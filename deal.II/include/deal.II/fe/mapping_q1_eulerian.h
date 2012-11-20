@@ -86,100 +86,100 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, class VECTOR = Vector<double>, int spacedim=dim >
 class MappingQ1Eulerian : public MappingQ1<dim,spacedim>
 {
-  public:
+public:
 
-                                     /**
-                                      * Constructor. It takes a
-                                      * <tt>Vector<double> &</tt> as its
-                                      * first argument to specify the
-                                      * transformation of the whole
-                                      * problem from the reference to
-                                      * the current configuration.
-                                      * The organization of the
-                                      * elements in the @p Vector
-                                      * must follow the concept how
-                                      * deal.II stores solutions that
-                                      * are associated to a
-                                      * triangulation.  This is
-                                      * automatically the case if the
-                                      * @p Vector represents the
-                                      * solution of the previous step
-                                      * of a nonlinear problem.
-                                      * Alternatively, the @p Vector
-                                      * can be initialized by
-                                      * <tt>DoFAccessor::set_dof_values()</tt>.
-                                      */
-    MappingQ1Eulerian (const VECTOR  &euler_transform_vectors,
-                       const DoFHandler<dim,spacedim> &shiftmap_dof_handler);
+  /**
+   * Constructor. It takes a
+   * <tt>Vector<double> &</tt> as its
+   * first argument to specify the
+   * transformation of the whole
+   * problem from the reference to
+   * the current configuration.
+   * The organization of the
+   * elements in the @p Vector
+   * must follow the concept how
+   * deal.II stores solutions that
+   * are associated to a
+   * triangulation.  This is
+   * automatically the case if the
+   * @p Vector represents the
+   * solution of the previous step
+   * of a nonlinear problem.
+   * Alternatively, the @p Vector
+   * can be initialized by
+   * <tt>DoFAccessor::set_dof_values()</tt>.
+   */
+  MappingQ1Eulerian (const VECTOR  &euler_transform_vectors,
+                     const DoFHandler<dim,spacedim> &shiftmap_dof_handler);
 
-                                     /**
-                                      * Return a pointer to a copy of the
-                                      * present object. The caller of this
-                                      * copy then assumes ownership of it.
-                                      */
-    virtual
-    Mapping<dim,spacedim> * clone () const;
+  /**
+   * Return a pointer to a copy of the
+   * present object. The caller of this
+   * copy then assumes ownership of it.
+   */
+  virtual
+  Mapping<dim,spacedim> *clone () const;
 
-                                     /**
-                                      * Always returns @p false because
-                                      * MappingQ1Eulerian does not in general
-                                      * preserve vertex locations (unless the
-                                      * translation vector happens to provide
-                                      * for zero displacements at vertex
-                                      * locations).
-                                      */
-    bool preserves_vertex_locations () const;
+  /**
+   * Always returns @p false because
+   * MappingQ1Eulerian does not in general
+   * preserve vertex locations (unless the
+   * translation vector happens to provide
+   * for zero displacements at vertex
+   * locations).
+   */
+  bool preserves_vertex_locations () const;
 
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException0 (ExcInactiveCell);
-
-
-
-  protected:
-                                     /**
-                                      * Implementation of the interface in
-                                      * MappingQ1. Overrides the function in
-                                      * the base class, since we cannot use
-                                      * any cell similarity for this class.
-                                      */
-    virtual void
-    fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-                    const Quadrature<dim>                                     &quadrature,
-                    typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
-                    typename std::vector<Point<spacedim> >                    &quadrature_points,
-                    std::vector<double>                                       &JxW_values,
-                    std::vector<DerivativeForm<1,dim,spacedim> >       &jacobians,
-                    std::vector<DerivativeForm<2,dim,spacedim>  >       &jacobian_grads,
-                    std::vector<DerivativeForm<1,spacedim,dim>  >       &inverse_jacobians,
-                    std::vector<Point<spacedim> >                             &cell_normal_vectors,
-                    CellSimilarity::Similarity                           &cell_similarity) const;
-
-                                     /**
-                                      * Reference to the vector of
-                                      * shifts.
-                                      */
-    SmartPointer<const VECTOR, MappingQ1Eulerian<dim,VECTOR,spacedim> > euler_transform_vectors;
-
-                                     /**
-                                      * Pointer to the DoFHandler to
-                                      * which the mapping vector is
-                                      * associated.
-                                      */
-    SmartPointer<const DoFHandler<dim,spacedim>,MappingQ1Eulerian<dim,VECTOR,spacedim> > shiftmap_dof_handler;
+  /**
+   * Exception.
+   */
+  DeclException0 (ExcInactiveCell);
 
 
-  private:
-                                     /**
-                                      * Computes the support points of
-                                      * the mapping. For
-                                      * @p MappingQ1Eulerian these
-                                      * are the vertices.
-                                      */
-    virtual void compute_mapping_support_points(
-        const typename Triangulation<dim,spacedim>::cell_iterator &cell,
-      std::vector<Point<spacedim> > &a) const;
+
+protected:
+  /**
+   * Implementation of the interface in
+   * MappingQ1. Overrides the function in
+   * the base class, since we cannot use
+   * any cell similarity for this class.
+   */
+  virtual void
+  fill_fe_values (const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+                  const Quadrature<dim>                                     &quadrature,
+                  typename Mapping<dim,spacedim>::InternalDataBase          &mapping_data,
+                  typename std::vector<Point<spacedim> >                    &quadrature_points,
+                  std::vector<double>                                       &JxW_values,
+                  std::vector<DerivativeForm<1,dim,spacedim> >       &jacobians,
+                  std::vector<DerivativeForm<2,dim,spacedim>  >       &jacobian_grads,
+                  std::vector<DerivativeForm<1,spacedim,dim>  >       &inverse_jacobians,
+                  std::vector<Point<spacedim> >                             &cell_normal_vectors,
+                  CellSimilarity::Similarity                           &cell_similarity) const;
+
+  /**
+   * Reference to the vector of
+   * shifts.
+   */
+  SmartPointer<const VECTOR, MappingQ1Eulerian<dim,VECTOR,spacedim> > euler_transform_vectors;
+
+  /**
+   * Pointer to the DoFHandler to
+   * which the mapping vector is
+   * associated.
+   */
+  SmartPointer<const DoFHandler<dim,spacedim>,MappingQ1Eulerian<dim,VECTOR,spacedim> > shiftmap_dof_handler;
+
+
+private:
+  /**
+   * Computes the support points of
+   * the mapping. For
+   * @p MappingQ1Eulerian these
+   * are the vertices.
+   */
+  virtual void compute_mapping_support_points(
+    const typename Triangulation<dim,spacedim>::cell_iterator &cell,
+    std::vector<Point<spacedim> > &a) const;
 
 };
 

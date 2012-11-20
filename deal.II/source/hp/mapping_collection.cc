@@ -31,7 +31,7 @@ namespace hp
   MappingCollection (const Mapping<dim,spacedim> &mapping)
   {
     mappings
-      .push_back (std_cxx1x::shared_ptr<const Mapping<dim,spacedim> >(mapping.clone()));
+    .push_back (std_cxx1x::shared_ptr<const Mapping<dim,spacedim> >(mapping.clone()));
   }
 
 
@@ -39,20 +39,20 @@ namespace hp
   template<int dim, int spacedim>
   MappingCollection<dim,spacedim>::
   MappingCollection (const MappingCollection<dim,spacedim> &mapping_collection)
-                  :
-                  Subscriptor (),
-                                                   // copy the array
-                                                   // of shared
-                                                   // pointers. nothing
-                                                   // bad should
-                                                   // happen -- they
-                                                   // simply all point
-                                                   // to the same
-                                                   // objects, and the
-                                                   // last one to die
-                                                   // will delete the
-                                                   // mappings
-                  mappings (mapping_collection.mappings)
+    :
+    Subscriptor (),
+    // copy the array
+    // of shared
+    // pointers. nothing
+    // bad should
+    // happen -- they
+    // simply all point
+    // to the same
+    // objects, and the
+    // last one to die
+    // will delete the
+    // mappings
+    mappings (mapping_collection.mappings)
   {}
 
 
@@ -72,7 +72,7 @@ namespace hp
   MappingCollection<dim,spacedim>::push_back (const Mapping<dim,spacedim> &new_mapping)
   {
     mappings
-      .push_back (std_cxx1x::shared_ptr<const Mapping<dim,spacedim> >(new_mapping.clone()));
+    .push_back (std_cxx1x::shared_ptr<const Mapping<dim,spacedim> >(new_mapping.clone()));
   }
 
 //---------------------------------------------------------------------------
@@ -87,7 +87,7 @@ namespace hp
   template<int dim, int spacedim>
   MappingCollection<dim,spacedim>
   StaticMappingQ1<dim,spacedim>::mapping_collection
-  = MappingCollection<dim,spacedim>(mapping_q1);
+    = MappingCollection<dim,spacedim>(mapping_q1);
 
 }
 

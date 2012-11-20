@@ -28,141 +28,141 @@ namespace MeshWorker
   namespace Assembler
   {
 
-/**
- * A class that, instead of assembling into a matrix or vector,
- * outputs the results on a cell to a gnuplot patch.
- *
- * This assembler expects that LocalResults contains quadrature values
- * set with LocalResults::quadrature_value(). When it is initialized
- * with the number of quadrature points in a single (!) space
- * direction and the number of data fields to be displayed, it
- * initializes LocalResults automatically. The number of data fields
- * in local results will be increased by dim in order to accommodate
- * for the coordinates of the data points.
- *
- * While data slots for the space coordinates are allocated
- * automatically, these coordinates are not entered. It is up to the
- * user to enter the coordinates in the first dim data entries at
- * every point. This adds the flexibility to output transformed
- * coordinates or even something completely different.
- *
- * @note In the current implementation, only cell data can be written.
- *
- * @author Guido Kanschat
- * @date 2011, 2012
- */
+    /**
+     * A class that, instead of assembling into a matrix or vector,
+     * outputs the results on a cell to a gnuplot patch.
+     *
+     * This assembler expects that LocalResults contains quadrature values
+     * set with LocalResults::quadrature_value(). When it is initialized
+     * with the number of quadrature points in a single (!) space
+     * direction and the number of data fields to be displayed, it
+     * initializes LocalResults automatically. The number of data fields
+     * in local results will be increased by dim in order to accommodate
+     * for the coordinates of the data points.
+     *
+     * While data slots for the space coordinates are allocated
+     * automatically, these coordinates are not entered. It is up to the
+     * user to enter the coordinates in the first dim data entries at
+     * every point. This adds the flexibility to output transformed
+     * coordinates or even something completely different.
+     *
+     * @note In the current implementation, only cell data can be written.
+     *
+     * @author Guido Kanschat
+     * @date 2011, 2012
+     */
     class GnuplotPatch
     {
-      public:
-                                         /**
-                                          * Constructor.
-                                          */
-        GnuplotPatch();
+    public:
+      /**
+       * Constructor.
+       */
+      GnuplotPatch();
 
-                                         /**
-                                          * Initialize for writing
-                                          * <i>n</i> data vectors. The
-                                          * number of points is the
-                                          * number of quadrature
-                                          * points in a single
-                                          * direction in a tensor
-                                          * product formula. It must
-                                          * match the number in the
-                                          * actual Quadrature used to
-                                          * create the patches. The
-                                          * total number of data
-                                          * vectors produced is <tt>n+dim</tt>
-                                          * and the first dim should be
-                                          * the space coordinates of
-                                          * the points. Nevertheless,
-                                          * it is up to the user to
-                                          * set these values to
-                                          * whatever is desired.
-                                          */
-        void initialize (const unsigned int n_points,
-                         const unsigned int n_vectors);
+      /**
+       * Initialize for writing
+       * <i>n</i> data vectors. The
+       * number of points is the
+       * number of quadrature
+       * points in a single
+       * direction in a tensor
+       * product formula. It must
+       * match the number in the
+       * actual Quadrature used to
+       * create the patches. The
+       * total number of data
+       * vectors produced is <tt>n+dim</tt>
+       * and the first dim should be
+       * the space coordinates of
+       * the points. Nevertheless,
+       * it is up to the user to
+       * set these values to
+       * whatever is desired.
+       */
+      void initialize (const unsigned int n_points,
+                       const unsigned int n_vectors);
 
-                                         /**
-                                          * Set the stream #os to
-                                          * which data is written. If
-                                          * no stream is selected with
-                                          * this function, data goes
-                                          * to @p deallog.
-                                          */
-        void initialize_stream (std::ostream& stream);
+      /**
+       * Set the stream #os to
+       * which data is written. If
+       * no stream is selected with
+       * this function, data goes
+       * to @p deallog.
+       */
+      void initialize_stream (std::ostream &stream);
 
-                                         /**
-                                          * Initialize the local data
-                                          * in the
-                                          * DoFInfo
-                                          * object used later for
-                                          * assembling.
-                                          *
-                                          * The info object refers to
-                                          * a cell if
-                                          * <code>!face</code>, or
-                                          * else to an interior or
-                                          * boundary face.
-                                          */
-        template <int dim>
-        void initialize_info(DoFInfo<dim>& info, bool face);
+      /**
+       * Initialize the local data
+       * in the
+       * DoFInfo
+       * object used later for
+       * assembling.
+       *
+       * The info object refers to
+       * a cell if
+       * <code>!face</code>, or
+       * else to an interior or
+       * boundary face.
+       */
+      template <int dim>
+      void initialize_info(DoFInfo<dim> &info, bool face);
 
-                                         /**
-                                          * Write the patch to the
-                                          * output stream.
-                                          */
-        template<int dim>
-        void assemble(const DoFInfo<dim>& info);
+      /**
+       * Write the patch to the
+       * output stream.
+       */
+      template<int dim>
+      void assemble(const DoFInfo<dim> &info);
 
-                                         /**
-                                          * @warning Not implemented yet
-                                          */
-        template<int dim>
-        void assemble(const DoFInfo<dim>& info1,
-                      const DoFInfo<dim>& info2);
+      /**
+       * @warning Not implemented yet
+       */
+      template<int dim>
+      void assemble(const DoFInfo<dim> &info1,
+                    const DoFInfo<dim> &info2);
 
-      private:
-                                         /**
-                                          * Write the object T either
-                                          * to the stream #os, if initialize_stream()
-                                          * has been called, or to
-                                          * @p deallog if no pointer has
-                                          * been set.
-                                          */
-        template<typename T>
-        void write(const T& t) const;
+    private:
+      /**
+       * Write the object T either
+       * to the stream #os, if initialize_stream()
+       * has been called, or to
+       * @p deallog if no pointer has
+       * been set.
+       */
+      template<typename T>
+      void write(const T &t) const;
 
-                                         /**
-                                          * Write an end-of-line marker either
-                                          * to the stream #os, if initialize_stream
-                                          * has been called, or to
-                                          * @p deallog if no pointer has
-                                          * been set.
-                                          */
-        void write_endl () const;
+      /**
+       * Write an end-of-line marker either
+       * to the stream #os, if initialize_stream
+       * has been called, or to
+       * @p deallog if no pointer has
+       * been set.
+       */
+      void write_endl () const;
 
-                                         /**
-                                          * The number of output
-                                          * components in each point.
-                                          */
-        unsigned int n_vectors;
-                                         /**
-                                          * The number of points in
-                                          * one direction.
-                                          */
-        unsigned int n_points;
+      /**
+       * The number of output
+       * components in each point.
+       */
+      unsigned int n_vectors;
+      /**
+       * The number of points in
+       * one direction.
+       */
+      unsigned int n_points;
 
-        /**
-         * Stream to which output is to be written. Set by initialize_stream().
-         */
-        std::ostream* os;
+      /**
+       * Stream to which output is to be written. Set by initialize_stream().
+       */
+      std::ostream *os;
     };
 
 //----------------------------------------------------------------------//
 
     template <typename T>
     inline void
-    GnuplotPatch::write(const T& d) const
+    GnuplotPatch::write(const T &d) const
     {
       if (os == 0)
         deallog << d;
@@ -183,8 +183,8 @@ namespace MeshWorker
 
     inline
     GnuplotPatch::GnuplotPatch()
-                    :
-                    os(0)
+      :
+      os(0)
     {}
 
 
@@ -198,7 +198,7 @@ namespace MeshWorker
 
 
     inline void
-    GnuplotPatch::initialize_stream (std::ostream& stream)
+    GnuplotPatch::initialize_stream (std::ostream &stream)
     {
       os = &stream;
     }
@@ -206,7 +206,7 @@ namespace MeshWorker
 
     template <int dim>
     inline void
-    GnuplotPatch::initialize_info(DoFInfo<dim>& info, bool face)
+    GnuplotPatch::initialize_info(DoFInfo<dim> &info, bool face)
     {
       if (face)
         info.initialize_quadrature(Utilities::fixed_power<dim-1>(n_points), n_vectors+dim);
@@ -217,16 +217,16 @@ namespace MeshWorker
 
     template <int dim>
     inline void
-    GnuplotPatch::assemble(const DoFInfo<dim>& info)
+    GnuplotPatch::assemble(const DoFInfo<dim> &info)
     {
       const unsigned int np = info.n_quadrature_points();
       const unsigned int nv = info.n_quadrature_values();
       const unsigned int patch_dim = (info.face_number == numbers::invalid_unsigned_int)
                                      ? dim : (dim-1);
       const unsigned int row_length = n_points;
-                                       // If patches are 1D, end the
-                                       // patch after a row, else end
-                                       // it after a square
+      // If patches are 1D, end the
+      // patch after a row, else end
+      // it after a square
       const unsigned int row_length2 = (patch_dim==1) ? row_length : (row_length*row_length);
 
 //      AssertDimension(np, Utilities::fixed_power<dim>(n_points));
@@ -240,11 +240,11 @@ namespace MeshWorker
           if (k % row_length2 == 0)
             write_endl();
 
-            for(unsigned int i=0; i<nv; ++i)
-              {
-                write(info.quadrature_value(k,i));
-                write('\t');
-              }
+          for (unsigned int i=0; i<nv; ++i)
+            {
+              write(info.quadrature_value(k,i));
+              write('\t');
+            }
           write_endl();
         }
     }
@@ -252,7 +252,7 @@ namespace MeshWorker
 
     template <int dim>
     inline void
-    GnuplotPatch::assemble(const DoFInfo<dim>& info1, const DoFInfo<dim>& info2)
+    GnuplotPatch::assemble(const DoFInfo<dim> &info1, const DoFInfo<dim> &info2)
     {
       assemble(info1);
       assemble(info2);

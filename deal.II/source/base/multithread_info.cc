@@ -50,16 +50,16 @@ unsigned int MultithreadInfo::get_n_cpus()
 // If it doesn't work please contact the mailinglist.
 unsigned int MultithreadInfo::get_n_cpus()
 {
-        int mib[2];
-        int n_cpus;
-        size_t len;
+  int mib[2];
+  int n_cpus;
+  size_t len;
 
-        mib[0] = CTL_HW;
-        mib[1] = HW_NCPU;
-        len = sizeof(n_cpus);
-        sysctl(mib, 2, &n_cpus, &len, NULL, 0);
+  mib[0] = CTL_HW;
+  mib[1] = HW_NCPU;
+  len = sizeof(n_cpus);
+  sysctl(mib, 2, &n_cpus, &len, NULL, 0);
 
-        return n_cpus;
+  return n_cpus;
 }
 
 #  else
@@ -104,9 +104,9 @@ unsigned int MultithreadInfo::get_n_cpus()
 
 
 MultithreadInfo::MultithreadInfo ()
-                :
-                n_cpus (get_n_cpus()),
-                n_default_threads (n_cpus)
+  :
+  n_cpus (get_n_cpus()),
+  n_default_threads (n_cpus)
 {}
 
 
@@ -114,8 +114,8 @@ MultithreadInfo::MultithreadInfo ()
 std::size_t
 MultithreadInfo::memory_consumption ()
 {
-                                   // only simple data elements, so
-                                   // use sizeof operator
+  // only simple data elements, so
+  // use sizeof operator
   return sizeof (MultithreadInfo);
 }
 

@@ -26,29 +26,29 @@ DEAL_II_NAMESPACE_OPEN
 
 SolverControl::NoConvergence::NoConvergence (const unsigned int last_step,
                                              const double       last_residual)
-                :
-                last_step (last_step),
-                last_residual (last_residual)
+  :
+  last_step (last_step),
+  last_residual (last_residual)
 {}
 
 
 const char *
 SolverControl::NoConvergence::what () const throw ()
 {
-                                   // have a place where to store the
-                                   // description of the exception as a char *
-                                   //
-                                   // this thing obviously is not multi-threading
-                                   // safe, but we don't care about that for now
-                                   //
-                                   // we need to make this object static, since
-                                   // we want to return the data stored in it
-                                   // and therefore need a lifetime which is
-                                   // longer than the execution time of this
-                                   // function
+  // have a place where to store the
+  // description of the exception as a char *
+  //
+  // this thing obviously is not multi-threading
+  // safe, but we don't care about that for now
+  //
+  // we need to make this object static, since
+  // we want to return the data stored in it
+  // and therefore need a lifetime which is
+  // longer than the execution time of this
+  // function
   static std::string description;
-                                   // convert the messages printed by the
-                                   // exceptions into a std::string
+  // convert the messages printed by the
+  // exceptions into a std::string
   std::ostringstream out;
   out << "Iterative method reported convergence failure in step "
       << last_step << " with residual " << last_residual;
@@ -63,18 +63,18 @@ SolverControl::SolverControl (const unsigned int maxiter,
                               const double tolerance,
                               const bool m_log_history,
                               const bool m_log_result)
-                :
-                maxsteps(maxiter),
-                tol(tolerance),
-                lvalue(1.e300),
-                lstep(0),
-                check_failure(false),
-                relative_failure_residual(0),
-                failure_residual(0),
-                m_log_history(m_log_history),
-                m_log_frequency(1),
-                m_log_result(m_log_result),
-                history_data_enabled(false)
+  :
+  maxsteps(maxiter),
+  tol(tolerance),
+  lvalue(1.e300),
+  lstep(0),
+  check_failure(false),
+  relative_failure_residual(0),
+  failure_residual(0),
+  m_log_history(m_log_history),
+  m_log_frequency(1),
+  m_log_result(m_log_result),
+  history_data_enabled(false)
 {}
 
 
@@ -88,9 +88,9 @@ SolverControl::State
 SolverControl::check (const unsigned int step,
                       const double check_value)
 {
-                                   // if this is the first time we
-                                   // come here, then store the
-                                   // residual for later comparisons
+  // if this is the first time we
+  // come here, then store the
+  // residual for later comparisons
   if (step==0)
     {
       initial_val = check_value;
@@ -130,13 +130,13 @@ SolverControl::check (const unsigned int step,
       isnan(check_value) ||
 #else
 #  ifdef HAVE_UNDERSCORE_ISNAN
-                                       // on Microsoft Windows, the
-                                       // function is called _isnan
+      // on Microsoft Windows, the
+      // function is called _isnan
       _isnan(check_value) ||
 #  endif
 #endif
       (check_failure && (check_value > failure_residual))
-  )
+     )
     {
       if (m_log_result)
         deallog << "Failure step " << step
@@ -233,7 +233,7 @@ SolverControl::final_reduction() const
 
 
 void
-SolverControl::declare_parameters (ParameterHandler& param)
+SolverControl::declare_parameters (ParameterHandler &param)
 {
   param.declare_entry ("Max steps", "100", Patterns::Integer());
   param.declare_entry ("Tolerance", "1.e-10", Patterns::Double());
@@ -243,7 +243,7 @@ SolverControl::declare_parameters (ParameterHandler& param)
 }
 
 
-void SolverControl::parse_parameters (ParameterHandler& param)
+void SolverControl::parse_parameters (ParameterHandler &param)
 {
   set_max_steps (param.get_integer("Max steps"));
   set_tolerance (param.get_double("Tolerance"));
@@ -260,22 +260,22 @@ ReductionControl::ReductionControl(const unsigned int n,
                                    const double red,
                                    const bool m_log_history,
                                    const bool m_log_result)
-                :
-                SolverControl (n, tol, m_log_history, m_log_result),
-                reduce(red)
+  :
+  SolverControl (n, tol, m_log_history, m_log_result),
+  reduce(red)
 {}
 
 
-ReductionControl::ReductionControl (const SolverControl& c)
-                :
-                SolverControl(c)
+ReductionControl::ReductionControl (const SolverControl &c)
+  :
+  SolverControl(c)
 {
   set_reduction(0.);
 }
 
 
-ReductionControl&
-ReductionControl::operator= (const SolverControl& c)
+ReductionControl &
+ReductionControl::operator= (const SolverControl &c)
 {
   SolverControl::operator=(c);
   set_reduction(0.);
@@ -291,19 +291,19 @@ SolverControl::State
 ReductionControl::check (const unsigned int step,
                          const double check_value)
 {
-                                   // if this is the first time we
-                                   // come here, then store the
-                                   // residual for later comparisons
+  // if this is the first time we
+  // come here, then store the
+  // residual for later comparisons
   if (step==0)
     {
       initial_val = check_value;
       reduced_tol = check_value * reduce;
     };
 
-                                   // check whether desired reduction
-                                   // has been achieved. also check
-                                   // for equality in case initial
-                                   // residual already was zero
+  // check whether desired reduction
+  // has been achieved. also check
+  // for equality in case initial
+  // residual already was zero
   if (check_value <= reduced_tol)
     {
       if (m_log_result)
@@ -322,7 +322,7 @@ ReductionControl::check (const unsigned int step,
 
 
 void
-ReductionControl::declare_parameters (ParameterHandler& param)
+ReductionControl::declare_parameters (ParameterHandler &param)
 {
   SolverControl::declare_parameters (param);
   param.declare_entry("Reduction", "1.e-2", Patterns::Double());
@@ -330,7 +330,7 @@ ReductionControl::declare_parameters (ParameterHandler& param)
 
 
 void
-ReductionControl::parse_parameters (ParameterHandler& param)
+ReductionControl::parse_parameters (ParameterHandler &param)
 {
   SolverControl::parse_parameters (param);
   set_reduction (param.get_double("Reduction"));

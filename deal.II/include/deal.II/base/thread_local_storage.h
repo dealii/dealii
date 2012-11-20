@@ -96,7 +96,7 @@ namespace Threads
      * need to declare the member variable <code>mutable</code> to
      * allow such access.
      */
-    T & get ();
+    T &get ();
 
     /**
      * Conversion operator that simply converts the thread-local object
@@ -104,7 +104,7 @@ namespace Threads
      * calling the get() member function; it's purpose is to make the
      * TLS object look more like the object it is storing.
      */
-    operator T & ();
+    operator T &();
 
     /**
      * Copy the given argument into the storage space used to represent
@@ -118,7 +118,7 @@ namespace Threads
      *
      * @return The current object, after the changes have been made
      **/
-    ThreadLocalStorage<T> & operator = (const T &t);
+    ThreadLocalStorage<T> &operator = (const T &t);
 
   private:
 #ifdef DEAL_II_USE_MT
@@ -145,16 +145,16 @@ namespace Threads
   template <typename T>
   inline
   ThreadLocalStorage<T>::ThreadLocalStorage(const T &t)
-  :
-  data (t)
+    :
+    data (t)
   {}
 
 
   template <typename T>
   inline
   ThreadLocalStorage<T>::ThreadLocalStorage(const ThreadLocalStorage<T> &t)
-  :
-  data (t)
+    :
+    data (t)
   {}
 
 
@@ -174,7 +174,7 @@ namespace Threads
 
   template <typename T>
   inline
-  ThreadLocalStorage<T>::operator T& ()
+  ThreadLocalStorage<T>::operator T &()
   {
     return get();
   }

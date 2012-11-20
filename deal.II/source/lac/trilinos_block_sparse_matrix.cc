@@ -30,8 +30,8 @@ namespace TrilinosWrappers
 
   BlockSparseMatrix::~BlockSparseMatrix ()
   {
-                                   // delete previous content of
-                                   // the subobjects array
+    // delete previous content of
+    // the subobjects array
     clear ();
   }
 
@@ -52,19 +52,19 @@ namespace TrilinosWrappers
   reinit (const unsigned int n_block_rows,
           const unsigned int n_block_columns)
   {
-                                     // first delete previous content of
-                                     // the subobjects array
+    // first delete previous content of
+    // the subobjects array
     clear ();
 
-                                     // then resize. set sizes of blocks to
-                                     // zero. user will later have to call
-                                     // collect_sizes for this
+    // then resize. set sizes of blocks to
+    // zero. user will later have to call
+    // collect_sizes for this
     this->sub_objects.reinit (n_block_rows,
                               n_block_columns);
     this->row_block_indices.reinit (n_block_rows, 0);
     this->column_block_indices.reinit (n_block_columns, 0);
 
-                                     // and reinitialize the blocks
+    // and reinitialize the blocks
     for (unsigned int r=0; r<this->n_block_rows(); ++r)
       for (unsigned int c=0; c<this->n_block_cols(); ++c)
         {
@@ -101,16 +101,16 @@ namespace TrilinosWrappers
                                   block_sparsity_pattern.n_block_cols()));
 
 
-                                     // Call the other basic reinit function, ...
+    // Call the other basic reinit function, ...
     reinit (block_sparsity_pattern.n_block_rows(),
             block_sparsity_pattern.n_block_cols());
 
-                                     // ... set the correct sizes, ...
+    // ... set the correct sizes, ...
     this->row_block_indices    = block_sparsity_pattern.get_row_indices();
     this->column_block_indices = block_sparsity_pattern.get_column_indices();
 
-                                     // ... and then assign the correct
-                                     // data to the blocks.
+    // ... and then assign the correct
+    // data to the blocks.
     for (unsigned int r=0; r<this->n_block_rows(); ++r)
       for (unsigned int c=0; c<this->n_block_cols(); ++c)
         {
@@ -132,7 +132,7 @@ namespace TrilinosWrappers
     std::vector<Epetra_Map> epetra_maps;
     for (unsigned int i=0; i<block_sparsity_pattern.n_block_rows(); ++i)
       epetra_maps.push_back
-        (parallel_partitioning[i].make_trilinos_map(communicator, false));
+      (parallel_partitioning[i].make_trilinos_map(communicator, false));
 
     reinit (epetra_maps, block_sparsity_pattern);
 
@@ -148,9 +148,9 @@ namespace TrilinosWrappers
     std::vector<Epetra_Map> parallel_partitioning;
     for (unsigned int i=0; i<block_sparsity_pattern.n_block_rows(); ++i)
       parallel_partitioning.push_back
-        (Epetra_Map(static_cast<int>(block_sparsity_pattern.block(i,0).n_rows()),
-                    0,
-                    Utilities::Trilinos::comm_self()));
+      (Epetra_Map(static_cast<int>(block_sparsity_pattern.block(i,0).n_rows()),
+                  0,
+                  Utilities::Trilinos::comm_self()));
 
     reinit (parallel_partitioning, block_sparsity_pattern);
   }
@@ -163,16 +163,16 @@ namespace TrilinosWrappers
   reinit (const BlockSparsityPattern    &block_sparsity_pattern)
   {
 
-                                     // Call the other basic reinit function, ...
+    // Call the other basic reinit function, ...
     reinit (block_sparsity_pattern.n_block_rows(),
             block_sparsity_pattern.n_block_cols());
 
-                                     // ... set the correct sizes, ...
+    // ... set the correct sizes, ...
     this->row_block_indices    = block_sparsity_pattern.get_row_indices();
     this->column_block_indices = block_sparsity_pattern.get_column_indices();
 
-                                     // ... and then assign the correct
-                                     // data to the blocks.
+    // ... and then assign the correct
+    // data to the blocks.
     for (unsigned int r=0; r<this->n_block_rows(); ++r)
       for (unsigned int c=0; c<this->n_block_cols(); ++c)
         {
@@ -197,11 +197,11 @@ namespace TrilinosWrappers
             ExcDimensionMismatch (n_block_rows,
                                   dealii_block_sparse_matrix.n_block_cols()));
 
-                                     // Call the other basic reinit function ...
+    // Call the other basic reinit function ...
     reinit (n_block_rows, n_block_rows);
 
-                                     // ... and then assign the correct
-                                     // data to the blocks.
+    // ... and then assign the correct
+    // data to the blocks.
     for (unsigned int r=0; r<this->n_block_rows(); ++r)
       for (unsigned int c=0; c<this->n_block_cols(); ++c)
         {
@@ -230,8 +230,8 @@ namespace TrilinosWrappers
             ExcDimensionMismatch (dealii_block_sparse_matrix.m(),
                                   dealii_block_sparse_matrix.n()));
 
-                                     // produce a dummy local map and pass it
-                                     // off to the other function
+    // produce a dummy local map and pass it
+    // off to the other function
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
     Epetra_MpiComm    trilinos_communicator (MPI_COMM_SELF);
 #else
@@ -241,8 +241,8 @@ namespace TrilinosWrappers
     std::vector<Epetra_Map> parallel_partitioning;
     for (unsigned int i=0; i<dealii_block_sparse_matrix.n_block_rows(); ++i)
       parallel_partitioning.push_back (Epetra_Map(static_cast<int>(dealii_block_sparse_matrix.block(i,0).m()),
-                                       0,
-                                       trilinos_communicator));
+                                                  0,
+                                                  trilinos_communicator));
 
     reinit (parallel_partitioning, dealii_block_sparse_matrix, drop_tolerance);
   }
@@ -287,10 +287,10 @@ namespace TrilinosWrappers
 
 
 
-                                        // TODO: In the following we
-                                        // use the same code as just
-                                        // above six more times. Use
-                                        // templates.
+  // TODO: In the following we
+  // use the same code as just
+  // above six more times. Use
+  // templates.
   TrilinosScalar
   BlockSparseMatrix::residual (BlockVector       &dst,
                                const BlockVector &x,
@@ -391,7 +391,7 @@ namespace TrilinosWrappers
 
   template void
   BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
-                             const dealii::BlockSparsityPattern    &);
+                             const dealii::BlockSparsityPattern &);
   template void
   BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
                              const dealii::BlockCompressedSparsityPattern &);

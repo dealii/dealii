@@ -68,99 +68,99 @@ DEAL_II_NAMESPACE_OPEN
  */
 class IdentityMatrix
 {
-  public:
-                                     /**
-                                      * Default constructor. Creates a
-                                      * zero-sized matrix that should
-                                      * be resized later on using the
-                                      * reinit() function.
-                                      */
-    IdentityMatrix ();
+public:
+  /**
+   * Default constructor. Creates a
+   * zero-sized matrix that should
+   * be resized later on using the
+   * reinit() function.
+   */
+  IdentityMatrix ();
 
-                                     /**
-                                      * Constructor. Creates a
-                                      * identity matrix of size #n.
-                                      */
-    IdentityMatrix (const unsigned int n);
+  /**
+   * Constructor. Creates a
+   * identity matrix of size #n.
+   */
+  IdentityMatrix (const unsigned int n);
 
-                                     /**
-                                      * Resize the matrix to be of
-                                      * size #n by #n.
-                                      */
-    void reinit (const unsigned int n);
+  /**
+   * Resize the matrix to be of
+   * size #n by #n.
+   */
+  void reinit (const unsigned int n);
 
-                                     /**
-                                      * Number of rows of this
-                                      * matrix. For the present
-                                      * matrix, the number of rows and
-                                      * columns are equal, of course.
-                                      */
-    unsigned int m () const;
+  /**
+   * Number of rows of this
+   * matrix. For the present
+   * matrix, the number of rows and
+   * columns are equal, of course.
+   */
+  unsigned int m () const;
 
-                                     /**
-                                      * Number of columns of this
-                                      * matrix. For the present
-                                      * matrix, the number of rows and
-                                      * columns are equal, of course.
-                                      */
-    unsigned int n () const;
+  /**
+   * Number of columns of this
+   * matrix. For the present
+   * matrix, the number of rows and
+   * columns are equal, of course.
+   */
+  unsigned int n () const;
 
-                                     /**
-                                      * Matrix-vector
-                                      * multiplication. For the
-                                      * present case, this of course
-                                      * amounts to simply copying the
-                                      * input vector to the output
-                                      * vector.
-                                      */
-    template <class VECTOR1, class VECTOR2>
-    void vmult (VECTOR1       &out,
-                const VECTOR2 &in) const;
+  /**
+   * Matrix-vector
+   * multiplication. For the
+   * present case, this of course
+   * amounts to simply copying the
+   * input vector to the output
+   * vector.
+   */
+  template <class VECTOR1, class VECTOR2>
+  void vmult (VECTOR1       &out,
+              const VECTOR2 &in) const;
 
-                                     /**
-                                      * Matrix-vector multiplication
-                                      * with addition to the output
-                                      * vector. For the present case,
-                                      * this of course amounts to
-                                      * simply adding the input
-                                      * vector to the output vector.
-                                      */
-    template <class VECTOR1, class VECTOR2>
-    void vmult_add (VECTOR1       &out,
-                    const VECTOR2 &in) const;
+  /**
+   * Matrix-vector multiplication
+   * with addition to the output
+   * vector. For the present case,
+   * this of course amounts to
+   * simply adding the input
+   * vector to the output vector.
+   */
+  template <class VECTOR1, class VECTOR2>
+  void vmult_add (VECTOR1       &out,
+                  const VECTOR2 &in) const;
 
-                                     /**
-                                      * Matrix-vector multiplication
-                                      * with the transpose matrix. For
-                                      * the present case, this of
-                                      * course amounts to simply
-                                      * copying the input vector to
-                                      * the output vector.
-                                      */
-    template <class VECTOR1, class VECTOR2>
-    void Tvmult (VECTOR1       &out,
-                 const VECTOR2 &in) const;
+  /**
+   * Matrix-vector multiplication
+   * with the transpose matrix. For
+   * the present case, this of
+   * course amounts to simply
+   * copying the input vector to
+   * the output vector.
+   */
+  template <class VECTOR1, class VECTOR2>
+  void Tvmult (VECTOR1       &out,
+               const VECTOR2 &in) const;
 
 
-                                     /**
-                                      * Matrix-vector multiplication
-                                      * with the transpose matrix,
-                                      * with addition to the output
-                                      * vector. For the present case,
-                                      * this of course amounts to
-                                      * simply adding the input vector
-                                      * to the output vector.
-                                      */
-    template <class VECTOR1, class VECTOR2>
-    void Tvmult_add (VECTOR1       &out,
-                     const VECTOR2 &in) const;
-  private:
+  /**
+   * Matrix-vector multiplication
+   * with the transpose matrix,
+   * with addition to the output
+   * vector. For the present case,
+   * this of course amounts to
+   * simply adding the input vector
+   * to the output vector.
+   */
+  template <class VECTOR1, class VECTOR2>
+  void Tvmult_add (VECTOR1       &out,
+                   const VECTOR2 &in) const;
+private:
 
-                                     /**
-                                      * Number of rows and columns of
-                                      * this matrix.
-                                      */
-    unsigned int size;
+  /**
+   * Number of rows and columns of
+   * this matrix.
+   */
+  unsigned int size;
 };
 
 
@@ -172,16 +172,16 @@ class IdentityMatrix
 
 inline
 IdentityMatrix::IdentityMatrix ()
-                :
-                size (0)
+  :
+  size (0)
 {}
 
 
 
 inline
 IdentityMatrix::IdentityMatrix (const unsigned int n)
-                :
-                size (n)
+  :
+  size (n)
 {}
 
 

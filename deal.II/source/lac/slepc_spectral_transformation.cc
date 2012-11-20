@@ -56,8 +56,8 @@ namespace SLEPcWrappers
 
   TransformationShift::AdditionalData::
   AdditionalData (const double shift_parameter)
-                  :
-                  shift_parameter (shift_parameter)
+    :
+    shift_parameter (shift_parameter)
   {}
 
   TransformationShift::TransformationShift (const AdditionalData &data)
@@ -80,8 +80,8 @@ namespace SLEPcWrappers
 
   TransformationShiftInvert::AdditionalData::
   AdditionalData (const double shift_parameter)
-                  :
-                  shift_parameter (shift_parameter)
+    :
+    shift_parameter (shift_parameter)
   {}
 
   TransformationShiftInvert::TransformationShiftInvert (const AdditionalData &data)
@@ -108,8 +108,8 @@ namespace SLEPcWrappers
 
   TransformationSpectrumFolding::AdditionalData::
   AdditionalData (const double shift_parameter)
-                  :
-                  shift_parameter (shift_parameter)
+    :
+    shift_parameter (shift_parameter)
   {}
 
   TransformationSpectrumFolding::TransformationSpectrumFolding (const AdditionalData &data)
@@ -134,9 +134,9 @@ namespace SLEPcWrappers
   TransformationCayley::AdditionalData::
   AdditionalData (const double shift_parameter,
                   const double antishift_parameter)
-                  :
-                  shift_parameter (shift_parameter),
-                  antishift_parameter (antishift_parameter)
+    :
+    shift_parameter (shift_parameter),
+    antishift_parameter (antishift_parameter)
   {
   }
 
@@ -166,6 +166,9 @@ DEAL_II_NAMESPACE_CLOSE
 #else
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty
 // files, so provide some dummy code
-namespace { void dummy () {} }
+namespace
+{
+  void dummy () {}
+}
 #endif // DEAL_II_USE_SLEPC
 

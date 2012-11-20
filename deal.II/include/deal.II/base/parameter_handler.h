@@ -54,611 +54,611 @@ class LogStream;
 namespace Patterns
 {
 
-                                   /**
-                                    * Base class to declare common
-                                    * interface. The purpose of this
-                                    * class is mostly to define the
-                                    * interface of patterns, and to
-                                    * force derived classes to have a
-                                    * <tt>clone</tt> function. It is thus,
-                                    * in the languages of the "Design
-                                    * Patterns" book (Gamma et al.), a
-                                    * "prototype".
-                                    */
+  /**
+   * Base class to declare common
+   * interface. The purpose of this
+   * class is mostly to define the
+   * interface of patterns, and to
+   * force derived classes to have a
+   * <tt>clone</tt> function. It is thus,
+   * in the languages of the "Design
+   * Patterns" book (Gamma et al.), a
+   * "prototype".
+   */
   class PatternBase
   {
-    public:
-                                       /**
-                                        * Make destructor of this and all
-                                        * derived classes virtual.
-                                        */
-      virtual ~PatternBase ();
+  public:
+    /**
+     * Make destructor of this and all
+     * derived classes virtual.
+     */
+    virtual ~PatternBase ();
 
-                                       /**
-                                        * Return <tt>true</tt> if the given string
-                                        * matches the pattern.
-                                        */
-      virtual bool match (const std::string &test_string) const = 0;
+    /**
+     * Return <tt>true</tt> if the given string
+     * matches the pattern.
+     */
+    virtual bool match (const std::string &test_string) const = 0;
 
-                                       /**
-                                        * Return a string describing the
-                                        * pattern.
-                                        */
-      virtual std::string description () const = 0;
+    /**
+     * Return a string describing the
+     * pattern.
+     */
+    virtual std::string description () const = 0;
 
-                                       /**
-                                        * Return a pointer to an
-                                        * exact copy of the
-                                        * object. This is necessary
-                                        * since we want to store
-                                        * objects of this type in
-                                        * containers, were we need
-                                        * to copy objects without
-                                        * knowledge of their actual
-                                        * data type (we only have
-                                        * pointers to the base
-                                        * class).
-                                        *
-                                        * Ownership of the objects
-                                        * returned by this function
-                                        * is passed to the caller of
-                                        * this function.
-                                        */
-      virtual PatternBase * clone () const = 0;
+    /**
+     * Return a pointer to an
+     * exact copy of the
+     * object. This is necessary
+     * since we want to store
+     * objects of this type in
+     * containers, were we need
+     * to copy objects without
+     * knowledge of their actual
+     * data type (we only have
+     * pointers to the base
+     * class).
+     *
+     * Ownership of the objects
+     * returned by this function
+     * is passed to the caller of
+     * this function.
+     */
+    virtual PatternBase *clone () const = 0;
 
-                                       /**
-                                        * Determine an estimate for
-                                        * the memory consumption (in
-                                        * bytes) of this object. To
-                                        * avoid unnecessary
-                                        * overhead, we do not force
-                                        * derived classes to provide
-                                        * this function as a virtual
-                                        * overloaded one, but rather
-                                        * try to cast the present
-                                        * object to one of the known
-                                        * derived classes and if
-                                        * that fails then take the
-                                        * size of this base class
-                                        * instead and add 32 byte
-                                        * (this value is arbitrary,
-                                        * it should account for
-                                        * virtual function tables,
-                                        * and some possible data
-                                        * elements). Since there are
-                                        * usually not many thousands
-                                        * of objects of this type
-                                        * around, and since the
-                                        * memory_consumption
-                                        * mechanism is used to find
-                                        * out where memory in the
-                                        * range of many megabytes
-                                        * is, this seems like a
-                                        * reasonable approximation.
-                                        *
-                                        * On the other hand, if you
-                                        * know that your class
-                                        * deviates from this
-                                        * assumption significantly,
-                                        * you can still overload
-                                        * this function.
-                                        */
-      virtual std::size_t memory_consumption () const;
+    /**
+     * Determine an estimate for
+     * the memory consumption (in
+     * bytes) of this object. To
+     * avoid unnecessary
+     * overhead, we do not force
+     * derived classes to provide
+     * this function as a virtual
+     * overloaded one, but rather
+     * try to cast the present
+     * object to one of the known
+     * derived classes and if
+     * that fails then take the
+     * size of this base class
+     * instead and add 32 byte
+     * (this value is arbitrary,
+     * it should account for
+     * virtual function tables,
+     * and some possible data
+     * elements). Since there are
+     * usually not many thousands
+     * of objects of this type
+     * around, and since the
+     * memory_consumption
+     * mechanism is used to find
+     * out where memory in the
+     * range of many megabytes
+     * is, this seems like a
+     * reasonable approximation.
+     *
+     * On the other hand, if you
+     * know that your class
+     * deviates from this
+     * assumption significantly,
+     * you can still overload
+     * this function.
+     */
+    virtual std::size_t memory_consumption () const;
   };
 
-                       /**
-                    * Returns pointer to the correct
-                    * derived class based on description.
-                    */
-  PatternBase * pattern_factory (const std::string& description);
+  /**
+  * Returns pointer to the correct
+  * derived class based on description.
+  */
+  PatternBase *pattern_factory (const std::string &description);
 
-                                   /**
-                                    * Test for the string being an
-                                    * integer. If bounds are given
-                                    * to the constructor, then the
-                                    * integer given also needs to be
-                                    * within the interval specified
-                                    * by these bounds. Note that
-                                    * unlike common convention in
-                                    * the C++ standard library, both
-                                    * bounds of this interval are
-                                    * inclusive; the reason is that
-                                    * in practice in most cases, one
-                                    * needs closed intervals, but
-                                    * these can only be realized
-                                    * with inclusive bounds for
-                                    * non-integer values. We thus
-                                    * stay consistent by always
-                                    * using closed intervals.
-                                    *
-                                    * If the upper bound given to
-                                    * the constructor is smaller
-                                    * than the lower bound, then the
-                                    * infinite interval is implied,
-                                    * i.e. every integer is allowed.
-                                    *
-                                    * Giving bounds may be useful if
-                                    * for example a value can only
-                                    * be positive and less than a
-                                    * reasonable upper bound (for
-                                    * example the number of
-                                    * refinement steps to be
-                                    * performed), or in many other
-                                    * cases.
-                                    */
+  /**
+   * Test for the string being an
+   * integer. If bounds are given
+   * to the constructor, then the
+   * integer given also needs to be
+   * within the interval specified
+   * by these bounds. Note that
+   * unlike common convention in
+   * the C++ standard library, both
+   * bounds of this interval are
+   * inclusive; the reason is that
+   * in practice in most cases, one
+   * needs closed intervals, but
+   * these can only be realized
+   * with inclusive bounds for
+   * non-integer values. We thus
+   * stay consistent by always
+   * using closed intervals.
+   *
+   * If the upper bound given to
+   * the constructor is smaller
+   * than the lower bound, then the
+   * infinite interval is implied,
+   * i.e. every integer is allowed.
+   *
+   * Giving bounds may be useful if
+   * for example a value can only
+   * be positive and less than a
+   * reasonable upper bound (for
+   * example the number of
+   * refinement steps to be
+   * performed), or in many other
+   * cases.
+   */
   class Integer : public PatternBase
   {
-    public:
-                                       /**
-                                        * Minimal integer value. If
-                                        * the numeric_limits class
-                                        * is available use this
-                                        * information to obtain the
-                                        * extremal values, otherwise
-                                        * set it so that this class
-                                        * understands that all values
-                                        * are allowed.
-                                        */
-      static const int min_int_value;
+  public:
+    /**
+     * Minimal integer value. If
+     * the numeric_limits class
+     * is available use this
+     * information to obtain the
+     * extremal values, otherwise
+     * set it so that this class
+     * understands that all values
+     * are allowed.
+     */
+    static const int min_int_value;
 
-                                       /**
-                                        * Maximal integer value. If
-                                        * the numeric_limits class
-                                        * is available use this
-                                        * information to obtain the
-                                        * extremal values, otherwise
-                                        * set it so that this class
-                                        * understands that all values
-                                        * are allowed.
-                                        */
-      static const int max_int_value;
+    /**
+     * Maximal integer value. If
+     * the numeric_limits class
+     * is available use this
+     * information to obtain the
+     * extremal values, otherwise
+     * set it so that this class
+     * understands that all values
+     * are allowed.
+     */
+    static const int max_int_value;
 
-                                       /**
-                                        * Constructor. Bounds can be
-                                        * specified within which a
-                                        * valid parameter has to
-                                        * be. If the upper bound is
-                                        * smaller than the lower
-                                        * bound, then the infinite
-                                        * interval is meant. The
-                                        * default values are chosen
-                                        * such that no bounds are
-                                        * enforced on parameters.
-                                        */
-      Integer (const int lower_bound = min_int_value,
-               const int upper_bound = max_int_value);
+    /**
+     * Constructor. Bounds can be
+     * specified within which a
+     * valid parameter has to
+     * be. If the upper bound is
+     * smaller than the lower
+     * bound, then the infinite
+     * interval is meant. The
+     * default values are chosen
+     * such that no bounds are
+     * enforced on parameters.
+     */
+    Integer (const int lower_bound = min_int_value,
+             const int upper_bound = max_int_value);
 
-                                       /**
-                                        * Return <tt>true</tt> if the
-                                        * string is an integer and
-                                        * its value is within the
-                                        * specified range.
-                                        */
-      virtual bool match (const std::string &test_string) const;
+    /**
+     * Return <tt>true</tt> if the
+     * string is an integer and
+     * its value is within the
+     * specified range.
+     */
+    virtual bool match (const std::string &test_string) const;
 
-                                       /**
-                                        * Return a description of
-                                        * the pattern that valid
-                                        * strings are expected to
-                                        * match. If bounds were
-                                        * specified to the
-                                        * constructor, then include
-                                        * them into this
-                                        * description.
-                                        */
-      virtual std::string description () const;
+    /**
+     * Return a description of
+     * the pattern that valid
+     * strings are expected to
+     * match. If bounds were
+     * specified to the
+     * constructor, then include
+     * them into this
+     * description.
+     */
+    virtual std::string description () const;
 
-                                       /**
-                                        * Return a copy of the
-                                        * present object, which is
-                                        * newly allocated on the
-                                        * heap. Ownership of that
-                                        * object is transferred to
-                                        * the caller of this
-                                        * function.
-                                        */
-      virtual PatternBase * clone () const;
+    /**
+     * Return a copy of the
+     * present object, which is
+     * newly allocated on the
+     * heap. Ownership of that
+     * object is transferred to
+     * the caller of this
+     * function.
+     */
+    virtual PatternBase *clone () const;
 
-                                       /**
-                                        * Creates new object if the start of
-                                        * description matches
-                                        * description_init.  Ownership of that
-                                        * object is transferred to the caller
-                                        * of this function.
-                                        */
-      static Integer* create (const std::string& description);
+    /**
+     * Creates new object if the start of
+     * description matches
+     * description_init.  Ownership of that
+     * object is transferred to the caller
+     * of this function.
+     */
+    static Integer *create (const std::string &description);
 
-    private:
-                                       /**
-                                        * Value of the lower
-                                        * bound. A number that
-                                        * satisfies the @ref match
-                                        * operation of this class
-                                        * must be equal to this
-                                        * value or larger, if the
-                                        * bounds of the interval for
-                                        * a valid range.
-                                        */
-      const int lower_bound;
+  private:
+    /**
+     * Value of the lower
+     * bound. A number that
+     * satisfies the @ref match
+     * operation of this class
+     * must be equal to this
+     * value or larger, if the
+     * bounds of the interval for
+     * a valid range.
+     */
+    const int lower_bound;
 
-                                       /**
-                                        * Value of the upper
-                                        * bound. A number that
-                                        * satisfies the @ref match
-                                        * operation of this class
-                                        * must be equal to this
-                                        * value or less, if the
-                                        * bounds of the interval for
-                                        * a valid range.
-                                        */
-      const int upper_bound;
+    /**
+     * Value of the upper
+     * bound. A number that
+     * satisfies the @ref match
+     * operation of this class
+     * must be equal to this
+     * value or less, if the
+     * bounds of the interval for
+     * a valid range.
+     */
+    const int upper_bound;
 
-                                       /**
-                                        * Initial part of description
-                                        */
-      static const char* description_init;
+    /**
+     * Initial part of description
+     */
+    static const char *description_init;
   };
 
-                                   /**
-                                    * Test for the string being a
-                                    * <tt>double</tt>. If bounds are
-                                    * given to the constructor, then
-                                    * the integer given also needs
-                                    * to be within the interval
-                                    * specified by these
-                                    * bounds. Note that unlike
-                                    * common convention in the C++
-                                    * standard library, both bounds
-                                    * of this interval are
-                                    * inclusive; the reason is that
-                                    * in practice in most cases, one
-                                    * needs closed intervals, but
-                                    * these can only be realized
-                                    * with inclusive bounds for
-                                    * non-integer values. We thus
-                                    * stay consistent by always
-                                    * using closed intervals.
-                                    *
-                                    * If the upper bound given to
-                                    * the constructor is smaller
-                                    * than the lower bound, then the
-                                    * infinite interval is implied,
-                                    * i.e. every integer is allowed.
-                                    *
-                                    * Giving bounds may be useful if
-                                    * for example a value can only
-                                    * be positive and less than a
-                                    * reasonable upper bound (for
-                                    * example damping parameters are
-                                    * frequently only reasonable if
-                                    * between zero and one), or in
-                                    * many other cases.
-                                    */
+  /**
+   * Test for the string being a
+   * <tt>double</tt>. If bounds are
+   * given to the constructor, then
+   * the integer given also needs
+   * to be within the interval
+   * specified by these
+   * bounds. Note that unlike
+   * common convention in the C++
+   * standard library, both bounds
+   * of this interval are
+   * inclusive; the reason is that
+   * in practice in most cases, one
+   * needs closed intervals, but
+   * these can only be realized
+   * with inclusive bounds for
+   * non-integer values. We thus
+   * stay consistent by always
+   * using closed intervals.
+   *
+   * If the upper bound given to
+   * the constructor is smaller
+   * than the lower bound, then the
+   * infinite interval is implied,
+   * i.e. every integer is allowed.
+   *
+   * Giving bounds may be useful if
+   * for example a value can only
+   * be positive and less than a
+   * reasonable upper bound (for
+   * example damping parameters are
+   * frequently only reasonable if
+   * between zero and one), or in
+   * many other cases.
+   */
   class Double : public PatternBase
   {
-    public:
-                                       /**
-                                        * Minimal double value. If the
-                                        * <tt>std::numeric_limits</tt>
-                                        * class is available use this
-                                        * information to obtain the
-                                        * extremal values, otherwise
-                                        * set it so that this class
-                                        * understands that all values
-                                        * are allowed.
-                                        */
-      static const double min_double_value;
+  public:
+    /**
+     * Minimal double value. If the
+     * <tt>std::numeric_limits</tt>
+     * class is available use this
+     * information to obtain the
+     * extremal values, otherwise
+     * set it so that this class
+     * understands that all values
+     * are allowed.
+     */
+    static const double min_double_value;
 
-                                       /**
-                                        * Maximal double value. If the
-                                        * numeric_limits class is
-                                        * available use this
-                                        * information to obtain the
-                                        * extremal values, otherwise
-                                        * set it so that this class
-                                        * understands that all values
-                                        * are allowed.
-                                        */
-      static const double max_double_value;
+    /**
+     * Maximal double value. If the
+     * numeric_limits class is
+     * available use this
+     * information to obtain the
+     * extremal values, otherwise
+     * set it so that this class
+     * understands that all values
+     * are allowed.
+     */
+    static const double max_double_value;
 
-                                       /**
-                                        * Constructor. Bounds can be
-                                        * specified within which a
-                                        * valid parameter has to
-                                        * be. If the upper bound is
-                                        * smaller than the lower
-                                        * bound, then the infinite
-                                        * interval is meant. The
-                                        * default values are chosen
-                                        * such that no bounds are
-                                        * enforced on parameters.
-                                        */
-      Double (const double lower_bound = min_double_value,
-              const double upper_bound = max_double_value);
+    /**
+     * Constructor. Bounds can be
+     * specified within which a
+     * valid parameter has to
+     * be. If the upper bound is
+     * smaller than the lower
+     * bound, then the infinite
+     * interval is meant. The
+     * default values are chosen
+     * such that no bounds are
+     * enforced on parameters.
+     */
+    Double (const double lower_bound = min_double_value,
+            const double upper_bound = max_double_value);
 
-                                       /**
-                                        * Return <tt>true</tt> if the
-                                        * string is a number and its
-                                        * value is within the
-                                        * specified range.
-                                        */
-      virtual bool match (const std::string &test_string) const;
+    /**
+     * Return <tt>true</tt> if the
+     * string is a number and its
+     * value is within the
+     * specified range.
+     */
+    virtual bool match (const std::string &test_string) const;
 
-                                       /**
-                                        * Return a description of
-                                        * the pattern that valid
-                                        * strings are expected to
-                                        * match. If bounds were
-                                        * specified to the
-                                        * constructor, then include
-                                        * them into this
-                                        * description.
-                                        */
-      virtual std::string description () const;
+    /**
+     * Return a description of
+     * the pattern that valid
+     * strings are expected to
+     * match. If bounds were
+     * specified to the
+     * constructor, then include
+     * them into this
+     * description.
+     */
+    virtual std::string description () const;
 
-                                       /**
-                                        * Return a copy of the
-                                        * present object, which is
-                                        * newly allocated on the
-                                        * heap. Ownership of that
-                                        * object is transferred to
-                                        * the caller of this
-                                        * function.
-                                        */
-      virtual PatternBase * clone () const;
+    /**
+     * Return a copy of the
+     * present object, which is
+     * newly allocated on the
+     * heap. Ownership of that
+     * object is transferred to
+     * the caller of this
+     * function.
+     */
+    virtual PatternBase *clone () const;
 
-                                       /**
-                                        * Creates new object if the start of
-                                        * description matches
-                                        * description_init.  Ownership of that
-                                        * object is transferred to the caller
-                                        * of this function.
-                                        */
-      static Double* create (const std::string& description);
+    /**
+     * Creates new object if the start of
+     * description matches
+     * description_init.  Ownership of that
+     * object is transferred to the caller
+     * of this function.
+     */
+    static Double *create (const std::string &description);
 
-    private:
-                                       /**
-                                        * Value of the lower
-                                        * bound. A number that
-                                        * satisfies the @ref match
-                                        * operation of this class
-                                        * must be equal to this
-                                        * value or larger, if the
-                                        * bounds of the interval for
-                                        * a valid range.
-                                        */
-      const double lower_bound;
+  private:
+    /**
+     * Value of the lower
+     * bound. A number that
+     * satisfies the @ref match
+     * operation of this class
+     * must be equal to this
+     * value or larger, if the
+     * bounds of the interval for
+     * a valid range.
+     */
+    const double lower_bound;
 
-                                       /**
-                                        * Value of the upper
-                                        * bound. A number that
-                                        * satisfies the @ref match
-                                        * operation of this class
-                                        * must be equal to this
-                                        * value or less, if the
-                                        * bounds of the interval for
-                                        * a valid range.
-                                        */
-      const double upper_bound;
+    /**
+     * Value of the upper
+     * bound. A number that
+     * satisfies the @ref match
+     * operation of this class
+     * must be equal to this
+     * value or less, if the
+     * bounds of the interval for
+     * a valid range.
+     */
+    const double upper_bound;
 
-                                       /**
-                                        * Initial part of description
-                                        */
-      static const char* description_init;
+    /**
+     * Initial part of description
+     */
+    static const char *description_init;
   };
 
-                                   /**
-                                    * Test for the string being one
-                                    * of a sequence of values given
-                                    * like a regular expression. For
-                                    * example, if the string given
-                                    * to the constructor is
-                                    * <tt>"red|blue|black"</tt>, then the
-                                    * @ref match function returns
-                                    * <tt>true</tt> exactly if the string
-                                    * is either "red" or "blue" or
-                                    * "black". Spaces around the
-                                    * pipe signs do not matter and
-                                    * are eliminated.
-                                    */
+  /**
+   * Test for the string being one
+   * of a sequence of values given
+   * like a regular expression. For
+   * example, if the string given
+   * to the constructor is
+   * <tt>"red|blue|black"</tt>, then the
+   * @ref match function returns
+   * <tt>true</tt> exactly if the string
+   * is either "red" or "blue" or
+   * "black". Spaces around the
+   * pipe signs do not matter and
+   * are eliminated.
+   */
   class Selection : public PatternBase
   {
-    public:
-                                       /**
-                                        * Constructor. Take the
-                                        * given parameter as the
-                                        * specification of valid
-                                        * strings.
-                                        */
-      Selection (const std::string &seq);
+  public:
+    /**
+     * Constructor. Take the
+     * given parameter as the
+     * specification of valid
+     * strings.
+     */
+    Selection (const std::string &seq);
 
-                                       /**
-                                        * Return <tt>true</tt> if the
-                                        * string is an element of
-                                        * the description list
-                                        * passed to the constructor.
-                                        */
-      virtual bool match (const std::string &test_string) const;
+    /**
+     * Return <tt>true</tt> if the
+     * string is an element of
+     * the description list
+     * passed to the constructor.
+     */
+    virtual bool match (const std::string &test_string) const;
 
-                                       /**
-                                        * Return a description of
-                                        * the pattern that valid
-                                        * strings are expected to
-                                        * match. Here, this is the
-                                        * list of valid strings
-                                        * passed to the constructor.
-                                        */
-      virtual std::string description () const;
+    /**
+     * Return a description of
+     * the pattern that valid
+     * strings are expected to
+     * match. Here, this is the
+     * list of valid strings
+     * passed to the constructor.
+     */
+    virtual std::string description () const;
 
-                                       /**
-                                        * Return a copy of the
-                                        * present object, which is
-                                        * newly allocated on the
-                                        * heap. Ownership of that
-                                        * object is transferred to
-                                        * the caller of this
-                                        * function.
-                                        */
-      virtual PatternBase * clone () const;
+    /**
+     * Return a copy of the
+     * present object, which is
+     * newly allocated on the
+     * heap. Ownership of that
+     * object is transferred to
+     * the caller of this
+     * function.
+     */
+    virtual PatternBase *clone () const;
 
-                                       /**
-                                        * Determine an estimate for
-                                        * the memory consumption (in
-                                        * bytes) of this object.
-                                        */
-      std::size_t memory_consumption () const;
+    /**
+     * Determine an estimate for
+     * the memory consumption (in
+     * bytes) of this object.
+     */
+    std::size_t memory_consumption () const;
 
-                                       /**
-                                        * Creates new object if the start of
-                                        * description matches
-                                        * description_init.  Ownership of that
-                                        * object is transferred to the caller
-                                        * of this function.
-                                        */
-      static Selection* create (const std::string& description);
+    /**
+     * Creates new object if the start of
+     * description matches
+     * description_init.  Ownership of that
+     * object is transferred to the caller
+     * of this function.
+     */
+    static Selection *create (const std::string &description);
 
-    private:
-                                       /**
-                                        * List of valid strings as
-                                        * passed to the
-                                        * constructor. We don't make
-                                        * this string constant, as
-                                        * we process it somewhat in
-                                        * the constructor.
-                                        */
-      std::string sequence;
+  private:
+    /**
+     * List of valid strings as
+     * passed to the
+     * constructor. We don't make
+     * this string constant, as
+     * we process it somewhat in
+     * the constructor.
+     */
+    std::string sequence;
 
-                                       /**
-                                        * Initial part of description
-                                        */
-      static const char* description_init;
+    /**
+     * Initial part of description
+     */
+    static const char *description_init;
   };
 
 
-                                   /**
-                                    * This pattern matches a list of
-                                    * comma-separated values each of which
-                                    * have to match a pattern given to the
-                                    * constructor. With two additional
-                                    * parameters, the number of elements this
-                                    * list has to have can be specified. If
-                                    * none is specified, the list may have
-                                    * zero or more entries.
-                                    */
+  /**
+   * This pattern matches a list of
+   * comma-separated values each of which
+   * have to match a pattern given to the
+   * constructor. With two additional
+   * parameters, the number of elements this
+   * list has to have can be specified. If
+   * none is specified, the list may have
+   * zero or more entries.
+   */
   class List : public PatternBase
   {
-    public:
-                                       /**
-                                        * Maximal integer value. If
-                                        * the numeric_limits class
-                                        * is available use this
-                                        * information to obtain the
-                                        * extremal values, otherwise
-                                        * set it so that this class
-                                        * understands that all values
-                                        * are allowed.
-                                        */
-      static const unsigned int max_int_value;
+  public:
+    /**
+     * Maximal integer value. If
+     * the numeric_limits class
+     * is available use this
+     * information to obtain the
+     * extremal values, otherwise
+     * set it so that this class
+     * understands that all values
+     * are allowed.
+     */
+    static const unsigned int max_int_value;
 
-                                       /**
-                                        * Constructor. Take the
-                                        * given parameter as the
-                                        * specification of valid
-                                        * elements of the list.
-                                        *
-                                        * The two other arguments can
-                                        * be used to denote minimal
-                                        * and maximal allowable
-                                        * lengths of the list.
-                                        */
-      List (const PatternBase  &base_pattern,
-            const unsigned int  min_elements = 0,
-            const unsigned int  max_elements = max_int_value);
+    /**
+     * Constructor. Take the
+     * given parameter as the
+     * specification of valid
+     * elements of the list.
+     *
+     * The two other arguments can
+     * be used to denote minimal
+     * and maximal allowable
+     * lengths of the list.
+     */
+    List (const PatternBase  &base_pattern,
+          const unsigned int  min_elements = 0,
+          const unsigned int  max_elements = max_int_value);
 
-                                       /**
-                                        * Destructor.
-                                        */
-      virtual ~List ();
+    /**
+     * Destructor.
+     */
+    virtual ~List ();
 
-                                       /**
-                                        * Return <tt>true</tt> if the
-                                        * string is a comma-separated
-                                        * list of strings each of
-                                        * which match the pattern
-                                        * given to the constructor.
-                                        */
-      virtual bool match (const std::string &test_string) const;
+    /**
+     * Return <tt>true</tt> if the
+     * string is a comma-separated
+     * list of strings each of
+     * which match the pattern
+     * given to the constructor.
+     */
+    virtual bool match (const std::string &test_string) const;
 
-                                       /**
-                                        * Return a description of
-                                        * the pattern that valid
-                                        * strings are expected to
-                                        * match.
-                                        */
-      virtual std::string description () const;
+    /**
+     * Return a description of
+     * the pattern that valid
+     * strings are expected to
+     * match.
+     */
+    virtual std::string description () const;
 
-                                       /**
-                                        * Return a copy of the
-                                        * present object, which is
-                                        * newly allocated on the
-                                        * heap. Ownership of that
-                                        * object is transferred to
-                                        * the caller of this
-                                        * function.
-                                        */
-      virtual PatternBase * clone () const;
+    /**
+     * Return a copy of the
+     * present object, which is
+     * newly allocated on the
+     * heap. Ownership of that
+     * object is transferred to
+     * the caller of this
+     * function.
+     */
+    virtual PatternBase *clone () const;
 
-                                       /**
-                                        * Creates new object if the start of
-                                        * description matches
-                                        * description_init.  Ownership of that
-                                        * object is transferred to the caller
-                                        * of this function.
-                                        */
-      static List* create (const std::string& description);
+    /**
+     * Creates new object if the start of
+     * description matches
+     * description_init.  Ownership of that
+     * object is transferred to the caller
+     * of this function.
+     */
+    static List *create (const std::string &description);
 
-                                       /**
-                                        * Determine an estimate for
-                                        * the memory consumption (in
-                                        * bytes) of this object.
-                                        */
-      std::size_t memory_consumption () const;
+    /**
+     * Determine an estimate for
+     * the memory consumption (in
+     * bytes) of this object.
+     */
+    std::size_t memory_consumption () const;
 
-                                       /** @addtogroup Exceptions
-                                        * @{ */
+    /** @addtogroup Exceptions
+     * @{ */
 
-                                       /**
-                                        * Exception.
-                                        */
-      DeclException2 (ExcInvalidRange,
-                      int, int,
-                      << "The values " << arg1 << " and " << arg2
-                      << " do not form a valid range.");
-                                       //@}
-    private:
-                                       /**
-                                        * Copy of the pattern that
-                                        * each element of the list has
-                                        * to satisfy.
-                                        */
-      PatternBase *pattern;
+    /**
+     * Exception.
+     */
+    DeclException2 (ExcInvalidRange,
+                    int, int,
+                    << "The values " << arg1 << " and " << arg2
+                    << " do not form a valid range.");
+    //@}
+  private:
+    /**
+     * Copy of the pattern that
+     * each element of the list has
+     * to satisfy.
+     */
+    PatternBase *pattern;
 
-                                       /**
-                                        * Minimum number of elements
-                                        * the list must have.
-                                        */
-      const unsigned int min_elements;
+    /**
+     * Minimum number of elements
+     * the list must have.
+     */
+    const unsigned int min_elements;
 
-                                       /**
-                                        * Maximum number of elements
-                                        * the list must have.
-                                        */
-      const unsigned int max_elements;
+    /**
+     * Maximum number of elements
+     * the list must have.
+     */
+    const unsigned int max_elements;
 
-                                       /**
-                                        * Initial part of description
-                                        */
-      static const char* description_init;
+    /**
+     * Initial part of description
+     */
+    static const char *description_init;
   };
 
 
@@ -741,7 +741,7 @@ namespace Patterns
      * the caller of this
      * function.
      */
-    virtual PatternBase * clone () const;
+    virtual PatternBase *clone () const;
 
     /**
      * Creates new object if the start of
@@ -750,7 +750,7 @@ namespace Patterns
      * object is transferred to the caller
      * of this function.
      */
-    static Map* create (const std::string& description);
+    static Map *create (const std::string &description);
 
     /**
      * Determine an estimate for
@@ -766,9 +766,9 @@ namespace Patterns
      * Exception.
      */
     DeclException2 (ExcInvalidRange,
-        int, int,
-        << "The values " << arg1 << " and " << arg2
-        << " do not form a valid range.");
+                    int, int,
+                    << "The values " << arg1 << " and " << arg2
+                    << " do not form a valid range.");
     //@}
   private:
     /**
@@ -794,383 +794,383 @@ namespace Patterns
     /**
      * Initial part of description
      */
-    static const char* description_init;
+    static const char *description_init;
   };
 
 
-                                   /**
-                                    * This class is much like the
-                                    * Selection class, but it
-                                    * allows the input to be a
-                                    * comma-separated list of values
-                                    * which each have to be given in
-                                    * the constructor
-                                    * argument. Alternatively, it
-                                    * could be viewed as a
-                                    * specialization of the List
-                                    * class. For example, if the
-                                    * string to the constructor was
-                                    * <tt>"ucd|gmv|eps"</tt>, then the
-                                    * following would be legal input:
-                                    * <tt>eps</tt>, <tt>gmv</tt>. You may give an
-                                    * arbitrarily long list of values,
-                                    * where there may be as many
-                                    * spaces around commas as you
-                                    * like.  However, commas are not
-                                    * allowed inside the values given
-                                    * to the constructor.
-                                    */
+  /**
+   * This class is much like the
+   * Selection class, but it
+   * allows the input to be a
+   * comma-separated list of values
+   * which each have to be given in
+   * the constructor
+   * argument. Alternatively, it
+   * could be viewed as a
+   * specialization of the List
+   * class. For example, if the
+   * string to the constructor was
+   * <tt>"ucd|gmv|eps"</tt>, then the
+   * following would be legal input:
+   * <tt>eps</tt>, <tt>gmv</tt>. You may give an
+   * arbitrarily long list of values,
+   * where there may be as many
+   * spaces around commas as you
+   * like.  However, commas are not
+   * allowed inside the values given
+   * to the constructor.
+   */
   class MultipleSelection : public PatternBase
   {
-    public:
-                                       /**
-                                        * Constructor. Take the
-                                        * given parameter as the
-                                        * specification of valid
-                                        * strings.
-                                        */
-      MultipleSelection (const std::string &seq);
+  public:
+    /**
+     * Constructor. Take the
+     * given parameter as the
+     * specification of valid
+     * strings.
+     */
+    MultipleSelection (const std::string &seq);
 
-                                       /**
-                                        * Return <tt>true</tt> if the
-                                        * string is an element of
-                                        * the description list
-                                        * passed to the constructor.
-                                        */
-      virtual bool match (const std::string &test_string) const;
+    /**
+     * Return <tt>true</tt> if the
+     * string is an element of
+     * the description list
+     * passed to the constructor.
+     */
+    virtual bool match (const std::string &test_string) const;
 
-                                       /**
-                                        * Return a description of
-                                        * the pattern that valid
-                                        * strings are expected to
-                                        * match. Here, this is the
-                                        * list of valid strings
-                                        * passed to the constructor.
-                                        */
-      virtual std::string description () const;
+    /**
+     * Return a description of
+     * the pattern that valid
+     * strings are expected to
+     * match. Here, this is the
+     * list of valid strings
+     * passed to the constructor.
+     */
+    virtual std::string description () const;
 
-                                       /**
-                                        * Return a copy of the
-                                        * present object, which is
-                                        * newly allocated on the
-                                        * heap. Ownership of that
-                                        * object is transferred to
-                                        * the caller of this
-                                        * function.
-                                        */
-      virtual PatternBase * clone () const;
+    /**
+     * Return a copy of the
+     * present object, which is
+     * newly allocated on the
+     * heap. Ownership of that
+     * object is transferred to
+     * the caller of this
+     * function.
+     */
+    virtual PatternBase *clone () const;
 
-                                       /**
-                                        * Creates new object if the start of
-                                        * description matches
-                                        * description_init.  Ownership of that
-                                        * object is transferred to the caller
-                                        * of this function.
-                                        */
-      static MultipleSelection* create (const std::string& description);
+    /**
+     * Creates new object if the start of
+     * description matches
+     * description_init.  Ownership of that
+     * object is transferred to the caller
+     * of this function.
+     */
+    static MultipleSelection *create (const std::string &description);
 
-                                       /**
-                                        * Determine an estimate for
-                                        * the memory consumption (in
-                                        * bytes) of this object.
-                                        */
-      std::size_t memory_consumption () const;
+    /**
+     * Determine an estimate for
+     * the memory consumption (in
+     * bytes) of this object.
+     */
+    std::size_t memory_consumption () const;
 
-                                       /** @addtogroup Exceptions
-                                        * @{ */
+    /** @addtogroup Exceptions
+     * @{ */
 
-                                       /**
-                                        * Exception.
-                                        */
-      DeclException1 (ExcCommasNotAllowed,
-                      int,
-                      << "A comma was found at position " << arg1
-                      << " of your input string, but commas are not allowed here.");
-                                       //@}
-    private:
-                                       /**
-                                        * List of valid strings as
-                                        * passed to the
-                                        * constructor. We don't make
-                                        * this string constant, as
-                                        * we process it somewhat in
-                                        * the constructor.
-                                        */
-      std::string sequence;
+    /**
+     * Exception.
+     */
+    DeclException1 (ExcCommasNotAllowed,
+                    int,
+                    << "A comma was found at position " << arg1
+                    << " of your input string, but commas are not allowed here.");
+    //@}
+  private:
+    /**
+     * List of valid strings as
+     * passed to the
+     * constructor. We don't make
+     * this string constant, as
+     * we process it somewhat in
+     * the constructor.
+     */
+    std::string sequence;
 
-                                       /**
-                                        * Initial part of description
-                                        */
-      static const char* description_init;
+    /**
+     * Initial part of description
+     */
+    static const char *description_init;
   };
 
-                                   /**
-                                    * Test for the string being
-                                    * either "true" or "false". This
-                                    * is mapped to the Selection
-                                    * class.
-                                    */
+  /**
+   * Test for the string being
+   * either "true" or "false". This
+   * is mapped to the Selection
+   * class.
+   */
   class Bool : public Selection
   {
-    public:
-                                       /**
-                                        * Constructor.
-                                        */
-      Bool ();
+  public:
+    /**
+     * Constructor.
+     */
+    Bool ();
 
-                                       /**
-                                        * Return a description of
-                                        * the pattern that valid
-                                        * strings are expected to
-                                        * match.
-                                        */
-      virtual std::string description () const;
+    /**
+     * Return a description of
+     * the pattern that valid
+     * strings are expected to
+     * match.
+     */
+    virtual std::string description () const;
 
-                                       /**
-                                        * Return a copy of the
-                                        * present object, which is
-                                        * newly allocated on the
-                                        * heap. Ownership of that
-                                        * object is transferred to
-                                        * the caller of this
-                                        * function.
-                                        */
-      virtual PatternBase * clone () const;
+    /**
+     * Return a copy of the
+     * present object, which is
+     * newly allocated on the
+     * heap. Ownership of that
+     * object is transferred to
+     * the caller of this
+     * function.
+     */
+    virtual PatternBase *clone () const;
 
-                                       /**
-                                        * Creates new object if the start of
-                                        * description matches
-                                        * description_init.  Ownership of that
-                                        * object is transferred to the caller
-                                        * of this function.
-                                        */
-      static Bool* create (const std::string& description);
+    /**
+     * Creates new object if the start of
+     * description matches
+     * description_init.  Ownership of that
+     * object is transferred to the caller
+     * of this function.
+     */
+    static Bool *create (const std::string &description);
 
-    private:
-                                       /**
-                                        * Initial part of description
-                                        */
-      static const char* description_init;
+  private:
+    /**
+     * Initial part of description
+     */
+    static const char *description_init;
   };
 
-                                   /**
-                                    * Always returns <tt>true</tt> when testing a
-                                    * string.
-                                    */
+  /**
+   * Always returns <tt>true</tt> when testing a
+   * string.
+   */
   class Anything : public PatternBase
   {
-    public:
-                                       /**
-                                        * Constructor. (Allow for at
-                                        * least one non-virtual
-                                        * function in this class, as
-                                        * otherwise sometimes no
-                                        * virtual table is emitted.)
-                                        */
-      Anything ();
+  public:
+    /**
+     * Constructor. (Allow for at
+     * least one non-virtual
+     * function in this class, as
+     * otherwise sometimes no
+     * virtual table is emitted.)
+     */
+    Anything ();
 
-                                       /**
-                                        * Return <tt>true</tt> if the
-                                        * string matches its
-                                        * constraints, i.e. always.
-                                        */
-      virtual bool match (const std::string &test_string) const;
+    /**
+     * Return <tt>true</tt> if the
+     * string matches its
+     * constraints, i.e. always.
+     */
+    virtual bool match (const std::string &test_string) const;
 
-                                       /**
-                                        * Return a description of
-                                        * the pattern that valid
-                                        * strings are expected to
-                                        * match. Here, this is the
-                                        * string <tt>"[Anything]"</tt>.
-                                        */
-      virtual std::string description () const;
+    /**
+     * Return a description of
+     * the pattern that valid
+     * strings are expected to
+     * match. Here, this is the
+     * string <tt>"[Anything]"</tt>.
+     */
+    virtual std::string description () const;
 
-                                       /**
-                                        * Return a copy of the
-                                        * present object, which is
-                                        * newly allocated on the
-                                        * heap. Ownership of that
-                                        * object is transferred to
-                                        * the caller of this
-                                        * function.
-                                        */
-      virtual PatternBase * clone () const;
+    /**
+     * Return a copy of the
+     * present object, which is
+     * newly allocated on the
+     * heap. Ownership of that
+     * object is transferred to
+     * the caller of this
+     * function.
+     */
+    virtual PatternBase *clone () const;
 
-                                       /**
-                                        * Creates new object if the start of
-                                        * description matches
-                                        * description_init.  Ownership of that
-                                        * object is transferred to the caller
-                                        * of this function.
-                                        */
-      static Anything* create (const std::string& description);
+    /**
+     * Creates new object if the start of
+     * description matches
+     * description_init.  Ownership of that
+     * object is transferred to the caller
+     * of this function.
+     */
+    static Anything *create (const std::string &description);
 
-    private:
-                                       /**
-                                        * Initial part of description
-                                        */
-      static const char* description_init;
+  private:
+    /**
+     * Initial part of description
+     */
+    static const char *description_init;
   };
 
 
-                                   /**
-                                    * A pattern that can be used to indicate
-                                    * when a parameter is intended to be the
-                                    * name of a file. By itself, this class
-                                    * does not check whether the string that
-                                    * is given in a parameter file actually
-                                    * corresponds to an existing file (it
-                                    * could, for example, be the name of a
-                                    * file to which you want to write
-                                    * output). Functionally, the class is
-                                    * therefore equivalent to the Anything
-                                    * class. However, it allows to specify the
-                                    * <i>intent</i> of a parameter. The flag
-                                    * given to the constructor also allows to
-                                    * specify whether the file is supposed to
-                                    * be an input or output file.
-                                    *
-                                    * The reason for the existence of this
-                                    * class is to support graphical user
-                                    * interfaces for editing parameter
-                                    * files. These may open a file selection
-                                    * dialog if the filename is supposed to
-                                    * represent an input file.
-                                    */
+  /**
+   * A pattern that can be used to indicate
+   * when a parameter is intended to be the
+   * name of a file. By itself, this class
+   * does not check whether the string that
+   * is given in a parameter file actually
+   * corresponds to an existing file (it
+   * could, for example, be the name of a
+   * file to which you want to write
+   * output). Functionally, the class is
+   * therefore equivalent to the Anything
+   * class. However, it allows to specify the
+   * <i>intent</i> of a parameter. The flag
+   * given to the constructor also allows to
+   * specify whether the file is supposed to
+   * be an input or output file.
+   *
+   * The reason for the existence of this
+   * class is to support graphical user
+   * interfaces for editing parameter
+   * files. These may open a file selection
+   * dialog if the filename is supposed to
+   * represent an input file.
+   */
   class FileName : public PatternBase
   {
-    public:
-                                       /**
-                                        * Files can be used for input
-                                        * or output. This can be
-                                        * specified in the constructor
-                                        * by choosing the flag <tt>type</tt>.
-                                        */
-      enum FileType {input = 0, output = 1};
+  public:
+    /**
+     * Files can be used for input
+     * or output. This can be
+     * specified in the constructor
+     * by choosing the flag <tt>type</tt>.
+     */
+    enum FileType {input = 0, output = 1};
 
-                                       /**
-                                        * Constructor.  The type of the file
-                                        * can be specified by choosing the
-                                        * flag.
-                                        */
-      FileName (const FileType type = input);
+    /**
+     * Constructor.  The type of the file
+     * can be specified by choosing the
+     * flag.
+     */
+    FileName (const FileType type = input);
 
-                                       /**
-                                        * Return <tt>true</tt> if the
-                                        * string matches its
-                                        * constraints, i.e. always.
-                                        */
-      virtual bool match (const std::string &test_string) const;
+    /**
+     * Return <tt>true</tt> if the
+     * string matches its
+     * constraints, i.e. always.
+     */
+    virtual bool match (const std::string &test_string) const;
 
-                                       /**
-                                        * Return a description of
-                                        * the pattern that valid
-                                        * strings are expected to
-                                        * match. Here, this is the
-                                        * string <tt>"[Filename]"</tt>.
-                                        */
-      virtual std::string description () const;
+    /**
+     * Return a description of
+     * the pattern that valid
+     * strings are expected to
+     * match. Here, this is the
+     * string <tt>"[Filename]"</tt>.
+     */
+    virtual std::string description () const;
 
-                                       /**
-                                        * Return a copy of the
-                                        * present object, which is
-                                        * newly allocated on the
-                                        * heap. Ownership of that
-                                        * object is transferred to
-                                        * the caller of this
-                                        * function.
-                                        */
-      virtual PatternBase * clone () const;
+    /**
+     * Return a copy of the
+     * present object, which is
+     * newly allocated on the
+     * heap. Ownership of that
+     * object is transferred to
+     * the caller of this
+     * function.
+     */
+    virtual PatternBase *clone () const;
 
-                                       /**
-                                        * file type flag
-                                        */
-      FileType  file_type;
+    /**
+     * file type flag
+     */
+    FileType  file_type;
 
-                                       /**
-                                        * Creates new object if the start of
-                                        * description matches
-                                        * description_init.  Ownership of that
-                                        * object is transferred to the caller
-                                        * of this function.
-                                        */
-      static FileName* create (const std::string& description);
+    /**
+     * Creates new object if the start of
+     * description matches
+     * description_init.  Ownership of that
+     * object is transferred to the caller
+     * of this function.
+     */
+    static FileName *create (const std::string &description);
 
-    private:
-                                       /**
-                                        * Initial part of description
-                                        */
-      static const char* description_init;
+  private:
+    /**
+     * Initial part of description
+     */
+    static const char *description_init;
   };
 
 
-                                   /**
-                                    * A pattern that can be used to indicate
-                                    * when a parameter is intended to be the
-                                    * name of a directory. By itself, this
-                                    * class does not check whether the string
-                                    * that is given in a parameter file
-                                    * actually corresponds to an existing
-                                    * directory. Functionally, the class is
-                                    * therefore equivalent to the Anything
-                                    * class. However, it allows to specify the
-                                    * <i>intent</i> of a parameter.
-                                    *
-                                    * The reason for the existence of this
-                                    * class is to support graphical user
-                                    * interfaces for editing parameter
-                                    * files. These may open a file selection
-                                    * dialog to select or create a directory.
-                                    */
+  /**
+   * A pattern that can be used to indicate
+   * when a parameter is intended to be the
+   * name of a directory. By itself, this
+   * class does not check whether the string
+   * that is given in a parameter file
+   * actually corresponds to an existing
+   * directory. Functionally, the class is
+   * therefore equivalent to the Anything
+   * class. However, it allows to specify the
+   * <i>intent</i> of a parameter.
+   *
+   * The reason for the existence of this
+   * class is to support graphical user
+   * interfaces for editing parameter
+   * files. These may open a file selection
+   * dialog to select or create a directory.
+   */
   class DirectoryName : public PatternBase
   {
-    public:
-                                       /**
-                                        * Constructor.
-                                        */
-      DirectoryName ();
+  public:
+    /**
+     * Constructor.
+     */
+    DirectoryName ();
 
-                                       /**
-                                        * Return <tt>true</tt> if the
-                                        * string matches its
-                                        * constraints, i.e. always.
-                                        */
-      virtual bool match (const std::string &test_string) const;
+    /**
+     * Return <tt>true</tt> if the
+     * string matches its
+     * constraints, i.e. always.
+     */
+    virtual bool match (const std::string &test_string) const;
 
-                                       /**
-                                        * Return a description of
-                                        * the pattern that valid
-                                        * strings are expected to
-                                        * match. Here, this is the
-                                        * string <tt>"[Filename]"</tt>.
-                                        */
-      virtual std::string description () const;
+    /**
+     * Return a description of
+     * the pattern that valid
+     * strings are expected to
+     * match. Here, this is the
+     * string <tt>"[Filename]"</tt>.
+     */
+    virtual std::string description () const;
 
-                                       /**
-                                        * Return a copy of the
-                                        * present object, which is
-                                        * newly allocated on the
-                                        * heap. Ownership of that
-                                        * object is transferred to
-                                        * the caller of this
-                                        * function.
-                                        */
-      virtual PatternBase * clone () const;
+    /**
+     * Return a copy of the
+     * present object, which is
+     * newly allocated on the
+     * heap. Ownership of that
+     * object is transferred to
+     * the caller of this
+     * function.
+     */
+    virtual PatternBase *clone () const;
 
-                                       /**
-                                        * Creates new object if the start of
-                                        * description matches
-                                        * description_init.  Ownership of that
-                                        * object is transferred to the caller
-                                        * of this function.
-                                        */
-      static DirectoryName* create (const std::string& description);
+    /**
+     * Creates new object if the start of
+     * description matches
+     * description_init.  Ownership of that
+     * object is transferred to the caller
+     * of this function.
+     */
+    static DirectoryName *create (const std::string &description);
 
-    private:
-                                       /**
-                                        * Initial part of description
-                                        */
-      static const char* description_init;
+  private:
+    /**
+     * Initial part of description
+     */
+    static const char *description_init;
   };
 }
 
@@ -1785,639 +1785,640 @@ namespace Patterns
  */
 class ParameterHandler : public Subscriptor
 {
-  private:
-                                     /**
-                                      * Inhibit automatic
-                                      * CopyConstructor.
-                                      */
-    ParameterHandler (const ParameterHandler&);
+private:
+  /**
+   * Inhibit automatic
+   * CopyConstructor.
+   */
+  ParameterHandler (const ParameterHandler &);
 
-                                     /**
-                                      * Inhibit automatic
-                                      * assignment operator.
-                                      */
-    ParameterHandler& operator= (const ParameterHandler&);
+  /**
+   * Inhibit automatic
+   * assignment operator.
+   */
+  ParameterHandler &operator= (const ParameterHandler &);
 
-  public:
-                                     /**
-                                      * List of possible output
-                                      * formats.
-                                      *
-                                      * The formats down the list with
-                                      * prefix <em>Short</em> and bit
-                                      * 6 and 7 set reproduce the old
-                                      * behavior of not writing
-                                      * comments or original values to
-                                      * the files.
-                                      */
-    enum OutputStyle {
-                                           /**
-                                            * Write human readable
-                                            * output suitable to be
-                                            * read by ParameterHandler
-                                            * again.
-                                            */
-          Text = 1,
-                                           /**
-                                            * Write parameters as a
-                                            * LaTeX table.
-                                            */
-          LaTeX = 2,
-                                           /**
-                                            * Write out declared parameters
-                                            * with description and possible
-                                            * values.
-                                            */
-          Description = 3,
+public:
+  /**
+   * List of possible output
+   * formats.
+   *
+   * The formats down the list with
+   * prefix <em>Short</em> and bit
+   * 6 and 7 set reproduce the old
+   * behavior of not writing
+   * comments or original values to
+   * the files.
+   */
+  enum OutputStyle
+  {
+    /**
+     * Write human readable
+     * output suitable to be
+     * read by ParameterHandler
+     * again.
+     */
+    Text = 1,
+    /**
+     * Write parameters as a
+     * LaTeX table.
+     */
+    LaTeX = 2,
+    /**
+     * Write out declared parameters
+     * with description and possible
+     * values.
+     */
+    Description = 3,
 
-                                           /**
-                                            * Write out everything as
-                                            * an <a href="http://en.wikipedia.org/wiki/XML">XML</a>
-                                            * file.
-                                            *
-                                            * See the general
-                                            * documentation of this
-                                            * class for an example of
-                                            * output.
-                                            */
-          XML = 4,
+    /**
+     * Write out everything as
+     * an <a href="http://en.wikipedia.org/wiki/XML">XML</a>
+     * file.
+     *
+     * See the general
+     * documentation of this
+     * class for an example of
+     * output.
+     */
+    XML = 4,
 
-                                           /**
-                                            * Write out everything as
-                                            * a <a href="http://en.wikipedia.org/wiki/JSON">JSON</a>
-                                            * file.
-                                            */
-          JSON = 5,
+    /**
+     * Write out everything as
+     * a <a href="http://en.wikipedia.org/wiki/JSON">JSON</a>
+     * file.
+     */
+    JSON = 5,
 
-                                           /**
-                                            * Write input for
-                                            * ParameterHandler without
-                                            * comments or changed
-                                            * default values.
-                                            */
-          ShortText = 193
-    };
-
-
-
-                                     /**
-                                      * Constructor.
-                                      */
-    ParameterHandler ();
-
-                                     /**
-                                      * Destructor. Declare this only
-                                      * to have a virtual destructor,
-                                      * which is safer as we have
-                                      * virtual functions.  It
-                                      * actually does nothing
-                                      * spectacular.
-                                      */
-    virtual ~ParameterHandler ();
-
-                                     /**
-                                      * Read input from a stream until
-                                      * stream returns <tt>eof</tt>
-                                      * condition or error.
-                                      *
-                                      * Return whether the read was
-                                      * successful.
-                                      */
-    virtual bool read_input (std::istream &input);
-
-                                     /**
-                                      * Read input from a file the
-                                      * name of which is given. The
-                                      * PathSearch class "PARAMETERS"
-                                      * is used to find the file.
-                                      *
-                                      * Return whether the read was
-                                      * successful.
-                                      *
-                                      * Unless <tt>optional</tt> is
-                                      * <tt>true</tt>, this function
-                                      * will automatically generate
-                                      * the requested file with
-                                      * default values if the file did
-                                      * not exist. This file will not
-                                      * contain additional comments if
-                                      * <tt>write_stripped_file</tt>
-                                      * is <tt>true</tt>.
-                                      */
-    virtual bool read_input (const std::string &filename,
-                             const bool optional = false,
-                             const bool write_stripped_file = false);
-
-                                     /**
-                                      * Read input from a string in
-                                      * memory. The lines in memory
-                                      * have to be separated by <tt>@\n</tt>
-                                      * characters.
-                                      *
-                                      * Return whether the read was
-                                      * successful.
-                                      */
-    virtual bool read_input_from_string (const char *s);
-
-                                     /**
-                                      * Read a parameter file in XML
-                                      * format. This could be from a file
-                                      * originally written by the
-                                      * print_parameters() function using the
-                                      * XML output style and then modified by
-                                      * hand as necessary; or from a file
-                                      * written using this method and then
-                                      * modified by the graphical parameter
-                                      * GUI (see the general documentation of
-                                      * this class).
-                                      *
-                                      * Return whether the read was
-                                      * successful.
-                                      */
-    virtual bool read_input_from_xml (std::istream &input);
-
-                                     /**
-                                      * Clear all contents.
-                                      */
-    void clear ();
+    /**
+     * Write input for
+     * ParameterHandler without
+     * comments or changed
+     * default values.
+     */
+    ShortText = 193
+  };
 
 
-                                     /**
-                                      * Declare a new entry with name
-                                      * <tt>entry</tt>, default and for
-                                      * which any input has to match
-                                      * the <tt>pattern</tt> (default: any
-                                      * pattern).
-                                      *
-                                      * The last parameter defaulting
-                                      * to an empty string is used to
-                                      * add a documenting text to each
-                                      * entry which will be printed as
-                                      * a comment when this class is
-                                      * asked to write out all
-                                      * declarations to a stream using
-                                      * the print_parameters()
-                                      * function.
-                                      *
-                                      * The function generates an
-                                      * exception if the default value
-                                      * doesn't match the given
-                                      * pattern. An entry can be
-                                      * declared more than once
-                                      * without generating an error,
-                                      * for example to override an
-                                      * earlier default value.
-                                      */
-    void declare_entry (const std::string           &entry,
-                        const std::string           &default_value,
-                        const Patterns::PatternBase &pattern = Patterns::Anything(),
-                        const std::string           &documentation = std::string());
 
-                                     /**
-                                      * Enter a subsection; if not yet
-                                      * existent, declare it.
-                                      */
-    void enter_subsection (const std::string &subsection);
+  /**
+   * Constructor.
+   */
+  ParameterHandler ();
 
-                                     /**
-                                      * Leave present subsection.
-                                      * Return <tt>false</tt> if there is
-                                      * no subsection to leave; <tt>true</tt>
-                                      * otherwise.
-                                      */
-    bool leave_subsection ();
+  /**
+   * Destructor. Declare this only
+   * to have a virtual destructor,
+   * which is safer as we have
+   * virtual functions.  It
+   * actually does nothing
+   * spectacular.
+   */
+  virtual ~ParameterHandler ();
 
-                                     /**
-                                      * Return value of entry
-                                      * <tt>entry_string</tt>.  If the
-                                      * entry was changed, then the
-                                      * changed value is returned,
-                                      * otherwise the default
-                                      * value. If the value of an
-                                      * undeclared entry is required,
-                                      * an exception will be thrown.
-                                      */
-    std::string get (const std::string &entry_string) const;
+  /**
+   * Read input from a stream until
+   * stream returns <tt>eof</tt>
+   * condition or error.
+   *
+   * Return whether the read was
+   * successful.
+   */
+  virtual bool read_input (std::istream &input);
 
-                                     /**
-                                      * Return value of entry
-                                      * <tt>entry_string</tt> as <tt>long
-                                      * int</tt>. (A long int is chosen so
-                                      * that even very large unsigned values
-                                      * can be returned by this function).
-                                      */
-    long int       get_integer (const std::string &entry_string) const;
+  /**
+   * Read input from a file the
+   * name of which is given. The
+   * PathSearch class "PARAMETERS"
+   * is used to find the file.
+   *
+   * Return whether the read was
+   * successful.
+   *
+   * Unless <tt>optional</tt> is
+   * <tt>true</tt>, this function
+   * will automatically generate
+   * the requested file with
+   * default values if the file did
+   * not exist. This file will not
+   * contain additional comments if
+   * <tt>write_stripped_file</tt>
+   * is <tt>true</tt>.
+   */
+  virtual bool read_input (const std::string &filename,
+                           const bool optional = false,
+                           const bool write_stripped_file = false);
 
-                                     /**
-                                      * Return value of entry
-                                      * <tt>entry_name</tt> as
-                                      * <tt>double</tt>.
-                                      */
-    double         get_double (const std::string &entry_name) const;
+  /**
+   * Read input from a string in
+   * memory. The lines in memory
+   * have to be separated by <tt>@\n</tt>
+   * characters.
+   *
+   * Return whether the read was
+   * successful.
+   */
+  virtual bool read_input_from_string (const char *s);
 
-                                     /**
-                                      * Return value of entry
-                                      * <tt>entry_name</tt> as <tt>bool</tt>.
-                                      * The entry may be "true" or "yes"
-                                      * for <tt>true</tt>, "false" or
-                                      * "no" for <tt>false</tt> respectively.
-                                      */
-    bool           get_bool (const std::string &entry_name) const;
+  /**
+   * Read a parameter file in XML
+   * format. This could be from a file
+   * originally written by the
+   * print_parameters() function using the
+   * XML output style and then modified by
+   * hand as necessary; or from a file
+   * written using this method and then
+   * modified by the graphical parameter
+   * GUI (see the general documentation of
+   * this class).
+   *
+   * Return whether the read was
+   * successful.
+   */
+  virtual bool read_input_from_xml (std::istream &input);
 
-                                     /**
-                                      * Change the value presently stored for
-                                      * <tt>entry_name</tt> to the one given
-                                      * in the second argument.
-                                      *
-                                      * The parameter must already exist in
-                                      * the present subsection.
-                                      *
-                                      * The function throws an
-                                      * exception of type
-                                      * ExcValueDoesNotMatchPattern
-                                      * if the new value does not
-                                      * conform to the pattern for
-                                      * this entry.
-                                      */
-    void           set (const std::string &entry_name,
-                        const std::string &new_value);
-
-                                     /**
-                                      * Same as above, but an overload where
-                                      * the second argument is a character
-                                      * pointer. This is necessary, since
-                                      * otherwise the call to
-                                      * <tt>set("abc","def")</code> will be
-                                      * mapped to the function taking one
-                                      * string and a bool as arguments, which
-                                      * is certainly not what is most often
-                                      * intended.
-                                      *
-                                      * The function throws an
-                                      * exception of type
-                                      * ExcValueDoesNotMatchPattern
-                                      * if the new value does not
-                                      * conform to the pattern for
-                                      * this entry.
-                                      */
-    void           set (const std::string &entry_name,
-                        const char        *new_value);
-
-                                     /**
-                                      * Change the value presently stored for
-                                      * <tt>entry_name</tt> to the one given
-                                      * in the second argument.
-                                      *
-                                      * The parameter must already exist in
-                                      * the present subsection.
-                                      *
-                                      * The function throws an
-                                      * exception of type
-                                      * ExcValueDoesNotMatchPattern
-                                      * if the new value does not
-                                      * conform to the pattern for
-                                      * this entry.
-                                      */
-    void           set (const std::string &entry_name,
-                        const long int    &new_value);
-
-                                     /**
-                                      * Change the value presently stored for
-                                      * <tt>entry_name</tt> to the one given
-                                      * in the second argument.
-                                      *
-                                      * The parameter must already exist in
-                                      * the present subsection.
-                                      *
-                                      * For internal purposes, the new value
-                                      * needs to be converted to a
-                                      * string. This is done using 16 digits
-                                      * of accuracy, so the set value and the
-                                      * one you can get back out using
-                                      * get_double() may differ in the 16th
-                                      * digit.
-                                      *
-                                      * The function throws an
-                                      * exception of type
-                                      * ExcValueDoesNotMatchPattern
-                                      * if the new value does not
-                                      * conform to the pattern for
-                                      * this entry.
-                                      */
-    void           set (const std::string &entry_name,
-                        const double      &new_value);
-
-                                     /**
-                                      * Change the value presently stored for
-                                      * <tt>entry_name</tt> to the one given
-                                      * in the second argument.
-                                      *
-                                      * The parameter must already exist in
-                                      * the present subsection.
-                                      *
-                                      * The function throws an
-                                      * exception of type
-                                      * ExcValueDoesNotMatchPattern
-                                      * if the new value does not
-                                      * conform to the pattern for
-                                      * this entry.
-                                      */
-    void           set (const std::string &entry_name,
-                        const bool        &new_value);
+  /**
+   * Clear all contents.
+   */
+  void clear ();
 
 
-                                     /**
-                                      * Print all parameters with the
-                                      * given style to
-                                      * <tt>out</tt>. Presently only
-                                      * <tt>Text</tt> and <tt>LaTeX</tt> are
-                                      * implemented.
-                                      *
-                                      * In <tt>Text</tt> format, the output
-                                      * is formatted in such a way
-                                      * that it is possible to use it
-                                      * for later input again. This is
-                                      * most useful to record the
-                                      * parameters for a specific run,
-                                      * since if you output the
-                                      * parameters using this function
-                                      * into a log file, you can
-                                      * always recover the results by
-                                      * simply copying the output to
-                                      * your input file.
-                                      *
-                                      * Besides the name and value of
-                                      * each entry, the output also
-                                      * contains the default value of
-                                      * entries if it is different
-                                      * from the actual value, as well
-                                      * as the documenting string
-                                      * given to the
-                                      * declare_entry() function
-                                      * if available.
-                                      *
-                                      * In <tt>Text</tt> format, the
-                                      * output contains the same information
-                                      * but in a format so that the
-                                      * resulting file can be input into
-                                      * a latex document such as a manual
-                                      * for the code for which this object
-                                      * handles run-time parameters.
-                                      * The various sections of parameters
-                                      * are then represented by latex
-                                      * section and subsection commands
-                                      * as well as by nested enumerations.
-                                      *
-                                      * In addition, all parameter names
-                                      * are listed with <code>@\index</code>
-                                      * statements in two indices called
-                                      * <code>prmindex</code> (where the
-                                      * name of each parameter is listed
-                                      * in the index) and <code>prmindexfull</code>
-                                      * where parameter names are listed
-                                      * sorted by the section in which
-                                      * they exist. By default, the LaTeX
-                                      * program ignores these <code>@\index</code>
-                                      * commands, but they can be used to
-                                      * generate an index by using the
-                                      * following commands in the preamble
-                                      * of the latex file:
-                                      * @code
-                                      * \usepackage{imakeidx}
-                                      * \makeindex[name=prmindex, title=Index of run-time parameter entries]
-                                      * \makeindex[name=prmindexfull, title=Index of run-time parameters with section names]
-                                      * @endcode
-                                      * and at the end of the file
-                                      * this:
-                                      * @code
-                                      * \printindex[prmindex]
-                                      * \printindex[prmindexfull]
-                                      * @endcode
-                                      */
-    std::ostream & print_parameters (std::ostream      &out,
-                                     const OutputStyle  style);
+  /**
+   * Declare a new entry with name
+   * <tt>entry</tt>, default and for
+   * which any input has to match
+   * the <tt>pattern</tt> (default: any
+   * pattern).
+   *
+   * The last parameter defaulting
+   * to an empty string is used to
+   * add a documenting text to each
+   * entry which will be printed as
+   * a comment when this class is
+   * asked to write out all
+   * declarations to a stream using
+   * the print_parameters()
+   * function.
+   *
+   * The function generates an
+   * exception if the default value
+   * doesn't match the given
+   * pattern. An entry can be
+   * declared more than once
+   * without generating an error,
+   * for example to override an
+   * earlier default value.
+   */
+  void declare_entry (const std::string           &entry,
+                      const std::string           &default_value,
+                      const Patterns::PatternBase &pattern = Patterns::Anything(),
+                      const std::string           &documentation = std::string());
 
-                                     /**
-                                      * Print out the parameters of
-                                      * the present subsection as
-                                      * given by the
-                                      * <tt>subsection_path</tt> member
-                                      * variable. This variable is
-                                      * controlled by entering and
-                                      * leaving subsections through
-                                      * the enter_subsection() and
-                                      * leave_subsection()
-                                      * functions.
-                                      *
-                                      * In most cases, you will not
-                                      * want to use this function
-                                      * directly, but have it called
-                                      * recursively by the previous
-                                      * function.
-                                      */
-    void print_parameters_section (std::ostream       &out,
-                                   const OutputStyle   style,
-                                   const unsigned int  indent_level);
+  /**
+   * Enter a subsection; if not yet
+   * existent, declare it.
+   */
+  void enter_subsection (const std::string &subsection);
 
-                                     /**
-                                      * Print parameters to a
-                                      * logstream.  This function
-                                      * allows to print all parameters
-                                      * into a log-file.  Sections
-                                      * will be indented in the usual
-                                      * log-file style.
-                                      */
-    void log_parameters (LogStream& out);
+  /**
+   * Leave present subsection.
+   * Return <tt>false</tt> if there is
+   * no subsection to leave; <tt>true</tt>
+   * otherwise.
+   */
+  bool leave_subsection ();
 
-                                     /**
-                                      * Log parameters in the present
-                                      * subsection. The subsection is
-                                      * determined by the
-                                      * <tt>subsection_path</tt> member
-                                      * variable. This variable is
-                                      * controlled by entering and
-                                      * leaving subsections through
-                                      * the enter_subsection() and
-                                      * leave_subsection()
-                                      * functions.
-                                      *
-                                      * In most cases, you will not
-                                      * want to use this function
-                                      * directly, but have it called
-                                      * recursively by the previous
-                                      * function.
-                                      */
-    void log_parameters_section (LogStream& out);
+  /**
+   * Return value of entry
+   * <tt>entry_string</tt>.  If the
+   * entry was changed, then the
+   * changed value is returned,
+   * otherwise the default
+   * value. If the value of an
+   * undeclared entry is required,
+   * an exception will be thrown.
+   */
+  std::string get (const std::string &entry_string) const;
 
-                                     /**
-                                      * Determine an estimate for
-                                      * the memory consumption (in
-                                      * bytes) of this
-                                      * object.
-                                      */
-    std::size_t memory_consumption () const;
+  /**
+   * Return value of entry
+   * <tt>entry_string</tt> as <tt>long
+   * int</tt>. (A long int is chosen so
+   * that even very large unsigned values
+   * can be returned by this function).
+   */
+  long int       get_integer (const std::string &entry_string) const;
 
-                                     /**
-                                      * Write the data of this object to a
-                                      * stream for the purpose of
-                                      * serialization.
-                                      */
-   template <class Archive>
-   void save (Archive & ar, const unsigned int version) const;
+  /**
+   * Return value of entry
+   * <tt>entry_name</tt> as
+   * <tt>double</tt>.
+   */
+  double         get_double (const std::string &entry_name) const;
 
-                                     /**
-                                      * Read the data of this object from a
-                                      * stream for the purpose of
-                                      * serialization.
-                                      */
-   template <class Archive>
-   void load (Archive & ar, const unsigned int version);
+  /**
+   * Return value of entry
+   * <tt>entry_name</tt> as <tt>bool</tt>.
+   * The entry may be "true" or "yes"
+   * for <tt>true</tt>, "false" or
+   * "no" for <tt>false</tt> respectively.
+   */
+  bool           get_bool (const std::string &entry_name) const;
 
-   BOOST_SERIALIZATION_SPLIT_MEMBER()
+  /**
+   * Change the value presently stored for
+   * <tt>entry_name</tt> to the one given
+   * in the second argument.
+   *
+   * The parameter must already exist in
+   * the present subsection.
+   *
+   * The function throws an
+   * exception of type
+   * ExcValueDoesNotMatchPattern
+   * if the new value does not
+   * conform to the pattern for
+   * this entry.
+   */
+  void           set (const std::string &entry_name,
+                      const std::string &new_value);
 
-                         /**
-                          * Test for equality.
-                          */
-   bool operator == (const ParameterHandler & prm2)  const;
+  /**
+   * Same as above, but an overload where
+   * the second argument is a character
+   * pointer. This is necessary, since
+   * otherwise the call to
+   * <tt>set("abc","def")</code> will be
+   * mapped to the function taking one
+   * string and a bool as arguments, which
+   * is certainly not what is most often
+   * intended.
+   *
+   * The function throws an
+   * exception of type
+   * ExcValueDoesNotMatchPattern
+   * if the new value does not
+   * conform to the pattern for
+   * this entry.
+   */
+  void           set (const std::string &entry_name,
+                      const char        *new_value);
 
-                                     /** @addtogroup Exceptions
-                                      * @{ */
+  /**
+   * Change the value presently stored for
+   * <tt>entry_name</tt> to the one given
+   * in the second argument.
+   *
+   * The parameter must already exist in
+   * the present subsection.
+   *
+   * The function throws an
+   * exception of type
+   * ExcValueDoesNotMatchPattern
+   * if the new value does not
+   * conform to the pattern for
+   * this entry.
+   */
+  void           set (const std::string &entry_name,
+                      const long int    &new_value);
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException1 (ExcEntryAlreadyExists,
-                    std::string,
-                    << "The following entry already exists: " << arg1);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException2 (ExcValueDoesNotMatchPattern,
-                    std::string, std::string,
-                    << "The string <" << arg1
-                    << "> does not match the given pattern <" << arg2 << ">");
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcAlreadyAtTopLevel);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException1 (ExcEntryUndeclared,
-                    std::string,
-                    << "You can't ask for entry <" << arg1 << "> you have not yet declared");
-                                     /**
-                                      * Exception
-                                      */
-    DeclException1 (ExcConversionError,
-                    std::string,
-                    << "Error when trying to convert the following string: " << arg1);
-                                     //@}
-  private:
-                                     /**
-                                      * The separator used when
-                                      * accessing elements of a path
-                                      * into the parameter tree.
-                                      */
-    static const char path_separator = '.';
+  /**
+   * Change the value presently stored for
+   * <tt>entry_name</tt> to the one given
+   * in the second argument.
+   *
+   * The parameter must already exist in
+   * the present subsection.
+   *
+   * For internal purposes, the new value
+   * needs to be converted to a
+   * string. This is done using 16 digits
+   * of accuracy, so the set value and the
+   * one you can get back out using
+   * get_double() may differ in the 16th
+   * digit.
+   *
+   * The function throws an
+   * exception of type
+   * ExcValueDoesNotMatchPattern
+   * if the new value does not
+   * conform to the pattern for
+   * this entry.
+   */
+  void           set (const std::string &entry_name,
+                      const double      &new_value);
 
-                                     /**
-                                      * The complete tree of sections
-                                      * and entries. See the general
-                                      * documentation of this class
-                                      * for a description how data is
-                                      * stored in this variable.
-                                      *
-                                      * The variable is a pointer so
-                                      * that we can use an incomplete
-                                      * type, rather than having to
-                                      * include all of the
-                                      * property_tree stuff from
-                                      * boost. This works around a
-                                      * problem with gcc 4.5.
-                                      */
-    std::auto_ptr<boost::property_tree::ptree> entries;
+  /**
+   * Change the value presently stored for
+   * <tt>entry_name</tt> to the one given
+   * in the second argument.
+   *
+   * The parameter must already exist in
+   * the present subsection.
+   *
+   * The function throws an
+   * exception of type
+   * ExcValueDoesNotMatchPattern
+   * if the new value does not
+   * conform to the pattern for
+   * this entry.
+   */
+  void           set (const std::string &entry_name,
+                      const bool        &new_value);
 
-                                     /**
-                                      * A list of patterns that are
-                                      * used to describe the
-                                      * parameters of this object. The
-                                      * are indexed by nodes in the
-                                      * property tree.
-                                      */
-    std::vector<std_cxx1x::shared_ptr<const Patterns::PatternBase> > patterns;
 
-                                     /**
-                                      * Mangle a string so that it
-                                      * doesn't contain any special
-                                      * characters or spaces.
-                                      */
-    static std::string mangle (const std::string &s);
+  /**
+   * Print all parameters with the
+   * given style to
+   * <tt>out</tt>. Presently only
+   * <tt>Text</tt> and <tt>LaTeX</tt> are
+   * implemented.
+   *
+   * In <tt>Text</tt> format, the output
+   * is formatted in such a way
+   * that it is possible to use it
+   * for later input again. This is
+   * most useful to record the
+   * parameters for a specific run,
+   * since if you output the
+   * parameters using this function
+   * into a log file, you can
+   * always recover the results by
+   * simply copying the output to
+   * your input file.
+   *
+   * Besides the name and value of
+   * each entry, the output also
+   * contains the default value of
+   * entries if it is different
+   * from the actual value, as well
+   * as the documenting string
+   * given to the
+   * declare_entry() function
+   * if available.
+   *
+   * In <tt>Text</tt> format, the
+   * output contains the same information
+   * but in a format so that the
+   * resulting file can be input into
+   * a latex document such as a manual
+   * for the code for which this object
+   * handles run-time parameters.
+   * The various sections of parameters
+   * are then represented by latex
+   * section and subsection commands
+   * as well as by nested enumerations.
+   *
+   * In addition, all parameter names
+   * are listed with <code>@\index</code>
+   * statements in two indices called
+   * <code>prmindex</code> (where the
+   * name of each parameter is listed
+   * in the index) and <code>prmindexfull</code>
+   * where parameter names are listed
+   * sorted by the section in which
+   * they exist. By default, the LaTeX
+   * program ignores these <code>@\index</code>
+   * commands, but they can be used to
+   * generate an index by using the
+   * following commands in the preamble
+   * of the latex file:
+   * @code
+   * \usepackage{imakeidx}
+   * \makeindex[name=prmindex, title=Index of run-time parameter entries]
+   * \makeindex[name=prmindexfull, title=Index of run-time parameters with section names]
+   * @endcode
+   * and at the end of the file
+   * this:
+   * @code
+   * \printindex[prmindex]
+   * \printindex[prmindexfull]
+   * @endcode
+   */
+  std::ostream &print_parameters (std::ostream      &out,
+                                  const OutputStyle  style);
 
-                                     /**
-                                      * Unmangle a string into its
-                                      * original form.
-                                      */
-    static std::string demangle (const std::string &s);
+  /**
+   * Print out the parameters of
+   * the present subsection as
+   * given by the
+   * <tt>subsection_path</tt> member
+   * variable. This variable is
+   * controlled by entering and
+   * leaving subsections through
+   * the enter_subsection() and
+   * leave_subsection()
+   * functions.
+   *
+   * In most cases, you will not
+   * want to use this function
+   * directly, but have it called
+   * recursively by the previous
+   * function.
+   */
+  void print_parameters_section (std::ostream       &out,
+                                 const OutputStyle   style,
+                                 const unsigned int  indent_level);
 
-                                     /**
-                                      * Return whether a given node is
-                                      * a parameter node or a
-                                      * subsection node.
-                                      */
-    static bool is_parameter_node (const boost::property_tree::ptree &);
+  /**
+   * Print parameters to a
+   * logstream.  This function
+   * allows to print all parameters
+   * into a log-file.  Sections
+   * will be indented in the usual
+   * log-file style.
+   */
+  void log_parameters (LogStream &out);
 
-                                     /**
-                                      * Path of presently selected
-                                      * subsections; empty list means
-                                      * top level
-                                      */
-    std::vector<std::string> subsection_path;
+  /**
+   * Log parameters in the present
+   * subsection. The subsection is
+   * determined by the
+   * <tt>subsection_path</tt> member
+   * variable. This variable is
+   * controlled by entering and
+   * leaving subsections through
+   * the enter_subsection() and
+   * leave_subsection()
+   * functions.
+   *
+   * In most cases, you will not
+   * want to use this function
+   * directly, but have it called
+   * recursively by the previous
+   * function.
+   */
+  void log_parameters_section (LogStream &out);
 
-                                     /**
-                                      * Return the string that
-                                      * identifies the current path
-                                      * into the property tree. This
-                                      * is only a path, i.e. it is not
-                                      * terminated by the
-                                      * path_separator character.
-                                      */
-    std::string get_current_path () const;
+  /**
+   * Determine an estimate for
+   * the memory consumption (in
+   * bytes) of this
+   * object.
+   */
+  std::size_t memory_consumption () const;
 
-                                     /**
-                                      * Given the name of an entry as
-                                      * argument, the function
-                                      * computes a full path into the
-                                      * parameter tree using the
-                                      * current subsection.
-                                      */
-    std::string get_current_full_path (const std::string &name) const;
+  /**
+   * Write the data of this object to a
+   * stream for the purpose of
+   * serialization.
+   */
+  template <class Archive>
+  void save (Archive &ar, const unsigned int version) const;
 
-                                     /**
-                                      * Scan one line of input.
-                                      * <tt>lineno</tt> is the number of
-                                      * the line presently scanned
-                                      * (for the logs if there are
-                                      * messages). Return <tt>false</tt> if
-                                      * line contained stuff that
-                                      * could not be understood, the
-                                      * uppermost subsection was to be
-                                      * left by an <tt>END</tt> or <tt>end</tt>
-                                      * statement, a value for a
-                                      * non-declared entry was given
-                                      * or the entry value did not
-                                      * match the regular
-                                      * expression. <tt>true</tt> otherwise.
-                                      *
-                                      * The function modifies its
-                                      * argument, but also takes it by
-                                      * value, so the caller's
-                                      * variable is not changed.
-                                      */
-    bool scan_line (std::string         line,
-                    const unsigned int  lineno);
+  /**
+   * Read the data of this object from a
+   * stream for the purpose of
+   * serialization.
+   */
+  template <class Archive>
+  void load (Archive &ar, const unsigned int version);
 
-    friend class MultipleParameterLoop;
+  BOOST_SERIALIZATION_SPLIT_MEMBER()
+
+  /**
+   * Test for equality.
+   */
+  bool operator == (const ParameterHandler &prm2)  const;
+
+  /** @addtogroup Exceptions
+   * @{ */
+
+  /**
+   * Exception
+   */
+  DeclException1 (ExcEntryAlreadyExists,
+                  std::string,
+                  << "The following entry already exists: " << arg1);
+  /**
+   * Exception
+   */
+  DeclException2 (ExcValueDoesNotMatchPattern,
+                  std::string, std::string,
+                  << "The string <" << arg1
+                  << "> does not match the given pattern <" << arg2 << ">");
+  /**
+   * Exception
+   */
+  DeclException0 (ExcAlreadyAtTopLevel);
+  /**
+   * Exception
+   */
+  DeclException1 (ExcEntryUndeclared,
+                  std::string,
+                  << "You can't ask for entry <" << arg1 << "> you have not yet declared");
+  /**
+   * Exception
+   */
+  DeclException1 (ExcConversionError,
+                  std::string,
+                  << "Error when trying to convert the following string: " << arg1);
+  //@}
+private:
+  /**
+   * The separator used when
+   * accessing elements of a path
+   * into the parameter tree.
+   */
+  static const char path_separator = '.';
+
+  /**
+   * The complete tree of sections
+   * and entries. See the general
+   * documentation of this class
+   * for a description how data is
+   * stored in this variable.
+   *
+   * The variable is a pointer so
+   * that we can use an incomplete
+   * type, rather than having to
+   * include all of the
+   * property_tree stuff from
+   * boost. This works around a
+   * problem with gcc 4.5.
+   */
+  std::auto_ptr<boost::property_tree::ptree> entries;
+
+  /**
+   * A list of patterns that are
+   * used to describe the
+   * parameters of this object. The
+   * are indexed by nodes in the
+   * property tree.
+   */
+  std::vector<std_cxx1x::shared_ptr<const Patterns::PatternBase> > patterns;
+
+  /**
+   * Mangle a string so that it
+   * doesn't contain any special
+   * characters or spaces.
+   */
+  static std::string mangle (const std::string &s);
+
+  /**
+   * Unmangle a string into its
+   * original form.
+   */
+  static std::string demangle (const std::string &s);
+
+  /**
+   * Return whether a given node is
+   * a parameter node or a
+   * subsection node.
+   */
+  static bool is_parameter_node (const boost::property_tree::ptree &);
+
+  /**
+   * Path of presently selected
+   * subsections; empty list means
+   * top level
+   */
+  std::vector<std::string> subsection_path;
+
+  /**
+   * Return the string that
+   * identifies the current path
+   * into the property tree. This
+   * is only a path, i.e. it is not
+   * terminated by the
+   * path_separator character.
+   */
+  std::string get_current_path () const;
+
+  /**
+   * Given the name of an entry as
+   * argument, the function
+   * computes a full path into the
+   * parameter tree using the
+   * current subsection.
+   */
+  std::string get_current_full_path (const std::string &name) const;
+
+  /**
+   * Scan one line of input.
+   * <tt>lineno</tt> is the number of
+   * the line presently scanned
+   * (for the logs if there are
+   * messages). Return <tt>false</tt> if
+   * line contained stuff that
+   * could not be understood, the
+   * uppermost subsection was to be
+   * left by an <tt>END</tt> or <tt>end</tt>
+   * statement, a value for a
+   * non-declared entry was given
+   * or the entry value did not
+   * match the regular
+   * expression. <tt>true</tt> otherwise.
+   *
+   * The function modifies its
+   * argument, but also takes it by
+   * value, so the caller's
+   * variable is not changed.
+   */
+  bool scan_line (std::string         line,
+                  const unsigned int  lineno);
+
+  friend class MultipleParameterLoop;
 };
 
 
@@ -2634,210 +2635,210 @@ class ParameterHandler : public Subscriptor
  */
 class MultipleParameterLoop : public ParameterHandler
 {
+public:
+  /**
+   * This is the class the helper class or the
+   * problem class has to be derived of.
+   */
+  class UserClass
+  {
   public:
-                                     /**
-                                      * This is the class the helper class or the
-                                      * problem class has to be derived of.
-                                      */
-    class UserClass
+    /**
+     * Destructor. It doesn't actually do
+     * anything, but is declared to force
+     * derived classes to have a virtual
+     * destructor.
+     */
+    virtual ~UserClass ();
+
+    /**
+     * <tt>create_new</tt> must provide a clean
+     * object, either by creating a new one
+     * or by cleaning an old one.
+     */
+    virtual void create_new (const unsigned int run_no) = 0;
+
+    /**
+     * This should declare parameters and call
+     * the <tt>declare_parameters</tt> function of the
+     * problem class.
+     */
+    virtual void declare_parameters (ParameterHandler &prm) = 0;
+
+    /**
+     * Get the parameters and run any
+     * necessary action.
+     */
+    virtual void run (ParameterHandler &prm) = 0;
+  };
+
+  /**
+   * Constructor
+   */
+  MultipleParameterLoop ();
+
+  /**
+   * Destructor. Declare this only to have
+   * a virtual destructor, which is safer
+   * as we have virtual functions.
+   * It actually does nothing spectacular.
+   */
+  virtual ~MultipleParameterLoop ();
+
+  virtual bool read_input (std::istream &Input);
+  virtual bool read_input (const std::string &FileName,
+                           const bool optional = false,
+                           const bool write_stripped_file = false);
+
+  /**
+   * Read input from a string in memory. The
+   *  lines in memory have to be separated by
+   *  <tt>@\n</tt> characters.
+   */
+  virtual bool read_input_from_string (const char *s);
+
+  /**
+   * run the central loop.
+   */
+  void loop (UserClass &uc);
+
+  /**
+   * Determine an estimate for
+   * the memory consumption (in
+   * bytes) of this
+   * object.
+   */
+  std::size_t memory_consumption () const;
+
+private:
+
+  /**
+   * An object in the list of entries with
+   * multiple values.
+   */
+  class Entry
+  {
+  public:
+    /**
+     * Declare what a multiple entry
+     * is: a variant * entry (in
+     * curly braces <tt>{</tt>, <tt>}</tt>) or an
+     * array (in double curly braces
+     * <tt>{{</tt>, <tt>}}</tt>).
+     */
+    enum MultipleEntryType
     {
-      public:
-                                         /**
-                                          * Destructor. It doesn't actually do
-                                          * anything, but is declared to force
-                                          * derived classes to have a virtual
-                                          * destructor.
-                                          */
-        virtual ~UserClass ();
-
-                                         /**
-                                          * <tt>create_new</tt> must provide a clean
-                                          * object, either by creating a new one
-                                          * or by cleaning an old one.
-                                          */
-        virtual void create_new (const unsigned int run_no) = 0;
-
-                                         /**
-                                          * This should declare parameters and call
-                                          * the <tt>declare_parameters</tt> function of the
-                                          * problem class.
-                                          */
-        virtual void declare_parameters (ParameterHandler &prm) = 0;
-
-                                         /**
-                                          * Get the parameters and run any
-                                          * necessary action.
-                                          */
-        virtual void run (ParameterHandler &prm) = 0;
+      variant, array
     };
 
-                                     /**
-                                      * Constructor
-                                      */
-    MultipleParameterLoop ();
+    /**
+     * Constructor
+     */
+    Entry () : type (array) {}
 
-                                     /**
-                                      * Destructor. Declare this only to have
-                                      * a virtual destructor, which is safer
-                                      * as we have virtual functions.
-                                      * It actually does nothing spectacular.
-                                      */
-    virtual ~MultipleParameterLoop ();
+    /**
+     * Construct an object with given subsection
+     * path, name and value. The splitting up
+     * into the different variants is done
+     * later by <tt>split_different_values</tt>.
+     */
+    Entry (const std::vector<std::string> &Path,
+           const std::string              &Name,
+           const std::string              &Value);
 
-    virtual bool read_input (std::istream &Input);
-    virtual bool read_input (const std::string &FileName,
-                             const bool optional = false,
-                             const bool write_stripped_file = false);
+    /**
+     * Split the entry value into the different
+     * branches.
+     */
+    void split_different_values ();
 
-                                     /**
-                                      * Read input from a string in memory. The
-                                      *  lines in memory have to be separated by
-                                      *  <tt>@\n</tt> characters.
-                                      */
-    virtual bool read_input_from_string (const char *s);
+    /**
+     * Path to variant entry.
+     */
+    std::vector<std::string> subsection_path;
 
-                                     /**
-                                      * run the central loop.
-                                      */
-    void loop (UserClass &uc);
+    /**
+     * Name of entry.
+     */
+    std::string         entry_name;
 
-                                     /**
-                                      * Determine an estimate for
-                                      * the memory consumption (in
-                                      * bytes) of this
-                                      * object.
-                                      */
+    /**
+     * Original variant value.
+     */
+    std::string         entry_value;
+
+    /**
+     * List of entry values constructed out of
+     * what was given in the input file (that
+     * is stored in EntryValue.
+     */
+    std::vector<std::string> different_values;
+
+    /**
+     * Store whether this entry is a variant
+     * entry or an array.
+     */
+    MultipleEntryType      type;
+
+    /**
+     * Determine an estimate for
+     * the memory consumption (in
+     * bytes) of this
+     * object.
+     */
     std::size_t memory_consumption () const;
+  };
 
-  private:
+  /**
+   * List of variant entry values.
+   */
+  std::vector<Entry> multiple_choices;
 
-                                     /**
-                                      * An object in the list of entries with
-                                      * multiple values.
-                                      */
-    class Entry
-    {
-      public:
-                                         /**
-                                          * Declare what a multiple entry
-                                          * is: a variant * entry (in
-                                          * curly braces <tt>{</tt>, <tt>}</tt>) or an
-                                          * array (in double curly braces
-                                          * <tt>{{</tt>, <tt>}}</tt>).
-                                          */
-        enum MultipleEntryType
-        {
-              variant, array
-        };
+  /**
+   * Number of branches constructed
+   * from the different
+   * combinations of the variants.
+   * This obviously equals the
+   * number of runs to be
+   * performed.
+   */
+  unsigned int n_branches;
 
-                                         /**
-                                          * Constructor
-                                          */
-        Entry () : type (array) {}
+  /**
+   * Initialize the different
+   * branches, i.e.  construct the
+   * combinations.
+   */
+  void init_branches ();
 
-                                         /**
-                                          * Construct an object with given subsection
-                                          * path, name and value. The splitting up
-                                          * into the different variants is done
-                                          * later by <tt>split_different_values</tt>.
-                                          */
-        Entry (const std::vector<std::string> &Path,
-               const std::string              &Name,
-               const std::string              &Value);
+  /**
+   * Traverse the section currently
+   * set by
+   * enter_subsection()/leave_subsection()
+   * and see which of the entries
+   * are variante/array
+   * entries. Then fill the
+   * multiple_choices variable
+   * using this information.
+   */
+  void init_branches_current_section ();
 
-                                         /**
-                                          * Split the entry value into the different
-                                          * branches.
-                                          */
-        void split_different_values ();
-
-                                         /**
-                                          * Path to variant entry.
-                                          */
-        std::vector<std::string> subsection_path;
-
-                                         /**
-                                          * Name of entry.
-                                          */
-        std::string         entry_name;
-
-                                         /**
-                                          * Original variant value.
-                                          */
-        std::string         entry_value;
-
-                                         /**
-                                          * List of entry values constructed out of
-                                          * what was given in the input file (that
-                                          * is stored in EntryValue.
-                                          */
-        std::vector<std::string> different_values;
-
-                                         /**
-                                          * Store whether this entry is a variant
-                                          * entry or an array.
-                                          */
-        MultipleEntryType      type;
-
-                                         /**
-                                          * Determine an estimate for
-                                          * the memory consumption (in
-                                          * bytes) of this
-                                          * object.
-                                          */
-        std::size_t memory_consumption () const;
-    };
-
-                                     /**
-                                      * List of variant entry values.
-                                      */
-    std::vector<Entry> multiple_choices;
-
-                                     /**
-                                      * Number of branches constructed
-                                      * from the different
-                                      * combinations of the variants.
-                                      * This obviously equals the
-                                      * number of runs to be
-                                      * performed.
-                                      */
-    unsigned int n_branches;
-
-                                     /**
-                                      * Initialize the different
-                                      * branches, i.e.  construct the
-                                      * combinations.
-                                      */
-    void init_branches ();
-
-                                     /**
-                                      * Traverse the section currently
-                                      * set by
-                                      * enter_subsection()/leave_subsection()
-                                      * and see which of the entries
-                                      * are variante/array
-                                      * entries. Then fill the
-                                      * multiple_choices variable
-                                      * using this information.
-                                      */
-    void init_branches_current_section ();
-
-                                     /**
-                                      * Transfer the entry values for one run
-                                      * to the entry tree.
-                                      */
-    void fill_entry_values (const unsigned int run_no);
+  /**
+   * Transfer the entry values for one run
+   * to the entry tree.
+   */
+  void fill_entry_values (const unsigned int run_no);
 };
 
 
 template <class Archive>
 inline
 void
-ParameterHandler::save (Archive & ar, const unsigned int) const
+ParameterHandler::save (Archive &ar, const unsigned int) const
 {
-                                       // Forward to serialization
-                                       // function in the base class.
-  ar &  static_cast<const Subscriptor &>(*this);
+  // Forward to serialization
+  // function in the base class.
+  ar   &static_cast<const Subscriptor &>(*this);
 
   ar & *entries.get();
 
@@ -2846,23 +2847,23 @@ ParameterHandler::save (Archive & ar, const unsigned int) const
   for (unsigned int j=0; j<patterns.size(); ++j)
     descriptions.push_back (patterns[j]->description());
 
-  ar & descriptions;
+  ar &descriptions;
 }
 
 
 template <class Archive>
 inline
 void
-ParameterHandler::load (Archive & ar, const unsigned int)
+ParameterHandler::load (Archive &ar, const unsigned int)
 {
-                                       // Forward to serialization
-                                       // function in the base class.
-  ar &  static_cast<Subscriptor &>(*this);
+  // Forward to serialization
+  // function in the base class.
+  ar   &static_cast<Subscriptor &>(*this);
 
   ar & *entries.get();
 
   std::vector<std::string> descriptions;
-  ar & descriptions;
+  ar &descriptions;
 
   patterns.clear ();
   for (unsigned int j=0; j<descriptions.size(); ++j)

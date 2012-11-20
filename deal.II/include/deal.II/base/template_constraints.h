@@ -78,7 +78,7 @@ template <bool, typename> struct constraint_and_return_value;
  */
 template <typename T> struct constraint_and_return_value<true,T>
 {
-    typedef T type;
+  typedef T type;
 };
 
 
@@ -137,7 +137,7 @@ template <typename T> struct constraint_and_return_value<true,T>
 template <typename T>
 struct identity
 {
-    typedef T type;
+  typedef T type;
 };
 
 
@@ -162,99 +162,99 @@ struct identity
  */
 struct PointerComparison
 {
-                                     /**
-                                      * Comparison function for pointers of
-                                      * the same type. Returns @p true if the
-                                      * two pointers are equal.
-                                      */
-    template <typename T>
-    static bool equal (const T *p1, const T *p2);
+  /**
+   * Comparison function for pointers of
+   * the same type. Returns @p true if the
+   * two pointers are equal.
+   */
+  template <typename T>
+  static bool equal (const T *p1, const T *p2);
 
-                                     /**
-                                      * Comparison function for pointers of
-                                      * different types. The C++ language does
-                                      * not allow comparing these pointers
-                                      * using <tt>operator==</tt>. However,
-                                      * since the two pointers have different
-                                      * types, we know that they can't be the
-                                      * same, so we always return @p false.
-                                      */
-    template <typename T, typename U>
-    static bool equal (const T*, const U*);
+  /**
+   * Comparison function for pointers of
+   * different types. The C++ language does
+   * not allow comparing these pointers
+   * using <tt>operator==</tt>. However,
+   * since the two pointers have different
+   * types, we know that they can't be the
+   * same, so we always return @p false.
+   */
+  template <typename T, typename U>
+  static bool equal (const T *, const U *);
 };
 
 
 
 namespace internal
 {
-/**
- * A type that is sometimes used for template tricks. For example, in
- * some situations one would like to do this:
- *
- * @verbatim
- *   template <int dim>
- *   class X {
- *     // do something on subdim-dimensional sub-objects of the big
- *     // dim-dimensional thing (for example on vertices/lines/quads of
- *     // cells):
- *     template <int subdim> void f();
- *   };
- *
- *   template <int dim>
- *   template <>
- *   void X<dim>::f<0> () { ...operate on the vertices of a cell... }
- *
- *   template <int dim, int subdim> void f(X<dim> &x) {
- *     x.f<subdim> ();
- *   }
- * @endverbatim
- *
- * The problem is: the language doesn't allow us to specialize
- * <code>X::f()</code> without specializing the outer class first. One
- * of the common tricks is therefore to use something like this:
- *
- * @verbatim
- *   template <int N> struct int2type {};
- *
- *   template <int dim>
- *   class X {
- *     // do something on subdim-dimensional sub-objects of the big
- *     // dim-dimensional thing (for example on vertices/lines/quads of
- *     // cells):
- *     void f(int2type<0>);
- *     void f(int2type<1>);
- *     void f(int2type<2>);
- *     void f(int2type<3>);
- *   };
- *
- *   template <int dim>
- *   void X<dim>::f (int2type<0>) { ...operate on the vertices of a cell... }
- *
- *   template <int dim>
- *   void X<dim>::f (int2type<1>) { ...operate on the lines of a cell... }
- *
- *   template <int dim, int subdim> void f(X<dim> &x) {
- *     x.f (int2type<subdim>());
- *   }
- * @endverbatim
- *
- * Note that we have replaced specialization of <code>X::f()</code> by
- * overloading, but that from inside the function <code>g()</code>, we
- * can still select which of the different <code>X::f()</code> we want
- * based on the <code>subdim</code> template argument.
- *
- * @author Wolfgang Bangerth, 2006
- */
+  /**
+   * A type that is sometimes used for template tricks. For example, in
+   * some situations one would like to do this:
+   *
+   * @verbatim
+   *   template <int dim>
+   *   class X {
+   *     // do something on subdim-dimensional sub-objects of the big
+   *     // dim-dimensional thing (for example on vertices/lines/quads of
+   *     // cells):
+   *     template <int subdim> void f();
+   *   };
+   *
+   *   template <int dim>
+   *   template <>
+   *   void X<dim>::f<0> () { ...operate on the vertices of a cell... }
+   *
+   *   template <int dim, int subdim> void f(X<dim> &x) {
+   *     x.f<subdim> ();
+   *   }
+   * @endverbatim
+   *
+   * The problem is: the language doesn't allow us to specialize
+   * <code>X::f()</code> without specializing the outer class first. One
+   * of the common tricks is therefore to use something like this:
+   *
+   * @verbatim
+   *   template <int N> struct int2type {};
+   *
+   *   template <int dim>
+   *   class X {
+   *     // do something on subdim-dimensional sub-objects of the big
+   *     // dim-dimensional thing (for example on vertices/lines/quads of
+   *     // cells):
+   *     void f(int2type<0>);
+   *     void f(int2type<1>);
+   *     void f(int2type<2>);
+   *     void f(int2type<3>);
+   *   };
+   *
+   *   template <int dim>
+   *   void X<dim>::f (int2type<0>) { ...operate on the vertices of a cell... }
+   *
+   *   template <int dim>
+   *   void X<dim>::f (int2type<1>) { ...operate on the lines of a cell... }
+   *
+   *   template <int dim, int subdim> void f(X<dim> &x) {
+   *     x.f (int2type<subdim>());
+   *   }
+   * @endverbatim
+   *
+   * Note that we have replaced specialization of <code>X::f()</code> by
+   * overloading, but that from inside the function <code>g()</code>, we
+   * can still select which of the different <code>X::f()</code> we want
+   * based on the <code>subdim</code> template argument.
+   *
+   * @author Wolfgang Bangerth, 2006
+   */
   template <int N>
   struct int2type
   {};
 
 
-/**
- * The equivalent of the int2type class for boolean arguments.
- *
- * @author Wolfgang Bangerth, 2009
- */
+  /**
+   * The equivalent of the int2type class for boolean arguments.
+   *
+   * @author Wolfgang Bangerth, 2009
+   */
   template <bool B>
   struct bool2type
   {};
@@ -281,7 +281,7 @@ namespace internal
 template <typename T, typename U>
 struct types_are_equal
 {
-    static const bool value = false;
+  static const bool value = false;
 };
 
 
@@ -293,7 +293,7 @@ struct types_are_equal
 template <typename T>
 struct types_are_equal<T,T>
 {
-    static const bool value = true;
+  static const bool value = true;
 };
 
 
@@ -304,7 +304,7 @@ struct types_are_equal<T,T>
 template <typename T, typename U>
 inline
 bool
-PointerComparison::equal (const T*, const U*)
+PointerComparison::equal (const T *, const U *)
 {
   return false;
 }

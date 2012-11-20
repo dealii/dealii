@@ -40,54 +40,54 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
 
   sizes.resize(n_levels);
-  for (unsigned int l=0;l<n_levels;++l)
+  for (unsigned int l=0; l<n_levels; ++l)
     sizes[l] = mg_dof.n_dofs(l);
 
-                                   // reset the size of the array of
-                                   // matrices. call resize(0) first,
-                                   // in order to delete all elements
-                                   // and clear their memory. then
-                                   // repopulate these arrays
-                                   //
-                                   // note that on resize(0), the
-                                   // shared_ptr class takes care of
-                                   // deleting the object it points to
-                                   // by itself
+  // reset the size of the array of
+  // matrices. call resize(0) first,
+  // in order to delete all elements
+  // and clear their memory. then
+  // repopulate these arrays
+  //
+  // note that on resize(0), the
+  // shared_ptr class takes care of
+  // deleting the object it points to
+  // by itself
   prolongation_matrices.resize (0);
   prolongation_sparsities.resize (0);
 
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
       prolongation_sparsities.push_back
-        (std_cxx1x::shared_ptr<SparsityPattern> (new SparsityPattern));
+      (std_cxx1x::shared_ptr<SparsityPattern> (new SparsityPattern));
       prolongation_matrices.push_back
-        (std_cxx1x::shared_ptr<SparseMatrix<double> > (new SparseMatrix<double>));
+      (std_cxx1x::shared_ptr<SparseMatrix<double> > (new SparseMatrix<double>));
     }
 
-                                   // two fields which will store the
-                                   // indices of the multigrid dofs
-                                   // for a cell and one of its children
+  // two fields which will store the
+  // indices of the multigrid dofs
+  // for a cell and one of its children
   std::vector<unsigned int> dof_indices_parent (dofs_per_cell);
   std::vector<unsigned int> dof_indices_child (dofs_per_cell);
 
-                                   // for each level: first build the sparsity
-                                   // pattern of the matrices and then build the
-                                   // matrices themselves. note that we only
-                                   // need to take care of cells on the coarser
-                                   // level which have children
+  // for each level: first build the sparsity
+  // pattern of the matrices and then build the
+  // matrices themselves. note that we only
+  // need to take care of cells on the coarser
+  // level which have children
   for (unsigned int level=0; level<n_levels-1; ++level)
     {
 
-                                       // reset the dimension of the structure.
-                                       // note that for the number of entries
-                                       // per row, the number of parent dofs
-                                       // coupling to a child dof is
-                                       // necessary. this, of course, is the
-                                       // number of degrees of freedom per
-                                       // cell
-                                       // increment dofs_per_cell
-                                       // since a useless diagonal
-                                       // element will be stored
+      // reset the dimension of the structure.
+      // note that for the number of entries
+      // per row, the number of parent dofs
+      // coupling to a child dof is
+      // necessary. this, of course, is the
+      // number of degrees of freedom per
+      // cell
+      // increment dofs_per_cell
+      // since a useless diagonal
+      // element will be stored
       CompressedSimpleSparsityPattern csp (sizes[level+1],
                                            sizes[level]);
       std::vector<unsigned int> entries (dofs_per_cell);
@@ -101,9 +101,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                    ExcNotImplemented());
             for (unsigned int child=0; child<cell->n_children(); ++child)
               {
-                                                 // set an alias to the
-                                                 // prolongation matrix for
-                                                 // this child
+                // set an alias to the
+                // prolongation matrix for
+                // this child
                 const FullMatrix<double> &prolongation
                   = mg_dof.get_fe().get_prolongation_matrix (child,
                                                              cell->refinement_case());
@@ -112,9 +112,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
-                                                 // now tag the entries in the
-                                                 // matrix which will be used
-                                                 // for this pair of parent/child
+                // now tag the entries in the
+                // matrix which will be used
+                // for this pair of parent/child
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
                   {
                     entries.resize(0);
@@ -131,7 +131,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       csp.reinit(0,0);
       prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
 
-                                       // now actually build the matrices
+      // now actually build the matrices
       for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children())
@@ -142,17 +142,17 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                    ExcNotImplemented());
             for (unsigned int child=0; child<cell->n_children(); ++child)
               {
-                                                 // set an alias to the
-                                                 // prolongation matrix for
-                                                 // this child
+                // set an alias to the
+                // prolongation matrix for
+                // this child
                 const FullMatrix<double> &prolongation
                   = mg_dof.get_fe().get_prolongation_matrix (child,
                                                              cell->refinement_case());
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
-                                                 // now set the entries in the
-                                                 // matrix
+                // now set the entries in the
+                // matrix
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
                   prolongation_matrices[level]->set (dof_indices_child[i],
                                                      dofs_per_cell,
@@ -164,56 +164,56 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
     }
 
 
-                                // impose boundary conditions
-                                // but only in the column of
-                                // the prolongation matrix
+  // impose boundary conditions
+  // but only in the column of
+  // the prolongation matrix
   if (mg_constrained_dofs != 0)
-  if (mg_constrained_dofs->set_boundary_values())
-    {
-      std::vector<unsigned int> constrain_indices;
-      for (int level=n_levels-2; level>=0; --level)
-        {
-          if (mg_constrained_dofs->get_boundary_indices()[level].size() == 0)
-            continue;
+    if (mg_constrained_dofs->set_boundary_values())
+      {
+        std::vector<unsigned int> constrain_indices;
+        for (int level=n_levels-2; level>=0; --level)
+          {
+            if (mg_constrained_dofs->get_boundary_indices()[level].size() == 0)
+              continue;
 
-                                // need to delete all the columns in the
-                                // matrix that are on the boundary. to achieve
-                                // this, create an array as long as there are
-                                // matrix columns, and find which columns we
-                                // need to filter away.
-          constrain_indices.resize (0);
-          constrain_indices.resize (prolongation_matrices[level]->n(), 0);
-          std::set<unsigned int>::const_iterator dof
+            // need to delete all the columns in the
+            // matrix that are on the boundary. to achieve
+            // this, create an array as long as there are
+            // matrix columns, and find which columns we
+            // need to filter away.
+            constrain_indices.resize (0);
+            constrain_indices.resize (prolongation_matrices[level]->n(), 0);
+            std::set<unsigned int>::const_iterator dof
             = mg_constrained_dofs->get_boundary_indices()[level].begin(),
             endd = mg_constrained_dofs->get_boundary_indices()[level].end();
-          for (; dof != endd; ++dof)
-            constrain_indices[*dof] = 1;
+            for (; dof != endd; ++dof)
+              constrain_indices[*dof] = 1;
 
-          const unsigned int n_dofs = prolongation_matrices[level]->m();
-          for (unsigned int i=0; i<n_dofs; ++i)
-            {
-              SparseMatrix<double>::iterator
+            const unsigned int n_dofs = prolongation_matrices[level]->m();
+            for (unsigned int i=0; i<n_dofs; ++i)
+              {
+                SparseMatrix<double>::iterator
                 start_row = prolongation_matrices[level]->begin(i),
                 end_row   = prolongation_matrices[level]->end(i);
-              for(; start_row != end_row; ++start_row)
-                {
-                  if (constrain_indices[start_row->column()] == 1)
-                    start_row->value() = 0;
-                }
-            }
-        }
-    }
+                for (; start_row != end_row; ++start_row)
+                  {
+                    if (constrain_indices[start_row->column()] == 1)
+                      start_row->value() = 0;
+                  }
+              }
+          }
+      }
 
-                                // to find the indices that describe the
-                                // relation between global dofs and local
-                                // numbering on the individual level, first
-                                // create a temp vector where the ith level
-                                // entry contains the respective global
-                                // entry. this gives a neat way to find those
-                                // indices. in a second step, actually build
-                                // the std::vector<std::pair<uint,uint> > that
-                                // only contains the active dofs on the
-                                // levels.
+  // to find the indices that describe the
+  // relation between global dofs and local
+  // numbering on the individual level, first
+  // create a temp vector where the ith level
+  // entry contains the respective global
+  // entry. this gives a neat way to find those
+  // indices. in a second step, actually build
+  // the std::vector<std::pair<uint,uint> > that
+  // only contains the active dofs on the
+  // levels.
 
   copy_indices.resize(n_levels);
   std::vector<unsigned int> temp_copy_indices;
@@ -223,43 +223,43 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
     {
       copy_indices[level].clear();
       typename MGDoFHandler<dim,spacedim>::active_cell_iterator
-        level_cell = mg_dof.begin_active(level);
+      level_cell = mg_dof.begin_active(level);
       const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
-        level_end  = mg_dof.end_active(level);
+      level_end  = mg_dof.end_active(level);
 
       temp_copy_indices.resize (0);
       temp_copy_indices.resize (mg_dof.n_dofs(level), numbers::invalid_unsigned_int);
 
-                                       // Compute coarse level right hand side
-                                       // by restricting from fine level.
+      // Compute coarse level right hand side
+      // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
         {
-          DoFAccessor<dim, DoFHandler<dim,spacedim> >& global_cell = *level_cell;
-                                           // get the dof numbers of
-                                           // this cell for the global
-                                           // and the level-wise
-                                           // numbering
+          DoFAccessor<dim, DoFHandler<dim,spacedim> > &global_cell = *level_cell;
+          // get the dof numbers of
+          // this cell for the global
+          // and the level-wise
+          // numbering
           global_cell.get_dof_indices(global_dof_indices);
           level_cell->get_mg_dof_indices (level_dof_indices);
 
           for (unsigned int i=0; i<dofs_per_cell; ++i)
-          {
-            if(mg_constrained_dofs != 0)
             {
-              if(!mg_constrained_dofs->at_refinement_edge(level,level_dof_indices[i]))
+              if (mg_constrained_dofs != 0)
+                {
+                  if (!mg_constrained_dofs->at_refinement_edge(level,level_dof_indices[i]))
+                    temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
+                }
+              else
                 temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
             }
-            else
-              temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
-          }
         }
 
-                                // now all the active dofs got a valid entry,
-                                // the other ones have an invalid entry. Count
-                                // the invalid entries and then resize the
-                                // copy_indices object. Then, insert the pairs
-                                // of global index and level index into
-                                // copy_indices.
+      // now all the active dofs got a valid entry,
+      // the other ones have an invalid entry. Count
+      // the invalid entries and then resize the
+      // copy_indices object. Then, insert the pairs
+      // of global index and level index into
+      // copy_indices.
       const unsigned int n_active_dofs =
         std::count_if (temp_copy_indices.begin(), temp_copy_indices.end(),
                        std::bind2nd(std::not_equal_to<unsigned int>(),

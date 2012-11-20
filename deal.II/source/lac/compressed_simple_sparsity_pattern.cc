@@ -38,8 +38,8 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
 
   if (indices_are_sorted == true && n_elements > 3)
     {
-                                   // in debug mode, check whether the
-                                   // indices really are sorted.
+      // in debug mode, check whether the
+      // indices really are sorted.
 #ifdef DEBUG
       {
         ForwardIterator test = begin, test1 = begin;
@@ -55,10 +55,10 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
           return;
         }
 
-                                   // find a possible insertion point for
-                                   // the first entry. check whether the
-                                   // first entry is a duplicate before
-                                   // actually doing something.
+      // find a possible insertion point for
+      // the first entry. check whether the
+      // first entry is a duplicate before
+      // actually doing something.
       ForwardIterator my_it = begin;
       unsigned int col = *my_it;
       std::vector<unsigned int>::iterator it =
@@ -69,8 +69,8 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
           if (my_it == end)
             break;
           col = *my_it;
-                                   // check the very next entry in the
-                                   // current array
+          // check the very next entry in the
+          // current array
           ++it;
           if (it == entries.end())
             break;
@@ -78,30 +78,30 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
             break;
           if (*it == col)
             continue;
-                                   // ok, it wasn't the very next one, do a
-                                   // binary search to find the insert point
+          // ok, it wasn't the very next one, do a
+          // binary search to find the insert point
           it = Utilities::lower_bound(it, entries.end(), col);
           if (it == entries.end())
             break;
         }
-                                   // all input entries were duplicates.
+      // all input entries were duplicates.
       if (my_it == end)
         return;
 
-                                   // resize vector by just inserting the
-                                   // list
+      // resize vector by just inserting the
+      // list
       const unsigned int pos1 = it - entries.begin();
       Assert (pos1 <= entries.size(), ExcInternalError());
       entries.insert (it, my_it, end);
       it = entries.begin() + pos1;
       Assert (entries.size() >= (unsigned int)(it-entries.begin()), ExcInternalError());
 
-                                   // now merge the two lists.
+      // now merge the two lists.
       std::vector<unsigned int>::iterator it2 = it + (end-my_it);
 
-                                   // as long as there are indices both in
-                                   // the end of the entries list and in the
-                                   // input list
+      // as long as there are indices both in
+      // the end of the entries list and in the
+      // input list
       while (my_it != end && it2 != entries.end())
         {
           if (*my_it < *it2)
@@ -114,89 +114,94 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
           else
             *it++ = *it2++;
         }
-                                   // in case there are indices left in the
-                                   // input list
+      // in case there are indices left in the
+      // input list
       while (my_it != end)
         *it++ = *my_it++;
 
-                                   // in case there are indices left in the
-                                   // end of entries
+      // in case there are indices left in the
+      // end of entries
       while (it2 != entries.end())
         *it++ = *it2++;
 
-                                   // resize and return
+      // resize and return
       const unsigned int new_size = it - entries.begin();
       Assert (new_size <= stop_size, ExcInternalError());
       entries.resize (new_size);
       return;
     }
 
-                                   // unsorted case or case with too few
-                                   // elements
+  // unsorted case or case with too few
+  // elements
   ForwardIterator my_it = begin;
 
-                                   // If necessary, increase the size of the
-                                   // array.
+  // If necessary, increase the size of the
+  // array.
   if (stop_size > entries.capacity())
     entries.reserve (stop_size);
 
   unsigned int col = *my_it;
   std::vector<unsigned int>::iterator it, it2;
-                                   // insert the first element as for one
-                                   // entry only first check the last
-                                   // element (or if line is still empty)
-  if ( (entries.size()==0) || ( entries.back() < col) ) {
-    entries.push_back(col);
-    it = entries.end()-1;
-  }
-  else {
-                                   // do a binary search to find the place
-                                   // where to insert:
-    it2 = Utilities::lower_bound(entries.begin(), entries.end(), col);
+  // insert the first element as for one
+  // entry only first check the last
+  // element (or if line is still empty)
+  if ( (entries.size()==0) || ( entries.back() < col) )
+    {
+      entries.push_back(col);
+      it = entries.end()-1;
+    }
+  else
+    {
+      // do a binary search to find the place
+      // where to insert:
+      it2 = Utilities::lower_bound(entries.begin(), entries.end(), col);
 
-                                   // If this entry is a duplicate, continue
-                                   // immediately Insert at the right place
-                                   // in the vector. Vector grows
-                                   // automatically to fit elements. Always
-                                   // doubles its size.
-    if (*it2 != col)
-      it = entries.insert(it2, col);
-    else
-      it = it2;
-  }
+      // If this entry is a duplicate, continue
+      // immediately Insert at the right place
+      // in the vector. Vector grows
+      // automatically to fit elements. Always
+      // doubles its size.
+      if (*it2 != col)
+        it = entries.insert(it2, col);
+      else
+        it = it2;
+    }
 
   ++my_it;
-                                   // Now try to be smart and insert with
-                                   // bias in the direction we are
-                                   // walking. This has the advantage that
-                                   // for sorted lists, we always search in
-                                   // the right direction, what should
-                                   // decrease the work needed in here.
+  // Now try to be smart and insert with
+  // bias in the direction we are
+  // walking. This has the advantage that
+  // for sorted lists, we always search in
+  // the right direction, what should
+  // decrease the work needed in here.
   for ( ; my_it != end; ++my_it)
     {
       col = *my_it;
-                                   // need a special insertion command when
-                                   // we're at the end of the list
-      if (col > entries.back()) {
-        entries.push_back(col);
-        it = entries.end()-1;
-      }
-                                   // search to the right (preferred search
-                                   // direction)
-      else if (col > *it) {
-        it2 = Utilities::lower_bound(it++, entries.end(), col);
-        if (*it2 != col)
-          it = entries.insert(it2, col);
-      }
-                                   // search to the left
-      else if (col < *it) {
-        it2 = Utilities::lower_bound(entries.begin(), it, col);
-        if (*it2 != col)
-          it = entries.insert(it2, col);
-      }
-                                   // if we're neither larger nor smaller,
-                                   // then this was a duplicate and we can
-                                   // just continue.
+      // need a special insertion command when
+      // we're at the end of the list
+      if (col > entries.back())
+        {
+          entries.push_back(col);
+          it = entries.end()-1;
+        }
+      // search to the right (preferred search
+      // direction)
+      else if (col > *it)
+        {
+          it2 = Utilities::lower_bound(it++, entries.end(), col);
+          if (*it2 != col)
+            it = entries.insert(it2, col);
+        }
+      // search to the left
+      else if (col < *it)
+        {
+          it2 = Utilities::lower_bound(entries.begin(), it, col);
+          if (*it2 != col)
+            it = entries.insert(it2, col);
+        }
+      // if we're neither larger nor smaller,
+      // then this was a duplicate and we can
+      // just continue.
     }
 }
 
@@ -209,21 +214,21 @@ CompressedSimpleSparsityPattern::Line::memory_consumption () const
 
 
 CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern ()
-                :
-                rows(0),
-                cols(0),
-                rowset(0)
+  :
+  rows(0),
+  cols(0),
+  rowset(0)
 {}
 
 
 
 CompressedSimpleSparsityPattern::
 CompressedSimpleSparsityPattern (const CompressedSimpleSparsityPattern &s)
-                :
-                Subscriptor(),
-                rows(0),
-                cols(0),
-                rowset(0)
+  :
+  Subscriptor(),
+  rows(0),
+  cols(0),
+  rowset(0)
 {
   Assert (s.rows == 0, ExcInvalidConstructorCall());
   Assert (s.cols == 0, ExcInvalidConstructorCall());
@@ -232,13 +237,13 @@ CompressedSimpleSparsityPattern (const CompressedSimpleSparsityPattern &s)
 
 
 CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const unsigned int m,
-                                                                  const unsigned int n,
-                                                                  const IndexSet & rowset_
-)
-                :
-                rows(0),
-                cols(0),
-                rowset(0)
+    const unsigned int n,
+    const IndexSet &rowset_
+                                                                 )
+  :
+  rows(0),
+  cols(0),
+  rowset(0)
 {
   reinit (m,n, rowset_);
 }
@@ -246,10 +251,10 @@ CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const unsigned
 
 
 CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const unsigned int n)
-                :
-                rows(0),
-                cols(0),
-                rowset(0)
+  :
+  rows(0),
+  cols(0),
+  rowset(0)
 {
   reinit (n,n);
 }
@@ -273,7 +278,7 @@ CompressedSimpleSparsityPattern::operator = (const CompressedSimpleSparsityPatte
 void
 CompressedSimpleSparsityPattern::reinit (const unsigned int m,
                                          const unsigned int n,
-                                         const IndexSet & rowset_)
+                                         const IndexSet &rowset_)
 {
   rows = m;
   cols = n;
@@ -338,28 +343,28 @@ CompressedSimpleSparsityPattern::symmetrize ()
 {
   Assert (rows==cols, ExcNotQuadratic());
 
-                                   // loop over all elements presently
-                                   // in the sparsity pattern and add
-                                   // the transpose element. note:
-                                   //
-                                   // 1. that the sparsity pattern
-                                   // changes which we work on, but
-                                   // not the present row
-                                   //
-                                   // 2. that the @p{add} function can
-                                   // be called on elements that
-                                   // already exist without any harm
+  // loop over all elements presently
+  // in the sparsity pattern and add
+  // the transpose element. note:
+  //
+  // 1. that the sparsity pattern
+  // changes which we work on, but
+  // not the present row
+  //
+  // 2. that the @p{add} function can
+  // be called on elements that
+  // already exist without any harm
   for (unsigned int row=0; row<lines.size(); ++row)
     {
       const unsigned int rowindex =
         rowset.size()==0 ? row : rowset.nth_index_in_set(row);
 
       for (std::vector<unsigned int>::const_iterator
-             j=lines[row].entries.begin();
+           j=lines[row].entries.begin();
            j != lines[row].entries.end();
            ++j)
-                                       // add the transpose entry if
-                                       // this is not the diagonal
+        // add the transpose entry if
+        // this is not the diagonal
         if (rowindex != *j)
           add (*j, rowindex);
     }
@@ -375,7 +380,7 @@ CompressedSimpleSparsityPattern::print (std::ostream &out) const
       out << '[' << (rowset.size()==0 ? row : rowset.nth_index_in_set(row));
 
       for (std::vector<unsigned int>::const_iterator
-             j=lines[row].entries.begin();
+           j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
         out << ',' << *j;
 
@@ -396,13 +401,13 @@ CompressedSimpleSparsityPattern::print_gnuplot (std::ostream &out) const
         rowset.size()==0 ? row : rowset.nth_index_in_set(row);
 
       for (std::vector<unsigned int>::const_iterator
-             j=lines[row].entries.begin();
+           j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
-                                         // while matrix entries are usually
-                                         // written (i,j), with i vertical and
-                                         // j horizontal, gnuplot output is
-                                         // x-y, that is we have to exchange
-                                         // the order of output
+        // while matrix entries are usually
+        // written (i,j), with i vertical and
+        // j horizontal, gnuplot output is
+        // x-y, that is we have to exchange
+        // the order of output
         out << *j << " "
             << -static_cast<signed int>(rowindex)
             << std::endl;
@@ -424,7 +429,7 @@ CompressedSimpleSparsityPattern::bandwidth () const
         rowset.size()==0 ? row : rowset.nth_index_in_set(row);
 
       for (std::vector<unsigned int>::const_iterator
-             j=lines[row].entries.begin();
+           j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
         if (static_cast<unsigned int>(std::abs(static_cast<int>(rowindex-*j))) > b)
           b = std::abs(static_cast<signed int>(rowindex-*j));
@@ -451,7 +456,7 @@ CompressedSimpleSparsityPattern::n_nonzero_elements () const
 std::size_t
 CompressedSimpleSparsityPattern::memory_consumption () const
 {
-                                   //TODO: IndexSet...
+  //TODO: IndexSet...
   std::size_t mem = sizeof(CompressedSimpleSparsityPattern);
   for (unsigned int i=0; i<lines.size(); ++i)
     mem += MemoryConsumption::memory_consumption (lines[i]);
@@ -462,11 +467,11 @@ CompressedSimpleSparsityPattern::memory_consumption () const
 
 // explicit instantiations
 template void CompressedSimpleSparsityPattern::Line::add_entries(unsigned int *,
-                                                                 unsigned int *,
-                                                                 const bool);
+    unsigned int *,
+    const bool);
 template void CompressedSimpleSparsityPattern::Line::add_entries(const unsigned int *,
-                                                                 const unsigned int *,
-                                                                 const bool);
+    const unsigned int *,
+    const bool);
 #ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 template void CompressedSimpleSparsityPattern::Line::
 add_entries(std::vector<unsigned int>::iterator,

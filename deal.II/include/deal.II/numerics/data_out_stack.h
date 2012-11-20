@@ -105,334 +105,334 @@ template <int dim, int spacedim> class DoFHandler;
 template <int dim, int spacedim=dim, class DH = DoFHandler<dim,spacedim> >
 class DataOutStack : public DataOutInterface<dim+1>
 {
-  public:
-                                     /**
-                                      * Data type declaring the two types
-                                      * of vectors which are used in this
-                                      * class.
-                                      */
-    enum VectorType { cell_vector, dof_vector };
+public:
+  /**
+   * Data type declaring the two types
+   * of vectors which are used in this
+   * class.
+   */
+  enum VectorType { cell_vector, dof_vector };
 
-                                     /**
-                                      * Destructor. Only declared to make
-                                      * it @p virtual.
-                                      */
-    virtual ~DataOutStack ();
+  /**
+   * Destructor. Only declared to make
+   * it @p virtual.
+   */
+  virtual ~DataOutStack ();
 
-                                     /**
-                                      * Start the next set of data for a
-                                      * specific parameter value. The argument
-                                      * @p parameter_step denotes the interval
-                                      * (in backward direction, counted from
-                                      * @p parameter_value) with which the
-                                      * output will be extended in parameter
-                                      * direction, i.e. orthogonal to the
-                                      * space directions.
-                                      */
-    void new_parameter_value (const double parameter_value,
-                              const double parameter_step);
+  /**
+   * Start the next set of data for a
+   * specific parameter value. The argument
+   * @p parameter_step denotes the interval
+   * (in backward direction, counted from
+   * @p parameter_value) with which the
+   * output will be extended in parameter
+   * direction, i.e. orthogonal to the
+   * space directions.
+   */
+  void new_parameter_value (const double parameter_value,
+                            const double parameter_step);
 
-                                     /**
-                                      * Attach the DoF handler for the
-                                      * grid and data associated with the
-                                      * parameter previously set by
-                                      * @p new_parameter_value.
-                                      *
-                                      * This has to happen before adding
-                                      * data vectors for the present
-                                      * parameter value.
-                                      */
-    void attach_dof_handler (const DH& dof_handler);
+  /**
+   * Attach the DoF handler for the
+   * grid and data associated with the
+   * parameter previously set by
+   * @p new_parameter_value.
+   *
+   * This has to happen before adding
+   * data vectors for the present
+   * parameter value.
+   */
+  void attach_dof_handler (const DH &dof_handler);
 
-                                     /**
-                                      * Declare a data vector. The @p vector_type
-                                      * argument determines whether the data
-                                      * vector will be considered as DoF or
-                                      * cell data.
-                                      *
-                                      * This version may be called if the
-                                      * finite element presently used by the
-                                      * DoFHandler (and previously attached
-                                      * to this object) has only one component
-                                      * and therefore only one name needs to
-                                      * be given.
-                                      */
-    void declare_data_vector (const std::string &name,
-                              const VectorType   vector_type);
+  /**
+   * Declare a data vector. The @p vector_type
+   * argument determines whether the data
+   * vector will be considered as DoF or
+   * cell data.
+   *
+   * This version may be called if the
+   * finite element presently used by the
+   * DoFHandler (and previously attached
+   * to this object) has only one component
+   * and therefore only one name needs to
+   * be given.
+   */
+  void declare_data_vector (const std::string &name,
+                            const VectorType   vector_type);
 
-                                     /**
-                                      * Declare a data vector. The @p vector_type
-                                      * argument determines whether the data
-                                      * vector will be considered as DoF or
-                                      * cell data.
-                                      *
-                                      * This version must be called if the
-                                      * finite element presently used by the
-                                      * DoFHandler (and previously attached
-                                      * to this object) has more than one
-                                      * component and therefore more than one
-                                      * name needs to be given. However, you
-                                      * can also call this function with a
-                                      * <tt>vector<string></tt> containing only one
-                                      * element if the finite element has
-                                      * only one component.
-                                      */
-    void declare_data_vector (const std::vector<std::string> &name,
-                              const VectorType                vector_type);
+  /**
+   * Declare a data vector. The @p vector_type
+   * argument determines whether the data
+   * vector will be considered as DoF or
+   * cell data.
+   *
+   * This version must be called if the
+   * finite element presently used by the
+   * DoFHandler (and previously attached
+   * to this object) has more than one
+   * component and therefore more than one
+   * name needs to be given. However, you
+   * can also call this function with a
+   * <tt>vector<string></tt> containing only one
+   * element if the finite element has
+   * only one component.
+   */
+  void declare_data_vector (const std::vector<std::string> &name,
+                            const VectorType                vector_type);
 
 
-                                     /**
-                                      * Add a data vector for the presently
-                                      * set value of the parameter.
-                                      *
-                                      * This version may be called if the
-                                      * finite element presently used by the
-                                      * DoFHandler (and previously attached
-                                      * to this object) has only one component
-                                      * and therefore only one name needs to
-                                      * be given.
-                                      *
-                                      * If @p vec is a vector with
-                                      * multiple components this
-                                      * function will generate
-                                      * distinct names for all
-                                      * components by appending an
-                                      * underscore and the number of
-                                      * each component to @p name
-                                      *
-                                      * The data vector must have been
-                                      * registered using the @p declare_data_vector
-                                      * function before actually using it the
-                                      * first time.
-                                      *
-                                      * Note that a copy of this vector is
-                                      * stored until @p finish_parameter_value
-                                      * is called the next time, so if you are
-                                      * short of memory you may want to call
-                                      * this function only after all
-                                      * computations involving large matrices
-                                      * are already done.
-                                      */
-    template <typename number>
-    void add_data_vector (const Vector<number> &vec,
-                          const std::string    &name);
+  /**
+   * Add a data vector for the presently
+   * set value of the parameter.
+   *
+   * This version may be called if the
+   * finite element presently used by the
+   * DoFHandler (and previously attached
+   * to this object) has only one component
+   * and therefore only one name needs to
+   * be given.
+   *
+   * If @p vec is a vector with
+   * multiple components this
+   * function will generate
+   * distinct names for all
+   * components by appending an
+   * underscore and the number of
+   * each component to @p name
+   *
+   * The data vector must have been
+   * registered using the @p declare_data_vector
+   * function before actually using it the
+   * first time.
+   *
+   * Note that a copy of this vector is
+   * stored until @p finish_parameter_value
+   * is called the next time, so if you are
+   * short of memory you may want to call
+   * this function only after all
+   * computations involving large matrices
+   * are already done.
+   */
+  template <typename number>
+  void add_data_vector (const Vector<number> &vec,
+                        const std::string    &name);
 
-                                     /**
-                                      * Add a data vector for the presently
-                                      * set value of the parameter.
-                                      *
-                                      * This version must be called if the
-                                      * finite element presently used by the
-                                      * DoFHandler (and previously attached
-                                      * to this object) has more than one
-                                      * component and therefore more than one
-                                      * name needs to be given. However, you
-                                      * can also call this function with a
-                                      * <tt>vector<string></tt> containing only one
-                                      * element if the finite element has
-                                      * only one component.
-                                      *
-                                      * The data vector must have been
-                                      * registered using the @p declare_data_vector
-                                      * function before actually using it the
-                                      * first time.
-                                      *
-                                      * Note that a copy of this vector is
-                                      * stored until @p finish_parameter_value
-                                      * is called the next time, so if you are
-                                      * short of memory you may want to call
-                                      * this function only after all
-                                      * computations involving large matrices
-                                      * are already done.
-                                      */
-    template <typename number>
-    void add_data_vector (const Vector<number>           &vec,
-                          const std::vector<std::string> &names);
+  /**
+   * Add a data vector for the presently
+   * set value of the parameter.
+   *
+   * This version must be called if the
+   * finite element presently used by the
+   * DoFHandler (and previously attached
+   * to this object) has more than one
+   * component and therefore more than one
+   * name needs to be given. However, you
+   * can also call this function with a
+   * <tt>vector<string></tt> containing only one
+   * element if the finite element has
+   * only one component.
+   *
+   * The data vector must have been
+   * registered using the @p declare_data_vector
+   * function before actually using it the
+   * first time.
+   *
+   * Note that a copy of this vector is
+   * stored until @p finish_parameter_value
+   * is called the next time, so if you are
+   * short of memory you may want to call
+   * this function only after all
+   * computations involving large matrices
+   * are already done.
+   */
+  template <typename number>
+  void add_data_vector (const Vector<number>           &vec,
+                        const std::vector<std::string> &names);
 
-                                     /**
-                                      * Actually build the patches for output
-                                      * by the base classes from the data
-                                      * stored in the data vectors and using
-                                      * the previously attached DoFHandler
-                                      * object.
-                                      *
-                                      * By @p n_subdivisions you can decide
-                                      * into how many subdivisions (in each
-                                      * space and parameter direction) each
-                                      * patch is divided. This is useful
-                                      * if higher order elements are used.
-                                      * Note however, that the number of
-                                      * subdivisions in parameter direction
-                                      * is always the same as the one is space
-                                      * direction for technical reasons.
-                                      */
-    void build_patches (const unsigned int n_subdivisions = 0);
+  /**
+   * Actually build the patches for output
+   * by the base classes from the data
+   * stored in the data vectors and using
+   * the previously attached DoFHandler
+   * object.
+   *
+   * By @p n_subdivisions you can decide
+   * into how many subdivisions (in each
+   * space and parameter direction) each
+   * patch is divided. This is useful
+   * if higher order elements are used.
+   * Note however, that the number of
+   * subdivisions in parameter direction
+   * is always the same as the one is space
+   * direction for technical reasons.
+   */
+  void build_patches (const unsigned int n_subdivisions = 0);
 
-                                     /**
-                                      * Release all data that is no
-                                      * more needed once @p build_patches
-                                      * was called and all other transactions
-                                      * for a given parameter value are done.
-                                      *
-                                      * Couterpart of @p new_parameter_value.
-                                      */
-    void finish_parameter_value ();
+  /**
+   * Release all data that is no
+   * more needed once @p build_patches
+   * was called and all other transactions
+   * for a given parameter value are done.
+   *
+   * Couterpart of @p new_parameter_value.
+   */
+  void finish_parameter_value ();
 
-                                     /**
-                                      * Clear all data presently stored
-                                      * in this object.
-                                      */
-    void clear ();
+  /**
+   * Clear all data presently stored
+   * in this object.
+   */
+  void clear ();
 
-                                     /**
-                                      * Determine an estimate for the
-                                      * memory consumption (in bytes)
-                                      * of this object.
-                                      */
+  /**
+   * Determine an estimate for the
+   * memory consumption (in bytes)
+   * of this object.
+   */
+  std::size_t memory_consumption () const;
+
+  /**
+   * Exception
+   */
+  DeclException0 (ExcNoDoFHandlerSelected);
+  /**
+   * Exception
+   */
+  DeclException3 (ExcInvalidVectorSize,
+                  int, int, int,
+                  << "The vector has size " << arg1
+                  << " but the DoFHandler objects says there are " << arg2
+                  << " degrees of freedom and there are " << arg3
+                  << " active cells.");
+  /**
+   * Exception
+   */
+  DeclException2 (ExcInvalidCharacter,
+                  std::string, size_t,
+                  << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
+                  << "description strings since some graphics formats will only accept these."
+                  << std::endl
+                  << "The string you gave was <" << arg1
+                  << ">, the invalid character is <" << arg1[arg2]
+                  << ">." << std::endl);
+  /**
+   * Exception
+   */
+  DeclException2 (ExcInvalidNumberOfNames,
+                  int, int,
+                  << "You have to give one name per component in your "
+                  << "data vector. The number you gave was " << arg1
+                  << ", but the number of components is " << arg2);
+  /**
+   * Exception
+   */
+  DeclException1 (ExcVectorNotDeclared,
+                  std::string,
+                  << "The data vector for which the first component has the name "
+                  << arg1 << " has not been declared before.");
+  /**
+   * Exception
+   */
+  DeclException0 (ExcDataNotCleared);
+  /**
+   * Exception
+   */
+  DeclException0 (ExcDataAlreadyAdded);
+  /**
+   * Exception
+   */
+  DeclException1 (ExcNameAlreadyUsed,
+                  std::string,
+                  << "You tried to declare a component of a data vector with "
+                  << "the name <" << arg1 << ">, but that name is already used.");
+  /**
+   * Exception
+   */
+  DeclException1 (ExcInvalidNumberOfSubdivisions,
+                  int,
+                  << "The number of subdivisions per patch, " << arg1
+                  << ", is not valid.");
+
+private:
+  /**
+   * Present parameter value.
+   */
+  double                               parameter;
+
+  /**
+   * Present parameter step, i.e.
+   * length of the parameter interval
+   * to be written next.
+   */
+  double                               parameter_step;
+
+  /**
+   * DoF handler to be used for the data
+   * corresponding to the present parameter
+   * value.
+   */
+  SmartPointer<const DH,DataOutStack<dim,spacedim,DH> > dof_handler;
+
+  /**
+   * List of patches of all past and
+   * present parameter value data sets.
+   */
+  std::vector< dealii::DataOutBase::Patch<dim+1,dim+1> >   patches;
+
+  /**
+   * Structure holding data vectors
+   * (cell and dof data) for the present
+   * parameter value.
+   */
+  struct DataVector
+  {
+    /**
+     * Data vector.
+     */
+    Vector<double> data;
+
+    /**
+     * Names of the different components
+     * within each such data set.
+     */
+    std::vector<std::string> names;
+
+    /**
+     * Determine an estimate for
+     * the memory consumption (in
+     * bytes) of this object.
+     */
     std::size_t memory_consumption () const;
+  };
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcNoDoFHandlerSelected);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException3 (ExcInvalidVectorSize,
-                    int, int, int,
-                    << "The vector has size " << arg1
-                    << " but the DoFHandler objects says there are " << arg2
-                    << " degrees of freedom and there are " << arg3
-                    << " active cells.");
-                                     /**
-                                      * Exception
-                                      */
-    DeclException2 (ExcInvalidCharacter,
-                    std::string, size_t,
-                    << "Please use only the characters [a-zA-Z0-9_<>()] for" << std::endl
-                    << "description strings since some graphics formats will only accept these."
-                    << std::endl
-                    << "The string you gave was <" << arg1
-                    << ">, the invalid character is <" << arg1[arg2]
-                    << ">." << std::endl);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException2 (ExcInvalidNumberOfNames,
-                    int, int,
-                    << "You have to give one name per component in your "
-                    << "data vector. The number you gave was " << arg1
-                    << ", but the number of components is " << arg2);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException1 (ExcVectorNotDeclared,
-                    std::string,
-                    << "The data vector for which the first component has the name "
-                    << arg1 << " has not been declared before.");
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcDataNotCleared);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcDataAlreadyAdded);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException1 (ExcNameAlreadyUsed,
-                    std::string,
-                    << "You tried to declare a component of a data vector with "
-                    << "the name <" << arg1 << ">, but that name is already used.");
-                                     /**
-                                      * Exception
-                                      */
-    DeclException1 (ExcInvalidNumberOfSubdivisions,
-                    int,
-                    << "The number of subdivisions per patch, " << arg1
-                    << ", is not valid.");
+  /**
+   * List of DoF data vectors.
+   */
+  std::vector<DataVector> dof_data;
 
-  private:
-                                     /**
-                                      * Present parameter value.
-                                      */
-    double                               parameter;
+  /**
+   * List of cell data vectors.
+   */
+  std::vector<DataVector> cell_data;
 
-                                     /**
-                                      * Present parameter step, i.e.
-                                      * length of the parameter interval
-                                      * to be written next.
-                                      */
-    double                               parameter_step;
-
-                                     /**
-                                      * DoF handler to be used for the data
-                                      * corresponding to the present parameter
-                                      * value.
-                                      */
-    SmartPointer<const DH,DataOutStack<dim,spacedim,DH> > dof_handler;
-
-                                     /**
-                                      * List of patches of all past and
-                                      * present parameter value data sets.
-                                      */
-    std::vector< dealii::DataOutBase::Patch<dim+1,dim+1> >   patches;
-
-                                     /**
-                                      * Structure holding data vectors
-                                      * (cell and dof data) for the present
-                                      * parameter value.
-                                      */
-    struct DataVector
-    {
-                                         /**
-                                          * Data vector.
-                                          */
-        Vector<double> data;
-
-                                         /**
-                                          * Names of the different components
-                                          * within each such data set.
-                                          */
-        std::vector<std::string> names;
-
-                                         /**
-                                          * Determine an estimate for
-                                          * the memory consumption (in
-                                          * bytes) of this object.
-                                          */
-        std::size_t memory_consumption () const;
-    };
-
-                                     /**
-                                      * List of DoF data vectors.
-                                      */
-    std::vector<DataVector> dof_data;
-
-                                     /**
-                                      * List of cell data vectors.
-                                      */
-    std::vector<DataVector> cell_data;
-
-                                     /**
-                                      * This is the function through
-                                      * which derived classes propagate
-                                      * preprocessed data in the form of
-                                      * Patch structures (declared in
-                                      * the base class DataOutBase) to
-                                      * the actual output function.
-                                      */
-    virtual const std::vector< dealii::DataOutBase::Patch<dim+1,dim+1> > & get_patches () const;
+  /**
+   * This is the function through
+   * which derived classes propagate
+   * preprocessed data in the form of
+   * Patch structures (declared in
+   * the base class DataOutBase) to
+   * the actual output function.
+   */
+  virtual const std::vector< dealii::DataOutBase::Patch<dim+1,dim+1> > & get_patches () const;
 
 
-                                     /**
-                                      * Virtual function through
-                                      * which the names of data sets are
-                                      * obtained by the output functions
-                                      * of the base class.
-                                      */
-    virtual std::vector<std::string> get_dataset_names () const;
+  /**
+   * Virtual function through
+   * which the names of data sets are
+   * obtained by the output functions
+   * of the base class.
+   */
+  virtual std::vector<std::string> get_dataset_names () const;
 };
 
 

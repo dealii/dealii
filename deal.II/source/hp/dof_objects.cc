@@ -30,7 +30,7 @@ namespace internal
     }
 
 
-                                     // explicit instantiations
+    // explicit instantiations
     template
     std::size_t
     DoFObjects<1>::memory_consumption () const;

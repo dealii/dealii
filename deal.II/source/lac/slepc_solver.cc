@@ -35,7 +35,7 @@ namespace SLEPcWrappers
 
   SolverBase::SolverData::~SolverData ()
   {
-                                   // Destroy the solver object.
+    // Destroy the solver object.
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
     int ierr = EPSDestroy (eps);
 #else
@@ -61,7 +61,7 @@ namespace SLEPcWrappers
   void
   SolverBase::set_matrices (const PETScWrappers::MatrixBase &A)
   {
-                                   // standard eigenspectrum problem
+    // standard eigenspectrum problem
     opA = &A;
     opB = NULL;
   }
@@ -70,7 +70,7 @@ namespace SLEPcWrappers
   SolverBase::set_matrices (const PETScWrappers::MatrixBase &A,
                             const PETScWrappers::MatrixBase &B)
   {
-                                   // generalized eigenspectrum problem
+    // generalized eigenspectrum problem
     opA = &A;
     opB = &B;
   }
@@ -101,13 +101,13 @@ namespace SLEPcWrappers
     AssertThrow (solver_data.get() == 0, ExcSLEPcWrappersUsageError());
     solver_data.reset (new SolverData());
 
-                                    // create eigensolver context and
-                                    // set operators
+    // create eigensolver context and
+    // set operators
     ierr = EPSCreate (mpi_communicator, &solver_data->eps);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-                                    // set eigenspectrum problem type
-                                    // (general/standard)
+    // set eigenspectrum problem type
+    // (general/standard)
     AssertThrow (opA, ExcSLEPcWrappersUsageError());
     if (opB)
       ierr = EPSSetOperators (solver_data->eps, *opA, *opB);
@@ -115,7 +115,7 @@ namespace SLEPcWrappers
       ierr = EPSSetOperators (solver_data->eps, *opA, PETSC_NULL);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-                                    // set the initial vector(s) if any
+    // set the initial vector(s) if any
     if (initial_vector && initial_vector->size() != 0)
       {
 
@@ -129,36 +129,36 @@ namespace SLEPcWrappers
         AssertThrow (ierr == 0, ExcSLEPcError(ierr));
       }
 
-                                    // set transformation type if any
+    // set transformation type if any
     if (transformation)
       transformation->set_context(solver_data->eps);
 
-                                    // set runtime options
+    // set runtime options
     set_solver_type (solver_data->eps);
 
-                                    // set which portion of the
-                                    // eigenspectrum to solve for
+    // set which portion of the
+    // eigenspectrum to solve for
     ierr = EPSSetWhichEigenpairs (solver_data->eps, set_which);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-                                    // set number of eigenvectors to
-                                    // compute
+    // set number of eigenvectors to
+    // compute
     ierr = EPSSetDimensions (solver_data->eps, n_eigenvectors,
                              PETSC_DECIDE, PETSC_DECIDE);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-                                    // set the solve options to the
-                                    // eigenvalue problem solver
-                                    // context
+    // set the solve options to the
+    // eigenvalue problem solver
+    // context
     ierr = EPSSetFromOptions (solver_data->eps);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-                                    // solve the eigensystem
+    // solve the eigensystem
     ierr = EPSSolve (solver_data->eps);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-                                    // get number of converged
-                                    // eigenstates
+    // get number of converged
+    // eigenstates
     ierr = EPSGetConverged (solver_data->eps,
 #ifdef PETSC_USE_64BIT_INDICES
                             reinterpret_cast<PetscInt *>(n_converged));
@@ -179,7 +179,7 @@ namespace SLEPcWrappers
   {
     AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());
 
-                                    // get converged eigenpair
+    // get converged eigenpair
     int ierr = EPSGetEigenpair (solver_data->eps, index,
                                 &kr, PETSC_NULL, vr, PETSC_NULL);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
@@ -191,7 +191,7 @@ namespace SLEPcWrappers
   {
     AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());
 
-                                    // destroy solver object.
+    // destroy solver object.
     solver_data.reset ();
   }
 
@@ -223,7 +223,7 @@ namespace SLEPcWrappers
                                 void               *solver_control_x)
   {
     SolverControl &solver_control
-      = *reinterpret_cast<SolverControl*>(solver_control_x);
+      = *reinterpret_cast<SolverControl *>(solver_control_x);
 
     const SolverControl::State state
       = solver_control.check (iteration, residual_norm);
@@ -249,7 +249,7 @@ namespace SLEPcWrappers
         Assert (false, ExcNotImplemented());
       }
 
-                                    // return without failure.
+    // return without failure.
     return 0;
   }
 
@@ -270,11 +270,11 @@ namespace SLEPcWrappers
     ierr = EPSSetType (eps, const_cast<char *>(EPSKRYLOVSCHUR));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-                                    // hand over the absolute
-                                    // tolerance and the maximum
-                                    // number of iteration steps to
-                                    // the SLEPc convergence
-                                    // criterion.
+    // hand over the absolute
+    // tolerance and the maximum
+    // number of iteration steps to
+    // the SLEPc convergence
+    // criterion.
     ierr = EPSSetTolerances(eps, this->solver_control.tolerance(),
                             this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
@@ -303,18 +303,18 @@ namespace SLEPcWrappers
     ierr = EPSSetType (eps, const_cast<char *>(EPSARNOLDI));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-                                    // hand over the absolute
-                                    // tolerance and the maximum
-                                    // number of iteration steps to
-                                    // the SLEPc convergence
-                                    // criterion.
+    // hand over the absolute
+    // tolerance and the maximum
+    // number of iteration steps to
+    // the SLEPc convergence
+    // criterion.
     ierr = EPSSetTolerances(eps, this->solver_control.tolerance(),
                             this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-                                    // if requested, set delayed
-                                    // reorthogonalization in the
-                                    // Arnoldi iteration.
+    // if requested, set delayed
+    // reorthogonalization in the
+    // Arnoldi iteration.
     if (additional_data.delayed_reorthogonalization)
       {
         ierr = EPSArnoldiSetDelayed (eps, PETSC_TRUE);
@@ -339,11 +339,11 @@ namespace SLEPcWrappers
     ierr = EPSSetType (eps, const_cast<char *>(EPSLANCZOS));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-                                    // hand over the absolute
-                                    // tolerance and the maximum
-                                    // number of iteration steps to
-                                    // the SLEPc convergence
-                                    // criterion.
+    // hand over the absolute
+    // tolerance and the maximum
+    // number of iteration steps to
+    // the SLEPc convergence
+    // criterion.
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
@@ -366,11 +366,11 @@ namespace SLEPcWrappers
     ierr = EPSSetType (eps, const_cast<char *>(EPSPOWER));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-                                    // hand over the absolute
-                                    // tolerance and the maximum
-                                    // number of iteration steps to
-                                    // the SLEPc convergence
-                                    // criterion.
+    // hand over the absolute
+    // tolerance and the maximum
+    // number of iteration steps to
+    // the SLEPc convergence
+    // criterion.
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
@@ -382,7 +382,7 @@ namespace SLEPcWrappers
   SolverDavidson::SolverDavidson (SolverControl        &cn,
                                   const MPI_Comm       &mpi_communicator,
                                   const AdditionalData &data)
-  :
+    :
     SolverBase (cn, mpi_communicator),
     additional_data (data)
   {}
@@ -394,11 +394,11 @@ namespace SLEPcWrappers
     ierr = EPSSetType (eps, const_cast<char *>(EPSGD));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-                                    // hand over the absolute
-                                    // tolerance and the maximum
-                                    // number of iteration steps to
-                                    // the SLEPc convergence
-                                    // criterion.
+    // hand over the absolute
+    // tolerance and the maximum
+    // number of iteration steps to
+    // the SLEPc convergence
+    // criterion.
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
@@ -412,6 +412,9 @@ DEAL_II_NAMESPACE_CLOSE
 #else
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty
 // files, so provide some dummy code
-namespace { void dummy () {} }
+namespace
+{
+  void dummy () {}
+}
 #endif // DEAL_II_USE_SLEPC
 

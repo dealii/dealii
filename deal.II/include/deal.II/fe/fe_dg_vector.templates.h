@@ -22,14 +22,14 @@ DEAL_II_NAMESPACE_OPEN
 template <class POLY, int dim, int spacedim>
 FE_DGVector<POLY,dim,spacedim>::FE_DGVector (
   const unsigned int deg, MappingType map)
-                :
-                FE_PolyTensor<POLY, dim, spacedim>(
-                  deg,
-                  FiniteElementData<dim>(
-                    get_dpo_vector(deg), dim, deg+1, FiniteElementData<dim>::L2, 1),
-                  std::vector<bool>(POLY::compute_n_pols(deg), true),
-                  std::vector<ComponentMask>(POLY::compute_n_pols(deg),
-                                             ComponentMask(dim,true)))
+  :
+  FE_PolyTensor<POLY, dim, spacedim>(
+    deg,
+    FiniteElementData<dim>(
+      get_dpo_vector(deg), dim, deg+1, FiniteElementData<dim>::L2, 1),
+    std::vector<bool>(POLY::compute_n_pols(deg), true),
+    std::vector<ComponentMask>(POLY::compute_n_pols(deg),
+                               ComponentMask(dim,true)))
 {
   this->mapping_type = map;
   const unsigned int polynomial_degree = this->tensor_degree();
@@ -37,9 +37,9 @@ FE_DGVector<POLY,dim,spacedim>::FE_DGVector (
   QGauss<dim> quadrature(polynomial_degree+1);
   this->generalized_support_points = quadrature.get_points();
 
- this->reinit_restriction_and_prolongation_matrices(true, true);
- FETools::compute_projection_matrices (*this, this->restriction, true);
- FETools::compute_embedding_matrices (*this, this->prolongation, true);
+  this->reinit_restriction_and_prolongation_matrices(true, true);
+  FETools::compute_projection_matrices (*this, this->restriction, true);
+  FETools::compute_embedding_matrices (*this, this->prolongation, true);
 }
 
 
@@ -86,8 +86,8 @@ FE_DGVector<POLY,dim,spacedim>::has_support_on_face (
 template <class POLY, int dim, int spacedim>
 void
 FE_DGVector<POLY,dim,spacedim>::interpolate(
-  std::vector<double>&,
-  const std::vector<double>&) const
+  std::vector<double> &,
+  const std::vector<double> &) const
 {
   Assert(false, ExcNotImplemented());
 }
@@ -96,8 +96,8 @@ FE_DGVector<POLY,dim,spacedim>::interpolate(
 template <class POLY, int dim, int spacedim>
 void
 FE_DGVector<POLY,dim,spacedim>::interpolate(
-  std::vector<double>& /*local_dofs*/,
-  const std::vector<Vector<double> >& /*values*/,
+  std::vector<double> & /*local_dofs*/,
+  const std::vector<Vector<double> > & /*values*/,
   unsigned int /*offset*/) const
 {
   Assert(false, ExcNotImplemented());
@@ -106,8 +106,8 @@ FE_DGVector<POLY,dim,spacedim>::interpolate(
 template <class POLY, int dim, int spacedim>
 void
 FE_DGVector<POLY,dim,spacedim>::interpolate(
-  std::vector<double>& /*local_dofs*/,
-  const VectorSlice<const std::vector<std::vector<double> > >& /*values*/) const
+  std::vector<double> & /*local_dofs*/,
+  const VectorSlice<const std::vector<std::vector<double> > > & /*values*/) const
 {
   Assert(false, ExcNotImplemented());
 }

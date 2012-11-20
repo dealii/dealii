@@ -94,147 +94,147 @@ DEAL_II_NAMESPACE_OPEN
 template <class VECTOR = Vector<double> >
 class SolverSelector : public Subscriptor
 {
-  public:
+public:
 
-                                     /**
-                                      * Constructor, filling in
-                                      * default values
-                                      */
-    SolverSelector ();
+  /**
+   * Constructor, filling in
+   * default values
+   */
+  SolverSelector ();
 
-                                     /**
-                                      * @deprecated Use deafult
-                                      * constructor and select.
-                                      *
-                                      * Constructor. Use the arguments
-                                      * to initialize actual solver
-                                      * objects. The VectorMemory
-                                      * argument is ignored.
-                                      */
-    SolverSelector (const std::string    &solvername,
-                    SolverControl        &control,
-                    VectorMemory<VECTOR> &vector_memory);
+  /**
+   * @deprecated Use deafult
+   * constructor and select.
+   *
+   * Constructor. Use the arguments
+   * to initialize actual solver
+   * objects. The VectorMemory
+   * argument is ignored.
+   */
+  SolverSelector (const std::string    &solvername,
+                  SolverControl        &control,
+                  VectorMemory<VECTOR> &vector_memory);
 
-                                     /**
-                                      * Destructor
-                                      */
-    ~SolverSelector();
+  /**
+   * Destructor
+   */
+  ~SolverSelector();
 
-                                     /**
-                                      * Solver procedure. Calls the @p solve
-                                      * function
-                                      * of the @p solver whose @p SolverName
-                                      * was specified in the constructor.
-                                      *
-                                      */
-    template<class Matrix, class Preconditioner>
-    void solve(const Matrix &A,
-               VECTOR &x,
-               const VECTOR &b,
-               const Preconditioner &precond) const;
+  /**
+   * Solver procedure. Calls the @p solve
+   * function
+   * of the @p solver whose @p SolverName
+   * was specified in the constructor.
+   *
+   */
+  template<class Matrix, class Preconditioner>
+  void solve(const Matrix &A,
+             VECTOR &x,
+             const VECTOR &b,
+             const Preconditioner &precond) const;
 
-                                     /**
-                                      * Select a new solver. Note that
-                                      * all solver names used in this
-                                      * class are all lower case.
-                                      */
-    void select(const std::string& name);
+  /**
+   * Select a new solver. Note that
+   * all solver names used in this
+   * class are all lower case.
+   */
+  void select(const std::string &name);
 
-                                     /**
-                                      * Set a new SolverControl. This needs to
-                                      * be set before solving.
-                                      */
-    void set_control(SolverControl & ctrl);
+  /**
+   * Set a new SolverControl. This needs to
+   * be set before solving.
+   */
+  void set_control(SolverControl &ctrl);
 
-                                     /**
-                                      * Set the additional data. For more
-                                      * info see the @p Solver class.
-                                      */
-    void set_data(const typename SolverRichardson<VECTOR>
-                  ::AdditionalData &data);
+  /**
+   * Set the additional data. For more
+   * info see the @p Solver class.
+   */
+  void set_data(const typename SolverRichardson<VECTOR>
+                ::AdditionalData &data);
 
-                                     /**
-                                      * Set the additional data. For more
-                                      * info see the @p Solver class.
-                                      */
-    void set_data(const typename SolverCG<VECTOR>
-                  ::AdditionalData &data);
+  /**
+   * Set the additional data. For more
+   * info see the @p Solver class.
+   */
+  void set_data(const typename SolverCG<VECTOR>
+                ::AdditionalData &data);
 
-                                     /**
-                                      * Set the additional data. For more
-                                      * info see the @p Solver class.
-                                      */
-    void set_data(const typename SolverBicgstab<VECTOR>
-                  ::AdditionalData &data);
+  /**
+   * Set the additional data. For more
+   * info see the @p Solver class.
+   */
+  void set_data(const typename SolverBicgstab<VECTOR>
+                ::AdditionalData &data);
 
-                                     /**
-                                      * Set the additional data. For more
-                                      * info see the @p Solver class.
-                                      */
-    void set_data(const typename SolverGMRES<VECTOR>
-                  ::AdditionalData &data);
+  /**
+   * Set the additional data. For more
+   * info see the @p Solver class.
+   */
+  void set_data(const typename SolverGMRES<VECTOR>
+                ::AdditionalData &data);
 
-                                     /**
-                                      * Set the additional data. For more
-                                      * info see the @p Solver class.
-                                      */
-    void set_data(const typename SolverFGMRES<VECTOR>
-                  ::AdditionalData &data);
+  /**
+   * Set the additional data. For more
+   * info see the @p Solver class.
+   */
+  void set_data(const typename SolverFGMRES<VECTOR>
+                ::AdditionalData &data);
 
-                                     /**
-                                      * Get the names of all implemented
-                                      * solvers.
-                                      */
-    static std::string get_solver_names ();
+  /**
+   * Get the names of all implemented
+   * solvers.
+   */
+  static std::string get_solver_names ();
 
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException1 (ExcSolverDoesNotExist,
-                    std::string, << "Solver " << arg1 << " does not exist. Use one of "
-                    << std::endl << get_solver_names());
+  /**
+   * Exception.
+   */
+  DeclException1 (ExcSolverDoesNotExist,
+                  std::string, << "Solver " << arg1 << " does not exist. Use one of "
+                  << std::endl << get_solver_names());
 
 
 
-  protected:
-                                     /**
-                                      * Stores the @p SolverControl that is
-                                      * needed in the constructor of each @p
-                                      * Solver class. This can be changed with
-                                      * @p set_control().
-                                      */
-    SmartPointer< SolverControl, SolverSelector< VECTOR > >     control;
+protected:
+  /**
+   * Stores the @p SolverControl that is
+   * needed in the constructor of each @p
+   * Solver class. This can be changed with
+   * @p set_control().
+   */
+  SmartPointer< SolverControl, SolverSelector< VECTOR > >     control;
 
-                                     /**
-                                      * Stores the name of the solver.
-                                      */
-    std::string solver_name;
+  /**
+   * Stores the name of the solver.
+   */
+  std::string solver_name;
 
-  private:
-                                     /**
-                                      * Stores the additional data.
-                                      */
-    typename SolverRichardson<VECTOR>::AdditionalData richardson_data;
+private:
+  /**
+   * Stores the additional data.
+   */
+  typename SolverRichardson<VECTOR>::AdditionalData richardson_data;
 
-                                     /**
-                                      * Stores the additional data.
-                                      */
-    typename SolverCG<VECTOR>::AdditionalData cg_data;
+  /**
+   * Stores the additional data.
+   */
+  typename SolverCG<VECTOR>::AdditionalData cg_data;
 
-                                     /**
-                                      * Stores the additional data.
-                                      */
-    typename SolverBicgstab<VECTOR>::AdditionalData bicgstab_data;
+  /**
+   * Stores the additional data.
+   */
+  typename SolverBicgstab<VECTOR>::AdditionalData bicgstab_data;
 
-                                     /**
-                                      * Stores the additional data.
-                                      */
-    typename SolverGMRES<VECTOR>::AdditionalData gmres_data;
+  /**
+   * Stores the additional data.
+   */
+  typename SolverGMRES<VECTOR>::AdditionalData gmres_data;
 
-                                     /**
-                                      * Stores the additional data.
-                                      */
-    typename SolverFGMRES<VECTOR>::AdditionalData fgmres_data;
+  /**
+   * Stores the additional data.
+   */
+  typename SolverFGMRES<VECTOR>::AdditionalData fgmres_data;
 };
 
 /*@}*/
@@ -250,8 +250,8 @@ template <class VECTOR>
 SolverSelector<VECTOR>::SolverSelector(const std::string    &solver_name,
                                        SolverControl        &control,
                                        VectorMemory<VECTOR> &) :
-                control(&control),
-                solver_name(solver_name)
+  control(&control),
+  solver_name(solver_name)
 {}
 
 
@@ -262,7 +262,7 @@ SolverSelector<VECTOR>::~SolverSelector()
 
 template <class VECTOR>
 void
-SolverSelector<VECTOR>::select(const std::string& name)
+SolverSelector<VECTOR>::select(const std::string &name)
 {
   solver_name = name;
 }
@@ -315,7 +315,7 @@ SolverSelector<VECTOR>::solve(const Matrix &A,
 
 template <class VECTOR>
 void SolverSelector<VECTOR>::set_control(
-  SolverControl & ctrl)
+  SolverControl &ctrl)
 {
   control=&ctrl;
 }

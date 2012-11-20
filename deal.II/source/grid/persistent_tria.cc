@@ -32,8 +32,8 @@ PersistentTriangulation<dim,spacedim>::spacedimension;
 template <int dim, int spacedim>
 PersistentTriangulation<dim,spacedim>::
 PersistentTriangulation (const Triangulation<dim,spacedim> &coarse_grid)
-                :
-                coarse_grid (&coarse_grid, typeid(*this).name())
+  :
+  coarse_grid (&coarse_grid, typeid(*this).name())
 {}
 
 
@@ -41,14 +41,14 @@ PersistentTriangulation (const Triangulation<dim,spacedim> &coarse_grid)
 template <int dim, int spacedim>
 PersistentTriangulation<dim,spacedim>::
 PersistentTriangulation (const PersistentTriangulation<dim,spacedim> &old_tria)
-                :
-                                                 // default initialize
-                                                 // tria, i.e. it will be
-                                                 // empty on first use
-                Triangulation<dim,spacedim> (),
-                coarse_grid (old_tria.coarse_grid),
-                refine_flags (old_tria.refine_flags),
-                coarsen_flags (old_tria.coarsen_flags)
+  :
+  // default initialize
+  // tria, i.e. it will be
+  // empty on first use
+  Triangulation<dim,spacedim> (),
+  coarse_grid (old_tria.coarse_grid),
+  refine_flags (old_tria.refine_flags),
+  coarsen_flags (old_tria.coarsen_flags)
 {
   Assert (old_tria.n_levels() == 0, ExcTriaNotEmpty ());
 }
@@ -65,16 +65,16 @@ template <int dim, int spacedim>
 void
 PersistentTriangulation<dim,spacedim>::execute_coarsening_and_refinement ()
 {
-                                   // first save flags
+  // first save flags
   refine_flags.push_back (std::vector<bool>());
   coarsen_flags.push_back (std::vector<bool>());
   this->save_refine_flags (refine_flags.back());
   this->save_coarsen_flags (coarsen_flags.back());
 
-                                   // then refine triangulation. if
-                                   // this function throws an
-                                   // exception, that's fine since it
-                                   // is the last call here
+  // then refine triangulation. if
+  // this function throws an
+  // exception, that's fine since it
+  // is the last call here
   Triangulation<dim,spacedim>::execute_coarsening_and_refinement ();
 }
 
@@ -84,8 +84,8 @@ template <int dim, int spacedim>
 void
 PersistentTriangulation<dim,spacedim>::restore ()
 {
-                                   // for each of the previous
-                                   // refinement sweeps
+  // for each of the previous
+  // refinement sweeps
   for (unsigned int i=0; i<refine_flags.size()+1; ++i)
     restore(i);
 }
@@ -98,14 +98,14 @@ PersistentTriangulation<dim,spacedim>::restore (const unsigned int step)
 {
 
   if (step==0)
-                                     // copy the old triangulation.
-                                     // this will yield an error if
-                                     // the underlying triangulation
-                                     // was not empty
+    // copy the old triangulation.
+    // this will yield an error if
+    // the underlying triangulation
+    // was not empty
     Triangulation<dim,spacedim>::copy_triangulation (*coarse_grid);
   else
-                                     // for each of the previous
-                                     // refinement sweeps
+    // for each of the previous
+    // refinement sweeps
     {
       Assert(step<refine_flags.size()+1,
              ExcDimensionMismatch(step, refine_flags.size()+1));
@@ -142,9 +142,9 @@ PersistentTriangulation<dim,spacedim>::copy_triangulation (const Triangulation<d
 
 template <int dim, int spacedim>
 void
-PersistentTriangulation<dim,spacedim>::create_triangulation (const std::vector<Point<spacedim> >    &,
-                                                    const std::vector<CellData<dim> > &,
-                                                    const SubCellData                 &)
+PersistentTriangulation<dim,spacedim>::create_triangulation (const std::vector<Point<spacedim> > &,
+    const std::vector<CellData<dim> > &,
+    const SubCellData &)
 {
   Assert (false, ExcImpossibleInDim(dim));
 }
@@ -154,9 +154,9 @@ PersistentTriangulation<dim,spacedim>::create_triangulation (const std::vector<P
 template <int dim, int spacedim>
 void
 PersistentTriangulation<dim,spacedim>::create_triangulation_compatibility (
-  const std::vector<Point<spacedim> >    &,
+  const std::vector<Point<spacedim> > &,
   const std::vector<CellData<dim> > &,
-  const SubCellData                 &)
+  const SubCellData &)
 {
   Assert (false, ExcImpossibleInDim(dim));
 }

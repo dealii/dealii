@@ -29,24 +29,24 @@ DEAL_II_NAMESPACE_OPEN
 void
 IndexSet::do_compress () const
 {
-                                   // see if any of the
-                                   // contiguous ranges can be
-                                   // merged. since they are sorted by
-                                   // their first index, determining
-                                   // overlap isn't all that hard
+  // see if any of the
+  // contiguous ranges can be
+  // merged. since they are sorted by
+  // their first index, determining
+  // overlap isn't all that hard
   for (std::vector<Range>::iterator
-         i = ranges.begin();
+       i = ranges.begin();
        i != ranges.end(); )
     {
       std::vector<Range>::iterator
-        next = i;
+      next = i;
       ++next;
 
       unsigned int first_index = i->begin;
       unsigned int last_index  = i->end;
 
-                                       // see if we can merge any of
-                                       // the following ranges
+      // see if we can merge any of
+      // the following ranges
       bool can_merge = false;
       while (next != ranges.end() &&
              (next->begin <= last_index))
@@ -58,10 +58,10 @@ IndexSet::do_compress () const
 
       if (can_merge == true)
         {
-                                           // delete the old ranges
-                                           // and insert the new range
-                                           // in place of the previous
-                                           // one
+          // delete the old ranges
+          // and insert the new range
+          // in place of the previous
+          // one
           *i = Range(first_index, last_index);
           i = ranges.erase (i+1, next);
         }
@@ -70,11 +70,11 @@ IndexSet::do_compress () const
     }
 
 
-                                   // now compute indices within set and the
-                                   // range with most elements
+  // now compute indices within set and the
+  // range with most elements
   unsigned int next_index = 0, largest_range_size = 0;
   for (std::vector<Range>::iterator
-         i = ranges.begin();
+       i = ranges.begin();
        i != ranges.end();
        ++i)
     {
@@ -90,11 +90,11 @@ IndexSet::do_compress () const
     }
   is_compressed = true;
 
-                                   // check that next_index is
-                                   // correct. needs to be after the
-                                   // previous statement because we
-                                   // otherwise will get into an
-                                   // endless loop
+  // check that next_index is
+  // correct. needs to be after the
+  // previous statement because we
+  // otherwise will get into an
+  // endless loop
   Assert (next_index == n_elements(), ExcInternalError());
 }
 
@@ -117,18 +117,18 @@ IndexSet::operator & (const IndexSet &is) const
          &&
          (r2 != is.ranges.end()))
     {
-                                       // if r1 and r2 do not overlap
-                                       // at all, then move the
-                                       // pointer that sits to the
-                                       // left of the other up by one
+      // if r1 and r2 do not overlap
+      // at all, then move the
+      // pointer that sits to the
+      // left of the other up by one
       if (r1->end <= r2->begin)
         ++r1;
       else if (r2->end <= r1->begin)
         ++r2;
       else
         {
-                                           // the ranges must overlap
-                                           // somehow
+          // the ranges must overlap
+          // somehow
           Assert (((r1->begin <= r2->begin) &&
                    (r1->end > r2->begin))
                   ||
@@ -136,21 +136,21 @@ IndexSet::operator & (const IndexSet &is) const
                    (r2->end > r1->begin)),
                   ExcInternalError());
 
-                                           // add the overlapping
-                                           // range to the result
+          // add the overlapping
+          // range to the result
           result.add_range (std::max (r1->begin,
                                       r2->begin),
                             std::min (r1->end,
                                       r2->end));
 
-                                           // now move that iterator
-                                           // that ends earlier one
-                                           // up. note that it has to
-                                           // be this one because a
-                                           // subsequent range may
-                                           // still have a chance of
-                                           // overlapping with the
-                                           // range that ends later
+          // now move that iterator
+          // that ends earlier one
+          // up. note that it has to
+          // be this one because a
+          // subsequent range may
+          // still have a chance of
+          // overlapping with the
+          // range that ends later
           if (r1->end <= r2->end)
             ++r1;
           else
@@ -195,9 +195,8 @@ IndexSet::get_view (const unsigned int begin,
                             std::min(r1->end, end)-begin);
 
         }
-      else
-        if (r1->begin >= end)
-          break;
+      else if (r1->begin >= end)
+        break;
 
       ++r1;
     }
@@ -209,13 +208,13 @@ IndexSet::get_view (const unsigned int begin,
 
 
 void
-IndexSet::write(std::ostream & out) const
+IndexSet::write(std::ostream &out) const
 {
   compress();
   out << size() << " ";
   out << ranges.size() << std::endl;
   std::vector<Range>::const_iterator r = ranges.begin();
-  for ( ;r!=ranges.end(); ++r)
+  for ( ; r!=ranges.end(); ++r)
     {
       out << r->begin << " " << r->end << std::endl;
     }
@@ -224,13 +223,13 @@ IndexSet::write(std::ostream & out) const
 
 
 void
-IndexSet::read(std::istream & in)
+IndexSet::read(std::istream &in)
 {
   unsigned int s, numranges, b, e;
   in >> s >> numranges;
   ranges.clear();
   set_size(s);
-  for (unsigned int i=0;i<numranges;++i)
+  for (unsigned int i=0; i<numranges; ++i)
     {
       in >> b >> e;
       add_range(b,e);
@@ -239,51 +238,51 @@ IndexSet::read(std::istream & in)
 
 
 void
-IndexSet::block_write(std::ostream & out) const
+IndexSet::block_write(std::ostream &out) const
 {
   Assert (out, ExcIO());
-  out.write(reinterpret_cast<const char*>(&index_space_size),
+  out.write(reinterpret_cast<const char *>(&index_space_size),
             sizeof(index_space_size));
   size_t n_ranges = ranges.size();
-  out.write(reinterpret_cast<const char*>(&n_ranges),
+  out.write(reinterpret_cast<const char *>(&n_ranges),
             sizeof(n_ranges));
   if (ranges.empty() == false)
-    out.write (reinterpret_cast<const char*>(&*ranges.begin()),
+    out.write (reinterpret_cast<const char *>(&*ranges.begin()),
                ranges.size() * sizeof(Range));
   Assert (out, ExcIO());
 }
 
 void
-IndexSet::block_read(std::istream & in)
+IndexSet::block_read(std::istream &in)
 {
   unsigned int size;
   size_t n_ranges;
-  in.read(reinterpret_cast<char*>(&size), sizeof(size));
-  in.read(reinterpret_cast<char*>(&n_ranges), sizeof(n_ranges));
-                                   // we have to clear ranges first
+  in.read(reinterpret_cast<char *>(&size), sizeof(size));
+  in.read(reinterpret_cast<char *>(&n_ranges), sizeof(n_ranges));
+  // we have to clear ranges first
   ranges.clear();
   set_size(size);
   ranges.resize(n_ranges, Range(0,0));
   if (n_ranges)
-    in.read(reinterpret_cast<char*>(&*ranges.begin()),
+    in.read(reinterpret_cast<char *>(&*ranges.begin()),
             ranges.size() * sizeof(Range));
 }
 
 
 
 void
-IndexSet::subtract_set (const IndexSet & other)
+IndexSet::subtract_set (const IndexSet &other)
 {
   compress();
   other.compress();
   is_compressed = false;
 
 
-                                   // we save new ranges to be added to our
-                                   // IndexSet in an temporary list and add
-                                   // all of them in one go at the end. This
-                                   // is necessary because a growing ranges
-                                   // vector invalidates iterators.
+  // we save new ranges to be added to our
+  // IndexSet in an temporary list and add
+  // all of them in one go at the end. This
+  // is necessary because a growing ranges
+  // vector invalidates iterators.
   std::list<Range> temp_list;
 
   std::vector<Range>::iterator own_it = ranges.begin();
@@ -291,34 +290,34 @@ IndexSet::subtract_set (const IndexSet & other)
 
   while (own_it != ranges.end() && other_it != other.ranges.end())
     {
-                                       //advance own iterator until we get an
-                                       //overlap
+      //advance own iterator until we get an
+      //overlap
       if (own_it->end <= other_it->begin)
         {
           ++own_it;
           continue;
         }
-                                       //we are done with other_it, so advance
+      //we are done with other_it, so advance
       if (own_it->begin >= other_it->end)
         {
           ++other_it;
           continue;
         }
 
-                                       //Now own_it and other_it overlap.
-                                       //First save the part of own_it that is
-                                       //before other_it (if not empty).
+      //Now own_it and other_it overlap.
+      //First save the part of own_it that is
+      //before other_it (if not empty).
       if (own_it->begin < other_it->begin)
         {
           Range r(own_it->begin, other_it->begin);
           r.nth_index_in_set = 0; //fix warning of unused variable
           temp_list.push_back(r);
         }
-                                       // change own_it to the sub range
-                                       // behind other_it. Do not delete
-                                       // own_it in any case. As removal would
-                                       // invalidate iterators, we just shrink
-                                       // the range to an empty one.
+      // change own_it to the sub range
+      // behind other_it. Do not delete
+      // own_it in any case. As removal would
+      // invalidate iterators, we just shrink
+      // the range to an empty one.
       own_it->begin = other_it->end;
       if (own_it->begin > own_it->end)
         {
@@ -326,13 +325,13 @@ IndexSet::subtract_set (const IndexSet & other)
           ++own_it;
         }
 
-                                       // continue without advancing
-                                       // iterators, the right one will be
-                                       // advanced next.
+      // continue without advancing
+      // iterators, the right one will be
+      // advanced next.
     }
 
-                                   // Now delete all empty ranges we might
-                                   // have created.
+  // Now delete all empty ranges we might
+  // have created.
   for (std::vector<Range>::iterator it = ranges.begin();
        it != ranges.end(); )
     {
@@ -342,7 +341,7 @@ IndexSet::subtract_set (const IndexSet & other)
         ++it;
     }
 
-                                   // done, now add the temporary ranges
+  // done, now add the temporary ranges
   for (std::list<Range>::iterator it = temp_list.begin();
        it != temp_list.end();
        ++it)
@@ -352,7 +351,7 @@ IndexSet::subtract_set (const IndexSet & other)
 }
 
 
-void IndexSet::fill_index_vector(std::vector<unsigned int> & indices) const
+void IndexSet::fill_index_vector(std::vector<unsigned int> &indices) const
 {
   compress();
 
@@ -398,7 +397,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
                          static_cast<int>(n_elements()),
                          (n_elements() > 0
                           ?
-                          reinterpret_cast<int*>(&indices[0])
+                          reinterpret_cast<int *>(&indices[0])
                           :
                           0),
                          0,
@@ -419,8 +418,8 @@ std::size_t
 IndexSet::memory_consumption () const
 {
   return MemoryConsumption::memory_consumption (ranges) +
-    MemoryConsumption::memory_consumption (is_compressed) +
-    MemoryConsumption::memory_consumption (index_space_size);
+         MemoryConsumption::memory_consumption (is_compressed) +
+         MemoryConsumption::memory_consumption (index_space_size);
 }
 
 

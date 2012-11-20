@@ -28,13 +28,13 @@ namespace internal
                                    const unsigned int dimension,
                                    const unsigned int space_dimension)
     {
-                                       // we need space for total_cells
-                                       // cells. Maybe we have more already
-                                       // with those cells which are unused,
-                                       // so only allocate new space if needed.
-                                       //
-                                       // note that all arrays should have equal
-                                       // sizes (checked by @p{monitor_memory}
+      // we need space for total_cells
+      // cells. Maybe we have more already
+      // with those cells which are unused,
+      // so only allocate new space if needed.
+      //
+      // note that all arrays should have equal
+      // sizes (checked by @p{monitor_memory}
       if (total_cells > refine_flags.size())
         {
           refine_flags.reserve (total_cells);
@@ -54,8 +54,8 @@ namespace internal
 
           level_subdomain_ids.reserve (total_cells);
           level_subdomain_ids.insert (level_subdomain_ids.end(),
-                                total_cells - level_subdomain_ids.size(),
-                                0);
+                                      total_cells - level_subdomain_ids.size(),
+                                      0);
 
           if (dimension < space_dimension)
             {
@@ -84,13 +84,13 @@ namespace internal
     void
     TriaLevel<dim>::monitor_memory (const unsigned int true_dimension) const
     {
-                                       // check that we have not allocated
-                                       // too much memory. note that bool
-                                       // vectors allocate their memory in
-                                       // chunks of whole integers, so
-                                       // they may over-allocate by up to
-                                       // as many elements as an integer
-                                       // has bits
+      // check that we have not allocated
+      // too much memory. note that bool
+      // vectors allocate their memory in
+      // chunks of whole integers, so
+      // they may over-allocate by up to
+      // as many elements as an integer
+      // has bits
       Assert (refine_flags.size() <=
               refine_flags.capacity()  + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("refine_flags",
@@ -141,13 +141,13 @@ namespace internal
                                  const unsigned int dimension,
                                  const unsigned int space_dimension)
     {
-                                       // we need space for total_cells
-                                       // cells. Maybe we have more already
-                                       // with those cells which are unused,
-                                       // so only allocate new space if needed.
-                                       //
-                                       // note that all arrays should have equal
-                                       // sizes (checked by @p{monitor_memory}
+      // we need space for total_cells
+      // cells. Maybe we have more already
+      // with those cells which are unused,
+      // so only allocate new space if needed.
+      //
+      // note that all arrays should have equal
+      // sizes (checked by @p{monitor_memory}
       if (total_cells > refine_flags.size())
         {
           refine_flags.reserve (total_cells);
@@ -167,8 +167,8 @@ namespace internal
 
           level_subdomain_ids.reserve (total_cells);
           level_subdomain_ids.insert (level_subdomain_ids.end(),
-                                total_cells - level_subdomain_ids.size(),
-                                0);
+                                      total_cells - level_subdomain_ids.size(),
+                                      0);
 
           if (dimension < space_dimension)
             {
@@ -196,13 +196,13 @@ namespace internal
     void
     TriaLevel<3>::monitor_memory (const unsigned int true_dimension) const
     {
-                                       // check that we have not allocated
-                                       // too much memory. note that bool
-                                       // vectors allocate their memory in
-                                       // chunks of whole integers, so
-                                       // they may over-allocate by up to
-                                       // as many elements as an integer
-                                       // has bits
+      // check that we have not allocated
+      // too much memory. note that bool
+      // vectors allocate their memory in
+      // chunks of whole integers, so
+      // they may over-allocate by up to
+      // as many elements as an integer
+      // has bits
       Assert (refine_flags.size() <=
               refine_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
               ExcMemoryWasted ("refine_flags",

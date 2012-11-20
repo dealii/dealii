@@ -48,7 +48,7 @@ namespace GridOutFlags
     write_all_faces (write_all_faces)
   {}
 
-  void DX::declare_parameters (ParameterHandler& param)
+  void DX::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Write cells", "true", Patterns::Bool(),
                         "Write the mesh connectivity as DX grid cells");
@@ -65,7 +65,7 @@ namespace GridOutFlags
                         "Write all faces, not only boundary");
   }
 
-  void DX::parse_parameters (ParameterHandler& param)
+  void DX::parse_parameters (ParameterHandler &param)
   {
     write_cells = param.get_bool("Write cells");
     write_faces = param.get_bool("Write faces");
@@ -81,14 +81,14 @@ namespace GridOutFlags
     write_lines (write_lines)
   {}
 
-  void Msh::declare_parameters (ParameterHandler& param)
+  void Msh::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Write faces", "false", Patterns::Bool());
     param.declare_entry("Write lines", "false", Patterns::Bool());
   }
 
 
-  void Msh::parse_parameters (ParameterHandler& param)
+  void Msh::parse_parameters (ParameterHandler &param)
   {
     write_faces = param.get_bool("Write faces");
     write_lines = param.get_bool("Write lines");
@@ -98,14 +98,14 @@ namespace GridOutFlags
   Ucd::Ucd (const bool write_preamble,
             const bool write_faces,
             const bool write_lines) :
-                  write_preamble (write_preamble),
-                  write_faces (write_faces),
-                  write_lines (write_lines)
+    write_preamble (write_preamble),
+    write_faces (write_faces),
+    write_lines (write_lines)
   {}
 
 
 
-  void Ucd::declare_parameters (ParameterHandler& param)
+  void Ucd::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Write preamble", "true", Patterns::Bool());
     param.declare_entry("Write faces", "false", Patterns::Bool());
@@ -113,7 +113,7 @@ namespace GridOutFlags
   }
 
 
-  void Ucd::parse_parameters (ParameterHandler& param)
+  void Ucd::parse_parameters (ParameterHandler &param)
   {
     write_preamble = param.get_bool("Write preamble");
     write_faces = param.get_bool("Write faces");
@@ -124,21 +124,21 @@ namespace GridOutFlags
   Gnuplot::Gnuplot (const bool write_cell_numbers,
                     const unsigned int n_boundary_face_points,
                     const bool         curved_inner_cells) :
-                  write_cell_numbers (write_cell_numbers),
-                  n_boundary_face_points(n_boundary_face_points),
-                  curved_inner_cells(curved_inner_cells)
+    write_cell_numbers (write_cell_numbers),
+    n_boundary_face_points(n_boundary_face_points),
+    curved_inner_cells(curved_inner_cells)
   {}
 
 
 
-  void Gnuplot::declare_parameters (ParameterHandler& param)
+  void Gnuplot::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Cell number", "false", Patterns::Bool());
     param.declare_entry("Boundary points", "2", Patterns::Integer());
   }
 
 
-  void Gnuplot::parse_parameters (ParameterHandler& param)
+  void Gnuplot::parse_parameters (ParameterHandler &param)
   {
     write_cell_numbers = param.get_bool("Cell number");
     n_boundary_face_points = param.get_integer("Boundary points");
@@ -151,19 +151,19 @@ namespace GridOutFlags
                               const bool color_lines_on_user_flag,
                               const unsigned int n_boundary_face_points,
                               const bool color_lines_level) :
-                  size_type (size_type),
-                  size (size),
-                  line_width (line_width),
-                  color_lines_on_user_flag(color_lines_on_user_flag),
-                  n_boundary_face_points(n_boundary_face_points),
-                  color_lines_level(color_lines_level)
+    size_type (size_type),
+    size (size),
+    line_width (line_width),
+    color_lines_on_user_flag(color_lines_on_user_flag),
+    n_boundary_face_points(n_boundary_face_points),
+    color_lines_level(color_lines_level)
   {}
 
 
-  void EpsFlagsBase::declare_parameters (ParameterHandler& param)
+  void EpsFlagsBase::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Size by", "width",
-                            Patterns::Selection("width|height"),
+                        Patterns::Selection("width|height"),
                         "Depending on this parameter, either the"
                         "width or height "
                         "of the eps is scaled to \"Size\"");
@@ -181,7 +181,7 @@ namespace GridOutFlags
   }
 
 
-  void EpsFlagsBase::parse_parameters (ParameterHandler& param)
+  void EpsFlagsBase::parse_parameters (ParameterHandler &param)
   {
     if (param.get("Size by") == std::string("width"))
       size_type = width;
@@ -201,18 +201,18 @@ namespace GridOutFlags
                const double       line_width,
                const bool color_lines_on_user_flag,
                const unsigned int n_boundary_face_points)
-                  :
-                  EpsFlagsBase(size_type, size, line_width,
-                               color_lines_on_user_flag,
-                               n_boundary_face_points)
+    :
+    EpsFlagsBase(size_type, size, line_width,
+                 color_lines_on_user_flag,
+                 n_boundary_face_points)
   {}
 
 
-  void Eps<1>::declare_parameters (ParameterHandler&)
+  void Eps<1>::declare_parameters (ParameterHandler &)
   {}
 
 
-  void Eps<1>::parse_parameters (ParameterHandler& param)
+  void Eps<1>::parse_parameters (ParameterHandler &param)
   {
     EpsFlagsBase::parse_parameters(param);
   }
@@ -228,19 +228,19 @@ namespace GridOutFlags
                const bool         write_cell_number_level,
                const bool         write_vertex_numbers,
                const bool         color_lines_level
-      )
-                  :
-                  EpsFlagsBase(size_type, size, line_width,
-                               color_lines_on_user_flag,
-                               n_boundary_face_points,
-                               color_lines_level),
-                  write_cell_numbers (write_cell_numbers),
-                  write_cell_number_level (write_cell_number_level),
-                  write_vertex_numbers (write_vertex_numbers)
+              )
+    :
+    EpsFlagsBase(size_type, size, line_width,
+                 color_lines_on_user_flag,
+                 n_boundary_face_points,
+                 color_lines_level),
+    write_cell_numbers (write_cell_numbers),
+    write_cell_number_level (write_cell_number_level),
+    write_vertex_numbers (write_vertex_numbers)
   {}
 
 
-  void Eps<2>::declare_parameters (ParameterHandler& param)
+  void Eps<2>::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Cell number", "false", Patterns::Bool(),
                         "(2D only) Write cell numbers"
@@ -253,7 +253,7 @@ namespace GridOutFlags
   }
 
 
-  void Eps<2>::parse_parameters (ParameterHandler& param)
+  void Eps<2>::parse_parameters (ParameterHandler &param)
   {
     EpsFlagsBase::parse_parameters(param);
     write_cell_numbers = param.get_bool("Cell number");
@@ -270,16 +270,16 @@ namespace GridOutFlags
                const unsigned int n_boundary_face_points,
                const double        azimut_angle,
                const double        turn_angle)
-                  :
-                  EpsFlagsBase(size_type, size, line_width,
-                               color_lines_on_user_flag,
-                               n_boundary_face_points),
-                  azimut_angle (azimut_angle),
-                  turn_angle (turn_angle)
+    :
+    EpsFlagsBase(size_type, size, line_width,
+                 color_lines_on_user_flag,
+                 n_boundary_face_points),
+    azimut_angle (azimut_angle),
+    turn_angle (turn_angle)
   {}
 
 
-  void Eps<3>::declare_parameters (ParameterHandler& param)
+  void Eps<3>::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Azimuth", "30", Patterns::Double(),
                         "Azimuth of the viw point, that is, the angle "
@@ -289,7 +289,7 @@ namespace GridOutFlags
   }
 
 
-  void Eps<3>::parse_parameters (ParameterHandler& param)
+  void Eps<3>::parse_parameters (ParameterHandler &param)
   {
     EpsFlagsBase::parse_parameters(param);
     azimut_angle = 90- param.get_double("Elevation");
@@ -299,7 +299,7 @@ namespace GridOutFlags
 
 
   XFig::XFig ()
-                  :
+    :
     draw_boundary(true),
     color_by(material_id),
     level_color(false),
@@ -314,7 +314,7 @@ namespace GridOutFlags
   {}
 
 
-  void XFig::declare_parameters (ParameterHandler& param)
+  void XFig::declare_parameters (ParameterHandler &param)
   {
     param.declare_entry("Boundary", "true", Patterns::Bool());
     param.declare_entry("Level color", "false", Patterns::Bool());
@@ -329,7 +329,7 @@ namespace GridOutFlags
   }
 
 
-  void XFig::parse_parameters (ParameterHandler& param)
+  void XFig::parse_parameters (ParameterHandler &param)
   {
     draw_boundary = param.get_bool("Boundary");
     level_color = param.get_bool("Level color");
@@ -348,8 +348,8 @@ namespace GridOutFlags
 
 
 GridOut::GridOut ()
-                :
-                default_format (none)
+  :
+  default_format (none)
 {}
 
 
@@ -413,23 +413,23 @@ GridOut::default_suffix (const OutputFormat output_format)
 {
   switch (output_format)
     {
-      case none:
-        return "";
-      case dx:
-        return ".dx";
-      case gnuplot:
-        return ".gnuplot";
-      case ucd:
-        return ".inp";
-      case eps:
-        return ".eps";
-      case xfig:
-        return ".fig";
-      case msh:
-        return ".msh";
-      default:
-            Assert (false, ExcNotImplemented());
-            return "";
+    case none:
+      return "";
+    case dx:
+      return ".dx";
+    case gnuplot:
+      return ".gnuplot";
+    case ucd:
+      return ".inp";
+    case eps:
+      return ".eps";
+    case xfig:
+      return ".fig";
+    case msh:
+      return ".msh";
+    default:
+      Assert (false, ExcNotImplemented());
+      return "";
     };
 }
 
@@ -468,7 +468,7 @@ GridOut::parse_output_format (const std::string &format_name)
     return msh;
 
   AssertThrow (false, ExcInvalidState ());
-                                   // return something weird
+  // return something weird
   return OutputFormat(-1);
 }
 
@@ -481,7 +481,7 @@ std::string GridOut::get_output_format_names ()
 
 
 void
-GridOut::declare_parameters(ParameterHandler& param)
+GridOut::declare_parameters(ParameterHandler &param)
 {
   param.declare_entry("Format", "none",
                       Patterns::Selection(get_output_format_names()));
@@ -517,7 +517,7 @@ GridOut::declare_parameters(ParameterHandler& param)
 
 
 void
-GridOut::parse_parameters(ParameterHandler& param)
+GridOut::parse_parameters(ParameterHandler &param)
 {
   default_format = parse_output_format(param.get("Format"));
 
@@ -567,7 +567,7 @@ GridOut::memory_consumption () const
 
 template <>
 void GridOut::write_dx (const Triangulation<1> &,
-                        std::ostream             &) const
+                        std::ostream &) const
 {
   Assert (false, ExcNotImplemented());
 }
@@ -581,20 +581,20 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
 //TODO:[GK] allow for boundary faces only
   Assert(dx_flags.write_all_faces, ExcNotImplemented());
   AssertThrow (out, ExcIO());
-                                   // Copied and adapted from write_ucd
+  // Copied and adapted from write_ucd
   const std::vector<Point<dim> > &vertices    = tria.get_vertices();
   const std::vector<bool>        &vertex_used = tria.get_used_vertices();
 
   const unsigned int n_vertices = tria.n_used_vertices();
 
-                                   // vertices are implicitly numbered from 0 to
-                                   // n_vertices-1. we have to renumber the
-                                   // vertices, because otherwise we would end
-                                   // up with wrong results, if there are unused
-                                   // vertices
+  // vertices are implicitly numbered from 0 to
+  // n_vertices-1. we have to renumber the
+  // vertices, because otherwise we would end
+  // up with wrong results, if there are unused
+  // vertices
   std::vector<unsigned int> renumber(vertices.size());
-                                   // fill this vector with new vertex numbers
-                                   // ranging from 0 to n_vertices-1
+  // fill this vector with new vertex numbers
+  // ranging from 0 to n_vertices-1
   unsigned int new_number=0;
   for (unsigned int i=0; i<vertices.size(); ++i)
     if (vertex_used[i])
@@ -605,7 +605,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
   const typename Triangulation<dim>::active_cell_iterator endc=tria.end();
 
 
-                                   // write the vertices
+  // write the vertices
   out << "object \"vertices\" class array type float rank 1 shape " << dim
       << " items " << n_vertices << " data follows"
       << '\n';
@@ -616,7 +616,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
         out << '\t' << vertices[i] << '\n';
       };
 
-                                   // write cells or faces
+  // write cells or faces
   const bool write_cells = dx_flags.write_cells;
   const bool write_faces = (dim>1) ? dx_flags.write_faces : false;
 
@@ -646,7 +646,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
       out << "\"" << '\n'
           << "attribute \"ref\" string \"positions\"" << '\n' << '\n';
 
-                                       // Additional cell information
+      // Additional cell information
 
       out << "object \"material\" class array type int rank 0 items "
           << n_cells << " data follows" << '\n';
@@ -692,7 +692,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
 
       for (cell = tria.begin_active(); cell != endc; ++cell)
         {
-          for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+          for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
             {
               typename Triangulation<dim>::face_iterator face = cell->face(f);
 
@@ -708,15 +708,15 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
           << "attribute \"ref\" string \"positions\"" << '\n' << '\n';
 
 
-                                       // Additional face information
+      // Additional face information
 
       out << "object \"boundary\" class array type int rank 0 items "
           << n_faces << " data follows" << '\n';
       for (cell = tria.begin_active(); cell != endc; ++cell)
         {
-                                           // Little trick to get -1
-                                           // for the interior
-          for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+          // Little trick to get -1
+          // for the interior
+          for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
             out << ' ' << (int)(signed char)cell->face(f)->boundary_indicator();
           out << '\n';
         }
@@ -728,7 +728,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
               << n_faces << " data follows" << '\n';
           for (cell = tria.begin_active(); cell != endc; ++cell)
             {
-              for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+              for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
                 out << ' ' << cell->face(f)->measure();
               out << '\n';
             }
@@ -741,7 +741,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
               << n_faces << " data follows" << '\n';
           for (cell = tria.begin_active(); cell != endc; ++cell)
             {
-              for (unsigned int f=0;f<GeometryInfo<dim>::faces_per_cell;++f)
+              for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
                 out << ' ' << cell->face(f)->diameter();
               out << '\n';
             }
@@ -751,7 +751,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
     }
 
 
-                                   // Write additional face information
+  // Write additional face information
 
   if (write_faces)
     {
@@ -761,7 +761,7 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
     {
     }
 
-                                   // The wrapper
+  // The wrapper
   out << "object \"deal data\" class field" << '\n'
       << "component \"positions\" value \"vertices\"" << '\n'
       << "component \"connections\" value \"cells\"" << '\n';
@@ -799,8 +799,8 @@ void GridOut::write_dx (const Triangulation<dim> &tria,
     out << "member \"faces\" value \"face data\"" << '\n';
   out << "end" << '\n';
 
-                                   // make sure everything now gets to
-                                   // disk
+  // make sure everything now gets to
+  // disk
   out.flush ();
 
   AssertThrow (out, ExcIO());
@@ -815,9 +815,9 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
 {
   AssertThrow (out, ExcIO());
 
-                                   // get the positions of the
-                                   // vertices and whether they are
-                                   // used.
+  // get the positions of the
+  // vertices and whether they are
+  // used.
   const std::vector<Point<spacedim> > &vertices    = tria.get_vertices();
   const std::vector<bool>        &vertex_used = tria.get_used_vertices();
 
@@ -826,28 +826,28 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
   typename Triangulation<dim,spacedim>::active_cell_iterator       cell=tria.begin_active();
   const typename Triangulation<dim,spacedim>::active_cell_iterator endc=tria.end();
 
-                                   // Write Header
-                                   // The file format is:
-                                   /*
+  // Write Header
+  // The file format is:
+  /*
 
 
-                                   $NOD
-                                   number-of-nodes
-                                   node-number x-coord y-coord z-coord
-                                   ...
-                                   $ENDNOD
-                                   $ELM
-                                   number-of-elements
-                                   elm-number elm-type reg-phys reg-elem number-of-nodes node-number-list
-                                   ...
-                                   $ENDELM
-                                   */
+  $NOD
+  number-of-nodes
+  node-number x-coord y-coord z-coord
+  ...
+  $ENDNOD
+  $ELM
+  number-of-elements
+  elm-number elm-type reg-phys reg-elem number-of-nodes node-number-list
+  ...
+  $ENDELM
+  */
   out << "$NOD" << std::endl
       << n_vertices << std::endl;
 
-                                   // actually write the vertices.
-                                   // note that we shall number them
-                                   // with first index 1 instead of 0
+  // actually write the vertices.
+  // note that we shall number them
+  // with first index 1 instead of 0
   for (unsigned int i=0; i<vertices.size(); ++i)
     if (vertex_used[i])
       {
@@ -859,7 +859,7 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
         out << std::endl;
       };
 
-                                   // Write cells preamble
+  // Write cells preamble
   out << "$ENDNOD" << std::endl
       << "$ELM" << std::endl
       << tria.n_active_cells() + ( (msh_flags.write_faces ?
@@ -867,57 +867,58 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
                                    ( msh_flags.write_lines ?
                                      n_boundary_lines(tria) : 0 ) ) << std::endl;
 
-                                   /*
-                                     elm-type
-                                     defines the geometrical type of the n-th element:
-                                     1
-                                     Line (2 nodes).
-                                     2
-                                     Triangle (3 nodes).
-                                     3
-                                     Quadrangle (4 nodes).
-                                     4
-                                     Tetrahedron (4 nodes).
-                                     5
-                                     Hexahedron (8 nodes).
-                                     6
-                                     Prism (6 nodes).
-                                     7
-                                     Pyramid (5 nodes).
-                                     8
-                                     Second order line (3 nodes: 2 associated with the vertices and 1 with the edge).
-                                     9
-                                     Second order triangle (6 nodes: 3 associated with the vertices and 3 with the edges).
-                                     10
-                                     Second order quadrangle (9 nodes: 4 associated with the vertices, 4 with the edges and 1 with the face).
-                                     11
-                                     Second order tetrahedron (10 nodes: 4 associated with the vertices and 6 with the edges).
-                                     12
-                                     Second order hexahedron (27 nodes: 8 associated with the vertices, 12 with the edges, 6 with the faces and 1 with the volume).
-                                     13
-                                     Second order prism (18 nodes: 6 associated with the vertices, 9 with the edges and 3 with the quadrangular faces).
-                                     14
-                                     Second order pyramid (14 nodes: 5 associated with the vertices, 8 with the edges and 1 with the quadrangular face).
-                                     15
-                                     Point (1 node).
-                                   */
+  /*
+    elm-type
+    defines the geometrical type of the n-th element:
+    1
+    Line (2 nodes).
+    2
+    Triangle (3 nodes).
+    3
+    Quadrangle (4 nodes).
+    4
+    Tetrahedron (4 nodes).
+    5
+    Hexahedron (8 nodes).
+    6
+    Prism (6 nodes).
+    7
+    Pyramid (5 nodes).
+    8
+    Second order line (3 nodes: 2 associated with the vertices and 1 with the edge).
+    9
+    Second order triangle (6 nodes: 3 associated with the vertices and 3 with the edges).
+    10
+    Second order quadrangle (9 nodes: 4 associated with the vertices, 4 with the edges and 1 with the face).
+    11
+    Second order tetrahedron (10 nodes: 4 associated with the vertices and 6 with the edges).
+    12
+    Second order hexahedron (27 nodes: 8 associated with the vertices, 12 with the edges, 6 with the faces and 1 with the volume).
+    13
+    Second order prism (18 nodes: 6 associated with the vertices, 9 with the edges and 3 with the quadrangular faces).
+    14
+    Second order pyramid (14 nodes: 5 associated with the vertices, 8 with the edges and 1 with the quadrangular face).
+    15
+    Point (1 node).
+  */
   unsigned int elm_type;
-  switch(dim) {
+  switch (dim)
+    {
     case 1:
-          elm_type = 1;
-          break;
+      elm_type = 1;
+      break;
     case 2:
-          elm_type = 3;
-          break;
+      elm_type = 3;
+      break;
     case 3:
-          elm_type = 5;
-          break;
+      elm_type = 5;
+      break;
     default:
-          Assert(false, ExcNotImplemented());
-  }
+      Assert(false, ExcNotImplemented());
+    }
 
-                                   // write cells. Enumerate cells
-                                   // consecutively, starting with 1
+  // write cells. Enumerate cells
+  // consecutively, starting with 1
   unsigned int cell_index=1;
   for (cell=tria.begin_active();
        cell!=endc; ++cell, ++cell_index)
@@ -927,7 +928,7 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
           << cell->subdomain_id() << ' '
           << GeometryInfo<dim>::vertices_per_cell << ' ';
 
-                                       // Vertex numbering follows UCD conventions.
+      // Vertex numbering follows UCD conventions.
 
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
            ++vertex)
@@ -935,8 +936,8 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
       out << std::endl;
     };
 
-                                   // write faces and lines with
-                                   // non-zero boundary indicator
+  // write faces and lines with
+  // non-zero boundary indicator
   if (msh_flags.write_faces)
     write_msh_faces (tria, cell_index, out);
   if (msh_flags.write_lines)
@@ -944,8 +945,8 @@ void GridOut::write_msh (const Triangulation<dim, spacedim> &tria,
 
   out << "$ENDELM" << std::endl;
 
-                                   // make sure everything now gets to
-                                   // disk
+  // make sure everything now gets to
+  // disk
   out.flush ();
 
   AssertThrow (out, ExcIO());
@@ -958,9 +959,9 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
 {
   AssertThrow (out, ExcIO());
 
-                                   // get the positions of the
-                                   // vertices and whether they are
-                                   // used.
+  // get the positions of the
+  // vertices and whether they are
+  // used.
   const std::vector<Point<spacedim> > &vertices    = tria.get_vertices();
   const std::vector<bool>             &vertex_used = tria.get_used_vertices();
 
@@ -969,12 +970,12 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
   typename Triangulation<dim,spacedim>::active_cell_iterator       cell=tria.begin_active();
   const typename Triangulation<dim,spacedim>::active_cell_iterator endc=tria.end();
 
-                                   // write preamble
+  // write preamble
   if (ucd_flags.write_preamble)
     {
-                                       // block this to have local
-                                       // variables destroyed after
-                                       // use
+      // block this to have local
+      // variables destroyed after
+      // use
       std::time_t  time1= std::time (0);
       std::tm     *time = std::localtime(&time1);
       out << "# This file was generated by the deal.II library." << '\n'
@@ -992,7 +993,7 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
           << "#" << '\n';
     };
 
-                                   // start with ucd data
+  // start with ucd data
   out << n_vertices << ' '
       << tria.n_active_cells() + ( (ucd_flags.write_faces ?
                                     n_boundary_faces(tria) : 0) +
@@ -1001,9 +1002,9 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
       << " 0 0 0"                  // no data
       << '\n';
 
-                                   // actually write the vertices.
-                                   // note that we shall number them
-                                   // with first index 1 instead of 0
+  // actually write the vertices.
+  // note that we shall number them
+  // with first index 1 instead of 0
   for (unsigned int i=0; i<vertices.size(); ++i)
     if (vertex_used[i])
       {
@@ -1015,8 +1016,8 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
         out << '\n';
       };
 
-                                   // write cells. Enumerate cells
-                                   // consecutively, starting with 1
+  // write cells. Enumerate cells
+  // consecutively, starting with 1
   unsigned int cell_index=1;
   for (cell=tria.begin_active();
        cell!=endc; ++cell, ++cell_index)
@@ -1026,43 +1027,49 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
           << ' ';
       switch (dim)
         {
-          case 1:  out << "line    "; break;
-          case 2:  out << "quad    "; break;
-          case 3:  out << "hex     "; break;
-          default:
-                Assert (false, ExcNotImplemented());
+        case 1:
+          out << "line    ";
+          break;
+        case 2:
+          out << "quad    ";
+          break;
+        case 3:
+          out << "hex     ";
+          break;
+        default:
+          Assert (false, ExcNotImplemented());
         };
 
-                                       // it follows a list of the
-                                       // vertices of each cell. in 1d
-                                       // this is simply a list of the
-                                       // two vertices, in 2d its counter
-                                       // clockwise, as usual in this
-                                       // library. in 3d, the same applies
-                                       // (special thanks to AVS for
-                                       // numbering their vertices in a
-                                       // way compatible to deal.II!)
-                                       //
-                                       // technical reference:
-                                       // AVS Developer's Guide, Release 4,
-                                       // May, 1992, p. E6
-                                       //
-                                       // note: vertex numbers are 1-base
+      // it follows a list of the
+      // vertices of each cell. in 1d
+      // this is simply a list of the
+      // two vertices, in 2d its counter
+      // clockwise, as usual in this
+      // library. in 3d, the same applies
+      // (special thanks to AVS for
+      // numbering their vertices in a
+      // way compatible to deal.II!)
+      //
+      // technical reference:
+      // AVS Developer's Guide, Release 4,
+      // May, 1992, p. E6
+      //
+      // note: vertex numbers are 1-base
       for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_cell;
            ++vertex)
         out << cell->vertex_index(GeometryInfo<dim>::ucd_to_deal[vertex])+1 << ' ';
       out << '\n';
     };
 
-                                   // write faces and lines with
-                                   // non-zero boundary indicator
+  // write faces and lines with
+  // non-zero boundary indicator
   if (ucd_flags.write_faces)
     write_ucd_faces (tria, cell_index, out);
   if (ucd_flags.write_lines)
     write_ucd_lines (tria, cell_index, out);
 
-                                   // make sure everything now gets to
-                                   // disk
+  // make sure everything now gets to
+  // disk
   out.flush ();
 
   AssertThrow (out, ExcIO());
@@ -1072,9 +1079,9 @@ void GridOut::write_ucd (const Triangulation<dim,spacedim> &tria,
 
 template <int dim>
 void GridOut::write_xfig (
-  const Triangulation<dim>&,
-  std::ostream&,
-  const Mapping<dim>*) const
+  const Triangulation<dim> &,
+  std::ostream &,
+  const Mapping<dim> *) const
 {
   Assert (false, ExcNotImplemented());
 }
@@ -1083,9 +1090,9 @@ void GridOut::write_xfig (
 //TODO:[GK] Obey parameters
 template <>
 void GridOut::write_xfig (
-  const Triangulation<2>& tria,
-  std::ostream&             out,
-  const Mapping<2>*       /*mapping*/) const
+  const Triangulation<2> &tria,
+  std::ostream             &out,
+  const Mapping<2> *       /*mapping*/) const
 {
   const int dim = 2;
 
@@ -1093,120 +1100,120 @@ void GridOut::write_xfig (
   const unsigned int nf = GeometryInfo<dim>::faces_per_cell;
   const unsigned int nvf = GeometryInfo<dim>::vertices_per_face;
 
-                                   // The following text was copied
-                                   // from an existing XFig file.
+  // The following text was copied
+  // from an existing XFig file.
   out << "#FIG 3.2\nLandscape\nCenter\nInches" << std::endl
       << "A4\n100.00\nSingle" << std::endl
-                                     // Background is transparent
+      // Background is transparent
       << "-3" << std::endl
       << "# generated by deal.II GridOut class" << std::endl
       << "# reduce first number to scale up image" << std::endl
       << "1200 2" << std::endl;
   // Write custom palette
   //grey
-  	  unsigned int colno = 32;
-  	  out << "0 " << colno++ << " #ff0000" << std::endl;
-  	  out << "0 " << colno++ << " #ff8000" << std::endl;
- 	  out << "0 " << colno++ << " #ffd000" << std::endl;
-  	  out << "0 " << colno++ << " #ffff00" << std::endl;
-  	  out << "0 " << colno++ << " #c0ff00" << std::endl;
-  	  out << "0 " << colno++ << " #80ff00" << std::endl;
-  	  out << "0 " << colno++ << " #00f000" << std::endl;
-  	  out << "0 " << colno++ << " #00f0c0" << std::endl;
- 	  out << "0 " << colno++ << " #00f0ff" << std::endl;
- 	  out << "0 " << colno++ << " #00c0ff" << std::endl;
- 	  out << "0 " << colno++ << " #0080ff" << std::endl;
- 	  out << "0 " << colno++ << " #0040ff" << std::endl;
-	  out << "0 " << colno++ << " #0000c0" << std::endl;
-	  out << "0 " << colno++ << " #5000ff" << std::endl;
-	  out << "0 " << colno++ << " #8000ff" << std::endl;
-	  out << "0 " << colno++ << " #b000ff" << std::endl;
-	  out << "0 " << colno++ << " #ff00ff" << std::endl;
-	  out << "0 " << colno++ << " #ff80ff" << std::endl;
-      // grey
-   	  for (unsigned int i=0;i<8;++i)
-   	      out << "0 " << colno++ << " #" << std::hex << 32*i+31 << 32*i+31 << 32*i+31 << std::dec << std::endl;
-  	  // green
-  	  for (unsigned int i=1;i<16;++i)
-  		  out << "0 " << colno++ << " #00" << std::hex << 16*i+15 << std::dec << "00" << std::endl;
-  	  // yellow
-  	  for (unsigned int i=1;i<16;++i)
-  		  out << "0 " << colno++ << " #" << std::hex << 16*i+15 << 16*i+15 << std::dec << "00" << std::endl;
-  	  // red
-   	  for (unsigned int i=1;i<16;++i)
-   		  out << "0 " << colno++ << " #" << std::hex << 16*i+15 << std::dec << "0000" << std::endl;
-   	  // purple
- 	  for (unsigned int i=1;i<16;++i)
- 		  out << "0 " << colno++ << " #" << std::hex << 16*i+15 << "00" << 16*i+15 << std::dec << std::endl;
- 	  // blue
-  	  for (unsigned int i=1;i<16;++i)
-  		  out << "0 " << colno++ << " #0000" << std::hex << 16*i+15 << std::dec << std::endl;
-  	  // cyan
- 	  for (unsigned int i=1;i<16;++i)
- 		  out << "0 " << colno++ << " #00" << std::hex << 16*i+15 << 16*i+15 << std::dec << std::endl;
+  unsigned int colno = 32;
+  out << "0 " << colno++ << " #ff0000" << std::endl;
+  out << "0 " << colno++ << " #ff8000" << std::endl;
+  out << "0 " << colno++ << " #ffd000" << std::endl;
+  out << "0 " << colno++ << " #ffff00" << std::endl;
+  out << "0 " << colno++ << " #c0ff00" << std::endl;
+  out << "0 " << colno++ << " #80ff00" << std::endl;
+  out << "0 " << colno++ << " #00f000" << std::endl;
+  out << "0 " << colno++ << " #00f0c0" << std::endl;
+  out << "0 " << colno++ << " #00f0ff" << std::endl;
+  out << "0 " << colno++ << " #00c0ff" << std::endl;
+  out << "0 " << colno++ << " #0080ff" << std::endl;
+  out << "0 " << colno++ << " #0040ff" << std::endl;
+  out << "0 " << colno++ << " #0000c0" << std::endl;
+  out << "0 " << colno++ << " #5000ff" << std::endl;
+  out << "0 " << colno++ << " #8000ff" << std::endl;
+  out << "0 " << colno++ << " #b000ff" << std::endl;
+  out << "0 " << colno++ << " #ff00ff" << std::endl;
+  out << "0 " << colno++ << " #ff80ff" << std::endl;
+  // grey
+  for (unsigned int i=0; i<8; ++i)
+    out << "0 " << colno++ << " #" << std::hex << 32*i+31 << 32*i+31 << 32*i+31 << std::dec << std::endl;
+  // green
+  for (unsigned int i=1; i<16; ++i)
+    out << "0 " << colno++ << " #00" << std::hex << 16*i+15 << std::dec << "00" << std::endl;
+  // yellow
+  for (unsigned int i=1; i<16; ++i)
+    out << "0 " << colno++ << " #" << std::hex << 16*i+15 << 16*i+15 << std::dec << "00" << std::endl;
+  // red
+  for (unsigned int i=1; i<16; ++i)
+    out << "0 " << colno++ << " #" << std::hex << 16*i+15 << std::dec << "0000" << std::endl;
+  // purple
+  for (unsigned int i=1; i<16; ++i)
+    out << "0 " << colno++ << " #" << std::hex << 16*i+15 << "00" << 16*i+15 << std::dec << std::endl;
+  // blue
+  for (unsigned int i=1; i<16; ++i)
+    out << "0 " << colno++ << " #0000" << std::hex << 16*i+15 << std::dec << std::endl;
+  // cyan
+  for (unsigned int i=1; i<16; ++i)
+    out << "0 " << colno++ << " #00" << std::hex << 16*i+15 << 16*i+15 << std::dec << std::endl;
 
-                                   // We write all cells and cells on
-                                   // coarser levels are behind cells
-                                   // on finer levels. Level 0
-                                   // corresponds to a depth of 900,
-                                   // each level subtracting 1
+  // We write all cells and cells on
+  // coarser levels are behind cells
+  // on finer levels. Level 0
+  // corresponds to a depth of 900,
+  // each level subtracting 1
   Triangulation<dim>::cell_iterator cell = tria.begin();
   const Triangulation<dim>::cell_iterator end = tria.end();
 
-  for (;cell != end; ++cell)
+  for (; cell != end; ++cell)
     {
-                                       // If depth is not encoded, write finest level only
+      // If depth is not encoded, write finest level only
       if (!xfig_flags.level_depth && !cell->active())
         continue;
-                                       // Code for polygon
+      // Code for polygon
       out << "2 3  "
           << xfig_flags.line_style << ' '
           << xfig_flags.line_thickness
-                                         // with black line
+          // with black line
           << " 0 ";
-                                       // Fill color
-      	switch(xfig_flags.color_by)
-      	{
+      // Fill color
+      switch (xfig_flags.color_by)
+        {
 //TODO[GK]: Simplify after deprecation period is over
-      	case GridOutFlags::XFig::material_id:
-      		if (xfig_flags.level_color)
-      		        out << cell->level()	 + 32;
-      		      else
-      		        out << static_cast<unsigned int>(cell->material_id()) + 32;
-      		break;
-      	case GridOutFlags::XFig::level_number:
-      		out << cell->level() + 8;
-      		break;
-      	case GridOutFlags::XFig::subdomain_id:
-      		out << cell->subdomain_id() + 32;
-      		break;
-      	case GridOutFlags::XFig::level_subdomain_id:
-      		out << cell->level_subdomain_id() + 32;
-      		break;
-      	default:
-      	  Assert(false, ExcInternalError());
-      	}
+        case GridOutFlags::XFig::material_id:
+          if (xfig_flags.level_color)
+            out << cell->level()   + 32;
+          else
+            out << static_cast<unsigned int>(cell->material_id()) + 32;
+          break;
+        case GridOutFlags::XFig::level_number:
+          out << cell->level() + 8;
+          break;
+        case GridOutFlags::XFig::subdomain_id:
+          out << cell->subdomain_id() + 32;
+          break;
+        case GridOutFlags::XFig::level_subdomain_id:
+          out << cell->level_subdomain_id() + 32;
+          break;
+        default:
+          Assert(false, ExcInternalError());
+        }
 
-                                       // Depth, unused, fill
+      // Depth, unused, fill
       out << ' '
           << (xfig_flags.level_depth
               ? (900-cell->level())
               : (900+cell->material_id()))
           << " 0 "
           << xfig_flags.fill_style << " 0.0 "
-                                         // some style parameters
+          // some style parameters
           << " 0 0 -1 0 0 "
-                                         // number of points
+          // number of points
           << nv+1 << std::endl;
 
-                                       // For each point, write scaled
-                                       // and shifted coordinates
-                                       // multiplied by 1200
-                                       // (dots/inch)
-      for (unsigned int k=0;k<=nv;++k)
+      // For each point, write scaled
+      // and shifted coordinates
+      // multiplied by 1200
+      // (dots/inch)
+      for (unsigned int k=0; k<=nv; ++k)
         {
-          const Point<dim>& p = cell->vertex(
-            GeometryInfo<dim>::ucd_to_deal[k % nv]);
+          const Point<dim> &p = cell->vertex(
+                                  GeometryInfo<dim>::ucd_to_deal[k % nv]);
           for (unsigned int d=0; d<static_cast<unsigned int>(dim); ++d)
             {
               int val = (int)(1200 * xfig_flags.scaling(d) *
@@ -1215,43 +1222,43 @@ void GridOut::write_xfig (
             }
           out << std::endl;
         }
-                                       // Now write boundary edges
-      static const unsigned int face_reorder[4]={2,1,3,0};
+      // Now write boundary edges
+      static const unsigned int face_reorder[4]= {2,1,3,0};
       if (xfig_flags.draw_boundary)
-        for (unsigned int f=0;f<nf;++f)
+        for (unsigned int f=0; f<nf; ++f)
           {
             Triangulation<dim>::face_iterator
-              face = cell->face(face_reorder[f]);
+            face = cell->face(face_reorder[f]);
             const types::boundary_id bi = face->boundary_indicator();
             if (bi != numbers::internal_face_boundary_id)
               {
-                                                 // Code for polyline
+                // Code for polyline
                 out << "2 1 "
-                                                   // with line style and thickness
+                    // with line style and thickness
                     << xfig_flags.boundary_style << ' '
                     << xfig_flags.boundary_thickness << ' '
                     << (1 + (unsigned int) bi);
-                                                 // Fill color
+                // Fill color
                 out << " -1 ";
-                                                 // Depth 100 less than cells
+                // Depth 100 less than cells
                 out << (xfig_flags.level_depth
                         ? (800-cell->level())
                         : 800+bi)
-                                                   // unused, no fill
+                    // unused, no fill
                     << " 0 -1 0.0 "
-                                                   // some style parameters
+                    // some style parameters
                     << " 0 0 -1 0 0 "
-                                                   // number of points
+                    // number of points
                     << nvf << std::endl;
 
-                                                 // For each point, write scaled
-                                                 // and shifted coordinates
-                                                 // multiplied by 1200
-                                                 // (dots/inch)
+                // For each point, write scaled
+                // and shifted coordinates
+                // multiplied by 1200
+                // (dots/inch)
 
-                for (unsigned int k=0;k<nvf;++k)
+                for (unsigned int k=0; k<nvf; ++k)
                   {
-                    const Point<dim>& p = face->vertex(k % nv);
+                    const Point<dim> &p = face->vertex(k % nv);
                     for (unsigned int d=0; d<static_cast<unsigned int>(dim); ++d)
                       {
                         int val = (int)(1200 * xfig_flags.scaling(d) *
@@ -1264,8 +1271,8 @@ void GridOut::write_xfig (
           }
     }
 
-                                   // make sure everything now gets to
-                                   // disk
+  // make sure everything now gets to
+  // disk
   out.flush ();
 
   AssertThrow (out, ExcIO());
@@ -1321,7 +1328,7 @@ unsigned int GridOut::n_boundary_lines (const Triangulation<2,3> &) const
 template <int dim, int spacedim>
 unsigned int GridOut::n_boundary_faces (const Triangulation<dim,spacedim> &tria) const
 {
-    typename Triangulation<dim,spacedim>::active_face_iterator face, endf;
+  typename Triangulation<dim,spacedim>::active_face_iterator face, endf;
   unsigned int n_faces = 0;
 
   for (face=tria.begin_active_face(), endf=tria.end_face();
@@ -1338,14 +1345,14 @@ unsigned int GridOut::n_boundary_faces (const Triangulation<dim,spacedim> &tria)
 template <int dim, int spacedim>
 unsigned int GridOut::n_boundary_lines (const Triangulation<dim, spacedim> &tria) const
 {
-				   // save the user flags for lines so
-				   // we can use these flags to track
-				   // which ones we've already counted
+  // save the user flags for lines so
+  // we can use these flags to track
+  // which ones we've already counted
   std::vector<bool> line_flags;
   const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
-    .save_user_flags_line (line_flags);
+  .save_user_flags_line (line_flags);
   const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
-    .clear_user_flags_line ();
+  .clear_user_flags_line ();
 
   unsigned int n_lines = 0;
 
@@ -1355,19 +1362,19 @@ unsigned int GridOut::n_boundary_lines (const Triangulation<dim, spacedim> &tria
        cell != endc; ++cell)
     for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
       if (cell->line(l)->at_boundary()
-	  &&
-	  (cell->line(l)->boundary_indicator() != 0)
-	  &&
-	  (cell->line(l)->user_flag_set() == false))
-      {
-        ++n_lines;
-	cell->line(l)->set_user_flag();
-      }
+          &&
+          (cell->line(l)->boundary_indicator() != 0)
+          &&
+          (cell->line(l)->user_flag_set() == false))
+        {
+          ++n_lines;
+          cell->line(l)->set_user_flag();
+        }
 
-				   // at the end, restore the user
-				   // flags for the lines
+  // at the end, restore the user
+  // flags for the lines
   const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
-    .load_user_flags_line (line_flags);
+  .load_user_flags_line (line_flags);
 
   return n_lines;
 }
@@ -1443,7 +1450,7 @@ void GridOut::write_msh_faces (const Triangulation<dim,spacedim> &tria,
                                const unsigned int        starting_index,
                                std::ostream             &out) const
 {
-    typename Triangulation<dim,spacedim>::active_face_iterator face, endf;
+  typename Triangulation<dim,spacedim>::active_face_iterator face, endf;
   unsigned int index=starting_index;
 
   for (face=tria.begin_active_face(), endf=tria.end_face();
@@ -1454,16 +1461,20 @@ void GridOut::write_msh_faces (const Triangulation<dim,spacedim> &tria,
         out << index << ' ';
         switch (dim)
           {
-            case 2: out << 1 << ' ';  break;
-            case 3: out << 3 << ' ';  break;
-            default:
-                  Assert (false, ExcNotImplemented());
+          case 2:
+            out << 1 << ' ';
+            break;
+          case 3:
+            out << 3 << ' ';
+            break;
+          default:
+            Assert (false, ExcNotImplemented());
           };
         out << static_cast<unsigned int>(face->boundary_indicator())
             << ' '
             << static_cast<unsigned int>(face->boundary_indicator())
             << ' ' << GeometryInfo<dim>::vertices_per_face;
-                                         // note: vertex numbers are 1-base
+        // note: vertex numbers are 1-base
         for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
           out << ' '
               << face->vertex_index(GeometryInfo<dim-1>::ucd_to_deal[vertex])+1;
@@ -1479,15 +1490,15 @@ void GridOut::write_msh_lines (const Triangulation<dim, spacedim> &tria,
                                const unsigned int        starting_index,
                                std::ostream             &out) const
 {
-				   // save the user flags for lines so
-				   // we can use these flags to track
-				   // which ones we've already taken
-				   // care of
+  // save the user flags for lines so
+  // we can use these flags to track
+  // which ones we've already taken
+  // care of
   std::vector<bool> line_flags;
   const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
-    .save_user_flags_line (line_flags);
+  .save_user_flags_line (line_flags);
   const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
-    .clear_user_flags_line ();
+  .clear_user_flags_line ();
 
   typename Triangulation<dim, spacedim>::active_cell_iterator cell, endc;
   unsigned int index=starting_index;
@@ -1496,33 +1507,33 @@ void GridOut::write_msh_lines (const Triangulation<dim, spacedim> &tria,
        cell != endc; ++cell)
     for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
       if (cell->line(l)->at_boundary()
-	  &&
-	  (cell->line(l)->boundary_indicator() != 0)
-	  &&
-	  (cell->line(l)->user_flag_set() == false))
-      {
-        out << index << " 1 ";
-        out << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
-            << ' '
-            << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
-            << " 2 ";
-                                         // note: vertex numbers are 1-base
-        for (unsigned int vertex=0; vertex<2; ++vertex)
-          out << ' '
-              << cell->line(l)->vertex_index(GeometryInfo<dim-2>::ucd_to_deal[vertex])+1;
-        out << '\n';
+          &&
+          (cell->line(l)->boundary_indicator() != 0)
+          &&
+          (cell->line(l)->user_flag_set() == false))
+        {
+          out << index << " 1 ";
+          out << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
+              << ' '
+              << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
+              << " 2 ";
+          // note: vertex numbers are 1-base
+          for (unsigned int vertex=0; vertex<2; ++vertex)
+            out << ' '
+                << cell->line(l)->vertex_index(GeometryInfo<dim-2>::ucd_to_deal[vertex])+1;
+          out << '\n';
 
-					 // move on to the next line
-					 // but mark the current one
-					 // as taken care of
-        ++index;
-	cell->line(l)->set_user_flag();
-      }
+          // move on to the next line
+          // but mark the current one
+          // as taken care of
+          ++index;
+          cell->line(l)->set_user_flag();
+        }
 
-				   // at the end, restore the user
-				   // flags for the lines
+  // at the end, restore the user
+  // flags for the lines
   const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
-    .load_user_flags_line (line_flags);
+  .load_user_flags_line (line_flags);
 }
 
 
@@ -1594,7 +1605,7 @@ void GridOut::write_ucd_faces (const Triangulation<dim, spacedim> &tria,
                                const unsigned int        starting_index,
                                std::ostream             &out) const
 {
-    typename Triangulation<dim,spacedim>::active_face_iterator face, endf;
+  typename Triangulation<dim,spacedim>::active_face_iterator face, endf;
   unsigned int index=starting_index;
 
   for (face=tria.begin_active_face(), endf=tria.end_face();
@@ -1607,12 +1618,16 @@ void GridOut::write_ucd_faces (const Triangulation<dim, spacedim> &tria,
             << "  ";
         switch (dim)
           {
-            case 2: out << "line    ";  break;
-            case 3: out << "quad    ";  break;
-            default:
-                  Assert (false, ExcNotImplemented());
+          case 2:
+            out << "line    ";
+            break;
+          case 3:
+            out << "quad    ";
+            break;
+          default:
+            Assert (false, ExcNotImplemented());
           };
-                                         // note: vertex numbers are 1-base
+        // note: vertex numbers are 1-base
         for (unsigned int vertex=0; vertex<GeometryInfo<dim>::vertices_per_face; ++vertex)
           out << face->vertex_index(GeometryInfo<dim-1>::ucd_to_deal[vertex])+1 << ' ';
         out << '\n';
@@ -1628,15 +1643,15 @@ void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
                                const unsigned int        starting_index,
                                std::ostream             &out) const
 {
-				   // save the user flags for lines so
-				   // we can use these flags to track
-				   // which ones we've already taken
-				   // care of
+  // save the user flags for lines so
+  // we can use these flags to track
+  // which ones we've already taken
+  // care of
   std::vector<bool> line_flags;
   const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
-    .save_user_flags_line (line_flags);
+  .save_user_flags_line (line_flags);
   const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
-    .clear_user_flags_line ();
+  .clear_user_flags_line ();
 
   typename Triangulation<dim, spacedim>::active_cell_iterator cell, endc;
   unsigned int index=starting_index;
@@ -1645,31 +1660,31 @@ void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
        cell != endc; ++cell)
     for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_cell; ++l)
       if (cell->line(l)->at_boundary()
-	  &&
-	  (cell->line(l)->boundary_indicator() != 0)
-	  &&
-	  (cell->line(l)->user_flag_set() == false))
-      {
-        out << index << "  "
-            << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
-            << "  line    ";
-        // note: vertex numbers in ucd format are 1-base
-        for (unsigned int vertex=0; vertex<2; ++vertex)
-          out << cell->line(l)->vertex_index(GeometryInfo<dim-2>::ucd_to_deal[vertex])+1
-	      << ' ';
-        out << '\n';
+          &&
+          (cell->line(l)->boundary_indicator() != 0)
+          &&
+          (cell->line(l)->user_flag_set() == false))
+        {
+          out << index << "  "
+              << static_cast<unsigned int>(cell->line(l)->boundary_indicator())
+              << "  line    ";
+          // note: vertex numbers in ucd format are 1-base
+          for (unsigned int vertex=0; vertex<2; ++vertex)
+            out << cell->line(l)->vertex_index(GeometryInfo<dim-2>::ucd_to_deal[vertex])+1
+                << ' ';
+          out << '\n';
 
-					 // move on to the next line
-					 // but mark the current one
-					 // as taken care of
-        ++index;
-	cell->line(l)->set_user_flag();
-      }
+          // move on to the next line
+          // but mark the current one
+          // as taken care of
+          ++index;
+          cell->line(l)->set_user_flag();
+        }
 
-				   // at the end, restore the user
-				   // flags for the lines
+  // at the end, restore the user
+  // flags for the lines
   const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
-    .load_user_flags_line (line_flags);
+  .load_user_flags_line (line_flags);
 }
 
 
@@ -1680,7 +1695,7 @@ namespace internal
     template <int spacedim>
     void write_gnuplot (const dealii::Triangulation<1,spacedim> &tria,
                         std::ostream             &out,
-                        const Mapping<1,spacedim>       *,
+                        const Mapping<1,spacedim> *,
                         const GridOutFlags::Gnuplot &gnuplot_flags)
     {
       AssertThrow (out, ExcIO());
@@ -1688,9 +1703,9 @@ namespace internal
       const int dim = 1;
 
       typename dealii::Triangulation<dim,spacedim>::active_cell_iterator
-        cell=tria.begin_active();
+      cell=tria.begin_active();
       const typename dealii::Triangulation<dim,spacedim>::active_cell_iterator
-        endc=tria.end();
+      endc=tria.end();
       for (; cell!=endc; ++cell)
         {
           if (gnuplot_flags.write_cell_numbers)
@@ -1705,8 +1720,8 @@ namespace internal
               << '\n';
         }
 
-                                       // make sure everything now gets to
-                                       // disk
+      // make sure everything now gets to
+      // disk
       out.flush ();
 
       AssertThrow (out, ExcIO());
@@ -1729,15 +1744,15 @@ namespace internal
       const unsigned int n_points=2+n_additional_points;
 
       typename dealii::Triangulation<dim,spacedim>::active_cell_iterator
-        cell=tria.begin_active();
+      cell=tria.begin_active();
       const typename dealii::Triangulation<dim,spacedim>::active_cell_iterator
-        endc=tria.end();
+      endc=tria.end();
 
-                                       // if we are to treat curved
-                                       // boundaries, then generate a
-                                       // quadrature formula which will be
-                                       // used to probe boundary points at
-                                       // curved faces
+      // if we are to treat curved
+      // boundaries, then generate a
+      // quadrature formula which will be
+      // used to probe boundary points at
+      // curved faces
       Quadrature<dim> *q_projector=0;
       std::vector<Point<dim-1> > boundary_points;
       if (mapping!=0)
@@ -1762,13 +1777,13 @@ namespace internal
           if (mapping==0 ||
               (!cell->at_boundary() && !gnuplot_flags.curved_inner_cells))
             {
-                                               // write out the four sides
-                                               // of this cell by putting
-                                               // the four points (+ the
-                                               // initial point again) in
-                                               // a row and lifting the
-                                               // drawing pencil at the
-                                               // end
+              // write out the four sides
+              // of this cell by putting
+              // the four points (+ the
+              // initial point again) in
+              // a row and lifting the
+              // drawing pencil at the
+              // end
               for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
                 out << cell->vertex(GeometryInfo<dim>::ucd_to_deal[i])
                     << ' ' << cell->level()
@@ -1780,24 +1795,24 @@ namespace internal
                   << '\n';
             }
           else
-                                             // cell is at boundary and we
-                                             // are to treat curved
-                                             // boundaries. so loop over
-                                             // all faces and draw them as
-                                             // small pieces of lines
+            // cell is at boundary and we
+            // are to treat curved
+            // boundaries. so loop over
+            // all faces and draw them as
+            // small pieces of lines
             {
               for (unsigned int face_no=0;
                    face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
                 {
                   const typename dealii::Triangulation<dim,spacedim>::face_iterator
-                    face = cell->face(face_no);
+                  face = cell->face(face_no);
                   if (face->at_boundary() || gnuplot_flags.curved_inner_cells)
                     {
-                                                       // compute offset
-                                                       // of quadrature
-                                                       // points within
-                                                       // set of projected
-                                                       // points
+                      // compute offset
+                      // of quadrature
+                      // points within
+                      // set of projected
+                      // points
                       const unsigned int offset=face_no*n_points;
                       for (unsigned int i=0; i<n_points; ++i)
                         out << (mapping->transform_unit_to_real_cell
@@ -1811,11 +1826,11 @@ namespace internal
                     }
                   else
                     {
-                                                       // if, however, the
-                                                       // face is not at
-                                                       // the boundary,
-                                                       // then draw it as
-                                                       // usual
+                      // if, however, the
+                      // face is not at
+                      // the boundary,
+                      // then draw it as
+                      // usual
                       out << face->vertex(0)
                           << ' ' << cell->level()
                           << ' ' << static_cast<unsigned int>(cell->material_id())
@@ -1834,8 +1849,8 @@ namespace internal
       if (q_projector != 0)
         delete q_projector;
 
-                                       // make sure everything now gets to
-                                       // disk
+      // make sure everything now gets to
+      // disk
       out.flush ();
 
       AssertThrow (out, ExcIO());
@@ -1858,15 +1873,15 @@ namespace internal
       const unsigned int n_points=2+n_additional_points;
 
       typename dealii::Triangulation<dim,spacedim>::active_cell_iterator
-        cell=tria.begin_active();
+      cell=tria.begin_active();
       const typename dealii::Triangulation<dim,spacedim>::active_cell_iterator
-        endc=tria.end();
+      endc=tria.end();
 
-                                       // if we are to treat curved
-                                       // boundaries, then generate a
-                                       // quadrature formula which will be
-                                       // used to probe boundary points at
-                                       // curved faces
+      // if we are to treat curved
+      // boundaries, then generate a
+      // quadrature formula which will be
+      // used to probe boundary points at
+      // curved faces
       Quadrature<dim> *q_projector=0;
       std::vector<Point<1> > boundary_points;
       if (mapping!=0)
@@ -1880,8 +1895,8 @@ namespace internal
           std::vector<double> dummy_weights(n_points, 1./n_points);
           Quadrature<1> quadrature1d(boundary_points, dummy_weights);
 
-                                           // tensor product of points,
-                                           // only one copy
+          // tensor product of points,
+          // only one copy
           QIterated<dim-1> quadrature(quadrature1d, 1);
           q_projector = new Quadrature<dim> (QProjector<dim>::project_to_all_faces(quadrature));
         }
@@ -1894,7 +1909,7 @@ namespace internal
           if (mapping==0 || n_points==2 ||
               (!cell->has_boundary_lines() && !gnuplot_flags.curved_inner_cells))
             {
-                                               // front face
+              // front face
               out << cell->vertex(0)
                   << ' ' << cell->level()
                   << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
@@ -1911,7 +1926,7 @@ namespace internal
                   << ' ' << cell->level()
                   << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
                   << '\n';
-                                               // back face
+              // back face
               out << cell->vertex(2)
                   << ' ' << cell->level()
                   << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
@@ -1929,7 +1944,7 @@ namespace internal
                   << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
                   << '\n';
 
-                                               // now for the four connecting lines
+              // now for the four connecting lines
               out << cell->vertex(0)
                   << ' ' << cell->level()
                   << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n'
@@ -1964,7 +1979,7 @@ namespace internal
               for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
                 {
                   const typename dealii::Triangulation<dim,spacedim>::face_iterator
-                    face = cell->face(face_no);
+                  face = cell->face(face_no);
 
                   if (face->at_boundary())
                     {
@@ -1973,7 +1988,7 @@ namespace internal
                         for (unsigned int j=0; j<n_points-1; ++j)
                           {
                             const Point<spacedim> p0=mapping->transform_unit_to_real_cell(
-                              cell, q_projector->point(offset+i*n_points+j));
+                                                       cell, q_projector->point(offset+i*n_points+j));
                             out << p0
                                 << ' ' << cell->level()
                                 << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
@@ -1989,10 +2004,10 @@ namespace internal
                                       cell, q_projector->point(offset+i*n_points+j+1)))
                                 << ' ' << cell->level()
                                 << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
-                                                             // and the
-                                                             // first
-                                                             // point
-                                                             // again
+                            // and the
+                            // first
+                            // point
+                            // again
                             out << p0
                                 << ' ' << cell->level()
                                 << ' ' << static_cast<unsigned int>(cell->material_id()) << '\n';
@@ -2004,20 +2019,20 @@ namespace internal
                       for (unsigned int l=0; l<GeometryInfo<dim>::lines_per_face; ++l)
                         {
                           const typename dealii::Triangulation<dim,spacedim>::line_iterator
-                            line=face->line(l);
+                          line=face->line(l);
 
                           const Point<spacedim> &v0=line->vertex(0),
-                                                &v1=line->vertex(1);
+                                                 &v1=line->vertex(1);
                           if (line->at_boundary() || gnuplot_flags.curved_inner_cells)
                             {
-                                                               // transform_real_to_unit_cell
-                                                               // could be
-                                                               // replaced
-                                                               // by using
-                                                               // QProjector<dim>::project_to_line
-                                                               // which is
-                                                               // not yet
-                                                               // implemented
+                              // transform_real_to_unit_cell
+                              // could be
+                              // replaced
+                              // by using
+                              // QProjector<dim>::project_to_line
+                              // which is
+                              // not yet
+                              // implemented
                               const Point<spacedim> u0=mapping->transform_real_to_unit_cell(cell, v0),
                                                     u1=mapping->transform_real_to_unit_cell(cell, v1);
 
@@ -2046,8 +2061,8 @@ namespace internal
         delete q_projector;
 
 
-                                       // make sure everything now gets to
-                                       // disk
+      // make sure everything now gets to
+      // disk
       out.flush ();
 
       AssertThrow (out, ExcIO());
@@ -2074,18 +2089,18 @@ namespace internal
   {
     struct LineEntry
     {
-        Point<2> first;
-        Point<2> second;
-        bool colorize;
-        unsigned int level;
-        LineEntry (const Point<2>    &f,
-                   const Point<2>    &s,
-                   const bool         c,
-                   const unsigned int l)
-                        :
-                        first(f), second(s),
-                        colorize(c), level(l)
-          {}
+      Point<2> first;
+      Point<2> second;
+      bool colorize;
+      unsigned int level;
+      LineEntry (const Point<2>    &f,
+                 const Point<2>    &s,
+                 const bool         c,
+                 const unsigned int l)
+        :
+        first(f), second(s),
+        colorize(c), level(l)
+      {}
     };
 
 
@@ -2109,244 +2124,244 @@ namespace internal
     {
       typedef std::list<LineEntry> LineList;
 
-                                       // get a pointer to the flags
-                                       // common to all dimensions, in
-                                       // order to avoid the recurring
-                                       // distinctions between
-                                       // eps_flags_1, eps_flags_2, ...
+      // get a pointer to the flags
+      // common to all dimensions, in
+      // order to avoid the recurring
+      // distinctions between
+      // eps_flags_1, eps_flags_2, ...
       const GridOutFlags::EpsFlagsBase
-        &eps_flags_base = (dim==2 ?
-                           static_cast<const GridOutFlags::EpsFlagsBase&>(eps_flags_2) :
-                           (dim==3 ?
-                            static_cast<const GridOutFlags::EpsFlagsBase&>(eps_flags_3) :
-                            *static_cast<const GridOutFlags::EpsFlagsBase*>(0)));
+      &eps_flags_base = (dim==2 ?
+                         static_cast<const GridOutFlags::EpsFlagsBase &>(eps_flags_2) :
+                         (dim==3 ?
+                          static_cast<const GridOutFlags::EpsFlagsBase &>(eps_flags_3) :
+                          *static_cast<const GridOutFlags::EpsFlagsBase *>(0)));
 
       AssertThrow (out, ExcIO());
       const unsigned int n_points = eps_flags_base.n_boundary_face_points;
 
-                                       // make up a list of lines by which
-                                       // we will construct the triangulation
-                                       //
-                                       // this part unfortunately is a bit
-                                       // dimension dependent, so we have to
-                                       // treat every dimension different.
-                                       // however, by directly producing
-                                       // the lines to be printed, i.e. their
-                                       // 2d images, we can later do the
-                                       // actual output dimension independent
-                                       // again
+      // make up a list of lines by which
+      // we will construct the triangulation
+      //
+      // this part unfortunately is a bit
+      // dimension dependent, so we have to
+      // treat every dimension different.
+      // however, by directly producing
+      // the lines to be printed, i.e. their
+      // 2d images, we can later do the
+      // actual output dimension independent
+      // again
       LineList line_list;
 
       switch (dim)
         {
-          case 1:
-          {
-            Assert(false, ExcInternalError());
-            break;
-          };
+        case 1:
+        {
+          Assert(false, ExcInternalError());
+          break;
+        };
 
-          case 2:
-          {
-            typename dealii::Triangulation<dim>::active_cell_iterator
-              cell=tria.begin_active(),
-              endc=tria.end();
+        case 2:
+        {
+          typename dealii::Triangulation<dim>::active_cell_iterator
+          cell=tria.begin_active(),
+          endc=tria.end();
 
-            for (; cell!=endc; ++cell)
-              for (unsigned int line_no=0;
-                   line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
-                {
-                  typename dealii::Triangulation<dim>::line_iterator
-                    line=cell->line(line_no);
-
-                                                   // first treat all
-                                                   // interior lines and
-                                                   // make up a list of
-                                                   // them. if curved
-                                                   // lines shall not be
-                                                   // supported (i.e. no
-                                                   // mapping is
-                                                   // provided), then also
-                                                   // treat all other
-                                                   // lines
-                  if (!line->has_children() &&
-                      (mapping==0 || !line->at_boundary()))
-                                                     // one would expect
-                                                     // make_pair(line->vertex(0),
-                                                     //           line->vertex(1))
-                                                     // here, but that is
-                                                     // not dimension
-                                                     // independent, since
-                                                     // vertex(i) is
-                                                     // Point<dim>, but we
-                                                     // want a Point<2>.
-                                                     // in fact, whenever
-                                                     // we're here, the
-                                                     // vertex is a
-                                                     // Point<dim>, but
-                                                     // the compiler does
-                                                     // not know
-                                                     // this. hopefully,
-                                                     // the compiler will
-                                                     // optimize away this
-                                                     // little kludge
-                    line_list.push_back (LineEntry(Point<2>(line->vertex(0)(0),
-                                                            line->vertex(0)(1)),
-                                                   Point<2>(line->vertex(1)(0),
-                                                            line->vertex(1)(1)),
-                                                   line->user_flag_set(),
-                                                   cell->level()));
-                }
-
-                                             // next if we are to treat
-                                             // curved boundaries
-                                             // specially, then add lines
-                                             // to the list consisting of
-                                             // pieces of the boundary
-                                             // lines
-            if (mapping!=0)
+          for (; cell!=endc; ++cell)
+            for (unsigned int line_no=0;
+                 line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
               {
-                                                 // to do so, first
-                                                 // generate a sequence of
-                                                 // points on a face and
-                                                 // project them onto the
-                                                 // faces of a unit cell
-                std::vector<Point<dim-1> > boundary_points (n_points);
+                typename dealii::Triangulation<dim>::line_iterator
+                line=cell->line(line_no);
 
-                for (unsigned int i=0; i<n_points; ++i)
-                  boundary_points[i](0) = 1.*(i+1)/(n_points+1);
-
-                Quadrature<dim-1> quadrature (boundary_points);
-                Quadrature<dim>   q_projector (QProjector<dim>::project_to_all_faces(quadrature));
-
-                                                 // next loop over all
-                                                 // boundary faces and
-                                                 // generate the info from
-                                                 // them
-                typename dealii::Triangulation<dim>::active_cell_iterator
-                  cell=tria.begin_active ();
-                const typename dealii::Triangulation<dim>::active_cell_iterator
-                  end=tria.end ();
-                for (; cell!=end; ++cell)
-                  for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
-                    {
-                      const typename dealii::Triangulation<dim>::face_iterator
-                        face = cell->face(face_no);
-
-                      if (face->at_boundary())
-                        {
-                          Point<dim> p0_dim(face->vertex(0));
-                          Point<2>   p0    (p0_dim(0), p0_dim(1));
-
-                                                           // loop over
-                                                           // all pieces
-                                                           // of the line
-                                                           // and generate
-                                                           // line-lets
-                          const unsigned int offset=face_no*n_points;
-                          for (unsigned int i=0; i<n_points; ++i)
-                            {
-                              const Point<dim> p1_dim (mapping->transform_unit_to_real_cell
-                                                       (cell, q_projector.point(offset+i)));
-                              const Point<2>   p1     (p1_dim(0), p1_dim(1));
-
-                              line_list.push_back (LineEntry(p0, p1,
-                                                             face->user_flag_set(),
-                                                             cell->level() ));
-                              p0=p1;
-                            }
-
-                                                           // generate last piece
-                          const Point<dim> p1_dim (face->vertex(1));
-                          const Point<2>   p1     (p1_dim(0), p1_dim(1));
-                          line_list.push_back (LineEntry(p0, p1,
-                                                         face->user_flag_set(),
-                                                         cell->level()));
-                        };
-                    };
-              };
-
-            break;
-          };
-
-          case 3:
-          {
-                                             // curved boundary output
-                                             // presently not supported
-            Assert (mapping == 0, ExcNotImplemented());
-
-            typename dealii::Triangulation<dim>::active_cell_iterator
-              cell=tria.begin_active(),
-              endc=tria.end();
-
-                                             // loop over all lines and compute their
-                                             // projection on the plane perpendicular
-                                             // to the direction of sight
-
-                                             // direction of view equals the unit
-                                             // vector of the position of the
-                                             // spectator to the origin.
-                                             //
-                                             // we chose here the viewpoint as in
-                                             // gnuplot as default.
-                                             //
-                                             //TODO:[WB] Fix a potential problem with viewing angles in 3d Eps GridOut
-                                             // note: the following might be wrong
-                                             // if one of the base vectors below
-                                             // is in direction of the viewer, but
-                                             // I am too tired at present to fix
-                                             // this
-            const double pi = numbers::PI;
-            const double z_angle    = eps_flags_3.azimut_angle;
-            const double turn_angle = eps_flags_3.turn_angle;
-            const Point<dim> view_direction(-std::sin(z_angle * 2.*pi / 360.) * std::sin(turn_angle * 2.*pi / 360.),
-                                            +std::sin(z_angle * 2.*pi / 360.) * std::cos(turn_angle * 2.*pi / 360.),
-                                            -std::cos(z_angle * 2.*pi / 360.));
-
-                                             // decide about the two unit vectors
-                                             // in this plane. we chose the first one
-                                             // to be the projection of the z-axis
-                                             // to this plane
-            const Point<dim> vector1
-              = Point<dim>(0,0,1) - ((Point<dim>(0,0,1) * view_direction) * view_direction);
-            const Point<dim> unit_vector1 = vector1 / std::sqrt(vector1.square());
-
-                                             // now the third vector is fixed. we
-                                             // chose the projection of a more or
-                                             // less arbitrary vector to the plane
-                                             // perpendicular to the first one
-            const Point<dim> vector2
-              = (Point<dim>(1,0,0)
-                 - ((Point<dim>(1,0,0) * view_direction) * view_direction)
-                 - ((Point<dim>(1,0,0) * unit_vector1)   * unit_vector1));
-            const Point<dim> unit_vector2 = vector2 / std::sqrt(vector2.square());
-
-
-            for (; cell!=endc; ++cell)
-              for (unsigned int line_no=0;
-                   line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
-                {
-                  typename dealii::Triangulation<dim>::line_iterator
-                    line=cell->line(line_no);
-                  line_list.push_back (LineEntry(Point<2>(line->vertex(0) * unit_vector2,
-                                                          line->vertex(0) * unit_vector1),
-                                                 Point<2>(line->vertex(1) * unit_vector2,
-                                                          line->vertex(1) * unit_vector1),
+                // first treat all
+                // interior lines and
+                // make up a list of
+                // them. if curved
+                // lines shall not be
+                // supported (i.e. no
+                // mapping is
+                // provided), then also
+                // treat all other
+                // lines
+                if (!line->has_children() &&
+                    (mapping==0 || !line->at_boundary()))
+                  // one would expect
+                  // make_pair(line->vertex(0),
+                  //           line->vertex(1))
+                  // here, but that is
+                  // not dimension
+                  // independent, since
+                  // vertex(i) is
+                  // Point<dim>, but we
+                  // want a Point<2>.
+                  // in fact, whenever
+                  // we're here, the
+                  // vertex is a
+                  // Point<dim>, but
+                  // the compiler does
+                  // not know
+                  // this. hopefully,
+                  // the compiler will
+                  // optimize away this
+                  // little kludge
+                  line_list.push_back (LineEntry(Point<2>(line->vertex(0)(0),
+                                                          line->vertex(0)(1)),
+                                                 Point<2>(line->vertex(1)(0),
+                                                          line->vertex(1)(1)),
                                                  line->user_flag_set(),
                                                  cell->level()));
-                }
+              }
 
-            break;
-          }
+          // next if we are to treat
+          // curved boundaries
+          // specially, then add lines
+          // to the list consisting of
+          // pieces of the boundary
+          // lines
+          if (mapping!=0)
+            {
+              // to do so, first
+              // generate a sequence of
+              // points on a face and
+              // project them onto the
+              // faces of a unit cell
+              std::vector<Point<dim-1> > boundary_points (n_points);
 
-          default:
-                Assert (false, ExcNotImplemented());
+              for (unsigned int i=0; i<n_points; ++i)
+                boundary_points[i](0) = 1.*(i+1)/(n_points+1);
+
+              Quadrature<dim-1> quadrature (boundary_points);
+              Quadrature<dim>   q_projector (QProjector<dim>::project_to_all_faces(quadrature));
+
+              // next loop over all
+              // boundary faces and
+              // generate the info from
+              // them
+              typename dealii::Triangulation<dim>::active_cell_iterator
+              cell=tria.begin_active ();
+              const typename dealii::Triangulation<dim>::active_cell_iterator
+              end=tria.end ();
+              for (; cell!=end; ++cell)
+                for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell; ++face_no)
+                  {
+                    const typename dealii::Triangulation<dim>::face_iterator
+                    face = cell->face(face_no);
+
+                    if (face->at_boundary())
+                      {
+                        Point<dim> p0_dim(face->vertex(0));
+                        Point<2>   p0    (p0_dim(0), p0_dim(1));
+
+                        // loop over
+                        // all pieces
+                        // of the line
+                        // and generate
+                        // line-lets
+                        const unsigned int offset=face_no*n_points;
+                        for (unsigned int i=0; i<n_points; ++i)
+                          {
+                            const Point<dim> p1_dim (mapping->transform_unit_to_real_cell
+                                                     (cell, q_projector.point(offset+i)));
+                            const Point<2>   p1     (p1_dim(0), p1_dim(1));
+
+                            line_list.push_back (LineEntry(p0, p1,
+                                                           face->user_flag_set(),
+                                                           cell->level() ));
+                            p0=p1;
+                          }
+
+                        // generate last piece
+                        const Point<dim> p1_dim (face->vertex(1));
+                        const Point<2>   p1     (p1_dim(0), p1_dim(1));
+                        line_list.push_back (LineEntry(p0, p1,
+                                                       face->user_flag_set(),
+                                                       cell->level()));
+                      };
+                  };
+            };
+
+          break;
+        };
+
+        case 3:
+        {
+          // curved boundary output
+          // presently not supported
+          Assert (mapping == 0, ExcNotImplemented());
+
+          typename dealii::Triangulation<dim>::active_cell_iterator
+          cell=tria.begin_active(),
+          endc=tria.end();
+
+          // loop over all lines and compute their
+          // projection on the plane perpendicular
+          // to the direction of sight
+
+          // direction of view equals the unit
+          // vector of the position of the
+          // spectator to the origin.
+          //
+          // we chose here the viewpoint as in
+          // gnuplot as default.
+          //
+          //TODO:[WB] Fix a potential problem with viewing angles in 3d Eps GridOut
+          // note: the following might be wrong
+          // if one of the base vectors below
+          // is in direction of the viewer, but
+          // I am too tired at present to fix
+          // this
+          const double pi = numbers::PI;
+          const double z_angle    = eps_flags_3.azimut_angle;
+          const double turn_angle = eps_flags_3.turn_angle;
+          const Point<dim> view_direction(-std::sin(z_angle * 2.*pi / 360.) * std::sin(turn_angle * 2.*pi / 360.),
+                                          +std::sin(z_angle * 2.*pi / 360.) * std::cos(turn_angle * 2.*pi / 360.),
+                                          -std::cos(z_angle * 2.*pi / 360.));
+
+          // decide about the two unit vectors
+          // in this plane. we chose the first one
+          // to be the projection of the z-axis
+          // to this plane
+          const Point<dim> vector1
+            = Point<dim>(0,0,1) - ((Point<dim>(0,0,1) * view_direction) * view_direction);
+          const Point<dim> unit_vector1 = vector1 / std::sqrt(vector1.square());
+
+          // now the third vector is fixed. we
+          // chose the projection of a more or
+          // less arbitrary vector to the plane
+          // perpendicular to the first one
+          const Point<dim> vector2
+            = (Point<dim>(1,0,0)
+               - ((Point<dim>(1,0,0) * view_direction) * view_direction)
+               - ((Point<dim>(1,0,0) * unit_vector1)   * unit_vector1));
+          const Point<dim> unit_vector2 = vector2 / std::sqrt(vector2.square());
+
+
+          for (; cell!=endc; ++cell)
+            for (unsigned int line_no=0;
+                 line_no<GeometryInfo<dim>::lines_per_cell; ++line_no)
+              {
+                typename dealii::Triangulation<dim>::line_iterator
+                line=cell->line(line_no);
+                line_list.push_back (LineEntry(Point<2>(line->vertex(0) * unit_vector2,
+                                                        line->vertex(0) * unit_vector1),
+                                               Point<2>(line->vertex(1) * unit_vector2,
+                                                        line->vertex(1) * unit_vector1),
+                                               line->user_flag_set(),
+                                               cell->level()));
+              }
+
+          break;
+        }
+
+        default:
+          Assert (false, ExcNotImplemented());
         }
 
 
 
-                                       // find out minimum and maximum x and
-                                       // y coordinates to compute offsets
-                                       // and scaling factors
+      // find out minimum and maximum x and
+      // y coordinates to compute offsets
+      // and scaling factors
       double x_min = tria.begin_active()->vertex(0)(0);
       double x_max = x_min;
       double y_min = tria.begin_active()->vertex(0)(1);
@@ -2371,23 +2386,23 @@ namespace internal
           max_level = std::max (max_level,  line->level);
         };
 
-                                       // scale in x-direction such that
-                                       // in the output 0 <= x <= 300.
-                                       // don't scale in y-direction to
-                                       // preserve the shape of the
-                                       // triangulation
+      // scale in x-direction such that
+      // in the output 0 <= x <= 300.
+      // don't scale in y-direction to
+      // preserve the shape of the
+      // triangulation
       const double scale = (eps_flags_base.size /
                             (eps_flags_base.size_type==GridOutFlags::EpsFlagsBase::width ?
                              x_max - x_min :
                              y_min - y_max));
 
 
-                                       // now write preamble
+      // now write preamble
       if (true)
         {
-                                           // block this to have local
-                                           // variables destroyed after
-                                           // use
+          // block this to have local
+          // variables destroyed after
+          // use
           std::time_t  time1= std::time (0);
           std::tm     *time = std::localtime(&time1);
           out << "%!PS-Adobe-2.0 EPSF-1.2" << '\n'
@@ -2401,29 +2416,29 @@ namespace internal
               << std::setw(2) << time->tm_min << ":"
               << std::setw(2) << time->tm_sec << '\n'
               << "%%BoundingBox: "
-                                             // lower left corner
+              // lower left corner
               << "0 0 "
-                                             // upper right corner
+              // upper right corner
               << static_cast<unsigned int>(std::floor(( (x_max-x_min) * scale )+1))
               << ' '
               << static_cast<unsigned int>(std::floor(( (y_max-y_min) * scale )+1))
               << '\n';
 
-                                           // define some abbreviations to keep
-                                           // the output small:
-                                           // m=move turtle to
-                                           // x=execute line stroke
-                                           // b=black pen
-                                           // r=red pen
+          // define some abbreviations to keep
+          // the output small:
+          // m=move turtle to
+          // x=execute line stroke
+          // b=black pen
+          // r=red pen
           out << "/m {moveto} bind def" << '\n'
               << "/x {lineto stroke} bind def" << '\n'
               << "/b {0 0 0 setrgbcolor} def" << '\n'
               << "/r {1 0 0 setrgbcolor} def" << '\n';
 
-                                           // calculate colors for level
-                                           // coloring; level 0 is black,
-                                           // other levels are blue
-                                           // ... red
+          // calculate colors for level
+          // coloring; level 0 is black,
+          // other levels are blue
+          // ... red
           if (eps_flags_base.color_lines_level)
             out  << "/l  { neg "
                  << (max_level)
@@ -2431,14 +2446,14 @@ namespace internal
                  << (0.66666/std::max(1U,(max_level-1)))
                  << " mul 1 0.8 sethsbcolor} def" << '\n';
 
-                                           // in 2d, we can also plot cell
-                                           // and vertex numbers, but this
-                                           // requires a somewhat more
-                                           // lengthy preamble. please
-                                           // don't ask me what most of
-                                           // this means, it is reverse
-                                           // engineered from what GNUPLOT
-                                           // uses in its output
+          // in 2d, we can also plot cell
+          // and vertex numbers, but this
+          // requires a somewhat more
+          // lengthy preamble. please
+          // don't ask me what most of
+          // this means, it is reverse
+          // engineered from what GNUPLOT
+          // uses in its output
           if ((dim == 2) && (eps_flags_2.write_cell_numbers ||
                              eps_flags_2.write_vertex_numbers))
             {
@@ -2461,20 +2476,20 @@ namespace internal
           out << "%%EndProlog" << '\n'
               << '\n';
 
-                                           // set fine lines
+          // set fine lines
           out << eps_flags_base.line_width << " setlinewidth" << '\n';
         };
 
-                                       // now write the lines
+      // now write the lines
       const Point<2> offset(x_min, y_min);
 
       for (LineList::const_iterator line=line_list.begin();
            line!=line_list.end(); ++line)
         if (eps_flags_base.color_lines_level && (line->level > 0))
-                                           // lines colored according to
-                                           // refinement level,
-                                           // contributed by J�rg
-                                           // R. Weimar
+          // lines colored according to
+          // refinement level,
+          // contributed by J�rg
+          // R. Weimar
           out << line->level
               << " l "
               << (line->first  - offset) * scale << " m "
@@ -2484,16 +2499,16 @@ namespace internal
               << (line->first  - offset) * scale << " m "
               << (line->second - offset) * scale << " x" << '\n';
 
-                                       // finally write the cell numbers
-                                       // in 2d, if that is desired
+      // finally write the cell numbers
+      // in 2d, if that is desired
       if ((dim == 2) && (eps_flags_2.write_cell_numbers == true))
         {
           out << "(Helvetica) findfont 140 scalefont setfont"
               << '\n';
 
           typename dealii::Triangulation<dim>::active_cell_iterator
-            cell = tria.begin_active (),
-            endc = tria.end ();
+          cell = tria.begin_active (),
+          endc = tria.end ();
           for (; cell!=endc; ++cell)
             {
               out << (cell->center()(0)-offset(0))*scale << ' '
@@ -2511,20 +2526,20 @@ namespace internal
             };
         };
 
-                                       // and the vertex numbers
+      // and the vertex numbers
       if ((dim == 2) && (eps_flags_2.write_vertex_numbers == true))
         {
           out << "(Helvetica) findfont 140 scalefont setfont"
               << '\n';
 
-                                           // have a list of those
-                                           // vertices which we have
-                                           // already tracked, to avoid
-                                           // doing this multiply
+          // have a list of those
+          // vertices which we have
+          // already tracked, to avoid
+          // doing this multiply
           std::set<unsigned int> treated_vertices;
           typename dealii::Triangulation<dim>::active_cell_iterator
-            cell = tria.begin_active (),
-            endc = tria.end ();
+          cell = tria.begin_active (),
+          endc = tria.end ();
           for (; cell!=endc; ++cell)
             for (unsigned int vertex=0;
                  vertex<GeometryInfo<dim>::vertices_per_cell;
@@ -2548,8 +2563,8 @@ namespace internal
 
       out << "showpage" << '\n';
 
-                                       // make sure everything now gets to
-                                       // disk
+      // make sure everything now gets to
+      // disk
       out.flush ();
 
       AssertThrow (out, ExcIO());
@@ -2576,32 +2591,32 @@ void GridOut::write (const Triangulation<dim, spacedim> &tria,
 {
   switch (output_format)
     {
-      case none:
-            return;
+    case none:
+      return;
 
-      case dx:
-            write_dx (tria, out);
-            return;
+    case dx:
+      write_dx (tria, out);
+      return;
 
-      case ucd:
-            write_ucd (tria, out);
-            return;
+    case ucd:
+      write_ucd (tria, out);
+      return;
 
-      case gnuplot:
-            write_gnuplot (tria, out, mapping);
-            return;
+    case gnuplot:
+      write_gnuplot (tria, out, mapping);
+      return;
 
-      case eps:
-            write_eps (tria, out, mapping);
-            return;
+    case eps:
+      write_eps (tria, out, mapping);
+      return;
 
-      case xfig:
-            write_xfig (tria, out, mapping);
-            return;
+    case xfig:
+      write_xfig (tria, out, mapping);
+      return;
 
-      case msh:
-            write_msh (tria, out);
-            return;
+    case msh:
+      write_msh (tria, out);
+      return;
     }
 
   Assert (false, ExcInternalError());
@@ -2610,7 +2625,7 @@ void GridOut::write (const Triangulation<dim, spacedim> &tria,
 
 template <int dim, int spacedim>
 void GridOut::write (
-    const Triangulation<dim, spacedim> &tria,
+  const Triangulation<dim, spacedim> &tria,
   std::ostream             &out,
   const Mapping<dim,spacedim>       *mapping) const
 {

@@ -128,233 +128,233 @@ template <typename number> class SparseBlockVanka;
 template<typename number>
 class SparseVanka
 {
-  public:
-                                     /**
-                                      * Constructor. Gets the matrix
-                                      * for preconditioning and a bit
-                                      * vector with entries @p true for
-                                      * all rows to be updated. A
-                                      * reference to this vector will
-                                      * be stored, so it must persist
-                                      * longer than the Vanka
-                                      * object. The same is true for
-                                      * the matrix.
-                                      *
-                                      * The matrix @p M which is passed
-                                      * here may or may not be the
-                                      * same matrix for which this
-                                      * object shall act as
-                                      * preconditioner. In particular,
-                                      * it is conceivable that the
-                                      * preconditioner is build up for
-                                      * one matrix once, but is used
-                                      * for subsequent steps in a
-                                      * nonlinear process as well,
-                                      * where the matrix changes in
-                                      * each step slightly.
-                                      *
-                                      * If @p conserve_mem is @p false,
-                                      * then the inverses of the local
-                                      * systems are computed now, if
-                                      * the flag is @p true, then they
-                                      * are computed every time the
-                                      * preconditioner is
-                                      * applied. This saves some
-                                      * memory, but makes
-                                      * preconditioning very
-                                      * slow. Note also, that if the
-                                      * flag is @p false, the the
-                                      * contents of the matrix @p M at
-                                      * the time of calling this
-                                      * constructor are used, while if
-                                      * the flag is @p true, then the
-                                      * values in @p M at the time of
-                                      * preconditioning are used. This
-                                      * may lead to different results,
-                                      * obviously, of @p M changes.
-                                      *
-                                      * The parameter @p n_threads
-                                      * determines how many threads
-                                      * shall be used in parallel when
-                                      * building the inverses of the
-                                      * diagonal blocks. This
-                                      * parameter is ignored if not in
-                                      * multithreaded mode. By
-                                      * default, this variable is set
-                                      * to the value of
-                                      * <tt>multithread_info.n_default_threads</tt>.
-                                      */
-    SparseVanka(const SparseMatrix<number> &M,
-                const std::vector<bool>    &selected,
-                const bool                  conserve_memory = false,
-                const unsigned int          n_threads       = multithread_info.n_default_threads);
+public:
+  /**
+   * Constructor. Gets the matrix
+   * for preconditioning and a bit
+   * vector with entries @p true for
+   * all rows to be updated. A
+   * reference to this vector will
+   * be stored, so it must persist
+   * longer than the Vanka
+   * object. The same is true for
+   * the matrix.
+   *
+   * The matrix @p M which is passed
+   * here may or may not be the
+   * same matrix for which this
+   * object shall act as
+   * preconditioner. In particular,
+   * it is conceivable that the
+   * preconditioner is build up for
+   * one matrix once, but is used
+   * for subsequent steps in a
+   * nonlinear process as well,
+   * where the matrix changes in
+   * each step slightly.
+   *
+   * If @p conserve_mem is @p false,
+   * then the inverses of the local
+   * systems are computed now, if
+   * the flag is @p true, then they
+   * are computed every time the
+   * preconditioner is
+   * applied. This saves some
+   * memory, but makes
+   * preconditioning very
+   * slow. Note also, that if the
+   * flag is @p false, the the
+   * contents of the matrix @p M at
+   * the time of calling this
+   * constructor are used, while if
+   * the flag is @p true, then the
+   * values in @p M at the time of
+   * preconditioning are used. This
+   * may lead to different results,
+   * obviously, of @p M changes.
+   *
+   * The parameter @p n_threads
+   * determines how many threads
+   * shall be used in parallel when
+   * building the inverses of the
+   * diagonal blocks. This
+   * parameter is ignored if not in
+   * multithreaded mode. By
+   * default, this variable is set
+   * to the value of
+   * <tt>multithread_info.n_default_threads</tt>.
+   */
+  SparseVanka(const SparseMatrix<number> &M,
+              const std::vector<bool>    &selected,
+              const bool                  conserve_memory = false,
+              const unsigned int          n_threads       = multithread_info.n_default_threads);
 
-                                     /**
-                                      * Destructor.
-                                      * Delete all allocated matrices.
-                                      */
-    ~SparseVanka();
+  /**
+   * Destructor.
+   * Delete all allocated matrices.
+   */
+  ~SparseVanka();
 
-                                     /**
-                                      * Do the preconditioning.
-                                      * This function takes the residual
-                                      * in @p src and returns the resulting
-                                      * update vector in @p dst.
-                                      */
-    template<typename number2>
-    void vmult (Vector<number2>       &dst,
-                const Vector<number2> &src) const;
+  /**
+   * Do the preconditioning.
+   * This function takes the residual
+   * in @p src and returns the resulting
+   * update vector in @p dst.
+   */
+  template<typename number2>
+  void vmult (Vector<number2>       &dst,
+              const Vector<number2> &src) const;
 
-  protected:
-                                     /**
-                                      * Apply the inverses
-                                      * corresponding to those degrees
-                                      * of freedom that have a @p true
-                                      * value in @p dof_mask, to the
-                                      * @p src vector and move the
-                                      * result into @p dst. Actually,
-                                      * only values for allowed
-                                      * indices are written to @p dst,
-                                      * so the application of this
-                                      * function only does what is
-                                      * announced in the general
-                                      * documentation if the given
-                                      * mask sets all values to zero
-                                      *
-                                      * The reason for providing the
-                                      * mask anyway is that in derived
-                                      * classes we may want to apply
-                                      * the preconditioner to parts of
-                                      * the matrix only, in order to
-                                      * parallelize the
-                                      * application. Then, it is
-                                      * important to only write to
-                                      * some slices of @p dst, in order
-                                      * to eliminate the dependencies
-                                      * of threads of each other.
-                                      *
-                                      * If a null pointer is passed
-                                      * instead of a pointer to the
-                                      * @p dof_mask (as is the default
-                                      * value), then it is assumed
-                                      * that we shall work on all
-                                      * degrees of freedom. This is
-                                      * then equivalent to calling the
-                                      * function with a
-                                      * <tt>vector<bool>(n_dofs,true)</tt>.
-                                      *
-                                      * The @p vmult of this class
-                                      * of course calls this function
-                                      * with a null pointer
-                                      */
-    template<typename number2>
-    void apply_preconditioner (Vector<number2>         &dst,
-                               const Vector<number2>   &src,
-                               const std::vector<bool> * const dof_mask = 0) const;
+protected:
+  /**
+   * Apply the inverses
+   * corresponding to those degrees
+   * of freedom that have a @p true
+   * value in @p dof_mask, to the
+   * @p src vector and move the
+   * result into @p dst. Actually,
+   * only values for allowed
+   * indices are written to @p dst,
+   * so the application of this
+   * function only does what is
+   * announced in the general
+   * documentation if the given
+   * mask sets all values to zero
+   *
+   * The reason for providing the
+   * mask anyway is that in derived
+   * classes we may want to apply
+   * the preconditioner to parts of
+   * the matrix only, in order to
+   * parallelize the
+   * application. Then, it is
+   * important to only write to
+   * some slices of @p dst, in order
+   * to eliminate the dependencies
+   * of threads of each other.
+   *
+   * If a null pointer is passed
+   * instead of a pointer to the
+   * @p dof_mask (as is the default
+   * value), then it is assumed
+   * that we shall work on all
+   * degrees of freedom. This is
+   * then equivalent to calling the
+   * function with a
+   * <tt>vector<bool>(n_dofs,true)</tt>.
+   *
+   * The @p vmult of this class
+   * of course calls this function
+   * with a null pointer
+   */
+  template<typename number2>
+  void apply_preconditioner (Vector<number2>         &dst,
+                             const Vector<number2>   &src,
+                             const std::vector<bool> *const dof_mask = 0) const;
 
-                                     /**
-                                      * Determine an estimate for the
-                                      * memory consumption (in bytes)
-                                      * of this object.
-                                      */
-    std::size_t memory_consumption () const;
+  /**
+   * Determine an estimate for the
+   * memory consumption (in bytes)
+   * of this object.
+   */
+  std::size_t memory_consumption () const;
 
-  private:
-                                     /**
-                                      * Pointer to the matrix.
-                                      */
-    SmartPointer<const SparseMatrix<number>,SparseVanka<number> > matrix;
+private:
+  /**
+   * Pointer to the matrix.
+   */
+  SmartPointer<const SparseMatrix<number>,SparseVanka<number> > matrix;
 
-                                     /**
-                                      * Conserve memory flag.
-                                      */
-    const bool conserve_mem;
+  /**
+   * Conserve memory flag.
+   */
+  const bool conserve_mem;
 
-                                     /**
-                                      * Indices of those degrees of
-                                      * freedom that we shall work on.
-                                      */
-    const std::vector<bool> &selected;
+  /**
+   * Indices of those degrees of
+   * freedom that we shall work on.
+   */
+  const std::vector<bool> &selected;
 
-                                     /**
-                                      * Number of threads to be used
-                                      * when building the
-                                      * inverses. Only relevant in
-                                      * multithreaded mode.
-                                      */
-    const unsigned int n_threads;
+  /**
+   * Number of threads to be used
+   * when building the
+   * inverses. Only relevant in
+   * multithreaded mode.
+   */
+  const unsigned int n_threads;
 
-                                     /**
-                                      * Array of inverse matrices,
-                                      * one for each degree of freedom.
-                                      * Only those elements will be used
-                                      * that are tagged in @p selected.
-                                      */
-    mutable std::vector<SmartPointer<FullMatrix<float>,SparseVanka<number> > > inverses;
+  /**
+   * Array of inverse matrices,
+   * one for each degree of freedom.
+   * Only those elements will be used
+   * that are tagged in @p selected.
+   */
+  mutable std::vector<SmartPointer<FullMatrix<float>,SparseVanka<number> > > inverses;
 
-                                     /**
-                                      * Compute the inverses of all
-                                      * selected diagonal elements.
-                                      */
-    void compute_inverses ();
+  /**
+   * Compute the inverses of all
+   * selected diagonal elements.
+   */
+  void compute_inverses ();
 
-                                     /**
-                                      * Compute the inverses at
-                                      * positions in the range
-                                      * <tt>[begin,end)</tt>. In
-                                      * non-multithreaded mode,
-                                      * <tt>compute_inverses()</tt> calls
-                                      * this function with the whole
-                                      * range, but in multithreaded
-                                      * mode, several copies of this
-                                      * function are spawned.
-                                      */
-    void compute_inverses (const unsigned int begin,
-                           const unsigned int end);
+  /**
+   * Compute the inverses at
+   * positions in the range
+   * <tt>[begin,end)</tt>. In
+   * non-multithreaded mode,
+   * <tt>compute_inverses()</tt> calls
+   * this function with the whole
+   * range, but in multithreaded
+   * mode, several copies of this
+   * function are spawned.
+   */
+  void compute_inverses (const unsigned int begin,
+                         const unsigned int end);
 
-                                     /**
-                                      * Compute the inverse of the
-                                      * block located at position
-                                      * @p row. Since the vector is
-                                      * used quite often, it is
-                                      * generated only once in the
-                                      * caller of this function and
-                                      * passed to this function which
-                                      * first clears it. Reusing the
-                                      * vector makes the process
-                                      * significantly faster than in
-                                      * the case where this function
-                                      * re-creates it each time.
-                                      */
-    void compute_inverse (const unsigned int         row,
-                          std::vector<unsigned int> &local_indices);
+  /**
+   * Compute the inverse of the
+   * block located at position
+   * @p row. Since the vector is
+   * used quite often, it is
+   * generated only once in the
+   * caller of this function and
+   * passed to this function which
+   * first clears it. Reusing the
+   * vector makes the process
+   * significantly faster than in
+   * the case where this function
+   * re-creates it each time.
+   */
+  void compute_inverse (const unsigned int         row,
+                        std::vector<unsigned int> &local_indices);
 
-                                     /**
-                                      * Make the derived class a
-                                      * friend. This seems silly, but
-                                      * is actually necessary, since
-                                      * derived classes can only
-                                      * access non-public members
-                                      * through their @p this
-                                      * pointer, but not access these
-                                      * members as member functions of
-                                      * other objects of the type of
-                                      * this base class (i.e. like
-                                      * <tt>x.f()</tt>, where @p x is an
-                                      * object of the base class, and
-                                      * @p f one of it's non-public
-                                      * member functions).
-                                      *
-                                      * Now, in the case of the
-                                      * @p SparseBlockVanka class, we
-                                      * would like to take the address
-                                      * of a function of the base
-                                      * class in order to call it
-                                      * through the multithreading
-                                      * framework, so the derived
-                                      * class has to be a friend.
-                                      */
-    template <typename T> friend class SparseBlockVanka;
+  /**
+   * Make the derived class a
+   * friend. This seems silly, but
+   * is actually necessary, since
+   * derived classes can only
+   * access non-public members
+   * through their @p this
+   * pointer, but not access these
+   * members as member functions of
+   * other objects of the type of
+   * this base class (i.e. like
+   * <tt>x.f()</tt>, where @p x is an
+   * object of the base class, and
+   * @p f one of it's non-public
+   * member functions).
+   *
+   * Now, in the case of the
+   * @p SparseBlockVanka class, we
+   * would like to take the address
+   * of a function of the base
+   * class in order to call it
+   * through the multithreading
+   * framework, so the derived
+   * class has to be a friend.
+   */
+  template <typename T> friend class SparseBlockVanka;
 };
 
 
@@ -509,74 +509,75 @@ class SparseVanka
 template<typename number>
 class SparseBlockVanka : public SparseVanka<number>
 {
-  public:
-                                     /**
-                                      * Enumeration of the different
-                                      * methods by which the DoFs are
-                                      * distributed to the blocks on
-                                      * which we are to work.
-                                      */
-    enum BlockingStrategy {
-          index_intervals, adaptive
-    };
+public:
+  /**
+   * Enumeration of the different
+   * methods by which the DoFs are
+   * distributed to the blocks on
+   * which we are to work.
+   */
+  enum BlockingStrategy
+  {
+    index_intervals, adaptive
+  };
 
-                                     /**
-                                      * Constructor. Pass all
-                                      * arguments except for
-                                      * @p n_blocks to the base class.
-                                      */
-    SparseBlockVanka (const SparseMatrix<number> &M,
-                      const std::vector<bool>    &selected,
-                      const unsigned int          n_blocks,
-                      const BlockingStrategy      blocking_strategy,
-                      const bool                  conserve_memory = false,
-                      const unsigned int          n_threads       = multithread_info.n_default_threads);
+  /**
+   * Constructor. Pass all
+   * arguments except for
+   * @p n_blocks to the base class.
+   */
+  SparseBlockVanka (const SparseMatrix<number> &M,
+                    const std::vector<bool>    &selected,
+                    const unsigned int          n_blocks,
+                    const BlockingStrategy      blocking_strategy,
+                    const bool                  conserve_memory = false,
+                    const unsigned int          n_threads       = multithread_info.n_default_threads);
 
-                                     /**
-                                      * Apply the preconditioner.
-                                      */
-    template<typename number2>
-    void vmult (Vector<number2>       &dst,
-                     const Vector<number2> &src) const;
+  /**
+   * Apply the preconditioner.
+   */
+  template<typename number2>
+  void vmult (Vector<number2>       &dst,
+              const Vector<number2> &src) const;
 
-                                     /**
-                                      * Determine an estimate for the
-                                      * memory consumption (in bytes)
-                                      * of this object.
-                                      */
-    std::size_t memory_consumption () const;
+  /**
+   * Determine an estimate for the
+   * memory consumption (in bytes)
+   * of this object.
+   */
+  std::size_t memory_consumption () const;
 
-  private:
-                                     /**
-                                      * Store the number of blocks.
-                                      */
-    const unsigned int n_blocks;
+private:
+  /**
+   * Store the number of blocks.
+   */
+  const unsigned int n_blocks;
 
-                                     /**
-                                      * In this field, we precompute
-                                      * for each block which degrees
-                                      * of freedom belong to it. Thus,
-                                      * if <tt>dof_masks[i][j]==true</tt>,
-                                      * then DoF @p j belongs to block
-                                      * @p i. Of course, no other
-                                      * <tt>dof_masks[l][j]</tt> may be
-                                      * @p true for <tt>l!=i</tt>. This
-                                      * computation is done in the
-                                      * constructor, to avoid
-                                      * recomputing each time the
-                                      * preconditioner is called.
-                                      */
-    std::vector<std::vector<bool> > dof_masks;
+  /**
+   * In this field, we precompute
+   * for each block which degrees
+   * of freedom belong to it. Thus,
+   * if <tt>dof_masks[i][j]==true</tt>,
+   * then DoF @p j belongs to block
+   * @p i. Of course, no other
+   * <tt>dof_masks[l][j]</tt> may be
+   * @p true for <tt>l!=i</tt>. This
+   * computation is done in the
+   * constructor, to avoid
+   * recomputing each time the
+   * preconditioner is called.
+   */
+  std::vector<std::vector<bool> > dof_masks;
 
-                                     /**
-                                      * Compute the contents of the
-                                      * field @p dof_masks. This
-                                      * function is called from the
-                                      * constructor.
-                                      */
-    void compute_dof_masks (const SparseMatrix<number> &M,
-                            const std::vector<bool>    &selected,
-                            const BlockingStrategy      blocking_strategy);
+  /**
+   * Compute the contents of the
+   * field @p dof_masks. This
+   * function is called from the
+   * constructor.
+   */
+  void compute_dof_masks (const SparseMatrix<number> &M,
+                          const std::vector<bool>    &selected,
+                          const BlockingStrategy      blocking_strategy);
 };
 
 /*@}*/

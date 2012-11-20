@@ -42,8 +42,8 @@ namespace parallel
 
     template<int dim, typename VECTOR, class DH>
     SolutionTransfer<dim, VECTOR, DH>::SolutionTransfer(const DH &dof)
-                    :
-                    dof_handler(&dof, typeid(*this).name())
+      :
+      dof_handler(&dof, typeid(*this).name())
     {}
 
 
@@ -57,7 +57,7 @@ namespace parallel
     template<int dim, typename VECTOR, class DH>
     void
     SolutionTransfer<dim, VECTOR, DH>::
-    prepare_for_coarsening_and_refinement (const std::vector<const VECTOR*> &all_in)
+    prepare_for_coarsening_and_refinement (const std::vector<const VECTOR *> &all_in)
     {
       input_vectors = all_in;
       register_data_attach( get_data_size() * input_vectors.size() );
@@ -73,7 +73,7 @@ namespace parallel
       Assert(size > 0, ExcMessage("Please transfer at least one vector!"));
 
 //TODO: casting away constness is bad
-      parallel::distributed::Triangulation<dim> * tria
+      parallel::distributed::Triangulation<dim> *tria
         = (dynamic_cast<parallel::distributed::Triangulation<dim>*>
            (const_cast<dealii::Triangulation<dim>*>
             (&dof_handler->get_tria())));
@@ -96,7 +96,7 @@ namespace parallel
     SolutionTransfer<dim, VECTOR, DH>::
     prepare_for_coarsening_and_refinement (const VECTOR &in)
     {
-      std::vector<const VECTOR*> all_in(1, &in);
+      std::vector<const VECTOR *> all_in(1, &in);
       prepare_for_coarsening_and_refinement(all_in);
     }
 
@@ -105,59 +105,59 @@ namespace parallel
     template<int dim, typename VECTOR, class DH>
     void
     SolutionTransfer<dim, VECTOR, DH>::
-        prepare_serialization(const VECTOR &in)
-        {
-      std::vector<const VECTOR*> all_in(1, &in);
+    prepare_serialization(const VECTOR &in)
+    {
+      std::vector<const VECTOR *> all_in(1, &in);
       prepare_serialization(all_in);
-        }
-
-
-
-        template<int dim, typename VECTOR, class DH>
-    void
-    SolutionTransfer<dim, VECTOR, DH>::
-        prepare_serialization(const std::vector<const VECTOR*> &all_in)
-        {
-          prepare_for_coarsening_and_refinement (all_in);
-        }
+    }
 
 
 
     template<int dim, typename VECTOR, class DH>
     void
     SolutionTransfer<dim, VECTOR, DH>::
-        deserialize(VECTOR &in)
-        {
-      std::vector<VECTOR*> all_in(1, &in);
+    prepare_serialization(const std::vector<const VECTOR *> &all_in)
+    {
+      prepare_for_coarsening_and_refinement (all_in);
+    }
+
+
+
+    template<int dim, typename VECTOR, class DH>
+    void
+    SolutionTransfer<dim, VECTOR, DH>::
+    deserialize(VECTOR &in)
+    {
+      std::vector<VECTOR *> all_in(1, &in);
       deserialize(all_in);
-        }
+    }
 
-
-
-        template<int dim, typename VECTOR, class DH>
-    void
-    SolutionTransfer<dim, VECTOR, DH>::
-        deserialize(std::vector<VECTOR*> &all_in)
-        {
-          register_data_attach( get_data_size() * all_in.size() );
-
-          // this makes interpolate() happy
-          input_vectors.resize(all_in.size());
-
-          interpolate(all_in);
-        }
 
 
     template<int dim, typename VECTOR, class DH>
     void
     SolutionTransfer<dim, VECTOR, DH>::
-    interpolate (std::vector<VECTOR*> &all_out)
+    deserialize(std::vector<VECTOR *> &all_in)
+    {
+      register_data_attach( get_data_size() * all_in.size() );
+
+      // this makes interpolate() happy
+      input_vectors.resize(all_in.size());
+
+      interpolate(all_in);
+    }
+
+
+    template<int dim, typename VECTOR, class DH>
+    void
+    SolutionTransfer<dim, VECTOR, DH>::
+    interpolate (std::vector<VECTOR *> &all_out)
     {
       Assert(input_vectors.size()==all_out.size(),
              ExcDimensionMismatch(input_vectors.size(), all_out.size()) );
 
 //TODO: casting away constness is bad
-      parallel::distributed::Triangulation<dim> * tria
+      parallel::distributed::Triangulation<dim> *tria
         = (dynamic_cast<parallel::distributed::Triangulation<dim>*>
            (const_cast<dealii::Triangulation<dim>*>
             (&dof_handler->get_tria())));
@@ -171,11 +171,11 @@ namespace parallel
                                                    std_cxx1x::_3,
                                                    std_cxx1x::ref(all_out)));
 
-      
-      for (typename std::vector<VECTOR*>::iterator it=all_out.begin();
+
+      for (typename std::vector<VECTOR *>::iterator it=all_out.begin();
            it !=all_out.end();
            ++it)
-	(*it)->compress(::dealii::VectorOperation::insert);
+        (*it)->compress(::dealii::VectorOperation::insert);
 
       input_vectors.clear();
     }
@@ -187,7 +187,7 @@ namespace parallel
     SolutionTransfer<dim, VECTOR, DH>::
     interpolate (VECTOR &out)
     {
-      std::vector<VECTOR*> all_out(1, &out);
+      std::vector<VECTOR *> all_out(1, &out);
       interpolate(all_out);
     }
 
@@ -205,9 +205,9 @@ namespace parallel
     template<int dim, typename VECTOR, class DH>
     void
     SolutionTransfer<dim, VECTOR, DH>::
-    pack_callback(const typename Triangulation<dim,dim>::cell_iterator & cell_,
+    pack_callback(const typename Triangulation<dim,dim>::cell_iterator &cell_,
                   const typename Triangulation<dim,dim>::CellStatus /*status*/,
-                  void* data)
+                  void *data)
     {
       double *data_store = reinterpret_cast<double *>(data);
 
@@ -215,7 +215,7 @@ namespace parallel
 
       const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
       ::dealii::Vector<double> dofvalues(dofs_per_cell);
-      for (typename std::vector<const VECTOR*>::iterator it=input_vectors.begin();
+      for (typename std::vector<const VECTOR *>::iterator it=input_vectors.begin();
            it !=input_vectors.end();
            ++it)
         {
@@ -229,19 +229,19 @@ namespace parallel
     template<int dim, typename VECTOR, class DH>
     void
     SolutionTransfer<dim, VECTOR, DH>::
-    unpack_callback(const typename Triangulation<dim,dim>::cell_iterator & cell_,
+    unpack_callback(const typename Triangulation<dim,dim>::cell_iterator &cell_,
                     const typename Triangulation<dim,dim>::CellStatus /*status*/,
-                    const void* data,
-                    std::vector<VECTOR*> &all_out)
+                    const void *data,
+                    std::vector<VECTOR *> &all_out)
     {
       typename DH::cell_iterator
-        cell(&dof_handler->get_tria(), cell_->level(), cell_->index(), dof_handler);
+      cell(&dof_handler->get_tria(), cell_->level(), cell_->index(), dof_handler);
 
       const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
       ::dealii::Vector<double> dofvalues(dofs_per_cell);
       const double *data_store = reinterpret_cast<const double *>(data);
 
-      for (typename std::vector<VECTOR*>::iterator it = all_out.begin();
+      for (typename std::vector<VECTOR *>::iterator it = all_out.begin();
            it != all_out.end();
            ++it)
         {

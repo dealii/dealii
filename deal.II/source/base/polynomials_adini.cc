@@ -113,33 +113,33 @@ PolynomialsAdini::PolynomialsAdini() :
 
 void
 PolynomialsAdini::compute (const Point<2> &unit_point,
-                   std::vector<double> &values,
-                   std::vector<Tensor<1,2> > &grads,
-                   std::vector< Tensor<2,2> > &grad_grads) const
+                           std::vector<double> &values,
+                           std::vector<Tensor<1,2> > &grads,
+                           std::vector< Tensor<2,2> > &grad_grads) const
 {
-  if(values.empty() == false)//nur dann was tun
-  {
-    for(unsigned int i=0; i<values.size(); ++i)
+  if (values.empty() == false) //nur dann was tun
     {
-      values[i] = compute_value(i, unit_point);
+      for (unsigned int i=0; i<values.size(); ++i)
+        {
+          values[i] = compute_value(i, unit_point);
+        }
     }
-  }
 
-  if(grads.empty() == false)//nur dann was tun
-  {
-    for(unsigned int i=0; i<grads.size(); ++i)
+  if (grads.empty() == false) //nur dann was tun
     {
-      grads[i] = compute_grad(i, unit_point);
+      for (unsigned int i=0; i<grads.size(); ++i)
+        {
+          grads[i] = compute_grad(i, unit_point);
+        }
     }
-  }
 
-  if(grad_grads.empty() == false)//nur dann was tun
-  {
-    for(unsigned int i=0; i<grad_grads.size(); ++i)
+  if (grad_grads.empty() == false) //nur dann was tun
     {
-      grad_grads[i] = compute_grad_grad(i, unit_point);
+      for (unsigned int i=0; i<grad_grads.size(); ++i)
+        {
+          grad_grads[i] = compute_grad_grad(i, unit_point);
+        }
     }
-  }
   return;
 }
 

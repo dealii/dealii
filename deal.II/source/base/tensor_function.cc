@@ -27,8 +27,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int rank, int dim>
 TensorFunction<rank, dim>::TensorFunction (const double initial_time)
-                :
-                FunctionTime (initial_time)
+  :
+  FunctionTime (initial_time)
 {}
 
 

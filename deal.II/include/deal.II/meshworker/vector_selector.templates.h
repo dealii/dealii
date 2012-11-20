@@ -24,9 +24,9 @@ namespace MeshWorker
 
 
   template <int dim, int spacedim>
-  VectorDataBase<dim, spacedim>::VectorDataBase(const VectorSelector& v)
-                  :
-                  VectorSelector(v)
+  VectorDataBase<dim, spacedim>::VectorDataBase(const VectorSelector &v)
+    :
+    VectorSelector(v)
   {}
 
 
@@ -38,15 +38,15 @@ namespace MeshWorker
   template <int dim, int spacedim>
   void
   VectorDataBase<dim, spacedim>::fill(
-        std::vector<std::vector<std::vector<double> > >&,
-        std::vector<std::vector<std::vector<Tensor<1,dim> > > >&,
-        std::vector<std::vector<std::vector<Tensor<2,dim> > > >&,
-        const FEValuesBase<dim,spacedim>&,
-        const std::vector<unsigned int>&,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int) const
+    std::vector<std::vector<std::vector<double> > > &,
+    std::vector<std::vector<std::vector<Tensor<1,dim> > > > &,
+    std::vector<std::vector<std::vector<Tensor<2,dim> > > > &,
+    const FEValuesBase<dim,spacedim> &,
+    const std::vector<unsigned int> &,
+    const unsigned int,
+    const unsigned int,
+    const unsigned int,
+    const unsigned int) const
   {
     Assert(false, ExcNotImplemented());
   }
@@ -55,16 +55,16 @@ namespace MeshWorker
   template <int dim, int spacedim>
   void
   VectorDataBase<dim, spacedim>::mg_fill(
-        std::vector<std::vector<std::vector<double> > >&,
-        std::vector<std::vector<std::vector<Tensor<1,dim> > > >&,
-        std::vector<std::vector<std::vector<Tensor<2,dim> > > >&,
-        const FEValuesBase<dim,spacedim>&,
-        const unsigned int,
-        const std::vector<unsigned int>&,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int,
-        const unsigned int) const
+    std::vector<std::vector<std::vector<double> > > &,
+    std::vector<std::vector<std::vector<Tensor<1,dim> > > > &,
+    std::vector<std::vector<std::vector<Tensor<2,dim> > > > &,
+    const FEValuesBase<dim,spacedim> &,
+    const unsigned int,
+    const std::vector<unsigned int> &,
+    const unsigned int,
+    const unsigned int,
+    const unsigned int,
+    const unsigned int) const
   {
     Assert(false, ExcNotImplemented());
   }
@@ -78,15 +78,15 @@ namespace MeshWorker
 
 
   template <class VECTOR, int dim, int spacedim>
-  VectorData<VECTOR, dim, spacedim>::VectorData(const VectorSelector& s)
-                  :
-                  VectorDataBase<dim, spacedim>(s)
+  VectorData<VECTOR, dim, spacedim>::VectorData(const VectorSelector &s)
+    :
+    VectorDataBase<dim, spacedim>(s)
   {}
 
 
   template <class VECTOR, int dim, int spacedim>
   void
-  VectorData<VECTOR, dim, spacedim>::initialize(const NamedData<VECTOR*>& d)
+  VectorData<VECTOR, dim, spacedim>::initialize(const NamedData<VECTOR *> &d)
   {
     data = d;
     VectorSelector::initialize(d);
@@ -95,7 +95,7 @@ namespace MeshWorker
 
   template <class VECTOR, int dim, int spacedim>
   void
-  VectorData<VECTOR, dim, spacedim>::initialize(const VECTOR* v, const std::string& name)
+  VectorData<VECTOR, dim, spacedim>::initialize(const VECTOR *v, const std::string &name)
   {
     SmartPointer<const VECTOR,VectorData<VECTOR, dim, spacedim> > p = v;
     data.add(p, name);
@@ -106,37 +106,37 @@ namespace MeshWorker
   template <class VECTOR, int dim, int spacedim>
   void
   VectorData<VECTOR, dim, spacedim>::fill(
-        std::vector<std::vector<std::vector<double> > >& values,
-        std::vector<std::vector<std::vector<Tensor<1,dim> > > >& gradients,
-        std::vector<std::vector<std::vector<Tensor<2,dim> > > >& hessians,
-        const FEValuesBase<dim,spacedim>& fe,
-        const std::vector<unsigned int>& index,
-        const unsigned int component,
-        const unsigned int n_comp,
-        const unsigned int start,
-        const unsigned int size) const
+    std::vector<std::vector<std::vector<double> > > &values,
+    std::vector<std::vector<std::vector<Tensor<1,dim> > > > &gradients,
+    std::vector<std::vector<std::vector<Tensor<2,dim> > > > &hessians,
+    const FEValuesBase<dim,spacedim> &fe,
+    const std::vector<unsigned int> &index,
+    const unsigned int component,
+    const unsigned int n_comp,
+    const unsigned int start,
+    const unsigned int size) const
   {
     AssertDimension(values.size(), this->n_values());
     AssertDimension(gradients.size(), this->n_gradients());
     AssertDimension(hessians.size(), this->n_hessians());
 
-    for (unsigned int i=0;i<this->n_values();++i)
+    for (unsigned int i=0; i<this->n_values(); ++i)
       {
-        const VECTOR& src = *data(this->value_index(i));
+        const VECTOR &src = *data(this->value_index(i));
         VectorSlice<std::vector<std::vector<double> > > dst(values[i], component, n_comp);
         fe.get_function_values(src, make_slice(index, start, size), dst, true);
       }
 
-    for (unsigned int i=0;i<this->n_gradients();++i)
+    for (unsigned int i=0; i<this->n_gradients(); ++i)
       {
-        const VECTOR& src = *data(this->gradient_index(i));
+        const VECTOR &src = *data(this->gradient_index(i));
         VectorSlice<std::vector<std::vector<Tensor<1,dim> > > > dst(gradients[i], component, n_comp);
         fe.get_function_gradients(src, make_slice(index, start, size), dst, true);
       }
 
-    for (unsigned int i=0;i<this->n_hessians();++i)
+    for (unsigned int i=0; i<this->n_hessians(); ++i)
       {
-        const VECTOR& src = *data(this->hessian_index(i));
+        const VECTOR &src = *data(this->hessian_index(i));
         VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > dst(hessians[i], component, n_comp);
         fe.get_function_hessians(src, make_slice(index, start, size), dst, true);
       }
@@ -160,15 +160,15 @@ namespace MeshWorker
 
 
   template <class VECTOR, int dim, int spacedim>
-  MGVectorData<VECTOR, dim, spacedim>::MGVectorData(const VectorSelector& s)
-                  :
-                  VectorDataBase<dim, spacedim>(s)
+  MGVectorData<VECTOR, dim, spacedim>::MGVectorData(const VectorSelector &s)
+    :
+    VectorDataBase<dim, spacedim>(s)
   {}
 
 
   template <class VECTOR, int dim, int spacedim>
   void
-  MGVectorData<VECTOR, dim, spacedim>::initialize(const NamedData<MGLevelObject<VECTOR>*>& d)
+  MGVectorData<VECTOR, dim, spacedim>::initialize(const NamedData<MGLevelObject<VECTOR>*> &d)
   {
     data = d;
     VectorSelector::initialize(d);
@@ -177,10 +177,10 @@ namespace MeshWorker
 
   template <class VECTOR, int dim, int spacedim>
   void
-  MGVectorData<VECTOR, dim, spacedim>::initialize(const MGLevelObject<VECTOR>* v, const std::string& name)
+  MGVectorData<VECTOR, dim, spacedim>::initialize(const MGLevelObject<VECTOR> *v, const std::string &name)
   {
     SmartPointer<const MGLevelObject<VECTOR>, MGVectorData<VECTOR, dim, spacedim> >
-      p = v;
+    p = v;
     data.add(p, name);
     VectorSelector::initialize(data);
   }
@@ -189,38 +189,38 @@ namespace MeshWorker
   template <class VECTOR, int dim, int spacedim>
   void
   MGVectorData<VECTOR, dim, spacedim>::mg_fill(
-        std::vector<std::vector<std::vector<double> > >& values,
-        std::vector<std::vector<std::vector<Tensor<1,dim> > > >& gradients,
-        std::vector<std::vector<std::vector<Tensor<2,dim> > > >& hessians,
-        const FEValuesBase<dim,spacedim>& fe,
-        const unsigned int level,
-        const std::vector<unsigned int>& index,
-        const unsigned int component,
-        const unsigned int n_comp,
-        const unsigned int start,
-        const unsigned int size) const
+    std::vector<std::vector<std::vector<double> > > &values,
+    std::vector<std::vector<std::vector<Tensor<1,dim> > > > &gradients,
+    std::vector<std::vector<std::vector<Tensor<2,dim> > > > &hessians,
+    const FEValuesBase<dim,spacedim> &fe,
+    const unsigned int level,
+    const std::vector<unsigned int> &index,
+    const unsigned int component,
+    const unsigned int n_comp,
+    const unsigned int start,
+    const unsigned int size) const
   {
     AssertDimension(values.size(), this->n_values());
     AssertDimension(gradients.size(), this->n_gradients());
     AssertDimension(hessians.size(), this->n_hessians());
 
-    for (unsigned int i=0;i<this->n_values();++i)
+    for (unsigned int i=0; i<this->n_values(); ++i)
       {
-        const VECTOR& src = (*data(this->value_index(i)))[level];
+        const VECTOR &src = (*data(this->value_index(i)))[level];
         VectorSlice<std::vector<std::vector<double> > > dst(values[i], component, n_comp);
         fe.get_function_values(src, make_slice(index, start, size), dst, true);
       }
 
-    for (unsigned int i=0;i<this->n_gradients();++i)
+    for (unsigned int i=0; i<this->n_gradients(); ++i)
       {
-        const VECTOR& src = (*data(this->value_index(i)))[level];
+        const VECTOR &src = (*data(this->value_index(i)))[level];
         VectorSlice<std::vector<std::vector<Tensor<1,dim> > > > dst(gradients[i], component, n_comp);
         fe.get_function_gradients(src, make_slice(index, start, size), dst, true);
       }
 
-    for (unsigned int i=0;i<this->n_hessians();++i)
+    for (unsigned int i=0; i<this->n_hessians(); ++i)
       {
-        const VECTOR& src = (*data(this->value_index(i)))[level];
+        const VECTOR &src = (*data(this->value_index(i)))[level];
         VectorSlice<std::vector<std::vector<Tensor<2,dim> > > > dst(hessians[i], component, n_comp);
         fe.get_function_hessians(src, make_slice(index, start, size), dst, true);
       }

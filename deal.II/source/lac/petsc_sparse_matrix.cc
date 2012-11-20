@@ -82,8 +82,8 @@ namespace PETScWrappers
                         const unsigned int n_nonzero_per_row,
                         const bool         is_symmetric)
   {
-                                     // get rid of old matrix and generate a
-                                     // new one
+    // get rid of old matrix and generate a
+    // new one
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
     const int ierr = MatDestroy (matrix);
 #else
@@ -102,8 +102,8 @@ namespace PETScWrappers
                         const std::vector<unsigned int> &row_lengths,
                         const bool         is_symmetric)
   {
-                                     // get rid of old matrix and generate a
-                                     // new one
+    // get rid of old matrix and generate a
+    // new one
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
     const int ierr = MatDestroy (matrix);
 #else
@@ -122,8 +122,8 @@ namespace PETScWrappers
   reinit (const SparsityType &sparsity_pattern,
           const bool          preset_nonzero_locations)
   {
-                                     // get rid of old matrix and generate a
-                                     // new one
+    // get rid of old matrix and generate a
+    // new one
 #if DEAL_II_PETSC_VERSION_LT(3,2,0)
     const int ierr = MatDestroy (matrix);
 #else
@@ -151,15 +151,15 @@ namespace PETScWrappers
                            const unsigned int n_nonzero_per_row,
                            const bool         is_symmetric)
   {
-                                     // use the call sequence indicating only
-                                     // a maximal number of elements per row
-                                     // for all rows globally
+    // use the call sequence indicating only
+    // a maximal number of elements per row
+    // for all rows globally
     const int ierr
       = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, n_nonzero_per_row,
                         0, &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                     // set symmetric flag, if so requested
+    // set symmetric flag, if so requested
     if (is_symmetric == true)
       {
 #if DEAL_II_PETSC_VERSION_LT(3,0,0)
@@ -185,26 +185,26 @@ namespace PETScWrappers
     Assert (row_lengths.size() == m,
             ExcDimensionMismatch (row_lengths.size(), m));
 
-                                     // use the call sequence indicating a
-                                     // maximal number of elements for each
-                                     // row individually. annoyingly, we
-                                     // always use unsigned ints for cases
-                                     // like this, while PETSc wants to see
-                                     // signed integers. so we have to
-                                     // convert, unless we want to play dirty
-                                     // tricks with conversions of pointers
+    // use the call sequence indicating a
+    // maximal number of elements for each
+    // row individually. annoyingly, we
+    // always use unsigned ints for cases
+    // like this, while PETSc wants to see
+    // signed integers. so we have to
+    // convert, unless we want to play dirty
+    // tricks with conversions of pointers
 #ifdef PETSC_USE_64BIT_INDICES
     const std::vector<PetscInt>
 #else
     const std::vector<int>
 #endif
-      int_row_lengths (row_lengths.begin(), row_lengths.end());
+    int_row_lengths (row_lengths.begin(), row_lengths.end());
     const int ierr
       = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, 0,
                         &int_row_lengths[0], &matrix);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-                                     // set symmetric flag, if so requested
+    // set symmetric flag, if so requested
     if (is_symmetric == true)
       {
 #if DEAL_II_PETSC_VERSION_LT(3,0,0)
@@ -234,19 +234,19 @@ namespace PETScWrappers
                sparsity_pattern.n_cols(),
                row_lengths, false);
 
-                                     // next preset the exact given matrix
-                                     // entries with zeros, if the user
-                                     // requested so. this doesn't avoid any
-                                     // memory allocations, but it at least
-                                     // avoids some searches later on. the
-                                     // key here is that we can use the
-                                     // matrix set routines that set an
-                                     // entire row at once, not a single
-                                     // entry at a time
-                                     //
-                                     // for the usefulness of this option
-                                     // read the documentation of this
-                                     // class.
+    // next preset the exact given matrix
+    // entries with zeros, if the user
+    // requested so. this doesn't avoid any
+    // memory allocations, but it at least
+    // avoids some searches later on. the
+    // key here is that we can use the
+    // matrix set routines that set an
+    // entire row at once, not a single
+    // entry at a time
+    //
+    // for the usefulness of this option
+    // read the documentation of this
+    // class.
     if (preset_nonzero_locations == true)
       {
 #ifdef PETSC_USE_64BIT_INDICES
@@ -254,7 +254,7 @@ namespace PETScWrappers
 #else
         std::vector<int>
 #endif
-          row_entries;
+        row_entries;
         std::vector<PetscScalar> row_values;
         for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
           {
@@ -268,7 +268,7 @@ namespace PETScWrappers
 #else
             const int
 #endif
-              int_row = i;
+            int_row = i;
             MatSetValues (matrix, 1, &int_row,
                           row_lengths[i], &row_entries[0],
                           &row_values[0], INSERT_VALUES);
@@ -276,45 +276,45 @@ namespace PETScWrappers
         compress ();
 
 
-                                         // Tell PETSc that we are not
-                                         // planning on adding new entries
-                                         // to the matrix. Generate errors
-                                         // in debug mode.
-          int ierr;
+        // Tell PETSc that we are not
+        // planning on adding new entries
+        // to the matrix. Generate errors
+        // in debug mode.
+        int ierr;
 #if DEAL_II_PETSC_VERSION_LT(3,0,0)
 #ifdef DEBUG
-          ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
+        ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 #else
-          ierr = MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
+        ierr = MatSetOption (matrix, MAT_NO_NEW_NONZERO_LOCATIONS);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 #endif
 #else
 #ifdef DEBUG
-          ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
+        ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATION_ERR, PETSC_TRUE);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 #else
-          ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
+        ierr = MatSetOption (matrix, MAT_NEW_NONZERO_LOCATIONS, PETSC_FALSE);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 #endif
 #endif
 
-                                           // Tell PETSc to keep the
-                                           // SparsityPattern entries even if
-                                           // we delete a row with
-                                           // clear_rows() which calls
-                                           // MatZeroRows(). Otherwise one can
-                                           // not write into that row
-                                           // afterwards.
+        // Tell PETSc to keep the
+        // SparsityPattern entries even if
+        // we delete a row with
+        // clear_rows() which calls
+        // MatZeroRows(). Otherwise one can
+        // not write into that row
+        // afterwards.
 #if DEAL_II_PETSC_VERSION_LT(3,0,0)
-          ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
+        ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 #elif DEAL_II_PETSC_VERSION_LT(3,1,0)
-          ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS, PETSC_TRUE);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
+        ierr = MatSetOption (matrix, MAT_KEEP_ZEROED_ROWS, PETSC_TRUE);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 #else
-          ierr = MatSetOption (matrix, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
-          AssertThrow (ierr == 0, ExcPETScError(ierr));
+        ierr = MatSetOption (matrix, MAT_KEEP_NONZERO_PATTERN, PETSC_TRUE);
+        AssertThrow (ierr == 0, ExcPETScError(ierr));
 #endif
 
       }
@@ -363,7 +363,7 @@ namespace PETScWrappers
 
   PetscScalar
   SparseMatrix::matrix_scalar_product (const VectorBase &u,
-				       const VectorBase &v) const
+                                       const VectorBase &v) const
   {
     Vector tmp (v.size());
     vmult (tmp, v);

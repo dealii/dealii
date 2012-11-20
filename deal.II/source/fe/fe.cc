@@ -44,20 +44,20 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim,spacedim> *element,
                                   const Mapping<dim,spacedim>       &mapping,
                                   const Quadrature<dim>    &quadrature)
 {
-                                   // if we shall compute second
-                                   // derivatives, then we do so by
-                                   // finite differencing the
-                                   // gradients. that we do by
-                                   // evaluating the gradients of
-                                   // shape values at points shifted
-                                   // star-like a little in each
-                                   // coordinate direction around each
-                                   // quadrature point.
-                                   //
-                                   // therefore generate 2*dim (the
-                                   // number of evaluation points)
-                                   // FEValues objects with slightly
-                                   // shifted positions
+  // if we shall compute second
+  // derivatives, then we do so by
+  // finite differencing the
+  // gradients. that we do by
+  // evaluating the gradients of
+  // shape values at points shifted
+  // star-like a little in each
+  // coordinate direction around each
+  // quadrature point.
+  //
+  // therefore generate 2*dim (the
+  // number of evaluation points)
+  // FEValues objects with slightly
+  // shifted positions
   std::vector<Point<dim> > diff_points (quadrature.size());
 
   differences.resize(2*dim);
@@ -66,23 +66,23 @@ InternalDataBase::initialize_2nd (const FiniteElement<dim,spacedim> *element,
       Point<dim> shift;
       shift (d) = fd_step_length;
 
-                                       // generate points and FEValues
-                                       // objects shifted in
-                                       // plus-direction. note that
-                                       // they only need to compute
-                                       // gradients, not more
+      // generate points and FEValues
+      // objects shifted in
+      // plus-direction. note that
+      // they only need to compute
+      // gradients, not more
       for (unsigned int i=0; i<diff_points.size(); ++i)
         diff_points[i] = quadrature.point(i) + shift;
       const Quadrature<dim> plus_quad (diff_points, quadrature.get_weights());
       differences[d] = new FEValues<dim,spacedim> (mapping, *element,
-                                          plus_quad, update_gradients);
+                                                   plus_quad, update_gradients);
 
-                                       // now same in minus-direction
+      // now same in minus-direction
       for (unsigned int i=0; i<diff_points.size(); ++i)
         diff_points[i] = quadrature.point(i) - shift;
       const Quadrature<dim> minus_quad (diff_points, quadrature.get_weights());
       differences[d+dim] = new FEValues<dim,spacedim> (mapping, *element,
-                                              minus_quad, update_gradients);
+                                                       minus_quad, update_gradients);
     }
 }
 
@@ -95,9 +95,9 @@ FiniteElement<dim,spacedim>::InternalDataBase::~InternalDataBase ()
   for (unsigned int i=0; i<differences.size (); ++i)
     if (differences[i] != 0)
       {
-                                         // delete pointer and set it
-                                         // to zero to avoid
-                                         // inadvertent use
+        // delete pointer and set it
+        // to zero to avoid
+        // inadvertent use
         delete differences[i];
         differences[i] = 0;
       };
@@ -111,56 +111,56 @@ FiniteElement<dim,spacedim>::FiniteElement (
   const FiniteElementData<dim> &fe_data,
   const std::vector<bool> &r_i_a_f,
   const std::vector<ComponentMask> &nonzero_c)
-                :
-                FiniteElementData<dim> (fe_data),
-                adjust_quad_dof_index_for_face_orientation_table (dim == 3 ?
-                                                                  this->dofs_per_quad : 0 ,
-                                                                  dim==3 ? 8 : 0),
-                adjust_line_dof_index_for_line_orientation_table (dim == 3 ?
-                                                                  this->dofs_per_line : 0),
-                system_to_base_table(this->dofs_per_cell),
-                face_system_to_base_table(this->dofs_per_face),
-                component_to_base_table (this->components,
-                                         std::make_pair(std::make_pair(0U, 0U), 0U)),
-                restriction_is_additive_flags(r_i_a_f),
-                nonzero_components (nonzero_c)
+  :
+  FiniteElementData<dim> (fe_data),
+  adjust_quad_dof_index_for_face_orientation_table (dim == 3 ?
+                                                    this->dofs_per_quad : 0 ,
+                                                    dim==3 ? 8 : 0),
+  adjust_line_dof_index_for_line_orientation_table (dim == 3 ?
+                                                    this->dofs_per_line : 0),
+  system_to_base_table(this->dofs_per_cell),
+  face_system_to_base_table(this->dofs_per_face),
+  component_to_base_table (this->components,
+                           std::make_pair(std::make_pair(0U, 0U), 0U)),
+  restriction_is_additive_flags(r_i_a_f),
+  nonzero_components (nonzero_c)
 {
-                                   // Special handling of vectors of
-                                   // length one: in this case, we
-                                   // assume that all entries were
-                                   // supposed to be equal.
+  // Special handling of vectors of
+  // length one: in this case, we
+  // assume that all entries were
+  // supposed to be equal.
 
 //TODO: Do the following in a better way by expanding these arrays in the member initializer section above
-                                   // Normally, we should be careful
-                                   // with const_cast, but since this
-                                   // is the constructor and we do it
-                                   // here only, we are fine.
-   unsigned int ndofs = this->dofs_per_cell;
-   if (restriction_is_additive_flags.size() == 1 && ndofs > 1)
-     {
-       std::vector<bool>& aux
-         = const_cast<std::vector<bool>&> (restriction_is_additive_flags);
-       aux.resize(ndofs, restriction_is_additive_flags[0]);
-     }
+  // Normally, we should be careful
+  // with const_cast, but since this
+  // is the constructor and we do it
+  // here only, we are fine.
+  unsigned int ndofs = this->dofs_per_cell;
+  if (restriction_is_additive_flags.size() == 1 && ndofs > 1)
+    {
+      std::vector<bool> &aux
+        = const_cast<std::vector<bool>&> (restriction_is_additive_flags);
+      aux.resize(ndofs, restriction_is_additive_flags[0]);
+    }
 
-   if (nonzero_components.size() == 1 && ndofs > 1)
-     {
-       std::vector<ComponentMask>& aux
-         = const_cast<std::vector<ComponentMask>&> (nonzero_components);
-       aux.resize(ndofs, nonzero_components[0]);
-     }
+  if (nonzero_components.size() == 1 && ndofs > 1)
+    {
+      std::vector<ComponentMask> &aux
+        = const_cast<std::vector<ComponentMask>&> (nonzero_components);
+      aux.resize(ndofs, nonzero_components[0]);
+    }
 
-                                    // These used to be initialized in
-                                    // the constructor, but here we
-                                    // have the possibly corrected
-                                    // nonzero_components vector.
-   const_cast<std::vector<unsigned int>&>
-   (n_nonzero_components_table) = compute_n_nonzero_components(nonzero_components);
-   this->set_primitivity(std::find_if (n_nonzero_components_table.begin(),
-                                       n_nonzero_components_table.end(),
-                                       std::bind2nd(std::not_equal_to<unsigned int>(),
-                                                    1U))
-                         == n_nonzero_components_table.end());
+  // These used to be initialized in
+  // the constructor, but here we
+  // have the possibly corrected
+  // nonzero_components vector.
+  const_cast<std::vector<unsigned int>&>
+  (n_nonzero_components_table) = compute_n_nonzero_components(nonzero_components);
+  this->set_primitivity(std::find_if (n_nonzero_components_table.begin(),
+                                      n_nonzero_components_table.end(),
+                                      std::bind2nd(std::not_equal_to<unsigned int>(),
+                                                   1U))
+                        == n_nonzero_components_table.end());
 
 
   Assert (restriction_is_additive_flags.size() == this->dofs_per_cell,
@@ -180,11 +180,11 @@ FiniteElement<dim,spacedim>::FiniteElement (
               ExcInternalError());
     };
 
-                                   // initialize some tables in the
-                                   // default way, i.e. if there is
-                                   // only one (vector-)component; if
-                                   // the element is not primitive,
-                                   // leave these tables empty.
+  // initialize some tables in the
+  // default way, i.e. if there is
+  // only one (vector-)component; if
+  // the element is not primitive,
+  // leave these tables empty.
   if (this->is_primitive())
     {
       system_to_component_table.resize(this->dofs_per_cell);
@@ -200,15 +200,15 @@ FiniteElement<dim,spacedim>::FiniteElement (
           face_system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);
         }
     }
-                                   // Fill with default value; may be
-                                   // changed by constructor of
-                                   // derived class.
+  // Fill with default value; may be
+  // changed by constructor of
+  // derived class.
   base_to_block_indices.reinit(1,1);
 
-                                   // initialize the restriction and
-                                   // prolongation matrices. the default
-                                   // contructur of FullMatrix<dim> initializes
-                                   // them with size zero
+  // initialize the restriction and
+  // prolongation matrices. the default
+  // contructur of FullMatrix<dim> initializes
+  // them with size zero
   prolongation.resize(RefinementCase<dim>::isotropic_refinement);
   restriction.resize(RefinementCase<dim>::isotropic_refinement);
   for (unsigned int ref=RefinementCase<dim>::cut_x;
@@ -218,8 +218,8 @@ FiniteElement<dim,spacedim>::FiniteElement (
                                   n_children(RefinementCase<dim>(ref)),
                                   FullMatrix<double>());
       restriction[ref-1].resize (GeometryInfo<dim>::
-                                  n_children(RefinementCase<dim>(ref)),
-                                  FullMatrix<double>());
+                                 n_children(RefinementCase<dim>(ref)),
+                                 FullMatrix<double>());
     }
 
   adjust_quad_dof_index_for_face_orientation_table.fill(0);
@@ -237,7 +237,7 @@ FiniteElement<dim,spacedim>::~FiniteElement ()
 template <int dim, int spacedim>
 double
 FiniteElement<dim,spacedim>::shape_value (const unsigned int,
-                                     const Point<dim> &) const
+                                          const Point<dim> &) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return 0.;
@@ -248,8 +248,8 @@ FiniteElement<dim,spacedim>::shape_value (const unsigned int,
 template <int dim, int spacedim>
 double
 FiniteElement<dim,spacedim>::shape_value_component (const unsigned int,
-                                               const Point<dim> &,
-                                               const unsigned int) const
+                                                    const Point<dim> &,
+                                                    const unsigned int) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return 0.;
@@ -260,7 +260,7 @@ FiniteElement<dim,spacedim>::shape_value_component (const unsigned int,
 template <int dim, int spacedim>
 Tensor<1,dim>
 FiniteElement<dim,spacedim>::shape_grad (const unsigned int,
-                                    const Point<dim> &) const
+                                         const Point<dim> &) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<1,dim> ();
@@ -271,8 +271,8 @@ FiniteElement<dim,spacedim>::shape_grad (const unsigned int,
 template <int dim, int spacedim>
 Tensor<1,dim>
 FiniteElement<dim,spacedim>::shape_grad_component (const unsigned int,
-                                              const Point<dim> &,
-                                              const unsigned int) const
+                                                   const Point<dim> &,
+                                                   const unsigned int) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<1,dim> ();
@@ -283,7 +283,7 @@ FiniteElement<dim,spacedim>::shape_grad_component (const unsigned int,
 template <int dim, int spacedim>
 Tensor<2,dim>
 FiniteElement<dim,spacedim>::shape_grad_grad (const unsigned int,
-                                         const Point<dim> &) const
+                                              const Point<dim> &) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<2,dim> ();
@@ -294,8 +294,8 @@ FiniteElement<dim,spacedim>::shape_grad_grad (const unsigned int,
 template <int dim, int spacedim>
 Tensor<2,dim>
 FiniteElement<dim,spacedim>::shape_grad_grad_component (const unsigned int,
-                                                   const Point<dim> &,
-                                                   const unsigned int) const
+                                                        const Point<dim> &,
+                                                        const unsigned int) const
 {
   AssertThrow(false, ExcUnitShapeValuesDoNotExist());
   return Tensor<2,dim> ();
@@ -337,11 +337,11 @@ FiniteElement<dim,spacedim>::get_restriction_matrix (const unsigned int child,
           ExcMessage("Restriction matrices are only available for refined cells!"));
   Assert (child<GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
           ExcIndexRange(child,0,GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case))));
-                                   // we use refinement_case-1 here. the -1 takes care
-                                   // of the origin of the vector, as for
-                                   // RefinementCase<dim>::no_refinement (=0) there is no
-                                   // data available and so the vector indices
-                                   // are shifted
+  // we use refinement_case-1 here. the -1 takes care
+  // of the origin of the vector, as for
+  // RefinementCase<dim>::no_refinement (=0) there is no
+  // data available and so the vector indices
+  // are shifted
   Assert (restriction[refinement_case-1][child].n() == this->dofs_per_cell, ExcProjectionVoid());
   return restriction[refinement_case-1][child];
 }
@@ -359,11 +359,11 @@ FiniteElement<dim,spacedim>::get_prolongation_matrix (const unsigned int child,
           ExcMessage("Prolongation matrices are only available for refined cells!"));
   Assert (child<GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
           ExcIndexRange(child,0,GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case))));
-                                   // we use refinement_case-1 here. the -1 takes care
-                                   // of the origin of the vector, as for
-                                   // RefinementCase::no_refinement (=0) there is no
-                                   // data available and so the vector indices
-                                   // are shifted
+  // we use refinement_case-1 here. the -1 takes care
+  // of the origin of the vector, as for
+  // RefinementCase::no_refinement (=0) there is no
+  // data available and so the vector indices
+  // are shifted
   Assert (prolongation[refinement_case-1][child].n() == this->dofs_per_cell, ExcEmbeddingVoid());
   return prolongation[refinement_case-1][child];
 }
@@ -378,7 +378,7 @@ FiniteElement<dim,spacedim>::component_to_block_index (const unsigned int index)
           ExcIndexRange(index, 0, this->n_components()));
 
   return first_block_of_base(component_to_base_table[index].first.first)
-    + component_to_base_table[index].second;
+         + component_to_base_table[index].second;
 }
 
 
@@ -510,38 +510,38 @@ block_mask (const ComponentMask &component_mask) const
 
   AssertDimension(component_mask.size(), this->n_components());
 
-				   // walk over all of the components
-				   // of this finite element and see
-				   // if we need to set the
-				   // corresponding block. inside the
-				   // block, walk over all the
-				   // components that correspond to
-				   // this block and make sure the
-				   // component mask is set for all of
-				   // them
+  // walk over all of the components
+  // of this finite element and see
+  // if we need to set the
+  // corresponding block. inside the
+  // block, walk over all the
+  // components that correspond to
+  // this block and make sure the
+  // component mask is set for all of
+  // them
   std::vector<bool> block_mask (this->n_blocks(), false);
   for (unsigned int c=0; c<this->n_components();)
     {
       const unsigned int block = component_to_block_index(c);
       if (component_mask[c] == true)
-	block_mask[block] = true;
+        block_mask[block] = true;
 
-				       // now check all of the other
-				       // components that correspond
-				       // to this block
+      // now check all of the other
+      // components that correspond
+      // to this block
       ++c;
       while ((c<this->n_components())
-	     &&
-	     (component_to_block_index(c) == block))
-	{
-	  Assert (component_mask[c] == block_mask[block],
-		  ExcMessage ("The component mask argument given to this function "
-			      "is not a mask where the individual components belonging "
-			      "to one block of the finite element are either all "
-			      "selected or not selected. You can't call this function "
-			      "with a component mask that splits blocks."));
-	  ++c;
-	}
+             &&
+             (component_to_block_index(c) == block))
+        {
+          Assert (component_mask[c] == block_mask[block],
+                  ExcMessage ("The component mask argument given to this function "
+                              "is not a mask where the individual components belonging "
+                              "to one block of the finite element are either all "
+                              "selected or not selected. You can't call this function "
+                              "with a component mask that splits blocks."));
+          ++c;
+        }
     }
 
 
@@ -553,27 +553,27 @@ block_mask (const ComponentMask &component_mask) const
 template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim,spacedim>::adjust_quad_dof_index_for_face_orientation (const unsigned int index,
-                                                                         const bool face_orientation,
-                                                                         const bool face_flip,
-                                                                         const bool face_rotation) const
+    const bool face_orientation,
+    const bool face_flip,
+    const bool face_rotation) const
 {
-                                   // general template for 1D and 2D: not
-                                   // implemented. in fact, the function
-                                   // shouldn't even be called unless we are
-                                   // in 3d, so throw an internal error
+  // general template for 1D and 2D: not
+  // implemented. in fact, the function
+  // shouldn't even be called unless we are
+  // in 3d, so throw an internal error
   Assert (dim==3, ExcInternalError());
   if (dim < 3)
     return index;
 
-                                   // adjust dofs on 3d faces if the face is
-                                   // flipped. note that we query a table that
-                                   // derived elements need to have set up
-                                   // front. the exception are discontinuous
-                                   // elements for which there should be no
-                                   // face dofs anyway (i.e. dofs_per_quad==0
-                                   // in 3d), so we don't need the table, but
-                                   // the function should also not have been
-                                   // called
+  // adjust dofs on 3d faces if the face is
+  // flipped. note that we query a table that
+  // derived elements need to have set up
+  // front. the exception are discontinuous
+  // elements for which there should be no
+  // face dofs anyway (i.e. dofs_per_quad==0
+  // in 3d), so we don't need the table, but
+  // the function should also not have been
+  // called
   Assert (index<this->dofs_per_quad, ExcIndexRange(index,0,this->dofs_per_quad));
   Assert (adjust_quad_dof_index_for_face_orientation_table.n_elements()==8*this->dofs_per_quad,
           ExcInternalError());
@@ -585,12 +585,12 @@ FiniteElement<dim,spacedim>::adjust_quad_dof_index_for_face_orientation (const u
 template <int dim, int spacedim>
 unsigned int
 FiniteElement<dim,spacedim>::adjust_line_dof_index_for_line_orientation (const unsigned int index,
-                                                                         const bool line_orientation) const
+    const bool line_orientation) const
 {
-                                   // general template for 1D and 2D: do
-                                   // nothing. Do not throw an Assertion,
-                                   // however, in order to allow to call this
-                                   // function in 2D as well
+  // general template for 1D and 2D: do
+  // nothing. Do not throw an Assertion,
+  // however, in order to allow to call this
+  // function in 2D as well
   if (dim<3)
     return index;
 
@@ -623,7 +623,7 @@ FiniteElement<dim,spacedim>::prolongation_is_implemented () const
         if ((prolongation[ref_case-1][c].m() == 0) ||
             (prolongation[ref_case-1][c].n() == 0))
           return false;
-       }
+      }
   return true;
 }
 
@@ -647,7 +647,7 @@ FiniteElement<dim,spacedim>::restriction_is_implemented () const
         if ((restriction[ref_case-1][c].m() == 0) ||
             (restriction[ref_case-1][c].n() == 0))
           return false;
-       }
+      }
   return true;
 }
 
@@ -746,19 +746,19 @@ FiniteElement<dim,spacedim>::interface_constraints_size () const
 {
   switch (dim)
     {
-      case 1:
-            return TableIndices<2> (0U, 0U);
-      case 2:
-            return TableIndices<2> (this->dofs_per_vertex +
-                                    2*this->dofs_per_line,
-                                    this->dofs_per_face);
-      case 3:
-            return TableIndices<2> (5*this->dofs_per_vertex +
-                                    12*this->dofs_per_line  +
-                                    4*this->dofs_per_quad,
-                                    this->dofs_per_face);
-      default:
-            Assert (false, ExcNotImplemented());
+    case 1:
+      return TableIndices<2> (0U, 0U);
+    case 2:
+      return TableIndices<2> (this->dofs_per_vertex +
+                              2*this->dofs_per_line,
+                              this->dofs_per_face);
+    case 3:
+      return TableIndices<2> (5*this->dofs_per_vertex +
+                              12*this->dofs_per_line  +
+                              4*this->dofs_per_quad,
+                              this->dofs_per_face);
+    default:
+      Assert (false, ExcNotImplemented());
     };
   return TableIndices<2> (numbers::invalid_unsigned_int,
                           numbers::invalid_unsigned_int);
@@ -770,15 +770,15 @@ template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::
 get_interpolation_matrix (const FiniteElement<dim,spacedim> &,
-                          FullMatrix<double>           &) const
+                          FullMatrix<double> &) const
 {
-                                   // by default, no interpolation
-                                   // implemented. so throw exception,
-                                   // as documentation says
+  // by default, no interpolation
+  // implemented. so throw exception,
+  // as documentation says
   typedef FiniteElement<dim,spacedim> FEE;
   AssertThrow (false,
                typename FEE::
-                ExcInterpolationNotImplemented());
+               ExcInterpolationNotImplemented());
 }
 
 
@@ -787,11 +787,11 @@ template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::
 get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &,
-                               FullMatrix<double>           &) const
+                               FullMatrix<double> &) const
 {
-                                   // by default, no interpolation
-                                   // implemented. so throw exception,
-                                   // as documentation says
+  // by default, no interpolation
+  // implemented. so throw exception,
+  // as documentation says
   typedef    FiniteElement<dim,spacedim> FEE;
   AssertThrow (false,
                typename FEE::
@@ -805,11 +805,11 @@ void
 FiniteElement<dim,spacedim>::
 get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &,
                                   const unsigned int,
-                                  FullMatrix<double>           &) const
+                                  FullMatrix<double> &) const
 {
-                                   // by default, no interpolation
-                                   // implemented. so throw exception,
-                                   // as documentation says
+  // by default, no interpolation
+  // implemented. so throw exception,
+  // as documentation says
   typedef    FiniteElement<dim,spacedim> FEE;
   AssertThrow (false,
                typename FEE::ExcInterpolationNotImplemented());
@@ -876,10 +876,10 @@ template <int dim, int spacedim>
 const std::vector<Point<dim> > &
 FiniteElement<dim,spacedim>::get_unit_support_points () const
 {
-                                   // a finite element may define
-                                   // support points, but only if
-                                   // there are as many as there are
-                                   // degrees of freedom
+  // a finite element may define
+  // support points, but only if
+  // there are as many as there are
+  // degrees of freedom
   Assert ((unit_support_points.size() == 0) ||
           (unit_support_points.size() == this->dofs_per_cell),
           ExcInternalError());
@@ -901,10 +901,10 @@ template <int dim, int spacedim>
 const std::vector<Point<dim> > &
 FiniteElement<dim,spacedim>::get_generalized_support_points () const
 {
-                                   // a finite element may define
-                                   // support points, but only if
-                                   // there are as many as there are
-                                   // degrees of freedom
+  // a finite element may define
+  // support points, but only if
+  // there are as many as there are
+  // degrees of freedom
   return ((generalized_support_points.size() == 0)
           ? unit_support_points
           : generalized_support_points);
@@ -938,10 +938,10 @@ template <int dim, int spacedim>
 const std::vector<Point<dim-1> > &
 FiniteElement<dim,spacedim>::get_unit_face_support_points () const
 {
-                                   // a finite element may define
-                                   // support points, but only if
-                                   // there are as many as there are
-                                   // degrees of freedom on a face
+  // a finite element may define
+  // support points, but only if
+  // there are as many as there are
+  // degrees of freedom on a face
   Assert ((unit_face_support_points.size() == 0) ||
           (unit_face_support_points.size() == this->dofs_per_face),
           ExcInternalError());
@@ -963,10 +963,10 @@ template <int dim, int spacedim>
 const std::vector<Point<dim-1> > &
 FiniteElement<dim,spacedim>::get_generalized_face_support_points () const
 {
-                                   // a finite element may define
-                                   // support points, but only if
-                                   // there are as many as there are
-                                   // degrees of freedom on a face
+  // a finite element may define
+  // support points, but only if
+  // there are as many as there are
+  // degrees of freedom on a face
   return ((generalized_face_support_points.size() == 0)
           ? unit_face_support_points
           : generalized_face_support_points);
@@ -1008,8 +1008,8 @@ FiniteElement<dim,spacedim>::has_support_on_face (
 template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::interpolate(
-  std::vector<double>&       local_dofs,
-  const std::vector<double>& values) const
+  std::vector<double>       &local_dofs,
+  const std::vector<double> &values) const
 {
   Assert (has_support_points(), ExcFEHasNoSupportPoints());
   Assert (values.size() == unit_support_points.size(),
@@ -1028,8 +1028,8 @@ FiniteElement<dim,spacedim>::interpolate(
 template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::interpolate(
-  std::vector<double>&    local_dofs,
-  const std::vector<Vector<double> >& values,
+  std::vector<double>    &local_dofs,
+  const std::vector<Vector<double> > &values,
   unsigned int offset) const
 {
   Assert (has_support_points(), ExcFEHasNoSupportPoints());
@@ -1040,7 +1040,7 @@ FiniteElement<dim,spacedim>::interpolate(
   Assert (values[0].size() >= offset+this->n_components(),
           ExcDimensionMismatch(values[0].size(),offset+this->n_components()));
 
-  for (unsigned int i=0;i<this->dofs_per_cell;++i)
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const std::pair<unsigned int, unsigned int> index
         = this->system_to_component_index(i);
@@ -1054,8 +1054,8 @@ FiniteElement<dim,spacedim>::interpolate(
 template <int dim, int spacedim>
 void
 FiniteElement<dim,spacedim>::interpolate(
-  std::vector<double>& local_dofs,
-  const VectorSlice<const std::vector<std::vector<double> > >& values) const
+  std::vector<double> &local_dofs,
+  const VectorSlice<const std::vector<std::vector<double> > > &values) const
 {
   Assert (has_support_points(), ExcFEHasNoSupportPoints());
   Assert (values[0].size() == unit_support_points.size(),
@@ -1065,7 +1065,7 @@ FiniteElement<dim,spacedim>::interpolate(
   Assert (values.size() == this->n_components(),
           ExcDimensionMismatch(values.size(), this->n_components()));
 
-  for (unsigned int i=0;i<this->dofs_per_cell;++i)
+  for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
       const std::pair<unsigned int, unsigned int> index
         = this->system_to_component_index(i);
@@ -1098,30 +1098,30 @@ FiniteElement<dim,spacedim>::memory_consumption () const
 template<>
 void
 FiniteElement<1,2>::compute_2nd (
-  const Mapping<1,2>                   &,
+  const Mapping<1,2> &,
   const Triangulation<1,2>::cell_iterator &,
   const unsigned int,
   Mapping<1,2>::InternalDataBase &,
-  InternalDataBase                     &,
-  FEValuesData<1,2>                    &) const
+  InternalDataBase &,
+  FEValuesData<1,2> &) const
 {
 
-        Assert(false, ExcNotImplemented());
+  Assert(false, ExcNotImplemented());
 }
 
 
 template<>
 void
 FiniteElement<1,3>::compute_2nd (
-  const Mapping<1,3>                   &,
+  const Mapping<1,3> &,
   const Triangulation<1,3>::cell_iterator &,
   const unsigned int,
   Mapping<1,3>::InternalDataBase &,
-  InternalDataBase                     &,
-  FEValuesData<1,3>                    &) const
+  InternalDataBase &,
+  FEValuesData<1,3> &) const
 {
 
-        Assert(false, ExcNotImplemented());
+  Assert(false, ExcNotImplemented());
 }
 
 
@@ -1129,15 +1129,15 @@ FiniteElement<1,3>::compute_2nd (
 template<>
 void
 FiniteElement<2,3>::compute_2nd (
-  const Mapping<2,3>                   &,
+  const Mapping<2,3> &,
   const Triangulation<2,3>::cell_iterator &,
   const unsigned int,
   Mapping<2,3>::InternalDataBase &,
-  InternalDataBase                     &,
-  FEValuesData<2,3>                    &) const
+  InternalDataBase &,
+  FEValuesData<2,3> &) const
 {
 
-        Assert(false, ExcNotImplemented());
+  Assert(false, ExcNotImplemented());
 }
 
 
@@ -1162,12 +1162,12 @@ FiniteElement<dim,spacedim>::compute_2nd (
 //                        n_nonzero_components_table.end(),
 //                        0U),
 //        ExcInternalError());
-                                   // Number of quadrature points
+  // Number of quadrature points
   const unsigned int n_q_points = data.shape_hessians[0].size();
 
-                                   // first reinit the fe_values
-                                   // objects used for the finite
-                                   // differencing stuff
+  // first reinit the fe_values
+  // objects used for the finite
+  // differencing stuff
   for (unsigned int d=0; d<dim; ++d)
     {
       fe_internal.differences[d]->reinit(cell);
@@ -1177,18 +1177,18 @@ FiniteElement<dim,spacedim>::compute_2nd (
                            - n_q_points));
     }
 
-                                   // collection of difference
-                                   // quotients of gradients in each
-                                   // direction (first index) and at
-                                   // all q-points (second index)
+  // collection of difference
+  // quotients of gradients in each
+  // direction (first index) and at
+  // all q-points (second index)
   std::vector<std::vector<Tensor<1,dim> > >
-    diff_quot (spacedim, std::vector<Tensor<1,dim> > (n_q_points));
+  diff_quot (spacedim, std::vector<Tensor<1,dim> > (n_q_points));
   std::vector<Tensor<1,spacedim> > diff_quot2 (n_q_points);
 
-                                   // for all nonzero components of
-                                   // all shape functions at all
-                                   // quadrature points and difference
-                                   // quotients in all directions:
+  // for all nonzero components of
+  // all shape functions at all
+  // quadrature points and difference
+  // quotients in all directions:
   unsigned int total_index = 0;
   for (unsigned int shape_index=0; shape_index<this->dofs_per_cell; ++shape_index)
     for (unsigned int n=0; n<n_nonzero_components(shape_index); ++n, ++total_index)
@@ -1196,21 +1196,21 @@ FiniteElement<dim,spacedim>::compute_2nd (
         for (unsigned int d1=0; d1<dim; ++d1)
           for (unsigned int q=0; q<n_q_points; ++q)
             {
-                                               // get gradient at points
-                                               // shifted slightly to
-                                               // the right and to the
-                                               // left in the present
-                                               // coordinate direction
-                                               //
-                                               // note that things
-                                               // might be more
-                                               // difficult if the
-                                               // shape function has
-                                               // more than one
-                                               // non-zero component,
-                                               // so find out about
-                                               // the actual component
-                                               // if necessary
+              // get gradient at points
+              // shifted slightly to
+              // the right and to the
+              // left in the present
+              // coordinate direction
+              //
+              // note that things
+              // might be more
+              // difficult if the
+              // shape function has
+              // more than one
+              // non-zero component,
+              // so find out about
+              // the actual component
+              // if necessary
               Tensor<1,spacedim> right, left;
               if (is_primitive(shape_index))
                 {
@@ -1219,31 +1219,31 @@ FiniteElement<dim,spacedim>::compute_2nd (
                 }
               else
                 {
-                                                   // get the
-                                                   // component index
-                                                   // of the n-th
-                                                   // nonzero
-                                                   // compoment
+                  // get the
+                  // component index
+                  // of the n-th
+                  // nonzero
+                  // compoment
                   unsigned int component=0;
                   for (unsigned int nonzero_comp=0; component<this->n_components();
                        ++component)
                     if (nonzero_components[shape_index][component] == true)
                       {
                         ++nonzero_comp;
-                                                         // check
-                                                         // whether we
-                                                         // have found
-                                                         // the
-                                                         // component
-                                                         // we are
-                                                         // looking
-                                                         // for. note
-                                                         // that
-                                                         // nonzero_comp
-                                                         // is 1-based
-                                                         // by the way
-                                                         // we compute
-                                                         // it
+                        // check
+                        // whether we
+                        // have found
+                        // the
+                        // component
+                        // we are
+                        // looking
+                        // for. note
+                        // that
+                        // nonzero_comp
+                        // is 1-based
+                        // by the way
+                        // we compute
+                        // it
                         if (nonzero_comp == n+1)
                           break;
                       }
@@ -1256,19 +1256,19 @@ FiniteElement<dim,spacedim>::compute_2nd (
                           ->shape_grad_component(shape_index, q+offset, component);
                 };
 
-                                               // compute the second
-                                               // derivative from a
-                                               // symmetric difference
-                                               // approximation
+              // compute the second
+              // derivative from a
+              // symmetric difference
+              // approximation
               for (unsigned int d=0; d<spacedim; ++d)
                 diff_quot[d][q][d1] = 1./(2*fd_step_length) * (right[d]-left[d]);
             }
 
-                                         // up to now we still have
-                                         // difference quotients on the
-                                         // unit cell, so transform it
-                                         // to something on the real
-                                         // cell
+        // up to now we still have
+        // difference quotients on the
+        // unit cell, so transform it
+        // to something on the real
+        // cell
         for (unsigned int d=0; d<spacedim; ++d)
           {
             mapping.transform (diff_quot[d], diff_quot2, mapping_internal, mapping_covariant);
@@ -1301,8 +1301,8 @@ FiniteElement<dim,spacedim>::compute_n_nonzero_components (
 template <int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 FiniteElement<dim,spacedim>::get_face_data (const UpdateFlags       flags,
-                                   const Mapping<dim,spacedim>      &mapping,
-                                   const Quadrature<dim-1> &quadrature) const
+                                            const Mapping<dim,spacedim>      &mapping,
+                                            const Quadrature<dim-1> &quadrature) const
 {
   return get_data (flags, mapping,
                    QProjector<dim>::project_to_all_faces(quadrature));
@@ -1313,8 +1313,8 @@ FiniteElement<dim,spacedim>::get_face_data (const UpdateFlags       flags,
 template <int dim, int spacedim>
 typename Mapping<dim,spacedim>::InternalDataBase *
 FiniteElement<dim,spacedim>::get_subface_data (const UpdateFlags        flags,
-                                      const Mapping<dim,spacedim>      &mapping,
-                                      const Quadrature<dim-1> &quadrature) const
+                                               const Mapping<dim,spacedim>      &mapping,
+                                               const Quadrature<dim-1> &quadrature) const
 {
   return get_data (flags, mapping,
                    QProjector<dim>::project_to_all_subfaces(quadrature));
@@ -1323,12 +1323,12 @@ FiniteElement<dim,spacedim>::get_subface_data (const UpdateFlags        flags,
 
 
 template <int dim, int spacedim>
-const FiniteElement<dim,spacedim>&
+const FiniteElement<dim,spacedim> &
 FiniteElement<dim,spacedim>::base_element(const unsigned int index) const
 {
   Assert (index==0, ExcIndexRange(index,0,1));
-                                   // This function should not be
-                                   // called for a system element
+  // This function should not be
+  // called for a system element
   Assert (base_to_block_indices.size() == 1, ExcInternalError());
   return *this;
 }

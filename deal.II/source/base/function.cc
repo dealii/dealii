@@ -27,16 +27,16 @@ const unsigned int Function<dim>::dimension;
 template <int dim>
 Function<dim>::Function (const unsigned int n_components,
                          const double       initial_time)
-                :
-                FunctionTime(initial_time),
-                n_components(n_components)
+  :
+  FunctionTime(initial_time),
+  n_components(n_components)
 {
-                                   // avoid the construction of function
-                                   // objects that don't return any
-                                   // values. This doesn't make much sense in
-                                   // the first place, but will lead to odd
-                                   // errors later on (happened to me in fact
-                                   // :-)
+  // avoid the construction of function
+  // objects that don't return any
+  // values. This doesn't make much sense in
+  // the first place, but will lead to odd
+  // errors later on (happened to me in fact
+  // :-)
   Assert (n_components > 0,
           ExcZero());
 }
@@ -49,7 +49,7 @@ Function<dim>::~Function ()
 
 
 template <int dim>
-Function<dim> & Function<dim>::operator= (const Function &f)
+Function<dim> &Function<dim>::operator= (const Function &f)
 {
   AssertDimension (n_components, f.n_components);
   return *this;
@@ -66,11 +66,11 @@ double Function<dim>::value (const Point<dim> &,
 
 
 template <int dim>
-void Function<dim>::vector_value (const Point<dim>& p,
-                                  Vector<double>& v) const
+void Function<dim>::vector_value (const Point<dim> &p,
+                                  Vector<double> &v) const
 {
   AssertDimension(v.size(), this->n_components);
-  for (unsigned int i=0;i<this->n_components;++i)
+  for (unsigned int i=0; i<this->n_components; ++i)
     v(i) = value(p, i);
 }
 
@@ -80,9 +80,9 @@ void Function<dim>::value_list (const std::vector<Point<dim> > &points,
                                 std::vector<double>                     &values,
                                 const unsigned int                       component) const
 {
-                                   // check whether component is in
-                                   // the valid range is up to the
-                                   // derived class
+  // check whether component is in
+  // the valid range is up to the
+  // derived class
   Assert (values.size() == points.size(),
           ExcDimensionMismatch(values.size(), points.size()));
 
@@ -95,9 +95,9 @@ template <int dim>
 void Function<dim>::vector_value_list (const std::vector<Point<dim> > &points,
                                        std::vector<Vector<double> >   &values) const
 {
-                                   // check whether component is in
-                                   // the valid range is up to the
-                                   // derived class
+  // check whether component is in
+  // the valid range is up to the
+  // derived class
   Assert (values.size() == points.size(),
           ExcDimensionMismatch(values.size(), points.size()));
 
@@ -108,12 +108,12 @@ void Function<dim>::vector_value_list (const std::vector<Point<dim> > &points,
 
 template <int dim>
 void Function<dim>::vector_values (
-  const std::vector<Point<dim> >& points,
-  std::vector<std::vector<double> >& values) const
+  const std::vector<Point<dim> > &points,
+  std::vector<std::vector<double> > &values) const
 {
   const unsigned int n = this->n_components;
   AssertDimension (values.size(), n);
-  for (unsigned int i=0;i<n;++i)
+  for (unsigned int i=0; i<n; ++i)
     value_list(points, values[i], i);
 }
 
@@ -129,11 +129,11 @@ Tensor<1,dim> Function<dim>::gradient (const Point<dim> &,
 
 template <int dim>
 void Function<dim>::vector_gradient (
-  const Point<dim>& p,
-  std::vector<Tensor<1,dim> >& v) const
+  const Point<dim> &p,
+  std::vector<Tensor<1,dim> > &v) const
 {
   AssertDimension(v.size(), this->n_components);
-  for (unsigned int i=0;i<this->n_components;++i)
+  for (unsigned int i=0; i<this->n_components; ++i)
     v[i] = gradient(p, i);
 }
 
@@ -169,12 +169,12 @@ void Function<dim>::vector_gradient_list (const std::vector<Point<dim> >        
 
 template <int dim>
 void Function<dim>::vector_gradients (
-  const std::vector<Point<dim> >& points,
-  std::vector<std::vector<Tensor<1,dim> > >& values) const
+  const std::vector<Point<dim> > &points,
+  std::vector<std::vector<Tensor<1,dim> > > &values) const
 {
   const unsigned int n = this->n_components;
   AssertDimension (values.size(), n);
-  for (unsigned int i=0;i<n;++i)
+  for (unsigned int i=0; i<n; ++i)
     gradient_list(points, values[i], i);
 }
 
@@ -191,7 +191,7 @@ double Function<dim>::laplacian (const Point<dim> &,
 
 template <int dim>
 void Function<dim>::vector_laplacian (const Point<dim> &,
-                                      Vector<double>   &) const
+                                      Vector<double> &) const
 {
   Assert (false, ExcPureFunctionCalled());
 }
@@ -203,9 +203,9 @@ void Function<dim>::laplacian_list (const std::vector<Point<dim> > &points,
                                     std::vector<double>            &laplacians,
                                     const unsigned int              component) const
 {
-                                   // check whether component is in
-                                   // the valid range is up to the
-                                   // derived class
+  // check whether component is in
+  // the valid range is up to the
+  // derived class
   Assert (laplacians.size() == points.size(),
           ExcDimensionMismatch(laplacians.size(), points.size()));
 
@@ -218,9 +218,9 @@ template <int dim>
 void Function<dim>::vector_laplacian_list (const std::vector<Point<dim> > &points,
                                            std::vector<Vector<double> >   &laplacians) const
 {
-                                   // check whether component is in
-                                   // the valid range is up to the
-                                   // derived class
+  // check whether component is in
+  // the valid range is up to the
+  // derived class
   Assert (laplacians.size() == points.size(),
           ExcDimensionMismatch(laplacians.size(), points.size()));
 
@@ -234,8 +234,8 @@ template <int dim>
 std::size_t
 Function<dim>::memory_consumption () const
 {
-                                   // only simple data elements, so
-                                   // use sizeof operator
+  // only simple data elements, so
+  // use sizeof operator
   return sizeof (*this);
 }
 
@@ -244,8 +244,8 @@ Function<dim>::memory_consumption () const
 
 template <int dim>
 ZeroFunction<dim>::ZeroFunction (const unsigned int n_components)
-                :
-                Function<dim> (n_components)
+  :
+  Function<dim> (n_components)
 {}
 
 
@@ -276,7 +276,8 @@ void ZeroFunction<dim>::vector_value (const Point<dim> &,
 template <int dim>
 void ZeroFunction<dim>::value_list (const std::vector<Point<dim> > &points,
                                     std::vector<double>            &values,
-                                    const unsigned int         /*component*/) const {
+                                    const unsigned int         /*component*/) const
+{
   Assert (values.size() == points.size(),
           ExcDimensionMismatch(values.size(), points.size()));
 
@@ -309,7 +310,7 @@ Tensor<1,dim> ZeroFunction<dim>::gradient (const Point<dim> &,
 
 
 template <int dim>
-void ZeroFunction<dim>::vector_gradient (const Point<dim>       &,
+void ZeroFunction<dim>::vector_gradient (const Point<dim> &,
                                          std::vector<Tensor<1,dim> > &gradients) const
 {
   Assert (gradients.size() == this->n_components,
@@ -354,9 +355,9 @@ void ZeroFunction<dim>::vector_gradient_list (const std::vector<Point<dim> >    
 template <int dim>
 ConstantFunction<dim>::ConstantFunction (const double value,
                                          const unsigned int n_components)
-                :
-                ZeroFunction<dim> (n_components),
-                function_value    (value)
+  :
+  ZeroFunction<dim> (n_components),
+  function_value    (value)
 {}
 
 
@@ -425,8 +426,8 @@ template <int dim>
 std::size_t
 ConstantFunction<dim>::memory_consumption () const
 {
-                                   // only simple data elements, so
-                                   // use sizeof operator
+  // only simple data elements, so
+  // use sizeof operator
   return sizeof (*this);
 }
 
@@ -437,9 +438,9 @@ ComponentSelectFunction<dim>::
 ComponentSelectFunction (const unsigned int selected,
                          const double value,
                          const unsigned int n_components)
-                :
-                ConstantFunction<dim> (value, n_components),
-                selected_components(std::make_pair(selected,selected+1))
+  :
+  ConstantFunction<dim> (value, n_components),
+  selected_components(std::make_pair(selected,selected+1))
 {}
 
 
@@ -448,9 +449,9 @@ template <int dim>
 ComponentSelectFunction<dim>::
 ComponentSelectFunction (const unsigned int selected,
                          const unsigned int n_components)
-                :
-                ConstantFunction<dim> (1., n_components),
-                selected_components(std::make_pair(selected,selected+1))
+  :
+  ConstantFunction<dim> (1., n_components),
+  selected_components(std::make_pair(selected,selected+1))
 {
   Assert (selected < n_components,
           ExcIndexRange (selected, 0, n_components));
@@ -462,9 +463,9 @@ template <int dim>
 ComponentSelectFunction<dim>::
 ComponentSelectFunction (const std::pair<unsigned int,unsigned int> &selected,
                          const unsigned int n_components)
-                :
-                ConstantFunction<dim> (1., n_components),
-                selected_components(selected)
+  :
+  ConstantFunction<dim> (1., n_components),
+  selected_components(selected)
 {
   Assert (selected_components.first < selected_components.second,
           ExcMessage ("The upper bound of the interval must be larger than "
@@ -509,8 +510,8 @@ template <int dim>
 std::size_t
 ComponentSelectFunction<dim>::memory_consumption () const
 {
-                                   // only simple data elements, so
-                                   // use sizeof operator
+  // only simple data elements, so
+  // use sizeof operator
   return sizeof (*this);
 }
 
@@ -518,9 +519,9 @@ ComponentSelectFunction<dim>::memory_consumption () const
 template <int dim>
 ScalarFunctionFromFunctionObject<dim>::
 ScalarFunctionFromFunctionObject (const std_cxx1x::function<double (const Point<dim> &)> &function_object)
-:
-Function<dim>(1),
-function_object (function_object)
+  :
+  Function<dim>(1),
+  function_object (function_object)
 {}
 
 
@@ -542,10 +543,10 @@ VectorFunctionFromScalarFunctionObject<dim>::
 VectorFunctionFromScalarFunctionObject (const std_cxx1x::function<double (const Point<dim> &)> &function_object,
                                         const unsigned int selected_component,
                                         const unsigned int n_components)
-:
-Function<dim>(n_components),
-function_object (function_object),
-selected_component (selected_component)
+  :
+  Function<dim>(n_components),
+  function_object (function_object),
+  selected_component (selected_component)
 {
   Assert (selected_component < this->n_components,
           ExcIndexRange (selected_component, 0, this->n_components));

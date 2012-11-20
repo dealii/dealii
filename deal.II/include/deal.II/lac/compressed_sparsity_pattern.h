@@ -87,391 +87,391 @@ template <typename number> class SparseMatrix;
  */
 class CompressedSparsityPattern : public Subscriptor
 {
-  public:
-                                     /**
-                                      * An iterator that can be used to
-                                      * iterate over the elements of a single
-                                      * row. The result of dereferencing such
-                                      * an iterator is a column index.
-                                      */
-    typedef std::vector<unsigned int>::const_iterator row_iterator;
+public:
+  /**
+   * An iterator that can be used to
+   * iterate over the elements of a single
+   * row. The result of dereferencing such
+   * an iterator is a column index.
+   */
+  typedef std::vector<unsigned int>::const_iterator row_iterator;
 
-                                     /**
-                                      * Initialize the matrix empty,
-                                      * that is with no memory
-                                      * allocated. This is useful if
-                                      * you want such objects as
-                                      * member variables in other
-                                      * classes. You can make the
-                                      * structure usable by calling
-                                      * the reinit() function.
-                                      */
-    CompressedSparsityPattern ();
+  /**
+   * Initialize the matrix empty,
+   * that is with no memory
+   * allocated. This is useful if
+   * you want such objects as
+   * member variables in other
+   * classes. You can make the
+   * structure usable by calling
+   * the reinit() function.
+   */
+  CompressedSparsityPattern ();
 
-                                     /**
-                                      * Copy constructor. This constructor is
-                                      * only allowed to be called if the
-                                      * matrix structure to be copied is
-                                      * empty. This is so in order to prevent
-                                      * involuntary copies of objects for
-                                      * temporaries, which can use large
-                                      * amounts of computing time.  However,
-                                      * copy constructors are needed if yo
-                                      * want to use the STL data types on
-                                      * classes like this, e.g. to write such
-                                      * statements like <tt>v.push_back
-                                      * (CompressedSparsityPattern());</tt>,
-                                      * with @p v a vector of @p
-                                      * CompressedSparsityPattern objects.
-                                      */
-    CompressedSparsityPattern (const CompressedSparsityPattern &);
+  /**
+   * Copy constructor. This constructor is
+   * only allowed to be called if the
+   * matrix structure to be copied is
+   * empty. This is so in order to prevent
+   * involuntary copies of objects for
+   * temporaries, which can use large
+   * amounts of computing time.  However,
+   * copy constructors are needed if yo
+   * want to use the STL data types on
+   * classes like this, e.g. to write such
+   * statements like <tt>v.push_back
+   * (CompressedSparsityPattern());</tt>,
+   * with @p v a vector of @p
+   * CompressedSparsityPattern objects.
+   */
+  CompressedSparsityPattern (const CompressedSparsityPattern &);
 
-                                     /**
-                                      * Initialize a rectangular
-                                      * matrix with @p m rows and
-                                      * @p n columns.
-                                      */
-    CompressedSparsityPattern (const unsigned int m,
-                               const unsigned int n);
+  /**
+   * Initialize a rectangular
+   * matrix with @p m rows and
+   * @p n columns.
+   */
+  CompressedSparsityPattern (const unsigned int m,
+                             const unsigned int n);
 
-                                     /**
-                                      * Initialize a square matrix of
-                                      * dimension @p n.
-                                      */
-    CompressedSparsityPattern (const unsigned int n);
+  /**
+   * Initialize a square matrix of
+   * dimension @p n.
+   */
+  CompressedSparsityPattern (const unsigned int n);
 
-                                     /**
-                                      * Copy operator. For this the
-                                      * same holds as for the copy
-                                      * constructor: it is declared,
-                                      * defined and fine to be called,
-                                      * but the latter only for empty
-                                      * objects.
-                                      */
-    CompressedSparsityPattern & operator = (const CompressedSparsityPattern &);
+  /**
+   * Copy operator. For this the
+   * same holds as for the copy
+   * constructor: it is declared,
+   * defined and fine to be called,
+   * but the latter only for empty
+   * objects.
+   */
+  CompressedSparsityPattern &operator = (const CompressedSparsityPattern &);
 
-                                     /**
-                                      * Reallocate memory and set up
-                                      * data structures for a new
-                                      * matrix with @p m rows and
-                                      * @p n columns, with at most
-                                      * max_entries_per_row() nonzero
-                                      * entries per row.
-                                      */
-    void reinit (const unsigned int m,
-                 const unsigned int n);
+  /**
+   * Reallocate memory and set up
+   * data structures for a new
+   * matrix with @p m rows and
+   * @p n columns, with at most
+   * max_entries_per_row() nonzero
+   * entries per row.
+   */
+  void reinit (const unsigned int m,
+               const unsigned int n);
 
-                                     /**
-                                      * Since this object is kept
-                                      * compressed at all times anway,
-                                      * this function does nothing,
-                                      * but is declared to make the
-                                      * interface of this class as
-                                      * much alike as that of the
-                                      * SparsityPattern class.
-                                      */
-    void compress ();
+  /**
+   * Since this object is kept
+   * compressed at all times anway,
+   * this function does nothing,
+   * but is declared to make the
+   * interface of this class as
+   * much alike as that of the
+   * SparsityPattern class.
+   */
+  void compress ();
 
-                                     /**
-                                      * Return whether the object is
-                                      * empty. It is empty if no
-                                      * memory is allocated, which is
-                                      * the same as that both
-                                      * dimensions are zero.
-                                      */
-    bool empty () const;
+  /**
+   * Return whether the object is
+   * empty. It is empty if no
+   * memory is allocated, which is
+   * the same as that both
+   * dimensions are zero.
+   */
+  bool empty () const;
 
-                                     /**
-                                      * Return the maximum number of
-                                      * entries per row. Note that
-                                      * this number may change as
-                                      * entries are added.
-                                      */
-    unsigned int max_entries_per_row () const;
+  /**
+   * Return the maximum number of
+   * entries per row. Note that
+   * this number may change as
+   * entries are added.
+   */
+  unsigned int max_entries_per_row () const;
 
-                                     /**
-                                      * Add a nonzero entry to the
-                                      * matrix. If the entry already
-                                      * exists, nothing bad happens.
-                                      */
-    void add (const unsigned int i,
-              const unsigned int j);
+  /**
+   * Add a nonzero entry to the
+   * matrix. If the entry already
+   * exists, nothing bad happens.
+   */
+  void add (const unsigned int i,
+            const unsigned int j);
 
-                                     /**
-                                      * Add several nonzero entries to the
-                                      * specified row of the matrix. If the
-                                      * entries already exist, nothing bad
-                                      * happens.
-                                      */
-    template <typename ForwardIterator>
-    void add_entries (const unsigned int row,
-                      ForwardIterator    begin,
-                      ForwardIterator    end,
-                      const bool         indices_are_unique_and_sorted = false);
+  /**
+   * Add several nonzero entries to the
+   * specified row of the matrix. If the
+   * entries already exist, nothing bad
+   * happens.
+   */
+  template <typename ForwardIterator>
+  void add_entries (const unsigned int row,
+                    ForwardIterator    begin,
+                    ForwardIterator    end,
+                    const bool         indices_are_unique_and_sorted = false);
 
-                                     /**
-                                      * Check if a value at a certain
-                                      * position may be non-zero.
-                                      */
-    bool exists (const unsigned int i,
-                 const unsigned int j) const;
+  /**
+   * Check if a value at a certain
+   * position may be non-zero.
+   */
+  bool exists (const unsigned int i,
+               const unsigned int j) const;
 
-                                     /**
-                                      * Make the sparsity pattern
-                                      * symmetric by adding the
-                                      * sparsity pattern of the
-                                      * transpose object.
-                                      *
-                                      * This function throws an
-                                      * exception if the sparsity
-                                      * pattern does not represent a
-                                      * square matrix.
-                                      */
-    void symmetrize ();
+  /**
+   * Make the sparsity pattern
+   * symmetric by adding the
+   * sparsity pattern of the
+   * transpose object.
+   *
+   * This function throws an
+   * exception if the sparsity
+   * pattern does not represent a
+   * square matrix.
+   */
+  void symmetrize ();
 
-                                     /**
-                                      * Print the sparsity of the
-                                      * matrix. The output consists of
-                                      * one line per row of the format
-                                      * <tt>[i,j1,j2,j3,...]</tt>. <i>i</i>
-                                      * is the row number and
-                                      * <i>jn</i> are the allocated
-                                      * columns in this row.
-                                      */
-    void print (std::ostream &out) const;
+  /**
+   * Print the sparsity of the
+   * matrix. The output consists of
+   * one line per row of the format
+   * <tt>[i,j1,j2,j3,...]</tt>. <i>i</i>
+   * is the row number and
+   * <i>jn</i> are the allocated
+   * columns in this row.
+   */
+  void print (std::ostream &out) const;
 
-                                     /**
-                                      * Print the sparsity of the matrix in a
-                                      * format that @p gnuplot understands and
-                                      * which can be used to plot the sparsity
-                                      * pattern in a graphical way. The format
-                                      * consists of pairs <tt>i j</tt> of
-                                      * nonzero elements, each representing
-                                      * one entry of this matrix, one per line
-                                      * of the output file. Indices are
-                                      * counted from zero on, as usual. Since
-                                      * sparsity patterns are printed in the
-                                      * same way as matrices are displayed, we
-                                      * print the negative of the column
-                                      * index, which means that the
-                                      * <tt>(0,0)</tt> element is in the top
-                                      * left rather than in the bottom left
-                                      * corner.
-                                      *
-                                      * Print the sparsity pattern in
-                                      * gnuplot by setting the data style
-                                      * to dots or points and use the
-                                      * @p plot command.
-                                      */
-    void print_gnuplot (std::ostream &out) const;
+  /**
+   * Print the sparsity of the matrix in a
+   * format that @p gnuplot understands and
+   * which can be used to plot the sparsity
+   * pattern in a graphical way. The format
+   * consists of pairs <tt>i j</tt> of
+   * nonzero elements, each representing
+   * one entry of this matrix, one per line
+   * of the output file. Indices are
+   * counted from zero on, as usual. Since
+   * sparsity patterns are printed in the
+   * same way as matrices are displayed, we
+   * print the negative of the column
+   * index, which means that the
+   * <tt>(0,0)</tt> element is in the top
+   * left rather than in the bottom left
+   * corner.
+   *
+   * Print the sparsity pattern in
+   * gnuplot by setting the data style
+   * to dots or points and use the
+   * @p plot command.
+   */
+  void print_gnuplot (std::ostream &out) const;
 
-                                     /**
-                                      * Return number of rows of this
-                                      * matrix, which equals the dimension
-                                      * of the image space.
-                                      */
-    unsigned int n_rows () const;
+  /**
+   * Return number of rows of this
+   * matrix, which equals the dimension
+   * of the image space.
+   */
+  unsigned int n_rows () const;
 
-                                     /**
-                                      * Return number of columns of this
-                                      * matrix, which equals the dimension
-                                      * of the range space.
-                                      */
-    unsigned int n_cols () const;
+  /**
+   * Return number of columns of this
+   * matrix, which equals the dimension
+   * of the range space.
+   */
+  unsigned int n_cols () const;
 
-                                     /**
-                                      * Number of entries in a specific row.
-                                      */
-    unsigned int row_length (const unsigned int row) const;
+  /**
+   * Number of entries in a specific row.
+   */
+  unsigned int row_length (const unsigned int row) const;
 
-                                     /**
-                                      * Access to column number field.
-                                      * Return the column number of
-                                      * the @p indexth entry in @p row.
-                                      */
-    unsigned int column_number (const unsigned int row,
-                                const unsigned int index) const;
+  /**
+   * Access to column number field.
+   * Return the column number of
+   * the @p indexth entry in @p row.
+   */
+  unsigned int column_number (const unsigned int row,
+                              const unsigned int index) const;
 
-                                     /**
-                                      * Return an iterator that can loop over
-                                      * all entries in the given
-                                      * row. Dereferencing the iterator yields
-                                      * a column index.
-                                      */
-    row_iterator row_begin (const unsigned int row) const;
+  /**
+   * Return an iterator that can loop over
+   * all entries in the given
+   * row. Dereferencing the iterator yields
+   * a column index.
+   */
+  row_iterator row_begin (const unsigned int row) const;
 
-                                     /**
-                                      * Returns the end of the current row.
-                                      */
-    row_iterator row_end (const unsigned int row) const;
+  /**
+   * Returns the end of the current row.
+   */
+  row_iterator row_end (const unsigned int row) const;
 
-                                     /**
-                                      * Compute the bandwidth of the matrix
-                                      * represented by this structure. The
-                                      * bandwidth is the maximum of
-                                      * $|i-j|$ for which the index pair
-                                      * $(i,j)$ represents a nonzero entry
-                                      * of the matrix.
-                                      */
-    unsigned int bandwidth () const;
+  /**
+   * Compute the bandwidth of the matrix
+   * represented by this structure. The
+   * bandwidth is the maximum of
+   * $|i-j|$ for which the index pair
+   * $(i,j)$ represents a nonzero entry
+   * of the matrix.
+   */
+  unsigned int bandwidth () const;
 
-                                     /**
-                                      * Return the number of nonzero elements
-                                      * allocated through this sparsity
-                                      * pattern.
-                                      */
-    unsigned int n_nonzero_elements () const;
+  /**
+   * Return the number of nonzero elements
+   * allocated through this sparsity
+   * pattern.
+   */
+  unsigned int n_nonzero_elements () const;
 
-                                     /**
-                                      * Return whether this object stores only
-                                      * those entries that have been added
-                                      * explicitly, or if the sparsity pattern
-                                      * contains elements that have been added
-                                      * through other means (implicitly) while
-                                      * building it. For the current class,
-                                      * the result is always true.
-                                      *
-                                      * This function mainly serves the
-                                      * purpose of describing the current
-                                      * class in cases where several kinds of
-                                      * sparsity patterns can be passed as
-                                      * template arguments.
-                                      */
-    static
-    bool stores_only_added_elements ();
+  /**
+   * Return whether this object stores only
+   * those entries that have been added
+   * explicitly, or if the sparsity pattern
+   * contains elements that have been added
+   * through other means (implicitly) while
+   * building it. For the current class,
+   * the result is always true.
+   *
+   * This function mainly serves the
+   * purpose of describing the current
+   * class in cases where several kinds of
+   * sparsity patterns can be passed as
+   * template arguments.
+   */
+  static
+  bool stores_only_added_elements ();
 
+private:
+  /**
+   * Number of rows that this sparsity
+   * structure shall represent.
+   */
+  unsigned int rows;
+
+  /**
+   * Number of columns that this sparsity
+   * structure shall represent.
+   */
+  unsigned int cols;
+
+  /**
+   * Store some data for each row
+   * describing which entries of this row
+   * are nonzero. Data is organized as
+   * follows: if an entry is added to a
+   * row, it is first added to the #cache
+   * variable, irrespective of whether an
+   * entry with same column number has
+   * already been added. Only if the cache
+   * is full do we flush it by removing
+   * duplicates, removing entries that are
+   * already stored in the @p entries
+   * array, sorting everything, and merging
+   * the two arrays.
+   *
+   * The reasoning behind this scheme is
+   * that memory allocation is expensive,
+   * and we only want to do it when really
+   * necessary. Previously (in deal.II
+   * versions up to 5.0), we used to store
+   * the column indices inside a std::set,
+   * but this would allocate 20 bytes each
+   * time we added an entry. (A std::set
+   * based class has later been revived in
+   * form of the
+   * CompressedSetSparsityPattern class, as
+   * this turned out to be more efficient
+   * for hp finite element programs such as
+   * step-27). Using the
+   * present scheme, we only need to
+   * allocate memory once for every 8 added
+   * entries, and we waste a lot less
+   * memory by not using a balanced tree
+   * for storing column indices.
+   *
+   * Since some functions that are @p const
+   * need to access the data of this
+   * object, but need to flush caches
+   * before, the flush_cache() function is
+   * marked const, and the data members are
+   * marked @p mutable.
+   *
+   * A small testseries about the size of
+   * the cache showed that the run time of
+   * a small program just testing the
+   * compressed sparsity pattern element
+   * insertion routine ran for 3.6 seconds
+   * with a cache size of 8, and 4.2
+   * seconds with a cache size of 16. We
+   * deem even smaller cache sizes
+   * undesirable, since they lead to more
+   * memory allocations, while larger cache
+   * sizes lead to waste of memory. The
+   * original version of this class, with
+   * one std::set per row took 8.2 seconds
+   * on the same program.
+   */
+  struct Line
+  {
   private:
-                                     /**
-                                      * Number of rows that this sparsity
-                                      * structure shall represent.
-                                      */
-    unsigned int rows;
+    /**
+     * Size of the cache.
+     */
+    static const unsigned int cache_size = 8;
 
-                                     /**
-                                      * Number of columns that this sparsity
-                                      * structure shall represent.
-                                      */
-    unsigned int cols;
+  public:
+    /**
+     * Storage for the column indices of
+     * this row, unless they are still in
+     * the cache. This array is always
+     * kept sorted.
+     */
+    mutable std::vector<unsigned int> entries;
 
-                                     /**
-                                      * Store some data for each row
-                                      * describing which entries of this row
-                                      * are nonzero. Data is organized as
-                                      * follows: if an entry is added to a
-                                      * row, it is first added to the #cache
-                                      * variable, irrespective of whether an
-                                      * entry with same column number has
-                                      * already been added. Only if the cache
-                                      * is full do we flush it by removing
-                                      * duplicates, removing entries that are
-                                      * already stored in the @p entries
-                                      * array, sorting everything, and merging
-                                      * the two arrays.
-                                      *
-                                      * The reasoning behind this scheme is
-                                      * that memory allocation is expensive,
-                                      * and we only want to do it when really
-                                      * necessary. Previously (in deal.II
-                                      * versions up to 5.0), we used to store
-                                      * the column indices inside a std::set,
-                                      * but this would allocate 20 bytes each
-                                      * time we added an entry. (A std::set
-                                      * based class has later been revived in
-                                      * form of the
-                                      * CompressedSetSparsityPattern class, as
-                                      * this turned out to be more efficient
-                                      * for hp finite element programs such as
-                                      * step-27). Using the
-                                      * present scheme, we only need to
-                                      * allocate memory once for every 8 added
-                                      * entries, and we waste a lot less
-                                      * memory by not using a balanced tree
-                                      * for storing column indices.
-                                      *
-                                      * Since some functions that are @p const
-                                      * need to access the data of this
-                                      * object, but need to flush caches
-                                      * before, the flush_cache() function is
-                                      * marked const, and the data members are
-                                      * marked @p mutable.
-                                      *
-                                      * A small testseries about the size of
-                                      * the cache showed that the run time of
-                                      * a small program just testing the
-                                      * compressed sparsity pattern element
-                                      * insertion routine ran for 3.6 seconds
-                                      * with a cache size of 8, and 4.2
-                                      * seconds with a cache size of 16. We
-                                      * deem even smaller cache sizes
-                                      * undesirable, since they lead to more
-                                      * memory allocations, while larger cache
-                                      * sizes lead to waste of memory. The
-                                      * original version of this class, with
-                                      * one std::set per row took 8.2 seconds
-                                      * on the same program.
-                                      */
-    struct Line
-    {
-      private:
-                                         /**
-                                          * Size of the cache.
-                                          */
-        static const unsigned int cache_size = 8;
+    /**
+     * Cache of entries that have not yet
+     * been written to #entries;
+     */
+    mutable unsigned int cache[cache_size];
 
-      public:
-                                         /**
-                                          * Storage for the column indices of
-                                          * this row, unless they are still in
-                                          * the cache. This array is always
-                                          * kept sorted.
-                                          */
-        mutable std::vector<unsigned int> entries;
+    /**
+     * Number of entries in the cache.
+     */
+    mutable unsigned int cache_entries;
 
-                                         /**
-                                          * Cache of entries that have not yet
-                                          * been written to #entries;
-                                          */
-        mutable unsigned int cache[cache_size];
+    /**
+     * Constructor.
+     */
+    Line ();
 
-                                         /**
-                                          * Number of entries in the cache.
-                                          */
-        mutable unsigned int cache_entries;
+    /**
+     * Add the given column number to
+     * this line.
+     */
+    void add (const unsigned int col_num);
 
-                                         /**
-                                          * Constructor.
-                                          */
-        Line ();
+    /**
+     * Add the columns specified by the
+     * iterator range to this line.
+     */
+    template <typename ForwardIterator>
+    void add_entries (ForwardIterator begin,
+                      ForwardIterator end,
+                      const bool indices_are_sorted);
 
-                                         /**
-                                          * Add the given column number to
-                                          * this line.
-                                          */
-        void add (const unsigned int col_num);
-
-                                         /**
-                                          * Add the columns specified by the
-                                          * iterator range to this line.
-                                          */
-        template <typename ForwardIterator>
-        void add_entries (ForwardIterator begin,
-                          ForwardIterator end,
-                          const bool indices_are_sorted);
-
-                                         /**
-                                          * Flush the cache my merging it with
-                                          * the #entries array.
-                                          */
-        void flush_cache () const;
-    };
+    /**
+     * Flush the cache my merging it with
+     * the #entries array.
+     */
+    void flush_cache () const;
+  };
 
 
-                                     /**
-                                      * Actual data: store for each
-                                      * row the set of nonzero
-                                      * entries.
-                                      */
-    std::vector<Line> lines;
+  /**
+   * Actual data: store for each
+   * row the set of nonzero
+   * entries.
+   */
+  std::vector<Line> lines;
 };
 
 /*@}*/
@@ -482,16 +482,16 @@ inline
 void
 CompressedSparsityPattern::Line::add (const unsigned int j)
 {
-                                   // first check whether this entry is
-                                   // already in the cache. if so, we can
-                                   // safely return
+  // first check whether this entry is
+  // already in the cache. if so, we can
+  // safely return
   for (unsigned int i=0; i<cache_entries; ++i)
     if (cache[i] == j)
       return;
 
-                                   // if not, see whether there is still some
-                                   // space in the cache. if not, then flush
-                                   // the cache first
+  // if not, see whether there is still some
+  // space in the cache. if not, then flush
+  // the cache first
   if (cache_entries == cache_size && cache_entries != 0)
     flush_cache ();
 
@@ -549,8 +549,8 @@ CompressedSparsityPattern::add_entries (const unsigned int row,
 
 inline
 CompressedSparsityPattern::Line::Line ()
-                :
-                cache_entries (0)
+  :
+  cache_entries (0)
 {}
 
 

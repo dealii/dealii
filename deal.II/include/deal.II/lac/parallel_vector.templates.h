@@ -29,10 +29,10 @@ namespace parallel
     Vector<Number>::clear_mpi_requests ()
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-      for (unsigned int j=0;j<compress_requests.size();j++)
+      for (unsigned int j=0; j<compress_requests.size(); j++)
         MPI_Request_free(&compress_requests[j]);
       compress_requests.clear();
-      for (unsigned int j=0;j<update_ghost_values_requests.size();j++)
+      for (unsigned int j=0; j<update_ghost_values_requests.size(); j++)
         MPI_Request_free(&update_ghost_values_requests[j]);
       update_ghost_values_requests.clear();
 #endif
@@ -70,21 +70,21 @@ namespace parallel
                             const bool         fast)
     {
       clear_mpi_requests();
-                                // check whether we need to reallocate
+      // check whether we need to reallocate
       resize_val (size);
 
-                                // reset vector view
+      // reset vector view
       vector_view.reinit (size, val);
 
-                                // delete previous content in import data
+      // delete previous content in import data
       if (import_data != 0)
         delete[] import_data;
       import_data = 0;
 
-                                // set partitioner to serial version
+      // set partitioner to serial version
       partitioner.reset (new Utilities::MPI::Partitioner (size));
 
-                                // set entries to zero if so requested
+      // set entries to zero if so requested
       if (fast == false)
         this->operator = (Number());
     }
@@ -100,15 +100,15 @@ namespace parallel
       clear_mpi_requests();
       Assert (v.partitioner.get() != 0, ExcNotInitialized());
 
-                                // check whether the partitioners are
-                                // different (check only if the are allocated
-                                // differently, not if the actual data is
-                                // different)
+      // check whether the partitioners are
+      // different (check only if the are allocated
+      // differently, not if the actual data is
+      // different)
       if (partitioner.get() != v.partitioner.get())
         {
           partitioner = v.partitioner;
           const unsigned int new_allocated_size = partitioner->local_size() +
-            partitioner->n_ghost_indices();
+                                                  partitioner->n_ghost_indices();
           resize_val (new_allocated_size);
           vector_view.reinit (partitioner->local_size(), val);
         }
@@ -123,12 +123,12 @@ namespace parallel
         {
           delete [] import_data;
 
-                                // do not reallocate import_data directly, but
-                                // only upon request. It is only used as
-                                // temporary storage for compress() and
-                                // update_ghost_values, and we might have vectors where
-                                // we never call these methods and hence do
-                                // not need to have the storage.
+          // do not reallocate import_data directly, but
+          // only upon request. It is only used as
+          // temporary storage for compress() and
+          // update_ghost_values, and we might have vectors where
+          // we never call these methods and hence do
+          // not need to have the storage.
           import_data = 0;
         }
     }
@@ -141,11 +141,11 @@ namespace parallel
                             const IndexSet &ghost_indices,
                             const MPI_Comm  communicator)
     {
-                                // set up parallel partitioner with index sets
-                                // and communicator
+      // set up parallel partitioner with index sets
+      // and communicator
       std_cxx1x::shared_ptr<const Utilities::MPI::Partitioner> new_partitioner
-        (new Utilities::MPI::Partitioner (locally_owned_indices,
-                                          ghost_indices, communicator));
+      (new Utilities::MPI::Partitioner (locally_owned_indices,
+                                        ghost_indices, communicator));
       reinit (new_partitioner);
     }
 
@@ -158,25 +158,25 @@ namespace parallel
       clear_mpi_requests();
       partitioner = partitioner_in;
 
-                                // set vector size and allocate memory
+      // set vector size and allocate memory
       const unsigned int new_allocated_size = partitioner->local_size() +
-        partitioner->n_ghost_indices();
+                                              partitioner->n_ghost_indices();
       resize_val (new_allocated_size);
       vector_view.reinit (partitioner->local_size(), val);
 
-                                // initialize to zero
+      // initialize to zero
       this->operator= (Number());
 
       if (import_data != 0)
         {
           delete [] import_data;
 
-                                // do not reallocate import_data directly, but
-                                // only upon request. It is only used as
-                                // temporary storage for compress() and
-                                // update_ghost_values, and we might have vectors where
-                                // we never call these methods and hence do
-                                // not need to have the storage.
+          // do not reallocate import_data directly, but
+          // only upon request. It is only used as
+          // temporary storage for compress() and
+          // update_ghost_values, and we might have vectors where
+          // we never call these methods and hence do
+          // not need to have the storage.
           import_data = 0;
         }
     }
@@ -204,31 +204,31 @@ namespace parallel
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       const Utilities::MPI::Partitioner &part = *partitioner;
 
-                                // nothing to do when we neither have import
-                                // nor ghost indices.
+      // nothing to do when we neither have import
+      // nor ghost indices.
       if (part.n_ghost_indices()==0 && part.n_import_indices()==0)
         return;
 
-                                // make this function thread safe
+      // make this function thread safe
       Threads::ThreadMutex::ScopedLock lock (mutex);
 
       const unsigned int n_import_targets = part.import_targets().size();
       const unsigned int n_ghost_targets  = part.ghost_targets().size();
 
-                                // Need to send and receive the data. Use
-                                // non-blocking communication, where it is
-                                // generally less overhead to first initiate
-                                // the receive and then actually send the data
+      // Need to send and receive the data. Use
+      // non-blocking communication, where it is
+      // generally less overhead to first initiate
+      // the receive and then actually send the data
       if (compress_requests.size() == 0)
         {
-                                // set channels in different range from
-                                // update_ghost_values channels
+          // set channels in different range from
+          // update_ghost_values channels
           const unsigned int channel = counter + 400;
           unsigned int current_index_start = 0;
           compress_requests.resize (n_import_targets + n_ghost_targets);
 
-                                // allocate import_data in case it is not set
-                                // up yet
+          // allocate import_data in case it is not set
+          // up yet
           if (import_data == 0)
             import_data = new Number[part.n_import_indices()];
           for (unsigned int i=0; i<n_import_targets; i++)
@@ -285,12 +285,12 @@ namespace parallel
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       const Utilities::MPI::Partitioner &part = *partitioner;
 
-                                // nothing to do when we neither have import
-                                // nor ghost indices.
+      // nothing to do when we neither have import
+      // nor ghost indices.
       if (part.n_ghost_indices()==0 && part.n_import_indices()==0)
         return;
 
-                                // make this function thread safe
+      // make this function thread safe
       Threads::ThreadMutex::ScopedLock lock (mutex);
 
       const unsigned int n_import_targets = part.import_targets().size();
@@ -299,7 +299,7 @@ namespace parallel
       AssertDimension (n_ghost_targets+n_import_targets,
                        compress_requests.size());
 
-                                // first wait for the receive to complete
+      // first wait for the receive to complete
       if (n_import_targets > 0)
         {
           int ierr;
@@ -307,13 +307,13 @@ namespace parallel
                               MPI_STATUSES_IGNORE);
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
 
-          Number * read_position = import_data;
+          Number *read_position = import_data;
           std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
-            my_imports = part.import_indices().begin();
+          my_imports = part.import_indices().begin();
 
-                                // If add_ghost_data is set, add the imported
-                                // data to the local values. If not, set the
-                                // vector entries.
+          // If add_ghost_data is set, add the imported
+          // data to the local values. If not, set the
+          // vector entries.
           if (add_ghost_data == true)
             for ( ; my_imports!=part.import_indices().end(); ++my_imports)
               for (unsigned int j=my_imports->first; j<my_imports->second; j++)
@@ -350,21 +350,21 @@ namespace parallel
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       const Utilities::MPI::Partitioner &part = *partitioner;
 
-                                // nothing to do when we neither have import
-                                // nor ghost indices.
+      // nothing to do when we neither have import
+      // nor ghost indices.
       if (part.n_ghost_indices()==0 && part.n_import_indices()==0)
         return;
 
-                                // make this function thread safe
+      // make this function thread safe
       Threads::ThreadMutex::ScopedLock lock (mutex);
 
       const unsigned int n_import_targets = part.import_targets().size();
       const unsigned int n_ghost_targets = part.ghost_targets().size();
 
-                                // Need to send and receive the data. Use
-                                // non-blocking communication, where it is
-                                // generally less overhead to first initiate
-                                // the receive and then actually send the data
+      // Need to send and receive the data. Use
+      // non-blocking communication, where it is
+      // generally less overhead to first initiate
+      // the receive and then actually send the data
       if (update_ghost_values_requests.size() == 0)
         {
           Assert (part.local_size() == vector_view.size(),
@@ -373,9 +373,9 @@ namespace parallel
           update_ghost_values_requests.resize (n_import_targets+n_ghost_targets);
           for (unsigned int i=0; i<n_ghost_targets; i++)
             {
-                                // allow writing into ghost indices even
-                                // though we are in a const function
-              MPI_Recv_init (const_cast<Number*>(&val[current_index_start]),
+              // allow writing into ghost indices even
+              // though we are in a const function
+              MPI_Recv_init (const_cast<Number *>(&val[current_index_start]),
                              part.ghost_targets()[i].second*sizeof(Number),
                              MPI_BYTE,
                              part.ghost_targets()[i].first,
@@ -388,8 +388,8 @@ namespace parallel
           AssertDimension (current_index_start,
                            part.local_size()+part.n_ghost_indices());
 
-                                // allocate import_data in case it is not set
-                                // up yet
+          // allocate import_data in case it is not set
+          // up yet
           if (import_data == 0 && part.n_import_indices() > 0)
             import_data = new Number[part.n_import_indices()];
           current_index_start = 0;
@@ -407,14 +407,14 @@ namespace parallel
           AssertDimension (current_index_start, part.n_import_indices());
         }
 
-                                // copy the data that is actually to be send
-                                // to the import_data field
+      // copy the data that is actually to be send
+      // to the import_data field
       if (part.n_import_indices() > 0)
         {
           Assert (import_data != 0, ExcInternalError());
-          Number * write_position = import_data;
+          Number *write_position = import_data;
           std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
-            my_imports = part.import_indices().begin();
+          my_imports = part.import_indices().begin();
           for ( ; my_imports!=part.import_indices().end(); ++my_imports)
             for (unsigned int j=my_imports->first; j<my_imports->second; j++)
               *write_position++ = local_element(j);
@@ -441,16 +441,16 @@ namespace parallel
     Vector<Number>::update_ghost_values_finish () const
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                                // wait for both sends and receives to
-                                // complete, even though only receives are
-                                // really necessary. this gives (much) better
-                                // performance
+      // wait for both sends and receives to
+      // complete, even though only receives are
+      // really necessary. this gives (much) better
+      // performance
       AssertDimension (partitioner->ghost_targets().size() +
                        partitioner->import_targets().size(),
                        update_ghost_values_requests.size());
       if (update_ghost_values_requests.size() > 0)
         {
-                                // make this function thread safe
+          // make this function thread safe
           Threads::ThreadMutex::ScopedLock lock (mutex);
 
           int ierr;
@@ -469,9 +469,9 @@ namespace parallel
     Vector<Number>::swap (Vector<Number> &v)
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-                                // introduce a Barrier over all MPI processes
-                                // to make sure that the compress request are
-                                // no longer used before changing the owner
+      // introduce a Barrier over all MPI processes
+      // to make sure that the compress request are
+      // no longer used before changing the owner
       if (v.partitioner->n_mpi_processes() > 1)
         MPI_Barrier (v.partitioner->get_communicator());
       if (partitioner->n_mpi_processes() > 1 &&
@@ -488,9 +488,9 @@ namespace parallel
       std::swap (val,            v.val);
       std::swap (import_data,    v.import_data);
 
-                                // vector view cannot be swapped so reset it
-                                // manually (without touching the vector
-                                // elements)
+      // vector view cannot be swapped so reset it
+      // manually (without touching the vector
+      // elements)
       vector_view.reinit (partitioner->local_size(), val);
       v.vector_view.reinit (v.partitioner->local_size(), v.val);
     }
@@ -504,10 +504,10 @@ namespace parallel
       std::size_t memory = sizeof(*this);
       memory += sizeof (Number) * static_cast<std::size_t>(allocated_size);
 
-                                // if the partitioner is shared between more
-                                // processors, just count a fraction of that
-                                // memory, since we're not actually using more
-                                // memory for it.
+      // if the partitioner is shared between more
+      // processors, just count a fraction of that
+      // memory, since we're not actually using more
+      // memory for it.
       if (partitioner.use_count() > 0)
         memory += partitioner->memory_consumption()/partitioner.use_count()+1;
       if (import_data != 0)
@@ -536,10 +536,10 @@ namespace parallel
       else
         out.setf (std::ios::fixed, std::ios::floatfield);
 
-                                // to make the vector write out all the
-                                // information in order, use as many barriers
-                                // as there are processors and start writing
-                                // when it's our turn
+      // to make the vector write out all the
+      // information in order, use as many barriers
+      // as there are processors and start writing
+      // when it's our turn
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       for (unsigned int i=0; i<partitioner->this_mpi_process(); i++)
         MPI_Barrier (partitioner->get_communicator());
@@ -562,11 +562,11 @@ namespace parallel
         for (unsigned int i=0; i<partitioner->n_ghost_indices(); ++i)
           out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
               << '/' << local_element(partitioner->local_size()+i) << ") ";
-    else
-      for (unsigned int i=0; i<partitioner->n_ghost_indices(); ++i)
-        out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
-            << '/' << local_element(partitioner->local_size()+i) << ")"
-            << std::endl;
+      else
+        for (unsigned int i=0; i<partitioner->n_ghost_indices(); ++i)
+          out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
+              << '/' << local_element(partitioner->local_size()+i) << ")"
+              << std::endl;
       out << std::endl << std::flush;
 
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
@@ -578,7 +578,7 @@ namespace parallel
 #endif
 
       AssertThrow (out, ExcIO());
-                                // reset output format
+      // reset output format
       out.flags (old_flags);
       out.precision(old_precision);
     }

@@ -29,17 +29,17 @@ namespace Functions
                                                const Point<dim> p,
                                                const unsigned int n_components,
                                                const unsigned int select)
-                  :
-                  Function<dim> (n_components),
-                  center(p),
-                  radius(r),
-                  selected(select)
+    :
+    Function<dim> (n_components),
+    center(p),
+    radius(r),
+    selected(select)
   {}
 
 
   template<int dim>
   void
-  CutOffFunctionBase<dim>::new_center (const Point<dim>& p)
+  CutOffFunctionBase<dim>::new_center (const Point<dim> &p)
   {
     center = p;
   }
@@ -59,8 +59,8 @@ namespace Functions
                                                    const Point<dim> p,
                                                    const unsigned int n_components,
                                                    const unsigned int select)
-                  :
-                  CutOffFunctionBase<dim> (r, p, n_components, select)
+    :
+    CutOffFunctionBase<dim> (r, p, n_components, select)
   {}
 
 
@@ -92,7 +92,7 @@ namespace Functions
     if (this->selected==CutOffFunctionBase<dim>::no_component
         ||
         component==this->selected)
-      for (unsigned int k=0;k<values.size();++k)
+      for (unsigned int k=0; k<values.size(); ++k)
         values[k] = (this->center.distance(points[k])<this->radius) ? 1. : 0.;
     else
       std::fill (values.begin(), values.end(), 0.);
@@ -108,10 +108,10 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int k=0;k<values.size();++k)
+    for (unsigned int k=0; k<values.size(); ++k)
       {
         const double
-          val = (this->center.distance(points[k])<this->radius) ? 1. : 0.;
+        val = (this->center.distance(points[k])<this->radius) ? 1. : 0.;
         if (this->selected==CutOffFunctionBase<dim>::no_component)
           values[k] = val;
         else
@@ -128,8 +128,8 @@ namespace Functions
                                            const Point<dim> p,
                                            const unsigned int n_components,
                                            const unsigned int select)
-                  :
-                  CutOffFunctionBase<dim> (r, p, n_components, select)
+    :
+    CutOffFunctionBase<dim> (r, p, n_components, select)
   {}
 
 
@@ -161,7 +161,7 @@ namespace Functions
     if (this->selected==CutOffFunctionBase<dim>::no_component
         ||
         component==this->selected)
-      for (unsigned int i=0;i<values.size();++i)
+      for (unsigned int i=0; i<values.size(); ++i)
         {
           const double d = this->center.distance(points[i]);
           values[i] = ((d<this->radius) ? (this->radius-d) : 0.);
@@ -181,11 +181,11 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int k=0;k<values.size();++k)
+    for (unsigned int k=0; k<values.size(); ++k)
       {
         const double d = this->center.distance(points[k]);
         const double
-          val = (d<this->radius) ? (this->radius-d) : 0.;
+        val = (d<this->radius) ? (this->radius-d) : 0.;
         if (this->selected==CutOffFunctionBase<dim>::no_component)
           values[k] = val;
         else
@@ -202,8 +202,8 @@ namespace Functions
                                                    const Point<dim> p,
                                                    const unsigned int n_components,
                                                    const unsigned int select)
-                  :
-                  CutOffFunctionBase<dim> (r, p, n_components, select)
+    :
+    CutOffFunctionBase<dim> (r, p, n_components, select)
   {}
 
 
@@ -241,13 +241,15 @@ namespace Functions
     if (this->selected==CutOffFunctionBase<dim>::no_component
         ||
         component==this->selected)
-      for (unsigned int i=0; i<values.size();++i)
+      for (unsigned int i=0; i<values.size(); ++i)
         {
           const double d = this->center.distance(points[i]);
           if (d>=r)
             {
               values[i] = 0.;
-            } else {
+            }
+          else
+            {
               const double e = -r*r/(r*r-d*d);
               values[i] = (e<-50) ? 0. : numbers::E * exp(e);
             }
@@ -266,7 +268,7 @@ namespace Functions
     Assert (values.size() == points.size(),
             ExcDimensionMismatch(values.size(), points.size()));
 
-    for (unsigned int k=0;k<values.size();++k)
+    for (unsigned int k=0; k<values.size(); ++k)
       {
         const double d = this->center.distance(points[k]);
         const double r = this->radius;

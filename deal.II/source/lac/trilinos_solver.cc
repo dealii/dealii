@@ -30,26 +30,26 @@ namespace TrilinosWrappers
 
   SolverBase::AdditionalData::AdditionalData (const bool         output_solver_details,
                                               const unsigned int gmres_restart_parameter)
-                  :
-                  output_solver_details (output_solver_details),
-                  gmres_restart_parameter (gmres_restart_parameter)
+    :
+    output_solver_details (output_solver_details),
+    gmres_restart_parameter (gmres_restart_parameter)
   {}
 
 
 
   SolverBase::SolverBase (SolverControl  &cn)
-                  :
-                  solver_name    (gmres),
-                  solver_control (cn)
+    :
+    solver_name    (gmres),
+    solver_control (cn)
   {}
 
 
 
   SolverBase::SolverBase (const enum SolverBase::SolverName  solver_name,
                           SolverControl                     &cn)
-                  :
-                  solver_name    (solver_name),
-                  solver_control (cn)
+    :
+    solver_name    (solver_name),
+    solver_control (cn)
   {}
 
 
@@ -77,22 +77,22 @@ namespace TrilinosWrappers
 
     linear_problem.reset();
 
-                                        // We need an
-                                        // Epetra_LinearProblem object
-                                        // to let the AztecOO solver
-                                        // know about the matrix and
-                                        // vectors.
+    // We need an
+    // Epetra_LinearProblem object
+    // to let the AztecOO solver
+    // know about the matrix and
+    // vectors.
     linear_problem.reset
-      (new Epetra_LinearProblem(const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()),
-                                &x.trilinos_vector(),
-                                const_cast<Epetra_MultiVector*>(&b.trilinos_vector())));
+    (new Epetra_LinearProblem(const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()),
+                              &x.trilinos_vector(),
+                              const_cast<Epetra_MultiVector *>(&b.trilinos_vector())));
 
-                                        // Next we can allocate the
-                                        // AztecOO solver...
+    // Next we can allocate the
+    // AztecOO solver...
     solver.SetProblem(*linear_problem);
 
-                                        // ... and we can specify the
-                                        // solver to be used.
+    // ... and we can specify the
+    // solver to be used.
     switch (solver_name)
       {
       case cg:
@@ -115,53 +115,53 @@ namespace TrilinosWrappers
         Assert (false, ExcNotImplemented());
       }
 
-                                        // Introduce the
-                                        // preconditioner, ...
-    ierr = solver.SetPrecOperator (const_cast<Epetra_Operator*>
+    // Introduce the
+    // preconditioner, ...
+    ierr = solver.SetPrecOperator (const_cast<Epetra_Operator *>
                                    (preconditioner.preconditioner.get()));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-                                        // ... set some options, ...
+    // ... set some options, ...
     solver.SetAztecOption (AZ_output, additional_data.output_solver_details ?
-                                      AZ_all : AZ_none);
+                           AZ_all : AZ_none);
     solver.SetAztecOption (AZ_conv, AZ_noscaled);
 
-                                        // ... and then solve!
+    // ... and then solve!
     ierr = solver.Iterate (solver_control.max_steps(),
                            solver_control.tolerance());
 
-                                     // report errors in more detail
-                                     // than just by checking whether
-                                     // the return status is zero or
-                                     // greater. the error strings are
-                                     // taken from the implementation
-                                     // of the AztecOO::Iterate
-                                     // function
+    // report errors in more detail
+    // than just by checking whether
+    // the return status is zero or
+    // greater. the error strings are
+    // taken from the implementation
+    // of the AztecOO::Iterate
+    // function
     switch (ierr)
       {
-        case -1:
-              AssertThrow (false, ExcMessage("AztecOO::Iterate error code -1: "
-                                             "option not implemented"));
-        case -2:
-              AssertThrow (false, ExcMessage("AztecOO::Iterate error code -2: "
-                                             "numerical breakdown"));
-        case -3:
-              AssertThrow (false, ExcMessage("AztecOO::Iterate error code -3: "
-                                             "loss of precision"));
-        case -4:
-              AssertThrow (false, ExcMessage("AztecOO::Iterate error code -4: "
-                                             "GMRES hessenberg ill-conditioned"));
-        default:
-              AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
+      case -1:
+        AssertThrow (false, ExcMessage("AztecOO::Iterate error code -1: "
+                                       "option not implemented"));
+      case -2:
+        AssertThrow (false, ExcMessage("AztecOO::Iterate error code -2: "
+                                       "numerical breakdown"));
+      case -3:
+        AssertThrow (false, ExcMessage("AztecOO::Iterate error code -3: "
+                                       "loss of precision"));
+      case -4:
+        AssertThrow (false, ExcMessage("AztecOO::Iterate error code -4: "
+                                       "GMRES hessenberg ill-conditioned"));
+      default:
+        AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
       }
 
-                                        // Finally, let the deal.II
-                                        // SolverControl object know
-                                        // what has happened. If the
-                                        // solve succeeded, the status
-                                        // of the solver control will
-                                        // turn into
-                                        // SolverControl::success.
+    // Finally, let the deal.II
+    // SolverControl object know
+    // what has happened. If the
+    // solve succeeded, the status
+    // of the solver control will
+    // turn into
+    // SolverControl::success.
     solver_control.check (solver.NumIters(), solver.TrueResidual());
 
     if (solver_control.last_check() != SolverControl::success)
@@ -181,9 +181,9 @@ namespace TrilinosWrappers
 
     linear_problem.reset();
 
-                                        // In case we call the solver with
-                                        // deal.II vectors, we create views
-                                        // of the vectors in Epetra format.
+    // In case we call the solver with
+    // deal.II vectors, we create views
+    // of the vectors in Epetra format.
     Assert (x.size() == A.n(),
             ExcDimensionMismatch(x.size(), A.n()));
     Assert (b.size() == A.m(),
@@ -194,23 +194,23 @@ namespace TrilinosWrappers
             ExcMessage ("Matrix is not compressed. Call compress() method."));
 
     Epetra_Vector ep_x (View, A.domain_partitioner(), x.begin());
-    Epetra_Vector ep_b (View, A.range_partitioner(), const_cast<double*>(b.begin()));
+    Epetra_Vector ep_b (View, A.range_partitioner(), const_cast<double *>(b.begin()));
 
-                                        // We need an
-                                        // Epetra_LinearProblem object
-                                        // to let the AztecOO solver
-                                        // know about the matrix and
-                                        // vectors.
+    // We need an
+    // Epetra_LinearProblem object
+    // to let the AztecOO solver
+    // know about the matrix and
+    // vectors.
     linear_problem.reset (new Epetra_LinearProblem
-                          (const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()),
+                          (const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()),
                            &ep_x, &ep_b));
 
-                                        // Next we can allocate the
-                                        // AztecOO solver...
+    // Next we can allocate the
+    // AztecOO solver...
     solver.SetProblem(*linear_problem);
 
-                                        // ... and we can specify the
-                                        // solver to be used.
+    // ... and we can specify the
+    // solver to be used.
     switch (solver_name)
       {
       case cg:
@@ -233,29 +233,29 @@ namespace TrilinosWrappers
         Assert (false, ExcNotImplemented());
       }
 
-                                        // Introduce the
-                                        // preconditioner, ...
-    ierr = solver.SetPrecOperator (const_cast<Epetra_Operator*>
+    // Introduce the
+    // preconditioner, ...
+    ierr = solver.SetPrecOperator (const_cast<Epetra_Operator *>
                                    (preconditioner.preconditioner.get()));
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
-                                        // ... set some options, ...
+    // ... set some options, ...
     solver.SetAztecOption (AZ_output, additional_data.output_solver_details ?
-                                      AZ_all : AZ_none);
+                           AZ_all : AZ_none);
     solver.SetAztecOption (AZ_conv, AZ_noscaled);
 
-                                        // ... and then solve!
+    // ... and then solve!
     ierr = solver.Iterate (solver_control.max_steps(),
                            solver_control.tolerance());
     AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
 
-                                        // Finally, let the deal.II
-                                        // SolverControl object know
-                                        // what has happened. If the
-                                        // solve succeeded, the status
-                                        // of the solver control will
-                                        // turn into
-                                        // SolverControl::success.
+    // Finally, let the deal.II
+    // SolverControl object know
+    // what has happened. If the
+    // solve succeeded, the status
+    // of the solver control will
+    // turn into
+    // SolverControl::success.
     solver_control.check (solver.NumIters(), solver.TrueResidual());
 
     if (solver_control.last_check() != SolverControl::success)
@@ -267,55 +267,55 @@ namespace TrilinosWrappers
 
 
 
-/* ---------------------- SolverCG ------------------------ */
+  /* ---------------------- SolverCG ------------------------ */
 
   SolverCG::AdditionalData::
   AdditionalData (const bool output_solver_details)
-                  :
-                  output_solver_details (output_solver_details)
+    :
+    output_solver_details (output_solver_details)
   {}
 
 
 
   SolverCG::SolverCG (SolverControl        &cn,
                       const AdditionalData &data)
-                  :
-                  SolverBase (cn),
-                  additional_data (data.output_solver_details)
+    :
+    SolverBase (cn),
+    additional_data (data.output_solver_details)
   {
     solver_name = cg;
   }
 
 
-/* ---------------------- SolverGMRES ------------------------ */
+  /* ---------------------- SolverGMRES ------------------------ */
 
   SolverGMRES::AdditionalData::
-    AdditionalData (const bool output_solver_details,
-                    const unsigned int restart_parameter)
-                  :
-                  output_solver_details (output_solver_details),
-                  restart_parameter (restart_parameter)
+  AdditionalData (const bool output_solver_details,
+                  const unsigned int restart_parameter)
+    :
+    output_solver_details (output_solver_details),
+    restart_parameter (restart_parameter)
   {}
 
 
 
   SolverGMRES::SolverGMRES (SolverControl        &cn,
                             const AdditionalData &data)
-                  :
-                  SolverBase (cn),
-                  additional_data (data.output_solver_details,
-                                   data.restart_parameter)
+    :
+    SolverBase (cn),
+    additional_data (data.output_solver_details,
+                     data.restart_parameter)
   {
     solver_name = gmres;
   }
 
 
-/* ---------------------- SolverBicgstab ------------------------ */
+  /* ---------------------- SolverBicgstab ------------------------ */
 
   SolverBicgstab::AdditionalData::
   AdditionalData (const bool output_solver_details)
-                  :
-                  output_solver_details (output_solver_details)
+    :
+    output_solver_details (output_solver_details)
   {}
 
 
@@ -323,20 +323,20 @@ namespace TrilinosWrappers
 
   SolverBicgstab::SolverBicgstab (SolverControl        &cn,
                                   const AdditionalData &data)
-                  :
-                  SolverBase (cn),
-                  additional_data (data.output_solver_details)
+    :
+    SolverBase (cn),
+    additional_data (data.output_solver_details)
   {
     solver_name = bicgstab;
   }
 
 
-/* ---------------------- SolverCGS ------------------------ */
+  /* ---------------------- SolverCGS ------------------------ */
 
   SolverCGS::AdditionalData::
   AdditionalData (const bool output_solver_details)
-                  :
-                  output_solver_details (output_solver_details)
+    :
+    output_solver_details (output_solver_details)
   {}
 
 
@@ -344,41 +344,41 @@ namespace TrilinosWrappers
 
   SolverCGS::SolverCGS (SolverControl        &cn,
                         const AdditionalData &data)
-                  :
-                  SolverBase (cn),
-                  additional_data (data.output_solver_details)
+    :
+    SolverBase (cn),
+    additional_data (data.output_solver_details)
   {
     solver_name = cgs;
   }
 
 
-/* ---------------------- SolverTFQMR ------------------------ */
+  /* ---------------------- SolverTFQMR ------------------------ */
 
   SolverTFQMR::AdditionalData::
   AdditionalData (const bool output_solver_details)
-                  :
-                  output_solver_details (output_solver_details)
+    :
+    output_solver_details (output_solver_details)
   {}
 
 
 
   SolverTFQMR::SolverTFQMR (SolverControl        &cn,
                             const AdditionalData &data)
-                  :
-                  SolverBase (cn),
-                  additional_data (data.output_solver_details)
+    :
+    SolverBase (cn),
+    additional_data (data.output_solver_details)
   {
     solver_name = tfqmr;
   }
 
 
 
-/* ---------------------- SolverDirect ------------------------ */
+  /* ---------------------- SolverDirect ------------------------ */
 
   SolverDirect::AdditionalData::
   AdditionalData (const bool output_solver_details)
-                  :
-                  output_solver_details (output_solver_details)
+    :
+    output_solver_details (output_solver_details)
   {}
 
 
@@ -386,9 +386,9 @@ namespace TrilinosWrappers
 
   SolverDirect::SolverDirect (SolverControl  &cn,
                               const AdditionalData &data)
-                  :
-                  solver_control (cn),
-                  additional_data (data.output_solver_details)
+    :
+    solver_control (cn),
+    additional_data (data.output_solver_details)
   {}
 
 
@@ -411,27 +411,27 @@ namespace TrilinosWrappers
                        VectorBase             &x,
                        const VectorBase       &b)
   {
-                                       // First set whether we want to print
-                                       // the solver information to screen
-                                       // or not.
+    // First set whether we want to print
+    // the solver information to screen
+    // or not.
     ConditionalOStream  verbose_cout (std::cout,
                                       additional_data.output_solver_details);
 
     linear_problem.reset();
     solver.reset();
 
-                                        // We need an
-                                        // Epetra_LinearProblem object
-                                        // to let the AztecOO solver
-                                        // know about the matrix and
-                                        // vectors.
+    // We need an
+    // Epetra_LinearProblem object
+    // to let the AztecOO solver
+    // know about the matrix and
+    // vectors.
     linear_problem.reset
-      (new Epetra_LinearProblem(const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()),
-                                &x.trilinos_vector(),
-                                const_cast<Epetra_MultiVector*>(&b.trilinos_vector())));
+    (new Epetra_LinearProblem(const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()),
+                              &x.trilinos_vector(),
+                              const_cast<Epetra_MultiVector *>(&b.trilinos_vector())));
 
-                                        // Next we can allocate the
-                                        // AztecOO solver...
+    // Next we can allocate the
+    // AztecOO solver...
     solver.reset (Amesos().Create("Amesos_Klu", *linear_problem));
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
@@ -443,13 +443,13 @@ namespace TrilinosWrappers
     verbose_cout << "Starting solve" << std::endl;
     solver->Solve();
 
-                                        // Finally, let the deal.II
-                                        // SolverControl object know
-                                        // what has happened. If the
-                                        // solve succeeded, the status
-                                        // of the solver control will
-                                        // turn into
-                                        // SolverControl::success.
+    // Finally, let the deal.II
+    // SolverControl object know
+    // what has happened. If the
+    // solve succeeded, the status
+    // of the solver control will
+    // turn into
+    // SolverControl::success.
     solver_control.check (0, 0);
 
     if (solver_control.last_check() != SolverControl::success)
@@ -464,9 +464,9 @@ namespace TrilinosWrappers
                        dealii::Vector<double>       &x,
                        const dealii::Vector<double> &b)
   {
-                                       // First set whether we want to print
-                                       // the solver information to screen
-                                       // or not.
+    // First set whether we want to print
+    // the solver information to screen
+    // or not.
     ConditionalOStream  verbose_cout (std::cout,
                                       additional_data.output_solver_details);
 
@@ -474,9 +474,9 @@ namespace TrilinosWrappers
     solver.reset();
 
 
-                                        // In case we call the solver with
-                                        // deal.II vectors, we create views
-                                        // of the vectors in Epetra format.
+    // In case we call the solver with
+    // deal.II vectors, we create views
+    // of the vectors in Epetra format.
     Assert (x.size() == A.n(),
             ExcDimensionMismatch(x.size(), A.n()));
     Assert (b.size() == A.m(),
@@ -484,19 +484,19 @@ namespace TrilinosWrappers
     Assert (A.local_range ().second == A.m(),
             ExcMessage ("Can only work in serial when using deal.II vectors."));
     Epetra_Vector ep_x (View, A.domain_partitioner(), x.begin());
-    Epetra_Vector ep_b (View, A.range_partitioner(), const_cast<double*>(b.begin()));
+    Epetra_Vector ep_b (View, A.range_partitioner(), const_cast<double *>(b.begin()));
 
-                                        // We need an
-                                        // Epetra_LinearProblem object
-                                        // to let the AztecOO solver
-                                        // know about the matrix and
-                                        // vectors.
+    // We need an
+    // Epetra_LinearProblem object
+    // to let the AztecOO solver
+    // know about the matrix and
+    // vectors.
     linear_problem.reset (new Epetra_LinearProblem
-                          (const_cast<Epetra_CrsMatrix*>(&A.trilinos_matrix()),
+                          (const_cast<Epetra_CrsMatrix *>(&A.trilinos_matrix()),
                            &ep_x, &ep_b));
 
-                                        // Next we can allocate the
-                                        // AztecOO solver...
+    // Next we can allocate the
+    // AztecOO solver...
     solver.reset (Amesos().Create("Amesos_Klu", *linear_problem));
 
     verbose_cout << "Starting symbolic factorization" << std::endl;
@@ -508,13 +508,13 @@ namespace TrilinosWrappers
     verbose_cout << "Starting solve" << std::endl;
     solver->Solve();
 
-                                        // Finally, let the deal.II
-                                        // SolverControl object know
-                                        // what has happened. If the
-                                        // solve succeeded, the status
-                                        // of the solver control will
-                                        // turn into
-                                        // SolverControl::success.
+    // Finally, let the deal.II
+    // SolverControl object know
+    // what has happened. If the
+    // solve succeeded, the status
+    // of the solver control will
+    // turn into
+    // SolverControl::success.
     solver_control.check (0, 0);
 
     if (solver_control.last_check() != SolverControl::success)

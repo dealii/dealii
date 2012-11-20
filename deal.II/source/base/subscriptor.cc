@@ -38,36 +38,36 @@ namespace
 }
 
 
-static const char* unknown_subscriber = "unknown subscriber";
+static const char *unknown_subscriber = "unknown subscriber";
 
 
 Subscriptor::Subscriptor ()
-                :
-                counter (0),
-                object_info (0)
+  :
+  counter (0),
+  object_info (0)
 {}
 
 
 Subscriptor::Subscriptor (const Subscriptor &)
-                :
-                counter (0),
-                object_info (0)
+  :
+  counter (0),
+  object_info (0)
 {}
 
 
 Subscriptor::~Subscriptor ()
 {
-                                   // check whether there are still
-                                   // subscriptions to this object. if
-                                   // so, output the actual name of
-                                   // the class to which this object
-                                   // belongs, i.e. the most derived
-                                   // class. note that the name may be
-                                   // mangled, so it need not be the
-                                   // clear-text class name. however,
-                                   // you can obtain the latter by
-                                   // running the c++filt program over
-                                   // the output.
+  // check whether there are still
+  // subscriptions to this object. if
+  // so, output the actual name of
+  // the class to which this object
+  // belongs, i.e. the most derived
+  // class. note that the name may be
+  // mangled, so it need not be the
+  // clear-text class name. however,
+  // you can obtain the latter by
+  // running the c++filt program over
+  // the output.
 #ifdef DEBUG
   std::string infostring;
   for (map_iterator it = counter_map.begin(); it != counter_map.end(); ++it)
@@ -77,24 +77,24 @@ Subscriptor::~Subscriptor ()
                       + std::string(it->first);
     }
 
-                                   // if there are still active pointers, show
-                                   // a message and kill the program. However,
-                                   // under some circumstances, this is not so
-                                   // desirable. For example, in code like this
-                                   //
-                                   // Triangulation tria;
-                                   // DoFHandler *dh = new DoFHandler(tria);
-                                   // ...some function that throws an exception
-                                   //
-                                   // the exception will lead to the
-                                   // destruction of the triangulation, but
-                                   // since the dof_handler is on the heap it
-                                   // will not be destroyed. This will trigger
-                                   // an assertion in the triangulation. If we
-                                   // kill the program at this point, we will
-                                   // never be able to learn what caused the
-                                   // problem. In this situation, just display
-                                   // a message and continue the program.
+  // if there are still active pointers, show
+  // a message and kill the program. However,
+  // under some circumstances, this is not so
+  // desirable. For example, in code like this
+  //
+  // Triangulation tria;
+  // DoFHandler *dh = new DoFHandler(tria);
+  // ...some function that throws an exception
+  //
+  // the exception will lead to the
+  // destruction of the triangulation, but
+  // since the dof_handler is on the heap it
+  // will not be destroyed. This will trigger
+  // an assertion in the triangulation. If we
+  // kill the program at this point, we will
+  // never be able to learn what caused the
+  // problem. In this situation, just display
+  // a message and continue the program.
   if (counter != 0)
     {
       if (std::uncaught_exception() == false)
@@ -120,17 +120,17 @@ Subscriptor::~Subscriptor ()
                     << std::endl;
         }
     }
-                                   // In case we do not abort
-                                   // on error, this will tell
-                                   // do_unsubscribe below that the
-                                   // object is unused now.
+  // In case we do not abort
+  // on error, this will tell
+  // do_unsubscribe below that the
+  // object is unused now.
   counter = 0;
 #endif
 }
 
 
 
-Subscriptor & Subscriptor::operator = (const Subscriptor &s)
+Subscriptor &Subscriptor::operator = (const Subscriptor &s)
 {
   object_info = s.object_info;
   return *this;
@@ -139,7 +139,7 @@ Subscriptor & Subscriptor::operator = (const Subscriptor &s)
 // These are the implementations for debug mode. The optimized
 // versions are inlined in the header file.
 
-void Subscriptor::do_subscribe (const char* id) const
+void Subscriptor::do_subscribe (const char *id) const
 {
 #ifdef DEBUG
   if (object_info == 0)
@@ -148,7 +148,7 @@ void Subscriptor::do_subscribe (const char* id) const
   ++counter;
 
 #ifndef DEAL_II_USE_MT
-  const char* const name = (id != 0) ? id : unknown_subscriber;
+  const char *const name = (id != 0) ? id : unknown_subscriber;
 
   map_iterator it = counter_map.find(name);
   if (it == counter_map.end())
@@ -161,13 +161,13 @@ void Subscriptor::do_subscribe (const char* id) const
 }
 
 
-void Subscriptor::do_unsubscribe (const char* id) const
+void Subscriptor::do_unsubscribe (const char *id) const
 {
 #ifdef DEBUG
-  const char* name = (id != 0) ? id : unknown_subscriber;
+  const char *name = (id != 0) ? id : unknown_subscriber;
   Assert (counter>0, ExcNoSubscriber(object_info->name(), name));
-                                   // This is for the case that we do
-                                   // not abort after the exception
+  // This is for the case that we do
+  // not abort after the exception
   if (counter == 0)
     return;
 
@@ -195,7 +195,7 @@ void Subscriptor::list_subscribers () const
 {
 #ifndef DEAL_II_USE_MT
   for (map_iterator it = counter_map.begin();
-  it != counter_map.end(); ++it)
+       it != counter_map.end(); ++it)
     deallog << it->second << '/'
             << counter << " subscriptions from \""
             << it->first << '\"' << std::endl;

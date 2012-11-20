@@ -39,123 +39,123 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim>
 class FunctionDerivative : public AutoDerivativeFunction<dim>
 {
-  public:
-                                     /**
-                                      * Constructor. Provided are the
-                                      * functions to compute
-                                      * derivatives of, the direction
-                                      * vector of the differentiation
-                                      * and the step size <tt>h</tt> of the
-                                      * difference formula.
-                                      */
-    FunctionDerivative (const Function<dim> &f,
-                        const Point<dim>    &direction,
-                        const double         h = 1.e-6);
+public:
+  /**
+   * Constructor. Provided are the
+   * functions to compute
+   * derivatives of, the direction
+   * vector of the differentiation
+   * and the step size <tt>h</tt> of the
+   * difference formula.
+   */
+  FunctionDerivative (const Function<dim> &f,
+                      const Point<dim>    &direction,
+                      const double         h = 1.e-6);
 
-                                     /**
-                                      * Constructor. Provided are the
-                                      * functions to compute
-                                      * derivatives of and the
-                                      * direction vector of the
-                                      * differentiation in each
-                                      * quadrature point and the
-                                      * difference step size.
-                                      *
-                                      * This is the constructor for a
-                                      * variable velocity field. Most
-                                      * probably, a new object of
-                                      * <tt>FunctionDerivative</tt> has to
-                                      * be constructed for each set of
-                                      * quadrature points.
-                                      *
-                                      * The number of quadrature point
-                                      * must still be the same, when
-                                      * values are accessed.
-                                      */
-    FunctionDerivative (const Function<dim>            &f,
-                        const std::vector<Point<dim> > &direction,
-                        const double                    h = 1.e-6);
+  /**
+   * Constructor. Provided are the
+   * functions to compute
+   * derivatives of and the
+   * direction vector of the
+   * differentiation in each
+   * quadrature point and the
+   * difference step size.
+   *
+   * This is the constructor for a
+   * variable velocity field. Most
+   * probably, a new object of
+   * <tt>FunctionDerivative</tt> has to
+   * be constructed for each set of
+   * quadrature points.
+   *
+   * The number of quadrature point
+   * must still be the same, when
+   * values are accessed.
+   */
+  FunctionDerivative (const Function<dim>            &f,
+                      const std::vector<Point<dim> > &direction,
+                      const double                    h = 1.e-6);
 
-                                     /**
-                                      * Choose the difference formula.
-                                      * This is set to the default in
-                                      * the constructor.
-                                      *
-                                      * Formulas implemented right now
-                                      * are first order backward Euler
-                                      * (<tt>UpwindEuler</tt>), second
-                                      * order symmetric Euler
-                                      * (<tt>Euler</tt>) and a symmetric
-                                      * fourth order formula
-                                      * (<tt>FourthOrder</tt>).
-                                      */
-    void set_formula (typename AutoDerivativeFunction<dim>::DifferenceFormula formula
-                      = AutoDerivativeFunction<dim>::Euler);
-                                     /**
-                                      * Change the base step size of
-                                      * the difference formula
-                                      */
-    void set_h (const double h);
+  /**
+   * Choose the difference formula.
+   * This is set to the default in
+   * the constructor.
+   *
+   * Formulas implemented right now
+   * are first order backward Euler
+   * (<tt>UpwindEuler</tt>), second
+   * order symmetric Euler
+   * (<tt>Euler</tt>) and a symmetric
+   * fourth order formula
+   * (<tt>FourthOrder</tt>).
+   */
+  void set_formula (typename AutoDerivativeFunction<dim>::DifferenceFormula formula
+                    = AutoDerivativeFunction<dim>::Euler);
+  /**
+   * Change the base step size of
+   * the difference formula
+   */
+  void set_h (const double h);
 
-    virtual double value (const Point<dim>& p,
-                          const unsigned int component = 0) const;
+  virtual double value (const Point<dim> &p,
+                        const unsigned int component = 0) const;
 
-    virtual void vector_value(const Point<dim>& p,
-                              Vector<double>& value) const;
+  virtual void vector_value(const Point<dim> &p,
+                            Vector<double> &value) const;
 
-    virtual void value_list (const std::vector<Point<dim> > &points,
-                             std::vector<double>            &values,
-                             const unsigned int              component = 0) const;
+  virtual void value_list (const std::vector<Point<dim> > &points,
+                           std::vector<double>            &values,
+                           const unsigned int              component = 0) const;
 
-                                     /**
-                                      * Determine an estimate for
-                                      * the memory consumption (in
-                                      * bytes) of this
-                                      * object. Since sometimes
-                                      * the size of objects can
-                                      * not be determined exactly
-                                      * (for example: what is the
-                                      * memory consumption of an
-                                      * STL <tt>std::map</tt> type with a
-                                      * certain number of
-                                      * elements?), this is only
-                                      * an estimate. however often
-                                      * quite close to the true
-                                      * value.
-                                      */
-    std::size_t memory_consumption () const;
+  /**
+   * Determine an estimate for
+   * the memory consumption (in
+   * bytes) of this
+   * object. Since sometimes
+   * the size of objects can
+   * not be determined exactly
+   * (for example: what is the
+   * memory consumption of an
+   * STL <tt>std::map</tt> type with a
+   * certain number of
+   * elements?), this is only
+   * an estimate. however often
+   * quite close to the true
+   * value.
+   */
+  std::size_t memory_consumption () const;
 
-                                     /** @addtogroup Exceptions
-                                      * @{ */
+  /** @addtogroup Exceptions
+   * @{ */
 
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException0(ExcInvalidFormula);
-                                     //@}
-  private:
-                                     /**
-                                      * Function for differentiation.
-                                      */
-    const Function<dim>& f;
+  /**
+   * Exception.
+   */
+  DeclException0(ExcInvalidFormula);
+  //@}
+private:
+  /**
+   * Function for differentiation.
+   */
+  const Function<dim> &f;
 
-                                     /**
-                                      * Step size of the difference
-                                      * formula.
-                                      */
-    double h;
+  /**
+   * Step size of the difference
+   * formula.
+   */
+  double h;
 
-                                     /**
-                                      * Difference formula.
-                                      */
-    typename AutoDerivativeFunction<dim>::DifferenceFormula formula;
+  /**
+   * Difference formula.
+   */
+  typename AutoDerivativeFunction<dim>::DifferenceFormula formula;
 
-                                     /**
-                                      * Helper object. Contains the
-                                      * increment vector for the
-                                      * formula.
-                                      */
-    std::vector<Point<dim> > incr;
+  /**
+   * Helper object. Contains the
+   * increment vector for the
+   * formula.
+   */
+  std::vector<Point<dim> > incr;
 };
 
 DEAL_II_NAMESPACE_CLOSE

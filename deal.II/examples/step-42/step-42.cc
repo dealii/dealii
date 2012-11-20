@@ -10,10 +10,10 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
-                                 // @sect3{Include files}
+// @sect3{Include files}
 
-				 // We are using the the same
-                                 // include files as in step-41:
+// We are using the the same
+// include files as in step-41:
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -68,32 +68,32 @@ namespace Step42
 {
   using namespace dealii;
 
-                                   // @sect3{The <code>PlasticityContactProblem</code> class template}
+  // @sect3{The <code>PlasticityContactProblem</code> class template}
 
-                                   // This class provides an interface
-                                   // for a constitutive law. In this
-                                   // example we are using an elastic
-                                   // plastic material with linear,
-                                   // isotropic hardening.
+  // This class provides an interface
+  // for a constitutive law. In this
+  // example we are using an elastic
+  // plastic material with linear,
+  // isotropic hardening.
 
   template <int dim> class ConstitutiveLaw;
 
-                                   // @sect3{The <code>PlasticityContactProblem</code> class template}
+  // @sect3{The <code>PlasticityContactProblem</code> class template}
 
-                                   // This class supplies all function
-                                   // and variables needed to describe
-                                   // the nonlinear contact problem. It is
-                                   // close to step-41 but with some additional
-                                   // features like: handling hanging nodes,
-                                   // a newton method, using Trilinos and p4est
-                                   // for parallel distributed computing.
-                                   // To deal with hanging nodes makes
-                                   // life a bit more complicated since
-                                   // we need an other ConstraintMatrix now.
-                                   // We create a newton method for the
-                                   // active set method for the contact
-                                   // situation and to handle the nonlinear
-                                   // operator for the constitutive law.
+  // This class supplies all function
+  // and variables needed to describe
+  // the nonlinear contact problem. It is
+  // close to step-41 but with some additional
+  // features like: handling hanging nodes,
+  // a newton method, using Trilinos and p4est
+  // for parallel distributed computing.
+  // To deal with hanging nodes makes
+  // life a bit more complicated since
+  // we need an other ConstraintMatrix now.
+  // We create a newton method for the
+  // active set method for the contact
+  // situation and to handle the nonlinear
+  // operator for the constitutive law.
 
   template <int dim>
   class PlasticityContactProblem
@@ -114,7 +114,7 @@ namespace Step42
     void solve_newton ();
     void refine_grid ();
     void move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const;
-    void output_results (const std::string& title) const;
+    void output_results (const std::string &title) const;
 
     int                  n_refinements_global;
     int                  n_refinements_local;
@@ -172,8 +172,8 @@ namespace Step42
 
     void plast_linear_hardening (SymmetricTensor<4,dim>  &stress_strain_tensor,
                                  SymmetricTensor<2,dim>  &strain_tensor,
-                                 unsigned int 	         &elast_points,
-                                 unsigned int 	         &plast_points,
+                                 unsigned int            &elast_points,
+                                 unsigned int            &plast_points,
                                  double                  &yield);
     void linearized_plast_linear_hardening (SymmetricTensor<4,dim>  &stress_strain_tensor_linearized,
                                             SymmetricTensor<4,dim>  &stress_strain_tensor,
@@ -197,12 +197,12 @@ namespace Step42
 
   template <int dim>
   ConstitutiveLaw<dim>::ConstitutiveLaw(double _E, double _nu, double _sigma_0, double _gamma, MPI_Comm _mpi_communicator, ConditionalOStream _pcout)
-   :E (_E),
-    nu (_nu),
-    sigma_0 (_sigma_0),
-    gamma (_gamma),
-    mpi_communicator (_mpi_communicator),
-    pcout (_pcout)
+    :E (_E),
+     nu (_nu),
+     sigma_0 (_sigma_0),
+     gamma (_gamma),
+     mpi_communicator (_mpi_communicator),
+     pcout (_pcout)
   {
     mu = E/(2*(1+nu));
     kappa = E/(3*(1-2*nu));
@@ -214,8 +214,8 @@ namespace Step42
   template <int dim>
   inline
   SymmetricTensor<2,dim> ConstitutiveLaw<dim>::get_strain (const FEValues<dim> &fe_values,
-                                                       const unsigned int   shape_func,
-                                                       const unsigned int   q_point) const
+                                                           const unsigned int   shape_func,
+                                                           const unsigned int   q_point) const
   {
     const FEValuesExtractors::Vector displacement (0);
     SymmetricTensor<2,dim> tmp;
@@ -233,63 +233,63 @@ namespace Step42
                                                      double                  &yield)
   {
     if (dim == 3)
-    {
-      SymmetricTensor<2,dim> stress_tensor;
-      stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)*strain_tensor;
-      double tmp = E/((1+nu)*(1-2*nu));
-
-      SymmetricTensor<2,dim> deviator_stress_tensor = deviator(stress_tensor);
-
-      double deviator_stress_tensor_norm = deviator_stress_tensor.norm ();
-
-      yield = 0;
-      stress_strain_tensor = stress_strain_tensor_mu;
-      double beta = 1.0;
-      if (deviator_stress_tensor_norm >= sigma_0)
       {
-        beta = (sigma_0 + gamma)/deviator_stress_tensor_norm;
-        stress_strain_tensor *= beta;
-        yield = 1;
-        plast_points += 1;
-      }
-      else
-        elast_points += 1;
+        SymmetricTensor<2,dim> stress_tensor;
+        stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)*strain_tensor;
+        double tmp = E/((1+nu)*(1-2*nu));
 
-      stress_strain_tensor += stress_strain_tensor_kappa;
-    }
+        SymmetricTensor<2,dim> deviator_stress_tensor = deviator(stress_tensor);
+
+        double deviator_stress_tensor_norm = deviator_stress_tensor.norm ();
+
+        yield = 0;
+        stress_strain_tensor = stress_strain_tensor_mu;
+        double beta = 1.0;
+        if (deviator_stress_tensor_norm >= sigma_0)
+          {
+            beta = (sigma_0 + gamma)/deviator_stress_tensor_norm;
+            stress_strain_tensor *= beta;
+            yield = 1;
+            plast_points += 1;
+          }
+        else
+          elast_points += 1;
+
+        stress_strain_tensor += stress_strain_tensor_kappa;
+      }
   }
 
   template <int dim>
   void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,dim>  &stress_strain_tensor_linearized,
-                                                                SymmetricTensor<4,dim>  &stress_strain_tensor,
-                                                                SymmetricTensor<2,dim>  &strain_tensor)
+      SymmetricTensor<4,dim>  &stress_strain_tensor,
+      SymmetricTensor<2,dim>  &strain_tensor)
   {
     if (dim == 3)
-    {
-      SymmetricTensor<2,dim> stress_tensor;
-      stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)*strain_tensor;
-      double tmp = E/((1+nu)*(1-2*nu));
-
-      stress_strain_tensor = stress_strain_tensor_mu;
-      stress_strain_tensor_linearized = stress_strain_tensor_mu;
-
-      SymmetricTensor<2,dim> deviator_stress_tensor = deviator(stress_tensor);
-
-      double deviator_stress_tensor_norm = deviator_stress_tensor.norm ();
-
-      double beta = 1.0;
-      if (deviator_stress_tensor_norm >= sigma_0)
       {
-        beta = (sigma_0 + gamma)/deviator_stress_tensor_norm;
-        stress_strain_tensor *= beta;
-        stress_strain_tensor_linearized *= beta;
-        deviator_stress_tensor /= deviator_stress_tensor_norm;
-        stress_strain_tensor_linearized -= beta*2*mu*outer_product(deviator_stress_tensor, deviator_stress_tensor);
-      }
+        SymmetricTensor<2,dim> stress_tensor;
+        stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)*strain_tensor;
+        double tmp = E/((1+nu)*(1-2*nu));
 
-      stress_strain_tensor += stress_strain_tensor_kappa;
-      stress_strain_tensor_linearized += stress_strain_tensor_kappa;
-    }
+        stress_strain_tensor = stress_strain_tensor_mu;
+        stress_strain_tensor_linearized = stress_strain_tensor_mu;
+
+        SymmetricTensor<2,dim> deviator_stress_tensor = deviator(stress_tensor);
+
+        double deviator_stress_tensor_norm = deviator_stress_tensor.norm ();
+
+        double beta = 1.0;
+        if (deviator_stress_tensor_norm >= sigma_0)
+          {
+            beta = (sigma_0 + gamma)/deviator_stress_tensor_norm;
+            stress_strain_tensor *= beta;
+            stress_strain_tensor_linearized *= beta;
+            deviator_stress_tensor /= deviator_stress_tensor_norm;
+            stress_strain_tensor_linearized -= beta*2*mu*outer_product(deviator_stress_tensor, deviator_stress_tensor);
+          }
+
+        stress_strain_tensor += stress_strain_tensor_kappa;
+        stress_strain_tensor_linearized += stress_strain_tensor_kappa;
+      }
   }
 
   namespace EquationData
@@ -319,7 +319,7 @@ namespace Step42
         return_value = 0.0;
       if (component == 2)
         // if ((p(0)-0.5)*(p(0)-0.5)+(p(1)-0.5)*(p(1)-0.5) < 0.2)
-        // 	return_value = -5000;
+        //  return_value = -5000;
         // else
         return_value = 0.0;
       // for (unsigned int i=0; i<dim; ++i)
@@ -368,7 +368,7 @@ namespace Step42
 
     template <int dim>
     void BoundaryValues<dim>::vector_value (const Point<dim> &p,
-                                             Vector<double>   &values) const
+                                            Vector<double>   &values) const
     {
       for (unsigned int c=0; c<this->n_components; ++c)
         values(c) = BoundaryValues<dim>::value (p, c);
@@ -400,21 +400,21 @@ namespace Step42
         return_value = p(1);
       if (component == 2)
         {
-      //     double hz = 0.98;
-      //     double position_x = 0.5;
-      //     double alpha = 12.0;
-      //     double s_x = 0.5039649116;
-      //     double s_y = hz + 0.00026316298;
-      //     if (p(0) > position_x - R && p(0) < s_x)
-      //       {
-      //         return_value = -sqrt(R*R - (p(0)-position_x)*(p(0)-position_x)) + hz + R;
-      //       }
-      //     else if (p(0) >= s_x)
-      //       {
-      //         return_value = 12.0/90.0*p(0) + (s_y - alpha/90.0*s_x);
-      //       }
-      //     else
-      //       return_value = 1e+10;
+          //     double hz = 0.98;
+          //     double position_x = 0.5;
+          //     double alpha = 12.0;
+          //     double s_x = 0.5039649116;
+          //     double s_y = hz + 0.00026316298;
+          //     if (p(0) > position_x - R && p(0) < s_x)
+          //       {
+          //         return_value = -sqrt(R*R - (p(0)-position_x)*(p(0)-position_x)) + hz + R;
+          //       }
+          //     else if (p(0) >= s_x)
+          //       {
+          //         return_value = 12.0/90.0*p(0) + (s_y - alpha/90.0*s_x);
+          //       }
+          //     else
+          //       return_value = 1e+10;
 
           // Hindernis Dortmund
           double x1 = p(0);
@@ -433,7 +433,7 @@ namespace Step42
           // double R = 1.0;
           // if (std::pow ((p(0)-1.0/2.0), 2) + std::pow ((p(1)-1.0/2.0), 2) < R*R)
           //   return_value = 1.0 + R - 0.01 - sqrt (R*R  - std::pow ((p(0)-1.0/2.0), 2)
-          // 					 - std::pow ((p(1)-1.0/2.0), 2));
+          //           - std::pow ((p(1)-1.0/2.0), 2));
           // else
           //   return_value = 1e+5;
         }
@@ -450,11 +450,11 @@ namespace Step42
   }
 
 
-                                   // @sect3{Implementation of the <code>PlasticityContactProblem</code> class}
+  // @sect3{Implementation of the <code>PlasticityContactProblem</code> class}
 
-                                   // Next for the implementation of the class
-                                   // template that makes use of the functions
-                                   // above. As before, we will write everything
+  // Next for the implementation of the class
+  // template that makes use of the functions
+  // above. As before, we will write everything
 
   template <int dim>
   PlasticityContactProblem<dim>::PlasticityContactProblem (int _n_refinements_global, int _n_refinements_local)
@@ -489,8 +489,8 @@ namespace Step42
     GridGenerator::subdivided_hyper_rectangle (triangulation, repet, p1, p2);
 
     Triangulation<3>::active_cell_iterator
-      cell = triangulation.begin_active(),
-      endc = triangulation.end();
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
 
     /* boundary_indicators:
               _______
@@ -526,30 +526,30 @@ namespace Step42
 //        for (; cell!=endc; ++cell)
 //           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
 //           {
-//  // 	   if (cell->face (face)->at_boundary()
-//  // 	       && cell->face (face)->boundary_indicator () == 9)
-//  // 	     {
-//  // 	       cell->set_refine_flag ();
-//  // 	       break;
-//  // 	     }
-//  // 	   else if (cell->level () == n_refinements + n_refinements_local - 1)
-//  // 	     {
-//  // 	       cell->set_refine_flag ();
-//  // 	       break;
-//  // 	     }
+//  //     if (cell->face (face)->at_boundary()
+//  //         && cell->face (face)->boundary_indicator () == 9)
+//  //       {
+//  //         cell->set_refine_flag ();
+//  //         break;
+//  //       }
+//  //     else if (cell->level () == n_refinements + n_refinements_local - 1)
+//  //       {
+//  //         cell->set_refine_flag ();
+//  //         break;
+//  //       }
 //
-//  // 	   if (cell->face (face)->at_boundary()
-//  // 	       && cell->face (face)->boundary_indicator () == 9)
-//  // 	     {
-//  // 	       if (cell->face (face)->vertex (0)(0) <= 0.7 &&
-//  // 	           cell->face (face)->vertex (1)(0) >= 0.3 &&
-//  // 		   cell->face (face)->vertex (0)(1) <= 0.875 &&
-//  // 	           cell->face (face)->vertex (2)(1) >= 0.125)
-//  //  	         {
-//  // 	           cell->set_refine_flag ();
-//  // 	           break;
-//  // 	         }
-//  // 	     }
+//  //     if (cell->face (face)->at_boundary()
+//  //         && cell->face (face)->boundary_indicator () == 9)
+//  //       {
+//  //         if (cell->face (face)->vertex (0)(0) <= 0.7 &&
+//  //             cell->face (face)->vertex (1)(0) >= 0.3 &&
+//  //       cell->face (face)->vertex (0)(1) <= 0.875 &&
+//  //             cell->face (face)->vertex (2)(1) >= 0.125)
+//  //             {
+//  //             cell->set_refine_flag ();
+//  //             break;
+//  //           }
+//  //       }
 //
 //              if (step == 0 &&
 //                  cell->center ()(2) < n_refinements_local*9.0/64.0)
@@ -584,14 +584,14 @@ namespace Step42
       constraints_hanging_nodes.close ();
 
       pcout << "Number of active cells: "
-                 << triangulation.n_active_cells()
-                 << std::endl
-                 << "Total number of cells: "
-                 << triangulation.n_cells()
-                 << std::endl
-                 << "Number of degrees of freedom: "
-                 << dof_handler.n_dofs ()
-                 << std::endl;
+            << triangulation.n_active_cells()
+            << std::endl
+            << "Total number of cells: "
+            << triangulation.n_cells()
+            << std::endl
+            << "Number of degrees of freedom: "
+            << dof_handler.n_dofs ()
+            << std::endl;
 
       dirichlet_constraints ();
     }
@@ -623,8 +623,8 @@ namespace Step42
       mass_matrix.reinit (sp);
       assemble_mass_matrix_diagonal (mass_matrix);
       const unsigned int
-        start = (system_rhs_newton.local_range().first),
-        end   = (system_rhs_newton.local_range().second);
+      start = (system_rhs_newton.local_range().first),
+      end   = (system_rhs_newton.local_range().second);
       for (unsigned int j=start; j<end; j++)
         diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
       number_iterations = 0;
@@ -694,9 +694,9 @@ namespace Step42
                                                                  stress_strain_tensor,
                                                                  strain_tensor[q_point]);
 
-              //   	if (q_point == 0)
-              //  	std::cout<< stress_strain_tensor_linearized <<std::endl;
-              //  	std::cout<< stress_strain_tensor <<std::endl;
+              //    if (q_point == 0)
+              //    std::cout<< stress_strain_tensor_linearized <<std::endl;
+              //    std::cout<< stress_strain_tensor <<std::endl;
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
                   stress_tensor = stress_strain_tensor_linearized * plast_lin_hard->get_strain(fe_values, i, q_point);
@@ -856,8 +856,8 @@ namespace Step42
 
           cell->get_dof_indices (local_dof_indices);
           constraints_dirichlet_hanging_nodes.distribute_local_to_global (cell_rhs,
-                                                                          local_dof_indices,
-                                                                          system_rhs_newton);
+              local_dof_indices,
+              system_rhs_newton);
 
           cell_number += 1;
         };
@@ -890,8 +890,8 @@ namespace Step42
     const FEValuesExtractors::Vector displacement (0);
 
     typename DoFHandler<dim>::active_cell_iterator
-      cell = dof_handler.begin_active(),
-      endc = dof_handler.end();
+    cell = dof_handler.begin_active(),
+    endc = dof_handler.end();
 
     for (; cell!=endc; ++cell)
       if (cell->is_locally_owned())
@@ -911,17 +911,17 @@ namespace Step42
               cell->get_dof_indices (local_dof_indices);
 
               constraints_dirichlet_hanging_nodes.distribute_local_to_global (cell_matrix,
-                                                                              local_dof_indices,
-                                                                              mass_matrix);
+                  local_dof_indices,
+                  mass_matrix);
             }
 
     mass_matrix.compress ();
   }
 
-                                   // @sect4{PlasticityContactProblem::update_solution_and_constraints}
+  // @sect4{PlasticityContactProblem::update_solution_and_constraints}
 
-                                   // Projection and updating of the active set
-                                   // for the dofs which penetrates the obstacle.
+  // Projection and updating of the active set
+  // for the dofs which penetrates the obstacle.
   template <int dim>
   void PlasticityContactProblem<dim>::update_solution_and_constraints ()
   {
@@ -975,10 +975,10 @@ namespace Step42
                     diag_mass_matrix_vector_relevant (index_z) *
                     (solution_index_z - gap)
                     > 0 &&
-		    !(constraints_hanging_nodes.is_constrained(index_z)))
+                    !(constraints_hanging_nodes.is_constrained(index_z)))
                   {
-		    constraints.add_line (index_z);
-		    constraints.set_inhomogeneity (index_z, gap);
+                    constraints.add_line (index_z);
+                    constraints.set_inhomogeneity (index_z, gap);
 
                     distributed_solution (index_z) = gap;
 
@@ -1002,12 +1002,12 @@ namespace Step42
     constraints.merge (constraints_dirichlet_hanging_nodes);
   }
 
-                                   // @sect4{PlasticityContactProblem::dirichlet_constraints}
+  // @sect4{PlasticityContactProblem::dirichlet_constraints}
 
-                                   // This function defines the new ConstraintMatrix
-                                   // constraints_dirichlet_hanging_nodes. It contains
-                                   // the dirichlet boundary values as well as the
-                                   // hanging nodes constraints.
+  // This function defines the new ConstraintMatrix
+  // constraints_dirichlet_hanging_nodes. It contains
+  // the dirichlet boundary values as well as the
+  // hanging nodes constraints.
   template <int dim>
   void PlasticityContactProblem<dim>::dirichlet_constraints ()
   {
@@ -1024,54 +1024,54 @@ namespace Step42
     constraints_dirichlet_hanging_nodes.reinit (locally_relevant_dofs);
     constraints_dirichlet_hanging_nodes.merge (constraints_hanging_nodes);
 
-				     // interpolate all components of the solution
+    // interpolate all components of the solution
     VectorTools::interpolate_boundary_values (dof_handler,
                                               6,
                                               EquationData::BoundaryValues<dim>(),
                                               constraints_dirichlet_hanging_nodes,
-					      ComponentMask());
+                                              ComponentMask());
 
-				     // interpolate x- and y-components of the
-				     // solution (this is a bit mask, so apply
-				     // operator| )
+    // interpolate x- and y-components of the
+    // solution (this is a bit mask, so apply
+    // operator| )
     FEValuesExtractors::Scalar x_displacement(0);
     FEValuesExtractors::Scalar y_displacement(1);
     VectorTools::interpolate_boundary_values (dof_handler,
                                               8,
                                               EquationData::BoundaryValues<dim>(),
                                               constraints_dirichlet_hanging_nodes,
-					      (fe.component_mask(x_displacement)
-					       |
-					       fe.component_mask(y_displacement)));
+                                              (fe.component_mask(x_displacement)
+                                               |
+                                               fe.component_mask(y_displacement)));
     constraints_dirichlet_hanging_nodes.close ();
   }
 
-                                   // @sect4{PlasticityContactProblem::solve}
+  // @sect4{PlasticityContactProblem::solve}
 
-                                   // In addition to step-41 we have
-                                   // to deal with the hanging node
-                                   // constraints. Again we also consider
-                                   // the locally_owned_dofs only by
-                                   // creating the vector distributed_solution.
-                                   //
-                                   // For the hanging nodes we have to apply
-                                   // the set_zero function to system_rhs_newton.
-                                   // This is necessary if a hanging node value x_0
-                                   // has one neighbor which is in contact with
-                                   // value x_0 and one neighbor which is not with
-                                   // value x_1. This leads to an inhomogeneity
-                                   // constraint with value x_1/2 = gap/2 in the
-                                   // ConstraintMatrix.
-                                   // So the corresponding entries in the 
-                                   // ride-hang-side are non-zero with a
-                                   // meaningless value. These values have to
-                                   // to set to zero.
+  // In addition to step-41 we have
+  // to deal with the hanging node
+  // constraints. Again we also consider
+  // the locally_owned_dofs only by
+  // creating the vector distributed_solution.
+  //
+  // For the hanging nodes we have to apply
+  // the set_zero function to system_rhs_newton.
+  // This is necessary if a hanging node value x_0
+  // has one neighbor which is in contact with
+  // value x_0 and one neighbor which is not with
+  // value x_1. This leads to an inhomogeneity
+  // constraint with value x_1/2 = gap/2 in the
+  // ConstraintMatrix.
+  // So the corresponding entries in the
+  // ride-hang-side are non-zero with a
+  // meaningless value. These values have to
+  // to set to zero.
 
-                                   // The rest of the funtion is smiliar to
-				   // step-41 except that we use a FGMRES-solver
-                                   // instead of CG. For a very small hardening
-                                   // value gamma the linear system becomes
-                                   // almost semi definite but still symmetric.
+  // The rest of the funtion is smiliar to
+  // step-41 except that we use a FGMRES-solver
+  // instead of CG. For a very small hardening
+  // value gamma the linear system becomes
+  // almost semi definite but still symmetric.
   template <int dim>
   void PlasticityContactProblem<dim>::solve ()
   {
@@ -1092,7 +1092,7 @@ namespace Step42
     MPI_Barrier (mpi_communicator);
     t.stop();
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-    run_time[6] += t.wall_time();
+      run_time[6] += t.wall_time();
 
     MPI_Barrier (mpi_communicator);
     t.restart();
@@ -1100,25 +1100,25 @@ namespace Step42
     PrimitiveVectorMemory<TrilinosWrappers::MPI::Vector> mem;
     TrilinosWrappers::MPI::Vector    tmp (system_rhs_newton);
     const double solver_tolerance = 1e-4 *
-          system_matrix_newton.residual (tmp, distributed_solution, system_rhs_newton);
+                                    system_matrix_newton.residual (tmp, distributed_solution, system_rhs_newton);
 
     SolverControl solver_control (system_matrix_newton.m(), solver_tolerance);
     SolverFGMRES<TrilinosWrappers::MPI::Vector>
-       solver(solver_control, mem,
-       SolverFGMRES<TrilinosWrappers::MPI::Vector>::
-       AdditionalData(30, true));
+    solver(solver_control, mem,
+           SolverFGMRES<TrilinosWrappers::MPI::Vector>::
+           AdditionalData(30, true));
     solver.solve(system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);
 
     pcout << "Initial error: " << solver_control.initial_value() <<std::endl;
     pcout << "   " << solver_control.last_step()
-              << " FGMRES iterations needed to obtain convergence with an error: "
-              <<  solver_control.last_value()
-              << std::endl;
+          << " FGMRES iterations needed to obtain convergence with an error: "
+          <<  solver_control.last_value()
+          << std::endl;
 
     MPI_Barrier (mpi_communicator);
     t.stop();
     if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
-    run_time[7] += t.wall_time();
+      run_time[7] += t.wall_time();
 
     number_iterations += solver_control.last_step();
 
@@ -1140,7 +1140,7 @@ namespace Step42
 
     std::vector<std::vector<bool> > constant_modes;
     DoFTools::extract_constant_modes (dof_handler,
-				      ComponentMask(),
+                                      ComponentMask(),
                                       constant_modes);
 
     additional_data.elliptic = true;
@@ -1153,7 +1153,7 @@ namespace Step42
     IndexSet                            active_set_old (active_set);
     unsigned int j = 0;
     unsigned int number_assemble_system = 0;
-    for (; j<=100;j++)
+    for (; j<=100; j++)
       {
         pcout<< " " <<std::endl;
         pcout<< j << ". Iteration of the inexact Newton-method." <<std::endl;
@@ -1210,16 +1210,16 @@ namespace Step42
             res = system_rhs_newton;
 
             const unsigned int
-              start_res     = (res.local_range().first),
-              end_res       = (res.local_range().second);
+            start_res     = (res.local_range().first),
+            end_res       = (res.local_range().second);
             for (unsigned int n=start_res; n<end_res; ++n)
               if (constraints.is_inhomogeneously_constrained (n))
                 {
                   // pcout<< i << ". " << constraints.get_inhomogeneity (n)
-                  // 	 << ". " << res (n)
-                  // 	 << ", start = " << start_res
-                  // 	 << ", end = " << end_res
-                  // 	 <<std::endl;
+                  //   << ". " << res (n)
+                  //   << ", start = " << start_res
+                  //   << ", end = " << end_res
+                  //   <<std::endl;
                   res(n) = 0;
                 }
 
@@ -1271,14 +1271,14 @@ namespace Step42
   {
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate (dof_handler,
-                                             QGauss<dim-1>(3),
-                                             typename FunctionMap<dim>::type(),
-                                             solution,
-                                             estimated_error_per_cell);
+                                        QGauss<dim-1>(3),
+                                        typename FunctionMap<dim>::type(),
+                                        solution,
+                                        estimated_error_per_cell);
     parallel::distributed::GridRefinement::
-      refine_and_coarsen_fixed_number (triangulation,
-                                       estimated_error_per_cell,
-                                       0.3, 0.03);
+    refine_and_coarsen_fixed_number (triangulation,
+                                     estimated_error_per_cell,
+                                     0.3, 0.03);
     triangulation.execute_coarsening_and_refinement ();
 
   }
@@ -1294,7 +1294,7 @@ namespace Step42
                                       false);
 
     for (typename DoFHandler<dim>::active_cell_iterator
-           cell = dof_handler.begin_active ();
+         cell = dof_handler.begin_active ();
          cell != dof_handler.end(); ++cell)
       if (cell->is_locally_owned())
         for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
@@ -1319,7 +1319,7 @@ namespace Step42
 
 
   template <int dim>
-  void PlasticityContactProblem<dim>::output_results (const std::string& title) const
+  void PlasticityContactProblem<dim>::output_results (const std::string &title) const
   {
     move_mesh (solution);
 
@@ -1331,8 +1331,8 @@ namespace Step42
     data_out.attach_dof_handler (dof_handler);
 
     const std::vector<DataComponentInterpretation::DataComponentInterpretation>
-      data_component_interpretation
-      (dim, DataComponentInterpretation::component_is_part_of_vector);
+    data_component_interpretation
+    (dim, DataComponentInterpretation::component_is_part_of_vector);
     data_out.add_data_vector (solution, std::vector<std::string>(dim, "Displacement"),
                               DataOut<dim>::type_dof_data,
                               data_component_interpretation);
@@ -1424,7 +1424,7 @@ namespace Step42
   }
 }
 
-                                 // @sect3{The <code>main</code> function}
+// @sect3{The <code>main</code> function}
 
 int main (int argc, char *argv[])
 {
@@ -1443,10 +1443,10 @@ int main (int argc, char *argv[])
     int _n_refinements_local = 1;
 
     if (argc == 3)
-    {
-      _n_refinements_global = atoi(argv[1]);
-      _n_refinements_local = atoi(argv[2]);
-    }
+      {
+        _n_refinements_global = atoi(argv[1]);
+        _n_refinements_local = atoi(argv[2]);
+      }
 
     PlasticityContactProblem<3> laplace_problem_3d (_n_refinements_global, _n_refinements_local);
     laplace_problem_3d.run ();

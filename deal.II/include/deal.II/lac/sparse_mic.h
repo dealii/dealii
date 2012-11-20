@@ -40,137 +40,137 @@ DEAL_II_NAMESPACE_OPEN
 template <typename number>
 class SparseMIC : public SparseLUDecomposition<number>
 {
-  public:
-                                     /**
-                                      * Constructor. Does nothing, so
-                                      * you have to call @p reinit
-                                      * sometimes afterwards.
-                                      */
-    SparseMIC ();
+public:
+  /**
+   * Constructor. Does nothing, so
+   * you have to call @p reinit
+   * sometimes afterwards.
+   */
+  SparseMIC ();
 
-                                     /**
-                                      * Constructor. Initialize the
-                                      * sparsity pattern of this
-                                      * object with the given
-                                      * argument.
-                                      */
-    SparseMIC (const SparsityPattern &sparsity);
+  /**
+   * Constructor. Initialize the
+   * sparsity pattern of this
+   * object with the given
+   * argument.
+   */
+  SparseMIC (const SparsityPattern &sparsity);
 
-                                     /**
-                                      * Destruction.
-                                      */
-    virtual ~SparseMIC();
+  /**
+   * Destruction.
+   */
+  virtual ~SparseMIC();
 
-                                     /**
-                                      * Deletes all member
-                                      * variables. Leaves the class in
-                                      * the state that it had directly
-                                      * after calling the constructor
-                                      */
-    virtual void clear();
+  /**
+   * Deletes all member
+   * variables. Leaves the class in
+   * the state that it had directly
+   * after calling the constructor
+   */
+  virtual void clear();
 
-                                     /**
-                                      * Make the @p AdditionalData
-                                      * type in the base class
-                                      * accessible to this class as
-                                      * well.
-                                      */
-    typedef
-    typename SparseLUDecomposition<number>::AdditionalData
-    AdditionalData;
+  /**
+   * Make the @p AdditionalData
+   * type in the base class
+   * accessible to this class as
+   * well.
+   */
+  typedef
+  typename SparseLUDecomposition<number>::AdditionalData
+  AdditionalData;
 
-                                     /**
-                                      * This method is deprecated, and
-                                      * left for backward
-                                      * compability. It will be
-                                      * removed in later versions.
-                                      */
-    void reinit (const SparsityPattern &sparsity);
+  /**
+   * This method is deprecated, and
+   * left for backward
+   * compability. It will be
+   * removed in later versions.
+   */
+  void reinit (const SparsityPattern &sparsity);
 
-                                     /**
-                                      * Same as @p decompose.
-                                      */
-    template <typename somenumber>
-    void initialize (const SparseMatrix<somenumber> &matrix,
-                     const AdditionalData parameters);
+  /**
+   * Same as @p decompose.
+   */
+  template <typename somenumber>
+  void initialize (const SparseMatrix<somenumber> &matrix,
+                   const AdditionalData parameters);
 
-                                     /**
-                                      * This method is deprecated, and
-                                      * left for backward
-                                      * compability. It will be
-                                      * removed in later versions.
-                                      */
-    template <typename somenumber>
-    void decompose (const SparseMatrix<somenumber> &matrix,
-                    const double                   strengthen_diagonal=0.);
+  /**
+   * This method is deprecated, and
+   * left for backward
+   * compability. It will be
+   * removed in later versions.
+   */
+  template <typename somenumber>
+  void decompose (const SparseMatrix<somenumber> &matrix,
+                  const double                   strengthen_diagonal=0.);
 
-                                     /**
-                                      * Apply the incomplete decomposition,
-                                      * i.e. do one forward-backward step
-                                      * $dst=(LU)^{-1}src$.
-                                      *
-                                      * Call @p initialize before
-                                      * calling this function.
-                                      */
-    template <typename somenumber>
-    void vmult (Vector<somenumber>       &dst,
-                const Vector<somenumber> &src) const;
+  /**
+   * Apply the incomplete decomposition,
+   * i.e. do one forward-backward step
+   * $dst=(LU)^{-1}src$.
+   *
+   * Call @p initialize before
+   * calling this function.
+   */
+  template <typename somenumber>
+  void vmult (Vector<somenumber>       &dst,
+              const Vector<somenumber> &src) const;
 
-                                     /**
-                                      * Determine an estimate for the
-                                      * memory consumption (in bytes)
-                                      * of this object.
-                                      */
-    std::size_t memory_consumption () const;
+  /**
+   * Determine an estimate for the
+   * memory consumption (in bytes)
+   * of this object.
+   */
+  std::size_t memory_consumption () const;
 
-                                     /** @addtogroup Exceptions
-                                      * @{ */
+  /** @addtogroup Exceptions
+   * @{ */
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcStrengthenDiagonalTooSmall);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException1 (ExcInvalidStrengthening,
-                    double,
-                    << "The strengthening parameter " << arg1
-                    << " is not greater or equal than zero!");
-                                     /**
-                                      * Exception
-                                      */
-    DeclException2(ExcDecompositionNotStable, int, double,
-                   << "The diagonal element (" <<arg1<<","<<arg1<<") is "
-                   << arg2 <<", but must be positive");
+  /**
+   * Exception
+   */
+  DeclException0 (ExcStrengthenDiagonalTooSmall);
+  /**
+   * Exception
+   */
+  DeclException1 (ExcInvalidStrengthening,
+                  double,
+                  << "The strengthening parameter " << arg1
+                  << " is not greater or equal than zero!");
+  /**
+   * Exception
+   */
+  DeclException2(ExcDecompositionNotStable, int, double,
+                 << "The diagonal element (" <<arg1<<","<<arg1<<") is "
+                 << arg2 <<", but must be positive");
 
-                                     //@}
-  private:
-                                     /**
-                                      * Values of the computed
-                                      * diagonal.
-                                      */
-    std::vector<number> diag;
+  //@}
+private:
+  /**
+   * Values of the computed
+   * diagonal.
+   */
+  std::vector<number> diag;
 
-                                     /**
-                                      * Inverses of the the diagonal:
-                                      * precomputed for faster vmult.
-                                      */
-    std::vector<number> inv_diag;
+  /**
+   * Inverses of the the diagonal:
+   * precomputed for faster vmult.
+   */
+  std::vector<number> inv_diag;
 
-                                     /**
-                                      * Values of the computed "inner
-                                      * sums", i.e. per-row sums of
-                                      * the elements laying on the
-                                      * right side of the diagonal.
-                                      */
-    std::vector<number> inner_sums;
+  /**
+   * Values of the computed "inner
+   * sums", i.e. per-row sums of
+   * the elements laying on the
+   * right side of the diagonal.
+   */
+  std::vector<number> inner_sums;
 
-                                     /**
-                                      * Compute the row-th "inner
-                                      * sum".
-                                      */
-    number get_rowsum (const unsigned int row) const;
+  /**
+   * Compute the row-th "inner
+   * sum".
+   */
+  number get_rowsum (const unsigned int row) const;
 };
 
 /*@}*/

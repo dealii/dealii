@@ -63,236 +63,236 @@ template <int dim, typename Number> class Tensor<1,dim,Number>;
 template <int dim, typename Number>
 class Tensor<0,dim,Number>
 {
-  public:
-                                     /**
-                                      * Provide a way to get the
-                                      * dimension of an object without
-                                      * explicit knowledge of it's
-                                      * data type. Implementation is
-                                      * this way instead of providing
-                                      * a function <tt>dimension()</tt>
-                                      * because now it is possible to
-                                      * get the dimension at compile
-                                      * time without the expansion and
-                                      * preevaluation of an inlined
-                                      * function; the compiler may
-                                      * therefore produce more
-                                      * efficient code and you may use
-                                      * this value to declare other
-                                      * data types.
-                                      */
-    static const unsigned int dimension = dim;
+public:
+  /**
+   * Provide a way to get the
+   * dimension of an object without
+   * explicit knowledge of it's
+   * data type. Implementation is
+   * this way instead of providing
+   * a function <tt>dimension()</tt>
+   * because now it is possible to
+   * get the dimension at compile
+   * time without the expansion and
+   * preevaluation of an inlined
+   * function; the compiler may
+   * therefore produce more
+   * efficient code and you may use
+   * this value to declare other
+   * data types.
+   */
+  static const unsigned int dimension = dim;
 
-                                     /**
-                                      * Publish the rank of this tensor to
-                                      * the outside world.
-                                      */
-    static const unsigned int rank      = 0;
+  /**
+   * Publish the rank of this tensor to
+   * the outside world.
+   */
+  static const unsigned int rank      = 0;
 
-                                     /**
-                                      * Type of stored objects. This
-                                      * is a Number for a rank 1 tensor.
-                                      */
+  /**
+   * Type of stored objects. This
+   * is a Number for a rank 1 tensor.
+   */
 
-    typedef Number value_type;
+  typedef Number value_type;
 
-                                     /**
-                                      * Declare a type that has holds
-                                      * real-valued numbers with the same
-                                      * precision as the template argument to
-                                      * this class. For std::complex<number>,
-                                      * this corresponds to type number, and
-                                      * it is equal to Number for all other
-                                      * cases. See also the respective field
-                                      * in Vector<Number>.
-                                      *
-                                      * This typedef is used to
-                                      * represent the return type of
-                                      * norms.
-                                      */
-    typedef typename numbers::NumberTraits<Number>::real_type real_type;
+  /**
+   * Declare a type that has holds
+   * real-valued numbers with the same
+   * precision as the template argument to
+   * this class. For std::complex<number>,
+   * this corresponds to type number, and
+   * it is equal to Number for all other
+   * cases. See also the respective field
+   * in Vector<Number>.
+   *
+   * This typedef is used to
+   * represent the return type of
+   * norms.
+   */
+  typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
-                                     /**
-                                      * Constructor. Set to zero.
-                                      */
-    Tensor ();
+  /**
+   * Constructor. Set to zero.
+   */
+  Tensor ();
 
-                                     /**
-                                      * Copy constructor, where the
-                                      * data is copied from a C-style
-                                      * array.
-                                      */
-    Tensor (const value_type &initializer);
+  /**
+   * Copy constructor, where the
+   * data is copied from a C-style
+   * array.
+   */
+  Tensor (const value_type &initializer);
 
-                                     /**
-                                      * Copy constructor.
-                                      */
-    Tensor (const Tensor<0,dim,Number> &);
+  /**
+   * Copy constructor.
+   */
+  Tensor (const Tensor<0,dim,Number> &);
 
-                                     /**
-                                      * Conversion to Number. Since
-                                      * rank-0 tensors are scalars,
-                                      * this is a natural operation.
-                                      */
-    operator Number () const;
+  /**
+   * Conversion to Number. Since
+   * rank-0 tensors are scalars,
+   * this is a natural operation.
+   */
+  operator Number () const;
 
-                                     /**
-                                      * Conversion to Number. Since
-                                      * rank-0 tensors are scalars,
-                                      * this is a natural operation.
-                                      *
-                                      * This is the non-const
-                                      * conversion operator that
-                                      * returns a writable reference.
-                                      */
-    operator Number& ();
+  /**
+   * Conversion to Number. Since
+   * rank-0 tensors are scalars,
+   * this is a natural operation.
+   *
+   * This is the non-const
+   * conversion operator that
+   * returns a writable reference.
+   */
+  operator Number &();
 
-                                     /**
-                                      * Assignment operator.
-                                      */
-    Tensor<0,dim,Number> & operator = (const Tensor<0,dim,Number> &);
+  /**
+   * Assignment operator.
+   */
+  Tensor<0,dim,Number> &operator = (const Tensor<0,dim,Number> &);
 
-                                     /**
-                                      * Assignment operator.
-                                      */
-    Tensor<0,dim,Number> & operator = (const Number d);
+  /**
+   * Assignment operator.
+   */
+  Tensor<0,dim,Number> &operator = (const Number d);
 
-                                     /**
-                                      * Test for equality of two
-                                      * tensors.
-                                      */
-    bool operator == (const Tensor<0,dim,Number> &) const;
+  /**
+   * Test for equality of two
+   * tensors.
+   */
+  bool operator == (const Tensor<0,dim,Number> &) const;
 
-                                     /**
-                                      * Test for inequality of two
-                                      * tensors.
-                                      */
-    bool operator != (const Tensor<0,dim,Number> &) const;
+  /**
+   * Test for inequality of two
+   * tensors.
+   */
+  bool operator != (const Tensor<0,dim,Number> &) const;
 
-                                     /**
-                                      * Add another vector, i.e. move
-                                      * this point by the given
-                                      * offset.
-                                      */
-    Tensor<0,dim,Number> & operator += (const Tensor<0,dim,Number> &);
+  /**
+   * Add another vector, i.e. move
+   * this point by the given
+   * offset.
+   */
+  Tensor<0,dim,Number> &operator += (const Tensor<0,dim,Number> &);
 
-                                     /**
-                                      * Subtract another vector.
-                                      */
-    Tensor<0,dim,Number> & operator -= (const Tensor<0,dim,Number> &);
+  /**
+   * Subtract another vector.
+   */
+  Tensor<0,dim,Number> &operator -= (const Tensor<0,dim,Number> &);
 
-                                     /**
-                                      * Scale the vector by
-                                      * <tt>factor</tt>, i.e. multiply all
-                                      * coordinates by <tt>factor</tt>.
-                                      */
-    Tensor<0,dim,Number> & operator *= (const Number factor);
+  /**
+   * Scale the vector by
+   * <tt>factor</tt>, i.e. multiply all
+   * coordinates by <tt>factor</tt>.
+   */
+  Tensor<0,dim,Number> &operator *= (const Number factor);
 
-                                     /**
-                                      * Scale the vector by <tt>1/factor</tt>.
-                                      */
-    Tensor<0,dim,Number> & operator /= (const Number factor);
+  /**
+   * Scale the vector by <tt>1/factor</tt>.
+   */
+  Tensor<0,dim,Number> &operator /= (const Number factor);
 
-                                     /**
-                                      * Returns the scalar product of
-                                      * two vectors.
-                                      */
-    Number                 operator * (const Tensor<0,dim,Number> &) const;
+  /**
+   * Returns the scalar product of
+   * two vectors.
+   */
+  Number                 operator * (const Tensor<0,dim,Number> &) const;
 
-                                     /**
-                                      * Add two tensors. If possible,
-                                      * use <tt>operator +=</tt> instead
-                                      * since this does not need to
-                                      * copy a point at least once.
-                                      */
-    Tensor<0,dim,Number>   operator + (const Tensor<0,dim,Number> &) const;
+  /**
+   * Add two tensors. If possible,
+   * use <tt>operator +=</tt> instead
+   * since this does not need to
+   * copy a point at least once.
+   */
+  Tensor<0,dim,Number>   operator + (const Tensor<0,dim,Number> &) const;
 
-                                     /**
-                                      * Subtract two tensors. If
-                                      * possible, use <tt>operator +=</tt>
-                                      * instead since this does not
-                                      * need to copy a point at least
-                                      * once.
-                                      */
-    Tensor<0,dim,Number>   operator - (const Tensor<0,dim,Number> &) const;
+  /**
+   * Subtract two tensors. If
+   * possible, use <tt>operator +=</tt>
+   * instead since this does not
+   * need to copy a point at least
+   * once.
+   */
+  Tensor<0,dim,Number>   operator - (const Tensor<0,dim,Number> &) const;
 
-                                     /**
-                                      * Tensor with inverted entries.
-                                      */
-    Tensor<0,dim,Number>   operator - () const;
+  /**
+   * Tensor with inverted entries.
+   */
+  Tensor<0,dim,Number>   operator - () const;
 
-                                     /**
-                                      * Return the Frobenius-norm of a
-                                      * tensor, i.e. the square root
-                                      * of the sum of squares of all
-                                      * entries. For the present case
-                                      * of rank-1 tensors, this equals
-                                      * the usual
-                                      * <tt>l<sub>2</sub></tt> norm of
-                                      * the vector.
-                                      */
-    real_type norm () const;
+  /**
+   * Return the Frobenius-norm of a
+   * tensor, i.e. the square root
+   * of the sum of squares of all
+   * entries. For the present case
+   * of rank-1 tensors, this equals
+   * the usual
+   * <tt>l<sub>2</sub></tt> norm of
+   * the vector.
+   */
+  real_type norm () const;
 
-                                     /**
-                                      * Return the square of the
-                                      * Frobenius-norm of a tensor,
-                                      * i.e. the square root of the
-                                      * sum of squares of all entries.
-                                      *
-                                      * This function mainly exists
-                                      * because it makes computing the
-                                      * norm simpler recursively, but
-                                      * may also be useful in other
-                                      * contexts.
-                                      */
-    real_type norm_square () const;
+  /**
+   * Return the square of the
+   * Frobenius-norm of a tensor,
+   * i.e. the square root of the
+   * sum of squares of all entries.
+   *
+   * This function mainly exists
+   * because it makes computing the
+   * norm simpler recursively, but
+   * may also be useful in other
+   * contexts.
+   */
+  real_type norm_square () const;
 
-                                     /**
-                                      * Reset all values to zero.
-                                      *
-                                      * Note that this is partly inconsistent
-                                      * with the semantics of the @p clear()
-                                      * member functions of the STL and of
-                                      * several other classes within deal.II
-                                      * which not only reset the values of
-                                      * stored elements to zero, but release
-                                      * all memory and return the object into
-                                      * a virginial state. However, since the
-                                      * size of objects of the present type is
-                                      * determined by its template parameters,
-                                      * resizing is not an option, and indeed
-                                      * the state where all elements have a
-                                      * zero value is the state right after
-                                      * construction of such an object.
-                                      */
-    void clear ();
+  /**
+   * Reset all values to zero.
+   *
+   * Note that this is partly inconsistent
+   * with the semantics of the @p clear()
+   * member functions of the STL and of
+   * several other classes within deal.II
+   * which not only reset the values of
+   * stored elements to zero, but release
+   * all memory and return the object into
+   * a virginial state. However, since the
+   * size of objects of the present type is
+   * determined by its template parameters,
+   * resizing is not an option, and indeed
+   * the state where all elements have a
+   * zero value is the state right after
+   * construction of such an object.
+   */
+  void clear ();
 
-                                     /**
-                                      * Only tensors with a positive
-                                      * dimension are implemented. This
-                                      * exception is thrown by the
-                                      * constructor if the template
-                                      * argument <tt>dim</tt> is zero or
-                                      * less.
-                                      *
-                                      * @ingroup Exceptions
-                                      */
-    DeclException1 (ExcDimTooSmall,
-                    int,
-                    << "dim must be positive, but was " << arg1);
+  /**
+   * Only tensors with a positive
+   * dimension are implemented. This
+   * exception is thrown by the
+   * constructor if the template
+   * argument <tt>dim</tt> is zero or
+   * less.
+   *
+   * @ingroup Exceptions
+   */
+  DeclException1 (ExcDimTooSmall,
+                  int,
+                  << "dim must be positive, but was " << arg1);
 
-                     /**
-                      * Read or write the data of this object to or
-                      * from a stream for the purpose of serialization
-                      */
-    template <class Archive>
-    void serialize(Archive & ar, const unsigned int version);
+  /**
+   * Read or write the data of this object to or
+   * from a stream for the purpose of serialization
+   */
+  template <class Archive>
+  void serialize(Archive &ar, const unsigned int version);
 
-  private:
-                                     /**
-                                      * The value of this scalar object.
-                                      */
-    Number value;
+private:
+  /**
+   * The value of this scalar object.
+   */
+  Number value;
 };
 
 
@@ -322,345 +322,345 @@ class Tensor<0,dim,Number>
 template <int dim,typename Number>
 class Tensor<1,dim,Number>
 {
-  public:
-                                     /**
-                                      * Provide a way to get the
-                                      * dimension of an object without
-                                      * explicit knowledge of it's
-                                      * data type. Implementation is
-                                      * this way instead of providing
-                                      * a function <tt>dimension()</tt>
-                                      * because now it is possible to
-                                      * get the dimension at compile
-                                      * time without the expansion and
-                                      * preevaluation of an inlined
-                                      * function; the compiler may
-                                      * therefore produce more
-                                      * efficient code and you may use
-                                      * this value to declare other
-                                      * data types.
-                                      */
-    static const unsigned int dimension = dim;
+public:
+  /**
+   * Provide a way to get the
+   * dimension of an object without
+   * explicit knowledge of it's
+   * data type. Implementation is
+   * this way instead of providing
+   * a function <tt>dimension()</tt>
+   * because now it is possible to
+   * get the dimension at compile
+   * time without the expansion and
+   * preevaluation of an inlined
+   * function; the compiler may
+   * therefore produce more
+   * efficient code and you may use
+   * this value to declare other
+   * data types.
+   */
+  static const unsigned int dimension = dim;
 
-                                     /**
-                                      * Publish the rank of this tensor to
-                                      * the outside world.
-                                      */
-    static const unsigned int rank      = 1;
+  /**
+   * Publish the rank of this tensor to
+   * the outside world.
+   */
+  static const unsigned int rank      = 1;
 
-                                     /**
-                                      * Type of stored objects. This
-                                      * is a Number for a rank 1 tensor.
-                                      */
+  /**
+   * Type of stored objects. This
+   * is a Number for a rank 1 tensor.
+   */
 
-    typedef Number value_type;
+  typedef Number value_type;
 
-                                     /**
-                                      * Declare a type that has holds
-                                      * real-valued numbers with the same
-                                      * precision as the template argument to
-                                      * this class. For std::complex<number>,
-                                      * this corresponds to type number, and
-                                      * it is equal to Number for all other
-                                      * cases. See also the respective field
-                                      * in Vector<Number>.
-                                      *
-                                      * This typedef is used to
-                                      * represent the return type of
-                                      * norms.
-                                      */
-    typedef typename numbers::NumberTraits<Number>::real_type real_type;
+  /**
+   * Declare a type that has holds
+   * real-valued numbers with the same
+   * precision as the template argument to
+   * this class. For std::complex<number>,
+   * this corresponds to type number, and
+   * it is equal to Number for all other
+   * cases. See also the respective field
+   * in Vector<Number>.
+   *
+   * This typedef is used to
+   * represent the return type of
+   * norms.
+   */
+  typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
-                                     /**
-                                      * Declare an array type which can
-                                      * be used to initialize statically
-                                      * an object of this type.
-                                      *
-                                      * Avoid warning about zero-sized
-                                      * array for <tt>dim==0</tt> by
-                                      * choosing lunatic value that is
-                                      * likely to overflow memory
-                                      * limits.
-                                      */
-    typedef Number array_type[(dim!=0) ? dim : 100000000];
+  /**
+   * Declare an array type which can
+   * be used to initialize statically
+   * an object of this type.
+   *
+   * Avoid warning about zero-sized
+   * array for <tt>dim==0</tt> by
+   * choosing lunatic value that is
+   * likely to overflow memory
+   * limits.
+   */
+  typedef Number array_type[(dim!=0) ? dim : 100000000];
 
-                                     /**
-                                      * Constructor. Initialize all entries
-                                      * to zero if <tt>initialize==true</tt>; this
-                                      * is the default behaviour.
-                                      */
-    explicit Tensor (const bool initialize = true);
+  /**
+   * Constructor. Initialize all entries
+   * to zero if <tt>initialize==true</tt>; this
+   * is the default behaviour.
+   */
+  explicit Tensor (const bool initialize = true);
 
-                                     /**
-                                      * Copy constructor, where the
-                                      * data is copied from a C-style
-                                      * array.
-                                      */
-    Tensor (const array_type &initializer);
+  /**
+   * Copy constructor, where the
+   * data is copied from a C-style
+   * array.
+   */
+  Tensor (const array_type &initializer);
 
-                                     /**
-                                      * Copy constructor.
-                                      */
-    Tensor (const Tensor<1,dim,Number> &);
+  /**
+   * Copy constructor.
+   */
+  Tensor (const Tensor<1,dim,Number> &);
 
-                                     /**
-                                      * Read access to the <tt>index</tt>th
-                                      * coordinate.
-                                      *
-                                      * Note that the derived
-                                      * <tt>Point</tt> class also provides
-                                      * access through the <tt>()</tt>
-                                      * operator for
-                                      * backcompatibility.
-                                      */
-    Number   operator [] (const unsigned int index) const;
+  /**
+   * Read access to the <tt>index</tt>th
+   * coordinate.
+   *
+   * Note that the derived
+   * <tt>Point</tt> class also provides
+   * access through the <tt>()</tt>
+   * operator for
+   * backcompatibility.
+   */
+  Number   operator [] (const unsigned int index) const;
 
-                                     /**
-                                      * Read and write access to the
-                                      * <tt>index</tt>th coordinate.
-                                      *
-                                      * Note that the derived
-                                      * <tt>Point</tt> class also provides
-                                      * access through the <tt>()</tt>
-                                      * operator for
-                                      * backcompatibility.
-                                      */
-    Number & operator [] (const unsigned int index);
+  /**
+   * Read and write access to the
+   * <tt>index</tt>th coordinate.
+   *
+   * Note that the derived
+   * <tt>Point</tt> class also provides
+   * access through the <tt>()</tt>
+   * operator for
+   * backcompatibility.
+   */
+  Number &operator [] (const unsigned int index);
 
-                                     /**
-                                      * Assignment operator.
-                                      */
-    Tensor<1,dim,Number> & operator = (const Tensor<1,dim,Number> &);
+  /**
+   * Assignment operator.
+   */
+  Tensor<1,dim,Number> &operator = (const Tensor<1,dim,Number> &);
 
-                                     /**
-                                      * This operator assigns a scalar
-                                      * to a tensor. To avoid
-                                      * confusion with what exactly it
-                                      * means to assign a scalar value
-                                      * to a tensor, zero is the only
-                                      * value allowed for <tt>d</tt>,
-                                      * allowing the intuitive
-                                      * notation <tt>t=0</tt> to reset
-                                      * all elements of the tensor to
-                                      * zero.
-                                      */
-    Tensor<1,dim,Number> & operator = (const Number d);
+  /**
+   * This operator assigns a scalar
+   * to a tensor. To avoid
+   * confusion with what exactly it
+   * means to assign a scalar value
+   * to a tensor, zero is the only
+   * value allowed for <tt>d</tt>,
+   * allowing the intuitive
+   * notation <tt>t=0</tt> to reset
+   * all elements of the tensor to
+   * zero.
+   */
+  Tensor<1,dim,Number> &operator = (const Number d);
 
-                                     /**
-                                      * Test for equality of two
-                                      * tensors.
-                                      */
-    bool operator == (const Tensor<1,dim,Number> &) const;
+  /**
+   * Test for equality of two
+   * tensors.
+   */
+  bool operator == (const Tensor<1,dim,Number> &) const;
 
-                                     /**
-                                      * Test for inequality of two
-                                      * tensors.
-                                      */
-    bool operator != (const Tensor<1,dim,Number> &) const;
+  /**
+   * Test for inequality of two
+   * tensors.
+   */
+  bool operator != (const Tensor<1,dim,Number> &) const;
 
-                                     /**
-                                      * Add another vector, i.e. move
-                                      * this point by the given
-                                      * offset.
-                                      */
-    Tensor<1,dim,Number> & operator += (const Tensor<1,dim,Number> &);
+  /**
+   * Add another vector, i.e. move
+   * this point by the given
+   * offset.
+   */
+  Tensor<1,dim,Number> &operator += (const Tensor<1,dim,Number> &);
 
-                                     /**
-                                      * Subtract another vector.
-                                      */
-    Tensor<1,dim,Number> & operator -= (const Tensor<1,dim,Number> &);
+  /**
+   * Subtract another vector.
+   */
+  Tensor<1,dim,Number> &operator -= (const Tensor<1,dim,Number> &);
 
-                                     /**
-                                      * Scale the vector by
-                                      * <tt>factor</tt>, i.e. multiply all
-                                      * coordinates by <tt>factor</tt>.
-                                      */
-    Tensor<1,dim,Number> & operator *= (const Number factor);
+  /**
+   * Scale the vector by
+   * <tt>factor</tt>, i.e. multiply all
+   * coordinates by <tt>factor</tt>.
+   */
+  Tensor<1,dim,Number> &operator *= (const Number factor);
 
-                                     /**
-                                      * Scale the vector by <tt>1/factor</tt>.
-                                      */
-    Tensor<1,dim,Number> & operator /= (const Number factor);
+  /**
+   * Scale the vector by <tt>1/factor</tt>.
+   */
+  Tensor<1,dim,Number> &operator /= (const Number factor);
 
-                                     /**
-                                      * Returns the scalar product of
-                                      * two vectors.
-                                      */
-    Number                 operator * (const Tensor<1,dim,Number> &) const;
+  /**
+   * Returns the scalar product of
+   * two vectors.
+   */
+  Number                 operator * (const Tensor<1,dim,Number> &) const;
 
-                                     /**
-                                      * Add two tensors. If possible,
-                                      * use <tt>operator +=</tt> instead
-                                      * since this does not need to
-                                      * copy a point at least once.
-                                      */
-    Tensor<1,dim,Number>   operator + (const Tensor<1,dim,Number> &) const;
+  /**
+   * Add two tensors. If possible,
+   * use <tt>operator +=</tt> instead
+   * since this does not need to
+   * copy a point at least once.
+   */
+  Tensor<1,dim,Number>   operator + (const Tensor<1,dim,Number> &) const;
 
-                                     /**
-                                      * Subtract two tensors. If
-                                      * possible, use <tt>operator +=</tt>
-                                      * instead since this does not
-                                      * need to copy a point at least
-                                      * once.
-                                      */
-    Tensor<1,dim,Number>   operator - (const Tensor<1,dim,Number> &) const;
+  /**
+   * Subtract two tensors. If
+   * possible, use <tt>operator +=</tt>
+   * instead since this does not
+   * need to copy a point at least
+   * once.
+   */
+  Tensor<1,dim,Number>   operator - (const Tensor<1,dim,Number> &) const;
 
-                                     /**
-                                      * Tensor with inverted entries.
-                                      */
-    Tensor<1,dim,Number>   operator - () const;
+  /**
+   * Tensor with inverted entries.
+   */
+  Tensor<1,dim,Number>   operator - () const;
 
-                                     /**
-                                      * Return the Frobenius-norm of a
-                                      * tensor, i.e. the square root
-                                      * of the sum of squares of all
-                                      * entries. For the present case
-                                      * of rank-1 tensors, this equals
-                                      * the usual
-                                      * <tt>l<sub>2</sub></tt> norm of
-                                      * the vector.
-                                      */
-    real_type norm () const;
+  /**
+   * Return the Frobenius-norm of a
+   * tensor, i.e. the square root
+   * of the sum of squares of all
+   * entries. For the present case
+   * of rank-1 tensors, this equals
+   * the usual
+   * <tt>l<sub>2</sub></tt> norm of
+   * the vector.
+   */
+  real_type norm () const;
 
-                                     /**
-                                      * Return the square of the
-                                      * Frobenius-norm of a tensor,
-                                      * i.e. the square root of the
-                                      * sum of squares of all entries.
-                                      *
-                                      * This function mainly exists
-                                      * because it makes computing the
-                                      * norm simpler recursively, but
-                                      * may also be useful in other
-                                      * contexts.
-                                      */
-    real_type norm_square () const;
+  /**
+   * Return the square of the
+   * Frobenius-norm of a tensor,
+   * i.e. the square root of the
+   * sum of squares of all entries.
+   *
+   * This function mainly exists
+   * because it makes computing the
+   * norm simpler recursively, but
+   * may also be useful in other
+   * contexts.
+   */
+  real_type norm_square () const;
 
-                                     /**
-                                      * Reset all values to zero.
-                                      *
-                                      * Note that this is partly inconsistent
-                                      * with the semantics of the @p clear()
-                                      * member functions of the STL and of
-                                      * several other classes within deal.II
-                                      * which not only reset the values of
-                                      * stored elements to zero, but release
-                                      * all memory and return the object into
-                                      * a virginial state. However, since the
-                                      * size of objects of the present type is
-                                      * determined by its template parameters,
-                                      * resizing is not an option, and indeed
-                                      * the state where all elements have a
-                                      * zero value is the state right after
-                                      * construction of such an object.
-                                      */
-    void clear ();
+  /**
+   * Reset all values to zero.
+   *
+   * Note that this is partly inconsistent
+   * with the semantics of the @p clear()
+   * member functions of the STL and of
+   * several other classes within deal.II
+   * which not only reset the values of
+   * stored elements to zero, but release
+   * all memory and return the object into
+   * a virginial state. However, since the
+   * size of objects of the present type is
+   * determined by its template parameters,
+   * resizing is not an option, and indeed
+   * the state where all elements have a
+   * zero value is the state right after
+   * construction of such an object.
+   */
+  void clear ();
 
-                                     /**
-                                      * Fill a vector with all tensor elements.
-                                      *
-                                      * This function unrolls all
-                                      * tensor entries into a single,
-                                      * linearly numbered vector. As
-                                      * usual in C++, the rightmost
-                                      * index marches fastest.
-                                      */
-    template <typename Number2>
-    void unroll (Vector<Number2> &result) const;
+  /**
+   * Fill a vector with all tensor elements.
+   *
+   * This function unrolls all
+   * tensor entries into a single,
+   * linearly numbered vector. As
+   * usual in C++, the rightmost
+   * index marches fastest.
+   */
+  template <typename Number2>
+  void unroll (Vector<Number2> &result) const;
 
-                                     /**
-                                      * Determine an estimate for
-                                      * the memory consumption (in
-                                      * bytes) of this
-                                      * object.
-                                      */
-    static std::size_t memory_consumption ();
+  /**
+   * Determine an estimate for
+   * the memory consumption (in
+   * bytes) of this
+   * object.
+   */
+  static std::size_t memory_consumption ();
 
-                                     /**
-                                      * Only tensors with a positive
-                                      * dimension are implemented. This
-                                      * exception is thrown by the
-                                      * constructor if the template
-                                      * argument <tt>dim</tt> is zero or
-                                      * less.
-                                      *
-                                      * @ingroup Exceptions
-                                      */
-    DeclException1 (ExcDimTooSmall,
-                    int,
-                    << "dim must be positive, but was " << arg1);
+  /**
+   * Only tensors with a positive
+   * dimension are implemented. This
+   * exception is thrown by the
+   * constructor if the template
+   * argument <tt>dim</tt> is zero or
+   * less.
+   *
+   * @ingroup Exceptions
+   */
+  DeclException1 (ExcDimTooSmall,
+                  int,
+                  << "dim must be positive, but was " << arg1);
 
-                     /**
-                      * Read or write the data of this object to or
-                      * from a stream for the purpose of serialization
-                      */
-    template <class Archive>
-    void serialize(Archive & ar, const unsigned int version);
+  /**
+   * Read or write the data of this object to or
+   * from a stream for the purpose of serialization
+   */
+  template <class Archive>
+  void serialize(Archive &ar, const unsigned int version);
 
-  private:
-                                     /**
-                                      * Store the values in a simple
-                                      * array.  For <tt>dim==0</tt> store
-                                      * one element, because otherways
-                                      * the compiler would choke.  We
-                                      * catch this case in the
-                                      * constructor to disallow the
-                                      * creation of such an object.
-                                      */
-    Number values[(dim!=0) ? (dim) : (dim+1)];
+private:
+  /**
+   * Store the values in a simple
+   * array.  For <tt>dim==0</tt> store
+   * one element, because otherways
+   * the compiler would choke.  We
+   * catch this case in the
+   * constructor to disallow the
+   * creation of such an object.
+   */
+  Number values[(dim!=0) ? (dim) : (dim+1)];
 
-                                     /**
-                                      * Help function for unroll. If
-                                      * we have detected an access
-                                      * control bug in the compiler,
-                                      * this function is declared
-                                      * public, otherwise private. Do
-                                      * not attempt to use this
-                                      * function from outside in any
-                                      * case, even if it should be
-                                      * public for your compiler.
-                                      */
-    template <typename Number2>
-    void unroll_recursion (Vector<Number2> &result,
-                           unsigned int    &start_index) const;
+  /**
+   * Help function for unroll. If
+   * we have detected an access
+   * control bug in the compiler,
+   * this function is declared
+   * public, otherwise private. Do
+   * not attempt to use this
+   * function from outside in any
+   * case, even if it should be
+   * public for your compiler.
+   */
+  template <typename Number2>
+  void unroll_recursion (Vector<Number2> &result,
+                         unsigned int    &start_index) const;
 
-  private:
-                                     /**
-                                      * Make the following classes
-                                      * friends to this class. In
-                                      * principle, it would suffice if
-                                      * otherrank==2, but that is not
-                                      * possible in C++ at present.
-                                      *
-                                      * Also, it would be sufficient
-                                      * to make the function
-                                      * unroll_loops a friend, but
-                                      * that seems to be impossible as
-                                      * well.
-                                      */
-    template <int otherrank, int otherdim, typename OtherNumber>  friend class dealii::Tensor;
+private:
+  /**
+   * Make the following classes
+   * friends to this class. In
+   * principle, it would suffice if
+   * otherrank==2, but that is not
+   * possible in C++ at present.
+   *
+   * Also, it would be sufficient
+   * to make the function
+   * unroll_loops a friend, but
+   * that seems to be impossible as
+   * well.
+   */
+  template <int otherrank, int otherdim, typename OtherNumber>  friend class dealii::Tensor;
 
-                                     /**
-                                      * Point is allowed access to
-                                      * the coordinates. This is
-                                      * supposed to improve speed.
-                                      */
-    friend class Point<dim,Number>;
+  /**
+   * Point is allowed access to
+   * the coordinates. This is
+   * supposed to improve speed.
+   */
+  friend class Point<dim,Number>;
 };
 
 
-                                 /**
-                                  *  Prints the value of this scalar.
-                                  */
+/**
+ *  Prints the value of this scalar.
+ */
 template <int dim,typename Number>
-std::ostream & operator << (std::ostream &out, const Tensor<0,dim,Number> &p);
+std::ostream &operator << (std::ostream &out, const Tensor<0,dim,Number> &p);
 
-                                 /**
-                                  *  Prints the values of this tensor in the
-                                  *  form <tt>x1 x2 x3 etc</tt>.
-                                  */
+/**
+ *  Prints the values of this tensor in the
+ *  form <tt>x1 x2 x3 etc</tt>.
+ */
 template <int dim,typename Number>
-std::ostream & operator << (std::ostream &out, const Tensor<1,dim,Number> &p);
+std::ostream &operator << (std::ostream &out, const Tensor<1,dim,Number> &p);
 
 
 #ifndef DOXYGEN
@@ -712,7 +712,7 @@ Tensor<0,dim,Number>::operator Number () const
 
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number>::operator Number & ()
+Tensor<0,dim,Number>::operator Number &()
 {
   return value;
 }
@@ -721,7 +721,7 @@ Tensor<0,dim,Number>::operator Number & ()
 
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number> & Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Number> &p)
+Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Number> &p)
 {
   value = p.value;
   return *this;
@@ -731,7 +731,7 @@ Tensor<0,dim,Number> & Tensor<0,dim,Number>::operator = (const Tensor<0,dim,Numb
 
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number> & Tensor<0,dim,Number>::operator = (const Number d)
+Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator = (const Number d)
 {
   value = d;
   return *this;
@@ -759,7 +759,7 @@ bool Tensor<0,dim,Number>::operator != (const Tensor<0,dim,Number> &p) const
 
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number> & Tensor<0,dim,Number>::operator += (const Tensor<0,dim,Number> &p)
+Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator += (const Tensor<0,dim,Number> &p)
 {
   value += p.value;
   return *this;
@@ -769,7 +769,7 @@ Tensor<0,dim,Number> & Tensor<0,dim,Number>::operator += (const Tensor<0,dim,Num
 
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number> & Tensor<0,dim,Number>::operator -= (const Tensor<0,dim,Number> &p)
+Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator -= (const Tensor<0,dim,Number> &p)
 {
   value -= p.value;
   return *this;
@@ -779,7 +779,7 @@ Tensor<0,dim,Number> & Tensor<0,dim,Number>::operator -= (const Tensor<0,dim,Num
 
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number> & Tensor<0,dim,Number>::operator *= (const Number s)
+Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator *= (const Number s)
 {
   value *= s;
   return *this;
@@ -789,7 +789,7 @@ Tensor<0,dim,Number> & Tensor<0,dim,Number>::operator *= (const Number s)
 
 template <int dim, typename Number>
 inline
-Tensor<0,dim,Number> & Tensor<0,dim,Number>::operator /= (const Number s)
+Tensor<0,dim,Number> &Tensor<0,dim,Number>::operator /= (const Number s)
 {
   value /= s;
   return *this;
@@ -865,9 +865,9 @@ void Tensor<0,dim,Number>::clear ()
 template <int dim, typename Number>
 template <class Archive>
 inline
-void Tensor<0,dim,Number>::serialize(Archive & ar, const unsigned int)
+void Tensor<0,dim,Number>::serialize(Archive &ar, const unsigned int)
 {
-  ar & value;
+  ar &value;
 }
 
 /*---------------------------- Inline functions: Tensor<1,dim,Number> ------------------------*/
@@ -878,11 +878,11 @@ inline
 Tensor<1,dim,Number>::Tensor (const bool initialize)
 {
   if (initialize)
-                                // need to create an object Number() to
-                                // initialize to zero to avoid confusion with
-                                // Tensor::operator=(scalar) when using
-                                // something like
-                                // Tensor<1,dim,Tensor<1,dim,Number> >.
+    // need to create an object Number() to
+    // initialize to zero to avoid confusion with
+    // Tensor::operator=(scalar) when using
+    // something like
+    // Tensor<1,dim,Tensor<1,dim,Number> >.
     for (unsigned int i=0; i!=dim; ++i)
       values[i] = Number();
 }
@@ -917,16 +917,16 @@ template <>
 inline
 Tensor<1,0,double>::Tensor (const Tensor<1,0,double> &)
 {
-                                   // at some places in the library,
-                                   // we have Point<0> for formal
-                                   // reasons (e.g., we sometimes have
-                                   // Quadrature<dim-1> for faces, so
-                                   // we have Quadrature<0> for dim=1,
-                                   // and then we have Point<0>). To
-                                   // avoid warnings in the above
-                                   // function that the loop end check
-                                   // always fails, we implement this
-                                   // function here
+  // at some places in the library,
+  // we have Point<0> for formal
+  // reasons (e.g., we sometimes have
+  // Quadrature<dim-1> for faces, so
+  // we have Quadrature<0> for dim=1,
+  // and then we have Point<0>). To
+  // avoid warnings in the above
+  // function that the loop end check
+  // always fails, we implement this
+  // function here
 }
 
 
@@ -943,7 +943,7 @@ Number Tensor<1,dim,Number>::operator [] (const unsigned int index) const
 
 template <int dim, typename Number>
 inline
-Number & Tensor<1,dim,Number>::operator [] (const unsigned int index)
+Number &Tensor<1,dim,Number>::operator [] (const unsigned int index)
 {
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
@@ -953,18 +953,18 @@ Number & Tensor<1,dim,Number>::operator [] (const unsigned int index)
 
 template <>
 inline
-Tensor<1,0,double> & Tensor<1,0,double>::operator = (const Tensor<1,0,double> &)
+Tensor<1,0,double> &Tensor<1,0,double>::operator = (const Tensor<1,0,double> &)
 {
-                                   // at some places in the library,
-                                   // we have Point<0> for formal
-                                   // reasons (e.g., we sometimes have
-                                   // Quadrature<dim-1> for faces, so
-                                   // we have Quadrature<0> for dim=1,
-                                   // and then we have Point<0>). To
-                                   // avoid warnings in the above
-                                   // function that the loop end check
-                                   // always fails, we implement this
-                                   // function here
+  // at some places in the library,
+  // we have Point<0> for formal
+  // reasons (e.g., we sometimes have
+  // Quadrature<dim-1> for faces, so
+  // we have Quadrature<0> for dim=1,
+  // and then we have Point<0>). To
+  // avoid warnings in the above
+  // function that the loop end check
+  // always fails, we implement this
+  // function here
   return *this;
 }
 
@@ -985,7 +985,7 @@ Tensor<1,dim,Number>::operator = (const Tensor<1,dim,Number> &p)
 
 template <int dim, typename Number>
 inline
-Tensor<1,dim,Number> & Tensor<1,dim,Number>::operator = (const Number d)
+Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator = (const Number d)
 {
   Assert (d==Number(0), ExcMessage ("Only assignment with zero is allowed"));
   (void) d;
@@ -1030,7 +1030,7 @@ bool Tensor<1,dim,Number>::operator != (const Tensor<1,dim,Number> &p) const
 
 template <int dim, typename Number>
 inline
-Tensor<1,dim,Number> & Tensor<1,dim,Number>::operator += (const Tensor<1,dim,Number> &p)
+Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator += (const Tensor<1,dim,Number> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] += p.values[i];
@@ -1041,7 +1041,7 @@ Tensor<1,dim,Number> & Tensor<1,dim,Number>::operator += (const Tensor<1,dim,Num
 
 template <int dim, typename Number>
 inline
-Tensor<1,dim,Number> & Tensor<1,dim,Number>::operator -= (const Tensor<1,dim,Number> &p)
+Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator -= (const Tensor<1,dim,Number> &p)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] -= p.values[i];
@@ -1052,7 +1052,7 @@ Tensor<1,dim,Number> & Tensor<1,dim,Number>::operator -= (const Tensor<1,dim,Num
 
 template <int dim, typename Number>
 inline
-Tensor<1,dim,Number> & Tensor<1,dim,Number>::operator *= (const Number s)
+Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator *= (const Number s)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] *= s;
@@ -1063,7 +1063,7 @@ Tensor<1,dim,Number> & Tensor<1,dim,Number>::operator *= (const Number s)
 
 template <int dim, typename Number>
 inline
-Tensor<1,dim,Number> & Tensor<1,dim,Number>::operator /= (const Number s)
+Tensor<1,dim,Number> &Tensor<1,dim,Number>::operator /= (const Number s)
 {
   for (unsigned int i=0; i<dim; ++i)
     values[i] /= s;
@@ -1077,11 +1077,11 @@ inline
 Number
 Tensor<1,dim,Number>::operator * (const Tensor<1,dim,Number> &p) const
 {
-                                   // unroll by hand since this is a
-                                   // frequently called function and
-                                   // some compilers don't want to
-                                   // always unroll the loop in the
-                                   // general template
+  // unroll by hand since this is a
+  // frequently called function and
+  // some compilers don't want to
+  // always unroll the loop in the
+  // general template
   switch (dim)
     {
     case 1:
@@ -1210,9 +1210,9 @@ Tensor<1,dim,Number>::memory_consumption ()
 template <int dim, typename Number>
 template <class Archive>
 inline
-void Tensor<1,dim,Number>::serialize(Archive & ar, const unsigned int)
+void Tensor<1,dim,Number>::serialize(Archive &ar, const unsigned int)
 {
-  ar & values;
+  ar &values;
 }
 #endif // DOXYGEN
 
@@ -1225,7 +1225,7 @@ void Tensor<1,dim,Number>::serialize(Archive & ar, const unsigned int)
  */
 template <int dim, typename Number>
 inline
-std::ostream & operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
+std::ostream &operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
 {
   out << static_cast<Number>(p);
   return out;
@@ -1241,7 +1241,7 @@ std::ostream & operator << (std::ostream &out, const Tensor<0,dim,Number> &p)
  */
 template <int dim, typename Number>
 inline
-std::ostream & operator << (std::ostream &out, const Tensor<1,dim,Number> &p)
+std::ostream &operator << (std::ostream &out, const Tensor<1,dim,Number> &p)
 {
   for (unsigned int i=0; i<dim-1; ++i)
     out << p[i] << ' ';
@@ -1260,7 +1260,7 @@ std::ostream & operator << (std::ostream &out, const Tensor<1,dim,Number> &p)
  * @relates Tensor<1,dim,Number>
  */
 inline
-std::ostream & operator << (std::ostream &out, const Tensor<1,1,double> &p)
+std::ostream &operator << (std::ostream &out, const Tensor<1,1,double> &p)
 {
   out << p[0];
 

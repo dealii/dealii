@@ -61,145 +61,145 @@ DEAL_II_NAMESPACE_OPEN
 template <class VECTOR = Vector<double> >
 class SolverQMRS : public Solver<VECTOR>
 {
-  public:
-                                     /**
-                                      * Standardized data struct to
-                                      * pipe additional data to the
-                                      * solver.
-                                      *
-                                      * There are two possibilities to compute
-                                      * the residual: one is an estimate using
-                                      * the computed value @p tau. The other
-                                      * is exact computation using another matrix
-                                      * vector multiplication.
-                                      *
-                                      * QMRS, is susceptible to
-                                      * breakdowns, so we need a
-                                      * parameter telling us, which
-                                      * numbers are considered
-                                      * zero. The proper breakdown
-                                      * criterion is very unclear, so
-                                      * experiments may be necessary
-                                      * here.
-                                      */
-    struct AdditionalData
-    {
-                                         /**
-                                          * Constructor.
-                                          *
-                                          * The default is no exact residual
-                                          * computation and breakdown
-                                          * parameter 1e-16.
-                                          */
-        AdditionalData(bool exact_residual = false,
-                       double breakdown=1.e-16) :
-                        exact_residual(exact_residual),
-                        breakdown(breakdown)
-          {}
+public:
+  /**
+   * Standardized data struct to
+   * pipe additional data to the
+   * solver.
+   *
+   * There are two possibilities to compute
+   * the residual: one is an estimate using
+   * the computed value @p tau. The other
+   * is exact computation using another matrix
+   * vector multiplication.
+   *
+   * QMRS, is susceptible to
+   * breakdowns, so we need a
+   * parameter telling us, which
+   * numbers are considered
+   * zero. The proper breakdown
+   * criterion is very unclear, so
+   * experiments may be necessary
+   * here.
+   */
+  struct AdditionalData
+  {
+    /**
+     * Constructor.
+     *
+     * The default is no exact residual
+     * computation and breakdown
+     * parameter 1e-16.
+     */
+    AdditionalData(bool exact_residual = false,
+                   double breakdown=1.e-16) :
+      exact_residual(exact_residual),
+      breakdown(breakdown)
+    {}
 
-                                         /**
-                                          * Flag for exact computation of residual.
-                                          */
-        bool exact_residual;
+    /**
+     * Flag for exact computation of residual.
+     */
+    bool exact_residual;
 
-                                         /**
-                                          * Breakdown threshold.
-                                          */
-        double breakdown;
-    };
+    /**
+     * Breakdown threshold.
+     */
+    double breakdown;
+  };
 
-                                     /**
-                                      * Constructor.
-                                      */
-    SolverQMRS (SolverControl &cn,
-                VectorMemory<VECTOR> &mem,
-                const AdditionalData &data=AdditionalData());
+  /**
+   * Constructor.
+   */
+  SolverQMRS (SolverControl &cn,
+              VectorMemory<VECTOR> &mem,
+              const AdditionalData &data=AdditionalData());
 
-                                     /**
-                                      * Constructor. Use an object of
-                                      * type GrowingVectorMemory as
-                                      * a default to allocate memory.
-                                      */
-    SolverQMRS (SolverControl        &cn,
-                const AdditionalData &data=AdditionalData());
+  /**
+   * Constructor. Use an object of
+   * type GrowingVectorMemory as
+   * a default to allocate memory.
+   */
+  SolverQMRS (SolverControl        &cn,
+              const AdditionalData &data=AdditionalData());
 
-                                     /**
-                                      * Solve the linear system $Ax=b$
-                                      * for x.
-                                      */
-    template<class MATRIX, class PRECONDITIONER>
-    void
-    solve (const MATRIX         &A,
-           VECTOR               &x,
-           const VECTOR         &b,
-           const PRECONDITIONER &precondition);
+  /**
+   * Solve the linear system $Ax=b$
+   * for x.
+   */
+  template<class MATRIX, class PRECONDITIONER>
+  void
+  solve (const MATRIX         &A,
+         VECTOR               &x,
+         const VECTOR         &b,
+         const PRECONDITIONER &precondition);
 
-                                     /**
-                                      * Interface for derived class.
-                                      * This function gets the current
-                                      * iteration vector, the residual
-                                      * and the update vector in each
-                                      * step. It can be used for a
-                                      * graphical output of the
-                                      * convergence history.
-                                      */
-    virtual void print_vectors(const unsigned int step,
-                               const VECTOR& x,
-                               const VECTOR& r,
-                               const VECTOR& d) const;
-   protected:
-                                     /**
-                                      * Implementation of the computation of
-                                      * the norm of the residual.
-                                      */
-    virtual double criterion();
+  /**
+   * Interface for derived class.
+   * This function gets the current
+   * iteration vector, the residual
+   * and the update vector in each
+   * step. It can be used for a
+   * graphical output of the
+   * convergence history.
+   */
+  virtual void print_vectors(const unsigned int step,
+                             const VECTOR &x,
+                             const VECTOR &r,
+                             const VECTOR &d) const;
+protected:
+  /**
+   * Implementation of the computation of
+   * the norm of the residual.
+   */
+  virtual double criterion();
 
-                                     /**
-                                      * Temporary vectors, allocated through
-                                      * the @p VectorMemory object at the start
-                                      * of the actual solution process and
-                                      * deallocated at the end.
-                                      */
-    VECTOR *Vv;
-    VECTOR *Vp;
-    VECTOR *Vq;
-    VECTOR *Vt;
-    VECTOR *Vd;
-                                     /**
-                                      * Iteration vector.
-                                      */
-    VECTOR *Vx;
-                                     /**
-                                      * RHS vector.
-                                      */
-    const VECTOR *Vb;
+  /**
+   * Temporary vectors, allocated through
+   * the @p VectorMemory object at the start
+   * of the actual solution process and
+   * deallocated at the end.
+   */
+  VECTOR *Vv;
+  VECTOR *Vp;
+  VECTOR *Vq;
+  VECTOR *Vt;
+  VECTOR *Vd;
+  /**
+   * Iteration vector.
+   */
+  VECTOR *Vx;
+  /**
+   * RHS vector.
+   */
+  const VECTOR *Vb;
 
-                                     /**
-                                      * Within the iteration loop, the
-                                      * square of the residual vector is
-                                      * stored in this variable. The
-                                      * function @p criterion uses this
-                                      * variable to compute the convergence
-                                      * value, which in this class is the
-                                      * norm of the residual vector and thus
-                                      * the square root of the @p res2 value.
-                                      */
-    double res2;
-                                     /**
-                                      * Additional parameters..
-                                      */
-    AdditionalData additional_data;
-  private:
-                                     /**
-                                      * The iteration loop itself.
-                                      */
-    template<class MATRIX, class PRECONDITIONER>
-    bool
-    iterate(const MATRIX& A, const PRECONDITIONER& precondition);
-                                     /**
-                                      * The current iteration step.
-                                      */
-    unsigned int step;
+  /**
+   * Within the iteration loop, the
+   * square of the residual vector is
+   * stored in this variable. The
+   * function @p criterion uses this
+   * variable to compute the convergence
+   * value, which in this class is the
+   * norm of the residual vector and thus
+   * the square root of the @p res2 value.
+   */
+  double res2;
+  /**
+   * Additional parameters..
+   */
+  AdditionalData additional_data;
+private:
+  /**
+   * The iteration loop itself.
+   */
+  template<class MATRIX, class PRECONDITIONER>
+  bool
+  iterate(const MATRIX &A, const PRECONDITIONER &precondition);
+  /**
+   * The current iteration step.
+   */
+  unsigned int step;
 };
 
 /*@}*/
@@ -211,9 +211,9 @@ template<class VECTOR>
 SolverQMRS<VECTOR>::SolverQMRS(SolverControl &cn,
                                VectorMemory<VECTOR> &mem,
                                const AdditionalData &data)
-                :
-                Solver<VECTOR>(cn,mem),
-                additional_data(data)
+  :
+  Solver<VECTOR>(cn,mem),
+  additional_data(data)
 {}
 
 
@@ -221,9 +221,9 @@ SolverQMRS<VECTOR>::SolverQMRS(SolverControl &cn,
 template<class VECTOR>
 SolverQMRS<VECTOR>::SolverQMRS(SolverControl &cn,
                                const AdditionalData &data)
-                :
-                Solver<VECTOR>(cn),
-                additional_data(data)
+  :
+  Solver<VECTOR>(cn),
+  additional_data(data)
 {}
 
 
@@ -240,9 +240,9 @@ SolverQMRS<VECTOR>::criterion()
 template<class VECTOR>
 void
 SolverQMRS<VECTOR>::print_vectors(const unsigned int,
-                                  const VECTOR&,
-                                  const VECTOR&,
-                                  const VECTOR&) const
+                                  const VECTOR &,
+                                  const VECTOR &,
+                                  const VECTOR &) const
 {}
 
 
@@ -257,7 +257,7 @@ SolverQMRS<VECTOR>::solve (const MATRIX         &A,
 {
   deallog.push("QMRS");
 
-                                   // Memory allocation
+  // Memory allocation
   Vv  = this->memory.alloc();
   Vp  = this->memory.alloc();
   Vq  = this->memory.alloc();
@@ -266,9 +266,9 @@ SolverQMRS<VECTOR>::solve (const MATRIX         &A,
 
   Vx = &x;
   Vb = &b;
-                                   // resize the vectors, but do not set
-                                   // the values since they'd be overwritten
-                                   // soon anyway.
+  // resize the vectors, but do not set
+  // the values since they'd be overwritten
+  // soon anyway.
   Vv->reinit(x, true);
   Vp->reinit(x, true);
   Vq->reinit(x, true);
@@ -286,22 +286,22 @@ SolverQMRS<VECTOR>::solve (const MATRIX         &A,
     }
   while (state);
 
-                                   // Deallocate Memory
+  // Deallocate Memory
   this->memory.free(Vv);
   this->memory.free(Vp);
   this->memory.free(Vq);
   this->memory.free(Vt);
   this->memory.free(Vd);
 
-                                   // Output
+  // Output
   deallog.pop();
 
-                                   // in case of failure: throw
-                                   // exception
+  // in case of failure: throw
+  // exception
   if (this->control().last_check() != SolverControl::success)
     throw SolverControl::NoConvergence (this->control().last_step(),
                                         this->control().last_value());
-                                   // otherwise exit as normal
+  // otherwise exit as normal
 }
 
 
@@ -312,22 +312,22 @@ bool
 SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
                             const PRECONDITIONER &precondition)
 {
-/* Remark: the matrix A in the article is the preconditioned matrix.
- * Therefore, we have to precondition x before we compute the first residual.
- * In step 1 we replace p by q to avoid one preconditioning step.
- * There are still two steps left, making this algorithm expensive.
- */
+  /* Remark: the matrix A in the article is the preconditioned matrix.
+   * Therefore, we have to precondition x before we compute the first residual.
+   * In step 1 we replace p by q to avoid one preconditioning step.
+   * There are still two steps left, making this algorithm expensive.
+   */
 
   SolverControl::State state = SolverControl::iterate;
 
-                                   // define some aliases for simpler access
-  VECTOR& v  = *Vv;
-  VECTOR& p  = *Vp;
-  VECTOR& q  = *Vq;
-  VECTOR& t  = *Vt;
-  VECTOR& d  = *Vd;
-  VECTOR& x  = *Vx;
-  const VECTOR& b = *Vb;
+  // define some aliases for simpler access
+  VECTOR &v  = *Vv;
+  VECTOR &p  = *Vp;
+  VECTOR &q  = *Vq;
+  VECTOR &t  = *Vt;
+  VECTOR &d  = *Vd;
+  VECTOR &x  = *Vx;
+  const VECTOR &b = *Vb;
 
   int  it=0;
 
@@ -336,9 +336,9 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
 
   d.reinit(x);
 
-                                   // Apply right preconditioning to x
+  // Apply right preconditioning to x
   precondition.vmult(q,x);
-                                   // Preconditioned residual
+  // Preconditioned residual
   A.vmult(v,q);
   v.sadd(-1.,1.,b);
   res = v.l2_norm();
@@ -355,20 +355,21 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
 
   while (state == SolverControl::iterate)
     {
-      step++; it++;
-                                       // Step 1
+      step++;
+      it++;
+      // Step 1
       A.vmult(t,q);
-                                       // Step 2
+      // Step 2
       sigma = q*t;
 
 //TODO:[?] Find a really good breakdown criterion. The absolute one detects breakdown instead of convergence
       if (std::fabs(sigma/rho) < additional_data.breakdown)
         return true;
-                                       // Step 3
+      // Step 3
       alpha = rho/sigma;
 
       v.add(-alpha,t);
-                                       // Step 4
+      // Step 4
       theta_old = theta;
       theta = v*v/tau;
       psi = 1./(1.+theta);
@@ -378,7 +379,7 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
       x.add(d);
 
       print_vectors(step,x,v,d);
-                                       // Step 5
+      // Step 5
       if (additional_data.exact_residual)
         {
           A.vmult(q,x);
@@ -389,12 +390,12 @@ SolverQMRS<VECTOR>::iterate(const MATRIX         &A,
         res = std::sqrt((it+1)*tau);
       state = this->control().check(step,res);
       if ((state == SolverControl::success)
-      || (state == SolverControl::failure))
+          || (state == SolverControl::failure))
         return false;
-                                       // Step 6
+      // Step 6
       if (std::fabs(rho) < additional_data.breakdown)
         return true;
-                                       // Step 7
+      // Step 7
       rho_old = rho;
       precondition.vmult(q,v);
       rho = q*v;

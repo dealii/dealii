@@ -45,49 +45,49 @@ Multigrid<Vector<double> >::print_vector (const unsigned int level,
                                           const Vector<double> &v,
                                           const char *name) const
 {
-   if (level!=maxlevel)
-     return;
-   const unsigned int dim=deal_II_dimension;
+  if (level!=maxlevel)
+    return;
+  const unsigned int dim=deal_II_dimension;
 
-   const DoFHandler<dim> *dof = mg_dof_handler;
+  const DoFHandler<dim> *dof = mg_dof_handler;
 
-   Vector<double> out_vector(dof->n_dofs());
+  Vector<double> out_vector(dof->n_dofs());
 
-   out_vector = -10000;
+  out_vector = -10000;
 
-   const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
+  const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
 
-   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
-   std::vector<unsigned int> level_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
+  std::vector<unsigned int> level_dof_indices (dofs_per_cell);
 
-   DoFHandler<dim>::active_cell_iterator
-     global_cell = dof->begin_active(level);
-   MGDoFHandler<dim>::active_cell_iterator
-     level_cell = mg_dof_handler->begin_active(level);
-   const MGDoFHandler<dim>::cell_iterator
-     endc = mg_dof_handler->end(level);
+  DoFHandler<dim>::active_cell_iterator
+  global_cell = dof->begin_active(level);
+  MGDoFHandler<dim>::active_cell_iterator
+  level_cell = mg_dof_handler->begin_active(level);
+  const MGDoFHandler<dim>::cell_iterator
+  endc = mg_dof_handler->end(level);
 
-                                   // traverse all cells and copy the
-                                   // data appropriately to the output
-                                   // vector
-   for (; level_cell != endc; ++level_cell, ++global_cell)
-     {
-       global_cell->get_dof_indices (global_dof_indices);
-       level_cell->get_mg_dof_indices(level_dof_indices);
+  // traverse all cells and copy the
+  // data appropriately to the output
+  // vector
+  for (; level_cell != endc; ++level_cell, ++global_cell)
+    {
+      global_cell->get_dof_indices (global_dof_indices);
+      level_cell->get_mg_dof_indices(level_dof_indices);
 
-                                       // copy level-wise data to
-                                       // global vector
-       for (unsigned int i=0; i<dofs_per_cell; ++i)
+      // copy level-wise data to
+      // global vector
+      for (unsigned int i=0; i<dofs_per_cell; ++i)
         out_vector(global_dof_indices[i])
           = v(level_dof_indices[i]);
-     }
+    }
 
-   std::ofstream out_file(name);
-   DataOut<dim> out;
-   out.attach_dof_handler(*dof);
-   out.add_data_vector(out_vector, "v");
-   out.build_patches(5);
-   out.write_gnuplot(out_file);
+  std::ofstream out_file(name);
+  DataOut<dim> out;
+  out.attach_dof_handler(*dof);
+  out.add_data_vector(out_vector, "v");
+  out.build_patches(5);
+  out.write_gnuplot(out_file);
 }
 
 
@@ -109,10 +109,10 @@ MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt ()
 
 
 template<class VECTOR>
-MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt (const ConstraintMatrix &c, const MGConstrainedDoFs& mg_c)
- :
-   constraints(&c),
-   mg_constrained_dofs(&mg_c)
+MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt (const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
+  :
+  constraints(&c),
+  mg_constrained_dofs(&mg_c)
 {}
 
 template <class VECTOR>
@@ -123,8 +123,8 @@ MGTransferPrebuilt<VECTOR>::~MGTransferPrebuilt ()
 template <class VECTOR>
 void MGTransferPrebuilt<VECTOR>::prolongate (
   const unsigned int to_level,
-  VECTOR&            dst,
-  const VECTOR&      src) const
+  VECTOR            &dst,
+  const VECTOR      &src) const
 {
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
           ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
@@ -151,17 +151,17 @@ MGTransferBlockBase::MGTransferBlockBase ()
 
 
 MGTransferBlockBase::MGTransferBlockBase (
-    const ConstraintMatrix &c, const MGConstrainedDoFs& mg_c)
- :
-   constraints(&c),
-   mg_constrained_dofs(&mg_c)
+  const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
+  :
+  constraints(&c),
+  mg_constrained_dofs(&mg_c)
 {}
 
 
 template <typename number>
 MGTransferBlock<number>::MGTransferBlock ()
-                :
-                memory(0, typeid(*this).name())
+  :
+  memory(0, typeid(*this).name())
 {}
 
 
@@ -174,8 +174,8 @@ MGTransferBlock<number>::~MGTransferBlock ()
 
 template <typename number>
 void
-MGTransferBlock<number>::initialize (const std::vector<number>& f,
-                                     VectorMemory<Vector<number> >& mem)
+MGTransferBlock<number>::initialize (const std::vector<number> &f,
+                                     VectorMemory<Vector<number> > &mem)
 {
   factors = f;
   memory = &mem;
@@ -195,10 +195,10 @@ void MGTransferBlock<number>::prolongate (
   Assert (dst.n_blocks() == this->n_mg_blocks,
           ExcDimensionMismatch(dst.n_blocks(), this->n_mg_blocks));
 
-                                   // Multiplicate with prolongation
-                                   // matrix, but only those blocks
-                                   // selected.
-  for (unsigned int b=0; b<this->mg_block.size();++b)
+  // Multiplicate with prolongation
+  // matrix, but only those blocks
+  // selected.
+  for (unsigned int b=0; b<this->mg_block.size(); ++b)
     {
       if (this->selected[b])
         prolongation_matrices[to_level-1]->block(b,b).vmult (
@@ -220,14 +220,14 @@ void MGTransferBlock<number>::restrict_and_add (
   Assert (dst.n_blocks() == this->n_mg_blocks,
           ExcDimensionMismatch(dst.n_blocks(), this->n_mg_blocks));
 
-  for (unsigned int b=0; b<this->mg_block.size();++b)
+  for (unsigned int b=0; b<this->mg_block.size(); ++b)
     {
       if (this->selected[b])
         {
           if (factors.size() != 0)
             {
               Assert (memory != 0, ExcNotInitialized());
-              Vector<number>* aux = memory->alloc();
+              Vector<number> *aux = memory->alloc();
               aux->reinit(dst.block(this->mg_block[b]));
               prolongation_matrices[from_level-1]->block(b,b).Tvmult (
                 *aux, src.block(this->mg_block[b]));
@@ -305,8 +305,8 @@ MGTransferSelect<number>::MGTransferSelect ()
 
 template<typename number>
 MGTransferSelect<number>::MGTransferSelect (const ConstraintMatrix &c)
- :
-   constraints(&c)
+  :
+  constraints(&c)
 {}
 
 template <typename number>
@@ -323,9 +323,9 @@ void MGTransferSelect<number>::prolongate (
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
           ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
 
-      prolongation_matrices[to_level-1]->block(mg_target_component[mg_selected_component],
-                                               mg_target_component[mg_selected_component])
-        .vmult (dst, src);
+  prolongation_matrices[to_level-1]->block(mg_target_component[mg_selected_component],
+                                           mg_target_component[mg_selected_component])
+  .vmult (dst, src);
 }
 
 
@@ -340,7 +340,7 @@ void MGTransferSelect<number>::restrict_and_add (
 
   prolongation_matrices[from_level-1]->block(mg_target_component[mg_selected_component],
                                              mg_target_component[mg_selected_component])
-    .Tvmult_add (dst, src);
+  .Tvmult_add (dst, src);
 }
 
 
@@ -353,8 +353,8 @@ MGTransferBlockSelect<number>::MGTransferBlockSelect ()
 
 template <typename number>
 MGTransferBlockSelect<number>::MGTransferBlockSelect (
-    const ConstraintMatrix &c, const MGConstrainedDoFs& mg_c)
-: MGTransferBlockBase(c, mg_c)
+  const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
+  : MGTransferBlockBase(c, mg_c)
 {}
 
 template <typename number>
@@ -371,9 +371,9 @@ void MGTransferBlockSelect<number>::prolongate (
   Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
           ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
 
-      prolongation_matrices[to_level-1]->block(selected_block,
-                                               selected_block)
-        .vmult (dst, src);
+  prolongation_matrices[to_level-1]->block(selected_block,
+                                           selected_block)
+  .vmult (dst, src);
 }
 
 
@@ -388,7 +388,7 @@ void MGTransferBlockSelect<number>::restrict_and_add (
 
   prolongation_matrices[from_level-1]->block(selected_block,
                                              selected_block)
-    .Tvmult_add (dst, src);
+  .Tvmult_add (dst, src);
 }
 
 

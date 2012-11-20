@@ -190,417 +190,417 @@ DEAL_II_NAMESPACE_OPEN
  */
 class SparseDirectMA27 : public Subscriptor
 {
-  public:
-                                     /**
-                                      * Constructor. See the
-                                      * documentation of this class
-                                      * for the meaning of the
-                                      * parameters to this function.
-                                      */
-    SparseDirectMA27 (const double LIW_factor_1          = 1.2,
-                      const double LIW_factor_2          = 1,
-                      const double LA_factor             = 1.5,
-                      const double LIW_increase_factor_1 = 1.2,
-                      const double LIW_increase_factor_2 = 1.2,
-                      const double LA_increase_factor    = 1.2,
-                      const bool   suppress_output       = true);
+public:
+  /**
+   * Constructor. See the
+   * documentation of this class
+   * for the meaning of the
+   * parameters to this function.
+   */
+  SparseDirectMA27 (const double LIW_factor_1          = 1.2,
+                    const double LIW_factor_2          = 1,
+                    const double LA_factor             = 1.5,
+                    const double LIW_increase_factor_1 = 1.2,
+                    const double LIW_increase_factor_2 = 1.2,
+                    const double LA_increase_factor    = 1.2,
+                    const bool   suppress_output       = true);
 
-                                     /**
-                                      * Destructor.
-                                      */
-    ~SparseDirectMA27 ();
+  /**
+   * Destructor.
+   */
+  ~SparseDirectMA27 ();
 
-                                     /**
-                                      * Set the detached mode (see the
-                                      * general class documentation
-                                      * for a description of what this
-                                      * is).
-                                      *
-                                      * This function must not be
-                                      * called after initialize()
-                                      * (or the two-argument solve()
-                                      * function has been called. If
-                                      * it is to be called, then only
-                                      * right after construction of
-                                      * the object, and before first
-                                      * use.
-                                      */
-    void set_detached_mode ();
+  /**
+   * Set the detached mode (see the
+   * general class documentation
+   * for a description of what this
+   * is).
+   *
+   * This function must not be
+   * called after initialize()
+   * (or the two-argument solve()
+   * function has been called. If
+   * it is to be called, then only
+   * right after construction of
+   * the object, and before first
+   * use.
+   */
+  void set_detached_mode ();
 
-                                     /**
-                                      * Return whether the detached
-                                      * mode is set.
-                                      */
-    bool detached_mode_set () const;
+  /**
+   * Return whether the detached
+   * mode is set.
+   */
+  bool detached_mode_set () const;
 
-                                     /**
-                                      * Initialize some data
-                                      * structures. This function
-                                      * computes symbolically some
-                                      * information based on the
-                                      * sparsity pattern, but does not
-                                      * actually use the values of the
-                                      * matrix, so only the sparsity
-                                      * pattern has to be passed as
-                                      * argument.
-                                      */
-    void initialize (const SparsityPattern &sparsity_pattern);
+  /**
+   * Initialize some data
+   * structures. This function
+   * computes symbolically some
+   * information based on the
+   * sparsity pattern, but does not
+   * actually use the values of the
+   * matrix, so only the sparsity
+   * pattern has to be passed as
+   * argument.
+   */
+  void initialize (const SparsityPattern &sparsity_pattern);
 
-                                     /**
-                                      * Actually factorize the
-                                      * matrix. This function may be
-                                      * called multiple times for
-                                      * different matrices, after the
-                                      * object of this class has been
-                                      * initialized for a certain
-                                      * sparsity pattern. You may
-                                      * therefore save some computing
-                                      * time if you want to invert
-                                      * several matrices with the same
-                                      * sparsity pattern. However,
-                                      * note that the bulk of the
-                                      * computing time is actually
-                                      * spent in the factorization, so
-                                      * this functionality may not
-                                      * always be of large benefit.
-                                      *
-                                      * If the initialization step has
-                                      * not been performed yet, then
-                                      * the initialize() function is
-                                      * called at the beginning of
-                                      * this function.
-                                      */
-    template <typename number>
-    void factorize (const SparseMatrix<number> &matrix);
+  /**
+   * Actually factorize the
+   * matrix. This function may be
+   * called multiple times for
+   * different matrices, after the
+   * object of this class has been
+   * initialized for a certain
+   * sparsity pattern. You may
+   * therefore save some computing
+   * time if you want to invert
+   * several matrices with the same
+   * sparsity pattern. However,
+   * note that the bulk of the
+   * computing time is actually
+   * spent in the factorization, so
+   * this functionality may not
+   * always be of large benefit.
+   *
+   * If the initialization step has
+   * not been performed yet, then
+   * the initialize() function is
+   * called at the beginning of
+   * this function.
+   */
+  template <typename number>
+  void factorize (const SparseMatrix<number> &matrix);
 
-                                     /**
-                                      * Solve for a certain right hand
-                                      * side vector. This function may
-                                      * be called multiple times for
-                                      * different right hand side
-                                      * vectors after the matrix has
-                                      * been factorized. This yields a
-                                      * big saving in computing time,
-                                      * since the actual solution is
-                                      * fast, compared to the
-                                      * factorization of the matrix.
-                                      *
-                                      * The solution will be returned
-                                      * in place of the right hand
-                                      * side vector.
-                                      *
-                                      * If the factorization has not
-                                      * happened before, strange
-                                      * things will happen. Note that
-                                      * we can't actually call the
-                                      * factorize() function from
-                                      * here if it has not yet been
-                                      * called, since we have no
-                                      * access to the actual matrix.
-                                      */
-    template <typename number>
-    void solve (Vector<number> &rhs_and_solution) const;
+  /**
+   * Solve for a certain right hand
+   * side vector. This function may
+   * be called multiple times for
+   * different right hand side
+   * vectors after the matrix has
+   * been factorized. This yields a
+   * big saving in computing time,
+   * since the actual solution is
+   * fast, compared to the
+   * factorization of the matrix.
+   *
+   * The solution will be returned
+   * in place of the right hand
+   * side vector.
+   *
+   * If the factorization has not
+   * happened before, strange
+   * things will happen. Note that
+   * we can't actually call the
+   * factorize() function from
+   * here if it has not yet been
+   * called, since we have no
+   * access to the actual matrix.
+   */
+  template <typename number>
+  void solve (Vector<number> &rhs_and_solution) const;
 
-                                     /**
-                                      * Call the three functions
-                                      * initialize, factorize and solve
-                                      * in that order, i.e. perform
-                                      * the whole solution process for
-                                      * the given right hand side
-                                      * vector.
-                                      *
-                                      * The solution will be returned
-                                      * in place of the right hand
-                                      * side vector.
-                                      */
-    template <typename number>
-    void solve (const SparseMatrix<number> &matrix,
-                Vector<double>             &rhs_and_solution);
+  /**
+   * Call the three functions
+   * initialize, factorize and solve
+   * in that order, i.e. perform
+   * the whole solution process for
+   * the given right hand side
+   * vector.
+   *
+   * The solution will be returned
+   * in place of the right hand
+   * side vector.
+   */
+  template <typename number>
+  void solve (const SparseMatrix<number> &matrix,
+              Vector<double>             &rhs_and_solution);
 
-                                     /**
-                                      * Return an estimate of the
-                                      * memory used by this class.
-                                      */
-    std::size_t memory_consumption () const;
+  /**
+   * Return an estimate of the
+   * memory used by this class.
+   */
+  std::size_t memory_consumption () const;
 
-                                     /**
-                                      * Get a reference to the
-                                      * synchronisation lock which can
-                                      * be used for this class. See
-                                      * the general description of
-                                      * this class for more
-                                      * information.
-                                      */
-    Threads::ThreadMutex & get_synchronisation_lock () const;
+  /**
+   * Get a reference to the
+   * synchronisation lock which can
+   * be used for this class. See
+   * the general description of
+   * this class for more
+   * information.
+   */
+  Threads::ThreadMutex &get_synchronisation_lock () const;
 
-                                     /** @addtogroup Exceptions
-                                      * @{ */
+  /** @addtogroup Exceptions
+   * @{ */
 
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException1 (ExcMA27AFailed,
-                    int,
-                    << "The function MA27A failed with an exit code of " << arg1);
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException1 (ExcMA27BFailed,
-                    int,
-                    << "The function MA27B failed with an exit code of " << arg1);
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException1 (ExcMA27CFailed,
-                    int,
-                    << "The function MA27C failed with an exit code of " << arg1);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcInitializeAlreadyCalled);
+  /**
+   * Exception.
+   */
+  DeclException1 (ExcMA27AFailed,
+                  int,
+                  << "The function MA27A failed with an exit code of " << arg1);
+  /**
+   * Exception.
+   */
+  DeclException1 (ExcMA27BFailed,
+                  int,
+                  << "The function MA27B failed with an exit code of " << arg1);
+  /**
+   * Exception.
+   */
+  DeclException1 (ExcMA27CFailed,
+                  int,
+                  << "The function MA27C failed with an exit code of " << arg1);
+  /**
+   * Exception
+   */
+  DeclException0 (ExcInitializeAlreadyCalled);
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcFactorizeNotCalled);
+  /**
+   * Exception
+   */
+  DeclException0 (ExcFactorizeNotCalled);
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcDifferentSparsityPatterns);
+  /**
+   * Exception
+   */
+  DeclException0 (ExcDifferentSparsityPatterns);
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException2 (ExcReadError,
-                    int, int,
-                    << "Error while reading in detached mode. Return value "
-                    << "for 'read' was " << arg1
-                    << ", errno has value " << arg2);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcMatrixNotSymmetric);
-                                     //@}
-  private:
-                                     /**
-                                      * Declare a local type which
-                                      * will store the data necessary
-                                      * to communicate with a detached
-                                      * solver. To avoid adding
-                                      * various system include files,
-                                      * the actual declaration of this
-                                      * class is in the implementation
-                                      * file.
-                                      */
-    struct DetachedModeData;
+  /**
+   * Exception
+   */
+  DeclException2 (ExcReadError,
+                  int, int,
+                  << "Error while reading in detached mode. Return value "
+                  << "for 'read' was " << arg1
+                  << ", errno has value " << arg2);
+  /**
+   * Exception
+   */
+  DeclException0 (ExcMatrixNotSymmetric);
+  //@}
+private:
+  /**
+   * Declare a local type which
+   * will store the data necessary
+   * to communicate with a detached
+   * solver. To avoid adding
+   * various system include files,
+   * the actual declaration of this
+   * class is in the implementation
+   * file.
+   */
+  struct DetachedModeData;
 
-                                     /**
-                                      * Store in the constructor
-                                      * whether the MA27 routines
-                                      * shall deliver output to stdout
-                                      * or not.
-                                      */
-    const bool suppress_output;
+  /**
+   * Store in the constructor
+   * whether the MA27 routines
+   * shall deliver output to stdout
+   * or not.
+   */
+  const bool suppress_output;
 
-                                     /**
-                                      * Store whether
-                                      * set_detached_mode() has been
-                                      * called.
-                                      */
-    bool detached_mode;
+  /**
+   * Store whether
+   * set_detached_mode() has been
+   * called.
+   */
+  bool detached_mode;
 
-                                     /**
-                                      * Pointer to a structure that
-                                      * will hold the data necessary
-                                      * to uphold communication with a
-                                      * detached solver.
-                                      */
-    DetachedModeData *detached_mode_data;
+  /**
+   * Pointer to a structure that
+   * will hold the data necessary
+   * to uphold communication with a
+   * detached solver.
+   */
+  DetachedModeData *detached_mode_data;
 
-                                     /**
-                                      * Store the three values passed
-                                      * to the cinstructor. See the
-                                      * documentation of this class
-                                      * for the meaning of these
-                                      * variables.
-                                      */
-    const double LIW_factor_1;
-    const double LIW_factor_2;
-    const double LA_factor;
+  /**
+   * Store the three values passed
+   * to the cinstructor. See the
+   * documentation of this class
+   * for the meaning of these
+   * variables.
+   */
+  const double LIW_factor_1;
+  const double LIW_factor_2;
+  const double LA_factor;
 
-                                     /**
-                                      * Increase factors in case a
-                                      * call to a function fails.
-                                      */
-    const double LIW_increase_factor_1;
-    const double LIW_increase_factor_2;
-    const double LA_increase_factor;
+  /**
+   * Increase factors in case a
+   * call to a function fails.
+   */
+  const double LIW_increase_factor_1;
+  const double LIW_increase_factor_2;
+  const double LA_increase_factor;
 
-                                     /**
-                                      * Flags storing whether the
-                                      * first two functions have
-                                      * already been called.
-                                      */
-    bool initialize_called;
-    bool factorize_called;
+  /**
+   * Flags storing whether the
+   * first two functions have
+   * already been called.
+   */
+  bool initialize_called;
+  bool factorize_called;
 
-                                     /**
-                                      * Store a pointer to the
-                                      * sparsity pattern, to make sure
-                                      * that we use the same thing for
-                                      * all calls.
-                                      */
-    SmartPointer<const SparsityPattern,SparseDirectMA27> sparsity_pattern;
+  /**
+   * Store a pointer to the
+   * sparsity pattern, to make sure
+   * that we use the same thing for
+   * all calls.
+   */
+  SmartPointer<const SparsityPattern,SparseDirectMA27> sparsity_pattern;
 
-                                     /**
-                                      * Number of nonzero elements in
-                                      * the sparsity pattern on and
-                                      * above the diagonal.
-                                      */
-    unsigned int n_nonzero_elements;
+  /**
+   * Number of nonzero elements in
+   * the sparsity pattern on and
+   * above the diagonal.
+   */
+  unsigned int n_nonzero_elements;
 
-                                     /**
-                                      * Arrays holding row and column
-                                      * indices.
-                                      */
-    std::vector<unsigned int> row_numbers;
-    std::vector<unsigned int> column_numbers;
+  /**
+   * Arrays holding row and column
+   * indices.
+   */
+  std::vector<unsigned int> row_numbers;
+  std::vector<unsigned int> column_numbers;
 
-                                     /**
-                                      * Array to hold the matrix
-                                      * elements, and later the
-                                      * elements of the factors.
-                                      */
-    std::vector<double>       A;
+  /**
+   * Array to hold the matrix
+   * elements, and later the
+   * elements of the factors.
+   */
+  std::vector<double>       A;
 
-                                     /**
-                                      * Length of the <tt>A</tt> array.
-                                      */
-    unsigned int         LA;
+  /**
+   * Length of the <tt>A</tt> array.
+   */
+  unsigned int         LA;
 
-                                     /**
-                                      * Scratch arrays and variables
-                                      * used by the MA27 functions. We
-                                      * keep to the names introduced
-                                      * in the documentation of these
-                                      * functions, in all uppercase
-                                      * letters as is usual in
-                                      * Fortran.
-                                      */
-    unsigned int LIW;
-    std::vector<unsigned int> IW;
-    std::vector<unsigned int> IKEEP;
-    std::vector<unsigned int> IW1;
+  /**
+   * Scratch arrays and variables
+   * used by the MA27 functions. We
+   * keep to the names introduced
+   * in the documentation of these
+   * functions, in all uppercase
+   * letters as is usual in
+   * Fortran.
+   */
+  unsigned int LIW;
+  std::vector<unsigned int> IW;
+  std::vector<unsigned int> IKEEP;
+  std::vector<unsigned int> IW1;
 
-    unsigned int NSTEPS;
-    unsigned int MAXFRT;
+  unsigned int NSTEPS;
+  unsigned int MAXFRT;
 
-                                     /**
-                                      * Two values that live inside a
-                                      * COMMON block of the Fortran
-                                      * code and are mirrored at these
-                                      * locations. They are used to
-                                      * transport information about
-                                      * the required length of arrays
-                                      * from the Fortran functions to
-                                      * the outside world.
-                                      */
-    unsigned int NRLNEC;
-    unsigned int NIRNEC;
+  /**
+   * Two values that live inside a
+   * COMMON block of the Fortran
+   * code and are mirrored at these
+   * locations. They are used to
+   * transport information about
+   * the required length of arrays
+   * from the Fortran functions to
+   * the outside world.
+   */
+  unsigned int NRLNEC;
+  unsigned int NIRNEC;
 
-                                     /**
-                                      * Flag indicating the level of
-                                      * output desired and returning
-                                      * error values if error occured.
-                                      */
-    int IFLAG;
+  /**
+   * Flag indicating the level of
+   * output desired and returning
+   * error values if error occured.
+   */
+  int IFLAG;
 
-                                     /**
-                                      * Mutexes for synchronising access
-                                      * to this class.
-                                      */
-    static Threads::ThreadMutex static_synchronisation_lock;
-    mutable Threads::ThreadMutex non_static_synchronisation_lock;
+  /**
+   * Mutexes for synchronising access
+   * to this class.
+   */
+  static Threads::ThreadMutex static_synchronisation_lock;
+  mutable Threads::ThreadMutex non_static_synchronisation_lock;
 
-                                     /**
-                                      * Fill the <tt>A</tt> array from the
-                                      * symmetric part of the given
-                                      * matrix.
-                                      */
-    template <typename number>
-    void fill_A (const SparseMatrix<number> &matrix);
+  /**
+   * Fill the <tt>A</tt> array from the
+   * symmetric part of the given
+   * matrix.
+   */
+  template <typename number>
+  void fill_A (const SparseMatrix<number> &matrix);
 
-                                     /**
-                                      * Call the respective function
-                                      * with the given args, either
-                                      * locally or remote.
-                                      */
-    void call_ma27ad (const unsigned int *N,
-                      const unsigned int *NZ,
-                      const unsigned int *IRN,
-                      const unsigned int *ICN,
-                      unsigned int       *IW,
-                      const unsigned int *LIW,
-                      unsigned int       *IKEEP,
-                      unsigned int       *IW1,
-                      unsigned int       *NSTEPS,
-                      int                *IFLAG);
+  /**
+   * Call the respective function
+   * with the given args, either
+   * locally or remote.
+   */
+  void call_ma27ad (const unsigned int *N,
+                    const unsigned int *NZ,
+                    const unsigned int *IRN,
+                    const unsigned int *ICN,
+                    unsigned int       *IW,
+                    const unsigned int *LIW,
+                    unsigned int       *IKEEP,
+                    unsigned int       *IW1,
+                    unsigned int       *NSTEPS,
+                    int                *IFLAG);
 
-                                     /**
-                                      * Call the respective function
-                                      * with the given args, either
-                                      * locally or remote.
-                                      */
-    void call_ma27bd (const unsigned int *N,
-                      const unsigned int *NZ,
-                      const unsigned int *IRN,
-                      const unsigned int *ICN,
-                      double             *A,
-                      const unsigned int *LA,
-                      unsigned int       *IW,
-                      const unsigned int *LIW,
-                      const unsigned int *IKEEP,
-                      const unsigned int *NSTEPS,
-                      unsigned int       *MAXFRT,
-                      unsigned int       *IW1,
-                      int                *IFLAG);
+  /**
+   * Call the respective function
+   * with the given args, either
+   * locally or remote.
+   */
+  void call_ma27bd (const unsigned int *N,
+                    const unsigned int *NZ,
+                    const unsigned int *IRN,
+                    const unsigned int *ICN,
+                    double             *A,
+                    const unsigned int *LA,
+                    unsigned int       *IW,
+                    const unsigned int *LIW,
+                    const unsigned int *IKEEP,
+                    const unsigned int *NSTEPS,
+                    unsigned int       *MAXFRT,
+                    unsigned int       *IW1,
+                    int                *IFLAG);
 
-                                     /**
-                                      * Call the respective function
-                                      * with the given args, either
-                                      * locally or remote.
-                                      */
-    void call_ma27cd (const unsigned int *N,
-                      const double       *A,
-                      const unsigned int *LA,
-                      const unsigned int *IW,
-                      const unsigned int *LIW,
-                      const unsigned int *MAXFRT,
-                      double             *RHS,
-                      const unsigned int *IW1,
-                      const unsigned int *NSTEPS) const;
+  /**
+   * Call the respective function
+   * with the given args, either
+   * locally or remote.
+   */
+  void call_ma27cd (const unsigned int *N,
+                    const double       *A,
+                    const unsigned int *LA,
+                    const unsigned int *IW,
+                    const unsigned int *LIW,
+                    const unsigned int *MAXFRT,
+                    double             *RHS,
+                    const unsigned int *IW1,
+                    const unsigned int *NSTEPS) const;
 
-                                     /**
-                                      * Call the respective function
-                                      * with the given args, either
-                                      * locally or remote.
-                                      */
-    void call_ma27x1 (unsigned int *NRLNEC);
+  /**
+   * Call the respective function
+   * with the given args, either
+   * locally or remote.
+   */
+  void call_ma27x1 (unsigned int *NRLNEC);
 
-                                     /**
-                                      * Call the respective function
-                                      * with the given args, either
-                                      * locally or remote.
-                                      */
-    void call_ma27x2 (unsigned int *NIRNEC);
+  /**
+   * Call the respective function
+   * with the given args, either
+   * locally or remote.
+   */
+  void call_ma27x2 (unsigned int *NIRNEC);
 
-                                     /**
-                                      * Call the respective function
-                                      * with the given args, either
-                                      * locally or remote.
-                                      */
-    void call_ma27x3 (const unsigned int *LP);
+  /**
+   * Call the respective function
+   * with the given args, either
+   * locally or remote.
+   */
+  void call_ma27x3 (const unsigned int *LP);
 };
 
 
@@ -680,333 +680,333 @@ class SparseDirectMA27 : public Subscriptor
  */
 class SparseDirectMA47 : public Subscriptor
 {
-  public:
-                                     /**
-                                      * Constructor. See the
-                                      * documentation of this class
-                                      * for the meaning of the
-                                      * parameters to this function.
-                                      *
-                                      * This function already calls
-                                      * the initialization function
-                                      * <tt>MA47ID</tt> to set up some
-                                      * values.
-                                      */
-    SparseDirectMA47 (const double LIW_factor_1 = 1.4,
-                      const double LIW_factor_2 = 1,
-                      const double LA_factor    = 3,
-                      const double LIW_increase_factor_1 = 1.2,
-                      const double LIW_increase_factor_2 = 1.2,
-                      const double LA_increase_factor    = 1.2,
-                      const bool   suppress_output       = true);
+public:
+  /**
+   * Constructor. See the
+   * documentation of this class
+   * for the meaning of the
+   * parameters to this function.
+   *
+   * This function already calls
+   * the initialization function
+   * <tt>MA47ID</tt> to set up some
+   * values.
+   */
+  SparseDirectMA47 (const double LIW_factor_1 = 1.4,
+                    const double LIW_factor_2 = 1,
+                    const double LA_factor    = 3,
+                    const double LIW_increase_factor_1 = 1.2,
+                    const double LIW_increase_factor_2 = 1.2,
+                    const double LA_increase_factor    = 1.2,
+                    const bool   suppress_output       = true);
 
-                                     /**
-                                      * Initialize some data
-                                      * structures. This function
-                                      * computes symbolically some
-                                      * information based on the
-                                      * sparsity pattern, but does not
-                                      * actually use the values of the
-                                      * matrix, so only the sparsity
-                                      * pattern has to be passed as
-                                      * argument.
-                                      *
-                                      * Since the MA47 solver requires
-                                      * us to omit zero-entries in the
-                                      * matrix (even if they are in
-                                      * the sparsity pattern), we have
-                                      * to actually use the matrix
-                                      * here, as opposed to the MA27
-                                      * solver that only required the
-                                      * sparsity pattern.
-                                      */
-    void initialize (const SparseMatrix<double> &matrix);
+  /**
+   * Initialize some data
+   * structures. This function
+   * computes symbolically some
+   * information based on the
+   * sparsity pattern, but does not
+   * actually use the values of the
+   * matrix, so only the sparsity
+   * pattern has to be passed as
+   * argument.
+   *
+   * Since the MA47 solver requires
+   * us to omit zero-entries in the
+   * matrix (even if they are in
+   * the sparsity pattern), we have
+   * to actually use the matrix
+   * here, as opposed to the MA27
+   * solver that only required the
+   * sparsity pattern.
+   */
+  void initialize (const SparseMatrix<double> &matrix);
 
-                                     /**
-                                      * Actually factorize the
-                                      * matrix. Unlike for the MA27
-                                      * solver, this function may not
-                                      * be called multiple times for
-                                      * different matrices, since we
-                                      * have eliminated entries from
-                                      * the sparsity pattern where
-                                      * matrix entries happen to be
-                                      * zero. Since this is likely to
-                                      * change between matrices
-                                      * although they have the same
-                                      * sparsity pattern.
-                                      *
-                                      * If the initialization step has
-                                      * not been performed yet, then
-                                      * the initialize() function is
-                                      * called at the beginning of
-                                      * this function.
-                                      */
-    void factorize (const SparseMatrix<double> &matrix);
+  /**
+   * Actually factorize the
+   * matrix. Unlike for the MA27
+   * solver, this function may not
+   * be called multiple times for
+   * different matrices, since we
+   * have eliminated entries from
+   * the sparsity pattern where
+   * matrix entries happen to be
+   * zero. Since this is likely to
+   * change between matrices
+   * although they have the same
+   * sparsity pattern.
+   *
+   * If the initialization step has
+   * not been performed yet, then
+   * the initialize() function is
+   * called at the beginning of
+   * this function.
+   */
+  void factorize (const SparseMatrix<double> &matrix);
 
-                                     /**
-                                      * Solve for a certain right hand
-                                      * side vector. This function may
-                                      * be called multiple times for
-                                      * different right hand side
-                                      * vectors after the matrix has
-                                      * been factorized. This yields a
-                                      * big saving in computing time,
-                                      * since the actual solution is
-                                      * fast, compared to the
-                                      * factorization of the matrix.
-                                      *
-                                      * The solution will be returned
-                                      * in place of the right hand
-                                      * side vector.
-                                      *
-                                      * If the factorization has not
-                                      * happened before, strange
-                                      * things will happen. Note that
-                                      * we can't actually call the
-                                      * factorize() function from
-                                      * here if it has not yet been
-                                      * called, since we have no
-                                      * access to the actual matrix.
-                                      */
-    void solve (Vector<double> &rhs_and_solution);
+  /**
+   * Solve for a certain right hand
+   * side vector. This function may
+   * be called multiple times for
+   * different right hand side
+   * vectors after the matrix has
+   * been factorized. This yields a
+   * big saving in computing time,
+   * since the actual solution is
+   * fast, compared to the
+   * factorization of the matrix.
+   *
+   * The solution will be returned
+   * in place of the right hand
+   * side vector.
+   *
+   * If the factorization has not
+   * happened before, strange
+   * things will happen. Note that
+   * we can't actually call the
+   * factorize() function from
+   * here if it has not yet been
+   * called, since we have no
+   * access to the actual matrix.
+   */
+  void solve (Vector<double> &rhs_and_solution);
 
-                                     /**
-                                      * Call the three functions
-                                      * initialize, factorize and
-                                      * solve
-                                      * in that order, i.e. perform
-                                      * the whole solution process for
-                                      * the given right hand side
-                                      * vector.
-                                      *
-                                      * The solution will be returned
-                                      * in place of the right hand
-                                      * side vector.
-                                      */
-    void solve (const SparseMatrix<double> &matrix,
-                Vector<double>             &rhs_and_solution);
+  /**
+   * Call the three functions
+   * initialize, factorize and
+   * solve
+   * in that order, i.e. perform
+   * the whole solution process for
+   * the given right hand side
+   * vector.
+   *
+   * The solution will be returned
+   * in place of the right hand
+   * side vector.
+   */
+  void solve (const SparseMatrix<double> &matrix,
+              Vector<double>             &rhs_and_solution);
 
-                                     /**
-                                      * Return an estimate of the
-                                      * memory used by this class.
-                                      */
-    std::size_t memory_consumption () const;
+  /**
+   * Return an estimate of the
+   * memory used by this class.
+   */
+  std::size_t memory_consumption () const;
 
-                                     /**
-                                      * Get a reference to the
-                                      * synchronisation lock which can
-                                      * be used for this class. See
-                                      * the general description of
-                                      * this class for more
-                                      * information.
-                                      */
-    Threads::ThreadMutex & get_synchronisation_lock () const;
+  /**
+   * Get a reference to the
+   * synchronisation lock which can
+   * be used for this class. See
+   * the general description of
+   * this class for more
+   * information.
+   */
+  Threads::ThreadMutex &get_synchronisation_lock () const;
 
-                                     /** @addtogroup Exceptions
-                                      * @{ */
+  /** @addtogroup Exceptions
+   * @{ */
 
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException1 (ExcMA47AFailed,
-                    int,
-                    << "The function MA47A failed with an exit code of " << arg1);
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException1 (ExcMA47BFailed,
-                    int,
-                    << "The function MA47B failed with an exit code of " << arg1);
-                                     /**
-                                      * Exception.
-                                      */
-    DeclException1 (ExcMA47CFailed,
-                    int,
-                    << "The function MA47C failed with an exit code of " << arg1);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcInitializeAlreadyCalled);
+  /**
+   * Exception.
+   */
+  DeclException1 (ExcMA47AFailed,
+                  int,
+                  << "The function MA47A failed with an exit code of " << arg1);
+  /**
+   * Exception.
+   */
+  DeclException1 (ExcMA47BFailed,
+                  int,
+                  << "The function MA47B failed with an exit code of " << arg1);
+  /**
+   * Exception.
+   */
+  DeclException1 (ExcMA47CFailed,
+                  int,
+                  << "The function MA47C failed with an exit code of " << arg1);
+  /**
+   * Exception
+   */
+  DeclException0 (ExcInitializeAlreadyCalled);
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcFactorizeNotCalled);
+  /**
+   * Exception
+   */
+  DeclException0 (ExcFactorizeNotCalled);
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcCantFactorizeAgain);
+  /**
+   * Exception
+   */
+  DeclException0 (ExcCantFactorizeAgain);
 
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcDifferentMatrices);
-                                     /**
-                                      * Exception
-                                      */
-    DeclException0 (ExcMatrixNotSymmetric);
-                                     //@}
-  private:
-                                     /**
-                                      * Store in the constructor
-                                      * whether the MA47 routines
-                                      * shall deliver output to stdout
-                                      * or not.
-                                      */
-    const bool suppress_output;
+  /**
+   * Exception
+   */
+  DeclException0 (ExcDifferentMatrices);
+  /**
+   * Exception
+   */
+  DeclException0 (ExcMatrixNotSymmetric);
+  //@}
+private:
+  /**
+   * Store in the constructor
+   * whether the MA47 routines
+   * shall deliver output to stdout
+   * or not.
+   */
+  const bool suppress_output;
 
-                                     /**
-                                      * Store the three values passed
-                                      * to the cinstructor. See the
-                                      * documentation of this class
-                                      * for the meaning of these
-                                      * variables.
-                                      */
-    const double LIW_factor_1;
-    const double LIW_factor_2;
-    const double LA_factor;
+  /**
+   * Store the three values passed
+   * to the cinstructor. See the
+   * documentation of this class
+   * for the meaning of these
+   * variables.
+   */
+  const double LIW_factor_1;
+  const double LIW_factor_2;
+  const double LA_factor;
 
-                                     /**
-                                      * Increase factors in case a
-                                      * call to a function fails.
-                                      */
-    const double LIW_increase_factor_1;
-    const double LIW_increase_factor_2;
-    const double LA_increase_factor;
+  /**
+   * Increase factors in case a
+   * call to a function fails.
+   */
+  const double LIW_increase_factor_1;
+  const double LIW_increase_factor_2;
+  const double LA_increase_factor;
 
-                                     /**
-                                      * Flags storing whether the
-                                      * first two functions have
-                                      * already been called.
-                                      */
-    bool initialize_called;
-    bool factorize_called;
+  /**
+   * Flags storing whether the
+   * first two functions have
+   * already been called.
+   */
+  bool initialize_called;
+  bool factorize_called;
 
-                                     /**
-                                      * Store a pointer to the matrix,
-                                      * to make sure that we use the
-                                      * same thing for all calls.
-                                      */
-    SmartPointer<const SparseMatrix<double>,SparseDirectMA47> matrix;
+  /**
+   * Store a pointer to the matrix,
+   * to make sure that we use the
+   * same thing for all calls.
+   */
+  SmartPointer<const SparseMatrix<double>,SparseDirectMA47> matrix;
 
-                                     /**
-                                      * Number of nonzero elements in
-                                      * the sparsity pattern on and
-                                      * above the diagonal.
-                                      */
-    unsigned int n_nonzero_elements;
+  /**
+   * Number of nonzero elements in
+   * the sparsity pattern on and
+   * above the diagonal.
+   */
+  unsigned int n_nonzero_elements;
 
-                                     /**
-                                      * Control values set by <tt>MA47ID</tt>.
-                                      */
-    double       CNTL[2];
-    unsigned int ICNTL[7];
+  /**
+   * Control values set by <tt>MA47ID</tt>.
+   */
+  double       CNTL[2];
+  unsigned int ICNTL[7];
 
-                                     /**
-                                      * Info field filled by the MA47
-                                      * functions and (partially) used
-                                      * for subsequent MA47 calls.
-                                      */
-    int          INFO[24];
+  /**
+   * Info field filled by the MA47
+   * functions and (partially) used
+   * for subsequent MA47 calls.
+   */
+  int          INFO[24];
 
-                                     /**
-                                      * Arrays holding row and column
-                                      * indices.
-                                      */
-    std::vector<unsigned int> row_numbers;
-    std::vector<unsigned int> column_numbers;
+  /**
+   * Arrays holding row and column
+   * indices.
+   */
+  std::vector<unsigned int> row_numbers;
+  std::vector<unsigned int> column_numbers;
 
-                                     /**
-                                      * Array to hold the matrix
-                                      * elements, and later the
-                                      * elements of the factors.
-                                      */
-    std::vector<double>       A;
+  /**
+   * Array to hold the matrix
+   * elements, and later the
+   * elements of the factors.
+   */
+  std::vector<double>       A;
 
-                                     /**
-                                      * Length of the <tt>A</tt> array.
-                                      */
-    unsigned int         LA;
+  /**
+   * Length of the <tt>A</tt> array.
+   */
+  unsigned int         LA;
 
-                                     /**
-                                      * Scratch arrays and variables
-                                      * used by the MA47 functions. We
-                                      * keep to the names introduced
-                                      * in the documentation of these
-                                      * functions, in all uppercase
-                                      * letters as is usual in
-                                      * Fortran.
-                                      */
-    unsigned int LIW;
-    std::vector<unsigned int> IW;
-    std::vector<unsigned int> KEEP;
-    std::vector<unsigned int> IW1;
+  /**
+   * Scratch arrays and variables
+   * used by the MA47 functions. We
+   * keep to the names introduced
+   * in the documentation of these
+   * functions, in all uppercase
+   * letters as is usual in
+   * Fortran.
+   */
+  unsigned int LIW;
+  std::vector<unsigned int> IW;
+  std::vector<unsigned int> KEEP;
+  std::vector<unsigned int> IW1;
 
-                                     /**
-                                      * Mutex for synchronising access
-                                      * to this class.
-                                      */
-    static Threads::ThreadMutex synchronisation_lock;
+  /**
+   * Mutex for synchronising access
+   * to this class.
+   */
+  static Threads::ThreadMutex synchronisation_lock;
 
-                                     /**
-                                      * Fill the <tt>A</tt> array from the
-                                      * symmetric part of the given
-                                      * matrix.
-                                      */
-    void fill_A (const SparseMatrix<double> &matrix);
+  /**
+   * Fill the <tt>A</tt> array from the
+   * symmetric part of the given
+   * matrix.
+   */
+  void fill_A (const SparseMatrix<double> &matrix);
 
-                                     /**
-                                      * Call the <tt>ma47id</tt> function
-                                      * with the given args.
-                                      */
-    void call_ma47id (double       *CNTL,
-                      unsigned int *ICNTL);
+  /**
+   * Call the <tt>ma47id</tt> function
+   * with the given args.
+   */
+  void call_ma47id (double       *CNTL,
+                    unsigned int *ICNTL);
 
-                                     /**
-                                      * Call the <tt>ma47ad</tt> function
-                                      * with the given args.
-                                      */
-    void call_ma47ad (const unsigned int *n_rows,
-                      const unsigned int *n_nonzero_elements,
-                      unsigned int       *row_numbers,
-                      unsigned int       *column_numbers,
-                      unsigned int       *IW,
-                      const unsigned int *LIW,
-                      unsigned int       *KEEP,
-                      const unsigned int *ICNTL,
-                      int                *INFO);
+  /**
+   * Call the <tt>ma47ad</tt> function
+   * with the given args.
+   */
+  void call_ma47ad (const unsigned int *n_rows,
+                    const unsigned int *n_nonzero_elements,
+                    unsigned int       *row_numbers,
+                    unsigned int       *column_numbers,
+                    unsigned int       *IW,
+                    const unsigned int *LIW,
+                    unsigned int       *KEEP,
+                    const unsigned int *ICNTL,
+                    int                *INFO);
 
-                                     /**
-                                      * Call the <tt>ma47bd</tt> function
-                                      * with the given args.
-                                      */
-    void call_ma47bd (const unsigned int *n_rows,
-                      const unsigned int *n_nonzero_elements,
-                      const unsigned int *column_numbers,
-                      double             *A,
-                      const unsigned int *LA,
-                      unsigned int       *IW,
-                      const unsigned int *LIW,
-                      const unsigned int *KEEP,
-                      const double       *CNTL,
-                      const unsigned int *ICNTL,
-                      unsigned int       *IW1,
-                      int                *INFO);
+  /**
+   * Call the <tt>ma47bd</tt> function
+   * with the given args.
+   */
+  void call_ma47bd (const unsigned int *n_rows,
+                    const unsigned int *n_nonzero_elements,
+                    const unsigned int *column_numbers,
+                    double             *A,
+                    const unsigned int *LA,
+                    unsigned int       *IW,
+                    const unsigned int *LIW,
+                    const unsigned int *KEEP,
+                    const double       *CNTL,
+                    const unsigned int *ICNTL,
+                    unsigned int       *IW1,
+                    int                *INFO);
 
-                                     /**
-                                      * Call the <tt>ma47bd</tt> function
-                                      * with the given args.
-                                      */
-    void call_ma47cd (const unsigned int *n_rows,
-                      const double       *A,
-                      const unsigned int *LA,
-                      const unsigned int *IW,
-                      const unsigned int *LIW,
-                      double             *rhs_and_solution,
-                      unsigned int       *IW1,
-                      const unsigned int *ICNTL);
+  /**
+   * Call the <tt>ma47bd</tt> function
+   * with the given args.
+   */
+  void call_ma47cd (const unsigned int *n_rows,
+                    const double       *A,
+                    const unsigned int *LA,
+                    const unsigned int *IW,
+                    const unsigned int *LIW,
+                    double             *rhs_and_solution,
+                    unsigned int       *IW1,
+                    const unsigned int *ICNTL);
 };
 
 
@@ -1059,219 +1059,219 @@ class SparseDirectMA47 : public Subscriptor
  */
 class SparseDirectUMFPACK : public Subscriptor
 {
-  public:
-                                     /**
-                                      * Dummy class needed for the
-                                      * usual initalization interface
-                                      * of preconditioners.
-                                      */
-    class AdditionalData
-    {};
+public:
+  /**
+   * Dummy class needed for the
+   * usual initalization interface
+   * of preconditioners.
+   */
+  class AdditionalData
+{};
 
 
-                                     /**
-                                      * Constructor. See the
-                                      * documentation of this class
-                                      * for the meaning of the
-                                      * parameters to this function.
-                                      */
-    SparseDirectUMFPACK ();
+  /**
+   * Constructor. See the
+   * documentation of this class
+   * for the meaning of the
+   * parameters to this function.
+   */
+  SparseDirectUMFPACK ();
 
-                                     /**
-                                      * Destructor.
-                                      */
-    ~SparseDirectUMFPACK ();
+  /**
+   * Destructor.
+   */
+  ~SparseDirectUMFPACK ();
 
-                                     /**
-                                      * This function does nothing. It is only
-                                      * here to provide an interface that is
-                                      * consistent with that of the HSL MA27
-                                      * and MA47 solver classes.
-                                      */
-    void initialize (const SparsityPattern &sparsity_pattern);
+  /**
+   * This function does nothing. It is only
+   * here to provide an interface that is
+   * consistent with that of the HSL MA27
+   * and MA47 solver classes.
+   */
+  void initialize (const SparsityPattern &sparsity_pattern);
 
-                                     /**
-                                      * Factorize the matrix. This function
-                                      * may be called multiple times for
-                                      * different matrices, after the object
-                                      * of this class has been initialized for
-                                      * a certain sparsity pattern. You may
-                                      * therefore save some computing time if
-                                      * you want to invert several matrices
-                                      * with the same sparsity
-                                      * pattern. However, note that the bulk
-                                      * of the computing time is actually
-                                      * spent in the factorization, so this
-                                      * functionality may not always be of
-                                      * large benefit.
-                                      *
-                                      * In contrast to the other direct solver
-                                      * classes, the initialisation method
-                                      * does nothing. Therefore initialise
-                                      * is not automatically called by this
-                                      * method, when
-                                      * the initialization step has
-                                      * not been performed yet.
-                                      *
-                                      * This function copies the contents of
-                                      * the matrix into its own storage; the
-                                      * matrix can therefore be deleted after
-                                      * this operation, even if subsequent
-                                      * solves are required.
-                                      */
-    template <class Matrix>
-    void factorize (const Matrix &matrix);
+  /**
+   * Factorize the matrix. This function
+   * may be called multiple times for
+   * different matrices, after the object
+   * of this class has been initialized for
+   * a certain sparsity pattern. You may
+   * therefore save some computing time if
+   * you want to invert several matrices
+   * with the same sparsity
+   * pattern. However, note that the bulk
+   * of the computing time is actually
+   * spent in the factorization, so this
+   * functionality may not always be of
+   * large benefit.
+   *
+   * In contrast to the other direct solver
+   * classes, the initialisation method
+   * does nothing. Therefore initialise
+   * is not automatically called by this
+   * method, when
+   * the initialization step has
+   * not been performed yet.
+   *
+   * This function copies the contents of
+   * the matrix into its own storage; the
+   * matrix can therefore be deleted after
+   * this operation, even if subsequent
+   * solves are required.
+   */
+  template <class Matrix>
+  void factorize (const Matrix &matrix);
 
-                                     /**
-                                      * Initialize memory and call
-                                      * SparseDirectUMFPACK::factorize.
-                                      */
-    template <class Matrix>
-    void initialize(const Matrix &matrix,
-                    const AdditionalData additional_data = AdditionalData());
+  /**
+   * Initialize memory and call
+   * SparseDirectUMFPACK::factorize.
+   */
+  template <class Matrix>
+  void initialize(const Matrix &matrix,
+                  const AdditionalData additional_data = AdditionalData());
 
-                                     /**
-                                      * Preconditioner interface
-                                      * function. Usually, given the source
-                                      * vector, this method returns an
-                                      * approximated solution of <i>Ax
-                                      * = b</i>. As this class provides a
-                                      * wrapper to a direct solver, here
-                                      * it is actually the exact solution
-                                      * (exact within the range of numerical
-                                      * accuracy of course).
-                                      */
-    void vmult (Vector<double>&, const Vector<double>&) const;
+  /**
+   * Preconditioner interface
+   * function. Usually, given the source
+   * vector, this method returns an
+   * approximated solution of <i>Ax
+   * = b</i>. As this class provides a
+   * wrapper to a direct solver, here
+   * it is actually the exact solution
+   * (exact within the range of numerical
+   * accuracy of course).
+   */
+  void vmult (Vector<double> &, const Vector<double> &) const;
 
-                                     /**
-                                      * Not implemented but necessary
-                                      * for compiling.
-                                      */
-    void Tvmult (Vector<double>&, const Vector<double>&) const;
+  /**
+   * Not implemented but necessary
+   * for compiling.
+   */
+  void Tvmult (Vector<double> &, const Vector<double> &) const;
 
-                                     /**
-                                      * Same as vmult(), but adding to
-                                      * the previous solution. Not
-                                      * implemented yet.
-                                      */
-    void vmult_add (Vector<double>&, const Vector<double>&) const;
+  /**
+   * Same as vmult(), but adding to
+   * the previous solution. Not
+   * implemented yet.
+   */
+  void vmult_add (Vector<double> &, const Vector<double> &) const;
 
-                                     /**
-                                      * Not implemented but necessary
-                                      * for compiling.
-                                      */
-    void Tvmult_add (Vector<double>&, const Vector<double>&) const;
+  /**
+   * Not implemented but necessary
+   * for compiling.
+   */
+  void Tvmult_add (Vector<double> &, const Vector<double> &) const;
 
-                                     /**
-                                      * Solve for a certain right hand
-                                      * side vector. This function may
-                                      * be called multiple times for
-                                      * different right hand side
-                                      * vectors after the matrix has
-                                      * been factorized. This yields a
-                                      * big saving in computing time,
-                                      * since the actual solution is
-                                      * fast, compared to the
-                                      * factorization of the matrix.
-                                      *
-                                      * The solution will be returned
-                                      * in place of the right hand
-                                      * side vector.
-                                      *
-                                      * If the factorization has not
-                                      * happened before, strange
-                                      * things will happen. Note that
-                                      * we can't actually call the
-                                      * factorize() function from
-                                      * here if it has not yet been
-                                      * called, since we have no
-                                      * access to the actual matrix.
-                                      */
-    void solve (Vector<double> &rhs_and_solution) const;
+  /**
+   * Solve for a certain right hand
+   * side vector. This function may
+   * be called multiple times for
+   * different right hand side
+   * vectors after the matrix has
+   * been factorized. This yields a
+   * big saving in computing time,
+   * since the actual solution is
+   * fast, compared to the
+   * factorization of the matrix.
+   *
+   * The solution will be returned
+   * in place of the right hand
+   * side vector.
+   *
+   * If the factorization has not
+   * happened before, strange
+   * things will happen. Note that
+   * we can't actually call the
+   * factorize() function from
+   * here if it has not yet been
+   * called, since we have no
+   * access to the actual matrix.
+   */
+  void solve (Vector<double> &rhs_and_solution) const;
 
-                                     /**
-                                      * Call the two functions
-                                      * factorize and solve
-                                      * in that order, i.e. perform
-                                      * the whole solution process for
-                                      * the given right hand side
-                                      * vector.
-                                      *
-                                      * The solution will be returned
-                                      * in place of the right hand
-                                      * side vector.
-                                      */
-    template <class Matrix>
-    void solve (const Matrix   &matrix,
-                Vector<double> &rhs_and_solution);
+  /**
+   * Call the two functions
+   * factorize and solve
+   * in that order, i.e. perform
+   * the whole solution process for
+   * the given right hand side
+   * vector.
+   *
+   * The solution will be returned
+   * in place of the right hand
+   * side vector.
+   */
+  template <class Matrix>
+  void solve (const Matrix   &matrix,
+              Vector<double> &rhs_and_solution);
 
-                                     /**
-                                      * One of the UMFPack routines
-                                      * threw an error. The error code
-                                      * is included in the output and
-                                      * can be looked up in the
-                                      * UMFPack user manual. The name
-                                      * of the routine is included for
-                                      * reference.
-                                      */
-    DeclException2 (ExcUMFPACKError, char*, int,
-                    << "UMFPACK routine " << arg1
-                    << " returned error status " << arg2
-                    << ". See the file <contrib/umfpack/UMFPACK/Include/umfpack.h>"
-                    << " for a description of error codes.");
+  /**
+   * One of the UMFPack routines
+   * threw an error. The error code
+   * is included in the output and
+   * can be looked up in the
+   * UMFPack user manual. The name
+   * of the routine is included for
+   * reference.
+   */
+  DeclException2 (ExcUMFPACKError, char *, int,
+                  << "UMFPACK routine " << arg1
+                  << " returned error status " << arg2
+                  << ". See the file <contrib/umfpack/UMFPACK/Include/umfpack.h>"
+                  << " for a description of error codes.");
 
-  private:
-                                     /**
-                                      * The UMFPACK routines allocate objects
-                                      * in which they store information about
-                                      * symbolic and numeric values of the
-                                      * decomposition. The actual data type of
-                                      * these objects is opaque, and only
-                                      * passed around as void pointers.
-                                      */
-    void *symbolic_decomposition;
-    void *numeric_decomposition;
+private:
+  /**
+   * The UMFPACK routines allocate objects
+   * in which they store information about
+   * symbolic and numeric values of the
+   * decomposition. The actual data type of
+   * these objects is opaque, and only
+   * passed around as void pointers.
+   */
+  void *symbolic_decomposition;
+  void *numeric_decomposition;
 
-                                     /**
-                                      * Free all memory that hasn't been freed
-                                      * yet.
-                                      */
-    void clear ();
+  /**
+   * Free all memory that hasn't been freed
+   * yet.
+   */
+  void clear ();
 
 
-                                     /**
-                                      * Make sure that the arrays Ai
-                                      * and Ap are sorted in each
-                                      * row. UMFPACK wants it this
-                                      * way. We need to have three
-                                      * versions of this function, one
-                                      * for the usual SparseMatrix, one
-                                      * for the SparseMatrixEZ, and
-                                      * one for the BlockSparseMatrix
-                                      * classes
-                                      */
-    template <typename number>
-    void sort_arrays (const SparseMatrixEZ<number> &);
+  /**
+   * Make sure that the arrays Ai
+   * and Ap are sorted in each
+   * row. UMFPACK wants it this
+   * way. We need to have three
+   * versions of this function, one
+   * for the usual SparseMatrix, one
+   * for the SparseMatrixEZ, and
+   * one for the BlockSparseMatrix
+   * classes
+   */
+  template <typename number>
+  void sort_arrays (const SparseMatrixEZ<number> &);
 
-    template <typename number>
-    void sort_arrays (const SparseMatrix<number> &);
+  template <typename number>
+  void sort_arrays (const SparseMatrix<number> &);
 
-    template <typename number>
-    void sort_arrays (const BlockSparseMatrix<number> &);
+  template <typename number>
+  void sort_arrays (const BlockSparseMatrix<number> &);
 
-                                     /**
-                                      * The arrays in which we store the data
-                                      * for the solver.
-                                      */
-    std::vector<long int> Ap;
-    std::vector<long int> Ai;
-    std::vector<double> Ax;
+  /**
+   * The arrays in which we store the data
+   * for the solver.
+   */
+  std::vector<long int> Ap;
+  std::vector<long int> Ai;
+  std::vector<double> Ax;
 
-                                     /**
-                                      * Control and info arrays for the solver
-                                      * routines.
-                                      */
-    std::vector<double> control;
+  /**
+   * Control and info arrays for the solver
+   * routines.
+   */
+  std::vector<double> control;
 };
 
 
@@ -1297,7 +1297,7 @@ class SparseDirectUMFPACK : public Subscriptor
  */
 class SparseDirectMUMPS
 {
- private:
+private:
 
 #ifdef DEAL_II_USE_MUMPS
   DMUMPS_STRUC_C id;
@@ -1310,77 +1310,77 @@ class SparseDirectMUMPS
   unsigned int  n;
   unsigned int  nz;
 
-                        /**
-                         * This function initializes a MUMPS instance
-                         * and hands over the system's matrix
-                         * <tt>matrix</tt>.
-                         */
+  /**
+   * This function initializes a MUMPS instance
+   * and hands over the system's matrix
+   * <tt>matrix</tt>.
+   */
   template<class Matrix>
-    void initialize_matrix (const Matrix& matrix);
+  void initialize_matrix (const Matrix &matrix);
 
-                        /**
-                         * Copy the computed solution into the
-                         * solution vector.
-                         */
-  void copy_solution (Vector<double>& vector);
+  /**
+   * Copy the computed solution into the
+   * solution vector.
+   */
+  void copy_solution (Vector<double> &vector);
 
-                        /**
-                         * Flags storing whether the function
-                         * <tt>initialize ()</tt> has already been
-                         * called.
-                         */
+  /**
+   * Flags storing whether the function
+   * <tt>initialize ()</tt> has already been
+   * called.
+   */
   bool initialize_called;
 
- public:
+public:
 
-                        /**
-                         * Constructor
-                         */
+  /**
+   * Constructor
+   */
   SparseDirectMUMPS ();
 
-                        /**
-                         * Destructor
-                         */
+  /**
+   * Destructor
+   */
   ~SparseDirectMUMPS ();
 
-                        /**
-                         * Exception
-                         */
+  /**
+   * Exception
+   */
   DeclException0 (ExcInitializeAlreadyCalled);
 
-                        /**
-                         * This function initializes a MUMPS instance
-                         * and hands over the system's matrix
-                         * <tt>matrix</tt> and right-hand side
-                         * <tt>vector</tt> to the solver.
-                         */
+  /**
+   * This function initializes a MUMPS instance
+   * and hands over the system's matrix
+   * <tt>matrix</tt> and right-hand side
+   * <tt>vector</tt> to the solver.
+   */
   template <class Matrix>
-    void initialize (const Matrix& matrix,
-                     const Vector<double>      & vector);
+  void initialize (const Matrix &matrix,
+                   const Vector<double>       &vector);
 
-                        /**
-                         * This function initializes a MUMPS instance
-                         * and computes the factorization of the
-                         * system's matrix <tt>matrix</tt>.
-                         */
+  /**
+   * This function initializes a MUMPS instance
+   * and computes the factorization of the
+   * system's matrix <tt>matrix</tt>.
+   */
   template <class Matrix>
-    void initialize (const Matrix& matrix);
+  void initialize (const Matrix &matrix);
 
-                        /**
-                         * A function in which the linear system is
-                         * solved and the solution vector is copied
-                         * into the given <tt>vector</tt>.
-                         */
-  void solve (Vector<double>& vector);
-  
-                        /**
-                         * A function in which the inverse of the
-                         * matrix is applied to the input vector
-                         * <tt>src</tt> and the solution is
-                         * written into the output vector
-                         * <tt>dst</tt>.
-                         */
-  void vmult (Vector<double>& dst, const Vector<double>& src);
+  /**
+   * A function in which the linear system is
+   * solved and the solution vector is copied
+   * into the given <tt>vector</tt>.
+   */
+  void solve (Vector<double> &vector);
+
+  /**
+   * A function in which the inverse of the
+   * matrix is applied to the input vector
+   * <tt>src</tt> and the solution is
+   * written into the output vector
+   * <tt>dst</tt>.
+   */
+  void vmult (Vector<double> &dst, const Vector<double> &src);
 };
 
 DEAL_II_NAMESPACE_CLOSE

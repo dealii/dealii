@@ -35,20 +35,20 @@ namespace hp
   template <int dim, int spacedim>
   FECollection<dim,spacedim>::
   FECollection (const FECollection<dim,spacedim> &fe_collection)
-                  :
-                  Subscriptor (),
-                                                   // copy the array
-                                                   // of shared
-                                                   // pointers. nothing
-                                                   // bad should
-                                                   // happen -- they
-                                                   // simply all point
-                                                   // to the same
-                                                   // objects, and the
-                                                   // last one to die
-                                                   // will delete the
-                                                   // mappings
-                  finite_elements (fe_collection.finite_elements)
+    :
+    Subscriptor (),
+    // copy the array
+    // of shared
+    // pointers. nothing
+    // bad should
+    // happen -- they
+    // simply all point
+    // to the same
+    // objects, and the
+    // last one to die
+    // will delete the
+    // mappings
+    finite_elements (fe_collection.finite_elements)
   {}
 
 
@@ -56,18 +56,18 @@ namespace hp
   template <int dim, int spacedim>
   void FECollection<dim,spacedim>::push_back (const FiniteElement<dim,spacedim> &new_fe)
   {
-                                     // check that the new element has the right
-                                     // number of components. only check with
-                                     // the first element, since all the other
-                                     // elements have already passed the test
-                                     // against the first element
+    // check that the new element has the right
+    // number of components. only check with
+    // the first element, since all the other
+    // elements have already passed the test
+    // against the first element
     if (finite_elements.size() != 0)
       Assert (new_fe.n_components() == finite_elements[0]->n_components(),
               ExcMessage ("All elements inside a collection need to have the "
                           "same number of vector components!"));
 
     finite_elements
-      .push_back (std_cxx1x::shared_ptr<const FiniteElement<dim,spacedim> >(new_fe.clone()));
+    .push_back (std_cxx1x::shared_ptr<const FiniteElement<dim,spacedim> >(new_fe.clone()));
   }
 
 
@@ -151,7 +151,7 @@ namespace hp
     for (unsigned int c=1; c<size(); ++c)
       Assert (mask == (*this)[c].component_mask(block_mask),
               ExcMessage ("Not all elements of this collection agree on what "
-			  "the appropriate mask should be."));
+                          "the appropriate mask should be."));
 
     return mask;
   }
@@ -173,7 +173,7 @@ namespace hp
     for (unsigned int c=1; c<size(); ++c)
       Assert (mask == (*this)[c].block_mask(scalar),
               ExcMessage ("Not all elements of this collection agree on what "
-			  "the appropriate mask should be."));
+                          "the appropriate mask should be."));
 
     return mask;
   }
@@ -195,7 +195,7 @@ namespace hp
     for (unsigned int c=1; c<size(); ++c)
       Assert (mask == (*this)[c].block_mask(vector),
               ExcMessage ("Not all elements of this collection agree on what "
-			  "the appropriate mask should be."));
+                          "the appropriate mask should be."));
 
     return mask;
   }
@@ -217,7 +217,7 @@ namespace hp
     for (unsigned int c=1; c<size(); ++c)
       Assert (mask == (*this)[c].block_mask(sym_tensor),
               ExcMessage ("Not all elements of this collection agree on what "
-			  "the appropriate mask should be."));
+                          "the appropriate mask should be."));
 
     return mask;
   }
@@ -240,7 +240,7 @@ namespace hp
     for (unsigned int c=1; c<size(); ++c)
       Assert (mask == (*this)[c].block_mask(component_mask),
               ExcMessage ("Not all elements of this collection agree on what "
-			  "the appropriate mask should be."));
+                          "the appropriate mask should be."));
 
     return mask;
   }
@@ -256,8 +256,8 @@ namespace hp
     const unsigned int nb = finite_elements[0]->n_blocks ();
     for (unsigned int i=1; i<finite_elements.size(); ++i)
       Assert (finite_elements[i]->n_blocks() == nb,
-          ExcMessage ("Not all finite elements in this collection have "
-                      "the same number of components."));
+              ExcMessage ("Not all finite elements in this collection have "
+                          "the same number of components."));
 
     return nb;
   }

@@ -30,13 +30,13 @@ namespace Functions
   FEFieldFunction<dim, DH, VECTOR>::FEFieldFunction (const DH &mydh,
                                                      const VECTOR &myv,
                                                      const Mapping<dim> &mymapping)
-                  :
-                  Function<dim>(mydh.get_fe().n_components()),
-                  dh(&mydh, "FEFieldFunction"),
-                  data_vector(myv),
-                  mapping(mymapping),
-                  cell_hint(dh->end()),
-                  n_components(mydh.get_fe().n_components())
+    :
+    Function<dim>(mydh.get_fe().n_components()),
+    dh(&mydh, "FEFieldFunction"),
+    data_vector(myv),
+    mapping(mymapping),
+    cell_hint(dh->end()),
+    n_components(mydh.get_fe().n_components())
   {
   }
 
@@ -63,7 +63,7 @@ namespace Functions
       cell = dh->begin_active();
 
     boost::optional<Point<dim> >
-      qp = get_reference_coordinates (cell, p);
+    qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
         const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
@@ -74,7 +74,7 @@ namespace Functions
 
     cell_hint.get() = cell;
 
-                                     // Now we can find out about the point
+    // Now we can find out about the point
     Quadrature<dim> quad(qp.get());
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_values);
@@ -102,16 +102,16 @@ namespace Functions
   void
   FEFieldFunction<dim, DH, VECTOR>::
   vector_gradient (const Point<dim>            &p,
-		   std::vector<Tensor<1,dim> > &gradients) const
+                   std::vector<Tensor<1,dim> > &gradients) const
   {
     Assert (gradients.size() == n_components,
             ExcDimensionMismatch(gradients.size(), n_components));
     typename DH::active_cell_iterator cell = cell_hint.get();
-    if(cell == dh->end())
+    if (cell == dh->end())
       cell = dh->begin_active();
 
     boost::optional<Point<dim> >
-      qp = get_reference_coordinates (cell, p);
+    qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
         std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
@@ -122,13 +122,13 @@ namespace Functions
 
     cell_hint.get() = cell;
 
-                                     // Now we can find out about the point
+    // Now we can find out about the point
     Quadrature<dim> quad(qp.get());
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_gradients);
     fe_v.reinit(cell);
     std::vector< std::vector<Tensor<1,dim> > > vgrads
-      (1,  std::vector<Tensor<1,dim> >(n_components) );
+    (1,  std::vector<Tensor<1,dim> >(n_components) );
     fe_v.get_function_grads(data_vector, vgrads);
     gradients = vgrads[0];
   }
@@ -139,7 +139,7 @@ namespace Functions
   Tensor<1,dim>
   FEFieldFunction<dim, DH, VECTOR>::
   gradient (const Point<dim>   &p,
-	    const unsigned int comp) const
+            const unsigned int comp) const
   {
     std::vector<Tensor<1,dim> > grads(n_components);
     vector_gradient(p, grads);
@@ -152,7 +152,7 @@ namespace Functions
   void
   FEFieldFunction<dim, DH, VECTOR>::
   vector_laplacian (const Point<dim> &p,
-		    Vector<double>   &values) const
+                    Vector<double>   &values) const
   {
     Assert (values.size() == n_components,
             ExcDimensionMismatch(values.size(), n_components));
@@ -161,7 +161,7 @@ namespace Functions
       cell = dh->begin_active();
 
     boost::optional<Point<dim> >
-      qp = get_reference_coordinates (cell, p);
+    qp = get_reference_coordinates (cell, p);
     if (!qp)
       {
         const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
@@ -172,7 +172,7 @@ namespace Functions
 
     cell_hint.get() = cell;
 
-                                     // Now we can find out about the point
+    // Now we can find out about the point
     Quadrature<dim> quad(qp.get());
     FEValues<dim> fe_v(mapping, cell->get_fe(), quad,
                        update_hessians);
@@ -194,13 +194,13 @@ namespace Functions
   }
 
 
-                                   // Now the list versions
-                                   // ==============================
+  // Now the list versions
+  // ==============================
 
   template <int dim, typename DH, typename VECTOR>
   void
   FEFieldFunction<dim, DH, VECTOR>::
-  vector_value_list (const std::vector<Point< dim > > &    points,
+  vector_value_list (const std::vector<Point< dim > >     &points,
                      std::vector< Vector<double> > &values) const
   {
     Assert(points.size() == values.size(),
@@ -214,19 +214,20 @@ namespace Functions
     hp::MappingCollection<dim> mapping_collection (mapping);
     hp::FECollection<dim> fe_collection (dh->get_fe ());
     hp::QCollection<dim> quadrature_collection;
-                                     // Create quadrature collection
-    for (unsigned int i=0; i<ncells; ++i) {
-                                       // Number of quadrature points on this cell
-      unsigned int nq = qpoints[i].size();
-                                       // Construct a quadrature formula
-      std::vector< double > ww(nq, 1./((double) nq));
+    // Create quadrature collection
+    for (unsigned int i=0; i<ncells; ++i)
+      {
+        // Number of quadrature points on this cell
+        unsigned int nq = qpoints[i].size();
+        // Construct a quadrature formula
+        std::vector< double > ww(nq, 1./((double) nq));
 
-      quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
-    }
-                                     // Get a function value object
+        quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
+      }
+    // Get a function value object
     hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
                            update_values);
-                                     // Now gather all the informations we need
+    // Now gather all the informations we need
     for (unsigned int i=0; i<ncells; ++i)
       {
         fe_v.reinit(cells[i], i, 0);
@@ -260,7 +261,7 @@ namespace Functions
   template <int dim, typename DH, typename VECTOR>
   void
   FEFieldFunction<dim, DH, VECTOR>::
-  vector_gradient_list (const std::vector<Point< dim > > &    points,
+  vector_gradient_list (const std::vector<Point< dim > >     &points,
                         std::vector<
                         std::vector< Tensor<1,dim> > > &values) const
   {
@@ -275,25 +276,26 @@ namespace Functions
     hp::MappingCollection<dim> mapping_collection (mapping);
     hp::FECollection<dim> fe_collection (dh->get_fe ());
     hp::QCollection<dim> quadrature_collection;
-                                     // Create quadrature collection
-    for (unsigned int i=0; i<ncells; ++i) {
-                                       // Number of quadrature points on this cell
-      unsigned int nq = qpoints[i].size();
-                                       // Construct a quadrature formula
-      std::vector< double > ww(nq, 1./((double) nq));
+    // Create quadrature collection
+    for (unsigned int i=0; i<ncells; ++i)
+      {
+        // Number of quadrature points on this cell
+        unsigned int nq = qpoints[i].size();
+        // Construct a quadrature formula
+        std::vector< double > ww(nq, 1./((double) nq));
 
-      quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
-    }
-                                     // Get a function value object
+        quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
+      }
+    // Get a function value object
     hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
                            update_gradients);
-                                     // Now gather all the informations we need
+    // Now gather all the informations we need
     for (unsigned int i=0; i<ncells; ++i)
       {
         fe_v.reinit(cells[i], i, 0);
         const unsigned int nq = qpoints[i].size();
         std::vector< std::vector<Tensor<1,dim> > >
-          vgrads (nq, std::vector<Tensor<1,dim> >(n_components));
+        vgrads (nq, std::vector<Tensor<1,dim> >(n_components));
         fe_v.get_present_fe_values ().get_function_grads(data_vector, vgrads);
         for (unsigned int q=0; q<nq; ++q)
           values[maps[i][q]] = vgrads[q];
@@ -310,7 +312,7 @@ namespace Functions
     Assert(points.size() == values.size(),
            ExcDimensionMismatch(points.size(), values.size()));
     std::vector< std::vector<Tensor<1,dim> > >
-      vvalues(points.size(), std::vector<Tensor<1,dim> >(n_components));
+    vvalues(points.size(), std::vector<Tensor<1,dim> >(n_components));
     vector_gradient_list(points, vvalues);
     for (unsigned int q=0; q<points.size(); ++q)
       values[q] = vvalues[q][component];
@@ -320,7 +322,7 @@ namespace Functions
   template <int dim, typename DH, typename VECTOR>
   void
   FEFieldFunction<dim, DH, VECTOR>::
-  vector_laplacian_list (const std::vector<Point< dim > > &    points,
+  vector_laplacian_list (const std::vector<Point< dim > >     &points,
                          std::vector< Vector<double> > &values) const
   {
     Assert(points.size() == values.size(),
@@ -334,19 +336,20 @@ namespace Functions
     hp::MappingCollection<dim> mapping_collection (mapping);
     hp::FECollection<dim> fe_collection (dh->get_fe ());
     hp::QCollection<dim> quadrature_collection;
-                                     // Create quadrature collection
-    for (unsigned int i=0; i<ncells; ++i) {
-                                       // Number of quadrature points on this cell
-      unsigned int nq = qpoints[i].size();
-                                       // Construct a quadrature formula
-      std::vector< double > ww(nq, 1./((double) nq));
+    // Create quadrature collection
+    for (unsigned int i=0; i<ncells; ++i)
+      {
+        // Number of quadrature points on this cell
+        unsigned int nq = qpoints[i].size();
+        // Construct a quadrature formula
+        std::vector< double > ww(nq, 1./((double) nq));
 
-      quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
-    }
-                                     // Get a function value object
+        quadrature_collection.push_back (Quadrature<dim> (qpoints[i], ww));
+      }
+    // Get a function value object
     hp::FEValues<dim> fe_v(mapping_collection, fe_collection, quadrature_collection,
                            update_hessians);
-                                     // Now gather all the informations we need
+    // Now gather all the informations we need
     for (unsigned int i=0; i<ncells; ++i)
       {
         fe_v.reinit(cells[i], i, 0);
@@ -382,91 +385,91 @@ namespace Functions
                           std::vector<std::vector<Point<dim> > > &qpoints,
                           std::vector<std::vector<unsigned int> > &maps) const
   {
-                                     // How many points are here?
+    // How many points are here?
     const unsigned int np = points.size();
 
-                                     // Reset output maps.
+    // Reset output maps.
     cells.clear();
     qpoints.clear();
     maps.clear();
 
-                                     // Now the easy case.
+    // Now the easy case.
     if (np==0) return 0;
 
-                                     // Keep track of the points we
-                                     // found
+    // Keep track of the points we
+    // found
     std::vector<bool> point_flags(np, false);
 
-                                     // Set this to true until all
-                                     // points have been classified
+    // Set this to true until all
+    // points have been classified
     bool left_over = true;
 
-                                     // Current quadrature point
+    // Current quadrature point
     typename DH::active_cell_iterator cell = cell_hint.get();
     if (cell == dh->end())
       cell = dh->begin_active();
 
     {
-                                       // see if the point is
-                                       // inside the
-                                       // cell. there are two
-                                       // ways that
-                                       // transform_real_to_unit_cell
-                                       // can indicate that a
-                                       // point is outside: by
-                                       // returning
-                                       // coordinates that lie
-                                       // outside the
-                                       // reference cell, or
-                                       // by throwing an
-                                       // exception. handle
-                                       // both
+      // see if the point is
+      // inside the
+      // cell. there are two
+      // ways that
+      // transform_real_to_unit_cell
+      // can indicate that a
+      // point is outside: by
+      // returning
+      // coordinates that lie
+      // outside the
+      // reference cell, or
+      // by throwing an
+      // exception. handle
+      // both
       boost::optional<Point<dim> >
-        qp = get_reference_coordinates (cell, points[0]);
+      qp = get_reference_coordinates (cell, points[0]);
       if (!qp)
         {
           const std::pair<typename DH::active_cell_iterator, Point<dim> >
-            my_pair  = GridTools::find_active_cell_around_point
-            (mapping, *dh, points[0]);
+          my_pair  = GridTools::find_active_cell_around_point
+                     (mapping, *dh, points[0]);
           cell = my_pair.first;
           qp = my_pair.second;
           point_flags[0] = true;
         }
 
-                                       // Put in the first point.
+      // Put in the first point.
       cells.push_back(cell);
       qpoints.push_back(std::vector<Point<dim> >(1, qp.get()));
       maps.push_back(std::vector<unsigned int> (1, 0));
     }
 
 
-                                     // Check if we need to do anything else
+    // Check if we need to do anything else
     if (points.size() > 1)
       left_over = true;
     else
       left_over = false;
 
 
-                                     // This is the first index of a non processed point
+    // This is the first index of a non processed point
     unsigned int first_outside = 1;
 
-                                     // And this is the index of the current cell
+    // And this is the index of the current cell
     unsigned int c = 0;
 
     while (left_over == true)
       {
-                                         // Assume this is the last one
+        // Assume this is the last one
         left_over = false;
         Assert(first_outside < np,
                ExcIndexRange(first_outside, 0, np));
 
-                                         // If we found one in this cell, keep looking in the same cell
+        // If we found one in this cell, keep looking in the same cell
         for (unsigned int p=first_outside; p<np; ++p)
           if (point_flags[p] == false)
             {
-                                               // same logic as above
+              // same logic as above
               const boost::optional<Point<dim> >
-                qp = get_reference_coordinates (cells[c], points[p]);
+              qp = get_reference_coordinates (cells[c], points[p]);
               if (qp)
                 {
                   point_flags[p] = true;
@@ -475,16 +478,16 @@ namespace Functions
                 }
               else
                 {
-                                                   // Set things up for next round
+                  // Set things up for next round
                   if (left_over == false)
                     first_outside = p;
                   left_over = true;
                 }
             }
-                                         // If we got here and there is
-                                         // no left over, we are
-                                         // done. Else we need to find
-                                         // the next cell
+        // If we got here and there is
+        // no left over, we are
+        // done. Else we need to find
+        // the next cell
         if (left_over == true)
           {
             const std::pair<typename DH::active_cell_iterator, Point<dim> > my_pair
@@ -494,15 +497,15 @@ namespace Functions
             maps.push_back(std::vector<unsigned int>(1, first_outside));
             c++;
             point_flags[first_outside] = true;
-                                             // And check if we can exit the loop now
+            // And check if we can exit the loop now
             if (first_outside == np-1)
               left_over = false;
           }
       }
 
-                                     // Augment of one the number of cells
+    // Augment of one the number of cells
     ++c;
-                                     // Debug Checking
+    // Debug Checking
     Assert(c == cells.size(), ExcInternalError());
 
     Assert(c == maps.size(),
@@ -513,10 +516,10 @@ namespace Functions
 
 #ifdef DEBUG
     unsigned int qps = 0;
-                                     // The number of points in all
-                                     // the cells must be the same as
-                                     // the number of points we
-                                     // started off from.
+    // The number of points in all
+    // the cells must be the same as
+    // the number of points we
+    // started off from.
     for (unsigned int n=0; n<c; ++n)
       {
         Assert(qpoints[n].size() == maps[n].size(),
@@ -547,9 +550,9 @@ namespace Functions
       }
     catch (const typename Mapping<dim>::ExcTransformationFailed &)
       {
-                                         // transformation failed, so
-                                         // assume the point is
-                                         // outside
+        // transformation failed, so
+        // assume the point is
+        // outside
         return boost::optional<Point<dim> >();
       }
   }

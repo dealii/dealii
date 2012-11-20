@@ -54,7 +54,7 @@ JobIdentifier::operator ()() const
 
 
 std::string
-JobIdentifier::base_name(const char* filename)
+JobIdentifier::base_name(const char *filename)
 {
   std::string name(filename);
   std::string::size_type pos = name.find(".");

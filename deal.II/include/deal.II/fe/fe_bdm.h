@@ -53,77 +53,77 @@ class FE_BDM
   :
   public FE_PolyTensor<PolynomialsBDM<dim>, dim>
 {
-  public:
-                                     /**
-                                      * Constructor for the BDM
-                                      * element of degree @p p.
-                                      */
-    FE_BDM (const unsigned int p);
+public:
+  /**
+   * Constructor for the BDM
+   * element of degree @p p.
+   */
+  FE_BDM (const unsigned int p);
 
-                                     /**
-                                      * Return a string that uniquely
-                                      * identifies a finite
-                                      * element. This class returns
-                                      * <tt>FE_BDM<dim>(degree)</tt>, with
-                                      * @p dim and @p degree
-                                      * replaced by appropriate
-                                      * values.
-                                      */
-    virtual std::string get_name () const;
+  /**
+   * Return a string that uniquely
+   * identifies a finite
+   * element. This class returns
+   * <tt>FE_BDM<dim>(degree)</tt>, with
+   * @p dim and @p degree
+   * replaced by appropriate
+   * values.
+   */
+  virtual std::string get_name () const;
 
-    virtual FiniteElement<dim>* clone () const;
+  virtual FiniteElement<dim> *clone () const;
 
-    virtual void interpolate(std::vector<double>&                local_dofs,
-                             const std::vector<double>& values) const;
-    virtual void interpolate(std::vector<double>&                local_dofs,
-                             const std::vector<Vector<double> >& values,
-                             unsigned int offset = 0) const;
-    virtual void interpolate(
-      std::vector<double>& local_dofs,
-      const VectorSlice<const std::vector<std::vector<double> > >& values) const;
-  private:
-                                     /**
-                                      * Only for internal use. Its
-                                      * full name is
-                                      * @p get_dofs_per_object_vector
-                                      * function and it creates the
-                                      * @p dofs_per_object vector that is
-                                      * needed within the constructor to
-                                      * be passed to the constructor of
-                                      * @p FiniteElementData.
-                                      */
-    static std::vector<unsigned int>
-    get_dpo_vector (const unsigned int degree);
+  virtual void interpolate(std::vector<double>                &local_dofs,
+                           const std::vector<double> &values) const;
+  virtual void interpolate(std::vector<double>                &local_dofs,
+                           const std::vector<Vector<double> > &values,
+                           unsigned int offset = 0) const;
+  virtual void interpolate(
+    std::vector<double> &local_dofs,
+    const VectorSlice<const std::vector<std::vector<double> > > &values) const;
+private:
+  /**
+   * Only for internal use. Its
+   * full name is
+   * @p get_dofs_per_object_vector
+   * function and it creates the
+   * @p dofs_per_object vector that is
+   * needed within the constructor to
+   * be passed to the constructor of
+   * @p FiniteElementData.
+   */
+  static std::vector<unsigned int>
+  get_dpo_vector (const unsigned int degree);
 
-                                     /**
-                                      * Compute the vector used for
-                                      * the
-                                      * @p restriction_is_additive
-                                      * field passed to the base
-                                      * class's constructor.
-                                      */
-    static std::vector<bool>
-    get_ria_vector (const unsigned int degree);
-                                     /**
-                                      * Initialize the
-                                      * FiniteElement<dim>::generalized_support_points
-                                      * and FiniteElement<dim>::generalized_face_support_points
-                                      * fields. Called from the
-                                      * constructor.
-				      * See the @ref GlossGeneralizedSupport "glossary entry on generalized support points"
-				      * for more information.
-                                      */
-    void initialize_support_points (const unsigned int rt_degree);
-                                     /**
-                                      * The values in the interior
-                                      * support points of the
-                                      * polynomials needed as test
-                                      * functions. The outer vector is
-                                      * indexed by quadrature points,
-                                      * the inner by the test
-                                      * function.
-                                      */
-    std::vector<std::vector<double> > test_values;
+  /**
+   * Compute the vector used for
+   * the
+   * @p restriction_is_additive
+   * field passed to the base
+   * class's constructor.
+   */
+  static std::vector<bool>
+  get_ria_vector (const unsigned int degree);
+  /**
+   * Initialize the
+   * FiniteElement<dim>::generalized_support_points
+   * and FiniteElement<dim>::generalized_face_support_points
+   * fields. Called from the
+   * constructor.
+  * See the @ref GlossGeneralizedSupport "glossary entry on generalized support points"
+  * for more information.
+   */
+  void initialize_support_points (const unsigned int rt_degree);
+  /**
+   * The values in the interior
+   * support points of the
+   * polynomials needed as test
+   * functions. The outer vector is
+   * indexed by quadrature points,
+   * the inner by the test
+   * function.
+   */
+  std::vector<std::vector<double> > test_values;
 };
 
 DEAL_II_NAMESPACE_CLOSE

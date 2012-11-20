@@ -20,25 +20,25 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, int spacedim>
 FE_DGP<dim,spacedim>::FE_DGP (const unsigned int degree)
-                :
-                FE_Poly<PolynomialSpace<dim>, dim, spacedim> (
-                  PolynomialSpace<dim>(Polynomials::Legendre::generate_complete_basis(degree)),
-                  FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
-                  std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
-                  std::vector<ComponentMask>(FiniteElementData<dim>(
-                    get_dpo_vector(degree), 1, degree).dofs_per_cell, std::vector<bool>(1,true)))
+  :
+  FE_Poly<PolynomialSpace<dim>, dim, spacedim> (
+    PolynomialSpace<dim>(Polynomials::Legendre::generate_complete_basis(degree)),
+    FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
+    std::vector<bool>(FiniteElementData<dim>(get_dpo_vector(degree), 1, degree).dofs_per_cell,true),
+    std::vector<ComponentMask>(FiniteElementData<dim>(
+                                 get_dpo_vector(degree), 1, degree).dofs_per_cell, std::vector<bool>(1,true)))
 {
-                                   // Reinit the vectors of
-                                   // restriction and prolongation
-                                   // matrices to the right sizes
+  // Reinit the vectors of
+  // restriction and prolongation
+  // matrices to the right sizes
   this->reinit_restriction_and_prolongation_matrices();
-                                   // Fill prolongation matrices with embedding operators
+  // Fill prolongation matrices with embedding operators
   if (dim == spacedim)
-  {
+    {
       FETools::compute_embedding_matrices (*this, this->prolongation);
-                                   // Fill restriction matrices with L2-projection
+      // Fill restriction matrices with L2-projection
       FETools::compute_projection_matrices (*this, this->restriction);
-  }
+    }
 }
 
 
@@ -46,12 +46,12 @@ template <int dim, int spacedim>
 std::string
 FE_DGP<dim,spacedim>::get_name () const
 {
-                                   // note that the
-                                   // FETools::get_fe_from_name
-                                   // function depends on the
-                                   // particular format of the string
-                                   // this function returns, so they
-                                   // have to be kept in synch
+  // note that the
+  // FETools::get_fe_from_name
+  // function depends on the
+  // particular format of the string
+  // this function returns, so they
+  // have to be kept in synch
 
   std::ostringstream namebuf;
   namebuf << "FE_DGP<" << dim << ">(" << this->degree << ")";
@@ -81,7 +81,7 @@ FE_DGP<dim,spacedim>::get_dpo_vector (const unsigned int deg)
 {
   std::vector<unsigned int> dpo(dim+1, 0U);
   dpo[dim] = deg+1;
-  for (unsigned int i=1;i<dim;++i)
+  for (unsigned int i=1; i<dim; ++i)
     {
       dpo[dim] *= deg+1+i;
       dpo[dim] /= i+1;
@@ -97,17 +97,17 @@ FE_DGP<dim,spacedim>::
 get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
                                FullMatrix<double>       &interpolation_matrix) const
 {
-                                   // this is only implemented, if the source
-                                   // FE is also a DGP element. in that case,
-                                   // both elements have no dofs on their
-                                   // faces and the face interpolation matrix
-                                   // is necessarily empty -- i.e. there isn't
-                                   // much we need to do here.
+  // this is only implemented, if the source
+  // FE is also a DGP element. in that case,
+  // both elements have no dofs on their
+  // faces and the face interpolation matrix
+  // is necessarily empty -- i.e. there isn't
+  // much we need to do here.
   typedef FiniteElement<dim,spacedim> FE;
   typedef FE_DGP<dim,spacedim> FEDGP;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGP<") == 0)
                ||
-               (dynamic_cast<const FEDGP*>(&x_source_fe) != 0),
+               (dynamic_cast<const FEDGP *>(&x_source_fe) != 0),
                typename FE::
                ExcInterpolationNotImplemented());
 
@@ -128,17 +128,17 @@ get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe
                                   const unsigned int ,
                                   FullMatrix<double>           &interpolation_matrix) const
 {
-                                   // this is only implemented, if the source
-                                   // FE is also a DGP element. in that case,
-                                   // both elements have no dofs on their
-                                   // faces and the face interpolation matrix
-                                   // is necessarily empty -- i.e. there isn't
-                                   // much we need to do here.
+  // this is only implemented, if the source
+  // FE is also a DGP element. in that case,
+  // both elements have no dofs on their
+  // faces and the face interpolation matrix
+  // is necessarily empty -- i.e. there isn't
+  // much we need to do here.
   typedef FiniteElement<dim,spacedim> FE;
   typedef FE_DGP<dim,spacedim> FEDGP;
   AssertThrow ((x_source_fe.get_name().find ("FE_DGP<") == 0)
                ||
-               (dynamic_cast<const FEDGP*>(&x_source_fe) != 0),
+               (dynamic_cast<const FEDGP *>(&x_source_fe) != 0),
                typename FE::
                ExcInterpolationNotImplemented());
 
@@ -166,8 +166,8 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGP<dim,spacedim>::
 hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 {
-                                   // there are no such constraints for DGP
-                                   // elements at all
+  // there are no such constraints for DGP
+  // elements at all
   if (dynamic_cast<const FE_DGP<dim,spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
@@ -185,8 +185,8 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGP<dim,spacedim>::
 hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const
 {
-                                   // there are no such constraints for DGP
-                                   // elements at all
+  // there are no such constraints for DGP
+  // elements at all
   if (dynamic_cast<const FE_DGP<dim,spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
@@ -204,8 +204,8 @@ std::vector<std::pair<unsigned int, unsigned int> >
 FE_DGP<dim,spacedim>::
 hp_quad_dof_identities (const FiniteElement<dim,spacedim>        &fe_other) const
 {
-                                   // there are no such constraints for DGP
-                                   // elements at all
+  // there are no such constraints for DGP
+  // elements at all
   if (dynamic_cast<const FE_DGP<dim,spacedim>*>(&fe_other) != 0)
     return
       std::vector<std::pair<unsigned int, unsigned int> > ();
@@ -222,9 +222,9 @@ template <int dim, int spacedim>
 FiniteElementDomination::Domination
 FE_DGP<dim,spacedim>::compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const
 {
-                                   // check whether both are discontinuous
-                                   // elements, see the description of
-                                   // FiniteElementDomination::Domination
+  // check whether both are discontinuous
+  // elements, see the description of
+  // FiniteElementDomination::Domination
   if (dynamic_cast<const FE_DGP<dim,spacedim>*>(&fe_other) != 0)
     return FiniteElementDomination::no_requirements;
 
@@ -237,10 +237,10 @@ FE_DGP<dim,spacedim>::compare_for_face_domination (const FiniteElement<dim,space
 template <int dim, int spacedim>
 bool
 FE_DGP<dim,spacedim>::has_support_on_face (const unsigned int,
-                                  const unsigned int) const
+                                           const unsigned int) const
 {
-                                   // all shape functions have support on all
-                                   // faces
+  // all shape functions have support on all
+  // faces
   return true;
 }
 
