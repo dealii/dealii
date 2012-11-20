@@ -462,7 +462,8 @@ namespace TrilinosWrappers
     void
     BlockVector::compress (const Epetra_CombineMode last_action)
     {
-      ::dealii::VectorOperation::values last_action_;
+      ::dealii::VectorOperation::values last_action_ =
+        ::dealii::VectorOperation::unknown;
       if (last_action == Add)
 	last_action_ = ::dealii::VectorOperation::add;
       else if (last_action == Insert)
