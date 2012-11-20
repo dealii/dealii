@@ -5,6 +5,7 @@ style-cc-files:= $(wildcard source/*/*.cc)
 style-examples:= $(wildcard examples/*/*.cc)
 
 indent:
-        @echo "============ Indenting all files"
-        astyle --options=contrib/utilities/astyle.rc $(style-h-files) $(style-cc-files) $(style-examples)
+	@echo "============ Indenting all files"
+	astyle --options=contrib/utilities/astyle.rc $(style-h-files) $(style-cc-files) $(style-examples)
 
+.PHONY: indent
