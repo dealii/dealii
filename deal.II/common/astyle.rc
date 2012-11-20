@@ -11,9 +11,9 @@
 --min-conditional-indent=0
 --pad-header
 
-# write things as 'char *p', not 'char* p'
---align-pointer=name
---align-reference=name
+# write things as 'char* p', not 'char *p'
+--align-pointer=type
+#--align-reference=name
 
 --max-instatement-indent=60
 --suffix=none
