@@ -10,8 +10,8 @@
 --pad-header
 
 # write things as 'char * p'
---align-pointer=middle
---align-reference=middle
+--align-pointer=name
+--align-reference=name
 
 --max-instatement-indent=60
 --suffix=none
