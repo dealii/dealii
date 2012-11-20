@@ -1,0 +1,12 @@
+
+DEAL:mpi::Running on 10 CPU(s).
+DEAL:mpi::got message '1' from CPU 2!
+DEAL:mpi::got message '2' from CPU 3!
+DEAL:mpi::got message '3' from CPU 4!
+DEAL:mpi::got message '4' from CPU 5!
+DEAL:mpi::got message '5' from CPU 6!
+DEAL:mpi::got message '6' from CPU 7!
+DEAL:mpi::got message '7' from CPU 8!
+DEAL:mpi::got message '8' from CPU 9!
+DEAL:mpi::got message '9' from CPU 10!
+DEAL:mpi::done

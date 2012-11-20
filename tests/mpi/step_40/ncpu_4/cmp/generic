@@ -1,0 +1,6 @@
+
+DEAL:mpi::Running on 4 CPU(s).
+DEAL:mpi::got message '1' from CPU 2!
+DEAL:mpi::got message '2' from CPU 3!
+DEAL:mpi::got message '3' from CPU 4!
+DEAL:mpi::done
