@@ -658,7 +658,7 @@ class DoFHandler  :  public Subscriptor
                                       * you are only interested in
                                       * the number of elements
                                       * each processor owns then
-                                      * n_dofs_per_processor() is
+                                      * n_locally_owned_dofs_per_processor() is
                                       * a better choice.
                                       *
                                       * If this is a sequential job,
