@@ -1,7 +1,7 @@
 /* Authors: Jean-Paul Pelteret, University of Cape Town,            */
 /*          Andrew McBride, University of Erlangen-Nuremberg, 2010  */
 /*                                                                  */
-/*    Copyright (C) 2010, 2011, 2012 by the deal.II authors         */
+/*    Copyright (C) 2010-2012 by the deal.II authors         */
 /*                        & Jean-Paul Pelteret and Andrew McBride   */
 /*                                                                  */
 /*    This file is subject to QPL and may not be  distributed       */

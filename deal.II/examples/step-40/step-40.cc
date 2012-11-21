@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2009, 2010, 2011, 2012 by Timo Heister and the deal.II authors */
+/*    Copyright (C) 2009-2012 by Timo Heister and the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
