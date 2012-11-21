@@ -1156,7 +1156,7 @@ namespace PETScWrappers
    *    SolverControl cn;
    *    PETScWrappers::SparseDirectMUMPS solver(cn, mpi_communicator);
    *    solver.set_symmetric_mode(true);
-   *    solver.solve(system_matrix, solutions, system_rhs);
+   *    solver.solve(system_matrix, solution, system_rhs);
    * @endcode
    *
    * @note The class internally calls KSPSetFromOptions thus you are
