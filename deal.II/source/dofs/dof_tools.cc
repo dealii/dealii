@@ -581,6 +581,14 @@ namespace DoFTools
                 {
                   typename DH::cell_iterator neighbor = cell->neighbor(face);
 
+                  // in 1d, we do not need to worry whether the neighbor
+                  // might have children and then loop over those children.
+                  // rather, we may as well go straight to to cell behind
+                  // this particular cell's most terminal child
+                  if (DH::dimension==1)
+                    while (neighbor->has_children())
+                      neighbor = neighbor->child(face==0 ? 1 : 0);
+
                   if (neighbor->has_children())
                     {
                       for (unsigned int sub_nr = 0;
