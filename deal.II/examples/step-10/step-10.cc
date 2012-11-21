@@ -160,8 +160,9 @@ namespace Step10
   // circle of radius 1, the area represents just the number that is searched
   // for. The numerical computation of the area is performed by integrating
   // the constant function of value 1 over the whole computational domain,
-  // i.e. by computing the areas $\int_K 1 dx=\int_{\hat K} 1 \ \textrm{det}\
-  // J(\hat x) d\hat x \approx \sum_i \textrm{det} \ J(\hat x_i)w(\hat x_i)$,
+  // i.e. by computing the areas $\int_K 1 dx=\int_{\hat K} 1
+  // \ \textrm{det}\ J(\hat x) d\hat x \approx \sum_i \textrm{det}
+  // \ J(\hat x_i)w(\hat x_i)$,
   // where the sum extends over all quadrature points on all active cells in
   // the triangulation, with $w(x_i)$ being the weight of quadrature point
   // $x_i$. The integrals on each cell are approximated by numerical
