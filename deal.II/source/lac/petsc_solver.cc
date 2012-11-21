@@ -805,8 +805,6 @@ namespace PETScWrappers
                                           solver_control.last_value());
     else
       {
-        PetscPrintf(PETSC_COMM_WORLD, "Success.  MUMPS has solved.\n");
-
         /**
          * obtain convergence
          * information. obtain
@@ -817,13 +815,6 @@ namespace PETScWrappers
         AssertThrow (ierr == 0, ExcPETScError(ierr));
         ierr = KSPGetResidualNorm (solver_data->ksp, &rnorm);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
-
-        /**
-         * print the convergence
-         * information
-         */
-        PetscPrintf(PETSC_COMM_WORLD, "Norm of residual is %G in %D iteration(s)\n",
-                    rnorm, its);
       }
 
 #else  // PETSC_HAVE_MUMPS
