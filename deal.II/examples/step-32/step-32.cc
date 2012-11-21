@@ -205,8 +205,13 @@ namespace Step32
   // This namespace implements the preconditioner. As discussed in the
   // introduction, this preconditioner differs in a number of key portions
   // from the one used in step-31. Specifically, it is a right preconditioner,
-  // implementing the matrix @f{align*}\left(\begin{array}{cc}A^{-1} & B^T \\
-  // 0 & S^{-1}\end{array}\right)@f} where the two inverse matrix operations
+  // implementing the matrix
+  // @f{align*}
+  //   \left(\begin{array}{cc}A^{-1} & B^T
+  //                        \\0 & S^{-1}
+  // \end{array}\right)
+  // @f}
+  // where the two inverse matrix operations
   // are approximated by linear solvers or, if the right flag is given to the
   // constructor of this class, by a single AMG V-cycle for the velocity
   // block. The three code blocks of the <code>vmult</code> function implement
