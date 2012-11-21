@@ -392,15 +392,16 @@ namespace Step20
   }
 
 
-  // @sect4{MixedLaplaceProblem::assemble_system} Similarly, the function that
-  // assembles the linear system has mostly been discussed already in the
-  // introduction to this example. At its top, what happens are all the usual
-  // steps, with the addition that we do not only allocate quadrature and
-  // <code>FEValues</code> objects for the cell terms, but also for face
-  // terms. After that, we define the usual abbreviations for variables, and
-  // the allocate space for the local matrix and right hand side
-  // contributions, and the array that holds the global numbers of the degrees
-  // of freedom local to the present cell.
+  // @sect4{MixedLaplaceProblem::assemble_system}
+
+  // Similarly, the function that assembles the linear system has mostly been
+  // discussed already in the introduction to this example. At its top, what
+  // happens are all the usual steps, with the addition that we do not only
+  // allocate quadrature and <code>FEValues</code> objects for the cell terms,
+  // but also for face terms. After that, we define the usual abbreviations
+  // for variables, and the allocate space for the local matrix and right hand
+  // side contributions, and the array that holds the global numbers of the
+  // degrees of freedom local to the present cell.
   template <int dim>
   void MixedLaplaceProblem<dim>::assemble_system ()
   {

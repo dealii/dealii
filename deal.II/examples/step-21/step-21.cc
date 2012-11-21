@@ -122,9 +122,11 @@ namespace Step21
 
   // @sect3{Equation data}
 
-  // @sect4{Pressure right hand side} At present, the right hand side of the
-  // pressure equation is simply the zero function. However, the rest of the
-  // program is fully equipped to deal with anything else, if this is desired:
+  // @sect4{Pressure right hand side}
+
+  // At present, the right hand side of the pressure equation is simply the
+  // zero function. However, the rest of the program is fully equipped to deal
+  // with anything else, if this is desired:
   template <int dim>
   class PressureRightHandSide : public Function<dim>
   {
@@ -146,9 +148,10 @@ namespace Step21
   }
 
 
-  // @sect4{Pressure boundary values} The next are pressure boundary
-  // values. As mentioned in the introduction, we choose a linear pressure
-  // field:
+  // @sect4{Pressure boundary values}
+
+  // The next are pressure boundary values. As mentioned in the introduction,
+  // we choose a linear pressure field:
   template <int dim>
   class PressureBoundaryValues : public Function<dim>
   {
@@ -565,10 +568,12 @@ namespace Step21
   // try to get familiar with that program first, then most of what is
   // happening here should be mostly clear.
 
-  // @sect4{TwoPhaseFlowProblem::TwoPhaseFlowProblem} First for the
-  // constructor. We use $RT_k \times DQ_k \times DQ_k$ spaces. The time step
-  // is set to zero initially, but will be computed before it is needed first,
-  // as described in a subsection of the introduction.
+  // @sect4{TwoPhaseFlowProblem::TwoPhaseFlowProblem}
+
+  // First for the constructor. We use $RT_k \times DQ_k \times DQ_k$
+  // spaces. The time step is set to zero initially, but will be computed
+  // before it is needed first, as described in a subsection of the
+  // introduction.
   template <int dim>
   TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem (const unsigned int degree)
     :

@@ -552,9 +552,10 @@ namespace Step29
   }
 
 
-  // @sect4{<code>UltrasoundProblem::assemble_system</code>} As before, this
-  // function takes care of assembling the system matrix and right hand side
-  // vector:
+  // @sect4{<code>UltrasoundProblem::assemble_system</code>}
+
+  // As before, this function takes care of assembling the system matrix and
+  // right hand side vector:
   template <int dim>
   void UltrasoundProblem<dim>::assemble_system ()
   {
@@ -906,8 +907,9 @@ namespace Step29
 
 
 
-  // @sect4{<code>UltrasoundProblem::run</code>} Here we simply execute our
-  // functions one after the other:
+  // @sect4{<code>UltrasoundProblem::run</code>}
+
+  // Here we simply execute our functions one after the other:
   template <int dim>
   void UltrasoundProblem<dim>::run ()
   {

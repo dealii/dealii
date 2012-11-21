@@ -1235,20 +1235,22 @@ namespace Step32
 
 
   // @sect4{The BoussinesqFlowProblem helper functions}
-  // @sect5{BoussinesqFlowProblem::get_maximal_velocity} Except for two small
-  // details, the function to compute the global maximum of the velocity is
-  // the same as in step-31. The first detail is actually common to all
-  // functions that implement loops over all cells in the triangulation: When
-  // operating in %parallel, each processor can only work on a chunk of cells
-  // since each processor only has a certain part of the entire
-  // triangulation. This chunk of cells that we want to work on is identified
-  // via a so-called <code>subdomain_id</code>, as we also did in step-18. All
-  // we need to change is hence to perform the cell-related operations only on
-  // cells that are owned by the current process (as opposed to ghost or
-  // artificial cells), i.e. for which the subdomain id equals the number of
-  // the process ID. Since this is a commonly used operation, there is a
-  // shortcut for this operation: we can ask whether the cell is owned by the
-  // current processor using <code>cell-@>is_locally_owned()</code>.
+  // @sect5{BoussinesqFlowProblem::get_maximal_velocity}
+
+  // Except for two small details, the function to compute the global maximum
+  // of the velocity is the same as in step-31. The first detail is actually
+  // common to all functions that implement loops over all cells in the
+  // triangulation: When operating in %parallel, each processor can only work
+  // on a chunk of cells since each processor only has a certain part of the
+  // entire triangulation. This chunk of cells that we want to work on is
+  // identified via a so-called <code>subdomain_id</code>, as we also did in
+  // step-18. All we need to change is hence to perform the cell-related
+  // operations only on cells that are owned by the current process (as
+  // opposed to ghost or artificial cells), i.e. for which the subdomain id
+  // equals the number of the process ID. Since this is a commonly used
+  // operation, there is a shortcut for this operation: we can ask whether the
+  // cell is owned by the current processor using
+  // <code>cell-@>is_locally_owned()</code>.
   //
   // The second difference is the way we calculate the maximum value. Before,
   // we could simply have a <code>double</code> variable that we checked
@@ -1297,13 +1299,15 @@ namespace Step32
   }
 
 
-  // @sect5{BoussinesqFlowProblem::get_cfl_number} The next function does
-  // something similar, but we now compute the CFL number, i.e., maximal
-  // velocity on a cell divided by the cell diameter. This number is necessary
-  // to determine the time step size, as we use a semi-explicit time stepping
-  // scheme for the temperature equation (see step-31 for a discussion). We
-  // compute it in the same way as above: Compute the local maximum over all
-  // locally owned cells, then exchange it via MPI to find the global maximum.
+  // @sect5{BoussinesqFlowProblem::get_cfl_number}
+
+  // The next function does something similar, but we now compute the CFL
+  // number, i.e., maximal velocity on a cell divided by the cell
+  // diameter. This number is necessary to determine the time step size, as we
+  // use a semi-explicit time stepping scheme for the temperature equation
+  // (see step-31 for a discussion). We compute it in the same way as above:
+  // Compute the local maximum over all locally owned cells, then exchange it
+  // via MPI to find the global maximum.
   template <int dim>
   double BoussinesqFlowProblem<dim>::get_cfl_number () const
   {
@@ -1340,14 +1344,16 @@ namespace Step32
   }
 
 
-  // @sect5{BoussinesqFlowProblem::get_entropy_variation} Next comes the
-  // computation of the global entropy variation $\|E(T)-\bar{E}(T)\|_\infty$
-  // where the entropy $E$ is defined as discussed in the introduction.  This
-  // is needed for the evaluation of the stabilization in the temperature
-  // equation as explained in the introduction. The entropy variation is
-  // actually only needed if we use $\alpha=2$ as a power in the residual
-  // computation. The infinity norm is computed by the maxima over quadrature
-  // points, as usual in discrete computations.
+  // @sect5{BoussinesqFlowProblem::get_entropy_variation}
+
+  // Next comes the computation of the global entropy variation
+  // $\|E(T)-\bar{E}(T)\|_\infty$ where the entropy $E$ is defined as
+  // discussed in the introduction.  This is needed for the evaluation of the
+  // stabilization in the temperature equation as explained in the
+  // introduction. The entropy variation is actually only needed if we use
+  // $\alpha=2$ as a power in the residual computation. The infinity norm is
+  // computed by the maxima over quadrature points, as usual in discrete
+  // computations.
   //
   // In order to compute this quantity, we first have to find the
   // space-average $\bar{E}(T)$ and then evaluate the maximum. However, that
@@ -1447,12 +1453,13 @@ namespace Step32
 
 
 
-  // @sect5{BoussinesqFlowProblem::get_extrapolated_temperature_range} The
-  // next function computes the minimal and maximal value of the extrapolated
-  // temperature over the entire domain. Again, this is only a slightly
-  // modified version of the respective function in step-31. As in the
-  // function above, we collect local minima and maxima and then compute the
-  // global extrema using the same trick as above.
+  // @sect5{BoussinesqFlowProblem::get_extrapolated_temperature_range}
+
+  // The next function computes the minimal and maximal value of the
+  // extrapolated temperature over the entire domain. Again, this is only a
+  // slightly modified version of the respective function in step-31. As in
+  // the function above, we collect local minima and maxima and then compute
+  // the global extrema using the same trick as above.
   //
   // As already discussed in step-31, the function needs to distinguish
   // between the first and all following time steps because it uses a higher
@@ -1535,10 +1542,11 @@ namespace Step32
   }
 
 
-  // @sect5{BoussinesqFlowProblem::compute_viscosity} The function that
-  // calculates the viscosity is purely local and so needs no communication at
-  // all. It is mostly the same as in step-31 but with an updated formulation
-  // of the viscosity if $\alpha=2$ is chosen:
+  // @sect5{BoussinesqFlowProblem::compute_viscosity}
+
+  // The function that calculates the viscosity is purely local and so needs
+  // no communication at all. It is mostly the same as in step-31 but with an
+  // updated formulation of the viscosity if $\alpha=2$ is chosen:
   template <int dim>
   double
   BoussinesqFlowProblem<dim>::

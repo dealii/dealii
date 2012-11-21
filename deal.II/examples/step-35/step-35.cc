@@ -673,8 +673,7 @@ namespace Step35
   }
 
 
-  // @sect4{
-  // <code>NavierStokesProjection::create_triangulation_and_dofs</code> }
+  // @sect4{ <code>NavierStokesProjection::create_triangulation_and_dofs</code> }
 
   // The method that creates the triangulation and refines it the needed
   // number of times.  After creating the triangulation, it creates the mesh
@@ -765,8 +764,7 @@ namespace Step35
   }
 
 
-  // @sect4{ The <code>NavierStokesProjection::initialize_*_matrices</code>
-  // methods }
+  // @sect4{ The <code>NavierStokesProjection::initialize_*_matrices</code> methods }
 
   // In this set of methods we initialize the sparsity patterns, the
   // constraints (if any) and assemble the matrices that do not depend on the
@@ -1093,8 +1091,7 @@ namespace Step35
   }
 
 
-  // @sect4{ The <code>NavierStokesProjection::assemble_advection_term</code>
-  // method and related}
+  // @sect4{ The <code>NavierStokesProjection::assemble_advection_term</code> method and related}
 
   // The following few functions deal with assembling the advection terms,
   // which is the part of the system matrix for the diffusion step that
