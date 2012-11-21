@@ -12,12 +12,10 @@
 
 // @sect3{Include files}
 
-// The include files for this program are the
-// same as for many others before. The only
-// new one is the one that declares
-// FE_Nothing as discussed in the
-// introduction. The ones in the hp directory
-// have already been discussed in step-27.
+// The include files for this program are the same as for many others
+// before. The only new one is the one that declares FE_Nothing as discussed
+// in the introduction. The ones in the hp directory have already been
+// discussed in step-27.
 
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/logstream.h>
@@ -62,38 +60,26 @@ namespace Step46
 
   // @sect3{The <code>FluidStructureProblem</code> class template}
 
-  // This is the main class. It is, if you
-  // want, a combination of step-8 and step-22
-  // in that it has member variables that
-  // either address the global problem (the
-  // Triangulation and hp::DoFHandler objects,
-  // as well as the hp::FECollection and
-  // various linear algebra objects) or that
-  // pertain to either the elasticity or Stokes
-  // sub-problems. The general structure of the
-  // class, however, is like that of most of
-  // the other programs implementing stationary
-  // problems.
+  // This is the main class. It is, if you want, a combination of step-8 and
+  // step-22 in that it has member variables that either address the global
+  // problem (the Triangulation and hp::DoFHandler objects, as well as the
+  // hp::FECollection and various linear algebra objects) or that pertain to
+  // either the elasticity or Stokes sub-problems. The general structure of
+  // the class, however, is like that of most of the other programs
+  // implementing stationary problems.
   //
-  // There are a few helper functions
-  // (<code>cell_is_in_fluid_domain,
-  // cell_is_in_solid_domain</code>) of
-  // self-explanatory nature (operating on the
-  // symbolic names for the two subdomains that
-  // will be used as material_ids for cells
-  // belonging to the subdomains, as explained
-  // in the introduction) and a few functions
-  // (<code>make_grid, set_active_fe_indices,
-  // assemble_interface_terms</code>) that have
-  // been broken out of other functions that
-  // can be found in many of the other tutorial
-  // programs and that will be discussed as we
-  // get to their implementation.
+  // There are a few helper functions (<code>cell_is_in_fluid_domain,
+  // cell_is_in_solid_domain</code>) of self-explanatory nature (operating on
+  // the symbolic names for the two subdomains that will be used as
+  // material_ids for cells belonging to the subdomains, as explained in the
+  // introduction) and a few functions (<code>make_grid,
+  // set_active_fe_indices, assemble_interface_terms</code>) that have been
+  // broken out of other functions that can be found in many of the other
+  // tutorial programs and that will be discussed as we get to their
+  // implementation.
   //
-  // The final set of variables
-  // (<code>viscosity, lambda, eta</code>)
-  // describes the material properties used for
-  // the two physics models.
+  // The final set of variables (<code>viscosity, lambda, eta</code>)
+  // describes the material properties used for the two physics models.
   template <int dim>
   class FluidStructureProblem
   {
@@ -155,17 +141,12 @@ namespace Step46
 
   // @sect3{Boundary values and right hand side}
 
-  // The following classes do as their names
-  // suggest. The boundary values for the
-  // velocity are $\mathbf u=(0, \sin(\pi
-  // x))^T$ in 2d and $\mathbf u=(0, 0,
-  // \sin(\pi x)\sin(\pi y))^T$ in 3d,
-  // respectively. The remaining boundary
-  // conditions for this problem are all
-  // homogenous and have been discussed in the
-  // introduction. The right hand side forcing
-  // term is zero for both the fluid and the
-  // solid.
+  // The following classes do as their names suggest. The boundary values for
+  // the velocity are $\mathbf u=(0, \sin(\pi x))^T$ in 2d and $\mathbf u=(0,
+  // 0, \sin(\pi x)\sin(\pi y))^T$ in 3d, respectively. The remaining boundary
+  // conditions for this problem are all homogenous and have been discussed in
+  // the introduction. The right hand side forcing term is zero for both the
+  // fluid and the solid.
   template <int dim>
   class StokesBoundaryValues : public Function<dim>
   {
@@ -253,23 +234,15 @@ namespace Step46
 
   // @sect4{Constructors and helper functions}
 
-  // Let's now get to the implementation of the
-  // primary class of this program. The first
-  // few functions are the constructor and the
-  // helper functions that can be used to
-  // determine which part of the domain a cell
-  // is in. Given the discussion of these
-  // topics in the introduction, their
-  // implementation is rather obvious. In the
-  // constructor, note that we have to
-  // construct the hp::FECollection object from
-  // the base elements for Stokes and
-  // elasticity; using the
-  // hp::FECollection::push_back function
-  // assigns them spots zero and one in this
-  // collection, an order that we have to
-  // remember and use consistently in the rest
-  // of the program.
+  // Let's now get to the implementation of the primary class of this
+  // program. The first few functions are the constructor and the helper
+  // functions that can be used to determine which part of the domain a cell
+  // is in. Given the discussion of these topics in the introduction, their
+  // implementation is rather obvious. In the constructor, note that we have
+  // to construct the hp::FECollection object from the base elements for
+  // Stokes and elasticity; using the hp::FECollection::push_back function
+  // assigns them spots zero and one in this collection, an order that we have
+  // to remember and use consistently in the rest of the program.
   template <int dim>
   FluidStructureProblem<dim>::
   FluidStructureProblem (const unsigned int stokes_degree,
@@ -316,24 +289,16 @@ namespace Step46
 
   // @sect4{Meshes and assigning subdomains}
 
-  // The next pair of functions deals with
-  // generating a mesh and making sure all
-  // flags that denote subdomains are
-  // correct. <code>make_grid</code>, as
-  // discussed in the introduction, generates
-  // an $8\times 8$ mesh (or an $8\times
-  // 8\times 8$ mesh in 3d) to make sure that
-  // each coarse mesh cell is completely within
-  // one of the subdomains. After generating
-  // this mesh, we loop over its boundary and
-  // set the boundary indicator to one at the
-  // top boundary, the only place where we set
-  // nonzero Dirichlet boundary
-  // conditions. After this, we loop again over
-  // all cells to set the material indicator
-  // &mdash; used to denote which part of the
-  // domain we are in, to either the fluid or
-  // solid indicator.
+  // The next pair of functions deals with generating a mesh and making sure
+  // all flags that denote subdomains are correct. <code>make_grid</code>, as
+  // discussed in the introduction, generates an $8\times 8$ mesh (or an
+  // $8\times 8\times 8$ mesh in 3d) to make sure that each coarse mesh cell
+  // is completely within one of the subdomains. After generating this mesh,
+  // we loop over its boundary and set the boundary indicator to one at the
+  // top boundary, the only place where we set nonzero Dirichlet boundary
+  // conditions. After this, we loop again over all cells to set the material
+  // indicator &mdash; used to denote which part of the domain we are in, to
+  // either the fluid or solid indicator.
   template <int dim>
   void
   FluidStructureProblem<dim>::make_grid ()
@@ -366,24 +331,16 @@ namespace Step46
   }
 
 
-  // The second part of this pair of functions
-  // determines which finite element to use on
-  // each cell. Above we have set the material
-  // indicator for each coarse mesh cell, and
-  // as mentioned in the introduction, this
-  // information is inherited from mother to
-  // child cell upon mesh refinement.
+  // The second part of this pair of functions determines which finite element
+  // to use on each cell. Above we have set the material indicator for each
+  // coarse mesh cell, and as mentioned in the introduction, this information
+  // is inherited from mother to child cell upon mesh refinement.
   //
-  // In other words, whenever we have refined
-  // (or created) the mesh, we can rely on the
-  // material indicators to be a correct
-  // description of which part of the domain a
-  // cell is in. We then use this to set the
-  // active FE index of the cell to the
-  // corresponding element of the
-  // hp::FECollection member variable of this
-  // class: zero for fluid cells, one for solid
-  // cells.
+  // In other words, whenever we have refined (or created) the mesh, we can
+  // rely on the material indicators to be a correct description of which part
+  // of the domain a cell is in. We then use this to set the active FE index
+  // of the cell to the corresponding element of the hp::FECollection member
+  // variable of this class: zero for fluid cells, one for solid cells.
   template <int dim>
   void
   FluidStructureProblem<dim>::set_active_fe_indices ()
@@ -404,18 +361,13 @@ namespace Step46
 
   // @sect4{<code>FluidStructureProblem::setup_dofs</code>}
 
-  // The next step is to setup the data
-  // structures for the linear system. To this
-  // end, we first have to set the active FE
-  // indices with the function immediately
-  // above, then distribute degrees of freedom,
-  // and then determine constraints on the
-  // linear system. The latter includes hanging
-  // node constraints as usual, but also the
-  // inhomogenous boundary values at the top
-  // fluid boundary, and zero boundary values
-  // along the perimeter of the solid
-  // subdomain.
+  // The next step is to setup the data structures for the linear system. To
+  // this end, we first have to set the active FE indices with the function
+  // immediately above, then distribute degrees of freedom, and then determine
+  // constraints on the linear system. The latter includes hanging node
+  // constraints as usual, but also the inhomogenous boundary values at the
+  // top fluid boundary, and zero boundary values along the perimeter of the
+  // solid subdomain.
   template <int dim>
   void
   FluidStructureProblem<dim>::setup_dofs ()
@@ -443,12 +395,10 @@ namespace Step46
                                                 fe_collection.component_mask(displacements));
     }
 
-    // There are more constraints we have to
-    // handle, though: we have to make sure
-    // that the velocity is zero at the
-    // interface between fluid and solid. The
-    // following piece of code was already
-    // presented in the introduction:
+    // There are more constraints we have to handle, though: we have to make
+    // sure that the velocity is zero at the interface between fluid and
+    // solid. The following piece of code was already presented in the
+    // introduction:
     {
       std::vector<unsigned int> local_face_dof_indices (stokes_fe.dofs_per_face);
       for (typename hp::DoFHandler<dim>::active_cell_iterator
@@ -485,11 +435,9 @@ namespace Step46
               }
     }
 
-    // At the end of all this, we can declare
-    // to the constraints object that we now
-    // have all constraints ready to go and
-    // that the object can rebuild its internal
-    // data structures for better efficiency:
+    // At the end of all this, we can declare to the constraints object that
+    // we now have all constraints ready to go and that the object can rebuild
+    // its internal data structures for better efficiency:
     constraints.close ();
 
     std::cout << "   Number of active cells: "
@@ -499,11 +447,9 @@ namespace Step46
               << dof_handler.n_dofs()
               << std::endl;
 
-    // In the rest of this function we create a
-    // sparsity pattern as discussed
-    // extensively in the introduction, and use
-    // it to initialize the matrix; then also
-    // set vectors to their correct sizes:
+    // In the rest of this function we create a sparsity pattern as discussed
+    // extensively in the introduction, and use it to initialize the matrix;
+    // then also set vectors to their correct sizes:
     {
       CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
                                            dof_handler.n_dofs());
@@ -542,18 +488,13 @@ namespace Step46
 
   // @sect4{<code>FluidStructureProblem::assemble_system</code>}
 
-  // Following is the central function of this
-  // program: the one that assembles the linear
-  // system. It has a long section of setting
-  // up auxiliary functions at the beginning:
-  // from creating the quadrature formulas and
-  // setting up the FEValues, FEFaceValues and
-  // FESubfaceValues objects necessary to
-  // integrate the cell terms as well as the
-  // interface terms for the case where cells
-  // along the interface come together at same
-  // size or with differing levels of
-  // refinement...
+  // Following is the central function of this program: the one that assembles
+  // the linear system. It has a long section of setting up auxiliary
+  // functions at the beginning: from creating the quadrature formulas and
+  // setting up the FEValues, FEFaceValues and FESubfaceValues objects
+  // necessary to integrate the cell terms as well as the interface terms for
+  // the case where cells along the interface come together at same size or
+  // with differing levels of refinement...
   template <int dim>
   void FluidStructureProblem<dim>::assemble_system ()
   {
@@ -593,9 +534,8 @@ namespace Step46
                                                        common_face_quadrature,
                                                        update_values);
 
-    // ...to objects that are needed to
-    // describe the local contributions to the
-    // global linear system...
+    // ...to objects that are needed to describe the local contributions to
+    // the global linear system...
     const unsigned int        stokes_dofs_per_cell     = stokes_fe.dofs_per_cell;
     const unsigned int        elasticity_dofs_per_cell = elasticity_fe.dofs_per_cell;
 
@@ -609,11 +549,9 @@ namespace Step46
 
     const RightHandSide<dim>  right_hand_side;
 
-    // ...to variables that allow us to extract
-    // certain components of the shape
-    // functions and cache their values rather
-    // than having to recompute them at every
-    // quadrature point:
+    // ...to variables that allow us to extract certain components of the
+    // shape functions and cache their values rather than having to recompute
+    // them at every quadrature point:
     const FEValuesExtractors::Vector     velocities (0);
     const FEValuesExtractors::Scalar     pressure (dim);
     const FEValuesExtractors::Vector     displacements (dim+1);
@@ -626,12 +564,10 @@ namespace Step46
     std::vector<double>                  elasticity_div_phi  (elasticity_dofs_per_cell);
     std::vector<Tensor<1,dim> >          elasticity_phi      (elasticity_dofs_per_cell);
 
-    // Then comes the main loop over all cells
-    // and, as in step-27, the initialization
-    // of the hp::FEValues object for the
-    // current cell and the extraction of a
-    // FEValues object that is appropriate for
-    // the current cell:
+    // Then comes the main loop over all cells and, as in step-27, the
+    // initialization of the hp::FEValues object for the current cell and the
+    // extraction of a FEValues object that is appropriate for the current
+    // cell:
     typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
@@ -645,29 +581,20 @@ namespace Step46
                              cell->get_fe().dofs_per_cell);
         local_rhs.reinit (cell->get_fe().dofs_per_cell);
 
-        // With all of this done, we continue
-        // to assemble the cell terms for cells
-        // that are part of the Stokes and
-        // elastic regions. While we could in
-        // principle do this in one formula, in
-        // effect implementing the one bilinear
-        // form stated in the introduction, we
-        // realize that our finite element
-        // spaces are chosen in such a way that
-        // on each cell, one set of variables
-        // (either velocities and pressure, or
-        // displacements) are always zero, and
-        // consequently a more efficient way of
-        // computing local integrals is to do
-        // only what's necessary based on an
-        // <code>if</code> clause that tests
-        // which part of the domain we are in.
+        // With all of this done, we continue to assemble the cell terms for
+        // cells that are part of the Stokes and elastic regions. While we
+        // could in principle do this in one formula, in effect implementing
+        // the one bilinear form stated in the introduction, we realize that
+        // our finite element spaces are chosen in such a way that on each
+        // cell, one set of variables (either velocities and pressure, or
+        // displacements) are always zero, and consequently a more efficient
+        // way of computing local integrals is to do only what's necessary
+        // based on an <code>if</code> clause that tests which part of the
+        // domain we are in.
         //
-        // The actual computation of the local
-        // matrix is the same as in step-22 as
-        // well as that given in the @ref
-        // vector_valued documentation module
-        // for the elasticity equations:
+        // The actual computation of the local matrix is the same as in
+        // step-22 as well as that given in the @ref vector_valued
+        // documentation module for the elasticity equations:
         if (cell_is_in_fluid_domain (cell))
           {
             const unsigned int dofs_per_cell = cell->get_fe().dofs_per_cell;
@@ -724,94 +651,57 @@ namespace Step46
               }
           }
 
-        // Once we have the contributions from
-        // cell integrals, we copy them into
-        // the global matrix (taking care of
-        // constraints right away, through the
-        // ConstraintMatrix::distribute_local_to_global
-        // function). Note that we have not
-        // written anything into the
-        // <code>local_rhs</code> variable,
-        // though we still need to pass it
-        // along since the elimination of
-        // nonzero boundary values requires the
-        // modification of local and
-        // consequently also global right hand
-        // side values:
+        // Once we have the contributions from cell integrals, we copy them
+        // into the global matrix (taking care of constraints right away,
+        // through the ConstraintMatrix::distribute_local_to_global
+        // function). Note that we have not written anything into the
+        // <code>local_rhs</code> variable, though we still need to pass it
+        // along since the elimination of nonzero boundary values requires the
+        // modification of local and consequently also global right hand side
+        // values:
         local_dof_indices.resize (cell->get_fe().dofs_per_cell);
         cell->get_dof_indices (local_dof_indices);
         constraints.distribute_local_to_global (local_matrix, local_rhs,
                                                 local_dof_indices,
                                                 system_matrix, system_rhs);
 
-        // The more interesting part of this
-        // function is where we see about face
-        // terms along the interface between
-        // the two subdomains. To this end, we
-        // first have to make sure that we only
-        // assemble them once even though a
-        // loop over all faces of all cells
-        // would encounter each part of the
-        // interface twice. We arbitrarily make
-        // the decision that we will only
-        // evaluate interface terms if the
-        // current cell is part of the solid
-        // subdomain and if, consequently, a
-        // face is not at the boundary and the
-        // potential neighbor behind it is part
-        // of the fluid domain. Let's start
-        // with these conditions:
+        // The more interesting part of this function is where we see about
+        // face terms along the interface between the two subdomains. To this
+        // end, we first have to make sure that we only assemble them once
+        // even though a loop over all faces of all cells would encounter each
+        // part of the interface twice. We arbitrarily make the decision that
+        // we will only evaluate interface terms if the current cell is part
+        // of the solid subdomain and if, consequently, a face is not at the
+        // boundary and the potential neighbor behind it is part of the fluid
+        // domain. Let's start with these conditions:
         if (cell_is_in_solid_domain (cell))
           for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
             if (cell->at_boundary(f) == false)
               {
-                // At this point we know that
-                // the current cell is a
-                // candidate for integration
-                // and that a neighbor behind
-                // face <code>f</code>
-                // exists. There are now three
-                // possibilities:
+                // At this point we know that the current cell is a candidate
+                // for integration and that a neighbor behind face
+                // <code>f</code> exists. There are now three possibilities:
                 //
-                // - The neighbor is at the
-                //   same refinement level and
-                //   has no children.
-                // - The neighbor has children.
-                // - The neighbor is coarser.
+                // - The neighbor is at the same refinement level and has no
+                //   children.
+		// - The neighbor has children.
+		// - The neighbor is coarser.
                 //
-                // In all three cases, we are
-                // only interested in it if it
-                // is part of the fluid
-                // subdomain. So let us start
-                // with the first and simplest
-                // case: if the neighbor is at
-                // the same level, has no
-                // children, and is a fluid
-                // cell, then the two cells
-                // share a boundary that is
-                // part of the interface along
-                // which we want to integrate
-                // interface terms. All we have
-                // to do is initialize two
-                // FEFaceValues object with the
-                // current face and the face of
-                // the neighboring cell (note
-                // how we find out which face
-                // of the neighboring cell
-                // borders on the current cell)
-                // and pass things off to the
-                // function that evaluates the
-                // interface terms (the third
-                // through fifth arguments to
-                // this function provide it
-                // with scratch arrays). The
-                // result is then again copied
-                // into the global matrix,
-                // using a function that knows
-                // that the DoF indices of rows
-                // and columns of the local
-                // matrix result from different
-                // cells:
+                // In all three cases, we are only interested in it if it is
+                // part of the fluid subdomain. So let us start with the first
+                // and simplest case: if the neighbor is at the same level,
+                // has no children, and is a fluid cell, then the two cells
+                // share a boundary that is part of the interface along which
+                // we want to integrate interface terms. All we have to do is
+                // initialize two FEFaceValues object with the current face
+                // and the face of the neighboring cell (note how we find out
+                // which face of the neighboring cell borders on the current
+                // cell) and pass things off to the function that evaluates
+                // the interface terms (the third through fifth arguments to
+                // this function provide it with scratch arrays). The result
+                // is then again copied into the global matrix, using a
+                // function that knows that the DoF indices of rows and
+                // columns of the local matrix result from different cells:
                 if ((cell->neighbor(f)->level() == cell->level())
                     &&
                     (cell->neighbor(f)->has_children() == false)
@@ -833,22 +723,13 @@ namespace Step46
                                                            system_matrix);
                   }
 
-                // The second case is if the
-                // neighbor has further
-                // children. In that case, we
-                // have to loop over all the
-                // children of the neighbor to
-                // see if they are part of the
-                // fluid subdomain. If they
-                // are, then we integrate over
-                // the common interface, which
-                // is a face for the neighbor
-                // and a subface of the current
-                // cell, requiring us to use an
-                // FEFaceValues for the
-                // neighbor and an
-                // FESubfaceValues for the
-                // current cell:
+                // The second case is if the neighbor has further children. In
+                // that case, we have to loop over all the children of the
+                // neighbor to see if they are part of the fluid subdomain. If
+                // they are, then we integrate over the common interface,
+                // which is a face for the neighbor and a subface of the
+                // current cell, requiring us to use an FEFaceValues for the
+                // neighbor and an FESubfaceValues for the current cell:
                 else if ((cell->neighbor(f)->level() == cell->level())
                          &&
                          (cell->neighbor(f)->has_children() == true))
@@ -880,14 +761,10 @@ namespace Step46
                         }
                   }
 
-                // The last option is that the
-                // neighbor is coarser. In that
-                // case we have to use an
-                // FESubfaceValues object for
-                // the neighbor and a
-                // FEFaceValues for the current
-                // cell; the rest is the same
-                // as before:
+                // The last option is that the neighbor is coarser. In that
+                // case we have to use an FESubfaceValues object for the
+                // neighbor and a FEFaceValues for the current cell; the rest
+                // is the same as before:
                 else if (cell->neighbor_is_coarser(f)
                          &&
                          cell_is_in_fluid_domain(cell->neighbor(f)))
@@ -916,25 +793,17 @@ namespace Step46
 
 
 
-  // In the function that assembles the global
-  // system, we passed computing interface
-  // terms to a separate function we discuss
-  // here. The key is that even though we can't
-  // predict the combination of FEFaceValues
-  // and FESubfaceValues objects, they are both
-  // derived from the FEFaceValuesBase class
-  // and consequently we don't have to care:
-  // the function is simply called with two
-  // such objects denoting the values of the
-  // shape functions on the quadrature points
-  // of the two sides of the face. We then do
-  // what we always do: we fill the scratch
-  // arrays with the values of shape functions
-  // and their derivatives, and then loop over
-  // all entries of the matrix to compute the
-  // local integrals. The details of the
-  // bilinear form we evaluate here are given
-  // in the introduction.
+  // In the function that assembles the global system, we passed computing
+  // interface terms to a separate function we discuss here. The key is that
+  // even though we can't predict the combination of FEFaceValues and
+  // FESubfaceValues objects, they are both derived from the FEFaceValuesBase
+  // class and consequently we don't have to care: the function is simply
+  // called with two such objects denoting the values of the shape functions
+  // on the quadrature points of the two sides of the face. We then do what we
+  // always do: we fill the scratch arrays with the values of shape functions
+  // and their derivatives, and then loop over all entries of the matrix to
+  // compute the local integrals. The details of the bilinear form we evaluate
+  // here are given in the introduction.
   template <int dim>
   void
   FluidStructureProblem<dim>::
@@ -981,14 +850,10 @@ namespace Step46
 
   // @sect4{<code>FluidStructureProblem::solve</code>}
 
-  // As discussed in the introduction, we use a
-  // rather trivial solver here: we just pass
-  // the linear system off to the
-  // SparseDirectUMFPACK direct solver (see,
-  // for example, step-29). The only thing we
-  // have to do after solving is ensure that
-  // hanging node and boundary value
-  // constraints are correct.
+  // As discussed in the introduction, we use a rather trivial solver here: we
+  // just pass the linear system off to the SparseDirectUMFPACK direct solver
+  // (see, for example, step-29). The only thing we have to do after solving
+  // is ensure that hanging node and boundary value constraints are correct.
   template <int dim>
   void
   FluidStructureProblem<dim>::solve ()
@@ -1004,15 +869,11 @@ namespace Step46
 
   // @sect4{<code>FluidStructureProblem::output_results</code>}
 
-  // Generating graphical output is rather
-  // trivial here: all we have to do is
-  // identify which components of the solution
-  // vector belong to scalars and/or vectors
-  // (see, for example, step-22 for a previous
-  // example), and then pass it all on to the
-  // DataOut class (with the second template
-  // argument equal to hp::DoFHandler instead
-  // of the usual default DoFHandler):
+  // Generating graphical output is rather trivial here: all we have to do is
+  // identify which components of the solution vector belong to scalars and/or
+  // vectors (see, for example, step-22 for a previous example), and then pass
+  // it all on to the DataOut class (with the second template argument equal
+  // to hp::DoFHandler instead of the usual default DoFHandler):
   template <int dim>
   void
   FluidStructureProblem<dim>::
@@ -1052,20 +913,14 @@ namespace Step46
 
   // @sect4{<code>FluidStructureProblem::refine_mesh</code>}
 
-  // The next step is to refine the mesh. As
-  // was discussed in the introduction, this is
-  // a bit tricky primarily because the fluid
-  // and the solid subdomains use variables
-  // that have different physical dimensions
-  // and for which the absolute magnitude of
-  // error estimates is consequently not
-  // directly comparable. We will therefore
-  // have to scale them. At the top of the
-  // function, we therefore first compute error
-  // estimates for the different variables
-  // separately (using the velocities but not
-  // the pressure for the fluid domain, and the
-  // displacements in the solid domain):
+  // The next step is to refine the mesh. As was discussed in the
+  // introduction, this is a bit tricky primarily because the fluid and the
+  // solid subdomains use variables that have different physical dimensions
+  // and for which the absolute magnitude of error estimates is consequently
+  // not directly comparable. We will therefore have to scale them. At the top
+  // of the function, we therefore first compute error estimates for the
+  // different variables separately (using the velocities but not the pressure
+  // for the fluid domain, and the displacements in the solid domain):
   template <int dim>
   void
   FluidStructureProblem<dim>::refine_mesh ()
@@ -1098,13 +953,10 @@ namespace Step46
                                         elasticity_estimated_error_per_cell,
                                         fe_collection.component_mask(displacements));
 
-    // We then normalize error estimates by
-    // dividing by their norm and scale the
-    // fluid error indicators by a factor of 4
-    // as discussed in the introduction. The
-    // results are then added together into a
-    // vector that contains error indicators
-    // for all cells:
+    // We then normalize error estimates by dividing by their norm and scale
+    // the fluid error indicators by a factor of 4 as discussed in the
+    // introduction. The results are then added together into a vector that
+    // contains error indicators for all cells:
     stokes_estimated_error_per_cell
     *= 4. / stokes_estimated_error_per_cell.l2_norm();
     elasticity_estimated_error_per_cell
@@ -1116,34 +968,23 @@ namespace Step46
     estimated_error_per_cell += stokes_estimated_error_per_cell;
     estimated_error_per_cell += elasticity_estimated_error_per_cell;
 
-    // The second to last part of the function,
-    // before actually refining the mesh,
-    // involves a heuristic that we have
-    // already mentioned in the introduction:
-    // because the solution is discontinuous,
-    // the KellyErrorEstimator class gets all
-    // confused about cells that sit at the
-    // boundary between subdomains: it believes
-    // that the error is large there because
-    // the jump in the gradient is large, even
-    // though this is entirely expected and a
-    // feature that is in fact present in the
-    // exact solution as well and therefore not
-    // indicative of any numerical error.
+    // The second to last part of the function, before actually refining the
+    // mesh, involves a heuristic that we have already mentioned in the
+    // introduction: because the solution is discontinuous, the
+    // KellyErrorEstimator class gets all confused about cells that sit at the
+    // boundary between subdomains: it believes that the error is large there
+    // because the jump in the gradient is large, even though this is entirely
+    // expected and a feature that is in fact present in the exact solution as
+    // well and therefore not indicative of any numerical error.
     //
-    // Consequently, we set the error
-    // indicators to zero for all cells at the
-    // interface; the conditions determining
-    // which cells this affects are slightly
-    // awkward because we have to account for
-    // the possibility of adaptively refined
-    // meshes, meaning that the neighboring
-    // cell can be coarser than the current
-    // one, or could in fact be refined some
-    // more. The structure of these nested
-    // conditions is much the same as we
-    // encountered when assembling interface
-    // terms in <code>assemble_system</code>.
+    // Consequently, we set the error indicators to zero for all cells at the
+    // interface; the conditions determining which cells this affects are
+    // slightly awkward because we have to account for the possibility of
+    // adaptively refined meshes, meaning that the neighboring cell can be
+    // coarser than the current one, or could in fact be refined some
+    // more. The structure of these nested conditions is much the same as we
+    // encountered when assembling interface terms in
+    // <code>assemble_system</code>.
     {
       unsigned int cell_index = 0;
       for (typename hp::DoFHandler<dim>::active_cell_iterator
@@ -1208,11 +1049,9 @@ namespace Step46
 
   // @sect4{<code>FluidStructureProblem::run</code>}
 
-  // This is, as usual, the function that
-  // controls the overall flow of operation. If
-  // you've read through tutorial programs
-  // step-1 through step-6, for example, then
-  // you are already quite familiar with the
+  // This is, as usual, the function that controls the overall flow of
+  // operation. If you've read through tutorial programs step-1 through
+  // step-6, for example, then you are already quite familiar with the
   // following structure:
   template <int dim>
   void FluidStructureProblem<dim>::run ()
@@ -1247,9 +1086,8 @@ namespace Step46
 
 // @sect4{The <code>main()</code> function}
 
-// This, final, function contains pretty much
-// exactly what most of the other tutorial
-// programs have:
+// This, final, function contains pretty much exactly what most of the other
+// tutorial programs have:
 int main ()
 {
   try

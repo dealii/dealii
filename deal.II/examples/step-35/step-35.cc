@@ -12,11 +12,9 @@
 
 // @sect3{Include files}
 
-// We start by including all the necessary
-// deal.II header files and some C++ related
-// ones. Each one of them has been discussed
-// in previous tutorial programs, so we will
-// not get into details here.
+// We start by including all the necessary deal.II header files and some C++
+// related ones. Each one of them has been discussed in previous tutorial
+// programs, so we will not get into details here.
 #include <deal.II/base/parameter_handler.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/function.h>
@@ -63,8 +61,7 @@
 #include <cmath>
 #include <iostream>
 
-// Finally this is as in all previous
-// programs:
+// Finally this is as in all previous programs:
 namespace Step35
 {
   using namespace dealii;
@@ -73,20 +70,13 @@ namespace Step35
 
   // @sect3{Run time parameters}
   //
-  // Since our method has several
-  // parameters that can be fine-tuned
-  // we put them into an external file,
-  // so that they can be determined at
-  // run-time.
+  // Since our method has several parameters that can be fine-tuned we put
+  // them into an external file, so that they can be determined at run-time.
   //
-  // This includes, in particular, the
-  // formulation of the equation for
-  // the auxiliary variable $\phi$, for
-  // which we declare an
-  // <code>enum</code>.  Next, we
-  // declare a class that is going to
-  // read and store all the parameters
-  // that our program needs to run.
+  // This includes, in particular, the formulation of the equation for the
+  // auxiliary variable $\phi$, for which we declare an <code>enum</code>.
+  // Next, we declare a class that is going to read and store all the
+  // parameters that our program needs to run.
   namespace RunTimeParameters
   {
     enum MethodFormulation
@@ -120,11 +110,8 @@ namespace Step35
       ParameterHandler prm;
     };
 
-    // In the constructor of this class
-    // we declare all the
-    // parameters. The details of how
-    // this works have been discussed
-    // elsewhere, for example in
+    // In the constructor of this class we declare all the parameters. The
+    // details of how this works have been discussed elsewhere, for example in
     // step-19 and step-29.
     Data_Storage::Data_Storage()
     {
@@ -262,27 +249,16 @@ namespace Step35
 
   // @sect3{Equation data}
 
-  // In the next namespace, we declare
-  // the initial and boundary
-  // conditions:
+  // In the next namespace, we declare the initial and boundary conditions:
   namespace EquationData
   {
-    // As we have chosen a completely
-    // decoupled formulation, we will
-    // not take advantage of deal.II's
-    // capabilities to handle vector
-    // valued problems. We do, however,
-    // want to use an interface for the
-    // equation data that is somehow
-    // dimension independent. To be
-    // able to do that, our functions
-    // should be able to know on which
-    // spatial component we are
-    // currently working, and we should
-    // be able to have a common
-    // interface to do that. The
-    // following class is an attempt in
-    // that direction.
+    // As we have chosen a completely decoupled formulation, we will not take
+    // advantage of deal.II's capabilities to handle vector valued
+    // problems. We do, however, want to use an interface for the equation
+    // data that is somehow dimension independent. To be able to do that, our
+    // functions should be able to know on which spatial component we are
+    // currently working, and we should be able to have a common interface to
+    // do that. The following class is an attempt in that direction.
     template <int dim>
     class MultiComponentFunction: public Function<dim>
     {
@@ -309,10 +285,8 @@ namespace Step35
     }
 
 
-    // With this class defined, we
-    // declare classes that describe
-    // the boundary conditions for
-    // velocity and pressure:
+    // With this class defined, we declare classes that describe the boundary
+    // conditions for velocity and pressure:
     template <int dim>
     class Velocity : public MultiComponentFunction<dim>
     {
@@ -408,14 +382,10 @@ namespace Step35
 
   // @sect3{The <code>NavierStokesProjection</code> class}
 
-  // Now for the main class of the program. It
-  // implements the various versions of the
-  // projection method for Navier-Stokes
-  // equations.  The names for all the methods
-  // and member variables should be
-  // self-explanatory, taking into account the
-  // implementation details given in the
-  // introduction.
+  // Now for the main class of the program. It implements the various versions
+  // of the projection method for Navier-Stokes equations.  The names for all
+  // the methods and member variables should be self-explanatory, taking into
+  // account the implementation details given in the introduction.
   template <int dim>
   class NavierStokesProjection
   {
@@ -507,50 +477,30 @@ namespace Step35
 
     void initialize_pressure_matrices();
 
-    // The next few structures and functions
-    // are for doing various things in
-    // parallel. They follow the scheme laid
-    // out in @ref threads, using the
-    // WorkStream class. As explained there,
-    // this requires us to declare two
-    // structures for each of the assemblers,
-    // a per-task data and a scratch data
-    // structure. These are then handed over
-    // to functions that assemble local
-    // contributions and that copy these
-    // local contributions to the global
-    // objects.
+    // The next few structures and functions are for doing various things in
+    // parallel. They follow the scheme laid out in @ref threads, using the
+    // WorkStream class. As explained there, this requires us to declare two
+    // structures for each of the assemblers, a per-task data and a scratch
+    // data structure. These are then handed over to functions that assemble
+    // local contributions and that copy these local contributions to the
+    // global objects.
     //
-    // One of the things that are specific to
-    // this program is that we don't just
-    // have a single DoFHandler object that
-    // represents both the velocities and the
-    // pressure, but we use individual
-    // DoFHandler objects for these two kinds
-    // of variables. We pay for this
-    // optimization when we want to assemble
-    // terms that involve both variables,
-    // such as the divergence of the velocity
-    // and the gradient of the pressure,
-    // times the respective test
-    // functions. When doing so, we can't
-    // just anymore use a single FEValues
-    // object, but rather we need two, and
-    // they need to be initialized with cell
-    // iterators that point to the same cell
-    // in the triangulation but different
-    // DoFHandlers.
+    // One of the things that are specific to this program is that we don't
+    // just have a single DoFHandler object that represents both the
+    // velocities and the pressure, but we use individual DoFHandler objects
+    // for these two kinds of variables. We pay for this optimization when we
+    // want to assemble terms that involve both variables, such as the
+    // divergence of the velocity and the gradient of the pressure, times the
+    // respective test functions. When doing so, we can't just anymore use a
+    // single FEValues object, but rather we need two, and they need to be
+    // initialized with cell iterators that point to the same cell in the
+    // triangulation but different DoFHandlers.
     //
-    // To do this in practice, we declare a
-    // "synchronous" iterator -- an object
-    // that internally consists of several
-    // (in our case two) iterators, and each
-    // time the synchronous iteration is
-    // moved up one step, each of the
-    // iterators stored internally is moved
-    // up one step as well, thereby always
-    // staying in sync. As it so happens,
-    // there is a deal.II class that
+    // To do this in practice, we declare a "synchronous" iterator -- an
+    // object that internally consists of several (in our case two) iterators,
+    // and each time the synchronous iteration is moved up one step, each of
+    // the iterators stored internally is moved up one step as well, thereby
+    // always staying in sync. As it so happens, there is a deal.II class that
     // facilitates this sort of thing.
     typedef std_cxx1x::tuple< typename DoFHandler<dim>::active_cell_iterator,
             typename DoFHandler<dim>::active_cell_iterator
@@ -615,10 +565,8 @@ namespace Step35
 
     void copy_gradient_local_to_global (const InitGradPerTaskData &data);
 
-    // The same general layout also applies
-    // to the following classes and functions
-    // implementing the assembly of the
-    // advection term:
+    // The same general layout also applies to the following classes and
+    // functions implementing the assembly of the advection term:
     void assemble_advection_term();
 
     struct AdvectionPerTaskData
@@ -671,10 +619,9 @@ namespace Step35
 
     void copy_advection_local_to_global (const AdvectionPerTaskData &data);
 
-    // The final few functions implement the
-    // diffusion solve as well as
-    // postprocessing the output, including
-    // computing the curl of the velocity:
+    // The final few functions implement the diffusion solve as well as
+    // postprocessing the output, including computing the curl of the
+    // velocity:
     void diffusion_component_solve (const unsigned int d);
 
     void output_results (const unsigned int step);
@@ -686,14 +633,10 @@ namespace Step35
 
   // @sect4{ <code>NavierStokesProjection::NavierStokesProjection</code> }
 
-  // In the constructor, we just read
-  // all the data from the
-  // <code>Data_Storage</code> object
-  // that is passed as an argument,
-  // verify that the data we read is
-  // reasonable and, finally, create
-  // the triangulation and load the
-  // initial data.
+  // In the constructor, we just read all the data from the
+  // <code>Data_Storage</code> object that is passed as an argument, verify
+  // that the data we read is reasonable and, finally, create the
+  // triangulation and load the initial data.
   template <int dim>
   NavierStokesProjection<dim>::NavierStokesProjection(const RunTimeParameters::Data_Storage &data)
     :
@@ -730,17 +673,13 @@ namespace Step35
   }
 
 
-  // @sect4{ <code>NavierStokesProjection::create_triangulation_and_dofs</code> }
+  // @sect4{
+  // <code>NavierStokesProjection::create_triangulation_and_dofs</code> }
 
-  // The method that creates the
-  // triangulation and refines it the
-  // needed number of times.  After
-  // creating the triangulation, it
-  // creates the mesh dependent data,
-  // i.e. it distributes degrees of
-  // freedom and renumbers them, and
-  // initializes the matrices and
-  // vectors that we will use.
+  // The method that creates the triangulation and refines it the needed
+  // number of times.  After creating the triangulation, it creates the mesh
+  // dependent data, i.e. it distributes degrees of freedom and renumbers
+  // them, and initializes the matrices and vectors that we will use.
   template <int dim>
   void
   NavierStokesProjection<dim>::
@@ -800,9 +739,7 @@ namespace Step35
 
   // @sect4{ <code>NavierStokesProjection::initialize</code> }
 
-  // This method creates the constant
-  // matrices and loads the initial
-  // data
+  // This method creates the constant matrices and loads the initial data
   template <int dim>
   void
   NavierStokesProjection<dim>::initialize()
@@ -828,28 +765,20 @@ namespace Step35
   }
 
 
-  // @sect4{ The <code>NavierStokesProjection::initialize_*_matrices</code> methods }
+  // @sect4{ The <code>NavierStokesProjection::initialize_*_matrices</code>
+  // methods }
 
-  // In this set of methods we initialize the
-  // sparsity patterns, the constraints (if
-  // any) and assemble the matrices that do not
-  // depend on the timestep
-  // <code>dt</code>. Note that for the Laplace
-  // and mass matrices, we can use functions in
-  // the library that do this. Because the
-  // expensive operations of this function --
-  // creating the two matrices -- are entirely
-  // independent, we could in principle mark
-  // them as tasks that can be worked on in
-  // %parallel using the Threads::new_task
-  // functions. We won't do that here since
-  // these functions internally already are
-  // parallelized, and in particular because
-  // the current function is only called once
-  // per program run and so does not incur a
-  // cost in each time step. The necessary
-  // modifications would be quite
-  // straightforward, however.
+  // In this set of methods we initialize the sparsity patterns, the
+  // constraints (if any) and assemble the matrices that do not depend on the
+  // timestep <code>dt</code>. Note that for the Laplace and mass matrices, we
+  // can use functions in the library that do this. Because the expensive
+  // operations of this function -- creating the two matrices -- are entirely
+  // independent, we could in principle mark them as tasks that can be worked
+  // on in %parallel using the Threads::new_task functions. We won't do that
+  // here since these functions internally already are parallelized, and in
+  // particular because the current function is only called once per program
+  // run and so does not incur a cost in each time step. The necessary
+  // modifications would be quite straightforward, however.
   template <int dim>
   void
   NavierStokesProjection<dim>::initialize_velocity_matrices()
@@ -876,9 +805,8 @@ namespace Step35
                                           vel_Laplace);
   }
 
-  // The initialization of the matrices
-  // that act on the pressure space is similar
-  // to the ones that act on the velocity space.
+  // The initialization of the matrices that act on the pressure space is
+  // similar to the ones that act on the velocity space.
   template <int dim>
   void
   NavierStokesProjection<dim>::initialize_pressure_matrices()
@@ -902,19 +830,12 @@ namespace Step35
   }
 
 
-  // For the gradient operator, we
-  // start by initializing the sparsity
-  // pattern and compressing it.  It is
-  // important to notice here that the
-  // gradient operator acts from the
-  // pressure space into the velocity
-  // space, so we have to deal with two
-  // different finite element
-  // spaces. To keep the loops
-  // synchronized, we use the
-  // <code>typedef</code>'s that we
-  // have defined before, namely
-  // <code>PairedIterators</code> and
+  // For the gradient operator, we start by initializing the sparsity pattern
+  // and compressing it.  It is important to notice here that the gradient
+  // operator acts from the pressure space into the velocity space, so we have
+  // to deal with two different finite element spaces. To keep the loops
+  // synchronized, we use the <code>typedef</code>'s that we have defined
+  // before, namely <code>PairedIterators</code> and
   // <code>IteratorPair</code>.
   template <int dim>
   void
@@ -996,38 +917,26 @@ namespace Step35
 
   // @sect4{ <code>NavierStokesProjection::run</code> }
 
-  // This is the time marching
-  // function, which starting at
-  // <code>t_0</code> advances in time
-  // using the projection method with
-  // time step <code>dt</code> until
-  // <code>T</code>.
+  // This is the time marching function, which starting at <code>t_0</code>
+  // advances in time using the projection method with time step
+  // <code>dt</code> until <code>T</code>.
   //
-  // Its second parameter, <code>verbose</code>
-  // indicates whether the function should
-  // output information what it is doing at any
-  // given moment: for example, it will say
-  // whether we are working on the diffusion,
-  // projection substep; updating
-  // preconditioners etc. Rather than
-  // implementing this output using code like
+  // Its second parameter, <code>verbose</code> indicates whether the function
+  // should output information what it is doing at any given moment: for
+  // example, it will say whether we are working on the diffusion, projection
+  // substep; updating preconditioners etc. Rather than implementing this
+  // output using code like
   // @code
-  //   if (verbose)
-  //     std::cout << "something";
+  //   if (verbose) std::cout << "something";
   // @endcode
-  // we use the ConditionalOStream class to
-  // do that for us. That class takes an
-  // output stream and a condition that
-  // indicates whether the things you pass
-  // to it should be passed through to the
-  // given output stream, or should just
-  // be ignored. This way, above code
-  // simply becomes
+  // we use the ConditionalOStream class to do that for us. That
+  // class takes an output stream and a condition that indicates whether the
+  // things you pass to it should be passed through to the given output
+  // stream, or should just be ignored. This way, above code simply becomes
   // @code
   //   verbose_cout << "something";
   // @endcode
-  // and does the right thing in either
-  // case.
+  // and does the right thing in either case.
   template <int dim>
   void
   NavierStokesProjection<dim>::run (const bool verbose,
@@ -1076,26 +985,17 @@ namespace Step35
 
   // @sect4{<code>NavierStokesProjection::diffusion_step</code>}
 
-  // The implementation of a diffusion
-  // step. Note that the expensive operation is
-  // the diffusion solve at the end of the
-  // function, which we have to do once for
-  // each velocity component. To accellerate
-  // things a bit, we allow to do this in
-  // %parallel, using the Threads::new_task
-  // function which makes sure that the
-  // <code>dim</code> solves are all taken care
-  // of and are scheduled to available
-  // processors: if your machine has more than
-  // one processor core and no other parts of
-  // this program are using resources
-  // currently, then the diffusion solves will
-  // run in %parallel. On the other hand, if
-  // your system has only one processor core
-  // then running things in %parallel would be
-  // inefficient (since it leads, for example,
-  // to cache congestion) and things will be
-  // executed sequentially.
+  // The implementation of a diffusion step. Note that the expensive operation
+  // is the diffusion solve at the end of the function, which we have to do
+  // once for each velocity component. To accellerate things a bit, we allow
+  // to do this in %parallel, using the Threads::new_task function which makes
+  // sure that the <code>dim</code> solves are all taken care of and are
+  // scheduled to available processors: if your machine has more than one
+  // processor core and no other parts of this program are using resources
+  // currently, then the diffusion solves will run in %parallel. On the other
+  // hand, if your system has only one processor core then running things in
+  // %parallel would be inefficient (since it leads, for example, to cache
+  // congestion) and things will be executed sequentially.
   template <int dim>
   void
   NavierStokesProjection<dim>::diffusion_step (const bool reinit_prec)
@@ -1193,16 +1093,14 @@ namespace Step35
   }
 
 
-  // @sect4{ The <code>NavierStokesProjection::assemble_advection_term</code> method and related}
+  // @sect4{ The <code>NavierStokesProjection::assemble_advection_term</code>
+  // method and related}
 
-  // The following few functions deal with
-  // assembling the advection terms, which is the part of the
-  // system matrix for the diffusion step that changes
-  // at every time step. As mentioned above, we
-  // will run the assembly loop over all cells
-  // in %parallel, using the WorkStream class
-  // and other facilities as described in the
-  // documentation module on @ref threads.
+  // The following few functions deal with assembling the advection terms,
+  // which is the part of the system matrix for the diffusion step that
+  // changes at every time step. As mentioned above, we will run the assembly
+  // loop over all cells in %parallel, using the WorkStream class and other
+  // facilities as described in the documentation module on @ref threads.
   template <int dim>
   void
   NavierStokesProjection<dim>::assemble_advection_term()
@@ -1319,17 +1217,10 @@ namespace Step35
 
   // @sect4{ <code>NavierStokesProjection::update_pressure</code> }
 
-  // This is the pressure update step
-  // of the projection method. It
-  // implements the standard
-  // formulation of the method, that is
-  // @f[
-  //      p^{n+1} = p^n + \phi^{n+1},
-  // @f]
-  // or the rotational form, which is
-  // @f[
-  //      p^{n+1} = p^n + \phi^{n+1} - \frac{1}{Re} \nabla\cdot u^{n+1}.
-  // @f]
+  // This is the pressure update step of the projection method. It implements
+  // the standard formulation of the method, that is @f[ p^{n+1} = p^n +
+  // \phi^{n+1}, @f] or the rotational form, which is @f[ p^{n+1} = p^n +
+  // \phi^{n+1} - \frac{1}{Re} \nabla\cdot u^{n+1}.  @f]
   template <int dim>
   void
   NavierStokesProjection<dim>::update_pressure (const bool reinit_prec)
@@ -1355,38 +1246,25 @@ namespace Step35
 
   // @sect4{ <code>NavierStokesProjection::output_results</code> }
 
-  // This method plots the current
-  // solution. The main difficulty is that we
-  // want to create a single output file that
-  // contains the data for all velocity
-  // components, the pressure, and also the
-  // vorticity of the flow. On the other hand,
-  // velocities and the pressure live on
-  // separate DoFHandler objects, and so can't
-  // be written to the same file using a single
-  // DataOut object. As a consequence, we have
-  // to work a bit harder to get the various
-  // pieces of data into a single DoFHandler
-  // object, and then use that to drive
-  // graphical output.
+  // This method plots the current solution. The main difficulty is that we
+  // want to create a single output file that contains the data for all
+  // velocity components, the pressure, and also the vorticity of the flow. On
+  // the other hand, velocities and the pressure live on separate DoFHandler
+  // objects, and so can't be written to the same file using a single DataOut
+  // object. As a consequence, we have to work a bit harder to get the various
+  // pieces of data into a single DoFHandler object, and then use that to
+  // drive graphical output.
   //
-  // We will not elaborate on this process
-  // here, but rather refer to step-31 and
-  // step-32, where a similar procedure is used
-  // (and is documented) to create a joint
-  // DoFHandler object for all variables.
+  // We will not elaborate on this process here, but rather refer to step-31
+  // and step-32, where a similar procedure is used (and is documented) to
+  // create a joint DoFHandler object for all variables.
   //
-  // Let us also note that we here compute the
-  // vorticity as a scalar quantity in a
-  // separate function, using the $L^2$
-  // projection of the quantity $\text{curl} u$
-  // onto the finite element space used for the
-  // components of the velocity. In principle,
-  // however, we could also have computed as a
-  // pointwise quantity from the velocity, and
-  // do so through the DataPostprocessor
-  // mechanism discussed in step-29 and
-  // step-33.
+  // Let us also note that we here compute the vorticity as a scalar quantity
+  // in a separate function, using the $L^2$ projection of the quantity
+  // $\text{curl} u$ onto the finite element space used for the components of
+  // the velocity. In principle, however, we could also have computed as a
+  // pointwise quantity from the velocity, and do so through the
+  // DataPostprocessor mechanism discussed in step-29 and step-33.
   template <int dim>
   void NavierStokesProjection<dim>::output_results (const unsigned int step)
   {
@@ -1465,20 +1343,14 @@ namespace Step35
 
 
 
-  // Following is the helper function that
-  // computes the vorticity by projecting the
-  // term $\text{curl} u$ onto the finite
-  // element space used for the components of
-  // the velocity. The function is only called
-  // whenever we generate graphical output, so
-  // not very often, and as a consequence we
-  // didn't bother parallelizing it using the
-  // WorkStream concept as we do for the other
-  // assembly functions. That should not be
-  // overly complicated, however, if
-  // needed. Moreover, the implementation that
-  // we have here only works for 2d, so we bail
-  // if that is not the case.
+  // Following is the helper function that computes the vorticity by
+  // projecting the term $\text{curl} u$ onto the finite element space used
+  // for the components of the velocity. The function is only called whenever
+  // we generate graphical output, so not very often, and as a consequence we
+  // didn't bother parallelizing it using the WorkStream concept as we do for
+  // the other assembly functions. That should not be overly complicated,
+  // however, if needed. Moreover, the implementation that we have here only
+  // works for 2d, so we bail if that is not the case.
   template <int dim>
   void NavierStokesProjection<dim>::assemble_vorticity (const bool reinit_prec)
   {
@@ -1525,9 +1397,8 @@ namespace Step35
 
 // @sect3{ The main function }
 
-// The main function looks very much like in
-// all the other tutorial programs, so there
-// is little to comment on here:
+// The main function looks very much like in all the other tutorial programs,
+// so there is little to comment on here:
 int main()
 {
   try

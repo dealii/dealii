@@ -9,18 +9,14 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
-// This program is an adaptation of step-20
-// and includes some technique of DG methods
-// from step-12. A good part of the program
-// is therefore very similar to step-20 and
-// we will not comment again on these
-// parts. Only the new stuff will be
-// discussed in more detail.
+// This program is an adaptation of step-20 and includes some technique of DG
+// methods from step-12. A good part of the program is therefore very similar
+// to step-20 and we will not comment again on these parts. Only the new stuff
+// will be discussed in more detail.
 
 // @sect3{Include files}
 
-// All of these include files have been used
-// before:
+// All of these include files have been used before:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/function.h>
@@ -55,16 +51,13 @@
 #include <fstream>
 #include <sstream>
 
-// In this program, we use a tensor-valued
-// coefficient. Since it may have a spatial
-// dependence, we consider it a tensor-valued
-// function. The following include file
-// provides the <code>TensorFunction</code>
-// class that offers such functionality:
+// In this program, we use a tensor-valued coefficient. Since it may have a
+// spatial dependence, we consider it a tensor-valued function. The following
+// include file provides the <code>TensorFunction</code> class that offers
+// such functionality:
 #include <deal.II/base/tensor_function.h>
 
-// The last step is as in all
-// previous programs:
+// The last step is as in all previous programs:
 namespace Step21
 {
   using namespace dealii;
@@ -72,35 +65,24 @@ namespace Step21
 
   // @sect3{The <code>TwoPhaseFlowProblem</code> class}
 
-  // This is the main class of the program. It
-  // is close to the one of step-20, but with a
-  // few additional functions:
+  // This is the main class of the program. It is close to the one of step-20,
+  // but with a few additional functions:
   //
-  // <ul>
-  //   <li><code>assemble_rhs_S</code> assembles the
-  //   right hand side of the saturation
-  //   equation. As explained in the
-  //   introduction, this can't be integrated
-  //   into <code>assemble_rhs</code> since it depends
-  //   on the velocity that is computed in the
-  //   first part of the time step.
+  // <ul> <li><code>assemble_rhs_S</code> assembles the right hand side of the
+  //   saturation equation. As explained in the introduction, this can't be
+  //   integrated into <code>assemble_rhs</code> since it depends on the
+  //   velocity that is computed in the first part of the time step.
   //
-  //   <li><code>get_maximal_velocity</code> does as its
-  //   name suggests. This function is used in
-  //   the computation of the time step size.
+  //   <li><code>get_maximal_velocity</code> does as its name suggests. This
+  //   function is used in the computation of the time step size.
   //
-  //   <li><code>project_back_saturation</code> resets
-  //   all saturation degrees of freedom with
-  //   values less than zero to zero, and all
-  //   those with saturations greater than one
-  //   to one.
-  // </ul>
+  //   <li><code>project_back_saturation</code> resets all saturation degrees
+  //   of freedom with values less than zero to zero, and all those with
+  //   saturations greater than one to one.  </ul>
   //
-  // The rest of the class should be pretty
-  // much obvious. The <code>viscosity</code> variable
-  // stores the viscosity $\mu$ that enters
-  // several of the formulas in the nonlinear
-  // equations.
+  // The rest of the class should be pretty much obvious. The
+  // <code>viscosity</code> variable stores the viscosity $\mu$ that enters
+  // several of the formulas in the nonlinear equations.
   template <int dim>
   class TwoPhaseFlowProblem
   {
@@ -140,12 +122,9 @@ namespace Step21
 
   // @sect3{Equation data}
 
-  // @sect4{Pressure right hand side}
-  // At present, the right hand side of the
-  // pressure equation is simply the zero
-  // function. However, the rest of the program
-  // is fully equipped to deal with anything
-  // else, if this is desired:
+  // @sect4{Pressure right hand side} At present, the right hand side of the
+  // pressure equation is simply the zero function. However, the rest of the
+  // program is fully equipped to deal with anything else, if this is desired:
   template <int dim>
   class PressureRightHandSide : public Function<dim>
   {
@@ -167,10 +146,9 @@ namespace Step21
   }
 
 
-  // @sect4{Pressure boundary values}
-  // The next are pressure boundary values. As
-  // mentioned in the introduction, we choose a
-  // linear pressure field:
+  // @sect4{Pressure boundary values} The next are pressure boundary
+  // values. As mentioned in the introduction, we choose a linear pressure
+  // field:
   template <int dim>
   class PressureBoundaryValues : public Function<dim>
   {
@@ -193,13 +171,10 @@ namespace Step21
 
   // @sect4{Saturation boundary values}
 
-  // Then we also need boundary values on the
-  // inflow portions of the boundary. The
-  // question whether something is an inflow
-  // part is decided when assembling the right
-  // hand side, we only have to provide a
-  // functional description of the boundary
-  // values. This is as explained in the
+  // Then we also need boundary values on the inflow portions of the
+  // boundary. The question whether something is an inflow part is decided
+  // when assembling the right hand side, we only have to provide a functional
+  // description of the boundary values. This is as explained in the
   // introduction:
   template <int dim>
   class SaturationBoundaryValues : public Function<dim>
@@ -228,22 +203,16 @@ namespace Step21
 
   // @sect4{Initial data}
 
-  // Finally, we need initial data. In reality,
-  // we only need initial data for the
-  // saturation, but we are lazy, so we will
-  // later, before the first time step, simply
-  // interpolate the entire solution for the
-  // previous time step from a function that
-  // contains all vector components.
+  // Finally, we need initial data. In reality, we only need initial data for
+  // the saturation, but we are lazy, so we will later, before the first time
+  // step, simply interpolate the entire solution for the previous time step
+  // from a function that contains all vector components.
   //
-  // We therefore simply create a function that
-  // returns zero in all components. We do that
-  // by simply forward every function to the
-  // ZeroFunction class. Why not use that right
-  // away in the places of this program where
-  // we presently use the <code>InitialValues</code>
-  // class? Because this way it is simpler to
-  // later go back and choose a different
+  // We therefore simply create a function that returns zero in all
+  // components. We do that by simply forward every function to the
+  // ZeroFunction class. Why not use that right away in the places of this
+  // program where we presently use the <code>InitialValues</code> class?
+  // Because this way it is simpler to later go back and choose a different
   // function for initial values.
   template <int dim>
   class InitialValues : public Function<dim>
@@ -282,27 +251,18 @@ namespace Step21
 
   // @sect3{The inverse permeability tensor}
 
-  // As announced in the introduction, we
-  // implement two different permeability
-  // tensor fields. Each of them we put into a
-  // namespace of its own, so that it will be
-  // easy later to replace use of one by the
-  // other in the code.
+  // As announced in the introduction, we implement two different permeability
+  // tensor fields. Each of them we put into a namespace of its own, so that
+  // it will be easy later to replace use of one by the other in the code.
 
   // @sect4{Single curving crack permeability}
 
-  // The first function for the
-  // permeability was the one that
-  // models a single curving crack. It
-  // was already used at the end of
-  // step-20, and its functional form
-  // is given in the introduction of
-  // the present tutorial program. As
-  // in some previous programs, we have
-  // to declare a (seemingly
-  // unnecessary) default constructor
-  // of the KInverse class to avoid
-  // warnings from some compilers:
+  // The first function for the permeability was the one that models a single
+  // curving crack. It was already used at the end of step-20, and its
+  // functional form is given in the introduction of the present tutorial
+  // program. As in some previous programs, we have to declare a (seemingly
+  // unnecessary) default constructor of the KInverse class to avoid warnings
+  // from some compilers:
   namespace SingleCurvingCrack
   {
     template <int dim>
@@ -348,54 +308,35 @@ namespace Step21
 
   // @sect4{Random medium permeability}
 
-  // This function does as announced in the
-  // introduction, i.e. it creates an overlay
-  // of exponentials at random places. There is
-  // one thing worth considering for this
-  // class. The issue centers around the
-  // problem that the class creates the centers
-  // of the exponentials using a random
-  // function. If we therefore created the
-  // centers each time we create an object of
-  // the present type, we would get a different
-  // list of centers each time. That's not what
-  // we expect from classes of this type: they
-  // should reliably represent the same
-  // function.
+  // This function does as announced in the introduction, i.e. it creates an
+  // overlay of exponentials at random places. There is one thing worth
+  // considering for this class. The issue centers around the problem that the
+  // class creates the centers of the exponentials using a random function. If
+  // we therefore created the centers each time we create an object of the
+  // present type, we would get a different list of centers each time. That's
+  // not what we expect from classes of this type: they should reliably
+  // represent the same function.
   //
-  // The solution to this problem is to make
-  // the list of centers a static member
-  // variable of this class, i.e. there exists
-  // exactly one such variable for the entire
-  // program, rather than for each object of
-  // this type. That's exactly what we are
-  // going to do.
+  // The solution to this problem is to make the list of centers a static
+  // member variable of this class, i.e. there exists exactly one such
+  // variable for the entire program, rather than for each object of this
+  // type. That's exactly what we are going to do.
   //
-  // The next problem, however, is that we need
-  // a way to initialize this variable. Since
-  // this variable is initialized at the
-  // beginning of the program, we can't use a
-  // regular member function for that since
-  // there may not be an object of this type
-  // around at the time. The C++ standard
-  // therefore says that only non-member and
-  // static member functions can be used to
-  // initialize a static variable. We use the
-  // latter possibility by defining a function
-  // <code>get_centers</code> that computes the list of
+  // The next problem, however, is that we need a way to initialize this
+  // variable. Since this variable is initialized at the beginning of the
+  // program, we can't use a regular member function for that since there may
+  // not be an object of this type around at the time. The C++ standard
+  // therefore says that only non-member and static member functions can be
+  // used to initialize a static variable. We use the latter possibility by
+  // defining a function <code>get_centers</code> that computes the list of
   // center points when called.
   //
-  // Note that this class works just fine in
-  // both 2d and 3d, with the only difference
-  // being that we use more points in 3d: by
-  // experimenting we find that we need more
-  // exponentials in 3d than in 2d (we have
-  // more ground to cover, after all, if we
-  // want to keep the distance between centers
-  // roughly equal), so we choose 40 in 2d and
-  // 100 in 3d. For any other dimension, the
-  // function does presently not know what to
-  // do so simply throws an exception
+  // Note that this class works just fine in both 2d and 3d, with the only
+  // difference being that we use more points in 3d: by experimenting we find
+  // that we need more exponentials in 3d than in 2d (we have more ground to
+  // cover, after all, if we want to keep the distance between centers roughly
+  // equal), so we choose 40 in 2d and 100 in 3d. For any other dimension, the
+  // function does presently not know what to do so simply throws an exception
   // indicating exactly this.
   namespace RandomMedium
   {
@@ -474,11 +415,9 @@ namespace Step21
 
   // @sect3{The inverse mobility and saturation functions}
 
-  // There are two more pieces of data that we
-  // need to describe, namely the inverse
-  // mobility function and the saturation
-  // curve. Their form is also given in the
-  // introduction:
+  // There are two more pieces of data that we need to describe, namely the
+  // inverse mobility function and the saturation curve. Their form is also
+  // given in the introduction:
   double mobility_inverse (const double S,
                            const double viscosity)
   {
@@ -497,28 +436,16 @@ namespace Step21
 
   // @sect3{Linear solvers and preconditioners}
 
-  // The linear solvers we use are also
-  // completely analogous to the ones
-  // used in step-20. The following
-  // classes are therefore copied
-  // verbatim from there. There is a
-  // single change: if the size of a
-  // linear system is small, i.e. when
-  // the mesh is very coarse, then it
-  // is sometimes not sufficient to set
-  // a maximum of
-  // <code>src.size()</code> CG
-  // iterations before the solver in
-  // the <code>vmult()</code> function
-  // converges. (This is, of course, a
-  // result of numerical round-off,
-  // since we know that on paper, the
-  // CG method converges in at most
-  // <code>src.size()</code> steps.) As
-  // a consequence, we set the maximum
-  // number of iterations equal to the
-  // maximum of the size of the linear
-  // system and 200.
+  // The linear solvers we use are also completely analogous to the ones used
+  // in step-20. The following classes are therefore copied verbatim from
+  // there. There is a single change: if the size of a linear system is small,
+  // i.e. when the mesh is very coarse, then it is sometimes not sufficient to
+  // set a maximum of <code>src.size()</code> CG iterations before the solver
+  // in the <code>vmult()</code> function converges. (This is, of course, a
+  // result of numerical round-off, since we know that on paper, the CG method
+  // converges in at most <code>src.size()</code> steps.) As a consequence, we
+  // set the maximum number of iterations equal to the maximum of the size of
+  // the linear system and 200.
   template <class Matrix>
   class InverseMatrix : public Subscriptor
   {
@@ -633,20 +560,15 @@ namespace Step21
 
   // @sect3{<code>TwoPhaseFlowProblem</code> class implementation}
 
-  // Here now the implementation of the main
-  // class. Much of it is actually copied from
-  // step-20, so we won't comment on it in much
-  // detail. You should try to get familiar
-  // with that program first, then most of what
-  // is happening here should be mostly clear.
+  // Here now the implementation of the main class. Much of it is actually
+  // copied from step-20, so we won't comment on it in much detail. You should
+  // try to get familiar with that program first, then most of what is
+  // happening here should be mostly clear.
 
-  // @sect4{TwoPhaseFlowProblem::TwoPhaseFlowProblem}
-  // First for the constructor. We use $RT_k
-  // \times DQ_k \times DQ_k$ spaces. The time
-  // step is set to zero initially, but will be
-  // computed before it is needed first, as
-  // described in a subsection of the
-  // introduction.
+  // @sect4{TwoPhaseFlowProblem::TwoPhaseFlowProblem} First for the
+  // constructor. We use $RT_k \times DQ_k \times DQ_k$ spaces. The time step
+  // is set to zero initially, but will be computed before it is needed first,
+  // as described in a subsection of the introduction.
   template <int dim>
   TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem (const unsigned int degree)
     :
@@ -664,12 +586,10 @@ namespace Step21
 
   // @sect4{TwoPhaseFlowProblem::make_grid_and_dofs}
 
-  // This next function starts out with
-  // well-known functions calls that create and
-  // refine a mesh, and then associate degrees
-  // of freedom with it. It does all the same
-  // things as in step-20, just now for three
-  // components instead of two.
+  // This next function starts out with well-known functions calls that create
+  // and refine a mesh, and then associate degrees of freedom with it. It does
+  // all the same things as in step-20, just now for three components instead
+  // of two.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::make_grid_and_dofs ()
   {
@@ -739,28 +659,20 @@ namespace Step21
 
   // @sect4{TwoPhaseFlowProblem::assemble_system}
 
-  // This is the function that assembles the
-  // linear system, or at least everything
-  // except the (1,3) block that depends on the
-  // still-unknown velocity computed during
-  // this time step (we deal with this in
-  // <code>assemble_rhs_S</code>). Much of it
-  // is again as in step-20, but we have to
-  // deal with some nonlinearity this time.
-  // However, the top of the function is pretty
-  // much as usual (note that we set matrix and
-  // right hand side to zero at the beginning
-  // &mdash; something we didn't have to do for
-  // stationary problems since there we use
-  // each matrix object only once and it is
-  // empty at the beginning anyway).
+  // This is the function that assembles the linear system, or at least
+  // everything except the (1,3) block that depends on the still-unknown
+  // velocity computed during this time step (we deal with this in
+  // <code>assemble_rhs_S</code>). Much of it is again as in step-20, but we
+  // have to deal with some nonlinearity this time.  However, the top of the
+  // function is pretty much as usual (note that we set matrix and right hand
+  // side to zero at the beginning &mdash; something we didn't have to do for
+  // stationary problems since there we use each matrix object only once and
+  // it is empty at the beginning anyway).
   //
-  // Note that in its present form, the
-  // function uses the permeability implemented
-  // in the RandomMedium::KInverse
-  // class. Switching to the single curved
-  // crack permeability function is as simple
-  // as just changing the namespace name.
+  // Note that in its present form, the function uses the permeability
+  // implemented in the RandomMedium::KInverse class. Switching to the single
+  // curved crack permeability function is as simple as just changing the
+  // namespace name.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_system ()
   {
@@ -812,44 +724,30 @@ namespace Step21
         local_matrix = 0;
         local_rhs = 0;
 
-        // Here's the first significant
-        // difference: We have to get the
-        // values of the saturation function of
-        // the previous time step at the
-        // quadrature points. To this end, we
-        // can use the
-        // FEValues::get_function_values
-        // (previously already used in step-9,
-        // step-14 and step-15), a function
-        // that takes a solution vector and
-        // returns a list of function values at
-        // the quadrature points of the present
-        // cell. In fact, it returns the
-        // complete vector-valued solution at
-        // each quadrature point, i.e. not only
-        // the saturation but also the
-        // velocities and pressure:
+        // Here's the first significant difference: We have to get the values
+        // of the saturation function of the previous time step at the
+        // quadrature points. To this end, we can use the
+        // FEValues::get_function_values (previously already used in step-9,
+        // step-14 and step-15), a function that takes a solution vector and
+        // returns a list of function values at the quadrature points of the
+        // present cell. In fact, it returns the complete vector-valued
+        // solution at each quadrature point, i.e. not only the saturation but
+        // also the velocities and pressure:
         fe_values.get_function_values (old_solution, old_solution_values);
 
-        // Then we also have to get the values
-        // of the pressure right hand side and
-        // of the inverse permeability tensor
-        // at the quadrature points:
+        // Then we also have to get the values of the pressure right hand side
+        // and of the inverse permeability tensor at the quadrature points:
         pressure_right_hand_side.value_list (fe_values.get_quadrature_points(),
                                              pressure_rhs_values);
         k_inverse.value_list (fe_values.get_quadrature_points(),
                               k_inverse_values);
 
-        // With all this, we can now loop over
-        // all the quadrature points and shape
-        // functions on this cell and assemble
-        // those parts of the matrix and right
-        // hand side that we deal with in this
-        // function. The individual terms in
-        // the contributions should be
-        // self-explanatory given the explicit
-        // form of the bilinear form stated in
-        // the introduction:
+        // With all this, we can now loop over all the quadrature points and
+        // shape functions on this cell and assemble those parts of the matrix
+        // and right hand side that we deal with in this function. The
+        // individual terms in the contributions should be self-explanatory
+        // given the explicit form of the bilinear form stated in the
+        // introduction:
         for (unsigned int q=0; q<n_q_points; ++q)
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             {
@@ -880,8 +778,7 @@ namespace Step21
             }
 
 
-        // Next, we also have to deal with the
-        // pressure boundary values. This,
+        // Next, we also have to deal with the pressure boundary values. This,
         // again is as in step-20:
         for (unsigned int face_no=0;
              face_no<GeometryInfo<dim>::faces_per_cell;
@@ -907,11 +804,8 @@ namespace Step21
                   }
             }
 
-        // The final step in the loop
-        // over all cells is to
-        // transfer local contributions
-        // into the global matrix and
-        // right hand side vector:
+        // The final step in the loop over all cells is to transfer local
+        // contributions into the global matrix and right hand side vector:
         cell->get_dof_indices (local_dof_indices);
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           for (unsigned int j=0; j<dofs_per_cell; ++j)
@@ -925,20 +819,16 @@ namespace Step21
   }
 
 
-  // So much for assembly of matrix and right
-  // hand side. Note that we do not have to
-  // interpolate and apply boundary values
-  // since they have all been taken care of in
-  // the weak form already.
+  // So much for assembly of matrix and right hand side. Note that we do not
+  // have to interpolate and apply boundary values since they have all been
+  // taken care of in the weak form already.
 
 
   // @sect4{TwoPhaseFlowProblem::assemble_rhs_S}
 
-  // As explained in the introduction, we can
-  // only evaluate the right hand side of the
-  // saturation equation once the velocity has
-  // been computed. We therefore have this
-  // separate function to this end.
+  // As explained in the introduction, we can only evaluate the right hand
+  // side of the saturation equation once the velocity has been computed. We
+  // therefore have this separate function to this end.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_rhs_S ()
   {
@@ -983,12 +873,10 @@ namespace Step21
         fe_values.get_function_values (old_solution, old_solution_values);
         fe_values.get_function_values (solution, present_solution_values);
 
-        // First for the cell terms. These are,
-        // following the formulas in the
-        // introduction, $(S^n,\sigma)-(F(S^n)
-        // \mathbf{v}^{n+1},\nabla \sigma)$,
-        // where $\sigma$ is the saturation
-        // component of the test function:
+        // First for the cell terms. These are, following the formulas in the
+        // introduction, $(S^n,\sigma)-(F(S^n) \mathbf{v}^{n+1},\nabla
+        // \sigma)$, where $\sigma$ is the saturation component of the test
+        // function:
         for (unsigned int q=0; q<n_q_points; ++q)
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             {
@@ -1010,22 +898,15 @@ namespace Step21
                               fe_values.JxW(q);
             }
 
-        // Secondly, we have to deal with the
-        // flux parts on the face
-        // boundaries. This was a bit more
-        // involved because we first have to
-        // determine which are the influx and
-        // outflux parts of the cell
-        // boundary. If we have an influx
-        // boundary, we need to evaluate the
-        // saturation on the other side of the
-        // face (or the boundary values, if we
-        // are at the boundary of the domain).
+        // Secondly, we have to deal with the flux parts on the face
+        // boundaries. This was a bit more involved because we first have to
+        // determine which are the influx and outflux parts of the cell
+        // boundary. If we have an influx boundary, we need to evaluate the
+        // saturation on the other side of the face (or the boundary values,
+        // if we are at the boundary of the domain).
         //
-        // All this is a bit tricky, but has
-        // been explained in some detail
-        // already in step-9. Take a look there
-        // how this is supposed to work!
+        // All this is a bit tricky, but has been explained in some detail
+        // already in step-9. Take a look there how this is supposed to work!
         for (unsigned int face_no=0; face_no<GeometryInfo<dim>::faces_per_cell;
              ++face_no)
           {
@@ -1091,11 +972,9 @@ namespace Step21
 
   // @sect4{TwoPhaseFlowProblem::solve}
 
-  // After all these preparations, we finally
-  // solve the linear system for velocity and
-  // pressure in the same way as in
-  // step-20. After that, we have to deal with
-  // the saturation equation (see below):
+  // After all these preparations, we finally solve the linear system for
+  // velocity and pressure in the same way as in step-20. After that, we have
+  // to deal with the saturation equation (see below):
   template <int dim>
   void TwoPhaseFlowProblem<dim>::solve ()
   {
@@ -1106,9 +985,8 @@ namespace Step21
     Vector<double> tmp2 (solution.block(2).size());
 
 
-    // First the pressure, using the pressure
-    // Schur complement of the first two
-    // equations:
+    // First the pressure, using the pressure Schur complement of the first
+    // two equations:
     {
       m_inverse.vmult (tmp, system_rhs.block(0));
       system_matrix.block(1,0).vmult (schur_rhs, tmp);
@@ -1147,36 +1025,24 @@ namespace Step21
       m_inverse.vmult (solution.block(0), tmp);
     }
 
-    // Finally, we have to take care of the
-    // saturation equation. The first business
-    // we have here is to determine the time
-    // step using the formula in the
-    // introduction. Knowing the shape of our
-    // domain and that we created the mesh by
-    // regular subdivision of cells, we can
-    // compute the diameter of each of our
-    // cells quite easily (in fact we use the
-    // linear extensions in coordinate
-    // directions of the cells, not the
-    // diameter). Note that we will learn a
-    // more general way to do this in step-24,
-    // where we use the
-    // GridTools::minimal_cell_diameter
-    // function.
+    // Finally, we have to take care of the saturation equation. The first
+    // business we have here is to determine the time step using the formula
+    // in the introduction. Knowing the shape of our domain and that we
+    // created the mesh by regular subdivision of cells, we can compute the
+    // diameter of each of our cells quite easily (in fact we use the linear
+    // extensions in coordinate directions of the cells, not the
+    // diameter). Note that we will learn a more general way to do this in
+    // step-24, where we use the GridTools::minimal_cell_diameter function.
     //
-    // The maximal velocity we compute using a
-    // helper function to compute the maximal
-    // velocity defined below, and with all
-    // this we can evaluate our new time step
-    // length:
+    // The maximal velocity we compute using a helper function to compute the
+    // maximal velocity defined below, and with all this we can evaluate our
+    // new time step length:
     time_step = std::pow(0.5, double(n_refinement_steps)) /
                 get_maximal_velocity();
 
-    // The next step is to assemble the right
-    // hand side, and then to pass everything
-    // on for solution. At the end, we project
-    // back saturations onto the physically
-    // reasonable range:
+    // The next step is to assemble the right hand side, and then to pass
+    // everything on for solution. At the end, we project back saturations
+    // onto the physically reasonable range:
     assemble_rhs_S ();
     {
 
@@ -1201,10 +1067,8 @@ namespace Step21
 
   // @sect4{TwoPhaseFlowProblem::output_results}
 
-  // There is nothing surprising here. Since
-  // the program will do a lot of time steps,
-  // we create an output file only every fifth
-  // time step.
+  // There is nothing surprising here. Since the program will do a lot of time
+  // steps, we create an output file only every fifth time step.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::output_results ()  const
   {
@@ -1251,30 +1115,21 @@ namespace Step21
 
   // @sect4{TwoPhaseFlowProblem::project_back_saturation}
 
-  // In this function, we simply run over all
-  // saturation degrees of freedom and make
-  // sure that if they should have left the
-  // physically reasonable range, that they be
-  // reset to the interval $[0,1]$. To do this,
-  // we only have to loop over all saturation
-  // components of the solution vector; these
-  // are stored in the block 2 (block 0 are the
-  // velocities, block 1 are the pressures).
+  // In this function, we simply run over all saturation degrees of freedom
+  // and make sure that if they should have left the physically reasonable
+  // range, that they be reset to the interval $[0,1]$. To do this, we only
+  // have to loop over all saturation components of the solution vector; these
+  // are stored in the block 2 (block 0 are the velocities, block 1 are the
+  // pressures).
   //
-  // It may be instructive to note that this
-  // function almost never triggers when the
-  // time step is chosen as mentioned in the
-  // introduction. However, if we choose the
-  // timestep only slightly larger, we get
-  // plenty of values outside the proper
-  // range. Strictly speaking, the function is
-  // therefore unnecessary if we choose the
-  // time step small enough. In a sense, the
-  // function is therefore only a safety device
-  // to avoid situations where our entire
-  // solution becomes unphysical because
-  // individual degrees of freedom have become
-  // unphysical a few time steps earlier.
+  // It may be instructive to note that this function almost never triggers
+  // when the time step is chosen as mentioned in the introduction. However,
+  // if we choose the timestep only slightly larger, we get plenty of values
+  // outside the proper range. Strictly speaking, the function is therefore
+  // unnecessary if we choose the time step small enough. In a sense, the
+  // function is therefore only a safety device to avoid situations where our
+  // entire solution becomes unphysical because individual degrees of freedom
+  // have become unphysical a few time steps earlier.
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::project_back_saturation ()
@@ -1289,12 +1144,9 @@ namespace Step21
 
   // @sect4{TwoPhaseFlowProblem::get_maximal_velocity}
 
-  // The following function is used in
-  // determining the maximal allowable time
-  // step. What it does is to loop over all
-  // quadrature points in the domain and find
-  // what the maximal magnitude of the velocity
-  // is.
+  // The following function is used in determining the maximal allowable time
+  // step. What it does is to loop over all quadrature points in the domain
+  // and find what the maximal magnitude of the velocity is.
   template <int dim>
   double
   TwoPhaseFlowProblem<dim>::get_maximal_velocity () const
@@ -1334,36 +1186,24 @@ namespace Step21
 
   // @sect4{TwoPhaseFlowProblem::run}
 
-  // This is the final function of our main
-  // class. Its brevity speaks for
-  // itself. There are only two points worth
-  // noting: First, the function projects the
-  // initial values onto the finite element
-  // space at the beginning; the
-  // VectorTools::project function doing this
-  // requires an argument indicating the
-  // hanging node constraints. We have none in
-  // this program (we compute on a uniformly
-  // refined mesh), but the function requires
-  // the argument anyway, of course. So we have
-  // to create a constraint object. In its
-  // original state, constraint objects are
-  // unsorted, and have to be sorted (using the
-  // ConstraintMatrix::close function) before
-  // they can be used. This is what we do here,
-  // and which is why we can't simply call the
-  // VectorTools::project function with an
-  // anonymous temporary object
-  // <code>ConstraintMatrix()</code> as the
-  // second argument.
+  // This is the final function of our main class. Its brevity speaks for
+  // itself. There are only two points worth noting: First, the function
+  // projects the initial values onto the finite element space at the
+  // beginning; the VectorTools::project function doing this requires an
+  // argument indicating the hanging node constraints. We have none in this
+  // program (we compute on a uniformly refined mesh), but the function
+  // requires the argument anyway, of course. So we have to create a
+  // constraint object. In its original state, constraint objects are
+  // unsorted, and have to be sorted (using the ConstraintMatrix::close
+  // function) before they can be used. This is what we do here, and which is
+  // why we can't simply call the VectorTools::project function with an
+  // anonymous temporary object <code>ConstraintMatrix()</code> as the second
+  // argument.
   //
-  // The second point worth mentioning is that
-  // we only compute the length of the present
-  // time step in the middle of solving the
-  // linear system corresponding to each time
-  // step. We can therefore output the present
-  // end time of a time step only at the end of
-  // the time step.
+  // The second point worth mentioning is that we only compute the length of
+  // the present time step in the middle of solving the linear system
+  // corresponding to each time step. We can therefore output the present end
+  // time of a time step only at the end of the time step.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::run ()
   {
@@ -1408,13 +1248,10 @@ namespace Step21
 
 // @sect3{The <code>main</code> function}
 
-// That's it. In the main function, we pass
-// the degree of the finite element space to
-// the constructor of the TwoPhaseFlowProblem
-// object.  Here, we use zero-th degree
-// elements, i.e. $RT_0\times DQ_0 \times
-// DQ_0$. The rest is as in all the other
-// programs.
+// That's it. In the main function, we pass the degree of the finite element
+// space to the constructor of the TwoPhaseFlowProblem object.  Here, we use
+// zero-th degree elements, i.e. $RT_0\times DQ_0 \times DQ_0$. The rest is as
+// in all the other programs.
 int main ()
 {
   try
