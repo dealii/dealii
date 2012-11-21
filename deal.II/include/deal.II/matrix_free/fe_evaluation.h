@@ -1982,7 +1982,7 @@ namespace internal
 
 
   // write access to distributed MPI vectors
-  // that have operator [] to access data in
+  // that have a local_element(uint) method to access data in
   // local index space, which is what we use in
   // DoFInfo and hence in read_dof_values etc.
   template <typename Number>
@@ -1997,7 +1997,7 @@ namespace internal
 
 
   // read access to distributed MPI vectors that
-  // have operator [] to access data in local
+  // have a local_element(uint) method to access data in local
   // index space, which is what we use in
   // DoFInfo and hence in read_dof_values etc.
   template <typename Number>
@@ -2017,8 +2017,8 @@ namespace internal
   // same as stored in MatrixFree
   template <typename VectorType>
   inline
-  void check_vector_compatibility (const VectorType &vec,
-                                   const internal::MatrixFreeFunctions::DoFInfo      &dof_info)
+  void check_vector_compatibility (const VectorType                             &vec,
+                                   const internal::MatrixFreeFunctions::DoFInfo &dof_info)
   {
     AssertDimension (vec.size(),
                      dof_info.vector_partitioner->size());
@@ -2026,8 +2026,8 @@ namespace internal
 
   template <typename Number>
   inline
-  void check_vector_compatibility (const parallel::distributed::Vector<Number> &vec,
-                                   const internal::MatrixFreeFunctions::DoFInfo      &dof_info)
+  void check_vector_compatibility (const parallel::distributed::Vector<Number>  &vec,
+                                   const internal::MatrixFreeFunctions::DoFInfo &dof_info)
   {
     Assert (vec.partitioners_are_compatible(*dof_info.vector_partitioner),
             ExcMessage("The parallel layout of the given vector is not "

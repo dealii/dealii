@@ -827,7 +827,7 @@ private:
  * double and float. The definition of a vectorized array does not
  * initialize the data field but rather leaves it undefined, as is the case
  * for double and float. However, when calling something like
- * VectorType<double> a = VectorType<double>(), it sets all numbers in this
+ * VectorizedArray<double> a = VectorizedArray<double>(), it sets all numbers in this
  * field to zero. In other words, this class is a plain old data (POD) type
  * which has an equivalent C representation and can e.g. be safely copied
  * with std::memcpy. This POD layout is also necessary for ensuring correct
