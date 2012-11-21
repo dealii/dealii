@@ -23,8 +23,6 @@
 #include <cmath>
 #include <cstring>
 
-// set flag DEAL_II_COMPILER_VECTORIZATION_LEVEL depending on whether we are
-// in debug or optimized mode
 // Note:
 // The flag DEAL_II_COMPILER_VECTORIZATION_LEVEL is essentially constructed
 // according to the following scheme
