@@ -47,13 +47,13 @@ FIND_LIBRARY(UMFPACK_LIBRARY
     lib${LIB_SUFFIX} lib64 lib Lib UMFPACK/Lib
   )
 
-
 SET(required_variables
   BLAS_FOUND
   AMD_FOUND
   UMFPACK_INCLUDE_DIRS
   UMFPACK_LIBRARY
   )
+
 
 #
 # Well, recent versions of UMFPACK >= 5.6 include SuiteSparse_config.h, if so,
@@ -73,8 +73,25 @@ ENDIF()
 # Otherwise, we're lazy for the moment.
 #
 
+
+#
+# UMFPACK may need to be linked with cholmod as well.
+#
+FIND_LIBRARY(CHOLMOD_LIBRARY
+  NAMES cholmod
+  HINTS
+    ${UMFPACK_DIR}
+  PATH_SUFFIXES
+    lib${LIB_SUFFIX} lib64 lib Lib UMFPACK/Lib
+  )
+IF(NOT CHOLMOD_LIBRARY MATCHES "-NOTFOUND")
+  SET(CHOLMOD_LIBRARY)
+ENDIF()
+
+
 SET(UMFPACK_LIBRARIES
   ${UMFPACK_LIBRARY}
+  ${CHOLMOD_LIBRARY} # may be empty
   ${AMD_LIBRARY}
   ${SUITESPARSECONFIG_LIBRARY} # may be empty
   ${BLAS_LIBRARIES}
@@ -90,6 +107,7 @@ SET(UMFPACK_LINKER_FLAGS
   ${BLAS_LINKER_FLAGS}
   )
 
+
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(UMFPACK DEFAULT_MSG ${required_variables})
 
 IF(UMFPACK_FOUND)
@@ -97,6 +115,7 @@ IF(UMFPACK_FOUND)
     UMFPACK_LIBRARY
     UMFPACK_INCLUDE_DIR
     UMFPACK_DIR
+    CHOLMOD_LIBRARY
     atlas_LIBRARY
     blas_LIBRARY
   )
