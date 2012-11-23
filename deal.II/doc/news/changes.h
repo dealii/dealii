@@ -154,6 +154,13 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The DoFTools::make_flux_sparsity_pattern() function
+had a bug that triggered in 1d whenever there were neighboring
+cells that differed in refinement level by more than one. This
+is now fixed.
+<br>
+(Wolfgang Bangerth, 2012/11/20)
+
 <li> New: The TrilinosWrappers::PreconditionBase class now has
 a function TrilinosWrappers::PreconditionBase::Tvmult that
 allows applying the transpose preconditioner.

@@ -149,19 +149,10 @@ namespace internal
                           16*dof_handler.selected_fe->dofs_per_quad;
             break;
 
-            // the following
-            // numbers are not
-            // based on actual
-            // counting but by
-            // extrapolating the
-            // number sequences
-            // from the previous
-            // ones (for example,
-            // for dofs_per_vertex,
-            // the sequence above
-            // is 19, 21, 28, 30,
-            // 37, and is continued
-            // as follows):
+            // the following numbers are not based on actual counting but by
+            // extrapolating the number sequences from the previous ones (for
+            // example, for dofs_per_vertex, the sequence above is 19, 21, 28,
+            // 30, 37, and is continued as follows):
           case 9:
             max_couplings=39*dof_handler.selected_fe->dofs_per_vertex +
                           59*dof_handler.selected_fe->dofs_per_line +
@@ -309,10 +300,14 @@ namespace internal
           }
 
         dof_handler.faces = new internal::DoFHandler::DoFFaces<2>;
-        dof_handler.faces->lines.dofs
-        .resize (dof_handler.tria->n_raw_lines() *
-                 dof_handler.selected_fe->dofs_per_line,
-                 DoFHandler<2,spacedim>::invalid_dof_index);
+        // avoid access to n_raw_lines when there are no cells
+        if (dof_handler.tria->n_cells() > 0)
+          {
+            dof_handler.faces->lines.dofs
+            .resize (dof_handler.tria->n_raw_lines() *
+                     dof_handler.selected_fe->dofs_per_line,
+                     DoFHandler<2,spacedim>::invalid_dof_index);
+          }
       }
 
 
@@ -341,14 +336,18 @@ namespace internal
           }
         dof_handler.faces = new internal::DoFHandler::DoFFaces<3>;
 
-        dof_handler.faces->lines.dofs
-        .resize (dof_handler.tria->n_raw_lines() *
-                 dof_handler.selected_fe->dofs_per_line,
-                 DoFHandler<3,spacedim>::invalid_dof_index);
-        dof_handler.faces->quads.dofs
-        .resize (dof_handler.tria->n_raw_quads() *
-                 dof_handler.selected_fe->dofs_per_quad,
-                 DoFHandler<3,spacedim>::invalid_dof_index);
+        // avoid access to n_raw_lines when there are no cells
+        if (dof_handler.tria->n_cells() > 0)
+          {
+            dof_handler.faces->lines.dofs
+            .resize (dof_handler.tria->n_raw_lines() *
+                     dof_handler.selected_fe->dofs_per_line,
+                     DoFHandler<3,spacedim>::invalid_dof_index);
+            dof_handler.faces->quads.dofs
+            .resize (dof_handler.tria->n_raw_quads() *
+                     dof_handler.selected_fe->dofs_per_quad,
+                     DoFHandler<3,spacedim>::invalid_dof_index);
+          }
       }
     };
   }

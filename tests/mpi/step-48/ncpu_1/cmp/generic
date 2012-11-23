@@ -1,0 +1,19 @@
+
+DEAL:0:2d::   Number of global active cells: 964
+DEAL:0:2d::   Number of degrees of freedom: 16033
+DEAL:0:2d::   Time step size: 0.01176, finest cell: 0.4688
+DEAL:0:2d::
+DEAL:0:2d::   Time:-10.0   , solution norm: 9.5599 
+DEAL:0:2d::   Time:-8.99   , solution norm: 21.965 
+DEAL:0:2d::
+DEAL:0:2d::   Performed 86 time steps.
+DEAL:0:2d::
+DEAL:0:3d::   Number of global active cells: 176
+DEAL:0:3d::   Number of degrees of freedom: 14001
+DEAL:0:3d::   Time step size: 0.047619, finest cell: 1.8750
+DEAL:0:3d::
+DEAL:0:3d::   Time:-10.0   , solution norm: 29.559 
+DEAL:0:3d::   Time:-8.95   , solution norm: 90.729 
+DEAL:0:3d::
+DEAL:0:3d::   Performed 22 time steps.
+DEAL:0:3d::
