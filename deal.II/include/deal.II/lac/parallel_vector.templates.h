@@ -190,6 +190,7 @@ namespace parallel
     {
       AssertDimension (local_range().first, c.local_range().first);
       AssertDimension (local_range().second, c.local_range().second);
+      AssertDimension (vector_view.size(), c.vector_view.size());
       vector_view = c.vector_view;
       if (call_update_ghost_values == true)
         update_ghost_values();
