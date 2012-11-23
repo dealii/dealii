@@ -10816,7 +10816,7 @@ $as_echo "no" >&6; }
   fi
 
   if test "x$enableshared" = "xno" -a "x$DEAL_II_TRILINOS_STATIC" != "xyes" ; then
-    as_fn_error $? "When building deal.II with shared libraries, Trilinos also needs to be built with shared libraries" "$LINENO" 5
+    as_fn_error $? "When building deal.II with static libraries, Trilinos also needs to be built with static libraries" "$LINENO" 5
   fi
 
       if test "x$enableshared" = "xyes" ; then

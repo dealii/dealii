@@ -6274,7 +6274,7 @@ AC_DEFUN(DEAL_II_CHECK_TRILINOS_SHARED_STATIC, dnl
   fi
 
   if test "x$enableshared" = "xno" -a "x$DEAL_II_TRILINOS_STATIC" != "xyes" ; then
-    AC_MSG_ERROR([When building deal.II with shared libraries, Trilinos also needs to be built with shared libraries])
+    AC_MSG_ERROR([When building deal.II with static libraries, Trilinos also needs to be built with static libraries])
   fi
 
   dnl If we use shared libs (and we've made sure above that Trilinos provides
