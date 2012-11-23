@@ -53,6 +53,7 @@ IF(NOT (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-pedantic")
 ENDIF()
 
+
 #
 # Setup various warnings:
 #
@@ -62,6 +63,7 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wwrite-strings")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wsynth")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wsign-compare")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wswitch")
+
 
 #
 # Newer versions of gcc have a flag -Wunused-local-typedefs that, though in
