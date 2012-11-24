@@ -1368,13 +1368,7 @@ template <int dim, int spacedim>
 void FE_Q<dim,spacedim>::initialize_unit_face_support_points ()
 {
   const unsigned int codim = dim-1;
-
-  // number of points: (degree+1)^codim
-  unsigned int n = this->degree+1;
-  for (unsigned int i=1; i<codim; ++i)
-    n *= this->degree+1;
-
-  this->unit_face_support_points.resize(n);
+  this->unit_face_support_points.resize(Utilities::fixed_power<codim>(this->degree+1));
 
   const std::vector<unsigned int> &face_index_map_inverse=
     FE_Q_Helper::invert_numbering(face_index_map);
@@ -1403,15 +1397,9 @@ template <int dim, int spacedim>
 void FE_Q<dim,spacedim>::initialize_unit_face_support_points (const Quadrature<1> &points)
 {
   const unsigned int codim = dim-1;
+  this->unit_face_support_points.resize(Utilities::fixed_power<codim>(this->degree+1));
 
-  // number of points: (degree+1)^codim
-  unsigned int n = this->degree+1;
-  for (unsigned int i=1; i<codim; ++i)
-    n *= this->degree+1;
-
-  this->unit_face_support_points.resize(n);
-
-  const std::vector< Point<1> > edge = points.get_points();
+  const std::vector< Point<1> > &edge = points.get_points();
 
   const std::vector<unsigned int> &face_index_map_inverse=
     FE_Q_Helper::invert_numbering(face_index_map);
