@@ -43,9 +43,9 @@ MACRO(SETUP_THREADING var)
     #
     IF("${CMAKE_THREAD_LIBS_INIT}" MATCHES "-lpthread")
       CHECK_CXX_COMPILER_FLAG("-pthread"
-        DEAL_II_HAVE_FLAG_-pthread
+        DEAL_II_HAVE_FLAG_pthread
         )
-      IF(DEAL_II_HAVE_FLAG_-pthread)
+      IF(DEAL_II_HAVE_FLAG_pthread)
         STRING(REPLACE "-lpthread" "-pthread" CMAKE_THREAD_LIBS_INIT
           "${CMAKE_THREAD_LIBS_INIT}"
           )

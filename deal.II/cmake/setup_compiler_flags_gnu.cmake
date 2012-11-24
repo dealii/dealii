@@ -137,7 +137,7 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
   #
   # If -ggdb is not available, fall back to -g:
   #
-  IF(NOT DEAL_II_HAVE_FLAG_-ggdb)
+  IF(NOT DEAL_II_HAVE_FLAG_ggdb)
     ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-g")
     ENABLE_IF_SUPPORTED(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-g")
   ENDIF()

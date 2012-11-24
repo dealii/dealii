@@ -22,15 +22,17 @@
 #
 
 MACRO(ENABLE_IF_LINKS _variable _flag)
+  STRING(REGEX REPLACE "^-" "" _flag_name "${_flag}")
+
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_flag}")
   CHECK_CXX_SOURCE_COMPILES(
   "
   int main() { return 0; }
   "
-  DEAL_II_HAVE_FLAG_${_flag}
+  DEAL_II_HAVE_FLAG_${_flag_name}
   )
   STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${_flag}")
-  IF(DEAL_II_HAVE_FLAG_${_flag})
+  IF(DEAL_II_HAVE_FLAG_${_flag_name})
     SET(${_variable} "${${_variable}} ${_flag}")
   ENDIF()
 ENDMACRO()
