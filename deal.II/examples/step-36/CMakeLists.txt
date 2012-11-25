@@ -28,12 +28,12 @@ FIND_PACKAGE(deal.II 8.0 REQUIRED
 #
 # Are all dependencies fullfilled?
 #
-IF(NOT DEAL_II_WITH_PETSC OR NOT DEAL_II_WITH_SLEPC OR DEAL_II_WITH_TBB)
+IF(NOT DEAL_II_WITH_PETSC OR NOT DEAL_II_WITH_SLEPC OR DEAL_II_WITH_THREADS)
   MESSAGE(FATAL_ERROR "
 Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
     DEAL_II_WITH_PETSC = ON
     DEAL_II_WITH_SLEPC = ON
-    DEAL_II_WITH_TBB = ON
+    DEAL_II_WITH_THREADS = ON
 which is required for this tutorial step."
     )
 ENDIF()
