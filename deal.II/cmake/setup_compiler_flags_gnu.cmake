@@ -132,14 +132,22 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
 
   ADD_FLAGS(DEAL_II_CXX_FLAGS_DEBUG "-O0")
 
-  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-ggdb")
-  ENABLE_IF_SUPPORTED(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-ggdb")
   #
-  # If -ggdb is not available, fall back to -g:
+  # Disable -ggdb and -g on Windows/MinGW targets for the moment until the
+  # compilation issues with too big files is resolved
   #
-  IF(NOT DEAL_II_HAVE_FLAG_ggdb)
-    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-g")
-    ENABLE_IF_SUPPORTED(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-g")
+  # - Matthias Maier, 2012
+  #
+  IF(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+    ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-ggdb")
+    ENABLE_IF_SUPPORTED(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-ggdb")
+    #
+    # If -ggdb is not available, fall back to -g:
+    #
+    IF(NOT DEAL_II_HAVE_FLAG_ggdb)
+      ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-g")
+      ENABLE_IF_SUPPORTED(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-g")
+    ENDIF()
   ENDIF()
 ENDIF()
 
