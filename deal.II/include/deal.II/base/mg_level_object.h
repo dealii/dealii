@@ -100,12 +100,12 @@ public:
   /**
    * @deprecated Replaced by min_level()
    */
-  unsigned int get_minlevel () const;
+  unsigned int get_minlevel () const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Replaced by max_level()
    */
-  unsigned int get_maxlevel () const;
+  unsigned int get_maxlevel () const DEAL_II_DEPRECATED;
 
   /**
    * Memory used by this object.

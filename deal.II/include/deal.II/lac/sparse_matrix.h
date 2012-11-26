@@ -1260,7 +1260,7 @@ public:
    * const_iterator instead!
    */
   number raw_entry (const unsigned int row,
-                    const unsigned int index) const;
+                    const unsigned int index) const DEAL_II_DEPRECATED;
 
   /**
    * @internal @deprecated Use iterator or
@@ -1285,7 +1285,7 @@ public:
    * avoid programs relying on
    * outdated information!
    */
-  number global_entry (const unsigned int i) const;
+  number global_entry (const unsigned int i) const DEAL_II_DEPRECATED;
 
   /**
    * @internal @deprecated Use iterator or
@@ -1295,7 +1295,7 @@ public:
    * access.  You certainly know
    * what you do?
    */
-  number &global_entry (const unsigned int i);
+  number &global_entry (const unsigned int i) DEAL_II_DEPRECATED;
 
 //@}
   /**

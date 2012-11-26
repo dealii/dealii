@@ -1093,7 +1093,7 @@ public:
    * SparseMatrix::const_iterator
    */
   unsigned int operator() (const unsigned int i,
-                           const unsigned int j) const;
+                           const unsigned int j) const DEAL_II_DEPRECATED;
 
   /**
    * This is the inverse operation
@@ -1329,7 +1329,7 @@ public:
    * @p GridTools::partition_triangulation.
    */
   void partition (const unsigned int         n_partitions,
-                  std::vector<unsigned int> &partition_indices) const;
+                  std::vector<unsigned int> &partition_indices) const DEAL_II_DEPRECATED;
 
 
   /**
@@ -1359,7 +1359,7 @@ public:
    * avoid programs relying on outdated
    * information!
    */
-  inline const std::size_t *get_rowstart_indices () const;
+  inline const std::size_t *get_rowstart_indices () const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated. Use @p row_length and
@@ -1387,7 +1387,7 @@ public:
    * avoid programs relying on outdated
    * information!
    */
-  inline const unsigned int *get_column_numbers () const;
+  inline const unsigned int *get_column_numbers () const DEAL_II_DEPRECATED;
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
   /** @addtogroup Exceptions

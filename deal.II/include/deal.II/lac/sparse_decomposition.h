@@ -153,7 +153,7 @@ protected:
    * compability. It will be removed
    * in later versions.
    */
-  SparseLUDecomposition (const SparsityPattern &sparsity);
+  SparseLUDecomposition (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
 
 public:
   /**
@@ -302,7 +302,7 @@ public:
    *
    * @deprecated
    */
-  void reinit (const SparsityPattern &sparsity);
+  void reinit (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
 
   /**
    * This method is deprecated,
@@ -314,7 +314,7 @@ public:
    */
   template <typename somenumber>
   void decompose (const SparseMatrix<somenumber> &matrix,
-                  const double                    strengthen_diagonal=0.);
+                  const double                    strengthen_diagonal=0.) DEAL_II_DEPRECATED;
 
   /**
    * This method is deprecated,
@@ -324,7 +324,7 @@ public:
    *
    * @deprecated
    */
-  virtual bool is_decomposed () const;
+  virtual bool is_decomposed () const DEAL_II_DEPRECATED;
 
   /**
    * Return whether the object is

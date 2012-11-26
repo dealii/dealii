@@ -216,14 +216,14 @@ public:
    * colon and there is a double
    * colon after the last prefix.
    */
-  void push (const std::string &text);
+  void push (const std::string &text) DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Use Prefix instead
    *
    * Remove the last prefix.
    */
-  void pop ();
+  void pop () DEAL_II_DEPRECATED;
 
   /**
    * Maximum number of levels to be

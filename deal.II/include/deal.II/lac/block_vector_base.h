@@ -816,7 +816,7 @@ public:
    * versions
    */
   const BlockIndices &
-  get_block_indices () const;
+  get_block_indices () const DEAL_II_DEPRECATED;
 
   /**
    * Number of blocks.

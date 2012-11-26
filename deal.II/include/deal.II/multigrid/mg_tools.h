@@ -205,7 +205,7 @@ namespace MGTools
   void
   count_dofs_per_component (const MGDoFHandler<dim,spacedim> &mg_dof,
                             std::vector<std::vector<unsigned int> > &result,
-                            std::vector<unsigned int> target_component);
+                            std::vector<unsigned int> target_component) DEAL_II_DEPRECATED;
 
   /**
    * Generate a list of those

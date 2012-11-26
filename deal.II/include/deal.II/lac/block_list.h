@@ -135,7 +135,7 @@ public:
   template <typename ITERATOR>
   void initialize_mg(unsigned int n_blocks,
                      const ITERATOR begin,
-                     const typename identity<ITERATOR>::type end);
+                     const typename identity<ITERATOR>::type end) DEAL_II_DEPRECATED;
 
   /**
    * @deprecated This function will
@@ -173,7 +173,7 @@ public:
                   const ITERATOR begin,
                   const typename identity<ITERATOR>::type end,
                   const std::vector<bool> &selected_dofs,
-                  unsigned int offset = 0);
+                  unsigned int offset = 0) DEAL_II_DEPRECATED;
   /**
    * @deprecated This function will
    * move to DoFTools.
@@ -210,7 +210,7 @@ public:
                      const ITERATOR begin,
                      const typename identity<ITERATOR>::type end,
                      const std::vector<bool> &selected_dofs,
-                     unsigned int offset = 0);
+                     unsigned int offset = 0) DEAL_II_DEPRECATED;
 
   /**
    * @deprecated This function will
@@ -228,7 +228,7 @@ public:
                                     const ITERATOR begin,
                                     const typename identity<ITERATOR>::type end,
                                     const std::vector<bool> &selected_dofs = std::vector<bool>(),
-                                    unsigned int offset = 0);
+                                    unsigned int offset = 0) DEAL_II_DEPRECATED;
 
   /**
    * @deprecated This function will
@@ -241,7 +241,7 @@ public:
   unsigned int count_vertex_patches(
     const ITERATOR begin,
     const typename identity<ITERATOR>::type end,
-    bool same_level_only) const;
+    bool same_level_only) const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated This function will
@@ -250,7 +250,7 @@ public:
    */
   template <int dim, typename ITERATOR>
   bool cell_generates_vertex_patch(const ITERATOR cell,
-                                   bool same_level_only) const;
+                                   bool same_level_only) const DEAL_II_DEPRECATED;
 
   /**
    * The number of blocks.
@@ -284,7 +284,7 @@ private:
    * The container for t he index sets.
    */
   std::vector<block_container> index_sets;
-};
+} DEAL_II_DEPRECATED;
 
 
 inline

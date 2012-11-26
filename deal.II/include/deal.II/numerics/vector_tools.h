@@ -770,7 +770,7 @@ namespace VectorTools
                                const types::boundary_id            boundary_component,
                                const Function<DH::space_dimension>           &boundary_function,
                                std::map<unsigned int,double> &boundary_values,
-                               const ComponentMask       &component_mask = ComponentMask());
+                               const ComponentMask       &component_mask = ComponentMask()) DEAL_II_DEPRECATED;
 
   /**
    * Calls the other
@@ -911,7 +911,7 @@ namespace VectorTools
                                const types::boundary_id                  boundary_component,
                                const Function<DH::space_dimension> &boundary_function,
                                ConstraintMatrix                    &constraints,
-                               const ComponentMask             &component_mask = ComponentMask());
+                               const ComponentMask             &component_mask = ComponentMask()) DEAL_II_DEPRECATED;
 
   /**
    * Calls the other

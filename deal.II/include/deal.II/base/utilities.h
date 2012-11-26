@@ -388,7 +388,7 @@ namespace Utilities
      *
      * @deprecated
      */
-    bool program_uses_mpi ();
+    bool program_uses_mpi () DEAL_II_DEPRECATED;
 
     /**
      * @name Functions that work
@@ -406,7 +406,7 @@ namespace Utilities
      *
      * @deprecated
      */
-    unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator);
+    unsigned int get_n_mpi_processes (const MPI_Comm &mpi_communicator) DEAL_II_DEPRECATED;
 
     /**
      * This function is an alias for
@@ -414,7 +414,7 @@ namespace Utilities
      *
      * @deprecated
      */
-    unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator);
+    unsigned int get_this_mpi_process (const MPI_Comm &mpi_communicator) DEAL_II_DEPRECATED;
 
 
     /**
@@ -450,7 +450,7 @@ namespace Utilities
     void
     calculate_collective_mpi_min_max_avg (const MPI_Comm &mpi_communicator,
                                           const double my_value,
-                                          MinMaxAvg &result);
+                                          MinMaxAvg &result) DEAL_II_DEPRECATED;
 
     /**
      * An alias for Utilities::MPI::MPI_InitFinalize.

@@ -962,7 +962,7 @@ namespace DoFRenumbering
   template <class DH>
   void
   cell_wise_dg (DH &dof_handler,
-                const std::vector<typename DH::cell_iterator> &cell_order);
+                const std::vector<typename DH::cell_iterator> &cell_order) DEAL_II_DEPRECATED;
 
   /**
    * Computes the renumbering
@@ -1019,7 +1019,7 @@ namespace DoFRenumbering
   void
   cell_wise_dg (MGDoFHandler<dim>   &dof_handler,
                 const unsigned int   level,
-                const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
+                const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order) DEAL_II_DEPRECATED;
 
   /**
    * Computes the renumbering
@@ -1120,7 +1120,7 @@ namespace DoFRenumbering
   template <class DH, int dim>
   void
   downstream_dg (DH               &dof_handler,
-                 const Point<dim> &direction);
+                 const Point<dim> &direction) DEAL_II_DEPRECATED;
 
   /**
    * Cell-wise downstream numbering
@@ -1144,7 +1144,7 @@ namespace DoFRenumbering
   void
   downstream_dg (MGDoFHandler<dim> &dof_handler,
                  const unsigned int level,
-                 const Point<dim>  &direction);
+                 const Point<dim>  &direction) DEAL_II_DEPRECATED;
 
   /**
    * @deprecated The new function
@@ -1166,7 +1166,7 @@ namespace DoFRenumbering
   void
   compute_downstream_dg (std::vector<unsigned int> &new_dof_indices,
                          const DH                  &dof_handler,
-                         const Point<dim>          &direction);
+                         const Point<dim>          &direction) DEAL_II_DEPRECATED;
 
   /**
    * Computes the renumbering
@@ -1194,7 +1194,7 @@ namespace DoFRenumbering
   compute_downstream_dg (std::vector<unsigned int> &new_dof_indices,
                          std::vector<unsigned int> &reverse,
                          const DH                  &dof_handler,
-                         const Point<dim>          &direction);
+                         const Point<dim>          &direction) DEAL_II_DEPRECATED;
 
   /**
    * Computes the renumbering
@@ -1224,7 +1224,7 @@ namespace DoFRenumbering
                          std::vector<unsigned int> &reverse,
                          const MGDoFHandler<dim>   &dof_handler,
                          const unsigned int         level,
-                         const Point<dim>          &direction);
+                         const Point<dim>          &direction) DEAL_II_DEPRECATED;
 
   /**
    * Cell-wise clockwise numbering.

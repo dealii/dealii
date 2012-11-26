@@ -316,7 +316,7 @@ namespace TrilinosWrappers
        * distributed objects" for more
        * information.
        */
-      void compress (const Epetra_CombineMode last_action);
+      void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
 
       /**
        * so it is not hidden

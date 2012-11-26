@@ -376,7 +376,7 @@ public:
    * The number of blocks of the
    * matrix.
    */
-  unsigned int n_blocks() const;
+  unsigned int n_blocks() const DEAL_II_DEPRECATED;
 
   /**
    * Determine an estimate for the

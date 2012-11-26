@@ -609,7 +609,7 @@ public:
   transform_covariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                        const unsigned int                                    offset,
                        VectorSlice<std::vector<Tensor<1,spacedim> > >        output,
-                       const InternalDataBase &internal) const;
+                       const InternalDataBase &internal) const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Use transform() instead.
@@ -618,7 +618,7 @@ public:
   transform_covariant (const VectorSlice<const std::vector<DerivativeForm<1, dim ,spacedim> > > input,
                        const unsigned int                 offset,
                        VectorSlice<std::vector<Tensor<2,spacedim> > >      output,
-                       const InternalDataBase &internal) const;
+                       const InternalDataBase &internal) const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Use transform() instead.
@@ -627,7 +627,7 @@ public:
   transform_contravariant (const VectorSlice<const std::vector<Tensor<1,dim> > > input,
                            const unsigned int                 offset,
                            VectorSlice<std::vector<Tensor<1,spacedim> > >      output,
-                           const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
+                           const typename Mapping<dim,spacedim>::InternalDataBase &internal) const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Use transform() instead.
@@ -637,7 +637,7 @@ public:
   transform_contravariant (const VectorSlice<const std::vector<DerivativeForm<1, dim,spacedim> > > input,
                            const unsigned int                 offset,
                            const VectorSlice<std::vector<Tensor<2,spacedim> > > output,
-                           const typename Mapping<dim,spacedim>::InternalDataBase &internal) const;
+                           const typename Mapping<dim,spacedim>::InternalDataBase &internal) const DEAL_II_DEPRECATED;
 
   /**
    * The transformed (generalized)

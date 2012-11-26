@@ -700,7 +700,7 @@ protected:
    * cast from const), otherwise,
    * keep away!
    */
-  typename std::vector<T>::const_pointer data () const;
+  typename std::vector<T>::const_pointer data () const DEAL_II_DEPRECATED;
 
 protected:
   /**

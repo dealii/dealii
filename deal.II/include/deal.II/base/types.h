@@ -40,17 +40,17 @@ namespace types
   /**
    * @deprecated Old name for the typedef above.
    */
-  typedef subdomain_id subdomain_id_t;
+  typedef subdomain_id subdomain_id_t DEAL_II_DEPRECATED;
 
   /**
   * @deprecated Use numbers::invalid_subdomain_id
    */
-  const unsigned int invalid_subdomain_id = static_cast<subdomain_id>(-1);
+  const unsigned int invalid_subdomain_id DEAL_II_DEPRECATED = static_cast<subdomain_id>(-1);
 
   /**
    * @deprecated Use numbers::artificial_subdomain_id
    */
-  const unsigned int artificial_subdomain_id = static_cast<subdomain_id>(-2);
+  const unsigned int artificial_subdomain_id DEAL_II_DEPRECATED = static_cast<subdomain_id>(-2);
 
   /**
    * The type used to denote global dof
@@ -61,7 +61,7 @@ namespace types
   /**
   *  @deprecated Use numbers::invalid_dof_index
    */
-  const global_dof_index invalid_dof_index = static_cast<global_dof_index>(-1);
+  const global_dof_index invalid_dof_index DEAL_II_DEPRECATED = static_cast<global_dof_index>(-1);
 
   /**
    * The type used to denote boundary indicators associated with every
@@ -79,7 +79,7 @@ namespace types
   /**
    * @deprecated Old name for the typedef above.
    */
-  typedef boundary_id boundary_id_t;
+  typedef boundary_id boundary_id_t DEAL_II_DEPRECATED;
 
   /**
    * The type used to denote material indicators associated with every
@@ -93,7 +93,7 @@ namespace types
   /**
    * @deprecated Old name for the typedef above.
    */
-  typedef material_id material_id_t;
+  typedef material_id material_id_t DEAL_II_DEPRECATED;
 
 }
 

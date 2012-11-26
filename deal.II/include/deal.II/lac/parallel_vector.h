@@ -754,7 +754,7 @@ namespace parallel
        * <tt>operator *=</tt> and
        * <tt>operator /=</tt> instead.
        */
-      void scale (const Number factor);
+      void scale (const Number factor) DEAL_II_DEPRECATED;
 
 
       /**

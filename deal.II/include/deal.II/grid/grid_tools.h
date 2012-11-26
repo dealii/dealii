@@ -298,7 +298,7 @@ namespace GridTools
   template<int dim, template <int, int> class Container, int spacedim>
   std::vector<typename Container<dim,spacedim>::active_cell_iterator>
   find_cells_adjacent_to_vertex (const Container<dim,spacedim> &container,
-                                 const unsigned int    vertex);
+                                 const unsigned int    vertex) DEAL_II_DEPRECATED;
 
 
   /**

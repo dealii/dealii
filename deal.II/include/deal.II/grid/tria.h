@@ -1475,7 +1475,7 @@ public:
      *
      * @deprecated
      */
-    virtual ~RefinementListener ();
+    virtual ~RefinementListener () DEAL_II_DEPRECATED;
 
     /**
      * Before refinement is actually
@@ -1493,7 +1493,7 @@ public:
      */
     virtual
     void
-    pre_refinement_notification (const Triangulation<dim, spacedim> &tria);
+    pre_refinement_notification (const Triangulation<dim, spacedim> &tria) DEAL_II_DEPRECATED;
 
     /**
      * After refinement is actually
@@ -1511,7 +1511,7 @@ public:
      */
     virtual
     void
-    post_refinement_notification (const Triangulation<dim, spacedim> &tria);
+    post_refinement_notification (const Triangulation<dim, spacedim> &tria) DEAL_II_DEPRECATED;
 
     /**
      * At the end of a call to
@@ -1537,7 +1537,7 @@ public:
     virtual
     void
     copy_notification (const Triangulation<dim, spacedim> &old_tria,
-                       const Triangulation<dim, spacedim> &new_tria);
+                       const Triangulation<dim, spacedim> &new_tria) DEAL_II_DEPRECATED;
 
     /**
      * At the end of a call to
@@ -1559,8 +1559,9 @@ public:
      */
     virtual
     void
-    create_notification (const Triangulation<dim, spacedim> &tria);
-  };
+    create_notification (const Triangulation<dim, spacedim> &tria) DEAL_II_DEPRECATED;
+
+  } DEAL_II_DEPRECATED;
 
   /**
    * A structure that is used as an
@@ -2196,7 +2197,7 @@ public:
    *
    * @deprecated
    */
-  void add_refinement_listener (RefinementListener &listener) const;
+  void add_refinement_listener (RefinementListener &listener) const DEAL_II_DEPRECATED;
 
   /**
    *  Remove a
@@ -2214,7 +2215,7 @@ public:
    *
    * @deprecated
    */
-  void remove_refinement_listener (RefinementListener &listener) const;
+  void remove_refinement_listener (RefinementListener &listener) const DEAL_II_DEPRECATED;
 
   /**
    * A structure that has boost::signal objects for a number of actions that a
@@ -2460,7 +2461,7 @@ public:
    *  Clear all user pointers.
   *  See also @ref GlossUserData .
    */
-  void clear_user_pointers ();
+  void clear_user_pointers () DEAL_II_DEPRECATED;
 
   /**
    * Save all user indices. The
