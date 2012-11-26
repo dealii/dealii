@@ -13,7 +13,7 @@ DEAL::Cycle 2:
 DEAL::   Number of active cells:       3
 DEAL::   Number of degrees of freedom: 6
 DEAL::   Number of constraints       : 0
-DEAL::nnz=24
+DEAL::nnz=28
 DEAL::Cycle 0:
 DEAL::   Number of active cells:       1
 DEAL::   Number of degrees of freedom: 4
