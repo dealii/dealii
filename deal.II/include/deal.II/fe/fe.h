@@ -2137,13 +2137,13 @@ protected:
    * actual vector sizes.
    *
    * @param
-   * isotropic_restriction_only:
+   * isotropic_restriction_only
    * only the restriction matrices
    * required for isotropic
    * refinement are reinited to the
    * right size.
    * @param
-   * isotropic_prolongation_only:
+   * isotropic_prolongation_only
    * only the prolongation matrices
    * required for isotropic
    * refinement are reinited to the
