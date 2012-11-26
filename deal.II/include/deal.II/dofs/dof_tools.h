@@ -2655,30 +2655,57 @@ namespace DoFTools
   /**
    * Make a constraint matrix for the
    * constraints that result from zero
-   * boundary values.
+   * boundary values on the given boundary indicator.
    *
    * This function constrains all
-   * degrees of freedom on the
-   * boundary. Optionally, you can
-   * add a component mask, which
-   * restricts this functionality
-   * to a subset of an FESystem.
+   * degrees of freedom on the given part of the
+   * boundary.
    *
-   * For non-@ref GlossPrimitive "primitive"
-   * shape functions, any degree of freedom
-   * is affected that belongs to a
-   * shape function where at least
-   * one of its nonzero components
-   * is affected.
+   * A variant of this function with different arguments is used
+   * in step-36.
    *
-   * The last argument indicates which
-   * components of the solution
-   * vector should be constrained to zero
-   * (see @ref GlossComponentMask).
+   * @param dof The DoFHandler to work on.
+   * @param boundary_indicator The indicator of that part of the boundary
+   *   for which constraints should be computed. If this number equals
+   *   numbers::invalid_boundary_id then all boundaries of the domain
+   *   will be treated.
+   * @param zero_boundary_constraints The constraint object into which the
+   *   constraints will be written. The new constraints due to zero boundary
+   *   values will simply be added, preserving any other constraints
+   *   previously present. However, this will only work if the previous
+   *   content of that object consists of constraints on degrees of freedom
+   *   that are not located on the boundary treated here. If there are
+   *   previously existing constraints for degrees of freedom located on the
+   *   boundary, then this would constitute a conflict. See the @ref constraints
+   *   module for handling the case where there are conflicting constraints
+   *   on individual degrees of freedom.
+   * @param component_mask An optional component mask that
+   *   restricts the functionality of this function to a subset of an FESystem.
+   *   For non-@ref GlossPrimitive "primitive"
+   *   shape functions, any degree of freedom
+   *   is affected that belongs to a
+   *   shape function where at least
+   *   one of its nonzero components
+   *   is affected by the component mask (see @ref GlossComponentMask). If
+   *   this argument is omitted, all components of the finite element with
+   *   degrees of freedom at the boundary will be considered.
    *
-   * This function is used
-   * in step-36, for
-   * example.
+   * @ingroup constraints
+   */
+  template <int dim, int spacedim, template <int, int> class DH>
+  void
+  make_zero_boundary_constraints (const DH<dim,spacedim> &dof,
+                                  const types::boundary_id boundary_indicator,
+                                  ConstraintMatrix       &zero_boundary_constraints,
+                                  const ComponentMask    &component_mask = ComponentMask());
+
+  /**
+   * Do the same as the previous function, except do it for all
+   * parts of the boundary, not just those with a particular boundary
+   * indicator. This function is then equivalent to calling the previous
+   * one with numbers::invalid_boundary_id as second argument.
+   *
+   * This function is used in step-36, for example.
    *
    * @ingroup constraints
    */
@@ -2687,6 +2714,7 @@ namespace DoFTools
   make_zero_boundary_constraints (const DH<dim,spacedim> &dof,
                                   ConstraintMatrix       &zero_boundary_constraints,
                                   const ComponentMask    &component_mask = ComponentMask());
+
 
   /**
    * Map a coupling table from the
