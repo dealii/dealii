@@ -78,9 +78,9 @@ namespace Step48
   {
   public:
     SineGordonOperation(const MatrixFree<dim,double> &data_in,
-                        const double                      time_step);
+                        const double                  time_step);
 
-    void apply (parallel::distributed::Vector<double>                        &dst,
+    void apply (parallel::distributed::Vector<double>                     &dst,
                 const std::vector<parallel::distributed::Vector<double>*> &src) const;
 
   private:
@@ -124,7 +124,7 @@ namespace Step48
     FEEvaluationGL<dim,fe_degree> fe_eval(data);
     const unsigned int            n_q_points = fe_eval.n_q_points;
 
-    for (unsigned int cell=0; cell<data.get_size_info().n_macro_cells; ++cell)
+    for (unsigned int cell=0; cell<data.n_macro_cells(); ++cell)
       {
         fe_eval.reinit(cell);
         for (unsigned int q=0; q<n_q_points; ++q)
@@ -173,8 +173,8 @@ namespace Step48
   // global solution vector @p dst.
   template <int dim, int fe_degree>
   void SineGordonOperation<dim, fe_degree>::
-  local_apply (const MatrixFree<dim>                 &data,
-               parallel::distributed::Vector<double>     &dst,
+  local_apply (const MatrixFree<dim>                      &data,
+               parallel::distributed::Vector<double>      &dst,
                const std::vector<parallel::distributed::Vector<double>*> &src,
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
@@ -221,7 +221,7 @@ namespace Step48
   // provide a function with the same signature that is not part of a class.
   template <int dim, int fe_degree>
   void SineGordonOperation<dim, fe_degree>::
-  apply (parallel::distributed::Vector<double>                        &dst,
+  apply (parallel::distributed::Vector<double>                     &dst,
          const std::vector<parallel::distributed::Vector<double>*> &src) const
   {
     dst = 0;
@@ -328,7 +328,7 @@ namespace Step48
 #endif
     fe (QGaussLobatto<1>(fe_degree+1)),
     dof_handler (triangulation),
-    n_global_refinements (11-2*dim),
+    n_global_refinements (10-2*dim),
     time (-10),
     final_time (10),
     cfl_number (.1/fe_degree),

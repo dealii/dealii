@@ -6167,6 +6167,7 @@ namespace DoFTools
   template <int dim, int spacedim, template <int,int> class DH>
   void
   make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
+                                  const types::boundary_id boundary_indicator,
                                   ConstraintMatrix        &zero_boundary_constraints,
                                   const ComponentMask     &component_mask)
   {
@@ -6194,10 +6195,15 @@ namespace DoFTools
           {
             const FiniteElement<dim,spacedim> &fe = cell->get_fe();
 
-            typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
+            const typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
 
-            // if face is on the boundary
-            if (face->at_boundary ())
+            // if face is on the boundary and satisfies the correct
+            // boundary id property
+            if (face->at_boundary ()
+                &&
+                ((boundary_indicator == numbers::invalid_boundary_id)
+                 ||
+                 (face->boundary_indicator() == boundary_indicator)))
               {
                 // get indices and physical
                 // location on this face
@@ -6230,6 +6236,19 @@ namespace DoFTools
               }
           }
   }
+
+
+
+  template <int dim, int spacedim, template <int,int> class DH>
+  void
+  make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
+                                  ConstraintMatrix        &zero_boundary_constraints,
+                                  const ComponentMask     &component_mask)
+  {
+    make_zero_boundary_constraints(dof, numbers::invalid_boundary_id,
+                                   zero_boundary_constraints, component_mask);
+  }
+
 
   template <class DH, class Sparsity>
   void make_cell_patches(
