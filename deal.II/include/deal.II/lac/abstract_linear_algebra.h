@@ -176,6 +176,8 @@ namespace LinearAlgebraTrilinos
      */
     typedef TrilinosWrappers::BlockSparseMatrix BlockSparseMatrix;
 
+    typedef TrilinosWrappers::BlockSparsityPattern CompressedBlockSparsityPattern;
+
     /**
      * Typedef for the AMG preconditioner type used for the
      * top left block of the Stokes matrix.
@@ -193,6 +195,12 @@ namespace LinearAlgebraTrilinos
      * for other blocks of the system matrix.
      */
     typedef TrilinosWrappers::PreconditionILU PreconditionILU;
+    
+    /**
+     * Typedef for the Incomplete Jacobi decomposition preconditioner used
+     * for other blocks of the system matrix.
+     */
+    typedef TrilinosWrappers::PreconditionJacobi PreconditionJacobi;
   }
 
 }
