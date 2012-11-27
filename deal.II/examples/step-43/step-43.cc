@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2010, 2011, 2012 by Chih-Che Chueh and the deal.II authors */
+/*    Copyright (C) 2010-2012 by Chih-Che Chueh and the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -13,18 +13,12 @@
 
 // @sect3{Include files}
 
-// The first step, as always, is to
-// include the functionality of a
-// number of deal.II and C++ header
-// files.
+// The first step, as always, is to include the functionality of a number of
+// deal.II and C++ header files.
 //
-// The list includes some header
-// files that provide vector, matrix,
-// and preconditioner classes that
-// implement interfaces to the
-// respective Trilinos classes; some
-// more information on these may be
-// found in step-31.
+// The list includes some header files that provide vector, matrix, and
+// preconditioner classes that implement interfaces to the respective Trilinos
+// classes; some more information on these may be found in step-31.
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
@@ -67,12 +61,9 @@
 #include <sstream>
 
 
-// At the end of this top-matter, we
-// open a namespace for the current
-// project into which all the
-// following material will go, and
-// then import all deal.II names into
-// this namespace:
+// At the end of this top-matter, we open a namespace for the current project
+// into which all the following material will go, and then import all deal.II
+// names into this namespace:
 namespace Step43
 {
   using namespace dealii;
@@ -80,10 +71,8 @@ namespace Step43
 
   // @sect3{Pressure right hand side, pressure boundary values and saturation initial value classes}
 
-  // The following part is taken
-  // directly from step-21 so there is
-  // no need to repeat the
-  // descriptions found there.
+  // The following part is taken directly from step-21 so there is no need to
+  // repeat the descriptions found there.
   template <int dim>
   class PressureRightHandSide : public Function<dim>
   {
@@ -184,11 +173,8 @@ namespace Step43
 
   // @sect3{Permeability models}
 
-  // In this tutorial, we still use
-  // the two permeability models
-  // previously used in step-21 so we
-  // again refrain from commenting in
-  // detail about them.
+  // In this tutorial, we still use the two permeability models previously
+  // used in step-21 so we again refrain from commenting in detail about them.
   namespace SingleCurvingCrack
   {
     template <int dim>
@@ -308,25 +294,14 @@ namespace Step43
 
   // @sect3{Physical quantities}
 
-  // The implementations of all the
-  // physical quantities such as
-  // total mobility $\lambda_t$ and
-  // fractional flow of water $F$ are
-  // taken from step-21 so again we
-  // don't have do any comment about
-  // them. Compared to step-21 we
-  // have added checks that the
-  // saturation passed to these
-  // functions is in fact within the
-  // physically valid
-  // range. Furthermore, given that
-  // the wetting phase moves at speed
-  // $\mathbf u F'(S)$ it is clear
-  // that $F'(S)$ must be greater or
-  // equal to zero, so we assert that
-  // as well to make sure that our
-  // calculations to get at the
-  // formula for the derivative made
+  // The implementations of all the physical quantities such as total mobility
+  // $\lambda_t$ and fractional flow of water $F$ are taken from step-21 so
+  // again we don't have do any comment about them. Compared to step-21 we
+  // have added checks that the saturation passed to these functions is in
+  // fact within the physically valid range. Furthermore, given that the
+  // wetting phase moves at speed $\mathbf u F'(S)$ it is clear that $F'(S)$
+  // must be greater or equal to zero, so we assert that as well to make sure
+  // that our calculations to get at the formula for the derivative made
   // sense.
   double mobility_inverse (const double S,
                            const double viscosity)
@@ -369,18 +344,11 @@ namespace Step43
 
   // @sect3{Helper classes for solvers and preconditioners}
 
-  // In this first part we define a
-  // number of classes that we need
-  // in the construction of linear
-  // solvers and
-  // preconditioners. This part is
-  // essentially the same as that
-  // used in step-31. The only
-  // difference is that the original
-  // variable name stokes_matrix is
-  // replaced by another name
-  // darcy_matrix to match our
-  // problem.
+  // In this first part we define a number of classes that we need in the
+  // construction of linear solvers and preconditioners. This part is
+  // essentially the same as that used in step-31. The only difference is that
+  // the original variable name stokes_matrix is replaced by another name
+  // darcy_matrix to match our problem.
   namespace LinearSolvers
   {
     template <class Matrix, class Preconditioner>
@@ -487,64 +455,32 @@ namespace Step43
 
   // @sect3{The TwoPhaseFlowProblem class}
 
-  // The definition of the class that
-  // defines the top-level logic of
-  // solving the time-dependent
-  // advection-dominated two-phase
-  // flow problem (or
-  // Buckley-Leverett problem
-  // [Buckley 1942]) is mainly based
-  // on tutorial programs step-21 and
-  // step-33, and in particular on
-  // step-31 where we have used
-  // basically the same general
-  // structure as done here. As in
-  // step-31, the key routines to
-  // look for in the implementation
-  // below are the <code>run()</code>
-  // and <code>solve()</code>
-  // functions.
+  // The definition of the class that defines the top-level logic of solving
+  // the time-dependent advection-dominated two-phase flow problem (or
+  // Buckley-Leverett problem [Buckley 1942]) is mainly based on tutorial
+  // programs step-21 and step-33, and in particular on step-31 where we have
+  // used basically the same general structure as done here. As in step-31,
+  // the key routines to look for in the implementation below are the
+  // <code>run()</code> and <code>solve()</code> functions.
   //
-  // The main difference to step-31
-  // is that, since adaptive operator
-  // splitting is considered, we need
-  // a couple more member variables
-  // to hold the last two computed
-  // Darcy (velocity/pressure)
-  // solutions in addition to the
-  // current one (which is either
-  // computed directly, or
-  // extrapolated from the previous
-  // two), and we need to remember
-  // the last two times we computed
-  // the Darcy solution. We also need
-  // a helper function that figures
-  // out whether we do indeed need to
-  // recompute the Darcy solution.
+  // The main difference to step-31 is that, since adaptive operator splitting
+  // is considered, we need a couple more member variables to hold the last
+  // two computed Darcy (velocity/pressure) solutions in addition to the
+  // current one (which is either computed directly, or extrapolated from the
+  // previous two), and we need to remember the last two times we computed the
+  // Darcy solution. We also need a helper function that figures out whether
+  // we do indeed need to recompute the Darcy solution.
   //
-  // Unlike step-31, this step uses
-  // one more ConstraintMatrix object
-  // called
-  // darcy_preconditioner_constraints. This
-  // constraint object is used only
-  // for assembling the matrix for
-  // the Darcy preconditioner and
-  // includes hanging node constrants
-  // as well as Dirichlet boundary
-  // value constraints for the
-  // pressure variable. We need this
-  // because we are building a
-  // Laplace matrix for the pressure
-  // as an approximation of the Schur
-  // complement) which is only
-  // positive definite if boundary
-  // conditions are applied.
+  // Unlike step-31, this step uses one more ConstraintMatrix object called
+  // darcy_preconditioner_constraints. This constraint object is used only for
+  // assembling the matrix for the Darcy preconditioner and includes hanging
+  // node constrants as well as Dirichlet boundary value constraints for the
+  // pressure variable. We need this because we are building a Laplace matrix
+  // for the pressure as an approximation of the Schur complement) which is
+  // only positive definite if boundary conditions are applied.
   //
-  // The collection of member
-  // functions and variables thus
-  // declared in this class is then
-  // rather similar to those in
-  // step-31:
+  // The collection of member functions and variables thus declared in this
+  // class is then rather similar to those in step-31:
   template <int dim>
   class TwoPhaseFlowProblem
   {
@@ -573,10 +509,8 @@ namespace Step43
                       const unsigned int              max_grid_level);
     void output_results () const;
 
-    // We follow with a number of
-    // helper functions that are
-    // used in a variety of places
-    // throughout the program:
+    // We follow with a number of helper functions that are used in a variety
+    // of places throughout the program:
     double                   get_max_u_F_prime () const;
     std::pair<double,double> get_extrapolated_saturation_range () const;
     bool                     determine_whether_to_solve_for_pressure_and_velocity () const;
@@ -591,14 +525,9 @@ namespace Step43
                                                 const double                        cell_diameter) const;
 
 
-    // This all is followed by the
-    // member variables, most of
-    // which are similar to the
-    // ones in step-31, with the
-    // exception of the ones that
-    // pertain to the macro time
-    // stepping for the
-    // velocity/pressure system:
+    // This all is followed by the member variables, most of which are similar
+    // to the ones in step-31, with the exception of the ones that pertain to
+    // the macro time stepping for the velocity/pressure system:
     Triangulation<dim>                   triangulation;
     double                               global_Omega_diameter;
 
@@ -657,19 +586,11 @@ namespace Step43
 
     bool                                rebuild_saturation_matrix;
 
-    // At the very end we declare a
-    // variable that denotes the
-    // material model. Compared to
-    // step-21, we do this here as
-    // a member variable since we
-    // will want to use it in a
-    // variety of places and so
-    // having a central place where
-    // such a variable is declared
-    // will make it simpler to
-    // replace one class by another
-    // (e.g. replace
-    // RandomMedium::KInverse by
+    // At the very end we declare a variable that denotes the material
+    // model. Compared to step-21, we do this here as a member variable since
+    // we will want to use it in a variety of places and so having a central
+    // place where such a variable is declared will make it simpler to replace
+    // one class by another (e.g. replace RandomMedium::KInverse by
     // SingleCurvingCrack::KInverse).
     const RandomMedium::KInverse<dim>   k_inverse;
   };
@@ -677,26 +598,17 @@ namespace Step43
 
   // @sect3{TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem}
 
-  // The constructor of this class is an
-  // extension of the constructors in step-21
-  // and step-31. We need to add the various
-  // variables that concern the saturation. As
-  // discussed in the introduction, we are
-  // going to use $Q_2 \times Q_1$
-  // (Taylor-Hood) elements again for the Darcy
-  // system, an element combination that fulfills
-  // the Ladyzhenskaya-Babuska-Brezzi (LBB)
-  // conditions
-  // [Brezzi and Fortin 1991, Chen 2005], and $Q_1$
-  // elements for the saturation. However, by
-  // using variables that store the polynomial
-  // degree of the Darcy and temperature finite
-  // elements, it is easy to consistently
-  // modify the degree of the elements as well
-  // as all quadrature formulas used on them
-  // downstream. Moreover, we initialize the
-  // time stepping variables related to
-  // operator splitting as well as the option
+  // The constructor of this class is an extension of the constructors in
+  // step-21 and step-31. We need to add the various variables that concern
+  // the saturation. As discussed in the introduction, we are going to use
+  // $Q_2 \times Q_1$ (Taylor-Hood) elements again for the Darcy system, an
+  // element combination that fulfills the Ladyzhenskaya-Babuska-Brezzi (LBB)
+  // conditions [Brezzi and Fortin 1991, Chen 2005], and $Q_1$ elements for
+  // the saturation. However, by using variables that store the polynomial
+  // degree of the Darcy and temperature finite elements, it is easy to
+  // consistently modify the degree of the elements as well as all quadrature
+  // formulas used on them downstream. Moreover, we initialize the time
+  // stepping variables related to operator splitting as well as the option
   // for matrix assembly and preconditioning:
   template <int dim>
   TwoPhaseFlowProblem<dim>::TwoPhaseFlowProblem (const unsigned int degree)
@@ -733,70 +645,36 @@ namespace Step43
 
   // @sect3{TwoPhaseFlowProblem<dim>::setup_dofs}
 
-  // This is the function that sets up the
-  // DoFHandler objects we have here (one for
-  // the Darcy part and one for the saturation
-  // part) as well as set to the right sizes
-  // the various objects required for the
-  // linear algebra in this program. Its basic
-  // operations are similar to what
-  // step-31 did.
+  // This is the function that sets up the DoFHandler objects we have here
+  // (one for the Darcy part and one for the saturation part) as well as set
+  // to the right sizes the various objects required for the linear algebra in
+  // this program. Its basic operations are similar to what step-31 did.
   //
-  // The body of the function first enumerates
-  // all degrees of freedom for the Darcy and
-  // saturation systems. For the Darcy part,
-  // degrees of freedom are then sorted to
-  // ensure that velocities precede pressure
-  // DoFs so that we can partition the Darcy
-  // matrix into a $2 \times 2$ matrix.
+  // The body of the function first enumerates all degrees of freedom for the
+  // Darcy and saturation systems. For the Darcy part, degrees of freedom are
+  // then sorted to ensure that velocities precede pressure DoFs so that we
+  // can partition the Darcy matrix into a $2 \times 2$ matrix.
   //
-  // Then, we need to incorporate
-  // hanging node constraints and
-  // Dirichlet boundary value
-  // constraints into
-  // darcy_preconditioner_constraints.
-  // The boundary condition
-  // constraints are only set on the
-  // pressure component since the
-  // Schur complement preconditioner
-  // that corresponds to the porous
-  // media flow operator in non-mixed
-  // form, $-\nabla \cdot [\mathbf K
-  // \lambda_t(S)]\nabla$, acts only
-  // on the pressure
-  // variable. Therefore, we use a
-  // component_mask that filters out
-  // the velocity component, so that
-  // the condensation is performed on
-  // pressure degrees of freedom
-  // only.
+  // Then, we need to incorporate hanging node constraints and Dirichlet
+  // boundary value constraints into darcy_preconditioner_constraints.  The
+  // boundary condition constraints are only set on the pressure component
+  // since the Schur complement preconditioner that corresponds to the porous
+  // media flow operator in non-mixed form, $-\nabla \cdot [\mathbf K
+  // \lambda_t(S)]\nabla$, acts only on the pressure variable. Therefore, we
+  // use a component_mask that filters out the velocity component, so that the
+  // condensation is performed on pressure degrees of freedom only.
   //
-  // After having done so, we count
-  // the number of degrees of freedom
-  // in the various blocks. This
-  // information is then used to
-  // create the sparsity pattern for
-  // the Darcy and saturation system
-  // matrices as well as the
-  // preconditioner matrix from which
-  // we build the Darcy
-  // preconditioner. As in step-31,
-  // we choose to create the pattern
-  // not as in the first few tutorial
-  // programs, but by using the
-  // blocked version of
-  // CompressedSimpleSparsityPattern. The
-  // reason for doing this is mainly
-  // memory, that is, the
-  // SparsityPattern class would
-  // consume too much memory when
-  // used in three spatial dimensions
-  // as we intend to do for this
-  // program. So, for this, we follow
-  // the same way as step-31 did and
-  // we don't have to repeat
-  // descriptions again for the rest
-  // of the member function.
+  // After having done so, we count the number of degrees of freedom in the
+  // various blocks. This information is then used to create the sparsity
+  // pattern for the Darcy and saturation system matrices as well as the
+  // preconditioner matrix from which we build the Darcy preconditioner. As in
+  // step-31, we choose to create the pattern not as in the first few tutorial
+  // programs, but by using the blocked version of
+  // CompressedSimpleSparsityPattern. The reason for doing this is mainly
+  // memory, that is, the SparsityPattern class would consume too much memory
+  // when used in three spatial dimensions as we intend to do for this
+  // program. So, for this, we follow the same way as step-31 did and we don't
+  // have to repeat descriptions again for the rest of the member function.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::setup_dofs ()
   {
@@ -950,82 +828,46 @@ namespace Step43
 
   // @sect3{Assembling matrices and preconditioners}
 
-  // The next few functions are
-  // devoted to setting up the
-  // various system and
-  // preconditioner matrices and
-  // right hand sides that we have to
-  // deal with in this program.
+  // The next few functions are devoted to setting up the various system and
+  // preconditioner matrices and right hand sides that we have to deal with in
+  // this program.
 
   // @sect4{TwoPhaseFlowProblem<dim>::assemble_darcy_preconditioner}
 
-  // This function assembles the matrix we use
-  // for preconditioning the Darcy system. What
-  // we need are a vector mass matrix weighted by
-  // $\left(\mathbf{K} \lambda_t\right)^{-1}$
-  // on the velocity components and a mass
-  // matrix weighted by $\left(\mathbf{K}
-  // \lambda_t\right)$ on the pressure
-  // component. We start by generating a
-  // quadrature object of appropriate order,
-  // the FEValues object that can give values
-  // and gradients at the quadrature points
-  // (together with quadrature weights). Next
-  // we create data structures for the cell
-  // matrix and the relation between local and
-  // global DoFs. The vectors phi_u and
-  // grad_phi_p are going to hold the values of
-  // the basis functions in order to faster
-  // build up the local matrices, as was
-  // already done in step-22. Before we start
-  // the loop over all active cells, we have to
-  // specify which components are pressure and
+  // This function assembles the matrix we use for preconditioning the Darcy
+  // system. What we need are a vector mass matrix weighted by
+  // $\left(\mathbf{K} \lambda_t\right)^{-1}$ on the velocity components and a
+  // mass matrix weighted by $\left(\mathbf{K} \lambda_t\right)$ on the
+  // pressure component. We start by generating a quadrature object of
+  // appropriate order, the FEValues object that can give values and gradients
+  // at the quadrature points (together with quadrature weights). Next we
+  // create data structures for the cell matrix and the relation between local
+  // and global DoFs. The vectors phi_u and grad_phi_p are going to hold the
+  // values of the basis functions in order to faster build up the local
+  // matrices, as was already done in step-22. Before we start the loop over
+  // all active cells, we have to specify which components are pressure and
   // which are velocity.
   //
-  // The creation of the local matrix
-  // is rather simple. There are only
-  // a term weighted by
-  // $\left(\mathbf{K}
-  // \lambda_t\right)^{-1}$ (on the
-  // velocity) and a Laplace matrix
-  // weighted by $\left(\mathbf{K}
-  // \lambda_t\right)$ to be
-  // generated, so the creation of
-  // the local matrix is done in
-  // essentially two lines. Since the
-  // material model functions at the
-  // top of this file only provide
-  // the inverses of the permeability
-  // and mobility, we have to compute
-  // $\mathbf K$ and $\lambda_t$ by
-  // hand from the given values, once
+  // The creation of the local matrix is rather simple. There are only a term
+  // weighted by $\left(\mathbf{K} \lambda_t\right)^{-1}$ (on the velocity)
+  // and a Laplace matrix weighted by $\left(\mathbf{K} \lambda_t\right)$ to
+  // be generated, so the creation of the local matrix is done in essentially
+  // two lines. Since the material model functions at the top of this file
+  // only provide the inverses of the permeability and mobility, we have to
+  // compute $\mathbf K$ and $\lambda_t$ by hand from the given values, once
   // per quadrature point.
   //
-  // Once the
-  // local matrix is ready (loop over
-  // rows and columns in the local
-  // matrix on each quadrature
-  // point), we get the local DoF
-  // indices and write the local
-  // information into the global
-  // matrix. We do this by directly
-  // applying the constraints
-  // (i.e. darcy_preconditioner_constraints)
-  // that takes care of hanging node
-  // and zero Dirichlet boundary
-  // condition constraints. By doing
-  // so, we don't have to do that
-  // afterwards, and we later don't
-  // have to use
-  // ConstraintMatrix::condense and
-  // MatrixTools::apply_boundary_values,
-  // both functions that would need
-  // to modify matrix and vector
-  // entries and so are difficult to
-  // write for the Trilinos classes
-  // where we don't immediately have
-  // access to individual memory
-  // locations.
+  // Once the local matrix is ready (loop over rows and columns in the local
+  // matrix on each quadrature point), we get the local DoF indices and write
+  // the local information into the global matrix. We do this by directly
+  // applying the constraints (i.e. darcy_preconditioner_constraints) that
+  // takes care of hanging node and zero Dirichlet boundary condition
+  // constraints. By doing so, we don't have to do that afterwards, and we
+  // later don't have to use ConstraintMatrix::condense and
+  // MatrixTools::apply_boundary_values, both functions that would need to
+  // modify matrix and vector entries and so are difficult to write for the
+  // Trilinos classes where we don't immediately have access to individual
+  // memory locations.
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::assemble_darcy_preconditioner ()
@@ -1113,43 +955,21 @@ namespace Step43
 
   // @sect4{TwoPhaseFlowProblem<dim>::build_darcy_preconditioner}
 
-  // After calling the above
-  // functions to assemble the
-  // preconditioner matrix, this
-  // function generates the inner
-  // preconditioners that are going
-  // to be used for the Schur
-  // complement block
-  // preconditioner. The
-  // preconditioners need to be
-  // regenerated at every saturation
-  // time step since they depend on
-  // the saturation $S$ that varies
-  // with time.
+  // After calling the above functions to assemble the preconditioner matrix,
+  // this function generates the inner preconditioners that are going to be
+  // used for the Schur complement block preconditioner. The preconditioners
+  // need to be regenerated at every saturation time step since they depend on
+  // the saturation $S$ that varies with time.
   //
-  // In here, we set up the
-  // preconditioner for the
-  // velocity-velocity matrix
-  // $\mathbf{M}^{\mathbf{u}}$ and
-  // the Schur complement
-  // $\mathbf{S}$. As explained in
-  // the introduction, we are going
-  // to use an IC preconditioner
-  // based on the vector matrix
-  // $\mathbf{M}^{\mathbf{u}}$ and
-  // another based on the scalar
-  // Laplace matrix
-  // $\tilde{\mathbf{S}}^p$ (which is
-  // spectrally close to the Schur
-  // complement of the Darcy
-  // matrix). Usually, the
-  // TrilinosWrappers::PreconditionIC
-  // class can be seen as a good
-  // black-box preconditioner which
-  // does not need any special
-  // knowledge of the matrix
-  // structure and/or the operator
-  // that's behind it.
+  // In here, we set up the preconditioner for the velocity-velocity matrix
+  // $\mathbf{M}^{\mathbf{u}}$ and the Schur complement $\mathbf{S}$. As
+  // explained in the introduction, we are going to use an IC preconditioner
+  // based on the vector matrix $\mathbf{M}^{\mathbf{u}}$ and another based on
+  // the scalar Laplace matrix $\tilde{\mathbf{S}}^p$ (which is spectrally
+  // close to the Schur complement of the Darcy matrix). Usually, the
+  // TrilinosWrappers::PreconditionIC class can be seen as a good black-box
+  // preconditioner which does not need any special knowledge of the matrix
+  // structure and/or the operator that's behind it.
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::build_darcy_preconditioner ()
@@ -1169,38 +989,27 @@ namespace Step43
 
   // @sect4{TwoPhaseFlowProblem<dim>::assemble_darcy_system}
 
-  // This is the function that assembles the
-  // linear system for the Darcy system.
+  // This is the function that assembles the linear system for the Darcy
+  // system.
   //
-  // Regarding the technical details of
-  // implementation, the procedures are similar
-  // to those in step-22 and step-31. We reset
-  // matrix and vector, create a quadrature
-  // formula on the cells, and then create the
-  // respective FEValues object.
+  // Regarding the technical details of implementation, the procedures are
+  // similar to those in step-22 and step-31. We reset matrix and vector,
+  // create a quadrature formula on the cells, and then create the respective
+  // FEValues object.
   //
-  // There is one thing that needs to be
-  // commented: since we have a separate
-  // finite element and DoFHandler for the
-  // saturation, we need to generate a second
-  // FEValues object for the proper evaluation
-  // of the saturation solution. This isn't too
-  // complicated to realize here: just use the
-  // saturation structures and set an update
-  // flag for the basis function values which
-  // we need for evaluation of the saturation
-  // solution. The only important part to
-  // remember here is that the same quadrature
-  // formula is used for both FEValues objects
-  // to ensure that we get matching information
-  // when we loop over the quadrature points of
-  // the two objects.
+  // There is one thing that needs to be commented: since we have a separate
+  // finite element and DoFHandler for the saturation, we need to generate a
+  // second FEValues object for the proper evaluation of the saturation
+  // solution. This isn't too complicated to realize here: just use the
+  // saturation structures and set an update flag for the basis function
+  // values which we need for evaluation of the saturation solution. The only
+  // important part to remember here is that the same quadrature formula is
+  // used for both FEValues objects to ensure that we get matching information
+  // when we loop over the quadrature points of the two objects.
   //
-  // The declarations proceed with some
-  // shortcuts for array sizes, the creation of
-  // the local matrix, right hand side as well
-  // as the vector for the indices of the local
-  // dofs compared to the global system.
+  // The declarations proceed with some shortcuts for array sizes, the
+  // creation of the local matrix, right hand side as well as the vector for
+  // the indices of the local dofs compared to the global system.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_darcy_system ()
   {
@@ -1238,33 +1047,19 @@ namespace Step43
     std::vector<double>               boundary_values (n_face_q_points);
     std::vector<Tensor<2,dim> >       k_inverse_values (n_q_points);
 
-    // Next we need a vector that
-    // will contain the values of the
-    // saturation solution at the
-    // previous time level at the
-    // quadrature points to assemble
-    // the saturation dependent
-    // coefficients in the Darcy
-    // equations.
+    // Next we need a vector that will contain the values of the saturation
+    // solution at the previous time level at the quadrature points to
+    // assemble the saturation dependent coefficients in the Darcy equations.
     //
-    // The set of vectors we create
-    // next hold the evaluations of
-    // the basis functions as well as
-    // their gradients that will be
-    // used for creating the
-    // matrices. Putting these into
-    // their own arrays rather than
-    // asking the FEValues object for
-    // this information each time it
-    // is needed is an optimization
-    // to accelerate the assembly
-    // process, see step-22 for
+    // The set of vectors we create next hold the evaluations of the basis
+    // functions as well as their gradients that will be used for creating the
+    // matrices. Putting these into their own arrays rather than asking the
+    // FEValues object for this information each time it is needed is an
+    // optimization to accelerate the assembly process, see step-22 for
     // details.
     //
-    // The last two declarations are used to
-    // extract the individual blocks (velocity,
-    // pressure, saturation) from the total FE
-    // system.
+    // The last two declarations are used to extract the individual blocks
+    // (velocity, pressure, saturation) from the total FE system.
     std::vector<double>               old_saturation_values (n_q_points);
 
     std::vector<Tensor<1,dim> >       phi_u (dofs_per_cell);
@@ -1274,72 +1069,38 @@ namespace Step43
     const FEValuesExtractors::Vector  velocities (0);
     const FEValuesExtractors::Scalar  pressure (dim);
 
-    // Now start the loop over all
-    // cells in the problem. We are
-    // working on two different
-    // DoFHandlers for this assembly
-    // routine, so we must have two
-    // different cell iterators for
-    // the two objects in use. This
-    // might seem a bit peculiar, but
-    // since both the Darcy system
-    // and the saturation system use
-    // the same grid we can assume
-    // that the two iterators run in
-    // sync over the cells of the two
-    // DoFHandler objects.
+    // Now start the loop over all cells in the problem. We are working on two
+    // different DoFHandlers for this assembly routine, so we must have two
+    // different cell iterators for the two objects in use. This might seem a
+    // bit peculiar, but since both the Darcy system and the saturation system
+    // use the same grid we can assume that the two iterators run in sync over
+    // the cells of the two DoFHandler objects.
     //
-    // The first statements within
-    // the loop are again all very
-    // familiar, doing the update of
-    // the finite element data as
-    // specified by the update flags,
-    // zeroing out the local arrays
-    // and getting the values of the
-    // old solution at the quadrature
-    // points.  At this point we also
-    // have to get the values of the
-    // saturation function of the
-    // previous time step at the
-    // quadrature points. To this
-    // end, we can use the
-    // FEValues::get_function_values
-    // (previously already used in
-    // step-9, step-14 and step-15),
-    // a function that takes a
-    // solution vector and returns a
-    // list of function values at the
-    // quadrature points of the
-    // present cell. In fact, it
-    // returns the complete
-    // vector-valued solution at each
-    // quadrature point, i.e. not
-    // only the saturation but also
-    // the velocities and pressure.
+    // The first statements within the loop are again all very familiar, doing
+    // the update of the finite element data as specified by the update flags,
+    // zeroing out the local arrays and getting the values of the old solution
+    // at the quadrature points.  At this point we also have to get the values
+    // of the saturation function of the previous time step at the quadrature
+    // points. To this end, we can use the FEValues::get_function_values
+    // (previously already used in step-9, step-14 and step-15), a function
+    // that takes a solution vector and returns a list of function values at
+    // the quadrature points of the present cell. In fact, it returns the
+    // complete vector-valued solution at each quadrature point, i.e. not only
+    // the saturation but also the velocities and pressure.
     //
-    // Then we are ready to loop over
-    // the quadrature points on the
-    // cell to do the
-    // integration. The formula for
-    // this follows in a
-    // straightforward way from what
-    // has been discussed in the
-    // introduction.
+    // Then we are ready to loop over the quadrature points on the cell to do
+    // the integration. The formula for this follows in a straightforward way
+    // from what has been discussed in the introduction.
     //
-    // Once this is done, we start the loop over
-    // the rows and columns of the local matrix
-    // and feed the matrix with the relevant
-    // products.
+    // Once this is done, we start the loop over the rows and columns of the
+    // local matrix and feed the matrix with the relevant products.
     //
-    // The last step in the loop over all cells
-    // is to enter the local contributions into
-    // the global matrix and vector structures to
-    // the positions specified in
-    // local_dof_indices. Again, we let the
-    // ConstraintMatrix class do the insertion of
-    // the cell matrix elements to the global
-    // matrix, which already condenses the
-    // hanging node constraints.
+    // The last step in the loop over all cells is to enter the local
+    // contributions into the global matrix and vector structures to the
+    // positions specified in local_dof_indices. Again, we let the
+    // ConstraintMatrix class do the insertion of the cell matrix elements to
+    // the global matrix, which already condenses the hanging node
+    // constraints.
     typename DoFHandler<dim>::active_cell_iterator
     cell = darcy_dof_handler.begin_active(),
     endc = darcy_dof_handler.end();
@@ -1428,18 +1189,13 @@ namespace Step43
 
   // @sect4{TwoPhaseFlowProblem<dim>::assemble_saturation_system}
 
-  // This function is to assemble the linear
-  // system for the saturation transport
-  // equation. It calls, if necessary, two
-  // other member functions:
-  // assemble_saturation_matrix() and
-  // assemble_saturation_rhs(). The former
-  // function then assembles the saturation
-  // matrix that only needs to be changed
-  // occasionally. On the other hand, the
-  // latter function that assembles the right
-  // hand side must be called at every
-  // saturation time step.
+  // This function is to assemble the linear system for the saturation
+  // transport equation. It calls, if necessary, two other member functions:
+  // assemble_saturation_matrix() and assemble_saturation_rhs(). The former
+  // function then assembles the saturation matrix that only needs to be
+  // changed occasionally. On the other hand, the latter function that
+  // assembles the right hand side must be called at every saturation time
+  // step.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_saturation_system ()
   {
@@ -1457,18 +1213,13 @@ namespace Step43
 
   // @sect4{TwoPhaseFlowProblem<dim>::assemble_saturation_matrix}
 
-  // This function is easily understood since
-  // it only forms a simple mass matrix for the
-  // left hand side of the saturation linear
-  // system by basis functions phi_i_s and
-  // phi_j_s only. Finally, as usual, we enter
-  // the local contribution into the global
-  // matrix by specifying the position in
-  // local_dof_indices. This is done by letting
-  // the ConstraintMatrix class do the
-  // insertion of the cell matrix elements to
-  // the global matrix, which already condenses
-  // the hanging node constraints.
+  // This function is easily understood since it only forms a simple mass
+  // matrix for the left hand side of the saturation linear system by basis
+  // functions phi_i_s and phi_j_s only. Finally, as usual, we enter the local
+  // contribution into the global matrix by specifying the position in
+  // local_dof_indices. This is done by letting the ConstraintMatrix class do
+  // the insertion of the cell matrix elements to the global matrix, which
+  // already condenses the hanging node constraints.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_saturation_matrix ()
   {
@@ -1518,40 +1269,27 @@ namespace Step43
 
   // @sect4{TwoPhaseFlowProblem<dim>::assemble_saturation_rhs}
 
-  // This function is to assemble the right
-  // hand side of the saturation transport
-  // equation. Before going about it, we have to
-  // create two FEValues objects for the Darcy
-  // and saturation systems respectively and,
-  // in addition, two FEFaceValues objects for
-  // the two systems because we have a
-  // boundary integral term in the weak form of
-  // saturation equation. For the FEFaceValues
-  // object of the saturation system, we also
-  // require normal vectors, which we request
-  // using the update_normal_vectors flag.
+  // This function is to assemble the right hand side of the saturation
+  // transport equation. Before going about it, we have to create two FEValues
+  // objects for the Darcy and saturation systems respectively and, in
+  // addition, two FEFaceValues objects for the two systems because we have a
+  // boundary integral term in the weak form of saturation equation. For the
+  // FEFaceValues object of the saturation system, we also require normal
+  // vectors, which we request using the update_normal_vectors flag.
   //
-  // Next, before looping over all the cells,
-  // we have to compute some parameters
-  // (e.g. global_u_infty, global_S_variation,
-  // and global_Omega_diameter) that the
-  // artificial viscosity $\nu$ needs. This is
-  // largely the same as was done in
-  // step-31, so you may see there for more
+  // Next, before looping over all the cells, we have to compute some
+  // parameters (e.g. global_u_infty, global_S_variation, and
+  // global_Omega_diameter) that the artificial viscosity $\nu$ needs. This is
+  // largely the same as was done in step-31, so you may see there for more
   // information.
   //
-  // The real works starts with the loop over all the
-  // saturation and Darcy cells to put the
-  // local contributions into the global
-  // vector. In this loop, in order to simplify
-  // the implementation, we split some of the
-  // work into two helper functions:
-  // assemble_saturation_rhs_cell_term and
-  // assemble_saturation_rhs_boundary_term.
-  // We note that we insert cell or boundary
-  // contributions into the global vector in
-  // the two functions rather than in this
-  // present function.
+  // The real works starts with the loop over all the saturation and Darcy
+  // cells to put the local contributions into the global vector. In this
+  // loop, in order to simplify the implementation, we split some of the work
+  // into two helper functions: assemble_saturation_rhs_cell_term and
+  // assemble_saturation_rhs_boundary_term.  We note that we insert cell or
+  // boundary contributions into the global vector in the two functions rather
+  // than in this present function.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::assemble_saturation_rhs ()
   {
@@ -1613,22 +1351,15 @@ namespace Step43
 
   // @sect4{TwoPhaseFlowProblem<dim>::assemble_saturation_rhs_cell_term}
 
-  // This function takes care of integrating
-  // the cell terms of the right hand side of
-  // the saturation equation, and then
-  // assembling it into the global right hand
-  // side vector. Given the discussion in the
-  // introduction, the form of these
-  // contributions is clear. The only tricky
-  // part is getting the artificial viscosity
-  // and all that is necessary to compute
-  // it. The first half of the function is
-  // devoted to this task.
+  // This function takes care of integrating the cell terms of the right hand
+  // side of the saturation equation, and then assembling it into the global
+  // right hand side vector. Given the discussion in the introduction, the
+  // form of these contributions is clear. The only tricky part is getting the
+  // artificial viscosity and all that is necessary to compute it. The first
+  // half of the function is devoted to this task.
   //
-  // The last part of the function is copying
-  // the local contributions into the global
-  // vector with position specified in
-  // local_dof_indices.
+  // The last part of the function is copying the local contributions into the
+  // global vector with position specified in local_dof_indices.
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::
@@ -1698,17 +1429,12 @@ namespace Step43
 
   // @sect4{TwoPhaseFlowProblem<dim>::assemble_saturation_rhs_boundary_term}
 
-  // The next function is responsible for the
-  // boundary integral terms in the right
-  // hand side form of the saturation
-  // equation.  For these, we have to compute
-  // the upwinding flux on the global
-  // boundary faces, i.e. we impose Dirichlet
-  // boundary conditions weakly only on
-  // inflow parts of the global boundary. As
-  // before, this has been described in
-  // step-21 so we refrain from giving more
-  // descriptions about that.
+  // The next function is responsible for the boundary integral terms in the
+  // right hand side form of the saturation equation.  For these, we have to
+  // compute the upwinding flux on the global boundary faces, i.e. we impose
+  // Dirichlet boundary conditions weakly only on inflow parts of the global
+  // boundary. As before, this has been described in step-21 so we refrain
+  // from giving more descriptions about that.
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::
@@ -1767,28 +1493,18 @@ namespace Step43
 
   // @sect3{TwoPhaseFlowProblem<dim>::solve}
 
-  // This function implements the operator
-  // splitting algorithm, i.e. in each time
-  // step it either re-computes the solution
-  // of the Darcy system or extrapolates
-  // velocity/pressure from previous time
-  // steps, then determines the size of the
-  // time step, and then updates the
-  // saturation variable. The implementation
-  // largely follows similar code in
-  // step-31. It is, next to the run()
-  // function, the central one in this
-  // program.
+  // This function implements the operator splitting algorithm, i.e. in each
+  // time step it either re-computes the solution of the Darcy system or
+  // extrapolates velocity/pressure from previous time steps, then determines
+  // the size of the time step, and then updates the saturation variable. The
+  // implementation largely follows similar code in step-31. It is, next to
+  // the run() function, the central one in this program.
   //
-  // At the beginning of the function, we ask
-  // whether to solve the pressure-velocity
-  // part by evaluating the posteriori
-  // criterion (see the following
-  // function). If necessary, we will solve
-  // the pressure-velocity part using the
-  // GMRES solver with the Schur complement
-  // block preconditioner as is described in
-  // the introduction.
+  // At the beginning of the function, we ask whether to solve the
+  // pressure-velocity part by evaluating the posteriori criterion (see the
+  // following function). If necessary, we will solve the pressure-velocity
+  // part using the GMRES solver with the Schur complement block
+  // preconditioner as is described in the introduction.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::solve ()
   {
@@ -1839,38 +1555,22 @@ namespace Step43
           saturation_matching_last_computed_darcy_solution = saturation_solution;
         }
       }
-    // On the other hand, if we have decided
-    // that we don't want to compute the
-    // solution of the Darcy system for the
-    // current time step, then we need to
-    // simply extrapolate the previous two
-    // Darcy solutions to the same time as we
-    // would have computed the
-    // velocity/pressure at. We do a simple
-    // linear extrapolation, i.e. given the
-    // current length $dt$ of the macro time
-    // step from the time when we last
-    // computed the Darcy solution to now
-    // (given by
-    // <code>current_macro_time_step</code>),
-    // and $DT$ the length of the last macro
-    // time step (given by
-    // <code>old_macro_time_step</code>),
-    // then we get
-    // $u^\ast = u_p + dt \frac{u_p-u_{pp}}{DT}
-    // = (1+dt/DT)u_p - dt/DT u_{pp}$, where
-    // $u_p$ and $u_{pp}$ are the last two
-    // computed Darcy solutions. We can
-    // implement this formula using just
-    // two lines of code.
+    // On the other hand, if we have decided that we don't want to compute the
+    // solution of the Darcy system for the current time step, then we need to
+    // simply extrapolate the previous two Darcy solutions to the same time as
+    // we would have computed the velocity/pressure at. We do a simple linear
+    // extrapolation, i.e. given the current length $dt$ of the macro time
+    // step from the time when we last computed the Darcy solution to now
+    // (given by <code>current_macro_time_step</code>), and $DT$ the length of
+    // the last macro time step (given by <code>old_macro_time_step</code>),
+    // then we get $u^\ast = u_p + dt \frac{u_p-u_{pp}}{DT} = (1+dt/DT)u_p -
+    // dt/DT u_{pp}$, where $u_p$ and $u_{pp}$ are the last two computed Darcy
+    // solutions. We can implement this formula using just two lines of code.
     //
-    // Note that the algorithm here only
-    // works if we have at least two
-    // previously computed Darcy solutions
-    // from which we can extrapolate to the
-    // current time, and this is ensured by
-    // requiring re-computation of the Darcy
-    // solution for the first 2 time steps.
+    // Note that the algorithm here only works if we have at least two
+    // previously computed Darcy solutions from which we can extrapolate to
+    // the current time, and this is ensured by requiring re-computation of
+    // the Darcy solution for the first 2 time steps.
     else
       {
         darcy_solution = last_computed_darcy_solution;
@@ -1880,11 +1580,8 @@ namespace Step43
       }
 
 
-    // With the so computed velocity
-    // vector, compute the optimal
-    // time step based on the CFL
-    // criterion discussed in the
-    // introduction...
+    // With the so computed velocity vector, compute the optimal time step
+    // based on the CFL criterion discussed in the introduction...
     {
       old_time_step = time_step;
 
@@ -1900,24 +1597,14 @@ namespace Step43
 
 
 
-    // ...and then also update the
-    // length of the macro time steps
-    // we use while we're dealing
-    // with time step sizes. In
-    // particular, this involves: (i)
-    // If we have just recomputed the
-    // Darcy solution, then the
-    // length of the previous macro
-    // time step is now fixed and the
-    // length of the current macro
-    // time step is, up to now,
-    // simply the length of the
-    // current (micro) time
-    // step. (ii) If we have not
-    // recomputed the Darcy solution,
-    // then the length of the current
-    // macro time step has just grown
-    // by <code>time_step</code>.
+    // ...and then also update the length of the macro time steps we use while
+    // we're dealing with time step sizes. In particular, this involves: (i)
+    // If we have just recomputed the Darcy solution, then the length of the
+    // previous macro time step is now fixed and the length of the current
+    // macro time step is, up to now, simply the length of the current (micro)
+    // time step. (ii) If we have not recomputed the Darcy solution, then the
+    // length of the current macro time step has just grown by
+    // <code>time_step</code>.
     if (solve_for_pressure_and_velocity == true)
       {
         old_macro_time_step     = current_macro_time_step;
@@ -1926,18 +1613,11 @@ namespace Step43
     else
       current_macro_time_step += time_step;
 
-    // The last step in this function
-    // is to recompute the saturation
-    // solution based on the velocity
-    // field we've just
-    // obtained. This naturally
-    // happens in every time step,
-    // and we don't skip any of these
-    // computations. At the end of
-    // computing the saturation, we
-    // project back into the allowed
-    // interval $[0,1]$ to make sure
-    // our solution remains physical.
+    // The last step in this function is to recompute the saturation solution
+    // based on the velocity field we've just obtained. This naturally happens
+    // in every time step, and we don't skip any of these computations. At the
+    // end of computing the saturation, we project back into the allowed
+    // interval $[0,1]$ to make sure our solution remains physical.
     {
       std::cout << "   Solving saturation transport equation..." << std::endl;
 
@@ -1966,27 +1646,15 @@ namespace Step43
 
   // @sect3{TwoPhaseFlowProblem<dim>::refine_mesh}
 
-  // The next function does the
-  // refinement and coarsening of the
-  // mesh. It does its work in three
-  // blocks: (i) Compute refinement
-  // indicators by looking at the
-  // gradient of a solution vector
-  // extrapolated linearly from the
-  // previous two using the
-  // respective sizes of the time
-  // step (or taking the only
-  // solution we have if this is the
-  // first time step). (ii) Flagging
-  // those cells for refinement and
-  // coarsening where the gradient is
-  // larger or smaller than a certain
-  // threshold, preserving minimal
-  // and maximal levels of mesh
-  // refinement. (iii) Transferring
-  // the solution from the old to the
-  // new mesh. None of this is
-  // particularly difficult.
+  // The next function does the refinement and coarsening of the mesh. It does
+  // its work in three blocks: (i) Compute refinement indicators by looking at
+  // the gradient of a solution vector extrapolated linearly from the previous
+  // two using the respective sizes of the time step (or taking the only
+  // solution we have if this is the first time step). (ii) Flagging those
+  // cells for refinement and coarsening where the gradient is larger or
+  // smaller than a certain threshold, preserving minimal and maximal levels
+  // of mesh refinement. (iii) Transferring the solution from the old to the
+  // new mesh. None of this is particularly difficult.
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::
@@ -2087,9 +1755,7 @@ namespace Step43
 
   // @sect3{TwoPhaseFlowProblem<dim>::output_results}
 
-  // This function generates
-  // graphical output. It is in
-  // essence a copy of the
+  // This function generates graphical output. It is in essence a copy of the
   // implementation in step-31.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::output_results ()  const
@@ -2178,36 +1844,20 @@ namespace Step43
 
   // @sect4{TwoPhaseFlowProblem<dim>::determine_whether_to_solve_for_pressure_and_velocity}
 
-  // This function implements the a
-  // posteriori criterion for
-  // adaptive operator splitting. The
-  // function is relatively
-  // straightforward given the way we
-  // have implemented other functions
-  // above and given the formula for
-  // the criterion derived in the
-  // paper.
+  // This function implements the a posteriori criterion for adaptive operator
+  // splitting. The function is relatively straightforward given the way we
+  // have implemented other functions above and given the formula for the
+  // criterion derived in the paper.
   //
-  // If one decides that one wants
-  // the original IMPES method in
-  // which the Darcy equation is
-  // solved in every time step, then
-  // this can be achieved by setting
-  // the threshold value
-  // <code>AOS_threshold</code> (with
-  // a default of $5.0$) to zero,
-  // thereby forcing the function to
-  // always return true.
+  // If one decides that one wants the original IMPES method in which the
+  // Darcy equation is solved in every time step, then this can be achieved by
+  // setting the threshold value <code>AOS_threshold</code> (with a default of
+  // $5.0$) to zero, thereby forcing the function to always return true.
   //
-  // Finally, note that the function
-  // returns true unconditionally for
-  // the first two time steps to
-  // ensure that we have always
-  // solved the Darcy system at least
-  // twice when skipping its
-  // solution, thereby allowing us to
-  // extrapolate the velocity from
-  // the last two solutions in
+  // Finally, note that the function returns true unconditionally for the
+  // first two time steps to ensure that we have always solved the Darcy
+  // system at least twice when skipping its solution, thereby allowing us to
+  // extrapolate the velocity from the last two solutions in
   // <code>solve()</code>.
   template <int dim>
   bool
@@ -2272,28 +1922,15 @@ namespace Step43
 
   // @sect4{TwoPhaseFlowProblem<dim>::project_back_saturation}
 
-  // The next function simply makes
-  // sure that the saturation values
-  // always remain within the
-  // physically reasonable range of
-  // $[0,1]$. While the continuous
-  // equations guarantee that this is
-  // so, the discrete equations
-  // don't. However, if we allow the
-  // discrete solution to escape this
-  // range we get into trouble
-  // because terms like $F(S)$ and
-  // $F'(S)$ will produce
-  // unreasonable results
-  // (e.g. $F'(S)<0$ for $S<0$, which
-  // would imply that the wetting
-  // fluid phase flows <i>against</i>
-  // the direction of the bulk fluid
-  // velocity)). Consequently, at the
-  // end of each time step, we simply
-  // project the saturation field
-  // back into the physically
-  // reasonable region.
+  // The next function simply makes sure that the saturation values always
+  // remain within the physically reasonable range of $[0,1]$. While the
+  // continuous equations guarantee that this is so, the discrete equations
+  // don't. However, if we allow the discrete solution to escape this range we
+  // get into trouble because terms like $F(S)$ and $F'(S)$ will produce
+  // unreasonable results (e.g. $F'(S)<0$ for $S<0$, which would imply that
+  // the wetting fluid phase flows <i>against</i> the direction of the bulk
+  // fluid velocity)). Consequently, at the end of each time step, we simply
+  // project the saturation field back into the physically reasonable region.
   template <int dim>
   void
   TwoPhaseFlowProblem<dim>::project_back_saturation ()
@@ -2309,17 +1946,11 @@ namespace Step43
 
   // @sect4{TwoPhaseFlowProblem<dim>::get_max_u_F_prime}
   //
-  // Another simpler helper function:
-  // Compute the maximum of the total
-  // velocity times the derivative of
-  // the fraction flow function,
-  // i.e., compute $\|\mathbf{u}
-  // F'(S)\|_{L_\infty(\Omega)}$. This
-  // term is used in both the
-  // computation of the time step as
-  // well as in normalizing the
-  // entropy-residual term in the
-  // artificial viscosity.
+  // Another simpler helper function: Compute the maximum of the total
+  // velocity times the derivative of the fraction flow function, i.e.,
+  // compute $\|\mathbf{u} F'(S)\|_{L_\infty(\Omega)}$. This term is used in
+  // both the computation of the time step as well as in normalizing the
+  // entropy-residual term in the artificial viscosity.
   template <int dim>
   double
   TwoPhaseFlowProblem<dim>::get_max_u_F_prime () const
@@ -2370,24 +2001,14 @@ namespace Step43
 
   // @sect4{TwoPhaseFlowProblem<dim>::get_extrapolated_saturation_range}
   //
-  // For computing the stabilization
-  // term, we need to know the range
-  // of the saturation
-  // variable. Unlike in step-31,
-  // this range is trivially bounded
-  // by the interval $[0,1]$ but we
-  // can do a bit better by looping
-  // over a collection of quadrature
-  // points and seeing what the
-  // values are there. If we can,
-  // i.e., if there are at least two
-  // timesteps around, we can even
-  // take the values extrapolated to
-  // the next time step.
+  // For computing the stabilization term, we need to know the range of the
+  // saturation variable. Unlike in step-31, this range is trivially bounded
+  // by the interval $[0,1]$ but we can do a bit better by looping over a
+  // collection of quadrature points and seeing what the values are there. If
+  // we can, i.e., if there are at least two timesteps around, we can even
+  // take the values extrapolated to the next time step.
   //
-  // As before, the function is taken
-  // with minimal modifications from
-  // step-31.
+  // As before, the function is taken with minimal modifications from step-31.
   template <int dim>
   std::pair<double,double>
   TwoPhaseFlowProblem<dim>::get_extrapolated_saturation_range () const
@@ -2460,18 +2081,11 @@ namespace Step43
 
   // @sect4{TwoPhaseFlowProblem<dim>::compute_viscosity}
   //
-  // The final tool function is used
-  // to compute the artificial
-  // viscosity on a given cell. This
-  // isn't particularly complicated
-  // if you have the formula for it
-  // in front of you, and looking at
-  // the implementation in
-  // step-31. The major difference to
-  // that tutorial program is that
-  // the velocity here is not simply
-  // $\mathbf u$ but $\mathbf u
-  // F'(S)$ and some of the formulas
+  // The final tool function is used to compute the artificial viscosity on a
+  // given cell. This isn't particularly complicated if you have the formula
+  // for it in front of you, and looking at the implementation in step-31. The
+  // major difference to that tutorial program is that the velocity here is
+  // not simply $\mathbf u$ but $\mathbf u F'(S)$ and some of the formulas
   // need to be adjusted accordingly.
   template <int dim>
   double
@@ -2531,9 +2145,7 @@ namespace Step43
     const double global_scaling = c_R * porosity * (global_max_u_F_prime) * global_S_variation /
                                   std::pow(global_Omega_diameter, alpha - 2.);
 
-//    return (beta *
-//          (max_velocity_times_dF_dS) *
-//          cell_diameter);
+//    return (beta * (max_velocity_times_dF_dS) * cell_diameter);
 
     return (beta *
             (max_velocity_times_dF_dS) *
@@ -2545,25 +2157,14 @@ namespace Step43
 
   // @sect3{TwoPhaseFlowProblem<dim>::run}
 
-  // This function is, besides
-  // <code>solve()</code>, the
-  // primary function of this program
-  // as it controls the time
-  // iteration as well as when the
-  // solution is written into output
-  // files and when to do mesh
-  // refinement.
+  // This function is, besides <code>solve()</code>, the primary function of
+  // this program as it controls the time iteration as well as when the
+  // solution is written into output files and when to do mesh refinement.
   //
-  // With the exception of the
-  // startup code that loops back to
-  // the beginning of the function
-  // through the <code>goto
-  // start_time_iteration</code>
-  // label, everything should be
-  // relatively straightforward. In
-  // any case, it mimicks the
-  // corresponding function in
-  // step-31.
+  // With the exception of the startup code that loops back to the beginning
+  // of the function through the <code>goto start_time_iteration</code> label,
+  // everything should be relatively straightforward. In any case, it mimicks
+  // the corresponding function in step-31.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::run ()
   {
@@ -2632,12 +2233,9 @@ start_time_iteration:
 
 // @sect3{The <code>main()</code> function}
 //
-// The main function looks almost the
-// same as in all other programs. In
-// particular, it is essentially the
-// same as in step-31 where we also
-// explain the need to initialize the
-// MPI subsystem.
+// The main function looks almost the same as in all other programs. In
+// particular, it is essentially the same as in step-31 where we also explain
+// the need to initialize the MPI subsystem.
 int main (int argc, char *argv[])
 {
   try

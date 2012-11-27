@@ -270,17 +270,7 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::refine_grid ()
   {
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-    KellyErrorEstimator<dim>::estimate (dof_handler,
-                                        QGauss<dim-1>(3),
-                                        typename FunctionMap<dim>::type(),
-                                        locally_relevant_solution,
-                                        estimated_error_per_cell);
-    parallel::distributed::GridRefinement::
-      refine_and_coarsen_fixed_number (triangulation,
-                                       estimated_error_per_cell,
-                                       0.3, 0.03);
-    triangulation.execute_coarsening_and_refinement ();
+    triangulation.refine_global (1);
   }
 
 
@@ -289,7 +279,7 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::run ()
   {
-    const unsigned int n_cycles = 3;
+    const unsigned int n_cycles = 2;
     for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
       {
         pcout << "Cycle " << cycle << ':' << std::endl;

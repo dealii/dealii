@@ -581,6 +581,14 @@ namespace DoFTools
                 {
                   typename DH::cell_iterator neighbor = cell->neighbor(face);
 
+                  // in 1d, we do not need to worry whether the neighbor
+                  // might have children and then loop over those children.
+                  // rather, we may as well go straight to to cell behind
+                  // this particular cell's most terminal child
+                  if (DH::dimension==1)
+                    while (neighbor->has_children())
+                      neighbor = neighbor->child(face==0 ? 1 : 0);
+
                   if (neighbor->has_children())
                     {
                       for (unsigned int sub_nr = 0;
@@ -6159,6 +6167,7 @@ namespace DoFTools
   template <int dim, int spacedim, template <int,int> class DH>
   void
   make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
+                                  const types::boundary_id boundary_indicator,
                                   ConstraintMatrix        &zero_boundary_constraints,
                                   const ComponentMask     &component_mask)
   {
@@ -6186,10 +6195,15 @@ namespace DoFTools
           {
             const FiniteElement<dim,spacedim> &fe = cell->get_fe();
 
-            typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
+            const typename DH<dim,spacedim>::face_iterator face = cell->face(face_no);
 
-            // if face is on the boundary
-            if (face->at_boundary ())
+            // if face is on the boundary and satisfies the correct
+            // boundary id property
+            if (face->at_boundary ()
+                &&
+                ((boundary_indicator == numbers::invalid_boundary_id)
+                 ||
+                 (face->boundary_indicator() == boundary_indicator)))
               {
                 // get indices and physical
                 // location on this face
@@ -6222,6 +6236,19 @@ namespace DoFTools
               }
           }
   }
+
+
+
+  template <int dim, int spacedim, template <int,int> class DH>
+  void
+  make_zero_boundary_constraints (const DH<dim, spacedim> &dof,
+                                  ConstraintMatrix        &zero_boundary_constraints,
+                                  const ComponentMask     &component_mask)
+  {
+    make_zero_boundary_constraints(dof, numbers::invalid_boundary_id,
+                                   zero_boundary_constraints, component_mask);
+  }
+
 
   template <class DH, class Sparsity>
   void make_cell_patches(

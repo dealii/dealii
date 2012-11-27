@@ -9,20 +9,11 @@ DEAL:mpi::Convergence step 10 value 0
    Solved in 10 iterations.
 
 Cycle 1:
-   Number of active cells:       1960
-      490+490+490+490+
-   Number of degrees of freedom: 8421
-      2152+2107+2105+2057+
-DEAL:mpi::Starting value 0.835969
-DEAL:mpi::Convergence step 10 value 0
-   Solved in 10 iterations.
-
-Cycle 2:
-   Number of active cells:       3658
-      916+913+913+916+
-   Number of degrees of freedom: 16109
-      4079+4025+4032+3973+
-DEAL:mpi::Starting value 1.04003
+   Number of active cells:       4096
+      1024+1024+1024+1024+
+   Number of degrees of freedom: 16641
+      4225+4160+4160+4096+
+DEAL:mpi::Starting value 1.39777
 DEAL:mpi::Convergence step 10 value 0
    Solved in 10 iterations.
 

@@ -25,8 +25,9 @@ DEAL_II_NAMESPACE_OPEN
 template<typename number> class Vector;
 template<typename number> class FullMatrix;
 
-/*! @addtogroup Matrix1
- *@{
+/**
+ * @addtogroup Matrix1
+ * @{
  */
 
 /**
@@ -1076,7 +1077,9 @@ private:
    */
 };
 
-/*@}*/
+/**
+ * @}
+ */
 /*---------------------- Inline functions -----------------------------------*/
 
 template <typename number>

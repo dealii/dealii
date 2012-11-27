@@ -24,7 +24,35 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
     TensorProductPolynomials<dim-1>(Polynomials::LagrangeEquidistant::generate_complete_basis(degree)),
     FiniteElementData<dim>(get_dpo_vector(degree), 1, degree, FiniteElementData<dim>::L2),
     std::vector<bool>(1,true))
-{}
+{
+  // initialize unit face support points
+  const unsigned int codim = dim-1;
+  this->unit_face_support_points.resize(Utilities::fixed_power<codim>(this->degree+1));
+
+  if (this->degree == 0)
+    for (unsigned int d=0; d<codim; ++d)
+      this->unit_face_support_points[0][d] = 0.5;
+  else
+    {
+      const double step = 1./this->degree;
+      Point<codim> p;
+  
+      unsigned int k=0;
+      for (unsigned int iz=0; iz <= ((codim>2) ? this->degree : 0) ; ++iz)
+        for (unsigned int iy=0; iy <= ((codim>1) ? this->degree : 0) ; ++iy)
+          for (unsigned int ix=0; ix<=this->degree; ++ix)
+            {
+              p(0) = ix * step;
+              if (codim>1)
+                p(1) = iy * step;
+              if (codim>2)
+                p(2) = iz * step;
+              
+              this->unit_face_support_points[k++] = p;
+            }
+      AssertDimension (k, this->unit_face_support_points.size());
+    }
+}
 
 
 template <int dim, int spacedim>

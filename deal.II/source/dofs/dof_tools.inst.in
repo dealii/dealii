@@ -1013,9 +1013,26 @@ DoFTools::make_zero_boundary_constraints
 template
 void
 DoFTools::make_zero_boundary_constraints
+(const DoFHandler<deal_II_dimension> &,
+ const types::boundary_id          ,
+ ConstraintMatrix                    &,
+ const ComponentMask             &);
+
+template
+void
+DoFTools::make_zero_boundary_constraints
 (const hp::DoFHandler<deal_II_dimension> &,
  ConstraintMatrix                        &,
  const ComponentMask                 &);
+
+template
+void
+DoFTools::make_zero_boundary_constraints
+(const hp::DoFHandler<deal_II_dimension> &,
+ const types::boundary_id          ,
+ ConstraintMatrix                        &,
+ const ComponentMask                 &);
+
 
 #if deal_II_dimension < 3
 

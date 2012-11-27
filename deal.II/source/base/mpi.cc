@@ -14,6 +14,7 @@
 #include <deal.II/base/mpi.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/lac/vector_memory.h>
 
 #include <cstddef>
 #include <iostream>
@@ -30,11 +31,10 @@
 #ifdef DEAL_II_USE_PETSC
 #  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 #    include <petscsys.h>
-#include <deal.II/lac/vector_memory.h>
-#include <deal.II/lac/petsc_block_vector.h>
-#include <deal.II/lac/petsc_parallel_block_vector.h>
-#include <deal.II/lac/petsc_vector.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#    include <deal.II/lac/petsc_block_vector.h>
+#    include <deal.II/lac/petsc_parallel_block_vector.h>
+#    include <deal.II/lac/petsc_vector.h>
+#    include <deal.II/lac/petsc_parallel_vector.h>
 #  endif
 #endif
 
@@ -344,27 +344,12 @@ namespace Utilities
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
 
-      // make memory pool release all
-      // vectors that are no longer
-      // used at this point. this is
-      // relevant because the static
-      // object destructors run for
-      // these vectors at the end of
-      // the program would run after
-      // MPI_Finalize is called,
-      // leading to errors
-      //
-#  if defined(DEAL_II_USE_TRILINOS) && !defined(__APPLE__)
-      // TODO: On Mac OS X, shared libs can
-      // only depend on other libs listed
-      // later on the command line. This
-      // means that libbase can't depend on
-      // liblac, and we can't destroy the
-      // memory pool here as long as we have
-      // separate libraries. Consequently,
-      // the #ifdef above. Deal will then
-      // just continue to seg fault upon
-      // completion of main()
+      // make memory pool release all MPI-based vectors that are no
+      // longer used at this point. this is relevant because the
+      // static object destructors run for these vectors at the end of
+      // the program would run after MPI_Finalize is called, leading
+      // to errors
+#  if defined(DEAL_II_USE_TRILINOS)
       GrowingVectorMemory<TrilinosWrappers::MPI::Vector>
       ::release_unused_memory ();
       GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>

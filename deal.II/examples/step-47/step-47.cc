@@ -2,7 +2,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2011, 2012 by the deal.II authors */
+/*    Copyright (C) 2011-2012 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -219,9 +219,8 @@ namespace Step47
       if (level_set(cell->vertex(v)) * level_set(cell->vertex(v+1)) < 0)
         return true;
 
-    // we get here only if all vertices
-    // have the same sign, which means
-    // that the cell is not intersected
+    // we get here only if all vertices have the same sign, which means that
+    // the cell is not intersected
     return false;
   }
 
@@ -246,8 +245,7 @@ namespace Step47
 
     constraints.clear ();
 //TODO: fix this, it currently crashes
-    // DoFTools::make_hanging_node_constraints (dof_handler,
-    //                                            constraints);
+    // DoFTools::make_hanging_node_constraints (dof_handler, constraints);
 
 //TODO: component 1 must satisfy zero boundary conditions
     constraints.close();
@@ -325,8 +323,9 @@ namespace Step47
           }
         else
           {
-//TODO: verify that the order of support points equals the order of vertices of the cells, as we use below
-//TODO: remove update_support_points and friends, since they aren't implemented anyway
+//TODO: verify that the order of support points equals the order of vertices
+//of the cells, as we use below TODO: remove update_support_points and
+//friends, since they aren't implemented anyway
             Assert (cell->active_fe_index() == 1, ExcInternalError());
             Assert (interface_intersects_cell(cell) == true, ExcInternalError());
 
@@ -438,15 +437,16 @@ namespace Step47
 
   }
 
-// To integrate the enriched elements we have to find the geometrical decomposition
-// of the original element in subelements. The subelements are used to integrate
-// the elements on both sides of the discontinuity. The disontinuity line is approximated
-// by a piece-wise linear interpolation between the intersection of the discontinuity
-// with the edges of the elements. The vector level_set_values has the values of
-// the level set function at the vertices of the elements. From these values can be found
-// by linear interpolation the intersections. There are three kind of decomposition that
-// are considered.
-// Type 1: there is not cut. Type 2: a corner of the element is cut. Type 3: two corners are cut.
+// To integrate the enriched elements we have to find the geometrical
+// decomposition of the original element in subelements. The subelements are
+// used to integrate the elements on both sides of the discontinuity. The
+// disontinuity line is approximated by a piece-wise linear interpolation
+// between the intersection of the discontinuity with the edges of the
+// elements. The vector level_set_values has the values of the level set
+// function at the vertices of the elements. From these values can be found by
+// linear interpolation the intersections. There are three kind of
+// decomposition that are considered.  Type 1: there is not cut. Type 2: a
+// corner of the element is cut. Type 3: two corners are cut.
 
   template <int dim>
   std::pair<unsigned int, Quadrature<dim> >
@@ -466,11 +466,11 @@ namespace Step47
         else sign_ls[v] = 0;
       }
 
-    // the sign of the level set function at the 4 nodes of the elements can be positive + or negative -
-    // depending on the sign of the level set function we have the folloing three classes of decomposition
-    // type 1: ++++, ----
-    // type 2: -+++, +-++, ++-+, +++-, +---, -+--, --+-, ---+
-    // type 3: +--+, ++--, +-+-, -++-, --++, -+-+
+    // the sign of the level set function at the 4 nodes of the elements can
+    // be positive + or negative - depending on the sign of the level set
+    // function we have the folloing three classes of decomposition type 1:
+    // ++++, ---- type 2: -+++, +-++, ++-+, +++-, +---, -+--, --+-, ---+ type
+    // 3: +--+, ++--, +-+-, -++-, --++, -+-+
 
     if ( sign_ls[0]==sign_ls[1] & sign_ls[0]==sign_ls[2] & sign_ls[0]==sign_ls[3] ) type =1;
     else if ( sign_ls[0]*sign_ls[1]*sign_ls[2]*sign_ls[3] < 0 ) type = 2;
@@ -497,8 +497,8 @@ namespace Step47
       {
         const unsigned int   n_q_points    = plain_quadrature.size();
 
-        // loop over all subelements for integration
-        // in type 2 there are 5 subelements
+        // loop over all subelements for integration in type 2 there are 5
+        // subelements
 
         Quadrature<dim> xfem_quadrature(5*n_q_points);
 
@@ -514,11 +514,7 @@ namespace Step47
 
         // deal.ii local coordinates
 
-        //    2-------3
-        //    |       |
-        //             |       |
-        //             |       |
-        //             0-------1
+        //    2-------3 | | | | | | 0-------1
 
         if (Pos == 0)
           {
@@ -581,12 +577,9 @@ namespace Step47
             F(1) = 0.5*( 1. + B(1) );
           }
 
-        //std::cout << A << std::endl;
-        //std::cout << B << std::endl;
-        //std::cout << C << std::endl;
-        //std::cout << D << std::endl;
-        //std::cout << E << std::endl;
-        //std::cout << F << std::endl;
+        //std::cout << A << std::endl; std::cout << B << std::endl; std::cout
+        //<< C << std::endl; std::cout << D << std::endl; std::cout << E <<
+        //std::endl; std::cout << F << std::endl;
 
         std::string filename = "vertices.dat";
         std::ofstream output (filename.c_str());
@@ -648,22 +641,23 @@ namespace Step47
 
             for (unsigned int subcell = 0; subcell<5; subcell++)
               {
-                //std::cout << "subcell   : " << subcell << std::endl;
+                //std::cout << "subcell : " << subcell << std::endl;
                 std::vector<Point<dim> > vertices;
                 for (unsigned int i=0; i<4; i++)
                   {
                     vertices.push_back( subcell_vertices[subcell_v_indices[Pos][subcell][i]] );
-                    //std::cout << "i         : " << i << std::endl;
-                    //std::cout << "subcell v : " << subcell_v_indices[Pos][subcell][i] << std::endl;
-                    //std::cout << vertices[i](0) << "  " << vertices[i](1) << std::endl;
+                    //std::cout << "i : " << i << std::endl; std::cout <<
+                    //"subcell v : " << subcell_v_indices[Pos][subcell][i] <<
+                    //std::endl; std::cout << vertices[i](0) << " " <<
+                    //vertices[i](1) << std::endl;
                   }
-                //std::cout << std::endl;
-                // create quadrature rule
+                //std::cout << std::endl; create quadrature rule
                 append_quadrature( plain_quadrature,
                                    vertices,
                                    xfem_points,
                                    xfem_weights);
-                //initialize xfem_quadrature with quadrature points of all subelements
+                //initialize xfem_quadrature with quadrature points of all
+                //subelements
                 xfem_quadrature.initialize(xfem_points, xfem_weights);
               }
           }
@@ -672,15 +666,14 @@ namespace Step47
         return std::pair<unsigned int, Quadrature<dim> >(2, xfem_quadrature);
       }
 
-    // Type three decomposition
-    // (+--+, ++--, +-+-, -++-, --++, -+-+)
+    // Type three decomposition (+--+, ++--, +-+-, -++-, --++, -+-+)
 
     if (type==3)
       {
         const unsigned int   n_q_points    = plain_quadrature.size();
 
-        // loop over all subelements for integration
-        // in type 2 there are 5 subelements
+        // loop over all subelements for integration in type 2 there are 5
+        // subelements
 
         Quadrature<dim> xfem_quadrature(5*n_q_points);
 
@@ -713,9 +706,8 @@ namespace Step47
             assert(0);
           }
 
-        //std::cout << "Pos " << Pos << std::endl;
-        //std::cout << A << std::endl;
-        //std::cout << B << std::endl;
+        //std::cout << "Pos " << Pos << std::endl; std::cout << A <<
+        //std::endl; std::cout << B << std::endl;
         std::string filename = "vertices.dat";
         std::ofstream output (filename.c_str());
         output << "#vertices of xfem subcells" << std::endl;
@@ -742,25 +734,26 @@ namespace Step47
               {{0,4,2,5}, {4,1,5,3}}
             };
 
-            //std::cout << "Pos       : " << Pos << std::endl;
+            //std::cout << "Pos : " << Pos << std::endl;
             for (unsigned int subcell = 0; subcell<2; subcell++)
               {
-                //std::cout << "subcell   : " << subcell << std::endl;
+                //std::cout << "subcell : " << subcell << std::endl;
                 std::vector<Point<dim> > vertices;
                 for (unsigned int i=0; i<4; i++)
                   {
                     vertices.push_back( subcell_vertices[subcell_v_indices[Pos][subcell][i]] );
-                    //std::cout << "i         : " << i << std::endl;
-                    //std::cout << "subcell v : " << subcell_v_indices[Pos][subcell][i] << std::endl;
-                    //std::cout << vertices[i](0) << "  " << vertices[i](1) << std::endl;
+                    //std::cout << "i : " << i << std::endl; std::cout <<
+                    //"subcell v : " << subcell_v_indices[Pos][subcell][i] <<
+                    //std::endl; std::cout << vertices[i](0) << " " <<
+                    //vertices[i](1) << std::endl;
                   }
-                //std::cout << std::endl;
-                // create quadrature rule
+                //std::cout << std::endl; create quadrature rule
                 append_quadrature( plain_quadrature,
                                    vertices,
                                    xfem_points,
                                    xfem_weights);
-                //initialize xfem_quadrature with quadrature points of all subelements
+                //initialize xfem_quadrature with quadrature points of all
+                //subelements
                 xfem_quadrature.initialize(xfem_points, xfem_weights);
               }
           }
@@ -779,11 +772,13 @@ namespace Step47
                                                 std::vector<double>      &xfem_weights)
 
   {
-    // Project integration points into sub-elements.
-    // This maps quadrature points from a reference element to a subelement of a reference element.
-    // To implement the action of this map the coordinates of the subelements have been calculated (A(0)...F(0),A(1)...F(1))
-    // the coordinates of the quadrature points are given by the bi-linear map defined by the form functions
-    // $x^\prime_i = \sum_j v^\prime \phi_j(x^hat_i)$, where the $\phi_j$ are the shape functions of the FEQ.
+    // Project integration points into sub-elements.  This maps quadrature
+    // points from a reference element to a subelement of a reference element.
+    // To implement the action of this map the coordinates of the subelements
+    // have been calculated (A(0)...F(0),A(1)...F(1)) the coordinates of the
+    // quadrature points are given by the bi-linear map defined by the form
+    // functions $x^\prime_i = \sum_j v^\prime \phi_j(x^hat_i)$, where the
+    // $\phi_j$ are the shape functions of the FEQ.
 
     unsigned int n_v = GeometryInfo<dim>::vertices_per_cell;
 
@@ -806,8 +801,8 @@ namespace Step47
             double xi  = q_points[i](0);
             double eta = q_points[i](1);
 
-            // Define shape functions on reference element
-            // we consider a bi-linear mapping
+            // Define shape functions on reference element we consider a
+            // bi-linear mapping
             phi[0] = (1. - xi) * (1. - eta);
             phi[1] = xi * (1. - eta);
             phi[2] = (1. - xi) * eta;
@@ -846,7 +841,8 @@ namespace Step47
         double detJ = determinant(jacobian);
         xfem_weights.push_back (W[i] * detJ);
 
-        // Map integration points from reference element to subcell of reference element
+        // Map integration points from reference element to subcell of
+        // reference element
         Point<dim> q_prime;
         for (unsigned int d=0; d<dim; ++d)
           for (unsigned int j = 0; j<GeometryInfo<dim>::vertices_per_cell; j++)

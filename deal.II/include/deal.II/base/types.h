@@ -136,11 +136,25 @@ namespace numbers
   const types::material_id invalid_material_id = static_cast<types::material_id>(-1);
 
   /**
-   * The number which we reserve for
+   * Invalid boundary_id which we
+   * need in several places as a
+   * default value.  We assume that
+   * all valid boundary_ids lie in the
+   * range [0, invalid_boundary_id).
+   */
+  const types::boundary_id invalid_boundary_id = static_cast<types::boundary_id>(-1);
+
+  /**
+   * A boundary indicator number that we reserve for
    * internal faces.  We assume that
-   * all boundary_ids lie in the
+   * all valid boundary_ids lie in the
    * range [0,
    * internal_face_boundary_id).
+   *
+   * This is an indicator that is used internally (by the library) to
+   * differentiate between faces that lie at the boundary of the domain
+   * and faces that lie in the interior of the domain. You should never try
+   * to assign this boundary indicator to anything in user code.
    */
   const types::boundary_id internal_face_boundary_id = static_cast<types::boundary_id>(-1);
 
