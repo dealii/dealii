@@ -27,11 +27,15 @@ template <typename number> class FullMatrix;
 template <typename Matrix> class BlockMatrixBase;
 template <typename number> class SparseILU;
 
-/*! @addtogroup Matrix1
- *@{
+/**
+ * @addtogroup Matrix1
+ * @{
  */
 
-
+/**
+ * A namespace in which we declare iterators over the elements of sparse
+ * matrices.
+ */
 namespace SparseMatrixIterators
 {
   // forward declaration
@@ -1263,9 +1267,6 @@ public:
                     const unsigned int index) const;
 
   /**
-   * @internal @deprecated Use iterator or
-   * const_iterator instead!
-   *
    * This is for hackers. Get
    * access to the <i>i</i>th element of
    * this matrix. The elements are
@@ -1284,16 +1285,19 @@ public:
    * also rename this function to
    * avoid programs relying on
    * outdated information!
+   *
+   * @internal @deprecated Use iterator or
+   * const_iterator instead!
    */
   number global_entry (const unsigned int i) const;
 
   /**
-   * @internal @deprecated Use iterator or
-   * const_iterator instead!
-   *
    * Same as above, but with write
    * access.  You certainly know
    * what you do?
+   *
+   * @internal @deprecated Use iterator or
+   * const_iterator instead!
    */
   number &global_entry (const unsigned int i);
 
@@ -2012,7 +2016,7 @@ public:
    * not more.
    */
   void block_read (std::istream &in);
-//@}
+  //@}
   /** @addtogroup Exceptions
    * @{ */
 
@@ -2133,7 +2137,9 @@ private:
   template <typename> friend class BlockMatrixBase;
 };
 
-/*@}*/
+/**
+ * @}
+ */
 
 #ifndef DOXYGEN
 /*---------------------- Inline functions -----------------------------------*/
