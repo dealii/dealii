@@ -61,6 +61,20 @@
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/solution_transfer.h>
 
+#include <deal.II/lac/abstract_linear_algebra.h>
+
+//#define USE_PETSC_LA
+
+namespace LA
+{
+#ifdef USE_PETSC_LA
+  using namespace dealii::LinearAlgebraPETSc;
+#else
+//using namespace dealii::LinearAlgebraDealII;
+  using namespace dealii::LinearAlgebraTrilinos;
+#endif
+}
+
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -224,8 +238,8 @@ namespace Step32
     class BlockSchurPreconditioner : public Subscriptor
     {
     public:
-      BlockSchurPreconditioner (const TrilinosWrappers::BlockSparseMatrix  &S,
-                                const TrilinosWrappers::BlockSparseMatrix  &Spre,
+      BlockSchurPreconditioner (const LA::MPI::BlockSparseMatrix  &S,
+                                const LA::MPI::BlockSparseMatrix  &Spre,
                                 const PreconditionerMp                     &Mppreconditioner,
                                 const PreconditionerA                      &Apreconditioner,
                                 const bool                                  do_solve_A)
@@ -237,15 +251,15 @@ namespace Step32
         do_solve_A        (do_solve_A)
       {}
 
-      void vmult (TrilinosWrappers::MPI::BlockVector       &dst,
-                  const TrilinosWrappers::MPI::BlockVector &src) const
+      void vmult(LA::MPI::BlockVector &dst,
+                 const LA::MPI::BlockVector &src) const
       {
-        TrilinosWrappers::MPI::Vector utmp(src.block(0));
+        LA::MPI::Vector utmp(src.block(0));
 
         {
           SolverControl solver_control(5000, 1e-6 * src.block(1).l2_norm());
 
-          SolverCG<TrilinosWrappers::MPI::Vector> solver(solver_control);
+          SolverCG<LA::MPI::Vector> solver(solver_control);
 
           solver.solve(stokes_preconditioner_matrix->block(1,1),
                        dst.block(1), src.block(1),
@@ -263,8 +277,12 @@ namespace Step32
         if (do_solve_A == true)
           {
             SolverControl solver_control(5000, utmp.l2_norm()*1e-2);
+#ifdef USE_PETSC_LA
+            PETScWrappers::SolverCG solver(solver_control);
+#else
             TrilinosWrappers::SolverCG solver(solver_control);
-            solver.solve(stokes_matrix->block(0,0), dst.block(0), utmp,
+#endif
+            solver.solve(stokes_matrix->block(0, 0), dst.block(0), utmp,
                          a_preconditioner);
           }
         else
@@ -272,8 +290,8 @@ namespace Step32
       }
 
     private:
-      const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_matrix;
-      const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_preconditioner_matrix;
+      const SmartPointer<const LA::MPI::BlockSparseMatrix> stokes_matrix;
+      const SmartPointer<const LA::MPI::BlockSparseMatrix> stokes_preconditioner_matrix;
       const PreconditionerMp &mp_preconditioner;
       const PreconditionerA  &a_preconditioner;
       const bool do_solve_A;
@@ -877,35 +895,34 @@ namespace Step32
     DoFHandler<dim>                           stokes_dof_handler;
     ConstraintMatrix                          stokes_constraints;
 
-    TrilinosWrappers::BlockSparseMatrix       stokes_matrix;
-    TrilinosWrappers::BlockSparseMatrix       stokes_preconditioner_matrix;
+    LA::MPI::BlockSparseMatrix stokes_matrix;
+    LA::MPI::BlockSparseMatrix stokes_preconditioner_matrix;
 
-    TrilinosWrappers::MPI::BlockVector        stokes_solution;
-    TrilinosWrappers::MPI::BlockVector        old_stokes_solution;
-    TrilinosWrappers::MPI::BlockVector        stokes_rhs;
-
+    LA::MPI::BlockVector stokes_solution;
+    LA::MPI::BlockVector old_stokes_solution;
+    LA::MPI::BlockVector stokes_rhs;
 
     FE_Q<dim>                                 temperature_fe;
     DoFHandler<dim>                           temperature_dof_handler;
     ConstraintMatrix                          temperature_constraints;
 
-    TrilinosWrappers::SparseMatrix            temperature_mass_matrix;
-    TrilinosWrappers::SparseMatrix            temperature_stiffness_matrix;
-    TrilinosWrappers::SparseMatrix            temperature_matrix;
+    LA::MPI::SparseMatrix temperature_mass_matrix;
+    LA::MPI::SparseMatrix temperature_stiffness_matrix;
+    LA::MPI::SparseMatrix temperature_matrix;
 
-    TrilinosWrappers::MPI::Vector             temperature_solution;
-    TrilinosWrappers::MPI::Vector             old_temperature_solution;
-    TrilinosWrappers::MPI::Vector             old_old_temperature_solution;
-    TrilinosWrappers::MPI::Vector             temperature_rhs;
+    LA::MPI::Vector temperature_solution;
+    LA::MPI::Vector old_temperature_solution;
+    LA::MPI::Vector old_old_temperature_solution;
+    LA::MPI::Vector temperature_rhs;
 
 
     double                                    time_step;
     double                                    old_time_step;
     unsigned int                              timestep_number;
 
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionAMG>    Amg_preconditioner;
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionJacobi> Mp_preconditioner;
-    std_cxx1x::shared_ptr<TrilinosWrappers::PreconditionJacobi> T_preconditioner;
+    std_cxx1x::shared_ptr<LA::MPI::PreconditionAMG>    Amg_preconditioner;
+    std_cxx1x::shared_ptr<LA::MPI::PreconditionJacobi> Mp_preconditioner;
+    std_cxx1x::shared_ptr<LA::MPI::PreconditionJacobi> T_preconditioner;
 
     bool                                      rebuild_stokes_matrix;
     bool                                      rebuild_stokes_preconditioner;
@@ -1696,7 +1713,7 @@ namespace Step32
 
     std::vector<double> rhs_values(n_q_points);
 
-    TrilinosWrappers::MPI::Vector
+    LA::MPI::Vector
     rhs (temperature_mass_matrix.row_partitioner()),
         solution (temperature_mass_matrix.row_partitioner());
 
@@ -1743,9 +1760,9 @@ namespace Step32
     // Now that we have the right linear system, we solve it using the CG
     // method with a simple Jacobi preconditioner:
     SolverControl solver_control(5*rhs.size(), 1e-12*rhs.l2_norm());
-    SolverCG<TrilinosWrappers::MPI::Vector> cg(solver_control);
+    SolverCG<LA::MPI::Vector> cg(solver_control);
 
-    TrilinosWrappers::PreconditionJacobi preconditioner_mass;
+    LA::MPI::PreconditionJacobi preconditioner_mass;
     preconditioner_mass.initialize(temperature_mass_matrix, 1.3);
 
     cg.solve (temperature_mass_matrix, solution, rhs, preconditioner_mass);
@@ -1822,8 +1839,7 @@ namespace Step32
   {
     stokes_matrix.clear ();
 
-    TrilinosWrappers::BlockSparsityPattern sp (stokes_partitioning,
-                                               MPI_COMM_WORLD);
+    LA::MPI::CompressedBlockSparsityPattern sp(stokes_partitioning, MPI_COMM_WORLD);
 
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
 
@@ -1855,8 +1871,13 @@ namespace Step32
 
     stokes_preconditioner_matrix.clear ();
 
-    TrilinosWrappers::BlockSparsityPattern sp (stokes_partitioning,
-                                               MPI_COMM_WORLD);
+#ifdef USE_PETSC_LA
+    PETScWrappers::BlockSparsityPattern sp (stokes_partitioning,
+                                            MPI_COMM_WORLD);
+#else
+    TrilinosWrappers::BlockSparsityPattern sp(stokes_partitioning,
+                                              MPI_COMM_WORLD);
+#endif
 
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
     for (unsigned int c=0; c<dim+1; ++c)
@@ -1886,8 +1907,13 @@ namespace Step32
     temperature_stiffness_matrix.clear ();
     temperature_matrix.clear ();
 
-    TrilinosWrappers::SparsityPattern sp (temperature_partitioner,
-                                          MPI_COMM_WORLD);
+#ifdef USE_PETSC_LA
+    PETScWrappers::SparsityPattern sp (temperature_partitioner,
+                                       MPI_COMM_WORLD);
+#else
+    TrilinosWrappers::SparsityPattern sp(temperature_partitioner,
+                                         MPI_COMM_WORLD);
+#endif
     DoFTools::make_sparsity_pattern (temperature_dof_handler, sp,
                                      temperature_constraints, false,
                                      Utilities::MPI::
@@ -2263,10 +2289,16 @@ namespace Step32
                                       stokes_fe.component_mask(velocity_components),
                                       constant_modes);
 
-    Mp_preconditioner.reset  (new TrilinosWrappers::PreconditionJacobi());
-    Amg_preconditioner.reset (new TrilinosWrappers::PreconditionAMG());
-
+#ifdef USE_PETSC_LA
+    Mp_preconditioner.reset (new PETScWrappers::PreconditionJacobi());
+    Amg_preconditioner.reset (new PETScWrappers::PreconditionAMG());
+    PETScWrappers::PreconditionAMG::AdditionalData Amg_data;
+#else
+    Mp_preconditioner.reset(new TrilinosWrappers::PreconditionJacobi());
+    Amg_preconditioner.reset(new TrilinosWrappers::PreconditionAMG());
     TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
+#endif
+
     Amg_data.constant_modes = constant_modes;
     Amg_data.elliptic = true;
     Amg_data.higher_order_elements = true;
@@ -2789,8 +2821,13 @@ namespace Step32
 
     if (rebuild_temperature_preconditioner == true)
       {
-        T_preconditioner.reset (new TrilinosWrappers::PreconditionJacobi());
+#ifdef USE_PETSC_LA
+        T_preconditioner.reset (new PETScWrappers::PreconditionJacobi());
         T_preconditioner->initialize (temperature_matrix);
+#else
+        T_preconditioner.reset(new TrilinosWrappers::PreconditionJacobi());
+        T_preconditioner->initialize(temperature_matrix);
+#endif
         rebuild_temperature_preconditioner = false;
       }
 
@@ -2905,8 +2942,7 @@ namespace Step32
     {
       pcout << "   Solving Stokes system... " << std::flush;
 
-      TrilinosWrappers::MPI::BlockVector
-      distributed_stokes_solution (stokes_rhs);
+      LA::MPI::BlockVector distributed_stokes_solution(stokes_rhs);
       distributed_stokes_solution = stokes_solution;
 
       distributed_stokes_solution.block(1) /= EquationData::pressure_scaling;
@@ -2921,7 +2957,7 @@ namespace Step32
           distributed_stokes_solution(i) = 0;
 
 
-      PrimitiveVectorMemory<TrilinosWrappers::MPI::BlockVector> mem;
+      PrimitiveVectorMemory<LA::MPI::BlockVector> mem;
 
       unsigned int n_iterations = 0;
       const double solver_tolerance = 1e-8 * stokes_rhs.l2_norm();
@@ -2929,15 +2965,15 @@ namespace Step32
 
       try
         {
-          const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-                TrilinosWrappers::PreconditionJacobi>
+          const LinearSolvers::BlockSchurPreconditioner<LA::MPI::PreconditionAMG,
+                LA::MPI::PreconditionJacobi>
                 preconditioner (stokes_matrix, stokes_preconditioner_matrix,
                                 *Mp_preconditioner, *Amg_preconditioner,
                                 false);
 
-          SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
+          SolverFGMRES<LA::MPI::BlockVector>
           solver(solver_control, mem,
-                 SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::
+                 SolverFGMRES<LA::MPI::BlockVector>::
                  AdditionalData(30, true));
           solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
                        preconditioner);
@@ -2947,16 +2983,16 @@ namespace Step32
 
       catch (SolverControl::NoConvergence)
         {
-          const LinearSolvers::BlockSchurPreconditioner<TrilinosWrappers::PreconditionAMG,
-                TrilinosWrappers::PreconditionJacobi>
+          const LinearSolvers::BlockSchurPreconditioner<LA::MPI::PreconditionAMG,
+                LA::MPI::PreconditionJacobi>
                 preconditioner (stokes_matrix, stokes_preconditioner_matrix,
                                 *Mp_preconditioner, *Amg_preconditioner,
                                 true);
 
           SolverControl solver_control_refined (stokes_matrix.m(), solver_tolerance);
-          SolverFGMRES<TrilinosWrappers::MPI::BlockVector>
+          SolverFGMRES<LA::MPI::BlockVector>
           solver(solver_control_refined, mem,
-                 SolverFGMRES<TrilinosWrappers::MPI::BlockVector>::
+                 SolverFGMRES<LA::MPI::BlockVector>::
                  AdditionalData(50, true));
           solver.solve(stokes_matrix, distributed_stokes_solution, stokes_rhs,
                        preconditioner);
@@ -3023,9 +3059,9 @@ namespace Step32
     {
       SolverControl solver_control (temperature_matrix.m(),
                                     1e-12*temperature_rhs.l2_norm());
-      SolverCG<TrilinosWrappers::MPI::Vector>   cg (solver_control);
+      SolverCG<LA::MPI::Vector>   cg (solver_control);
 
-      TrilinosWrappers::MPI::Vector
+      LA::MPI::Vector
       distributed_temperature_solution (temperature_rhs);
       distributed_temperature_solution = temperature_solution;
 
@@ -3248,7 +3284,7 @@ namespace Step32
             stokes_dof_handler.n_dofs() + temperature_dof_handler.n_dofs(),
             ExcInternalError());
 
-    TrilinosWrappers::MPI::Vector joint_solution;
+    LA::MPI::Vector joint_solution;
     joint_solution.reinit (joint_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
 
     {
@@ -3299,7 +3335,7 @@ namespace Step32
 
     IndexSet locally_relevant_joint_dofs(joint_dof_handler.n_dofs());
     DoFTools::extract_locally_relevant_dofs (joint_dof_handler, locally_relevant_joint_dofs);
-    TrilinosWrappers::MPI::Vector locally_relevant_joint_solution;
+    LA::MPI::Vector locally_relevant_joint_solution;
     locally_relevant_joint_solution.reinit (locally_relevant_joint_dofs, MPI_COMM_WORLD);
     locally_relevant_joint_solution = joint_solution;
 
@@ -3417,16 +3453,16 @@ namespace Step32
     // the function is concerned with setting up the data structures again
     // after mesh refinement and restoring the solution vectors on the new
     // mesh.
-    std::vector<const TrilinosWrappers::MPI::Vector *> x_temperature (2);
+    std::vector<const LA::MPI::Vector *> x_temperature (2);
     x_temperature[0] = &temperature_solution;
     x_temperature[1] = &old_temperature_solution;
-    std::vector<const TrilinosWrappers::MPI::BlockVector *> x_stokes (2);
+    std::vector<const LA::MPI::BlockVector *> x_stokes (2);
     x_stokes[0] = &stokes_solution;
     x_stokes[1] = &old_stokes_solution;
 
-    parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::Vector>
+    parallel::distributed::SolutionTransfer<dim,LA::MPI::Vector>
     temperature_trans(temperature_dof_handler);
-    parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::BlockVector>
+    parallel::distributed::SolutionTransfer<dim,LA::MPI::BlockVector>
     stokes_trans(stokes_dof_handler);
 
     triangulation.prepare_coarsening_and_refinement();
@@ -3441,10 +3477,10 @@ namespace Step32
     computing_timer.enter_section ("Refine mesh structure, part 2");
 
     {
-      TrilinosWrappers::MPI::Vector distributed_temp1 (temperature_rhs);
-      TrilinosWrappers::MPI::Vector distributed_temp2 (temperature_rhs);
+      LA::MPI::Vector distributed_temp1 (temperature_rhs);
+      LA::MPI::Vector distributed_temp2 (temperature_rhs);
 
-      std::vector<TrilinosWrappers::MPI::Vector *> tmp (2);
+      std::vector<LA::MPI::Vector *> tmp (2);
       tmp[0] = &(distributed_temp1);
       tmp[1] = &(distributed_temp2);
       temperature_trans.interpolate(tmp);
@@ -3454,10 +3490,10 @@ namespace Step32
     }
 
     {
-      TrilinosWrappers::MPI::BlockVector distributed_stokes (stokes_rhs);
-      TrilinosWrappers::MPI::BlockVector old_distributed_stokes (stokes_rhs);
+      LA::MPI::BlockVector distributed_stokes(stokes_rhs);
+      LA::MPI::BlockVector old_distributed_stokes(stokes_rhs);
 
-      std::vector<TrilinosWrappers::MPI::BlockVector *> stokes_tmp (2);
+      std::vector<LA::MPI::BlockVector *> stokes_tmp (2);
       stokes_tmp[0] = &(distributed_stokes);
       stokes_tmp[1] = &(old_distributed_stokes);
 
@@ -3556,7 +3592,7 @@ start_time_iteration:
         if (time > parameters.end_time * EquationData::year_in_seconds)
           break;
 
-        TrilinosWrappers::MPI::BlockVector old_old_stokes_solution;
+        LA::MPI::BlockVector old_old_stokes_solution;
         old_old_stokes_solution      = old_stokes_solution;
         old_stokes_solution          = stokes_solution;
         old_old_temperature_solution = old_temperature_solution;
@@ -3566,18 +3602,18 @@ start_time_iteration:
             //Trilinos sadd does not like ghost vectors even as input. Copy
             //into distributed vectors for now:
             {
-              TrilinosWrappers::MPI::BlockVector distr_solution (stokes_rhs);
+              LA::MPI::BlockVector distr_solution (stokes_rhs);
               distr_solution = stokes_solution;
-              TrilinosWrappers::MPI::BlockVector distr_old_solution (stokes_rhs);
+              LA::MPI::BlockVector distr_old_solution (stokes_rhs);
               distr_old_solution = old_old_stokes_solution;
               distr_solution .sadd (1.+time_step/old_time_step, -time_step/old_time_step,
                                     distr_old_solution);
               stokes_solution = distr_solution;
             }
             {
-              TrilinosWrappers::MPI::Vector distr_solution (temperature_rhs);
+              LA::MPI::Vector distr_solution (temperature_rhs);
               distr_solution = temperature_solution;
-              TrilinosWrappers::MPI::Vector distr_old_solution (temperature_rhs);
+              LA::MPI::Vector distr_old_solution (temperature_rhs);
               distr_old_solution = old_old_temperature_solution;
               distr_solution .sadd (1.+time_step/old_time_step, -time_step/old_time_step,
                                     distr_old_solution);
