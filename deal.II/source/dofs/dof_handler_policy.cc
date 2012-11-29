@@ -212,14 +212,9 @@ namespace internal
 
 
         /**
-         * Distribute degrees of
-         * freedom on all cells, or
-         * on cells with the
-         * correct subdomain_id if
-         * the corresponding
-         * argument is not equal to
-         * types::invalid_subdomain_id. Return
-         * the total number of dofs
+         * Distribute degrees of freedom on all cells, or on cells with the
+         * correct subdomain_id if the corresponding argument is not equal to
+         * types::invalid_subdomain_id. Return the total number of dofs
          * returned.
          */
         template <int dim, int spacedim>
@@ -233,14 +228,10 @@ namespace internal
             = dof_handler.get_tria();
           Assert (tria.n_levels() > 0, ExcMessage("Empty triangulation"));
 
-          // Clear user flags because we will
-          // need them. But first we save
-          // them and make sure that we
-          // restore them later such that at
-          // the end of this function the
-          // Triangulation will be in the
-          // same state as it was at the
-          // beginning of this function.
+          // Clear user flags because we will need them. But first we save
+          // them and make sure that we restore them later such that at the
+          // end of this function the Triangulation will be in the same state
+          // as it was at the beginning of this function.
           std::vector<bool> user_flags;
           tria.save_user_flags(user_flags);
           const_cast<dealii::Triangulation<dim,spacedim> &>(tria).clear_user_flags ();
@@ -255,10 +246,11 @@ namespace internal
                 ||
                 (cell->subdomain_id() == subdomain_id))
               next_free_dof
-                = Implementation::distribute_dofs_on_cell (dof_handler, cell, next_free_dof);
+                = Implementation::distribute_dofs_on_cell (dof_handler,
+							   cell,
+							   next_free_dof);
 
-          // update the cache used
-          // for cell dof indices
+          // update the cache used for cell dof indices
           for (typename DoFHandler<dim,spacedim>::cell_iterator
                cell = dof_handler.begin(); cell != dof_handler.end(); ++cell)
             if (cell->subdomain_id() != types::artificial_subdomain_id)
