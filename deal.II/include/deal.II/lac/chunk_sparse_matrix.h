@@ -379,6 +379,31 @@ public:
             const number value);
 
   /**
+   * Add an array of values given by
+   * <tt>values</tt> in the given
+   * global matrix row at columns
+   * specified by col_indices in the
+   * sparse matrix.
+   *
+   * The optional parameter
+   * <tt>elide_zero_values</tt> can be
+   * used to specify whether zero
+   * values should be added anyway or
+   * these should be filtered away and
+   * only non-zero data is added. The
+   * default value is <tt>true</tt>,
+   * i.e., zero values won't be added
+   * into the matrix.
+   */
+  template <typename number2>
+  void add (const unsigned int  row,
+            const unsigned int  n_cols,
+            const unsigned int *col_indices,
+            const number2      *values,
+            const bool          elide_zero_values = true,
+            const bool          col_indices_are_sorted = false);
+
+  /**
    * Multiply the entire matrix by a
    * fixed factor.
    */
@@ -1277,13 +1302,31 @@ void ChunkSparseMatrix<number>::add (const unsigned int i,
 
   Assert (cols != 0, ExcNotInitialized());
 
-  const unsigned int index = compute_location(i,j);
-  Assert ((index != ChunkSparsityPattern::invalid_entry) ||
-          (value == 0.),
-          ExcInvalidIndex(i,j));
-
   if (value != 0.)
-    val[index] += value;
+    {
+      const unsigned int index = compute_location(i,j);
+      Assert ((index != ChunkSparsityPattern::invalid_entry),
+              ExcInvalidIndex(i,j));
+
+      val[index] += value;
+    }
+}
+
+
+
+template <typename number>
+template <typename number2>
+inline
+void ChunkSparseMatrix<number>::add (const unsigned int row,
+                                     const unsigned int n_cols,
+                                     const unsigned int *col_indices,
+                                     const number2      *values,
+                                     const bool          elide_zero_values,
+                                     const bool          col_indices_are_sorted)
+{
+  // TODO: could be done more efficiently...
+  for (unsigned int col=0; col<n_cols; ++col)
+    add(row, col_indices[col], static_cast<number>(values[col]));
 }
 
 
