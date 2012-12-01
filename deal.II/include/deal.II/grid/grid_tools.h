@@ -1046,6 +1046,34 @@ namespace GridTools
                                const dealii::Tensor<1,DH::space_dimension> &offset);
 
 
+  /**
+   * This compatibility version of collect_periodic_face_pairs only works
+   * on grids with cells in @ref GlossFaceOrientation "standard orientation".
+   *
+   * Instead of defining a 'first' and 'second' boundary with the help of
+   * two boundary_indicators this function defines a 'left' boundary as all
+   * faces with local face index <code>2*dimension</code> and boundary
+   * indicator @p b_id and, similarly, a 'right' boundary consisting of all
+   * face with local face index <code>2*dimension+1</code> and boundary
+   * indicator @p b_id.
+   *
+   * This function will collect periodic face pairs on the highest (i.e.
+   * coarsest) mesh level.
+   *
+   * @note This version of collect_periodic_face_pairs  will not work on
+   * meshes with cells not in @ref GlossFaceOrientation
+   * "standard orientation".
+   *
+   * @author Matthias Maier, 2012
+   */
+  template<typename DH>
+  std::map<typename DH::face_iterator, typename DH::face_iterator>
+  collect_periodic_face_pairs (const DH                 &dof_handler, /*TODO: Name*/
+                               const types::boundary_id b_id,
+                               int                      direction,
+                               const dealii::Tensor<1,DH::space_dimension> &offset);
+
+
 
   /**
    * Exception

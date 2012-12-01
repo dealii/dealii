@@ -1163,6 +1163,61 @@ namespace DoFTools
                                 dealii::Tensor<1,DH::space_dimension> &offset,
                                 dealii::ConstraintMatrix &constraint_matrix,
                                 const ComponentMask      &component_mask = ComponentMask());
+
+
+  /**
+   * This compatibility version of make_periodicity_constraints only works
+   * on grids with cells in @ref GlossFaceOrientation "standard orientation".
+   *
+   * Instead of defining a 'first' and 'second' boundary with the help of
+   * two boundary_indicators this function defines a 'left' boundary as all
+   * faces with local face index <code>2*dimension</code> and boundary
+   * indicator @p b_id and, similarly, a 'right' boundary consisting of all
+   * face with local face index <code>2*dimension+1</code> and boundary
+   * indicator @p b_id.
+   *
+   * @note This version of make_periodicity_constraints  will not work on
+   * meshes with cells not in @ref GlossFaceOrientation
+   * "standard orientation".
+   *
+   * @note This function will not work for DoFHandler objects that are
+   * built on a parallel::distributed::Triangulation object.
+   */
+  template<typename DH>
+  void
+  make_periodicity_constraints (const DH                 &dof_handler,
+                                const types::boundary_id b_id,
+                                const int                direction,
+                                dealii::ConstraintMatrix &constraint_matrix,
+                                const ComponentMask      &component_mask = ComponentMask());
+
+
+  /**
+   * Same as above but with an optional argument @p offset.
+   *
+   * The @p offset is a vector tangential to the faces that is added to
+   * the location of vertices of the 'first' boundary when attempting to
+   * match them to the corresponding vertices of the 'second' boundary via
+   * @p orthogonal_equality. This can be used to implement conditions such
+   * as $u(0,y)=u(1,y+1)$.
+   *
+   * @note This version of make_periodicity_constraints  will not work on
+   * meshes with cells not in @ref GlossFaceOrientation
+   * "standard orientation".
+   *
+   * @note This function will not work for DoFHandler objects that are
+   * built on a parallel::distributed::Triangulation object.
+   */
+  template<typename DH>
+  void
+  make_periodicity_constraints (const DH                 &dof_handler,
+                                const types::boundary_id b_id,
+                                const int                direction,
+                                dealii::Tensor<1,DH::space_dimension> &offset,
+                                dealii::ConstraintMatrix &constraint_matrix,
+                                const ComponentMask      &component_mask = ComponentMask());
+
+
   //@}
 
 

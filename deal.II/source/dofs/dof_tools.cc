@@ -3556,6 +3556,88 @@ namespace DoFTools
 
 
 
+  template<typename DH>
+  void
+  make_periodicity_constraints (const DH                       &dof_handler,
+                                const types::boundary_id       b_id,
+                                const int                      direction,
+                                dealii::ConstraintMatrix       &constraint_matrix,
+                                const ComponentMask            &component_mask)
+  {
+    Tensor<1,DH::space_dimension> dummy;
+    make_periodicity_constraints (dof_handler,
+                                  b_id,
+                                  direction,
+                                  dummy,
+                                  constraint_matrix,
+                                  component_mask);
+  }
+
+
+
+  template<typename DH>
+  void
+  make_periodicity_constraints (const DH                  &dof_handler,
+                                const types::boundary_id  b_id,
+                                const int                 direction,
+                                dealii::Tensor<1,DH::space_dimension> &offset,
+                                dealii::ConstraintMatrix  &constraint_matrix,
+                                const ComponentMask       &component_mask)
+  {
+    static const int dim = DH::dimension;
+    static const int space_dim = DH::space_dimension;
+
+    Assert (0<=direction && direction<space_dim,
+            ExcIndexRange (direction, 0, space_dim));
+
+    Assert(dim == space_dim,
+           ExcNotImplemented());
+
+    Assert ((dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
+             (&dof_handler.get_tria())
+             ==
+             0),
+            ExcMessage ("This function can not be used with distributed triangulations."
+                        "See the documentation for more information."));
+
+    typedef typename DH::face_iterator FaceIterator;
+    typedef std::map<FaceIterator, FaceIterator> FaceMap;
+
+    // Collect matching periodic cells on the coarsest level:
+    FaceMap matched_cells =
+      GridTools::collect_periodic_face_pairs(dof_handler,
+                                             b_id,
+                                             direction, offset);
+
+    // And apply the low level make_periodicity_constraints function to
+    // every matching pair:
+    for (typename FaceMap::iterator it = matched_cells.begin();
+         it != matched_cells.end(); ++it)
+      {
+        typedef typename DH::face_iterator FaceIterator;
+        const FaceIterator &face_1 = it->first;
+        const FaceIterator &face_2 = it->second;
+
+        Assert(face_1->at_boundary() && face_2->at_boundary(),
+               ExcInternalError());
+
+        Assert (face_1->boundary_indicator() == b_id &&
+                face_2->boundary_indicator() == b_id,
+                ExcInternalError());
+
+        Assert (face_1 != face_2,
+                ExcInternalError());
+
+        make_periodicity_constraints(face_1,
+                                     face_2,
+                                     constraint_matrix,
+                                     component_mask
+                                     /* standard orientation */);
+      }
+  }
+
+
+
   namespace internal
   {
     // return an array that for each dof on the reference cell

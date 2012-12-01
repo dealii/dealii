@@ -347,6 +347,23 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
                                          dealii::Tensor<1,DH::space_dimension> &,
                                          dealii::ConstraintMatrix &,
                                          const ComponentMask &);
+
+  template
+  void
+  DoFTools::make_periodicity_constraints(const DH &,
+                                         const types::boundary_id,
+                                         const int,
+                                         dealii::ConstraintMatrix &,
+                                         const ComponentMask &);
+
+  template
+  void
+  DoFTools::make_periodicity_constraints(const DH &,
+                                         const types::boundary_id,
+                                         const int,
+                                         dealii::Tensor<1,DH::space_dimension> &,
+                                         dealii::ConstraintMatrix &,
+                                         const ComponentMask &);
 #endif
 }
 

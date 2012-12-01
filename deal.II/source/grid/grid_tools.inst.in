@@ -240,6 +240,14 @@ for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II
                                   int,
                                   const Tensor<1,deal_II_space_dimension> &);
 
+      template
+      std::map<X::face_iterator, X::face_iterator>
+      collect_periodic_face_pairs
+                                 (const X &,
+                                  const types::boundary_id,
+                                  int,
+                                  const Tensor<1,deal_II_space_dimension> &);
+
     #endif
 
   \}
