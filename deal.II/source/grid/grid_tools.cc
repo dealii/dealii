@@ -12,6 +12,7 @@
 //---------------------------------------------------------------------------
 
 
+#include <deal.II/base/std_cxx1x/array.h>
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -2159,142 +2160,294 @@ next_cell:
     return surface_to_volume_mapping;
   }
 
-  // Internally used in
-  // collect_periodic_cell_pairs.
-  template<typename CellIterator>
-  inline bool orthogonal_equality (const CellIterator &cell1,
-                                   const CellIterator &cell2,
-                                   const int          direction,
-                                   const dealii::Tensor<1,CellIterator::AccessorType::space_dimension>
-                                   &offset)
+
+
+  /*
+   * Internally used in orthogonal_equality
+   *
+   * An orthogonal equality test for points:
+   *
+   * point1 and point2 are considered equal, if
+   *    (point1 + offset) - point2
+   * is parallel to the unit vector in <direction>
+   */
+  template<int spacedim>
+  inline bool orthogonal_equality (const dealii::Point<spacedim> &point1,
+                                   const dealii::Point<spacedim> &point2,
+                                   const int direction,
+                                   const dealii::Tensor<1,spacedim> &offset)
   {
-    // An orthogonal equality test for
-    // cells:
-    // Two cells are equal if the
-    // corresponding vertices of the
-    // boundary faces can be transformed
-    // into each other parallel to the
-    // given direction.
-    // It is assumed that
-    // cell1->face(2*direction) and
-    // cell2->face(2*direction+1) are the
-    // corresponding boundary faces.
-    // The optional argument offset will
-    // be added to each vertex of cell1
-
-    static const int dim = CellIterator::AccessorType::dimension;
-    static const int space_dim = CellIterator::AccessorType::space_dimension;
-    Assert(dim == space_dim,
-           ExcNotImplemented());
-    // ... otherwise we would need two
-    // directions: One for selecting the
-    // faces, thus living in dim,
-    // the other direction for selecting the
-    // direction for the orthogonal
-    // projection, thus living in
-    // space_dim.
-
-    for (int i = 0; i < space_dim; ++i)
+    Assert (0<=direction && direction<spacedim,
+            ExcIndexRange (direction, 0, spacedim));
+    for (int i = 0; i < spacedim; ++i)
       {
-        // Only compare
-        // coordinate-components != direction:
+        // Only compare coordinate-components != direction:
         if (i == direction)
           continue;
 
-        for (unsigned int v = 0; v < GeometryInfo<dim>::vertices_per_face; ++v)
-          if (fabs (  cell1->face(2*direction)->vertex(v)(i)
-                      + offset[i]
-                      - cell2->face(2*direction+1)->vertex(v)(i))
-              > 1.e-10)
-            return false;
+        if (fabs(point1(i) + offset[i] - point2(i)) > 1.e-10)
+          return false;
       }
     return true;
   }
 
 
-  template<typename CellIterator>
-  std::map<CellIterator, CellIterator>
-  collect_periodic_cell_pairs (const CellIterator                          &begin,
-                               const typename identity<CellIterator>::type &end,
-                               const types::boundary_id                  boundary_component,
-                               int                                         direction,
-                               const dealii::Tensor<1,CellIterator::AccessorType::space_dimension>
-                               &offset)
+
+  /*
+   * Internally used in orthogonal_equality
+   *
+   * A lookup table to transform vertex matchings to orientation flags of
+   * the form (face_orientation, face_flip, face_rotation)
+   *
+   * See the comment on the next function as well as the detailed
+   * documentation of make_periodicity_constraints and
+   * collect_periodic_face_pairs for details
+   */
+  template<int dim> struct OrientationLookupTable {};
+
+  template<> struct OrientationLookupTable<1>
   {
-    static const int space_dim = CellIterator::AccessorType::space_dimension;
-    Assert (0<=direction && direction<space_dim,
-            ExcIndexRange (direction, 0, space_dim));
+    typedef std_cxx1x::array<unsigned int, GeometryInfo<1>::vertices_per_face> MATCH_T;
+    static inline std::bitset<3> lookup (const MATCH_T &)
+    {
+      // The 1D case is trivial
+      return 4; // [true ,false,false]
+    }
+  };
 
-    std::set<CellIterator> cells1;
-    std::set<CellIterator> cells2;
+  template<> struct OrientationLookupTable<2>
+  {
+    typedef std_cxx1x::array<unsigned int, GeometryInfo<2>::vertices_per_face> MATCH_T;
+    static inline std::bitset<3> lookup (const MATCH_T &matching)
+    {
+      // In 2D matching faces (=lines) results in two cases: Either
+      // they are aligned or flipped. We store this "line_flip"
+      // property somewhat sloppy as "face_flip"
+      // (always: face_orientation = true, face_rotation = false)
 
-    // collect boundary cells, i.e. cells
-    // with face(2*direction), resp.
-    // face(2*direction+1) being on the
-    // boundary and having the correct
-    // color:
-    CellIterator cell = begin;
-    for (; cell!= end; ++cell)
+      static const MATCH_T m_tff = {{ 0 , 1 }};
+      if (matching == m_tff) return 1;           // [true ,false,false]
+      static const MATCH_T m_ttf = {{ 1 , 0 }};
+      if (matching == m_ttf) return 3;           // [true ,true ,false]
+      AssertThrow(false, ExcInternalError());
+    }
+  };
+
+  template<> struct OrientationLookupTable<3>
+  {
+    typedef std_cxx1x::array<unsigned int, GeometryInfo<3>::vertices_per_face> MATCH_T;
+    static inline std::bitset<3> lookup (const MATCH_T &matching)
+    {
+      // The full fledged 3D case. *Yay*
+      // See the documentation in include/deal.II/base/geometry_info.h
+      // as well as the actual implementation in source/grid/tria.cc
+      // for more details...
+
+      static const MATCH_T m_tff = {{ 0 , 1 , 2 , 3 }};
+      if (matching == m_tff) return 1;                   // [true ,false,false]
+      static const MATCH_T m_tft = {{ 1 , 3 , 0 , 2 }};
+      if (matching == m_tft) return 5;                   // [true ,false,true ]
+      static const MATCH_T m_ttf = {{ 3 , 2 , 1 , 0 }};
+      if (matching == m_ttf) return 3;                   // [true ,true ,false]
+      static const MATCH_T m_ttt = {{ 2 , 0 , 3 , 1 }};
+      if (matching == m_ttt) return 7;                   // [true ,true ,true ]
+      static const MATCH_T m_fff = {{ 0 , 2 , 1 , 3 }};
+      if (matching == m_fff) return 0;                   // [false,false,false]
+      static const MATCH_T m_fft = {{ 2 , 3 , 0 , 1 }};
+      if (matching == m_fft) return 4;                   // [false,false,true ]
+      static const MATCH_T m_ftf = {{ 3 , 1 , 2 , 0 }};
+      if (matching == m_ftf) return 2;                   // [false,true ,false]
+      static const MATCH_T m_ftt = {{ 1 , 0 , 3 , 2 }};
+      if (matching == m_ftt) return 6;                   // [false,true ,true ]
+      AssertThrow(false, ExcInternalError());
+    }
+  };
+
+
+
+  template<typename FaceIterator>
+  inline bool
+  orthogonal_equality (std::bitset<3>     &orientation,
+                       const FaceIterator &face1,
+                       const FaceIterator &face2,
+                       const int          direction,
+                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset)
+  {
+    static const int dim = FaceIterator::AccessorType::dimension;
+
+    // Do a full matching of the face vertices:
+
+    std_cxx1x::
+    array<unsigned int, GeometryInfo<dim>::vertices_per_face> matching;
+
+    std::set<unsigned int> face2_vertices;
+    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face; ++i)
+      face2_vertices.insert(i);
+
+    for (unsigned int i = 0; i < GeometryInfo<dim>::vertices_per_face; ++i)
       {
-        if (cell->face(2*direction)->at_boundary() &&
-            cell->face(2*direction)->boundary_indicator() == boundary_component)
+        for (std::set<unsigned int>::iterator it = face2_vertices.begin();
+             it != face2_vertices.end();
+             it++)
           {
-            cells1.insert(cell);
-          }
-        if (cell->face(2*direction+1)->at_boundary() &&
-            cell->face(2*direction+1)->boundary_indicator() == boundary_component)
-          {
-            cells2.insert(cell);
+            if (orthogonal_equality(face1->vertex(i),face2->vertex(*it),
+                                    direction, offset))
+              {
+                matching[i] = *it;
+                face2_vertices.erase(it);
+                break; // jump out of the innermost loop
+              }
           }
       }
 
-    Assert (cells1.size() == cells2.size(),
-            ExcMessage ("Unmatched cells on periodic boundaries"));
+    // And finally, a lookup to determine the ordering bitmask:
+    if (face2_vertices.empty())
+      orientation = OrientationLookupTable<dim>::lookup(matching);
 
-    std::map<CellIterator, CellIterator> matched_cells;
+    return face2_vertices.empty();
+  }
 
-    // Match with a complexity of O(n^2).
-    // This could be improved...
-    typedef typename std::set<CellIterator>::const_iterator SetIterator;
-    for (SetIterator it1 = cells1.begin(); it1 != cells1.end(); ++it1)
+
+
+  template<typename FaceIterator>
+  inline bool
+  orthogonal_equality (const FaceIterator &face1,
+                       const FaceIterator &face2,
+                       const int direction,
+                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset)
+  {
+    // Call the function above with a dummy orientation array
+    std::bitset<3> dummy;
+    return orthogonal_equality (dummy, face1, face2, direction, offset);
+  }
+
+
+
+  /*
+   * Internally used in collect_periodic_face_pairs
+   */
+  template<typename FaceIterator>
+  std::map<FaceIterator, std::pair<FaceIterator, std::bitset<3> > >
+  match_periodic_face_pairs (std::set<FaceIterator> &faces1, /* not const! */
+                             std::set<typename identity<FaceIterator>::type> &faces2, /* not const! */
+                             int                         direction,
+                             const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset)
+  {
+    static const int space_dim = FaceIterator::AccessorType::space_dimension;
+    Assert (0<=direction && direction<space_dim,
+            ExcIndexRange (direction, 0, space_dim));
+
+    Assert (faces1.size() == faces2.size(),
+            ExcMessage ("Unmatched faces on periodic boundaries"));
+
+    typedef std::pair<FaceIterator, std::bitset<3> > ResultPair;
+    std::map<FaceIterator, ResultPair> matched_faces;
+
+    // Match with a complexity of O(n^2). This could be improved...
+    std::bitset<3> orientation;
+    typedef typename std::set<FaceIterator>::const_iterator SetIterator;
+    for (SetIterator it1 = faces1.begin(); it1 != faces1.end(); ++it1)
       {
-        for (SetIterator it2 = cells2.begin(); it2 != cells2.end(); ++it2)
+        for (SetIterator it2 = faces2.begin(); it2 != faces2.end(); ++it2)
           {
-            if (orthogonal_equality(*it1, *it2, direction, offset))
+            if (GridTools::orthogonal_equality(orientation, *it1, *it2,
+                                               direction, offset))
               {
-                // We have a match, so insert the
-                // matching pairs and remove the matched
-                // cell in cells2 to speed up the
+                // We have a match, so insert the matching pairs and
+                // remove the matched cell in faces2 to speed up the
                 // matching:
-                matched_cells[*it1] = *it2;
-                cells2.erase(it2);
+                matched_faces[*it1] = std::make_pair(*it2, orientation);
+                faces2.erase(it2);
                 break;
               }
           }
       }
 
-    Assert (matched_cells.size() == cells1.size() &&
-            cells2.size() == 0,
-            ExcMessage ("Unmatched cells on periodic boundaries"));
+    AssertThrow (matched_faces.size() == faces1.size() && faces2.size() == 0,
+                 ExcMessage ("Unmatched faces on periodic boundaries"));
 
-    return matched_cells;
+    return matched_faces;
   }
 
 
-  template<typename DH>
-  std::map<typename DH::cell_iterator, typename DH::cell_iterator>
-  collect_periodic_cell_pairs (const DH                   &dof_handler,
-                               const types::boundary_id boundary_component,
-                               int                        direction,
-                               const dealii::Tensor<1,DH::space_dimension>
-                               &offset)
+
+  template<typename FaceIterator>
+  std::map<FaceIterator, std::pair<FaceIterator, std::bitset<3> > >
+  collect_periodic_face_pairs (const FaceIterator                          &begin,
+                               const typename identity<FaceIterator>::type &end,
+                               const types::boundary_id                    b_id1,
+                               const types::boundary_id                    b_id2,
+                               int                                         direction,
+                               const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset)
   {
-    return collect_periodic_cell_pairs<typename DH::cell_iterator>
-           (dof_handler.begin_active(),
-            dof_handler.end(),
-            boundary_component,
-            direction,
-            offset);
+    static const int space_dim = FaceIterator::AccessorType::space_dimension;
+    Assert (0<=direction && direction<space_dim,
+            ExcIndexRange (direction, 0, space_dim));
+
+    // Collect all faces belonging to b_id1 and b_id2:
+
+    std::set<FaceIterator> faces1;
+    std::set<FaceIterator> faces2;
+
+    for (FaceIterator face = begin; face!= end; ++face)
+      {
+        if (face->at_boundary() && face->boundary_indicator() == b_id1)
+          faces1.insert(face);
+
+        if (face->at_boundary() && face->boundary_indicator() == b_id2)
+          faces2.insert(face);
+      }
+
+    Assert (faces1.size() == faces2.size(),
+            ExcMessage ("Unmatched faces on periodic boundaries"));
+
+    // and call match_periodic_face_pairs that does the actual matching:
+
+    return match_periodic_face_pairs(faces1, faces2, direction, offset);
+  }
+
+
+
+  template<typename DH>
+  std::map<typename DH::face_iterator, std::pair<typename DH::face_iterator, std::bitset<3> > >
+  collect_periodic_face_pairs (const DH                 &dof_handler,
+                               const types::boundary_id b_id1,
+                               const types::boundary_id b_id2,
+                               int                      direction,
+                               const dealii::Tensor<1,DH::space_dimension> &offset)
+  {
+    static const int dim = DH::dimension;
+    static const int space_dim = DH::space_dimension;
+    Assert (0<=direction && direction<space_dim,
+            ExcIndexRange (direction, 0, space_dim));
+
+    // Loop over all cells on the highest level and collect all boundary
+    // faces belonging to b_id1 and b_id2:
+
+    std::set<typename DH::face_iterator> faces1;
+    std::set<typename DH::face_iterator> faces2;
+
+    for (typename DH::cell_iterator cell = dof_handler.begin(0);
+         cell != dof_handler.end(0); ++cell)
+      {
+        for (unsigned int i = 0; i < GeometryInfo<dim>::faces_per_cell; ++i)
+          {
+            const typename DH::face_iterator face = cell->face(i);
+
+            if (face->at_boundary() && face->boundary_indicator() == b_id1)
+              faces1.insert(face);
+
+            if (face->at_boundary() && face->boundary_indicator() == b_id2)
+              faces2.insert(face);
+          }
+      }
+
+    Assert (faces1.size() == faces2.size(),
+            ExcMessage ("Unmatched faces on periodic boundaries"));
+
+    // and call match_periodic_face_pairs that does the actual matching:
+
+    return match_periodic_face_pairs(faces1, faces2, direction, offset);
   }
 
 
