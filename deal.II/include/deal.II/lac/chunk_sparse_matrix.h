@@ -1321,8 +1321,8 @@ void ChunkSparseMatrix<number>::add (const unsigned int row,
                                      const unsigned int n_cols,
                                      const unsigned int *col_indices,
                                      const number2      *values,
-                                     const bool          elide_zero_values,
-                                     const bool          col_indices_are_sorted)
+                                     const bool          /*elide_zero_values*/,
+                                     const bool          /*col_indices_are_sorted*/)
 {
   // TODO: could be done more efficiently...
   for (unsigned int col=0; col<n_cols; ++col)
