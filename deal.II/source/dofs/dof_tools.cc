@@ -3303,15 +3303,24 @@ namespace DoFTools
   {
     static const int dim = FaceIterator::AccessorType::dimension;
 
-    Assert( (dim != 1)
-            ||
-            (face_orientation == true && face_flip == false && face_rotation == false),
-            ExcMessage ("The supplied orientation (face_orientation, face_flip, face_rotation) is invalid for 1D"));
+    Assert( (dim != 1) ||
+                (face_orientation == true &&
+                 face_flip == false &&
+                 face_rotation == false),
+            ExcMessage ("The supplied orientation "
+                        "(face_orientation, face_flip, face_rotation) "
+                        "is invalid for 1D"));
 
-    Assert( (dim != 2)
-            ||
-            (face_orientation == true && face_rotation == false),
-            ExcMessage ("The supplied orientation (face_orientation, face_flip, face_rotation) is invalid for 2D"));
+    Assert( (dim != 2) ||
+                (face_orientation == true &&
+                 face_rotation == false),
+            ExcMessage ("The supplied orientation "
+                        "(face_orientation, face_flip, face_rotation) "
+                        "is invalid for 2D"));
+
+    Assert(face_1 != face_2,
+           ExcMessage ("face_1 and face_2 are equal! Cannot constrain DoFs "
+                       "on the very same face"));
 
     Assert(face_1->at_boundary() && face_2->at_boundary(),
            ExcMessage ("Faces for periodicity constraints must be on the boundary"));
@@ -3502,15 +3511,18 @@ namespace DoFTools
             ExcMessage ("This function can not be used with distributed triangulations."
                         "See the documentation for more information."));
 
+    Assert (b_id1 != b_id2,
+            ExcMessage ("The boundary indicators b_id1 and b_id2 must be"
+                        "different to denote different boundaries."));
+
     typedef typename DH::face_iterator FaceIterator;
     typedef std::map<FaceIterator, std::pair<FaceIterator, std::bitset<3> > > FaceMap;
 
     // Collect matching periodic cells on the coarsest level:
-    FaceMap matched_cells = GridTools::collect_periodic_face_pairs(dof_handler,
-                                                                   b_id1,
-                                                                   b_id2,
-                                                                   direction,
-                                                                   offset);
+    FaceMap matched_cells =
+      GridTools::collect_periodic_face_pairs(dof_handler,
+                                             b_id1, b_id2,
+                                             direction, offset);
 
     // And apply the low level make_periodicity_constraints function to
     // every matching pair:
@@ -3527,6 +3539,9 @@ namespace DoFTools
 
         Assert (face_1->boundary_indicator() == b_id1 &&
                 face_2->boundary_indicator() == b_id2,
+                ExcInternalError());
+
+        Assert (face_1 != face_2,
                 ExcInternalError());
 
         make_periodicity_constraints(face_1,
