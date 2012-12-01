@@ -108,6 +108,15 @@ never working correctly and it is not used.
 
 
 <ol>
+
+<li> Improved GridTools::make_periodicity_constraints substantially:
+The low level interface now allows to specify a face orientation that
+will be used when matching and constraining DoFs for periodic boundary
+conditions. With that, the high level interface will work correctly on
+(mainly 3d) grids that have cells in non standard orientation.
+<br>
+(Matthias Maier, 2012/12/01)
+
 <li> The class Utilities::MPI::MPI_InitFinalize now also initializes
 PETSc, when PETSc is installed.
 <br>
@@ -154,6 +163,10 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Bugfix: Fix GeometryInfo<2>::child_cell_on_face to respect face_flip
+<br>
+(Matthias Maier, 2012/12/01)
+
 <li> New: There is now a version of DoFTools::make_zero_boundary_constraints()
 that accepts a boundary indicator as argument.
 <br>
