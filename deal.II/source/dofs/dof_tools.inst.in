@@ -326,11 +326,13 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
   DoFTools::make_periodicity_constraints (const DH::face_iterator &,
                                           const DH::face_iterator &,
                                           dealii::ConstraintMatrix &,
-                                          const ComponentMask &);
+                                          const ComponentMask &,
+                                          bool, bool, bool);
 
   template
   void
   DoFTools::make_periodicity_constraints(const DH &,
+                                         const types::boundary_id,
                                          const types::boundary_id,
                                          const int,
                                          dealii::ConstraintMatrix &,
@@ -339,6 +341,7 @@ for (DH : DOFHANDLERS; deal_II_dimension : DIMENSIONS)
   template
   void
   DoFTools::make_periodicity_constraints(const DH &,
+                                         const types::boundary_id,
                                          const types::boundary_id,
                                          const int,
                                          dealii::Tensor<1,DH::space_dimension> &,
