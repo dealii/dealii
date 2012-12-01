@@ -21,6 +21,7 @@
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/sparse_matrix_ez.h>
+#include <deal.II/lac/chunk_sparse_matrix.h>
 #include <deal.II/lac/block_sparse_matrix_ez.h>
 #include <deal.II/lac/parallel_vector.h>
 #include <deal.II/lac/parallel_block_vector.h>
@@ -2373,7 +2374,10 @@ BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrix<float>,  BlockVector<double>);
 
 MATRIX_FUNCTIONS(SparseMatrixEZ<double>);
 MATRIX_FUNCTIONS(SparseMatrixEZ<float>);
+MATRIX_FUNCTIONS(ChunkSparseMatrix<double>);
+MATRIX_FUNCTIONS(ChunkSparseMatrix<float>);
 MATRIX_VECTOR_FUNCTIONS(SparseMatrixEZ<float>,  Vector<float>);
+MATRIX_VECTOR_FUNCTIONS(ChunkSparseMatrix<float>, Vector<float>);
 
 // BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrixEZ<double>);
 // BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrixEZ<float>,  Vector<float>);

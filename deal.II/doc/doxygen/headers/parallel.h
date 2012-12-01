@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,7 +14,7 @@
 /**
  * @defgroup Parallel Parallel computing
  *
- * @brief A module discussing the use of multiple processor.
+ * @brief A module discussing the use of multiple processors.
  *
  * This module contains information on %parallel computing. It is
  * subdivided into parts on @ref threads and on @ref distributed.

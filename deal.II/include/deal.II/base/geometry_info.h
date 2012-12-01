@@ -1200,8 +1200,8 @@ struct GeometryInfo<0>
  * normal vector is pointing the other direction. There are not very many
  * places in application programs where you need this information actually,
  * but a few places in the library make use of this. Note that in 2d, the
- * result is always @p true. More information on the topic can be found in the
- * @ref GlossFaceOrientation "glossary" article on this topic.
+ * result is always @p true. More information on the topic can be found in this
+ * @ref GlossFaceOrientation "glossary" article.
  *
  * In order to allow all kinds of meshes in 3d, including
  * <em>Moebius</em>-loops, for example, a face might even be rotated looking
@@ -1792,8 +1792,10 @@ struct GeometryInfo
    * <tt>face_orientation</tt> defaults to
    * <tt>true</tt>, <tt>face_flip</tt> and
    * <tt>face_rotation</tt> default to
-   * <tt>false</tt> (standard orientation)
-   * and has no effect in 2d.
+   * <tt>false</tt> (standard orientation).
+   * In 2d only <tt>face_flip</tt> is considered.
+   * See this @ref GlossFaceOrientation "glossary"
+   * article for more information.
    *
    * As the children of a cell are
    * ordered according to the
