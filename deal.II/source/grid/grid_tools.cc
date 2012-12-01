@@ -2402,7 +2402,6 @@ next_cell:
             ExcMessage ("Unmatched faces on periodic boundaries"));
 
     // and call match_periodic_face_pairs that does the actual matching:
-
     return match_periodic_face_pairs(faces1, faces2, direction, offset);
   }
 
@@ -2446,9 +2445,70 @@ next_cell:
             ExcMessage ("Unmatched faces on periodic boundaries"));
 
     // and call match_periodic_face_pairs that does the actual matching:
-
     return match_periodic_face_pairs(faces1, faces2, direction, offset);
   }
+
+
+
+  template<typename DH>
+  std::map<typename DH::face_iterator, typename DH::face_iterator>
+  collect_periodic_face_pairs (const DH                 &dof_handler,
+                               const types::boundary_id b_id,
+                               int                      direction,
+                               const dealii::Tensor<1,DH::space_dimension> &offset)
+  {
+    static const int dim = DH::dimension;
+    static const int space_dim = DH::space_dimension;
+    Assert (0<=direction && direction<space_dim,
+            ExcIndexRange (direction, 0, space_dim));
+
+    Assert(dim == space_dim,
+           ExcNotImplemented());
+
+    // Loop over all cells on the highest level and collect all boundary
+    // faces 2*direction and 2*direction*1:
+
+    std::set<typename DH::face_iterator> faces1;
+    std::set<typename DH::face_iterator> faces2;
+
+    for (typename DH::cell_iterator cell = dof_handler.begin(0);
+         cell != dof_handler.end(0); ++cell)
+      {
+        const typename DH::face_iterator face_1 = cell->face(2*direction);
+        const typename DH::face_iterator face_2 = cell->face(2*direction+1);
+
+        if (face_1->at_boundary() && face_1->boundary_indicator() == b_id)
+          faces1.insert(face_1);
+
+        if (face_2->at_boundary() && face_2->boundary_indicator() == b_id)
+          faces2.insert(face_2);
+      }
+
+    Assert (faces1.size() == faces2.size(),
+            ExcMessage ("Unmatched faces on periodic boundaries"));
+
+    // and call match_periodic_face_pairs that does the actual matching:
+
+    typedef std::map<typename DH::face_iterator, std::pair<typename DH::face_iterator, std::bitset<3> > > FaceMap;
+    FaceMap matching = match_periodic_face_pairs(faces1, faces2, direction, offset);
+
+    std::map<typename DH::face_iterator, typename DH::face_iterator>
+      return_value;
+
+    for(typename FaceMap::iterator pairing = matching.begin();
+        pairing != matching.end(); ++pairing)
+      {
+        Assert(pairing->second.second == 1,
+               ExcMessage("Found a face match with non standard orientation. "
+                          "This function is only suitable for meshes with cells "
+                          "in default orientation"));
+
+        return_value[pairing->first] = pairing->second.first;
+      }
+
+    return return_value;
+  }
+
 
 
 } /* namespace GridTools */
