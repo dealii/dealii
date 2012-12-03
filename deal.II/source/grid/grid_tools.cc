@@ -2499,10 +2499,10 @@ next_cell:
     FaceMap matching = match_periodic_face_pairs(faces1, faces2, direction, offset);
 
     std::map<typename DH::face_iterator, typename DH::face_iterator>
-      return_value;
+    return_value;
 
-    for(typename FaceMap::iterator pairing = matching.begin();
-        pairing != matching.end(); ++pairing)
+    for (typename FaceMap::iterator pairing = matching.begin();
+         pairing != matching.end(); ++pairing)
       {
         Assert(pairing->second.second == 1,
                ExcMessage("Found a face match with non standard orientation. "

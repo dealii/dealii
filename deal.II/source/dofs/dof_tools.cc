@@ -3304,16 +3304,16 @@ namespace DoFTools
     static const int dim = FaceIterator::AccessorType::dimension;
 
     Assert( (dim != 1) ||
-                (face_orientation == true &&
-                 face_flip == false &&
-                 face_rotation == false),
+            (face_orientation == true &&
+             face_flip == false &&
+             face_rotation == false),
             ExcMessage ("The supplied orientation "
                         "(face_orientation, face_flip, face_rotation) "
                         "is invalid for 1D"));
 
     Assert( (dim != 2) ||
-                (face_orientation == true &&
-                 face_rotation == false),
+            (face_orientation == true &&
+             face_rotation == false),
             ExcMessage ("The supplied orientation "
                         "(face_orientation, face_flip, face_rotation) "
                         "is invalid for 2D"));
@@ -3332,20 +3332,26 @@ namespace DoFTools
     static const int lookup_table_2d[2][2]
     //             flip
     = { {0, 1}, // false
-        {1, 0}, // true
-      };
+      {1, 0}, // true
+    };
 
     static const int lookup_table_3d[2][2][2][4]
     //                             orientation flip  rotation
     = { { { {0, 2, 1, 3},       // false       false false
-            {2, 3, 0, 1}, },    // false       false true
-          { {3, 1, 2, 0},       // false       true  false
-            {1, 0, 3, 2}, }, }, // false       true  true
-        { { {0, 1, 2, 3},       // true        false false
-            {1, 3, 0, 2}, },    // true        false true
-          { {3, 2, 1, 0},       // true        true  false
-            {2, 0, 3, 1}, }, }, // true        true  true
-      };
+          {2, 3, 0, 1},
+        },    // false       false true
+        { {3, 1, 2, 0},       // false       true  false
+          {1, 0, 3, 2},
+        },
+      }, // false       true  true
+      { { {0, 1, 2, 3},       // true        false false
+          {1, 3, 0, 2},
+        },    // true        false true
+        { {3, 2, 1, 0},       // true        true  false
+          {2, 0, 3, 1},
+        },
+      }, // true        true  true
+    };
 
     // In the case that both faces have children, we loop over all
     // children and apply make_periodicty_constrains recursively:
@@ -3359,16 +3365,16 @@ namespace DoFTools
           {
             // Lookup the index for the second face
             unsigned int j;
-            switch(dim)
+            switch (dim)
               {
-                case 2:
-                  j = lookup_table_2d[face_flip][i];
-                  break;
-                case 3:
-                  j = lookup_table_3d[face_orientation][face_flip][face_rotation][i];
-                  break;
-                default:
-                  AssertThrow(false, ExcNotImplemented());
+              case 2:
+                j = lookup_table_2d[face_flip][i];
+                break;
+              case 3:
+                j = lookup_table_3d[face_orientation][face_flip][face_rotation][i];
+                break;
+              default:
+                AssertThrow(false, ExcNotImplemented());
               }
 
             make_periodicity_constraints (face_1->child(i),
@@ -3433,11 +3439,11 @@ namespace DoFTools
     for (unsigned int i = 0; i < dofs_per_face; ++i)
       {
         const unsigned int cell_index = fe.
-          face_to_cell_index(i,
-                             0, // It doesn't really matter, just assume
-                                // we're on the first face...
-                             true, false, false // default orientation
-                             );
+                                        face_to_cell_index(i,
+                                                           0, // It doesn't really matter, just assume
+                                                           // we're on the first face...
+                                                           true, false, false // default orientation
+                                                          );
         cell_to_rotated_face_index[cell_index] = i;
       }
 
@@ -3447,12 +3453,12 @@ namespace DoFTools
         // orientation:
         const unsigned int j =
           cell_to_rotated_face_index[fe.
-                face_to_cell_index(i,
-                                   0, // It doesn't really matter, just assume
-                                      // we're on the first face...
-                                   face_orientation,
-                                   face_flip,
-                                   face_rotation)];
+                                     face_to_cell_index(i,
+                                                        0, // It doesn't really matter, just assume
+                                                        // we're on the first face...
+                                                        face_orientation,
+                                                        face_flip,
+                                                        face_rotation)];
 
         // And finally constrain the two DoFs respecting component_mask:
         if ((component_mask.n_selected_components(fe.n_components()) == fe.n_components())

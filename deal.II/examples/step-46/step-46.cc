@@ -684,8 +684,8 @@ namespace Step46
                 //
                 // - The neighbor is at the same refinement level and has no
                 //   children.
-		// - The neighbor has children.
-		// - The neighbor is coarser.
+                // - The neighbor has children.
+                // - The neighbor is coarser.
                 //
                 // In all three cases, we are only interested in it if it is
                 // part of the fluid subdomain. So let us start with the first

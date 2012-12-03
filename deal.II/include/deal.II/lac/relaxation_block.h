@@ -310,7 +310,7 @@ public:
   /**
    * Return the memory allocated in this object.
    */
-    std::size_t memory_consumption() const;
+  std::size_t memory_consumption() const;
 };
 
 

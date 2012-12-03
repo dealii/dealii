@@ -508,7 +508,7 @@ namespace internal
     struct Norm2
     {
       RealType
-      operator() (const Number  *&X, const Number  * &, const RealType &) const
+      operator() (const Number  *&X, const Number  *&, const RealType &) const
       {
         return numbers::NumberTraits<Number>::abs_square(*X++);
       }
@@ -518,7 +518,7 @@ namespace internal
     struct Norm1
     {
       RealType
-      operator() (const Number  *&X, const Number  * &, const RealType &) const
+      operator() (const Number  *&X, const Number  *&, const RealType &) const
       {
         return numbers::NumberTraits<Number>::abs(*X++);
       }
@@ -528,7 +528,7 @@ namespace internal
     struct NormP
     {
       RealType
-      operator() (const Number  *&X, const Number  * &, const RealType &p) const
+      operator() (const Number  *&X, const Number  *&, const RealType &p) const
       {
         return std::pow(numbers::NumberTraits<Number>::abs(*X++), p);
       }
@@ -538,7 +538,7 @@ namespace internal
     struct MeanValue
     {
       Number
-      operator() (const Number  *&X, const Number  * &, const Number &) const
+      operator() (const Number  *&X, const Number  *&, const Number &) const
       {
         return *X++;
       }
