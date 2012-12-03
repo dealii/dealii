@@ -4562,7 +4562,7 @@ namespace DoFTools
                         block);
 
 #ifdef DEAL_II_USE_P4EST
-#if DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
         // if we are working on a parallel mesh, we now need to collect
         // this information from all processors
         if (const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> *tria
