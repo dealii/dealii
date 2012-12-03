@@ -35,6 +35,19 @@ RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData (
 
 template <class MATRIX, typename inverse_type>
 inline
+std::size_t
+RelaxationBlock<MATRIX,inverse_type>::AdditionalData::memory_consumption() const
+{
+  std::size_t result = sizeof(*this)
+		       + - sizeof(block_list) + block_list.memory_consumption();
+  for (unsigned int i=0;i<order.size();++i)
+    result += MemoryConsumption::memory_consumption(order[i]);
+  return result;
+}
+
+
+template <class MATRIX, typename inverse_type>
+inline
 RelaxationBlock<MATRIX,inverse_type>::AdditionalData::AdditionalData (
   const BlockList &bl,
   const double relaxation,
