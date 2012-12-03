@@ -247,8 +247,8 @@ namespace internal
                 (cell->subdomain_id() == subdomain_id))
               next_free_dof
                 = Implementation::distribute_dofs_on_cell (dof_handler,
-							   cell,
-							   next_free_dof);
+                                                           cell,
+                                                           next_free_dof);
 
           // update the cache used for cell dof indices
           for (typename DoFHandler<dim,spacedim>::cell_iterator

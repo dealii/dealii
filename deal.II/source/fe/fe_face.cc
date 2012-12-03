@@ -36,7 +36,7 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
     {
       const double step = 1./this->degree;
       Point<codim> p;
-  
+
       unsigned int k=0;
       for (unsigned int iz=0; iz <= ((codim>2) ? this->degree : 0) ; ++iz)
         for (unsigned int iy=0; iy <= ((codim>1) ? this->degree : 0) ; ++iy)
@@ -47,7 +47,7 @@ FE_FaceQ<dim,spacedim>::FE_FaceQ (const unsigned int degree)
                 p(1) = iy * step;
               if (codim>2)
                 p(2) = iz * step;
-              
+
               this->unit_face_support_points[k++] = p;
             }
       AssertDimension (k, this->unit_face_support_points.size());

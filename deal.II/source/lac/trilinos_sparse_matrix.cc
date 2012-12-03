@@ -771,7 +771,7 @@ set_matrix_values:
     // Extract local indices in
     // the matrix.
     int trilinos_i = matrix->LRID(static_cast<int>(i)),
-	trilinos_j = matrix->LCID(static_cast<int>(j));
+        trilinos_j = matrix->LCID(static_cast<int>(j));
     TrilinosScalar value = 0.;
 
     // If the data is not on the
