@@ -2230,6 +2230,9 @@ next_cell:
       static const MATCH_T m_ttf = {{ 1 , 0 }};
       if (matching == m_ttf) return 3;           // [true ,true ,false]
       AssertThrow(false, ExcInternalError());
+      // what follows is dead code, but it avoids warnings about the lack
+      // of a return value
+      return -1;
     }
   };
 
@@ -2260,6 +2263,9 @@ next_cell:
       static const MATCH_T m_ftt = {{ 1 , 0 , 3 , 2 }};
       if (matching == m_ftt) return 6;                   // [false,true ,true ]
       AssertThrow(false, ExcInternalError());
+      // what follows is dead code, but it avoids warnings about the lack
+      // of a return value
+      return -1;
     }
   };
 
@@ -2518,4 +2524,3 @@ next_cell:
 #include "grid_tools.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-
