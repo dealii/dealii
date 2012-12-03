@@ -498,7 +498,6 @@ namespace Step40
     constraints.distribute (completely_distributed_solution);
 
     locally_relevant_solution = completely_distributed_solution;
-    locally_relevant_solution.update_ghost_values();
   }
 
 
