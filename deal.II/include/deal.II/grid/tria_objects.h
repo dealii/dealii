@@ -763,7 +763,7 @@ namespace internal
 
     template<typename G>
     inline
-    void*&
+    void *&
     TriaObjects<G>::user_pointer (const unsigned int i)
     {
 #ifdef DEBUG
