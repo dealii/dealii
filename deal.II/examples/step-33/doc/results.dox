@@ -141,7 +141,7 @@ The result of running these computations is a bunch of output files that we
 can pass to our visualization program of choice. When we collate them into a
 movie, the results looks like this:
 
-@image html step-33.slide.gif
+<img src="http://www.dealii.org/images/steps/developer/step-33.slide.gif" alt="">
 
 As we see, the heavy mass of fluid is drawn down the slope by gravity, where
 it collides with the ski lodge and is flung into the air!  Hopefully everyone
@@ -149,7 +149,7 @@ escapes!
 
 We can also visualize the evolution of the adaptively refined grid:
 
-@image html step-33.slide_adapt.gif
+<img src="http://www.dealii.org/images/steps/developer/step-33.slide_adapt.gif" alt="">
 
 The adaptivity follows and precedes the flow pattern, based on the heuristic
 refinement scheme discussed above.
