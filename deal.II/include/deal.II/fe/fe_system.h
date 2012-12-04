@@ -792,23 +792,22 @@ private:
   static const unsigned int invalid_face_number = numbers::invalid_unsigned_int;
 
   /**
-   * Pairs of multiplicity and
-   * element type.
-   */
-  typedef std::pair<const FiniteElement<dim,spacedim> *, unsigned int> ElementPair;
-
-  /**
-   * Pointer to underlying finite
-   * element classes.
+   * Pointers to underlying finite element objects.
    *
-   * This object contains a pointer
-   * to each contributing element
-   * of a mixed discretization and
-   * its multiplicity. It is
-   * created by the constructor and
+   * This object contains a pointer to each contributing element of a mixed
+   * discretization and its multiplicity. It is created by the constructor and
    * constant afterwards.
+   *
+   * The pointers are managed as shared pointers. This ensures that we can use
+   * the copy constructor of this class without having to manage cloning the
+   * elements themselves. Since finite element objects do not contain any
+   * state, this also allows multiple copies of an FESystem object to share
+   * pointers to the underlying base finite elements. The last one of these
+   * copies around will then delete the pointer to the base elements.
    */
-  std::vector<ElementPair> base_elements;
+  std::vector<std::pair<std_cxx1x::shared_ptr<const FiniteElement<dim,spacedim> >,
+			unsigned int> >
+  base_elements;
 
 
   /**
@@ -1145,4 +1144,3 @@ DEAL_II_NAMESPACE_CLOSE
 /*----------------------------  fe_system.h  ---------------------------*/
 #endif
 /*----------------------------  fe_system.h  ---------------------------*/
-

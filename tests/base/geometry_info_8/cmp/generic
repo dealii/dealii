@@ -1,0 +1,385 @@
+
+DEAL::
+DEAL::GeometryInfo<dim>::face_to_cell_vertices:
+DEAL::1D:
+DEAL::face 0:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 0 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 0 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 0 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 0 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 0 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 0 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 0 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 0 )
+DEAL::face 1:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 1 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 1 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 1 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 1 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 1 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 1 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 1 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 1 )
+DEAL::2D:
+DEAL::face 0:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 0 ) (1 -> 2 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 0 ) (1 -> 2 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 2 ) (1 -> 0 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 2 ) (1 -> 0 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 0 ) (1 -> 2 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 0 ) (1 -> 2 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 2 ) (1 -> 0 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 2 ) (1 -> 0 )
+DEAL::face 1:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 1 ) (1 -> 3 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 1 ) (1 -> 3 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 3 ) (1 -> 1 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 3 ) (1 -> 1 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 1 ) (1 -> 3 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 1 ) (1 -> 3 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 3 ) (1 -> 1 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 3 ) (1 -> 1 )
+DEAL::face 2:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 0 ) (1 -> 1 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 0 ) (1 -> 1 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 1 ) (1 -> 0 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 1 ) (1 -> 0 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 0 ) (1 -> 1 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 0 ) (1 -> 1 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 1 ) (1 -> 0 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 1 ) (1 -> 0 )
+DEAL::face 3:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 2 ) (1 -> 3 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 2 ) (1 -> 3 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 3 ) (1 -> 2 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 3 ) (1 -> 2 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 2 ) (1 -> 3 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 2 ) (1 -> 3 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 3 ) (1 -> 2 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 3 ) (1 -> 2 )
+DEAL::3D:
+DEAL::face 0:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 0 ) (1 -> 4 ) (2 -> 2 ) (3 -> 6 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 0 ) (1 -> 2 ) (2 -> 4 ) (3 -> 6 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 6 ) (1 -> 2 ) (2 -> 4 ) (3 -> 0 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 6 ) (1 -> 4 ) (2 -> 2 ) (3 -> 0 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 4 ) (1 -> 6 ) (2 -> 0 ) (3 -> 2 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 2 ) (1 -> 6 ) (2 -> 0 ) (3 -> 4 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 2 ) (1 -> 0 ) (2 -> 6 ) (3 -> 4 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 4 ) (1 -> 0 ) (2 -> 6 ) (3 -> 2 )
+DEAL::face 1:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 1 ) (1 -> 5 ) (2 -> 3 ) (3 -> 7 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 1 ) (1 -> 3 ) (2 -> 5 ) (3 -> 7 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 7 ) (1 -> 3 ) (2 -> 5 ) (3 -> 1 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 7 ) (1 -> 5 ) (2 -> 3 ) (3 -> 1 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 5 ) (1 -> 7 ) (2 -> 1 ) (3 -> 3 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 3 ) (1 -> 7 ) (2 -> 1 ) (3 -> 5 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 3 ) (1 -> 1 ) (2 -> 7 ) (3 -> 5 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 5 ) (1 -> 1 ) (2 -> 7 ) (3 -> 3 )
+DEAL::face 2:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 0 ) (1 -> 1 ) (2 -> 4 ) (3 -> 5 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 0 ) (1 -> 4 ) (2 -> 1 ) (3 -> 5 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 5 ) (1 -> 4 ) (2 -> 1 ) (3 -> 0 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 5 ) (1 -> 1 ) (2 -> 4 ) (3 -> 0 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 1 ) (1 -> 5 ) (2 -> 0 ) (3 -> 4 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 4 ) (1 -> 5 ) (2 -> 0 ) (3 -> 1 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 4 ) (1 -> 0 ) (2 -> 5 ) (3 -> 1 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 1 ) (1 -> 0 ) (2 -> 5 ) (3 -> 4 )
+DEAL::face 3:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 2 ) (1 -> 3 ) (2 -> 6 ) (3 -> 7 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 2 ) (1 -> 6 ) (2 -> 3 ) (3 -> 7 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 7 ) (1 -> 6 ) (2 -> 3 ) (3 -> 2 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 7 ) (1 -> 3 ) (2 -> 6 ) (3 -> 2 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 3 ) (1 -> 7 ) (2 -> 2 ) (3 -> 6 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 6 ) (1 -> 7 ) (2 -> 2 ) (3 -> 3 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 6 ) (1 -> 2 ) (2 -> 7 ) (3 -> 3 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 3 ) (1 -> 2 ) (2 -> 7 ) (3 -> 6 )
+DEAL::face 4:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 0 ) (1 -> 2 ) (2 -> 1 ) (3 -> 3 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 0 ) (1 -> 1 ) (2 -> 2 ) (3 -> 3 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 3 ) (1 -> 1 ) (2 -> 2 ) (3 -> 0 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 3 ) (1 -> 2 ) (2 -> 1 ) (3 -> 0 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 2 ) (1 -> 3 ) (2 -> 0 ) (3 -> 1 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 1 ) (1 -> 3 ) (2 -> 0 ) (3 -> 2 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 1 ) (1 -> 0 ) (2 -> 3 ) (3 -> 2 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 2 ) (1 -> 0 ) (2 -> 3 ) (3 -> 1 )
+DEAL::face 5:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 4 ) (1 -> 6 ) (2 -> 5 ) (3 -> 7 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 4 ) (1 -> 5 ) (2 -> 6 ) (3 -> 7 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 7 ) (1 -> 5 ) (2 -> 6 ) (3 -> 4 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 7 ) (1 -> 6 ) (2 -> 5 ) (3 -> 4 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 6 ) (1 -> 7 ) (2 -> 4 ) (3 -> 5 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 5 ) (1 -> 7 ) (2 -> 4 ) (3 -> 6 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 5 ) (1 -> 4 ) (2 -> 7 ) (3 -> 6 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 6 ) (1 -> 4 ) (2 -> 7 ) (3 -> 5 )
+DEAL::
+DEAL::
+DEAL::GeometryInfo<dim>::face_to_cell_lines:
+DEAL::2D:
+DEAL::face 0:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 0 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 0 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 0 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 0 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 0 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 0 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 0 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 0 )
+DEAL::face 1:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 1 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 1 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 1 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 1 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 1 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 1 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 1 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 1 )
+DEAL::face 2:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 2 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 2 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 2 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 2 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 2 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 2 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 2 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 2 )
+DEAL::face 3:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 3 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 3 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 3 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 3 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 3 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 3 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 3 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 3 )
+DEAL::3D:
+DEAL::face 0:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 0 ) (1 -> 4 ) (2 -> 8 ) (3 -> 10 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 8 ) (1 -> 10 ) (2 -> 0 ) (3 -> 4 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 4 ) (1 -> 0 ) (2 -> 10 ) (3 -> 8 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 10 ) (1 -> 8 ) (2 -> 4 ) (3 -> 0 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 8 ) (1 -> 10 ) (2 -> 4 ) (3 -> 0 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 0 ) (1 -> 4 ) (2 -> 10 ) (3 -> 8 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 10 ) (1 -> 8 ) (2 -> 0 ) (3 -> 4 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 4 ) (1 -> 0 ) (2 -> 8 ) (3 -> 10 )
+DEAL::face 1:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 1 ) (1 -> 5 ) (2 -> 9 ) (3 -> 11 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 9 ) (1 -> 11 ) (2 -> 1 ) (3 -> 5 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 5 ) (1 -> 1 ) (2 -> 11 ) (3 -> 9 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 11 ) (1 -> 9 ) (2 -> 5 ) (3 -> 1 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 9 ) (1 -> 11 ) (2 -> 5 ) (3 -> 1 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 1 ) (1 -> 5 ) (2 -> 11 ) (3 -> 9 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 11 ) (1 -> 9 ) (2 -> 1 ) (3 -> 5 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 5 ) (1 -> 1 ) (2 -> 9 ) (3 -> 11 )
+DEAL::face 2:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 8 ) (1 -> 9 ) (2 -> 2 ) (3 -> 6 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 2 ) (1 -> 6 ) (2 -> 8 ) (3 -> 9 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 9 ) (1 -> 8 ) (2 -> 6 ) (3 -> 2 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 6 ) (1 -> 2 ) (2 -> 9 ) (3 -> 8 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 2 ) (1 -> 6 ) (2 -> 9 ) (3 -> 8 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 8 ) (1 -> 9 ) (2 -> 6 ) (3 -> 2 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 6 ) (1 -> 2 ) (2 -> 8 ) (3 -> 9 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 9 ) (1 -> 8 ) (2 -> 2 ) (3 -> 6 )
+DEAL::face 3:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 10 ) (1 -> 11 ) (2 -> 3 ) (3 -> 7 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 3 ) (1 -> 7 ) (2 -> 10 ) (3 -> 11 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 11 ) (1 -> 10 ) (2 -> 7 ) (3 -> 3 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 7 ) (1 -> 3 ) (2 -> 11 ) (3 -> 10 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 3 ) (1 -> 7 ) (2 -> 11 ) (3 -> 10 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 10 ) (1 -> 11 ) (2 -> 7 ) (3 -> 3 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 7 ) (1 -> 3 ) (2 -> 10 ) (3 -> 11 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 11 ) (1 -> 10 ) (2 -> 3 ) (3 -> 7 )
+DEAL::face 4:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 2 ) (1 -> 3 ) (2 -> 0 ) (3 -> 1 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 0 ) (1 -> 1 ) (2 -> 2 ) (3 -> 3 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 3 ) (1 -> 2 ) (2 -> 1 ) (3 -> 0 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 1 ) (1 -> 0 ) (2 -> 3 ) (3 -> 2 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 0 ) (1 -> 1 ) (2 -> 3 ) (3 -> 2 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 2 ) (1 -> 3 ) (2 -> 1 ) (3 -> 0 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 1 ) (1 -> 0 ) (2 -> 2 ) (3 -> 3 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 3 ) (1 -> 2 ) (2 -> 0 ) (3 -> 1 )
+DEAL::face 5:
+DEAL::orientation 0, flip 0, rotation 0:
+DEAL::     (0 -> 6 ) (1 -> 7 ) (2 -> 4 ) (3 -> 5 )
+DEAL::orientation 1, flip 0, rotation 0:
+DEAL::     (0 -> 4 ) (1 -> 5 ) (2 -> 6 ) (3 -> 7 )
+DEAL::orientation 0, flip 1, rotation 0:
+DEAL::     (0 -> 7 ) (1 -> 6 ) (2 -> 5 ) (3 -> 4 )
+DEAL::orientation 1, flip 1, rotation 0:
+DEAL::     (0 -> 5 ) (1 -> 4 ) (2 -> 7 ) (3 -> 6 )
+DEAL::orientation 0, flip 0, rotation 1:
+DEAL::     (0 -> 4 ) (1 -> 5 ) (2 -> 7 ) (3 -> 6 )
+DEAL::orientation 1, flip 0, rotation 1:
+DEAL::     (0 -> 6 ) (1 -> 7 ) (2 -> 5 ) (3 -> 4 )
+DEAL::orientation 0, flip 1, rotation 1:
+DEAL::     (0 -> 5 ) (1 -> 4 ) (2 -> 6 ) (3 -> 7 )
+DEAL::orientation 1, flip 1, rotation 1:
+DEAL::     (0 -> 7 ) (1 -> 6 ) (2 -> 4 ) (3 -> 5 )

@@ -163,7 +163,13 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
-<li> Bugfix: Fix GeometryInfo<2>::child_cell_on_face to respect face_flip
+<li> Fixed: Using the copy constructor of FESystem led to trouble
+down the road because some pointers were freed by the copy while
+still in use by the original object. This is now fixed.
+<br>
+(Timo Heister, Wolfgang Bangerth, 2012/12/03)
+
+<li> Fixed: Fix GeometryInfo<2>::child_cell_on_face to respect face_flip
 <br>
 (Matthias Maier, 2012/12/01)
 
