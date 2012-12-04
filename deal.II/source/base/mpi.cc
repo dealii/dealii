@@ -38,6 +38,11 @@
 #  endif
 #endif
 
+#ifdef DEAL_II_USE_SLEPC
+#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#    include <slepcsys.h>
+#  endif
+#endif
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -316,7 +321,13 @@ namespace Utilities
       // if we have PETSc, we will initialize it and let it handle MPI.
       // Otherwise, we will do it.
 #ifdef DEAL_II_USE_PETSC
+#  ifdef DEAL_II_USE_SLEPC
+      // Initialise SLEPc (with PETSc):
+      SlepcInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
+#  else
+      // or just initialise PETSc alone:
       PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
+#  endif
 #else
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
@@ -367,8 +378,13 @@ namespace Utilities
       GrowingVectorMemory<PETScWrappers::BlockVector>
       ::release_unused_memory ();
 
-      // now end PETSc.
+#  ifdef DEAL_II_USE_SLEPC
+      // and now end SLEPc (with PETSc)
+      SlepcFinalize();
+#  else
+      // or just end PETSc.
       PetscFinalize();
+#  endif
 #else
 
 
