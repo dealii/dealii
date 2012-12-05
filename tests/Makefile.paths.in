@@ -3,6 +3,9 @@
 
 D = @DEAL_II_DIR@
 
+# Set debug mode to link against the correct library:
+debug-mode = on
+
 TEST_MINUS_L = @TEST_MINUS_L@
 ULIMIT = @ULIMIT@
 
