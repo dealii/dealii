@@ -10,7 +10,7 @@
 // constraints.close().
 // This is because it contains a cycle. The test now checks that this
 // is detected.
-
+invalid
 
 #include <deal.II/base/job_identifier.h>
 #include <deal.II/grid/grid_generator.h>
