@@ -676,13 +676,10 @@ namespace internal
          * "flipped" faces in 1d.
          *
          * In 2d, we currently only support meshes where all faces are in
-         * standard orientation, so the result is also false.
-         *
-         * TODO: If we support meshes with flipped faces one day, this
-         * function has to be implemented for that as well.
-         * Maier, 2012
+         * standard orientation, so the result is also false. This also
+         * matches the fact that one can *always* orient faces in 2d in such a
+         * way that the don't need to be flipped
          */
-
         return false;
 
       }
