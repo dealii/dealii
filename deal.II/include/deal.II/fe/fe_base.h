@@ -584,6 +584,19 @@ public:
    * return the index of the same
    * degree of freedom on the cell.
    *
+   * @param face_index The index of the degree of freedom on a face.
+   *   This index must be between zero and dofs_per_face.
+   * @param face The number of the face this degree of freedom lives on.
+   *   This number must be between zero and GeometryInfo::faces_per_cell.
+   * @param face_orientation One part of the description of the orientation
+   *   of the face. See @ref GlossFaceOrientation .
+   * @param face_flip One part of the description of the orientation
+   *   of the face. See @ref GlossFaceOrientation .
+   * @param face_rotation One part of the description of the orientation
+   *   of the face. See @ref GlossFaceOrientation .
+   * @return The index of this degree of freedom within the set
+   *   of degrees of freedom on the entire cell. The returned value
+   *   will be between zero and dofs_per_cell.
    */
   unsigned int face_to_cell_index (const unsigned int face_index,
                                    const unsigned int face,
