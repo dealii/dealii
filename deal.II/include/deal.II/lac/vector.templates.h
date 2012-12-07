@@ -553,7 +553,7 @@ namespace internal
     // worst case error made by this algorithm is on the order O(eps *
     // log2(vec_size)), whereas a naive summation is O(eps * vec_size). Even
     // though the Kahan summation is even more accurate with an error O(eps)
-    // by carrying along remainders not captured by the sum, that involves
+    // by carrying along remainders not captured by the main sum, that involves
     // additional costs which are not worthwhile. See the Wikipedia article on
     // the Kahan summation algorithm.
 
@@ -561,7 +561,7 @@ namespace internal
     // easily parallelized without changing the order of how the elements are
     // added (floating point addition is not associative). For the same vector
     // size and minimum_parallel_grainsize, the blocks are always the
-    // same. Only at the innermost level, eight values are summed up
+    // same and added pairwise. At the innermost level, eight values are added
     // consecutively in order to better balance multiplications and additions.
 
     // The code returns the result as the last argument in order to make
@@ -790,7 +790,7 @@ Vector<Number>::l2_norm () const
   internal::Vector::accumulate (internal::Vector::Norm2<Number,real_type>(),
                                 val, val, real_type(), vec_size, norm_square);
   if (numbers::is_finite(norm_square) &&
-      norm_square > std::numeric_limits<real_type>::min())
+      norm_square >= std::numeric_limits<real_type>::min())
     return std::sqrt(norm_square);
   else
     {
@@ -833,7 +833,7 @@ Vector<Number>::lp_norm (const real_type p) const
   internal::Vector::accumulate (internal::Vector::NormP<Number,real_type>(),
                                 val, val, p, vec_size, sum);
 
-  if (numbers::is_finite(sum) && sum > std::numeric_limits<real_type>::min())
+  if (numbers::is_finite(sum) && sum >= std::numeric_limits<real_type>::min())
     return std::pow(sum, static_cast<real_type>(1./p));
   else
     {
