@@ -199,6 +199,11 @@ public:
   bool operator== (const BlockMask &mask) const;
 
   /**
+   * Return whether this object and the argument are not identical.
+   */
+  bool operator!= (const BlockMask &mask) const;
+
+  /**
    * Determine an estimate for the
    * memory consumption (in bytes)
    * of this object.
@@ -405,6 +410,14 @@ bool
 BlockMask::operator== (const BlockMask &mask) const
 {
   return block_mask == mask.block_mask;
+}
+
+
+inline
+bool
+BlockMask::operator!= (const BlockMask &mask) const
+{
+  return block_mask != mask.block_mask;
 }
 
 
