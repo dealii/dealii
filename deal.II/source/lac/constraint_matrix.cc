@@ -2141,13 +2141,6 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::BlockVector &/*vec*/) const
 
 
 
-unsigned int ConstraintMatrix::n_constraints () const
-{
-  return lines.size();
-}
-
-
-
 bool ConstraintMatrix::is_identity_constrained (const unsigned int index) const
 {
   if (is_constrained(index) == false)

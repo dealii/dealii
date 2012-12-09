@@ -195,7 +195,7 @@ namespace Utilities
    * power <code>N</code> are compile-time
    * constants. This computes the result of
    * the power operation at compile time,
-   * enables its use e.g. in other
+   * enabling its use e.g. in other
    * templates.
    *
    * Use this function with the arguments

@@ -939,14 +939,14 @@ namespace DoFTools
    * Insert the (algebraic) constraints due to periodic boundary
    * conditions into a ConstraintMatrix @p constraint_matrix.
    *
-   * Given a pair of not necessarily active faces @p face_1 and @p
-   * face_2, this functions constrains all DoFs associated with the boundary
+   * Given a pair of not necessarily active boundary faces @p face_1 and
+   * @p face_2, this functions constrains all DoFs associated with the boundary
    * described by @p face_1 to the respective DoFs of the boundary described
    * by @p face_2. More precisely:
    *
    * If @p face_1 and @p face_2 are both active faces it adds the DoFs
    * of @p face_1 to the list of constrained DoFs in @p constraint_matrix
-   * and adds lines to constrain them to the corresponding values of the
+   * and adds entries to constrain them to the corresponding values of the
    * DoFs on @p face_2. This happens on a purely algebraic level, meaning,
    * the global DoF with (local face) index <tt>i</tt> on @p face_1 gets
    * constraint to the DoF with (local face) index <tt>i</tt> on @p face_2
@@ -975,14 +975,18 @@ namespace DoFTools
    * constrained with periodic boundary conditions. If it is left as
    * specified by the default value all components are constrained. If it
    * is different from the default value, it is assumed that the number
-   * of entries equals the number of components in the boundary functions
-   * and the finite element, and those components in the given boundary
-   * function will be used for which the respective flag was set in the
-   * component mask.
+   * of entries equals the number of components the finite element. This
+   * can be used to enforce periodicity in only one variable in a system
+   * of equations.
    *
    * @p face_orientation, @p face_flip and @p face_rotation describe an
    * orientation that should be applied to @p face_1 prior to matching and
-   * constraining DoFs. More precisely, this matches local face DoF indices
+   * constraining DoFs. This has nothing to do with the actual orientation of
+   * the given faces in their respective cells (which for boundary faces is
+   * always the default) but instead how you want to see periodicity to be
+   * enforced. For example, by using these flags, you can enforce a condition
+   * of the kind $u(0,y)=u(1,1-y)$ (i.e., a Moebius band) or in 3d
+   * a twisted torus. More precisely, these flags match local face DoF indices
    * in the following manner:
    *
    * In 2d: <tt>face_orientation</tt> must always be <tt>true</tt>,
@@ -1015,7 +1019,7 @@ namespace DoFTools
    *     Resulting constraints: 1 <-> 0, 0 <-> 1
    * @endcode
    *
-   * And simliarly for the case of Q1 in 3d:
+   * And similarly for the case of Q1 in 3d:
    *
    * @code
    *
@@ -1071,7 +1075,8 @@ namespace DoFTools
    * @ref GlossFaceOrientation "glossary" article.
    *
    * @note This function will not work for DoFHandler objects that are
-   * built on a parallel::distributed::Triangulation object.
+   * built on a parallel::distributed::Triangulation object unless both
+   * faces (or their children) are owned by the current processor.
    *
    * @author Matthias Maier, 2012
    */
@@ -1081,9 +1086,9 @@ namespace DoFTools
                                 const typename identity<FaceIterator>::type &face_2,
                                 dealii::ConstraintMatrix                    &constraint_matrix,
                                 const ComponentMask                         &component_mask = ComponentMask(),
-                                bool face_orientation = true,
-                                bool face_flip = false,
-                                bool face_rotation = false);
+                                const bool face_orientation = true,
+                                const bool face_flip = false,
+                                const bool face_rotation = false);
 
 
   /**

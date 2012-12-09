@@ -2793,9 +2793,9 @@ namespace DoFTools
                                 const typename identity<FaceIterator>::type &face_2,
                                 dealii::ConstraintMatrix                    &constraint_matrix,
                                 const ComponentMask                         &component_mask,
-                                bool                                        face_orientation,
-                                bool                                        face_flip,
-                                bool                                        face_rotation)
+                                const bool                                   face_orientation,
+                                const bool                                   face_flip,
+                                const bool                                   face_rotation)
   {
     static const int dim = FaceIterator::AccessorType::dimension;
 

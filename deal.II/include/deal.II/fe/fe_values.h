@@ -3808,33 +3808,6 @@ private:
 #ifndef DOXYGEN
 
 
-/*------------------------ Inline functions: namespace FEValuesExtractors --------*/
-
-namespace FEValuesExtractors
-{
-  inline
-  Scalar::Scalar (const unsigned int component)
-    :
-    component (component)
-  {}
-
-
-
-  inline
-  Vector::Vector (const unsigned int first_vector_component)
-    :
-    first_vector_component (first_vector_component)
-  {}
-
-  template <int rank>
-  inline
-  SymmetricTensor<rank>::SymmetricTensor (const unsigned int first_tensor_component)
-    :
-    first_tensor_component (first_tensor_component)
-  {}
-}
-
-
 /*------------------------ Inline functions: namespace FEValuesViews --------*/
 
 namespace FEValuesViews

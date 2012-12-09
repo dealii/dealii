@@ -23,6 +23,6 @@ for (VEC : SERIAL_VECTORS)
 				      /// given arguments.
     virtual
     void
-    get_interpolated_dof_values (const VEC &in,
-				 Vector<VEC::value_type> &out) const;
+    get_interpolated_dof_values (const VEC      &in,
+				 Vector<double> &out) const;
   }
