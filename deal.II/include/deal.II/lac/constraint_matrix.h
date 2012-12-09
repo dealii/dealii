@@ -1904,6 +1904,15 @@ ConstraintMatrix::set_inhomogeneity (const unsigned int line,
 
 
 inline
+unsigned int
+ConstraintMatrix::n_constraints () const
+{
+  return lines.size();
+}
+
+
+
+inline
 bool
 ConstraintMatrix::is_constrained (const unsigned int index) const
 {
@@ -1999,7 +2008,7 @@ void ConstraintMatrix::distribute_local_to_global (
   const double       value,
   VectorType        &global_vector) const
 {
-  Assert (sorted == true, ExcMatrixNotClosed());
+  Assert (lines.empty() || sorted == true, ExcMatrixNotClosed());
 
   if (is_constrained(index) == false)
     global_vector(index) += value;
@@ -2023,7 +2032,7 @@ void ConstraintMatrix::distribute_local_to_global (
   ForwardIteratorInd local_indices_begin,
   VectorType        &global_vector) const
 {
-  Assert (sorted == true, ExcMatrixNotClosed());
+  Assert (lines.empty() || sorted == true, ExcMatrixNotClosed());
   for ( ; local_vector_begin != local_vector_end;
         ++local_vector_begin, ++local_indices_begin)
     {
@@ -2065,7 +2074,7 @@ void ConstraintMatrix::get_dof_values (const VectorType &global_vector,
                                        ForwardIteratorVec local_vector_begin,
                                        ForwardIteratorVec local_vector_end) const
 {
-  Assert (sorted == true, ExcMatrixNotClosed());
+  Assert (lines.empty() || sorted == true, ExcMatrixNotClosed());
   for ( ; local_vector_begin != local_vector_end;
         ++local_vector_begin, ++local_indices_begin)
     {

@@ -818,7 +818,7 @@ distribute_local_to_global (const Vector<double>            &local_vector,
   AssertDimension (local_matrix.n(), local_dof_indices.size());
 
   const unsigned int n_local_dofs = local_vector.size();
-  if (lines.size() == 0)
+  if (lines.empty())
     global_vector.add(local_dof_indices, local_vector);
   else
     for (unsigned int i=0; i<n_local_dofs; ++i)
@@ -2312,7 +2312,7 @@ ConstraintMatrix::distribute_local_to_global (
       AssertDimension (local_matrix.m(), local_vector.size());
       AssertDimension (global_matrix.m(), global_vector.size());
     }
-  Assert (sorted == true, ExcMatrixNotClosed());
+  Assert (lines.empty() || sorted == true, ExcMatrixNotClosed());
 
   const unsigned int n_local_dofs = local_dof_indices.size();
   internals::GlobalRowsFromLocal global_rows (n_local_dofs);
