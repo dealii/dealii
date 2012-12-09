@@ -374,20 +374,18 @@ SparseMatrix<number>::add (const number factor,
 }
 
 
+
 namespace internal
 {
   namespace SparseMatrix
   {
     /**
-     * Perform a vmult using the SparseMatrix
-     * data structures, but only using a
-     * subinterval for the row indices.
+     * Perform a vmult using the SparseMatrix data structures, but only using
+     * a subinterval for the row indices.
      *
-     * In the sequential case, this function
-     * is called on all rows, in the parallel
-     * case it may be called on a subrange,
-     * at the discretion of the task
-     * scheduler.
+     * In the sequential case, this function is called on all rows, in the
+     * parallel case it may be called on a subrange, at the discretion of the
+     * task scheduler.
      */
     template <typename number,
              typename InVector,
