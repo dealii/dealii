@@ -734,21 +734,18 @@ end_set:
                             break;
                           }
 
-                  // in case we have only one quadrature point,
-                  // we can have non-constant Jacobians, but we
-                  // cannot detect it by comparison from one
-                  // quadrature point to the next: in that case,
-                  // need to look at second derivatives and see
-                  // whether there are some non-zero entries
-                  // (this is necessary since we determine the
-                  // constness of the Jacobian for the first
-                  // quadrature formula and might not look at
-                  // them any more for the second, third
-                  // quadrature formula
-                  if (cell_cartesian == false && n_q_points == 1)
+                  // in case we have only one quadrature point, we can have
+                  // non-constant Jacobians, but we cannot detect it by
+                  // comparison from one quadrature point to the next: in that
+                  // case, need to look at second derivatives and see whether
+                  // there are some non-zero entries (this is necessary since
+                  // we determine the constness of the Jacobian for the first
+                  // quadrature formula and might not look at them any more
+                  // for the second, third quadrature formula). in any case,
+                  // the flag update_jacobian_grads will be set in that case
+                  if (cell_cartesian == false && n_q_points == 1 &&
+                      update_flags & update_jacobian_grads)
                     {
-                      Assert (update_flags & update_jacobian_grads,
-                              ExcInternalError());
                       const DerivativeForm<1,dim,dim> &jac = fe_val.jacobian(0);
                       const DerivativeForm<2,dim,dim> &jacobian_grad =
                         fe_val.jacobian_grad(0);
