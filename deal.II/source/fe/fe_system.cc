@@ -973,39 +973,31 @@ FESystem<dim,spacedim>::compute_fill (
             }
         }
 
-      // fill_fe_face_values needs
-      // argument Quadrature<dim-1>
-      // for both cases
-      // dim_1==dim-1 and
-      // dim_1=dim. Hence the
-      // following workaround
+      // fill_fe_face_values needs argument Quadrature<dim_1> for both
+      // cases dim_1==dim-1 and dim_1=dim. Hence the following workaround
       const Quadrature<dim>   *cell_quadrature = 0;
       const Quadrature<dim-1> *face_quadrature = 0;
 
-      // static cast to the
-      // common base class of
-      // quadrature being either
-      // Quadrature<dim> or
-      // Quadrature<dim-1>:
-      const Subscriptor *quadrature_base_pointer = &quadrature;
+      // static cast to the common base class of quadrature being either
+      // Quadrature<dim> or Quadrature<dim-1>:
 
       if (face_no==invalid_face_number)
         {
           Assert(dim_1==dim, ExcDimensionMismatch(dim_1,dim));
-          Assert (dynamic_cast<const Quadrature<dim> *>(quadrature_base_pointer) != 0,
+          Assert (dynamic_cast<const Quadrature<dim> *>(&quadrature) != 0,
                   ExcInternalError());
 
           cell_quadrature
-            = static_cast<const Quadrature<dim> *>(quadrature_base_pointer);
+            = reinterpret_cast<const Quadrature<dim> *>(&quadrature);
         }
       else
         {
           Assert(dim_1==dim-1, ExcDimensionMismatch(dim_1,dim-1));
-          Assert (dynamic_cast<const Quadrature<dim-1> *>(quadrature_base_pointer) != 0,
+          Assert (dynamic_cast<const Quadrature<dim-1> *>(&quadrature) != 0,
                   ExcInternalError());
 
           face_quadrature
-            = static_cast<const Quadrature<dim-1> *>(quadrature_base_pointer);
+            = reinterpret_cast<const Quadrature<dim-1> *>(&quadrature);
         }
 
       // let base elements update the
