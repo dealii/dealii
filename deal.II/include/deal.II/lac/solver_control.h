@@ -58,7 +58,7 @@ class ParameterHandler;
  *
  * @author Guido Kanschat
  */
-class SolverControl : public Subscriptor
+class SolverControl : public virtual Subscriptor
 {
 public:
 

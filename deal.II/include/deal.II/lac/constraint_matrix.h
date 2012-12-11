@@ -136,7 +136,7 @@ namespace internals
  * @ingroup constraints
  * @author Wolfgang Bangerth, Martin Kronbichler, 1998, 2004, 2008, 2009
  */
-class ConstraintMatrix : public Subscriptor
+class ConstraintMatrix : public virtual Subscriptor
 {
 public:
   /**

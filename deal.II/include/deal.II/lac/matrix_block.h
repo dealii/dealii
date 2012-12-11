@@ -98,7 +98,7 @@ namespace internal
  */
 template <class MATRIX>
 class MatrixBlock
-  : public Subscriptor
+  : public virtual Subscriptor
 {
 public:
   /**
@@ -482,7 +482,7 @@ public:
  */
 template <class MATRIX>
 class MGMatrixBlockVector
-  : public Subscriptor
+  : public virtual Subscriptor
 {
 public:
   /**

@@ -40,7 +40,7 @@ namespace MeshWorker
    * @author Guido Kanschat 2009
    */
   class VectorSelector :
-    public Subscriptor
+    public virtual Subscriptor
   {
   public:
     /**

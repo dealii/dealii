@@ -32,7 +32,7 @@ template <int dim> struct FunctionMap;
  *
  * @ingroup mg
  */
-class MGConstrainedDoFs : public Subscriptor
+class MGConstrainedDoFs : public virtual Subscriptor
 {
 public:
   /**

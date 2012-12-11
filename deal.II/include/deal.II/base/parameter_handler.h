@@ -1783,7 +1783,7 @@ namespace Patterns
  *   @ingroup input
  *   @author Wolfgang Bangerth, October 1997, revised February 1998, 2010, 2011
  */
-class ParameterHandler : public Subscriptor
+class ParameterHandler : public virtual Subscriptor
 {
 private:
   /**

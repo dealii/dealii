@@ -90,7 +90,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2000, 2001, 2002
  */
 template <class MA_inverse, class MB, class MDt, class MC>
-class SchurMatrix : public Subscriptor
+class SchurMatrix : public virtual Subscriptor
 {
 public:
 

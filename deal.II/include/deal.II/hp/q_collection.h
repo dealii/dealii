@@ -37,7 +37,7 @@ namespace hp
    * @author Oliver Kayser-Herold, 2005
    */
   template <int dim>
-  class QCollection : public Subscriptor
+  class QCollection : public virtual Subscriptor
   {
   public:
     /**

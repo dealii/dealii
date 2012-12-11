@@ -1201,7 +1201,7 @@ namespace internal
  * @author Wolfgang Bangerth, 1998; Ralf Hartmann, 2005
  */
 template <int dim, int spacedim=dim>
-class Triangulation : public Subscriptor
+class Triangulation : public virtual Subscriptor
 {
 private:
 

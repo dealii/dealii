@@ -1611,7 +1611,7 @@ public:
  */
 template <int dim, int spacedim>
 class FEValuesBase : protected FEValuesData<dim,spacedim>,
-  public Subscriptor
+  public virtual Subscriptor
 {
 public:
   /**

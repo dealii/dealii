@@ -66,7 +66,7 @@ public:
   /**
    * Parameters for block relaxation methods.
    */
-  class AdditionalData : public Subscriptor
+  class AdditionalData : public virtual Subscriptor
   {
   public:
     /**

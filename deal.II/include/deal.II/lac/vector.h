@@ -101,7 +101,7 @@ struct VectorOperation
  * @author Guido Kanschat, Franz-Theo Suttmeier, Wolfgang Bangerth
  */
 template <typename Number>
-class Vector : public Subscriptor
+class Vector : public virtual Subscriptor
 {
 public:
   /**

@@ -75,7 +75,7 @@ template <int dim, int space_dim> class Triangulation;
  * @author Wolfgang Bangerth, 1999, 2001, 2009, Ralf Hartmann, 2001, 2008
  */
 template <int dim, int spacedim=dim>
-class Boundary : public Subscriptor
+class Boundary : public virtual Subscriptor
 {
 public:
 

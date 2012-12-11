@@ -99,7 +99,7 @@ template <typename number> class Vector;
  */
 template <int dim>
 class Function : public FunctionTime,
-  public Subscriptor
+  public virtual Subscriptor
 {
 public:
   /**

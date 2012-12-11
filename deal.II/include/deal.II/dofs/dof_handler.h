@@ -168,7 +168,7 @@ namespace internal
  * @author Wolfgang Bangerth
  */
 template <int dim, int spacedim=dim>
-class DoFHandler  :  public Subscriptor
+class DoFHandler  :  public virtual Subscriptor
 {
   typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim> > IteratorSelector;
 public:

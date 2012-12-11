@@ -708,7 +708,7 @@ namespace internal
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2000, 2001, 2002, 2004
  */
 template <class VectorType>
-class BlockVectorBase : public Subscriptor
+class BlockVectorBase : public virtual Subscriptor
 {
 public:
   /**

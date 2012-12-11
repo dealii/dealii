@@ -338,7 +338,7 @@ namespace hp
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1998, 2000, 2001, 2005
  */
 template <int dim, int spacedim=dim>
-class FiniteElement : public Subscriptor,
+class FiniteElement : public virtual Subscriptor,
   public FiniteElementData<dim>
 {
 public:

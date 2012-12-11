@@ -73,7 +73,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2010
  */
 template <class VECTOR>
-class IterativeInverse : public Subscriptor
+class IterativeInverse : public virtual Subscriptor
 {
 public:
   /**

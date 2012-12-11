@@ -79,7 +79,7 @@ namespace TrilinosWrappers
  * @author Wolfgang Bangerth, 2000, 2001
  */
 template <class SparsityPatternBase>
-class BlockSparsityPatternBase : public Subscriptor
+class BlockSparsityPatternBase : public virtual Subscriptor
 {
 public:
   /**

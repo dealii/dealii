@@ -66,7 +66,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 1998-2003
 */
 template<class VECTOR = dealii::Vector<double> >
-class VectorMemory : public Subscriptor
+class VectorMemory : public virtual Subscriptor
 {
 public:
 

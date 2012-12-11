@@ -216,7 +216,7 @@ enum MappingType
  * @author Guido Kanschat, Ralf Hartmann 2000, 2001
  */
 template <int dim, int spacedim=dim>
-class Mapping : public Subscriptor
+class Mapping : public virtual Subscriptor
 {
 public:
 
@@ -316,7 +316,7 @@ public:
    * has access to the precomputed
    * values stored there.
    */
-  class InternalDataBase: public Subscriptor
+  class InternalDataBase: public virtual Subscriptor
   {
   private:
     /**

@@ -60,7 +60,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 1999 - 2005
  */
 template <class VECTOR>
-class Multigrid : public Subscriptor
+class Multigrid : public virtual Subscriptor
 {
 public:
   /**
@@ -503,7 +503,7 @@ private:
  * @author Guido Kanschat, 1999, 2000, 2001, 2002
  */
 template<int dim, class VECTOR, class TRANSFER>
-class PreconditionMG : public Subscriptor
+class PreconditionMG : public virtual Subscriptor
 {
 public:
   /**

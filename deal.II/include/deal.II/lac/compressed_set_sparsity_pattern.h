@@ -103,7 +103,7 @@ template <typename number> class SparseMatrix;
  *
  * @author Oliver Kayser-Herold, 2007
  */
-class CompressedSetSparsityPattern : public Subscriptor
+class CompressedSetSparsityPattern : public virtual Subscriptor
 {
 public:
   /**

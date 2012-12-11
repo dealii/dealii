@@ -754,7 +754,7 @@ private:
  *
  * @author Wolfgang Bangerth, 1999
  */
-class TimeStepBase : public Subscriptor
+class TimeStepBase : public virtual Subscriptor
 {
 public:
   /**

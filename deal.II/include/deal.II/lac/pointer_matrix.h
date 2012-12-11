@@ -45,7 +45,7 @@ template <typename number> class TridiagonalMatrix;
  * @author Guido Kanschat, 2000, 2001, 2002
  */
 template<class VECTOR>
-class PointerMatrixBase : public Subscriptor
+class PointerMatrixBase : public virtual Subscriptor
 {
 public:
   /**

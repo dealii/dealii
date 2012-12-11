@@ -86,7 +86,7 @@ namespace hp
  * @ingroup dofs
  * @author Guido Kanschat, 2009
  */
-class BlockInfo : public Subscriptor
+class BlockInfo : public virtual Subscriptor
 {
 public:
   /**

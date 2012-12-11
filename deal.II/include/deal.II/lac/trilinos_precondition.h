@@ -69,7 +69,7 @@ namespace TrilinosWrappers
    * @ingroup Preconditioners
    * @author Martin Kronbichler, 2008
    */
-  class PreconditionBase : public Subscriptor
+  class PreconditionBase : public virtual Subscriptor
   {
   public:
 

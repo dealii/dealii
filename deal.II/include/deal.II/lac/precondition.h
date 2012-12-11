@@ -52,7 +52,7 @@ template <typename number> class SparseMatrix;
  *
  * @author Guido Kanschat, 1999
  */
-class PreconditionIdentity : public Subscriptor
+class PreconditionIdentity : public virtual Subscriptor
 {
 public:
 
@@ -139,7 +139,7 @@ public:
  *
  * @author Guido Kanschat, 2005
  */
-class PreconditionRichardson : public Subscriptor
+class PreconditionRichardson : public virtual Subscriptor
 {
 public:
   /**
@@ -280,7 +280,7 @@ private:
  * @author Guido Kanschat, Wolfgang Bangerth, 1999
  */
 template<class MATRIX = SparseMatrix<double>, class VECTOR = Vector<double> >
-class PreconditionUseMatrix : public Subscriptor
+class PreconditionUseMatrix : public virtual Subscriptor
 {
 public:
   /**
@@ -333,7 +333,7 @@ private:
  * @author Guido Kanschat, 2000
  */
 template<class MATRIX = SparseMatrix<double> >
-class PreconditionRelaxation : public Subscriptor
+class PreconditionRelaxation : public virtual Subscriptor
 {
 public:
   /**
@@ -761,7 +761,7 @@ private:
  * @author Guido Kanschat, 1999
  */
 template<class SOLVER, class MATRIX = SparseMatrix<double>, class PRECONDITION = PreconditionIdentity>
-class PreconditionLACSolver : public Subscriptor
+class PreconditionLACSolver : public virtual Subscriptor
 {
 public:
   /**
@@ -819,7 +819,7 @@ private:
  * @author Guido Kanschat, 2000
  */
 template<class MATRIX, class PRECOND, class VECTOR>
-class PreconditionedMatrix : public Subscriptor
+class PreconditionedMatrix : public virtual Subscriptor
 {
 public:
   /**
@@ -881,7 +881,7 @@ private:
  * @author Martin Kronbichler, 2009
  */
 template <class MATRIX=SparseMatrix<double>, class VECTOR=Vector<double> >
-class PreconditionChebyshev : public Subscriptor
+class PreconditionChebyshev : public virtual Subscriptor
 {
 public:
   /**

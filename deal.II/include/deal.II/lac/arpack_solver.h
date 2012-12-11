@@ -73,7 +73,7 @@ extern "C" void dneupd_(int *rvec, char *howmany, int *select, double *d,
  * Class to interface with the ARPACK routines.
  */
 
-class ArpackSolver : public Subscriptor
+class ArpackSolver : public virtual Subscriptor
 {
 public:
   /**
