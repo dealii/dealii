@@ -52,7 +52,7 @@ namespace Algorithms
    * @author Guido Kanschat, 2010
    */
   template <class VECTOR>
-  class Operator : public virtual Subscriptor
+  class Operator : public Subscriptor
   {
   public:
     /**
@@ -94,7 +94,7 @@ namespace Algorithms
    * @author Guido Kanschat, 2010
    */
   template <class VECTOR>
-  class OutputOperator : public virtual Subscriptor
+  class OutputOperator : public Subscriptor
   {
     OutputOperator(const OutputOperator<VECTOR> &);
   public:

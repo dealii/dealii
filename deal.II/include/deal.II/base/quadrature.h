@@ -77,7 +77,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Wolfgang Bangerth, Guido Kanschat, 1998, 1999, 2000, 2005, 2009
  */
 template <int dim>
-class Quadrature : public virtual Subscriptor
+class Quadrature : public Subscriptor
 {
 public:
   /**

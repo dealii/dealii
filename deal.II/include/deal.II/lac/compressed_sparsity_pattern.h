@@ -85,7 +85,7 @@ template <typename number> class SparseMatrix;
  *
  * @author Wolfgang Bangerth, 2001
  */
-class CompressedSparsityPattern : public virtual Subscriptor
+class CompressedSparsityPattern : public Subscriptor
 {
 public:
   /**

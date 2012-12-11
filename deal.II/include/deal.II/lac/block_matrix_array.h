@@ -120,7 +120,7 @@ template <typename> class Vector;
  * @date 2000-2005, 2010
  */
 template <typename number = double>
-class BlockMatrixArray : public virtual Subscriptor
+class BlockMatrixArray : public Subscriptor
 {
 public:
   /**

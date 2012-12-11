@@ -459,7 +459,7 @@ namespace internal
  * @author Wolfgang Bangerth, 2002.
  */
 template <int N, typename T>
-class TableBase : public virtual Subscriptor
+class TableBase : public Subscriptor
 {
 public:
   /**

@@ -90,7 +90,7 @@ template <class number> class SparseMatrix;
  */
 template <class MATRIX = SparseMatrix<double>,
          class VECTOR = dealii::Vector<double> >
-class PreconditionSelector : public virtual Subscriptor
+class PreconditionSelector : public Subscriptor
 {
 public:
 

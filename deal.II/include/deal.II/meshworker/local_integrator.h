@@ -40,7 +40,7 @@ namespace MeshWorker
    * @date 2012
    */
   template <int dim, int spacedim=dim, typename number=double>
-  class LocalIntegrator : public virtual Subscriptor
+  class LocalIntegrator : public Subscriptor
   {
   public:
     /**

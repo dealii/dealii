@@ -53,7 +53,7 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <int rank, int dim>
 class TensorFunction : public FunctionTime,
-  public virtual Subscriptor
+  public Subscriptor
 {
 public:
   /**

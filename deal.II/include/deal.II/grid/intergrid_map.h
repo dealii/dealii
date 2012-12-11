@@ -112,7 +112,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Wolfgang Bangerth, 1999
  */
 template <class GridClass>
-class InterGridMap : public virtual Subscriptor
+class InterGridMap : public Subscriptor
 {
 public:
 

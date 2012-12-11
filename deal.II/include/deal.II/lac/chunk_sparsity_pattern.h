@@ -43,7 +43,7 @@ template <typename> class ChunkSparseMatrix;
  *
  * @author Wolfgang Bangerth, 2008
  */
-class ChunkSparsityPattern : public virtual Subscriptor
+class ChunkSparsityPattern : public Subscriptor
 {
 public:
 

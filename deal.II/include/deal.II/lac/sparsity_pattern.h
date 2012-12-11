@@ -254,7 +254,7 @@ namespace SparsityPatternIterators
  *
  * @author Wolfgang Bangerth, Guido Kanschat and others
  */
-class SparsityPattern : public virtual Subscriptor
+class SparsityPattern : public Subscriptor
 {
 public:
   /**

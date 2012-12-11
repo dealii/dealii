@@ -45,7 +45,7 @@ DEAL_II_NAMESPACE_OPEN
  * @date 2010
  */
 class BlockList :
-  public virtual Subscriptor
+  public Subscriptor
 {
 public:
   /// The container for each index set

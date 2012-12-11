@@ -266,7 +266,7 @@ namespace TrilinosWrappers
    * @ingroup Sparsity
    * @author Martin Kronbichler, 2008
    */
-  class SparsityPattern : public virtual Subscriptor
+  class SparsityPattern : public Subscriptor
   {
   public:
 

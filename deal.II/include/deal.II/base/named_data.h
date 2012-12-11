@@ -40,7 +40,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2007, 2008, 2009
  */
 template <typename DATA>
-class NamedData : public virtual Subscriptor
+class NamedData : public Subscriptor
 {
 public:
   /** Standard constructor creating

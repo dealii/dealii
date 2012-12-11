@@ -46,7 +46,7 @@ template <typename> class MGLevelObject;
  * @author Guido Kanschat, 2002
  */
 template <class VECTOR>
-class MGMatrixBase : public virtual Subscriptor
+class MGMatrixBase : public Subscriptor
 {
 public:
   /*
@@ -98,7 +98,7 @@ public:
  * @author Guido Kanschat, 2002
  */
 template <class VECTOR>
-class MGCoarseGridBase : public virtual Subscriptor
+class MGCoarseGridBase : public Subscriptor
 {
 public:
   /**
@@ -163,7 +163,7 @@ public:
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2002, 2007
  */
 template <class VECTOR>
-class MGTransferBase : public virtual Subscriptor
+class MGTransferBase : public Subscriptor
 {
 public:
   /**
@@ -233,7 +233,7 @@ public:
  * @author Guido Kanschat, 2002
  */
 template <class VECTOR>
-class MGSmootherBase : public virtual Subscriptor
+class MGSmootherBase : public Subscriptor
 {
 public:
   /**

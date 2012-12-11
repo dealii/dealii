@@ -188,7 +188,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @author Wolfgang Bangerth, 2000, 2001, 2002
  */
-class SparseDirectMA27 : public virtual Subscriptor
+class SparseDirectMA27 : public Subscriptor
 {
 public:
   /**
@@ -678,7 +678,7 @@ private:
  *
  * @author Wolfgang Bangerth, 2000, 2001
  */
-class SparseDirectMA47 : public virtual Subscriptor
+class SparseDirectMA47 : public Subscriptor
 {
 public:
   /**
@@ -1057,7 +1057,7 @@ private:
  *
  * @author Wolfgang Bangerth, 2004
  */
-class SparseDirectUMFPACK : public virtual Subscriptor
+class SparseDirectUMFPACK : public Subscriptor
 {
 public:
   /**

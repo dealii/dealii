@@ -252,7 +252,7 @@ namespace TrilinosWrappers
    * @ingroup Vectors
    * @author Martin Kronbichler, 2008
    */
-  class VectorBase : public virtual Subscriptor
+  class VectorBase : public Subscriptor
   {
   public:
     /**

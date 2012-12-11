@@ -46,7 +46,7 @@ namespace Polynomials
    * @author Ralf Hartmann, Guido Kanschat, 2000, 2006
    */
   template <typename number>
-  class Polynomial : public virtual Subscriptor
+  class Polynomial : public Subscriptor
   {
   public:
     /**

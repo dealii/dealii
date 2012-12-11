@@ -680,7 +680,7 @@ private:
 template <typename number>
 class PreconditionLU
   :
-  public virtual Subscriptor
+  public Subscriptor
 {
 public:
   void initialize(const LAPACKFullMatrix<number> &);

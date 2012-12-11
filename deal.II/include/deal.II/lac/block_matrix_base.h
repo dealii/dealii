@@ -354,7 +354,7 @@ namespace BlockMatrixIterators
  * @author Wolfgang Bangerth, 2000, 2004
  */
 template <typename MatrixType>
-class BlockMatrixBase : public virtual Subscriptor
+class BlockMatrixBase : public Subscriptor
 {
 public:
   /**

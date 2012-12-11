@@ -284,7 +284,7 @@ namespace PETScWrappers
    * @ingroup Matrix1
    * @author Wolfgang Bangerth, 2004
    */
-  class MatrixBase : public virtual Subscriptor
+  class MatrixBase : public Subscriptor
   {
   public:
     /**

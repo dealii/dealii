@@ -35,7 +35,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Wolfgang Bangerth, Guido Kanschat, 1999, 2005, 2010
  */
 template<class Object>
-class MGLevelObject : public virtual Subscriptor
+class MGLevelObject : public Subscriptor
 {
 public:
   /**

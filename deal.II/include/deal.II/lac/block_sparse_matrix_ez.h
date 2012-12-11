@@ -44,7 +44,7 @@ template <typename Number> class BlockVector;
  * @author Guido Kanschat, 2002, 2003
  */
 template<typename Number>
-class BlockSparseMatrixEZ : public virtual Subscriptor
+class BlockSparseMatrixEZ : public Subscriptor
 {
 public:
   /**

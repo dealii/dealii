@@ -39,7 +39,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Guido Kanschat, 2000
  */
 template <class MATRIX>
-class BlockDiagonalMatrix : public virtual Subscriptor
+class BlockDiagonalMatrix : public Subscriptor
 {
 public:
   /**

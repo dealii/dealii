@@ -81,7 +81,7 @@ namespace parallel
      * @author Katharina Kormann, Martin Kronbichler, 2010, 2011
      */
     template <typename Number>
-    class Vector : public virtual Subscriptor
+    class Vector : public Subscriptor
     {
     public:
       /**

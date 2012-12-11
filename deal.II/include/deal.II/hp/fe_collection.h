@@ -45,7 +45,7 @@ namespace hp
    * @author Wolfgang Bangerth, 2003
    */
   template <int dim, int spacedim=dim>
-  class FECollection : public virtual Subscriptor
+  class FECollection : public Subscriptor
   {
   public:
     /**

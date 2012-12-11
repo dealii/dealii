@@ -201,7 +201,7 @@ template <class VECTOR> class FilteredMatrixBlock;
  * @author Wolfgang Bangerth 2001, Luca Heltai 2006, Guido Kanschat 2007, 2008
  */
 template <class VECTOR>
-class FilteredMatrix : public virtual Subscriptor
+class FilteredMatrix : public Subscriptor
 {
 public:
   class const_iterator;

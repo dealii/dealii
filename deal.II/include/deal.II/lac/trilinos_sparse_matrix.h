@@ -302,7 +302,7 @@ namespace TrilinosWrappers
    * @ingroup Matrix1
    * @author Martin Kronbichler, Wolfgang Bangerth, 2008, 2009
    */
-  class SparseMatrix : public virtual Subscriptor
+  class SparseMatrix : public Subscriptor
   {
   public:
     /**

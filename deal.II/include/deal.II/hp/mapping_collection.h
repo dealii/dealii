@@ -48,7 +48,7 @@ namespace hp
    * @author Oliver Kayser-Herold, 2005
    */
   template<int dim, int spacedim=dim>
-  class MappingCollection : public virtual Subscriptor
+  class MappingCollection : public Subscriptor
   {
   public:
     /**

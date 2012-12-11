@@ -139,7 +139,7 @@ class SolverControl;
  * @author Wolfgang Bangerth, Guido Kanschat, Ralf Hartmann, 1997-2001, 2005
  */
 template <class VECTOR = Vector<double> >
-class Solver : public virtual Subscriptor
+class Solver : public Subscriptor
 {
 public:
   /**

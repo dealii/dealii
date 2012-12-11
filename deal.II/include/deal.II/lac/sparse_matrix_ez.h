@@ -94,7 +94,7 @@ template<typename number> class FullMatrix;
  * @date 2002, 2010
  */
 template <typename number>
-class SparseMatrixEZ : public virtual Subscriptor
+class SparseMatrixEZ : public Subscriptor
 {
 public:
   /**

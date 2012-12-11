@@ -46,7 +46,7 @@ DEAL_II_NAMESPACE_OPEN
  * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Wolfgang Bangerth, Guido Kanschat, 2000, 2007, 2011
  */
-class BlockIndices : public virtual Subscriptor
+class BlockIndices : public Subscriptor
 {
 public:
 

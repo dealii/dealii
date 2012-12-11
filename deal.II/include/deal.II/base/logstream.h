@@ -83,7 +83,7 @@ DEAL_II_NAMESPACE_OPEN
  * @ingroup textoutput
  * @author Guido Kanschat, Wolfgang Bangerth, 1999, 2003, 2011
  */
-class LogStream : public virtual Subscriptor
+class LogStream : public Subscriptor
 {
 public:
   /**

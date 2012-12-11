@@ -154,7 +154,7 @@ private:
  * @author Guido Kanschat, 2007
  */
 template<class VECTOR>
-class ScaledMatrix : public virtual Subscriptor
+class ScaledMatrix : public Subscriptor
 {
 public:
   /**
@@ -323,7 +323,7 @@ private:
  *
  * @author Guido Kanschat, 2002, 2003
  */
-class MeanValueFilter : public virtual Subscriptor
+class MeanValueFilter : public Subscriptor
 {
 public:
   /**
@@ -418,7 +418,7 @@ private:
  * @author Guido Kanschat, 2005
  */
 template<class VECTOR>
-class InverseMatrixRichardson : public virtual Subscriptor
+class InverseMatrixRichardson : public Subscriptor
 {
 public:
   /**

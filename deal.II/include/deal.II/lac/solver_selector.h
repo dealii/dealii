@@ -92,7 +92,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Ralf Hartmann, 1999
  */
 template <class VECTOR = Vector<double> >
-class SolverSelector : public virtual Subscriptor
+class SolverSelector : public Subscriptor
 {
 public:
 

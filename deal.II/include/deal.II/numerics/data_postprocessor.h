@@ -95,7 +95,7 @@ DEAL_II_NAMESPACE_OPEN
  * @author Tobias Leicht, 2007
  */
 template <int dim>
-class DataPostprocessor: public virtual Subscriptor
+class DataPostprocessor: public Subscriptor
 {
 public:
   /**
