@@ -594,6 +594,19 @@ namespace PETScWrappers
 
   /* ---------------------- SparseDirectMUMPS------------------------ */
 
+  SparseDirectMUMPS::SolverDataMUMPS::~SolverDataMUMPS ()
+  {
+    // destroy the solver object
+#if DEAL_II_PETSC_VERSION_LT(3,2,0)
+    int ierr = KSPDestroy (ksp);
+#else
+    int ierr = KSPDestroy (&ksp);
+#endif
+
+    AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
+
+
   SparseDirectMUMPS::SparseDirectMUMPS (SolverControl     &cn,
                                         const MPI_Comm       &mpi_communicator,
                                         const AdditionalData &data)
