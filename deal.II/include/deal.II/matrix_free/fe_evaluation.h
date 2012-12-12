@@ -2203,7 +2203,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
       Number *local_data [n_components];
       for (unsigned int comp=0; comp<n_components; ++comp)
         local_data[comp] =
-          const_cast<Number *>(reinterpret_cast<const Number *>(values_dofs[comp]));
+          const_cast<Number *>(&values_dofs[comp][0][0]);
 
       // standard case where there are sufficiently
       // many cells to fill all vectors
@@ -2367,7 +2367,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
       const unsigned int n_local_dofs =
         dofs_per_cell*VectorizedArray<Number>::n_array_elements * n_components;
       Number   *local_data =
-        const_cast<Number *>(reinterpret_cast<const Number *>(values_dofs[0]));
+        const_cast<Number *>(&values_dofs[0][0][0]);
       if (at_irregular_cell == false)
         {
           // check whether there is any constraint on
@@ -2841,7 +2841,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
         internal::check_vector_compatibility (*src[comp], dof_info);
       Number *local_src_number [n_components];
       for (unsigned int comp=0; comp<n_components; ++comp)
-        local_src_number[comp] = reinterpret_cast<Number *>(values_dofs[comp]);
+        local_src_number[comp] = &values_dofs[comp][0][0];
 
       // standard case where there are sufficiently
       // many cells to fill all vectors
@@ -2892,7 +2892,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
       Assert (n_fe_components == n_components_, ExcNotImplemented());
       const unsigned int n_local_dofs =
         dofs_per_cell * VectorizedArray<Number>::n_array_elements * n_components;
-      Number *local_src_number = reinterpret_cast<Number *>(values_dofs[0]);
+      Number *local_src_number = &values_dofs[0][0][0];
       if (at_irregular_cell == false)
         {
           for (unsigned int j=0; j<n_local_dofs; ++j)
