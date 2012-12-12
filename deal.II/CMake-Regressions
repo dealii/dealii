@@ -1,121 +1,16 @@
-2012-12-05 19:00  2   base/thread_validity_07
 2012-12-05 19:00  2   base/thread_validity_08
 2012-12-05 19:00  2   base/thread_validity_09
-2012-12-05 19:00  3   base/utilities_01
-2012-12-05 19:01  3   deal.II/derivative_approximation_2
 2012-12-05 19:01  3   deal.II/dof_renumbering_04
 2012-12-05 19:01  3   deal.II/dof_renumbering_04a
 2012-12-05 19:01  3   deal.II/support_point_map
 
     * This stuff looks bad...
 
+2012-12-05 19:00  3   base/utilities_01
 
-
-Minor issues producing a lot of noise:
-
-
-
-2012-12-05 19:00  3   base/data_out_base
-2012-12-05 19:00  3   base/data_out_reader_01
-2012-12-05 19:01  3   bits/data_out_01
-2012-12-05 19:01  3   bits/data_out_02
-2012-12-05 19:01  3   bits/data_out_faces_01
-2012-12-05 19:01  3   bits/data_out_faces_02
-2012-12-05 19:01  3   bits/data_out_rotation_01
-2012-12-05 19:01  3   bits/data_out_rotation_02
-2012-12-05 19:01  3   bits/data_out_stack_01
-2012-12-05 19:01  3   bits/data_out_stack_02
-
-    * These tests fail due to "7.3 pre" -> "8.0 pre" name change...
-
-
-2012-12-05 19:00  3   base/data_out_base_eps
-2012-12-05 19:01  3   deal.II/inhomogeneous_constraints
-2012-12-05 19:01  3   petsc/66
-2012-12-05 19:01  3   petsc/67
-2012-12-05 19:01  3   petsc/solver_09
-2012-12-05 19:01  3   petsc/solver_11
-
-    * Roundoff errors...
-
-
-2012-12-05 19:00  3   base/hierarchical
-2012-12-05 19:00  3   base/polynomial1d
-2012-12-05 19:01  3   deal.II/grid_test
-2012-12-05 19:01  3   deal.II/project_01
-2012-12-05 19:01  3   deal.II/project_02
-
-    * This is a weird bug: Somehow sometimes 1.000 gets printed as 1.00 ...
-
+    * Random number generator
 
 2012-12-05 19:00  0   base/path_search
 
     * broken because DEAL_II_PATH is not available any more in config.h
-
-
-2012-12-05 19:01  0   mpi/parallel_partitioner_01---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_partitioner_01---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_partitioner_02---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_partitioner_02---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_partitioner_04---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_partitioner_04---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_vector_01---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_vector_01---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_vector_02---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_vector_02---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_vector_03---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_vector_03---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_vector_04---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_vector_04---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_vector_05---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_vector_05---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_vector_06---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_vector_06---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_vector_07---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_vector_07---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_vector_08---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_vector_08---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_vector_09---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_vector_09---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_vector_10---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_vector_10---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_vector_11---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_vector_11---ncpu_4
-2012-12-05 19:01  0   mpi/parallel_vector_12---ncpu_1
-2012-12-05 19:01  0   mpi/parallel_vector_12---ncpu_10
-2012-12-05 19:01  0   mpi/parallel_vector_12---ncpu_4
-2012-12-05 19:01  0   mpi/trilinos_bug_5609---ncpu_2
-
-    * Compilation failed due to missing <iomanip> include
-
-
-2012-12-05 19:01  2   mpi/step-40_direct_solver---ncpu_10
-2012-12-05 19:01  2   mpi/step-40_direct_solver---ncpu_3
-2012-12-05 19:01  2   mpi/step-40_direct_solver---ncpu_4
-2012-12-05 19:01  2   petsc/sparse_direct_mumps
-
-    * My PETSc installation is not configured with MUMPS support
-
-
-2012-12-05 19:01  3   distributed_grids/2d_coarse_grid_01
-2012-12-05 19:01  3   distributed_grids/2d_coarse_grid_02
-2012-12-05 19:01  3   distributed_grids/2d_coarse_grid_03
-2012-12-05 19:01  3   distributed_grids/2d_coarse_grid_04
-2012-12-05 19:01  3   distributed_grids/2d_coarsening_01
-2012-12-05 19:01  3   distributed_grids/2d_coarsening_02
-2012-12-05 19:01  3   distributed_grids/2d_refinement_01
-2012-12-05 19:01  3   distributed_grids/2d_refinement_02
-2012-12-05 19:01  3   distributed_grids/3d_coarse_grid_01
-2012-12-05 19:01  3   distributed_grids/3d_coarse_grid_02
-2012-12-05 19:01  3   distributed_grids/3d_coarse_grid_03
-2012-12-05 19:01  3   distributed_grids/3d_coarse_grid_04
-2012-12-05 19:01  3   distributed_grids/3d_coarse_grid_05
-2012-12-05 19:01  3   distributed_grids/3d_coarsening_01
-2012-12-05 19:01  3   distributed_grids/3d_coarsening_02
-2012-12-05 19:01  3   distributed_grids/3d_refinement_01
-2012-12-05 19:01  3   distributed_grids/3d_refinement_02
-2012-12-05 19:01  3   distributed_grids/3d_refinement_03
-
-    * Binary output instead of ASCII due to zlib being used
-
 
