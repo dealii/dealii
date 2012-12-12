@@ -740,9 +740,8 @@ namespace MeshWorker
 
         if (pc != 0)
           fevalv[i] = std_cxx1x::shared_ptr<FEValuesBase<dim,sdim> > (
-                        reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
                           new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
-                                                  pc->get_quadrature(), pc->get_update_flags())));
+                                                  pc->get_quadrature(), pc->get_update_flags()));
         else if (pf != 0)
           fevalv[i] = std_cxx1x::shared_ptr<FEValuesBase<dim,sdim> > (
                         new FEFaceValues<dim,sdim> (pf->get_mapping(), pf->get_fe(), pf->get_quadrature(), pf->get_update_flags()));
@@ -779,9 +778,8 @@ namespace MeshWorker
 
         if (pc != 0)
           fevalv[i] = std_cxx1x::shared_ptr<FEValuesBase<dim,sdim> > (
-                        reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
                           new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
-                                                  pc->get_quadrature(), pc->get_update_flags())));
+                                                  pc->get_quadrature(), pc->get_update_flags()));
         else if (pf != 0)
           {
             Assert (false, ExcImpossibleInDim(1));
@@ -822,9 +820,8 @@ namespace MeshWorker
 
         if (pc != 0)
           fevalv[i] = std_cxx1x::shared_ptr<FEValuesBase<dim,sdim> > (
-                        reinterpret_cast<FEFaceValuesBase<dim,sdim>*>(
                           new FEValues<dim,sdim> (pc->get_mapping(), pc->get_fe(),
-                                                  pc->get_quadrature(), pc->get_update_flags())));
+                                                  pc->get_quadrature(), pc->get_update_flags()));
         else if (pf != 0)
           {
             Assert (false, ExcImpossibleInDim(1));
