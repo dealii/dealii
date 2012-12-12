@@ -355,17 +355,11 @@ namespace FEValuesViews
     // consistently throughout the code since revision 17903 at least.
 
     // ------------------------- scalar functions --------------------------
-
-    struct ShapeFunctionDataScalar
-    {
-      bool is_nonzero_shape_function_component;
-      unsigned int row_index;
-    };
-
+    template <int dim, int spacedim>
     void
     do_function_values (const ::dealii::Vector<double> &dof_values,
                         const Table<2,double>          &shape_values,
-                        const std::vector<ShapeFunctionDataScalar> &shape_function_data,
+                        const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                         std::vector<double>            &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
@@ -394,11 +388,11 @@ namespace FEValuesViews
 
     // same code for gradient and Hessian, template argument 'order' to give
     // the order of the derivative (= rank of gradient/Hessian tensor)
-    template <int order, int spacedim>
+    template <int order, int dim, int spacedim>
     void
     do_function_derivatives (const ::dealii::Vector<double> &dof_values,
                              const std::vector<std::vector<Tensor<order,spacedim> > > &shape_derivatives,
-                             const std::vector<ShapeFunctionDataScalar> &shape_function_data,
+                             const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<Tensor<order,spacedim> > &derivatives)
     {
       const unsigned int dofs_per_cell = dof_values.size();
@@ -426,11 +420,11 @@ namespace FEValuesViews
 
 
 
-    template <int spacedim>
+    template <int dim, int spacedim>
     void
     do_function_laplacians (const ::dealii::Vector<double> &dof_values,
                             const std::vector<std::vector<Tensor<2,spacedim> > > &shape_hessians,
-                            const std::vector<ShapeFunctionDataScalar> &shape_function_data,
+                            const std::vector<typename Scalar<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                             std::vector<double>           &laplacians)
     {
       const unsigned int dofs_per_cell = dof_values.size();
@@ -459,21 +453,10 @@ namespace FEValuesViews
 
     // ----------------------------- vector part ---------------------------
 
-    template <int spacedim>
-    struct ShapeFunctionDataVector
-    {
-      bool is_nonzero_shape_function_component[spacedim];
-      unsigned int row_index[spacedim];
-      int          single_nonzero_component;
-      unsigned int single_nonzero_component_index;
-    };
-
-
-
-    template <int spacedim>
+    template <int dim, int spacedim>
     void do_function_values (const ::dealii::Vector<double> &dof_values,
                              const Table<2,double>          &shape_values,
-                             const std::vector<ShapeFunctionDataVector<spacedim> > &shape_function_data,
+                             const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<Tensor<1,spacedim> > &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
@@ -518,11 +501,11 @@ namespace FEValuesViews
 
 
 
-    template <int order, int spacedim>
+    template <int order, int dim, int spacedim>
     void
     do_function_derivatives (const ::dealii::Vector<double> &dof_values,
                              const std::vector<std::vector<Tensor<order,spacedim> > > &shape_derivatives,
-                             const std::vector<ShapeFunctionDataVector<spacedim> > &shape_function_data,
+                             const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<Tensor<order+1,spacedim> > &derivatives)
     {
       const unsigned int dofs_per_cell = dof_values.size();
@@ -570,11 +553,11 @@ namespace FEValuesViews
 
 
 
-    template <int spacedim>
+    template <int dim, int spacedim>
     void
     do_function_symmetric_gradients (const ::dealii::Vector<double> &dof_values,
                                      const std::vector<std::vector<Tensor<1,spacedim> > > &shape_gradients,
-                                     const std::vector<ShapeFunctionDataVector<spacedim> > &shape_function_data,
+                                     const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                                      std::vector<dealii::SymmetricTensor<2,spacedim> > &symmetric_gradients)
     {
       const unsigned int dofs_per_cell = dof_values.size();
@@ -623,11 +606,11 @@ namespace FEValuesViews
 
 
 
-    template <int spacedim>
+    template <int dim, int spacedim>
     void
     do_function_divergences (const ::dealii::Vector<double> &dof_values,
                              const std::vector<std::vector<Tensor<1,spacedim> > > &shape_gradients,
-                             const std::vector<ShapeFunctionDataVector<spacedim> > &shape_function_data,
+                             const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<double> &divergences)
     {
       const unsigned int dofs_per_cell = dof_values.size();
@@ -673,11 +656,11 @@ namespace FEValuesViews
 
 
 
-    template <int spacedim>
+    template <int dim, int spacedim>
     void
     do_function_curls (const ::dealii::Vector<double> &dof_values,
                        const std::vector<std::vector<Tensor<1,spacedim> > > &shape_gradients,
-                       const std::vector<ShapeFunctionDataVector<spacedim> > &shape_function_data,
+                       const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                        std::vector<typename dealii::internal::CurlType<spacedim>::type> &curls)
     {
       const unsigned int dofs_per_cell = dof_values.size();
@@ -858,11 +841,11 @@ namespace FEValuesViews
 
 
 
-    template <int spacedim>
+    template <int dim, int spacedim>
     void
     do_function_laplacians (const ::dealii::Vector<double> &dof_values,
                             const std::vector<std::vector<Tensor<2,spacedim> > > &shape_hessians,
-                            const std::vector<ShapeFunctionDataVector<spacedim> > &shape_function_data,
+                            const std::vector<typename Vector<dim,spacedim>::ShapeFunctionData> &shape_function_data,
                             std::vector<Tensor<1,spacedim> > &laplacians)
     {
       const unsigned int dofs_per_cell = dof_values.size();
@@ -912,11 +895,11 @@ namespace FEValuesViews
 
     // ---------------------- symmetric tensor part ------------------------
 
-    template <int spacedim>
+    template <int dim, int spacedim>
     void
     do_function_values (const ::dealii::Vector<double> &dof_values,
                         const Table<2,double>          &shape_values,
-                        const std::vector<ShapeFunctionDataVector<dealii::SymmetricTensor<2,spacedim>::n_independent_components> > &shape_function_data,
+                        const std::vector<typename SymmetricTensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
                         std::vector<dealii::SymmetricTensor<2,spacedim> > &values)
     {
       const unsigned int dofs_per_cell = dof_values.size();
@@ -966,11 +949,11 @@ namespace FEValuesViews
 
 
 
-    template <int spacedim>
+    template <int dim, int spacedim>
     void
     do_function_divergences (const ::dealii::Vector<double> &dof_values,
                              const std::vector<std::vector<Tensor<1,spacedim> > > &shape_gradients,
-                             const std::vector<ShapeFunctionDataVector<dealii::SymmetricTensor<2,spacedim>::n_independent_components> > &shape_function_data,
+                             const std::vector<typename SymmetricTensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
                              std::vector<Tensor<1,spacedim> > &divergences)
     {
       const unsigned int dofs_per_cell = dof_values.size();
@@ -1050,6 +1033,7 @@ namespace FEValuesViews
             }
         }
     }
+
   } // end of namespace internal
 
 
@@ -1072,9 +1056,8 @@ namespace FEValuesViews
     // get function values of dofs on this cell and call internal worker function
     dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_values (dof_values, fe_values.shape_values,
-                                  reinterpret_cast<const std::vector<internal::ShapeFunctionDataScalar>&>(shape_function_data),
-                                  values);
+    internal::do_function_values<dim,spacedim>
+      (dof_values, fe_values.shape_values, shape_function_data, values);
   }
 
 
@@ -1097,9 +1080,8 @@ namespace FEValuesViews
     // get function values of dofs on this cell
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_derivatives (dof_values, fe_values.shape_gradients,
-                                       reinterpret_cast<const std::vector<internal::ShapeFunctionDataScalar>&>(shape_function_data),
-                                       gradients);
+    internal::do_function_derivatives<1,dim,spacedim>
+      (dof_values, fe_values.shape_gradients, shape_function_data, gradients);
   }
 
 
@@ -1122,9 +1104,8 @@ namespace FEValuesViews
     // get function values of dofs on this cell
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_derivatives (dof_values, fe_values.shape_hessians,
-                                       reinterpret_cast<const std::vector<internal::ShapeFunctionDataScalar>&>(shape_function_data),
-                                       hessians);
+    internal::do_function_derivatives<2,dim,spacedim>
+      (dof_values, fe_values.shape_hessians, shape_function_data, hessians);
   }
 
 
@@ -1147,9 +1128,8 @@ namespace FEValuesViews
     // get function values of dofs on this cell
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_laplacians (dof_values, fe_values.shape_hessians,
-                                      reinterpret_cast<const std::vector<internal::ShapeFunctionDataScalar>&>(shape_function_data),
-                                      laplacians);
+    internal::do_function_laplacians<dim,spacedim>
+      (dof_values, fe_values.shape_hessians, shape_function_data, laplacians);
   }
 
 
@@ -1172,9 +1152,8 @@ namespace FEValuesViews
     // get function values of dofs on this cell
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_values (dof_values, fe_values.shape_values,
-                                  reinterpret_cast<const std::vector<internal::ShapeFunctionDataVector<spacedim> >&>(shape_function_data),
-                                  values);
+    internal::do_function_values<dim,spacedim>
+      (dof_values, fe_values.shape_values, shape_function_data, values);
   }
 
 
@@ -1198,9 +1177,8 @@ namespace FEValuesViews
     // get function values of dofs on this cell
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_derivatives (dof_values, fe_values.shape_gradients,
-                                       reinterpret_cast<const std::vector<internal::ShapeFunctionDataVector<spacedim> >&>(shape_function_data),
-                                       gradients);
+    internal::do_function_derivatives<1,dim,spacedim>
+      (dof_values, fe_values.shape_gradients, shape_function_data, gradients);
   }
 
 
@@ -1223,10 +1201,9 @@ namespace FEValuesViews
     // get function values of dofs on this cell
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_symmetric_gradients (dof_values,
-                                               fe_values.shape_gradients,
-                                               reinterpret_cast<const std::vector<internal::ShapeFunctionDataVector<spacedim> >&>(shape_function_data),
-                                               symmetric_gradients);
+    internal::do_function_symmetric_gradients<dim,spacedim>
+      (dof_values, fe_values.shape_gradients, shape_function_data,
+       symmetric_gradients);
   }
 
 
@@ -1250,10 +1227,8 @@ namespace FEValuesViews
     // on this cell
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_divergences (dof_values,
-                                       fe_values.shape_gradients,
-                                       reinterpret_cast<const std::vector<internal::ShapeFunctionDataVector<spacedim> >&>(shape_function_data),
-                                       divergences);
+    internal::do_function_divergences<dim,spacedim>
+      (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
   }
 
   template <int dim, int spacedim>
@@ -1275,9 +1250,8 @@ namespace FEValuesViews
     // get function values of dofs on this cell
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values (fe_function, dof_values);
-    internal::do_function_curls (dof_values, fe_values.shape_gradients,
-                                 reinterpret_cast<const std::vector<internal::ShapeFunctionDataVector<spacedim> >&>(shape_function_data),
-                                 curls);
+    internal::do_function_curls<dim,spacedim>
+      (dof_values, fe_values.shape_gradients, shape_function_data, curls);
   }
 
 
@@ -1299,9 +1273,8 @@ namespace FEValuesViews
     // get function values of dofs on this cell
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_derivatives (dof_values, fe_values.shape_hessians,
-                                       reinterpret_cast<const std::vector<internal::ShapeFunctionDataVector<spacedim> >&>(shape_function_data),
-                                       hessians);
+    internal::do_function_derivatives<2,dim,spacedim>
+      (dof_values, fe_values.shape_hessians, shape_function_data, hessians);
   }
 
 
@@ -1327,9 +1300,8 @@ namespace FEValuesViews
     // get function values of dofs on this cell
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_laplacians (dof_values, fe_values.shape_hessians,
-                                      reinterpret_cast<const std::vector<internal::ShapeFunctionDataVector<spacedim> >&>(shape_function_data),
-                                      laplacians);
+    internal::do_function_laplacians<dim,spacedim>
+      (dof_values, fe_values.shape_hessians, shape_function_data, laplacians);
   }
 
 
@@ -1352,9 +1324,8 @@ namespace FEValuesViews
     // get function values of dofs on this cell
     dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_values (dof_values, fe_values.shape_values,
-                                  reinterpret_cast<const std::vector<internal::ShapeFunctionDataVector<dealii::SymmetricTensor<2,spacedim>::n_independent_components> >&>(shape_function_data),
-                                  values);
+    internal::do_function_values<dim,spacedim>
+      (dof_values, fe_values.shape_values, shape_function_data, values);
   }
 
 
@@ -1378,9 +1349,8 @@ namespace FEValuesViews
     // on this cell
     dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
-    internal::do_function_divergences (dof_values, fe_values.shape_gradients,
-                                       reinterpret_cast<const std::vector<internal::ShapeFunctionDataVector<dealii::SymmetricTensor<2,spacedim>::n_independent_components> >&>(shape_function_data),
-                                       divergences);
+    internal::do_function_divergences<dim,spacedim>
+      (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
   }
 }
 
