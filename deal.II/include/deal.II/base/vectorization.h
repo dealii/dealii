@@ -103,10 +103,7 @@ public:
   operator [] (const unsigned int comp)
   {
     AssertIndexRange (comp, 4);
-    // __m256d stores doubles in adjacent memory blocks. to access one double
-    // data field at a time, first cast the address of the given data field to
-    // void* and then back to double*.
-    return *(static_cast<double *>(static_cast<void *>(&data))+comp);
+    return *(reinterpret_cast<double *>(&data)+comp);
   }
 
   /**
@@ -116,7 +113,7 @@ public:
   operator [] (const unsigned int comp) const
   {
     AssertIndexRange (comp, 4);
-    return *(static_cast<const double *>(static_cast<const void *>(&data))+comp);
+    return *(reinterpret_cast<const double *>(&data)+comp);
   }
 
   /**
@@ -289,7 +286,7 @@ public:
   operator [] (const unsigned int comp)
   {
     AssertIndexRange (comp, 8);
-    return *(static_cast<float *>(static_cast<void *>(&data))+comp);
+    return *(reinterpret_cast<float *>(&data)+comp);
   }
 
   /**
@@ -299,7 +296,7 @@ public:
   operator [] (const unsigned int comp) const
   {
     AssertIndexRange (comp, 8);
-    return *(static_cast<const float *>(static_cast<const void *>(&data))+comp);
+    return *(reinterpret_cast<const float *>(&data)+comp);
   }
 
   /**
@@ -475,7 +472,7 @@ public:
   operator [] (const unsigned int comp)
   {
     AssertIndexRange (comp, 2);
-    return *(static_cast<double *>(static_cast<void *>(&data))+comp);
+    return *(reinterpret_cast<double *>(&data)+comp);
   }
 
   /**
@@ -485,7 +482,7 @@ public:
   operator [] (const unsigned int comp) const
   {
     AssertIndexRange (comp, 2);
-    return *(static_cast<const double *>(static_cast<const void *>(&data))+comp);
+    return *(reinterpret_cast<const double *>(&data)+comp);
   }
 
   /**
@@ -654,7 +651,7 @@ public:
   operator [] (const unsigned int comp)
   {
     AssertIndexRange (comp, 4);
-    return *(static_cast<float *>(static_cast<void *>(&data))+comp);
+    return *(reinterpret_cast<float *>(&data)+comp);
   }
 
   /**
@@ -664,7 +661,7 @@ public:
   operator [] (const unsigned int comp) const
   {
     AssertIndexRange (comp, 4);
-    return *(static_cast<const float *>(static_cast<const void *>(&data))+comp);
+    return *(reinterpret_cast<const float *>(&data)+comp);;
   }
 
   /**
