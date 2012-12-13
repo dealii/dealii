@@ -540,13 +540,6 @@ namespace Utilities
 
     bool job_supports_mpi ()
     {
-      return program_uses_mpi();
-    }
-
-
-    bool
-    program_uses_mpi ()
-    {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
@@ -555,6 +548,13 @@ namespace Utilities
 #else
       return false;
 #endif
+    }
+
+
+    bool
+    program_uses_mpi ()
+    {
+      return job_supports_mpi();
     }
 
 
