@@ -970,7 +970,7 @@ public:
    * yourself, you should also rename this function to avoid programs relying
    * on outdated information!
    */
-  inline const std::size_t *get_rowstart_indices () const DEAL_II_DEPRECATED;
+  inline const std::size_t *get_rowstart_indices () const;
 
   /**
    * @deprecated. Use @p row_length and @p column_number instead. Also, using
@@ -989,7 +989,7 @@ public:
    * yourself, you should also rename this function to avoid programs relying
    * on outdated information!
    */
-  inline const unsigned int *get_column_numbers () const DEAL_II_DEPRECATED;
+  inline const unsigned int *get_column_numbers () const;
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
   /** @addtogroup Exceptions
