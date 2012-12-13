@@ -31,7 +31,7 @@ template <typename VECTOR>
 typename GrowingVectorMemory<VECTOR>::Pool GrowingVectorMemory<VECTOR>::pool;
 
 template <typename VECTOR>
-Threads::ThreadMutex GrowingVectorMemory<VECTOR>::mutex;
+Threads::Mutex GrowingVectorMemory<VECTOR>::mutex;
 
 template <typename VECTOR>
 inline
@@ -96,7 +96,7 @@ GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const unsigned int initial_siz
   current_alloc(0),
   log_statistics(log_statistics)
 {
-  Threads::ThreadMutex::ScopedLock lock(mutex);
+  Threads::Mutex::ScopedLock lock(mutex);
   pool.initialize(initial_size);
 }
 
@@ -123,7 +123,7 @@ inline
 VECTOR *
 GrowingVectorMemory<VECTOR>::alloc ()
 {
-  Threads::ThreadMutex::ScopedLock lock(mutex);
+  Threads::Mutex::ScopedLock lock(mutex);
   ++total_alloc;
   ++current_alloc;
   // see if there is a free vector
@@ -153,7 +153,7 @@ inline
 void
 GrowingVectorMemory<VECTOR>::free(const VECTOR *const v)
 {
-  Threads::ThreadMutex::ScopedLock lock(mutex);
+  Threads::Mutex::ScopedLock lock(mutex);
   for (typename std::vector<entry_type>::iterator i=pool.data->begin();
        i != pool.data->end(); ++i)
     {
@@ -174,7 +174,7 @@ inline
 void
 GrowingVectorMemory<VECTOR>::release_unused_memory ()
 {
-  Threads::ThreadMutex::ScopedLock lock(mutex);
+  Threads::Mutex::ScopedLock lock(mutex);
 
   std::vector<entry_type> new_data;
 
@@ -200,7 +200,7 @@ inline
 std::size_t
 GrowingVectorMemory<VECTOR>::memory_consumption () const
 {
-  Threads::ThreadMutex::ScopedLock lock(mutex);
+  Threads::Mutex::ScopedLock lock(mutex);
 
   std::size_t result = sizeof (*this);
   const typename std::vector<entry_type>::const_iterator

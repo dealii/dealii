@@ -947,7 +947,7 @@ namespace parallel
        * when used with several
        * threads.
        */
-      mutable Threads::ThreadMutex mutex;
+      mutable Threads::Mutex mutex;
 
       /**
        * A helper function that clears the

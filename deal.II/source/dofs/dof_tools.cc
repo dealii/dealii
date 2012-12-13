@@ -4720,8 +4720,8 @@ namespace DoFTools
                   // since it should happen rather rarely that there are
                   // several threads operating on different intergrid
                   // weights, have only one mutex for all of them
-                  static Threads::ThreadMutex mutex;
-                  Threads::ThreadMutex::ScopedLock lock (mutex);
+                  static Threads::Mutex mutex;
+                  Threads::Mutex::ScopedLock lock (mutex);
                   for (unsigned int i=0; i<global_parameter_representation.size(); ++i)
                     // set this weight if it belongs to a parameter dof.
                     if (weight_mapping[i] != -1)

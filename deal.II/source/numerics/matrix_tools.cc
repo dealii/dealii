@@ -825,7 +825,7 @@ namespace MatrixCreator
                                    const Function<spacedim> *const coefficient,
                                    const std::vector<unsigned int> &component_mapping,
                                    const MatrixCreator::internal::IteratorRange<DoFHandler<dim,spacedim> >   range,
-                                   Threads::ThreadMutex      &mutex)
+                                   Threads::Mutex      &mutex)
     {
       // All assertions for this function
       // are in the calling function
@@ -1060,7 +1060,7 @@ namespace MatrixCreator
                                      dofs_on_face_vector.end());
 
               // lock the matrix
-              Threads::ThreadMutex::ScopedLock lock (mutex);
+              Threads::Mutex::ScopedLock lock (mutex);
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
                   if (dof_is_on_face[i] && dof_to_boundary_mapping[dofs[i]] != numbers::invalid_unsigned_int)
@@ -1093,7 +1093,7 @@ namespace MatrixCreator
                                         const Function<3> *const ,
                                         const std::vector<unsigned int> &,
                                         const MatrixCreator::internal::IteratorRange<DoFHandler<2,3> > ,
-                                        Threads::ThreadMutex &)
+                                        Threads::Mutex &)
     {
       Assert(false,ExcNotImplemented());
     }
@@ -1112,7 +1112,7 @@ namespace MatrixCreator
                                         const Function<3> *const ,
                                         const std::vector<unsigned int> &,
                                         const MatrixCreator::internal::IteratorRange<DoFHandler<1,3> > ,
-                                        Threads::ThreadMutex &)
+                                        Threads::Mutex &)
     {
       Assert(false,ExcNotImplemented());
     }
@@ -1177,7 +1177,7 @@ namespace MatrixCreator
 
     // mutex to synchronise access to
     // the matrix
-    Threads::ThreadMutex mutex;
+    Threads::Mutex mutex;
 
     typedef std_cxx1x::tuple<const Mapping<dim,spacedim> &,
             const DoFHandler<dim,spacedim> &,
@@ -1193,7 +1193,7 @@ namespace MatrixCreator
      const Function<spacedim> *const coefficient,
      const std::vector<unsigned int> &component_mapping,
      const MatrixCreator::internal::IteratorRange<DoFHandler<dim,spacedim> >   range,
-     Threads::ThreadMutex      &mutex);
+     Threads::Mutex      &mutex);
     create_boundary_mass_matrix_1_t p
       = &create_boundary_mass_matrix_1<dim,spacedim>;
 
@@ -1225,7 +1225,7 @@ namespace MatrixCreator
                                    const Function<spacedim> *const coefficient,
                                    const std::vector<unsigned int> &component_mapping,
                                    const MatrixCreator::internal::IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
-                                   Threads::ThreadMutex      &mutex)
+                                   Threads::Mutex      &mutex)
     {
       const hp::MappingCollection<dim,spacedim> &mapping = std_cxx1x::get<0>(commons);
       const hp::DoFHandler<dim,spacedim> &dof = std_cxx1x::get<1>(commons);
@@ -1522,7 +1522,7 @@ namespace MatrixCreator
 #endif
 
               // lock the matrix
-              Threads::ThreadMutex::ScopedLock lock (mutex);
+              Threads::Mutex::ScopedLock lock (mutex);
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 for (unsigned int j=0; j<dofs_per_cell; ++j)
                   if (dof_is_on_face[i] && dof_is_on_face[j])
@@ -1657,7 +1657,7 @@ namespace MatrixCreator
 
     // mutex to synchronise access to
     // the matrix
-    Threads::ThreadMutex mutex;
+    Threads::Mutex mutex;
 
     // then assemble in parallel
     typedef void (*create_boundary_mass_matrix_1_t)
@@ -1669,7 +1669,7 @@ namespace MatrixCreator
      const Function<spacedim> *const coefficient,
      const std::vector<unsigned int> &component_mapping,
      const MatrixCreator::internal::IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
-     Threads::ThreadMutex      &mutex);
+     Threads::Mutex      &mutex);
     create_boundary_mass_matrix_1_t p = &create_boundary_mass_matrix_1<dim,spacedim>;
 
 //TODO: Use WorkStream here

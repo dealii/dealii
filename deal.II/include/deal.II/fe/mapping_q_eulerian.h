@@ -220,7 +220,7 @@ private:
    * A variable to guard access to
    * the fe_values variable.
    */
-  mutable Threads::ThreadMutex fe_values_mutex;
+  mutable Threads::Mutex fe_values_mutex;
 
   /**
    * Compute the positions of the

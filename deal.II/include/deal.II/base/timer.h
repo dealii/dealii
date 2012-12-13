@@ -516,7 +516,7 @@ private:
    * class gives reasonable results even
    * when used with several threads.
    */
-  Threads::ThreadMutex mutex;
+  Threads::Mutex mutex;
 };
 
 

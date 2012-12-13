@@ -163,7 +163,7 @@ compute_mapping_support_points
   // fe_values variable isn't used
   // simulatenously from different
   // threads
-  Threads::ThreadMutex::ScopedLock lock(fe_values_mutex);
+  Threads::Mutex::ScopedLock lock(fe_values_mutex);
   fe_values.reinit(dof_cell);
   fe_values.get_function_values(*euler_vector, shift_vector);
 

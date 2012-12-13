@@ -175,7 +175,7 @@ namespace
   // linking libraries for more than
   // one space dimension together
   static
-  Threads::ThreadMutex fe_name_map_lock;
+  Threads::Mutex fe_name_map_lock;
 
   // This is the map used by
   // FETools::get_fe_from_name and
@@ -1951,7 +1951,7 @@ namespace FETools
     // operation of this function;
     // for this, acquire the lock
     // until we quit this function
-    Threads::ThreadMutex::ScopedLock lock(fe_name_map_lock);
+    Threads::Mutex::ScopedLock lock(fe_name_map_lock);
 
     Assert(fe_name_map_1d.find(name) == fe_name_map_1d.end(),
            ExcMessage("Cannot change existing element in finite element name list"));
@@ -1981,7 +1981,7 @@ namespace FETools
     // operation of this function;
     // for this, acquire the lock
     // until we quit this function
-    Threads::ThreadMutex::ScopedLock lock(fe_name_map_lock);
+    Threads::Mutex::ScopedLock lock(fe_name_map_lock);
 
     Assert(fe_name_map_2d.find(name) == fe_name_map_2d.end(),
            ExcMessage("Cannot change existing element in finite element name list"));
@@ -2010,7 +2010,7 @@ namespace FETools
     // operation of this function;
     // for this, acquire the lock
     // until we quit this function
-    Threads::ThreadMutex::ScopedLock lock(fe_name_map_lock);
+    Threads::Mutex::ScopedLock lock(fe_name_map_lock);
 
     Assert(fe_name_map_3d.find(name) == fe_name_map_3d.end(),
            ExcMessage("Cannot change existing element in finite element name list"));
@@ -2200,7 +2200,7 @@ namespace FETools
           {
             // Make sure no other thread
             // is just adding an element
-            Threads::ThreadMutex::ScopedLock lock (fe_name_map_lock);
+            Threads::Mutex::ScopedLock lock (fe_name_map_lock);
 
             AssertThrow (fe_name_map.find(name_part) != fe_name_map.end(),
                          ExcInvalidFEName(name));

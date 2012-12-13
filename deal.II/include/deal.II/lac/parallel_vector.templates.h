@@ -211,7 +211,7 @@ namespace parallel
         return;
 
       // make this function thread safe
-      Threads::ThreadMutex::ScopedLock lock (mutex);
+      Threads::Mutex::ScopedLock lock (mutex);
 
       const unsigned int n_import_targets = part.import_targets().size();
       const unsigned int n_ghost_targets  = part.ghost_targets().size();
@@ -292,7 +292,7 @@ namespace parallel
         return;
 
       // make this function thread safe
-      Threads::ThreadMutex::ScopedLock lock (mutex);
+      Threads::Mutex::ScopedLock lock (mutex);
 
       const unsigned int n_import_targets = part.import_targets().size();
       const unsigned int n_ghost_targets  = part.ghost_targets().size();
@@ -357,7 +357,7 @@ namespace parallel
         return;
 
       // make this function thread safe
-      Threads::ThreadMutex::ScopedLock lock (mutex);
+      Threads::Mutex::ScopedLock lock (mutex);
 
       const unsigned int n_import_targets = part.import_targets().size();
       const unsigned int n_ghost_targets = part.ghost_targets().size();
@@ -452,7 +452,7 @@ namespace parallel
       if (update_ghost_values_requests.size() > 0)
         {
           // make this function thread safe
-          Threads::ThreadMutex::ScopedLock lock (mutex);
+          Threads::Mutex::ScopedLock lock (mutex);
 
           int ierr;
           ierr = MPI_Waitall (update_ghost_values_requests.size(),
