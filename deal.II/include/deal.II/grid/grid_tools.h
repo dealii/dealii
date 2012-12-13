@@ -20,6 +20,7 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/fe/mapping_q1.h>
 
+#include <bitset>
 #include <list>
 
 DEAL_II_NAMESPACE_OPEN
@@ -278,7 +279,7 @@ namespace GridTools
    * function which computes all
    * active vertex patches by looping
    * over cells.
-  *
+   *
    * Find and return a vector of
    * iterators to active cells that
    * surround a given vertex @p vertex.
@@ -914,71 +915,164 @@ namespace GridTools
                              = std::set<types::boundary_id>());
 
 
+
   /**
-   * This function loops over all cells
-   * from @p begin to @p end and collects a
-   * set of periodic cell pairs for
-   * @p direction:
+   * An orthogonal equality test for faces.
    *
-   * Given a @p direction,
-   * define a 'left' boundary as all
-   * boundary faces belonging to
-   * @p boundary_component with corresponding
-   * unit normal (of the @ref
-   * GlossReferenceCell "reference cell") in
-   * negative @p direction, i.e. all boundary
-   * faces with
-   * <tt>face(2*direction)->at_boundary()==true</tt>.
-   * Analogously, a 'right' boundary
-   * consisting of all faces of @p
-   * boundary_component with unit normal
-   * in positive @p direction,
-   * <tt>face(2*direction+1)->at_boundary()==true</tt>.
+   * @p face1 and @p face2 are considered equal, if a one to one matching
+   * between its vertices can be achieved via an orthogonal equality
+   * relation: Two vertices <tt>v_1</tt> and <tt>v_2</tt> are considered
+   * equal, if <code> (v_1 + offset) - v_2</code> is parallel to the unit
+   * vector in @p direction.
    *
-   * This function tries to match
-   * all cells with faces belonging to the
-   * left' boundary with the cells with faces
-   * belonging to the 'right' boundary
-   * with the help of an
-   * orthogonal equality relation:
-   * Two cells do match if the vertices of
-   * the respective boundary faces
-   * can be transformed into each other by
-   * parallel translation in @p direction.
+   * If the matching was successful, the _relative_ orientation of @p face1
+   * with respect to @p face2 is returned in the bitset @p orientation,
+   * where
+   * @code
+   * orientation[0] -> face_orientation
+   * orientation[1] -> face_flip
+   * orientation[2] -> face_rotation
+   * @endcode
    *
-   * The @p offset is a vector tangential to
-   * the faces that is added to the location
-   * of vertices of the 'left' boundary when
-   * attempting to match them to the
-   * corresponding vertices of the 'right'
-   * boundary. This can be used to implement
-   * conditions such as $u(0,y)=u(1,y+1)$.
+   * In 2D <tt>face_orientation</tt> is always <tt>true</tt>,
+   * <tt>face_rotation</tt> is always <tt>false</tt>, and face_flip has the
+   * meaning of <tt>line_flip</tt>. More precisely in 3d:
+   *
+   * <tt>face_orientation</tt>:
+   * <tt>true</tt> if @p face1 and @p face2 have the same orientation.
+   * Otherwise, the vertex indices of @p face1 match the vertex indices of
+   * @p face2 in the following manner:
+   *
+   * @code
+   * face1:           face2:
+   *
+   * 1 - 3            2 - 3
+   * |   |    <-->    |   |
+   * 0 - 2            0 - 1
+   * @endcode
+   *
+   * <tt>face_flip</tt>:
+   * <tt>true</tt> if the matched vertices are rotated by 180 degrees:
+   *
+   * @code
+   * face1:           face2:
+   *
+   * 1 - 0            2 - 3
+   * |   |    <-->    |   |
+   * 3 - 2            0 - 1
+   * @endcode
+   *
+   * <tt>face_rotation</tt>: <tt>true</tt> if the matched vertices are
+   * rotated by 90 degrees counterclockwise:
+   *
+   * @code
+   * face1:           face2:
+   *
+   * 0 - 2            2 - 3
+   * |   |    <-->    |   |
+   * 1 - 3            0 - 1
+   * @endcode
+   *
+   * and any combination of that...
+   * More information on the topic can be found in the
+   * @ref GlossFaceOrientation "glossary" article.
+   *
+   * @author Matthias Maier, 2012
    */
-  template<typename CellIterator>
-  std::map<CellIterator, CellIterator>
-  collect_periodic_cell_pairs (const CellIterator                          &begin,
-                               const typename identity<CellIterator>::type &end,
-                               const types::boundary_id                  boundary_component,
-                               int                                         direction,
-                               const dealii::Tensor<1,CellIterator::AccessorType::space_dimension>
-                               &offset = dealii::Tensor<1,CellIterator::AccessorType::space_dimension>());
+  template<typename FaceIterator>
+  bool
+  orthogonal_equality (std::bitset<3>     &orientation,
+                       const FaceIterator &face1,
+                       const FaceIterator &face2,
+                       const int          direction,
+                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset);
 
 
   /**
-   * Same as above but matches all active
-   * cells, i.e. this function calls the
-   * above function with
-   * @p dof_handler.begin_active() and
-   * @p dof_handler.end() as the first two
-   * arguments.
+   * Same function as above, but doesn't return the actual orientation
+   */
+  template<typename FaceIterator>
+  bool
+  orthogonal_equality (const FaceIterator &face1,
+                       const FaceIterator &face2,
+                       const int direction,
+                       const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset);
+
+
+  /**
+   * This function loops over all faces from @p begin to @p end and
+   * collects a set of periodic face pairs for @p direction:
+   *
+   * Define a 'first' boundary as all boundary faces having boundary_id
+   * @p b_id1 and a 'second' boundary consisting of all faces belonging
+   * to @p b_id2.
+   *
+   * This function tries to match all faces belonging to the first
+   * boundary with faces belonging to the second boundary with the help
+   * of orthogonal_equality.
+   *
+   * The @p offset is a vector tangential to the faces that is added to the
+   * location of vertices of the 'first' boundary when attempting to match
+   * them to the corresponding vertices of the 'second' boundary. This can
+   * be used to implement conditions such as $u(0,y)=u(1,y+1)$.
+   *
+   * @author Matthias Maier, 2012
+   */
+  template<typename FaceIterator>
+  std::map<FaceIterator, std::pair<FaceIterator, std::bitset<3> > >
+  collect_periodic_face_pairs (const FaceIterator                          &begin,
+                               const typename identity<FaceIterator>::type &end,
+                               const types::boundary_id                    b_id1,
+                               const types::boundary_id                    b_id2,
+                               int                                         direction,
+                               const dealii::Tensor<1,FaceIterator::AccessorType::space_dimension> &offset);
+
+
+  /**
+   * Same function as above, but accepts a Triangulation or DoFHandler
+   * object @p dof_handler instead of an explicit face iterator range.
+   *
+   * This function will collect periodic face pairs on the highest (i.e.
+   * coarsest) mesh level.
+   *
+   * @author Matthias Maier, 2012
    */
   template<typename DH>
-  std::map<typename DH::cell_iterator, typename DH::cell_iterator>
-  collect_periodic_cell_pairs (const DH                   &dof_handler,
-                               const types::boundary_id boundary_component,
-                               int                        direction,
-                               const dealii::Tensor<1,DH::space_dimension>
-                               &offset = Tensor<1,DH::space_dimension>());
+  std::map<typename DH::face_iterator, std::pair<typename DH::face_iterator, std::bitset<3> > >
+  collect_periodic_face_pairs (const DH                 &dof_handler, /*TODO: Name*/
+                               const types::boundary_id b_id1,
+                               const types::boundary_id b_id2,
+                               int                      direction,
+                               const dealii::Tensor<1,DH::space_dimension> &offset);
+
+
+  /**
+   * This compatibility version of collect_periodic_face_pairs only works
+   * on grids with cells in @ref GlossFaceOrientation "standard orientation".
+   *
+   * Instead of defining a 'first' and 'second' boundary with the help of
+   * two boundary_indicators this function defines a 'left' boundary as all
+   * faces with local face index <code>2*dimension</code> and boundary
+   * indicator @p b_id and, similarly, a 'right' boundary consisting of all
+   * face with local face index <code>2*dimension+1</code> and boundary
+   * indicator @p b_id.
+   *
+   * This function will collect periodic face pairs on the highest (i.e.
+   * coarsest) mesh level.
+   *
+   * @note This version of collect_periodic_face_pairs  will not work on
+   * meshes with cells not in @ref GlossFaceOrientation
+   * "standard orientation".
+   *
+   * @author Matthias Maier, 2012
+   */
+  template<typename DH>
+  std::map<typename DH::face_iterator, typename DH::face_iterator>
+  collect_periodic_face_pairs (const DH                 &dof_handler, /*TODO: Name*/
+                               const types::boundary_id b_id,
+                               int                      direction,
+                               const dealii::Tensor<1,DH::space_dimension> &offset);
+
 
 
   /**
@@ -1030,7 +1124,7 @@ namespace GridTools
                   << " is not used in the given triangulation");
 
 
-}
+} /*namespace GridTools*/
 
 
 

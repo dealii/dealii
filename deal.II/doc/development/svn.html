@@ -2,12 +2,13 @@
                  "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
-  <link href="../screen.css" rel="StyleSheet">
+  <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
   <title>deal.II SVN Archive</title>
+  <link href="../screen.css" rel="StyleSheet">
   <meta name="author" content="the deal.II authors <authors@dealii.org>">
   <meta name="copyright" content="Copyright (C) 1998, 1999, 2000, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012 by the deal.II authors">
-  <meta name="date" content="$Date: 2006-07-24 10:37:21 -0500 (Mon, 24 Jul 2006) $">
-  <meta name="svn_id" content="$Id: writing-documentation.html 13428 2006-07-24 15:37:21Z bangerth $">
+  <meta name="date" content="$Date$">
+  <meta name="svn_id" content="$Id$">
   <meta name="keywords" content="deal dealii finite elements fem triangulation">
   <meta http-equiv="content-language" content="en">
 </head>
@@ -19,26 +20,26 @@
 
 
   The root of the deal.II archive is located
-  at <a href="http://www.dealii.org/svn/dealii/">http://www.dealii.org/svn/dealii/</a>.
+  at <a href="https://svn.dealii.org/">https://svn.dealii.org/</a>.
   There are three subdirectories:
   <ul>
-    <li> <a href="http://www.dealii.org/svn/dealii/trunk/">trunk</a>:
+    <li> <a href="https://svn.dealii.org/trunk/">trunk</a>:
       This is the location of the current development version; it contains the
-    directories <a href="http://www.dealii.org/svn/dealii/trunk/deal.II">deal.II</a>
+    directories <a href="https://svn.dealii.org/trunk/deal.II">deal.II</a>
     with the library proper
-    and <a href="http://www.dealii.org/svn/dealii/trunk/tests">tests</a>
+    and <a href="https://svn.dealii.org/trunk/tests">tests</a>
     with the testsuite.
 
-    <li> <a href="http://www.dealii.org/svn/dealii/tags/">tags</a>:
+    <li> <a href="https://svn.dealii.org/tags/">tags</a>:
     contains released versions. They have the same
     structure as the trunk.
 
-    <li> <a href="http://www.dealii.org/svn/dealii/branches/">branches</a>:
+    <li> <a href="https://svn.dealii.org/branches/">branches</a>:
     currently active branches; it also has subdirectories:
       <ul>
-	<li> <a href="http://www.dealii.org/svn/dealii/branches/releases">releases</a>:
+	<li> <a href="https://svn.dealii.org/branches/releases">releases</a>:
 	branches for releases of deal.II
-	  <li> <a href="http://www.dealii.org/svn/dealii/branches/retired">retired</a>:
+	  <li> <a href="https://svn.dealii.org/branches/retired">retired</a>:
 	  development branches that have been merged into the
 	  trunk and are no longer used.
 	    </ul>
@@ -47,13 +48,21 @@
   <h2>Creating a development branch</h2>
 
   <p>
-    Significant new functionality can often not be developed all at once. In a
+    Significant changes in the library often cannot be developed all at once. In a
     case like this, one can create a development branch in the subversion
     repository into which one can check in all necessary changes and from which
     one can merge the final set of changes into the main development line once
     ready. The <tt>svn</tt> program can be used
     to keep your branch up-to-date with the trunk.
   </p>
+  
+  <p><b>Note: </b> Maintaining a branch over a long time can become
+  quite cumbersome, since you have to merge changes on the trunk on a
+  regular basis so that the branch does not deviate too
+  much. Therefore, when adding functionality, like a new class or a
+  new function in a class or namespace, it is advisable not to create
+  a new branch, but to mark in the documentation clearly that this is
+  experimental. Before checking in, verify that the library compiles.</p>
 
   <p>
     Creating a branch works through the following steps:
@@ -61,12 +70,12 @@
   <ol>
     <li> Create the branch using
       <pre>
-	svn copy http://www.dealii.org/svn/dealii/trunk/ http://www.dealii.org/svn/dealii/branches/new-branch-name
+	svn copy https://svn.dealii.org/trunk/ https://svn.dealii.org/branches/new-branch-name
       </pre>
 
     <li> Either check out the new branch or switch your working copy by
       <pre>
-	svn switch http://www.dealii.org/svn/dealii/branches/new-branch-name
+	svn switch https://svn.dealii.org/branches/new-branch-name
       </pre>
       This command assumes you are in the top level directory, the one
       containing <tt>deal.II</tt> and <tt>tests</tt>

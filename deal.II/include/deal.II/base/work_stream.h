@@ -342,7 +342,7 @@ namespace WorkStream
         typename IteratorRangeToItemStream<Iterator,ScratchData,CopyData>::ItemType
         ItemType;
 
-        ItemType *current_item = reinterpret_cast<ItemType *> (item);
+        ItemType *current_item = static_cast<ItemType *> (item);
 
         // then call the worker function on
         // each element of the chunk we
@@ -413,7 +413,7 @@ namespace WorkStream
         typename IteratorRangeToItemStream<Iterator,ScratchData,CopyData>::ItemType
         ItemType;
 
-        ItemType *current_item = reinterpret_cast<ItemType *> (item);
+        ItemType *current_item = static_cast<ItemType *> (item);
 
         // initiate copying data
         for (unsigned int i=0; i<std_cxx1x::get<3>(*current_item); ++i)

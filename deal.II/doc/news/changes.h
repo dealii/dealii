@@ -108,38 +108,11 @@ never working correctly and it is not used.
 
 
 <ol>
-<li> The class Utilities::MPI::MPI_InitFinalize now also initializes
-PETSc, when PETSc is installed.
-<br>
-(Timo Heister, 2012/11/02)
-
 <li> step-6 now uses ConstraintMatrix::distribute_local_to_global()
 instead of condense(), which is the preferred way to use a ConstraintMatrix
  (and the only sensible way in parallel).
 <br>
 (Timo Heister, 2012/11/02)
-
-<li> Fixed: DoFTools::make_flux_sparsity_pattern wasn't prepared to
-deal with adaptively refined meshes in 1d.
-<br>
-(Wolfgang Bangerth, 2012/10/30)
-
-<li> New: Added PETScWrappers::PreconditionParaSails and
-PETScWrappers::PreconditionNone. PETScWrappers::PreconditionParaSails
-implements the interface to use the ParaSails sparse approximate
-inverse preconditioner from the HYPRE suite. ParaSails supports
-parallel distributed computations and can handle nonsymmetric
-and also indefinite problems. PETScWrappers::PreconditionNone
-implements non-preconditioning in PETSc which can be of use
-together with the PETScWrappers::MatrixFree class.
-<br>
-(Martin Steigemann, 2012/10/26)
-
-<li> New: Added SparsityTools::distribute_sparsity_pattern() for
-BlockCompressedSimpleSparsityPattern. This allows parallel computations
-with distributed::Triangulation and PETScWrappers::MPI::BlockSparseMatrix.
-<br>
-(Timo Heister, 2012/09/25)
 
 <li> Simplifications of the internal structures of Triangulation and
 DoFHandler, in particular removal of specializations.
@@ -154,6 +127,29 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: PETScWrappers::SparseDirectMUMPS forgot to release
+its memory upon destruction. This is now fixed.
+<br>
+(Alexander Grayver, 2012/12/12)
+
+<li> Fixed: Using the copy constructor of FESystem led to trouble
+down the road because some pointers were freed by the copy while
+still in use by the original object. This is now fixed.
+<br>
+(Timo Heister, Wolfgang Bangerth, 2012/12/03)
+
+<li> Improved: GridTools::make_periodicity_constraints substantially:
+The low level interface now allows to specify a face orientation that
+will be used when matching and constraining DoFs for periodic boundary
+conditions. With that, the high level interface will work correctly on
+(mainly 3d) grids that have cells in non standard orientation.
+<br>
+(Matthias Maier, 2012/12/01)
+
+<li> Fixed: Fix GeometryInfo<2>::child_cell_on_face to respect face_flip
+<br>
+(Matthias Maier, 2012/12/01)
+
 <li> New: There is now a version of DoFTools::make_zero_boundary_constraints()
 that accepts a boundary indicator as argument.
 <br>
@@ -191,6 +187,27 @@ of different criteria that can be set in GridOutFlags::XFig.
 <br>
 (Guido Kanschat, 2012/11/04)
 
+<li> The class Utilities::MPI::MPI_InitFinalize now also initializes
+PETSc, when PETSc is installed.
+<br>
+(Timo Heister, 2012/11/02)
+
+<li> Fixed: DoFTools::make_flux_sparsity_pattern wasn't prepared to
+deal with adaptively refined meshes in 1d.
+<br>
+(Wolfgang Bangerth, 2012/10/30)
+
+<li> New: Added PETScWrappers::PreconditionParaSails and
+PETScWrappers::PreconditionNone. PETScWrappers::PreconditionParaSails
+implements the interface to use the ParaSails sparse approximate
+inverse preconditioner from the HYPRE suite. ParaSails supports
+parallel distributed computations and can handle nonsymmetric
+and also indefinite problems. PETScWrappers::PreconditionNone
+implements non-preconditioning in PETSc which can be of use
+together with the PETScWrappers::MatrixFree class.
+<br>
+(Martin Steigemann, 2012/10/26)
+
 <li> New: The PETScWrappers::SparseDirectMUMPS class now allows to
 exploit symmetry of the matrix, using the
 PETScWrappers::SparseDirectMUMPS::set_symmetric_mode() function.
@@ -225,6 +242,12 @@ However, if there are none, we end up with an empty list which
 latex does not like. This is now fixed.
 <br>
 (Wolfgang Bangerth, 2012/09/27)
+
+<li> New: Added SparsityTools::distribute_sparsity_pattern() for
+BlockCompressedSimpleSparsityPattern. This allows parallel computations
+with distributed::Triangulation and PETScWrappers::MPI::BlockSparseMatrix.
+<br>
+(Timo Heister, 2012/09/25)
 
 <li> New: Added BlockCompressedSimpleSparsityPattern::column_number().
 <br>

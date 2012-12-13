@@ -192,6 +192,11 @@ public:
   bool operator== (const ComponentMask &mask) const;
 
   /**
+   * Return whether this object and the argument are not identical.
+   */
+  bool operator!= (const ComponentMask &mask) const;
+
+  /**
    * Determine an estimate for the
    * memory consumption (in bytes)
    * of this object.
@@ -399,6 +404,15 @@ ComponentMask::operator== (const ComponentMask &mask) const
 {
   return component_mask == mask.component_mask;
 }
+
+
+inline
+bool
+ComponentMask::operator!= (const ComponentMask &mask) const
+{
+  return component_mask != mask.component_mask;
+}
+
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -324,16 +324,7 @@ FESystem<dim,spacedim>::FESystem (
 
 template <int dim, int spacedim>
 FESystem<dim,spacedim>::~FESystem ()
-{
-  // delete base elements created in
-  // the constructor
-  for (unsigned int i=0; i<base_elements.size(); ++i)
-    {
-      base_elements[i].first->unsubscribe(typeid(*this).name());
-      delete base_elements[i].first;
-      base_elements[i].first = 0;
-    }
-}
+{}
 
 
 
@@ -1863,8 +1854,10 @@ void FESystem<dim,spacedim>::initialize (const std::vector<const FiniteElement<d
     {
       if (multiplicities[i]>0)
         {
-          base_elements[ind] = ElementPair(fes[i]->clone(), multiplicities[i]);
-          base_elements[ind].first->subscribe (typeid(*this).name());
+          base_elements[ind] =
+	    std::make_pair (std_cxx1x::shared_ptr<const FiniteElement<dim,spacedim> >
+			    (fes[i]->clone()),
+			    multiplicities[i]);
           ++ind;
         }
     }

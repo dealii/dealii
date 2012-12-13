@@ -166,6 +166,17 @@ namespace Utilities
    * normalized Gaussian probability
    * distribution centered around @p a and
    * with standard deviation @p sigma.
+   *
+   * This function is reentrant, i.e., it can safely be
+   * called from multiple threads at the same time. However, if
+   * so done, then there is no guarantee that each thread will
+   * get the same sequence of numbers every time. Rather, the
+   * produced sequence of random numbers will be apportioned to
+   * the different threads in non-deterministic ways. If this
+   * is a problem, for example for exactly reproducibility, then
+   * you need to use separate random number facilities for separate
+   * threads, rather than this global function. For example, the C++11
+   * standard offers such objects, as does BOOST.
    */
   double
   generate_normal_random_number (const double a,
@@ -195,7 +206,7 @@ namespace Utilities
    * power <code>N</code> are compile-time
    * constants. This computes the result of
    * the power operation at compile time,
-   * enables its use e.g. in other
+   * enabling its use e.g. in other
    * templates.
    *
    * Use this function with the arguments
@@ -782,4 +793,3 @@ namespace Utilities
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-

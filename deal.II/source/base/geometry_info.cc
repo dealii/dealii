@@ -1099,7 +1099,7 @@ unsigned int
 GeometryInfo<2>::child_cell_on_face (const RefinementCase<2> &ref_case,
                                      const unsigned int face,
                                      const unsigned int subface,
-                                     const bool, const bool, const bool,
+                                     const bool, const bool face_flip, const bool,
                                      const RefinementCase<1> &)
 {
   Assert (face<faces_per_cell, ExcIndexRange(face, 0, faces_per_cell));
@@ -1114,14 +1114,23 @@ GeometryInfo<2>::child_cell_on_face (const RefinementCase<2> &ref_case,
   // refined neighbor. this simplifies setting neighbor
   // information in execute_refinement.
   static const unsigned int
-  subcells[RefinementCase<2>::isotropic_refinement][faces_per_cell][max_children_per_face] =
+  subcells[2][RefinementCase<2>::isotropic_refinement][faces_per_cell][max_children_per_face] =
   {
-    {{0,0},{1,1},{0,1},{0,1}},          // cut_x
-    {{0,1},{0,1},{0,0},{1,1}},          // cut_y
-    {{0,2},{1,3},{0,1},{2,3}}
-  };         // cut_xy
+    {
+      // Normal orientation (face_filp = false)
+      {{0,0},{1,1},{0,1},{0,1}},          // cut_x
+      {{0,1},{0,1},{0,0},{1,1}},          // cut_y
+      {{0,2},{1,3},{0,1},{2,3}}           // cut_z
+    },
+    {
+      // Flipped orientation (face_flip = true)
+      {{0,0},{1,1},{1,0},{1,0}},          // cut_x
+      {{1,0},{1,0},{0,0},{1,1}},          // cut_y
+      {{2,0},{3,1},{1,0},{3,2}}           // cut_z
+    }
+  };
 
-  return subcells[ref_case-1][face][subface];
+  return subcells[face_flip][ref_case-1][face][subface];
 }
 
 

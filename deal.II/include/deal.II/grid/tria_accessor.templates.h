@@ -628,9 +628,7 @@ namespace internal
 
 
       /**
-       * Implementation of the function
-       * of some name in the mother
-       * class.
+       * Implementation of the function of some name in the mother class
        */
       template <int structdim, int dim, int spacedim>
       static
@@ -638,6 +636,12 @@ namespace internal
       face_orientation (const TriaAccessor<structdim, dim, spacedim> &,
                         const unsigned int)
       {
+        /*
+         * Default implementation used in 1d and 2d
+         *
+         * In 1d and 2d, face_orientation is always true
+         */
+
         return true;
       }
 
@@ -665,7 +669,19 @@ namespace internal
       face_flip (const TriaAccessor<structdim, dim, spacedim> &,
                  const unsigned int)
       {
-        return true;
+        /*
+         * Default implementation used in 1d and 2d
+         *
+         * In 1d, face_flip is always false as there is no such concept as
+         * "flipped" faces in 1d.
+         *
+         * In 2d, we currently only support meshes where all faces are in
+         * standard orientation, so the result is also false. This also
+         * matches the fact that one can *always* orient faces in 2d in such a
+         * way that the don't need to be flipped
+         */
+        return false;
+
       }
 
 
@@ -701,7 +717,13 @@ namespace internal
       face_rotation (const TriaAccessor<structdim, dim, spacedim> &,
                      const unsigned int)
       {
-        return true;
+        /*
+         * Default implementation used in 1d and 2d
+         *
+         * In 1d and 2d, face_rotation is always false as there is no such
+         * concept as "rotated" faces in 1d and 2d.
+         */
+        return false;
       }
 
 
@@ -745,8 +767,7 @@ namespace internal
       line_orientation (const TriaAccessor<2, 2, spacedim> &,
                         const unsigned int)
       {
-        // quads in 2d have no
-        // non-standard orientation
+        // quads in 2d have no non-standard orientation
         return true;
       }
 
@@ -757,10 +778,9 @@ namespace internal
       line_orientation (const TriaAccessor<2, 3, spacedim> &accessor,
                         const unsigned int line)
       {
-        // quads as part of 3d hexes
-        // can have non-standard
-        // orientation
-//TODO: why is this face_orientation, not line_orientation as in the setter function?
+        // quads as part of 3d hexes can have non-standard orientation
+
+        //TODO: why is this face_orientation, not line_orientation as in the setter function?
         return accessor.tria->faces->quads.face_orientation(accessor.present_index, line);
       }
 

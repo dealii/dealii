@@ -77,14 +77,14 @@ namespace VectorTools
     template <typename Number>
     void perform_compress_insert (::dealii::parallel::distributed::Vector<Number> &vec)
     {
-                                // should not do compress when inserting
-                                // elements as the ghosts are fixed and some
-                                // will not be set at all. Instead, zero the
-                                // ghost data afterwards to get consistent
-                                // data. Otherwise, at least with the layout
-                                // in r27671 the tests/mpi/step-48/ncpu_10
-                                // will signal incorrect results because of
-                                // incorrect interpolation.
+      // should not do compress when inserting
+      // elements as the ghosts are fixed and some
+      // will not be set at all. Instead, zero the
+      // ghost data afterwards to get consistent
+      // data. Otherwise, at least with the layout
+      // in r27671 the tests/mpi/step-48/ncpu_10
+      // will signal incorrect results because of
+      // incorrect interpolation.
       vec.zero_out_ghosts();
     }
 

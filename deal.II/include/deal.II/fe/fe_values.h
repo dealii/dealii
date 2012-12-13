@@ -180,6 +180,48 @@ namespace FEValuesViews
     typedef Tensor<2,spacedim> hessian_type;
 
     /**
+     * A structure where for each shape
+     * function we pre-compute a bunch of
+     * data that will make later accesses
+     * much cheaper.
+     */
+    struct ShapeFunctionData
+    {
+      /**
+       * For each shape function, store
+       * whether the selected vector
+       * component may be nonzero. For
+       * primitive shape functions we
+       * know for sure whether a certain
+       * scalar component of a given
+       * shape function is nonzero,
+       * whereas for non-primitive shape
+       * functions this may not be
+       * entirely clear (e.g. for RT
+       * elements it depends on the shape
+       * of a cell).
+       */
+      bool is_nonzero_shape_function_component;
+
+      /**
+       * For each shape function, store
+       * the row index within the
+       * shape_values, shape_gradients,
+       * and shape_hessians tables (the
+       * column index is the quadrature
+       * point index). If the shape
+       * function is primitive, then we
+       * can get this information from
+       * the shape_function_to_row_table
+       * of the FEValues object;
+       * otherwise, we have to work a bit
+       * harder to compute this
+       * information.
+       */
+      unsigned int row_index;
+    };
+
+    /**
      * Default constructor. Creates an
      * invalid object.
      */
@@ -341,7 +383,6 @@ namespace FEValuesViews
     void get_function_laplacians (const InputVector &fe_function,
                                   std::vector<value_type> &laplacians) const;
 
-
   private:
     /**
      * A reference to the FEValuesBase object
@@ -355,48 +396,6 @@ namespace FEValuesViews
      * object.
      */
     const unsigned int component;
-
-    /**
-     * A structure where for each shape
-     * function we pre-compute a bunch of
-     * data that will make later accesses
-     * much cheaper.
-     */
-    struct ShapeFunctionData
-    {
-      /**
-       * For each shape function, store
-       * whether the selected vector
-       * component may be nonzero. For
-       * primitive shape functions we
-       * know for sure whether a certain
-       * scalar component of a given
-       * shape function is nonzero,
-       * whereas for non-primitive shape
-       * functions this may not be
-       * entirely clear (e.g. for RT
-       * elements it depends on the shape
-       * of a cell).
-       */
-      bool is_nonzero_shape_function_component;
-
-      /**
-       * For each shape function, store
-       * the row index within the
-       * shape_values, shape_gradients,
-       * and shape_hessians tables (the
-       * column index is the quadrature
-       * point index). If the shape
-       * function is primitive, then we
-       * can get this information from
-       * the shape_function_to_row_table
-       * of the FEValues object;
-       * otherwise, we have to work a bit
-       * harder to compute this
-       * information.
-       */
-      unsigned int row_index;
-    };
 
     /**
      * Store the data about shape
@@ -515,6 +514,70 @@ namespace FEValuesViews
      * <code>Tensor@<3,dim@></code>.
      */
     typedef Tensor<3,spacedim>          hessian_type;
+
+    /**
+     * A structure where for each shape
+     * function we pre-compute a bunch of
+     * data that will make later accesses
+     * much cheaper.
+     */
+    struct ShapeFunctionData
+    {
+      /**
+       * For each pair (shape
+       * function,component within
+       * vector), store whether the
+       * selected vector component may be
+       * nonzero. For primitive shape
+       * functions we know for sure
+       * whether a certain scalar
+       * component of a given shape
+       * function is nonzero, whereas for
+       * non-primitive shape functions
+       * this may not be entirely clear
+       * (e.g. for RT elements it depends
+       * on the shape of a cell).
+       */
+      bool is_nonzero_shape_function_component[spacedim];
+
+      /**
+       * For each pair (shape function,
+       * component within vector), store
+       * the row index within the
+       * shape_values, shape_gradients,
+       * and shape_hessians tables (the
+       * column index is the quadrature
+       * point index). If the shape
+       * function is primitive, then we
+       * can get this information from
+       * the shape_function_to_row_table
+       * of the FEValues object;
+       * otherwise, we have to work a bit
+       * harder to compute this
+       * information.
+       */
+      unsigned int row_index[spacedim];
+
+      /**
+       * For each shape function say the
+       * following: if only a single
+       * entry in
+       * is_nonzero_shape_function_component
+       * for this shape function is
+       * nonzero, then store the
+       * corresponding value of row_index
+       * and
+       * single_nonzero_component_index
+       * represents the index between 0
+       * and dim for which it is
+       * attained. If multiple components
+       * are nonzero, then store -1. If
+       * no components are nonzero then
+       * store -2.
+       */
+      int          single_nonzero_component;
+      unsigned int single_nonzero_component_index;
+    };
 
     /**
      * Default constructor. Creates an
@@ -850,70 +913,6 @@ namespace FEValuesViews
     const unsigned int first_vector_component;
 
     /**
-     * A structure where for each shape
-     * function we pre-compute a bunch of
-     * data that will make later accesses
-     * much cheaper.
-     */
-    struct ShapeFunctionData
-    {
-      /**
-       * For each pair (shape
-       * function,component within
-       * vector), store whether the
-       * selected vector component may be
-       * nonzero. For primitive shape
-       * functions we know for sure
-       * whether a certain scalar
-       * component of a given shape
-       * function is nonzero, whereas for
-       * non-primitive shape functions
-       * this may not be entirely clear
-       * (e.g. for RT elements it depends
-       * on the shape of a cell).
-       */
-      bool is_nonzero_shape_function_component[spacedim];
-
-      /**
-       * For each pair (shape function,
-       * component within vector), store
-       * the row index within the
-       * shape_values, shape_gradients,
-       * and shape_hessians tables (the
-       * column index is the quadrature
-       * point index). If the shape
-       * function is primitive, then we
-       * can get this information from
-       * the shape_function_to_row_table
-       * of the FEValues object;
-       * otherwise, we have to work a bit
-       * harder to compute this
-       * information.
-       */
-      unsigned int row_index[spacedim];
-
-      /**
-       * For each shape function say the
-       * following: if only a single
-       * entry in
-       * is_nonzero_shape_function_component
-       * for this shape function is
-       * nonzero, then store the
-       * corresponding value of row_index
-       * and
-       * single_nonzero_component_index
-       * represents the index between 0
-       * and dim for which it is
-       * attained. If multiple components
-       * are nonzero, then store -1. If
-       * no components are nonzero then
-       * store -2.
-       */
-      int          single_nonzero_component;
-      unsigned int single_nonzero_component_index;
-    };
-
-    /**
      * Store the data about shape
      * functions.
      */
@@ -988,6 +987,70 @@ namespace FEValuesViews
      * divergence.
      */
     typedef Tensor<1, spacedim> divergence_type;
+
+    /**
+     * A structure where for each shape
+     * function we pre-compute a bunch of
+     * data that will make later accesses
+     * much cheaper.
+     */
+    struct ShapeFunctionData
+    {
+      /**
+       * For each pair (shape
+       * function,component within
+       * vector), store whether the
+       * selected vector component may be
+       * nonzero. For primitive shape
+       * functions we know for sure
+       * whether a certain scalar
+       * component of a given shape
+       * function is nonzero, whereas for
+       * non-primitive shape functions
+       * this may not be entirely clear
+       * (e.g. for RT elements it depends
+       * on the shape of a cell).
+       */
+      bool is_nonzero_shape_function_component[value_type::n_independent_components];
+
+      /**
+       * For each pair (shape function,
+       * component within vector), store
+       * the row index within the
+       * shape_values, shape_gradients,
+       * and shape_hessians tables (the
+       * column index is the quadrature
+       * point index). If the shape
+       * function is primitive, then we
+       * can get this information from
+       * the shape_function_to_row_table
+       * of the FEValues object;
+       * otherwise, we have to work a bit
+       * harder to compute this
+       * information.
+       */
+      unsigned int row_index[value_type::n_independent_components];
+
+      /**
+       * For each shape function say the
+       * following: if only a single
+       * entry in
+       * is_nonzero_shape_function_component
+       * for this shape function is
+       * nonzero, then store the
+       * corresponding value of row_index
+       * and
+       * single_nonzero_component_index
+       * represents the index between 0
+       * and (dim^2 + dim)/2 for which it is
+       * attained. If multiple components
+       * are nonzero, then store -1. If
+       * no components are nonzero then
+       * store -2.
+       */
+      int single_nonzero_component;
+      unsigned int single_nonzero_component_index;
+    };
 
     /**
      * Default constructor. Creates an
@@ -1129,70 +1192,6 @@ namespace FEValuesViews
      * FEValuesBase object.
      */
     const unsigned int first_tensor_component;
-
-    /**
-     * A structure where for each shape
-     * function we pre-compute a bunch of
-     * data that will make later accesses
-     * much cheaper.
-     */
-    struct ShapeFunctionData
-    {
-      /**
-       * For each pair (shape
-       * function,component within
-       * vector), store whether the
-       * selected vector component may be
-       * nonzero. For primitive shape
-       * functions we know for sure
-       * whether a certain scalar
-       * component of a given shape
-       * function is nonzero, whereas for
-       * non-primitive shape functions
-       * this may not be entirely clear
-       * (e.g. for RT elements it depends
-       * on the shape of a cell).
-       */
-      bool is_nonzero_shape_function_component[value_type::n_independent_components];
-
-      /**
-       * For each pair (shape function,
-       * component within vector), store
-       * the row index within the
-       * shape_values, shape_gradients,
-       * and shape_hessians tables (the
-       * column index is the quadrature
-       * point index). If the shape
-       * function is primitive, then we
-       * can get this information from
-       * the shape_function_to_row_table
-       * of the FEValues object;
-       * otherwise, we have to work a bit
-       * harder to compute this
-       * information.
-       */
-      unsigned int row_index[value_type::n_independent_components];
-
-      /**
-       * For each shape function say the
-       * following: if only a single
-       * entry in
-       * is_nonzero_shape_function_component
-       * for this shape function is
-       * nonzero, then store the
-       * corresponding value of row_index
-       * and
-       * single_nonzero_component_index
-       * represents the index between 0
-       * and (dim^2 + dim)/2 for which it is
-       * attained. If multiple components
-       * are nonzero, then store -1. If
-       * no components are nonzero then
-       * store -2.
-       */
-      int single_nonzero_component;
-      unsigned int single_nonzero_component_index;
-    };
 
     /**
      * Store the data about shape
@@ -3806,33 +3805,6 @@ private:
 
 
 #ifndef DOXYGEN
-
-
-/*------------------------ Inline functions: namespace FEValuesExtractors --------*/
-
-namespace FEValuesExtractors
-{
-  inline
-  Scalar::Scalar (const unsigned int component)
-    :
-    component (component)
-  {}
-
-
-
-  inline
-  Vector::Vector (const unsigned int first_vector_component)
-    :
-    first_vector_component (first_vector_component)
-  {}
-
-  template <int rank>
-  inline
-  SymmetricTensor<rank>::SymmetricTensor (const unsigned int first_tensor_component)
-    :
-    first_tensor_component (first_tensor_component)
-  {}
-}
 
 
 /*------------------------ Inline functions: namespace FEValuesViews --------*/
