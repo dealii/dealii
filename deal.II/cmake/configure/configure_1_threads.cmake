@@ -86,27 +86,6 @@ MACRO(SETUP_THREADING var)
 
     ENDIF()
 
-    #
-    # In some cases, -threads (or whatever else command line option)
-    # switches on some preprocessor flags. If this is not the case,
-    # then define them explicitely.
-    #
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
-    CHECK_CXX_SOURCE_COMPILES(
-      "
-      #if !defined (_REENTRANT) && !defined (_THREAD_SAFE)
-      # error Neither _REENTRANT nor _THREAD_SAFE were defined.
-        nonsense
-      #endif
-      int main(){ return 0; }
-      "
-      DEAL_II_HAVE_MT_DEFINITIONS)
-    STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
-
-    IF(NOT DEAL_II_HAVE_MT_DEFINITIONS)
-      LIST(APPEND DEAL_II_DEFINITIONS "_REENTRANT" "_THREAD_SAFE")
-    ENDIF()
-
   ENDIF(Threads_FOUND)
 ENDMACRO()
 

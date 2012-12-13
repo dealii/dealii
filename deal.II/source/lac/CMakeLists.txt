@@ -33,6 +33,7 @@ SET(src
   petsc_block_sparse_matrix.cc
   petsc_full_matrix.cc
   petsc_matrix_base.cc
+  petsc_matrix_free.cc
   petsc_parallel_block_sparse_matrix.cc
   petsc_parallel_block_vector.cc
   petsc_parallel_sparse_matrix.cc

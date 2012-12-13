@@ -4,6 +4,12 @@ PLEASE NOTE THAT THESE PROJECTS MAY be COPYRIGHTED BY OTHERS THAN THE
 deal.II AUTHORS, but are included by permission. For details, consult the
 stated licenses below.
 
+lagrange_basis
+==============
+
+A Maple script to compute the coefficients of the LagrangeEquidistant
+basis functions of degree p.
+
 
 lapack_templates
 ================

@@ -1355,11 +1355,12 @@ namespace Threads
        * join() before, the variable is set
        * to true and we can skip over
        * calling std::thread::join() a
-       * second time.
+       * second time. Access to this variable
+       * is guarded by the following mutex.
        *
-       * Further, note that we need no
+       * @note Historically, we did not need the
        * mutex for this variable: threads
-       * can only be join from the thread
+       * can only be joined from the thread
        * that created it
        * originally. Consequently,
        * everything that happens in a
@@ -1375,9 +1376,21 @@ namespace Threads
        * join() on the same thread object
        * at the same time, but this action
        * is undefined anyway since they can
-       * not both join the same thread.
+       * not both join the same thread. That said,
+       * more recent C++ standards do not appear to
+       * have the requirement any more that the only
+       * thread that can call join() is the one that
+       * created the thread. Neither does pthread_join
+       * appear to have this requirement any more.
+       * Consequently, we can in fact join from different
+       * threads and we test this in base/thread_validity_07.
        */
       bool thread_is_active;
+
+      /**
+       * Mutex guarding access to the previous variable.
+       */
+      Mutex thread_is_active_mutex;
 
       /**
        * Default constructor.
@@ -1432,7 +1445,12 @@ namespace Threads
       {
         // see if the thread hasn't been
         // joined yet. if it has, then
-        // join() is a no-op
+        // join() is a no-op. use schmidt's double-checking
+        // strategy to use the mutex only when necessary
+        if (thread_is_active == false)
+          return;
+
+        Mutex::ScopedLock lock (thread_is_active_mutex);
         if (thread_is_active == true)
           {
             Assert (thread.joinable(), ExcInternalError());

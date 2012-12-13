@@ -91,8 +91,7 @@ ENDIF()
 
 IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
   FILE(APPEND ${_log}
-"
-#
+"#
 #  The bundled UMFPACK library will be compiled with the following C compiler:
 #        CMAKE_C_COMPILER:        ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}
 #                                 ${CMAKE_C_COMPILER}

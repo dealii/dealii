@@ -1241,10 +1241,15 @@ namespace PETScWrappers
      * function in the base is not used
      * here, the private SolverData struct
      * located in the base could not be used
-     * either
+     * either.
      */
     struct SolverDataMUMPS
     {
+      /**
+       * Destructor
+       */
+      ~SolverDataMUMPS ();
+
       KSP ksp;
       PC  pc;
     };

@@ -132,6 +132,10 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   # Transform some cmake lists into a string that the old Makefile
   # mechanism actually understands:
   #
+  # TODO: Come up with an idea how to get the link line directly from
+  # CMake...
+  #
+
   TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_CXX}"
     ${DEAL_II_USER_INCLUDE_DIRS}
     ${DEAL_II_INCLUDE_DIRS}
@@ -144,26 +148,27 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
       ${DEAL_II_USER_DEFINITIONS_${build}}
       )
 
-    #
-    # Add an rpath directive in front of each library, so that libraries
-    # outside of the default search directories will be found by the runtime
-    # dynamic linker:
-    #
-    FOREACH(lib
+
+    FOREACH(_lib
         ${MAKEFILE_LIBRARY_${build}}
         ${DEAL_II_EXTERNAL_LIBRARIES}
         ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
         )
-      GET_FILENAME_COMPONENT(path ${lib} PATH)
-      LIST(APPEND MAKEFILE_LIBS_${build} "-Wl,-rpath -Wl,${path}")
-      LIST(APPEND MAKEFILE_LIBS_${build} ${lib})
+      LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
+      #
+      # Add an rpath directive for each library:
+      #
+      GET_FILENAME_COMPONENT(_path ${_lib} PATH)
+      LIST(APPEND MAKEFILE_LIBS_${build} "-Wl,-rpath,${_path}")
     ENDFOREACH()
+
     TO_STRING(MAKEFILE_LIBS_${build} ${MAKEFILE_LIBS_${build}})
+
     #
-    # Put our linker flags directly in front of this string:
+    # Set up our linker flags:
     #
-    SET(MAKEFILE_LIBS_${build}
-      "${CMAKE_SHARED_LINKER_FLAGS} ${DEAL_II_SHARED_LINKER_FLAGS_${build}} ${MAKEFILE_LIBS_${build}}"
+    SET(MAKEFILE_LDFLAGS_${build}
+      "${CMAKE_CXX_FLAGS} ${DEAL_II_CXX_FLAGS_${build}} ${CMAKE_SHARED_LINKER_FLAGS} ${DEAL_II_SHARED_LINKER_FLAGS_${build}}"
       )
   ENDFOREACH()
 
@@ -176,14 +181,18 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   COND_SET_TO_YES(BUILD_SHARED_LIBS MAKEFILE_enableshared)
 
   COND_SET_TO_YES(DEAL_II_WITH_PETSC MAKEFILE_PETSC)
+  COND_SET_TO_YES(DEAL_II_WITH_SLEPC MAKEFILE_SLEPC)
   COND_SET_TO_YES(DEAL_II_WITH_TRILINOS MAKEFILE_TRILINOS)
+  COND_SET_TO_YES(DEAL_II_WITH_HDF5 MAKEFILE_HDF5)
   COND_SET_TO_YES(DEAL_II_WITH_BLAS MAKEFILE_BLAS)
+  COND_SET_TO_YES(DEAL_II_WITH_MUMPS MAKEFILE_MUMPS)
   COND_SET_TO_YES(DEAL_II_WITH_LAPACK MAKEFILE_LAPACK)
   COND_SET_TO_YES(DEAL_II_WITH_ARPACK MAKEFILE_ARPACK)
   COND_SET_TO_YES(DEAL_II_WITH_METIS MAKEFILE_METIS)
   COND_SET_TO_YES(DEAL_II_WITH_UMFPACK MAKEFILE_UMFPACK)
   COND_SET_TO_YES(DEAL_II_WITH_P4EST MAKEFILE_P4EST)
   COND_SET_TO_YES(DEAL_II_WITH_MPI MAKEFILE_MPI)
+
 
   CONFIGURE_FILE(
     ${CMAKE_CURRENT_SOURCE_DIR}/Make.global_options.in

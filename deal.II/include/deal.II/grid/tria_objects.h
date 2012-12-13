@@ -319,7 +319,7 @@ namespace internal
       /**
        * Access to user pointers.
        */
-      void *&user_pointer(const unsigned int i);
+      void  *&user_pointer(const unsigned int i);
 
       /**
        * Read-only access to user pointers.
