@@ -35,8 +35,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
-  Threads::ThreadMutex log_lock;
-  Threads::ThreadMutex write_lock;
+  Threads::Mutex log_lock;
+  Threads::Mutex write_lock;
 }
 
 
@@ -151,7 +151,7 @@ LogStream::~LogStream()
 void
 LogStream::test_mode(bool on)
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   if (on)
     {
       double_threshold = 1.e-10;
@@ -180,7 +180,7 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
   std::ostream & (* const p_endl) (std::ostream &) = &std::endl;
   if (p == p_endl)
     {
-      Threads::ThreadMutex::ScopedLock lock(write_lock);
+      Threads::Mutex::ScopedLock lock(write_lock);
       print_line_head();
       std::ostringstream &stream = get_stream();
       if (prefixes.size() <= std_depth)
@@ -200,7 +200,7 @@ std::ostringstream &
 LogStream::get_stream()
 {
 //TODO: use a ThreadLocalStorage object here
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   const unsigned int id = Threads::this_thread_id();
 
   // if necessary allocate a stream object
@@ -217,7 +217,7 @@ LogStream::get_stream()
 void
 LogStream::attach(std::ostream &o)
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   file = &o;
   o.setf(std::ios::showpoint | std::ios::left);
   o << dealjobid();
@@ -226,14 +226,14 @@ LogStream::attach(std::ostream &o)
 
 void LogStream::detach ()
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   file = 0;
 }
 
 
 void LogStream::log_cerr ()
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   if (old_cerr == 0)
     {
       old_cerr = std::cerr.rdbuf(file->rdbuf());
@@ -278,7 +278,7 @@ LogStream::get_prefix() const
 void
 LogStream::push (const std::string &text)
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   std::string pre=prefixes.top();
   pre += text;
   pre += std::string(":");
@@ -288,7 +288,7 @@ LogStream::push (const std::string &text)
 
 void LogStream::pop ()
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   if (prefixes.size() > 1)
     prefixes.pop();
 }
@@ -297,7 +297,7 @@ void LogStream::pop ()
 unsigned int
 LogStream::depth_console (const unsigned int n)
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   const unsigned int h = std_depth;
   std_depth = n;
   return h;
@@ -307,7 +307,7 @@ LogStream::depth_console (const unsigned int n)
 unsigned int
 LogStream::depth_file (const unsigned int n)
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   const unsigned int h = file_depth;
   file_depth = n;
   return h;
@@ -317,7 +317,7 @@ LogStream::depth_file (const unsigned int n)
 void
 LogStream::threshold_double (const double t)
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   double_threshold = t;
 }
 
@@ -325,7 +325,7 @@ LogStream::threshold_double (const double t)
 void
 LogStream::threshold_float (const float t)
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   float_threshold = t;
 }
 
@@ -333,7 +333,7 @@ LogStream::threshold_float (const float t)
 bool
 LogStream::log_execution_time (const bool flag)
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   const bool h = print_utime;
   print_utime = flag;
   return h;
@@ -343,7 +343,7 @@ LogStream::log_execution_time (const bool flag)
 bool
 LogStream::log_time_differences (const bool flag)
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   const bool h = diff_utime;
   diff_utime = flag;
   return h;
@@ -353,7 +353,7 @@ LogStream::log_time_differences (const bool flag)
 bool
 LogStream::log_thread_id (const bool flag)
 {
-  Threads::ThreadMutex::ScopedLock lock(log_lock);
+  Threads::Mutex::ScopedLock lock(log_lock);
   const bool h = print_thread_id;
   print_thread_id = flag;
   return h;
