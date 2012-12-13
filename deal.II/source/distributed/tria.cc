@@ -1035,7 +1035,7 @@ namespace
                   // not local.
                   delete_all_children<dim,spacedim> (dealii_cell->child(c));
                   dealii_cell->child(c)
-                  ->recursively_set_subdomain_id(types::artificial_subdomain_id);
+                  ->recursively_set_subdomain_id(numbers::artificial_subdomain_id);
                 }
               else
                 {
@@ -1968,7 +1968,7 @@ namespace parallel
         {
           std::string fname=std::string(filename)+".info";
           std::ofstream f(fname.c_str());
-          f << Utilities::System::get_n_mpi_processes (mpi_communicator) << " "
+          f << Utilities::MPI::n_mpi_processes (mpi_communicator) << " "
             << real_data_size << " "
             << attached_data_pack_callbacks.size() << std::endl;
         }
@@ -2010,7 +2010,7 @@ namespace parallel
         std::string fname=std::string(filename)+".info";
         std::ifstream f(fname.c_str());
         f >> numcpus >> attached_size >> attached_count;
-        if (numcpus != Utilities::System::get_n_mpi_processes (mpi_communicator))
+        if (numcpus != Utilities::MPI::n_mpi_processes (mpi_communicator))
           throw ExcInternalError();
       }
 
@@ -2454,7 +2454,7 @@ namespace parallel
            cell = this->begin(0);
            cell != this->end(0);
            ++cell)
-        cell->recursively_set_subdomain_id(types::artificial_subdomain_id);
+        cell->recursively_set_subdomain_id(numbers::artificial_subdomain_id);
 
       do
         {
@@ -2476,7 +2476,7 @@ namespace parallel
                   == false)
                 {
                   delete_all_children<dim,spacedim> (cell);
-                  cell->set_subdomain_id (types::artificial_subdomain_id);
+                  cell->set_subdomain_id (numbers::artificial_subdomain_id);
                 }
 
               else
@@ -2583,7 +2583,7 @@ namespace parallel
         {
           if (cell->subdomain_id() != my_subdomain
               &&
-              cell->subdomain_id() != types::artificial_subdomain_id)
+              cell->subdomain_id() != numbers::artificial_subdomain_id)
             ++num_ghosts;
         }
 

@@ -1354,7 +1354,7 @@ namespace FETools
     for (; cell1!=endc1; ++cell1, ++cell2)
       if ((cell1->subdomain_id() == subdomain_id)
           ||
-          (subdomain_id == types::invalid_subdomain_id))
+          (subdomain_id == numbers::invalid_subdomain_id))
         {
           Assert(cell1->get_fe().n_components() == cell2->get_fe().n_components(),
                  ExcDimensionMismatch (cell1->get_fe().n_components(),
@@ -1508,7 +1508,7 @@ namespace FETools
     for (; cell!=endc; ++cell)
       if ((cell->subdomain_id() == subdomain_id)
           ||
-          (subdomain_id == types::invalid_subdomain_id))
+          (subdomain_id == numbers::invalid_subdomain_id))
         {
           if (hanging_nodes_not_allowed)
             for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
@@ -1581,7 +1581,7 @@ namespace FETools
     for (; cell!=endc; ++cell)
       if ((cell->subdomain_id() == subdomain_id)
           ||
-          (subdomain_id == types::invalid_subdomain_id))
+          (subdomain_id == numbers::invalid_subdomain_id))
         {
           Assert(cell->get_fe().n_components() == fe2.n_components(),
                  ExcDimensionMismatch(cell->get_fe().n_components(),
@@ -1755,7 +1755,7 @@ namespace FETools
     for (; cell!=endc; ++cell)
       if ((cell->subdomain_id() == subdomain_id)
           ||
-          (subdomain_id == types::invalid_subdomain_id))
+          (subdomain_id == numbers::invalid_subdomain_id))
         {
           if (hanging_nodes_not_allowed)
             for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)

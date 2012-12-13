@@ -214,7 +214,7 @@ namespace internal
         /**
          * Distribute degrees of freedom on all cells, or on cells with the
          * correct subdomain_id if the corresponding argument is not equal to
-         * types::invalid_subdomain_id. Return the total number of dofs
+         * numbers::invalid_subdomain_id. Return the total number of dofs
          * returned.
          */
         template <int dim, int spacedim>
@@ -242,7 +242,7 @@ namespace internal
           endc = dof_handler.end();
 
           for (; cell != endc; ++cell)
-            if ((subdomain_id == types::invalid_subdomain_id)
+            if ((subdomain_id == numbers::invalid_subdomain_id)
                 ||
                 (cell->subdomain_id() == subdomain_id))
               next_free_dof
@@ -253,7 +253,7 @@ namespace internal
           // update the cache used for cell dof indices
           for (typename DoFHandler<dim,spacedim>::cell_iterator
                cell = dof_handler.begin(); cell != dof_handler.end(); ++cell)
-            if (cell->subdomain_id() != types::artificial_subdomain_id)
+            if (cell->subdomain_id() != numbers::artificial_subdomain_id)
               cell->update_cell_dof_indices_cache ();
 
           // finally restore the user flags
@@ -488,7 +488,7 @@ namespace internal
       {
         const unsigned int n_dofs =
           Implementation::distribute_dofs (0,
-                                           types::invalid_subdomain_id,
+                                           numbers::invalid_subdomain_id,
                                            dof_handler);
 
         // now set the elements of the
@@ -1482,8 +1482,7 @@ namespace internal
           // * Create global_dof_indexsets by
           // transferring our own owned_dofs to
           // every other machine.
-          const unsigned int n_cpus = Utilities::System::
-                                      get_n_mpi_processes (tr->get_communicator());
+          const unsigned int n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
 
           // Serialize our IndexSet and
           // determine size.

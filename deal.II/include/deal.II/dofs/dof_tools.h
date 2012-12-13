@@ -497,7 +497,7 @@ namespace DoFTools
                          SparsityPattern        &sparsity_pattern,
                          const ConstraintMatrix &constraints = ConstraintMatrix(),
                          const bool              keep_constrained_dofs = true,
-                         const types::subdomain_id subdomain_id = types::invalid_subdomain_id);
+                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
 
   /**
    * Locate non-zero entries for
@@ -659,7 +659,7 @@ namespace DoFTools
                          SparsityPattern          &sparsity_pattern,
                          const ConstraintMatrix   &constraints = ConstraintMatrix(),
                          const bool                keep_constrained_dofs = true,
-                         const types::subdomain_id subdomain_id = types::invalid_subdomain_id);
+                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
 
   /**
    * @deprecated This is the old

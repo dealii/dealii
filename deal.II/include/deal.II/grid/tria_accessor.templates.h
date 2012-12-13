@@ -2887,7 +2887,7 @@ CellAccessor<dim,spacedim>::is_locally_owned () const
   return true;
 #else
   const types::subdomain_id subdomain = this->subdomain_id();
-  if (subdomain == types::artificial_subdomain_id)
+  if (subdomain == numbers::artificial_subdomain_id)
     return false;
 
   const parallel::distributed::Triangulation<dim,spacedim> *pdt
@@ -2910,7 +2910,7 @@ CellAccessor<dim,spacedim>::is_ghost () const
   return false;
 #else
   const types::subdomain_id subdomain = this->subdomain_id();
-  if (subdomain == types::artificial_subdomain_id)
+  if (subdomain == numbers::artificial_subdomain_id)
     return false;
 
   const parallel::distributed::Triangulation<dim,spacedim> *pdt
@@ -2933,7 +2933,7 @@ CellAccessor<dim,spacedim>::is_artificial () const
 #ifndef DEAL_II_USE_P4EST
   return false;
 #else
-  return (this->subdomain_id() == types::artificial_subdomain_id);
+  return (this->subdomain_id() == numbers::artificial_subdomain_id);
 #endif
 }
 

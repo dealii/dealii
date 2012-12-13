@@ -73,9 +73,9 @@ namespace DoFTools
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
     Assert (
-      (dof.get_tria().locally_owned_subdomain() == types::invalid_subdomain_id)
+      (dof.get_tria().locally_owned_subdomain() == numbers::invalid_subdomain_id)
       ||
-      (subdomain_id == types::invalid_subdomain_id)
+      (subdomain_id == numbers::invalid_subdomain_id)
       ||
       (subdomain_id == dof.get_tria().locally_owned_subdomain()),
       ExcMessage ("For parallel::distributed::Triangulation objects and "
@@ -91,7 +91,7 @@ namespace DoFTools
     // type, we only have to do the work if the current cell is owned by
     // the calling processor. Otherwise, just continue.
     for (; cell!=endc; ++cell)
-      if (((subdomain_id == types::invalid_subdomain_id)
+      if (((subdomain_id == numbers::invalid_subdomain_id)
            ||
            (subdomain_id == cell->subdomain_id()))
           &&
@@ -136,9 +136,9 @@ namespace DoFTools
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
     Assert (
-      (dof.get_tria().locally_owned_subdomain() == types::invalid_subdomain_id)
+      (dof.get_tria().locally_owned_subdomain() == numbers::invalid_subdomain_id)
       ||
-      (subdomain_id == types::invalid_subdomain_id)
+      (subdomain_id == numbers::invalid_subdomain_id)
       ||
       (subdomain_id == dof.get_tria().locally_owned_subdomain()),
       ExcMessage ("For parallel::distributed::Triangulation objects and "
@@ -201,7 +201,7 @@ namespace DoFTools
     // type, we only have to do the work if the current cell is owned by
     // the calling processor. Otherwise, just continue.
     for (; cell!=endc; ++cell)
-      if (((subdomain_id == types::invalid_subdomain_id)
+      if (((subdomain_id == numbers::invalid_subdomain_id)
            ||
            (subdomain_id == cell->subdomain_id()))
           &&
@@ -503,9 +503,9 @@ namespace DoFTools
     // subdomain. Not setting a subdomain is also okay, because we skip
     // ghost cells in the loop below.
     Assert (
-      (dof.get_tria().locally_owned_subdomain() == types::invalid_subdomain_id)
+      (dof.get_tria().locally_owned_subdomain() == numbers::invalid_subdomain_id)
       ||
-      (subdomain_id == types::invalid_subdomain_id)
+      (subdomain_id == numbers::invalid_subdomain_id)
       ||
       (subdomain_id == dof.get_tria().locally_owned_subdomain()),
       ExcMessage ("For parallel::distributed::Triangulation objects and "
@@ -528,7 +528,7 @@ namespace DoFTools
     // type, we only have to do the work if the current cell is owned by
     // the calling processor. Otherwise, just continue.
     for (; cell!=endc; ++cell)
-      if (((subdomain_id == types::invalid_subdomain_id)
+      if (((subdomain_id == numbers::invalid_subdomain_id)
            ||
            (subdomain_id == cell->subdomain_id()))
           &&
@@ -4140,7 +4140,7 @@ namespace DoFTools
 
     // preset all values by an invalid value
     std::fill_n (subdomain_association.begin(), dof_handler.n_dofs(),
-                 types::invalid_subdomain_id);
+                 numbers::invalid_subdomain_id);
 
     std::vector<unsigned int> local_dof_indices;
     local_dof_indices.reserve (max_dofs_per_cell(dof_handler));
@@ -4183,7 +4183,7 @@ namespace DoFTools
 
     Assert (std::find (subdomain_association.begin(),
                        subdomain_association.end(),
-                       types::invalid_subdomain_id)
+                       numbers::invalid_subdomain_id)
             == subdomain_association.end(),
             ExcInternalError());
   }
@@ -4214,7 +4214,7 @@ namespace DoFTools
     // If we have a distributed::Triangulation only allow locally_owned
     // subdomain.
     Assert (
-      (dof_handler.get_tria().locally_owned_subdomain() == types::invalid_subdomain_id)
+      (dof_handler.get_tria().locally_owned_subdomain() == numbers::invalid_subdomain_id)
       ||
       (subdomain == dof_handler.get_tria().locally_owned_subdomain()),
       ExcMessage ("For parallel::distributed::Triangulation objects and "
