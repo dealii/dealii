@@ -760,9 +760,10 @@
  * a few places in the library make use of this. Note that in 2d, the
  * result is always @p true.
  *
- * The only places in the library where face orientations play a
- * significant role are in the Triangulation and its accessors, and in
- * the QProjector class and its users.
+ * There are two other flags that describe the orientation of a face:
+ * face_flip and face_rotation. Some documentation for these
+ * exists in the GeometryInfo class. An example of their use in user
+ * code is given in the DoFTools::make_periodicity_constraints function.
  *
  *
  * <dt class="glossary">@anchor GlossGeneralizedSupport <b>Generalized support points</b></dt>
