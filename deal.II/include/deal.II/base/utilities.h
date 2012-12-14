@@ -177,6 +177,17 @@ namespace Utilities
    * you need to use separate random number facilities for separate
    * threads, rather than this global function. For example, the C++11
    * standard offers such objects, as does BOOST.
+   *
+   * @note Like the system function rand(), this function produces
+   * the same sequence of random numbers every time a program is
+   * started. This is an important property for debugging codes,
+   * but it makes it impossible to really verify statistics
+   * properties of a code. For rand(), you can call srand() to
+   * "seed" the random number generator to get different sequences
+   * of random numbers every time a program is called. However, this
+   * function does not allow seeding the random number generator.
+   * If you need this, as above, use one of the C++ or BOOST
+   * facilities.
    */
   double
   generate_normal_random_number (const double a,
