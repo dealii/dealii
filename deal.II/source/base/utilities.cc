@@ -377,6 +377,11 @@ namespace Utilities
     if (sigma == 0)
       return a;
 
+    // we want to use rand(), but that function is not reentrant in a thread
+    // context. thus, use rand_r. this does not produce reproducible results
+    // between threads either, but at least it is reentrant. if you need
+    // an exactly reproducible sequence even in multithreaded contexts,
+    // then this is probably not the function to use.
 #ifdef HAVE_RAND_R
     static unsigned int seed = 0xabcd1234;
     const double y = 1.0*rand_r(&seed)/RAND_MAX;

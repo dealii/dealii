@@ -166,6 +166,28 @@ namespace Utilities
    * normalized Gaussian probability
    * distribution centered around @p a and
    * with standard deviation @p sigma.
+   *
+   * This function is reentrant, i.e., it can safely be
+   * called from multiple threads at the same time. However, if
+   * so done, then there is no guarantee that each thread will
+   * get the same sequence of numbers every time. Rather, the
+   * produced sequence of random numbers will be apportioned to
+   * the different threads in non-deterministic ways. If this
+   * is a problem, for example for exactly reproducibility, then
+   * you need to use separate random number facilities for separate
+   * threads, rather than this global function. For example, the C++11
+   * standard offers such objects, as does BOOST.
+   *
+   * @note Like the system function rand(), this function produces
+   * the same sequence of random numbers every time a program is
+   * started. This is an important property for debugging codes,
+   * but it makes it impossible to really verify statistics
+   * properties of a code. For rand(), you can call srand() to
+   * "seed" the random number generator to get different sequences
+   * of random numbers every time a program is called. However, this
+   * function does not allow seeding the random number generator.
+   * If you need this, as above, use one of the C++ or BOOST
+   * facilities.
    */
   double
   generate_normal_random_number (const double a,
@@ -782,4 +804,3 @@ namespace Utilities
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-
