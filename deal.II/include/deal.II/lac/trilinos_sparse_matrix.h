@@ -1677,6 +1677,14 @@ namespace TrilinosWrappers
                 const parallel::distributed::Vector<TrilinosScalar> &src) const;
 
     /**
+     * Same as before, but working with
+     * deal.II's own vector
+     * class.
+     */
+    void vmult (dealii::Vector<TrilinosScalar>       &dst,
+                const dealii::Vector<TrilinosScalar> &src) const;
+
+    /**
      * Matrix-vector multiplication:
      * let <i>dst =
      * M<sup>T</sup>*src</i> with
@@ -1718,6 +1726,14 @@ namespace TrilinosWrappers
      */
     void Tvmult (parallel::distributed::Vector<TrilinosScalar>       &dst,
                  const parallel::distributed::Vector<TrilinosScalar> &src) const;
+
+    /**
+     * Same as before, but working with
+     * deal.II's own vector
+     * class.
+     */
+    void Tvmult (dealii::Vector<TrilinosScalar>       &dst,
+                 const dealii::Vector<TrilinosScalar> &src) const;
 
     /**
      * Adding Matrix-vector
@@ -3273,6 +3289,30 @@ namespace TrilinosWrappers
 
   inline
   void
+  SparseMatrix::vmult (dealii::Vector<TrilinosScalar>       &dst,
+                       const dealii::Vector<TrilinosScalar> &src) const
+  {
+    Assert (&src != &dst, ExcSourceEqualsDestination());
+    Assert (matrix->Filled(), ExcMatrixNotCompressed());
+
+    AssertDimension (static_cast<unsigned int>(matrix->DomainMap().NumMyElements()),
+                     static_cast<unsigned int>(matrix->DomainMap().NumGlobalElements()));
+    AssertDimension (dst.size(), static_cast<unsigned int>(matrix->RangeMap().NumMyElements()));
+    AssertDimension (src.size(), static_cast<unsigned int>(matrix->DomainMap().NumMyElements()));
+
+    Epetra_Vector tril_dst (View, matrix->RangeMap(), dst.begin());
+    Epetra_Vector tril_src (View, matrix->DomainMap(),
+                            const_cast<double *>(src.begin()));
+
+    const int ierr = matrix->Multiply (false, tril_src, tril_dst);
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
+  }
+
+
+
+  inline
+  void
   SparseMatrix::Tvmult (VectorBase       &dst,
                         const VectorBase &src) const
   {
@@ -3302,6 +3342,30 @@ namespace TrilinosWrappers
 
     AssertDimension (dst.local_size(), static_cast<unsigned int>(matrix->DomainMap().NumMyElements()));
     AssertDimension (src.local_size(), static_cast<unsigned int>(matrix->RangeMap().NumMyElements()));
+
+    Epetra_Vector tril_dst (View, matrix->DomainMap(), dst.begin());
+    Epetra_Vector tril_src (View, matrix->RangeMap(),
+                            const_cast<double *>(src.begin()));
+
+    const int ierr = matrix->Multiply (true, tril_src, tril_dst);
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
+  }
+
+
+
+  inline
+  void
+  SparseMatrix::Tvmult (dealii::Vector<TrilinosScalar>      &dst,
+                        const dealii::Vector<TrilinosScalar> &src) const
+  {
+    Assert (&src != &dst, ExcSourceEqualsDestination());
+    Assert (matrix->Filled(), ExcMatrixNotCompressed());
+
+    AssertDimension (static_cast<unsigned int>(matrix->DomainMap().NumMyElements()),
+                     static_cast<unsigned int>(matrix->DomainMap().NumGlobalElements()));
+    AssertDimension (dst.size(), static_cast<unsigned int>(matrix->DomainMap().NumMyElements()));
+    AssertDimension (src.size(), static_cast<unsigned int>(matrix->RangeMap().NumMyElements()));
 
     Epetra_Vector tril_dst (View, matrix->DomainMap(), dst.begin());
     Epetra_Vector tril_src (View, matrix->RangeMap(),
