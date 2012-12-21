@@ -158,7 +158,11 @@ style-cc-files:= $(wildcard source/*/*.cc)
 style-examples:= $(wildcard examples/*/*.cc)
 indent:
 	@echo "============ Indenting all files"
-	astyle --options=common/astyle.rc $(style-h-files) $(style-cc-files) $(style-examples)
+	@for f in  $(style-h-files) $(style-cc-files) $(style-examples) ;\
+	do\
+	  echo $$f ;\
+	  astyle --options=common/astyle.rc $$f ;\
+	done
 
 .PHONY: indent	
 
