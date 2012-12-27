@@ -1085,8 +1085,11 @@ namespace parallel
         {
           unsigned int local_ranges_different_loc = (local_range() !=
                                                      c.local_range());
-          if (Utilities::MPI::max(local_ranges_different_loc,
-                                  partitioner->get_communicator()) != 0)
+          if ((partitioner->n_mpi_processes() > 1 &&
+               Utilities::MPI::max(local_ranges_different_loc,
+                                   partitioner->get_communicator()) != 0)
+              ||
+              local_ranges_different_loc)
             reinit (c, true);
         }
       vector_view = c.vector_view;
@@ -1114,8 +1117,11 @@ namespace parallel
         {
           unsigned int local_ranges_different_loc = (local_range() !=
                                                      c.local_range());
-          if (Utilities::MPI::max(local_ranges_different_loc,
-                                  partitioner->get_communicator()) != 0)
+          if ((partitioner->n_mpi_processes() > 1 &&
+               Utilities::MPI::max(local_ranges_different_loc,
+                                   partitioner->get_communicator()) != 0)
+              ||
+              local_ranges_different_loc)
             reinit (c, true);
         }
       vector_view.reinit (partitioner->local_size(), val);
