@@ -1,11 +1,11 @@
 
-DEAL:0::numproc=4
-DEAL:0::l2 norm: 23.66
-DEAL:0::l1 norm: 56.00
-DEAL:0::linfty norm: 14.00
-DEAL:0::l2.2 norm: 22.04
-DEAL:0::Mean value: 7.000
-DEAL:0::Inner product: 312.0
+DEAL:0::numproc=1
+DEAL:0::l2 norm: 2.000
+DEAL:0::l1 norm: 2.000
+DEAL:0::linfty norm: 2.000
+DEAL:0::l2.2 norm: 2.000
+DEAL:0::Mean value: 1.000
+DEAL:0::Inner product: 4.000
 DEAL:0:: v==v2 ? 1
 DEAL:0:: v!=v2 ? 0
 DEAL:0:: v==v2 ? 0
