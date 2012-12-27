@@ -1171,7 +1171,11 @@ namespace parallel
       // use int instead of bool
       int local_result = (partitioner->local_size()>0 ?
                           -vector_view.all_zero () : -1);
-      return - Utilities::MPI::max(local_result,partitioner->get_communicator());
+      if (partitioner->n_mpi_processes() > 1)
+        return -Utilities::MPI::max(local_result,
+                                    partitioner->get_communicator());
+      else
+        return local_result;
     }
 
 
@@ -1181,10 +1185,17 @@ namespace parallel
     bool
     Vector<Number>::is_non_negative () const
     {
-      // use int instead of bool
+      // use int instead of bool. in order to make this operation work also
+      // when MPI_Init was not called, only call MPI_Allreduce commands when
+      // there is more than one processor (note that reinit() functions handle
+      // this case correctly through the job_supports_mpi() query)
       int local_result = (partitioner->local_size()>0 ?
                           -vector_view.is_non_negative () : -1);
-      return  - Utilities::MPI::max(local_result,partitioner->get_communicator());
+      if (partitioner->n_mpi_processes() > 1)
+        return  -Utilities::MPI::max(local_result,
+                                     partitioner->get_communicator());
+      else
+        return local_result;
     }
 
 
@@ -1197,15 +1208,18 @@ namespace parallel
     {
       AssertDimension (local_size(), v.local_size());
 
-      // MPI does not support bools, so use unsigned
-      // int instead. Two vectors are equal if the
-      // check for non-equal fails on all processors
+      // MPI does not support bools, so use unsigned int instead. Two vectors
+      // are equal if the check for non-equal fails on all processors
       unsigned int local_result = (partitioner->local_size()>0 ?
                                    vector_view.template operator !=
                                    <Number2>(v.vector_view)
                                    : 0 );
-      unsigned int result = Utilities::MPI::max(local_result,
-                                                partitioner->get_communicator());
+      unsigned int result = 
+        partitioner->n_mpi_processes() > 1
+        ?
+        Utilities::MPI::max(local_result, partitioner->get_communicator())
+        :
+        local_result;
       return result==0;
     }
 
@@ -1231,7 +1245,11 @@ namespace parallel
       Number local_result = (partitioner->local_size()>0 ?
                              vector_view.operator* (V.vector_view)
                              : 0);
-      return Utilities::MPI::sum (local_result, partitioner->get_communicator());
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum (local_result,
+                                    partitioner->get_communicator());
+      else
+        return local_result;
     }
 
 
@@ -1244,10 +1262,14 @@ namespace parallel
       // on some processors, the size might be zero,
       // which is not allowed by the base
       // class. Therefore, insert a check here
-      Number local_result = (partitioner->local_size()>0 ?
-                             vector_view.norm_sqr()
-                             : 0);
-      return Utilities::MPI::sum(local_result,partitioner->get_communicator());
+      real_type local_result = (partitioner->local_size()>0 ?
+                                vector_view.norm_sqr()
+                                : 0);
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum(local_result,
+                                   partitioner->get_communicator());
+      else
+        return local_result;
     }
 
 
@@ -1262,7 +1284,11 @@ namespace parallel
          vector_view.mean_value()
          : 0)
         *((real_type)partitioner->local_size()/(real_type)partitioner->size());
-      return Utilities::MPI::sum (local_result, partitioner->get_communicator());
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum (local_result,
+                                    partitioner->get_communicator());
+      else
+        return local_result;
     }
 
 
@@ -1272,10 +1298,14 @@ namespace parallel
     typename Vector<Number>::real_type
     Vector<Number>::l1_norm () const
     {
-      Number local_result = (partitioner->local_size()>0 ?
-                             vector_view.l1_norm()
-                             : 0);
-      return Utilities::MPI::sum(local_result, partitioner->get_communicator());
+      real_type local_result = (partitioner->local_size()>0 ?
+                                vector_view.l1_norm()
+                                : 0);
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum(local_result,
+                                   partitioner->get_communicator());
+      else
+        return local_result;
     }
 
 
@@ -1295,12 +1325,15 @@ namespace parallel
     typename Vector<Number>::real_type
     Vector<Number>::lp_norm (const real_type p) const
     {
-      const Number local_result = (partitioner->local_size()>0 ?
-                                   std::pow(vector_view.lp_norm(p),p)
-                                   : 0);
-      return std::pow (Utilities::MPI::sum(local_result,
-                                           partitioner->get_communicator()),
-                       static_cast<Number>(1.0/p));
+      const real_type local_result = (partitioner->local_size()>0 ?
+                                      vector_view.lp_norm(p)
+                                      : 0);
+      if (partitioner->n_mpi_processes() > 1)
+        return std::pow (Utilities::MPI::sum(std::pow(local_result,p),
+                                             partitioner->get_communicator()),
+                         static_cast<real_type>(1.0/p));
+      else
+        return local_result;
     }
 
 
@@ -1310,10 +1343,14 @@ namespace parallel
     typename Vector<Number>::real_type
     Vector<Number>::linfty_norm () const
     {
-      const Number local_result = (partitioner->local_size()>0 ?
-                                   vector_view.linfty_norm()
-                                   : 0);
-      return Utilities::MPI::max (local_result, partitioner->get_communicator());
+      const real_type local_result = (partitioner->local_size()>0 ?
+                                      vector_view.linfty_norm()
+                                      : 0);
+      if (partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::max (local_result,
+                                    partitioner->get_communicator());
+      else
+        return local_result;
     }
 
 
