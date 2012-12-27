@@ -36,6 +36,9 @@ TimestepControl::TimestepControl (double start,
 {
   now_val = start_val;
   strcpy(format, "T.%06.3f");
+
+  // avoid compiler warning
+  (void)min_step_val;
 }
 
 
