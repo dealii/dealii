@@ -430,7 +430,6 @@ Vector<std::complex<float> >::operator = (const std::complex<float> s)
 
 
 template <typename Number>
-void
 Vector<Number> &Vector<Number>::operator *= (const Number factor)
 {
   Assert (numbers::is_finite(factor),ExcNumberNotFinite());
