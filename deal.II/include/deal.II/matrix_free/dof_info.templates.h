@@ -72,7 +72,7 @@ namespace internal
     template <typename Number>
     ConstraintValues<Number>::ConstraintValues ()
       :
-      constraints(FPArrayComparator<Number>(1.))
+      constraints(FPArrayComparator<double>(1.))
     {}
 
     template <typename Number>
@@ -110,8 +110,8 @@ namespace internal
       // lenghty and now we use a std::map with a
       // user-defined comparator to compare floating
       // point arrays to a tolerance 1e-13.
-      std::pair<typename std::map<std::vector<Number>, unsigned int,
-          FPArrayComparator<Number> >::iterator,
+      std::pair<typename std::map<std::vector<double>, unsigned int,
+          FPArrayComparator<double> >::iterator,
           bool> it = constraints.insert(next_constraint);
       unsigned int insert_position = deal_II_numbers::invalid_unsigned_int;
       if (it.second == false)

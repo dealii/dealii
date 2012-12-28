@@ -604,8 +604,8 @@ end_set:
             {
               cartesian_data.resize(cartesians.size());
               for (typename std::map<Tensor<1,dim,VEC_ARRAY>,
-                                     unsigned int>::iterator it = cartesians.begin();
-                   it != cartesians.end(); ++it)
+                     unsigned int, FPArrayComparator<Number> >::iterator
+                     it = cartesians.begin(); it != cartesians.end(); ++it)
                 {
                   VectorizedArray<Number> det = make_vectorized_array<Number>(1.);
                   for (unsigned int d=0; d<dim; ++d)
@@ -621,8 +621,8 @@ end_set:
                 }
               affine_data.resize(affines.size());
               for (typename std::map<Tensor<2,dim,VEC_ARRAY>,
-                                     unsigned int>::iterator it = affines.begin();
-                   it != affines.end(); ++it)
+                     unsigned int, FPArrayComparator<Number> >::iterator
+                     it = affines.begin(); it != affines.end(); ++it)
                 {
                   Tensor<2,dim,VectorizedArray<Number> > jac;
                   for (unsigned int d=0; d<dim; ++d)

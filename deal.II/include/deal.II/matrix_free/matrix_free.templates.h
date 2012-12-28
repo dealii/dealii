@@ -773,7 +773,7 @@ void MatrixFree<dim,Number>::initialize_indices
   // set constraint pool from the std::map and
   // reorder the indices
   typename std::map<std::vector<double>, unsigned int,
-           internal::MatrixFreeFunctions::FPArrayComparator<Number> >::iterator
+           internal::MatrixFreeFunctions::FPArrayComparator<double> >::iterator
            it = constraint_values.constraints.begin(),
            end = constraint_values.constraints.end();
   std::vector<const std::vector<double>*>
