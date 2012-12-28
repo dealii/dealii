@@ -62,7 +62,7 @@ namespace boost
         inline std::size_t float_hash_value(T v)
         {
             using namespace std;
-            switch (fpclassify(v)) {
+            switch (std::fpclassify(v)) {
             case FP_ZERO:
                 return 0;
             case FP_INFINITE:

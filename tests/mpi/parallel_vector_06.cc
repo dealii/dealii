@@ -90,8 +90,8 @@ void test ()
   }
 
                                 // check mean value (should be equal to l1
-                                // norm here since we have no negative
-                                // entries)
+                                // norm divided by vector size here since we
+                                // have no negative entries)
   {
     const double mean = v.mean_value();
     if (myid == 0)
@@ -203,7 +203,7 @@ void test ()
 
                                 // only one processor has non-negative entry
     v3 = v;
-    if (myid == 1)
+    if (myid == 1 || numproc==1)
       v3.local_element(0) = -1;
     allnonneg = v3.is_non_negative();
     if (myid == 0)

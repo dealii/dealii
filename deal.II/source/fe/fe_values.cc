@@ -104,7 +104,7 @@ namespace FEValuesViews
 // variables from FEValuesData, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
-    = make_shape_function_to_row_table (*fe_values.fe);
+      = make_shape_function_to_row_table (*fe_values.fe);
 
     for (unsigned int i=0; i<fe_values.fe->dofs_per_cell; ++i)
       {
@@ -113,16 +113,16 @@ namespace FEValuesViews
 
         if (is_primitive == true)
           shape_function_data[i].is_nonzero_shape_function_component
-          = (component ==
-             fe_values.fe->system_to_component_index(i).first);
+            = (component ==
+               fe_values.fe->system_to_component_index(i).first);
         else
           shape_function_data[i].is_nonzero_shape_function_component
-          = (fe_values.fe->get_nonzero_components(i)[component]
-             == true);
+            = (fe_values.fe->get_nonzero_components(i)[component]
+               == true);
 
         if (shape_function_data[i].is_nonzero_shape_function_component == true)
           shape_function_data[i].row_index
-          = shape_function_to_row_table[i*fe_values.fe->n_components()+component];
+            = shape_function_to_row_table[i*fe_values.fe->n_components()+component];
         else
           shape_function_data[i].row_index = numbers::invalid_unsigned_int;
       }
@@ -165,7 +165,7 @@ namespace FEValuesViews
 // variables from FEValuesData, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
-    = make_shape_function_to_row_table (*fe_values.fe);
+      = make_shape_function_to_row_table (*fe_values.fe);
 
     for (unsigned int d=0; d<spacedim; ++d)
       {
@@ -178,20 +178,20 @@ namespace FEValuesViews
 
             if (is_primitive == true)
               shape_function_data[i].is_nonzero_shape_function_component[d]
-              = (component ==
-                 fe_values.fe->system_to_component_index(i).first);
+                = (component ==
+                   fe_values.fe->system_to_component_index(i).first);
             else
               shape_function_data[i].is_nonzero_shape_function_component[d]
-              = (fe_values.fe->get_nonzero_components(i)[component]
-                 == true);
+                = (fe_values.fe->get_nonzero_components(i)[component]
+                   == true);
 
             if (shape_function_data[i].is_nonzero_shape_function_component[d]
                 == true)
               shape_function_data[i].row_index[d]
-              = shape_function_to_row_table[i*fe_values.fe->n_components()+component];
+                = shape_function_to_row_table[i*fe_values.fe->n_components()+component];
             else
               shape_function_data[i].row_index[d]
-              = numbers::invalid_unsigned_int;
+                = numbers::invalid_unsigned_int;
           }
       }
 
@@ -214,9 +214,9 @@ namespace FEValuesViews
                   == true)
                 {
                   shape_function_data[i].single_nonzero_component
-                  = shape_function_data[i].row_index[d];
+                    = shape_function_data[i].row_index[d];
                   shape_function_data[i].single_nonzero_component_index
-                  = d;
+                    = d;
                   break;
                 }
           }
@@ -263,7 +263,7 @@ namespace FEValuesViews
 // variables from FEValuesData, but they aren't initialized yet
 // at the time we get here, so re-create it all
     const std::vector<unsigned int> shape_function_to_row_table
-    = make_shape_function_to_row_table (*fe_values.fe);
+      = make_shape_function_to_row_table (*fe_values.fe);
 
     for (unsigned int d = 0; d < dealii::SymmetricTensor<2,dim>::n_independent_components; ++d)
       {
@@ -276,20 +276,20 @@ namespace FEValuesViews
 
             if (is_primitive == true)
               shape_function_data[i].is_nonzero_shape_function_component[d]
-              = (component ==
-                 fe_values.fe->system_to_component_index(i).first);
+                = (component ==
+                   fe_values.fe->system_to_component_index(i).first);
             else
               shape_function_data[i].is_nonzero_shape_function_component[d]
-              = (fe_values.fe->get_nonzero_components(i)[component]
-                 == true);
+                = (fe_values.fe->get_nonzero_components(i)[component]
+                   == true);
 
             if (shape_function_data[i].is_nonzero_shape_function_component[d]
                 == true)
               shape_function_data[i].row_index[d]
-              = shape_function_to_row_table[i*fe_values.fe->n_components()+component];
+                = shape_function_to_row_table[i*fe_values.fe->n_components()+component];
             else
               shape_function_data[i].row_index[d]
-              = numbers::invalid_unsigned_int;
+                = numbers::invalid_unsigned_int;
           }
       }
 
@@ -312,9 +312,9 @@ namespace FEValuesViews
                   == true)
                 {
                   shape_function_data[i].single_nonzero_component
-                  = shape_function_data[i].row_index[d];
+                    = shape_function_data[i].row_index[d];
                   shape_function_data[i].single_nonzero_component_index
-                  = d;
+                    = d;
                   break;
                 }
           }
@@ -1057,7 +1057,7 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-      (dof_values, fe_values.shape_values, shape_function_data, values);
+    (dof_values, fe_values.shape_values, shape_function_data, values);
   }
 
 
@@ -1081,7 +1081,7 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<1,dim,spacedim>
-      (dof_values, fe_values.shape_gradients, shape_function_data, gradients);
+    (dof_values, fe_values.shape_gradients, shape_function_data, gradients);
   }
 
 
@@ -1105,7 +1105,7 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<2,dim,spacedim>
-      (dof_values, fe_values.shape_hessians, shape_function_data, hessians);
+    (dof_values, fe_values.shape_hessians, shape_function_data, hessians);
   }
 
 
@@ -1129,7 +1129,7 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_laplacians<dim,spacedim>
-      (dof_values, fe_values.shape_hessians, shape_function_data, laplacians);
+    (dof_values, fe_values.shape_hessians, shape_function_data, laplacians);
   }
 
 
@@ -1153,7 +1153,7 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-      (dof_values, fe_values.shape_values, shape_function_data, values);
+    (dof_values, fe_values.shape_values, shape_function_data, values);
   }
 
 
@@ -1178,7 +1178,7 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<1,dim,spacedim>
-      (dof_values, fe_values.shape_gradients, shape_function_data, gradients);
+    (dof_values, fe_values.shape_gradients, shape_function_data, gradients);
   }
 
 
@@ -1202,8 +1202,8 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_symmetric_gradients<dim,spacedim>
-      (dof_values, fe_values.shape_gradients, shape_function_data,
-       symmetric_gradients);
+    (dof_values, fe_values.shape_gradients, shape_function_data,
+     symmetric_gradients);
   }
 
 
@@ -1228,7 +1228,7 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
-      (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
+    (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
   }
 
   template <int dim, int spacedim>
@@ -1251,7 +1251,7 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values (fe_function, dof_values);
     internal::do_function_curls<dim,spacedim>
-      (dof_values, fe_values.shape_gradients, shape_function_data, curls);
+    (dof_values, fe_values.shape_gradients, shape_function_data, curls);
   }
 
 
@@ -1274,7 +1274,7 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_derivatives<2,dim,spacedim>
-      (dof_values, fe_values.shape_hessians, shape_function_data, hessians);
+    (dof_values, fe_values.shape_hessians, shape_function_data, hessians);
   }
 
 
@@ -1301,7 +1301,7 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values (fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_laplacians<dim,spacedim>
-      (dof_values, fe_values.shape_hessians, shape_function_data, laplacians);
+    (dof_values, fe_values.shape_hessians, shape_function_data, laplacians);
   }
 
 
@@ -1325,7 +1325,7 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_values<dim,spacedim>
-      (dof_values, fe_values.shape_values, shape_function_data, values);
+    (dof_values, fe_values.shape_values, shape_function_data, values);
   }
 
 
@@ -1350,7 +1350,7 @@ namespace FEValuesViews
     dealii::Vector<double> dof_values(fe_values.dofs_per_cell);
     fe_values.present_cell->get_interpolated_dof_values(fe_function, dof_values);
     internal::do_function_divergences<dim,spacedim>
-      (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
+    (dof_values, fe_values.shape_gradients, shape_function_data, divergences);
   }
 }
 
@@ -1414,9 +1414,9 @@ namespace internal
       // compute number of symmetric
       // tensors in the same way as above
       const unsigned int n_symmetric_second_order_tensors
-      = (fe.n_components() >= (dim*dim + dim)/2 ?
-         fe.n_components() - (dim*dim + dim)/2 + 1 :
-         0);
+        = (fe.n_components() >= (dim*dim + dim)/2 ?
+           fe.n_components() - (dim*dim + dim)/2 + 1 :
+           0);
       symmetric_second_order_tensors.resize(n_symmetric_second_order_tensors);
       for (unsigned int component = 0; component < n_symmetric_second_order_tensors; ++component)
         {
@@ -1739,13 +1739,13 @@ get_interpolated_dof_values (const IndexSet &in,
 template <int dim, int spacedim>
 const char *const
 FEValuesBase<dim,spacedim>::TriaCellIterator::message_string
-= ("You have previously called the FEValues::reinit function with a\n"
-   "cell iterator of type Triangulation<dim,spacedim>::cell_iterator. However,\n"
-   "when you do this, you cannot call some functions in the FEValues\n"
-   "class, such as the get_function_values/gradients/hessians\n"
-   "functions. If you need these functions, then you need to call\n"
-   "FEValues::reinit with an iterator type that allows to extract\n"
-   "degrees of freedom, such as DoFHandler<dim,spacedim>::cell_iterator.");
+  = ("You have previously called the FEValues::reinit function with a\n"
+     "cell iterator of type Triangulation<dim,spacedim>::cell_iterator. However,\n"
+     "when you do this, you cannot call some functions in the FEValues\n"
+     "class, such as the get_function_values/gradients/hessians\n"
+     "functions. If you need these functions, then you need to call\n"
+     "FEValues::reinit with an iterator type that allows to extract\n"
+     "degrees of freedom, such as DoFHandler<dim,spacedim>::cell_iterator.");
 
 
 template <int dim, int spacedim>
@@ -1806,7 +1806,7 @@ FEValuesData<dim,spacedim>::initialize (const unsigned int        n_quadrature_p
   // the data by shape function and
   // nonzero component
   this->shape_function_to_row_table
-  = make_shape_function_to_row_table (fe);
+    = make_shape_function_to_row_table (fe);
 
   // count the total number of non-zero
   // components accumulated over all shape
@@ -2075,7 +2075,7 @@ namespace internal
           continue;
 
         const Tensor<order,spacedim> *shape_derivative_ptr
-        = &shape_derivatives[shape_func][0];
+          = &shape_derivatives[shape_func][0];
         for (unsigned int point=0; point<n_quadrature_points; ++point)
           derivatives[point] += value * *shape_derivative_ptr++;
       }
@@ -2191,7 +2191,7 @@ namespace internal
           continue;
 
         const Tensor<2,spacedim> *shape_hessian_ptr
-        = &shape_hessians[shape_func][0];
+          = &shape_hessians[shape_func][0];
         for (unsigned int point=0; point<n_quadrature_points; ++point)
           laplacians[point] += value * trace(*shape_hessian_ptr++);
       }

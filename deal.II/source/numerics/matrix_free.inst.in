@@ -58,5 +58,9 @@ for (deal_II_dimension : DIMENSIONS)
   print_memory_consumption<std::ostream> (std::ostream &) const;
   template void MatrixFree<deal_II_dimension,float>::
   print_memory_consumption<ConditionalOStream> (ConditionalOStream &) const;
+
+
+  template struct internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,double>;
+  template struct internal::MatrixFreeFunctions::MappingInfo<deal_II_dimension,float>;
 }
 
