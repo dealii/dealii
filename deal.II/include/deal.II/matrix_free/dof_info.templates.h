@@ -35,10 +35,8 @@ namespace internal
     };
 
     /**
-     * A struct that takes entries describing
-     * a constraint and puts them into a
-     * sorted list where duplicates are
-     * filtered out
+     * A struct that takes entries describing a constraint and puts them into
+     * a sorted list where duplicates are filtered out
      */
     template <typename Number>
     struct ConstraintValues
@@ -46,18 +44,11 @@ namespace internal
       ConstraintValues();
 
       /**
-       * This function inserts some
-       * constrained entries to the
-       * collection of all
-       * values. It stores the
-       * (reordered) numbering of
-       * the dofs (according to the
-       * ordering that matches with
-       * the function) in
-       * new_indices, and returns
-       * the storage position the
-       * double array for access
-       * later on.
+       * This function inserts some constrained entries to the collection of
+       * all values. It stores the (reordered) numbering of the dofs
+       * (according to the ordering that matches with the function) in
+       * new_indices, and returns the storage position the double array for
+       * access later on.
        */
       unsigned short
       insert_entries (const std::vector<std::pair<unsigned int,double> > &entries);
@@ -89,27 +80,22 @@ namespace internal
                     ConstraintComparator());
           for (unsigned int j=0; j<constraint_entries.size(); j++)
             {
-              // copy the indices of the constraint entries after
-              // sorting.
+              // copy the indices of the constraint entries after sorting.
               constraint_indices[j] = constraint_entries[j].first;
 
-              // one_constraint takes the weights of the
-              // constraint
+              // one_constraint takes the weights of the constraint
               next_constraint.first[j] = constraint_entries[j].second;
             }
         }
       next_constraint.second = constraints.size();
 
-      // check whether or not constraint is already
-      // in pool. the initial implementation
-      // computed a hash value based on the truncated
-      // array (to given accuracy around 1e-13) in
-      // order to easily detect different arrays and
-      // then made a fine-grained check when the
-      // hash values were equal. this was quite
-      // lenghty and now we use a std::map with a
-      // user-defined comparator to compare floating
-      // point arrays to a tolerance 1e-13.
+      // check whether or not constraint is already in pool. the initial
+      // implementation computed a hash value based on the truncated array (to
+      // given accuracy around 1e-13) in order to easily detect different
+      // arrays and then made a fine-grained check when the hash values were
+      // equal. this was quite lenghty and now we use a std::map with a
+      // user-defined comparator to compare floating point arrays to a
+      // tolerance 1e-13.
       std::pair<typename std::map<std::vector<double>, unsigned int,
           FPArrayComparator<double> >::iterator,
           bool> it = constraints.insert(next_constraint);
@@ -119,10 +105,8 @@ namespace internal
       else
         insert_position = next_constraint.second;
 
-      // we want to store the result as a short
-      // variable, so we have to make sure that the
-      // result does not exceed the limits when
-      // casting.
+      // we want to store the result as a short variable, so we have to make
+      // sure that the result does not exceed the limits when casting.
       Assert(insert_position < (1<<(8*sizeof(unsigned short))),
              ExcInternalError());
       return static_cast<unsigned short>(insert_position);
@@ -208,19 +192,17 @@ namespace internal
           // dof is constrained
           if (entries_ptr != 0)
             {
-              // in case we want to access plain indices, we
-              // need to know about the location of
-              // constrained indices as well (all the other
-              // indices are collected by the cases below)
+              // in case we want to access plain indices, we need to know
+              // about the location of constrained indices as well (all the
+              // other indices are collected by the cases below)
               if (current_dof < first_owned || current_dof >= last_owned)
                 {
                   ghost_dofs.push_back (current_dof);
                   cell_at_boundary = true;
                 }
 
-              // check whether this dof is identity
-              // constrained to another dof. then we can
-              // simply insert that dof and there is no need
+              // check whether this dof is identity constrained to another
+              // dof. then we can simply insert that dof and there is no need
               // to actually resolve the constraint entries
               const std::vector<std::pair<unsigned int,double> >
               &entries = *entries_ptr;
@@ -239,10 +221,9 @@ namespace internal
               // reset constraint iterator for next round
               constraint_iterator.first = 0;
 
-              // add the local_to_global indices computed in
-              // the insert_entries function. transform the
-              // index to local index space or mark it as
-              // ghost if necessary
+              // add the local_to_global indices computed in the
+              // insert_entries function. transform the index to local index
+              // space or mark it as ghost if necessary
               if (n_entries > 0)
                 {
                   const std::vector<unsigned int> &constraint_indices =
@@ -256,15 +237,15 @@ namespace internal
                           dof_indices.push_back
                           (n_owned + ghost_dofs.size());
 
-                          // collect ghosts so that we can later
-                          // construct an IndexSet for them. also store
-                          // whether the current cell is on the boundary
+                          // collect ghosts so that we can later construct an
+                          // IndexSet for them. also store whether the current
+                          // cell is on the boundary
                           ghost_dofs.push_back(constraint_indices[j]);
                           cell_at_boundary = true;
                         }
                       else
-                        // not ghost, so transform to the local index
-                        // space directly
+                        // not ghost, so transform to the local index space
+                        // directly
                         dof_indices.push_back
                         (constraint_indices[j] - first_owned);
                     }
@@ -273,11 +254,9 @@ namespace internal
           else
             {
 no_constraint:
-              // Not constrained, we simply have to add the
-              // local index to the indices_local_to_global
-              // list and increment constraint
-              // iterator. transform to local index
-              // space/mark as ghost
+              // Not constrained, we simply have to add the local index to the
+              // indices_local_to_global list and increment constraint
+              // iterator. transform to local index space/mark as ghost
               if (n_mpi_procs > 1 &&
                   (current_dof < first_owned ||
                    current_dof >= last_owned))
@@ -291,8 +270,8 @@ no_constraint:
 
               dof_indices.push_back (current_dof);
 
-              // make sure constraint_iterator.first is
-              // always within the bounds of unsigned short
+              // make sure constraint_iterator.first is always within the
+              // bounds of unsigned short
               Assert (constraint_iterator.first <
                       (1<<(8*sizeof(unsigned short)))-1,
                       ExcInternalError());
@@ -303,9 +282,8 @@ no_constraint:
                                   unsigned int>
                                   (dof_indices.size(), constraint_indicator.size(), 0);
 
-      // now to the plain indices: in case we have
-      // constraints on this cell, store the indices
-      // without the constraints resolve once again
+      // now to the plain indices: in case we have constraints on this cell,
+      // store the indices without the constraints resolve once again
       if (store_plain_indices == true)
         {
           if (cell_number == 0)
@@ -358,11 +336,9 @@ no_constraint:
       IndexSet ghost_indices (vector_partitioner->size());
       if (n_ghosts > 0)
         {
-          // since we need to go back to the
-          // local_to_global indices and replace the
-          // temporary numbering of ghosts by the real
-          // number in the index set, we need to store
-          // these values
+          // since we need to go back to the local_to_global indices and
+          // replace the temporary numbering of ghosts by the real number in
+          // the index set, we need to store these values
           std::vector<std::pair<unsigned int,unsigned int> > ghost_origin(n_ghosts);
           for (unsigned int i=0; i<n_ghosts; ++i)
             {
@@ -389,9 +365,8 @@ no_constraint:
                                    ghost_origin.back().first+1);
           ghost_indices.compress();
 
-          // make sure that we got the correct local
-          // numbering of the ghost dofs. the ghost
-          // index set should store the same number
+          // make sure that we got the correct local numbering of the ghost
+          // dofs. the ghost index set should store the same number
           {
             AssertDimension (n_unique_ghosts, ghost_indices.n_elements());
             for (unsigned int i=0; i<n_ghosts; ++i)
@@ -400,12 +375,10 @@ no_constraint:
                       ExcInternalError());
           }
 
-          // apply correct numbering for ghost indices:
-          // We previously just enumerated them
-          // according to their appearance in the
-          // local_to_global structure. Above, we
-          // derived a relation between this enumeration
-          // and the actual number
+          // apply correct numbering for ghost indices: We previously just
+          // enumerated them according to their appearance in the
+          // local_to_global structure. Above, we derived a relation between
+          // this enumeration and the actual number
           const unsigned int n_boundary_cells = boundary_cells.size();
           for (unsigned int i=0; i<n_boundary_cells; ++i)
             {
@@ -444,10 +417,9 @@ no_constraint:
       std::vector<unsigned int> new_ghosts;
       ghost_dofs.swap(new_ghosts);
 
-      // set the ghost indices now. need to cast
-      // away constness here, but that is uncritical
-      // since we reset the Partitioner in the same
-      // initialize call as this call here.
+      // set the ghost indices now. need to cast away constness here, but that
+      // is uncritical since we reset the Partitioner in the same initialize
+      // call as this call here.
       Utilities::MPI::Partitioner *vec_part =
         const_cast<Utilities::MPI::Partitioner *>(vector_partitioner.get());
       vec_part->set_ghost_indices (ghost_indices);
@@ -617,8 +589,7 @@ no_constraint:
               for (unsigned int j=0; j<n_comp; ++j)
                 fe_indices[j]=cell_active_fe_index[renumbering[position_cell+j]];
 
-              // by construction, all cells should
-              // have the same fe index.
+              // by construction, all cells should have the same fe index.
               for (unsigned int j=1; j<n_comp; ++j)
                 Assert (fe_indices[j] == fe_indices[0], ExcInternalError());
 
@@ -645,13 +616,11 @@ no_constraint:
           new_plain_indices.reserve (plain_dof_indices.size());
         }
 
-      // copy the indices and the constraint
-      // indicators to the new data field: Store the
-      // indices in a way so that adjacent data
-      // fields in local vectors are adjacent, i.e.,
-      // first dof index 0 for all vectors, then dof
-      // index 1 for all vectors, and so on. This
-      // involves some extra resorting.
+      // copy the indices and the constraint indicators to the new data field:
+      // Store the indices in a way so that adjacent data fields in local
+      // vectors are adjacent, i.e., first dof index 0 for all vectors, then
+      // dof index 1 for all vectors, and so on. This involves some extra
+      // resorting.
       std::vector<const unsigned int *> glob_indices (vectorization_length);
       std::vector<const unsigned int *> plain_glob_indices (vectorization_length);
       std::vector<const std::pair<unsigned short,unsigned short>*>
@@ -707,14 +676,12 @@ no_constraint:
                     continue;
                   }
 
-                // otherwise, check if we are a constrained
-                // dof. The dof is not constrained if we are
-                // at the end of the row for the constraints
-                // (indi[j] == n_indi[j]) or if the local
-                // index[j] is smaller than the next position
-                // for a constraint. Then, just copy
-                // it. otherwise, copy all the entries that
-                // come with this dof
+                // otherwise, check if we are a constrained dof. The dof is
+                // not constrained if we are at the end of the row for the
+                // constraints (indi[j] == n_indi[j]) or if the local index[j]
+                // is smaller than the next position for a constraint. Then,
+                // just copy it. otherwise, copy all the entries that come
+                // with this dof
                 if (constr_ind[j] == constr_end[j] ||
                     index[j] < constr_ind[j]->first)
                   {
@@ -763,20 +730,17 @@ no_constraint:
       new_rowstart_plain.swap (row_starts_plain_indices);
 
 #ifdef DEBUG
-      // sanity check 1: all indices should be
-      // smaller than the number of dofs locally
-      // owned plus the number of ghosts
+      // sanity check 1: all indices should be smaller than the number of dofs
+      // locally owned plus the number of ghosts
       const unsigned int index_range = (vector_partitioner->local_range().second-
                                         vector_partitioner->local_range().first)
                                        + vector_partitioner->ghost_indices().n_elements();
       for (unsigned int i=0; i<dof_indices.size(); ++i)
         AssertIndexRange (dof_indices[i], index_range);
 
-      // sanity check 2: for the constraint
-      // indicators, the first index should be
-      // smaller than the number of indices in the
-      // row, and the second index should be smaller
-      // than the number of constraints in the
+      // sanity check 2: for the constraint indicators, the first index should
+      // be smaller than the number of indices in the row, and the second
+      // index should be smaller than the number of constraints in the
       // constraint pool.
       for (unsigned int row=0; row<size_info.n_macro_cells; ++row)
         {
@@ -791,9 +755,8 @@ no_constraint:
             }
         }
 
-      // sanity check 3: all non-boundary cells
-      // should have indices that only refer to the
-      // locally owned range
+      // sanity check 3: all non-boundary cells should have indices that only
+      // refer to the locally owned range
       const unsigned int local_size = (vector_partitioner->local_range().second-
                                        vector_partitioner->local_range().first);
       for (unsigned int row=0; row<size_info.boundary_cells_start; ++row)
@@ -819,19 +782,16 @@ no_constraint:
     void DoFInfo::guess_block_size (const SizeInfo &size_info,
                                     TaskInfo       &task_info)
     {
-      // user did not say a positive number, so we
-      // have to guess
+      // user did not say a positive number, so we have to guess
       if (task_info.block_size == 0)
         {
-          // we would like to have enough work to do, so
-          // as first guess, try to get 50 times as many
-          // chunks as we have threads on the
-          // system.
+          // we would like to have enough work to do, so as first guess, try
+          // to get 50 times as many chunks as we have threads on the system.
           task_info.block_size =
             size_info.n_macro_cells / (multithread_info.n_default_threads * 50);
 
-          // if there are too few degrees of freedom per
-          // cell, need to increase the block size
+          // if there are too few degrees of freedom per cell, need to
+          // increase the block size
           const unsigned int minimum_parallel_grain_size = 500;
           if (dofs_per_cell[0] * task_info.block_size <
               minimum_parallel_grain_size)
@@ -859,11 +819,9 @@ no_constraint:
 
       guess_block_size (size_info, task_info);
 
-      // set up partitions. if we just use coloring
-      // without partitions, do nothing here, assume
-      // all cells to belong to the zero partition
-      // (that we otherwise use for MPI boundary
-      // cells)
+      // set up partitions. if we just use coloring without partitions, do
+      // nothing here, assume all cells to belong to the zero partition (that
+      // we otherwise use for MPI boundary cells)
       unsigned int partition = 0, start_up = 0, counter = 0;
       unsigned int start_nonboundary = numbers::invalid_unsigned_int;
       bool work = true;
@@ -941,51 +899,45 @@ no_constraint:
             task_info.block_size_last = task_info.block_size;
         }
 
-      // assume that all FEs have the same
-      // connectivity graph, so take the zeroth FE
+      // assume that all FEs have the same connectivity graph, so take the
+      // zeroth FE
       task_info.n_blocks = (size_info.n_macro_cells+task_info.block_size-1)/
                            task_info.block_size;
       task_info.block_size_last = size_info.n_macro_cells-
                                   (task_info.block_size*(task_info.n_blocks-1));
 
-      // create the connectivity graph with internal
-      // blocking
+      // create the connectivity graph with internal blocking
       CompressedSimpleSparsityPattern connectivity;
       make_connectivity_graph (size_info, task_info, renumbering,irregular_cells,
                                true, connectivity);
 
       // Create cell-block  partitioning.
 
-      // For each block of cells, this variable
-      // saves to which partitions the block
-      // belongs. Initialize all to n_macro_cells to
-      // mark them as not yet assigned a partition.
+      // For each block of cells, this variable saves to which partitions the
+      // block belongs. Initialize all to n_macro_cells to mark them as not
+      // yet assigned a partition.
       std::vector<unsigned int> cell_partition(task_info.n_blocks,
                                                size_info.n_macro_cells);
       std::vector<unsigned int> neighbor_list;
       std::vector<unsigned int> neighbor_neighbor_list;
 
-      // In element j of this variable, one puts the
-      // old number of the block that should be the
-      // jth block in the new numeration.
+      // In element j of this variable, one puts the old number of the block
+      // that should be the jth block in the new numeration.
       std::vector<unsigned int> partition_list      (task_info.n_blocks,0);
       std::vector<unsigned int> partition_color_list(task_info.n_blocks,0);
 
-      // This vector points to the start of each
-      // partition.
+      // This vector points to the start of each partition.
       std::vector<unsigned int> partition_blocks (2,0);
       std::vector<unsigned int> cell_color(task_info.n_blocks,
                                            size_info.n_macro_cells);
       std::vector<bool> color_finder;
 
-      // this performs a classical breath-first
-      // search in the connectivity graph of the
-      // cell chunks
+      // this performs a classical breath-first search in the connectivity
+      // graph of the cell chunks
       while (work)
         {
-          // put all cells up to begin_inner_cells into
-          // first partition. if the numbers do not add
-          // up exactly, assign an additional block
+          // put all cells up to begin_inner_cells into first partition. if
+          // the numbers do not add up exactly, assign an additional block
           if (start_nonboundary>0 && start_up == start_nonboundary)
             {
               unsigned int n_blocks = ((start_nonboundary+task_info.block_size-1)
@@ -1000,8 +952,8 @@ no_constraint:
             }
           else
             {
-              // To start up, set the start_up cell to
-              // partition and list all its neighbors.
+              // To start up, set the start_up cell to partition and list all
+              // its neighbors.
               AssertIndexRange(start_up, cell_partition.size());
               cell_partition[start_up] = partition;
               neighbor_list.push_back(start_up);
@@ -1035,9 +987,8 @@ no_constraint:
               neighbor_neighbor_list.resize(0);
             }
 
-          // One has to check if the graph is not
-          // connected so we have to find another
-          // partition.
+          // One has to check if the graph is not connected so we have to find
+          // another partition.
           work = false;
           for (unsigned int j=start_up; j<task_info.n_blocks; ++j)
             if (cell_partition[j] == size_info.n_macro_cells)
@@ -1063,9 +1014,8 @@ no_constraint:
               unsigned int cell = partition_list[k];
               unsigned int no_neighbors = connectivity.row_length(cell);
 
-              // In the worst case, each neighbor has a
-              // different color. So we find at least one
-              // available color between 0 and no_neighbors.
+              // In the worst case, each neighbor has a different color. So we
+              // find at least one available color between 0 and no_neighbors.
               color_finder.resize(no_neighbors+1);
               for (unsigned int j=0; j<=no_neighbors; ++j)
                 color_finder[j]=true;
@@ -1074,24 +1024,22 @@ no_constraint:
               end      = connectivity.row_end(cell);
               for (; neighbor!=end ; ++neighbor)
                 {
-                  // Mark the color that a neighbor within the
-                  // partition has as taken
+                  // Mark the color that a neighbor within the partition has
+                  // as taken
                   if (cell_partition[*neighbor] == part &&
                       cell_color[*neighbor] <= no_neighbors)
                     color_finder[cell_color[*neighbor]] = false;
                 }
-              // Choose the smallest color that is not taken
-              // for the block
+              // Choose the smallest color that is not taken for the block
               cell_color[cell]=0;
               while (color_finder[cell_color[cell]] == false)
                 cell_color[cell]++;
               if (cell_color[cell] > max_color)
                 max_color = cell_color[cell];
             }
-          // Reorder within partition: First, all blocks
-          // that belong the 0 and then so on until
-          // those with color max (Note that the smaller
-          // the number the larger the partition)
+          // Reorder within partition: First, all blocks that belong the 0 and
+          // then so on until those with color max (Note that the smaller the
+          // number the larger the partition)
           for (unsigned int color=0; color<=max_color; color++)
             {
               task_info.partition_color_blocks_data.push_back(color_counter);
@@ -1113,8 +1061,7 @@ no_constraint:
 
       partition_list = renumbering;
 
-      // in debug mode, check that the partition
-      // color list is one-to-one
+      // in debug mode, check that the partition color list is one-to-one
 #ifdef DEBUG
       {
         std::vector<unsigned int> sorted_pc_list (partition_color_list);
@@ -1124,8 +1071,8 @@ no_constraint:
       }
 #endif
 
-      // set the start list for each block and
-      // compute the renumbering of cells
+      // set the start list for each block and compute the renumbering of
+      // cells
       std::vector<unsigned int> block_start(size_info.n_macro_cells+1);
       std::vector<unsigned int> irregular(size_info.n_macro_cells);
 
@@ -1202,8 +1149,8 @@ no_constraint:
 
       guess_block_size (size_info, task_info);
 
-      // assume that all FEs have the same
-      // connectivity graph, so take the zeroth FE
+      // assume that all FEs have the same connectivity graph, so take the
+      // zeroth FE
       task_info.n_blocks = (size_info.n_macro_cells+task_info.block_size-1)/
                            task_info.block_size;
       task_info.block_size_last = size_info.n_macro_cells-
@@ -1211,31 +1158,27 @@ no_constraint:
       task_info.position_short_block = task_info.n_blocks-1;
       unsigned int cluster_size = task_info.block_size*vectorization_length;
 
-      // create the connectivity graph without
-      // internal blocking
+      // create the connectivity graph without internal blocking
       CompressedSimpleSparsityPattern connectivity;
       make_connectivity_graph (size_info, task_info, renumbering,irregular_cells,
                                false, connectivity);
 
       // Create cell-block  partitioning.
 
-      // For each block of cells, this variable
-      // saves to which partitions the block
-      // belongs. Initialize all to n_macro_cells to
-      // mark them as not yet assigned a partition.
+      // For each block of cells, this variable saves to which partitions the
+      // block belongs. Initialize all to n_macro_cells to mark them as not
+      // yet assigned a partition.
       std::vector<unsigned int> cell_partition (size_info.n_active_cells,
                                                 size_info.n_active_cells);
       std::vector<unsigned int> neighbor_list;
       std::vector<unsigned int> neighbor_neighbor_list;
 
-      // In element j of this variable, one puts the
-      // old number of the block that should be the
-      // jth block in the new numeration.
+      // In element j of this variable, one puts the old number of the block
+      // that should be the jth block in the new numeration.
       std::vector<unsigned int> partition_list(size_info.n_active_cells,0);
       std::vector<unsigned int> partition_partition_list(size_info.n_active_cells,0);
 
-      // This vector points to the start of each
-      // partition.
+      // This vector points to the start of each partition.
       std::vector<unsigned int> partition_size(2,0);
 
       unsigned int partition = 0,start_up=0,counter=0;
@@ -1245,15 +1188,12 @@ no_constraint:
       bool work = true;
       unsigned int remainder = cluster_size;
 
-      // this performs a classical breath-first
-      // search in the connectivity graph of the
-      // cells under the restriction that the size
-      // of the partitions should be a multiple of
-      // the given block size
+      // this performs a classical breath-first search in the connectivity
+      // graph of the cells under the restriction that the size of the
+      // partitions should be a multiple of the given block size
       while (work)
         {
-          // put the cells with neighbors on remote MPI
-          // processes up front
+          // put the cells with neighbors on remote MPI processes up front
           if (start_nonboundary>0)
             {
               for (unsigned int cell=0; cell<start_nonboundary; ++cell)
@@ -1268,14 +1208,13 @@ no_constraint:
               if (remainder == cluster_size)
                 remainder = 0;
 
-              // adjust end of boundary cells to the
-              // remainder
+              // adjust end of boundary cells to the remainder
               size_info.boundary_cells_end += (remainder+vectorization_length-1)/vectorization_length;
             }
           else
             {
-              // To start up, set the start_up cell to
-              // partition and list all its neighbors.
+              // To start up, set the start_up cell to partition and list all
+              // its neighbors.
               cell_partition[start_up] = partition;
               neighbor_list.push_back(start_up);
               partition_list[counter++] = start_up;
@@ -1387,9 +1326,8 @@ no_constraint:
               neighbor_neighbor_list.resize(0);
             }
 not_connect:
-          // One has to check if the graph is not
-          // connected so we have to find another
-          // partition.
+          // One has to check if the graph is not connected so we have to find
+          // another partition.
           work = false;
           for (unsigned int j=start_up; j<size_info.n_active_cells; ++j)
             if (cell_partition[j] == size_info.n_active_cells)
@@ -1412,10 +1350,9 @@ not_connect:
       {
         // Create partitioning within partitions.
 
-        // For each block of cells, this variable
-        // saves to which partitions the block
-        // belongs. Initialize all to n_macro_cells to
-        // mark them as not yet assigned a partition.
+        // For each block of cells, this variable saves to which partitions
+        // the block belongs. Initialize all to n_macro_cells to mark them as
+        // not yet assigned a partition.
         std::vector<unsigned int> cell_partition_l2(size_info.n_active_cells,
                                                     size_info.n_active_cells);
         task_info.partition_color_blocks_row_index.resize(partition+1,0);
@@ -1445,8 +1382,8 @@ not_connect:
                           start_up = j;
                           work = true;
                           partition_counter = 1;
-                          // To start up, set the start_up cell to
-                          // partition and list all its neighbors.
+                          // To start up, set the start_up cell to partition
+                          // and list all its neighbors.
                           AssertIndexRange (start_up, partition_size[part+1]);
                           cell_partition_l2[partition_list[start_up]] =
                             partition_l2;
@@ -1489,8 +1426,8 @@ not_connect:
                     int index_before = neighbor_neighbor_list.size(),
                         index = index_before;
                     {
-                      // put the cells into separate lists for each
-                      // FE index within one partition-partition
+                      // put the cells into separate lists for each FE index
+                      // within one partition-partition
                       missing_macros = 0;
                       std::vector<unsigned int> remaining_per_macro_cell
                       (max_fe_index);
@@ -1509,8 +1446,7 @@ not_connect:
                                                     [cell]]].
                               push_back(partition_partition_list[cell]);
                             }
-                          // check how many more cells are needed in the
-                          // lists
+                          // check how many more cells are needed in the lists
                           for (unsigned int j=0; j<max_fe_index; j++)
                             {
                               remaining_per_macro_cell[j] =
@@ -1536,8 +1472,7 @@ not_connect:
                       missing_macros = task_info.block_size -
                                        (missing_macros%task_info.block_size);
 
-                      // now we realized that there are some cells
-                      // missing.
+                      // now we realized that there are some cells missing.
                       while (missing_macros>0 || filled == false)
                         {
                           if (index==0)
@@ -1557,9 +1492,9 @@ not_connect:
                           unsigned int additional = neighbor_neighbor_list
                                                     [index];
 
-                          // go through the neighbors of the last cell
-                          // in the current partition and check if we
-                          // find some to fill up with.
+                          // go through the neighbors of the last cell in the
+                          // current partition and check if we find some to
+                          // fill up with.
                           CompressedSimpleSparsityPattern::row_iterator
                           neighbor =
                             connectivity.row_begin(additional),
@@ -1576,9 +1511,9 @@ not_connect:
                                                  cell_active_fe_index[*neighbor];
 
                                   // Only add this cell if we need more macro
-                                  // cells in the current block or if there is a
-                                  // macro cell with the FE index that is not
-                                  // yet fully populated
+                                  // cells in the current block or if there is
+                                  // a macro cell with the FE index that is
+                                  // not yet fully populated
                                   if (missing_macros > 0 ||
                                       remaining_per_macro_cell[this_index] > 0)
                                     {
@@ -1616,10 +1551,9 @@ not_connect:
                         }
                       if (hp_bool == true)
                         {
-                          // set the renumbering according to their
-                          // active FE index within one
-                          // partition-partition which was implicitly
-                          // assumed above
+                          // set the renumbering according to their active FE
+                          // index within one partition-partition which was
+                          // implicitly assumed above
                           cell = counter - partition_counter;
                           for (unsigned int j=0; j<max_fe_index; j++)
                             {
@@ -1698,14 +1632,9 @@ not_connect:
     }
 
 
-    // internal sparsity pattern structure that is
-    // specialized to the situation in the setup
-    // of the cells the dofs belong to: allows
-    // only insertion of entries at the end
     namespace internal
     {
-      // rudimentary version of a vector that keeps
-      // entries always ordered
+      // rudimentary version of a vector that keeps entries always ordered
       class ordered_vector : public std::vector<unsigned int>
       {
       public:
@@ -1721,10 +1650,8 @@ not_connect:
         }
 
 
-        // insert a given entry. dat is a pointer
-        // within this vector (make sure that it
-        // really stays there, otherwise there will be
-        // an error)
+        // insert a given entry. dat is a pointer within this vector (the user
+        // needs to make sure that it really stays there)
         void insert (const unsigned int entry,
                      std::vector<unsigned int>::iterator &dat)
         {
@@ -1737,12 +1664,15 @@ not_connect:
           if (dat == end())
             {
               push_back(entry);
+              dat = end();
             }
           else if (*dat > entry)
             {
-              this->std::vector<unsigned int>::insert (dat, entry);
+              dat = this->std::vector<unsigned int>::insert (dat, entry);
+              ++dat;
             }
-          ++dat;
+          else
+            ++dat;
         }
       };
     }
@@ -1926,8 +1856,7 @@ not_connect:
 
     void DoFInfo::renumber_dofs (std::vector<unsigned int> &renumbering)
     {
-      // first renumber all locally owned degrees of
-      // freedom
+      // first renumber all locally owned degrees of freedom
       AssertDimension (vector_partitioner->local_size(),
                        vector_partitioner->size());
       const unsigned int local_size = vector_partitioner->local_size();
@@ -1956,9 +1885,8 @@ not_connect:
       for (unsigned int i=0; i<constrained_dofs.size(); ++i)
         new_constrained_dofs[i] = renumbering[constrained_dofs[i]];
 
-      // the new constrained DoFs should be sorted
-      // already as they are not contained in
-      // dof_indices and then get contiguous numbers
+      // the new constrained DoFs should be sorted already as they are not
+      // contained in dof_indices and then get contiguous numbers
 #ifdef DEBUG
       for (unsigned int i=1; i<new_constrained_dofs.size(); ++i)
         Assert (new_constrained_dofs[i] > new_constrained_dofs[i-1], ExcInternalError());
