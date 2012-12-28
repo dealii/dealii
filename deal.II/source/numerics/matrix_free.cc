@@ -21,4 +21,7 @@ DEAL_II_NAMESPACE_OPEN
 
 #include "matrix_free.inst"
 
+template struct internal::MatrixFreeFunctions::ShapeInfo<double>;
+template struct internal::MatrixFreeFunctions::ShapeInfo<float>;
+
 DEAL_II_NAMESPACE_CLOSE

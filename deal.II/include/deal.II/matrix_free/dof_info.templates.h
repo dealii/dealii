@@ -14,6 +14,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/lac/compressed_simple_sparsity_pattern.h>
+#include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/helper_functions.h>
 
@@ -1702,74 +1703,6 @@ not_connect:
     // only insertion of entries at the end
     namespace internal
     {
-      struct SimplifiedCompressedSparsity
-      {
-        static const unsigned int short_length = 8;
-        struct LineData
-        {
-          LineData () : n_entries (0) {};
-          void add (unsigned int entry)
-          {
-            if (n_entries < short_length)
-              {
-                if (n_entries == 0 || short_data[n_entries-1] < entry)
-                  short_data[n_entries++] = entry;
-#ifdef DEBUG
-                else
-                  Assert (short_data[n_entries-1] == entry, ExcInternalError());
-#endif
-              }
-            else
-              {
-                if (short_data[short_length-1] < entry)
-                  {
-                    Assert (n_entries == short_length, ExcInternalError());
-                    if (additional_data.size()==0)
-                      {
-#ifdef DEBUG
-                        Assert (short_data[n_entries-1] < entry, ExcInternalError());
-#endif
-                        additional_data.reserve (16);
-                        additional_data.push_back (entry);
-                      }
-                    else if (additional_data.back() < entry)
-                      additional_data.push_back (entry);
-#ifdef DEBUG
-                    else
-                      Assert (additional_data.back() == entry, ExcInternalError());
-#endif
-                  }
-              }
-          }
-
-          unsigned int n_entries;
-          unsigned int short_data[short_length];
-          std::vector<unsigned int> additional_data;
-        };
-
-        SimplifiedCompressedSparsity (const unsigned int n_rows,
-                                      const unsigned int n_cols)
-          :
-          rows (n_rows),
-          n_cols (n_cols)
-        {}
-
-        void add (unsigned int row, unsigned int entry)
-        {
-          AssertIndexRange (row, rows.size());
-          AssertIndexRange (entry, n_cols);
-          rows[row].add (entry);
-        }
-
-        unsigned int row_length (unsigned int row) const
-        {
-          return rows[row].n_entries + rows[row].additional_data.size();
-        }
-
-        std::vector<LineData> rows;
-        unsigned int n_cols;
-      };
-
       // rudimentary version of a vector that keeps
       // entries always ordered
       class ordered_vector : public std::vector<unsigned int>
@@ -1830,18 +1763,66 @@ not_connect:
       const unsigned int n_blocks = (do_blocking == true) ?
                                     task_info.n_blocks : size_info.n_active_cells;
 
-      internal::SimplifiedCompressedSparsity
-      connectivity_dof (n_rows, n_blocks);
-      unsigned int cell_start = 0,mcell_start = 0;
+      // first determine row lengths
+      std::vector<unsigned int> row_lengths(n_rows);
+      unsigned int cell_start = 0, mcell_start = 0;
+      std::vector<unsigned int> scratch;
       for (unsigned int block = 0; block < n_blocks; ++block)
         {
+          // if we have the blocking variant (used in the coloring scheme), we
+          // want to build a graph with the blocks with interaction with
+          // remote MPI processes up front. in the non-blocking variant, we do
+          // not do this here. TODO: unify this approach!!!
+          if (do_blocking == true)
+            {
+              scratch.clear();
+              for (unsigned int mcell=mcell_start; mcell<
+                   std::min(mcell_start+task_info.block_size,
+                            size_info.n_macro_cells);
+                   ++mcell)
+                {
+                  unsigned int n_comp = (irregular_cells[mcell]>0)
+                                        ?irregular_cells[mcell]:size_info.vectorization_length;
+                  for (unsigned int cell = cell_start; cell < cell_start+n_comp;
+                       ++cell)
+                    scratch.insert(scratch.end(),
+                                   begin_indices(renumbering[cell]),
+                                   end_indices(renumbering[cell]));
+                  cell_start += n_comp;
+                }
+              std::sort(scratch.begin(), scratch.end());
+              const unsigned int n_unique =
+                std::unique(scratch.begin(), scratch.end())-scratch.begin();
+              for (unsigned int i=0; i<n_unique; ++i)
+                row_lengths[scratch[i]]++;
+              mcell_start += task_info.block_size;
+            }
+          else
+            {
+              scratch.clear();
+              scratch.insert(scratch.end(),
+                             begin_indices(block), end_indices(block));
+              std::sort(scratch.begin(), scratch.end());
+              const unsigned int n_unique =
+                std::unique(scratch.begin(), scratch.end())-scratch.begin();
+              for (unsigned int i=0; i<n_unique; ++i)
+                row_lengths[scratch[i]]++;
+            }
+        }
 
-          // if we have the blocking variant (used in
-          // the coloring scheme), we want to build a
-          // graph with the blocks with interaction with
-          // remote MPI processes up front. in the
-          // non-blocking variant, we do not do this
-          // here. TODO: unify this approach!!!
+      // disregard dofs that only sit on one cell
+      for (unsigned int row=0; row<n_rows; ++row)
+        if (row_lengths[row] == 1)
+          row_lengths[row] = 0;
+
+      SparsityPattern connectivity_dof (n_rows, n_blocks, row_lengths, false);
+      cell_start = 0,mcell_start = 0;
+      for (unsigned int block = 0; block < n_blocks; ++block)
+        {
+          // if we have the blocking variant (used in the coloring scheme), we
+          // want to build a graph with the blocks with interaction with
+          // remote MPI processes up front. in the non-blocking variant, we do
+          // not do this here. TODO: unify this approach!!!
           if (do_blocking == true)
             {
               for (unsigned int mcell=mcell_start; mcell<
@@ -1854,11 +1835,12 @@ not_connect:
                   for (unsigned int cell = cell_start; cell < cell_start+n_comp;
                        ++cell)
                     {
-                      const unsigned int *it = begin_indices
-                                               (renumbering[cell]),
-                                               * end_cell = end_indices (renumbering[cell]);
+                      const unsigned int
+                        *it = begin_indices (renumbering[cell]),
+                        *end_cell = end_indices (renumbering[cell]);
                       for ( ; it != end_cell; ++it)
-                        connectivity_dof.add(*it, block);
+                        if (row_lengths[*it]>0)
+                          connectivity_dof.add(*it, block);
                     }
                   cell_start += n_comp;
                 }
@@ -1866,12 +1848,15 @@ not_connect:
             }
           else
             {
-              const unsigned int *it = begin_indices (block),
-                                  * end_cell = end_indices (block);
+              const unsigned int
+                *it = begin_indices (block),
+                *end_cell = end_indices (block);
               for ( ; it != end_cell; ++it)
-                connectivity_dof.add(*it, block);
+                if (row_lengths[*it]>0)
+                  connectivity_dof.add(*it, block);
             }
         }
+      connectivity_dof.compress();
 
       connectivity.reinit (n_blocks, n_blocks);
       internal::ordered_vector row_entries;
@@ -1894,36 +1879,21 @@ not_connect:
                        ++cell)
                     {
                       // apply renumbering when we do blocking
-                      const unsigned int *it = begin_indices (renumbering[cell]),
-                                          * end_cell = end_indices (renumbering[cell]);
-                      row_entries.reserve (row_entries.size() + end_cell - it);
+                      const unsigned int
+                        *it = begin_indices (renumbering[cell]),
+                        *end_cell = end_indices (renumbering[cell]);
                       for ( ; it != end_cell; ++it)
-                        {
-                          // the simplified sparsity pattern has two
-                          // fields: a short field for dofs that only
-                          // belong to a few cells, and a long field for
-                          // all dofs with many cells that spills the
-                          // short data field. so go them through both
-                          const internal::SimplifiedCompressedSparsity::LineData &dat =
-                            connectivity_dof.rows[*it];
-                          std::vector<unsigned int>::iterator insert_pos = row_entries.begin();
-                          for (unsigned int i=0; i<dat.n_entries; ++i)
-                            if (dat.short_data[i] >= block)
-                              goto end_this;
-                            else
-                              row_entries.insert (dat.short_data[i], insert_pos);
-                          if (dat.n_entries ==
-                              internal::SimplifiedCompressedSparsity::short_length)
-                            {
-                              for (unsigned int i=0; i<dat.additional_data.size(); ++i)
-                                if (dat.additional_data[i] >= block)
-                                  goto end_this;
-                                else
-                                  row_entries.insert (dat.additional_data[i], insert_pos);
-                            }
-end_this:
-                          {}
-                        }
+                        if (row_lengths[*it] > 0)
+                          {
+                            SparsityPattern::row_iterator sp = connectivity_dof.row_begin(*it);
+                            row_entries.reserve (row_entries.size() + end_cell - it);
+                            std::vector<unsigned int>::iterator insert_pos = row_entries.begin();
+                            for ( ; sp != connectivity_dof.row_end(*it); ++sp)
+                              if (*sp >= block)
+                                break;
+                              else
+                                row_entries.insert (*sp, insert_pos);
+                          }
                     }
                   cell_start +=n_comp;
                 }
@@ -1933,34 +1903,18 @@ end_this:
             {
               const unsigned int *it = begin_indices (block),
                                   * end_cell = end_indices (block);
-              row_entries.reserve (row_entries.size() + end_cell - it);
               for ( ; it != end_cell; ++it)
-                {
-                  // the simplified sparsity pattern has two
-                  // fields: a short field for dofs that only
-                  // belong to a few cells, and a long field for
-                  // all dofs with many cells that spills the
-                  // short data field. so go them through both
-                  const internal::SimplifiedCompressedSparsity::LineData &dat =
-                    connectivity_dof.rows[*it];
-                  std::vector<unsigned int>::iterator insert_pos = row_entries.begin();
-                  for (unsigned int i=0; i<dat.n_entries; ++i)
-                    if (dat.short_data[i] >= block)
-                      goto end_this_nb;
-                    else
-                      row_entries.insert (dat.short_data[i], insert_pos);
-                  if (dat.n_entries ==
-                      internal::SimplifiedCompressedSparsity::short_length)
-                    {
-                      for (unsigned int i=0; i<dat.additional_data.size(); ++i)
-                        if (dat.additional_data[i] >= block)
-                          goto end_this_nb;
-                        else
-                          row_entries.insert (dat.additional_data[i], insert_pos);
-                    }
-end_this_nb:
-                  {}
-                }
+                if (row_lengths[*it] > 0)
+                  {
+                    SparsityPattern::row_iterator sp = connectivity_dof.row_begin(*it);
+                    row_entries.reserve (row_entries.size() + end_cell - it);
+                    std::vector<unsigned int>::iterator insert_pos = row_entries.begin();
+                    for ( ; sp != connectivity_dof.row_end(*it); ++sp)
+                      if (*sp >= block)
+                        break;
+                      else
+                        row_entries.insert (*sp, insert_pos);
+                  }
             }
           connectivity.add_entries (block, row_entries.begin(), row_entries.end());
         }
