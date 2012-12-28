@@ -1087,7 +1087,7 @@ Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
 
   // This is the end accessor, which
   // does not hava a valid block.
-  if (a_block == matrix->n_blocks())
+  if (a_block == matrix->size())
     return;
 
   const unsigned int r = row % bs;
@@ -1095,8 +1095,8 @@ Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
   b_iterator = matrix->inverse(a_block).begin(r);
   b_end = matrix->inverse(a_block).end();
 
-  Assert (a_block < matrix->n_blocks(),
-          ExcIndexRange(a_block, 0, matrix->n_blocks()));
+  Assert (a_block < matrix->size(),
+          ExcIndexRange(a_block, 0, matrix->size()));
 }
 
 
@@ -1105,7 +1105,7 @@ inline
 unsigned int
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::row() const
 {
-  Assert (a_block < matrix->n_blocks(),
+  Assert (a_block < matrix->size(),
           ExcIteratorPastEnd());
 
   return bs * a_block + b_iterator->row();
@@ -1117,7 +1117,7 @@ inline
 unsigned int
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::column() const
 {
-  Assert (a_block < matrix->n_blocks(),
+  Assert (a_block < matrix->size(),
           ExcIteratorPastEnd());
 
   return bs * a_block + b_iterator->column();
@@ -1129,7 +1129,7 @@ inline
 inverse_type
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::value() const
 {
-  Assert (a_block < matrix->n_blocks(),
+  Assert (a_block < matrix->size(),
           ExcIteratorPastEnd());
 
   return b_iterator->value();
@@ -1158,7 +1158,7 @@ PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::operator++ ()
     {
       ++accessor.a_block;
 
-      if (accessor.a_block < accessor.matrix->n_blocks())
+      if (accessor.a_block < accessor.matrix->size())
         {
           accessor.b_iterator = accessor.matrix->inverse(accessor.a_block).begin();
           accessor.b_end = accessor.matrix->inverse(accessor.a_block).end();
@@ -1192,7 +1192,7 @@ bool
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::
 operator == (const const_iterator &other) const
 {
-  if (accessor.a_block == accessor.matrix->n_blocks() &&
+  if (accessor.a_block == accessor.matrix->size() &&
       accessor.a_block == other.accessor.a_block)
     return true;
 
@@ -1240,7 +1240,7 @@ inline
 typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator
 PreconditionBlockJacobi<MATRIX, inverse_type>::end () const
 {
-  return const_iterator(this, this->n_blocks() * this->block_size());
+  return const_iterator(this, this->size() * this->block_size());
 }
 
 

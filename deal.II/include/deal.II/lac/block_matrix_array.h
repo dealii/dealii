@@ -144,12 +144,9 @@ public:
    * function to call for an object
    * created by the default
    * constructor.
-   *
-   * @deprecated the last argument
-   * is ignored.
    */
   void initialize (const unsigned int n_block_rows,
-                   const unsigned int n_block_cols) DEAL_II_DEPRECATED;
+                   const unsigned int n_block_cols);
 
   /**
    * Constructor fixing the
