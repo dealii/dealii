@@ -1002,6 +1002,7 @@ no_constraint:
             {
               // To start up, set the start_up cell to
               // partition and list all its neighbors.
+              AssertIndexRange(start_up, cell_partition.size());
               cell_partition[start_up] = partition;
               neighbor_list.push_back(start_up);
               partition_list[counter++] = start_up;

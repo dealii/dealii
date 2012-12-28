@@ -1121,14 +1121,14 @@ namespace internal
     template <int dim>
     bool
     FPArrayComparator<Number>::
-    operator ()(const Tensor<1,dim,VectorizedArray<Number> > *t1,
-                const Tensor<1,dim,VectorizedArray<Number> > *t2) const
+    operator ()(const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
+                const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const
     {
       for (unsigned int d=0; d<dim; ++d)
         for (unsigned int k=0; k<VectorizedArray<Number>::n_array_elements; ++k)
-          if ((*t1)[d][k] < (*t2)[d][k] - tolerance)
+          if ((t1)[d][k] < (t2)[d][k] - tolerance)
             return true;
-          else if ((*t1)[d][k] > (*t2)[d][k] + tolerance)
+          else if ((t1)[d][k] > (t2)[d][k] + tolerance)
             return false;
       return false;
     }
@@ -1139,15 +1139,15 @@ namespace internal
     template <int dim>
     bool
     FPArrayComparator<Number>::
-    operator ()(const Tensor<2,dim,VectorizedArray<Number> > *t1,
-                const Tensor<2,dim,VectorizedArray<Number> > *t2) const
+    operator ()(const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
+                const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const
     {
       for (unsigned int d=0; d<dim; ++d)
         for (unsigned int e=0; e<dim; ++e)
           for (unsigned int k=0; k<VectorizedArray<Number>::n_array_elements; ++k)
-            if ((*t1)[d][e][k] < (*t2)[d][e][k] - tolerance)
+            if ((t1)[d][e][k] < (t2)[d][e][k] - tolerance)
               return true;
-            else if ((*t1)[d][e][k] > (*t2)[d][e][k] + tolerance)
+            else if ((t1)[d][e][k] > (t2)[d][e][k] + tolerance)
               return false;
       return false;
     }

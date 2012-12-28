@@ -287,11 +287,16 @@ end_set:
                 current_data.jacobians_grad_upper.reserve (reserve_size);
             }
 
+          // we would like to put a Tensor<1,dim,VectorizedArray<Number> > as
+          // key into the std::map, but std::map allocation does not align the
+          // allocated memory correctly, so put it into a tensor of the
+          // correct length instead
           FPArrayComparator<Number> comparator(jacobian_size);
-          std::map<const Tensor<1,dim,VectorizedArray<Number> > *, unsigned int,
-              FPArrayComparator<Number> > cartesians(comparator);
-          std::map<const Tensor<2,dim,VectorizedArray<Number> > *, unsigned int,
-              FPArrayComparator<Number> > affines(comparator);
+          typedef Tensor<1,VectorizedArray<Number>::n_array_elements,Number> VEC_ARRAY;
+          std::map<Tensor<1,dim,VEC_ARRAY>, unsigned int,
+                   FPArrayComparator<Number> > cartesians(comparator);
+          std::map<Tensor<2,dim,VEC_ARRAY>, unsigned int,
+                   FPArrayComparator<Number> > affines(comparator);
 
           // loop over all cells
           for (unsigned int cell=0; cell<n_macro_cells; ++cell)
@@ -357,28 +362,17 @@ end_set:
                   // correct place.
                   if (most_general_type == cartesian)
                     {
-                      std::pair<const Tensor<1,dim,VectorizedArray<Number> > *,
-                          unsigned int> new_entry;
-                      new_entry.second = cartesian_data.size();
-                      Tensor<1,dim,VectorizedArray<Number> > cart;
+                      std::pair<Tensor<1,dim,VEC_ARRAY>,unsigned int> new_entry;
+                      new_entry.second = cartesians.size();
                       for (unsigned int d=0; d<dim; ++d)
-                        cart[d] = data.const_jac[d][d];
-                      cartesian_data.push_back
-                      (std::pair<Tensor<1,dim,VectorizedArray<Number> >,
-                       VectorizedArray<Number> >
-                       (cart, VectorizedArray<Number>()));
-                      new_entry.first = &cartesian_data[new_entry.second].first;
+                        for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+                          new_entry.first[d][v] = data.const_jac[d][d][v];
 
-                      std::pair<typename std::
-                      map<const Tensor<1,dim,VectorizedArray<Number> > *,
-                          unsigned int,
-                          FPArrayComparator<Number> >::iterator,
+                      std::pair<typename std::map<Tensor<1,dim,VEC_ARRAY>,
+                          unsigned int, FPArrayComparator<Number> >::iterator,
                           bool> it = cartesians.insert(new_entry);
                       if (it.second == false)
-                        {
-                          insert_position = it.first->second;
-                          cartesian_data.resize(new_entry.second);
-                        }
+                        insert_position = it.first->second;
                       else
                         insert_position = new_entry.second;
                     }
@@ -387,25 +381,18 @@ end_set:
                   // before, but with other data fields
                   else if (most_general_type == affine)
                     {
-                      std::pair<const Tensor<2,dim,VectorizedArray<Number> > *,
-                          unsigned int> new_entry;
-                      new_entry.second = affine_data.size();
-                      affine_data.push_back
-                      (std::pair<Tensor<2,dim,VectorizedArray<Number> >,
-                       VectorizedArray<Number> >
-                       (data.const_jac, VectorizedArray<Number>()));
-                      new_entry.first = &affine_data[new_entry.second].first;
+                      std::pair<Tensor<2,dim,VEC_ARRAY>,unsigned int> new_entry;
+                      new_entry.second = affines.size();
+                      for (unsigned int d=0; d<dim; ++d)
+                        for (unsigned int e=0; e<dim; ++e)
+                          for (unsigned int v=0; v<VectorizedArray<Number>::n_array_elements; ++v)
+                            new_entry.first[d][e][v] = data.const_jac[d][e][v];
 
-                      std::pair<typename std::
-                      map<const Tensor<2,dim,VectorizedArray<Number> > *,
-                          unsigned int,
-                          FPArrayComparator<Number> >::iterator,
+                      std::pair<typename std::map<Tensor<2,dim,VEC_ARRAY>,
+                          unsigned int, FPArrayComparator<Number> >::iterator,
                           bool> it = affines.insert(new_entry);
                       if (it.second == false)
-                        {
-                          insert_position = it.first->second;
-                          affine_data.resize(new_entry.second);
-                        }
+                        insert_position = it.first->second;
                       else
                         insert_position = new_entry.second;
                     }
@@ -615,20 +602,37 @@ end_set:
           // fields and compute the JxW value.
           if (my_q == 0)
             {
-              for (unsigned int i=0; i<cartesian_data.size(); ++i)
+              cartesian_data.resize(cartesians.size());
+              for (typename std::map<Tensor<1,dim,VEC_ARRAY>,
+                                     unsigned int>::iterator it = cartesians.begin();
+                   it != cartesians.end(); ++it)
                 {
-                  VectorizedArray<Number> det = cartesian_data[i].first[0];
-                  for (unsigned int d=1; d<dim; ++d)
-                    det *= cartesian_data[i].first[d];
+                  VectorizedArray<Number> det = make_vectorized_array<Number>(1.);
                   for (unsigned int d=0; d<dim; ++d)
-                    cartesian_data[i].first[d] = 1./cartesian_data[i].first[d];
-                  cartesian_data[i].second = std::abs(det);
+                    {
+                      VectorizedArray<Number> jac_d;
+                      for (unsigned int v=0;
+                           v<VectorizedArray<Number>::n_array_elements; ++v)
+                        jac_d[v] = it->first[d][v];
+                      cartesian_data[it->second].first[d] = 1./jac_d;
+                      det *= jac_d;
+                    }
+                  cartesian_data[it->second].second = std::abs(det);
                 }
-              for (unsigned int i=0; i<affine_data.size(); ++i)
+              affine_data.resize(affines.size());
+              for (typename std::map<Tensor<2,dim,VEC_ARRAY>,
+                                     unsigned int>::iterator it = affines.begin();
+                   it != affines.end(); ++it)
                 {
-                  VectorizedArray<Number> det = determinant(affine_data[i].first);
-                  affine_data[i].first = transpose(invert(affine_data[i].first));
-                  affine_data[i].second = std::abs(det);
+                  Tensor<2,dim,VectorizedArray<Number> > jac;
+                  for (unsigned int d=0; d<dim; ++d)
+                    for (unsigned int e=0; e<dim; ++e)
+                      for (unsigned int v=0;
+                           v<VectorizedArray<Number>::n_array_elements; ++v)
+                        jac[d][e][v] = it->first[d][e][v];
+
+                  affine_data[it->second].first = transpose(invert(jac));
+                  affine_data[it->second].second = std::abs(determinant(jac));
                 }
             }
         }
