@@ -59,8 +59,8 @@
 IF(NOT ( "${CMAKE_C_COMPILER_ID}" STREQUAL "${CMAKE_CXX_COMPILER_ID}" AND
          "${CMAKE_C_COMPILER_VERSION}" STREQUAL "${CMAKE_CXX_COMPILER_VERSION}" ) )
     MESSAGE(FATAL_ERROR "\n"
-      "Configuration error: The specified C and CXX compiler have to be the "
-      "same, but found:\n"
+      "Configuration error: The specified C and CXX compiler have to be of the "
+      "same family, but cmake found:\n"
       "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}\n"
       "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}\n"
       )
@@ -105,4 +105,3 @@ ELSE(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
     "(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS=OFF)"
     )
 ENDIF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
-
