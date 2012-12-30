@@ -267,19 +267,6 @@ namespace GridTools
                        const Point<spacedim>     &p);
 
   /**
-   * @deprecated This function might
-   * be acceptable to find a patch
-   * around a single vertex, but it
-   * wastes resources creating
-   * patches around all vertices. The
-   * function may fail on
-   * anisotropic meshes, and an easy
-   * fix is not obvious. Therefore,
-   * it should be replaced by a
-   * function which computes all
-   * active vertex patches by looping
-   * over cells.
-   *
    * Find and return a vector of
    * iterators to active cells that
    * surround a given vertex with index @p vertex_index.
@@ -295,11 +282,15 @@ namespace GridTools
    * always be either a vertex of a cell or be
    * a hanging node located on a face or an
    * edge of it.
+   *
+   * @note It isn't entirely clear at this time whether the function
+   * does the right thing with anisotropically refined meshes. It needs
+   * to be checked for this case.
    */
   template<int dim, template <int, int> class Container, int spacedim>
   std::vector<typename Container<dim,spacedim>::active_cell_iterator>
   find_cells_adjacent_to_vertex (const Container<dim,spacedim> &container,
-                                 const unsigned int    vertex_index) DEAL_II_DEPRECATED;
+                                 const unsigned int    vertex_index);
 
 
   /**
