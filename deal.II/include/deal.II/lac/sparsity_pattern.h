@@ -790,10 +790,16 @@ public:
    * complexity of this function is <i>log(m)</i> if the sparsity pattern is
    * compressed.
    *
-   * @deprecated Use SparseMatrix::const_iterator
+   * @note This function is not cheap since it has to search through all
+   * of the elements of the given row <tt>i</tt> to find whether index
+   * <tt>j</tt> exists. Thus, it is more expensive than necessary in cases
+   * where you want to loop over all of the nonzero elements of this
+   * sparsity pattern (or of a sparse matrix associated with it) or of a
+   * single row. In such cases, it is more efficient to use iterators over
+   * the elements of the sparsity pattern or of the sparse matrix.
    */
   unsigned int operator() (const unsigned int i,
-                           const unsigned int j) const DEAL_II_DEPRECATED;
+                           const unsigned int j) const;
 
   /**
    * This is the inverse operation to operator()(): given a global index, find
