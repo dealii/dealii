@@ -267,12 +267,12 @@ namespace GridTools
                        const Point<spacedim>     &p);
 
   /**
-  * @deprecated This function might
+   * @deprecated This function might
    * be acceptable to find a patch
    * around a single vertex, but it
    * wastes resources creating
    * patches around all vertices. The
-   * function mail fail on
+   * function may fail on
    * anisotropic meshes, and an easy
    * fix is not obvious. Therefore,
    * it should be replaced by a
