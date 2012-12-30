@@ -422,7 +422,7 @@ public:
    * found in the implementation of this
    * function.
    *
-   * Note that this function is most often
+   * @note This function is most often
    * used to determine the maximal row
    * length for sparsity
    * patterns. Unfortunately, while the
