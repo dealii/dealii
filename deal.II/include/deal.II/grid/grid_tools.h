@@ -282,7 +282,7 @@ namespace GridTools
    *
    * Find and return a vector of
    * iterators to active cells that
-   * surround a given vertex @p vertex.
+   * surround a given vertex with index @p vertex_index.
    * The type of the first parameter
    * may be either Triangulation,
    * DoFHandler, hp::DoFHandler, or
@@ -292,14 +292,14 @@ namespace GridTools
    * vertex itself might not be a vertex
    * of all adjacent cells that are returned.
    * However, it will
-   * always be either a vertex of a cell of be
+   * always be either a vertex of a cell or be
    * a hanging node located on a face or an
    * edge of it.
    */
   template<int dim, template <int, int> class Container, int spacedim>
   std::vector<typename Container<dim,spacedim>::active_cell_iterator>
   find_cells_adjacent_to_vertex (const Container<dim,spacedim> &container,
-                                 const unsigned int    vertex) DEAL_II_DEPRECATED;
+                                 const unsigned int    vertex_index) DEAL_II_DEPRECATED;
 
 
   /**
