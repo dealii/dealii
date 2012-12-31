@@ -1215,16 +1215,8 @@ template <typename number>
 bool
 FullMatrix<number>::operator == (const FullMatrix<number> &M) const
 {
-  // the matrices may either be both
-  // empty, or of same size and with
-  // same values, if they shall be
-  // equal
-  bool result = (this->data()==0) && (M.data()==0);
-  result = result || ((m()==M.m()) && (n()==M.n()) &&
-                      std::equal (this->data(), this->data()+m()*n(),
-                                  M.data()));
-
-  return result;
+  // simply pass down to the base class
+  return Table<2,number>::operator==(M);
 }
 
 
