@@ -456,21 +456,12 @@ namespace DoFRenumbering
     constraints.close ();
 
     SparsityPattern sparsity;
-    if (DH::dimension < 2)
-      {
-        sparsity.reinit (dof_handler.n_dofs(),
-                         dof_handler.n_dofs(),
-                         dof_handler.max_couplings_between_dofs());
-        DoFTools::make_sparsity_pattern (dof_handler, sparsity, constraints);
-        sparsity.compress();
-      }
-    else
-      {
-        CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-                                             dof_handler.n_dofs());
-        DoFTools::make_sparsity_pattern (dof_handler, csp, constraints);
-        sparsity.copy_from (csp);
-      }
+    {
+      CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
+					   dof_handler.n_dofs());
+      DoFTools::make_sparsity_pattern (dof_handler, csp, constraints);
+      sparsity.copy_from (csp);
+    }
 
     // constraints are not needed anymore
     constraints.clear ();
@@ -494,12 +485,13 @@ namespace DoFRenumbering
                       const bool                       reversed_numbering,
                       const std::vector<unsigned int> &starting_indices)
   {
-//TODO: we should be doing the same here as in the other compute_CMK function to preserve some memory
-
-    // make the connection graph
-    SparsityPattern sparsity (dof_handler.n_dofs(level),
-                              dof_handler.max_couplings_between_dofs());
-    MGTools::make_sparsity_pattern (dof_handler, sparsity, level);
+    SparsityPattern sparsity;
+    {
+      CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(level),
+					   dof_handler.n_dofs(level));
+      MGDoFTools::make_sparsity_pattern (dof_handler, csp, level);
+      sparsity.copy_from (csp);
+    }
 
     std::vector<unsigned int> new_indices(sparsity.n_rows());
     SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,
