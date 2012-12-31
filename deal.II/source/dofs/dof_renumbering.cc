@@ -2112,7 +2112,7 @@ namespace DoFRenumbering
     std::copy (begin, end, ordered_cells.begin());
     std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
-    cell_wise_dg(dof, level, ordered_cells);
+    cell_wise(dof, level, ordered_cells);
   }
 
 
