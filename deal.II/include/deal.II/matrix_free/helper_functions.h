@@ -166,12 +166,12 @@ namespace internal
                        const std::vector<Number> &v2) const;
 
       template <int dim>
-      bool operator ()(const Tensor<1,dim,VectorizedArray<Number> > *t1,
-                       const Tensor<1,dim,VectorizedArray<Number> > *t2) const;
+      bool operator ()(const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
+                       const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const;
 
       template <int dim>
-      bool operator ()(const Tensor<2,dim,VectorizedArray<Number> > *t1,
-                       const Tensor<2,dim,VectorizedArray<Number> > *t2) const;
+      bool operator ()(const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
+                       const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const;
 
       Number tolerance;
     };

@@ -136,9 +136,8 @@ internal_reinit(const Mapping<dim>                         &mapping,
       for (unsigned int no=0; no<dof_handler.size(); ++no)
         dof_info[no].store_plain_indices = additional_data.store_plain_indices;
 
-      // initialize the basic multithreading
-      // information that needs to be passed to the
-      // DoFInfo structure
+      // initialize the basic multithreading information that needs to be
+      // passed to the DoFInfo structure
 #ifdef DEAL_II_USE_MT
       if (additional_data.tasks_parallel_scheme != AdditionalData::none)
         {
@@ -155,18 +154,15 @@ internal_reinit(const Mapping<dim>                         &mapping,
 #endif
         task_info.use_multithreading = false;
 
-      // set dof_indices together with
-      // constraint_indicator and
-      // constraint_pool_data. It also reorders the way
-      // cells are gone through (to separate cells
-      // with overlap to other processors from
-      // others without).
+      // set dof_indices together with constraint_indicator and
+      // constraint_pool_data. It also reorders the way cells are gone through
+      // (to separate cells with overlap to other processors from others
+      // without).
       initialize_indices (constraint, locally_owned_set);
     }
 
-  // Reads out the FE information and stores the
-  // shape function values, gradients and
-  // Hessians for quadrature points.
+  // Reads out the FE information and stores the shape function values,
+  // gradients and Hessians for quadrature points.
   const unsigned int n_fe   = dof_handler.size();
   const unsigned int n_quad = quad.size();
   shape_info.reinit (TableIndices<4>(n_fe, n_quad, 1, 1));
@@ -180,16 +176,12 @@ internal_reinit(const Mapping<dim>                         &mapping,
         }
     }
 
-  // Evaluates transformations from unit to real
-  // cell, Jacobian determinants, quadrature
-  // points in real space, based on the ordering
-  // of the cells determined in @p
-  // extract_local_to_global_indices. The
-  // algorithm assumes that the active FE index
-  // for the transformations is given the active
-  // FE index in the zeroth DoFHandler. TODO:
-  // how do things look like in the more general
-  // case?
+  // Evaluates transformations from unit to real cell, Jacobian determinants,
+  // quadrature points in real space, based on the ordering of the cells
+  // determined in @p extract_local_to_global_indices. The algorithm assumes
+  // that the active FE index for the transformations is given the active FE
+  // index in the zeroth DoFHandler. TODO: how do things look like in the more
+  // general case?
   if (additional_data.initialize_mapping == true)
     {
       mapping_info.initialize (dof_handler[0]->get_tria(), cell_level_index,
@@ -239,9 +231,8 @@ internal_reinit(const Mapping<dim>                            &mapping,
       for (unsigned int no=0; no<dof_handler.size(); ++no)
         dof_info[no].store_plain_indices = additional_data.store_plain_indices;
 
-      // initialize the basic multithreading
-      // information that needs to be passed to the
-      // DoFInfo structure
+      // initialize the basic multithreading information that needs to be
+      // passed to the DoFInfo structure
 #ifdef DEAL_II_USE_MT
       if (additional_data.tasks_parallel_scheme != AdditionalData::none)
         {
@@ -258,18 +249,15 @@ internal_reinit(const Mapping<dim>                            &mapping,
 #endif
         task_info.use_multithreading = false;
 
-      // set dof_indices together with
-      // constraint_indicator and
-      // constraint_pool_data. It also reorders the way
-      // cells are gone through (to separate cells
-      // with overlap to other processors from
-      // others without).
+      // set dof_indices together with constraint_indicator and
+      // constraint_pool_data. It also reorders the way cells are gone through
+      // (to separate cells with overlap to other processors from others
+      // without).
       initialize_indices (constraint, locally_owned_set);
     }
 
-  // Reads out the FE information and stores the
-  // shape function values, gradients and
-  // Hessians for quadrature points.
+  // Reads out the FE information and stores the shape function values,
+  // gradients and Hessians for quadrature points.
   const unsigned int n_components = dof_handler.size();
   const unsigned int n_quad       = quad.size();
   unsigned int n_fe_in_collection = 0;
@@ -292,11 +280,9 @@ internal_reinit(const Mapping<dim>                            &mapping,
                                                  fe.base_element(0));
       }
 
-  // Evaluates transformations from unit to real
-  // cell, Jacobian determinants, quadrature
-  // points in real space, based on the ordering
-  // of the cells determined in @p
-  // extract_local_to_global_indices.
+  // Evaluates transformations from unit to real cell, Jacobian determinants,
+  // quadrature points in real space, based on the ordering of the cells
+  // determined in @p extract_local_to_global_indices.
   if (additional_data.initialize_mapping == true)
     {
       mapping_info.initialize (dof_handler[0]->get_tria(), cell_level_index,
@@ -347,12 +333,9 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
 
   dof_info.resize (dof_handlers.n_dof_handlers);
 
-  // go through cells on zeroth level and then
-  // successively step down into children. This
-  // gives a z-ordering of the cells, which is
-  // beneficial when setting up neighboring
-  // relations between cells for thread
-  // parallelization
+  // go through cells on zeroth level and then successively step down into
+  // children. This gives a z-ordering of the cells, which is beneficial when
+  // setting up neighboring relations between cells for thread parallelization
   const unsigned int n_mpi_procs = size_info.n_procs;
   const unsigned int my_pid = size_info.my_pid;
 
@@ -383,18 +366,14 @@ initialize_dof_handlers (const std::vector<const MGDoFHandler<dim>*> &dof_handle
 
   dof_info.resize (dof_handlers.n_dof_handlers);
 
-  // go through cells on zeroth level and then
-  // successively step down into children. This
-  // gives a z-ordering of the cells, which is
-  // beneficial when setting up neighboring
-  // relations between cells for thread
-  // parallelization
+  // go through cells on zeroth level and then successively step down into
+  // children. This gives a z-ordering of the cells, which is beneficial when
+  // setting up neighboring relations between cells for thread parallelization
   const unsigned int n_mpi_procs = size_info.n_procs;
   const unsigned int my_pid = size_info.my_pid;
 
-  // if we have no level given, use the same as
-  // for the standard DoFHandler, otherwise we
-  // must loop through the respective level
+  // if we have no level given, use the same as for the standard DoFHandler,
+  // otherwise we must loop through the respective level
   const Triangulation<dim> &tria = dof_handlers.mg_dof_handler[0]->get_tria();
 
   if (level == numbers::invalid_unsigned_int)
@@ -433,18 +412,14 @@ initialize_dof_handlers (const std::vector<const hp::DoFHandler<dim>*> &dof_hand
 
   dof_info.resize (dof_handlers.n_dof_handlers);
 
-  // go through cells on zeroth level and then
-  // successively step down into children. This
-  // gives a z-ordering of the cells, which is
-  // beneficial when setting up neighboring
-  // relations between cells for thread
-  // parallelization
+  // go through cells on zeroth level and then successively step down into
+  // children. This gives a z-ordering of the cells, which is beneficial when
+  // setting up neighboring relations between cells for thread parallelization
   const unsigned int n_mpi_procs = size_info.n_procs;
   const unsigned int my_pid = size_info.my_pid;
 
-  // if we have no level given, use the same as
-  // for the standard DoFHandler, otherwise we
-  // must loop through the respective level
+  // if we have no level given, use the same as for the standard DoFHandler,
+  // otherwise we must loop through the respective level
   const Triangulation<dim> &tria = dof_handler[0]->get_tria();
 
   if (n_mpi_procs == 1)
@@ -521,29 +496,24 @@ void MatrixFree<dim,Number>::initialize_indices
                   ExcMessage ("MatrixFree only works for DoFHandler with one base element"));
           const unsigned int n_fe_components = fe.element_multiplicity (0);
 
-          // cache number of finite elements and
-          // dofs_per_cell
+          // cache number of finite elements and dofs_per_cell
           dof_info[no].dofs_per_cell.push_back (fe.dofs_per_cell);
           dof_info[no].dofs_per_face.push_back (fe.dofs_per_face);
           dof_info[no].n_components  = n_fe_components;
 
 
-          // get permutation that gives lexicographic
-          // renumbering of the cell dofs
-          // renumber (this is necessary for FE_Q, for
-          // example, since there the vertex DoFs come
-          // first, which is incompatible with the
-          // lexicographic ordering necessary to apply
-          // tensor products efficiently)
+          // get permutation that gives lexicographic renumbering of the cell
+          // dofs renumber (this is necessary for FE_Q, for example, since
+          // there the vertex DoFs come first, which is incompatible with the
+          // lexicographic ordering necessary to apply tensor products
+          // efficiently)
           const FE_Poly<TensorProductPolynomials<dim>,dim,dim> *fe_poly =
             dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>
             (&fe.base_element(0));
 
-          // This class currently only works for
-          // elements derived from
-          // FE_Poly<TensorProductPolynomials<dim>,dim,dim>.
-          // For any other element, the dynamic cast
-          // above will fail and give fe_poly == 0.
+          // This class currently only works for elements derived from
+          // FE_Poly<TensorProductPolynomials<dim>,dim,dim>.  For any other
+          // element, the dynamic cast above will fail and give fe_poly == 0.
           Assert (fe_poly != 0, ExcNotImplemented());
           if (n_fe_components == 1)
             {
@@ -586,8 +556,7 @@ void MatrixFree<dim,Number>::initialize_indices
       dof_info[no].dof_indices.reserve
       ((n_active_cells*dof_info[no].dofs_per_cell[0]*3)/2);
 
-      // cache the constrained indices for use in
-      // matrix-vector products
+      // cache the constrained indices for use in matrix-vector products
       {
         const unsigned int
         start_index = dof_info[no].vector_partitioner->local_range().first,
@@ -601,18 +570,16 @@ void MatrixFree<dim,Number>::initialize_indices
         ghost_dofs[no].reserve (locally_owned_set[no].n_elements()/10+1);
     }
 
-  // extract all the global indices associated
-  // with the computation, and form the ghost
-  // indices
+  // extract all the global indices associated with the computation, and form
+  // the ghost indices
   std::vector<unsigned int> boundary_cells;
   for (unsigned int counter = 0 ; counter < n_active_cells ; ++counter)
     {
       bool cell_at_boundary = false;
       for (unsigned int no=0; no<n_fe; ++no)
         {
-          // OK, read indices from standard DoFHandler
-          // or active indices in MGDoFHandler. That is
-          // the usual stuff
+          // OK, read indices from standard DoFHandler or active indices in
+          // MGDoFHandler. That is the usual stuff
           if (dof_handlers.active_dof_handler == DoFHandlers::usual ||
               (dof_handlers.active_dof_handler == DoFHandlers::multigrid &&
                dof_handlers.level == numbers::invalid_unsigned_int))
@@ -633,8 +600,7 @@ void MatrixFree<dim,Number>::initialize_indices
                                              constraint_values,
                                              cell_at_boundary);
             }
-          // ok, now we are requested to use a level in
-          // a MGDoFHandler
+          // ok, now we are requested to use a level in a MGDoFHandler
           else if (dof_handlers.active_dof_handler == DoFHandlers::multigrid &&
                    dof_handlers.level != numbers::invalid_unsigned_int)
             {
@@ -680,9 +646,8 @@ void MatrixFree<dim,Number>::initialize_indices
             }
         }
 
-      // if we found dofs on some FE component that
-      // belong to other processors, the cell is
-      // added to the boundary cells.
+      // if we found dofs on some FE component that belong to other
+      // processors, the cell is added to the boundary cells.
       if (cell_at_boundary == true)
         boundary_cells.push_back(counter);
     }
@@ -696,11 +661,9 @@ void MatrixFree<dim,Number>::initialize_indices
   for (unsigned int no=0; no<n_fe; ++no)
     dof_info[no].assign_ghosts (boundary_cells);
 
-  // reorganize the indices in order to overlap
-  // communication in MPI with computations:
-  // Place all cells with ghost indices into one
-  // chunk. Also reorder cells so that we can
-  // parallelize by threads
+  // reorganize the indices in order to overlap communication in MPI with
+  // computations: Place all cells with ghost indices into one chunk. Also
+  // reorder cells so that we can parallelize by threads
   std::vector<unsigned int> renumbering;
   if (task_info.use_multithreading == true)
     {
@@ -717,9 +680,8 @@ void MatrixFree<dim,Number>::initialize_indices
     }
   else
     {
-      // In case, we have an hp-dofhandler, we have
-      // to reorder the cell according to the
-      // polynomial degree on the cell.
+      // In case, we have an hp-dofhandler, we have to reorder the cell
+      // according to the polynomial degree on the cell.
       dof_info[0].compute_renumber_serial (boundary_cells, size_info,
                                            renumbering);
       if (dof_handlers.active_dof_handler == DoFHandlers::hp)
@@ -727,11 +689,9 @@ void MatrixFree<dim,Number>::initialize_indices
                                                 irregular_cells);
     }
 
-  // Finally perform the renumbering. We also
-  // want to group several cells together to one
-  // "macro-cell" for vectorization (where the
-  // arithmetic operations will then be done
-  // simultaneously).
+  // Finally perform the renumbering. We also want to group several cells
+  // together to one "macro-cell" for vectorization (where the arithmetic
+  // operations will then be done simultaneously).
 #ifdef DEBUG
   {
     std::vector<unsigned int> sorted_renumbering (renumbering);
@@ -754,13 +714,10 @@ void MatrixFree<dim,Number>::initialize_indices
           cell_level_index.push_back
           (cell_level_index_old[renumbering[position_cell+j]]);
 
-        // generate a cell and level index
-        // also when we have not filled up
-        // vectorization_length cells. This is needed for
-        // MappingInfo when the transformation
-        // data is initialized. We just set
-        // the value to the last valid cell in
-        // that case.
+        // generate a cell and level index also when we have not filled up
+        // vectorization_length cells. This is needed for MappingInfo when the
+        // transformation data is initialized. We just set the value to the
+        // last valid cell in that case.
         for (unsigned int j=n_comp; j<vectorization_length; ++j)
           cell_level_index.push_back
           (cell_level_index_old[renumbering[position_cell+n_comp-1]]);
@@ -770,10 +727,9 @@ void MatrixFree<dim,Number>::initialize_indices
     AssertDimension (cell_level_index.size(),size_info.n_macro_cells*vectorization_length);
   }
 
-  // set constraint pool from the std::map and
-  // reorder the indices
+  // set constraint pool from the std::map and reorder the indices
   typename std::map<std::vector<double>, unsigned int,
-           internal::MatrixFreeFunctions::FPArrayComparator<Number> >::iterator
+           internal::MatrixFreeFunctions::FPArrayComparator<double> >::iterator
            it = constraint_values.constraints.begin(),
            end = constraint_values.constraints.end();
   std::vector<const std::vector<double>*>
@@ -995,13 +951,12 @@ namespace internal
       unsigned int n_max_boundary_cells = boundary_cells.size();
       unsigned int n_boundary_cells = n_max_boundary_cells;
 
-      // try to make the number of boundary cells
-      // divisible by the number of vectors in
-      // vectorization
+      // try to make the number of boundary cells divisible by the number of
+      // vectors in vectorization
+
       /*
-                                  // try to balance the number of cells before
-                                  // and after the boundary part on each
-                                  // processor. probably not worth it!
+      // try to balance the number of cells before and after the boundary part
+      // on each processor. probably not worth it!
       #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
       MPI_Allreduce (&n_boundary_cells, &n_max_boundary_cells, 1, MPI_UNSIGNED,
                      MPI_MAX, size_info.communicator);
@@ -1014,9 +969,8 @@ namespace internal
         (vectorization_length - n_boundary_cells%vectorization_length)%vectorization_length;
       if (fillup_needed > 0 && n_boundary_cells < n_active_cells)
         {
-          // fill additional cells into the list of
-          // boundary cells to get a balanced number. Go
-          // through the indices successively until we
+          // fill additional cells into the list of boundary cells to get a
+          // balanced number. Go through the indices successively until we
           // found enough indices
           std::vector<unsigned int> new_boundary_cells;
           new_boundary_cells.reserve (n_max_boundary_cells);
@@ -1026,8 +980,8 @@ namespace internal
             {
               if (next_free_slot < boundary_cells[bound_index])
                 {
-                  // check if there are enough cells to fill
-                  // with in the current slot
+                  // check if there are enough cells to fill with in the
+                  // current slot
                   if (next_free_slot + fillup_needed <= boundary_cells[bound_index])
                     {
                       for (unsigned int j=boundary_cells[bound_index]-fillup_needed;
@@ -1035,8 +989,8 @@ namespace internal
                         new_boundary_cells.push_back(j);
                       fillup_needed = 0;
                     }
-                  // ok, not enough indices, so just take them
-                  // all up to the next boundary cell
+                  // ok, not enough indices, so just take them all up to the
+                  // next boundary cell
                   else
                     {
                       for (unsigned int j=next_free_slot;
@@ -1062,10 +1016,8 @@ namespace internal
       std::sort (boundary_cells.begin(), boundary_cells.end());
       n_boundary_cells = boundary_cells.size();
 
-      // check that number of boundary cells
-      // is divisible by
-      // vectorization_length or that it
-      // contains all cells
+      // check that number of boundary cells is divisible by
+      // vectorization_length or that it contains all cells
       Assert (n_boundary_cells % vectorization_length == 0 ||
               n_boundary_cells == n_active_cells, ExcInternalError());
       n_macro_cells = (n_active_cells+vectorization_length-1)/vectorization_length;
@@ -1087,6 +1039,8 @@ namespace internal
     }
 
 
+
+    /* ------------------------------------------------------------------ */
 
     template <typename Number>
     FPArrayComparator<Number>::FPArrayComparator (const Number scaling)
@@ -1121,14 +1075,14 @@ namespace internal
     template <int dim>
     bool
     FPArrayComparator<Number>::
-    operator ()(const Tensor<1,dim,VectorizedArray<Number> > *t1,
-                const Tensor<1,dim,VectorizedArray<Number> > *t2) const
+    operator ()(const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
+                const Tensor<1,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const
     {
       for (unsigned int d=0; d<dim; ++d)
         for (unsigned int k=0; k<VectorizedArray<Number>::n_array_elements; ++k)
-          if ((*t1)[d][k] < (*t2)[d][k] - tolerance)
+          if ((t1)[d][k] < (t2)[d][k] - tolerance)
             return true;
-          else if ((*t1)[d][k] > (*t2)[d][k] + tolerance)
+          else if ((t1)[d][k] > (t2)[d][k] + tolerance)
             return false;
       return false;
     }
@@ -1139,15 +1093,15 @@ namespace internal
     template <int dim>
     bool
     FPArrayComparator<Number>::
-    operator ()(const Tensor<2,dim,VectorizedArray<Number> > *t1,
-                const Tensor<2,dim,VectorizedArray<Number> > *t2) const
+    operator ()(const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t1,
+                const Tensor<2,dim,Tensor<1,VectorizedArray<Number>::n_array_elements,Number> > &t2) const
     {
       for (unsigned int d=0; d<dim; ++d)
         for (unsigned int e=0; e<dim; ++e)
           for (unsigned int k=0; k<VectorizedArray<Number>::n_array_elements; ++k)
-            if ((*t1)[d][e][k] < (*t2)[d][e][k] - tolerance)
+            if ((t1)[d][e][k] < (t2)[d][e][k] - tolerance)
               return true;
-            else if ((*t1)[d][e][k] > (*t2)[d][e][k] + tolerance)
+            else if ((t1)[d][e][k] > (t2)[d][e][k] + tolerance)
               return false;
       return false;
     }
