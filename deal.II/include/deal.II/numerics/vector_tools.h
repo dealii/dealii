@@ -751,9 +751,6 @@ namespace VectorTools
                                const ComponentMask       &component_mask = ComponentMask());
 
   /**
-   * @deprecated This function exists mainly
-   * for backward compatibility.
-   *
    * Same function as above, but
    * taking only one pair of
    * boundary indicator and
@@ -770,7 +767,7 @@ namespace VectorTools
                                const types::boundary_id            boundary_component,
                                const Function<DH::space_dimension>           &boundary_function,
                                std::map<unsigned int,double> &boundary_values,
-                               const ComponentMask       &component_mask = ComponentMask()) DEAL_II_DEPRECATED;
+                               const ComponentMask       &component_mask = ComponentMask());
 
   /**
    * Calls the other
@@ -893,9 +890,6 @@ namespace VectorTools
                                const ComponentMask       &component_mask = ComponentMask());
 
   /**
-   * @deprecated This function exists
-   * only for backward compatibility.
-   *
    * Same function as above, but taking
    * only one pair of boundary indicator
    * and corresponding boundary
@@ -911,7 +905,7 @@ namespace VectorTools
                                const types::boundary_id                  boundary_component,
                                const Function<DH::space_dimension> &boundary_function,
                                ConstraintMatrix                    &constraints,
-                               const ComponentMask             &component_mask = ComponentMask()) DEAL_II_DEPRECATED;
+                               const ComponentMask             &component_mask = ComponentMask());
 
   /**
    * Calls the other
