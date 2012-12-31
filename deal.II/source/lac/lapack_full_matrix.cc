@@ -112,7 +112,7 @@ LAPACKFullMatrix<number>::vmult (
       AssertDimension(v.size(), this->n_cols());
       AssertDimension(w.size(), this->n_rows());
 
-      gemv("N", &mm, &nn, &alpha, this->data(), &mm, v.val, &one, &beta, w.val, &one);
+      gemv("N", &mm, &nn, &alpha, &this->values[0], &mm, v.val, &one, &beta, w.val, &one);
       break;
     }
     case svd:
@@ -121,12 +121,12 @@ LAPACKFullMatrix<number>::vmult (
       AssertDimension(w.size(), this->n_rows());
       // Compute V^T v
       work.resize(std::max(mm,nn));
-      gemv("N", &nn, &nn, &alpha, svd_vt->data(), &nn, v.val, &one, &null, &work[0], &one);
+      gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.val, &one, &null, &work[0], &one);
       // Multiply by singular values
       for (unsigned int i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with U
-      gemv("N", &mm, &mm, &alpha, svd_u->data(), &mm, &work[0], &one, &beta, w.val, &one);
+      gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, &work[0], &one, &beta, w.val, &one);
       break;
     }
     case inverse_svd:
@@ -135,12 +135,12 @@ LAPACKFullMatrix<number>::vmult (
       AssertDimension(v.size(), this->n_rows());
       // Compute U^T v
       work.resize(std::max(mm,nn));
-      gemv("T", &mm, &mm, &alpha, svd_u->data(), &mm, v.val, &one, &null, &work[0], &one);
+      gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.val, &one, &null, &work[0], &one);
       // Multiply by singular values
       for (unsigned int i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with V
-      gemv("T", &nn, &nn, &alpha, svd_vt->data(), &nn, &work[0], &one, &beta, w.val, &one);
+      gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, &work[0], &one, &beta, w.val, &one);
       break;
     }
     default:
@@ -170,7 +170,7 @@ LAPACKFullMatrix<number>::Tvmult (
       AssertDimension(w.size(), this->n_cols());
       AssertDimension(v.size(), this->n_rows());
 
-      gemv("T", &mm, &nn, &alpha, this->data(), &mm, v.val, &one, &beta, w.val, &one);
+      gemv("T", &mm, &nn, &alpha, &this->values[0], &mm, v.val, &one, &beta, w.val, &one);
       break;
     }
     case svd:
@@ -180,12 +180,12 @@ LAPACKFullMatrix<number>::Tvmult (
 
       // Compute U^T v
       work.resize(std::max(mm,nn));
-      gemv("T", &mm, &mm, &alpha, svd_u->data(), &mm, v.val, &one, &null, &work[0], &one);
+      gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.val, &one, &null, &work[0], &one);
       // Multiply by singular values
       for (unsigned int i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with V
-      gemv("T", &nn, &nn, &alpha, svd_vt->data(), &nn, &work[0], &one, &beta, w.val, &one);
+      gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, &work[0], &one, &beta, w.val, &one);
       break;
       case inverse_svd:
       {
@@ -194,12 +194,12 @@ LAPACKFullMatrix<number>::Tvmult (
 
         // Compute V^T v
         work.resize(std::max(mm,nn));
-        gemv("N", &nn, &nn, &alpha, svd_vt->data(), &nn, v.val, &one, &null, &work[0], &one);
+        gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.val, &one, &null, &work[0], &one);
         // Multiply by singular values
         for (unsigned int i=0; i<wr.size(); ++i)
           work[i] *= wr[i];
         // Multiply with U
-        gemv("N", &mm, &mm, &alpha, svd_u->data(), &mm, &work[0], &one, &beta, w.val, &one);
+        gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, &work[0], &one, &beta, w.val, &one);
         break;
       }
     }
@@ -216,7 +216,7 @@ LAPACKFullMatrix<number>::compute_lu_factorization()
   Assert(state == matrix, ExcState(state));
   const int mm = this->n_rows();
   const int nn = this->n_cols();
-  number *values = const_cast<number *> (this->data());
+  number *values = const_cast<number *> (&this->values[0]);
   ipiv.resize(mm);
   int info = 0;
   getrf(&mm, &nn, values, &mm, &ipiv[0], &info);
@@ -237,15 +237,15 @@ LAPACKFullMatrix<number>::compute_svd()
 
   const int mm = this->n_rows();
   const int nn = this->n_cols();
-  number *values = const_cast<number *> (this->data());
+  number *values = const_cast<number *> (&this->values[0]);
   wr.resize(std::max(mm,nn));
   std::fill(wr.begin(), wr.end(), 0.);
   ipiv.resize(8*mm);
 
   svd_u.reset (new LAPACKFullMatrix<number>(mm,mm));
   svd_vt.reset (new LAPACKFullMatrix<number>(nn,nn));
-  number *mu  = const_cast<number *> (svd_u->data());
-  number *mvt = const_cast<number *> (svd_vt->data());
+  number *mu  = const_cast<number *> (&svd_u->values[0]);
+  number *mvt = const_cast<number *> (&svd_vt->values[0]);
   int info = 0;
 
   // see comment on this #if
@@ -311,7 +311,7 @@ LAPACKFullMatrix<number>::invert()
   const int nn = this->n_cols();
   Assert (nn == mm, ExcNotQuadratic());
 
-  number *values = const_cast<number *> (this->data());
+  number *values = const_cast<number *> (&this->values[0]);
   ipiv.resize(mm);
   int info = 0;
 
@@ -344,7 +344,7 @@ LAPACKFullMatrix<number>::apply_lu_factorization(Vector<number> &v,
 
   const char *trans = transposed ? &T : &N;
   const int nn = this->n_cols();
-  const number *values = this->data();
+  const number *values = &this->values[0];
   int info = 0;
 
   getrs(trans, &nn, &one, values, &nn, &ipiv[0],
@@ -367,7 +367,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
   if (right) vr.resize(nn*nn);
   if (left)  vl.resize(nn*nn);
 
-  number *values = const_cast<number *> (this->data());
+  number *values = const_cast<number *> (&this->values[0]);
 
   int info  = 0;
   int lwork = 1;
@@ -450,8 +450,8 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
   wr.resize(nn);
   LAPACKFullMatrix<number> matrix_eigenvectors(nn, nn);
 
-  number *values_A = const_cast<number *> (this->data());
-  number *values_eigenvectors = const_cast<number *> (matrix_eigenvectors.data());
+  number *values_A = const_cast<number *> (&this->values[0]);
+  number *values_eigenvectors = const_cast<number *> (&matrix_eigenvectors.values[0]);
 
   int info(0),
       lwork(1),
@@ -562,9 +562,9 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   wr.resize(nn);
   LAPACKFullMatrix<number> matrix_eigenvectors(nn, nn);
 
-  number *values_A = const_cast<number *> (this->data());
-  number *values_B = const_cast<number *> (B.data());
-  number *values_eigenvectors = const_cast<number *> (matrix_eigenvectors.data());
+  number *values_A = const_cast<number *> (&this->values[0]);
+  number *values_B = const_cast<number *> (&B.values[0]);
+  number *values_eigenvectors = const_cast<number *> (&matrix_eigenvectors.values[0]);
 
   int info(0),
       lwork(1),
@@ -672,8 +672,8 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   wi.resize(nn); //This is set purley for consistency reasons with the
   //eigenvalues() function.
 
-  number *values_A = const_cast<number *> (this->data());
-  number *values_B = const_cast<number *> (B.data());
+  number *values_A = const_cast<number *> (&this->values[0]);
+  number *values_B = const_cast<number *> (&B.values[0]);
 
   int info  = 0;
   int lwork = 1;
