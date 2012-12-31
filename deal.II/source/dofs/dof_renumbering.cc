@@ -489,7 +489,7 @@ namespace DoFRenumbering
     {
       CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(level),
 					   dof_handler.n_dofs(level));
-      MGDoFTools::make_sparsity_pattern (dof_handler, csp, level);
+      MGTools::make_sparsity_pattern (dof_handler, csp, level);
       sparsity.copy_from (csp);
     }
 
