@@ -1982,18 +1982,13 @@ namespace MatrixTools
         const unsigned int dof_number = dof->first;
         // for each boundary dof:
 
-        // set entries of this line
-        // to zero except for the diagonal
-        // entry. Note that the diagonal
-        // entry is always the first one
-        // for square matrices, i.e.
-        // we shall not set
-        // matrix.global_entry(
-        //     sparsity_rowstart[dof.first])
-        const unsigned int last = sparsity_rowstart[dof_number+1];
-        for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
-          matrix.global_entry(j) = 0.;
-
+        // set entries of this line to zero except for the diagonal
+        // entry
+	for (typename SparseMatrix<number>::iterator
+	       p = matrix.begin(dof_number);
+	     p != matrix.end(dof_number); ++p)
+	  if (p->column() != dof_number)
+	    p->value() = 0.;
 
         // set right hand side to
         // wanted value: if main diagonal
@@ -2053,6 +2048,7 @@ namespace MatrixTools
             // since that is the
             // diagonal element and
             // thus the present row
+	    const unsigned int last = sparsity_rowstart[dof_number+1];
             for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
               {
                 const unsigned int row = sparsity_colnums[j];
