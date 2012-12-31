@@ -2140,17 +2140,20 @@ namespace VectorTools
     DoFTools::map_dof_to_boundary_indices (dof, selected_boundary_components,
                                            dof_to_boundary_mapping);
 
-    // Done if no degrees of freedom on
-    // the boundary
+    // Done if no degrees of freedom on the boundary
     if (dof.n_boundary_dofs (boundary_functions) == 0)
       return;
+
     // set up sparsity structure
-    SparsityPattern sparsity(dof.n_boundary_dofs (boundary_functions),
-                             dof.max_couplings_between_boundary_dofs());
+    CompressedSparsityPattern c_sparsity(dof.n_dofs());
     DoFTools::make_boundary_sparsity_pattern (dof,
                                               boundary_functions,
                                               dof_to_boundary_mapping,
-                                              sparsity);
+                                              c_sparsity);
+    SparsityPattern sparsity;
+    sparsity.copy_from(c_sparsity);
+
+
 
     // note: for three or more dimensions, there
     // may be constrained nodes on the boundary
