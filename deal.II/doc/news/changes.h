@@ -127,6 +127,12 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The PETScWrappers::VectorBase class now has a function
+PETScWrappers::VectorBase::write_ascii() that allows writing the
+vector's data to the default output stream.
+<br>
+(Fahad Alrashed, 2013/1/2)
+
 <li> Fixed: PETScWrappers::SparseDirectMUMPS forgot to release
 its memory upon destruction. This is now fixed.
 <br>
