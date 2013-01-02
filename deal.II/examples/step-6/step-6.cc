@@ -329,16 +329,19 @@ void Step6<dim>::setup_system ()
   // previous examples. Nevertheless, we do not copy it to the final sparsity
   // pattern immediately.  Note that we call a variant of
   // make_sparsity_pattern that takes the ConstraintMatrix as the third
-  // argument. We are letting the routine know, the we will never write into
+  // argument. We are letting the routine know that we will never write into
   // the locations given by <code>constraints</code> by setting the argument
-  // <code>keep_constrained_dofs</code> to false. If we were to condense the
+  // <code>keep_constrained_dofs</code> to false (in other words, that we will
+  // never write into entries of the matrix that correspond to constrained
+  // degrees of freedom). If we were to condense the
   // constraints after assembling, we would have to pass <code>true</code>
-  // instead.
+  // instead because then we would first write into these locations only to
+  // later set them to zero again during condensation.
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
   DoFTools::make_sparsity_pattern(dof_handler,
                                   c_sparsity,
                                   constraints,
-                                  false /*keep_constrained_dofs*/);
+                                  /*keep_constrained_dofs = */ false);
 
   // Now all non-zero entries of the matrix are known (i.e. those from
   // regularly assembling the matrix and those that were introduced by
