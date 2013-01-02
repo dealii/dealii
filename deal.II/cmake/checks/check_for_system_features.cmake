@@ -183,11 +183,22 @@ ENDIF()
 #                                                                         #
 ###########################################################################
 
-#
-# Export DEAL_II_MSVC if we are on a Windows platform.
-#
 IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
+  #
+  # Export DEAL_II_MSVC if we are on a Windows platform:
+  #
   SET(DEAL_II_MSVC TRUE)
+
+  #
+  # Disable -ggdb and -g on Windows/MinGW targets for the moment until the
+  # compilation issues with too big files is resolved
+  #
+  # - Matthias Maier, 2012
+  #
+  STRIP_FLAG(DEAL_II_CXX_FLAGS_DEBUG "-ggdb")
+  STRIP_FLAG(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-ggdb")
+  STRIP_FLAG(DEAL_II_CXX_FLAGS_DEBUG "-g")
+  STRIP_FLAG(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-g")
 ENDIF()
 
 
