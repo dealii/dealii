@@ -595,17 +595,17 @@ namespace PETScWrappers
   }
 
   void
-  MatrixBase::write_ascii ()
+  MatrixBase::write_ascii (const PetscViewerFormat format)
   {
     // First flush PETSc caches
     compress ();
 
     // Set options
     PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-                          PETSC_VIEWER_DEFAULT);
+    		format);
 
     // Write to screen
-    MatView (matrix,PETSC_VIEWER_STDOUT_WORLD);
+    MatView (matrix, PETSC_VIEWER_STDOUT_WORLD);
   }
 
 
