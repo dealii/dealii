@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2004, 2006, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -285,6 +285,76 @@ namespace PETScWrappers
     }
 
 
+
+    void
+    Vector::print (std::ostream      &out,
+                   const unsigned int precision,
+                   const bool         scientific,
+                   const bool         across) const
+    {
+      AssertThrow (out, ExcIO());
+
+      // get a representation of the vector and
+      // loop over all the elements
+      PetscScalar *val;
+      PetscInt    nlocal, istart, iend;
+
+      int ierr = VecGetArray (vector, &val);
+
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      ierr = VecGetLocalSize (vector, &nlocal);
+
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      ierr = VecGetOwnershipRange (vector, &istart, &iend);
+
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      // save the state of out stream
+      std::ios::fmtflags old_flags = out.flags();
+      unsigned int old_precision = out.precision (precision);
+
+      out.precision (precision);
+      if (scientific)
+        out.setf (std::ios::scientific, std::ios::floatfield);
+      else
+        out.setf (std::ios::fixed, std::ios::floatfield);
+
+      for ( unsigned int i = 0;
+	    i < Utilities::MPI::n_mpi_processes(communicator);
+	    i++)
+	{
+	  // This is slow, but most likely only used to debug.
+	  MPI_Barrier(communicator);
+	  if (i == Utilities::MPI::this_mpi_process(communicator))
+	    {
+	      if (across)
+		{
+		  out << "[Proc" << i << " " << istart << "-" << iend-1 << "]" << ' ';
+		  for (PetscInt i=0; i<nlocal; ++i)
+		    out << val[i] << ' ';
+		}
+	      else
+		{
+		  out << "[Proc " << i << " " << istart << "-" << iend-1 << "]" << std::endl;
+		  for (PetscInt i=0; i<nlocal; ++i)
+		    out << val[i] << std::endl;
+		}
+	      out << std::endl;
+	    }
+	}
+      // reset output format
+      out.flags (old_flags);
+      out.precision(old_precision);
+
+      // restore the representation of the
+      // vector
+      ierr = VecRestoreArray (vector, &val);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+      AssertThrow (out, ExcIO());
+    }
 
   }
 
