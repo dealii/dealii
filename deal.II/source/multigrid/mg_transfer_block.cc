@@ -46,7 +46,7 @@ namespace
   template <int dim, typename number, int spacedim>
   void
   reinit_vector_by_blocks (
-    const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+    const dealii::DoFHandler<dim,spacedim> &mg_dof,
     MGLevelObject<BlockVector<number> > &v,
     const std::vector<bool> &sel,
     std::vector<std::vector<unsigned int> > &ndofs)
@@ -93,7 +93,7 @@ namespace
   template <int dim, typename number, int spacedim>
   void
   reinit_vector_by_blocks (
-    const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+    const dealii::DoFHandler<dim,spacedim> &mg_dof,
     MGLevelObject<dealii::Vector<number> > &v,
     const unsigned int selected_block,
     std::vector<std::vector<unsigned int> > &ndofs)
@@ -126,7 +126,7 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_to_mg (
-  const MGDoFHandler<dim,spacedim>        &mg_dof_handler,
+  const DoFHandler<dim,spacedim>        &mg_dof_handler,
   MGLevelObject<Vector<number> > &dst,
   const BlockVector<number2>     &src) const
 {
@@ -154,7 +154,7 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_to_mg (
-  const MGDoFHandler<dim,spacedim>        &mg_dof_handler,
+  const DoFHandler<dim,spacedim>        &mg_dof_handler,
   MGLevelObject<Vector<number> > &dst,
   const Vector<number2>          &src) const
 {
@@ -181,7 +181,7 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlock<number>::copy_to_mg (
-  const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+  const DoFHandler<dim,spacedim> &mg_dof_handler,
   MGLevelObject<BlockVector<number> > &dst,
   const BlockVector<number2> &src) const
 {
@@ -206,7 +206,7 @@ MGTransferBlock<number>::copy_to_mg (
 template <int dim, int spacedim>
 void MGTransferBlockBase::build_matrices (
   const DoFHandler<dim,spacedim> &,
-  const MGDoFHandler<dim,spacedim> &mg_dof)
+  const DoFHandler<dim,spacedim> &mg_dof)
 {
   const FiniteElement<dim> &fe = mg_dof.get_fe();
   const unsigned int n_blocks  = fe.n_blocks();
@@ -332,7 +332,7 @@ void MGTransferBlockBase::build_matrices (
 
       prolongation_sparsities[level]->collect_sizes();
 
-      for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
+      for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children())
           {
@@ -371,7 +371,7 @@ void MGTransferBlockBase::build_matrices (
 
       prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
       // now actually build the matrices
-      for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
+      for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children())
           {
@@ -462,7 +462,7 @@ template <typename number>
 template <int dim, int spacedim>
 void MGTransferBlockSelect<number>::build_matrices (
   const DoFHandler<dim,spacedim> &dof,
-  const MGDoFHandler<dim,spacedim> &mg_dof,
+  const DoFHandler<dim,spacedim> &mg_dof,
   unsigned int select)
 {
   const FiniteElement<dim> &fe = mg_dof.get_fe();
@@ -480,9 +480,9 @@ void MGTransferBlockSelect<number>::build_matrices (
 
   for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
     {
-      typename MGDoFHandler<dim,spacedim>::active_cell_iterator
+      typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_cell = mg_dof.begin_active(level);
-      const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
+      const typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_end  = mg_dof.end_active(level);
 
       temp_copy_indices.resize (0);
@@ -493,12 +493,11 @@ void MGTransferBlockSelect<number>::build_matrices (
       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
         {
-          DoFAccessor<dim, DoFHandler<dim,spacedim> > &global_cell = *level_cell;
           // get the dof numbers of
           // this cell for the global
           // and the level-wise
           // numbering
-          global_cell.get_dof_indices(global_dof_indices);
+          level_cell->get_dof_indices(global_dof_indices);
           level_cell->get_mg_dof_indices (level_dof_indices);
 
           for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -546,7 +545,7 @@ template <typename number>
 template <int dim, int spacedim>
 void MGTransferBlock<number>::build_matrices (
   const DoFHandler<dim,spacedim> &dof,
-  const MGDoFHandler<dim,spacedim> &mg_dof,
+  const DoFHandler<dim,spacedim> &mg_dof,
   const std::vector<bool> &sel)
 {
   const FiniteElement<dim> &fe = mg_dof.get_fe();
@@ -568,9 +567,9 @@ void MGTransferBlock<number>::build_matrices (
   std::vector<unsigned int> level_dof_indices  (fe.dofs_per_cell);
   for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
     {
-      typename MGDoFHandler<dim,spacedim>::active_cell_iterator
+      typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_cell = mg_dof.begin_active(level);
-      const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
+      const typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_end  = mg_dof.end_active(level);
 
       for (unsigned int block=0; block<n_blocks; ++block)
@@ -585,12 +584,11 @@ void MGTransferBlock<number>::build_matrices (
       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
         {
-          DoFAccessor<dim, DoFHandler<dim,spacedim> > &global_cell = *level_cell;
           // get the dof numbers of
           // this cell for the global
           // and the level-wise
           // numbering
-          global_cell.get_dof_indices(global_dof_indices);
+          level_cell->get_dof_indices(global_dof_indices);
           level_cell->get_mg_dof_indices (level_dof_indices);
 
           for (unsigned int i=0; i<fe.dofs_per_cell; ++i)

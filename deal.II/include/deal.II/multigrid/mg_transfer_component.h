@@ -34,7 +34,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim, int spacedim> class MGDoFHandler;
+template <int dim, int spacedim> class DoFHandler;
 
 /*
  * MGTransferBase is defined in mg_base.h
@@ -80,7 +80,7 @@ protected:
    */
   template <int dim, int spacedim>
   void build_matrices (const DoFHandler<dim,spacedim> &dof,
-                       const MGDoFHandler<dim,spacedim> &mg_dof);
+                       const DoFHandler<dim,spacedim> &mg_dof);
 
   /**
    * Flag of selected components.
@@ -261,7 +261,7 @@ public:
    */
   template <int dim, int spacedim>
   void build_matrices (const DoFHandler<dim,spacedim> &dof,
-                       const MGDoFHandler<dim,spacedim> &mg_dof,
+                       const DoFHandler<dim,spacedim> &mg_dof,
                        unsigned int selected,
                        unsigned int mg_selected,
                        const std::vector<unsigned int> &target_component
@@ -293,7 +293,7 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_to_mg (const MGDoFHandler<dim,spacedim>        &mg_dof,
+  copy_to_mg (const DoFHandler<dim,spacedim>        &mg_dof,
               MGLevelObject<Vector<number> > &dst,
               const Vector<number2>          &src) const;
 
@@ -308,7 +308,7 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_from_mg (const MGDoFHandler<dim,spacedim>              &mg_dof,
+  copy_from_mg (const DoFHandler<dim,spacedim>              &mg_dof,
                 Vector<number2>                      &dst,
                 const MGLevelObject<Vector<number> > &src) const;
 
@@ -322,7 +322,7 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_from_mg_add (const MGDoFHandler<dim,spacedim>              &mg_dof,
+  copy_from_mg_add (const DoFHandler<dim,spacedim>              &mg_dof,
                     Vector<number2>                      &dst,
                     const MGLevelObject<Vector<number> > &src) const;
 
@@ -332,7 +332,7 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_to_mg (const MGDoFHandler<dim,spacedim>        &mg_dof,
+  copy_to_mg (const DoFHandler<dim,spacedim>        &mg_dof,
               MGLevelObject<Vector<number> > &dst,
               const BlockVector<number2>     &src) const;
 
@@ -348,7 +348,7 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_from_mg (const MGDoFHandler<dim,spacedim>              &mg_dof,
+  copy_from_mg (const DoFHandler<dim,spacedim>              &mg_dof,
                 BlockVector<number2>                 &dst,
                 const MGLevelObject<Vector<number> > &src) const;
 
@@ -362,7 +362,7 @@ public:
    */
   template <int dim, typename number2, int spacedim>
   void
-  copy_from_mg_add (const MGDoFHandler<dim,spacedim>              &mg_dof,
+  copy_from_mg_add (const DoFHandler<dim,spacedim>              &mg_dof,
                     BlockVector<number2>                 &dst,
                     const MGLevelObject<Vector<number> > &src) const;
 
@@ -378,7 +378,7 @@ private:
    */
   template <int dim, class OutVector, int spacedim>
   void
-  do_copy_from_mg (const MGDoFHandler<dim,spacedim>              &mg_dof,
+  do_copy_from_mg (const DoFHandler<dim,spacedim>              &mg_dof,
                    OutVector                            &dst,
                    const MGLevelObject<Vector<number> > &src) const;
 
@@ -388,7 +388,7 @@ private:
    */
   template <int dim, class OutVector, int spacedim>
   void
-  do_copy_from_mg_add (const MGDoFHandler<dim,spacedim>              &mg_dof,
+  do_copy_from_mg_add (const DoFHandler<dim,spacedim>              &mg_dof,
                        OutVector                            &dst,
                        const MGLevelObject<Vector<number> > &src) const;
 
@@ -398,7 +398,7 @@ private:
    */
   template <int dim, class InVector, int spacedim>
   void
-  do_copy_to_mg (const MGDoFHandler<dim,spacedim>        &mg_dof,
+  do_copy_to_mg (const DoFHandler<dim,spacedim>        &mg_dof,
                  MGLevelObject<Vector<number> > &dst,
                  const InVector                 &src) const;
   /**

@@ -3194,37 +3194,8 @@ public:
    * used by this FEValues
    * object.
    */
-  void reinit (const typename DoFHandler<dim,spacedim>::cell_iterator &cell);
-
-  /**
-   * Reinitialize the gradients,
-   * Jacobi determinants, etc for
-   * the given cell of type
-   * "iterator into a hp::DoFHandler
-   * object", and the finite
-   * element associated with this
-   * object. It is assumed that the
-   * finite element used by the
-   * given cell is also the one
-   * used by this @p FEValues
-   * object.
-   */
-  void reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell);
-
-  /**
-   * Reinitialize the gradients,
-   * Jacobi determinants, etc for
-   * the given cell of type
-   * "iterator into a MGDoFHandler
-   * object", and the finite
-   * element associated with this
-   * object. It is assumed that the
-   * finite element used by the
-   * given cell is also the one
-   * used by this FEValues
-   * object.
-   */
-  void reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell);
+  template <class DH, bool level_dof_access>
+  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > cell);
 
   /**
    * Reinitialize the gradients,
@@ -3485,40 +3456,9 @@ public:
    * number @p face_no of @p cell
    * and the given finite element.
    */
-  void reinit (const typename DoFHandler<dim,spacedim>::cell_iterator &cell,
-               const unsigned int                                      face_no);
-
-  /**
-   * Reinitialize the gradients,
-   * Jacobi determinants, etc for
-   * the given cell of type
-   * "iterator into a hp::DoFHandler
-   * object", and the finite
-   * element associated with this
-   * object. It is assumed that the
-   * finite element used by the
-   * given cell is also the one
-   * used by this FEValues
-   * object.
-   */
-  void reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
-               const unsigned int                                          face_no);
-
-  /**
-   * Reinitialize the gradients,
-   * Jacobi determinants, etc for
-   * the given cell of type
-   * "iterator into a MGDoFHandler
-   * object", and the finite
-   * element associated with this
-   * object. It is assumed that the
-   * finite element used by the
-   * given cell is also the one
-   * used by this FEValues
-   * object.
-   */
-  void reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
-               const unsigned int                                        face_no);
+  template <class DH, bool level_dof_access>
+  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > cell,
+               const unsigned int face_no);
 
   /**
    * Reinitialize the gradients,
@@ -3672,41 +3612,8 @@ public:
    * used by this
    * FESubfaceValues object.
    */
-  void reinit (const typename DoFHandler<dim,spacedim>::cell_iterator &cell,
-               const unsigned int                    face_no,
-               const unsigned int                    subface_no);
-
-  /**
-   * Reinitialize the gradients,
-   * Jacobi determinants, etc for
-   * the given cell of type
-   * "iterator into a hp::DoFHandler
-   * object", and the finite
-   * element associated with this
-   * object. It is assumed that the
-   * finite element used by the
-   * given cell is also the one
-   * used by this FEValues
-   * object.
-   */
-  void reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
-               const unsigned int                    face_no,
-               const unsigned int                    subface_no);
-
-  /**
-   * Reinitialize the gradients,
-   * Jacobi determinants, etc for
-   * the given cell of type
-   * "iterator into a MGDoFHandler
-   * object", and the finite
-   * element associated with this
-   * object. It is assumed that the
-   * finite element used by the
-   * given cell is also the one
-   * used by this FEValues
-   * object.
-   */
-  void reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
+  template <class DH, bool level_dof_access>
+  void reinit (const TriaIterator<DoFCellAccessor<DH,level_dof_access> > cell,
                const unsigned int                    face_no,
                const unsigned int                    subface_no);
 

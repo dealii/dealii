@@ -16,6 +16,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/smartpointer.h>
+#include <deal.II/dofs/dof_handler.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/vector.h>
@@ -81,7 +82,7 @@ public:
 
   /**
    * Constructor. The
-   * MGDoFHandler is used to
+   * DoFHandler is used to
    * determine the highest possible
    * level. <tt>transfer</tt> is an
    * object performing prolongation
@@ -96,7 +97,7 @@ public:
    * this type as late as possible.
    */
   template <int dim>
-  Multigrid(const MGDoFHandler<dim> &mg_dof_handler,
+  Multigrid(const DoFHandler<dim> &mg_dof_handler,
             const MGMatrixBase<VECTOR> &matrix,
             const MGCoarseGridBase<VECTOR> &coarse,
             const MGTransferBase<VECTOR> &transfer,
@@ -106,7 +107,7 @@ public:
 
   /**
    * Experimental constructor for
-   * cases in which no MGDoFHandler
+   * cases in which no DoFHandler
    * is available.
    *
    * @warning Not intended for general use.
@@ -512,7 +513,7 @@ public:
    * pre-smoother, post-smoother and
    * coarse grid solver.
    */
-  PreconditionMG(const MGDoFHandler<dim>     &mg_dof,
+  PreconditionMG(const DoFHandler<dim>     &dof_handler,
                  Multigrid<VECTOR>           &mg,
                  const TRANSFER &transfer);
 
@@ -566,9 +567,9 @@ public:
 
 private:
   /**
-   * Associated @p MGDoFHandler.
+   * Associated @p DoFHandler.
    */
-  SmartPointer<const MGDoFHandler<dim>,PreconditionMG<dim,VECTOR,TRANSFER> > mg_dof_handler;
+  SmartPointer<const DoFHandler<dim>,PreconditionMG<dim,VECTOR,TRANSFER> > dof_handler;
 
   /**
    * The multigrid object.
@@ -589,7 +590,7 @@ private:
 
 template <class VECTOR>
 template <int dim>
-Multigrid<VECTOR>::Multigrid (const MGDoFHandler<dim> &mg_dof_handler,
+Multigrid<VECTOR>::Multigrid (const DoFHandler<dim> &mg_dof_handler,
                               const MGMatrixBase<VECTOR> &matrix,
                               const MGCoarseGridBase<VECTOR> &coarse,
                               const MGTransferBase<VECTOR> &transfer,
@@ -640,11 +641,11 @@ Multigrid<VECTOR>::get_minlevel () const
 
 template<int dim, class VECTOR, class TRANSFER>
 PreconditionMG<dim, VECTOR, TRANSFER>
-::PreconditionMG(const MGDoFHandler<dim>      &mg_dof_handler,
+::PreconditionMG(const DoFHandler<dim>      &dof_handler,
                  Multigrid<VECTOR> &mg,
                  const TRANSFER              &transfer)
   :
-  mg_dof_handler(&mg_dof_handler),
+  dof_handler(&dof_handler),
   multigrid(&mg),
   transfer(&transfer)
 {}
@@ -663,12 +664,12 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult (
   VECTOR2 &dst,
   const VECTOR2 &src) const
 {
-  transfer->copy_to_mg(*mg_dof_handler,
+  transfer->copy_to_mg(*dof_handler,
                        multigrid->defect,
                        src);
   multigrid->cycle();
 
-  transfer->copy_from_mg(*mg_dof_handler,
+  transfer->copy_from_mg(*dof_handler,
                          dst,
                          multigrid->solution);
 }
@@ -681,11 +682,11 @@ PreconditionMG<dim, VECTOR, TRANSFER>::vmult_add (
   VECTOR2 &dst,
   const VECTOR2 &src) const
 {
-  transfer->copy_to_mg(*mg_dof_handler,
+  transfer->copy_to_mg(*dof_handler,
                        multigrid->defect,
                        src);
   multigrid->cycle();
-  transfer->copy_from_mg_add(*mg_dof_handler,
+  transfer->copy_from_mg_add(*dof_handler,
                              dst,
                              multigrid->solution);
 }

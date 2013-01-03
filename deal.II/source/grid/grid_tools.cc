@@ -45,7 +45,7 @@ namespace GridTools
 {
 
 // This anonymous namespace contains utility functions to extract the
-// triangulation from any container such as DoFHandler, MGDoFHandler,
+// triangulation from any container such as DoFHandler
 // and the like
   namespace
   {
@@ -1189,7 +1189,7 @@ next_cell:
   void
   partition_triangulation (const unsigned int           n_partitions,
                            const SparsityPattern        &cell_connection_graph,
-                           Triangulation<dim,spacedim> &triangulation)
+                           Triangulation<dim,spacedim>  &triangulation)
   {
     Assert ((dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (&triangulation)

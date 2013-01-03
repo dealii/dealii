@@ -49,49 +49,6 @@ namespace MeshWorker
     for (unsigned int i=0; i<indices.size(); ++i)
       indices[this->block_info->renumber(i)] = indices_org[i];
   }
-
-
-  template <int dim, int spacedim, typename number>
-  void
-  DoFInfo<dim,spacedim,number>::get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator &c)
-  {
-    if (!c->has_children())
-      {
-        indices.resize(c->get_fe().dofs_per_cell);
-
-        if (block_info == 0 || block_info->local().size() == 0)
-          c->get_dof_indices(indices);
-        else
-          {
-            indices_org.resize(c->get_fe().dofs_per_cell);
-            c->get_dof_indices(indices_org);
-            set_block_indices();
-          }
-      }
-    else
-      indices.resize(0);
-
-    level_cell = false;
-  }
-
-
-  template <int dim, int spacedim, typename number>
-  void
-  DoFInfo<dim,spacedim,number>::get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator &c)
-  {
-    indices.resize(c->get_fe().dofs_per_cell);
-
-    if (block_info == 0 || block_info->local().size() == 0)
-      c->get_mg_dof_indices(indices);
-    else
-      {
-        indices_org.resize(c->get_fe().dofs_per_cell);
-        c->get_mg_dof_indices(indices_org);
-        set_block_indices();
-      }
-    level_cell = true;
-  }
-
 }
 
 

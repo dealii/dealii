@@ -351,7 +351,6 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
 }
 
 
-
 template <int dim, typename Number>
 void MatrixFree<dim,Number>::
 initialize_dof_handlers (const std::vector<const MGDoFHandler<dim>*> &dof_handler,

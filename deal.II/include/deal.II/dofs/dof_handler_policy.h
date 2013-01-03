@@ -68,6 +68,14 @@ namespace internal
         distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const = 0;
 
         /**
+         * Distribute the multigrid dofs on each level
+         */
+        virtual
+        void
+        distribute_mg_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler,
+                            std::vector<NumberCache> &number_caches) const = 0;
+
+        /**
          * Renumber degrees of freedom as
          * specified by the first argument.
          */
@@ -95,6 +103,14 @@ namespace internal
         virtual
         NumberCache
         distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const;
+
+        /**
+         * Distribute multigrid DoFs.
+         */
+        virtual
+        void
+        distribute_mg_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler,
+                            std::vector<NumberCache> &number_caches) const;
 
         /**
          * Renumber degrees of freedom as
@@ -125,6 +141,14 @@ namespace internal
         virtual
         NumberCache
         distribute_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler) const;
+
+        /**
+         * Distribute multigrid DoFs.
+         */
+        virtual
+        void
+        distribute_mg_dofs (dealii::DoFHandler<dim,spacedim> &dof_handler,
+                            std::vector<NumberCache> &number_caches) const;
 
         /**
          * Renumber degrees of freedom as

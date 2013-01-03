@@ -38,7 +38,7 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg (
-  const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
+  const DoFHandler<dim,spacedim>              &mg_dof_handler,
   BlockVector<number2>                 &dst,
   const MGLevelObject<Vector<number> > &src) const
 {
@@ -54,7 +54,7 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg (
-  const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
+  const DoFHandler<dim,spacedim>              &mg_dof_handler,
   Vector<number2>                      &dst,
   const MGLevelObject<Vector<number> > &src) const
 {
@@ -70,7 +70,7 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg_add (
-  const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
+  const DoFHandler<dim,spacedim>              &mg_dof_handler,
   BlockVector<number2>                 &dst,
   const MGLevelObject<Vector<number> > &src) const
 {
@@ -86,7 +86,7 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlockSelect<number>::copy_from_mg_add (
-  const MGDoFHandler<dim,spacedim>              &mg_dof_handler,
+  const DoFHandler<dim,spacedim>              &mg_dof_handler,
   Vector<number2>                      &dst,
   const MGLevelObject<Vector<number> > &src) const
 {
@@ -114,7 +114,7 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlock<number>::copy_from_mg (
-  const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+  const DoFHandler<dim,spacedim> &mg_dof_handler,
   BlockVector<number2> &dst,
   const MGLevelObject<BlockVector<number> > &src) const
 {
@@ -132,7 +132,7 @@ template <typename number>
 template <int dim, typename number2, int spacedim>
 void
 MGTransferBlock<number>::copy_from_mg_add (
-  const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+  const DoFHandler<dim,spacedim> &mg_dof_handler,
   BlockVector<number2> &dst,
   const MGLevelObject<BlockVector<number> > &src) const
 {

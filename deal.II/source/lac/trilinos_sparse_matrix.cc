@@ -32,11 +32,10 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  namespace MatrixIterators
+  namespace SparseMatrixIterators
   {
     void
-    SparseMatrix::const_iterator::Accessor::
-    visit_present_row ()
+    AccessorBase::visit_present_row ()
     {
       // if we are asked to visit the
       // past-the-end line, then simply

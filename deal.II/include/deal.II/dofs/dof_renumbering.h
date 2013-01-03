@@ -683,9 +683,9 @@ namespace DoFRenumbering
    * of this class for details on
    * the different methods.
    */
-  template <int dim>
+  template <class DH>
   void
-  Cuthill_McKee (MGDoFHandler<dim>          &dof_handler,
+  Cuthill_McKee (DH &dof_handler,
                  const unsigned int          level,
                  const bool                  reversed_numbering = false,
                  const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int> ());
@@ -750,6 +750,13 @@ namespace DoFRenumbering
    * non-primitive base element,
    * this function is the identity
    * operation.
+  *
+  * @note A similar function, which
+  * renumbered all levels existed
+  * for MGDoFHandler. This function
+  * was deleted. Thus, you have to
+  * call the level function for each
+  * level now.
    */
   template <int dim, int spacedim>
   void
@@ -778,10 +785,10 @@ namespace DoFRenumbering
    * non-multigrid part of the
    * MGDoFHandler is not touched.
    */
-  template <int dim>
+  template <class DH>
   void
-  component_wise (MGDoFHandler<dim>               &dof_handler,
-                  const unsigned int               level,
+  component_wise (DH &dof_handler,
+                  const unsigned int level,
                   const std::vector<unsigned int> &target_component = std::vector<unsigned int>());
 
 
@@ -952,33 +959,7 @@ namespace DoFRenumbering
   template <class DH>
   void
   cell_wise (DH &dof_handler,
-             const std::vector<typename DH::cell_iterator> &cell_order);
-
-  /**
-   * @deprecated Use cell_wise() instead.
-   *
-   * Cell-wise numbering only for DG.
-   */
-  template <class DH>
-  void
-  cell_wise_dg (DH &dof_handler,
-                const std::vector<typename DH::cell_iterator> &cell_order);
-
-  /**
-   * Computes the renumbering
-   * vector needed by the
-   * cell_wise_dg() function. Does
-   * not perform the renumbering on
-   * the DoFHandler dofs but
-   * returns the renumbering
-   * vector.
-   */
-  template <class DH>
-  void
-  compute_cell_wise_dg (std::vector<unsigned int> &renumbering,
-                        std::vector<unsigned int> &inverse_renumbering,
-                        const DH &dof_handler,
-                        const std::vector<typename DH::cell_iterator> &cell_order);
+             const std::vector<typename DH::active_cell_iterator> &cell_order);
 
   /**
    * Computes the renumbering
@@ -994,67 +975,35 @@ namespace DoFRenumbering
   compute_cell_wise (std::vector<unsigned int> &renumbering,
                      std::vector<unsigned int> &inverse_renumbering,
                      const DH &dof_handler,
-                     const std::vector<typename DH::cell_iterator> &cell_order);
+                     const std::vector<typename DH::active_cell_iterator> &cell_order);
 
   /**
    * Cell-wise renumbering on one
    * level. See the other function
    * with the same name.
    */
-  template <int dim>
+  template <class DH>
   void
-  cell_wise (MGDoFHandler<dim>   &dof_handler,
-             const unsigned int   level,
-             const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
-
-  /**
-   * @deprecated Use cell_wise() instead.
-   *
-   * Cell-wise renumbering on one
-   * level for DG elements. See the
-   * other function with the same
-   * name.
-   */
-  template <int dim>
-  void
-  cell_wise_dg (MGDoFHandler<dim>   &dof_handler,
-                const unsigned int   level,
-                const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
-
-  /**
-   * Computes the renumbering
-   * vector needed by the
-   * cell_wise_dg() level renumbering function. Does
-   * not perform the renumbering on
-   * the MGDoFHandler dofs but
-   * returns the renumbering
-   * vector.
-   */
-  template <int dim>
-  void
-  compute_cell_wise_dg (std::vector<unsigned int> &renumbering,
-                        std::vector<unsigned int> &inverse_renumbering,
-                        const MGDoFHandler<dim>   &dof_handler,
-                        const unsigned int         level,
-                        const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
-
+  cell_wise (DH &dof_handler,
+             const unsigned int level,
+             const std::vector<typename DH::level_cell_iterator> &cell_order);
 
   /**
    * Computes the renumbering
    * vector needed by the
    * cell_wise() level renumbering function. Does
    * not perform the renumbering on
-   * the MGDoFHandler dofs but
+   * the DoFHandler dofs but
    * returns the renumbering
    * vector.
    */
-  template <int dim>
+  template <class DH>
   void
   compute_cell_wise (std::vector<unsigned int> &renumbering,
                      std::vector<unsigned int> &inverse_renumbering,
-                     const MGDoFHandler<dim>   &dof_handler,
+                     const DH   &dof_handler,
                      const unsigned int         level,
-                     const std::vector<typename MGDoFHandler<dim>::cell_iterator> &cell_order);
+                     const std::vector<typename DH::level_cell_iterator> &cell_order);
 
   /**
    * @}
@@ -1108,19 +1057,12 @@ namespace DoFRenumbering
    * direction, or several dofs within a
    * FESystem) will be unaffected.
    */
-  template <class DH, int dim>
+  template <class DH>
   void
   downstream (DH               &dof_handler,
-              const Point<dim> &direction,
+              const Point<DH::space_dimension> &direction,
               const bool        dof_wise_renumbering = false);
 
-  /**
-   * @deprecated Use downstream() instead.
-   */
-  template <class DH, int dim>
-  void
-  downstream_dg (DH               &dof_handler,
-                 const Point<dim> &direction);
 
   /**
    * Cell-wise downstream numbering
@@ -1129,102 +1071,71 @@ namespace DoFRenumbering
    * level. See the other function
    * with the same name.
    */
-  template <int dim>
+  template <class DH>
   void
-  downstream (MGDoFHandler<dim> &dof_handler,
+  downstream (DH &dof_handler,
               const unsigned int level,
-              const Point<dim> &direction,
+              const Point<DH::space_dimension>  &direction,
               const bool         dof_wise_renumbering = false);
 
-  /**
-   * @deprecated Use downstream()
-   * instead.
-   */
-  template <int dim>
+  // The following three are only temporary for compatibility reasons and will be removed in 8.0
+  template <int dim, int spacedim>
   void
-  downstream_dg (MGDoFHandler<dim> &dof_handler,
-                 const unsigned int level,
-                 const Point<dim> &direction);
+  downstream (MGDoFHandler<dim,spacedim>               &dof_handler,
+              const Point<spacedim> &direction,
+              const bool        dof_wise_renumbering = false);
+
+  template <class DH>
+  void
+  downstream_dg (DH &dof,
+                 const Point<DH::space_dimension> &direction)
+  {
+    downstream(dof, direction);
+  }
+
+  template <class DH>
+  void
+  downstream_dg (DH &dof,
+                 unsigned int level,
+                 const Point<DH::space_dimension> &direction)
+  {
+    downstream(dof, level, direction);
+  }
 
   /**
-   * @deprecated The new function
-   * of this name computes the
-   * renumbering and its inverse at
-   * the same time. So, at least if
-   * you need both, you should use
-   * the other one.
-   *
    * Computes the renumbering
    * vector needed by the
-   * downstream_dg() function. Does
+   * downstream() function. Does
    * not perform the renumbering on
    * the DoFHandler dofs but
    * returns the renumbering
    * vector.
    */
-  template <class DH, int dim>
-  void
-  compute_downstream_dg (std::vector<unsigned int> &new_dof_indices,
-                         const DH                  &dof_handler,
-                         const Point<dim>          &direction);
-
-  /**
-   * Computes the renumbering
-   * vector needed by the
-   * downstream_dg() function. Does
-   * not perform the renumbering on
-   * the DoFHandler dofs but
-   * returns the renumbering
-   * vector.
-   */
-  template <class DH, int dim>
+  template <class DH>
   void
   compute_downstream (std::vector<unsigned int> &new_dof_indices,
                       std::vector<unsigned int> &reverse,
                       const DH                  &dof_handler,
-                      const Point<dim>          &direction,
+                      const Point<DH::space_dimension>          &direction,
                       const bool                 dof_wise_renumbering);
-
-  /**
-   * @deprecated Use
-   * compute_downstream() instead
-   */
-  template <class DH, int dim>
-  void
-  compute_downstream_dg (std::vector<unsigned int> &new_dof_indices,
-                         std::vector<unsigned int> &reverse,
-                         const DH                  &dof_handler,
-                         const Point<dim>          &direction);
 
   /**
    * Computes the renumbering
    * vector needed by the
-   * downstream_dg() function. Does
+   * downstream() function. Does
    * not perform the renumbering on
-   * the MGDoFHandler dofs but
+   * the DoFHandler dofs but
    * returns the renumbering
    * vector.
    */
-  template <int dim>
+  template <class DH>
   void
   compute_downstream (std::vector<unsigned int> &new_dof_indices,
                       std::vector<unsigned int> &reverse,
-                      const MGDoFHandler<dim>   &dof_handler,
+                      const DH &dof_handler,
                       const unsigned int         level,
-                      const Point<dim>          &direction,
+                      const Point<DH::space_dimension>          &direction,
                       const bool                 dof_wise_renumbering);
-
-  /**
-   * @deprecated Use
-   * compute_downstream() instead
-   */
-  template <int dim>
-  void
-  compute_downstream_dg (std::vector<unsigned int> &new_dof_indices,
-                         std::vector<unsigned int> &reverse,
-                         const MGDoFHandler<dim>   &dof_handler,
-                         const unsigned int         level,
-                         const Point<dim>          &direction);
 
   /**
    * Cell-wise clockwise numbering.
@@ -1233,17 +1144,17 @@ namespace DoFRenumbering
    * (counter)clockwise ordering of
    * the mesh cells with respect to
    * the hub @p center and calls
-   * cell_wise_dg().  Therefore, it
+   * cell_wise().  Therefore, it
    * only works with Discontinuous
    * Galerkin Finite Elements,
    * i.e. all degrees of freedom
    * have to be associated with the
    * interior of the cell.
    */
-  template <class DH, int dim>
+  template <class DH>
   void
   clockwise_dg (DH               &dof_handler,
-                const Point<dim> &center,
+                const Point<DH::space_dimension> &center,
                 const bool        counter = false);
 
   /**
@@ -1251,11 +1162,11 @@ namespace DoFRenumbering
    * on one level. See the other
    * function with the same name.
    */
-  template <int dim>
+  template <class DH>
   void
-  clockwise_dg (MGDoFHandler<dim> &dof_handler,
+  clockwise_dg (DH &dof_handler,
                 const unsigned int level,
-                const Point<dim> &center,
+                const Point<DH::space_dimension> &center,
                 const bool counter = false);
 
   /**
@@ -1267,11 +1178,11 @@ namespace DoFRenumbering
    * returns the renumbering
    * vector.
    */
-  template <class DH, int dim>
+  template <class DH>
   void
   compute_clockwise_dg (std::vector<unsigned int> &new_dof_indices,
                         const DH                  &dof_handler,
-                        const Point<dim>          &center,
+                        const Point<DH::space_dimension>          &center,
                         const bool                 counter);
 
   /**

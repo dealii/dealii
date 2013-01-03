@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,80 +13,69 @@
 
 
 // TODO: This could surely be made more systematic!
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS; lda : BOOL)
   {
 // explicit instantiations (for DoFHandler)
 
-#if deal_II_dimension == 1
-    template class DoFAccessor<1, DoFHandler<1> >;
-#endif
 
 #if deal_II_dimension == 2
-    template class DoFAccessor<1, DoFHandler<2> >;
-    template class DoFAccessor<2, DoFHandler<2> >;
-
-    template class TriaRawIterator   <DoFAccessor<1, DoFHandler<2> > >;
-    template class TriaIterator      <DoFAccessor<1, DoFHandler<2> > >;
-    template class TriaActiveIterator<DoFAccessor<1, DoFHandler<2> > >;
+    template class DoFAccessor<1, DoFHandler<2>, lda>;
+    
+    template class TriaRawIterator   <DoFAccessor<1, DoFHandler<2>, lda> >;
+    template class TriaIterator      <DoFAccessor<1, DoFHandler<2>, lda> >;
+    template class TriaActiveIterator<DoFAccessor<1, DoFHandler<2>, lda> >;
 #endif
 
 #if deal_II_dimension == 3
-    template class DoFAccessor<1, DoFHandler<3> >;
-    template class DoFAccessor<2, DoFHandler<3> >;
-    template class DoFAccessor<3, DoFHandler<3> >;
-
-    template class TriaRawIterator   <DoFAccessor<1, DoFHandler<3> > >;
-    template class TriaIterator      <DoFAccessor<1, DoFHandler<3> > >;
-    template class TriaActiveIterator<DoFAccessor<1, DoFHandler<3> > >;
-    template class TriaRawIterator   <DoFAccessor<2, DoFHandler<3> > >;
-    template class TriaIterator      <DoFAccessor<2, DoFHandler<3> > >;
-    template class TriaActiveIterator<DoFAccessor<2, DoFHandler<3> > >;
+    template class DoFAccessor<1, DoFHandler<3>, lda>;
+    template class DoFAccessor<2, DoFHandler<3>, lda>;
+    
+    template class TriaRawIterator   <DoFAccessor<1, DoFHandler<3>, lda> >;
+    template class TriaIterator      <DoFAccessor<1, DoFHandler<3>, lda> >;
+    template class TriaActiveIterator<DoFAccessor<1, DoFHandler<3>, lda> >;
+    template class TriaRawIterator   <DoFAccessor<2, DoFHandler<3>, lda> >;
+    template class TriaIterator      <DoFAccessor<2, DoFHandler<3>, lda> >;
+    template class TriaActiveIterator<DoFAccessor<2, DoFHandler<3>, lda> >;
 #endif
 
+    template class DoFAccessor<deal_II_dimension, DoFHandler<deal_II_dimension>, lda>;
+    template class DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>;
 
-    template class DoFCellAccessor<DoFHandler<deal_II_dimension> >;
-
-    template class TriaRawIterator   <DoFCellAccessor<DoFHandler<deal_II_dimension> > >;
-    template class TriaIterator      <DoFCellAccessor<DoFHandler<deal_II_dimension> > >;
-    template class TriaActiveIterator<DoFCellAccessor<DoFHandler<deal_II_dimension> > >;
+    template class TriaRawIterator   <DoFCellAccessor<DoFHandler<deal_II_dimension>, lda> >;
+    template class TriaIterator      <DoFCellAccessor<DoFHandler<deal_II_dimension>, lda> >;
+    template class TriaActiveIterator<DoFCellAccessor<DoFHandler<deal_II_dimension>, lda> >;
 
 
 // --------------------------------------------------------------------------
 // explicit instantiations (for hp::DoFHandler)
 
-#if deal_II_dimension == 1
-    template class DoFAccessor<1, hp::DoFHandler<1> >;
-#endif
 
 #if deal_II_dimension == 2
-    template class DoFAccessor<1, hp::DoFHandler<2> >;
-    template class DoFAccessor<2, hp::DoFHandler<2> >;
-
-    template class TriaRawIterator   <DoFAccessor<1, hp::DoFHandler<2> > >;
-    template class TriaIterator      <DoFAccessor<1, hp::DoFHandler<2> > >;
-    template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<2> > >;
+    template class DoFAccessor<1, hp::DoFHandler<2>, lda>;
+    template class TriaRawIterator   <DoFAccessor<1, hp::DoFHandler<2>, lda> >;
+    template class TriaIterator      <DoFAccessor<1, hp::DoFHandler<2>, lda> >;
+    template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<2>, lda> >;
 #endif
 
 
 #if deal_II_dimension == 3
-    template class DoFAccessor<1, hp::DoFHandler<3> >;
-    template class DoFAccessor<2, hp::DoFHandler<3> >;
-    template class DoFAccessor<3, hp::DoFHandler<3> >;
-
-    template class TriaRawIterator   <DoFAccessor<1, hp::DoFHandler<3> > >;
-    template class TriaIterator      <DoFAccessor<1, hp::DoFHandler<3> > >;
-    template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<3> > >;
-    template class TriaRawIterator   <DoFAccessor<2, hp::DoFHandler<3> > >;
-    template class TriaIterator      <DoFAccessor<2, hp::DoFHandler<3> > >;
-    template class TriaActiveIterator<DoFAccessor<2, hp::DoFHandler<3> > >;
+    template class DoFAccessor<1, hp::DoFHandler<3>, lda>;
+    template class TriaRawIterator   <DoFAccessor<1, hp::DoFHandler<3>, lda> >;
+    template class TriaIterator      <DoFAccessor<1, hp::DoFHandler<3>, lda> >;
+    template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<3>, lda> >;
+    
+    template class DoFAccessor<2, hp::DoFHandler<3>, lda>;
+    template class TriaRawIterator   <DoFAccessor<2, hp::DoFHandler<3>, lda> >;
+    template class TriaIterator      <DoFAccessor<2, hp::DoFHandler<3>, lda> >;
+    template class TriaActiveIterator<DoFAccessor<2, hp::DoFHandler<3>, lda> >;
 #endif
 
+    template class DoFAccessor<deal_II_dimension, hp::DoFHandler<deal_II_dimension>, lda>;
+    template class DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>;
 
-    template class DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >;
-
-    template class TriaRawIterator   <DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
-    template class TriaIterator      <DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
-    template class TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<deal_II_dimension> > >;
+    template class TriaRawIterator   <DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda> >;
+    template class TriaIterator      <DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda> >;
+    template class TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda> >;
 
 
 
@@ -94,40 +83,40 @@ for (deal_II_dimension : DIMENSIONS)
 // // explicit instantiations (for DoFHandler)
 
 #if deal_II_dimension == 1
-    template class DoFAccessor<1, DoFHandler<1,2> >;
+    template class DoFAccessor<1, DoFHandler<1,2>, lda>;
 #endif
 
 #if deal_II_dimension == 2
-    template class DoFAccessor<1, DoFHandler<2,3> >;
-    template class DoFAccessor<2, DoFHandler<2,3> >;
+    template class DoFAccessor<1, DoFHandler<2,3>, lda>;
+    template class DoFAccessor<2, DoFHandler<2,3>, lda>;
 
-    template class TriaRawIterator   <DoFAccessor<1, DoFHandler<2,3> > >;
-    template class TriaIterator      <DoFAccessor<1, DoFHandler<2,3> > >;
-    template class TriaActiveIterator<DoFAccessor<1, DoFHandler<2,3> > >;
+    template class TriaRawIterator   <DoFAccessor<1, DoFHandler<2,3>, lda> >;
+    template class TriaIterator      <DoFAccessor<1, DoFHandler<2,3>, lda> >;
+    template class TriaActiveIterator<DoFAccessor<1, DoFHandler<2,3>, lda> >;
 #endif
 
 
 #if deal_II_dimension != 3
-    template class DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> >;
+    template class DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda>;
 
     template class
-      TriaRawIterator   <DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
+      TriaRawIterator   <DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda> >;
     template class
-      TriaIterator      <DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
+      TriaIterator      <DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda> >;
     template class
-      TriaActiveIterator<DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
+      TriaActiveIterator<DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda> >;
 #endif
 
 
 #if deal_II_dimension == 3
-    template class DoFCellAccessor<DoFHandler<1,3> >;
+    template class DoFCellAccessor<DoFHandler<1,3>, lda>;
 
     template class
-      TriaRawIterator   <DoFCellAccessor<DoFHandler<1,3> > >;
+      TriaRawIterator   <DoFCellAccessor<DoFHandler<1,3>, lda> >;
     template class
-      TriaIterator      <DoFCellAccessor<DoFHandler<1,3> > >;
+      TriaIterator      <DoFCellAccessor<DoFHandler<1,3>, lda> >;
     template class
-      TriaActiveIterator<DoFCellAccessor<DoFHandler<1,3> > >;
+      TriaActiveIterator<DoFCellAccessor<DoFHandler<1,3>, lda> >;
 #endif
 
 
@@ -135,64 +124,64 @@ for (deal_II_dimension : DIMENSIONS)
 // explicit instantiations (for hp::DoFHandler)
 
 #if deal_II_dimension == 1
-    template class DoFAccessor<1, hp::DoFHandler<1,2> >;
-    template class DoFAccessor<1, hp::DoFHandler<1,3> >;
+    template class DoFAccessor<1, hp::DoFHandler<1,2>, lda>;
+    template class DoFAccessor<1, hp::DoFHandler<1,3>, lda>;
 #endif
 
 #if deal_II_dimension == 2
-    template class DoFAccessor<1, hp::DoFHandler<2,3> >;
-    template class DoFAccessor<2, hp::DoFHandler<2,3> >;
+    template class DoFAccessor<1, hp::DoFHandler<2,3>, lda>;
+    template class DoFAccessor<2, hp::DoFHandler<2,3>, lda>;
 
-    template class TriaRawIterator   <DoFAccessor<1, hp::DoFHandler<2,3> > >;
-    template class TriaIterator      <DoFAccessor<1, hp::DoFHandler<2,3> > >;
-    template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<2,3> > >;
+    template class TriaRawIterator   <DoFAccessor<1, hp::DoFHandler<2,3>, lda> >;
+    template class TriaIterator      <DoFAccessor<1, hp::DoFHandler<2,3>, lda> >;
+    template class TriaActiveIterator<DoFAccessor<1, hp::DoFHandler<2,3>, lda> >;
 #endif
 
 #if deal_II_dimension != 3
-    template class DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >;
+    template class DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda>;
 
     template class
-      TriaRawIterator   <DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
+      TriaRawIterator   <DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda> >;
     template class
-      TriaIterator      <DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
+      TriaIterator      <DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda> >;
     template class
-      TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > >;
+      TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda> >;
 #endif
 
 
 #if deal_II_dimension == 3
-    template class DoFCellAccessor<hp::DoFHandler<1,3> >;
+    template class DoFCellAccessor<hp::DoFHandler<1,3>, lda>;
 
     template class
-      TriaRawIterator   <DoFCellAccessor<hp::DoFHandler<1,3> > >;
+      TriaRawIterator   <DoFCellAccessor<hp::DoFHandler<1,3>, lda> >;
     template class
-      TriaIterator      <DoFCellAccessor<hp::DoFHandler<1,3> > >;
+      TriaIterator      <DoFCellAccessor<hp::DoFHandler<1,3>, lda> >;
     template class
-      TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<1,3> > >;
+      TriaActiveIterator<DoFCellAccessor<hp::DoFHandler<1,3>, lda> >;
 #endif
   }
 
 
-for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
+for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS; lda : BOOL)
   {
     template
       void
-      DoFCellAccessor<DoFHandler<deal_II_dimension> >::get_interpolated_dof_values
+      DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>::get_interpolated_dof_values
       (const VEC&, Vector<SCALAR>&) const;
     template
       void
-      DoFCellAccessor<DoFHandler<deal_II_dimension> >::set_dof_values_by_interpolation
+      DoFCellAccessor<DoFHandler<deal_II_dimension>, lda>::set_dof_values_by_interpolation
       (const Vector<SCALAR>&, VEC&) const;
 
 #if deal_II_dimension != 3
 
     template
       void
-      DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> >::get_interpolated_dof_values
+      DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda>::get_interpolated_dof_values
       (const VEC&, Vector<SCALAR>&) const;
     template
       void
-      DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1> >::set_dof_values_by_interpolation
+      DoFCellAccessor<DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda>::set_dof_values_by_interpolation
       (const Vector<SCALAR>&, VEC&) const;
 
 #endif
@@ -201,11 +190,11 @@ for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS
 
     template
       void
-      DoFCellAccessor<DoFHandler<1,3> >::get_interpolated_dof_values
+      DoFCellAccessor<DoFHandler<1,3>, lda>::get_interpolated_dof_values
       (const VEC&, Vector<SCALAR>&) const;
     template
       void
-      DoFCellAccessor<DoFHandler<1,3> >::set_dof_values_by_interpolation
+      DoFCellAccessor<DoFHandler<1,3>, lda>::set_dof_values_by_interpolation
       (const Vector<SCALAR>&, VEC&) const;
 
 #endif
@@ -213,26 +202,26 @@ for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS
   }
 
 
-for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS)
+for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS; lda : BOOL)
   {
     template
       void
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::get_interpolated_dof_values
+      DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>::get_interpolated_dof_values
       (const VEC&, Vector<SCALAR>&) const;
     template
       void
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension> >::set_dof_values_by_interpolation
+      DoFCellAccessor<hp::DoFHandler<deal_II_dimension>, lda>::set_dof_values_by_interpolation
       (const Vector<SCALAR>&, VEC&) const;
 
 #if deal_II_dimension != 3
 
     template
       void
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >::get_interpolated_dof_values
+      DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda>::get_interpolated_dof_values
       (const VEC&, Vector<SCALAR>&) const;
     template
       void
-      DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >::set_dof_values_by_interpolation
+      DoFCellAccessor<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>, lda>::set_dof_values_by_interpolation
       (const Vector<SCALAR>&, VEC&) const;
 
 #endif
@@ -241,11 +230,11 @@ for (VEC : SERIAL_VECTORS; SCALAR : REAL_SCALARS; deal_II_dimension : DIMENSIONS
 
     template
       void
-      DoFCellAccessor<hp::DoFHandler<1,3> >::get_interpolated_dof_values
+      DoFCellAccessor<hp::DoFHandler<1,3>, lda>::get_interpolated_dof_values
       (const VEC&, Vector<SCALAR>&) const;
     template
       void
-      DoFCellAccessor<hp::DoFHandler<1,3> >::set_dof_values_by_interpolation
+      DoFCellAccessor<hp::DoFHandler<1,3>, lda>::set_dof_values_by_interpolation
       (const Vector<SCALAR>&, VEC&) const;
 
 #endif

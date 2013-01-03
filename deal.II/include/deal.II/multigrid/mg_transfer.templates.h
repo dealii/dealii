@@ -13,6 +13,7 @@
 #ifndef __deal2__mg_transfer_templates_h
 #define __deal2__mg_transfer_templates_h
 
+#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/fe/fe.h>
@@ -42,8 +43,8 @@ namespace
    */
   template <int dim, typename number, int spacedim>
   void
-  reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
-                 std::vector<unsigned int> ,
+  reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
+                 const std::vector<unsigned int> &,
                  MGLevelObject<dealii::Vector<number> > &v)
   {
     for (unsigned int level=v.get_minlevel();
@@ -54,7 +55,6 @@ namespace
       }
 
   }
-
 
   /**
    * Adjust vectors on all levels to
@@ -68,7 +68,7 @@ namespace
    */
   template <int dim, typename number, int spacedim>
   void
-  reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+  reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
                  std::vector<unsigned int> target_component,
                  MGLevelObject<BlockVector<number> > &v)
   {
@@ -100,6 +100,34 @@ namespace
         v[level].collect_sizes();
       }
   }
+
+#ifdef DEAL_II_USE_TRILINOS
+  /**
+   * Adjust vectors on all levels to
+   * correct size.  Here, we just
+   * count the numbers of degrees
+   * of freedom on each level and
+   * @p reinit each level vector
+   * to this length.
+   */
+  template <int dim, int spacedim>
+  void
+  reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
+                 const std::vector<unsigned int> &,
+                 MGLevelObject<TrilinosWrappers::MPI::Vector> &v)
+  {
+    const dealii::parallel::distributed::Triangulation<dim,spacedim> *tria =
+      (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
+       (&mg_dof.get_tria()));
+    AssertThrow(tria!=NULL, ExcMessage("multigrid with Trilinos vectors only works with distributed Triangulation!"));
+
+    for (unsigned int level=v.get_minlevel();
+         level<=v.get_maxlevel(); ++level)
+      {
+        v[level].reinit(mg_dof.locally_owned_mg_dofs(level), tria->get_communicator());
+      }
+  }
+#endif
 }
 
 
@@ -113,7 +141,7 @@ template <class VECTOR>
 template <int dim, class InVector, int spacedim>
 void
 MGTransferPrebuilt<VECTOR>::copy_to_mg (
-  const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+  const DoFHandler<dim,spacedim> &mg_dof_handler,
   MGLevelObject<VECTOR> &dst,
   const InVector &src) const
 {
@@ -149,7 +177,7 @@ template <class VECTOR>
 template <int dim, class OutVector, int spacedim>
 void
 MGTransferPrebuilt<VECTOR>::copy_from_mg(
-  const MGDoFHandler<dim,spacedim>       &mg_dof_handler,
+  const DoFHandler<dim,spacedim>       &mg_dof_handler,
   OutVector                     &dst,
   const MGLevelObject<VECTOR> &src) const
 {
@@ -165,12 +193,15 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
     {
       typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
 
-      for (IT i= copy_indices[level].begin();
-           i != copy_indices[level].end(); ++i)
-        dst(i->first) = src[level](i->second);
+      if (constraints == 0)
+        for (IT i= copy_indices[level].begin();
+             i != copy_indices[level].end(); ++i)
+          dst(i->first) = src[level](i->second);
+      else
+        for (IT i= copy_indices[level].begin();
+             i != copy_indices[level].end(); ++i)
+          constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
     }
-  if (constraints != 0)
-    constraints->condense(dst);
 }
 
 
@@ -179,7 +210,7 @@ template <class VECTOR>
 template <int dim, class OutVector, int spacedim>
 void
 MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
-  const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+  const DoFHandler<dim,spacedim> &mg_dof_handler,
   OutVector                            &dst,
   const MGLevelObject<VECTOR> &src) const
 {

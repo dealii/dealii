@@ -29,8 +29,7 @@ namespace TrilinosWrappers
   namespace SparsityPatternIterators
   {
     void
-    const_iterator::Accessor::
-    visit_present_row ()
+    Accessor::visit_present_row ()
     {
       // if we are asked to visit the
       // past-the-end line, then simply
@@ -42,6 +41,7 @@ namespace TrilinosWrappers
 
           return;
         }
+//TODO: Is this thread safe?
 
       // otherwise first flush Trilinos caches
       sparsity_pattern->compress ();
@@ -659,7 +659,13 @@ namespace TrilinosWrappers
     AssertThrow (out, ExcIO());
   }
 
-
+//TODO: Implement!
+  std::size_t
+  SparsityPattern::memory_consumption() const
+  {
+    Assert(false, ExcNotImplemented());
+    return 0;
+  }
 
 
   // explicit instantiations

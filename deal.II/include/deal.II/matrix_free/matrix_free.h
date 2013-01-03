@@ -1318,7 +1318,7 @@ MatrixFree<dim,Number>::get_mg_cell_iterator(const unsigned int macro_cell_numbe
 
   std::pair<unsigned int,unsigned int> index =
     cell_level_index[macro_cell_number*vectorization_length+vector_number];
-  return typename MGDoFHandler<dim>::cell_iterator
+  return typename DoFHandler<dim>::cell_iterator
          (&dofh->get_tria(), index.first, index.second, dofh);
 }
 

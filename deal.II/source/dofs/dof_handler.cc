@@ -349,6 +349,379 @@ namespace internal
                      DoFHandler<3,spacedim>::invalid_dof_index);
           }
       }
+
+      template<int spacedim>
+      static
+      void reserve_space_mg (DoFHandler<1, spacedim> &dof_handler)
+      {
+        Assert (dof_handler.get_tria ().n_levels () > 0, ExcMessage ("Invalid triangulation"));
+        dof_handler.clear_mg_space ();
+
+        const dealii::Triangulation<1, spacedim> &tria = dof_handler.get_tria ();
+        const unsigned int &dofs_per_line = dof_handler.get_fe ().dofs_per_line;
+        const unsigned int &n_levels = tria.n_levels ();
+
+        for (unsigned int i = 0; i < n_levels; ++i)
+          {
+            dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<1>);
+            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<unsigned int> (tria.n_raw_lines (i) * dofs_per_line, DoFHandler<1>::invalid_dof_index);
+          }
+
+        const unsigned int &n_vertices = tria.n_vertices ();
+
+        dof_handler.mg_vertex_dofs.resize (n_vertices);
+
+        std::vector<unsigned int> max_level (n_vertices, 0);
+        std::vector<unsigned int> min_level (n_vertices, n_levels);
+
+        for (typename dealii::Triangulation<1, spacedim>::cell_iterator cell = tria.begin (); cell != tria.end (); ++cell)
+          {
+            const unsigned int level = cell->level ();
+
+            for (unsigned int vertex = 0; vertex < GeometryInfo<1>::vertices_per_cell; ++vertex)
+              {
+                const unsigned int vertex_index = cell->vertex_index (vertex);
+
+                if (min_level[vertex_index] > level)
+                  min_level[vertex_index] = level;
+
+                if (max_level[vertex_index] < level)
+                  max_level[vertex_index] = level;
+              }
+          }
+
+        for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
+          if (tria.vertex_used (vertex))
+            {
+              Assert (min_level[vertex] < n_levels, ExcInternalError ());
+              Assert (max_level[vertex] >= min_level[vertex], ExcInternalError ());
+              dof_handler.mg_vertex_dofs[vertex].init (min_level[vertex], max_level[vertex], dof_handler.get_fe ().dofs_per_vertex);
+            }
+
+          else
+            {
+              Assert (min_level[vertex] == n_levels, ExcInternalError ());
+              Assert (max_level[vertex] == 0, ExcInternalError ());
+              dof_handler.mg_vertex_dofs[vertex].init (1, 0, 0);
+            }
+      }
+
+      template<int spacedim>
+      static
+      void reserve_space_mg (DoFHandler<2, spacedim> &dof_handler)
+      {
+        Assert (dof_handler.get_tria ().n_levels () > 0, ExcMessage ("Invalid triangulation"));
+        dof_handler.clear_mg_space ();
+
+        const dealii::FiniteElement<2, spacedim> &fe = dof_handler.get_fe ();
+        const dealii::Triangulation<2, spacedim> &tria = dof_handler.get_tria ();
+        const unsigned int &n_levels = tria.n_levels ();
+
+        for (unsigned int i = 0; i < n_levels; ++i)
+          {
+            dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<2>);
+            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<unsigned int> (tria.n_raw_quads (i) * fe.dofs_per_quad, DoFHandler<2>::invalid_dof_index);
+          }
+
+        dof_handler.mg_faces = new internal::DoFHandler::DoFFaces<2>;
+        dof_handler.mg_faces->lines.dofs = std::vector<unsigned int> (tria.n_raw_lines () * fe.dofs_per_line, DoFHandler<2>::invalid_dof_index);
+
+        const unsigned int &n_vertices = tria.n_vertices ();
+
+        dof_handler.mg_vertex_dofs.resize (n_vertices);
+
+        std::vector<unsigned int> max_level (n_vertices, 0);
+        std::vector<unsigned int> min_level (n_vertices, n_levels);
+
+        for (typename dealii::Triangulation<2, spacedim>::cell_iterator cell = tria.begin (); cell != tria.end (); ++cell)
+          {
+            const unsigned int level = cell->level ();
+
+            for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_cell; ++vertex)
+              {
+                const unsigned int vertex_index = cell->vertex_index (vertex);
+
+                if (min_level[vertex_index] > level)
+                  min_level[vertex_index] = level;
+
+                if (max_level[vertex_index] < level)
+                  max_level[vertex_index] = level;
+              }
+          }
+
+        for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
+          if (tria.vertex_used (vertex))
+            {
+              Assert (min_level[vertex] < n_levels, ExcInternalError ());
+              Assert (max_level[vertex] >= min_level[vertex], ExcInternalError ());
+              dof_handler.mg_vertex_dofs[vertex].init (min_level[vertex], max_level[vertex], fe.dofs_per_vertex);
+            }
+
+          else
+            {
+              Assert (min_level[vertex] == n_levels, ExcInternalError ());
+              Assert (max_level[vertex] == 0, ExcInternalError ());
+              dof_handler.mg_vertex_dofs[vertex].init (1, 0, 0);
+            }
+      }
+
+      template<int spacedim>
+      static
+      void reserve_space_mg (DoFHandler<3, spacedim> &dof_handler)
+      {
+        Assert (dof_handler.get_tria ().n_levels () > 0, ExcMessage ("Invalid triangulation"));
+        dof_handler.clear_mg_space ();
+
+        const dealii::FiniteElement<3, spacedim> &fe = dof_handler.get_fe ();
+        const dealii::Triangulation<3, spacedim> &tria = dof_handler.get_tria ();
+        const unsigned int &n_levels = tria.n_levels ();
+
+        for (unsigned int i = 0; i < n_levels; ++i)
+          {
+            dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<3>);
+            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<unsigned int> (tria.n_raw_hexs (i) * fe.dofs_per_hex, DoFHandler<3>::invalid_dof_index);
+          }
+
+        dof_handler.mg_faces = new internal::DoFHandler::DoFFaces<3>;
+        dof_handler.mg_faces->lines.dofs = std::vector<unsigned int> (tria.n_raw_lines () * fe.dofs_per_line, DoFHandler<3>::invalid_dof_index);
+        dof_handler.mg_faces->quads.dofs = std::vector<unsigned int> (tria.n_raw_quads () * fe.dofs_per_quad, DoFHandler<3>::invalid_dof_index);
+
+        const unsigned int &n_vertices = tria.n_vertices ();
+
+        dof_handler.mg_vertex_dofs.resize (n_vertices);
+
+        std::vector<unsigned int> max_level (n_vertices, 0);
+        std::vector<unsigned int> min_level (n_vertices, n_levels);
+
+        for (typename dealii::Triangulation<3, spacedim>::cell_iterator cell = tria.begin (); cell != tria.end (); ++cell)
+          {
+            const unsigned int level = cell->level ();
+
+            for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_cell; ++vertex)
+              {
+                const unsigned int vertex_index = cell->vertex_index (vertex);
+
+                if (min_level[vertex_index] > level)
+                  min_level[vertex_index] = level;
+
+                if (max_level[vertex_index] < level)
+                  max_level[vertex_index] = level;
+              }
+          }
+
+        for (unsigned int vertex = 0; vertex < n_vertices; ++vertex)
+          if (tria.vertex_used (vertex))
+            {
+              Assert (min_level[vertex] < n_levels, ExcInternalError ());
+              Assert (max_level[vertex] >= min_level[vertex], ExcInternalError ());
+              dof_handler.mg_vertex_dofs[vertex].init (min_level[vertex], max_level[vertex], fe.dofs_per_vertex);
+            }
+
+          else
+            {
+              Assert (min_level[vertex] == n_levels, ExcInternalError ());
+              Assert (max_level[vertex] == 0, ExcInternalError ());
+              dof_handler.mg_vertex_dofs[vertex].init (1, 0, 0);
+            }
+      }
+
+      template<int spacedim>
+      static
+      unsigned int distribute_dofs_on_cell (typename DoFHandler<1, spacedim>::cell_iterator &cell, unsigned int next_free_dof)
+      {
+        const FiniteElement<1, spacedim> &fe = cell->get_fe ();
+
+        if (fe.dofs_per_vertex > 0)
+          for (unsigned int vertex = 0; vertex < GeometryInfo<1>::vertices_per_cell; ++vertex)
+            {
+              typename DoFHandler<1, spacedim>::cell_iterator neighbor = cell->neighbor (vertex);
+
+              if (neighbor.state () == IteratorState::valid)
+                if (neighbor->user_flag_set () && (neighbor->level () == cell->level ()))
+                  {
+                    if (vertex == 0)
+                      for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
+                        cell->set_mg_vertex_dof_index (cell->level (), 0, dof, neighbor->mg_vertex_dof_index (cell->level (), 1, dof));
+
+                    else
+                      for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
+                        cell->set_mg_vertex_dof_index (cell->level (), 1, dof, neighbor->mg_vertex_dof_index (cell->level (), 0, dof));
+
+                    continue;
+                  }
+
+              for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
+                cell->set_mg_vertex_dof_index (cell->level (), vertex, dof, next_free_dof++);
+            }
+
+        if (fe.dofs_per_line > 0)
+          for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
+            cell->set_mg_dof_index (cell->level (), dof, next_free_dof++);
+
+        cell->set_user_flag ();
+        return next_free_dof;
+      }
+
+      template<int spacedim>
+      static
+      unsigned int distribute_dofs_on_cell (typename DoFHandler<2, spacedim>::cell_iterator &cell, unsigned int next_free_dof)
+      {
+        const FiniteElement<2, spacedim> &fe = cell->get_fe ();
+
+        if (fe.dofs_per_vertex > 0)
+          for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_cell; ++vertex)
+            if (cell->mg_vertex_dof_index (cell->level (), vertex, 0) == DoFHandler<2>::invalid_dof_index)
+              for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
+                cell->set_mg_vertex_dof_index (cell->level (), vertex, dof, next_free_dof++);
+
+        if (fe.dofs_per_line > 0)
+          for (unsigned int face = 0; face < GeometryInfo<2>::faces_per_cell; ++face)
+            {
+              typename DoFHandler<2, spacedim>::line_iterator line = cell->line (face);
+
+              if (line->mg_dof_index (cell->level (), 0) == DoFHandler<2>::invalid_dof_index)
+                for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
+                  line->set_mg_dof_index (cell->level (), dof, next_free_dof++);
+            }
+
+        if (fe.dofs_per_quad > 0)
+          for (unsigned int dof = 0; dof < fe.dofs_per_quad; ++dof)
+            cell->set_mg_dof_index (cell->level (), dof, next_free_dof++);
+
+        cell->set_user_flag ();
+        return next_free_dof;
+      }
+
+      template<int spacedim>
+      static
+      unsigned int distribute_dofs_on_cell (typename DoFHandler<3, spacedim>::cell_iterator &cell, unsigned int next_free_dof)
+      {
+        const FiniteElement<3, spacedim> &fe = cell->get_fe ();
+
+        if (fe.dofs_per_vertex > 0)
+          for (unsigned int vertex = 0; vertex < GeometryInfo<3>::vertices_per_cell; ++vertex)
+            if (cell->mg_vertex_dof_index (cell->level (), vertex, 0) == DoFHandler<3>::invalid_dof_index)
+              for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
+                cell->set_mg_vertex_dof_index (cell->level (), vertex, dof, next_free_dof++);
+
+        if (fe.dofs_per_line > 0)
+          for (unsigned int line = 0; line < GeometryInfo<3>::lines_per_cell; ++line)
+            {
+              typename DoFHandler<3, spacedim>::line_iterator line_it = cell->line (line);
+
+              if (line_it->mg_dof_index (cell->level (), 0) == DoFHandler<3>::invalid_dof_index)
+                for (unsigned int dof = 0; dof < fe.dofs_per_line; ++dof)
+                  line_it->set_mg_dof_index (cell->level (), dof, next_free_dof++);
+            }
+
+        if (fe.dofs_per_quad > 0)
+          for (unsigned int face = 0; face < GeometryInfo<3>::quads_per_cell; ++face)
+            {
+              typename DoFHandler<3, spacedim>::quad_iterator quad = cell->quad (face);
+
+              if (quad->mg_dof_index (cell->level (), 0) == DoFHandler<3>::invalid_dof_index)
+                for (unsigned int dof = 0; dof < fe.dofs_per_quad; ++dof)
+                  quad->set_mg_dof_index (cell->level (), dof, next_free_dof++);
+            }
+
+        if (fe.dofs_per_hex > 0)
+          for (unsigned int dof = 0; dof < fe.dofs_per_hex; ++dof)
+            cell->set_mg_dof_index (cell->level (), dof, next_free_dof++);
+
+        cell->set_user_flag ();
+        return next_free_dof;
+      }
+
+      template<int spacedim>
+      static
+      unsigned int get_dof_index (
+        const DoFHandler<1, spacedim> &dof_handler,
+        internal::DoFHandler::DoFLevel<1> &mg_level,
+        internal::DoFHandler::DoFFaces<1> &,
+        const unsigned int obj_index,
+        const unsigned int fe_index,
+        const unsigned int local_index,
+        const int2type<1>)
+      {
+        return mg_level.dof_object.get_dof_index (dof_handler, obj_index, fe_index, local_index);
+      }
+
+      template<int spacedim>
+      static
+      unsigned int get_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &, internal::DoFHandler::DoFFaces<2> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<1>)
+      {
+        return mg_faces.lines.get_dof_index (dof_handler, obj_index, fe_index, local_index);
+      }
+
+      template<int spacedim>
+      static
+      unsigned int get_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &mg_level, internal::DoFHandler::DoFFaces<2> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<2>)
+      {
+        return mg_level.dof_object.get_dof_index (dof_handler, obj_index, fe_index, local_index);
+      }
+
+      template<int spacedim>
+      static
+      unsigned int get_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<1>)
+      {
+        return mg_faces.lines.get_dof_index (dof_handler, obj_index, fe_index, local_index);
+      }
+
+      template<int spacedim>
+      static
+      unsigned int get_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<2>)
+      {
+        return mg_faces.quads.get_dof_index (dof_handler, obj_index, fe_index, local_index);
+      }
+
+      template<int spacedim>
+      static
+      unsigned int get_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &mg_level, internal::DoFHandler::DoFFaces<3> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const int2type<3>)
+      {
+        return mg_level.dof_object.get_dof_index (dof_handler, obj_index, fe_index, local_index);
+      }
+
+      template<int spacedim>
+      static
+      void set_dof_index (const DoFHandler<1, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<1> &mg_level, internal::DoFHandler::DoFFaces<1> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const unsigned int global_index, const int2type<1>)
+      {
+        mg_level.dof_object.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
+      }
+
+      template<int spacedim>
+      static
+      void set_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &, internal::DoFHandler::DoFFaces<2> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const unsigned int global_index, const int2type<1>)
+      {
+        mg_faces.lines.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
+      }
+
+      template<int spacedim>
+      static
+      void set_dof_index (const DoFHandler<2, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<2> &mg_level, internal::DoFHandler::DoFFaces<2> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const unsigned int global_index, const int2type<2>)
+      {
+        mg_level.dof_object.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
+      }
+
+      template<int spacedim>
+      static
+      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const unsigned int global_index, const int2type<1>)
+      {
+        mg_faces.lines.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
+      }
+
+      template<int spacedim>
+      static
+      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &, internal::DoFHandler::DoFFaces<3> &mg_faces, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const unsigned int global_index, const int2type<2>)
+      {
+        mg_faces.quads.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
+      }
+
+      template<int spacedim>
+      static
+      void set_dof_index (const DoFHandler<3, spacedim> &dof_handler, internal::DoFHandler::DoFLevel<3> &mg_level, internal::DoFHandler::DoFFaces<3> &, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const unsigned int global_index, const int2type<3>)
+      {
+        mg_level.dof_object.set_dof_index (dof_handler, obj_index, fe_index, local_index, global_index);
+      }
     };
   }
 }
@@ -360,7 +733,8 @@ DoFHandler<dim,spacedim>::DoFHandler (const Triangulation<dim,spacedim> &tria)
   :
   tria(&tria, typeid(*this).name()),
   selected_fe(0, typeid(*this).name()),
-  faces(NULL)
+  faces(NULL),
+  mg_faces (NULL)
 {
   // decide whether we need a
   // sequential or a parallel
@@ -379,7 +753,8 @@ DoFHandler<dim,spacedim>::DoFHandler ()
   :
   tria(0, typeid(*this).name()),
   selected_fe(0, typeid(*this).name()),
-  faces(NULL)
+  faces(NULL),
+  mg_faces (NULL)
 {}
 
 
@@ -413,6 +788,7 @@ DoFHandler<dim,spacedim>::initialize(
 
   distribute_dofs(fe);
 }
+
 
 
 /*------------------------ Cell iterator functions ------------------------*/
@@ -471,6 +847,38 @@ DoFHandler<dim, spacedim>::end_active (const unsigned int level) const
   return (level == this->get_tria().n_levels()-1 ?
           active_cell_iterator(end()) :
           begin_active (level+1));
+}
+
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim, spacedim>::level_cell_iterator
+DoFHandler<dim, spacedim>::begin_mg (const unsigned int level) const
+{
+  // Assert(this->has_level_dofs(), ExcMessage("You can only iterate over mg "
+  //     "levels if mg dofs got distributed."));
+  return level_cell_iterator (*this->get_tria().begin(level),
+                              this);
+}
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim, spacedim>::level_cell_iterator
+DoFHandler<dim, spacedim>::end_mg (const unsigned int level) const
+{
+  // Assert(this->has_level_dofs(), ExcMessage("You can only iterate over mg "
+  //     "levels if mg dofs got distributed."));
+  return (level == this->get_tria().n_levels()-1 ?
+          end() :
+          begin (level+1));
+}
+
+
+template <int dim, int spacedim>
+typename DoFHandler<dim, spacedim>::level_cell_iterator
+DoFHandler<dim, spacedim>::end_mg () const
+{
+  return level_cell_iterator (&this->get_tria(), -1, -1, this);
 }
 
 
@@ -590,6 +998,7 @@ unsigned int DoFHandler<dim,spacedim>::n_boundary_dofs () const
           for (unsigned int i=0; i<dofs_per_face; ++i)
             boundary_dofs.insert(dofs_on_face[i]);
         }
+
   return boundary_dofs.size();
 }
 
@@ -676,9 +1085,19 @@ DoFHandler<dim,spacedim>::memory_consumption () const
                      MemoryConsumption::memory_consumption (*faces) +
                      MemoryConsumption::memory_consumption (faces) +
                      sizeof (number_cache) +
+                     MemoryConsumption::memory_consumption (mg_number_cache) +
                      MemoryConsumption::memory_consumption (vertex_dofs));
   for (unsigned int i=0; i<levels.size(); ++i)
     mem += MemoryConsumption::memory_consumption (*levels[i]);
+
+  for (unsigned int level = 0; level < mg_levels.size (); ++level)
+    mem += mg_levels[level]->memory_consumption ();
+
+  if (mg_faces != 0)
+    mem += MemoryConsumption::memory_consumption (*mg_faces);
+
+  for (unsigned int i = 0; i < mg_vertex_dofs.size (); ++i)
+    mem += sizeof (MGVertexDoFs) + (1 + mg_vertex_dofs[i].get_finest_level () - mg_vertex_dofs[i].get_coarsest_level ()) * sizeof (unsigned int);
 
   return mem;
 }
@@ -686,8 +1105,7 @@ DoFHandler<dim,spacedim>::memory_consumption () const
 
 
 template<int dim, int spacedim>
-void DoFHandler<dim,spacedim>::
-distribute_dofs (const FiniteElement<dim,spacedim> &ff)
+void DoFHandler<dim,spacedim>::distribute_dofs (const FiniteElement<dim,spacedim> &ff)
 {
   selected_fe = &ff;
 
@@ -718,9 +1136,58 @@ distribute_dofs (const FiniteElement<dim,spacedim> &ff)
   // triangulation. it doesn't work
   // correctly yet if it is parallel
   if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&*tria) == 0)
-    block_info_object.initialize(*this);
+    block_info_object.initialize(*this, false, true);
 }
 
+
+template<int dim, int spacedim>
+void DoFHandler<dim, spacedim>::distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe)
+{
+  const FiniteElement<dim, spacedim> *old_fe = selected_fe;
+  Assert((old_fe==NULL) || (old_fe == &fe), ExcMessage("you are required to use the same FE for level and active DoFs!") );
+  selected_fe = &fe;
+
+  clear_mg_space();
+
+  internal::DoFHandler::Implementation::reserve_space_mg (*this);
+  const parallel::distributed::Triangulation<dim,spacedim> *dist_tr = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&*tria);
+  if (!dist_tr)
+    mg_number_cache.resize((*tria).n_levels());
+  else
+    mg_number_cache.resize(dist_tr->n_global_levels());
+
+  policy->distribute_mg_dofs (*this, mg_number_cache);
+
+  // initialize the block info object
+  // only if this is a sequential
+  // triangulation. it doesn't work
+  // correctly yet if it is parallel
+  if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&*tria) == 0)
+    block_info_object.initialize (*this, true, false);
+}
+
+template<int dim, int spacedim>
+void DoFHandler<dim, spacedim>::reserve_space ()
+{
+  //TODO: move this to distribute_mg_dofs and remove function
+}
+
+template<int dim, int spacedim>
+void DoFHandler<dim, spacedim>::clear_mg_space ()
+{
+  for (unsigned int i = 0; i < mg_levels.size (); ++i)
+    delete mg_levels[i];
+
+  mg_levels.clear ();
+  delete mg_faces;
+  mg_faces = NULL;
+
+  std::vector<MGVertexDoFs> tmp;
+
+  std::swap (mg_vertex_dofs, tmp);
+
+  mg_number_cache.clear();
+}
 
 
 template<int dim, int spacedim>
@@ -739,14 +1206,14 @@ void DoFHandler<dim,spacedim>::clear ()
 
   // release memory
   clear_space ();
+  clear_mg_space ();
 }
 
 
 
 template <int dim, int spacedim>
 void
-DoFHandler<dim,spacedim>::
-renumber_dofs (const std::vector<unsigned int> &new_numbers)
+DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
 {
   Assert (new_numbers.size() == n_locally_owned_dofs(),
           ExcRenumberingIncomplete());
@@ -778,6 +1245,202 @@ renumber_dofs (const std::vector<unsigned int> &new_numbers)
 
   number_cache = policy->renumber_dofs (new_numbers, *this);
 }
+
+
+template <int dim, int spacedim>
+void
+DoFHandler<dim,spacedim>::renumber_dofs (const unsigned int,
+                                         const std::vector<unsigned int> &)
+{
+  Assert(false, ExcNotImplemented());
+}
+
+
+template<>
+void DoFHandler<1>::renumber_dofs (const unsigned int level,
+                                   const std::vector<unsigned int> &new_numbers)
+{
+  Assert (new_numbers.size() == n_dofs(level), DoFHandler<1>::ExcRenumberingIncomplete());
+
+  // note that we can not use cell iterators
+  // in this function since then we would
+  // renumber the dofs on the interface of
+  // two cells more than once. Anyway, this
+  // ways it's not only more correct but also
+  // faster
+  for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
+       i!=mg_vertex_dofs.end(); ++i)
+    // if the present vertex lives on
+    // the present level
+    if ((i->get_coarsest_level() <= level) &&
+        (i->get_finest_level() >= level))
+      for (unsigned int d=0; d<this->get_fe().dofs_per_vertex; ++d)
+        i->set_index (level, d, new_numbers[i->get_index (level, d)]);
+
+  for (std::vector<unsigned int>::iterator i=mg_levels[level]->dof_object.dofs.begin();
+       i!=mg_levels[level]->dof_object.dofs.end(); ++i)
+    {
+      if (*i != DoFHandler<1>::invalid_dof_index)
+        {
+          Assert(*i<new_numbers.size(), ExcInternalError());
+          *i = new_numbers[*i];
+        }
+    }
+}
+
+
+
+template<>
+void DoFHandler<2>::renumber_dofs (const unsigned int  level,
+                                   const std::vector<unsigned int>  &new_numbers)
+{
+  Assert (new_numbers.size() == n_dofs(level),
+          DoFHandler<2>::ExcRenumberingIncomplete());
+
+  for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
+       i!=mg_vertex_dofs.end(); ++i)
+    // if the present vertex lives on
+    // the present level
+    if ((i->get_coarsest_level() <= level) &&
+        (i->get_finest_level() >= level))
+      for (unsigned int d=0; d<this->get_fe().dofs_per_vertex; ++d)
+        i->set_index (level, d, new_numbers[i->get_index (level, d)]);
+
+  if (this->get_fe().dofs_per_line > 0)
+    {
+      // save user flags as they will be modified
+      std::vector<bool> user_flags;
+      this->get_tria().save_user_flags(user_flags);
+      const_cast<Triangulation<2> &>(this->get_tria()).clear_user_flags ();
+
+      // flag all lines adjacent to cells of the current
+      // level, as those lines logically belong to the same
+      // level as the cell, at least for for isotropic
+      // refinement
+      level_cell_iterator cell = begin(level),
+                          endcell  = end(level);
+      for ( ; cell != endcell; ++cell)
+        for (unsigned int line=0; line < GeometryInfo<2>::faces_per_cell; ++line)
+          cell->face(line)->set_user_flag();
+
+      for (cell_iterator cell = begin(); cell != end(); ++cell)
+        for (unsigned int l=0; l<GeometryInfo<2>::lines_per_cell; ++l)
+          if (cell->line(l)->user_flag_set())
+            {
+              for (unsigned int d=0; d<this->get_fe().dofs_per_line; ++d)
+                cell->line(l)->set_mg_dof_index (level, d,
+                                                 new_numbers[cell->line(l)->mg_dof_index(level, d)]);
+              cell->line(l)->clear_user_flag();
+            }
+      // finally, restore user flags
+      const_cast<Triangulation<2> &>(this->get_tria()).load_user_flags (user_flags);
+    }
+
+  for (std::vector<unsigned int>::iterator i=mg_levels[level]->dof_object.dofs.begin();
+       i!=mg_levels[level]->dof_object.dofs.end(); ++i)
+    {
+      if (*i != DoFHandler<2>::invalid_dof_index)
+        {
+          Assert(*i<new_numbers.size(), ExcInternalError());
+          *i = new_numbers[*i];
+        }
+    }
+}
+
+
+
+template<>
+void DoFHandler<3>::renumber_dofs (const unsigned int  level,
+                                   const std::vector<unsigned int>  &new_numbers)
+{
+  Assert (new_numbers.size() == n_dofs(level),
+          DoFHandler<3>::ExcRenumberingIncomplete());
+
+  for (std::vector<MGVertexDoFs>::iterator i=mg_vertex_dofs.begin();
+       i!=mg_vertex_dofs.end(); ++i)
+    // if the present vertex lives on
+    // the present level
+    if ((i->get_coarsest_level() <= level) &&
+        (i->get_finest_level() >= level))
+      for (unsigned int d=0; d<this->get_fe().dofs_per_vertex; ++d)
+        i->set_index (level, d, new_numbers[i->get_index (level, d)]);
+
+  // LINE DoFs
+  if (this->get_fe().dofs_per_line > 0)
+    {
+      // save user flags as they will be modified
+      std::vector<bool> user_flags;
+      this->get_tria().save_user_flags(user_flags);
+      const_cast<Triangulation<3> &>(this->get_tria()).clear_user_flags ();
+
+      // flag all lines adjacent to cells of the current
+      // level, as those lines logically belong to the same
+      // level as the cell, at least for for isotropic
+      // refinement
+
+      level_cell_iterator cell = begin(level),
+                          endcell  = end(level);
+      for ( ; cell != endcell ; ++cell)
+        for (unsigned int line=0; line < GeometryInfo<3>::lines_per_cell; ++line)
+          cell->line(line)->set_user_flag();
+
+
+      for (cell_iterator cell = begin(level); cell != end(level); ++cell)
+        for (unsigned int l=0; l<GeometryInfo<3>::lines_per_cell; ++l)
+          if (cell->line(l)->user_flag_set())
+            {
+              for (unsigned int d=0; d<this->get_fe().dofs_per_line; ++d)
+                cell->line(l)->set_mg_dof_index (level, d,
+                                                 new_numbers[cell->line(l)->mg_dof_index(level, d)]);
+              cell->line(l)->clear_user_flag();
+            }
+      // finally, restore user flags
+      const_cast<Triangulation<3> &>(this->get_tria()).load_user_flags (user_flags);
+    }
+
+  // QUAD DoFs
+  if (this->get_fe().dofs_per_quad > 0)
+    {
+      // save user flags as they will be modified
+      std::vector<bool> user_flags;
+      this->get_tria().save_user_flags(user_flags);
+      const_cast<Triangulation<3> &>(this->get_tria()).clear_user_flags ();
+
+      // flag all quads adjacent to cells of the current
+      // level, as those lines logically belong to the same
+      // level as the cell, at least for for isotropic
+      // refinement
+      level_cell_iterator cell = begin(level),
+                          endcell  = end(level);
+      for ( ; cell != endcell ; ++cell)
+        for (unsigned int quad=0; quad < GeometryInfo<3>::faces_per_cell; ++quad)
+          cell->face(quad)->set_user_flag();
+
+      for (cell_iterator cell = begin(level); cell != end(level); ++cell)
+        for (unsigned int q=0; q<GeometryInfo<3>::quads_per_cell; ++q)
+          if (cell->quad(q)->user_flag_set())
+            {
+              for (unsigned int d=0; d<this->get_fe().dofs_per_quad; ++d)
+                cell->quad(q)->set_mg_dof_index (level, d,
+                                                 new_numbers[cell->quad(q)->mg_dof_index(level, d)]);
+              cell->quad(q)->clear_user_flag();
+            }
+      // finally, restore user flags
+      const_cast<Triangulation<3> &>(this->get_tria()).load_user_flags (user_flags);
+    }
+
+  //HEX DoFs
+  for (std::vector<unsigned int>::iterator i=mg_levels[level]->dof_object.dofs.begin();
+       i!=mg_levels[level]->dof_object.dofs.end(); ++i)
+    {
+      if (*i != DoFHandler<3>::invalid_dof_index)
+        {
+          Assert(*i<new_numbers.size(), ExcInternalError());
+          *i = new_numbers[*i];
+        }
+    }
+}
+
 
 
 
@@ -843,6 +1506,88 @@ void DoFHandler<dim,spacedim>::clear_space ()
   std::swap (vertex_dofs, tmp);
 
   number_cache.clear ();
+}
+
+template<int dim, int spacedim>
+template<int structdim>
+unsigned int DoFHandler<dim, spacedim>::get_dof_index (
+  const unsigned int obj_level,
+  const unsigned int obj_index,
+  const unsigned int fe_index,
+  const unsigned int local_index) const
+{
+  return internal::DoFHandler::Implementation::get_dof_index (*this, *this->mg_levels[obj_level],
+                                                              *this->mg_faces, obj_index,
+                                                              fe_index, local_index,
+                                                              internal::int2type<structdim> ());
+}
+
+template<int dim, int spacedim>
+template<int structdim>
+void DoFHandler<dim, spacedim>::set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const unsigned int global_index) const
+{
+  internal::DoFHandler::Implementation::set_dof_index (*this, *this->mg_levels[obj_level], *this->mg_faces, obj_index, fe_index, local_index, global_index, internal::int2type<structdim> ());
+}
+
+template<int dim, int spacedim>
+DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs (): coarsest_level (numbers::invalid_unsigned_int), finest_level (0), indices (0), indices_offset (0)
+{
+}
+
+template<int dim, int spacedim>
+DoFHandler<dim, spacedim>::MGVertexDoFs::~MGVertexDoFs ()
+{
+  delete[] indices;
+  delete[] indices_offset;
+}
+
+template<int dim, int spacedim>
+void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl, const unsigned int fl, const unsigned int dofs_per_vertex)
+{
+  if (indices != 0)
+    {
+      delete[] indices;
+      indices = 0;
+    }
+
+  if (indices_offset != 0)
+    {
+      delete[] indices_offset;
+      indices_offset = 0;
+    }
+
+  coarsest_level = cl;
+  finest_level = fl;
+
+  if (cl > fl)
+    return;
+
+  const unsigned int n_levels = finest_level - coarsest_level + 1;
+  const unsigned int n_indices = n_levels * dofs_per_vertex;
+
+  indices = new unsigned int[n_indices];
+  Assert (indices != 0, ExcNoMemory ());
+
+  for (unsigned int i = 0; i < n_indices; ++i)
+    indices[i] = DoFHandler<dim, spacedim>::invalid_dof_index;
+
+  indices_offset = new unsigned int[n_levels];
+  Assert (indices != 0, ExcNoMemory ());
+
+  for (unsigned int i = 0; i < n_levels; ++i)
+    indices_offset[i] = i * dofs_per_vertex;
+}
+
+template<int dim, int spacedim>
+unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_coarsest_level () const
+{
+  return coarsest_level;
+}
+
+template<int dim, int spacedim>
+unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_finest_level () const
+{
+  return finest_level;
 }
 
 

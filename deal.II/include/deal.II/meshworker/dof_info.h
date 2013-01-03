@@ -191,10 +191,11 @@ namespace MeshWorker
     /// Set up local block indices
     void set_block_indices ();
     /// Fill index vector with active indices
-    void get_indices(const typename DoFHandler<dim, spacedim>::cell_iterator &c);
+    template <class DHCellIterator>
+    void get_indices(const DHCellIterator &c);
 
     /// Fill index vector with level indices
-    void get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator &c);
+    //void get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator& c);
 
     /// Auxiliary vector
     std::vector<unsigned int> indices_org;
@@ -306,9 +307,28 @@ namespace MeshWorker
   template <int dim, int spacedim, typename number>
   template <class DHCellIterator>
   inline void
+  DoFInfo<dim,spacedim,number>::get_indices(const DHCellIterator &c)
+  {
+    indices.resize(c->get_fe().dofs_per_cell);
+    if (block_info == 0 || block_info->local().size() == 0)
+      c->dof_indices(indices);
+    else
+      {
+        indices_org.resize(c->get_fe().dofs_per_cell);
+        c->dof_indices(indices_org);
+        set_block_indices();
+      }
+  }
+
+
+  template <int dim, int spacedim, typename number>
+  template <class DHCellIterator>
+  inline void
   DoFInfo<dim,spacedim,number>::reinit(const DHCellIterator &c)
   {
     get_indices(c);
+    level_cell = c->is_level_cell();
+
     cell = static_cast<typename Triangulation<dim,spacedim>::cell_iterator> (c);
     face_number = deal_II_numbers::invalid_unsigned_int;
     sub_number = deal_II_numbers::invalid_unsigned_int;
@@ -343,6 +363,8 @@ namespace MeshWorker
     if ((cell.state() != IteratorState::valid)
         ||  cell != static_cast<typename Triangulation<dim>::cell_iterator> (c))
       get_indices(c);
+    level_cell = c->is_level_cell();
+
     cell = static_cast<typename Triangulation<dim>::cell_iterator> (c);
     set_face(f,n);
 
@@ -379,6 +401,8 @@ namespace MeshWorker
     if (cell.state() != IteratorState::valid
         || cell != static_cast<typename Triangulation<dim>::cell_iterator> (c))
       get_indices(c);
+    level_cell = c->is_level_cell();
+
     cell = static_cast<typename Triangulation<dim>::cell_iterator> (c);
     set_subface(f,n,s);
 

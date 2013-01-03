@@ -22,7 +22,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim> class MGDoFHandler;
+template <int dim, int spacedim> class DoFHandler;
 template <int dim> struct FunctionMap;
 
 
@@ -47,7 +47,7 @@ public:
    * provided.
    */
   template <int dim, int spacedim>
-  void initialize(const MGDoFHandler<dim,spacedim> &dof);
+  void initialize(const DoFHandler<dim,spacedim> &dof);
 
   /**
    * Fill the internal data
@@ -57,7 +57,7 @@ public:
    * values provided.
    */
   template <int dim, int spacedim>
-  void initialize(const MGDoFHandler<dim,spacedim> &dof,
+  void initialize(const DoFHandler<dim,spacedim> &dof,
                   const typename FunctionMap<dim>::type &function_map,
                   const ComponentMask &component_mask = ComponentMask());
 
@@ -185,7 +185,7 @@ private:
 template <int dim, int spacedim>
 inline
 void
-MGConstrainedDoFs::initialize(const MGDoFHandler<dim,spacedim> &dof)
+MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof)
 {
   const unsigned int nlevels = dof.get_tria().n_levels();
   refinement_edge_indices.resize(nlevels);
@@ -207,7 +207,7 @@ template <int dim, int spacedim>
 inline
 void
 MGConstrainedDoFs::initialize(
-  const MGDoFHandler<dim,spacedim> &dof,
+  const DoFHandler<dim,spacedim> &dof,
   const typename FunctionMap<dim>::type &function_map,
   const ComponentMask &component_mask)
 {
