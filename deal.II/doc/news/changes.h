@@ -108,6 +108,14 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> Unification of DoFHandler and MGDoFHandler and internal
+restructuring of DoFAccessors. MGDofHandler is now deprecated
+and will be removed in a future release. Use DoFHandler with
+distribute_mg_dofs() instead.
+<br>
+(Markus Bürg, Timo Heister, Guido Kanschat, 2013/01/03)
+
+
 <li> step-6 now uses ConstraintMatrix::distribute_local_to_global()
 instead of condense(), which is the preferred way to use a ConstraintMatrix
  (and the only sensible way in parallel).
