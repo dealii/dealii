@@ -22,7 +22,7 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/multigrid/mg_transfer_block.h>
 #include <deal.II/multigrid/mg_transfer_block.templates.h>
 #include <deal.II/multigrid/mg_tools.h>

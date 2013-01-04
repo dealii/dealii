@@ -32,7 +32,6 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
 
 #include <cmath>
 #include <numeric>

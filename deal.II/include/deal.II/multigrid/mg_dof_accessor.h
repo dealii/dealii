@@ -14,9 +14,6 @@
 
 #include <deal.II/dofs/dof_accessor.h>
 
-/**
-* @deprecated use file dofs/dof_accessor.h instead.
-*/
-void deprecated_deal2__mg_dof_accessor_h();
+#warning file mg_dof_accessor.h is deprecated use file dofs/dof_accessor.h instead.
 
 #endif

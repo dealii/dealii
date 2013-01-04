@@ -42,7 +42,6 @@
 #include <deal.II/numerics/vector_tools.h>
 
 #include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
 
 #include <algorithm>
 #include <numeric>

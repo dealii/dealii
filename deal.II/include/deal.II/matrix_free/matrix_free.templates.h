@@ -16,7 +16,6 @@
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/distributed/tria.h>

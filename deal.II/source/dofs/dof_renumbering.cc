@@ -35,8 +35,6 @@
 #include <deal.II/hp/fe_collection.h>
 #include <deal.II/hp/fe_values.h>
 
-#include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
 #include <deal.II/multigrid/mg_tools.h>
 
 #include <boost/config.hpp>
