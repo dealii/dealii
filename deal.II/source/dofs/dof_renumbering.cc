@@ -1500,7 +1500,7 @@ namespace DoFRenumbering
   void
   downstream (MGDoFHandler<dim,spacedim>               &dof_handler,
               const Point<spacedim> &direction,
-              const bool        dof_wise_renumbering = false)
+              const bool        dof_wise_renumbering)
   {
     for (unsigned int level=0; level<dof_handler.n_levels(); ++level)
       downstream(dof_handler, level, direction, dof_wise_renumbering);
