@@ -44,7 +44,18 @@ clean-up-files = *gmv *gnuplot *gpl *eps *pov *vtk *ucd *.d2
 # settings
 include $D/common/Make.global_options
 
-
+ifneq ($(USE_CONTRIB_TRILINOS)$(USE_CONTRIB_P4EST),yesyes)
+default run clean:
+	@echo
+	@echo "==========================================================="
+	@echo "=   This program can only be run with the following       ="
+	@echo "=   configuration:                                        ="
+	@echo "=   - with Trilinos                                       ="
+	@echo "=   - with P4EST                                          ="
+	@echo "=   At least one of these conditions is not satisfied.    ="
+	@echo "==========================================================="
+	@echo
+else
 # Since the whole project consists of only one file, we need not
 # consider difficult dependencies. We only have to declare the
 # libraries which we want to link to the object file. deal.II has two
@@ -141,3 +152,4 @@ Makefile.dep: $(target).cc Makefile \
 include Makefile.dep
 
 
+endif  # USE_CONTRIB_TRILINOS
