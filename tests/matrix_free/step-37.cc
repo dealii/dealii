@@ -33,7 +33,7 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_coarse.h>
