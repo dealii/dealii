@@ -33,7 +33,6 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_dof_accessor.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
@@ -124,7 +123,7 @@ namespace Step37
 
     void clear();
 
-    void reinit (const MGDoFHandler<dim> &dof_handler,
+    void reinit (const DoFHandler<dim>  &dof_handler,
                  const ConstraintMatrix &constraints,
                  const unsigned int       level = numbers::invalid_unsigned_int);
 
@@ -202,7 +201,7 @@ namespace Step37
 
   template <int dim, int fe_degree, typename number>
   void
-  LaplaceOperator<dim,fe_degree,number>::reinit (const MGDoFHandler<dim> &dof_handler,
+  LaplaceOperator<dim,fe_degree,number>::reinit (const DoFHandler<dim>  &dof_handler,
                                                  const ConstraintMatrix &constraints,
                                                  const unsigned int      level)
   {
@@ -376,7 +375,7 @@ namespace Step37
 
     Triangulation<dim>               triangulation;
     FE_Q<dim>                        fe;
-    MGDoFHandler<dim>                mg_dof_handler;
+    DoFHandler<dim>                  mg_dof_handler;
     ConstraintMatrix                 constraints;
 
     SystemMatrixType                 system_matrix;
@@ -408,6 +407,7 @@ namespace Step37
     mg_constraints.clear();
 
     mg_dof_handler.distribute_dofs (fe);
+    mg_dof_handler.distribute_mg_dofs (fe);
 
     deallog << "Number of degrees of freedom: "
             << mg_dof_handler.n_dofs()
@@ -511,8 +511,8 @@ namespace Step37
       diagonals[level].reinit (mg_dof_handler.n_dofs(level));
 
     std::vector<unsigned int> cell_no(triangulation.n_levels());
-    typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
-                                              endc = mg_dof_handler.end();
+    typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
+                                            endc = mg_dof_handler.end();
     for (; cell!=endc; ++cell)
       {
         const unsigned int level = cell->level();

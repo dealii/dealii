@@ -31,7 +31,6 @@
 #include <deal.II/grid/grid_generator.h>
 
 #include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_dof_accessor.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
@@ -273,9 +272,9 @@ namespace Step37
 
     void clear();
 
-    void reinit (const MGDoFHandler<dim> &dof_handler,
+    void reinit (const DoFHandler<dim>  &dof_handler,
                  const ConstraintMatrix &constraints,
-                 const unsigned int       level = numbers::invalid_unsigned_int);
+                 const unsigned int      level = numbers::invalid_unsigned_int);
 
     unsigned int m () const;
     unsigned int n () const;
@@ -398,7 +397,7 @@ namespace Step37
   // FEEvaluation class (and its template arguments) will be explained below.
   template <int dim, int fe_degree, typename number>
   void
-  LaplaceOperator<dim,fe_degree,number>::reinit (const MGDoFHandler<dim> &dof_handler,
+  LaplaceOperator<dim,fe_degree,number>::reinit (const DoFHandler<dim>  &dof_handler,
                                                  const ConstraintMatrix &constraints,
                                                  const unsigned int      level)
   {
@@ -734,7 +733,7 @@ namespace Step37
 
     Triangulation<dim>               triangulation;
     FE_Q<dim>                        fe;
-    MGDoFHandler<dim>                mg_dof_handler;
+    DoFHandler<dim>                  dof_handler;
     ConstraintMatrix                 constraints;
 
     SystemMatrixType                 system_matrix;
@@ -760,7 +759,7 @@ namespace Step37
   LaplaceProblem<dim>::LaplaceProblem ()
     :
     fe (degree_finite_element),
-    mg_dof_handler (triangulation),
+    dof_handler (triangulation),
     time_details (std::cout, false)
   {}
 
@@ -789,14 +788,15 @@ namespace Step37
     mg_matrices.clear();
     mg_constraints.clear();
 
-    mg_dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_mg_dofs (fe);
 
     std::cout << "Number of degrees of freedom: "
-              << mg_dof_handler.n_dofs()
+              << dof_handler.n_dofs()
               << std::endl;
 
     constraints.clear();
-    VectorTools::interpolate_boundary_values (mg_dof_handler,
+    VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
                                               ZeroFunction<dim>(),
                                               constraints);
@@ -806,15 +806,15 @@ namespace Step37
                  << time() << "s/" << time.wall_time() << "s" << std::endl;
     time.restart();
 
-    system_matrix.reinit (mg_dof_handler, constraints);
+    system_matrix.reinit (dof_handler, constraints);
     std::cout.precision(4);
     std::cout << "System matrix memory consumption:     "
               << system_matrix.memory_consumption()*1e-6
               << " MB."
               << std::endl;
 
-    solution.reinit (mg_dof_handler.n_dofs());
-    system_rhs.reinit (mg_dof_handler.n_dofs());
+    solution.reinit (dof_handler.n_dofs());
+    system_rhs.reinit (dof_handler.n_dofs());
 
     setup_time += time.wall_time();
     time_details << "Setup matrix-free system   (CPU/wall) "
@@ -837,7 +837,7 @@ namespace Step37
     ZeroFunction<dim>               homogeneous_dirichlet_bc (1);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     std::vector<std::set<unsigned int> > boundary_indices(triangulation.n_levels());
-    MGTools::make_boundary_list (mg_dof_handler,
+    MGTools::make_boundary_list (dof_handler,
                                  dirichlet_boundary,
                                  boundary_indices);
     for (unsigned int level=0; level<nlevels; ++level)
@@ -847,12 +847,12 @@ namespace Step37
           mg_constraints[level].add_line(*bc_it);
 
         mg_constraints[level].close();
-        mg_matrices[level].reinit(mg_dof_handler,
+        mg_matrices[level].reinit(dof_handler,
                                   mg_constraints[level],
                                   level);
       }
-    coarse_matrix.reinit (mg_dof_handler.n_dofs(0),
-                          mg_dof_handler.n_dofs(0));
+    coarse_matrix.reinit (dof_handler.n_dofs(0),
+                          dof_handler.n_dofs(0));
     setup_time += time.wall_time();
     time_details << "Setup matrix-free levels   (CPU/wall) "
                  << time() << "s/" << time.wall_time() << "s" << std::endl;
@@ -881,8 +881,8 @@ namespace Step37
     const Coefficient<dim> coefficient;
     std::vector<double>    coefficient_values (n_q_points);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = mg_dof_handler.begin_active(),
-                                                   endc = mg_dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
         cell->get_dof_indices (local_dof_indices);
@@ -932,11 +932,11 @@ namespace Step37
     const unsigned int n_levels = triangulation.n_levels();
     std::vector<Vector<float> > diagonals (n_levels);
     for (unsigned int level=0; level<n_levels; ++level)
-      diagonals[level].reinit (mg_dof_handler.n_dofs(level));
+      diagonals[level].reinit (dof_handler.n_dofs(level));
 
     std::vector<unsigned int> cell_no(triangulation.n_levels());
-    typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
-                                              endc = mg_dof_handler.end();
+    typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin(),
+                                            endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
         const unsigned int level = cell->level();
@@ -1004,7 +1004,7 @@ namespace Step37
     GrowingVectorMemory<>   vector_memory;
 
     MGTransferPrebuilt<Vector<double> > mg_transfer;
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build_matrices(dof_handler);
     setup_time += time.wall_time();
     time_details << "MG build transfer time     (CPU/wall) " << time()
                  << "s/" << time.wall_time() << "s\n";
@@ -1041,7 +1041,7 @@ namespace Step37
     MGMatrix<LevelMatrixType, Vector<double> >
     mg_matrix(&mg_matrices);
 
-    Multigrid<Vector<double> > mg(mg_dof_handler,
+    Multigrid<Vector<double> > mg(dof_handler,
                                   mg_matrix,
                                   mg_coarse,
                                   mg_transfer,
@@ -1049,7 +1049,7 @@ namespace Step37
                                   mg_smoother);
     PreconditionMG<dim, Vector<double>,
                    MGTransferPrebuilt<Vector<double> > >
-                   preconditioner(mg_dof_handler, mg, mg_transfer);
+                   preconditioner(dof_handler, mg, mg_transfer);
 
     // Finally, write out the memory consumption of the Multigrid object (or
     // rather, of its most significant components, since there is no built-in
@@ -1102,7 +1102,7 @@ namespace Step37
   {
     DataOut<dim> data_out;
 
-    data_out.attach_dof_handler (mg_dof_handler);
+    data_out.attach_dof_handler (dof_handler);
     data_out.add_data_vector (solution, "solution");
     data_out.build_patches ();
 

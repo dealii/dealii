@@ -224,10 +224,12 @@ public:
     UpdateFlags         mapping_update_flags;
 
     /**
-     * If working on a MGDoFHandler, this option can be used to define whether
-     * we work on a certain level of the mesh, and not the active cells. If
-     * set to invalid_unsigned_int (which is the default value), the active
-     * cells are gone through, otherwise the level given by this parameter.
+     * This option can be used to define whether we work on a certain level of
+     * the mesh, and not the active cells. If set to invalid_unsigned_int
+     * (which is the default value), the active cells are gone through,
+     * otherwise the level given by this parameter. Note that if you specify
+     * to work on a level, its dofs must be distributed by using
+     * <code>dof_handler.distribute_mg_dofs(fe);</code>.
      */
     unsigned int        level_mg_handler;
 
@@ -558,7 +560,7 @@ public:
   get_constrained_dofs (const unsigned int fe_component = 0) const;
 
   /**
-   * Calls renumber_dofs function in dof info which renumbers the the degrees
+   * Calls renumber_dofs function in dof info which renumbers the degrees
    * of freedom according to the ordering for parallelization.
    */
   void renumber_dofs (std::vector<unsigned int> &renumbering,
@@ -599,27 +601,14 @@ public:
 
   /**
    * In case this structure was built based on a DoFHandler, this returns the
-   * DoFHandler. Note that this function returns an exception in case the
-   * structure was based on MGDoFHandler and a level has been specified in
-   * InitializationOption.
+   * DoFHandler.
    */
   const DoFHandler<dim> &
   get_dof_handler (const unsigned int fe_component = 0) const;
 
   /**
-   * In case this structure was built based on a DoFHandler, this returns the
-   * DoFHandler. Note that this function returns an exception in case the
-   * structure was based on MGDoFHandler and a level has been specified in
-   * InitializationOption.
-   */
-  const MGDoFHandler<dim> &
-  get_mg_dof_handler (const unsigned int fe_component = 0) const;
-
-  /**
    * This returns the cell iterator in deal.II speak to a given cell in the
-   * renumbering of this structure. This function returns an exception in case
-   * the structure was constructed based on an MGDoFHandler with level
-   * specified, as these cells are in general not active.
+   * renumbering of this structure.
    *
    * Note that the cell iterators in deal.II go through cells differently to
    * what the cell loop of this class does. This is because several cells are
@@ -631,22 +620,6 @@ public:
   get_cell_iterator (const unsigned int macro_cell_number,
                      const unsigned int vector_number,
                      const unsigned int fe_component = 0) const;
-
-  /**
-   * This returns the cell iterator in deal.II speak to a given cell in the
-   * renumbering of this structure. This function returns an exception in case
-   * the structure was constructed based on a DoFHandler and not MGDoFHandler.
-   *
-   * Note that the cell iterators in deal.II go through cells differently to
-   * what the cell loop of this class does. This is because several cells are
-   * worked on together (vectorization), and since cells with neighbors on
-   * different MPI processors need to be accessed at a certain time when
-   * accessing remote data and overlapping communication with computation.
-   */
-  typename MGDoFHandler<dim>::cell_iterator
-  get_mg_cell_iterator (const unsigned int macro_cell_number,
-                        const unsigned int vector_number,
-                        const unsigned int fe_component = 0) const;
 
   /**
    * This returns the cell iterator in deal.II speak to a given cell in the
@@ -829,11 +802,10 @@ private:
 
   /**
    * This is the actual reinit function that sets up the indices for the
-   * DoFHandler and MGDoFHandler case.
+   * DoFHandler case.
    */
-  template <typename DoFHandler>
   void internal_reinit (const Mapping<dim>                &mapping,
-                        const std::vector<const DoFHandler *> &dof_handler,
+                        const std::vector<const DoFHandler<dim> *> &dof_handler,
                         const std::vector<const ConstraintMatrix *> &constraint,
                         const std::vector<IndexSet>       &locally_owned_set,
                         const std::vector<hp::QCollection<1> > &quad,
@@ -866,13 +838,7 @@ private:
                                 const unsigned int                         level);
 
   /**
-   * Initializes the DoFHandlers based on a DoFHandler<dim> argument.
-   */
-  void initialize_dof_handlers (const std::vector<const MGDoFHandler<dim>*> &dof_handlers,
-                                const unsigned int                           level);
-
-  /**
-   * Initializes the DoFHandlers based on a DoFHandler<dim> argument.
+   * Initializes the DoFHandlers based on a hp::DoFHandler<dim> argument.
    */
   void initialize_dof_handlers (const std::vector<const hp::DoFHandler<dim>*> &dof_handlers,
                                 const unsigned int                             level);
@@ -886,9 +852,8 @@ private:
   {
     DoFHandlers () : n_dof_handlers (0), level (numbers::invalid_unsigned_int) {};
     std::vector<SmartPointer<const DoFHandler<dim> > >   dof_handler;
-    std::vector<SmartPointer<const MGDoFHandler<dim> > > mg_dof_handler;
     std::vector<SmartPointer<const hp::DoFHandler<dim> > > hp_dof_handler;
-    enum ActiveDoFHandler { usual, multigrid, hp } active_dof_handler;
+    enum ActiveDoFHandler { usual, hp } active_dof_handler;
     unsigned int n_dof_handlers;
     unsigned int level;
   };
@@ -1213,15 +1178,6 @@ MatrixFree<dim,Number>::get_dof_handler (const unsigned int dof_index) const
                        dof_handlers.n_dof_handlers);
       return *dof_handlers.dof_handler[dof_index];
     }
-  else if (dof_handlers.active_dof_handler == DoFHandlers::multigrid)
-    {
-      Assert (dof_handlers.level == numbers::invalid_unsigned_int,
-              ExcMessage("Cannot return DoFHandler when MGDoFHandler and "
-                         "level are specified."));
-      AssertDimension (dof_handlers.mg_dof_handler.size(),
-                       dof_handlers.n_dof_handlers);
-      return *dof_handlers.mg_dof_handler[dof_index];
-    }
   else
     {
       Assert (false, ExcNotImplemented());
@@ -1229,19 +1185,6 @@ MatrixFree<dim,Number>::get_dof_handler (const unsigned int dof_index) const
       // segfault in case this is only run in optimized mode
       return *dof_handlers.dof_handler[numbers::invalid_unsigned_int];
     }
-}
-
-
-
-template <int dim, typename Number>
-inline
-const MGDoFHandler<dim> &
-MatrixFree<dim,Number>::get_mg_dof_handler (const unsigned int dof_index) const
-{
-  AssertIndexRange (dof_index, dof_handlers.n_dof_handlers);
-  Assert (dof_handlers.active_dof_handler == DoFHandlers::multigrid,
-          ExcNotImplemented());
-  return *dof_handlers.mg_dof_handler[dof_index];
 }
 
 
@@ -1271,15 +1214,6 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
                        dof_handlers.n_dof_handlers);
       dofh = dof_handlers.dof_handler[dof_index];
     }
-  else if (dof_handlers.active_dof_handler == DoFHandlers::multigrid)
-    {
-      Assert (dof_handlers.level == numbers::invalid_unsigned_int,
-              ExcMessage("Cannot return DoFHandler when MGDoFHandler and "
-                         "level are specified."));
-      AssertDimension (dof_handlers.mg_dof_handler.size(),
-                       dof_handlers.n_dof_handlers);
-      dofh = dof_handlers.mg_dof_handler[dof_index];
-    }
   else
     {
       Assert (false, ExcMessage ("Cannot return DoFHandler<dim>::cell_iterator "
@@ -1289,36 +1223,6 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
   std::pair<unsigned int,unsigned int> index =
     cell_level_index[macro_cell_number*vectorization_length+vector_number];
   return typename DoFHandler<dim>::active_cell_iterator
-         (&dofh->get_tria(), index.first, index.second, dofh);
-}
-
-
-
-template <int dim, typename Number>
-inline
-typename MGDoFHandler<dim>::cell_iterator
-MatrixFree<dim,Number>::get_mg_cell_iterator(const unsigned int macro_cell_number,
-                                             const unsigned int vector_number,
-                                             const unsigned int dof_index) const
-{
-  const unsigned int vectorization_length=VectorizedArray<Number>::n_array_elements;
-#ifdef DEBUG
-  AssertIndexRange (dof_index, dof_handlers.n_dof_handlers);
-  AssertIndexRange (macro_cell_number, size_info.n_macro_cells);
-  AssertIndexRange (vector_number, vectorization_length);
-  const unsigned int irreg_filled =
-    std_cxx1x::get<2>(dof_info[dof_index].row_starts[macro_cell_number]);
-  if (irreg_filled > 0)
-    AssertIndexRange (vector_number, irreg_filled);
-#endif
-
-  Assert (dof_handlers.active_dof_handler == DoFHandlers::multigrid,
-          ExcNotImplemented());
-  const MGDoFHandler<dim> *dofh = dof_handlers.mg_dof_handler[dof_index];
-
-  std::pair<unsigned int,unsigned int> index =
-    cell_level_index[macro_cell_number*vectorization_length+vector_number];
-  return typename DoFHandler<dim>::cell_iterator
          (&dofh->get_tria(), index.first, index.second, dofh);
 }
 
@@ -1520,37 +1424,28 @@ MatrixFree<dim,Number>::mapping_initialized () const
 
 namespace internal
 {
-  template <typename DH>
-  std::vector<IndexSet>
-  extract_locally_owned_index_sets (const std::vector<const DH *> &dofh,
-                                    const unsigned int)
+  namespace MatrixFree
   {
-    std::vector<IndexSet> locally_owned_set;
-    locally_owned_set.reserve (dofh.size());
-    for (unsigned int j=0; j<dofh.size(); j++)
-      locally_owned_set.push_back(dofh[j]->locally_owned_dofs());
-    return locally_owned_set;
-  }
-
-
-
-  template <int dim>
-  std::vector<IndexSet>
-  extract_locally_owned_index_sets (const std::vector<const dealii::MGDoFHandler<dim>*> &dofh,
-                                    const unsigned int level)
-  {
-    std::vector<IndexSet> locally_owned_set;
-    locally_owned_set.reserve (dofh.size());
-    for (unsigned int j=0; j<dofh.size(); j++)
-      if (level == numbers::invalid_unsigned_int)
-        locally_owned_set.push_back(dofh[j]->locally_owned_dofs());
-      else
-        {
-          IndexSet new_set (dofh[j]->n_dofs(level));
-          new_set.add_range (0, dofh[j]->n_dofs(level));
-          locally_owned_set.push_back(new_set);
-        }
-    return locally_owned_set;
+    template <typename DH>
+    inline
+    std::vector<IndexSet>
+    extract_locally_owned_index_sets (const std::vector<const DH *> &dofh,
+                                      const unsigned int level)
+    {
+      std::vector<IndexSet> locally_owned_set;
+      locally_owned_set.reserve (dofh.size());
+      for (unsigned int j=0; j<dofh.size(); j++)
+        if (level == numbers::invalid_unsigned_int)
+          locally_owned_set.push_back(dofh[j]->locally_owned_dofs());
+        else
+          {
+            // TODO: not distributed yet
+            IndexSet new_set (dofh[j]->n_dofs(level));
+            new_set.add_range (0, dofh[j]->n_dofs(level));
+            locally_owned_set.push_back(new_set);
+          }
+      return locally_owned_set;
+    }
   }
 }
 
@@ -1574,8 +1469,8 @@ reinit(const DH               &dof_handler,
   quads.push_back (quad);
 
   std::vector<IndexSet> locally_owned_sets =
-    internal::extract_locally_owned_index_sets (dof_handlers,
-                                                additional_data.level_mg_handler);
+    internal::MatrixFree::extract_locally_owned_index_sets
+    (dof_handlers, additional_data.level_mg_handler);
   reinit(mapping, dof_handlers,constraints, locally_owned_sets, quads,
          additional_data);
 }
@@ -1600,8 +1495,8 @@ reinit(const Mapping<dim>     &mapping,
   quads.push_back (quad);
 
   std::vector<IndexSet> locally_owned_sets =
-    internal::extract_locally_owned_index_sets (dof_handlers,
-                                                additional_data.level_mg_handler);
+    internal::MatrixFree::extract_locally_owned_index_sets
+    (dof_handlers, additional_data.level_mg_handler);
   reinit(mapping, dof_handlers,constraints,locally_owned_sets, quads,
          additional_data);
 }
@@ -1618,8 +1513,8 @@ reinit(const std::vector<const DH *>               &dof_handler,
 {
   MappingQ1<dim> mapping;
   std::vector<IndexSet> locally_owned_set =
-    internal::extract_locally_owned_index_sets (dof_handler,
-                                                additional_data.level_mg_handler);
+    internal::MatrixFree::extract_locally_owned_index_sets
+    (dof_handler, additional_data.level_mg_handler);
   reinit(mapping, dof_handler,constraint,locally_owned_set,
          static_cast<const std::vector<Quadrature<1> >&>(quad),
          additional_data);
@@ -1639,8 +1534,8 @@ reinit(const std::vector<const DH *>               &dof_handler,
   std::vector<Quad> quads;
   quads.push_back(quad);
   std::vector<IndexSet> locally_owned_set =
-    internal::extract_locally_owned_index_sets (dof_handler,
-                                                additional_data.level_mg_handler);
+    internal::MatrixFree::extract_locally_owned_index_sets
+    (dof_handler, additional_data.level_mg_handler);
   reinit(mapping, dof_handler,constraint,locally_owned_set, quads,
          additional_data);
 }
@@ -1659,8 +1554,8 @@ reinit(const Mapping<dim>                         &mapping,
   std::vector<Quad> quads;
   quads.push_back(quad);
   std::vector<IndexSet> locally_owned_set =
-    internal::extract_locally_owned_index_sets (dof_handler,
-                                                additional_data.level_mg_handler);
+    internal::MatrixFree::extract_locally_owned_index_sets
+    (dof_handler, additional_data.level_mg_handler);
   reinit(mapping, dof_handler,constraint,locally_owned_set, quads,
          additional_data);
 }
@@ -1677,10 +1572,42 @@ reinit(const Mapping<dim>                         &mapping,
        const MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
-    internal::extract_locally_owned_index_sets (dof_handler,
-                                                additional_data.level_mg_handler);
+    internal::MatrixFree::extract_locally_owned_index_sets
+    (dof_handler, additional_data.level_mg_handler);
   reinit(mapping, dof_handler,constraint,locally_owned_set,
          quad, additional_data);
+}
+
+
+
+namespace internal
+{
+  namespace MatrixFree
+  {
+    // resolve DoFHandler types
+
+    // MGDoFHandler is deprecated in deal.II but might still be present in
+    // user code, so we need to resolve its type (fortunately, it is derived
+    // from DoFHandler, so we can static_cast it to a DoFHandler<dim>)
+    template <typename DH>
+    inline
+    std::vector<const dealii::DoFHandler<DH::dimension> *>
+    resolve_dof_handler (const std::vector<const DH *> &dof_handler)
+    {
+      std::vector<const dealii::DoFHandler<DH::dimension> *> conversion(dof_handler.size());
+      for (unsigned int i=0; i<dof_handler.size(); ++i)
+        conversion[i] = static_cast<const dealii::DoFHandler<DH::dimension> *>(dof_handler[i]);
+      return conversion;
+    }
+
+    template <int dim>
+    inline
+    std::vector<const dealii::hp::DoFHandler<dim> *>
+    resolve_dof_handler (const std::vector<const dealii::hp::DoFHandler<dim> *> &dof_handler)
+    {
+      return dof_handler;
+    }
+  }
 }
 
 
@@ -1699,8 +1626,9 @@ reinit(const Mapping<dim>                         &mapping,
   std::vector<hp::QCollection<1> > quad_hp;
   for (unsigned int q=0; q<quad.size(); ++q)
     quad_hp.push_back (hp::QCollection<1>(quad[q]));
-  internal_reinit (mapping, dof_handler, constraint, locally_owned_set,
-                   quad_hp, additional_data);
+  internal_reinit (mapping,
+                   internal::MatrixFree::resolve_dof_handler(dof_handler),
+                   constraint, locally_owned_set, quad_hp, additional_data);
 }
 
 
