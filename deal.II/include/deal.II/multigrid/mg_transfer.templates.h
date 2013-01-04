@@ -121,11 +121,13 @@ namespace
        (&mg_dof.get_tria()));
     AssertThrow(tria!=NULL, ExcMessage("multigrid with Trilinos vectors only works with distributed Triangulation!"));
 
+#ifdef DEAL_II_USE_P4EST
     for (unsigned int level=v.get_minlevel();
          level<=v.get_maxlevel(); ++level)
       {
         v[level].reinit(mg_dof.locally_owned_mg_dofs(level), tria->get_communicator());
       }
+#endif
   }
 #endif
 }
