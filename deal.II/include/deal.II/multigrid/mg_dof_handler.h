@@ -12,10 +12,8 @@
 #ifndef __deal2__mg_dof_handler_h
 #define __deal2__mg_dof_handler_h
 
-/**
-* @deprecated use DoFHandler instead.
-*/
-void deprecated_deal2__mg_dof_handler_h();
+//TODO: MgDoFHandler should be marked deprecated, but is used everywhere...
+//#warning MGDoFHandler is deprecated
 
 #include <deal.II/base/config.h>
 #include <deal.II/dofs/dof_handler.h>
