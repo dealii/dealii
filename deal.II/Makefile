@@ -24,7 +24,7 @@ help:
 	@echo "=    distclean  : removes all object files, libraries, etc in subdirs  ="
 	@echo "========================================================================"
 
-config.log: configure
+config.log: configure common/template-arguments.in common/dealiitemplates.pm.in
 	$(error Error: configuration not up to date. Please run ./configure or ./reconfigure)
 
 deps: config.log
