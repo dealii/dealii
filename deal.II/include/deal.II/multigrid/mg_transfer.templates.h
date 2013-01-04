@@ -127,6 +127,8 @@ namespace
       {
         v[level].reinit(mg_dof.locally_owned_mg_dofs(level), tria->get_communicator());
       }
+#else
+    (void)v;
 #endif
   }
 #endif
