@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -21,15 +21,21 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/include/
   )
 
-ADD_SUBDIRECTORY(base)
-ADD_SUBDIRECTORY(distributed)
-ADD_SUBDIRECTORY(dofs)
+# list the directories where we have source files. the ones with the longest
+# compile jobs come first so that 'make -j N' saturates many processors also
+# towards the end of compiling rather than having to wait for one long
+# compilation that, because it has been listed last, is started towards the
+# end of everything (e.g. numerics/vectors.cc takes several minutes to
+# compile...)
+ADD_SUBDIRECTORY(numerics)
 ADD_SUBDIRECTORY(fe)
+ADD_SUBDIRECTORY(dofs)
+ADD_SUBDIRECTORY(lac)
+ADD_SUBDIRECTORY(base)
 ADD_SUBDIRECTORY(grid)
 ADD_SUBDIRECTORY(hp)
-ADD_SUBDIRECTORY(lac)
 ADD_SUBDIRECTORY(multigrid)
-ADD_SUBDIRECTORY(numerics)
+ADD_SUBDIRECTORY(distributed)
 
 
 FOREACH(build ${DEAL_II_BUILD_TYPES})
@@ -85,4 +91,3 @@ INSTALL(EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
   DESTINATION ${DEAL_II_PROJECT_CONFIG_RELDIR}
   COMPONENT library
   )
-
