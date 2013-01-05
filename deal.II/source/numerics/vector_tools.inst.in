@@ -1,6 +1,5 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
 //    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2011, 2012 by the deal.II authors
 //
@@ -153,18 +152,6 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
       const VEC&,
       const Point<deal_II_dimension>&);
 
-      template
-        void interpolate
-        (const Mapping<deal_II_dimension>&,
-         const MGDoFHandler<deal_II_dimension>&,
-         const Function<deal_II_dimension>&,
-         VEC&);
-      template
-        void interpolate
-        (const MGDoFHandler<deal_II_dimension>&,
-         const Function<deal_II_dimension>&,
-         VEC&);
-
   template
     void point_value<deal_II_dimension> (
       const hp::MappingCollection<deal_II_dimension>&,
@@ -280,6 +267,27 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
 #endif
   }
 
+
+for (deal_II_dimension : DIMENSIONS)
+{
+    namespace VectorTools \{
+      template
+        void interpolate_boundary_values (
+          const MGDoFHandler<deal_II_dimension> &,
+          const types::boundary_id,
+          const Function<deal_II_dimension>   &,
+	  ConstraintMatrix&,
+          const ComponentMask    &);
+
+      template
+        void interpolate_boundary_values (
+          const MGDoFHandler<deal_II_dimension> &,
+          const types::boundary_id,
+          const Function<deal_II_dimension>   &,
+          std::map<unsigned int,double>       &,
+          const ComponentMask    &);
+    \}
+}
 
 
 for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; DH : DOFHANDLER_TEMPLATES)

@@ -13,7 +13,6 @@
 
 #include <deal.II/numerics/fe_field_function.templates.h>
 #include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/hp/dof_handler.h>

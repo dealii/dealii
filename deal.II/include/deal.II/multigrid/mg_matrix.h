@@ -92,6 +92,7 @@ class MGMatrix : public MGMatrixBase<VECTOR>
 {
 public:
   MGMatrix (MGLevelObject<MATRIX> *matrix= 0);
+
   void set_matrix (MGLevelObject<MATRIX> *M);
   virtual void vmult (const unsigned int level,
                       VECTOR &dst,

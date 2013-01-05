@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,23 +11,44 @@
 //---------------------------------------------------------------------------
 
 
-for (deal_II_dimension : DIMENSIONS; V1 : DEAL_II_VEC_TEMPLATES; S1 : REAL_SCALARS)
+for (V1 : VECTORS_WITH_MATRIX)
+  {
+    template class MGTransferPrebuilt< V1 >;
+  }
+
+for (deal_II_dimension : DIMENSIONS; V1 : VECTORS_WITH_MATRIX)
   {
     template
-      void MGTransferPrebuilt<V1<S1> >::build_matrices<deal_II_dimension>(
-	const MGDoFHandler<deal_II_dimension> &mg_dof);
+      void MGTransferPrebuilt< V1 >::build_matrices<deal_II_dimension>(
+	const DoFHandler<deal_II_dimension> &mg_dof);
   }
 
 for (deal_II_dimension : DIMENSIONS; V1,V2 : DEAL_II_VEC_TEMPLATES; S1, S2 : REAL_SCALARS)
   {    
     template void
       MGTransferPrebuilt<V1<S1> >::copy_to_mg (
-	const MGDoFHandler<deal_II_dimension>&, MGLevelObject<V1<S1> >&, const V2<S2>&) const;
+	const DoFHandler<deal_II_dimension>&, MGLevelObject<V1<S1> >&, const V2<S2>&) const;
     template void
-      MGTransferPrebuilt<V1<S1> >::copy_from_mg (const MGDoFHandler<deal_II_dimension>&, V2<S2>&,
+      MGTransferPrebuilt<V1<S1> >::copy_from_mg (const DoFHandler<deal_II_dimension>&, V2<S2>&,
 					     const MGLevelObject<V1<S1> >&) const;
     template void
-      MGTransferPrebuilt<V1<S1> >::copy_from_mg_add (const MGDoFHandler<deal_II_dimension>&, V2<S2>&,
+      MGTransferPrebuilt<V1<S1> >::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, V2<S2>&,
 						 const MGLevelObject<V1<S1> >&) const;
+  }
+
+for(deal_II_dimension : DIMENSIONS)
+  {    
+#ifdef DEAL_II_USE_TRILINOS
+
+    template void
+      MGTransferPrebuilt<TrilinosWrappers::MPI::Vector>::copy_to_mg (
+	const DoFHandler<deal_II_dimension>&, MGLevelObject<TrilinosWrappers::MPI::Vector>&, const TrilinosWrappers::MPI::Vector&) const;
+    template void
+      MGTransferPrebuilt<TrilinosWrappers::MPI::Vector>::copy_from_mg (const DoFHandler<deal_II_dimension>&, TrilinosWrappers::MPI::Vector&,
+					     const MGLevelObject<TrilinosWrappers::MPI::Vector>&) const;
+    template void
+      MGTransferPrebuilt<TrilinosWrappers::MPI::Vector>::copy_from_mg_add (const DoFHandler<deal_II_dimension>&, TrilinosWrappers::MPI::Vector&,
+						 const MGLevelObject<TrilinosWrappers::MPI::Vector>&) const;
+#endif
   }
 

@@ -6,7 +6,7 @@ DEAL::   Number of degrees of freedom: 17
 DEAL:cg::Starting value 0.261041
 DEAL:cg::Convergence step 13 value 0
 DEAL::Memory consumption -- Triangulation: 2778
-DEAL::Memory consumption -- DoFHandler:    952
+DEAL::Memory consumption -- DoFHandler:    976
 DEAL::Memory consumption -- FE:            1800
 DEAL::Memory consumption -- Constraints:   78
 DEAL::Memory consumption -- Sparsity:      456
@@ -19,7 +19,7 @@ DEAL::   Number of degrees of freedom: 23
 DEAL:cg::Starting value 0.235472
 DEAL:cg::Convergence step 16 value 0
 DEAL::Memory consumption -- Triangulation: 3618
-DEAL::Memory consumption -- DoFHandler:    1140
+DEAL::Memory consumption -- DoFHandler:    1164
 DEAL::Memory consumption -- FE:            1800
 DEAL::Memory consumption -- Constraints:   78
 DEAL::Memory consumption -- Sparsity:      576
@@ -32,7 +32,7 @@ DEAL::   Number of degrees of freedom: 31
 DEAL:cg::Starting value 0.226008
 DEAL:cg::Convergence step 21 value 0
 DEAL::Memory consumption -- Triangulation: 4426
-DEAL::Memory consumption -- DoFHandler:    1332
+DEAL::Memory consumption -- DoFHandler:    1356
 DEAL::Memory consumption -- FE:            1800
 DEAL::Memory consumption -- Constraints:   78
 DEAL::Memory consumption -- Sparsity:      736
@@ -45,7 +45,7 @@ DEAL::   Number of degrees of freedom: 41
 DEAL:cg::Starting value 0.204506
 DEAL:cg::Convergence step 27 value 0
 DEAL::Memory consumption -- Triangulation: 5442
-DEAL::Memory consumption -- DoFHandler:    1560
+DEAL::Memory consumption -- DoFHandler:    1584
 DEAL::Memory consumption -- FE:            1800
 DEAL::Memory consumption -- Constraints:   78
 DEAL::Memory consumption -- Sparsity:      936
@@ -60,7 +60,7 @@ DEAL::   Number of degrees of freedom: 89
 DEAL:cg::Starting value 0.351647
 DEAL:cg::Convergence step 22 value 0
 DEAL::Memory consumption -- Triangulation: 4887
-DEAL::Memory consumption -- DoFHandler:    1912
+DEAL::Memory consumption -- DoFHandler:    1936
 DEAL::Memory consumption -- FE:            14308
 DEAL::Memory consumption -- Constraints:   78
 DEAL::Memory consumption -- Sparsity:      5736
@@ -73,7 +73,7 @@ DEAL::   Number of degrees of freedom: 209
 DEAL:cg::Starting value 0.271387
 DEAL:cg::Convergence step 30 value 0
 DEAL::Memory consumption -- Triangulation: 10047
-DEAL::Memory consumption -- DoFHandler:    3704
+DEAL::Memory consumption -- DoFHandler:    3728
 DEAL::Memory consumption -- FE:            14308
 DEAL::Memory consumption -- Constraints:   3102
 DEAL::Memory consumption -- Sparsity:      13992
@@ -86,7 +86,7 @@ DEAL::   Number of degrees of freedom: 449
 DEAL:cg::Starting value 0.203851
 DEAL:cg::Convergence step 51 value 0
 DEAL::Memory consumption -- Triangulation: 19591
-DEAL::Memory consumption -- DoFHandler:    7160
+DEAL::Memory consumption -- DoFHandler:    7184
 DEAL::Memory consumption -- FE:            14308
 DEAL::Memory consumption -- Constraints:   10734
 DEAL::Memory consumption -- Sparsity:      31240
@@ -99,7 +99,7 @@ DEAL::   Number of degrees of freedom: 921
 DEAL:cg::Starting value 0.151971
 DEAL:cg::Convergence step 71 value 0
 DEAL::Memory consumption -- Triangulation: 39319
-DEAL::Memory consumption -- DoFHandler:    14648
+DEAL::Memory consumption -- DoFHandler:    14672
 DEAL::Memory consumption -- FE:            14308
 DEAL::Memory consumption -- Constraints:   19966
 DEAL::Memory consumption -- Sparsity:      64168
@@ -114,7 +114,7 @@ DEAL::   Number of degrees of freedom: 517
 DEAL:cg::Starting value 0.206362
 DEAL:cg::Convergence step 29 value 0
 DEAL::Memory consumption -- Triangulation: 22643
-DEAL::Memory consumption -- DoFHandler:    9736
+DEAL::Memory consumption -- DoFHandler:    9760
 DEAL::Memory consumption -- FE:            315604
 DEAL::Memory consumption -- Constraints:   78
 DEAL::Memory consumption -- Sparsity:      120280
@@ -127,7 +127,7 @@ DEAL::   Number of degrees of freedom: 2217
 DEAL:cg::Starting value 0.116541
 DEAL:cg::Convergence step 31 value 0
 DEAL::Memory consumption -- Triangulation: 88881
-DEAL::Memory consumption -- DoFHandler:    37972
+DEAL::Memory consumption -- DoFHandler:    37996
 DEAL::Memory consumption -- FE:            315604
 DEAL::Memory consumption -- Constraints:   55262
 DEAL::Memory consumption -- Sparsity:      567152
@@ -140,7 +140,7 @@ DEAL::   Number of degrees of freedom: 9373
 DEAL:cg::Starting value 0.0978429
 DEAL:cg::Convergence step 55 value 0
 DEAL::Memory consumption -- Triangulation: 355923
-DEAL::Memory consumption -- DoFHandler:    151256
+DEAL::Memory consumption -- DoFHandler:    151280
 DEAL::Memory consumption -- FE:            315604
 DEAL::Memory consumption -- Constraints:   367086
 DEAL::Memory consumption -- Sparsity:      2517208
@@ -153,7 +153,7 @@ DEAL::   Number of degrees of freedom: 32433
 DEAL:cg::Starting value 0.0425276
 DEAL:cg::Convergence step 82 value 0
 DEAL::Memory consumption -- Triangulation: 1252759
-DEAL::Memory consumption -- DoFHandler:    541984
+DEAL::Memory consumption -- DoFHandler:    542008
 DEAL::Memory consumption -- FE:            315604
 DEAL::Memory consumption -- Constraints:   1307806
 DEAL::Memory consumption -- Sparsity:      8321768

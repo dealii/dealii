@@ -14,136 +14,23 @@
 
 
 #include <deal.II/lac/vector.h>
+#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer_block.h>
 #include <deal.II/multigrid/mg_transfer_component.h>
 #include <deal.II/multigrid/mg_smoother.h>
-#include <deal.II/multigrid/mg_transfer.templates.h>
 #include <deal.II/multigrid/mg_transfer_block.templates.h>
 #include <deal.II/multigrid/mg_transfer_component.templates.h>
 #include <deal.II/multigrid/multigrid.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
-
-
-// Warning: the following function is for debugging purposes only. It
-// will be compiled only, if the additional and undocumented compiler
-// flag MG_DEBUG is set. Furthermore, as soon as this function is
-// compiled, libraries for different dimensions may NOT be linked
-// anymore at the same time.
-
-// If this function is to be used, its declaration must be added to
-// the class Multigrid again.
-
-// TODO: deal_II_dimension not set any more, so this will not compile!
-#ifdef MG_DEBUG
-template <>
-void
-Multigrid<Vector<double> >::print_vector (const unsigned int level,
-                                          const Vector<double> &v,
-                                          const char *name) const
-{
-  if (level!=maxlevel)
-    return;
-  const unsigned int dim=deal_II_dimension;
-
-  const DoFHandler<dim> *dof = mg_dof_handler;
-
-  Vector<double> out_vector(dof->n_dofs());
-
-  out_vector = -10000;
-
-  const unsigned int dofs_per_cell = mg_dof_handler->get_fe().dofs_per_cell;
-
-  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
-  std::vector<unsigned int> level_dof_indices (dofs_per_cell);
-
-  DoFHandler<dim>::active_cell_iterator
-  global_cell = dof->begin_active(level);
-  MGDoFHandler<dim>::active_cell_iterator
-  level_cell = mg_dof_handler->begin_active(level);
-  const MGDoFHandler<dim>::cell_iterator
-  endc = mg_dof_handler->end(level);
-
-  // traverse all cells and copy the
-  // data appropriately to the output
-  // vector
-  for (; level_cell != endc; ++level_cell, ++global_cell)
-    {
-      global_cell->get_dof_indices (global_dof_indices);
-      level_cell->get_mg_dof_indices(level_dof_indices);
-
-      // copy level-wise data to
-      // global vector
-      for (unsigned int i=0; i<dofs_per_cell; ++i)
-        out_vector(global_dof_indices[i])
-          = v(level_dof_indices[i]);
-    }
-
-  std::ofstream out_file(name);
-  DataOut<dim> out;
-  out.attach_dof_handler(*dof);
-  out.add_data_vector(out_vector, "v");
-  out.build_patches(5);
-  out.write_gnuplot(out_file);
-}
-
-
-
-template <class VECTOR>
-void
-Multigrid<VECTOR>::print_vector (const unsigned int level,
-                                 const VECTOR &v,
-                                 const char *name) const
-{
-  Assert(false, ExcNotImplemented());
-}
-#endif
-
-
-template<class VECTOR>
-MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt ()
-{}
-
-
-template<class VECTOR>
-MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt (const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
-  :
-  constraints(&c),
-  mg_constrained_dofs(&mg_c)
-{}
-
-template <class VECTOR>
-MGTransferPrebuilt<VECTOR>::~MGTransferPrebuilt ()
-{}
-
-
-template <class VECTOR>
-void MGTransferPrebuilt<VECTOR>::prolongate (
-  const unsigned int to_level,
-  VECTOR            &dst,
-  const VECTOR      &src) const
-{
-  Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
-          ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
-
-  prolongation_matrices[to_level-1]->vmult (dst, src);
-}
-
-
-template <class VECTOR>
-void MGTransferPrebuilt<VECTOR>::restrict_and_add (
-  const unsigned int   from_level,
-  VECTOR       &dst,
-  const VECTOR &src) const
-{
-  Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
-          ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
-
-  prolongation_matrices[from_level-1]->Tvmult_add (dst, src);
-}
 
 
 MGTransferBlockBase::MGTransferBlockBase ()
@@ -395,15 +282,8 @@ void MGTransferBlockSelect<number>::restrict_and_add (
 
 // Explicit instantiations
 
-template class Multigrid<Vector<float> >;
-template class Multigrid<Vector<double> >;
-template class Multigrid<BlockVector<float> >;
-template class Multigrid<BlockVector<double> >;
+#include "multigrid.inst"
 
-template class MGTransferPrebuilt<Vector<float> >;
-template class MGTransferPrebuilt<BlockVector<float> >;
-template class MGTransferPrebuilt<Vector<double> >;
-template class MGTransferPrebuilt<BlockVector<double> >;
 template class MGTransferBlock<float>;
 template class MGTransferBlock<double>;
 template class MGTransferSelect<float>;

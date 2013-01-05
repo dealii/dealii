@@ -37,7 +37,6 @@
 
 #include <deal.II/multigrid/multigrid.h>
 #include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer_component.h>
 #include <deal.II/multigrid/mg_tools.h>

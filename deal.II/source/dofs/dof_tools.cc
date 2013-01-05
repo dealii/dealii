@@ -42,7 +42,6 @@
 #include <deal.II/numerics/vector_tools.h>
 
 #include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
 
 #include <algorithm>
 #include <numeric>
@@ -241,6 +240,7 @@ namespace DoFTools
     Assert (sparsity.n_cols() == n_dofs_col,
             ExcDimensionMismatch (sparsity.n_cols(), n_dofs_col));
 
+//TODO: Looks like wasteful memory management here
 
     const std::list<std::pair<typename DH::cell_iterator,
           typename DH::cell_iterator> >
@@ -249,8 +249,7 @@ namespace DoFTools
 
 
     typename std::list<std::pair<typename DH::cell_iterator,
-             typename DH::cell_iterator> >
-             ::const_iterator
+             typename DH::cell_iterator> >::const_iterator
              cell_iter = cell_list.begin();
 
     for (; cell_iter!=cell_list.end(); ++cell_iter)
@@ -281,7 +280,7 @@ namespace DoFTools
             child_cells = GridTools::get_active_child_cells<DH> (cell_row);
             for (unsigned int i=0; i<child_cells.size(); i++)
               {
-                const typename DH::active_cell_iterator
+                const typename DH::cell_iterator
                 cell_row_child = child_cells[i];
                 const unsigned int dofs_per_cell_row =
                   cell_row_child->get_fe().dofs_per_cell;
@@ -415,7 +414,7 @@ namespace DoFTools
 
             // find active cell at that boundary: first go to left/right,
             // then to children
-            typename DH::cell_iterator cell = dof.begin(0);
+            typename DH::level_cell_iterator cell = dof.begin(0);
             while (!cell->at_boundary(direction))
               cell = cell->neighbor(direction);
             while (!cell->active())
@@ -552,7 +551,7 @@ namespace DoFTools
               typename DH::face_iterator cell_face = cell->face(face);
               if (! cell->at_boundary(face) )
                 {
-                  typename DH::cell_iterator neighbor = cell->neighbor(face);
+                  typename DH::level_cell_iterator neighbor = cell->neighbor(face);
 
                   // in 1d, we do not need to worry whether the neighbor
                   // might have children and then loop over those children.
@@ -568,7 +567,7 @@ namespace DoFTools
                            sub_nr != cell_face->number_of_children();
                            ++sub_nr)
                         {
-                          const typename DH::cell_iterator
+                          const typename DH::level_cell_iterator
                           sub_neighbor
                             = cell->neighbor_child_on_subface (face, sub_nr);
 
@@ -769,7 +768,7 @@ namespace DoFTools
                     }
                   else
                     {
-                      typename DH::cell_iterator
+                      typename DH::level_cell_iterator
                       neighbor = cell->neighbor(face);
                       // Refinement edges are taken care of by coarser
                       // cells
@@ -786,7 +785,7 @@ namespace DoFTools
                                sub_nr != cell_face->n_children();
                                ++sub_nr)
                             {
-                              const typename DH::cell_iterator
+                              const typename DH::level_cell_iterator
                               sub_neighbor
                                 = cell->neighbor_child_on_subface (face, sub_nr);
 
@@ -998,7 +997,7 @@ namespace DoFTools
                   }
                 else
                   {
-                    typename dealii::hp::DoFHandler<dim,spacedim>::cell_iterator
+                    typename dealii::hp::DoFHandler<dim,spacedim>::level_cell_iterator
                     neighbor = cell->neighbor(face);
 
                     // Refinement edges are taken care of by coarser cells
@@ -1016,7 +1015,7 @@ namespace DoFTools
                              sub_nr != cell_face->n_children();
                              ++sub_nr)
                           {
-                            const typename dealii::hp::DoFHandler<dim,spacedim>::cell_iterator
+                            const typename dealii::hp::DoFHandler<dim,spacedim>::level_cell_iterator
                             sub_neighbor
                               = cell->neighbor_child_on_subface (face, sub_nr);
 
@@ -1841,7 +1840,7 @@ namespace DoFTools
 //   currently not used but may be in the future:
 
 //     void
-//     make_hp_hanging_node_constraints (const dealii::MGDoFHandler<1,2> &,
+//     make_hp_hanging_node_constraints (const dealii::MDoFHandler<1,2> &,
 //                                    ConstraintMatrix    &)
 //     {
 //                                     // nothing to do for regular
@@ -1851,7 +1850,7 @@ namespace DoFTools
 
 
 //     void
-//     make_oldstyle_hanging_node_constraints (const dealii::MGDoFHandler<1,2> &,
+//     make_oldstyle_hanging_node_constraints (const dealii::DoFHandler<1,2> &,
 //                                          ConstraintMatrix    &,
 //                                          dealii::internal::int2type<1>)
 //     {
@@ -2637,7 +2636,7 @@ namespace DoFTools
                     (!cell->face(face)->has_children() &&
                      !cell->neighbor_is_coarser(face) ))
                   {
-                    const typename DH::cell_iterator neighbor = cell->neighbor (face);
+                    const typename DH::level_cell_iterator neighbor = cell->neighbor (face);
 
                     // see which side of the face we have to constrain
                     switch (cell->get_fe().compare_for_face_domination (neighbor->get_fe ()))
@@ -3534,14 +3533,14 @@ namespace DoFTools
 
 
 
-  template<int dim, int spacedim>
+  template<class DH>
   void
   extract_level_dofs(const unsigned int       level,
-                     const MGDoFHandler<dim,spacedim> &dof,
+                     const DH &dof,
                      const ComponentMask &component_mask,
                      std::vector<bool>       &selected_dofs)
   {
-    const FiniteElement<dim,spacedim> &fe = dof.get_fe();
+    const FiniteElement<DH::dimension,DH::space_dimension> &fe = dof.get_fe();
 
     Assert(component_mask.represents_n_components(n_components(dof)),
            ExcMessage ("The given component mask is not sized correctly to represent the "
@@ -3575,7 +3574,7 @@ namespace DoFTools
 
     // then loop over all cells and do work
     std::vector<unsigned int> indices(fe.dofs_per_cell);
-    typename MGDoFHandler<dim,spacedim>::cell_iterator c;
+    typename DH::level_cell_iterator c;
     for (c = dof.begin(level) ; c != dof.end(level) ; ++ c)
       {
         c->get_mg_dof_indices(indices);
@@ -3586,10 +3585,10 @@ namespace DoFTools
 
 
 
-  template<int dim, int spacedim>
+  template<class DH>
   void
   extract_level_dofs(const unsigned int       level,
-                     const MGDoFHandler<dim,spacedim> &dof,
+                     const DH &dof,
                      const BlockMask         &block_mask,
                      std::vector<bool>       &selected_dofs)
   {
@@ -5651,8 +5650,8 @@ namespace DoFTools
     const std::vector<bool> &selected_dofs,
     unsigned int offset)
   {
-    typename DH::cell_iterator cell;
-    typename DH::cell_iterator endc = dof_handler.end(level);
+    typename DH::level_cell_iterator cell;
+    typename DH::level_cell_iterator endc = dof_handler.end(level);
     std::vector<unsigned int> indices;
 
     unsigned int i=0;
@@ -5687,8 +5686,8 @@ namespace DoFTools
   {
     const FiniteElement<DH::dimension> &fe = dof_handler.get_fe();
     block_list.reinit(1, dof_handler.n_dofs(level), dof_handler.n_dofs(level));
-    typename DH::cell_iterator cell;
-    typename DH::cell_iterator endc = dof_handler.end(level);
+    typename DH::level_cell_iterator cell;
+    typename DH::level_cell_iterator endc = dof_handler.end(level);
 
     std::vector<unsigned int> indices;
     std::vector<bool> exclude;
@@ -5733,9 +5732,9 @@ namespace DoFTools
     Assert(level > 0 && level < dof_handler.get_tria().n_levels(),
            ExcIndexRange(level, 1, dof_handler.get_tria().n_levels()));
 
-    typename DH::cell_iterator cell;
-    typename DH::cell_iterator pcell = dof_handler.begin(level-1);
-    typename DH::cell_iterator endc = dof_handler.end(level-1);
+    typename DH::level_cell_iterator cell;
+    typename DH::level_cell_iterator pcell = dof_handler.begin(level-1);
+    typename DH::level_cell_iterator endc = dof_handler.end(level-1);
 
     std::vector<unsigned int> indices;
     std::vector<bool> exclude;
@@ -5797,8 +5796,8 @@ namespace DoFTools
     const bool level_boundary_patches,
     const bool single_cell_patches)
   {
-    typename DH::cell_iterator cell;
-    typename DH::cell_iterator endc = dof_handler.end(level);
+    typename DH::level_cell_iterator cell;
+    typename DH::level_cell_iterator endc = dof_handler.end(level);
 
     // Vector mapping from vertex index in the triangulation to consecutive
     // block indices on this level The number of cells at a vertex

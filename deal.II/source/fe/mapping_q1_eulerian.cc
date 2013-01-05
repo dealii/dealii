@@ -61,11 +61,7 @@ compute_mapping_support_points(const typename Triangulation<dim,spacedim>::cell_
   // DoFHandler<dim>::cell_iterator
   // which is necessary for access to
   // DoFCellAccessor::get_dof_values()
-  typename DoFHandler<dim,spacedim>::cell_iterator
-  dof_cell (const_cast<Triangulation<dim,spacedim> *> (&(cell->get_triangulation())),
-            cell->level(),
-            cell->index(),
-            shiftmap_dof_handler);
+  typename DoFHandler<dim,spacedim>::cell_iterator dof_cell (*cell, shiftmap_dof_handler);
 
   // We require the cell to be active
   // since we can only then get nodal

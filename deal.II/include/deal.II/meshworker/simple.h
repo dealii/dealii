@@ -751,6 +751,8 @@ namespace MeshWorker
     inline void
     MatrixSimple<MATRIX>::assemble(const DOFINFO &info)
     {
+      Assert(!info.level_cell, ExcMessage("Cell may not access level dofs"));
+
       if (local_indices.size() == 0)
         assemble(info.matrix(0,false).matrix, info.indices, info.indices);
       else
@@ -770,6 +772,9 @@ namespace MeshWorker
     inline void
     MatrixSimple<MATRIX>::assemble(const DOFINFO &info1, const DOFINFO &info2)
     {
+      Assert(!info1.level_cell, ExcMessage("Cell may not access level dofs"));
+      Assert(!info2.level_cell, ExcMessage("Cell may not access level dofs"));
+
       if (local_indices.size() == 0)
         {
           assemble(info1.matrix(0,false).matrix, info1.indices, info1.indices);
@@ -1111,6 +1116,7 @@ namespace MeshWorker
     inline void
     MGMatrixSimple<MATRIX>::assemble(const DOFINFO &info)
     {
+      Assert(info.level_cell, ExcMessage("Cell must access level dofs"));
       const unsigned int level = info.cell->level();
 
       if (local_indices.size() == 0)
@@ -1151,6 +1157,8 @@ namespace MeshWorker
     MGMatrixSimple<MATRIX>::assemble(const DOFINFO &info1,
                                      const DOFINFO &info2)
     {
+      Assert(info1.level_cell, ExcMessage("Cell must access level dofs"));
+      Assert(info2.level_cell, ExcMessage("Cell must access level dofs"));
       const unsigned int level1 = info1.cell->level();
       const unsigned int level2 = info2.cell->level();
 

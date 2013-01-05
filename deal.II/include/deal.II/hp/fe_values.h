@@ -405,78 +405,9 @@ namespace hp
      * unless a different value for
      * this argument is specified.
      */
+    template <class DH, bool lda>
     void
-    reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
-            const unsigned int q_index = numbers::invalid_unsigned_int,
-            const unsigned int mapping_index = numbers::invalid_unsigned_int,
-            const unsigned int fe_index = numbers::invalid_unsigned_int);
-
-    /**
-     * Like the previous function,
-     * but for non-hp
-     * iterators. The reason this
-     * (and the other non-hp
-     * iterator) function exists is
-     * so that one can use
-     * hp::FEValues not only for
-     * hp::DoFhandler objects, but
-     * for all sorts of DoFHandler
-     * objects, and triangulations
-     * not associated with
-     * DoFHandlers in general.
-     *
-     * Since
-     * <code>cell-@>active_fe_index()</code>
-     * always returns zero for
-     * non-hp iterators, this
-     * function chooses the zero-th
-     * finite element, mapping, and
-     * quadrature object from the
-     * relevant constructions
-     * passed to the constructor of
-     * this object. The only
-     * exception is if you specify
-     * a value different from the
-     * default value for any of
-     * these last three arguments.
-     */
-    void
-    reinit (const typename dealii::DoFHandler<dim,spacedim>::cell_iterator &cell,
-            const unsigned int q_index = numbers::invalid_unsigned_int,
-            const unsigned int mapping_index = numbers::invalid_unsigned_int,
-            const unsigned int fe_index = numbers::invalid_unsigned_int);
-
-    /**
-     * Like the previous function,
-     * but for non-hp
-     * iterators. The reason this
-     * (and the other non-hp
-     * iterator) function exists is
-     * so that one can use
-     * hp::FEValues not only for
-     * hp::DoFhandler objects, but
-     * for all sorts of DoFHandler
-     * objects, and triangulations
-     * not associated with
-     * DoFHandlers in general.
-     *
-     * Since
-     * <code>cell-@>active_fe_index()</code>
-     * always returns zero for
-     * non-hp iterators, this
-     * function chooses the zero-th
-     * finite element, mapping, and
-     * quadrature object from the
-     * relevant constructions
-     * passed to the constructor of
-     * this object. The only
-     * exception is if you specify
-     * a value different from the
-     * default value for any of
-     * these last three arguments.
-     */
-    void
-    reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
+    reinit (const TriaIterator<DoFCellAccessor<DH,lda> > cell,
             const unsigned int q_index = numbers::invalid_unsigned_int,
             const unsigned int mapping_index = numbers::invalid_unsigned_int,
             const unsigned int fe_index = numbers::invalid_unsigned_int);
@@ -700,80 +631,9 @@ namespace hp
      * unless a different value for
      * this argument is specified.
      */
+    template <class DH, bool lda>
     void
-    reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
-            const unsigned int face_no,
-            const unsigned int q_index = numbers::invalid_unsigned_int,
-            const unsigned int mapping_index = numbers::invalid_unsigned_int,
-            const unsigned int fe_index = numbers::invalid_unsigned_int);
-
-    /**
-     * Like the previous function,
-     * but for non-hp
-     * iterators. The reason this
-     * (and the other non-hp
-     * iterator) function exists is
-     * so that one can use
-     * hp::FEValues not only for
-     * hp::DoFhandler objects, but
-     * for all sorts of DoFHandler
-     * objects, and triangulations
-     * not associated with
-     * DoFHandlers in general.
-     *
-     * Since
-     * <code>cell-@>active_fe_index()</code>
-     * always returns zero for
-     * non-hp iterators, this
-     * function chooses the zero-th
-     * finite element, mapping, and
-     * quadrature object from the
-     * relevant constructions
-     * passed to the constructor of
-     * this object. The only
-     * exception is if you specify
-     * a value different from the
-     * default value for any of
-     * these last three arguments.
-     */
-    void
-    reinit (const typename dealii::DoFHandler<dim,spacedim>::cell_iterator &cell,
-            const unsigned int face_no,
-            const unsigned int q_index = numbers::invalid_unsigned_int,
-            const unsigned int mapping_index = numbers::invalid_unsigned_int,
-            const unsigned int fe_index = numbers::invalid_unsigned_int);
-
-    /**
-     * Like the previous function,
-     * but for non-hp
-     * iterators. The reason this
-     * (and the other non-hp
-     * iterator) function exists is
-     * so that one can use
-     * hp::FEValues not only for
-     * hp::DoFhandler objects, but
-     * for all sorts of DoFHandler
-     * objects, and triangulations
-     * not associated with
-     * DoFHandlers in general.
-     *
-     * Since
-     * <code>cell-@>active_fe_index()</code>
-     * always returns zero for
-     * non-hp iterators, this
-     * function chooses the zero-th
-     * finite element, mapping, and
-     * quadrature object from the
-     * relevant constructions
-     * passed to the constructor of
-     * this object. The only
-     * exception is if you specify
-     * a value different from the
-     * default value for any of
-     * these last three arguments.
-     */
-    void
-    reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
+    reinit (const TriaIterator<DoFCellAccessor<DH,lda> > cell,
             const unsigned int face_no,
             const unsigned int q_index = numbers::invalid_unsigned_int,
             const unsigned int mapping_index = numbers::invalid_unsigned_int,
@@ -960,82 +820,9 @@ namespace hp
      * unless a different value for
      * this argument is specified.
      */
+    template <class DH, bool lda>
     void
-    reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
-            const unsigned int face_no,
-            const unsigned int subface_no,
-            const unsigned int q_index = numbers::invalid_unsigned_int,
-            const unsigned int mapping_index = numbers::invalid_unsigned_int,
-            const unsigned int fe_index = numbers::invalid_unsigned_int);
-
-    /**
-     * Like the previous function,
-     * but for non-hp
-     * iterators. The reason this
-     * (and the other non-hp
-     * iterator) function exists is
-     * so that one can use
-     * hp::FEValues not only for
-     * hp::DoFhandler objects, but
-     * for all sorts of DoFHandler
-     * objects, and triangulations
-     * not associated with
-     * DoFHandlers in general.
-     *
-     * Since
-     * <code>cell-@>active_fe_index()</code>
-     * always returns zero for
-     * non-hp iterators, this
-     * function chooses the zero-th
-     * finite element, mapping, and
-     * quadrature object from the
-     * relevant constructions
-     * passed to the constructor of
-     * this object. The only
-     * exception is if you specify
-     * a value different from the
-     * default value for any of
-     * these last three arguments.
-     */
-    void
-    reinit (const typename dealii::DoFHandler<dim,spacedim>::cell_iterator &cell,
-            const unsigned int face_no,
-            const unsigned int subface_no,
-            const unsigned int q_index = numbers::invalid_unsigned_int,
-            const unsigned int mapping_index = numbers::invalid_unsigned_int,
-            const unsigned int fe_index = numbers::invalid_unsigned_int);
-
-    /**
-     * Like the previous function,
-     * but for non-hp
-     * iterators. The reason this
-     * (and the other non-hp
-     * iterator) function exists is
-     * so that one can use
-     * hp::FEValues not only for
-     * hp::DoFhandler objects, but
-     * for all sorts of DoFHandler
-     * objects, and triangulations
-     * not associated with
-     * DoFHandlers in general.
-     *
-     * Since
-     * <code>cell-@>active_fe_index()</code>
-     * always returns zero for
-     * non-hp iterators, this
-     * function chooses the zero-th
-     * finite element, mapping, and
-     * quadrature object from the
-     * relevant constructions
-     * passed to the constructor of
-     * this object. The only
-     * exception is if you specify
-     * a value different from the
-     * default value for any of
-     * these last three arguments.
-     */
-    void
-    reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
+    reinit (const TriaIterator<DoFCellAccessor<DH,lda> > cell,
             const unsigned int face_no,
             const unsigned int subface_no,
             const unsigned int q_index = numbers::invalid_unsigned_int,
