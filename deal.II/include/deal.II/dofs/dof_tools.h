@@ -1383,10 +1383,10 @@ namespace DoFTools
    * extract_dofs() functino for one level
    * of a multi-grid DoF numbering.
    */
-  template <int dim, int spacedim>
+  template <class DH>
   void
   extract_level_dofs (const unsigned int       level,
-                      const MGDoFHandler<dim,spacedim> &dof,
+                      const DH &dof,
                       const ComponentMask     &component_mask,
                       std::vector<bool>       &selected_dofs);
 
@@ -1395,10 +1395,10 @@ namespace DoFTools
    * extract_dofs() functino for one level
    * of a multi-grid DoF numbering.
    */
-  template <int dim, int spacedim>
+  template <class DH>
   void
   extract_level_dofs (const unsigned int       level,
-                      const MGDoFHandler<dim,spacedim> &dof,
+                      const DH &dof,
                       const BlockMask     &component_mask,
                       std::vector<bool>       &selected_dofs);
 
@@ -1864,7 +1864,6 @@ namespace DoFTools
   IndexSet
   dof_indices_with_subdomain_association (const DH           &dof_handler,
                                           const types::subdomain_id subdomain);
-
   // @}
   /**
    * @name Dof indices for patches
@@ -2644,6 +2643,7 @@ namespace DoFTools
   /**
    * Same as the previous function but for the hp case.
    */
+
   template <int dim, int spacedim>
   void
   map_dofs_to_support_points (const dealii::hp::MappingCollection<dim,spacedim>   &mapping,
@@ -2691,6 +2691,7 @@ namespace DoFTools
   map_dofs_to_support_points (const dealii::hp::MappingCollection<dim,spacedim>   &mapping,
                               const hp::DoFHandler<dim,spacedim>    &dof_handler,
                               std::map<unsigned int, Point<spacedim> > &support_points);
+
 
   /**
    * This is the opposite function

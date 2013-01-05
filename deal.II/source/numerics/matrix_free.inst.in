@@ -16,39 +16,6 @@ for (deal_II_dimension : DIMENSIONS)
   template class MatrixFree<deal_II_dimension,double>;
   template class MatrixFree<deal_II_dimension,float>;
 
-  // reinit for DoFHandler
-  template void MatrixFree<deal_II_dimension,double>::internal_reinit
-  (const Mapping<deal_II_dimension>                           &,
-   const std::vector<const DoFHandler<deal_II_dimension>*>    &,
-   const std::vector<const ConstraintMatrix*>                 &,
-   const std::vector<IndexSet>                                &,
-   const std::vector<hp::QCollection<1> >                     &,
-   const MatrixFree<deal_II_dimension,double>::AdditionalData);
-  template void MatrixFree<deal_II_dimension,float>::internal_reinit
-  (const Mapping<deal_II_dimension>                           &,
-   const std::vector<const DoFHandler<deal_II_dimension>*>    &,
-   const std::vector<const ConstraintMatrix*>                 &,
-   const std::vector<IndexSet>                                &,
-   const std::vector<hp::QCollection<1> >                     &,
-   const MatrixFree<deal_II_dimension,float>::AdditionalData);
-
-
-  // reinit for MGDoFHandler
-  template void MatrixFree<deal_II_dimension,double>::internal_reinit
-  (const Mapping<deal_II_dimension>                           &,
-   const std::vector<const MGDoFHandler<deal_II_dimension>*>  &,
-   const std::vector<const ConstraintMatrix*>                 &,
-   const std::vector<IndexSet>                                &,
-   const std::vector<hp::QCollection<1> >                     &,
-   const MatrixFree<deal_II_dimension,double>::AdditionalData);
-  template void MatrixFree<deal_II_dimension,float>::internal_reinit
-  (const Mapping<deal_II_dimension>                           &,
-   const std::vector<const MGDoFHandler<deal_II_dimension>*>  &,
-   const std::vector<const ConstraintMatrix*>                 &,
-   const std::vector<IndexSet>                                &,
-   const std::vector<hp::QCollection<1> >                     &,
-   const MatrixFree<deal_II_dimension,float>::AdditionalData);
-
   template void MatrixFree<deal_II_dimension,double>::
   print_memory_consumption<std::ostream> (std::ostream &) const;
   template void MatrixFree<deal_II_dimension,double>::

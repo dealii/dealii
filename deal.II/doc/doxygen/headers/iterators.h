@@ -239,21 +239,18 @@ of accessor classes:
   topological connection of a mesh is available from an accessor such as to
   request iterators pointing to neighbors of a cell.
 
-- The DoFAccessor class lets you access information related to degrees of
-  freedom associated with cells, faces, etc; it does so for both DoFHandler
-  and hp::DoFHandler objects. Note that the DoFAccessor class is derived from
-  either TriaAccessor or CellAccessor (depending on whether the DoFAccessor
-  points to an object of full dimension or not) and so is able to provide a
-  superset of information over its base classes.
+- The DoFAccessor class lets you access information related to degrees
+  of freedom associated with cells, faces, etc; it does so for both
+  DoFHandler and hp::DoFHandler objects. Note that the DoFAccessor
+  class is derived from either TriaAccessor or CellAccessor (depending
+  on whether the DoFAccessor points to an object of full dimension or
+  not) and so is able to provide a superset of information over its
+  base classes. Additionally, the DoFAccessor class comes in two
+  flavors, one accessing degrees of freedom on the level of a cell and
+  the other accessing the active dofs of an active cell.
 
 - The DoFCellAccessor class has the same purpose and relation to
   DoFCellAccessor as the CellAccessor has to TriaAccessor.
-
-- The MGDoFAccessor and MFCellDoFAccessor give access to the multilevel degree
-  of freedom information associated with MGDoFHandler objects. As before,
-  since the MGDoFHandler extends the data structures of regular DoFHandler
-  objects, the MGDoFAccessor is also derived from the DoFAccessor (or
-  DoFCellAccessor) class to provide a superset of information.
 
 Except to look up member documentation, you will not usually have to deal with
 the actual class names listed above. Rather, one uses the typedefs provided by

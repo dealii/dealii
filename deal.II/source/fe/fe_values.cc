@@ -3081,119 +3081,6 @@ FEValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
 
 template <int dim, int spacedim>
-void
-FEValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spacedim>::cell_iterator &cell)
-{
-  // assert that the finite elements
-  // passed to the constructor and
-  // used by the DoFHandler used by
-  // this cell, are the same
-
-  typedef FEValuesBase<dim,spacedim> FEVB;
-  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-          static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
-          typename FEVB::ExcFEDontMatch());
-
-  this->maybe_invalidate_previous_present_cell (cell);
-  this->check_cell_similarity(cell);
-
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of this class
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::template
-   CellIterator<typename DoFHandler<dim,spacedim>::cell_iterator> (cell));
-
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
-  // the real work.
-  do_reinit ();
-}
-
-
-
-template <int dim, int spacedim>
-void
-FEValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell)
-{
-  // assert that the finite elements
-  // passed to the constructor and
-  // used by the DoFHandler used by
-  // this cell, are the same
-  typedef FEValuesBase<dim,spacedim> FEVB;
-  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-          static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
-          typename FEVB::ExcFEDontMatch());
-
-  this->maybe_invalidate_previous_present_cell (cell);
-  this->check_cell_similarity(cell);
-
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of this class
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::template
-   CellIterator<typename hp::DoFHandler<dim,spacedim>::cell_iterator> (cell));
-
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
-  // the real work.
-  do_reinit ();
-}
-
-
-template <int dim, int spacedim>
-void
-FEValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell)
-{
-  if (spacedim > dim)
-    {
-      Assert(false, ExcNotImplemented());
-      return;
-    }
-
-  // assert that the finite elements
-  // passed to the constructor and
-  // used by the DoFHandler used by
-  // this cell, are the same
-
-//TODO: This was documented out ith the repository. Why?
-
-//  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-//        static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
-//        typename FEValuesBase<dim,spacedim>::ExcFEDontMatch());
-
-  this->maybe_invalidate_previous_present_cell (cell);
-  this->check_cell_similarity(cell);
-
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of this class
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::template
-   CellIterator<typename MGDoFHandler<dim,spacedim>::cell_iterator> (cell));
-
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
-  // the real work.
-  do_reinit ();
-}
-
-
-
-template <int dim, int spacedim>
 void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>::cell_iterator &cell)
 {
   // no FE in this cell, so no assertion
@@ -3208,6 +3095,42 @@ void FEValues<dim,spacedim>::reinit (const typename Triangulation<dim,spacedim>:
   // destruction of this class
   this->present_cell.reset
   (new typename FEValuesBase<dim,spacedim>::TriaCellIterator (cell));
+  // this was the part of the work
+  // that is dependent on the actual
+  // data type of the iterator. now
+  // pass on to the function doing
+  // the real work.
+  do_reinit ();
+}
+
+
+
+template <int dim, int spacedim>
+template <class DH, bool lda>
+void
+FEValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > cell)
+{
+  // assert that the finite elements
+  // passed to the constructor and
+  // used by the DoFHandler used by
+  // this cell, are the same
+  typedef FEValuesBase<dim,spacedim> FEVB;
+  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
+          static_cast<const FiniteElementData<dim>&>(cell->get_fe()),
+          typename FEVB::ExcFEDontMatch());
+
+  this->maybe_invalidate_previous_present_cell (cell);
+  this->check_cell_similarity(cell);
+
+  // set new cell. auto_ptr will take
+  // care that old object gets
+  // destroyed and also that this
+  // object gets destroyed in the
+  // destruction of this class
+  this->present_cell.reset
+  (new typename FEValuesBase<dim,spacedim>::template
+   CellIterator<TriaIterator<DoFCellAccessor<DH, lda> > > (cell));
+
   // this was the part of the work
   // that is dependent on the actual
   // data type of the iterator. now
@@ -3359,43 +3282,10 @@ FEFaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 
 
 template <int dim, int spacedim>
-void FEFaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spacedim>::cell_iterator &cell,
-                                         const unsigned int              face_no)
-{
-  // assert that the finite elements
-  // passed to the constructor and
-  // used by the DoFHandler used by
-  // this cell, are the same
-//   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-//        static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
-//        typename FEValuesBase<dim,spacedim>::ExcFEDontMatch());
-
-  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
-          ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of this class
-  this->maybe_invalidate_previous_present_cell (cell);
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::template
-   CellIterator<typename DoFHandler<dim,spacedim>::cell_iterator> (cell));
-
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
-  // the real work.
-  do_reinit (face_no);
-}
-
-
-
-template <int dim, int spacedim>
-void FEFaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
-                                         const unsigned int              face_no)
+template <class DH, bool lda>
+void
+FEFaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > cell,
+                                    const unsigned int face_no)
 {
   // assert that the finite elements
   // passed to the constructor and
@@ -3418,7 +3308,7 @@ void FEFaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,space
   this->maybe_invalidate_previous_present_cell (cell);
   this->present_cell.reset
   (new typename FEValuesBase<dim,spacedim>::template
-   CellIterator<typename hp::DoFHandler<dim,spacedim>::cell_iterator> (cell));
+   CellIterator<TriaIterator<DoFCellAccessor<DH, lda> > > (cell));
 
   // this was the part of the work
   // that is dependent on the actual
@@ -3428,46 +3318,6 @@ void FEFaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,space
   do_reinit (face_no);
 }
 
-
-
-template <int dim, int spacedim>
-void FEFaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
-                                         const unsigned int              face_no)
-{
-  if (spacedim > dim)
-    {
-      Assert(false,ExcNotImplemented());
-      return;
-    }
-  // assert that the finite elements
-  // passed to the constructor and
-  // used by the DoFHandler used by
-  // this cell, are the same
-  typedef FEValuesBase<dim,spacedim> FEVB;
-  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-          static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
-          typename FEVB::ExcFEDontMatch());
-
-  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
-          ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of this class
-  this->maybe_invalidate_previous_present_cell (cell);
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::template
-   CellIterator<typename MGDoFHandler<dim,spacedim>::cell_iterator> (cell));
-
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
-  // the real work.
-  do_reinit (face_no);
-}
 
 
 template <int dim, int spacedim>
@@ -3589,19 +3439,21 @@ FESubfaceValues<dim,spacedim>::initialize (const UpdateFlags update_flags)
 }
 
 
-
 template <int dim, int spacedim>
-void FESubfaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spacedim>::cell_iterator &cell,
+template <class DH, bool lda>
+void FESubfaceValues<dim,spacedim>::reinit (const TriaIterator<DoFCellAccessor<DH, lda> > cell,
                                             const unsigned int         face_no,
                                             const unsigned int         subface_no)
 {
   // assert that the finite elements
   // passed to the constructor and
-  // used by the DoFHandler used by
+  // used by the hp::DoFHandler used by
   // this cell, are the same
-//   Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-//        static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
-//        typename FEValuesBase<dim,spacedim>::ExcFEDontMatch());
+  typedef FEValuesBase<dim,spacedim> FEVB;
+  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
+          static_cast<const FiniteElementData<dim>&>(
+            cell->get_dof_handler().get_fe()[cell->active_fe_index ()]),
+          typename FEVB::ExcFEDontMatch());
   Assert (face_no < GeometryInfo<dim>::faces_per_cell,
           ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
   // We would like to check for
@@ -3618,7 +3470,6 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spaced
   Assert (!cell->face(face_no)->has_children() ||
           subface_no < cell->face(face_no)->number_of_children(),
           ExcIndexRange (subface_no, 0, cell->face(face_no)->number_of_children()));
-
   Assert (cell->has_children() == false,
           ExcMessage ("You can't use subface data for cells that are "
                       "already refined. Iterate over their children "
@@ -3632,7 +3483,7 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spaced
   this->maybe_invalidate_previous_present_cell (cell);
   this->present_cell.reset
   (new typename FEValuesBase<dim,spacedim>::template
-   CellIterator<typename DoFHandler<dim,spacedim>::cell_iterator> (cell));
+   CellIterator<TriaIterator<DoFCellAccessor<DH, lda> > > (cell));
 
   // this was the part of the work
   // that is dependent on the actual
@@ -3641,87 +3492,6 @@ void FESubfaceValues<dim,spacedim>::reinit (const typename DoFHandler<dim,spaced
   // the real work.
   do_reinit (face_no, subface_no);
 }
-
-
-
-template <int dim, int spacedim>
-void FESubfaceValues<dim,spacedim>::reinit (const typename hp::DoFHandler<dim,spacedim>::cell_iterator &cell,
-                                            const unsigned int         face_no,
-                                            const unsigned int         subface_no)
-{
-  // assert that the finite elements
-  // passed to the constructor and
-  // used by the hp::DoFHandler used by
-  // this cell, are the same
-  typedef FEValuesBase<dim,spacedim> FEVB;
-  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-          static_cast<const FiniteElementData<dim>&>(
-            cell->get_dof_handler().get_fe()[cell->active_fe_index ()]),
-          typename FEVB::ExcFEDontMatch());
-  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
-          ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-  Assert (subface_no < cell->face(face_no)->number_of_children(),
-          ExcIndexRange (subface_no, 0, cell->face(face_no)->number_of_children()));
-  Assert (cell->has_children() == false,
-          ExcMessage ("You can't use subface data for cells that are "
-                      "already refined. Iterate over their children "
-                      "instead in these cases."));
-
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of this class
-  this->maybe_invalidate_previous_present_cell (cell);
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::template
-   CellIterator<typename hp::DoFHandler<dim,spacedim>::cell_iterator> (cell));
-
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
-  // the real work.
-  do_reinit (face_no, subface_no);
-}
-
-
-template <int dim, int spacedim>
-void FESubfaceValues<dim,spacedim>::reinit (const typename MGDoFHandler<dim,spacedim>::cell_iterator &cell,
-                                            const unsigned int         face_no,
-                                            const unsigned int         subface_no)
-{
-  typedef FEValuesBase<dim,spacedim> FEVB;
-  Assert (static_cast<const FiniteElementData<dim>&>(*this->fe) ==
-          static_cast<const FiniteElementData<dim>&>(cell->get_dof_handler().get_fe()),
-          typename FEVB::ExcFEDontMatch());
-  Assert (face_no < GeometryInfo<dim>::faces_per_cell,
-          ExcIndexRange (face_no, 0, GeometryInfo<dim>::faces_per_cell));
-  Assert (subface_no < cell->face(face_no)->number_of_children(),
-          ExcIndexRange (subface_no, 0, cell->face(face_no)->number_of_children()));
-  Assert (cell->has_children() == false,
-          ExcMessage ("You can't use subface data for cells that are "
-                      "already refined. Iterate over their children "
-                      "instead in these cases."));
-
-  // set new cell. auto_ptr will take
-  // care that old object gets
-  // destroyed and also that this
-  // object gets destroyed in the
-  // destruction of this class
-  this->maybe_invalidate_previous_present_cell (cell);
-  this->present_cell.reset
-  (new typename FEValuesBase<dim,spacedim>::template
-   CellIterator<typename MGDoFHandler<dim,spacedim>::cell_iterator> (cell));
-
-  // this was the part of the work
-  // that is dependent on the actual
-  // data type of the iterator. now
-  // pass on to the function doing
-  // the real work.
-  do_reinit (face_no, subface_no);
-}
-
 
 
 template <int dim, int spacedim>

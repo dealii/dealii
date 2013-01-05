@@ -1137,12 +1137,14 @@ namespace PETScWrappers
     is_hermitian (const double tolerance = 1.e-12);
 
     /**
-     * Abstract PETSc object that helps view
-     * in ASCII other PETSc objects. Currently
-     * this function simply writes non-zero
-     * elements of a matrix to the terminal.
+     * Prints the PETSc matrix object values
+     * using PETSc internal matrix viewer function
+     * <tt>MatView</tt>. The default format prints
+     * the non-zero matrix elements. For other valid
+     * view formats, consult
+     * http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Mat/MatView.html
      */
-    void write_ascii ();
+    void write_ascii (const PetscViewerFormat format = PETSC_VIEWER_DEFAULT);
 
     /**
      *  Returns the number bytes consumed

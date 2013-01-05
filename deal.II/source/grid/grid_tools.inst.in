@@ -12,6 +12,15 @@
 //---------------------------------------------------------------------------
 
 
+for (deal_II_dimension : DIMENSIONS)
+  {
+  namespace GridTools \{
+  template
+    std::list<std::pair<MGDoFHandler<deal_II_dimension>::cell_iterator, MGDoFHandler<deal_II_dimension>::cell_iterator> >
+    get_finest_common_cells (const MGDoFHandler<deal_II_dimension> &mesh_1,
+  			     const MGDoFHandler<deal_II_dimension> &mesh_2);
+  \}
+  }
 
 for (X : TRIANGULATION_AND_DOFHANDLERS; deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
 {

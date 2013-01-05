@@ -2839,6 +2839,14 @@ public:
   unsigned int n_levels () const;
 
   /**
+   * Return the number of levels in use. This function is equivalent to
+   * n_levels() for a serial Triangulation, but gives the maximum of
+   * n_levels() over all processors for a parallel::distributed::Triangulation
+   * and therefore can be larger than n_levels().
+   */
+  virtual unsigned int n_global_levels () const;
+
+  /**
    * Return the total number of
    * vertices.  Some of them may
    * not be used, which usually
@@ -3679,6 +3687,12 @@ unsigned int Triangulation<dim, spacedim>::n_levels () const
   return number_cache.n_levels;
 }
 
+template <int dim, int spacedim>
+inline
+unsigned int Triangulation<dim, spacedim>::n_global_levels () const
+{
+  return number_cache.n_levels;
+}
 
 
 template <int dim, int spacedim>

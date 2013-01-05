@@ -51,125 +51,132 @@ namespace TrilinosWrappers
 
   namespace SparsityPatternIterators
   {
+    // forward declaration
+    class Iterator;
+
     /**
-     * STL conforming iterator. This class acts as an iterator walking
-     * over the elements of Trilinos sparsity pattern.
+     * Accessor class for iterators into sparsity patterns. This class is
+     * also the base class for both const and non-const accessor classes
+     * into sparse matrices.
+     *
+     * Note that this class only allows read access to elements, providing
+     * their row and column number. It does not allow modifying the
+     * sparsity pattern itself.
      *
      * @ingroup TrilinosWrappers
-     * @author Martin Kronbichler, Wolfgang Bangerth, 2008
+     * @author Wolfgang Bangerth, Martin Kronbichler, Guido Kanschat
+     * @date 2004, 2008, 2012
      */
-    class const_iterator
+    class Accessor
     {
+    public:
+      /**
+       * Constructor.
+       */
+      Accessor (const SparsityPattern *sparsity_pattern,
+                const unsigned int     row,
+                const unsigned int     index);
+
+      /**
+       * Row number of the element
+       * represented by this object.
+       */
+      unsigned int row() const;
+
+      /**
+       * Index in row of the element
+       * represented by this object.
+       */
+      unsigned int index() const;
+
+      /**
+       * Column number of the element
+       * represented by this object.
+       */
+      unsigned int column() const;
+
+      /**
+       * Exception
+       */
+      DeclException0 (ExcBeyondEndOfSparsityPattern);
+
+      /**
+       * Exception
+       */
+      DeclException3 (ExcAccessToNonlocalRow,
+                      int, int, int,
+                      << "You tried to access row " << arg1
+                      << " of a distributed sparsity pattern, "
+                      << " but only rows " << arg2 << " through " << arg3
+                      << " are stored locally and can be accessed.");
+
     private:
       /**
-       * Accessor class for iterators
+       * The matrix accessed.
        */
-      class Accessor
-      {
-      public:
-        /**
-         * Constructor. Since we use
-         * accessors only for read
-         * access, a const matrix
-         * pointer is sufficient.
-         */
-        Accessor (const SparsityPattern *sparsity_pattern,
-                  const unsigned int     row,
-                  const unsigned int     index);
+      mutable SparsityPattern *sparsity_pattern;
 
-        /**
-         * Row number of the element
-         * represented by this object.
-         */
-        unsigned int row() const;
+      /**
+       * Current row number.
+       */
+      unsigned int a_row;
 
-        /**
-         * Index in row of the element
-         * represented by this object.
-         */
-        unsigned int index() const;
+      /**
+       * Current index in row.
+       */
+      unsigned int a_index;
 
-        /**
-         * Column number of the element
-         * represented by this object.
-         */
-        unsigned int column() const;
+      /**
+       * Cache where we store the
+       * column indices of the
+       * present row. This is
+       * necessary, since Trilinos
+       * makes access to the elements
+       * of its matrices rather hard,
+       * and it is much more
+       * efficient to copy all column
+       * entries of a row once when
+       * we enter it than repeatedly
+       * asking Trilinos for
+       * individual ones. This also
+       * makes some sense since it is
+       * likely that we will access
+       * them sequentially anyway.
+       *
+       * In order to make copying of
+       * iterators/accessor of
+       * acceptable performance, we
+       * keep a shared pointer to
+       * these entries so that more
+       * than one accessor can access
+       * this data if necessary.
+       */
+      std_cxx1x::shared_ptr<const std::vector<unsigned int> > colnum_cache;
 
-        /**
-         * Exception
-         */
-        DeclException0 (ExcBeyondEndOfSparsityPattern);
+      /**
+       * Discard the old row caches
+       * (they may still be used by
+       * other accessors) and
+       * generate new ones for the
+       * row pointed to presently by
+       * this accessor.
+       */
+      void visit_present_row ();
 
-        /**
-         * Exception
-         */
-        DeclException3 (ExcAccessToNonlocalRow,
-                        int, int, int,
-                        << "You tried to access row " << arg1
-                        << " of a distributed sparsity pattern, "
-                        << " but only rows " << arg2 << " through " << arg3
-                        << " are stored locally and can be accessed.");
+      /**
+       * Make enclosing class a
+       * friend.
+       */
+      friend class Iterator;
+    };
 
-      private:
-        /**
-         * The matrix accessed.
-         */
-        mutable SparsityPattern *sparsity_pattern;
-
-        /**
-         * Current row number.
-         */
-        unsigned int a_row;
-
-        /**
-         * Current index in row.
-         */
-        unsigned int a_index;
-
-        /**
-         * Cache where we store the
-         * column indices of the
-         * present row. This is
-         * necessary, since Trilinos
-         * makes access to the elements
-         * of its matrices rather hard,
-         * and it is much more
-         * efficient to copy all column
-         * entries of a row once when
-         * we enter it than repeatedly
-         * asking Trilinos for
-         * individual ones. This also
-         * makes some sense since it is
-         * likely that we will access
-         * them sequentially anyway.
-         *
-         * In order to make copying of
-         * iterators/accessor of
-         * acceptable performance, we
-         * keep a shared pointer to
-         * these entries so that more
-         * than one accessor can access
-         * this data if necessary.
-         */
-        std_cxx1x::shared_ptr<const std::vector<unsigned int> > colnum_cache;
-
-        /**
-         * Discard the old row caches
-         * (they may still be used by
-         * other accessors) and
-         * generate new ones for the
-         * row pointed to presently by
-         * this accessor.
-         */
-        void visit_present_row ();
-
-        /**
-         * Make enclosing class a
-         * friend.
-         */
-        friend class const_iterator;
-      };
-
+    /**
+     * Iterator class for sparsity patterns of type TrilinosWrappers::SparsityPattern.
+     * Access to individual elements of the sparsity pattern is handled by the
+     * Accessor class in this namespace.
+     */
+    class Iterator
+    {
     public:
 
       /**
@@ -178,19 +185,19 @@ namespace TrilinosWrappers
        * matrix for the given row and
        * the index within it.
        */
-      const_iterator (const SparsityPattern *sparsity_pattern,
-                      const unsigned int     row,
-                      const unsigned int     index);
+      Iterator (const SparsityPattern *sparsity_pattern,
+                const unsigned int     row,
+                const unsigned int     index);
 
       /**
        * Prefix increment.
        */
-      const_iterator &operator++ ();
+      Iterator &operator++ ();
 
       /**
        * Postfix increment.
        */
-      const_iterator operator++ (int);
+      Iterator operator++ (int);
 
       /**
        * Dereferencing operator.
@@ -207,12 +214,12 @@ namespace TrilinosWrappers
        * iterators point to the same
        * matrix position.
        */
-      bool operator == (const const_iterator &) const;
+      bool operator == (const Iterator &) const;
 
       /**
        * Inverse of <tt>==</tt>.
        */
-      bool operator != (const const_iterator &) const;
+      bool operator != (const Iterator &) const;
 
       /**
        * Comparison operator. Result
@@ -222,7 +229,7 @@ namespace TrilinosWrappers
        * and the first index is
        * smaller.
        */
-      bool operator < (const const_iterator &) const;
+      bool operator < (const Iterator &) const;
 
       /**
        * Exception
@@ -274,7 +281,7 @@ namespace TrilinosWrappers
      * Declare a typedef for the
      * iterator class.
      */
-    typedef SparsityPatternIterators::const_iterator const_iterator;
+    typedef SparsityPatternIterators::Iterator const_iterator;
 
     /**
      * @name Basic constructors and initalization.
@@ -1359,8 +1366,8 @@ namespace TrilinosWrappers
      */
     std_cxx1x::shared_ptr<Epetra_FECrsGraph> graph;
 
-    friend class SparsityPatternIterators::const_iterator;
-    friend class SparsityPatternIterators::const_iterator::Accessor;
+    friend class SparsityPatternIterators::Accessor;
+    friend class SparsityPatternIterators::Iterator;
   };
 
 
@@ -1374,10 +1381,9 @@ namespace TrilinosWrappers
   {
 
     inline
-    const_iterator::Accessor::
-    Accessor (const SparsityPattern *sp,
-              const unsigned int     row,
-              const unsigned int     index)
+    Accessor::Accessor (const SparsityPattern *sp,
+                        const unsigned int     row,
+                        const unsigned int     index)
       :
       sparsity_pattern(const_cast<SparsityPattern *>(sp)),
       a_row(row),
@@ -1389,7 +1395,7 @@ namespace TrilinosWrappers
 
     inline
     unsigned int
-    const_iterator::Accessor::row() const
+    Accessor::row() const
     {
       Assert (a_row < sparsity_pattern->n_rows(), ExcBeyondEndOfSparsityPattern());
       return a_row;
@@ -1399,7 +1405,7 @@ namespace TrilinosWrappers
 
     inline
     unsigned int
-    const_iterator::Accessor::column() const
+    Accessor::column() const
     {
       Assert (a_row < sparsity_pattern->n_rows(), ExcBeyondEndOfSparsityPattern());
       return (*colnum_cache)[a_index];
@@ -1409,7 +1415,7 @@ namespace TrilinosWrappers
 
     inline
     unsigned int
-    const_iterator::Accessor::index() const
+    Accessor::index() const
     {
       Assert (a_row < sparsity_pattern->n_rows(), ExcBeyondEndOfSparsityPattern());
       return a_index;
@@ -1418,10 +1424,9 @@ namespace TrilinosWrappers
 
 
     inline
-    const_iterator::
-    const_iterator(const SparsityPattern *sp,
-                   const unsigned int     row,
-                   const unsigned int     index)
+    Iterator::Iterator(const SparsityPattern *sp,
+                       const unsigned int     row,
+                       const unsigned int     index)
       :
       accessor(sp, row, index)
     {}
@@ -1429,8 +1434,8 @@ namespace TrilinosWrappers
 
 
     inline
-    const_iterator &
-    const_iterator::operator++ ()
+    Iterator &
+    Iterator::operator++ ()
     {
       Assert (accessor.a_row < accessor.sparsity_pattern->n_rows(),
               ExcIteratorPastEnd());
@@ -1459,10 +1464,10 @@ namespace TrilinosWrappers
 
 
     inline
-    const_iterator
-    const_iterator::operator++ (int)
+    Iterator
+    Iterator::operator++ (int)
     {
-      const const_iterator old_state = *this;
+      const Iterator old_state = *this;
       ++(*this);
       return old_state;
     }
@@ -1470,8 +1475,8 @@ namespace TrilinosWrappers
 
 
     inline
-    const const_iterator::Accessor &
-    const_iterator::operator* () const
+    const Accessor &
+    Iterator::operator* () const
     {
       return accessor;
     }
@@ -1479,8 +1484,8 @@ namespace TrilinosWrappers
 
 
     inline
-    const const_iterator::Accessor *
-    const_iterator::operator-> () const
+    const Accessor *
+    Iterator::operator-> () const
     {
       return &accessor;
     }
@@ -1489,8 +1494,7 @@ namespace TrilinosWrappers
 
     inline
     bool
-    const_iterator::
-    operator == (const const_iterator &other) const
+    Iterator::operator == (const Iterator &other) const
     {
       return (accessor.a_row == other.accessor.a_row &&
               accessor.a_index == other.accessor.a_index);
@@ -1500,8 +1504,7 @@ namespace TrilinosWrappers
 
     inline
     bool
-    const_iterator::
-    operator != (const const_iterator &other) const
+    Iterator::operator != (const Iterator &other) const
     {
       return ! (*this == other);
     }
@@ -1510,8 +1513,7 @@ namespace TrilinosWrappers
 
     inline
     bool
-    const_iterator::
-    operator < (const const_iterator &other) const
+    Iterator::operator < (const Iterator &other) const
     {
       return (accessor.row() < other.accessor.row() ||
               (accessor.row() == other.accessor.row() &&

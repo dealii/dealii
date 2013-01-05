@@ -16,15 +16,15 @@
 
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/sparsity_pattern.h>
+#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
+
 #include <deal.II/lac/vector_memory.h>
 
 #include <deal.II/multigrid/mg_base.h>
 #include <deal.II/multigrid/mg_constrained_dofs.h>
 #include <deal.II/base/mg_level_object.h>
-
-
 
 #include <deal.II/dofs/dof_handler.h>
 
@@ -34,7 +34,33 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-template <int dim, int spacedim> class MGDoFHandler;
+template <int dim, int spacedim> class DoFHandler;
+
+namespace internal
+{
+  template <class VECTOR>
+  struct MatrixSelector
+  {
+    typedef ::dealii::SparsityPattern Sparsity;
+    typedef ::dealii::SparseMatrix<typename VECTOR::value_type> Matrix;
+  };
+
+#ifdef DEAL_II_USE_TRILINOS
+  template <>
+  struct MatrixSelector<dealii::TrilinosWrappers::MPI::Vector>
+  {
+    typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
+    typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
+  };
+
+  template <>
+  struct MatrixSelector<dealii::TrilinosWrappers::Vector>
+  {
+    typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
+    typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
+  };
+#endif
+}
 
 /*
  * MGTransferBase is defined in mg_base.h
@@ -53,7 +79,8 @@ template <int dim, int spacedim> class MGDoFHandler;
  * See MGTransferBase to find out which of the transfer classes
  * is best for your needs.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999-2004
+ * @author Wolfgang Bangerth, Guido Kanschat
+ * @date 1999, 2000, 2001, 2002, 2003, 2004, 2012
  */
 template <class VECTOR>
 class MGTransferPrebuilt : public MGTransferBase<VECTOR>
@@ -81,7 +108,7 @@ public:
    * matrices for each level.
    */
   template <int dim, int spacedim>
-  void build_matrices (const MGDoFHandler<dim,spacedim> &mg_dof);
+  void build_matrices (const DoFHandler<dim,spacedim> &mg_dof);
 
   virtual void prolongate (const unsigned int    to_level,
                            VECTOR       &dst,
@@ -99,7 +126,7 @@ public:
    */
   template <int dim, class InVector, int spacedim>
   void
-  copy_to_mg (const MGDoFHandler<dim,spacedim> &mg_dof,
+  copy_to_mg (const DoFHandler<dim,spacedim> &mg_dof,
               MGLevelObject<VECTOR> &dst,
               const InVector &src) const;
 
@@ -117,7 +144,7 @@ public:
    */
   template <int dim, class OutVector, int spacedim>
   void
-  copy_from_mg (const MGDoFHandler<dim,spacedim> &mg_dof,
+  copy_from_mg (const DoFHandler<dim,spacedim> &mg_dof,
                 OutVector &dst,
                 const MGLevelObject<VECTOR> &src) const;
 
@@ -131,7 +158,7 @@ public:
    */
   template <int dim, class OutVector, int spacedim>
   void
-  copy_from_mg_add (const MGDoFHandler<dim,spacedim> &mg_dof,
+  copy_from_mg_add (const DoFHandler<dim,spacedim> &mg_dof,
                     OutVector &dst,
                     const MGLevelObject<VECTOR> &src) const;
 
@@ -197,7 +224,7 @@ private:
    * Sparsity patterns for transfer
    * matrices.
    */
-  std::vector<std_cxx1x::shared_ptr<SparsityPattern> >   prolongation_sparsities;
+  std::vector<std_cxx1x::shared_ptr<typename internal::MatrixSelector<VECTOR>::Sparsity> >   prolongation_sparsities;
 
   /**
    * The actual prolongation matrix.
@@ -207,14 +234,14 @@ private:
    * while row indices belong to the
    * child cell, i.e. the fine level.
    */
-  std::vector<std_cxx1x::shared_ptr<SparseMatrix<double> > > prolongation_matrices;
+  std::vector<std_cxx1x::shared_ptr<typename internal::MatrixSelector<VECTOR>::Matrix> > prolongation_matrices;
 
   /**
    * Mapping for the
    * <tt>copy_to/from_mg</tt>-functions.
    * The data is first the global
    * index, then the level index.
-  */
+   */
   std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
   copy_indices;
 

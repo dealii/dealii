@@ -24,8 +24,6 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
     template class FEValues<deal_II_dimension,deal_II_space_dimension>;
     template class FEValuesBase<deal_II_dimension,deal_II_space_dimension>::
       CellIterator<DoFHandler<deal_II_dimension,deal_II_space_dimension>::cell_iterator>;
-    template class FEValuesBase<deal_II_dimension,deal_II_space_dimension>::
-      CellIterator<MGDoFHandler<deal_II_dimension,deal_II_space_dimension>::cell_iterator>;
 
     template class FEFaceValuesBase<deal_II_dimension,deal_II_space_dimension>;
     template class FEFaceValues<deal_II_dimension,deal_II_space_dimension>;
@@ -38,6 +36,20 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       template class Vector<deal_II_dimension, deal_II_space_dimension>;
       template class SymmetricTensor<2, deal_II_dimension, deal_II_space_dimension>;
       \}
+#endif
+  }
+
+
+for (dof_handler : DOFHANDLER_TEMPLATES; deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS; lda : BOOL)
+  {
+#if deal_II_dimension <= deal_II_space_dimension
+
+    template void FEValues<deal_II_dimension,deal_II_space_dimension>::reinit(
+    TriaIterator<DoFCellAccessor<dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >);
+    template void FEFaceValues<deal_II_dimension,deal_II_space_dimension>::reinit(
+    TriaIterator<DoFCellAccessor<dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >, unsigned int);
+    template void FESubfaceValues<deal_II_dimension,deal_II_space_dimension>::reinit(
+    TriaIterator<DoFCellAccessor<dof_handler<deal_II_dimension,deal_II_space_dimension>, lda> >, unsigned int, unsigned int);
 #endif
   }
 

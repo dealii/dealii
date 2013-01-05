@@ -15,7 +15,6 @@
 std::ofstream logfile("matrix_vector_mg/output");
 
 #include "matrix_vector_common.h"
-#include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_matrix.h>
 #include <deal.II/base/function.h>
@@ -34,8 +33,9 @@ void test ()
   FE_Q<dim> fe (fe_degree);
 
                                 // setup DoFs
-  MGDoFHandler<dim> dof(tria);
+  DoFHandler<dim> dof(tria);
   dof.distribute_dofs(fe);
+  dof.distribute_mg_dofs(fe);
   ConstraintMatrix constraints;
   VectorTools::interpolate_boundary_values (dof,
                                             0,
@@ -132,7 +132,7 @@ void test ()
       }
 
     // now to the MG assembly
-    typename MGDoFHandler<dim>::cell_iterator
+    typename DoFHandler<dim>::cell_iterator
       cellm = dof.begin(),
       endcm = dof.end();
     for (; cellm!=endcm; ++cellm)

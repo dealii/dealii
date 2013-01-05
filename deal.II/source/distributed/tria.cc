@@ -27,11 +27,13 @@
 #  include <p4est_extended.h>
 #  include <p4est_vtk.h>
 #  include <p4est_ghost.h>
+#  include <p4est_communication.h>
 
 #  include <p8est_bits.h>
 #  include <p8est_extended.h>
 #  include <p8est_vtk.h>
 #  include <p8est_ghost.h>
+#  include <p8est_communication.h>
 #endif
 
 #include <algorithm>
@@ -97,6 +99,12 @@ namespace internal
       static
       int (&quadrant_is_ancestor) (const types<2>::quadrant *q1,
                                    const types<2>::quadrant *q2);
+
+      static
+      int (&comm_find_owner) (types<2>::forest *p4est,
+                              const types<2>::locidx which_tree,
+                              const types<2>::quadrant *q,
+                              const int guess);
 
       static
       types<2>::connectivity *(&connectivity_new) (types<2>::topidx num_vertices,
@@ -218,6 +226,12 @@ namespace internal
     int (&functions<2>::quadrant_is_ancestor) (const types<2>::quadrant *q1,
                                                const types<2>::quadrant *q2)
       = p4est_quadrant_is_ancestor;
+
+    int (&functions<2>::comm_find_owner) (types<2>::forest *p4est,
+                                          const types<2>::locidx which_tree,
+                                          const types<2>::quadrant *q,
+                                          const int guess)
+      = p4est_comm_find_owner;
 
     types<2>::connectivity *(&functions<2>::connectivity_new) (types<2>::topidx num_vertices,
                                                                types<2>::topidx num_trees,
@@ -345,6 +359,12 @@ namespace internal
                                    const types<3>::quadrant *q2);
 
       static
+      int (&comm_find_owner) (types<3>::forest *p4est,
+                              const types<3>::locidx which_tree,
+                              const types<3>::quadrant *q,
+                              const int guess);
+
+      static
       types<3>::connectivity *(&connectivity_new) (types<3>::topidx num_vertices,
                                                    types<3>::topidx num_trees,
                                                    types<3>::topidx num_edges,
@@ -467,6 +487,12 @@ namespace internal
     int (&functions<3>::quadrant_is_ancestor) (const types<3>::quadrant *q1,
                                                const types<3>::quadrant *q2)
       = p8est_quadrant_is_ancestor;
+
+    int (&functions<3>::comm_find_owner) (types<3>::forest *p4est,
+                                          const types<3>::locidx which_tree,
+                                          const types<3>::quadrant *q,
+                                          const int guess)
+      = p8est_comm_find_owner;
 
     types<3>::connectivity *(&functions<3>::connectivity_new) (types<3>::topidx num_vertices,
                                                                types<3>::topidx num_trees,
@@ -954,6 +980,78 @@ namespace
         delete_all_children_and_self<dim,spacedim> (cell->child(c));
   }
 
+
+  template <int dim, int spacedim>
+  void
+  determine_level_subdomain_id_recursively (const typename internal::p4est::types<dim>::tree     &tree,
+                                            const typename internal::p4est::types<dim>::locidx &tree_index,
+                                            const typename Triangulation<dim,spacedim>::cell_iterator     &dealii_cell,
+                                            const typename internal::p4est::types<dim>::quadrant &p4est_cell,
+                                            typename internal::p4est::types<dim>::forest   &forest,
+                                            const types::subdomain_id_t                           my_subdomain,
+                                            const std::vector<std::vector<bool> > &marked_vertices)
+  {
+    if (dealii_cell->level_subdomain_id()==types::artificial_subdomain_id)
+      {
+        //important: only assign the level_subdomain_id if it is a ghost cell
+        // even though we could fill in all.
+        bool used = false;
+        for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+          {
+            if (marked_vertices[dealii_cell->level()][dealii_cell->vertex_index(v)])
+              {
+                used = true;
+                break;
+              }
+          }
+
+        if (used)
+          {
+            int owner = internal::p4est::functions<dim>::comm_find_owner (&forest,
+                        tree_index,
+                        &p4est_cell,
+                        my_subdomain);
+            Assert((owner!=-2) && (owner!=-1), ExcMessage("p4est should know the owner."));
+            dealii_cell->set_level_subdomain_id(owner);
+          }
+
+      }
+
+    if (dealii_cell->has_children ())
+      {
+        typename internal::p4est::types<dim>::quadrant
+        p4est_child[GeometryInfo<dim>::max_children_per_cell];
+        for (unsigned int c=0;
+             c<GeometryInfo<dim>::max_children_per_cell; ++c)
+          switch (dim)
+            {
+            case 2:
+              P4EST_QUADRANT_INIT(&p4est_child[c]);
+              break;
+            case 3:
+              P8EST_QUADRANT_INIT(&p4est_child[c]);
+              break;
+            default:
+              Assert (false, ExcNotImplemented());
+            }
+
+
+        internal::p4est::functions<dim>::
+        quadrant_childrenv (&p4est_cell,
+                            p4est_child);
+
+        for (unsigned int c=0;
+             c<GeometryInfo<dim>::max_children_per_cell; ++c)
+          {
+            determine_level_subdomain_id_recursively <dim,spacedim> (tree,tree_index,
+                                                                     dealii_cell->child(c),
+                                                                     p4est_child[c],
+                                                                     forest,
+                                                                     my_subdomain,
+                                                                     marked_vertices);
+          }
+      }
+  }
 
 
   template <int dim, int spacedim>
@@ -2589,6 +2687,95 @@ namespace parallel
 
       Assert( num_ghosts == ghostlayer->ghosts.elem_count, ExcInternalError());
 #endif
+
+
+
+      // fill level_subdomain_ids for geometric multigrid
+      // This is disabled for now until it works correctly.
+      // the level ownership of a cell is defined as the owner if the cell is active or as the owner of child(0)
+      // we need this information for all our ancestors and the same-level neighbors of our own cells (=level ghosts)
+      if (false)
+        {
+          // step 1: We set our own ids all the way down and all the others to -1. Note that we do not fill
+          // other cells we could figure out the same way, because we might accidentally set an id for a
+          // cell that is not a ghost cell.
+          for (unsigned int lvl=this->n_levels(); lvl>0;)
+            {
+              --lvl;
+              for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(lvl); cell!=this->end(lvl); ++cell)
+                {
+                  if ((!cell->has_children() && cell->subdomain_id()==this->locally_owned_subdomain())
+                      || (cell->has_children() && cell->child(0)->level_subdomain_id()==this->locally_owned_subdomain()))
+                    cell->set_level_subdomain_id(this->locally_owned_subdomain());
+                  else
+                    {
+                      //not our cell
+                      cell->set_level_subdomain_id(types::artificial_subdomain_id);
+                    }
+                }
+            }
+
+          //step 2: make sure all the neighbors to our level_cells exist. Need to look up in p4est...
+          std::vector<std::vector<bool> > marked_vertices(this->n_levels());
+
+          for (unsigned int lvl=0; lvl<this->n_levels(); ++lvl)
+            {
+              marked_vertices[lvl].resize(this->n_vertices(), false);
+
+              for (typename dealii::Triangulation<dim,spacedim>::cell_iterator
+                   cell = this->begin(lvl);
+                   cell != this->end(lvl); ++cell)
+                if (cell->level_subdomain_id() == this->locally_owned_subdomain())
+                  for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
+                    marked_vertices[lvl][cell->vertex_index(v)] = true;
+            }
+
+
+
+          for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(0); cell!=this->end(0); ++cell)
+            {
+              typename dealii::internal::p4est::types<dim>::quadrant p4est_coarse_cell;
+              const unsigned int tree_index
+                = coarse_cell_to_p4est_tree_permutation[cell->index()];
+              typename dealii::internal::p4est::types<dim>::tree *tree =
+                init_tree(cell->index());
+
+              dealii::internal::p4est::init_coarse_quadrant<dim>(p4est_coarse_cell);
+
+              determine_level_subdomain_id_recursively<dim,spacedim> (*tree, tree_index, cell,
+                                                                      p4est_coarse_cell,
+                                                                      *parallel_forest,
+                                                                      my_subdomain,
+                                                                      marked_vertices);
+            }
+
+          //step 3: make sure we have the parent of our level cells
+          for (unsigned int lvl=this->n_levels(); lvl>0;)
+            {
+              --lvl;
+              for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(lvl); cell!=this->end(lvl); ++cell)
+                {
+                  if (cell->has_children() && cell->subdomain_id()!=this->locally_owned_subdomain())
+                    {
+                      //not our cell
+                      for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+                        {
+                          if (cell->child(c)->level_subdomain_id()==this->locally_owned_subdomain())
+                            {
+                              types::subdomain_id_t mark = types::artificial_subdomain_id;
+                              mark = cell->child(0)->level_subdomain_id();
+                              Assert(mark != types::artificial_subdomain_id, ExcInternalError()); //we should know the child(0)
+                              cell->set_level_subdomain_id(mark);
+                              break;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+
+        }
 
 
 

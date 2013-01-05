@@ -24,7 +24,7 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/multigrid/mg_transfer_component.h>
 #include <deal.II/multigrid/mg_transfer_component.templates.h>
 #include <deal.II/multigrid/mg_tools.h>
@@ -38,6 +38,114 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace
 {
+  /**
+   * Adjust block-vectors on all
+   * levels to correct size.  Count
+   * the numbers of degrees of
+   * freedom on each level
+   * component-wise. Then, assign
+   * each block of @p vector the
+   * corresponding size.
+   *
+   * The boolean field @p selected
+   * allows restricting this
+   * operation to certain
+   * components. In this case, @p
+   * vector will only have as many
+   * blocks as there are true
+   * values in @p selected (no
+   * blocks of length zero are
+   * padded in). If this argument
+   * is omitted, all blocks will be
+   * considered.
+   *
+   * Degrees of freedom must be
+   * sorted by component in order
+   * to obtain reasonable results
+   * from this function.
+   *
+   * The argument
+   * @p target_component allows to
+   * re-sort and group components
+   * as in
+   * DoFRenumbering::component_wise.
+   *
+   *
+   */
+  template <int dim, typename number, int spacedim>
+  void
+  reinit_vector_by_components (
+    const dealii::DoFHandler<dim,spacedim> &mg_dof,
+    MGLevelObject<BlockVector<number> > &v,
+    const std::vector<bool> &sel,
+    const std::vector<unsigned int> &target_comp,
+    std::vector<std::vector<unsigned int> > &ndofs)
+  {
+    std::vector<bool> selected=sel;
+    std::vector<unsigned int> target_component=target_comp;
+    const unsigned int ncomp = mg_dof.get_fe().n_components();
+
+    // If the selected and
+    // target_component have size 0,
+    // they must be replaced by default
+    // values.
+    //
+    // Since we already made copies
+    // directly after this function was
+    // called, we use the arguments
+    // directly.
+    if (target_component.size() == 0)
+      {
+        target_component.resize(ncomp);
+        for (unsigned int i=0; i<ncomp; ++i)
+          target_component[i] = i;
+      }
+
+    // If selected is an empty vector,
+    // all components are selected.
+    if (selected.size() == 0)
+      {
+        selected.resize(target_component.size());
+        std::fill_n (selected.begin(), ncomp, false);
+        for (unsigned int i=0; i<target_component.size(); ++i)
+          selected[target_component[i]] = true;
+      }
+
+    Assert (selected.size() == target_component.size(),
+            ExcDimensionMismatch(selected.size(), target_component.size()));
+
+    // Compute the number of blocks needed
+    const unsigned int n_selected
+      = std::accumulate(selected.begin(),
+                        selected.end(),
+                        0U);
+
+    if (ndofs.size() == 0)
+      {
+        std::vector<std::vector<unsigned int> >
+        new_dofs(mg_dof.get_tria().n_levels(),
+                 std::vector<unsigned int>(target_component.size()));
+        std::swap(ndofs, new_dofs);
+        MGTools::count_dofs_per_block (mg_dof, ndofs, target_component);
+      }
+
+    for (unsigned int level=v.get_minlevel();
+         level<=v.get_maxlevel(); ++level)
+      {
+        v[level].reinit(n_selected, 0);
+        unsigned int k=0;
+        for (unsigned int i=0; i<selected.size() && (k<v[level].n_blocks()); ++i)
+          {
+            if (selected[i])
+              {
+                v[level].block(k++).reinit(ndofs[level][i]);
+              }
+            v[level].collect_sizes();
+          }
+      }
+  }
+
+
   /**
    * Adjust vectors on all levels
    * to correct size.  Count the
@@ -67,7 +175,7 @@ namespace
   template <int dim, typename number, int spacedim>
   void
   reinit_vector_by_components (
-    const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
+    const dealii::DoFHandler<dim,spacedim> &mg_dof,
     MGLevelObject<dealii::Vector<number> > &v,
     const ComponentMask &component_mask,
     const std::vector<unsigned int> &target_component,
@@ -104,7 +212,7 @@ template <typename number>
 template <int dim, class InVector, int spacedim>
 void
 MGTransferSelect<number>::do_copy_to_mg (
-  const MGDoFHandler<dim,spacedim>        &mg_dof_handler,
+  const DoFHandler<dim,spacedim>        &mg_dof_handler,
   MGLevelObject<Vector<number> > &dst,
   const InVector                 &src) const
 {
@@ -152,7 +260,7 @@ MGTransferSelect<number>::do_copy_to_mg (
 template <int dim, int spacedim>
 void MGTransferComponentBase::build_matrices (
   const DoFHandler<dim,spacedim> &,
-  const MGDoFHandler<dim,spacedim> &mg_dof)
+  const DoFHandler<dim,spacedim> &mg_dof)
 {
   // Fill target component with
   // standard values (identity) if it
@@ -319,7 +427,7 @@ void MGTransferComponentBase::build_matrices (
 
       prolongation_sparsities[level]->collect_sizes();
 
-      for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
+      for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children())
           {
@@ -356,7 +464,7 @@ void MGTransferComponentBase::build_matrices (
 
       prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
       // now actually build the matrices
-      for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
+      for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children())
           {
@@ -445,7 +553,7 @@ template <typename number>
 template <int dim, int spacedim>
 void MGTransferSelect<number>::build_matrices (
   const DoFHandler<dim,spacedim> &dof,
-  const MGDoFHandler<dim,spacedim> &mg_dof,
+  const DoFHandler<dim,spacedim> &mg_dof,
   unsigned int select,
   unsigned int mg_select,
   const std::vector<unsigned int> &t_component,
@@ -515,9 +623,9 @@ void MGTransferSelect<number>::build_matrices (
   for (int level=dof.get_tria().n_levels()-1; level>=0; --level)
     {
       copy_to_and_from_indices[level].clear();
-      typename MGDoFHandler<dim,spacedim>::active_cell_iterator
+      typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_cell = mg_dof.begin_active(level);
-      const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
+      const typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_end  = mg_dof.end_active(level);
 
       temp_copy_indices.resize (0);
@@ -527,12 +635,11 @@ void MGTransferSelect<number>::build_matrices (
       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
         {
-          DoFAccessor<dim, DoFHandler<dim,spacedim> > &global_cell = *level_cell;
           // get the dof numbers of
           // this cell for the global
           // and the level-wise
           // numbering
-          global_cell.get_dof_indices(global_dof_indices);
+          level_cell->get_dof_indices(global_dof_indices);
           level_cell->get_mg_dof_indices (level_dof_indices);
 
           for (unsigned int i=0; i<fe.dofs_per_cell; ++i)

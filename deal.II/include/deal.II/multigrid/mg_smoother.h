@@ -23,9 +23,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim> class MGDoFHandler;
-
-
 /*
  * MGSmootherBase is defined in mg_base.h
  */

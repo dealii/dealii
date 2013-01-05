@@ -202,6 +202,7 @@ CHECK_CXX_COMPILER_BUG(
   DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
   )
 
+
 #
 # Many compilers get this wrong (see Section 14.7.3.1, number (4)):
 #

@@ -16,7 +16,7 @@
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <dofs/dof_tools.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_dgq.h>

@@ -165,30 +165,39 @@ namespace internal
  * serialization archive.
  *
  * @ingroup dofs
- * @author Wolfgang Bangerth
+ * @author Wolfgang Bangerth, Markus Buerg, Timo Heister, Guido Kanschat,
+ * @date 1998, 1999, 2000, 2012
  */
 template <int dim, int spacedim=dim>
 class DoFHandler  :  public Subscriptor
 {
-  typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim> > IteratorSelector;
+  typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim>, false> ActiveSelector;
+  typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim>, true> LevelSelector;
 public:
-  typedef typename IteratorSelector::CellAccessor         cell_accessor;
-  typedef typename IteratorSelector::FaceAccessor         face_accessor;
+  typedef typename ActiveSelector::CellAccessor         cell_accessor;
+  typedef typename ActiveSelector::FaceAccessor         face_accessor;
 
-  typedef typename IteratorSelector::line_iterator        line_iterator;
-  typedef typename IteratorSelector::active_line_iterator active_line_iterator;
+  typedef typename ActiveSelector::line_iterator        line_iterator;
+  typedef typename ActiveSelector::active_line_iterator active_line_iterator;
 
-  typedef typename IteratorSelector::quad_iterator        quad_iterator;
-  typedef typename IteratorSelector::active_quad_iterator active_quad_iterator;
+  typedef typename ActiveSelector::quad_iterator        quad_iterator;
+  typedef typename ActiveSelector::active_quad_iterator active_quad_iterator;
 
-  typedef typename IteratorSelector::hex_iterator        hex_iterator;
-  typedef typename IteratorSelector::active_hex_iterator active_hex_iterator;
+  typedef typename ActiveSelector::hex_iterator         hex_iterator;
+  typedef typename ActiveSelector::active_hex_iterator  active_hex_iterator;
 
-  typedef typename IteratorSelector::cell_iterator        cell_iterator;
-  typedef typename IteratorSelector::active_cell_iterator active_cell_iterator;
+  typedef typename ActiveSelector::active_cell_iterator active_cell_iterator;
 
-  typedef typename IteratorSelector::face_iterator        face_iterator;
-  typedef typename IteratorSelector::active_face_iterator active_face_iterator;
+  typedef typename ActiveSelector::face_iterator        face_iterator;
+  typedef typename ActiveSelector::active_face_iterator active_face_iterator;
+
+  typedef typename LevelSelector::CellAccessor          level_cell_accessor;
+  typedef typename LevelSelector::FaceAccessor          level_face_accessor;
+
+  typedef typename LevelSelector::cell_iterator         level_cell_iterator;
+  typedef typename LevelSelector::face_iterator         level_face_iterator;
+
+  typedef typename ActiveSelector::cell_iterator        cell_iterator;
 
   /**
    * Alias the @p FunctionMap type
@@ -302,6 +311,31 @@ public:
   virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe);
 
   /**
+   * Distribute multigrid degrees of freedom similar
+   * to distribute_dofs() but on each level.
+   * This replaces the functionality of the old MGDoFHandler.
+   */
+  virtual void distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe);
+
+  /**
+   * This function returns whether
+   * this DoFHandler has DoFs
+   * distributed on each multigrid
+   * level or in other words if
+   * distribute_mg_dofs() has been
+   * called.
+   */
+  bool has_level_dofs() const;
+
+  /**
+   * This function returns whether
+   * this DoFHandler has active
+   * DoFs or in other words if
+   * distribute_dofs() has been
+   * called.
+   */
+  bool has_active_dofs() const;
+  /**
    * After distribute_dofs() with
    * an FESystem element, the block
    * structure of global and level
@@ -391,6 +425,14 @@ public:
    * participates in the mesh.
    */
   void renumber_dofs (const std::vector<unsigned int> &new_numbers);
+
+  /**
+   * The same function as above, but
+   * renumber the degrees of freedom of a
+   * single level of a multigrid hierarchy.
+   */
+  void renumber_dofs (const unsigned int level,
+                      const std::vector<unsigned int> &new_numbers);
 
   /**
    * @deprecated Use
@@ -491,13 +533,12 @@ public:
   cell_iterator        end () const;
 
   /**
-   * Return an iterator which is
-   * the first iterator not on
-   * level. If @p level is the
-   * last level, then this returns
+   * Return an iterator which is the first
+   * iterator not on the given level. If @p level is
+   * the last level, then this returns
    * <tt>end()</tt>.
    */
-  cell_iterator        end (const unsigned int level) const;
+  cell_iterator end (const unsigned int level) const;
 
   /**
    * Return an active iterator
@@ -507,6 +548,31 @@ public:
    * returns <tt>end()</tt>.
    */
   active_cell_iterator end_active (const unsigned int level) const;
+
+
+  /**
+   * Iterator to the first used
+   * cell on level @p level. This returns a level_cell_iterator
+   * that returns level dofs when dof_indices() is called.
+   */
+  level_cell_iterator begin_mg (const unsigned int level = 0) const;
+
+  /**
+   * Iterator past the last
+   * cell on level @p level. This returns a level_cell_iterator
+   * that returns level dofs when dof_indices() is called.
+   */
+  level_cell_iterator end_mg (const unsigned int level) const;
+
+  /**
+   * Iterator past the end; this
+   * iterator serves for
+   * comparisons of iterators with
+   * past-the-end or
+   * before-the-beginning states.
+   */
+  level_cell_iterator end_mg () const;
+
 
   //@}
 
@@ -545,6 +611,20 @@ public:
    * hanging nodes, see @ref constraints.
    */
   unsigned int n_dofs () const;
+
+  /**
+   * The (global) number of multilevel
+   * degrees of freedom on a
+   * given level.
+   *
+   * If no level degrees of
+   * freedom have been assigned
+   * to this level, returns
+   * numbers::invalid_unsigned_int. Else
+   * returns the number of
+   * degrees of freedom on this level.
+   */
+  unsigned int n_dofs (const unsigned int level) const;
 
   /**
    * Return the number of degrees of freedom
@@ -650,6 +730,13 @@ public:
    */
   const IndexSet &locally_owned_dofs() const;
 
+  /**
+   * Returns an IndexSet describing the set of locally
+   * owned DoFs used for the given multigrid level as
+   * a subset of 0..n_dofs(level).
+   */
+  const IndexSet &locally_owned_mg_dofs(const unsigned int level) const;
+
 
   /**
    * Returns a vector that
@@ -669,6 +756,9 @@ public:
    */
   const std::vector<IndexSet> &
   locally_owned_dofs_per_processor () const;
+
+  const std::vector<IndexSet> &
+  locally_owned_mg_dofs_per_processor (const unsigned int level) const;
 
   /**
    * Return a vector that
@@ -854,6 +944,11 @@ protected:
    */
   dealii::internal::DoFHandler::NumberCache number_cache;
 
+  /**
+   * Datastructure like number_cache, but for each Multigrid level.
+   */
+  std::vector<dealii::internal::DoFHandler::NumberCache> mg_number_cache;
+
 private:
 
   /**
@@ -878,10 +973,39 @@ private:
    */
   DoFHandler &operator = (const DoFHandler &);
 
+  class MGVertexDoFs
+  {
+  private:
+    unsigned int coarsest_level;
+    unsigned int finest_level;
+    unsigned int *indices;
+    unsigned int *indices_offset;
+
+  public:
+    DeclException0 (ExcNoMemory);
+    MGVertexDoFs ();
+    ~MGVertexDoFs ();
+    unsigned int get_coarsest_level () const;
+    unsigned int get_finest_level () const;
+    unsigned int get_index (const unsigned int level, const unsigned int dof_number) const;
+    void init (const unsigned int coarsest_level, const unsigned int finest_level, const unsigned int dofs_per_vertex);
+    void set_index (const unsigned int level, const unsigned int dof_number, const unsigned int index);
+  };
+
+  void clear_mg_space ();
+
   /**
    * Free all used memory.
    */
   void clear_space ();
+
+  void reserve_space ();
+
+  template <int structdim>
+  unsigned int get_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index) const;
+
+  template<int structdim>
+  void set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const unsigned int global_index) const;
 
   /**
    * Space to store the DoF numbers
@@ -891,6 +1015,8 @@ private:
    * Triangulation objects.
    */
   std::vector<dealii::internal::DoFHandler::DoFLevel<dim>*> levels;
+
+  std::vector<dealii::internal::DoFHandler::DoFLevel<dim>*> mg_levels;
 
   /**
    * Space to store DoF numbers of
@@ -902,11 +1028,15 @@ private:
    */
   dealii::internal::DoFHandler::DoFFaces<dim> *faces;
 
+  dealii::internal::DoFHandler::DoFFaces<dim> *mg_faces;
+
+  std::vector<MGVertexDoFs> mg_vertex_dofs;
+
   /**
    * Make accessor objects friends.
    */
-  template <int, class> friend class DoFAccessor;
-  template <class> friend class DoFCellAccessor;
+  template <int, class, bool> friend class DoFAccessor;
+  template <class, bool> friend class DoFCellAccessor;
   friend struct dealii::internal::DoFAccessor::Implementation;
   friend struct dealii::internal::DoFCellAccessor::Implementation;
 
@@ -925,9 +1055,29 @@ template <> unsigned int DoFHandler<1>::n_boundary_dofs () const;
 template <> unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
 template <> unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &) const;
 
+template <> void DoFHandler<1>::renumber_dofs(unsigned int,const std::vector<unsigned int>  &new_numbers);
+template <> void DoFHandler<2>::renumber_dofs(unsigned int,const std::vector<unsigned int>  &new_numbers);
+template <> void DoFHandler<3>::renumber_dofs(unsigned int,const std::vector<unsigned int>  &new_numbers);
+
 
 /* ----------------------- Inline functions ---------------------------------- */
 
+
+template <int dim, int spacedim>
+inline
+bool
+DoFHandler<dim,spacedim>::has_level_dofs() const
+{
+  return mg_number_cache.size()>0;
+}
+
+template <int dim, int spacedim>
+inline
+bool
+DoFHandler<dim,spacedim>::has_active_dofs() const
+{
+  return number_cache.n_global_dofs>0;
+}
 
 template <int dim, int spacedim>
 inline
@@ -935,6 +1085,15 @@ unsigned int
 DoFHandler<dim,spacedim>::n_dofs () const
 {
   return number_cache.n_global_dofs;
+}
+
+template<int dim, int spacedim>
+inline
+unsigned int DoFHandler<dim, spacedim>::n_dofs (const unsigned int level) const
+{
+  Assert(has_level_dofs(), ExcMessage("n_dofs(level) can only be called after distribute_mg_dofs()"));
+  Assert (level < mg_number_cache.size (), ExcInvalidLevel (level));
+  return mg_number_cache[level].n_global_dofs;
 }
 
 
@@ -953,6 +1112,13 @@ DoFHandler<dim, spacedim>::locally_owned_dofs() const
   return number_cache.locally_owned_dofs;
 }
 
+template <int dim, int spacedim>
+const IndexSet &
+DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
+{
+  Assert(level < this->get_tria().n_global_levels(), ExcMessage("invalid level in locally_owned_mg_dofs"));
+  return mg_number_cache[level].locally_owned_dofs;
+}
 
 template <int dim, int spacedim>
 const std::vector<unsigned int> &
@@ -969,6 +1135,13 @@ DoFHandler<dim, spacedim>::locally_owned_dofs_per_processor () const
   return number_cache.locally_owned_dofs_per_processor;
 }
 
+template <int dim, int spacedim>
+const std::vector<IndexSet> &
+DoFHandler<dim, spacedim>::locally_owned_mg_dofs_per_processor (const unsigned int level) const
+{
+  Assert(level < this->get_tria().n_global_levels(), ExcMessage("invalid level in locally_owned_mg_dofs_per_processor"));
+  return mg_number_cache[level].locally_owned_dofs_per_processor;
+}
 
 
 template <int dim, int spacedim>
@@ -1063,10 +1236,30 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
 }
 
 
+template<int dim, int spacedim>
+inline
+unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (
+  const unsigned int level,
+  const unsigned int dof_number) const
+{
+  Assert ((level >= coarsest_level) && (level <= finest_level), ExcInvalidLevel (level));
+  return indices[indices_offset[level - coarsest_level] + dof_number];
+}
+
+
+template<int dim, int spacedim>
+inline
+void DoFHandler<dim, spacedim>::MGVertexDoFs::set_index (
+  const unsigned int level,
+  const unsigned int dof_number,
+  const unsigned int index)
+{
+  Assert ((level >= coarsest_level) && (level <= finest_level), ExcInvalidLevel (level));
+  indices[indices_offset[level - coarsest_level] + dof_number] = index;
+}
+
 #endif // DOXYGEN
 
 DEAL_II_NAMESPACE_CLOSE
 
-/*----------------------------   dof_handler.h     ---------------------------*/
 #endif
-/*----------------------------   dof_handler.h     ---------------------------*/

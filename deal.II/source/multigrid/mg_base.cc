@@ -14,6 +14,12 @@
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/multigrid/mg_base.h>
 
 
@@ -42,25 +48,6 @@ MGCoarseGridBase<VECTOR>::~MGCoarseGridBase()
 
 // Explicit instantiations
 
-//TODO: Use the template expander script for this
-template class MGTransferBase<dealii::Vector<double> >;
-template class MGTransferBase<dealii::Vector<float> >;
-template class MGTransferBase<BlockVector<double> >;
-template class MGTransferBase<BlockVector<float> >;
-
-template class MGMatrixBase<dealii::Vector<double> >;
-template class MGMatrixBase<dealii::Vector<float> >;
-template class MGMatrixBase<BlockVector<double> >;
-template class MGMatrixBase<BlockVector<float> >;
-
-template class MGSmootherBase<dealii::Vector<float> >;
-template class MGSmootherBase<dealii::Vector<double> >;
-template class MGSmootherBase<BlockVector<float> >;
-template class MGSmootherBase<BlockVector<double> >;
-
-template class MGCoarseGridBase<dealii::Vector<double> >;
-template class MGCoarseGridBase<dealii::Vector<float> >;
-template class MGCoarseGridBase<BlockVector<double> >;
-template class MGCoarseGridBase<BlockVector<float> >;
+#include "mg_base.inst"
 
 DEAL_II_NAMESPACE_CLOSE

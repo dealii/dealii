@@ -16,7 +16,6 @@
 #include <deal.II/base/tensor_product_polynomials.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
 #include <deal.II/fe/fe_poly.h>
 #include <deal.II/hp/q_collection.h>
 #include <deal.II/distributed/tria.h>
@@ -99,13 +98,12 @@ namespace internal
 
 
 template <int dim, typename Number>
-template <typename DH>
 void MatrixFree<dim,Number>::
-internal_reinit(const Mapping<dim>                         &mapping,
-                const std::vector<const DH *>               &dof_handler,
+internal_reinit(const Mapping<dim>                          &mapping,
+                const std::vector<const DoFHandler<dim> *>  &dof_handler,
                 const std::vector<const ConstraintMatrix *> &constraint,
-                const std::vector<IndexSet>                &locally_owned_set,
-                const std::vector<hp::QCollection<1> >     &quad,
+                const std::vector<IndexSet>                 &locally_owned_set,
+                const std::vector<hp::QCollection<1> >      &quad,
                 const MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   if (additional_data.initialize_indices == true)
@@ -323,9 +321,10 @@ namespace internal
 template <int dim, typename Number>
 void MatrixFree<dim,Number>::
 initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
-                         const unsigned int)
+                         const unsigned int level)
 {
   dof_handlers.active_dof_handler = DoFHandlers::usual;
+  dof_handlers.level = level;
   dof_handlers.n_dof_handlers = dof_handler.size();
   dof_handlers.dof_handler.resize (dof_handlers.n_dof_handlers);
   for (unsigned int no=0; no<dof_handlers.n_dof_handlers; ++no)
@@ -340,42 +339,6 @@ initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handler,
   const unsigned int my_pid = size_info.my_pid;
 
   const Triangulation<dim> &tria = dof_handlers.dof_handler[0]->get_tria();
-  {
-    if (n_mpi_procs == 1)
-      cell_level_index.reserve (tria.n_active_cells());
-    typename Triangulation<dim>::cell_iterator cell = tria.begin(0),
-                                               end_cell = tria.end(0);
-    for ( ; cell != end_cell; ++cell)
-      internal::resolve_cell (cell, cell_level_index, my_pid);
-  }
-}
-
-
-
-template <int dim, typename Number>
-void MatrixFree<dim,Number>::
-initialize_dof_handlers (const std::vector<const MGDoFHandler<dim>*> &dof_handler,
-                         const unsigned int                           level)
-{
-  dof_handlers.active_dof_handler = DoFHandlers::multigrid;
-  dof_handlers.level = level;
-  dof_handlers.n_dof_handlers = dof_handler.size();
-  dof_handlers.mg_dof_handler.resize (dof_handlers.n_dof_handlers);
-  for (unsigned int no=0; no<dof_handlers.n_dof_handlers; ++no)
-    dof_handlers.mg_dof_handler[no] = dof_handler[no];
-
-  dof_info.resize (dof_handlers.n_dof_handlers);
-
-  // go through cells on zeroth level and then successively step down into
-  // children. This gives a z-ordering of the cells, which is beneficial when
-  // setting up neighboring relations between cells for thread parallelization
-  const unsigned int n_mpi_procs = size_info.n_procs;
-  const unsigned int my_pid = size_info.my_pid;
-
-  // if we have no level given, use the same as for the standard DoFHandler,
-  // otherwise we must loop through the respective level
-  const Triangulation<dim> &tria = dof_handlers.mg_dof_handler[0]->get_tria();
-
   if (level == numbers::invalid_unsigned_int)
     {
       if (n_mpi_procs == 1)
@@ -477,9 +440,7 @@ void MatrixFree<dim,Number>::initialize_indices
         }
       else
         {
-          const DoFHandler<dim> *dofh =
-            dof_handlers.active_dof_handler == DoFHandlers::usual ?
-            &*dof_handlers.dof_handler[no] : &*dof_handlers.mg_dof_handler[no];
+          const DoFHandler<dim> *dofh =&*dof_handlers.dof_handler[no];
           fes.push_back (&dofh->get_fe());
           dof_info[no].max_fe_index = 1;
           dof_info[no].fe_index_conversion.resize (1);
@@ -578,15 +539,11 @@ void MatrixFree<dim,Number>::initialize_indices
       bool cell_at_boundary = false;
       for (unsigned int no=0; no<n_fe; ++no)
         {
-          // OK, read indices from standard DoFHandler or active indices in
-          // MGDoFHandler. That is the usual stuff
-          if (dof_handlers.active_dof_handler == DoFHandlers::usual ||
-              (dof_handlers.active_dof_handler == DoFHandlers::multigrid &&
-               dof_handlers.level == numbers::invalid_unsigned_int))
+          // OK, read indices from standard DoFHandler in the usual way
+          if (dof_handlers.active_dof_handler == DoFHandlers::usual &&
+              dof_handlers.level == numbers::invalid_unsigned_int)
             {
-              const DoFHandler<dim> *dofh =
-                dof_handlers.active_dof_handler == DoFHandlers::usual ?
-                &*dof_handlers.dof_handler[no] : &*dof_handlers.mg_dof_handler[no];
+              const DoFHandler<dim> *dofh = &*dof_handlers.dof_handler[no];
               typename DoFHandler<dim>::active_cell_iterator
               cell_it (&dofh->get_tria(),
                        cell_level_index[counter].first,
@@ -601,13 +558,12 @@ void MatrixFree<dim,Number>::initialize_indices
                                              cell_at_boundary);
             }
           // ok, now we are requested to use a level in a MGDoFHandler
-          else if (dof_handlers.active_dof_handler == DoFHandlers::multigrid &&
+          else if (dof_handlers.active_dof_handler == DoFHandlers::usual &&
                    dof_handlers.level != numbers::invalid_unsigned_int)
             {
-              const MGDoFHandler<dim> *dofh =
-                dof_handlers.mg_dof_handler[no];
+              const DoFHandler<dim> *dofh = dof_handlers.dof_handler[no];
               AssertIndexRange (dof_handlers.level, dofh->get_tria().n_levels());
-              typename MGDoFHandler<dim>::cell_iterator
+              typename DoFHandler<dim>::cell_iterator
               cell_it (&dofh->get_tria(),
                        cell_level_index[counter].first,
                        cell_level_index[counter].second,

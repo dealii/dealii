@@ -19,8 +19,8 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int, int, int> class InvalidAccessor;
 
-template <int structdim, class DH> class DoFAccessor;
-template <class DH> class DoFCellAccessor;
+template <int structdim, class DH, bool lda> class DoFAccessor;
+template <class DH, bool lda> class DoFCellAccessor;
 
 template <int dim, int spacedim> class FiniteElement;
 template <typename Accessor> class TriaRawIterator;
@@ -34,7 +34,7 @@ namespace internal
 {
   namespace DoFHandler
   {
-    template <class DH>
+    template <class DH, bool lda=false>
     struct Iterators;
 
 
@@ -48,12 +48,12 @@ namespace internal
      *
      * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998, 2003, 2008, 2010
      */
-    template <template <int, int> class DH, int spacedim>
-    struct Iterators<DH<1, spacedim> >
+    template <template <int, int> class DH, int spacedim, bool lda>
+    struct Iterators<DH<1, spacedim>, lda>
     {
       typedef DH<1,spacedim> DoFHandler_type;
-      typedef dealii::DoFCellAccessor<DoFHandler_type> CellAccessor;
-      typedef dealii::DoFAccessor<0,DoFHandler_type> FaceAccessor;
+      typedef dealii::DoFCellAccessor<DoFHandler_type, lda> CellAccessor;
+      typedef dealii::DoFAccessor<0,DoFHandler_type, lda> FaceAccessor;
 
       typedef TriaRawIterator   <CellAccessor> raw_line_iterator;
       typedef TriaIterator      <CellAccessor> line_iterator;
@@ -89,12 +89,12 @@ namespace internal
      *
      * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998, 2003, 2008, 2010
      */
-    template <template <int, int> class DH, int spacedim>
-    struct Iterators<DH<2, spacedim> >
+    template <template <int, int> class DH, int spacedim, bool lda>
+    struct Iterators<DH<2, spacedim>, lda>
     {
       typedef DH<2,spacedim> DoFHandler_type;
-      typedef dealii::DoFCellAccessor<DoFHandler_type> CellAccessor;
-      typedef dealii::DoFAccessor<1, DoFHandler_type> FaceAccessor;
+      typedef dealii::DoFCellAccessor<DoFHandler_type, lda> CellAccessor;
+      typedef dealii::DoFAccessor<1, DoFHandler_type, lda> FaceAccessor;
 
       typedef TriaRawIterator   <FaceAccessor> raw_line_iterator;
       typedef TriaIterator      <FaceAccessor> line_iterator;
@@ -130,16 +130,16 @@ namespace internal
      *
      * @author Wolfgang Bangerth, Oliver Kayser-Herold, Guido Kanschat, 1998, 2003, 2008, 2010
      */
-    template <template <int, int> class DH, int spacedim>
-    struct Iterators<DH<3, spacedim> >
+    template <template <int, int> class DH, int spacedim, bool lda>
+    struct Iterators<DH<3, spacedim>, lda>
     {
       typedef DH<3, spacedim> DoFHandler_type;
-      typedef dealii::DoFCellAccessor<DoFHandler_type> CellAccessor;
-      typedef dealii::DoFAccessor<2, DoFHandler_type> FaceAccessor;
+      typedef dealii::DoFCellAccessor<DoFHandler_type, lda> CellAccessor;
+      typedef dealii::DoFAccessor<2, DoFHandler_type, lda> FaceAccessor;
 
-      typedef TriaRawIterator   <dealii::DoFAccessor<1, DoFHandler_type> > raw_line_iterator;
-      typedef TriaIterator      <dealii::DoFAccessor<1, DoFHandler_type> > line_iterator;
-      typedef TriaActiveIterator<dealii::DoFAccessor<1, DoFHandler_type> > active_line_iterator;
+      typedef TriaRawIterator   <dealii::DoFAccessor<1, DoFHandler_type, lda> > raw_line_iterator;
+      typedef TriaIterator      <dealii::DoFAccessor<1, DoFHandler_type, lda> > line_iterator;
+      typedef TriaActiveIterator<dealii::DoFAccessor<1, DoFHandler_type, lda> > active_line_iterator;
 
       typedef TriaRawIterator   <FaceAccessor> raw_quad_iterator;
       typedef TriaIterator      <FaceAccessor> quad_iterator;
