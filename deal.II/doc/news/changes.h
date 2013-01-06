@@ -24,6 +24,28 @@ inconvenience this causes.
 </p>
 
 <ol>
+<li>Changed: Over the past few years, deal.II has accumulated a
+number of things that we would like to change but that would introduce
+incompatibility. Examples are inconsistent naming of functions or types,
+or things put into the wrong namespace. In reality, while there are
+about 100 examples of things we'd like to get rid of, most of them are
+rather obscure to begin with and will not affect most user code.
+Nevertheless, as a developer community, we are
+very careful in making such incompatible changes.
+
+All this said, it is sometimes necessary. We plan to create an incompatible
+release 8.0 at a later time. To give users a chance to already see which
+functions need to be changed, we have introduced markers into the deal.II
+header files that identify which functions, classes or symbols are now
+deprecated. If your compiler supports this, it will then warn if you are
+using any of these. The documentation for each of these symbols discusses
+the recommended alternative, which are in all cases already in place. In
+other words, you can already change your code in such a way that it compiles
+both with the current 7.3 release as well as with the future 8.0 release
+in which these symbols will have been removed.
+<br>
+(Matthias Maier, Timo Heister, Wolfgang Bangerth, 2013/1/5)
+
 <li>Changed: deal.II previously had two separate classes, DoFHandler
 and MGDoFHandler, for standard and multilevel discretizations, respectively.
 There were also corresponding accessor hierarchies for the cell and
