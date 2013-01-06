@@ -24,6 +24,29 @@ inconvenience this causes.
 </p>
 
 <ol>
+<li>Changed: deal.II previously had two separate classes, DoFHandler
+and MGDoFHandler, for standard and multilevel discretizations, respectively.
+There were also corresponding accessor hierarchies for the cell and
+face iterators. This turned out to be an obstacle for future developments.
+Consequently, the functionality of the MGDoFHandler class has been merged
+into the standard DoFHandler (which already was a base class of MGDoFHandler;
+moving the functions down in the class hierarchy therefore does not
+significantly affect how these classes are used). The MGDoFHandler class
+still exists for now, but is deprecated and will be removed in deal.II 8.0.
+Use the DoFHandler class instead which has obtained all the functionality of
+the old MGDoFHandler class.
+
+From a user perspective, there is only one significant change: The old
+MGDoFHandler::distribute_dofs() function called DoFHandler::distribute_dofs()
+and then distributed degrees of freedom on all levels of the multilevel
+hierarchy. In the new scheme, this is now achieved using the function
+DoFHandler::distribute_mg_dofs(). In other words, where you previously
+used the class MGDoFHandler and called MGDoFHandler::distribute_dofs(), you
+should now use the class DoFHandler and call first DoFHandler::distribute_dofs()
+and then DoFHandler::distribute_mg_dofs().
+<br>
+(Markus B&uuml;rg, Timo Heister, Guido Kanschat, 2013/01/03)
+
 <li>Removed: The Triangulation and DoFHandler classes had a great number
 of functions that allowed to get the first and last iterators to cells,
 faces, lines, quads and hexes overall and on each level of the mesh
@@ -108,14 +131,6 @@ never working correctly and it is not used.
 
 
 <ol>
-<li> Unification of DoFHandler and MGDoFHandler and internal
-restructuring of DoFAccessors. MGDofHandler is now deprecated
-and will be removed in a future release. Use DoFHandler with
-distribute_mg_dofs() instead.
-<br>
-(Markus B&uuml;rg, Timo Heister, Guido Kanschat, 2013/01/03)
-
-
 <li> step-6 now uses ConstraintMatrix::distribute_local_to_global()
 instead of condense(), which is the preferred way to use a ConstraintMatrix
  (and the only sensible way in parallel).
