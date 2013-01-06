@@ -349,7 +349,7 @@ public:
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
                         const unsigned int       n_threads = numbers::invalid_unsigned_int,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
   /**
@@ -366,7 +366,7 @@ public:
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
                         const unsigned int       n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
   /**
@@ -406,7 +406,7 @@ public:
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
                         const unsigned int           n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
   /**
@@ -423,7 +423,7 @@ public:
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
                         const unsigned int           n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id          material_id = numbers::invalid_material_id);
 
 
@@ -443,7 +443,7 @@ public:
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
                         const unsigned int       n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
 
@@ -462,7 +462,7 @@ public:
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
                         const unsigned int       n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
 
@@ -482,7 +482,7 @@ public:
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
                         const unsigned int           n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
 
@@ -501,7 +501,7 @@ public:
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>    *coefficients   = 0,
                         const unsigned int           n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
 
@@ -612,7 +612,7 @@ public:
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
                         const unsigned int       n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
   /**
@@ -629,7 +629,7 @@ public:
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
                         const unsigned int       n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
   /**
@@ -669,7 +669,7 @@ public:
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
                         const unsigned int           n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
   /**
@@ -686,7 +686,7 @@ public:
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
                         const unsigned int           n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
 
@@ -706,7 +706,7 @@ public:
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
                         const unsigned int       n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
 
@@ -725,7 +725,7 @@ public:
                         const ComponentMask &component_mask = ComponentMask(),
                         const Function<spacedim>     *coefficients   = 0,
                         const unsigned int       n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id       material_id = numbers::invalid_material_id);
 
 
@@ -745,7 +745,7 @@ public:
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
                         const unsigned int           n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
 
@@ -764,7 +764,7 @@ public:
                         const ComponentMask     &component_mask = ComponentMask(),
                         const Function<spacedim>         *coefficients   = 0,
                         const unsigned int           n_threads = multithread_info.n_default_threads,
-                        const types::subdomain_id subdomain_id = types::invalid_subdomain_id,
+                        const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id,
                         const types::material_id           material_id = numbers::invalid_material_id);
 
   /**

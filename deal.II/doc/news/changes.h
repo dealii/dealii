@@ -113,7 +113,7 @@ restructuring of DoFAccessors. MGDofHandler is now deprecated
 and will be removed in a future release. Use DoFHandler with
 distribute_mg_dofs() instead.
 <br>
-(Markus Bürg, Timo Heister, Guido Kanschat, 2013/01/03)
+(Markus B&uuml;rg, Timo Heister, Guido Kanschat, 2013/01/03)
 
 
 <li> step-6 now uses ConstraintMatrix::distribute_local_to_global()
@@ -135,6 +135,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: Utilities::int_to_string can now deal with any 32-bit
+integer, not just those with up to 6 digits.
+<br>
+(Wolfgang Bangerth, 2013/1/5)
+
 <li> New: The PETScWrappers::MatrixBase::write_ascii() now takes a
 (defaulted) argument allowing to select the PETSc Viewer style.
 <br>

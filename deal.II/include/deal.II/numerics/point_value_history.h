@@ -554,7 +554,7 @@ public:
   *
   * @deprecated
    */
-  Vector<double> mark_locations();
+  Vector<double> mark_locations() DEAL_II_DEPRECATED;
 
 
   /**

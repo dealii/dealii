@@ -144,9 +144,6 @@ public:
    * function to call for an object
    * created by the default
    * constructor.
-   *
-   * @deprecated the last argument
-   * is ignored.
    */
   void initialize (const unsigned int n_block_rows,
                    const unsigned int n_block_cols);
@@ -160,7 +157,7 @@ public:
    */
   BlockMatrixArray (const unsigned int n_block_rows,
                     const unsigned int n_block_cols,
-                    VectorMemory<Vector<number> > &mem);
+                    VectorMemory<Vector<number> > &mem) DEAL_II_DEPRECATED;
 
   /**
    * Initialize object
@@ -174,7 +171,7 @@ public:
    */
   void initialize (const unsigned int n_block_rows,
                    const unsigned int n_block_cols,
-                   VectorMemory<Vector<number> > &mem);
+                   VectorMemory<Vector<number> > &mem) DEAL_II_DEPRECATED;
 
   /**
    * Adjust the matrix to a new
@@ -224,7 +221,7 @@ public:
                   const unsigned int row,
                   const unsigned int col,
                   const double       prefix = 1.,
-                  const bool         transpose = false);
+                  const bool         transpose = false) DEAL_II_DEPRECATED;
 
 
   /**
@@ -500,7 +497,7 @@ public:
    */
   BlockTrianglePrecondition (unsigned int n_block_rows,
                              VectorMemory<Vector<number> > &mem,
-                             bool backward = false);
+                             bool backward = false) DEAL_II_DEPRECATED;
 
   /**
    * Initialize object
@@ -514,7 +511,7 @@ public:
    */
   void initialize (const unsigned int n_block_rows,
                    VectorMemory<Vector<number> > &mem,
-                   bool backward = false);
+                   bool backward = false) DEAL_II_DEPRECATED;
 
   /**
    * Resize preconditioner to a new
@@ -554,7 +551,7 @@ public:
                   const unsigned int row,
                   const unsigned int col,
                   const double       prefix = 1.,
-                  const bool         transpose = false);
+                  const bool         transpose = false) DEAL_II_DEPRECATED;
 
   /**
    * Preconditioning.

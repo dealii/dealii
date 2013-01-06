@@ -396,7 +396,7 @@ private:
    * internal data of this object
    * from multiple threads.
    */
-  static Threads::ThreadMutex mutex;
+  static Threads::Mutex mutex;
 };
 
 /*@}*/

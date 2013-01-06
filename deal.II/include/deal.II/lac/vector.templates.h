@@ -430,8 +430,7 @@ Vector<std::complex<float> >::operator = (const std::complex<float> s)
 
 
 template <typename Number>
-void
-Vector<Number>::scale (const Number factor)
+Vector<Number> &Vector<Number>::operator *= (const Number factor)
 {
   Assert (numbers::is_finite(factor),ExcNumberNotFinite());
 
@@ -442,6 +441,8 @@ Vector<Number>::scale (const Number factor)
                        val,
                        (factor*boost::lambda::_1),
                        internal::Vector::minimum_parallel_grain_size);
+
+  return *this;
 }
 
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -215,7 +215,7 @@ namespace internal
         /**
          * Distribute degrees of freedom on all cells, or on cells with the
          * correct subdomain_id if the corresponding argument is not equal to
-         * types::invalid_subdomain_id. Return the total number of dofs
+         * numbers::invalid_subdomain_id. Return the total number of dofs
          * returned.
          */
         template <int dim, int spacedim>
@@ -243,7 +243,7 @@ namespace internal
           endc = dof_handler.end();
 
           for (; cell != endc; ++cell)
-            if ((subdomain_id == types::invalid_subdomain_id)
+            if ((subdomain_id == numbers::invalid_subdomain_id)
                 ||
                 (cell->subdomain_id() == subdomain_id))
               next_free_dof
@@ -254,7 +254,7 @@ namespace internal
           // update the cache used for cell dof indices
           for (typename DoFHandler<dim,spacedim>::level_cell_iterator
                cell = dof_handler.begin(); cell != dof_handler.end(); ++cell)
-            if (cell->subdomain_id() != types::artificial_subdomain_id)
+            if (cell->subdomain_id() != numbers::artificial_subdomain_id)
               cell->update_cell_dof_indices_cache ();
 
           // finally restore the user flags
@@ -459,7 +459,7 @@ namespace internal
         static
         unsigned int
         distribute_dofs_on_level (const unsigned int        offset,
-                                  const types::subdomain_id_t level_subdomain_id,
+                                  const types::subdomain_id level_subdomain_id,
                                   DoFHandler<dim,spacedim> &dof_handler,
                                   const unsigned int level)
         {
@@ -487,7 +487,7 @@ namespace internal
           endc = dof_handler.end(level);
 
           for (; cell != endc; ++cell)
-            if ((level_subdomain_id == types::invalid_subdomain_id)
+            if ((level_subdomain_id == numbers::invalid_subdomain_id)
                 ||
                 (cell->level_subdomain_id() == level_subdomain_id))
               next_free_dof
@@ -871,7 +871,7 @@ namespace internal
       {
         const unsigned int n_dofs =
           Implementation::distribute_dofs (0,
-                                           types::invalid_subdomain_id,
+                                           numbers::invalid_subdomain_id,
                                            dof_handler);
 
         // now set the elements of the
@@ -910,7 +910,7 @@ namespace internal
 
         for (unsigned int level = 0; level < dof_handler.get_tria().n_levels(); ++level)
           {
-            unsigned int next_free_dof = Implementation::distribute_dofs_on_level(0, types::invalid_subdomain_id, dof_handler, level);
+            unsigned int next_free_dof = Implementation::distribute_dofs_on_level(0, numbers::invalid_subdomain_id, dof_handler, level);
 
             number_caches[level].n_global_dofs = next_free_dof;
             number_caches[level].n_locally_owned_dofs = next_free_dof;
@@ -2570,8 +2570,7 @@ namespace internal
           // * Create global_dof_indexsets by
           // transferring our own owned_dofs to
           // every other machine.
-          const unsigned int n_cpus = Utilities::System::
-                                      get_n_mpi_processes (tr->get_communicator());
+          const unsigned int n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
 
           // Serialize our IndexSet and
           // determine size.

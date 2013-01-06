@@ -464,7 +464,7 @@ public:
    * found in the implementation of this
    * function.
    *
-   * Note that this function is most often
+   * @note This function is most often
    * used to determine the maximal row
    * length for sparsity
    * patterns. Unfortunately, while the
@@ -486,7 +486,7 @@ public:
    * is also discussed in the documentation
    * of the module on @ref Sparsity.
    */
-  unsigned int max_couplings_between_dofs () const;
+  unsigned int max_couplings_between_dofs () const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Use
@@ -503,7 +503,7 @@ public:
    * max_couplings_between_dofs() in one
    * dimension less.
    */
-  unsigned int max_couplings_between_boundary_dofs () const;
+  unsigned int max_couplings_between_boundary_dofs () const DEAL_II_DEPRECATED;
 
   /*--------------------------------------*/
 

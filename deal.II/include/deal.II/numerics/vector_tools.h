@@ -751,9 +751,6 @@ namespace VectorTools
                                const ComponentMask       &component_mask = ComponentMask());
 
   /**
-   * @deprecated This function exists mainly
-   * for backward compatibility.
-   *
    * Same function as above, but
    * taking only one pair of
    * boundary indicator and
@@ -893,9 +890,6 @@ namespace VectorTools
                                const ComponentMask       &component_mask = ComponentMask());
 
   /**
-   * @deprecated This function exists
-   * only for backward compatibility.
-   *
    * Same function as above, but taking
    * only one pair of boundary indicator
    * and corresponding boundary

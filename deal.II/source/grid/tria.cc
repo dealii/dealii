@@ -12046,7 +12046,7 @@ template <int dim, int spacedim>
 types::subdomain_id
 Triangulation<dim,spacedim>::locally_owned_subdomain () const
 {
-  return types::invalid_subdomain_id;
+  return numbers::invalid_subdomain_id;
 }
 
 

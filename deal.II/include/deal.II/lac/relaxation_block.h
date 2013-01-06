@@ -86,7 +86,7 @@ public:
     AdditionalData (const BlockList &block_list,
                     const double relaxation = 1.,
                     const bool invert_diagonal = true,
-                    const bool same_diagonal = false);
+                    const bool same_diagonal = false) DEAL_II_DEPRECATED;
 
 
     /**

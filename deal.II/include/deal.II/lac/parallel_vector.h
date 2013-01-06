@@ -754,7 +754,7 @@ namespace parallel
        * <tt>operator *=</tt> and
        * <tt>operator /=</tt> instead.
        */
-      void scale (const Number factor);
+      void scale (const Number factor) DEAL_II_DEPRECATED;
 
 
       /**
@@ -947,7 +947,7 @@ namespace parallel
        * when used with several
        * threads.
        */
-      mutable Threads::ThreadMutex mutex;
+      mutable Threads::Mutex mutex;
 
       /**
        * A helper function that clears the

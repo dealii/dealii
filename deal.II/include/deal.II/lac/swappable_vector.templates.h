@@ -66,7 +66,7 @@ SwappableVector<number>::operator= (const SwappableVector<number> &v)
   // if in MT mode, block all other
   // operations. if not in MT mode,
   // this is a no-op
-  Threads::ThreadMutex::ScopedLock lock(this->lock);
+  Threads::Mutex::ScopedLock lock(this->lock);
 
   Vector<number>::operator = (v);
   data_is_preloaded = false;
@@ -94,7 +94,7 @@ void SwappableVector<number>::swap_out (const std::string &name)
   // if in MT mode, block all other
   // operations. if not in MT mode,
   // this is a no-op
-  Threads::ThreadMutex::ScopedLock lock(this->lock);
+  Threads::Mutex::ScopedLock lock(this->lock);
 
   //  check that we have not called
   //  @p alert without the respective
@@ -208,7 +208,7 @@ void SwappableVector<number>::kill_file ()
   // (there should be none, but who
   // knows). if not in MT mode,
   // this is a no-op
-  Threads::ThreadMutex::ScopedLock lock(this->lock);
+  Threads::Mutex::ScopedLock lock(this->lock);
 
   // this is too bad: someone
   // requested the vector in advance,

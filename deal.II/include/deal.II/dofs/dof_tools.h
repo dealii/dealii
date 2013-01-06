@@ -497,7 +497,7 @@ namespace DoFTools
                          SparsityPattern        &sparsity_pattern,
                          const ConstraintMatrix &constraints = ConstraintMatrix(),
                          const bool              keep_constrained_dofs = true,
-                         const types::subdomain_id subdomain_id = types::invalid_subdomain_id);
+                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
 
   /**
    * Locate non-zero entries for
@@ -659,7 +659,7 @@ namespace DoFTools
                          SparsityPattern          &sparsity_pattern,
                          const ConstraintMatrix   &constraints = ConstraintMatrix(),
                          const bool                keep_constrained_dofs = true,
-                         const types::subdomain_id subdomain_id = types::invalid_subdomain_id);
+                         const types::subdomain_id subdomain_id = numbers::invalid_subdomain_id);
 
   /**
    * @deprecated This is the old
@@ -677,7 +677,7 @@ namespace DoFTools
   void
   make_sparsity_pattern (const DH                              &dof,
                          const std::vector<std::vector<bool> > &mask,
-                         SparsityPattern                       &sparsity_pattern);
+                         SparsityPattern                       &sparsity_pattern) DEAL_II_DEPRECATED;
 
   /**
    * Construct a sparsity pattern that
@@ -2298,7 +2298,7 @@ namespace DoFTools
   void
   count_dofs_per_component (const DoFHandler<dim,spacedim>     &dof_handler,
                             std::vector<unsigned int> &dofs_per_component,
-                            std::vector<unsigned int>  target_component);
+                            std::vector<unsigned int>  target_component) DEAL_II_DEPRECATED;
 
   /**
    * This function can be used when

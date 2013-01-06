@@ -130,8 +130,8 @@ FullMatrix<number>::all_zero () const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
-  const number *p = this->data();
-  const number *const e = this->data() + this->n_elements();
+  const number *p = &this->values[0];
+  const number *const e = &this->values[0] + this->n_elements();
   while (p!=e)
     if (*p++ != number(0.0))
       return false;
@@ -194,7 +194,7 @@ FullMatrix<number>::vmult (Vector<number2> &dst,
 
   Assert (&src != &dst, ExcSourceEqualsDestination());
 
-  const number *e = this->data();
+  const number *e = &this->values[0];
   // get access to the data in order to
   // avoid copying it when using the ()
   // operator
@@ -224,7 +224,7 @@ void FullMatrix<number>::Tvmult (Vector<number2>       &dst,
 
   Assert (&src != &dst, ExcSourceEqualsDestination());
 
-  const number *e = this->data();
+  const number *e = &this->values[0];
   number2 *dst_ptr = &dst(0);
   const unsigned int size_m = m(), size_n = n();
 
@@ -370,7 +370,7 @@ void FullMatrix<number>::fill_permutation (const FullMatrix<number2> &src,
 /*  void FullMatrix<number>::fill (const number2* entries) */
 /*  { */
 /*      if (n_cols()*n_rows() != 0) */
-/*        std::copy (entries, entries+n_rows()*n_cols(), this->data()); */
+/*        std::copy (entries, entries+n_rows()*n_cols(), &this->values[0]); */
 /*  } */
 
 
@@ -949,7 +949,7 @@ FullMatrix<number>::matrix_norm_square (const Vector<number2> &v) const
 
   number2 sum = 0.;
   const unsigned int n_rows = m();
-  const number *val_ptr = this->data();
+  const number *val_ptr = &this->values[0];
   const number2 *v_ptr;
 
   for (unsigned int row=0; row<n_rows; ++row)
@@ -981,7 +981,7 @@ FullMatrix<number>::matrix_scalar_product (const Vector<number2> &u,
   number2 sum = 0.;
   const unsigned int n_rows = m();
   const unsigned int n_cols = n();
-  const number *val_ptr = this->data();
+  const number *val_ptr = &this->values[0];
   const number2 *v_ptr;
 
   for (unsigned int row=0; row<n_rows; ++row)
@@ -1215,16 +1215,8 @@ template <typename number>
 bool
 FullMatrix<number>::operator == (const FullMatrix<number> &M) const
 {
-  // the matrices may either be both
-  // empty, or of same size and with
-  // same values, if they shall be
-  // equal
-  bool result = (this->data()==0) && (M.data()==0);
-  result = result || ((m()==M.m()) && (n()==M.n()) &&
-                      std::equal (this->data(), this->data()+m()*n(),
-                                  M.data()));
-
-  return result;
+  // simply pass down to the base class
+  return Table<2,number>::operator==(M);
 }
 
 
@@ -1284,7 +1276,7 @@ FullMatrix<number>::frobenius_norm () const
 
   real_type s = 0.;
   for (unsigned int i=0; i<this->n_rows()*this->n_cols(); ++i)
-    s += numbers::NumberTraits<number>::abs_square(this->data()[i]);
+    s += numbers::NumberTraits<number>::abs_square(this->values[i]);
   return std::sqrt(s);
 }
 

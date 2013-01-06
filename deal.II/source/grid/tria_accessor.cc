@@ -1348,7 +1348,7 @@ CellAccessor<dim, spacedim>::set_subdomain_id (const types::subdomain_id new_sub
 
 
 template <int dim, int spacedim>
-types::subdomain_id_t CellAccessor<dim, spacedim>::level_subdomain_id () const
+types::subdomain_id CellAccessor<dim, spacedim>::level_subdomain_id () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   return this->tria->levels[this->present_level]->level_subdomain_ids[this->present_index];
@@ -1358,7 +1358,7 @@ types::subdomain_id_t CellAccessor<dim, spacedim>::level_subdomain_id () const
 
 template <int dim, int spacedim>
 void
-CellAccessor<dim, spacedim>::set_level_subdomain_id (const types::subdomain_id_t new_level_subdomain_id) const
+CellAccessor<dim, spacedim>::set_level_subdomain_id (const types::subdomain_id new_level_subdomain_id) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
   this->tria->levels[this->present_level]->level_subdomain_ids[this->present_index]

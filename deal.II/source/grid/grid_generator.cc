@@ -20,6 +20,7 @@
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_reordering.h>
@@ -3196,9 +3197,14 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
 
   DoFHandler<dim> dof_handler(tria);
   dof_handler.distribute_dofs(q1);
-  SparsityPattern sparsity_pattern (dof_handler.n_dofs (), dof_handler.n_dofs (),
-                                    dof_handler.max_couplings_between_dofs());
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity_pattern);
+
+  CompressedSparsityPattern c_sparsity_pattern (dof_handler.n_dofs (),
+					dof_handler.n_dofs ());
+  DoFTools::make_sparsity_pattern (dof_handler, c_sparsity_pattern);
+  c_sparsity_pattern.compress ();
+
+  SparsityPattern sparsity_pattern;
+  sparsity_pattern.copy_from (c_sparsity_pattern);
   sparsity_pattern.compress ();
 
   SparseMatrix<double> S(sparsity_pattern);
