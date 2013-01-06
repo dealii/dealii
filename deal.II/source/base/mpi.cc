@@ -392,7 +392,7 @@ namespace Utilities
 
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
-      if (Utilities::System::program_uses_mpi() == true && owns_mpi == true &&
+      if (Utilities::System::job_supports_mpi() == true && owns_mpi == true &&
           MPI_has_been_started != 0)
         {
           if (std::uncaught_exception())

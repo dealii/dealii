@@ -903,7 +903,7 @@ namespace internal
           // material_id), or if one of the
           // neighbors behind the face is on
           // the subdomain we care for
-          if ( ! ( ((subdomain_id == types::invalid_subdomain_id)
+          if ( ! ( ((subdomain_id == numbers::invalid_subdomain_id)
                     ||
                     (cell->subdomain_id() == subdomain_id))
                    &&
@@ -923,7 +923,7 @@ namespace internal
               if (face->has_children() == false)
                 care_for_cell |= ((cell->neighbor(face_no)->subdomain_id()
                                    == subdomain_id) ||
-                                  (subdomain_id == types::invalid_subdomain_id))
+                                  (subdomain_id == numbers::invalid_subdomain_id))
                                  &&
                                  ((cell->neighbor(face_no)->material_id()
                                    == material_id) ||
@@ -941,7 +941,7 @@ namespace internal
                           ->material_id() == material_id)
                          &&
                          (subdomain_id ==
-                          types::invalid_subdomain_id)))
+                          numbers::invalid_subdomain_id)))
                       {
                         care_for_cell = true;
                         break;
@@ -1176,7 +1176,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   if (dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>*>
       (&dof_handler.get_tria())
       != 0)
-    Assert ((subdomain_id_ == types::invalid_subdomain_id)
+    Assert ((subdomain_id_ == numbers::invalid_subdomain_id)
             ||
             (subdomain_id_ ==
              dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>&>
@@ -1287,7 +1287,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
   typename DH::active_cell_iterator cell = dof_handler.begin_active();
   for (unsigned int cell_index=0; cell != dof_handler.end();
        ++cell, ++cell_index)
-    if (((subdomain_id == types::invalid_subdomain_id)
+    if (((subdomain_id == numbers::invalid_subdomain_id)
          ||
          (cell->subdomain_id() == subdomain_id))
         &&
@@ -1527,7 +1527,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
       (&dof_handler.get_tria())
       != 0)
-    Assert ((subdomain_id_ == types::invalid_subdomain_id)
+    Assert ((subdomain_id_ == numbers::invalid_subdomain_id)
             ||
             (subdomain_id_ ==
              dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>&>
@@ -1637,7 +1637,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
   for (typename DH::active_cell_iterator cell=dof_handler.begin_active();
        cell!=dof_handler.end();
        ++cell, ++present_cell)
-    if ( ((subdomain_id == types::invalid_subdomain_id)
+    if ( ((subdomain_id == numbers::invalid_subdomain_id)
           ||
           (cell->subdomain_id() == subdomain_id))
          &&

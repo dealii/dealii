@@ -1853,7 +1853,7 @@ public:
    */
   const Tensor<2,spacedim> &
   shape_2nd_derivative (const unsigned int function_no,
-                        const unsigned int point_no) const;
+                        const unsigned int point_no) const DEAL_II_DEPRECATED;
 
 
   /**
@@ -1897,7 +1897,7 @@ public:
   Tensor<2,spacedim>
   shape_2nd_derivative_component (const unsigned int function_no,
                                   const unsigned int point_no,
-                                  const unsigned int component) const;
+                                  const unsigned int component) const DEAL_II_DEPRECATED;
 
 
   //@}
@@ -2285,7 +2285,7 @@ public:
    */
   template <class InputVector>
   void get_function_grads (const InputVector      &fe_function,
-                           std::vector<Tensor<1,spacedim> > &gradients) const;
+                           std::vector<Tensor<1,spacedim> > &gradients) const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Use
@@ -2293,7 +2293,7 @@ public:
    */
   template <class InputVector>
   void get_function_grads (const InputVector               &fe_function,
-                           std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const;
+                           std::vector<std::vector<Tensor<1,spacedim> > > &gradients) const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Use
@@ -2302,7 +2302,7 @@ public:
   template <class InputVector>
   void get_function_grads (const InputVector &fe_function,
                            const VectorSlice<const std::vector<unsigned int> > &indices,
-                           std::vector<Tensor<1,spacedim> > &gradients) const;
+                           std::vector<Tensor<1,spacedim> > &gradients) const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Use
@@ -2312,7 +2312,7 @@ public:
   void get_function_grads (const InputVector &fe_function,
                            const VectorSlice<const std::vector<unsigned int> > &indices,
                            std::vector<std::vector<Tensor<1,spacedim> > > &gradients,
-                           bool quadrature_points_fastest = false) const;
+                           bool quadrature_points_fastest = false) const DEAL_II_DEPRECATED;
 
   //@}
   /// @name Access to second derivatives (Hessian matrices and Laplacians) of global finite element fields
@@ -2464,7 +2464,7 @@ public:
   template <class InputVector>
   void
   get_function_2nd_derivatives (const InputVector &,
-                                std::vector<Tensor<2,spacedim> > &) const;
+                                std::vector<Tensor<2,spacedim> > &) const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Wrapper for get_function_hessians()
@@ -2473,7 +2473,7 @@ public:
   void
   get_function_2nd_derivatives (const InputVector &,
                                 std::vector<std::vector<Tensor<2,spacedim> > > &,
-                                bool = false) const;
+                                bool = false) const DEAL_II_DEPRECATED;
 
   /**
    * Compute the (scalar) Laplacian (i.e. the trace of the tensor of second
@@ -2775,7 +2775,7 @@ public:
    * point. The length of the vector
    * is normalized to one.
    */
-  const Point<spacedim> &cell_normal_vector (const unsigned int i) const;
+  const Point<spacedim> &cell_normal_vector (const unsigned int i) const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Use
@@ -2785,7 +2785,7 @@ public:
    * the cell in each of the
    * quadrature points.
    */
-  const std::vector<Point<spacedim> > &get_cell_normal_vectors () const;
+  const std::vector<Point<spacedim> > &get_cell_normal_vectors () const DEAL_II_DEPRECATED;
 
   //@}
 

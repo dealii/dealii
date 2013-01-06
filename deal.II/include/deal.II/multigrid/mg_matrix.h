@@ -109,7 +109,7 @@ public:
   std::size_t memory_consumption () const;
 private:
   SmartPointer<MGLevelObject<MATRIX>,MGMatrix<MATRIX,VECTOR> > matrix;
-};
+} DEAL_II_DEPRECATED;
 
 
 /**

@@ -34,7 +34,7 @@ DEAL_II_NAMESPACE_OPEN
 // more fine-grained solution
 namespace
 {
-  Threads::ThreadMutex coefficients_lock;
+  Threads::Mutex coefficients_lock;
 }
 
 
@@ -888,7 +888,7 @@ namespace Polynomials
     // operation of this function;
     // for this, acquire the lock
     // until we quit this function
-    Threads::ThreadMutex::ScopedLock lock(coefficients_lock);
+    Threads::Mutex::ScopedLock lock(coefficients_lock);
 
     // The first 2 coefficients are hard-coded
     if (k==0)
@@ -1021,7 +1021,7 @@ namespace Polynomials
     // then get a pointer to the array
     // of coefficients. do that in a MT
     // safe way
-    Threads::ThreadMutex::ScopedLock lock (coefficients_lock);
+    Threads::Mutex::ScopedLock lock (coefficients_lock);
     return *shifted_coefficients[k];
   }
 
@@ -1153,7 +1153,7 @@ namespace Polynomials
     // of this function
     // for this, acquire the lock
     // until we quit this function
-    Threads::ThreadMutex::ScopedLock lock(coefficients_lock);
+    Threads::Mutex::ScopedLock lock(coefficients_lock);
 
     // The first 2 coefficients
     // are hard-coded
@@ -1288,7 +1288,7 @@ namespace Polynomials
     // then get a pointer to the array
     // of coefficients. do that in a MT
     // safe way
-    Threads::ThreadMutex::ScopedLock lock (coefficients_lock);
+    Threads::Mutex::ScopedLock lock (coefficients_lock);
     return *recursive_coefficients[k];
   }
 

@@ -124,7 +124,7 @@ public:
                                      const std::vector<Tensor<1,dim> > &duh,
                                      const std::vector<Tensor<2,dim> > &dduh,
                                      const std::vector<Point<dim> >    &normals,
-                                     std::vector<Vector<double> >      &computed_quantities) const;
+                                     std::vector<Vector<double> >      &computed_quantities) const DEAL_II_DEPRECATED;
 
   /**
    * This is the main function which actually
@@ -182,7 +182,7 @@ public:
                                      const std::vector<std::vector<Tensor<1,dim> > > &duh,
                                      const std::vector<std::vector<Tensor<2,dim> > > &dduh,
                                      const std::vector<Point<dim> >                  &normals,
-                                     std::vector<Vector<double> >                    &computed_quantities) const;
+                                     std::vector<Vector<double> >                    &computed_quantities) const DEAL_II_DEPRECATED;
 
   /**
    * Same as the

@@ -351,7 +351,7 @@ namespace TrilinosWrappers
     /**
     * @deprecated
     */
-    void compress (const Epetra_CombineMode last_action);
+    void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
 
     /**
      * Returns the state of the

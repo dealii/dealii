@@ -34,12 +34,12 @@ namespace Threads
     // counter and access mutex for the
     // number of threads
     volatile unsigned int n_existing_threads_counter = 1;
-    ThreadMutex  n_existing_threads_mutex;
+    Mutex  n_existing_threads_mutex;
 
 
     void register_thread ()
     {
-      ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
+      Mutex::ScopedLock lock (n_existing_threads_mutex);
       ++n_existing_threads_counter;
     }
 
@@ -47,7 +47,7 @@ namespace Threads
 
     void deregister_thread ()
     {
-      ThreadMutex::ScopedLock lock (n_existing_threads_mutex);
+      Mutex::ScopedLock lock (n_existing_threads_mutex);
       --n_existing_threads_counter;
       Assert (n_existing_threads_counter >= 1,
               ExcInternalError());
@@ -127,7 +127,7 @@ namespace Threads
 
   unsigned int n_existing_threads ()
   {
-    ThreadMutex::ScopedLock lock (internal::n_existing_threads_mutex);
+    Mutex::ScopedLock lock (internal::n_existing_threads_mutex);
     return internal::n_existing_threads_counter;
   }
 

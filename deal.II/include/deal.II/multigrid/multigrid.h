@@ -176,7 +176,7 @@ public:
    * level of this Multigrid
    * object.
    */
-  void vmult(VECTOR &dst, const VECTOR &src) const;
+  void vmult(VECTOR &dst, const VECTOR &src) const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated This function is
@@ -194,7 +194,7 @@ public:
    * level of this Multigrid
    * object.
    */
-  void vmult_add(VECTOR &dst, const VECTOR &src) const;
+  void vmult_add(VECTOR &dst, const VECTOR &src) const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Even worse than
@@ -204,7 +204,7 @@ public:
    * objects relying on it can be
    * constructed.
    */
-  void Tvmult(VECTOR &dst, const VECTOR &src) const;
+  void Tvmult(VECTOR &dst, const VECTOR &src) const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated Even worse than
@@ -214,7 +214,7 @@ public:
    * objects relying on it can be
    * constructed.
    */
-  void Tvmult_add(VECTOR &dst, const VECTOR &src) const;
+  void Tvmult_add(VECTOR &dst, const VECTOR &src) const DEAL_II_DEPRECATED;
 
   /**
    * Set additional matrices to

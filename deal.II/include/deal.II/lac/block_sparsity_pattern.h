@@ -745,7 +745,7 @@ public:
  *
  * @deprecated
  */
-typedef BlockCompressedSparsityPattern CompressedBlockSparsityPattern;
+typedef BlockCompressedSparsityPattern CompressedBlockSparsityPattern DEAL_II_DEPRECATED;
 
 
 

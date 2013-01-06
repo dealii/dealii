@@ -908,7 +908,7 @@ public:
    * @deprecated Use iterator or const_iterator instead!
    */
   number raw_entry (const unsigned int row,
-                    const unsigned int index) const;
+                    const unsigned int index) const DEAL_II_DEPRECATED;
 
   /**
    * This is for hackers. Get access to the <i>i</i>th element of this
@@ -923,14 +923,14 @@ public:
    *
    * @internal @deprecated Use iterator or const_iterator instead!
    */
-  number global_entry (const unsigned int i) const;
+  number global_entry (const unsigned int i) const DEAL_II_DEPRECATED;
 
   /**
    * Same as above, but with write access.  You certainly know what you do?
    *
    * @internal @deprecated Use iterator or const_iterator instead!
    */
-  number &global_entry (const unsigned int i);
+  number &global_entry (const unsigned int i) DEAL_II_DEPRECATED;
 
 //@}
   /**
@@ -1497,6 +1497,16 @@ private:
    */
   std::size_t max_len;
 
+  /**
+   * Return the value of the <tt>index</tt>th entry in <tt>row</tt>. Here,
+   * <tt>index</tt> refers to the internal representation of the matrix, not
+   * the column. This is an internal function because it exposes the actual
+   * format in which data is stored -- be sure to understand what you are
+   * doing here.
+   */
+  number nth_entry_in_row (const unsigned int row,
+			   const unsigned int index) const;
+
   // make all other sparse matrices friends
   template <typename somenumber> friend class SparseMatrix;
   template <typename somenumber> friend class SparseLUDecomposition;
@@ -1506,6 +1516,13 @@ private:
    * To allow it calling private prepare_add() and prepare_set().
    */
   template <typename> friend class BlockMatrixBase;
+
+  /**
+   * Also give access to internal details to the iterator/accessor
+   * classes.
+   */
+  template <typename,bool> friend class SparseMatrixIterators::Iterator;
+  template <typename,bool> friend class SparseMatrixIterators::Accessor;
 };
 
 /**
@@ -1813,6 +1830,20 @@ number
 SparseMatrix<number>::raw_entry (const unsigned int row,
                                  const unsigned int index) const
 {
+  // this is the (deprecated) public version of the
+  // nth_entry_in_row() function. this function will soon
+  // go away.
+  return nth_entry_in_row (row, index);
+}
+
+
+
+template <typename number>
+inline
+number
+SparseMatrix<number>::nth_entry_in_row (const unsigned int row,
+					const unsigned int index) const
+{
   Assert(row<cols->rows, ExcIndexRange(row,0,cols->rows));
   Assert(index<cols->row_length(row),
          ExcIndexRange(index,0,cols->row_length(row)));
@@ -1917,7 +1948,7 @@ namespace SparseMatrixIterators
   number
   Accessor<number, true>::value () const
   {
-    return matrix->raw_entry(a_row, a_index);
+    return matrix->nth_entry_in_row(a_row, a_index);
   }
 
 
@@ -1946,8 +1977,8 @@ namespace SparseMatrixIterators
   inline
   Accessor<number, false>::Reference::operator number() const
   {
-    return accessor->matrix->raw_entry(accessor->a_row,
-                                       accessor->a_index);
+    return accessor->matrix->nth_entry_in_row(accessor->a_row,
+					      accessor->a_index);
   }
 
 

@@ -253,7 +253,7 @@ private:
    * we can as well get away
    * with it.
    */
-  Threads::ThreadMutex lock;
+  Threads::Mutex lock;
 
   /**
    * Flag by which the @p alert

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1078,12 +1078,27 @@ namespace DoFRenumbering
               const Point<DH::space_dimension>  &direction,
               const bool         dof_wise_renumbering = false);
 
-  // The following three are only temporary for compatibility reasons and will be removed in 8.0
+  /**
+   * This function does the downstream numbering for the individual
+   * levels of a multigrid hierarchy, but not for the global degrees
+   * of freedom.
+   *
+   * @deprecated Call downstream() function that takes a level
+   * argument for each of the levels of the multigrid hierarchy.
+   */
   template <int dim, int spacedim>
   void
   downstream (MGDoFHandler<dim,spacedim>               &dof_handler,
               const Point<spacedim> &direction,
-              const bool        dof_wise_renumbering = false);
+              const bool        dof_wise_renumbering = false) DEAL_II_DEPRECATED;
+
+  /**
+   * @deprecated Use downstream() instead.
+   */
+  template <class DH>
+  void
+  downstream_dg (DH &dof,
+                 const Point<DH::space_dimension> &direction) DEAL_II_DEPRECATED;
 
   template <class DH>
   void
@@ -1092,6 +1107,16 @@ namespace DoFRenumbering
   {
     downstream(dof, direction);
   }
+
+
+  /**
+   * @deprecated Use downstream() instead.
+   */
+  template <class DH>
+  void
+  downstream_dg (DH &dof,
+                 unsigned int level,
+                 const Point<DH::space_dimension> &direction) DEAL_II_DEPRECATED;
 
   template <class DH>
   void

@@ -450,7 +450,7 @@ public:
    * @endcode
    *
    */
-  unsigned int face_to_equivalent_cell_index (const unsigned int index) const;
+  unsigned int face_to_equivalent_cell_index (const unsigned int index) const DEAL_II_DEPRECATED;
 
   /**
    * Comparison operator.

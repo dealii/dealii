@@ -34,7 +34,7 @@ namespace
 // operates on a per-object base (in which case we would have to
 // include the huge <thread_management.h> file into the
 // <subscriptor.h> file).
-  Threads::ThreadMutex subscription_lock;
+  Threads::Mutex subscription_lock;
 }
 
 
@@ -144,7 +144,7 @@ void Subscriptor::do_subscribe (const char *id) const
 #ifdef DEBUG
   if (object_info == 0)
     object_info = &typeid(*this);
-  Threads::ThreadMutex::ScopedLock lock (subscription_lock);
+  Threads::Mutex::ScopedLock lock (subscription_lock);
   ++counter;
 
 #if DEAL_USE_MT == 0
@@ -171,7 +171,7 @@ void Subscriptor::do_unsubscribe (const char *id) const
   if (counter == 0)
     return;
 
-  Threads::ThreadMutex::ScopedLock lock (subscription_lock);
+  Threads::Mutex::ScopedLock lock (subscription_lock);
   --counter;
 
 #if DEAL_USE_MT == 0

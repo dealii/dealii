@@ -331,7 +331,7 @@ public:
    * this class for more
    * information.
    */
-  Threads::ThreadMutex &get_synchronisation_lock () const;
+  Threads::Mutex &get_synchronisation_lock () const;
 
   /** @addtogroup Exceptions
    * @{ */
@@ -520,8 +520,8 @@ private:
    * Mutexes for synchronising access
    * to this class.
    */
-  static Threads::ThreadMutex static_synchronisation_lock;
-  mutable Threads::ThreadMutex non_static_synchronisation_lock;
+  static Threads::Mutex static_synchronisation_lock;
+  mutable Threads::Mutex non_static_synchronisation_lock;
 
   /**
    * Fill the <tt>A</tt> array from the
@@ -801,7 +801,7 @@ public:
    * this class for more
    * information.
    */
-  Threads::ThreadMutex &get_synchronisation_lock () const;
+  Threads::Mutex &get_synchronisation_lock () const;
 
   /** @addtogroup Exceptions
    * @{ */
@@ -948,7 +948,7 @@ private:
    * Mutex for synchronising access
    * to this class.
    */
-  static Threads::ThreadMutex synchronisation_lock;
+  static Threads::Mutex synchronisation_lock;
 
   /**
    * Fill the <tt>A</tt> array from the
