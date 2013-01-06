@@ -2,7 +2,7 @@
 //      $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -82,12 +82,24 @@ namespace Utilities
                      (digits==3 && i>=1000) ||
                      (digits==4 && i>=10000)||
                      (digits==5 && i>=100000)||
-                     (i>=1000000)),
+		     (digits==6 && i>=1000000)||
+                     (digits==7 && i>=10000000)||
+                     (digits==8 && i>=100000000)||
+		     (digits==9 && i>=1000000000)||
+                     (i>=1000000000)),
                   ExcInvalidNumber2StringConversersion(i, digits));
 
     std::string s;
     switch (digits)
       {
+      case 10:
+        s += '0' + i/1000000000;
+      case 9:
+        s += '0' + i/100000000;
+      case 8:
+        s += '0' + i/10000000;
+      case 7:
+        s += '0' + i/1000000;
       case 6:
         s += '0' + i/100000;
       case 5:

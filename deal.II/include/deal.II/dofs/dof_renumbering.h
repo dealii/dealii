@@ -1116,7 +1116,13 @@ namespace DoFRenumbering
   void
   downstream_dg (DH &dof,
                  unsigned int level,
-                 const Point<DH::space_dimension> &direction) DEAL_II_DEPRECATED
+                 const Point<DH::space_dimension> &direction) DEAL_II_DEPRECATED;
+
+  template <class DH>
+  void
+  downstream_dg (DH &dof,
+                 unsigned int level,
+                 const Point<DH::space_dimension> &direction)
   {
     downstream(dof, level, direction);
   }

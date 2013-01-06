@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -459,7 +459,7 @@ namespace internal
         static
         unsigned int
         distribute_dofs_on_level (const unsigned int        offset,
-                                  const types::subdomain_id_t level_subdomain_id,
+                                  const types::subdomain_id level_subdomain_id,
                                   DoFHandler<dim,spacedim> &dof_handler,
                                   const unsigned int level)
         {
@@ -487,7 +487,7 @@ namespace internal
           endc = dof_handler.end(level);
 
           for (; cell != endc; ++cell)
-            if ((level_subdomain_id == types::invalid_subdomain_id)
+            if ((level_subdomain_id == numbers::invalid_subdomain_id)
                 ||
                 (cell->level_subdomain_id() == level_subdomain_id))
               next_free_dof
@@ -910,7 +910,7 @@ namespace internal
 
         for (unsigned int level = 0; level < dof_handler.get_tria().n_levels(); ++level)
           {
-            unsigned int next_free_dof = Implementation::distribute_dofs_on_level(0, types::invalid_subdomain_id, dof_handler, level);
+            unsigned int next_free_dof = Implementation::distribute_dofs_on_level(0, numbers::invalid_subdomain_id, dof_handler, level);
 
             number_caches[level].n_global_dofs = next_free_dof;
             number_caches[level].n_locally_owned_dofs = next_free_dof;
