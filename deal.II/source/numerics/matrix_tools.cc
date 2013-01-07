@@ -2203,38 +2203,15 @@ namespace MatrixTools
         // to zero except for the diagonal
         // entry. Note that the diagonal
         // entry is always the first one
-        // for square matrices, i.e.
-        // we shall not set
-        // matrix.global_entry(
-        //     sparsity_rowstart[dof.first])
-        // of the diagonal block
+        // in a row for square matrices
         for (unsigned int block_col=0; block_col<blocks; ++block_col)
-          {
-            const SparsityPattern &
-            local_sparsity = sparsity_pattern.block(block_index.first,
-                                                    block_col);
-
-            // find first and last
-            // entry in the present row
-            // of the present
-            // block. exclude the main
-            // diagonal element, which
-            // is the diagonal element
-            // of a diagonal block,
-            // which must be a square
-            // matrix so the diagonal
-            // element is the first of
-            // this row.
-            const unsigned int
-            last  = local_sparsity.get_rowstart_indices()[block_index.second+1],
-            first = (block_col == block_index.first ?
-                     local_sparsity.get_rowstart_indices()[block_index.second]+1 :
-                     local_sparsity.get_rowstart_indices()[block_index.second]);
-
-            for (unsigned int j=first; j<last; ++j)
-              matrix.block(block_index.first,block_col).global_entry(j) = 0.;
-          }
-
+          for (typename SparseMatrix<number>::iterator
+               p = (block_col == block_index.first ?
+                    matrix.block(block_index.first,block_col).begin(block_index.second) + 1 :
+                    matrix.block(block_index.first,block_col).begin(block_index.second));
+               p != matrix.block(block_index.first,block_col).end(block_index.second);
+               ++p)
+            p->value() = 0;
 
         // set right hand side to
         // wanted value: if main diagonal
