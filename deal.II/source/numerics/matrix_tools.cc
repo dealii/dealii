@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1932,7 +1932,7 @@ namespace MatrixTools
   namespace
   {
     template <typename Iterator>
-    bool column_less_than(const typename Iterator::value_type &p,
+    bool column_less_than(const typename Iterator::value_type p,
                           const unsigned int column)
     {
       return (p.column() < column);
@@ -2066,7 +2066,7 @@ namespace MatrixTools
                 // find the position of
                 // element
                 // (row,dof_number)
-                bool (*comp)(const typename SparseMatrix<number>::iterator::value_type &p,
+                bool (*comp)(const typename SparseMatrix<number>::iterator::value_type p,
                              const unsigned int column)
                 = &column_less_than<typename SparseMatrix<number>::iterator>;
                 const typename SparseMatrix<number>::iterator
