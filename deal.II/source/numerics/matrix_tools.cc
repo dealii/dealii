@@ -1929,6 +1929,15 @@ namespace MatrixCreator
 
 namespace MatrixTools
 {
+  namespace
+  {
+    template <typename Iterator>
+    bool column_less_than(const typename Iterator::value_type &p,
+                          const unsigned int column)
+    {
+      return (p.column() < column);
+    }
+  };
 
 //TODO:[WB] I don't think that the optimized storage of diagonals is needed (GK)
   template <typename number>
@@ -2048,18 +2057,20 @@ namespace MatrixTools
             // since that is the
             // diagonal element and
             // thus the present row
-	    const unsigned int last = sparsity_rowstart[dof_number+1];
-            for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
+            for (typename SparseMatrix<number>::iterator
+                q = matrix.begin(dof_number)++;
+                q != matrix.end(dof_number); ++q)
               {
-                const unsigned int row = sparsity_colnums[j];
+                const unsigned int row = q->column();
 
                 // find the position of
                 // element
                 // (row,dof_number)
-                const unsigned int *
-                p = Utilities::lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
-                                           &sparsity_colnums[sparsity_rowstart[row+1]],
-                                           dof_number);
+                const typename SparseMatrix<number>::iterator
+                p = Utilities::lower_bound(matrix.begin(row)++,
+                                           matrix.end(row),
+                                           dof_number,
+                                           &column_less_than<typename SparseMatrix<number>::iterator>);
 
                 // check whether this line has
                 // an entry in the regarding column
@@ -2070,19 +2081,17 @@ namespace MatrixTools
                 // to dof_number anyway...)
                 //
                 // there should be such an entry!
-                Assert ((*p == dof_number) &&
-                        (p != &sparsity_colnums[sparsity_rowstart[row+1]]),
+                Assert ((p != matrix.end(row))
+                        &&
+                        (p->column() == dof_number),
                         ExcInternalError());
 
-                const unsigned int global_entry
-                  = (p - &sparsity_colnums[sparsity_rowstart[0]]);
-
                 // correct right hand side
-                right_hand_side(row) -= matrix.global_entry(global_entry) /
+                right_hand_side(row) -= p->value() /
                                         diagonal_entry * new_rhs;
 
                 // set matrix entry to zero
-                matrix.global_entry(global_entry) = 0.;
+                q->value() = 0.;
               }
           }
 
