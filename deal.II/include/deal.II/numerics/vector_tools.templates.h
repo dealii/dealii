@@ -335,8 +335,8 @@ namespace VectorTools
             Assert (touch_count[local_dof_indices[j]] < numbers::internal_face_boundary_id,
                     ExcInternalError());
             ++touch_count[local_dof_indices[j]];
-          };
-      };
+          }
+      }
 
     // compute the mean value of the
     // sum which we have placed in each
@@ -347,7 +347,7 @@ namespace VectorTools
                 ExcInternalError());
 
         data_2(i) /= touch_count[i];
-      };
+      }
   }
 
 
