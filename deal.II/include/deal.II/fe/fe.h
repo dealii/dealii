@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2875,7 +2875,7 @@ FiniteElement<dim,spacedim>::face_system_to_component_index (const unsigned int 
   //
   // in 1d, the face index is equal
   // to the cell index
-  Assert (is_primitive(this->face_to_cell_index(0, index)),
+  Assert (is_primitive(this->face_to_cell_index(index, 0)),
           (typename FiniteElement<dim,spacedim>::ExcShapeFunctionNotPrimitive(index)) );
 
   return face_system_to_component_table[index];
