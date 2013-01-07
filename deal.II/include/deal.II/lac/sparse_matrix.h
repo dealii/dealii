@@ -2240,13 +2240,13 @@ namespace SparseMatrixIterators
       return ((*this)->index() - other->index());
     else
       {
-//TODO: this shouldn't be so hard to implement. it could either be done as
-// std::difference(*this, other), but for that we lack a bunch of typedefs
-// in the iterator class; it is also inefficient since it has linear complexity
-// in the distance. alternatively, one should be able to just add up the
-// entries in all of the rows of the matrix between *this and other
-        Assert (false, ExcNotImplemented());
-        return 0;
+        const SparsityPattern &sparsity = accessor.get_matrix().get_sparsity_pattern();
+        const unsigned int this_position
+        = sparsity.get_rowstart_indices()[(*this)->row()] + (*this)->index();
+        const unsigned int other_position
+        = sparsity.get_rowstart_indices()[other->row()] + other->index();
+
+        return (this_position - other_position);
       }
   }
 
