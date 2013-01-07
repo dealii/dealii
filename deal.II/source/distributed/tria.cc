@@ -988,7 +988,7 @@ namespace
                                             const typename Triangulation<dim,spacedim>::cell_iterator     &dealii_cell,
                                             const typename internal::p4est::types<dim>::quadrant &p4est_cell,
                                             typename internal::p4est::types<dim>::forest   &forest,
-                                            const types::subdomain_id_t                           my_subdomain,
+                                            const types::subdomain_id                           my_subdomain,
                                             const std::vector<std::vector<bool> > &marked_vertices)
   {
     if (dealii_cell->level_subdomain_id()==numbers::artificial_subdomain_id)
@@ -2762,7 +2762,7 @@ namespace parallel
                         {
                           if (cell->child(c)->level_subdomain_id()==this->locally_owned_subdomain())
                             {
-                              types::subdomain_id_t mark = numbers::artificial_subdomain_id;
+                              types::subdomain_id mark = numbers::artificial_subdomain_id;
                               mark = cell->child(0)->level_subdomain_id();
                               Assert(mark != numbers::artificial_subdomain_id, ExcInternalError()); //we should know the child(0)
                               cell->set_level_subdomain_id(mark);
