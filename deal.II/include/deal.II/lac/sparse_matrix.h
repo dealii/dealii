@@ -297,6 +297,13 @@ namespace SparseMatrixIterators
     MatrixType;
 
     /**
+     * A typedef for the type you get when you dereference an iterator
+     * of the current kind.
+     */
+    typedef
+    const Accessor<number,Constness> & value_type;
+
+    /**
      * Constructor. Create an iterator into the matrix @p matrix for the given
      * row and the index within it.
      */
@@ -359,6 +366,19 @@ namespace SparseMatrixIterators
      * other way round.
      */
     bool operator > (const Iterator &) const;
+
+    /**
+     * Return the distance between the current iterator and the argument.
+     * The distance is given by how many times one has to apply operator++
+     * to the current iterator to get the argument (for a positive return
+     * value), or operator-- (for a negative return value).
+     */
+    int operator - (const Iterator &p) const;
+
+    /**
+     * Return an iterator that is @p n ahead of the current one.
+     */
+    Iterator operator + (const unsigned int n) const;
 
   private:
     /**
@@ -2204,6 +2224,44 @@ namespace SparseMatrixIterators
   operator > (const Iterator &other) const
   {
     return (other < *this);
+  }
+
+
+  template <typename number, bool Constness>
+  inline
+  int
+  Iterator<number,Constness>::
+  operator - (const Iterator &other) const
+  {
+    Assert (&accessor.get_matrix() == &other.accessor.get_matrix(),
+            ExcInternalError());
+
+    if ((*this)->row() == other->row())
+      return ((*this)->index() - other->index());
+    else
+      {
+        const SparsityPattern &sparsity = accessor.get_matrix().get_sparsity_pattern();
+        const unsigned int this_position
+        = sparsity.get_rowstart_indices()[(*this)->row()] + (*this)->index();
+        const unsigned int other_position
+        = sparsity.get_rowstart_indices()[other->row()] + other->index();
+
+        return (this_position - other_position);
+      }
+  }
+
+
+  template <typename number, bool Constness>
+  inline
+  Iterator<number,Constness>
+  Iterator<number,Constness>::
+  operator + (const unsigned int n) const
+  {
+    Iterator x = *this;
+    for (unsigned int i=0; i<n; ++i)
+      ++x;
+
+    return x;
   }
 
 }

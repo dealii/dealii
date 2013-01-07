@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2009, 2010, 2011, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -54,7 +54,7 @@ initlog(const char* filename, bool console=false)
   if (!console)
     deallog.depth_console(0);
 
-//TODO: Remove this line and replace by test_mode()				   
+//TODO: Remove this line and replace by test_mode()
   deallog.threshold_float(1.e-8);
 }
 
@@ -182,7 +182,7 @@ std::string output_file_for_mpi (const std::string &directory)
 {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
   return (directory + "/ncpu_" +
-	  Utilities::int_to_string (Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD)) +
+	  Utilities::int_to_string (Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) +
 	  "/output");
 #else
   return (directory + "/ncpu_1/output");

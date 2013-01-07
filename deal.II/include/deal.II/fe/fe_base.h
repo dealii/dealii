@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -408,7 +408,7 @@ public:
    * Given an index in the natural ordering of indices on a face, return the
    * index of the same degree of freedom on the cell.
    *
-   * @param face_index The index of the degree of freedom on a face.
+   * @param face_dof_index The index of the degree of freedom on a face.
    *   This index must be between zero and dofs_per_face.
    * @param face The number of the face this degree of freedom lives on.
    *   This number must be between zero and GeometryInfo::faces_per_cell.
@@ -422,7 +422,7 @@ public:
    *   of degrees of freedom on the entire cell. The returned value
    *   will be between zero and dofs_per_cell.
    */
-  unsigned int face_to_cell_index (const unsigned int face_index,
+  unsigned int face_to_cell_index (const unsigned int face_dof_index,
                                    const unsigned int face,
                                    const bool face_orientation = true,
                                    const bool face_flip        = false,

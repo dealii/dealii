@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -335,8 +335,8 @@ namespace VectorTools
             Assert (touch_count[local_dof_indices[j]] < numbers::internal_face_boundary_id,
                     ExcInternalError());
             ++touch_count[local_dof_indices[j]];
-          };
-      };
+          }
+      }
 
     // compute the mean value of the
     // sum which we have placed in each
@@ -347,7 +347,7 @@ namespace VectorTools
                 ExcInternalError());
 
         data_2(i) /= touch_count[i];
-      };
+      }
   }
 
 
@@ -1689,7 +1689,7 @@ namespace VectorTools
               std::vector<Point<dim-1> > unit_support_points (fe.dofs_per_face);
 
               for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-                if (fe.is_primitive (fe.face_to_cell_index(0,i)))
+                if (fe.is_primitive (fe.face_to_cell_index(i,0)))
                   if (component_mask[fe.face_system_to_component_index(i).first]
                       == true)
                     unit_support_points[i] = fe.unit_face_support_point(i);
@@ -2146,7 +2146,8 @@ namespace VectorTools
       return;
 
     // set up sparsity structure
-    CompressedSparsityPattern c_sparsity(dof.n_dofs());
+    CompressedSparsityPattern c_sparsity(dof.n_boundary_dofs (boundary_functions),
+					 dof.n_boundary_dofs (boundary_functions));
     DoFTools::make_boundary_sparsity_pattern (dof,
                                               boundary_functions,
                                               dof_to_boundary_mapping,

@@ -1929,6 +1929,15 @@ namespace MatrixCreator
 
 namespace MatrixTools
 {
+  namespace
+  {
+    template <typename Iterator>
+    bool column_less_than(const typename Iterator::value_type &p,
+                          const unsigned int column)
+    {
+      return (p.column() < column);
+    }
+  };
 
 //TODO:[WB] I don't think that the optimized storage of diagonals is needed (GK)
   template <typename number>
@@ -2048,18 +2057,23 @@ namespace MatrixTools
             // since that is the
             // diagonal element and
             // thus the present row
-	    const unsigned int last = sparsity_rowstart[dof_number+1];
-            for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
+            for (typename SparseMatrix<number>::iterator
+                q = matrix.begin(dof_number)++;
+                q != matrix.end(dof_number); ++q)
               {
-                const unsigned int row = sparsity_colnums[j];
+                const unsigned int row = q->column();
 
                 // find the position of
                 // element
                 // (row,dof_number)
-                const unsigned int *
-                p = Utilities::lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
-                                           &sparsity_colnums[sparsity_rowstart[row+1]],
-                                           dof_number);
+                bool (*comp)(const typename SparseMatrix<number>::iterator::value_type &p,
+                             const unsigned int column)
+                = &column_less_than<typename SparseMatrix<number>::iterator>;
+                const typename SparseMatrix<number>::iterator
+                p = Utilities::lower_bound(matrix.begin(row)++,
+                                           matrix.end(row),
+                                           dof_number,
+                                           comp);
 
                 // check whether this line has
                 // an entry in the regarding column
@@ -2070,19 +2084,17 @@ namespace MatrixTools
                 // to dof_number anyway...)
                 //
                 // there should be such an entry!
-                Assert ((*p == dof_number) &&
-                        (p != &sparsity_colnums[sparsity_rowstart[row+1]]),
+                Assert ((p != matrix.end(row))
+                        &&
+                        (p->column() == dof_number),
                         ExcInternalError());
 
-                const unsigned int global_entry
-                  = (p - &sparsity_colnums[sparsity_rowstart[0]]);
-
                 // correct right hand side
-                right_hand_side(row) -= matrix.global_entry(global_entry) /
+                right_hand_side(row) -= p->value() /
                                         diagonal_entry * new_rhs;
 
                 // set matrix entry to zero
-                matrix.global_entry(global_entry) = 0.;
+                q->value() = 0.;
               }
           }
 
@@ -2191,38 +2203,15 @@ namespace MatrixTools
         // to zero except for the diagonal
         // entry. Note that the diagonal
         // entry is always the first one
-        // for square matrices, i.e.
-        // we shall not set
-        // matrix.global_entry(
-        //     sparsity_rowstart[dof.first])
-        // of the diagonal block
+        // in a row for square matrices
         for (unsigned int block_col=0; block_col<blocks; ++block_col)
-          {
-            const SparsityPattern &
-            local_sparsity = sparsity_pattern.block(block_index.first,
-                                                    block_col);
-
-            // find first and last
-            // entry in the present row
-            // of the present
-            // block. exclude the main
-            // diagonal element, which
-            // is the diagonal element
-            // of a diagonal block,
-            // which must be a square
-            // matrix so the diagonal
-            // element is the first of
-            // this row.
-            const unsigned int
-            last  = local_sparsity.get_rowstart_indices()[block_index.second+1],
-            first = (block_col == block_index.first ?
-                     local_sparsity.get_rowstart_indices()[block_index.second]+1 :
-                     local_sparsity.get_rowstart_indices()[block_index.second]);
-
-            for (unsigned int j=first; j<last; ++j)
-              matrix.block(block_index.first,block_col).global_entry(j) = 0.;
-          }
-
+          for (typename SparseMatrix<number>::iterator
+               p = (block_col == block_index.first ?
+                    matrix.block(block_index.first,block_col).begin(block_index.second) + 1 :
+                    matrix.block(block_index.first,block_col).begin(block_index.second));
+               p != matrix.block(block_index.first,block_col).end(block_index.second);
+               ++p)
+            p->value() = 0;
 
         // set right hand side to
         // wanted value: if main diagonal

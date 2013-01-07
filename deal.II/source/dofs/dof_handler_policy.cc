@@ -497,7 +497,7 @@ namespace internal
 //                                               // for cell dof indices
 //              for (typename DoFHandler<dim,spacedim>::level_cell_iterator
 //                     cell = dof_handler.begin(); cell != dof_handler.end(); ++cell)
-//                if (cell->subdomain_id() != types::artificial_subdomain_id)
+//                if (cell->subdomain_id() != numbers::artificial_subdomain_id)
 //                  cell->update_cell_dof_indices_cache ();
 
           // finally restore the user flags
@@ -1130,8 +1130,8 @@ namespace internal
                                         const unsigned int tree_index,
                                         const typename DoFHandler<dim,spacedim>::level_cell_iterator &dealii_cell,
                                         const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell,
-                                        const std::map<unsigned int, std::set<dealii::types::subdomain_id_t> > &vertices_with_ghost_neighbors,
-                                        std::map<dealii::types::subdomain_id_t, typename types<dim>::cellinfo> &needs_to_get_cell,
+                                        const std::map<unsigned int, std::set<dealii::types::subdomain_id> > &vertices_with_ghost_neighbors,
+                                        std::map<dealii::types::subdomain_id, typename types<dim>::cellinfo> &needs_to_get_cell,
                                         const unsigned int level)
         {
           if (dealii_cell->level()>(int)level)
@@ -1171,10 +1171,10 @@ namespace internal
               // check each vertex if
               // it is interesting and
               // push dofindices if yes
-              std::set<dealii::types::subdomain_id_t> send_to;
+              std::set<dealii::types::subdomain_id> send_to;
               for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
                 {
-                  const std::map<unsigned int, std::set<dealii::types::subdomain_id_t> >::const_iterator
+                  const std::map<unsigned int, std::set<dealii::types::subdomain_id> >::const_iterator
                   neighbor_subdomains_of_vertex
                     = vertices_with_ghost_neighbors.find (dealii_cell->vertex_index(v));
 
@@ -1195,8 +1195,8 @@ namespace internal
                   for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
                     {
                       //TODO: we don't know about our children if proc 0 owns all coarse cells!
-                      dealii::types::subdomain_id_t dest = dealii_cell->child(c)->level_subdomain_id();
-                      Assert(dest!=dealii::types::artificial_subdomain_id && dest!=dealii::types::invalid_subdomain_id, ExcInternalError());
+                      dealii::types::subdomain_id dest = dealii_cell->child(c)->level_subdomain_id();
+                      Assert(dest!=dealii::numbers::artificial_subdomain_id && dest!=dealii::numbers::invalid_subdomain_id, ExcInternalError());
                       if (dest != tria.locally_owned_subdomain())
                         send_to.insert(dest);
                     }
@@ -1211,10 +1211,10 @@ namespace internal
                   local_dof_indices (dealii_cell->get_fe().dofs_per_cell);
                   dealii_cell->get_mg_dof_indices (local_dof_indices);
 
-                  for (std::set<dealii::types::subdomain_id_t>::iterator it=send_to.begin();
+                  for (std::set<dealii::types::subdomain_id>::iterator it=send_to.begin();
                        it!=send_to.end(); ++it)
                     {
-                      const dealii::types::subdomain_id_t subdomain = *it;
+                      const dealii::types::subdomain_id subdomain = *it;
 
                       // get an iterator
                       // to what needs to
@@ -1223,7 +1223,7 @@ namespace internal
                       // already exists),
                       // or create such
                       // an object
-                      typename std::map<dealii::types::subdomain_id_t, typename types<dim>::cellinfo>::iterator
+                      typename std::map<dealii::types::subdomain_id, typename types<dim>::cellinfo>::iterator
                       p
                         = needs_to_get_cell.insert (std::make_pair(subdomain,
                                                                    typename types<dim>::cellinfo()))
@@ -1322,7 +1322,7 @@ namespace internal
         {
           if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
             {
-              Assert(dealii_cell->level_subdomain_id()!=dealii::types::artificial_subdomain_id, ExcInternalError());
+              Assert(dealii_cell->level_subdomain_id()!=dealii::numbers::artificial_subdomain_id, ExcInternalError());
               Assert(dealii_cell->level()==(int)level, ExcInternalError());
 
               // update dof indices of cell
@@ -1650,7 +1650,7 @@ namespace internal
         void
         communicate_mg_dof_indices_on_marked_cells
         (const DoFHandler<1,spacedim> &dof_handler,
-         const std::map<unsigned int, std::set<dealii::types::subdomain_id_t> > &vertices_with_ghost_neighbors,
+         const std::map<unsigned int, std::set<dealii::types::subdomain_id> > &vertices_with_ghost_neighbors,
          const std::vector<unsigned int> &coarse_cell_to_p4est_tree_permutation,
          const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
          const unsigned int level)
@@ -1664,7 +1664,7 @@ namespace internal
         void
         communicate_mg_dof_indices_on_marked_cells
         (const DoFHandler<dim,spacedim> &dof_handler,
-         const std::map<unsigned int, std::set<dealii::types::subdomain_id_t> > &vertices_with_ghost_neighbors,
+         const std::map<unsigned int, std::set<dealii::types::subdomain_id> > &vertices_with_ghost_neighbors,
          const std::vector<unsigned int> &coarse_cell_to_p4est_tree_permutation,
          const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
          const unsigned int level)
@@ -1683,7 +1683,7 @@ namespace internal
           // dof_indices for the
           // interested neighbors
           typedef
-          std::map<dealii::types::subdomain_id_t, typename types<dim>::cellinfo>
+          std::map<dealii::types::subdomain_id, typename types<dim>::cellinfo>
           cellmap_t;
           cellmap_t needs_to_get_cells;
 
@@ -1742,7 +1742,7 @@ namespace internal
           // mark all own cells, that miss some
           // dof_data and collect the neighbors
           // that are going to send stuff to us
-          std::set<dealii::types::subdomain_id_t> senders;
+          std::set<dealii::types::subdomain_id> senders;
           if (level < tr->n_levels())
             {
               std::vector<unsigned int> local_dof_indices;
@@ -1751,7 +1751,7 @@ namespace internal
 
               for (cell = dof_handler.begin(level); cell != endc; ++cell)
                 {
-                  if (cell->level_subdomain_id()==dealii::types::artificial_subdomain_id)
+                  if (cell->level_subdomain_id()==dealii::numbers::artificial_subdomain_id)
                     {
                       //artificial
                     }
@@ -2285,7 +2285,7 @@ namespace internal
                 typename DoFHandler<dim,spacedim>::level_cell_iterator
                 cell, endc = dof_handler.end(level);
                 for (cell = dof_handler.begin(level); cell != endc; ++cell)
-                  if (cell->level_subdomain_id() != dealii::types::artificial_subdomain_id)
+                  if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id)
                     cell->set_user_flag();
               }
 
@@ -2298,13 +2298,13 @@ namespace internal
             // subdomain to the vertex and
             // keep track of interesting
             // neighbors
-            std::map<unsigned int, std::set<dealii::types::subdomain_id_t> >
+            std::map<unsigned int, std::set<dealii::types::subdomain_id> >
             vertices_with_ghost_neighbors;
             if (level < tr->n_levels())
               for (typename DoFHandler<dim,spacedim>::level_cell_iterator
                    cell = dof_handler.begin(level);
                    cell != dof_handler.end(level); ++cell)
-                if (cell->level_subdomain_id() != dealii::types::artificial_subdomain_id && cell->level_subdomain_id() != tr->locally_owned_subdomain())
+                if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id && cell->level_subdomain_id() != tr->locally_owned_subdomain())
                   for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
                     if (locally_active_vertices[cell->vertex_index(v)])
                       vertices_with_ghost_neighbors[cell->vertex_index(v)]
@@ -2339,7 +2339,7 @@ namespace internal
                 cell, endc = dof_handler.end(level);
 
                 for (cell = dof_handler.begin(level); cell != endc; ++cell)
-                  if (cell->level_subdomain_id() != dealii::types::artificial_subdomain_id)
+                  if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id)
                     {
                       local_dof_indices.resize (cell->get_fe().dofs_per_cell);
                       cell->get_mg_dof_indices (local_dof_indices);

@@ -58,7 +58,7 @@ void write_vtk (const parallel::distributed::Triangulation<dim> &tria,
   if (false)
     {
 
-      int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+      int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
 
 				       // copy the .pvtu and .vtu files
