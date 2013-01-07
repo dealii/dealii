@@ -1689,7 +1689,7 @@ namespace VectorTools
               std::vector<Point<dim-1> > unit_support_points (fe.dofs_per_face);
 
               for (unsigned int i=0; i<fe.dofs_per_face; ++i)
-                if (fe.is_primitive (fe.face_to_cell_index(0,i)))
+                if (fe.is_primitive (fe.face_to_cell_index(i,0)))
                   if (component_mask[fe.face_system_to_component_index(i).first]
                       == true)
                     unit_support_points[i] = fe.unit_face_support_point(i);
