@@ -254,7 +254,7 @@ namespace
 
 /* -------------------------- MA27 ---------------------------- */
 
-Threads::ThreadMutex SparseDirectMA27::static_synchronisation_lock;
+Threads::Mutex SparseDirectMA27::static_synchronisation_lock;
 
 
 struct SparseDirectMA27::DetachedModeData
@@ -264,7 +264,7 @@ struct SparseDirectMA27::DetachedModeData
    * thread is currently talking
    * through the pipe.
    */
-  Threads::ThreadMutex mutex;
+  Threads::Mutex mutex;
 
   /**
    * File handles for the pipe
@@ -387,7 +387,7 @@ SparseDirectMA27::~SparseDirectMA27()
     if (detached_mode_data != 0)
       {
         // close down client
-        Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
+        Threads::Mutex::ScopedLock lock (detached_mode_data->mutex);
         // Assign the result of write
         // and reset the variable to
         // avoid compiler warnings
@@ -850,7 +850,7 @@ SparseDirectMA27::memory_consumption () const
 
 
 
-Threads::ThreadMutex &
+Threads::Mutex &
 SparseDirectMA27::get_synchronisation_lock () const
 {
   if (detached_mode)
@@ -928,7 +928,7 @@ void SparseDirectMA27::call_ma27ad (const unsigned int *N,
                         IKEEP, IW1, NSTEPS, IFLAG);
   else
     {
-      Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
+      Threads::Mutex::ScopedLock lock (detached_mode_data->mutex);
       // first write the data we have
       // to push over, i.e. first
       // function index, then array
@@ -978,7 +978,7 @@ void SparseDirectMA27::call_ma27bd (const unsigned int *N,
       // basically, everything is
       // already over the line,
       // except for A and LA
-      Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
+      Threads::Mutex::ScopedLock lock (detached_mode_data->mutex);
       detached_mode_data->put ("2", 1, "ACTION 2");
 
       detached_mode_data->put (LA, 1, "LA");
@@ -1026,7 +1026,7 @@ void SparseDirectMA27::call_ma27x1 (unsigned int *NRLNEC)
     HSL::MA27::ma27x1_ (NRLNEC);
   else
     {
-      Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
+      Threads::Mutex::ScopedLock lock (detached_mode_data->mutex);
       // ma27x1 only reads data, so
       // don't send anything except
       // for the id
@@ -1043,7 +1043,7 @@ void SparseDirectMA27::call_ma27x2 (unsigned int *NIRNEC)
     HSL::MA27::ma27x2_ (NIRNEC);
   else
     {
-      Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
+      Threads::Mutex::ScopedLock lock (detached_mode_data->mutex);
       // ma27x2 only reads data, so
       // don't send anything except
       // for the id
@@ -1060,7 +1060,7 @@ void SparseDirectMA27::call_ma27x3 (const unsigned int *LP)
     HSL::MA27::ma27x3_ (LP);
   else
     {
-      Threads::ThreadMutex::ScopedLock lock (detached_mode_data->mutex);
+      Threads::Mutex::ScopedLock lock (detached_mode_data->mutex);
       // ma27x2 only reads data, so
       // don't send anything except
       // for the id
@@ -1075,7 +1075,7 @@ void SparseDirectMA27::call_ma27x3 (const unsigned int *LP)
 
 /* -------------------------- MA47 ---------------------------- */
 
-Threads::ThreadMutex SparseDirectMA47::synchronisation_lock;
+Threads::Mutex SparseDirectMA47::synchronisation_lock;
 
 
 SparseDirectMA47::SparseDirectMA47 (const double LIW_factor_1,
@@ -1373,7 +1373,7 @@ SparseDirectMA47::memory_consumption () const
 
 
 
-Threads::ThreadMutex &
+Threads::Mutex &
 SparseDirectMA47::get_synchronisation_lock () const
 {
   return synchronisation_lock;

@@ -407,7 +407,8 @@ BlockIndices::global_to_local (const unsigned int i) const
   while (i < start_indices[block])
     --block;
 
-  return std::make_pair<unsigned int>(block, i-start_indices[block]);
+  return std::pair<unsigned int,unsigned int>(block,
+					      i-start_indices[block]);
 }
 
 

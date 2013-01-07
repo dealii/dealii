@@ -78,8 +78,8 @@ PolynomialsRaviartThomas<dim>::compute (const Point<dim>            &unit_point,
   // deal.II/create_mass_matrix_05)
   // will start to produce random
   // results in multithread mode
-  static Threads::ThreadMutex mutex;
-  Threads::ThreadMutex::ScopedLock lock(mutex);
+  static Threads::Mutex mutex;
+  Threads::Mutex::ScopedLock lock(mutex);
 
   static std::vector<double> p_values;
   static std::vector<Tensor<1,dim> > p_grads;

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -733,6 +733,18 @@ namespace PETScWrappers
      * values.
      */
     void update_ghost_values() const;
+
+
+    /**
+     * Prints the PETSc vector object values
+     * using PETSc internal vector viewer function
+     * <tt>VecView</tt>. The default format prints
+     * the vector's contents, including indices of
+     * vector elements. For other valid view formats,
+     * consult
+     * http://www.mcs.anl.gov/petsc/petsc-current/docs/manualpages/Vec/VecView.html
+     */
+    void write_ascii (const PetscViewerFormat format = PETSC_VIEWER_DEFAULT) ;
 
     /**
      * Print to a

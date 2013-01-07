@@ -75,25 +75,33 @@ namespace hp
   template <int dim, int spacedim=dim>
   class DoFHandler : public Subscriptor
   {
-    typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim> > IteratorSelector;
+    typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim>, false> ActiveSelector;
+    typedef dealii::internal::DoFHandler::Iterators<DoFHandler<dim,spacedim>, true> LevelSelector;
   public:
-    typedef typename IteratorSelector::CellAccessor         cell_accessor;
-    typedef typename IteratorSelector::FaceAccessor         face_accessor;
+    typedef typename ActiveSelector::CellAccessor         cell_accessor;
+    typedef typename ActiveSelector::FaceAccessor         face_accessor;
 
-    typedef typename IteratorSelector::line_iterator line_iterator;
-    typedef typename IteratorSelector::active_line_iterator active_line_iterator;
+    typedef typename ActiveSelector::line_iterator        line_iterator;
+    typedef typename ActiveSelector::active_line_iterator active_line_iterator;
 
-    typedef typename IteratorSelector::quad_iterator quad_iterator;
-    typedef typename IteratorSelector::active_quad_iterator active_quad_iterator;
+    typedef typename ActiveSelector::quad_iterator        quad_iterator;
+    typedef typename ActiveSelector::active_quad_iterator active_quad_iterator;
 
-    typedef typename IteratorSelector::hex_iterator hex_iterator;
-    typedef typename IteratorSelector::active_hex_iterator active_hex_iterator;
+    typedef typename ActiveSelector::hex_iterator         hex_iterator;
+    typedef typename ActiveSelector::active_hex_iterator  active_hex_iterator;
 
-    typedef typename IteratorSelector::cell_iterator cell_iterator;
-    typedef typename IteratorSelector::active_cell_iterator active_cell_iterator;
+    typedef typename ActiveSelector::active_cell_iterator active_cell_iterator;
 
-    typedef typename IteratorSelector::face_iterator face_iterator;
-    typedef typename IteratorSelector::active_face_iterator active_face_iterator;
+    typedef typename ActiveSelector::face_iterator        face_iterator;
+    typedef typename ActiveSelector::active_face_iterator active_face_iterator;
+
+    typedef typename LevelSelector::CellAccessor          level_cell_accessor;
+    typedef typename LevelSelector::FaceAccessor          level_face_accessor;
+
+    typedef typename LevelSelector::cell_iterator         level_cell_iterator;
+    typedef typename LevelSelector::face_iterator         level_face_iterator;
+
+    typedef level_cell_iterator                           cell_iterator;
 
     /**
      * Alias the @p FunctionMap type
@@ -327,7 +335,7 @@ namespace hp
     */
     active_cell_iterator end_active (const unsigned int level) const;
 
-    //@}
+    /*@}*/
 
     /*---------------------------------------*/
 
@@ -364,6 +372,17 @@ namespace hp
      * hanging nodes, see @ref constraints.
      */
     unsigned int n_dofs () const;
+
+    /**
+    * The number of multilevel
+    * dofs on given level. Since
+    * hp::DoFHandler does not
+    * support multilevel methods
+    * yet, this function returns
+    * numbers::invalid_unsigned
+    * int independent of its argument.
+    */
+    unsigned int n_dofs(const unsigned int level) const;
 
     /**
      * Return the number of degrees of freedom
@@ -631,10 +650,25 @@ namespace hp
      */
     DoFHandler &operator = (const DoFHandler &);
 
+    class MGVertexDoFs
+    {
+    public:
+      MGVertexDoFs ();
+      ~MGVertexDoFs ();
+      unsigned int get_index (const unsigned int level, const unsigned int dof_number) const;
+      void set_index (const unsigned int level, const unsigned int dof_number, const unsigned int index);
+    };
+
     /**
      * Free all used memory.
      */
     void clear_space ();
+
+    template<int structdim>
+    unsigned int get_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index) const;
+
+    template<int structdim>
+    void set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const unsigned int global_index) const;
 
     /**
      *  Create default tables for
@@ -667,7 +701,6 @@ namespace hp
      */
     void pre_refinement_action ();
     void post_refinement_action ();
-
 
     /**
      * Compute identities between
@@ -811,6 +844,8 @@ namespace hp
      */
     std::vector<unsigned int>      vertex_dofs_offsets;
 
+    std::vector<MGVertexDoFs> mg_vertex_dofs;
+
     /**
      * Array to store the
      * information, if a cell on
@@ -835,8 +870,8 @@ namespace hp
     /**
      * Make accessor objects friends.
      */
-    template <int, class> friend class dealii::DoFAccessor;
-    template <class> friend class dealii::DoFCellAccessor;
+    template <int, class, bool> friend class dealii::DoFAccessor;
+    template <class, bool> friend class dealii::DoFCellAccessor;
     friend struct dealii::internal::DoFAccessor::Implementation;
     friend struct dealii::internal::DoFCellAccessor::Implementation;
 
@@ -865,6 +900,15 @@ namespace hp
   DoFHandler<dim,spacedim>::n_dofs () const
   {
     return number_cache.n_global_dofs;
+  }
+
+
+  template <int dim, int spacedim>
+  inline
+  unsigned int
+  DoFHandler<dim,spacedim>::n_dofs (const unsigned int) const
+  {
+    return numbers::invalid_unsigned_int;
   }
 
 
@@ -921,7 +965,37 @@ namespace hp
     return *tria;
   }
 
+  template<int dim, int spacedim>
+  inline
+  DoFHandler<dim, spacedim>::MGVertexDoFs::MGVertexDoFs()
+  {
+    Assert (false, ExcNotImplemented ());
+  }
 
+  template<int dim, int spacedim>
+  inline
+  DoFHandler<dim, spacedim>::MGVertexDoFs::~MGVertexDoFs()
+  {
+    Assert (false, ExcNotImplemented ());
+  }
+
+  template<int dim, int spacedim>
+  inline
+  unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (const unsigned int,
+      const unsigned int) const
+  {
+    Assert (false, ExcNotImplemented ());
+    return invalid_dof_index;
+  }
+
+  template<int dim, int spacedim>
+  inline
+  void DoFHandler<dim, spacedim>::MGVertexDoFs::set_index (const unsigned int,
+                                                           const unsigned int,
+                                                           const unsigned int)
+  {
+    Assert (false, ExcNotImplemented ());
+  }
 
 
 #endif

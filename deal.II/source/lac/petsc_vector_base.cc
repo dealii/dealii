@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -979,6 +979,22 @@ namespace PETScWrappers
   {
     const int ierr = VecPointwiseDivide (vector, a, b);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+  }
+
+
+
+  void
+  VectorBase::write_ascii (const PetscViewerFormat format)
+  {
+    // First flush PETSc caches
+    compress();
+
+    // Set options
+    PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
+			  format);
+
+    // Write to screen
+    VecView (vector, PETSC_VIEWER_STDOUT_WORLD);
   }
 
 

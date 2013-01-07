@@ -119,12 +119,7 @@ compute_mapping_support_points
   // into a dof iterator so we can
   // access data not associated with
   // triangulations
-
-  typename DoFHandler<dim,spacedim>::cell_iterator dof_cell
-  (const_cast<Triangulation<dim,spacedim> *> (&(cell->get_triangulation())),
-   cell->level(),
-   cell->index(),
-   euler_dof_handler);
+  typename DoFHandler<dim,spacedim>::cell_iterator dof_cell(*cell, euler_dof_handler);
 
   Assert (dof_cell->active() == true, ExcInactiveCell());
 
@@ -163,7 +158,7 @@ compute_mapping_support_points
   // fe_values variable isn't used
   // simulatenously from different
   // threads
-  Threads::ThreadMutex::ScopedLock lock(fe_values_mutex);
+  Threads::Mutex::ScopedLock lock(fe_values_mutex);
   fe_values.reinit(dof_cell);
   fe_values.get_function_values(*euler_vector, shift_vector);
 

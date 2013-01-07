@@ -23,7 +23,6 @@
 #include <deal.II/grid/intergrid_map.h>
 
 #include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
 
 DEAL_II_NAMESPACE_OPEN
 

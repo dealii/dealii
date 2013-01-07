@@ -825,7 +825,7 @@ namespace MatrixCreator
                                    const Function<spacedim> *const coefficient,
                                    const std::vector<unsigned int> &component_mapping,
                                    const MatrixCreator::internal::IteratorRange<DoFHandler<dim,spacedim> >   range,
-                                   Threads::ThreadMutex      &mutex)
+                                   Threads::Mutex      &mutex)
     {
       // All assertions for this function
       // are in the calling function
@@ -1060,7 +1060,7 @@ namespace MatrixCreator
                                      dofs_on_face_vector.end());
 
               // lock the matrix
-              Threads::ThreadMutex::ScopedLock lock (mutex);
+              Threads::Mutex::ScopedLock lock (mutex);
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
                   if (dof_is_on_face[i] && dof_to_boundary_mapping[dofs[i]] != numbers::invalid_unsigned_int)
@@ -1093,7 +1093,7 @@ namespace MatrixCreator
                                         const Function<3> *const ,
                                         const std::vector<unsigned int> &,
                                         const MatrixCreator::internal::IteratorRange<DoFHandler<2,3> > ,
-                                        Threads::ThreadMutex &)
+                                        Threads::Mutex &)
     {
       Assert(false,ExcNotImplemented());
     }
@@ -1112,7 +1112,7 @@ namespace MatrixCreator
                                         const Function<3> *const ,
                                         const std::vector<unsigned int> &,
                                         const MatrixCreator::internal::IteratorRange<DoFHandler<1,3> > ,
-                                        Threads::ThreadMutex &)
+                                        Threads::Mutex &)
     {
       Assert(false,ExcNotImplemented());
     }
@@ -1177,7 +1177,7 @@ namespace MatrixCreator
 
     // mutex to synchronise access to
     // the matrix
-    Threads::ThreadMutex mutex;
+    Threads::Mutex mutex;
 
     typedef std_cxx1x::tuple<const Mapping<dim,spacedim> &,
             const DoFHandler<dim,spacedim> &,
@@ -1193,7 +1193,7 @@ namespace MatrixCreator
      const Function<spacedim> *const coefficient,
      const std::vector<unsigned int> &component_mapping,
      const MatrixCreator::internal::IteratorRange<DoFHandler<dim,spacedim> >   range,
-     Threads::ThreadMutex      &mutex);
+     Threads::Mutex      &mutex);
     create_boundary_mass_matrix_1_t p
       = &create_boundary_mass_matrix_1<dim,spacedim>;
 
@@ -1225,7 +1225,7 @@ namespace MatrixCreator
                                    const Function<spacedim> *const coefficient,
                                    const std::vector<unsigned int> &component_mapping,
                                    const MatrixCreator::internal::IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
-                                   Threads::ThreadMutex      &mutex)
+                                   Threads::Mutex      &mutex)
     {
       const hp::MappingCollection<dim,spacedim> &mapping = std_cxx1x::get<0>(commons);
       const hp::DoFHandler<dim,spacedim> &dof = std_cxx1x::get<1>(commons);
@@ -1522,7 +1522,7 @@ namespace MatrixCreator
 #endif
 
               // lock the matrix
-              Threads::ThreadMutex::ScopedLock lock (mutex);
+              Threads::Mutex::ScopedLock lock (mutex);
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 for (unsigned int j=0; j<dofs_per_cell; ++j)
                   if (dof_is_on_face[i] && dof_is_on_face[j])
@@ -1657,7 +1657,7 @@ namespace MatrixCreator
 
     // mutex to synchronise access to
     // the matrix
-    Threads::ThreadMutex mutex;
+    Threads::Mutex mutex;
 
     // then assemble in parallel
     typedef void (*create_boundary_mass_matrix_1_t)
@@ -1669,7 +1669,7 @@ namespace MatrixCreator
      const Function<spacedim> *const coefficient,
      const std::vector<unsigned int> &component_mapping,
      const MatrixCreator::internal::IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
-     Threads::ThreadMutex      &mutex);
+     Threads::Mutex      &mutex);
     create_boundary_mass_matrix_1_t p = &create_boundary_mass_matrix_1<dim,spacedim>;
 
 //TODO: Use WorkStream here
@@ -1929,6 +1929,15 @@ namespace MatrixCreator
 
 namespace MatrixTools
 {
+  namespace
+  {
+    template <typename Iterator>
+    bool column_less_than(const typename Iterator::value_type &p,
+                          const unsigned int column)
+    {
+      return (p.column() < column);
+    }
+  };
 
 //TODO:[WB] I don't think that the optimized storage of diagonals is needed (GK)
   template <typename number>
@@ -1982,18 +1991,13 @@ namespace MatrixTools
         const unsigned int dof_number = dof->first;
         // for each boundary dof:
 
-        // set entries of this line
-        // to zero except for the diagonal
-        // entry. Note that the diagonal
-        // entry is always the first one
-        // for square matrices, i.e.
-        // we shall not set
-        // matrix.global_entry(
-        //     sparsity_rowstart[dof.first])
-        const unsigned int last = sparsity_rowstart[dof_number+1];
-        for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
-          matrix.global_entry(j) = 0.;
-
+        // set entries of this line to zero except for the diagonal
+        // entry
+	for (typename SparseMatrix<number>::iterator
+	       p = matrix.begin(dof_number);
+	     p != matrix.end(dof_number); ++p)
+	  if (p->column() != dof_number)
+	    p->value() = 0.;
 
         // set right hand side to
         // wanted value: if main diagonal
@@ -2053,17 +2057,23 @@ namespace MatrixTools
             // since that is the
             // diagonal element and
             // thus the present row
-            for (unsigned int j=sparsity_rowstart[dof_number]+1; j<last; ++j)
+            for (typename SparseMatrix<number>::iterator
+                q = matrix.begin(dof_number)++;
+                q != matrix.end(dof_number); ++q)
               {
-                const unsigned int row = sparsity_colnums[j];
+                const unsigned int row = q->column();
 
                 // find the position of
                 // element
                 // (row,dof_number)
-                const unsigned int *
-                p = Utilities::lower_bound(&sparsity_colnums[sparsity_rowstart[row]+1],
-                                           &sparsity_colnums[sparsity_rowstart[row+1]],
-                                           dof_number);
+                bool (*comp)(const typename SparseMatrix<number>::iterator::value_type &p,
+                             const unsigned int column)
+                = &column_less_than<typename SparseMatrix<number>::iterator>;
+                const typename SparseMatrix<number>::iterator
+                p = Utilities::lower_bound(matrix.begin(row)++,
+                                           matrix.end(row),
+                                           dof_number,
+                                           comp);
 
                 // check whether this line has
                 // an entry in the regarding column
@@ -2074,19 +2084,17 @@ namespace MatrixTools
                 // to dof_number anyway...)
                 //
                 // there should be such an entry!
-                Assert ((*p == dof_number) &&
-                        (p != &sparsity_colnums[sparsity_rowstart[row+1]]),
+                Assert ((p != matrix.end(row))
+                        &&
+                        (p->column() == dof_number),
                         ExcInternalError());
 
-                const unsigned int global_entry
-                  = (p - &sparsity_colnums[sparsity_rowstart[0]]);
-
                 // correct right hand side
-                right_hand_side(row) -= matrix.global_entry(global_entry) /
+                right_hand_side(row) -= p->value() /
                                         diagonal_entry * new_rhs;
 
                 // set matrix entry to zero
-                matrix.global_entry(global_entry) = 0.;
+                q->value() = 0.;
               }
           }
 

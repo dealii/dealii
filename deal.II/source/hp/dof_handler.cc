@@ -1638,7 +1638,6 @@ namespace hp
   }
 
 
-
   /*------------------------ Cell iterator functions ------------------------*/
 
   template <int dim, int spacedim>
@@ -1696,6 +1695,8 @@ namespace hp
             active_cell_iterator(end()) :
             begin_active (level+1));
   }
+
+
 
 
 //------------------------------------------------------------------
@@ -1823,6 +1824,7 @@ namespace hp
     Assert(false,ExcNotImplemented());
     return 0;
   }
+
 
 
   template <>
@@ -2021,7 +2023,7 @@ namespace hp
     // vertices at all, I can't think
     // of a finite element that would
     // make that necessary...
-    Table<2,std_cxx1x::shared_ptr<internal::hp::DoFIdentities> >
+    Table<2,std_cxx1x::shared_ptr<dealii::internal::hp::DoFIdentities> >
     vertex_dof_identities (get_fe().size(),
                            get_fe().size());
 
@@ -2032,13 +2034,13 @@ namespace hp
          ++vertex_index)
       {
         const unsigned int n_active_fe_indices
-          = internal::DoFAccessor::Implementation::
+          = dealii::internal::DoFAccessor::Implementation::
             n_active_vertex_fe_indices (*this, vertex_index);
         if (n_active_fe_indices > 1)
           {
             const unsigned int
             first_fe_index
-              = internal::DoFAccessor::Implementation::
+              = dealii::internal::DoFAccessor::Implementation::
                 nth_active_vertex_fe_index (*this, vertex_index, 0);
 
             // loop over all the
@@ -2050,14 +2052,14 @@ namespace hp
               {
                 const unsigned int
                 other_fe_index
-                  = internal::DoFAccessor::Implementation::
+                  = dealii::internal::DoFAccessor::Implementation::
                     nth_active_vertex_fe_index (*this, vertex_index, f);
 
                 // make sure the
                 // entry in the
                 // equivalence
                 // table exists
-                internal::hp::ensure_existence_of_dof_identities<0>
+                dealii::internal::hp::ensure_existence_of_dof_identities<0>
                 (get_fe()[first_fe_index],
                  get_fe()[other_fe_index],
                  vertex_dof_identities[first_fe_index][other_fe_index]);
@@ -2086,18 +2088,18 @@ namespace hp
                 // lower, to avoid
                 // circular
                 // reasoning.
-                internal::hp::DoFIdentities &identities
+                dealii::internal::hp::DoFIdentities &identities
                   = *vertex_dof_identities[first_fe_index][other_fe_index];
                 for (unsigned int i=0; i<identities.size(); ++i)
                   {
                     const unsigned int lower_dof_index
-                      = internal::DoFAccessor::Implementation::
+                      = dealii::internal::DoFAccessor::Implementation::
                         get_vertex_dof_index (*this,
                                               vertex_index,
                                               first_fe_index,
                                               identities[i].first);
                     const unsigned int higher_dof_index
-                      = internal::DoFAccessor::Implementation::
+                      = dealii::internal::DoFAccessor::Implementation::
                         get_vertex_dof_index (*this,
                                               vertex_index,
                                               other_fe_index,
@@ -2116,7 +2118,6 @@ namespace hp
           }
       }
   }
-
 
 
   template <>
@@ -2573,7 +2574,7 @@ namespace hp
 
     // then allocate space for all
     // the other tables
-    internal::hp::DoFHandler::Implementation::reserve_space (*this);
+    dealii::internal::hp::DoFHandler::Implementation::reserve_space (*this);
 
     // Clear user flags because we will
     // need them. But first we save
@@ -2599,7 +2600,7 @@ namespace hp
 
       for (; cell != endc; ++cell)
         next_free_dof
-          = internal::hp::DoFHandler::Implementation::template distribute_dofs_on_cell<spacedim> (cell,
+          = dealii::internal::hp::DoFHandler::Implementation::template distribute_dofs_on_cell<spacedim> (cell,
             next_free_dof);
 
       number_cache.n_global_dofs = next_free_dof;
@@ -2658,7 +2659,7 @@ namespace hp
     // finally, do the renumbering
     // and set the number of actually
     // used dof indices
-    renumber_dofs_internal (new_dof_indices, internal::int2type<dim>());
+    renumber_dofs_internal (new_dof_indices, dealii::internal::int2type<dim>());
 
     // now set the elements of the
     // number cache appropriately
@@ -2714,7 +2715,7 @@ namespace hp
       }
 #endif
 
-    renumber_dofs_internal (new_numbers, internal::int2type<dim>());
+    renumber_dofs_internal (new_numbers, dealii::internal::int2type<dim>());
   }
 
 
@@ -2723,7 +2724,7 @@ namespace hp
   void
   DoFHandler<dim,spacedim>::
   renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
-                          internal::int2type<0>)
+                          dealii::internal::int2type<0>)
   {
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
@@ -2731,24 +2732,24 @@ namespace hp
          ++vertex_index)
       {
         const unsigned int n_active_fe_indices
-          = internal::DoFAccessor::Implementation::
+          = dealii::internal::DoFAccessor::Implementation::
             n_active_vertex_fe_indices (*this, vertex_index);
 
         for (unsigned int f=0; f<n_active_fe_indices; ++f)
           {
             const unsigned int fe_index
-              = internal::DoFAccessor::Implementation::
+              = dealii::internal::DoFAccessor::Implementation::
                 nth_active_vertex_fe_index (*this, vertex_index, f);
 
             for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_vertex; ++d)
               {
                 const unsigned int vertex_dof_index
-                  = internal::DoFAccessor::Implementation::
+                  = dealii::internal::DoFAccessor::Implementation::
                     get_vertex_dof_index(*this,
                                          vertex_index,
                                          fe_index,
                                          d);
-                internal::DoFAccessor::Implementation::
+                dealii::internal::DoFAccessor::Implementation::
                 set_vertex_dof_index (*this,
                                       vertex_index,
                                       fe_index,
@@ -2765,7 +2766,7 @@ namespace hp
   void
   DoFHandler<dim,spacedim>::
   renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
-                          internal::int2type<1>)
+                          dealii::internal::int2type<1>)
   {
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 
@@ -2809,12 +2810,13 @@ namespace hp
   }
 
 
+
 //TODO: Merge the following three functions -- they are identical
   template<>
   void
   DoFHandler<2,2>::
   renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
-                          internal::int2type<2>)
+                          dealii::internal::int2type<2>)
   {
     const unsigned int dim = 2;
     const unsigned int spacedim = 2;
@@ -2866,7 +2868,7 @@ namespace hp
   void
   DoFHandler<2,3>::
   renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
-                          internal::int2type<2>)
+                          dealii::internal::int2type<2>)
   {
     const unsigned int dim = 2;
     const unsigned int spacedim = 3;
@@ -2917,7 +2919,7 @@ namespace hp
   void
   DoFHandler<3,3>::
   renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
-                          internal::int2type<2>)
+                          dealii::internal::int2type<2>)
   {
     const unsigned int dim = 3;
     const unsigned int spacedim = 3;
@@ -2968,7 +2970,7 @@ namespace hp
   void
   DoFHandler<3,3>::
   renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
-                          internal::int2type<3>)
+                          dealii::internal::int2type<3>)
   {
     const unsigned int dim = 3;
     const unsigned int spacedim = 3;
@@ -3024,7 +3026,7 @@ namespace hp
   DoFHandler<dim, spacedim>::max_couplings_between_dofs () const
   {
     Assert (finite_elements != 0, ExcNoFESelected());
-    return internal::hp::DoFHandler::Implementation::max_couplings_between_dofs (*this);
+    return dealii::internal::hp::DoFHandler::Implementation::max_couplings_between_dofs (*this);
   }
 
 
@@ -3074,7 +3076,7 @@ namespace hp
     // Create sufficiently many
     // hp::DoFLevels.
     while (levels.size () < tria->n_levels ())
-      levels.push_back (new internal::hp::DoFLevel<dim>);
+      levels.push_back (new dealii::internal::hp::DoFLevel<dim>);
 
     // then make sure that on each
     // level we have the appropriate
@@ -3193,6 +3195,7 @@ namespace hp
   }
 
 
+
   template <>
   void DoFHandler<1,3>::pre_refinement_action ()
   {
@@ -3232,7 +3235,7 @@ namespace hp
     // it is appended to the DoFHandler
     // levels.
     if (levels.size () < tria->n_levels ())
-      levels.push_back (new internal::hp::DoFLevel<dim>);
+      levels.push_back (new dealii::internal::hp::DoFLevel<dim>);
 
     // Coarsening can lead to the loss
     // of levels. Hence remove them.
@@ -3304,6 +3307,32 @@ namespace hp
       delete());
     */
     has_children.clear ();
+  }
+
+
+  template <int dim, int spacedim>
+  template <int structdim>
+  unsigned int
+  DoFHandler<dim,spacedim>::get_dof_index (const unsigned int,
+                                           const unsigned int,
+                                           const unsigned int,
+                                           const unsigned int) const
+  {
+    Assert (false, ExcNotImplemented());
+    return numbers::invalid_unsigned_int;
+  }
+
+
+  template <int dim, int spacedim>
+  template <int structdim>
+  void
+  DoFHandler<dim,spacedim>::set_dof_index (const unsigned int,
+                                           const unsigned int,
+                                           const unsigned int,
+                                           const unsigned int,
+                                           const unsigned int) const
+  {
+    Assert (false, ExcNotImplemented());
   }
 
 

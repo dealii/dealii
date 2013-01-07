@@ -67,7 +67,7 @@ public:
    * backward compability. It will
    * be removed in later versions.
    */
-  SparseILU (const SparsityPattern &sparsity);
+  SparseILU (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
 
   /**
    * Make
@@ -122,7 +122,7 @@ public:
    */
   template <typename somenumber>
   void decompose (const SparseMatrix<somenumber> &matrix,
-                  const double                    strengthen_diagonal=0.);
+                  const double                    strengthen_diagonal=0.) DEAL_II_DEPRECATED;
 
   /**
    * This method is deprecated, and
@@ -132,7 +132,7 @@ public:
    */
   template <typename somenumber>
   void apply_decomposition (Vector<somenumber>       &dst,
-                            const Vector<somenumber> &src) const;
+                            const Vector<somenumber> &src) const DEAL_II_DEPRECATED;
 
   /**
    * Apply the incomplete decomposition,

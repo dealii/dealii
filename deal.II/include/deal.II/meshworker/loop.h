@@ -144,8 +144,7 @@ namespace MeshWorker
           else if (integrate_interior_face)
             {
               // Interior face
-              typename ITERATOR::AccessorType::Container::cell_iterator
-              neighbor = cell->neighbor(face_no);
+              TriaIterator<typename ITERATOR::AccessorType> neighbor = cell->neighbor(face_no);
 
               // Deal with
               // refinement edges

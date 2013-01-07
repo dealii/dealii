@@ -85,7 +85,7 @@ public:
    * compability. It will be
    * removed in later versions.
    */
-  void reinit (const SparsityPattern &sparsity);
+  void reinit (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
 
   /**
    * Same as @p decompose.
@@ -102,7 +102,7 @@ public:
    */
   template <typename somenumber>
   void decompose (const SparseMatrix<somenumber> &matrix,
-                  const double                   strengthen_diagonal=0.);
+                  const double                   strengthen_diagonal=0.) DEAL_II_DEPRECATED;
 
   /**
    * Apply the incomplete decomposition,

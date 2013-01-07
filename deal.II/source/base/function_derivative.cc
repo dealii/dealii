@@ -130,7 +130,7 @@ FunctionDerivative<dim>::vector_value (
       result.add(-8., aux);
       f.vector_value(p+incr[0], aux);
       result.add(8., aux);
-      result.scale(1./(12*h));
+      result/=(12.*h);
       return;
     default:
       Assert(false, ExcInvalidFormula());

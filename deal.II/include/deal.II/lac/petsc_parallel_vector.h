@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -390,6 +390,30 @@ namespace PETScWrappers
        * this vector.
        */
       const MPI_Comm &get_mpi_communicator () const;
+
+      /**
+       * Print to a
+       * stream. @p precision denotes
+       * the desired precision with
+       * which values shall be printed,
+       * @p scientific whether
+       * scientific notation shall be
+       * used. If @p across is
+       * @p true then the vector is
+       * printed in a line, while if
+       * @p false then the elements
+       * are printed on a separate line
+       * each.
+       *
+       * @note This function overloads the one in the
+       * base class to ensure that the right thing happens
+       * for parallel vectors that are distributed across
+       * processors.
+       */
+      void print (std::ostream       &out,
+                  const unsigned int  precision  = 3,
+                  const bool          scientific = true,
+                  const bool          across     = true) const;
 
     protected:
       /**

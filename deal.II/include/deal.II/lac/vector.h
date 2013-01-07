@@ -800,7 +800,10 @@ public:
    * <tt>operator *=</tt> and
    * <tt>operator /=</tt> instead.
    */
-  void scale (const Number factor);
+  void scale (const Number factor) DEAL_II_DEPRECATED
+  {
+    this->operator *= (factor);
+  }
 
 
   /**
@@ -1261,19 +1264,6 @@ inline
 Number &Vector<Number>::operator[] (const unsigned int i)
 {
   return operator()(i);
-}
-
-
-
-template <typename Number>
-inline
-Vector<Number> &Vector<Number>::operator *= (const Number factor)
-{
-
-  Assert (numbers::is_finite(factor),ExcNumberNotFinite());
-
-  scale (factor);
-  return *this;
 }
 
 

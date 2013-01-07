@@ -1,0 +1,19 @@
+//---------------------------------------------------------------------------
+//    $Id: vector_tools.inst.in 26105 2012-08-23 22:10:05Z heister $
+//
+//    Copyright (C) 2012 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+for (VEC : SERIAL_VECTORS)
+{
+  template class MGTransferBase< VEC >;
+  template class MGMatrixBase< VEC >;
+  template class MGSmootherBase< VEC >;
+  template class MGCoarseGridBase< VEC >;
+}

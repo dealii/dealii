@@ -23,9 +23,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim, int spacedim> class MGDoFHandler;
-
-
 /*
  * MGSmootherBase is defined in mg_base.h
  */
@@ -71,7 +68,7 @@ public:
              const unsigned int steps = 1,
              const bool variable = false,
              const bool symmetric = false,
-             const bool transpose = false);
+             const bool transpose = false) DEAL_II_DEPRECATED;
 
   /**
    * Modify the number of smoothing

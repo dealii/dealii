@@ -18,10 +18,6 @@ for (VECTOR : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS)
                                  VECTOR>;
 
   template class FEFieldFunction<deal_II_dimension,
-                                 MGDoFHandler<deal_II_dimension>,
-                                 VECTOR>;
-
-  template class FEFieldFunction<deal_II_dimension,
                                  hp::DoFHandler<deal_II_dimension>,
                                  VECTOR>;
 }

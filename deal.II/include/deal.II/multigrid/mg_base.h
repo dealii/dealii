@@ -25,11 +25,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-template <int, int> class MGDoFHandler;
 template <typename> class MGLevelObject;
-
-
 
 /*!@addtogroup mg */
 /*@{*/

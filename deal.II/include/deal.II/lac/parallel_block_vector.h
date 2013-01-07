@@ -284,7 +284,7 @@ namespace parallel
        * @deprecated Use <tt>operator*=</tt>
        * instead.
        */
-      void scale (const value_type factor);
+      void scale (const value_type factor) DEAL_II_DEPRECATED;
 
       /**
        * Multiply each element of this

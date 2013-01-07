@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -30,8 +30,7 @@
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
+#include <deal.II/dofs/dof_accessor.h>
 
 #include <fstream>
 
@@ -50,8 +49,9 @@ check ()
 
   FESystem<dim> element (FE_Q<dim>(2), 1,
 			 FE_Nedelec<dim>(0), 1);
-  MGDoFHandler<dim> dof(tr);
+  DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
+  dof.distribute_mg_dofs(element);
 
 				   // try all possible component
 				   // masks, which we encode as bit

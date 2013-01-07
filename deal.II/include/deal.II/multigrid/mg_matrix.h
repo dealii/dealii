@@ -92,6 +92,7 @@ class MGMatrix : public MGMatrixBase<VECTOR>
 {
 public:
   MGMatrix (MGLevelObject<MATRIX> *matrix= 0);
+
   void set_matrix (MGLevelObject<MATRIX> *M);
   virtual void vmult (const unsigned int level,
                       VECTOR &dst,
@@ -108,7 +109,7 @@ public:
   std::size_t memory_consumption () const;
 private:
   SmartPointer<MGLevelObject<MATRIX>,MGMatrix<MATRIX,VECTOR> > matrix;
-};
+} DEAL_II_DEPRECATED;
 
 
 /**

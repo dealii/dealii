@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 - 2006 by the deal.II authors
+//    Copyright (C) 2000 - 2006, 2012 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,7 +29,7 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
+#include <deal.II/dofs/dof_accessor.h>
 
 #include <fstream>
 #include <iomanip>
@@ -68,10 +68,7 @@ void check()
 
 int main()
 {
-  std::ofstream logfile("renumbering_03/output");
-  deallog.attach(logfile);
-  deallog.depth_console(0);
-
+  initlog(__FILE__);
   check<1> ();
   check<2> ();
   check<3> ();

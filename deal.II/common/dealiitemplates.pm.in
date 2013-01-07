@@ -102,7 +102,7 @@ our @dimensions       = (1,2,3);
 our @codim1_dimensions = (1,2);
 
 # DoFHandlers
-our @dofhandler_templates = qw(DoFHandler hp::DoFHandler MGDoFHandler);
+our @dofhandler_templates = qw(DoFHandler hp::DoFHandler);
 our @dofhandlers = map { $t = $_ ; map { "$_<$t>" } @dofhandler_templates } @dimensions;
 
 # All possible number types

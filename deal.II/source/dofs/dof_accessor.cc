@@ -37,11 +37,11 @@ DEAL_II_NAMESPACE_OPEN
 
 /*------------------------- Static variables: DoFAccessor -----------------------*/
 
-template <int structdim, class DH>
-const unsigned int DoFAccessor<structdim,DH>::dimension;
+template <int structdim, class DH, bool level_dof_access>
+const unsigned int DoFAccessor<structdim,DH,level_dof_access>::dimension;
 
-template <int structdim, class DH>
-const unsigned int DoFAccessor<structdim,DH>::space_dimension;
+template <int structdim, class DH, bool level_dof_access>
+const unsigned int DoFAccessor<structdim,DH,level_dof_access>::space_dimension;
 
 
 
@@ -50,9 +50,9 @@ const unsigned int DoFAccessor<structdim,DH>::space_dimension;
 
 
 
-template <class DH>
+template <class DH, bool lda>
 void
-DoFCellAccessor<DH>::update_cell_dof_indices_cache () const
+DoFCellAccessor<DH,lda>::update_cell_dof_indices_cache () const
 {
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
@@ -66,9 +66,9 @@ DoFCellAccessor<DH>::update_cell_dof_indices_cache () const
 
 
 
-template <class DH>
+template <class DH, bool lda>
 void
-DoFCellAccessor<DH>::set_dof_indices (const std::vector<unsigned int> &local_dof_indices)
+DoFCellAccessor<DH,lda>::set_dof_indices (const std::vector<unsigned int> &local_dof_indices)
 {
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));
@@ -83,26 +83,22 @@ DoFCellAccessor<DH>::set_dof_indices (const std::vector<unsigned int> &local_dof
 
 
 
-template <class DH>
-typename internal::DoFHandler::Iterators<DH>::cell_iterator
-DoFCellAccessor<DH>::neighbor_child_on_subface (const unsigned int face,
-                                                const unsigned int subface) const
+template <class DH, bool lda>
+TriaIterator<DoFCellAccessor<DH,lda> >
+DoFCellAccessor<DH,lda>::neighbor_child_on_subface (const unsigned int face,
+                                                    const unsigned int subface) const
 {
   const TriaIterator<CellAccessor<dim,spacedim> > q
     = CellAccessor<dim,spacedim>::neighbor_child_on_subface (face, subface);
-  return
-    typename internal::DoFHandler::Iterators<DH>::cell_iterator (this->tria,
-        q->level (),
-        q->index (),
-        this->dof_handler);
+  return TriaIterator<DoFCellAccessor<DH,lda> > (*q, this->dof_handler);
 }
 
 
 
-template <class DH>
+template <class DH, bool lda>
 template <class InputVector, typename number>
 void
-DoFCellAccessor<DH>::
+DoFCellAccessor<DH,lda>::
 get_interpolated_dof_values (const InputVector &values,
                              Vector<number>    &interpolated_values) const
 {
@@ -215,10 +211,10 @@ get_interpolated_dof_values (const InputVector &values,
 
 
 
-template <class DH>
+template <class DH, bool lda>
 template <class OutputVector, typename number>
 void
-DoFCellAccessor<DH>::
+DoFCellAccessor<DH,lda>::
 set_dof_values_by_interpolation (const Vector<number> &local_values,
                                  OutputVector         &values) const
 {

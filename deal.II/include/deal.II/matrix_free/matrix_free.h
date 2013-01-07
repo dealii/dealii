@@ -51,10 +51,10 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class collects all the data that is stored for the matrix free
- * implementation. The storage scheme is tailored towards several
- * loops performed with the same data, i.e., typically doing many
- * matrix-vector products or residual computations on the same
- * mesh. The class is used in step-37 and step-48.
+ * implementation. The storage scheme is tailored towards several loops
+ * performed with the same data, i.e., typically doing many matrix-vector
+ * products or residual computations on the same mesh. The class is used in
+ * step-37 and step-48.
  *
  * This class does not implement any operations involving finite element basis
  * functions, i.e., regarding the operation performed on the cells. For these
@@ -103,44 +103,32 @@ class MatrixFree
 public:
 
   /**
-   * Collects the options for initialization of
-   * the MatrixFree class. The first
-   * parameter specifies the MPI communicator to
-   * be used, the second the parallelization
-   * options in shared memory (task-based
-   * parallelism, where one can choose between
-   * no parallelism and three schemes that avoid
-   * that cells with access to the same vector
-   * entries are accessed simultaneously), the
-   * third with the block size for task parallel
-   * scheduling, the fourth the update flags
-   * that should be stored by this class.
+   * Collects the options for initialization of the MatrixFree class. The
+   * first parameter specifies the MPI communicator to be used, the second the
+   * parallelization options in shared memory (task-based parallelism, where
+   * one can choose between no parallelism and three schemes that avoid that
+   * cells with access to the same vector entries are accessed
+   * simultaneously), the third with the block size for task parallel
+   * scheduling, the fourth the update flags that should be stored by this
+   * class.
    *
-   * The fifth parameter specifies the level in
-   * the triangulation from which the indices
-   * are to be used. If the level is set to
-   * numbers::invalid_unsigned_int, the active
-   * cells are traversed, and otherwise the
-   * cells in the given level. This option has
-   * no effect in case a DoFHandler or
-   * hp::DoFHandler is given.
+   * The fifth parameter specifies the level in the triangulation from which
+   * the indices are to be used. If the level is set to
+   * numbers::invalid_unsigned_int, the active cells are traversed, and
+   * otherwise the cells in the given level. This option has no effect in case
+   * a DoFHandler or hp::DoFHandler is given.
    *
-   * The parameter @p initialize_plain_indices
-   * indicates whether the DoFInfo class should
-   * also allow for access to vectors without
-   * resolving constraints.
+   * The parameter @p initialize_plain_indices indicates whether the DoFInfo
+   * class should also allow for access to vectors without resolving
+   * constraints.
    *
-   * The last two parameters allow the user to
-   * disable some of the initialization
-   * processes. For example, if only the
-   * scheduling that avoids touching the same
-   * vector/matrix indices simultaneously is to
-   * be found, the mapping needs not be
-   * initialized. Likewise, if the mapping has
-   * changed from one iteration to the next but
-   * the topology has not (like when using a
-   * deforming mesh with MappingQEulerian), it
-   * suffices to initialize the mapping only.
+   * The last two parameters allow the user to disable some of the
+   * initialization processes. For example, if only the scheduling that avoids
+   * touching the same vector/matrix indices simultaneously is to be found,
+   * the mapping needs not be initialized. Likewise, if the mapping has
+   * changed from one iteration to the next but the topology has not (like
+   * when using a deforming mesh with MappingQEulerian), it suffices to
+   * initialize the mapping only.
    */
   struct AdditionalData
   {
@@ -172,142 +160,102 @@ public:
     {};
 
     /**
-     * Sets the MPI communicator that the parallel
-     * layout of the operator should be based
-     * upon. Defaults to MPI_COMM_SELF, but should
-     * be set to a communicator similar to the one
-     * used for a distributed triangulation in
-     * order to inform this class over all cells
-     * that are present.
+     * Sets the MPI communicator that the parallel layout of the operator
+     * should be based upon. Defaults to MPI_COMM_SELF, but should be set to a
+     * communicator similar to the one used for a distributed triangulation in
+     * order to inform this class over all cells that are present.
      */
     MPI_Comm            mpi_communicator;
 
     /**
-     * Sets the scheme for task parallelism. There
-     * are four options available. If set to @p
-     * none, the operator application is done in
-     * serial without shared memory
-     * parallelism. If this class is used together
-     * with MPI and MPI is also used for
-     * parallelism within the nodes, this flag
-     * should be set to @p none. The default value
-     * is @p partition_partition, i.e. we actually
-     * use multithreading with the first option
-     * described below.
+     * Sets the scheme for task parallelism. There are four options
+     * available. If set to @p none, the operator application is done in
+     * serial without shared memory parallelism. If this class is used
+     * together with MPI and MPI is also used for parallelism within the
+     * nodes, this flag should be set to @p none. The default value is @p
+     * partition_partition, i.e. we actually use multithreading with the first
+     * option described below.
      *
-     * The first option @p partition_partition is
-     * to partition the cells on two levels in
-     * onion-skin-like partitions and forming
-     * chunks of tasks_block_size after the
-     * partitioning. The partitioning finds sets
-     * of independent cells that enable working in
-     * parallel without accessing the same vector
-     * entries at the same time.
+     * The first option @p partition_partition is to partition the cells on
+     * two levels in onion-skin-like partitions and forming chunks of
+     * tasks_block_size after the partitioning. The partitioning finds sets of
+     * independent cells that enable working in parallel without accessing the
+     * same vector entries at the same time.
      *
-     * The second option @p partition_color is to
-     * use a partition on the global level and
-     * color cells within the partitions (where
-     * all chunks within a color are
-     * independent). Here, the subdivision into
-     * chunks of cells is done before the
-     * partitioning, which might give worse
-     * partitions but better cache performance if
-     * degrees of freedom are not renumbered.
+     * The second option @p partition_color is to use a partition on the
+     * global level and color cells within the partitions (where all chunks
+     * within a color are independent). Here, the subdivision into chunks of
+     * cells is done before the partitioning, which might give worse
+     * partitions but better cache performance if degrees of freedom are not
+     * renumbered.
      *
-     * The third option @p color is to use a
-     * traditional algorithm of coloring on the
-     * global level. This scheme is a special case
-     * of the second option where only one
-     * partition is present. Note that for
-     * problems with hanging nodes, there are
-     * quite many colors (50 or more in 3D), which
-     * might degrade parallel performance (bad
-     * cache behavior, many synchronization
-     * points).
+     * The third option @p color is to use a traditional algorithm of coloring
+     * on the global level. This scheme is a special case of the second option
+     * where only one partition is present. Note that for problems with
+     * hanging nodes, there are quite many colors (50 or more in 3D), which
+     * might degrade parallel performance (bad cache behavior, many
+     * synchronization points).
      */
     TasksParallelScheme tasks_parallel_scheme;
 
     /**
-     * Sets the number of so-called macro cells
-     * that should form one partition. If zero
-     * size is given, the class tries to find a
-     * good size for the blocks based on the
-     * number of threads stored in
-     * multithread_info.n_default_threads and the
-     * number of cells present. Otherwise, the
-     * given number is used. If the given number
-     * is larger than one third of the number of
-     * total cells, this means no
-     * parallelism. Note that in the case
-     * vectorization is used, a macro cell
+     * Sets the number of so-called macro cells that should form one
+     * partition. If zero size is given, the class tries to find a good size
+     * for the blocks based on the number of threads stored in
+     * multithread_info.n_default_threads and the number of cells
+     * present. Otherwise, the given number is used. If the given number is
+     * larger than one third of the number of total cells, this means no
+     * parallelism. Note that in the case vectorization is used, a macro cell
      * consists of more than one physical cell.
      */
     unsigned int        tasks_block_size;
 
     /**
-     * This flag is used to determine which
-     * quantities should be cached. This class can
-     * cache data needed for gradient computations
-     * (inverse Jacobians), Jacobian determinants
-     * (JxW), quadrature points as well as data
-     * for Hessians (derivative of Jacobians). By
-     * default, only data for gradients and
-     * Jacobian determinants times quadrature
-     * weights, JxW, are cached. If quadrature
-     * points or second derivatives are needed,
-     * they must be specified by this field (even
-     * though second derivatives might still be
-     * evaluated on Cartesian cells without this
-     * option set here, since there the Jacobian
-     * describes the mapping completely).
+     * This flag is used to determine which quantities should be cached. This
+     * class can cache data needed for gradient computations (inverse
+     * Jacobians), Jacobian determinants (JxW), quadrature points as well as
+     * data for Hessians (derivative of Jacobians). By default, only data for
+     * gradients and Jacobian determinants times quadrature weights, JxW, are
+     * cached. If quadrature points or second derivatives are needed, they
+     * must be specified by this field (even though second derivatives might
+     * still be evaluated on Cartesian cells without this option set here,
+     * since there the Jacobian describes the mapping completely).
      */
     UpdateFlags         mapping_update_flags;
 
     /**
-     * If working on a MGDoFHandler, this option
-     * can be used to define whether we work on a
-     * certain level of the mesh, and not the
-     * active cells. If set to
-     * invalid_unsigned_int (which is the default
-     * value), the active cells are gone through,
-     * otherwise the level given by this
-     * parameter.
+     * This option can be used to define whether we work on a certain level of
+     * the mesh, and not the active cells. If set to invalid_unsigned_int
+     * (which is the default value), the active cells are gone through,
+     * otherwise the level given by this parameter. Note that if you specify
+     * to work on a level, its dofs must be distributed by using
+     * <code>dof_handler.distribute_mg_dofs(fe);</code>.
      */
     unsigned int        level_mg_handler;
 
     /**
-     * Controls whether to allow reading from
-     * vectors without resolving constraints,
-     * i.e., just read the local values of the
-     * vector. By default, this option is
-     * disabled, so if you want to use
-     * FEEvaluationBase::read_dof_values_plain,
-     * this flag needs to be set.
+     * Controls whether to allow reading from vectors without resolving
+     * constraints, i.e., just read the local values of the vector. By
+     * default, this option is disabled, so if you want to use
+     * FEEvaluationBase::read_dof_values_plain, this flag needs to be set.
      */
     bool                store_plain_indices;
 
     /**
-     * Option to control whether the indices
-     * stored in the DoFHandler should be read and
-     * the pattern for task parallelism should be
-     * set up in the initialize method of
-     * MatrixFree. Defaults to true. Can be
-     * disabled in case the mapping should be
-     * recomputed (e.g. when using a deforming
-     * mesh described through MappingEulerian) but
-     * the topology of cells has remained the
-     * same.
+     * Option to control whether the indices stored in the DoFHandler should
+     * be read and the pattern for task parallelism should be set up in the
+     * initialize method of MatrixFree. Defaults to true. Can be disabled in
+     * case the mapping should be recomputed (e.g. when using a deforming mesh
+     * described through MappingEulerian) but the topology of cells has
+     * remained the same.
      */
     bool                initialize_indices;
 
     /**
-     * Option to control whether the mapping
-     * information should be computed in the
-     * initialize method of
-     * MatrixFree. Defaults to true. Can be
-     * disabled when only some indices should be
-     * set up (e.g. when only a set of independent
-     * cells should be computed).
+     * Option to control whether the mapping information should be computed in
+     * the initialize method of MatrixFree. Defaults to true. Can be disabled
+     * when only some indices should be set up (e.g. when only a set of
+     * independent cells should be computed).
      */
     bool                initialize_mapping;
   };
@@ -317,8 +265,7 @@ public:
    */
   //@{
   /**
-   * Default empty constructor. Does
-   * nothing.
+   * Default empty constructor. Does nothing.
    */
   MatrixFree ();
 
@@ -328,34 +275,20 @@ public:
   ~MatrixFree();
 
   /**
-  * Extracts the information needed to
-  * perform loops over cells. The
-  * DoFHandler and ConstraintMatrix
-  * describe the layout of degrees of
-  * freedom, the DoFHandler and the
-  * mapping describe the transformations
-  * from unit to real cell, and the finite
-  * element underlying the DoFHandler
-  * together with the quadrature formula
-  * describe the local operations. Note
-  * that the finite element underlying the
-  * DoFHandler must either be scalar or
-  * contain several copies of the same
-  * element. Mixing several different
-  * elements into one FESystem is not
-  * allowed. In that case, use the
-  * initialization function with several
-  * DoFHandler arguments.
+  * Extracts the information needed to perform loops over cells. The
+  * DoFHandler and ConstraintMatrix describe the layout of degrees of freedom,
+  * the DoFHandler and the mapping describe the transformations from unit to
+  * real cell, and the finite element underlying the DoFHandler together with
+  * the quadrature formula describe the local operations. Note that the finite
+  * element underlying the DoFHandler must either be scalar or contain several
+  * copies of the same element. Mixing several different elements into one
+  * FESystem is not allowed. In that case, use the initialization function
+  * with several DoFHandler arguments.
   *
-  * The @p IndexSet @p locally_owned_dofs
-  * is used to specify the parallel
-  * partitioning with MPI. Usually, this
-  * needs not be specified, and the other
-  * initialization function without and @p
-  * IndexSet description can be used,
-  * which gets the partitioning
-  * information builtin into the
-  * DoFHandler.
+  * The @p IndexSet @p locally_owned_dofs is used to specify the parallel
+  * partitioning with MPI. Usually, this needs not be specified, and the other
+  * initialization function without and @p IndexSet description can be used,
+  * which gets the partitioning information builtin into the DoFHandler.
   */
   template <typename DH, typename Quadrature>
   void reinit (const Mapping<dim>     &mapping,
@@ -366,10 +299,8 @@ public:
                const AdditionalData    additional_data = AdditionalData());
 
   /**
-  * Initializes the data structures. Same
-  * as above, but with index set stored in
-  * the DoFHandler for describing the
-  * locally owned degrees of freedom.
+  * Initializes the data structures. Same as above, but with index set stored
+  * in the DoFHandler for describing the locally owned degrees of freedom.
   */
   template <typename DH, typename Quadrature>
   void reinit (const Mapping<dim>     &mapping,
@@ -379,8 +310,7 @@ public:
                const AdditionalData    additional_data = AdditionalData());
 
   /**
-  * Initializes the data structures. Same
-  * as above, but with mapping @p
+  * Initializes the data structures. Same as above, but with mapping @p
   * MappingQ1.
   */
   template <typename DH, typename Quadrature>
@@ -390,51 +320,30 @@ public:
                const AdditionalData    additional_data = AdditionalData());
 
   /**
-  * Extracts the information needed to
-  * perform loops over cells. The
-  * DoFHandler and ConstraintMatrix
-  * describe the layout of degrees of
-  * freedom, the DoFHandler and the
-  * mapping describe the transformations
-  * from unit to real cell, and the finite
-  * element underlying the DoFHandler
-  * together with the quadrature formula
-  * describe the local operations. As
-  * opposed to the scalar case treated
-  * with the other initialization
-  * functions, this function allows for
-  * problems with two or more different
-  * finite elements. The DoFHandlers to
-  * each element must be passed as
-  * pointers to the initialization
-  * function. Note that the finite element
-  * underlying an DoFHandler must either
-  * be scalar or contain several copies of
-  * the same element. Mixing several
-  * different elements into one @p
-  * FE_System is not allowed.
+  * Extracts the information needed to perform loops over cells. The
+  * DoFHandler and ConstraintMatrix describe the layout of degrees of freedom,
+  * the DoFHandler and the mapping describe the transformations from unit to
+  * real cell, and the finite element underlying the DoFHandler together with
+  * the quadrature formula describe the local operations. As opposed to the
+  * scalar case treated with the other initialization functions, this function
+  * allows for problems with two or more different finite elements. The
+  * DoFHandlers to each element must be passed as pointers to the
+  * initialization function. Note that the finite element underlying an
+  * DoFHandler must either be scalar or contain several copies of the same
+  * element. Mixing several different elements into one @p FE_System is not
+  * allowed.
   *
-  * This function also allows for using
-  * several quadrature formulas, e.g. when
-  * the description contains independent
-  * integrations of elements of different
-  * degrees. However, the number of
-  * different quadrature formulas can be
-  * sets independently from the number of
-  * DoFHandlers, when several elements are
-  * always integrated with the same
-  * quadrature formula.
+  * This function also allows for using several quadrature formulas, e.g. when
+  * the description contains independent integrations of elements of different
+  * degrees. However, the number of different quadrature formulas can be sets
+  * independently from the number of DoFHandlers, when several elements are
+  * always integrated with the same quadrature formula.
   *
-  * The @p IndexSet @p locally_owned_dofs
-  * is used to specify the parallel
-  * partitioning with MPI. Usually, this
-  * needs not be specified, and the other
-  * initialization function without and @p
-  * IndexSet description can be used,
-  * which gets the partitioning
-  * information from the DoFHandler. This
-  * is the most general initialization
-  * function.
+  * The @p IndexSet @p locally_owned_dofs is used to specify the parallel
+  * partitioning with MPI. Usually, this needs not be specified, and the other
+  * initialization function without and @p IndexSet description can be used,
+  * which gets the partitioning information from the DoFHandler. This is the
+  * most general initialization function.
   */
   template <typename DH, typename Quadrature>
   void reinit (const Mapping<dim>                         &mapping,
@@ -445,10 +354,8 @@ public:
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
-  * Initializes the data structures. Same
-  * as before, but now the index set
-  * description of the locally owned range
-  * of degrees of freedom is taken from
+  * Initializes the data structures. Same as before, but now the index set
+  * description of the locally owned range of degrees of freedom is taken from
   * the DoFHandler.
   */
   template <typename DH, typename Quadrature>
@@ -459,8 +366,7 @@ public:
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
-  * Initializes the data structures. Same
-  * as above, but with mapping @p
+  * Initializes the data structures. Same as above, but with mapping @p
   * MappingQ1.
   */
   template <typename DH, typename Quadrature>
@@ -470,16 +376,11 @@ public:
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
-  * Initializes the data structures. Same
-  * as before, but now the index set
-  * description of the locally owned range
-  * of degrees of freedom is taken from
-  * the DoFHandler. Moreover, only a
-  * single quadrature formula is used, as
-  * might be necessary when several
-  * components in a vector-valued problem
-  * are integrated together based on the
-  * same quadrature formula.
+  * Initializes the data structures. Same as before, but now the index set
+  * description of the locally owned range of degrees of freedom is taken from
+  * the DoFHandler. Moreover, only a single quadrature formula is used, as
+  * might be necessary when several components in a vector-valued problem are
+  * integrated together based on the same quadrature formula.
   */
   template <typename DH, typename Quadrature>
   void reinit (const Mapping<dim>                         &mapping,
@@ -489,8 +390,7 @@ public:
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
-  * Initializes the data structures. Same
-  * as above, but with mapping @p
+  * Initializes the data structures. Same as above, but with mapping @p
   * MappingQ1.
   */
   template <typename DH, typename Quadrature>
@@ -500,18 +400,15 @@ public:
                const AdditionalData                        additional_data = AdditionalData());
 
   /**
-   * Copy function. Creates a deep copy of all
-   * data structures. It is usually enough to
-   * keep the data for different operations
-   * once, so this function should not be needed
-   * very often.
+   * Copy function. Creates a deep copy of all data structures. It is usually
+   * enough to keep the data for different operations once, so this function
+   * should not be needed very often.
    */
   void copy_from (const MatrixFree<dim,Number> &matrix_free_base);
 
   /**
-   * Clears all data fields and brings the class
-   * into a condition similar to after having
-   * called the default constructor.
+   * Clears all data fields and brings the class into a condition similar to
+   * after having called the default constructor.
    */
   void clear();
 
@@ -522,29 +419,17 @@ public:
    */
   //@{
   /**
-   * This method runs the loop over all
-   * cells (in parallel) and performs
-   * the MPI data exchange on the source
-   * vector and destination vector. The
-   * first argument indicates a function
-   * object that has the following
-   * signature: <code>cell_operation
-   * (const MatrixFree<dim,Number>
-   * &, OutVector &, InVector &,
-   * std::pair<unsigned int,unsigned
-   * int> &)</code>, where the first
-   * argument passes the data of the
-   * calling class and the last argument
-   * defines the range of cells which
-   * should be worked on (typically more
-   * than one cell should be worked on
-   * in order to reduce overheads).  One
-   * can pass a pointer to an object in
-   * this place if it has an
-   * <code>operator()</code> with the
-   * correct set of arguments since such
-   * a pointer can be converted to the
-   * function object.
+   * This method runs the loop over all cells (in parallel) and performs the
+   * MPI data exchange on the source vector and destination vector. The first
+   * argument indicates a function object that has the following signature:
+   * <code>cell_operation (const MatrixFree<dim,Number> &, OutVector &,
+   * InVector &, std::pair<unsigned int,unsigned int> &)</code>, where the
+   * first argument passes the data of the calling class and the last argument
+   * defines the range of cells which should be worked on (typically more than
+   * one cell should be worked on in order to reduce overheads).  One can pass
+   * a pointer to an object in this place if it has an <code>operator()</code>
+   * with the correct set of arguments since such a pointer can be converted
+   * to the function object.
    */
   template <typename OutVector, typename InVector>
   void cell_loop (const std_cxx1x::function<void (const MatrixFree<dim,Number> &,
@@ -556,18 +441,13 @@ public:
                   const InVector &src) const;
 
   /**
-   * This is the second variant to run the loop
-   * over all cells, now providing a function
-   * pointer to a member function of class @p
-   * CLASS with the signature
-   * <code>cell_operation (const
-   * MatrixFree<dim,Number> &, OutVector &,
-   * InVector &, std::pair<unsigned int,unsigned
-   * int>&)const</code>. This method obviates the need
-   * to call std_cxx1x::bind to bind the class
-   * into the given function in case the local
-   * function needs to access data in the class
-   * (i.e., it is a non-static member function).
+   * This is the second variant to run the loop over all cells, now providing
+   * a function pointer to a member function of class @p CLASS with the
+   * signature <code>cell_operation (const MatrixFree<dim,Number> &, OutVector
+   * &, InVector &, std::pair<unsigned int,unsigned int>&)const</code>. This
+   * method obviates the need to call std_cxx1x::bind to bind the class into
+   * the given function in case the local function needs to access data in the
+   * class (i.e., it is a non-static member function).
    */
   template <typename CLASS, typename OutVector, typename InVector>
   void cell_loop (void (CLASS::*function_pointer)(const MatrixFree &,
@@ -580,8 +460,7 @@ public:
                   const InVector &src) const;
 
   /**
-   * Same as above, but for class member
-   * functions which are non-const.
+   * Same as above, but for class member functions which are non-const.
    */
   template <typename CLASS, typename OutVector, typename InVector>
   void cell_loop (void (CLASS::*function_pointer)(const MatrixFree &,
@@ -594,14 +473,11 @@ public:
                   const InVector &src) const;
 
   /**
-   * In the hp adaptive case, a subrange of
-   * cells as computed during the cell loop
-   * might contain elements of different
-   * degrees. Use this function to compute what
-   * the subrange for an individual finite
-   * element degree is. The finite element
-   * degree is associated to the vector
-   * component given in the function call.
+   * In the hp adaptive case, a subrange of cells as computed during the cell
+   * loop might contain elements of different degrees. Use this function to
+   * compute what the subrange for an individual finite element degree is. The
+   * finite element degree is associated to the vector component given in the
+   * function call.
    */
   std::pair<unsigned int,unsigned int>
   create_cell_subrange_hp (const std::pair<unsigned int,unsigned int> &range,
@@ -609,13 +485,10 @@ public:
                            const unsigned int vector_component = 0) const;
 
   /**
-   * In the hp adaptive case, a subrange of
-   * cells as computed during the cell loop
-   * might contain elements of different
-   * degrees. Use this function to compute what
-   * the subrange for a given index the hp
-   * finite element, as opposed to the finite
-   * element degree in the other function.
+   * In the hp adaptive case, a subrange of cells as computed during the cell
+   * loop might contain elements of different degrees. Use this function to
+   * compute what the subrange for a given index the hp finite element, as
+   * opposed to the finite element degree in the other function.
    */
   std::pair<unsigned int,unsigned int>
   create_cell_subrange_hp_by_index (const std::pair<unsigned int,unsigned int> &range,
@@ -629,15 +502,11 @@ public:
    */
   //@{
   /**
-   * Initialize function for a general
-   * vector. The length of the vector is equal
-   * to the total number of degrees in the
-   * DoFHandler. If the vector is of class
-   * parallel::distributed::Vector@<Number@>, the ghost
-   * entries are set accordingly. For
-   * vector-valued problems with several
-   * DoFHandlers underlying this class, the
-   * parameter @p vector_component defines which
+   * Initialize function for a general vector. The length of the vector is
+   * equal to the total number of degrees in the DoFHandler. If the vector is
+   * of class parallel::distributed::Vector@<Number@>, the ghost entries are
+   * set accordingly. For vector-valued problems with several DoFHandlers
+   * underlying this class, the parameter @p vector_component defines which
    * component is to be used.
    */
   template <typename VectorType>
@@ -645,15 +514,11 @@ public:
                              const unsigned int vector_component=0) const;
 
   /**
-   * Initialize function for a distributed
-   * vector. The length of the vector is equal
-   * to the total number of degrees in the
-   * DoFHandler. If the vector is of class
-   * parallel::distributed::Vector@<Number@>, the ghost
-   * entries are set accordingly. For
-   * vector-valued problems with several
-   * DoFHandlers underlying this class, the
-   * parameter @p vector_component defines which
+   * Initialize function for a distributed vector. The length of the vector is
+   * equal to the total number of degrees in the DoFHandler. If the vector is
+   * of class parallel::distributed::Vector@<Number@>, the ghost entries are
+   * set accordingly. For vector-valued problems with several DoFHandlers
+   * underlying this class, the parameter @p vector_component defines which
    * component is to be used.
    */
   template <typename Number2>
@@ -661,55 +526,42 @@ public:
                              const unsigned int vector_component=0) const;
 
   /**
-   * Returns the partitioner that represents the
-   * locally owned data and the ghost indices
-   * where access is needed to for the cell
-   * loop. The partitioner is constructed from
-   * the locally owned dofs and ghost dofs given
-   * by the respective fields. If you want to
-   * have specific information about these
-   * objects, you can query them with the
-   * respective access functions. If you just
-   * want to initialize a (parallel) vector, you
-   * should usually prefer this data structure
-   * as the data exchange information can be
-   * reused from one vector to another.
+   * Returns the partitioner that represents the locally owned data and the
+   * ghost indices where access is needed to for the cell loop. The
+   * partitioner is constructed from the locally owned dofs and ghost dofs
+   * given by the respective fields. If you want to have specific information
+   * about these objects, you can query them with the respective access
+   * functions. If you just want to initialize a (parallel) vector, you should
+   * usually prefer this data structure as the data exchange information can
+   * be reused from one vector to another.
    */
   const std_cxx1x::shared_ptr<const Utilities::MPI::Partitioner> &
   get_vector_partitioner (const unsigned int vector_component=0) const;
 
   /**
-   * Returns the set of cells that are
-   * oned by the processor.
+   * Returns the set of cells that are oned by the processor.
    */
   const IndexSet &
   get_locally_owned_set (const unsigned int fe_component = 0) const;
 
   /**
-   * Returns the set of ghost cells
-   * needed but not owned by the
-   * processor.
+   * Returns the set of ghost cells needed but not owned by the processor.
    */
   const IndexSet &
   get_ghost_set (const unsigned int fe_component = 0) const;
 
   /**
-   * Returns a list of all degrees of freedom
-   * that are constrained. The list is returned
-   * in local index space for the locally owned
-   * range of the vector, not in global
-   * numbers. In addition, it only returns the
-   * indices for degrees of freedom that are
-   * owned locally, not for ghosts.
+   * Returns a list of all degrees of freedom that are constrained. The list
+   * is returned in local index space for the locally owned range of the
+   * vector, not in global numbers. In addition, it only returns the indices
+   * for degrees of freedom that are owned locally, not for ghosts.
    */
   const std::vector<unsigned int> &
   get_constrained_dofs (const unsigned int fe_component = 0) const;
 
   /**
-   * Calls renumber_dofs function in dof
-   * info which renumbers the the
-   * degrees of freedom according to the
-   * ordering for parallelization.
+   * Calls renumber_dofs function in dof info which renumbers the degrees
+   * of freedom according to the ordering for parallelization.
    */
   void renumber_dofs (std::vector<unsigned int> &renumbering,
                       const unsigned int vector_component = 0);
@@ -721,85 +573,48 @@ public:
    */
   //@{
   /**
-   * Returns the number of different DoFHandlers
-   * specified at initialization.
+   * Returns the number of different DoFHandlers specified at initialization.
    */
   unsigned int n_components () const;
 
   /**
-   * Returns the number of cells this structure
-   * is based on. If you are using a usual
-   * DoFHandler, it corresponds to the number of
-   * (locally owned) active cells. Note that
-   * most data structures in this class do not
-   * directly act on this number but rather on
-   * n_macro_cells() which gives the number of
-   * cells as seen when lumping several cells
-   * together with vectorization.
+   * Returns the number of cells this structure is based on. If you are using
+   * a usual DoFHandler, it corresponds to the number of (locally owned)
+   * active cells. Note that most data structures in this class do not
+   * directly act on this number but rather on n_macro_cells() which gives the
+   * number of cells as seen when lumping several cells together with
+   * vectorization.
    */
   unsigned int n_physical_cells () const;
 
   /**
-   * Returns the number of macro cells
-   * that this structure works on, i.e.,
-   * the number of cell chunks that are
-   * worked on after the application of
-   * vectorization which in general
-   * works on several cells at once. The
-   * cell range in @p cell_loop runs
-   * from zero to n_macro_cells()
-   * (exclusive), so this is the
-   * appropriate size if you want to
-   * store arrays of data for all cells
-   * to be worked on. This number is
-   * approximately
-   * n_physical_cells()/VectorizedArray::n_array_elements
-   * (depending on how many cell chunks
-   * that do not get filled up
-   * completely).
+   * Returns the number of macro cells that this structure works on, i.e., the
+   * number of cell chunks that are worked on after the application of
+   * vectorization which in general works on several cells at once. The cell
+   * range in @p cell_loop runs from zero to n_macro_cells() (exclusive), so
+   * this is the appropriate size if you want to store arrays of data for all
+   * cells to be worked on. This number is approximately
+   * n_physical_cells()/VectorizedArray::n_array_elements (depending on how
+   * many cell chunks that do not get filled up completely).
    */
   unsigned int n_macro_cells () const;
 
   /**
-   * In case this structure was built based on a
-   * DoFHandler, this returns the
-   * DoFHandler. Note that this function returns
-   * an exception in case the structure was
-   * based on MGDoFHandler and a level has been
-   * specified in InitializationOption.
+   * In case this structure was built based on a DoFHandler, this returns the
+   * DoFHandler.
    */
   const DoFHandler<dim> &
   get_dof_handler (const unsigned int fe_component = 0) const;
 
   /**
-   * In case this structure was built based on a
-   * DoFHandler, this returns the
-   * DoFHandler. Note that this function returns
-   * an exception in case the structure was
-   * based on MGDoFHandler and a level has been
-   * specified in InitializationOption.
-   */
-  const MGDoFHandler<dim> &
-  get_mg_dof_handler (const unsigned int fe_component = 0) const;
-
-  /**
-   * This returns the cell iterator in deal.II
-   * speak to a given cell in the renumbering of
-   * this structure. This function returns an
-   * exception in case the structure was
-   * constructed based on an MGDoFHandler with
-   * level specified, as these cells are in
-   * general not active.
+   * This returns the cell iterator in deal.II speak to a given cell in the
+   * renumbering of this structure.
    *
-   * Note that the cell iterators in deal.II go
-   * through cells differently to what the cell
-   * loop of this class does. This is because
-   * several cells are worked on together
-   * (vectorization), and since cells with
-   * neighbors on different MPI processors need
-   * to be accessed at a certain time when
-   * accessing remote data and overlapping
-   * communication with computation.
+   * Note that the cell iterators in deal.II go through cells differently to
+   * what the cell loop of this class does. This is because several cells are
+   * worked on together (vectorization), and since cells with neighbors on
+   * different MPI processors need to be accessed at a certain time when
+   * accessing remote data and overlapping communication with computation.
    */
   typename DoFHandler<dim>::active_cell_iterator
   get_cell_iterator (const unsigned int macro_cell_number,
@@ -807,44 +622,15 @@ public:
                      const unsigned int fe_component = 0) const;
 
   /**
-   * This returns the cell iterator in deal.II
-   * speak to a given cell in the renumbering of
-   * this structure. This function returns an
-   * exception in case the structure was
-   * constructed based on a DoFHandler and not
-   * MGDoFHandler.
+   * This returns the cell iterator in deal.II speak to a given cell in the
+   * renumbering of this structure. This function returns an exception in case
+   * the structure was not constructed based on an hp::DoFHandler.
    *
-   * Note that the cell iterators in deal.II go
-   * through cells differently to what the cell
-   * loop of this class does. This is because
-   * several cells are worked on together
-   * (vectorization), and since cells with
-   * neighbors on different MPI processors need
-   * to be accessed at a certain time when
-   * accessing remote data and overlapping
-   * communication with computation.
-   */
-  typename MGDoFHandler<dim>::cell_iterator
-  get_mg_cell_iterator (const unsigned int macro_cell_number,
-                        const unsigned int vector_number,
-                        const unsigned int fe_component = 0) const;
-
-  /**
-   * This returns the cell iterator in deal.II
-   * speak to a given cell in the renumbering of
-   * this structure. This function returns an
-   * exception in case the structure was
-   * not constructed based on an hp::DoFHandler.
-   *
-   * Note that the cell iterators in deal.II go
-   * through cells differently to what the cell
-   * loop of this class does. This is because
-   * several cells are worked on together
-   * (vectorization), and since cells with
-   * neighbors on different MPI processors need
-   * to be accessed at a certain time when
-   * accessing remote data and overlapping
-   * communication with computation.
+   * Note that the cell iterators in deal.II go through cells differently to
+   * what the cell loop of this class does. This is because several cells are
+   * worked on together (vectorization), and since cells with neighbors on
+   * different MPI processors need to be accessed at a certain time when
+   * accessing remote data and overlapping communication with computation.
    */
   typename hp::DoFHandler<dim>::active_cell_iterator
   get_hp_cell_iterator (const unsigned int macro_cell_number,
@@ -852,75 +638,54 @@ public:
                         const unsigned int fe_component = 0) const;
 
   /**
-   * Since this class uses vectorized
-   * data types with usually more than
-   * one value in the data field, a
-   * situation might occur when some
-   * components of the vector type do
-   * not correspond to an actual cell in
-   * the mesh. When using only this
-   * class, one usually does not need to
-   * bother about that fact since the
-   * values are padded with
-   * zeros. However, when this class is
-   * mixed with deal.II access to cells,
-   * care needs to be taken. This
-   * function returns @p true if not all
-   * @p vectorization_length cells for the given @p
-   * macro_cell are real cells. To find
-   * out how many cells are actually
-   * used, use the function @p
-   * n_components_filled.
+   * Since this class uses vectorized data types with usually more than one
+   * value in the data field, a situation might occur when some components of
+   * the vector type do not correspond to an actual cell in the mesh. When
+   * using only this class, one usually does not need to bother about that
+   * fact since the values are padded with zeros. However, when this class is
+   * mixed with deal.II access to cells, care needs to be taken. This function
+   * returns @p true if not all @p vectorization_length cells for the given @p
+   * macro_cell are real cells. To find out how many cells are actually used,
+   * use the function @p n_components_filled.
    */
   bool
   at_irregular_cell (const unsigned int macro_cell_number) const;
 
   /**
-   * Use this function to find out how
-   * many cells over the length of
-   * vectorization data types correspond
-   * to real cells in the mesh. For most
-   * given @p macro_cells, this is just
-   * @p vectorization_length many, but there might
-   * be one or a few meshes (where the
-   * numbers do not add up) where there
-   * are less such components filled,
-   * indicated by the function @p
+   * Use this function to find out how many cells over the length of
+   * vectorization data types correspond to real cells in the mesh. For most
+   * given @p macro_cells, this is just @p vectorization_length many, but
+   * there might be one or a few meshes (where the numbers do not add up)
+   * where there are less such components filled, indicated by the function @p
    * at_irregular_cell.
    */
   unsigned int
   n_components_filled (const unsigned int macro_cell_number) const;
 
   /**
-   * Returns the number of degrees of
-   * freedom per cell for a given hp
-   * index.
+   * Returns the number of degrees of freedom per cell for a given hp index.
    */
   unsigned int
   get_dofs_per_cell (const unsigned int fe_component = 0,
                      const unsigned int hp_active_fe_index = 0) const;
 
   /**
-   * Returns the number of quadrature
-   * points per cell for a given hp
-   * index.
+   * Returns the number of quadrature points per cell for a given hp index.
    */
   unsigned int
   get_n_q_points (const unsigned int quad_index = 0,
                   const unsigned int hp_active_fe_index = 0) const;
 
   /**
-   * Returns the number of degrees of
-   * freedom on each face of the cell
-   * for given hp index.
+   * Returns the number of degrees of freedom on each face of the cell for
+   * given hp index.
    */
   unsigned int
   get_dofs_per_face (const unsigned int fe_component = 0,
                      const unsigned int hp_active_fe_index = 0) const;
 
   /**
-   * Returns the number of quadrature
-   * points on each face of the cell for
+   * Returns the number of quadrature points on each face of the cell for
    * given hp index.
    */
   unsigned int
@@ -928,54 +693,47 @@ public:
                        const unsigned int hp_active_fe_index = 0) const;
 
   /**
-   * Returns the quadrature rule for
-   * given hp index.
+   * Returns the quadrature rule for given hp index.
    */
   const Quadrature<dim> &
   get_quadrature (const unsigned int quad_index = 0,
                   const unsigned int hp_active_fe_index = 0) const;
 
   /**
-   * Returns the quadrature rule for
-   * given hp index.
+   * Returns the quadrature rule for given hp index.
    */
   const Quadrature<dim-1> &
   get_face_quadrature (const unsigned int quad_index = 0,
                        const unsigned int hp_active_fe_index = 0) const;
 
   /**
-   * Queries whether or not the
-   * indexation has been set.
+   * Queries whether or not the indexation has been set.
    */
   bool indices_initialized () const;
 
   /**
-   * Queries whether or not the
-   * geometry-related information for
-   * the cells has been set.
+   * Queries whether or not the geometry-related information for the cells has
+   * been set.
    */
 
   bool mapping_initialized () const;
 
   /**
-   * Returns an approximation of the memory
-   * consumption of this class in bytes.
+   * Returns an approximation of the memory consumption of this class in
+   * bytes.
    */
   std::size_t memory_consumption() const;
 
   /**
-   * Prints a detailed summary of memory
-   * consumption in the different structures of
-   * this class to the given output stream.
+   * Prints a detailed summary of memory consumption in the different
+   * structures of this class to the given output stream.
    */
   template <typename STREAM>
   void print_memory_consumption(STREAM &out) const;
 
   /**
-   * Prints a summary of this class to the given
-   * output stream. It is focused on the
-   * indices, and does not print all the data
-   * stored.
+   * Prints a summary of this class to the given output stream. It is focused
+   * on the indices, and does not print all the data stored.
    */
   void print (std::ostream &out) const;
 
@@ -998,48 +756,39 @@ public:
   get_size_info () const;
 
   /*
-   * Returns geometry-dependent
-   * information on the cells.
+   * Returns geometry-dependent information on the cells.
    */
   const internal::MatrixFreeFunctions::MappingInfo<dim,Number> &
   get_mapping_info () const;
 
   /**
-   * Returns information on indexation
-   * degrees of freedom.
+   * Returns information on indexation degrees of freedom.
    */
   const internal::MatrixFreeFunctions::DoFInfo &
   get_dof_info (const unsigned int fe_component = 0) const;
 
   /**
-   * Returns the number of weights in the
-   * constraint pool.
+   * Returns the number of weights in the constraint pool.
    */
   unsigned int n_constraint_pool_entries() const;
 
   /**
-   * Returns a pointer to the first
-   * number in the constraint pool data
-   * with index @p pool_index (to
-   * be used together with @p
-   * constraint_pool_end()).
+   * Returns a pointer to the first number in the constraint pool data with
+   * index @p pool_index (to be used together with @p constraint_pool_end()).
    */
   const Number *
   constraint_pool_begin (const unsigned int pool_index) const;
 
   /**
-   * Returns a pointer to one past the
-   * last number in the constraint pool
-   * data with index @p pool_index (to
-   * be used together with @p
+   * Returns a pointer to one past the last number in the constraint pool data
+   * with index @p pool_index (to be used together with @p
    * constraint_pool_begin()).
    */
   const Number *
   constraint_pool_end (const unsigned int pool_index) const;
 
   /**
-   * Returns the unit cell information
-   * for given hp index.
+   * Returns the unit cell information for given hp index.
    */
   const internal::MatrixFreeFunctions::ShapeInfo<Number> &
   get_shape_info (const unsigned int fe_component = 0,
@@ -1052,21 +801,18 @@ public:
 private:
 
   /**
-   * This is the actual reinit function
-   * that sets up the indices for the
-   * DoFHandler and MGDoFHandler case.
+   * This is the actual reinit function that sets up the indices for the
+   * DoFHandler case.
    */
-  template <typename DoFHandler>
   void internal_reinit (const Mapping<dim>                &mapping,
-                        const std::vector<const DoFHandler *> &dof_handler,
+                        const std::vector<const DoFHandler<dim> *> &dof_handler,
                         const std::vector<const ConstraintMatrix *> &constraint,
                         const std::vector<IndexSet>       &locally_owned_set,
                         const std::vector<hp::QCollection<1> > &quad,
                         const AdditionalData               additional_data);
 
   /**
-   * Same as before but for hp::DoFHandler
-   * instead of generic DoFHandler type.
+   * Same as before but for hp::DoFHandler instead of generic DoFHandler type.
    */
   void internal_reinit (const Mapping<dim>               &mapping,
                         const std::vector<const hp::DoFHandler<dim>*> &dof_handler,
@@ -1076,135 +822,104 @@ private:
                         const AdditionalData              additional_data);
 
   /**
-   * Initializes the fields in DoFInfo
-   * together with the constraint pool
-   * that holds all different weights in
-   * the constraints (not part of
-   * DoFInfo because several DoFInfo
-   * classes can have the same weights
-   * which consequently only need to be
-   * stored once).
+   * Initializes the fields in DoFInfo together with the constraint pool that
+   * holds all different weights in the constraints (not part of DoFInfo
+   * because several DoFInfo classes can have the same weights which
+   * consequently only need to be stored once).
    */
   void
   initialize_indices (const std::vector<const ConstraintMatrix *> &constraint,
                       const std::vector<IndexSet> &locally_owned_set);
 
   /**
-   * Initializes the DoFHandlers based on a
-   * DoFHandler<dim> argument.
+   * Initializes the DoFHandlers based on a DoFHandler<dim> argument.
    */
   void initialize_dof_handlers (const std::vector<const DoFHandler<dim>*> &dof_handlers,
                                 const unsigned int                         level);
 
   /**
-   * Initializes the DoFHandlers based on a
-   * DoFHandler<dim> argument.
-   */
-  void initialize_dof_handlers (const std::vector<const MGDoFHandler<dim>*> &dof_handlers,
-                                const unsigned int                           level);
-
-  /**
-   * Initializes the DoFHandlers based on a
-   * DoFHandler<dim> argument.
+   * Initializes the DoFHandlers based on a hp::DoFHandler<dim> argument.
    */
   void initialize_dof_handlers (const std::vector<const hp::DoFHandler<dim>*> &dof_handlers,
                                 const unsigned int                             level);
 
   /**
-   * This struct defines which DoFHandler has
-   * actually been given at construction, in
-   * order to define the correct behavior when
-   * querying the underlying DoFHandler.
+   * This struct defines which DoFHandler has actually been given at
+   * construction, in order to define the correct behavior when querying the
+   * underlying DoFHandler.
    */
   struct DoFHandlers
   {
     DoFHandlers () : n_dof_handlers (0), level (numbers::invalid_unsigned_int) {};
     std::vector<SmartPointer<const DoFHandler<dim> > >   dof_handler;
-    std::vector<SmartPointer<const MGDoFHandler<dim> > > mg_dof_handler;
     std::vector<SmartPointer<const hp::DoFHandler<dim> > > hp_dof_handler;
-    enum ActiveDoFHandler { usual, multigrid, hp } active_dof_handler;
+    enum ActiveDoFHandler { usual, hp } active_dof_handler;
     unsigned int n_dof_handlers;
     unsigned int level;
   };
 
   /**
-   * Pointers to the DoFHandlers underlying the
-   * current problem.
+   * Pointers to the DoFHandlers underlying the current problem.
    */
   DoFHandlers dof_handlers;
 
   /**
-   * Contains the information about degrees of
-   * freedom on the individual cells and
-   * constraints.
+   * Contains the information about degrees of freedom on the individual cells
+   * and constraints.
    */
   std::vector<internal::MatrixFreeFunctions::DoFInfo> dof_info;
 
   /**
-   * Contains the weights for constraints stored
-   * in DoFInfo. Filled into a separate field
-   * since several vector components might share
-   * similar weights, which reduces memory
-   * consumption. Moreover, it obviates template
-   * arguments on DoFInfo and keeps it a plain
-   * field of indices only.
+   * Contains the weights for constraints stored in DoFInfo. Filled into a
+   * separate field since several vector components might share similar
+   * weights, which reduces memory consumption. Moreover, it obviates template
+   * arguments on DoFInfo and keeps it a plain field of indices only.
    */
   std::vector<Number> constraint_pool_data;
 
   /**
-   * Contains an indicator to the start
-   * of the ith index in the constraint
+   * Contains an indicator to the start of the ith index in the constraint
    * pool data.
    */
   std::vector<unsigned int> constraint_pool_row_index;
 
   /**
-   * Holds information on transformation of
-   * cells from reference cell to real cell that
-   * is needed for evaluating integrals.
+   * Holds information on transformation of cells from reference cell to real
+   * cell that is needed for evaluating integrals.
    */
   internal::MatrixFreeFunctions::MappingInfo<dim,Number> mapping_info;
 
   /**
-   * Contains shape value information on the
-   * unit cell.
+   * Contains shape value information on the unit cell.
    */
   Table<4,internal::MatrixFreeFunctions::ShapeInfo<Number> > shape_info;
 
   /**
-   * Describes how the cells are gone
-   * through. With the cell level (first index
-   * in this field) and the index within the
-   * level, one can reconstruct a deal.II
-   * cell iterator and use all the traditional
-   * things deal.II offers to do with cell
-   * iterators.
+   * Describes how the cells are gone through. With the cell level (first
+   * index in this field) and the index within the level, one can reconstruct
+   * a deal.II cell iterator and use all the traditional things deal.II offers
+   * to do with cell iterators.
    */
   std::vector<std::pair<unsigned int,unsigned int> > cell_level_index;
 
   /**
-   * Stores how many cells we have, how many
-   * cells that we see after applying
-   * vectorization (i.e., the number of macro
-   * cells), and MPI-related stuff.
+   * Stores how many cells we have, how many cells that we see after applying
+   * vectorization (i.e., the number of macro cells), and MPI-related stuff.
    */
   internal::MatrixFreeFunctions::SizeInfo size_info;
 
   /**
-   * Information regarding the shared memory
-   * parallelization.
+   * Information regarding the shared memory parallelization.
    */
   internal::MatrixFreeFunctions::TaskInfo task_info;
 
   /**
-   * Stores whether indices have been
-   * initialized.
+   * Stores whether indices have been initialized.
    */
   bool                               indices_are_initialized;
 
   /**
-   * Stores whether indices have been
-   * initialized.
+   * Stores whether indices have been initialized.
    */
   bool                               mapping_is_initialized;
 };
@@ -1352,7 +1067,8 @@ const Number *
 MatrixFree<dim,Number>::constraint_pool_begin (const unsigned int row) const
 {
   AssertIndexRange (row, constraint_pool_row_index.size()-1);
-  return &constraint_pool_data[0] + constraint_pool_row_index[row];
+  return constraint_pool_data.empty() ? 0 :
+    &constraint_pool_data[0] + constraint_pool_row_index[row];
 }
 
 
@@ -1363,7 +1079,8 @@ const Number *
 MatrixFree<dim,Number>::constraint_pool_end (const unsigned int row) const
 {
   AssertIndexRange (row, constraint_pool_row_index.size()-1);
-  return &constraint_pool_data[0] + constraint_pool_row_index[row+1];
+  return constraint_pool_data.empty() ? 0 :
+    &constraint_pool_data[0] + constraint_pool_row_index[row+1];
 }
 
 
@@ -1411,8 +1128,8 @@ MatrixFree<dim,Number>::create_cell_subrange_hp_by_index
     return range;
   else
     {
-      // the range over which we are searching must be ordered,
-      // otherwise we got a range that spans over too many cells
+      // the range over which we are searching must be ordered, otherwise we
+      // got a range that spans over too many cells
 #ifdef DEBUG
       for (unsigned int i=range.first+1; i<range.second; ++i)
         Assert (fe_indices[i] >= fe_indices[i-1],
@@ -1422,13 +1139,13 @@ MatrixFree<dim,Number>::create_cell_subrange_hp_by_index
 #endif
       std::pair<unsigned int,unsigned int> return_range;
       return_range.first =
-        std::lower_bound(&fe_indices[range.first], &fe_indices[range.second],
-                         fe_index)
+        std::lower_bound(&fe_indices[0] + range.first,
+                         &fe_indices[0] + range.second, fe_index)
         -&fe_indices[0] ;
       return_range.second =
-        std::lower_bound(&fe_indices[return_range.first],
-                         &fe_indices[range.second],
-                         fe_index+1)-&fe_indices[0];
+        std::lower_bound(&fe_indices[0] + return_range.first,
+                         &fe_indices[0] + range.second,
+                         fe_index + 1)-&fe_indices[0];
       Assert(return_range.first >= range.first &&
              return_range.second <= range.second, ExcInternalError());
       return return_range;
@@ -1461,36 +1178,13 @@ MatrixFree<dim,Number>::get_dof_handler (const unsigned int dof_index) const
                        dof_handlers.n_dof_handlers);
       return *dof_handlers.dof_handler[dof_index];
     }
-  else if (dof_handlers.active_dof_handler == DoFHandlers::multigrid)
-    {
-      Assert (dof_handlers.level == numbers::invalid_unsigned_int,
-              ExcMessage("Cannot return DoFHandler when MGDoFHandler and "
-                         "level are specified."));
-      AssertDimension (dof_handlers.mg_dof_handler.size(),
-                       dof_handlers.n_dof_handlers);
-      return *dof_handlers.mg_dof_handler[dof_index];
-    }
   else
     {
       Assert (false, ExcNotImplemented());
-      // put pseudo return argument to avoid
-      // compiler error, but trigger a segfault in
-      // case this is only run in optimized mode
+      // put pseudo return argument to avoid compiler error, but trigger a
+      // segfault in case this is only run in optimized mode
       return *dof_handlers.dof_handler[numbers::invalid_unsigned_int];
     }
-}
-
-
-
-template <int dim, typename Number>
-inline
-const MGDoFHandler<dim> &
-MatrixFree<dim,Number>::get_mg_dof_handler (const unsigned int dof_index) const
-{
-  AssertIndexRange (dof_index, dof_handlers.n_dof_handlers);
-  Assert (dof_handlers.active_dof_handler == DoFHandlers::multigrid,
-          ExcNotImplemented());
-  return *dof_handlers.mg_dof_handler[dof_index];
 }
 
 
@@ -1520,15 +1214,6 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
                        dof_handlers.n_dof_handlers);
       dofh = dof_handlers.dof_handler[dof_index];
     }
-  else if (dof_handlers.active_dof_handler == DoFHandlers::multigrid)
-    {
-      Assert (dof_handlers.level == numbers::invalid_unsigned_int,
-              ExcMessage("Cannot return DoFHandler when MGDoFHandler and "
-                         "level are specified."));
-      AssertDimension (dof_handlers.mg_dof_handler.size(),
-                       dof_handlers.n_dof_handlers);
-      dofh = dof_handlers.mg_dof_handler[dof_index];
-    }
   else
     {
       Assert (false, ExcMessage ("Cannot return DoFHandler<dim>::cell_iterator "
@@ -1538,36 +1223,6 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
   std::pair<unsigned int,unsigned int> index =
     cell_level_index[macro_cell_number*vectorization_length+vector_number];
   return typename DoFHandler<dim>::active_cell_iterator
-         (&dofh->get_tria(), index.first, index.second, dofh);
-}
-
-
-
-template <int dim, typename Number>
-inline
-typename MGDoFHandler<dim>::cell_iterator
-MatrixFree<dim,Number>::get_mg_cell_iterator(const unsigned int macro_cell_number,
-                                             const unsigned int vector_number,
-                                             const unsigned int dof_index) const
-{
-  const unsigned int vectorization_length=VectorizedArray<Number>::n_array_elements;
-#ifdef DEBUG
-  AssertIndexRange (dof_index, dof_handlers.n_dof_handlers);
-  AssertIndexRange (macro_cell_number, size_info.n_macro_cells);
-  AssertIndexRange (vector_number, vectorization_length);
-  const unsigned int irreg_filled =
-    std_cxx1x::get<2>(dof_info[dof_index].row_starts[macro_cell_number]);
-  if (irreg_filled > 0)
-    AssertIndexRange (vector_number, irreg_filled);
-#endif
-
-  Assert (dof_handlers.active_dof_handler == DoFHandlers::multigrid,
-          ExcNotImplemented());
-  const MGDoFHandler<dim> *dofh = dof_handlers.mg_dof_handler[dof_index];
-
-  std::pair<unsigned int,unsigned int> index =
-    cell_level_index[macro_cell_number*vectorization_length+vector_number];
-  return typename MGDoFHandler<dim>::cell_iterator
          (&dofh->get_tria(), index.first, index.second, dofh);
 }
 
@@ -1769,37 +1424,28 @@ MatrixFree<dim,Number>::mapping_initialized () const
 
 namespace internal
 {
-  template <typename DH>
-  std::vector<IndexSet>
-  extract_locally_owned_index_sets (const std::vector<const DH *> &dofh,
-                                    const unsigned int)
+  namespace MatrixFree
   {
-    std::vector<IndexSet> locally_owned_set;
-    locally_owned_set.reserve (dofh.size());
-    for (unsigned int j=0; j<dofh.size(); j++)
-      locally_owned_set.push_back(dofh[j]->locally_owned_dofs());
-    return locally_owned_set;
-  }
-
-
-
-  template <int dim>
-  std::vector<IndexSet>
-  extract_locally_owned_index_sets (const std::vector<const dealii::MGDoFHandler<dim>*> &dofh,
-                                    const unsigned int level)
-  {
-    std::vector<IndexSet> locally_owned_set;
-    locally_owned_set.reserve (dofh.size());
-    for (unsigned int j=0; j<dofh.size(); j++)
-      if (level == numbers::invalid_unsigned_int)
-        locally_owned_set.push_back(dofh[j]->locally_owned_dofs());
-      else
-        {
-          IndexSet new_set (dofh[j]->n_dofs(level));
-          new_set.add_range (0, dofh[j]->n_dofs(level));
-          locally_owned_set.push_back(new_set);
-        }
-    return locally_owned_set;
+    template <typename DH>
+    inline
+    std::vector<IndexSet>
+    extract_locally_owned_index_sets (const std::vector<const DH *> &dofh,
+                                      const unsigned int level)
+    {
+      std::vector<IndexSet> locally_owned_set;
+      locally_owned_set.reserve (dofh.size());
+      for (unsigned int j=0; j<dofh.size(); j++)
+        if (level == numbers::invalid_unsigned_int)
+          locally_owned_set.push_back(dofh[j]->locally_owned_dofs());
+        else
+          {
+            // TODO: not distributed yet
+            IndexSet new_set (dofh[j]->n_dofs(level));
+            new_set.add_range (0, dofh[j]->n_dofs(level));
+            locally_owned_set.push_back(new_set);
+          }
+      return locally_owned_set;
+    }
   }
 }
 
@@ -1823,8 +1469,8 @@ reinit(const DH               &dof_handler,
   quads.push_back (quad);
 
   std::vector<IndexSet> locally_owned_sets =
-    internal::extract_locally_owned_index_sets (dof_handlers,
-                                                additional_data.level_mg_handler);
+    internal::MatrixFree::extract_locally_owned_index_sets
+    (dof_handlers, additional_data.level_mg_handler);
   reinit(mapping, dof_handlers,constraints, locally_owned_sets, quads,
          additional_data);
 }
@@ -1849,8 +1495,8 @@ reinit(const Mapping<dim>     &mapping,
   quads.push_back (quad);
 
   std::vector<IndexSet> locally_owned_sets =
-    internal::extract_locally_owned_index_sets (dof_handlers,
-                                                additional_data.level_mg_handler);
+    internal::MatrixFree::extract_locally_owned_index_sets
+    (dof_handlers, additional_data.level_mg_handler);
   reinit(mapping, dof_handlers,constraints,locally_owned_sets, quads,
          additional_data);
 }
@@ -1867,8 +1513,8 @@ reinit(const std::vector<const DH *>               &dof_handler,
 {
   MappingQ1<dim> mapping;
   std::vector<IndexSet> locally_owned_set =
-    internal::extract_locally_owned_index_sets (dof_handler,
-                                                additional_data.level_mg_handler);
+    internal::MatrixFree::extract_locally_owned_index_sets
+    (dof_handler, additional_data.level_mg_handler);
   reinit(mapping, dof_handler,constraint,locally_owned_set,
          static_cast<const std::vector<Quadrature<1> >&>(quad),
          additional_data);
@@ -1888,8 +1534,8 @@ reinit(const std::vector<const DH *>               &dof_handler,
   std::vector<Quad> quads;
   quads.push_back(quad);
   std::vector<IndexSet> locally_owned_set =
-    internal::extract_locally_owned_index_sets (dof_handler,
-                                                additional_data.level_mg_handler);
+    internal::MatrixFree::extract_locally_owned_index_sets
+    (dof_handler, additional_data.level_mg_handler);
   reinit(mapping, dof_handler,constraint,locally_owned_set, quads,
          additional_data);
 }
@@ -1908,8 +1554,8 @@ reinit(const Mapping<dim>                         &mapping,
   std::vector<Quad> quads;
   quads.push_back(quad);
   std::vector<IndexSet> locally_owned_set =
-    internal::extract_locally_owned_index_sets (dof_handler,
-                                                additional_data.level_mg_handler);
+    internal::MatrixFree::extract_locally_owned_index_sets
+    (dof_handler, additional_data.level_mg_handler);
   reinit(mapping, dof_handler,constraint,locally_owned_set, quads,
          additional_data);
 }
@@ -1926,10 +1572,42 @@ reinit(const Mapping<dim>                         &mapping,
        const MatrixFree<dim,Number>::AdditionalData additional_data)
 {
   std::vector<IndexSet> locally_owned_set =
-    internal::extract_locally_owned_index_sets (dof_handler,
-                                                additional_data.level_mg_handler);
+    internal::MatrixFree::extract_locally_owned_index_sets
+    (dof_handler, additional_data.level_mg_handler);
   reinit(mapping, dof_handler,constraint,locally_owned_set,
          quad, additional_data);
+}
+
+
+
+namespace internal
+{
+  namespace MatrixFree
+  {
+    // resolve DoFHandler types
+
+    // MGDoFHandler is deprecated in deal.II but might still be present in
+    // user code, so we need to resolve its type (fortunately, it is derived
+    // from DoFHandler, so we can static_cast it to a DoFHandler<dim>)
+    template <typename DH>
+    inline
+    std::vector<const dealii::DoFHandler<DH::dimension> *>
+    resolve_dof_handler (const std::vector<const DH *> &dof_handler)
+    {
+      std::vector<const dealii::DoFHandler<DH::dimension> *> conversion(dof_handler.size());
+      for (unsigned int i=0; i<dof_handler.size(); ++i)
+        conversion[i] = static_cast<const dealii::DoFHandler<DH::dimension> *>(dof_handler[i]);
+      return conversion;
+    }
+
+    template <int dim>
+    inline
+    std::vector<const dealii::hp::DoFHandler<dim> *>
+    resolve_dof_handler (const std::vector<const dealii::hp::DoFHandler<dim> *> &dof_handler)
+    {
+      return dof_handler;
+    }
+  }
 }
 
 
@@ -1944,26 +1622,23 @@ reinit(const Mapping<dim>                         &mapping,
        const std::vector<Quad>                    &quad,
        const MatrixFree<dim,Number>::AdditionalData additional_data)
 {
-  // find out whether we use a hp Quadrature or
-  // a standard quadrature
+  // find out whether we use a hp Quadrature or a standard quadrature
   std::vector<hp::QCollection<1> > quad_hp;
   for (unsigned int q=0; q<quad.size(); ++q)
     quad_hp.push_back (hp::QCollection<1>(quad[q]));
-  internal_reinit (mapping, dof_handler, constraint, locally_owned_set,
-                   quad_hp, additional_data);
+  internal_reinit (mapping,
+                   internal::MatrixFree::resolve_dof_handler(dof_handler),
+                   constraint, locally_owned_set, quad_hp, additional_data);
 }
 
 
 
 // ------------------------------ implementation of cell_loop ---------------
 
-// internal helper functions that define how
-// to call MPI data exchange functions: for
-// generic vectors, do nothing at all. For
-// distributed vectors, can call
-// update_ghost_values_start function and so on. If we
-// have collections of vectors, just do the
-// individual functions of the components
+// internal helper functions that define how to call MPI data exchange
+// functions: for generic vectors, do nothing at all. For distributed vectors,
+// can call update_ghost_values_start function and so on. If we have
+// collections of vectors, just do the individual functions of the components
 namespace internal
 {
   template<typename VectorStruct>
@@ -2119,8 +1794,7 @@ namespace internal
 
 #if DEAL_II_USE_MT==1
 
-  // This defines the TBB data structures that
-  // are needed to schedule the
+  // This defines the TBB data structures that are needed to schedule the
   // partition-partition variant
 
   namespace partition
@@ -2390,14 +2064,12 @@ MatrixFree<dim, Number>::cell_loop
 {
 #if DEAL_II_USE_MT==1
 
-  // Use multithreading if so requested and if
-  // there is enough work to do in parallel (the
-  // code might hang if there are less than two
-  // chunks!)
+  // Use multithreading if so requested and if there is enough work to do in
+  // parallel (the code might hang if there are less than two chunks!)
   if (task_info.use_multithreading == true && task_info.n_blocks > 3)
     {
-      // to simplify the function calls, bind away
-      // all arguments except the cell range
+      // to simplify the function calls, bind away all arguments except the
+      // cell range
       typedef
       std_cxx1x::function<void (const std::pair<unsigned int,unsigned int> &range)>
       Worker;
@@ -2489,9 +2161,8 @@ MatrixFree<dim, Number>::cell_loop
           unsigned int evens = task_info.evens;
           unsigned int odds  = task_info.odds;
 
-          // check whether there is only one
-          // partition. if not, build up the tree of
-          // partitions
+          // check whether there is only one partition. if not, build up the
+          // tree of partitions
           if (odds > 0)
             {
               tbb::empty_task *root = new( tbb::task::allocate_root() ) tbb::empty_task;
@@ -2597,9 +2268,8 @@ MatrixFree<dim, Number>::cell_loop
               root->wait_for_all();
               root->destroy(*root);
             }
-          // case when we only have one partition: this
-          // is the usual coloring scheme, and we just
-          // schedule a parallel for loop for each color
+          // case when we only have one partition: this is the usual coloring
+          // scheme, and we just schedule a parallel for loop for each color
           else
             {
               Assert(evens==1,ExcInternalError());
@@ -2629,20 +2299,18 @@ MatrixFree<dim, Number>::cell_loop
 
       internal::update_ghost_values_start (src);
 
-      // First operate on cells where no ghost data is needed (inner
-      // cells)
+      // First operate on cells where no ghost data is needed (inner cells)
       {
         cell_range.first = 0;
         cell_range.second = size_info.boundary_cells_start;
         cell_operation (*this, dst, src, cell_range);
       }
 
-      // before starting operations on cells that contain ghost nodes
-      // (outer cells), wait for the MPI commands to finish
+      // before starting operations on cells that contain ghost nodes (outer
+      // cells), wait for the MPI commands to finish
       internal::update_ghost_values_finish(src);
 
-      // For the outer cells, do the same procedure as for inner
-      // cells.
+      // For the outer cells, do the same procedure as for inner cells.
       if (size_info.boundary_cells_end > size_info.boundary_cells_start)
         {
           cell_range.first = size_info.boundary_cells_start;
@@ -2652,8 +2320,7 @@ MatrixFree<dim, Number>::cell_loop
 
       internal::compress_start(dst);
 
-      // Finally operate on cells where no ghost data is needed (inner
-      // cells)
+      // Finally operate on cells where no ghost data is needed (inner cells)
       if (size_info.n_macro_cells > size_info.boundary_cells_end)
         {
           cell_range.first = size_info.boundary_cells_end;
@@ -2681,8 +2348,7 @@ MatrixFree<dim,Number>::cell_loop
  OutVector      &dst,
  const InVector &src) const
 {
-  // here, use std_cxx1x::bind to hand a
-  // function handler with the appropriate
+  // here, use std_cxx1x::bind to hand a function handler with the appropriate
   // argument to the other loop function
   std_cxx1x::function<void (const MatrixFree<dim,Number> &,
                             OutVector &,
@@ -2714,8 +2380,7 @@ MatrixFree<dim,Number>::cell_loop
  OutVector      &dst,
  const InVector &src) const
 {
-  // here, use std_cxx1x::bind to hand a
-  // function handler with the appropriate
+  // here, use std_cxx1x::bind to hand a function handler with the appropriate
   // argument to the other loop function
   std_cxx1x::function<void (const MatrixFree<dim,Number> &,
                             OutVector &,

@@ -59,8 +59,304 @@ namespace TrilinosWrappers
   /**
    * Iterators for Trilinos matrices
    */
-  namespace MatrixIterators
+  namespace SparseMatrixIterators
   {
+    // forward declaration
+    template <bool Constness> class Iterator;
+
+    /**
+     * Exception
+     */
+    DeclException0 (ExcBeyondEndOfMatrix);
+
+    /**
+     * Exception
+     */
+    DeclException3 (ExcAccessToNonlocalRow,
+                    int, int, int,
+                    << "You tried to access row " << arg1
+                    << " of a distributed sparsity pattern, "
+                    << " but only rows " << arg2 << " through " << arg3
+                    << " are stored locally and can be accessed.");
+
+    /**
+     * Handling of indices for both
+     * constant and non constant
+     * Accessor objects
+     *
+     * For a regular
+     * dealii::SparseMatrix, we would
+     * use an accessor for the sparsity
+     * pattern. For Trilinos matrices,
+     * this does not seem so simple,
+     * therefore, we write a little
+     * base class here.
+     *
+     * @author Guido Kanschat
+     * @date 2012
+     */
+    class AccessorBase
+    {
+    public:
+      /**
+       * Constructor.
+       */
+      AccessorBase (SparseMatrix *matrix,
+                    const unsigned int  row,
+                    const unsigned int  index);
+
+      /**
+       * Row number of the element
+       * represented by this object.
+       */
+      unsigned int row() const;
+
+      /**
+       * Index in row of the element
+       * represented by this object.
+       */
+      unsigned int index() const;
+
+      /**
+       * Column number of the element
+       * represented by this object.
+       */
+      unsigned int column() const;
+
+    protected:
+      /**
+       * Pointer to the matrix
+       * object. This object should
+       * be handled as a const
+       * pointer or non-const by the
+       * appropriate derived
+       * classes. In order to be able
+       * to implement both, it is not
+       * const here, so handle with
+       * care!
+       */
+      mutable SparseMatrix *matrix;
+      /**
+       * Current row number.
+       */
+      unsigned int a_row;
+
+      /**
+       * Current index in row.
+       */
+      unsigned int a_index;
+
+      /**
+       * Discard the old row caches
+       * (they may still be used by
+       * other accessors) and
+       * generate new ones for the
+       * row pointed to presently by
+       * this accessor.
+       */
+      void visit_present_row ();
+
+      /**
+       * Cache where we store the
+       * column indices of the
+       * present row. This is
+       * necessary, since Trilinos
+       * makes access to the elements
+       * of its matrices rather hard,
+       * and it is much more
+       * efficient to copy all column
+       * entries of a row once when
+       * we enter it than repeatedly
+       * asking Trilinos for
+       * individual ones. This also
+       * makes some sense since it is
+       * likely that we will access
+       * them sequentially anyway.
+       *
+       * In order to make copying of
+       * iterators/accessor of
+       * acceptable performance, we
+       * keep a shared pointer to
+       * these entries so that more
+       * than one accessor can access
+       * this data if necessary.
+       */
+      std_cxx1x::shared_ptr<std::vector<unsigned int> > colnum_cache;
+
+      /**
+       * Cache for the values
+       * of this row.
+       */
+      std_cxx1x::shared_ptr<std::vector<TrilinosScalar> > value_cache;
+    };
+
+    /**
+     * General template for sparse matrix accessors. The first template
+     * argument denotes the underlying numeric type, the second the
+     * constness of the matrix.
+     *
+     * The general template is not implemented, only the specializations
+     * for the two possible values of the second template
+     * argument. Therefore, the interface listed here only serves as a
+     * template provided since doxygen does not link the specializations.
+     */
+    template <bool Constess>
+    class Accessor : public AccessorBase
+    {
+      /**
+      * Value of this matrix entry.
+      */
+      TrilinosScalar value() const;
+
+      /**
+       * Value of this matrix entry.
+       */
+      TrilinosScalar &value();
+    };
+
+    /**
+     * The specialization for a const Accessor.
+     */
+    template<>
+    class Accessor<true> : public AccessorBase
+    {
+    public:
+      /**
+       * Typedef for the type (including
+       * constness) of the matrix to be
+       * used here.
+       */
+      typedef const SparseMatrix MatrixType;
+
+      /**
+       * Constructor. Since we use
+       * accessors only for read
+       * access, a const matrix
+       * pointer is sufficient.
+       */
+      Accessor (MatrixType *matrix,
+                const unsigned int  row,
+                const unsigned int  index);
+
+      /**
+       * Copy constructor to get from a
+       * const or non-const accessor to a const
+       * accessor.
+       */
+      template <bool Other>
+      Accessor (const Accessor<Other> &a);
+
+      /**
+       * Value of this matrix entry.
+       */
+      TrilinosScalar value() const;
+
+    private:
+      /**
+       * Make iterator class a
+       * friend.
+       */
+      template <bool> friend class Iterator;
+    };
+
+    /**
+     * The specialization for a mutable Accessor.
+     */
+    template<>
+    class Accessor<false> : public AccessorBase
+    {
+      class Reference
+      {
+      public:
+        /**
+         * Constructor.
+         */
+        Reference (const Accessor<false> &accessor);
+
+        /**
+         * Conversion operator to the
+         * data type of the matrix.
+         */
+        operator TrilinosScalar () const;
+
+        /**
+         * Set the element of the matrix
+         * we presently point to to @p n.
+         */
+        const Reference &operator = (const TrilinosScalar n) const;
+
+        /**
+         * Add @p n to the element of the
+         * matrix we presently point to.
+         */
+        const Reference &operator += (const TrilinosScalar n) const;
+
+        /**
+         * Subtract @p n from the element
+         * of the matrix we presently
+         * point to.
+         */
+        const Reference &operator -= (const TrilinosScalar n) const;
+
+        /**
+         * Multiply the element of the
+         * matrix we presently point to
+         * by @p n.
+         */
+        const Reference &operator *= (const TrilinosScalar n) const;
+
+        /**
+         * Divide the element of the
+         * matrix we presently point to
+         * by @p n.
+         */
+        const Reference &operator /= (const TrilinosScalar n) const;
+
+      private:
+        /**
+         * Pointer to the accessor that
+         * denotes which element we
+         * presently point to.
+         */
+        Accessor &accessor;
+      };
+
+    public:
+      /**
+       * Typedef for the type (including
+       * constness) of the matrix to be
+       * used here.
+       */
+      typedef SparseMatrix MatrixType;
+
+      /**
+       * Constructor. Since we use
+       * accessors only for read
+       * access, a const matrix
+       * pointer is sufficient.
+       */
+      Accessor (MatrixType *matrix,
+                const unsigned int  row,
+                const unsigned int  index);
+
+      /**
+       * Value of this matrix entry.
+       */
+      Reference value() const;
+
+    private:
+      /**
+       * Make iterator class a
+       * friend.
+       */
+      template <bool> friend class Iterator;
+      /**
+       * Make Reference object a
+       * friend.
+       */
+      friend class Reference;
+    };
+
     /**
      * STL conforming iterator. This class acts as an iterator walking
      * over the elements of Trilinos matrices. The implementation of this
@@ -75,130 +371,16 @@ namespace TrilinosWrappers
      * @ingroup TrilinosWrappers
      * @author Martin Kronbichler, Wolfgang Bangerth, 2008
      */
-    class const_iterator
+    template <bool Constness>
+    class Iterator
     {
-    private:
-      /**
-       * Accessor class for iterators
-       */
-      class Accessor
-      {
-      public:
-        /**
-         * Constructor. Since we use
-         * accessors only for read
-         * access, a const matrix
-         * pointer is sufficient.
-         */
-        Accessor (const SparseMatrix *matrix,
-                  const unsigned int  row,
-                  const unsigned int  index);
-
-        /**
-         * Row number of the element
-         * represented by this object.
-         */
-        unsigned int row() const;
-
-        /**
-         * Index in row of the element
-         * represented by this object.
-         */
-        unsigned int index() const;
-
-        /**
-         * Column number of the element
-         * represented by this object.
-         */
-        unsigned int column() const;
-
-        /**
-         * Value of this matrix entry.
-         */
-        TrilinosScalar value() const;
-
-        /**
-         * Exception
-         */
-        DeclException0 (ExcBeyondEndOfMatrix);
-
-        /**
-         * Exception
-         */
-        DeclException3 (ExcAccessToNonlocalRow,
-                        int, int, int,
-                        << "You tried to access row " << arg1
-                        << " of a distributed matrix, but only rows "
-                        << arg2 << " through " << arg3
-                        << " are stored locally and can be accessed.");
-
-      private:
-        /**
-         * The matrix accessed.
-         */
-        mutable SparseMatrix *matrix;
-
-        /**
-         * Current row number.
-         */
-        unsigned int a_row;
-
-        /**
-         * Current index in row.
-         */
-        unsigned int a_index;
-
-        /**
-         * Cache where we store the
-         * column indices of the
-         * present row. This is
-         * necessary, since Trilinos
-         * makes access to the elements
-         * of its matrices rather hard,
-         * and it is much more
-         * efficient to copy all column
-         * entries of a row once when
-         * we enter it than repeatedly
-         * asking Trilinos for
-         * individual ones. This also
-         * makes some sense since it is
-         * likely that we will access
-         * them sequentially anyway.
-         *
-         * In order to make copying of
-         * iterators/accessor of
-         * acceptable performance, we
-         * keep a shared pointer to
-         * these entries so that more
-         * than one accessor can access
-         * this data if necessary.
-         */
-        std_cxx1x::shared_ptr<std::vector<unsigned int> > colnum_cache;
-
-        /**
-         * Similar cache for the values
-         * of this row.
-         */
-        std_cxx1x::shared_ptr<std::vector<TrilinosScalar> > value_cache;
-
-        /**
-         * Discard the old row caches
-         * (they may still be used by
-         * other accessors) and
-         * generate new ones for the
-         * row pointed to presently by
-         * this accessor.
-         */
-        void visit_present_row ();
-
-        /**
-         * Make enclosing class a
-         * friend.
-         */
-        friend class const_iterator;
-      };
-
     public:
+      /**
+       * Typedef for the matrix type
+       * (including constness) we are to
+       * operate on.
+       */
+      typedef typename Accessor<Constness>::MatrixType MatrixType;
 
       /**
        * Constructor. Create an
@@ -206,41 +388,48 @@ namespace TrilinosWrappers
        * matrix for the given row and
        * the index within it.
        */
-      const_iterator (const SparseMatrix *matrix,
-                      const unsigned int  row,
-                      const unsigned int  index);
+      Iterator (MatrixType *matrix,
+                const unsigned int  row,
+                const unsigned int  index);
+
+      /**
+       * Copy constructor with
+       * optional change of constness.
+       */
+      template <bool Other>
+      Iterator(const Iterator<Other> &other);
 
       /**
        * Prefix increment.
        */
-      const_iterator &operator++ ();
+      Iterator<Constness> &operator++ ();
 
       /**
        * Postfix increment.
        */
-      const_iterator operator++ (int);
+      Iterator<Constness> operator++ (int);
 
       /**
        * Dereferencing operator.
        */
-      const Accessor &operator* () const;
+      const Accessor<Constness> &operator* () const;
 
       /**
        * Dereferencing operator.
        */
-      const Accessor *operator-> () const;
+      const Accessor<Constness> *operator-> () const;
 
       /**
        * Comparison. True, if both
        * iterators point to the same
        * matrix position.
        */
-      bool operator == (const const_iterator &) const;
+      bool operator == (const Iterator<Constness> &) const;
 
       /**
        * Inverse of <tt>==</tt>.
        */
-      bool operator != (const const_iterator &) const;
+      bool operator != (const Iterator<Constness> &) const;
 
       /**
        * Comparison operator. Result
@@ -250,7 +439,12 @@ namespace TrilinosWrappers
        * and the first index is
        * smaller.
        */
-      bool operator < (const const_iterator &) const;
+      bool operator < (const Iterator<Constness> &) const;
+
+      /**
+       * Comparison operator. The opposite of the previous operator
+       */
+      bool operator > (const Iterator<Constness> &) const;
 
       /**
        * Exception
@@ -266,7 +460,9 @@ namespace TrilinosWrappers
        * Store an object of the
        * accessor class.
        */
-      Accessor accessor;
+      Accessor<Constness> accessor;
+
+      template <bool Other> friend class Iterator;
     };
 
   }
@@ -331,7 +527,13 @@ namespace TrilinosWrappers
      * Declare a typedef for the
      * iterator class.
      */
-    typedef MatrixIterators::const_iterator const_iterator;
+    typedef SparseMatrixIterators::Iterator<false> iterator;
+
+    /**
+     * Declare a typedef for the
+     * const iterator class.
+     */
+    typedef SparseMatrixIterators::Iterator<true> const_iterator;
 
     /**
      * Declare a typedef in analogy
@@ -1677,6 +1879,14 @@ namespace TrilinosWrappers
                 const parallel::distributed::Vector<TrilinosScalar> &src) const;
 
     /**
+     * Same as before, but working with
+     * deal.II's own vector
+     * class.
+     */
+    void vmult (dealii::Vector<TrilinosScalar>       &dst,
+                const dealii::Vector<TrilinosScalar> &src) const;
+
+    /**
      * Matrix-vector multiplication:
      * let <i>dst =
      * M<sup>T</sup>*src</i> with
@@ -1718,6 +1928,14 @@ namespace TrilinosWrappers
      */
     void Tvmult (parallel::distributed::Vector<TrilinosScalar>       &dst,
                  const parallel::distributed::Vector<TrilinosScalar> &src) const;
+
+    /**
+     * Same as before, but working with
+     * deal.II's own vector
+     * class.
+     */
+    void Tvmult (dealii::Vector<TrilinosScalar>       &dst,
+                 const dealii::Vector<TrilinosScalar> &src) const;
 
     /**
      * Adding Matrix-vector
@@ -1916,60 +2134,60 @@ namespace TrilinosWrappers
                              const VectorBase &b) const;
 
     /**
-     * Perform the matrix-matrix
-     * multiplication <tt>C = A * B</tt>,
-     * or, if an optional vector argument
-     * is given, <tt>C = A * diag(V) *
-     * B</tt>, where <tt>diag(V)</tt>
-     * defines a diagonal matrix with the
-     * vector entries.
-     *
-     * This function assumes that the
-     * calling matrix <tt>A</tt> and
-     * <tt>B</tt> have compatible
-     * sizes. The size of <tt>C</tt> will
-     * be set within this function.
-     *
-     * The content as well as the sparsity
-     * pattern of the matrix C will be
-     * changed by this function, so make
-     * sure that the sparsity pattern is
-     * not used somewhere else in your
-     * program. This is an expensive
-     * operation, so think twice before you
-     * use this function.
-     */
+    * Perform the matrix-matrix
+    * multiplication <tt>C = A * B</tt>,
+    * or, if an optional vector argument
+    * is given, <tt>C = A * diag(V) *
+    * B</tt>, where <tt>diag(V)</tt>
+    * defines a diagonal matrix with the
+    * vector entries.
+    *
+    * This function assumes that the
+    * calling matrix <tt>A</tt> and
+    * <tt>B</tt> have compatible
+    * sizes. The size of <tt>C</tt> will
+    * be set within this function.
+    *
+    * The content as well as the sparsity
+    * pattern of the matrix C will be
+    * changed by this function, so make
+    * sure that the sparsity pattern is
+    * not used somewhere else in your
+    * program. This is an expensive
+    * operation, so think twice before you
+    * use this function.
+    */
     void mmult (SparseMatrix       &C,
                 const SparseMatrix &B,
                 const VectorBase   &V = VectorBase()) const;
 
 
     /**
-     * Perform the matrix-matrix
-     * multiplication with the transpose of
-     * <tt>this</tt>, i.e., <tt>C =
-     * A<sup>T</sup> * B</tt>, or, if an
-     * optional vector argument is given,
-     * <tt>C = A<sup>T</sup> * diag(V) *
-     * B</tt>, where <tt>diag(V)</tt>
-     * defines a diagonal matrix with the
-     * vector entries.
-     *
-     * This function assumes that the
-     * calling matrix <tt>A</tt> and
-     * <tt>B</tt> have compatible
-     * sizes. The size of <tt>C</tt> will
-     * be set within this function.
-     *
-     * The content as well as the sparsity
-     * pattern of the matrix C will be
-     * changed by this function, so make
-     * sure that the sparsity pattern is
-     * not used somewhere else in your
-     * program. This is an expensive
-     * operation, so think twice before you
-     * use this function.
-     */
+    * Perform the matrix-matrix
+    * multiplication with the transpose of
+    * <tt>this</tt>, i.e., <tt>C =
+    * A<sup>T</sup> * B</tt>, or, if an
+    * optional vector argument is given,
+    * <tt>C = A<sup>T</sup> * diag(V) *
+    * B</tt>, where <tt>diag(V)</tt>
+    * defines a diagonal matrix with the
+    * vector entries.
+    *
+    * This function assumes that the
+    * calling matrix <tt>A</tt> and
+    * <tt>B</tt> have compatible
+    * sizes. The size of <tt>C</tt> will
+    * be set within this function.
+    *
+    * The content as well as the sparsity
+    * pattern of the matrix C will be
+    * changed by this function, so make
+    * sure that the sparsity pattern is
+    * not used somewhere else in your
+    * program. This is an expensive
+    * operation, so think twice before you
+    * use this function.
+    */
     void Tmmult (SparseMatrix       &C,
                  const SparseMatrix &B,
                  const VectorBase   &V = VectorBase()) const;
@@ -2135,6 +2353,49 @@ namespace TrilinosWrappers
      * last row of a matrix.
      */
     const_iterator end (const unsigned int r) const;
+
+    /**
+     * STL-like iterator with the
+     * first entry.
+     */
+    iterator begin ();
+
+    /**
+     * Final iterator.
+     */
+    iterator end ();
+
+    /**
+     * STL-like iterator with the
+     * first entry of row @p r.
+     *
+     * Note that if the given row
+     * is empty, i.e. does not
+     * contain any nonzero entries,
+     * then the iterator returned
+     * by this function equals
+     * <tt>end(r)</tt>. Note also
+     * that the iterator may not be
+     * dereferencable in that case.
+     */
+    iterator begin (const unsigned int r);
+
+    /**
+     * Final iterator of row
+     * <tt>r</tt>. It points to the
+     * first element past the end
+     * of line @p r, or past the
+     * end of the entire sparsity
+     * pattern.
+     *
+     * Note that the end iterator
+     * is not necessarily
+     * dereferencable. This is in
+     * particular the case if it is
+     * the end iterator for the
+     * last row of a matrix.
+     */
+    iterator end (const unsigned int r);
 
 //@}
     /**
@@ -2355,16 +2616,12 @@ namespace TrilinosWrappers
 
 #ifndef DOXYGEN
 
-  namespace MatrixIterators
+  namespace SparseMatrixIterators
   {
-
     inline
-    const_iterator::Accessor::
-    Accessor (const SparseMatrix *matrix,
-              const unsigned int  row,
-              const unsigned int  index)
+    AccessorBase::AccessorBase(SparseMatrix *matrix, unsigned int row, unsigned int index)
       :
-      matrix(const_cast<SparseMatrix *>(matrix)),
+      matrix(matrix),
       a_row(row),
       a_index(index)
     {
@@ -2374,58 +2631,168 @@ namespace TrilinosWrappers
 
     inline
     unsigned int
-    const_iterator::Accessor::row() const
+    AccessorBase::row() const
     {
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
       return a_row;
     }
 
 
-
     inline
     unsigned int
-    const_iterator::Accessor::column() const
+    AccessorBase::column() const
     {
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
       return (*colnum_cache)[a_index];
     }
 
 
-
     inline
     unsigned int
-    const_iterator::Accessor::index() const
+    AccessorBase::index() const
     {
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
       return a_index;
     }
 
 
+    inline
+    Accessor<true>::Accessor (MatrixType *matrix,
+                              const unsigned int  row,
+                              const unsigned int  index)
+      :
+      AccessorBase(const_cast<SparseMatrix *>(matrix), row, index)
+    {}
+
+
+    template <bool Other>
+    inline
+    Accessor<true>::Accessor(const Accessor<Other> &other)
+      :
+      AccessorBase(other)
+    {}
+
 
     inline
     TrilinosScalar
-    const_iterator::Accessor::value() const
+    Accessor<true>::value() const
     {
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
       return (*value_cache)[a_index];
     }
 
 
+    inline
+    Accessor<false>::Reference::Reference (
+      const Accessor<false> &acc)
+      :
+      accessor(const_cast<Accessor<false>&>(acc))
+    {}
+
 
     inline
-    const_iterator::
-    const_iterator(const SparseMatrix *matrix,
-                   const unsigned int  row,
-                   const unsigned int  index)
+    Accessor<false>::Reference::operator TrilinosScalar () const
+    {
+      return (*accessor.value_cache)[accessor.a_index];
+    }
+
+    inline
+    const Accessor<false>::Reference &
+    Accessor<false>::Reference::operator = (const TrilinosScalar n) const
+    {
+      (*accessor.value_cache)[accessor.a_index] = n;
+      accessor.matrix->set(accessor.row(), accessor.column(),
+                           static_cast<TrilinosScalar>(*this));
+      return *this;
+    }
+
+
+    inline
+    const Accessor<false>::Reference &
+    Accessor<false>::Reference::operator += (const TrilinosScalar n) const
+    {
+      (*accessor.value_cache)[accessor.a_index] += n;
+      accessor.matrix->set(accessor.row(), accessor.column(),
+                           static_cast<TrilinosScalar>(*this));
+      return *this;
+    }
+
+
+    inline
+    const Accessor<false>::Reference &
+    Accessor<false>::Reference::operator -= (const TrilinosScalar n) const
+    {
+      (*accessor.value_cache)[accessor.a_index] -= n;
+      accessor.matrix->set(accessor.row(), accessor.column(),
+                           static_cast<TrilinosScalar>(*this));
+      return *this;
+    }
+
+
+    inline
+    const Accessor<false>::Reference &
+    Accessor<false>::Reference::operator *= (const TrilinosScalar n) const
+    {
+      (*accessor.value_cache)[accessor.a_index] *= n;
+      accessor.matrix->set(accessor.row(), accessor.column(),
+                           static_cast<TrilinosScalar>(*this));
+      return *this;
+    }
+
+
+    inline
+    const Accessor<false>::Reference &
+    Accessor<false>::Reference::operator /= (const TrilinosScalar n) const
+    {
+      (*accessor.value_cache)[accessor.a_index] /= n;
+      accessor.matrix->set(accessor.row(), accessor.column(),
+                           static_cast<TrilinosScalar>(*this));
+      return *this;
+    }
+
+
+    inline
+    Accessor<false>::Accessor (MatrixType *matrix,
+                               const unsigned int  row,
+                               const unsigned int  index)
+      :
+      AccessorBase(matrix, row, index)
+    {}
+
+
+    inline
+    Accessor<false>::Reference
+    Accessor<false>::value() const
+    {
+      Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
+      return Reference(*this);
+    }
+
+
+
+    template <bool Constness>
+    inline
+    Iterator<Constness>::Iterator(MatrixType *matrix,
+                                  const unsigned int  row,
+                                  const unsigned int  index)
       :
       accessor(matrix, row, index)
     {}
 
 
-
+    template <bool Constness>
+    template <bool Other>
     inline
-    const_iterator &
-    const_iterator::operator++ ()
+    Iterator<Constness>::Iterator(const Iterator<Other> &other)
+      :
+      accessor(other.accessor)
+    {}
+
+
+    template <bool Constness>
+    inline
+    Iterator<Constness> &
+    Iterator<Constness>::operator++ ()
     {
       Assert (accessor.a_row < accessor.matrix->m(), ExcIteratorPastEnd());
 
@@ -2451,40 +2818,42 @@ namespace TrilinosWrappers
     }
 
 
-
+    template <bool Constness>
     inline
-    const_iterator
-    const_iterator::operator++ (int)
+    Iterator<Constness>
+    Iterator<Constness>::operator++ (int)
     {
-      const const_iterator old_state = *this;
+      const Iterator<Constness> old_state = *this;
       ++(*this);
       return old_state;
     }
 
 
 
+    template <bool Constness>
     inline
-    const const_iterator::Accessor &
-    const_iterator::operator* () const
+    const Accessor<Constness> &
+    Iterator<Constness>::operator* () const
     {
       return accessor;
     }
 
 
 
+    template <bool Constness>
     inline
-    const const_iterator::Accessor *
-    const_iterator::operator-> () const
+    const Accessor<Constness> *
+    Iterator<Constness>::operator-> () const
     {
       return &accessor;
     }
 
 
 
+    template <bool Constness>
     inline
     bool
-    const_iterator::
-    operator == (const const_iterator &other) const
+    Iterator<Constness>::operator == (const Iterator<Constness> &other) const
     {
       return (accessor.a_row == other.accessor.a_row &&
               accessor.a_index == other.accessor.a_index);
@@ -2492,24 +2861,33 @@ namespace TrilinosWrappers
 
 
 
+    template <bool Constness>
     inline
     bool
-    const_iterator::
-    operator != (const const_iterator &other) const
+    Iterator<Constness>::operator != (const Iterator<Constness> &other) const
     {
       return ! (*this == other);
     }
 
 
 
+    template <bool Constness>
     inline
     bool
-    const_iterator::
-    operator < (const const_iterator &other) const
+    Iterator<Constness>::operator < (const Iterator<Constness> &other) const
     {
       return (accessor.row() < other.accessor.row() ||
               (accessor.row() == other.accessor.row() &&
                accessor.index() < other.accessor.index()));
+    }
+
+
+    template <bool Constness>
+    inline
+    bool
+    Iterator<Constness>::operator > (const Iterator<Constness> &other) const
+    {
+      return (other < *this);
     }
 
   }
@@ -2559,6 +2937,57 @@ namespace TrilinosWrappers
     for (unsigned int i=r+1; i<m(); ++i)
       if (row_length(i) > 0)
         return const_iterator(this, i, 0);
+
+    // if there is no such line, then take the
+    // end iterator of the matrix
+    return end();
+  }
+
+
+
+  inline
+  SparseMatrix::iterator
+  SparseMatrix::begin()
+  {
+    return iterator(this, 0, 0);
+  }
+
+
+
+  inline
+  SparseMatrix::iterator
+  SparseMatrix::end()
+  {
+    return iterator(this, m(), 0);
+  }
+
+
+
+  inline
+  SparseMatrix::iterator
+  SparseMatrix::begin(const unsigned int r)
+  {
+    Assert (r < m(), ExcIndexRange(r, 0, m()));
+    if (row_length(r) > 0)
+      return iterator(this, r, 0);
+    else
+      return end (r);
+  }
+
+
+
+  inline
+  SparseMatrix::iterator
+  SparseMatrix::end(const unsigned int r)
+  {
+    Assert (r < m(), ExcIndexRange(r, 0, m()));
+
+    // place the iterator on the first entry
+    // past this line, or at the end of the
+    // matrix
+    for (unsigned int i=r+1; i<m(); ++i)
+      if (row_length(i) > 0)
+        return iterator(this, i, 0);
 
     // if there is no such line, then take the
     // end iterator of the matrix
@@ -3273,6 +3702,30 @@ namespace TrilinosWrappers
 
   inline
   void
+  SparseMatrix::vmult (dealii::Vector<TrilinosScalar>       &dst,
+                       const dealii::Vector<TrilinosScalar> &src) const
+  {
+    Assert (&src != &dst, ExcSourceEqualsDestination());
+    Assert (matrix->Filled(), ExcMatrixNotCompressed());
+
+    AssertDimension (static_cast<unsigned int>(matrix->DomainMap().NumMyElements()),
+                     static_cast<unsigned int>(matrix->DomainMap().NumGlobalElements()));
+    AssertDimension (dst.size(), static_cast<unsigned int>(matrix->RangeMap().NumMyElements()));
+    AssertDimension (src.size(), static_cast<unsigned int>(matrix->DomainMap().NumMyElements()));
+
+    Epetra_Vector tril_dst (View, matrix->RangeMap(), dst.begin());
+    Epetra_Vector tril_src (View, matrix->DomainMap(),
+                            const_cast<double *>(src.begin()));
+
+    const int ierr = matrix->Multiply (false, tril_src, tril_dst);
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
+  }
+
+
+
+  inline
+  void
   SparseMatrix::Tvmult (VectorBase       &dst,
                         const VectorBase &src) const
   {
@@ -3302,6 +3755,30 @@ namespace TrilinosWrappers
 
     AssertDimension (dst.local_size(), static_cast<unsigned int>(matrix->DomainMap().NumMyElements()));
     AssertDimension (src.local_size(), static_cast<unsigned int>(matrix->RangeMap().NumMyElements()));
+
+    Epetra_Vector tril_dst (View, matrix->DomainMap(), dst.begin());
+    Epetra_Vector tril_src (View, matrix->RangeMap(),
+                            const_cast<double *>(src.begin()));
+
+    const int ierr = matrix->Multiply (true, tril_src, tril_dst);
+    Assert (ierr == 0, ExcTrilinosError(ierr));
+    (void)ierr; // removes -Wunused-variable in optimized mode
+  }
+
+
+
+  inline
+  void
+  SparseMatrix::Tvmult (dealii::Vector<TrilinosScalar>      &dst,
+                        const dealii::Vector<TrilinosScalar> &src) const
+  {
+    Assert (&src != &dst, ExcSourceEqualsDestination());
+    Assert (matrix->Filled(), ExcMatrixNotCompressed());
+
+    AssertDimension (static_cast<unsigned int>(matrix->DomainMap().NumMyElements()),
+                     static_cast<unsigned int>(matrix->DomainMap().NumGlobalElements()));
+    AssertDimension (dst.size(), static_cast<unsigned int>(matrix->DomainMap().NumMyElements()));
+    AssertDimension (src.size(), static_cast<unsigned int>(matrix->RangeMap().NumMyElements()));
 
     Epetra_Vector tril_dst (View, matrix->DomainMap(), dst.begin());
     Epetra_Vector tril_src (View, matrix->RangeMap(),

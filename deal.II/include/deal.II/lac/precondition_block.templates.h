@@ -625,7 +625,7 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
 
         begin_diag_block+=this->blocksize;
       }
-  dst.scale(this->relaxation);
+  dst *= this->relaxation;
 }
 
 

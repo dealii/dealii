@@ -1,0 +1,86 @@
+
+DEAL:0:2d::hyper_cube
+**** proc 0
+level 0: -
+
+**** proc 1
+level 0: 1
+level 1: 1368
+level 2: 11113-3-66--8---
+
+**** proc 2
+level 0: -
+
+**** proc 3
+level 0: 1
+level 1: 1368
+level 2: -1-13333-6--88--
+
+**** proc 4
+level 0: -
+
+**** proc 5
+level 0: -
+
+**** proc 6
+level 0: 1
+level 1: 1368
+level 2: --11--3-66668-8-
+
+**** proc 7
+level 0: -
+
+**** proc 8
+level 0: 1
+level 1: 1368
+level 2: ---1--33-6-68888
+
+**** proc 9
+level 0: -
+
+DEAL:0:2d::Levels: 3
+DEAL:0:2d::n_locally_owned_dofs_per_processor:
+DEAL:0:2d::0
+DEAL:0:2d::4
+DEAL:0:2d::0
+DEAL:0:2d::4
+DEAL:0:2d::0
+DEAL:0:2d::0
+DEAL:0:2d::4
+DEAL:0:2d::0
+DEAL:0:2d::4
+DEAL:0:2d::0
+DEAL:0:2d::locally_owned_mg_dofs_per_processor:
+DEAL:0:2d::level 0:
+DEAL:0:2d::0
+DEAL:0:2d::1
+DEAL:0:2d::0
+DEAL:0:2d::0
+DEAL:0:2d::0
+DEAL:0:2d::0
+DEAL:0:2d::0
+DEAL:0:2d::0
+DEAL:0:2d::0
+DEAL:0:2d::0
+DEAL:0:2d::level 1:
+DEAL:0:2d::0
+DEAL:0:2d::1
+DEAL:0:2d::0
+DEAL:0:2d::1
+DEAL:0:2d::0
+DEAL:0:2d::0
+DEAL:0:2d::1
+DEAL:0:2d::0
+DEAL:0:2d::1
+DEAL:0:2d::0
+DEAL:0:2d::level 2:
+DEAL:0:2d::0
+DEAL:0:2d::4
+DEAL:0:2d::0
+DEAL:0:2d::4
+DEAL:0:2d::0
+DEAL:0:2d::0
+DEAL:0:2d::4
+DEAL:0:2d::0
+DEAL:0:2d::4
+DEAL:0:2d::0

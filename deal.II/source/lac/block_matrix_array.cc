@@ -385,12 +385,12 @@ BlockTrianglePrecondition<number>::do_row (
           // First, divide by the current
           // factor, such that we can
           // multiply by it later.
-          aux.scale(1./m->prefix);
+          aux /= m->prefix;
           if (m->transpose)
             m->matrix->Tvmult_add(aux, dst.block(row_num));
           else
             m->matrix->vmult_add(aux, dst.block(row_num));
-          aux.scale(m->prefix);
+          aux *= m->prefix;
         }
       dst.block(row_num) = aux;
     }

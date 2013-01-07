@@ -17,4 +17,3 @@ ULIMIT = @ULIMIT@
 # with x-branch-name/ so that tests run from the branch will show up
 # in different folders on the webpage.
 WORKDIR = $(notdir $(shell pwd))
-

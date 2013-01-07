@@ -211,7 +211,7 @@ namespace parallel
     {
       double *data_store = reinterpret_cast<double *>(data);
 
-      typename DH::cell_iterator cell(&dof_handler->get_tria(), cell_->level(), cell_->index(), dof_handler);
+      typename DH::cell_iterator cell(*cell_, dof_handler);
 
       const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
       ::dealii::Vector<double> dofvalues(dofs_per_cell);
@@ -235,7 +235,7 @@ namespace parallel
                     std::vector<VECTOR *> &all_out)
     {
       typename DH::cell_iterator
-      cell(&dof_handler->get_tria(), cell_->level(), cell_->index(), dof_handler);
+      cell(*cell_, dof_handler);
 
       const unsigned int dofs_per_cell=cell->get_fe().dofs_per_cell;
       ::dealii::Vector<double> dofvalues(dofs_per_cell);

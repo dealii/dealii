@@ -15,7 +15,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/index_set.h>
 #include <deal.II/dofs/dof_tools.h>
-#include <deal.II/multigrid/mg_dof_handler.h>
+#include <deal.II/dofs/dof_handler.h>
 
 #include <vector>
 #include <set>
@@ -24,7 +24,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <class Object> class MGLevelObject;
-template <int dim, int spacedim> class MGDoFHandler;
+template <int dim, int spacedim> class DoFHandler;
 template <typename number> class Vector;
 template <typename number> class SparseMatrix;
 template <typename number> class BlockVector;
@@ -39,11 +39,11 @@ template <typename number> class BlockSparseMatrix;
  * This is a collection of functions operating on, and manipulating
  * the numbers of degrees of freedom in a multilevel triangulation. It
  * is similar in purpose and function to the @p DoFTools class, but
- * operates on @p MGDoFHandler objects instead of DoFHandler
+ * operates on levels of DoFHandler
  * objects. See there and the documentation of the member functions
  * for more information.
  *
- * @author Wolfgang Bangerth, Guido Kanschat, 1999 - 2005
+ * @author Wolfgang Bangerth, Guido Kanschat, 1999 - 2005, 2012
  */
 namespace MGTools
 {
@@ -53,7 +53,7 @@ namespace MGTools
    */
   template <int dim, int spacedim>
   void
-  compute_row_length_vector(const MGDoFHandler<dim,spacedim> &dofs,
+  compute_row_length_vector(const DoFHandler<dim,spacedim> &dofs,
                             const unsigned int level,
                             std::vector<unsigned int> &row_lengths,
                             const DoFTools::Coupling flux_couplings = DoFTools::none);
@@ -66,7 +66,7 @@ namespace MGTools
    */
   template <int dim, int spacedim>
   void
-  compute_row_length_vector(const MGDoFHandler<dim,spacedim> &dofs,
+  compute_row_length_vector(const DoFHandler<dim,spacedim> &dofs,
                             const unsigned int level,
                             std::vector<unsigned int> &row_lengths,
                             const Table<2,DoFTools::Coupling> &couplings,
@@ -86,9 +86,9 @@ namespace MGTools
    * hanging nodes here, since only
    * one level is considered.
    */
-  template <int dim, class SparsityPattern, int spacedim>
+  template <class DH, class SparsityPattern>
   void
-  make_sparsity_pattern (const MGDoFHandler<dim,spacedim> &dof_handler,
+  make_sparsity_pattern (const DH &dof_handler,
                          SparsityPattern         &sparsity,
                          const unsigned int       level);
 
@@ -100,7 +100,7 @@ namespace MGTools
    */
   template <int dim, class SparsityPattern, int spacedim>
   void
-  make_flux_sparsity_pattern (const MGDoFHandler<dim,spacedim> &dof_handler,
+  make_flux_sparsity_pattern (const DoFHandler<dim,spacedim> &dof_handler,
                               SparsityPattern         &sparsity,
                               const unsigned int       level);
 
@@ -116,7 +116,7 @@ namespace MGTools
    */
   template <int dim, class SparsityPattern, int spacedim>
   void
-  make_flux_sparsity_pattern_edge (const MGDoFHandler<dim,spacedim> &dof_handler,
+  make_flux_sparsity_pattern_edge (const DoFHandler<dim,spacedim> &dof_handler,
                                    SparsityPattern         &sparsity,
                                    const unsigned int       level);
   /**
@@ -138,7 +138,7 @@ namespace MGTools
    */
   template <int dim, class SparsityPattern, int spacedim>
   void
-  make_flux_sparsity_pattern (const MGDoFHandler<dim,spacedim> &dof,
+  make_flux_sparsity_pattern (const DoFHandler<dim,spacedim> &dof,
                               SparsityPattern       &sparsity,
                               const unsigned int level,
                               const Table<2,DoFTools::Coupling> &int_mask,
@@ -158,7 +158,7 @@ namespace MGTools
    */
   template <int dim, class SparsityPattern, int spacedim>
   void
-  make_flux_sparsity_pattern_edge (const MGDoFHandler<dim,spacedim> &dof_handler,
+  make_flux_sparsity_pattern_edge (const DoFHandler<dim,spacedim> &dof_handler,
                                    SparsityPattern         &sparsity,
                                    const unsigned int       level,
                                    const Table<2,DoFTools::Coupling> &flux_mask);
@@ -173,11 +173,11 @@ namespace MGTools
    * for each block (access is
    * <tt>result[level][block]</tt>).
    */
-  template <int dim, int spacedim>
+  template <class DH>
   void
-  count_dofs_per_block (const MGDoFHandler<dim,spacedim> &mg_dof,
-                        std::vector<std::vector<unsigned int> > &result,
-                        std::vector<unsigned int> target_block = std::vector<unsigned int>());
+  count_dofs_per_block (const DH     &dof_handler,
+                        std::vector<std::vector<unsigned int> > &dofs_per_block,
+                        std::vector<unsigned int>  target_block = std::vector<unsigned int>());
 
   /**
    * Count the dofs component-wise
@@ -191,7 +191,7 @@ namespace MGTools
    */
   template <int dim, int spacedim>
   void
-  count_dofs_per_component (const MGDoFHandler<dim,spacedim> &mg_dof,
+  count_dofs_per_component (const DoFHandler<dim,spacedim> &mg_dof,
                             std::vector<std::vector<unsigned int> > &result,
                             const bool only_once = false,
                             std::vector<unsigned int> target_component = std::vector<unsigned int>());
@@ -203,9 +203,9 @@ namespace MGTools
    */
   template <int dim, int spacedim>
   void
-  count_dofs_per_component (const MGDoFHandler<dim,spacedim> &mg_dof,
+  count_dofs_per_component (const DoFHandler<dim,spacedim> &mg_dof,
                             std::vector<std::vector<unsigned int> > &result,
-                            std::vector<unsigned int> target_component);
+                            std::vector<unsigned int> target_component) DEAL_II_DEPRECATED;
 
   /**
    * Generate a list of those
@@ -231,7 +231,7 @@ namespace MGTools
    */
   template <int dim, int spacedim>
   void
-  make_boundary_list (const MGDoFHandler<dim,spacedim>      &mg_dof,
+  make_boundary_list (const DoFHandler<dim,spacedim>      &mg_dof,
                       const typename FunctionMap<dim>::type &function_map,
                       std::vector<std::set<unsigned int> >  &boundary_indices,
                       const ComponentMask                   &component_mask = ComponentMask());
@@ -243,7 +243,7 @@ namespace MGTools
    */
   template <int dim, int spacedim>
   void
-  make_boundary_list (const MGDoFHandler<dim,spacedim>      &mg_dof,
+  make_boundary_list (const DoFHandler<dim,spacedim>      &mg_dof,
                       const typename FunctionMap<dim>::type &function_map,
                       std::vector<IndexSet>                 &boundary_indices,
                       const ComponentMask               &component_mask = ComponentMask());
@@ -285,7 +285,7 @@ namespace MGTools
    */
   template <int dim, int spacedim>
   void
-  extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+  extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
                                 std::vector<std::vector<bool> >  &interface_dofs,
                                 std::vector<std::vector<bool> >  &boundary_interface_dofs);
 
@@ -295,12 +295,12 @@ namespace MGTools
    */
   template <int dim, int spacedim>
   void
-  extract_inner_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+  extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
                                 std::vector<std::vector<bool> >  &interface_dofs);
 
   template <int dim, int spacedim>
   void
-  extract_non_interface_dofs (const MGDoFHandler<dim,spacedim> &mg_dof_handler,
+  extract_non_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
                               std::vector<std::set<unsigned int> >  &non_interface_dofs);
 }
 

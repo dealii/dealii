@@ -23,7 +23,6 @@ DEAL_II_NAMESPACE_OPEN
 // Forward declarations
 
 template <int dim, int spacedim> class DoFHandler;
-template <int dim, int spacedim> class MGDoFHandler;
 namespace hp
 {
   template <int dim, int spacedim> class DoFHandler;
@@ -48,7 +47,7 @@ namespace hp
  * BlockIndices::block_start() will return the start index for each of
  * the blocks.
  *
- * When an MGDoFHandler is used, the same structure is automatically
+ * When a DoFHandler with levels is used, the same structure is automatically
  * generated for each level. The level blocks can be accessed through
  * level().
  *
@@ -94,26 +93,25 @@ public:
    * describing block structure
    * of the DoFHandler.
    *
+  * By default, this function will
+  * attempt to initialize whatever
+  * is possible. If active dofs
+  * have been assigned int the
+  * DoFHandler argument, they
+  * BlockIndices for those will be
+  * generated. The same for level
+  * dofs.
+  *
+  * This default behavior can be
+  * overridden by the two
+  * parameters, which can switch
+  * off active dofs or level dofs.
+  *
    * This function will also clear
    * the local() indices.
    */
   template <int dim, int spacedim>
-  void initialize(const DoFHandler<dim, spacedim> &);
-
-  /**
-   * @brief Fill the object with values
-   * describing level block
-   * structure of the
-   * MGDoFHandler. If
-   * <tt>levels_only</tt> is false,
-   * the other initialize() is
-   * called as well.
-   *
-   * This function will also clear
-   * the local() indices.
-   */
-  template <int dim, int spacedim>
-  void initialize(const MGDoFHandler<dim, spacedim> &, bool levels_only = false);
+  void initialize(const DoFHandler<dim, spacedim> &, bool levels_only = false, bool active_only = false);
 
   /**
    * @brief Initialize block structure

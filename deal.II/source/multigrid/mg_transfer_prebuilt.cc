@@ -15,6 +15,12 @@
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/compressed_simple_sparsity_pattern.h>
@@ -23,7 +29,7 @@
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/multigrid/mg_dof_handler.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
+#include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer.templates.h>
@@ -31,10 +37,53 @@
 DEAL_II_NAMESPACE_OPEN
 
 
+template<class VECTOR>
+MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt ()
+{}
+
+
+template<class VECTOR>
+MGTransferPrebuilt<VECTOR>::MGTransferPrebuilt (const ConstraintMatrix &c, const MGConstrainedDoFs &mg_c)
+  :
+  constraints(&c),
+  mg_constrained_dofs(&mg_c)
+{}
+
+template <class VECTOR>
+MGTransferPrebuilt<VECTOR>::~MGTransferPrebuilt ()
+{}
+
+
+template <class VECTOR>
+void MGTransferPrebuilt<VECTOR>::prolongate (
+  const unsigned int to_level,
+  VECTOR            &dst,
+  const VECTOR      &src) const
+{
+  Assert ((to_level >= 1) && (to_level<=prolongation_matrices.size()),
+          ExcIndexRange (to_level, 1, prolongation_matrices.size()+1));
+
+  prolongation_matrices[to_level-1]->vmult (dst, src);
+}
+
+
+template <class VECTOR>
+void MGTransferPrebuilt<VECTOR>::restrict_and_add (
+  const unsigned int   from_level,
+  VECTOR       &dst,
+  const VECTOR &src) const
+{
+  Assert ((from_level >= 1) && (from_level<=prolongation_matrices.size()),
+          ExcIndexRange (from_level, 1, prolongation_matrices.size()+1));
+
+  prolongation_matrices[from_level-1]->Tvmult_add (dst, src);
+}
+
+
 template <typename VECTOR>
 template <int dim, int spacedim>
 void MGTransferPrebuilt<VECTOR>::build_matrices (
-  const MGDoFHandler<dim,spacedim>  &mg_dof)
+  const DoFHandler<dim,spacedim>  &mg_dof)
 {
   const unsigned int n_levels      = mg_dof.get_tria().n_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
@@ -59,9 +108,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   for (unsigned int i=0; i<n_levels-1; ++i)
     {
       prolongation_sparsities.push_back
-      (std_cxx1x::shared_ptr<SparsityPattern> (new SparsityPattern));
+      (std_cxx1x::shared_ptr<typename internal::MatrixSelector<VECTOR>::Sparsity> (new typename internal::MatrixSelector<VECTOR>::Sparsity));
       prolongation_matrices.push_back
-      (std_cxx1x::shared_ptr<SparseMatrix<double> > (new SparseMatrix<double>));
+      (std_cxx1x::shared_ptr<typename internal::MatrixSelector<VECTOR>::Matrix> (new typename internal::MatrixSelector<VECTOR>::Matrix));
     }
 
   // two fields which will store the
@@ -91,7 +140,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       CompressedSimpleSparsityPattern csp (sizes[level+1],
                                            sizes[level]);
       std::vector<unsigned int> entries (dofs_per_cell);
-      for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
+      for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children())
           {
@@ -132,7 +181,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
 
       // now actually build the matrices
-      for (typename MGDoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
+      for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children())
           {
@@ -192,7 +241,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
             const unsigned int n_dofs = prolongation_matrices[level]->m();
             for (unsigned int i=0; i<n_dofs; ++i)
               {
-                SparseMatrix<double>::iterator
+                typename internal::MatrixSelector<VECTOR>::Matrix::iterator
                 start_row = prolongation_matrices[level]->begin(i),
                 end_row   = prolongation_matrices[level]->end(i);
                 for (; start_row != end_row; ++start_row)
@@ -222,9 +271,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
     {
       copy_indices[level].clear();
-      typename MGDoFHandler<dim,spacedim>::active_cell_iterator
+      typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_cell = mg_dof.begin_active(level);
-      const typename MGDoFHandler<dim,spacedim>::active_cell_iterator
+      const typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_end  = mg_dof.end_active(level);
 
       temp_copy_indices.resize (0);
@@ -234,12 +283,11 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
         {
-          DoFAccessor<dim, DoFHandler<dim,spacedim> > &global_cell = *level_cell;
           // get the dof numbers of
           // this cell for the global
           // and the level-wise
           // numbering
-          global_cell.get_dof_indices(global_dof_indices);
+          level_cell->get_dof_indices(global_dof_indices);
           level_cell->get_mg_dof_indices (level_dof_indices);
 
           for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -273,6 +321,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       Assert (counter == n_active_dofs, ExcInternalError());
     }
 }
+
 
 
 

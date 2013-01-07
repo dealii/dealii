@@ -571,7 +571,7 @@ namespace Threads
    *
    * @deprecated
    */
-  typedef Mutex     ThreadMutex;
+  typedef Mutex ThreadMutex DEAL_II_DEPRECATED;
 
   /**
    * Provide a backward compatible name (we
@@ -581,7 +581,7 @@ namespace Threads
    *
    * @deprecated
    */
-  typedef ConditionVariable ThreadCondition;
+  typedef ConditionVariable ThreadCondition DEAL_II_DEPRECATED;
 
   /**
    * If using POSIX functions, then
@@ -589,7 +589,7 @@ namespace Threads
    * to the names we use throughout
    * the library.
    */
-  typedef PosixThreadBarrier   Barrier;
+  typedef PosixThreadBarrier Barrier;
 
 #else
   /**

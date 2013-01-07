@@ -25,7 +25,7 @@
 
 void test ()
 {
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
 
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
@@ -90,8 +90,8 @@ void test ()
   }
 
                                 // check mean value (should be equal to l1
-                                // norm here since we have no negative
-                                // entries)
+                                // norm divided by vector size here since we
+                                // have no negative entries)
   {
     const double mean = v.mean_value();
     if (myid == 0)
@@ -203,7 +203,7 @@ void test ()
 
                                 // only one processor has non-negative entry
     v3 = v;
-    if (myid == 1)
+    if (myid == 1 || numproc==1)
       v3.local_element(0) = -1;
     allnonneg = v3.is_non_negative();
     if (myid == 0)
@@ -220,7 +220,7 @@ int main (int argc, char **argv)
 {
   Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
 
-  unsigned int myid = Utilities::System::get_this_mpi_process (MPI_COMM_WORLD);
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
 
   if (myid == 0)
