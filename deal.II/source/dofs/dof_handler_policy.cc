@@ -497,7 +497,7 @@ namespace internal
 //                                               // for cell dof indices
 //              for (typename DoFHandler<dim,spacedim>::level_cell_iterator
 //                     cell = dof_handler.begin(); cell != dof_handler.end(); ++cell)
-//                if (cell->subdomain_id() != types::artificial_subdomain_id)
+//                if (cell->subdomain_id() != numbers::artificial_subdomain_id)
 //                  cell->update_cell_dof_indices_cache ();
 
           // finally restore the user flags
@@ -1196,7 +1196,7 @@ namespace internal
                     {
                       //TODO: we don't know about our children if proc 0 owns all coarse cells!
                       dealii::types::subdomain_id_t dest = dealii_cell->child(c)->level_subdomain_id();
-                      Assert(dest!=dealii::types::artificial_subdomain_id && dest!=dealii::types::invalid_subdomain_id, ExcInternalError());
+                      Assert(dest!=dealii::numbers::artificial_subdomain_id && dest!=dealii::types::invalid_subdomain_id, ExcInternalError());
                       if (dest != tria.locally_owned_subdomain())
                         send_to.insert(dest);
                     }
@@ -1322,7 +1322,7 @@ namespace internal
         {
           if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
             {
-              Assert(dealii_cell->level_subdomain_id()!=dealii::types::artificial_subdomain_id, ExcInternalError());
+              Assert(dealii_cell->level_subdomain_id()!=dealii::numbers::artificial_subdomain_id, ExcInternalError());
               Assert(dealii_cell->level()==(int)level, ExcInternalError());
 
               // update dof indices of cell
@@ -1751,7 +1751,7 @@ namespace internal
 
               for (cell = dof_handler.begin(level); cell != endc; ++cell)
                 {
-                  if (cell->level_subdomain_id()==dealii::types::artificial_subdomain_id)
+                  if (cell->level_subdomain_id()==dealii::numbers::artificial_subdomain_id)
                     {
                       //artificial
                     }
@@ -2285,7 +2285,7 @@ namespace internal
                 typename DoFHandler<dim,spacedim>::level_cell_iterator
                 cell, endc = dof_handler.end(level);
                 for (cell = dof_handler.begin(level); cell != endc; ++cell)
-                  if (cell->level_subdomain_id() != dealii::types::artificial_subdomain_id)
+                  if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id)
                     cell->set_user_flag();
               }
 
@@ -2304,7 +2304,7 @@ namespace internal
               for (typename DoFHandler<dim,spacedim>::level_cell_iterator
                    cell = dof_handler.begin(level);
                    cell != dof_handler.end(level); ++cell)
-                if (cell->level_subdomain_id() != dealii::types::artificial_subdomain_id && cell->level_subdomain_id() != tr->locally_owned_subdomain())
+                if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id && cell->level_subdomain_id() != tr->locally_owned_subdomain())
                   for (unsigned int v=0; v<GeometryInfo<dim>::vertices_per_cell; ++v)
                     if (locally_active_vertices[cell->vertex_index(v)])
                       vertices_with_ghost_neighbors[cell->vertex_index(v)]
@@ -2339,7 +2339,7 @@ namespace internal
                 cell, endc = dof_handler.end(level);
 
                 for (cell = dof_handler.begin(level); cell != endc; ++cell)
-                  if (cell->level_subdomain_id() != dealii::types::artificial_subdomain_id)
+                  if (cell->level_subdomain_id() != dealii::numbers::artificial_subdomain_id)
                     {
                       local_dof_indices.resize (cell->get_fe().dofs_per_cell);
                       cell->get_mg_dof_indices (local_dof_indices);
