@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2146,7 +2146,8 @@ namespace VectorTools
       return;
 
     // set up sparsity structure
-    CompressedSparsityPattern c_sparsity(dof.n_dofs());
+    CompressedSparsityPattern c_sparsity(dof.n_boundary_dofs (boundary_functions),
+					 dof.n_boundary_dofs (boundary_functions));
     DoFTools::make_boundary_sparsity_pattern (dof,
                                               boundary_functions,
                                               dof_to_boundary_mapping,
