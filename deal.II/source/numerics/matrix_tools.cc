@@ -2066,11 +2066,14 @@ namespace MatrixTools
                 // find the position of
                 // element
                 // (row,dof_number)
+                bool (*comp)(const typename SparseMatrix<number>::iterator::value_type &p,
+                             const unsigned int column)
+                = &column_less_than<typename SparseMatrix<number>::iterator>;
                 const typename SparseMatrix<number>::iterator
                 p = Utilities::lower_bound(matrix.begin(row)++,
                                            matrix.end(row),
                                            dof_number,
-                                           &column_less_than<typename SparseMatrix<number>::iterator>);
+                                           comp);
 
                 // check whether this line has
                 // an entry in the regarding column
