@@ -620,7 +620,8 @@ set_matrix_values:
     std::size_t in_index, index;
 
     for (unsigned int row=0; row<n_rows; ++row)
-      if (input_row_map.MyGID(static_cast<int>(row)))
+      // see if the row is locally stored on this processor
+      if (input_row_map.MyGID(static_cast<int>(row)) == true)
         {
           index = rowstart_indices[row];
           in_index = in_rowstart_indices[row];
