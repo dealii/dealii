@@ -2286,6 +2286,11 @@ namespace MatrixTools
                 const SparsityPattern &transpose_sparsity
                   = sparsity_pattern.block (block_index.first, block_row);
 
+                SparseMatrix<number> &this_matrix
+                  = matrix.block(block_row, block_index.first);
+                SparseMatrix<number> &transpose_matrix
+                  = matrix.block(block_index.first, block_row);
+
                 // traverse the row of
                 // the transpose block
                 // to find the
@@ -2350,23 +2355,16 @@ namespace MatrixTools
                                                  [this_sparsity.get_rowstart_indices()[row+1]],
                                                  block_index.second);
 
-                    // check whether this line has
-                    // an entry in the regarding column
-                    // (check for ==dof_number and
-                    // != next_row, since if
-                    // row==dof_number-1, *p is a
-                    // past-the-end pointer but points
-                    // to dof_number anyway...)
+                    // check whether this line has an entry in the
+                    // regarding column (check for ==dof_number and !=
+                    // next_row, since if row==dof_number-1, *p is a
+                    // past-the-end pointer but points to dof_number
+                    // anyway...)
                     //
-                    // there should be
-                    // such an entry!
-                    // note, however,
-                    // that this
-                    // assertion will
-                    // fail sometimes
-                    // if the sparsity
-                    // pattern is not
-                    // symmetric!
+                    // there should be such an entry! we know this because
+                    // we have assumed that the sparsity pattern is
+                    // symmetric and we only walk over those rows for
+                    // which the current row has a column entry
                     Assert ((*p == block_index.second) &&
                             (p != &this_sparsity.get_column_numbers()
                              [this_sparsity.get_rowstart_indices()[row+1]]),
@@ -2380,11 +2378,11 @@ namespace MatrixTools
 
                     // correct right hand side
                     right_hand_side.block(block_row)(row)
-                    -= matrix.block(block_row,block_index.first).global_entry(global_entry) /
+                    -= this_matrix.global_entry(global_entry) /
                        diagonal_entry * new_rhs;
 
                     // set matrix entry to zero
-                    matrix.block(block_row,block_index.first).global_entry(global_entry) = 0.;
+                    this_matrix.global_entry(global_entry) = 0.;
                   }
               }
           }
