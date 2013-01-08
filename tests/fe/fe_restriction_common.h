@@ -21,6 +21,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_dg0.h>
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
