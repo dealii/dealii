@@ -87,7 +87,7 @@ double
 TensorProductPolynomialsConst<dim>::compute_value (const unsigned int i,
                                                    const Point<dim> &p) const
 {
-  unsigned int max_indices=pow(polynomials.size(),dim);
+  unsigned int max_indices = Utilities::fixed_power<dim>(polynomials.size());
 
   Assert (i<=max_indices, ExcInternalError());
   if (i<max_indices)
