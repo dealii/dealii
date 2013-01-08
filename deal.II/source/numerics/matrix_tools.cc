@@ -2087,7 +2087,7 @@ namespace MatrixTools
                                         diagonal_entry * new_rhs;
 
                 // set matrix entry to zero
-                q->value() = 0.;
+                p->value() = 0.;
               }
           }
 
