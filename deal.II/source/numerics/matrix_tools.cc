@@ -2299,13 +2299,12 @@ namespace MatrixTools
                 // don't use the
                 // diagonal element of
                 // the diagonal block
-                const unsigned int
-                first = (block_index.first == block_row ?
-                         transpose_sparsity.get_rowstart_indices()[block_index.second]+1 :
-                         transpose_sparsity.get_rowstart_indices()[block_index.second]),
-                        last  = transpose_sparsity.get_rowstart_indices()[block_index.second+1];
-
-                for (unsigned int j=first; j<last; ++j)
+                for (typename SparseMatrix<number>::iterator
+                     q = (block_index.first == block_row ?
+                         transpose_matrix.begin(block_index.second)+1 :
+                         transpose_matrix.begin(block_index.second));
+                    q != transpose_matrix.end(block_index.second);
+                    ++q)
                   {
                     // get the number
                     // of the column in
@@ -2317,7 +2316,7 @@ namespace MatrixTools
                     // block which has
                     // an entry in the
                     // interesting row
-                    const unsigned int row = transpose_sparsity.get_column_numbers()[j];
+                    const unsigned int row = q->column();
 
                     // find the
                     // position of
