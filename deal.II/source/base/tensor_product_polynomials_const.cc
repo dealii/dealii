@@ -87,7 +87,7 @@ double
 TensorProductPolynomialsConst<dim>::compute_value (const unsigned int i,
                                                    const Point<dim> &p) const
 {
-  unsigned int max_indices = Utilities::fixed_power<dim>(polynomials.size());
+  const unsigned int max_indices = Utilities::fixed_power<dim>(polynomials.size());
 
   Assert (i<=max_indices, ExcInternalError());
   if (i<max_indices)
@@ -119,7 +119,7 @@ Tensor<1,dim>
 TensorProductPolynomialsConst<dim>::compute_grad (const unsigned int i,
                                                   const Point<dim> &p) const
 {
-  unsigned int max_indices=pow(polynomials.size(),dim);
+  const unsigned int max_indices=pow(polynomials.size(),dim);
 
   Assert (i<=max_indices, ExcInternalError());
   Tensor<1,dim> grad;
@@ -158,7 +158,7 @@ Tensor<2,dim>
 TensorProductPolynomialsConst<dim>::compute_grad_grad (const unsigned int i,
                                                        const Point<dim> &p) const
 {
-  unsigned int max_indices=pow(polynomials.size(),dim);
+  const unsigned int max_indices=pow(polynomials.size(),dim);
 
   Assert (i<=max_indices, ExcInternalError());
   Tensor<2,dim> grad_grad;
