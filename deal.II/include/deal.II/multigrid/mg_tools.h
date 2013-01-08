@@ -251,20 +251,18 @@ namespace MGTools
   /**
    * Maybe no longer needed.
    */
-
   template <typename number>
   void
   apply_boundary_values (const std::set<unsigned int> &boundary_dofs,
                          SparseMatrix<number> &matrix,
                          const bool preserve_symmetry,
-                         const bool ignore_zeros = false);
+                         const bool ignore_zeros = false) DEAL_II_DEPRECATED;
 
   template <typename number>
   void
   apply_boundary_values (const std::set<unsigned int> &boundary_dofs,
                          BlockSparseMatrix<number> &matrix,
-                         const bool preserve_symmetry);
-
+                         const bool preserve_symmetry) DEAL_II_DEPRECATED;
 
   /**
    * For each level in a multigrid
