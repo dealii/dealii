@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2236,19 +2236,15 @@ namespace SparseMatrixIterators
     Assert (&accessor.get_matrix() == &other.accessor.get_matrix(),
             ExcInternalError());
 
-    if ((*this)->row() == other->row())
-      return ((*this)->index() - other->index());
-    else
-      {
-        const SparsityPattern &sparsity = accessor.get_matrix().get_sparsity_pattern();
-        const unsigned int this_position
-        = sparsity.get_rowstart_indices()[(*this)->row()] + (*this)->index();
-        const unsigned int other_position
-        = sparsity.get_rowstart_indices()[other->row()] + other->index();
+    const SparsityPattern &sparsity = accessor.get_matrix().get_sparsity_pattern();
+    const unsigned int this_position
+      = sparsity.get_rowstart_indices()[(*this)->row()] + (*this)->index();
+    const unsigned int other_position
+      = sparsity.get_rowstart_indices()[other->row()] + other->index();
 
-        return (this_position - other_position);
-      }
+    return (this_position - other_position);
   }
+
 
 
   template <typename number, bool Constness>
