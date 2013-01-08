@@ -2318,8 +2318,7 @@ namespace MatrixTools
                     // interesting row
                     const unsigned int row = q->column();
 
-                    // find the
-                    // position of
+                    // find the position of
                     // element
                     // (row,dof_number)
                     // in this block
@@ -2331,28 +2330,30 @@ namespace MatrixTools
                     // cases with
                     // square
                     // sub-matrices
-                    const unsigned int *p = 0;
+                    bool (*comp)(const typename SparseMatrix<number>::iterator::value_type p,
+                                 const unsigned int column)
+                    = &column_less_than<typename SparseMatrix<number>::iterator>;
+
+                    typename SparseMatrix<number>::iterator p = this_matrix.end();
+
                     if (this_sparsity.n_rows() == this_sparsity.n_cols())
                       {
                         if (this_sparsity.get_column_numbers()
                             [this_sparsity.get_rowstart_indices()[row]]
                             ==
                             block_index.second)
-                          p = &this_sparsity.get_column_numbers()
-                              [this_sparsity.get_rowstart_indices()[row]];
+                          p = this_matrix.begin(row);
                         else
-                          p = Utilities::lower_bound(&this_sparsity.get_column_numbers()
-                                                     [this_sparsity.get_rowstart_indices()[row]+1],
-                                                     &this_sparsity.get_column_numbers()
-                                                     [this_sparsity.get_rowstart_indices()[row+1]],
-                                                     block_index.second);
+                          p = Utilities::lower_bound(this_matrix.begin(row)+1,
+                                                     this_matrix.end(row),
+                                                     block_index.second,
+                                                     comp);
                       }
                     else
-                      p = Utilities::lower_bound(&this_sparsity.get_column_numbers()
-                                                 [this_sparsity.get_rowstart_indices()[row]],
-                                                 &this_sparsity.get_column_numbers()
-                                                 [this_sparsity.get_rowstart_indices()[row+1]],
-                                                 block_index.second);
+                      p = Utilities::lower_bound(this_matrix.begin(row),
+                                                 this_matrix.end(row),
+                                                 block_index.second,
+                                                 comp);
 
                     // check whether this line has an entry in the
                     // regarding column (check for ==dof_number and !=
@@ -2364,24 +2365,17 @@ namespace MatrixTools
                     // we have assumed that the sparsity pattern is
                     // symmetric and we only walk over those rows for
                     // which the current row has a column entry
-                    Assert ((*p == block_index.second) &&
-                            (p != &this_sparsity.get_column_numbers()
-                             [this_sparsity.get_rowstart_indices()[row+1]]),
+                    Assert ((p->column() == block_index.second) &&
+                            (p != this_matrix.begin(row+1)),
                             ExcInternalError());
-
-                    const unsigned int global_entry
-                      = (p
-                         -
-                         &this_sparsity.get_column_numbers()
-                         [this_sparsity.get_rowstart_indices()[0]]);
 
                     // correct right hand side
                     right_hand_side.block(block_row)(row)
-                    -= this_matrix.global_entry(global_entry) /
+                    -= p->value() /
                        diagonal_entry * new_rhs;
 
                     // set matrix entry to zero
-                    this_matrix.global_entry(global_entry) = 0.;
+                    p->value() = 0.;
                   }
               }
           }
