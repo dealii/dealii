@@ -2366,7 +2366,7 @@ namespace MatrixTools
                     // symmetric and we only walk over those rows for
                     // which the current row has a column entry
                     Assert ((p->column() == block_index.second) &&
-                            (p != this_matrix.begin(row+1)),
+                            (p != this_matrix.end(row)),
                             ExcInternalError());
 
                     // correct right hand side
