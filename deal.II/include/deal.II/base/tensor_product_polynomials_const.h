@@ -1,3 +1,14 @@
+//---------------------------------------------------------------------------
+//    $Id: tensor_product_polynomials.h 27628 2012-11-20 22:49:26Z heister $
+//
+//    Copyright (C) 2012, 2013 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
 #ifndef __deal2__tensor_product_polynomials_const_h
 #define __deal2__tensor_product_polynomials_const_h
 
