@@ -1,0 +1,6 @@
+
+DEAL:mpi::Running on 4 CPU(s).
+DEAL:mpi::sum: 0 avg: 0 min: 0 @0 max: 0 @0
+DEAL:mpi::sum: 4.00000 avg: 1.00000 min: 1.00000 @0 max: 1.00000 @0
+DEAL:mpi::sum: 1.00000 avg: 0.250000 min: 0 @1 max: 1.00000 @0
+DEAL:mpi::done
