@@ -18,6 +18,7 @@
 #include <deal.II/base/tensor.h>
 #include <deal.II/base/point.h>
 #include <deal.II/base/polynomial.h>
+#include <deal.II/base/utilities.h>
 
 #include <vector>
 
@@ -268,15 +269,6 @@ private:
   // length arrays
   void compute_index (const unsigned int i,
                       unsigned int       (&indices)[(dim>0?dim:1)]) const;
-
-  /**
-   * Computes
-   * <i>x<sup>dim</sup></i> for
-   * unsigned int <i>x</i>. Used in
-   * the constructor.
-   */
-  static
-  unsigned int x_to_the_dim (const unsigned int x);
 };
 
 #ifndef DOXYGEN
@@ -322,26 +314,12 @@ TensorProductPolynomialsConst<3>::compute_index(const unsigned int n,
 /* ---------------- template and inline functions ---------- */
 
 template <int dim>
-inline
-unsigned int
-TensorProductPolynomialsConst<dim>::
-x_to_the_dim (const unsigned int x)
-{
-  unsigned int y = 1;
-  for (int d=0; d<dim; ++d)
-    y *= x;
-  return y;
-}
-
-
-
-template <int dim>
 template <class Pol>
 TensorProductPolynomialsConst<dim>::
 TensorProductPolynomialsConst(const std::vector<Pol> &pols)
   :
   polynomials (pols.begin(), pols.end()),
-  n_tensor_pols(x_to_the_dim(pols.size())+1),
+  n_tensor_pols(Utilities::fixed_power<dim>(pols.size())+1),
   index_map(n_tensor_pols),
   index_map_inverse(n_tensor_pols)
 {
