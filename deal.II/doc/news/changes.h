@@ -153,6 +153,11 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> New: finite element FE_Q_DG0 that implements polynomials
+of order k with an additional discontinuous constant function.
+<br>
+(Daniel Arndt, Timo Heister, 2013/01/07)
+
 <li> step-6 now uses ConstraintMatrix::distribute_local_to_global()
 instead of condense(), which is the preferred way to use a ConstraintMatrix
  (and the only sensible way in parallel).
