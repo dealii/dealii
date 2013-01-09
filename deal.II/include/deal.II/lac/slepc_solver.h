@@ -619,13 +619,25 @@ namespace SLEPcWrappers
 
 #if DEAL_II_PETSC_VERSION_GTE(3,1,0)
   /**
-   * An implementation of the solver interface using the SLEPc Davidson
-   * solver. Usage (incomplete/untested): All problem types.
+   * An implementation of the solver interface using the SLEPc
+   * Generalized Davidson solver. Usage: All problem types.
+   *
+   * @deprecated The use of this class has been superceded by the
+   * class SolverGeneralizedDavidson.
    *
    * @ingroup SLEPcWrappers
-   * @author Toby D. Young 2010
+   * @author Toby D. Young 2011
    */
-  class SolverDavidson : public SolverBase
+#define SolverDavidson SolverGeneralizedDavidson;
+
+  /**
+   * An implementation of the solver interface using the SLEPc
+   * Generalized Davidson solver. Usage: All problem types.
+   *
+   * @ingroup SLEPcWrappers
+   * @author Toby D. Young 2013
+   */
+  class SolverGeneralizedDavidson : public SolverBase
   {
   public:
     /**
@@ -645,9 +657,58 @@ namespace SLEPcWrappers
      * the PETScWrappers, but you can
      * change that.
      */
-    SolverDavidson (SolverControl        &cn,
-                    const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                    const AdditionalData &data = AdditionalData());
+    SolverGeneralizedDavidson (SolverControl        &cn,
+			       const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+			       const AdditionalData &data = AdditionalData());
+
+  protected:
+
+    /**
+     * Store a copy of the flags for
+     * this particular solver.
+     */
+    const AdditionalData additional_data;
+
+    /**
+     * Function that takes a Eigenvalue
+     * Problem Solver context object,
+     * and sets the type of solver that
+     * is appropriate for this class.
+     */
+    virtual void set_solver_type (EPS &eps) const;
+
+  };
+
+  /**
+   * An implementation of the solver interface using the SLEPc
+   * Jacobi-Davidson solver. Usage: All problem types.
+   *
+   * @ingroup SLEPcWrappers
+   * @author Toby D. Young 2013
+   */
+  class SolverJacobiDavidson : public SolverBase
+  {
+  public:
+    /**
+     * Standardized data struct to pipe
+     * additional data to the solver,
+     * should it be needed.
+     */
+    struct AdditionalData
+    {};
+
+    /**
+     * SLEPc solvers will want to have
+     * an MPI communicator context over
+     * which computations are
+     * parallelized. By default, this
+     * carries the same behaviour has
+     * the PETScWrappers, but you can
+     * change that.
+     */
+    SolverJacobiDavidson (SolverControl        &cn,
+			  const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+			  const AdditionalData &data = AdditionalData());
 
   protected:
 
@@ -667,6 +728,8 @@ namespace SLEPcWrappers
 
   };
 #endif
+
+
 
   // --------------------------- inline and template functions -----------
   /**

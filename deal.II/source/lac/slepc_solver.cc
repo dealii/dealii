@@ -377,21 +377,48 @@ namespace SLEPcWrappers
   }
 
 #if DEAL_II_PETSC_VERSION_GTE(3,1,0)
-  /* ---------------------- Davidson ----------------------- */
 
-  SolverDavidson::SolverDavidson (SolverControl        &cn,
-                                  const MPI_Comm       &mpi_communicator,
-                                  const AdditionalData &data)
+  /* ---------------- Generalized Davidson ----------------- */
+  SolverGeneralizedDavidson::SolverGeneralizedDavidson (SolverControl        &cn,
+							const MPI_Comm       &mpi_communicator,
+							const AdditionalData &data)
     :
     SolverBase (cn, mpi_communicator),
     additional_data (data)
   {}
 
   void
-  SolverDavidson::set_solver_type (EPS &eps) const
+  SolverGeneralizedDavidson::set_solver_type (EPS &eps) const
   {
     int ierr;
     ierr = EPSSetType (eps, const_cast<char *>(EPSGD));
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+
+    // hand over the absolute
+    // tolerance and the maximum
+    // number of iteration steps to
+    // the SLEPc convergence
+    // criterion.
+    ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
+                             this->solver_control.max_steps());
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+  }
+
+  /* ------------------ Jacobi Davidson -------------------- */
+
+  SolverJacobiDavidson::SolverJacobiDavidson (SolverControl        &cn,
+					      const MPI_Comm       &mpi_communicator,
+					      const AdditionalData &data)
+    :
+    SolverBase (cn, mpi_communicator),
+    additional_data (data)
+  {}
+
+  void
+  SolverJacobiDavidson::set_solver_type (EPS &eps) const
+  {
+    int ierr;
+    ierr = EPSSetType (eps, const_cast<char *>(EPSJD));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     // hand over the absolute
