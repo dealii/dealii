@@ -172,6 +172,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The one-argument version of ConstraintMatrix::condense was
+not prepared to deal with parallel vectors. This is now fixed.
+<br>
+(Daniel Arndt, Wolfgang Bangerth, 2013/1/9)
+
 <li> New: Utilities::int_to_string can now deal with any 32-bit
 integer, not just those with up to 6 digits.
 <br>
