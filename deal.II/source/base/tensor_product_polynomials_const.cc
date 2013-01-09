@@ -1,3 +1,16 @@
+//---------------------------------------------------------------------------
+//    $Id: trilinos_sparse_matrix.cc 27985 2013-01-08 21:36:23Z bangerth $
+//    Version: $Name$
+//
+//    Copyright (C) 2012, 2013 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
 #include <deal.II/base/tensor_product_polynomials_const.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table.h>
@@ -90,6 +103,8 @@ TensorProductPolynomialsConst<dim>::compute_value (const unsigned int i,
   const unsigned int max_indices = Utilities::fixed_power<dim>(polynomials.size());
 
   Assert (i<=max_indices, ExcInternalError());
+
+  // treat the regular basis functions
   if (i<max_indices)
     {
       unsigned int indices[dim];
@@ -102,7 +117,8 @@ TensorProductPolynomialsConst<dim>::compute_value (const unsigned int i,
       return value;
     }
   else
-    return 1.; //return 1 for q0 node
+    // this is for the constant function
+    return 1.;
 }
 
 template <>
@@ -114,6 +130,7 @@ TensorProductPolynomialsConst<0>::compute_value (const unsigned int ,
   return 0.;
 }
 
+
 template <int dim>
 Tensor<1,dim>
 TensorProductPolynomialsConst<dim>::compute_grad (const unsigned int i,
@@ -122,9 +139,12 @@ TensorProductPolynomialsConst<dim>::compute_grad (const unsigned int i,
   const unsigned int max_indices = Utilities::fixed_power<dim>(polynomials.size());
 
   Assert (i<=max_indices, ExcInternalError());
-  Tensor<1,dim> grad;
+
+  // treat the regular basis functions
   if (i<max_indices)
     {
+      Tensor<1,dim> grad;
+
       unsigned int indices[dim];
       compute_index (i, indices);
 
@@ -149,9 +169,15 @@ TensorProductPolynomialsConst<dim>::compute_grad (const unsigned int i,
           for (unsigned int x=0; x<dim; ++x)
             grad[d] *= v[x][d==x];
         }
+
+      return grad; //return 0 for q0 node
     }
-  return grad; //return 0 for q0 node
+  else
+    // this is for the constant function
+    return Tensor<1,dim>();
 }
+
+
 
 template <int dim>
 Tensor<2,dim>
@@ -161,9 +187,12 @@ TensorProductPolynomialsConst<dim>::compute_grad_grad (const unsigned int i,
   const unsigned int max_indices = Utilities::fixed_power<dim>(polynomials.size());
 
   Assert (i<=max_indices, ExcInternalError());
-  Tensor<2,dim> grad_grad;
+
+  // treat the regular basis functions
   if (i<max_indices)
     {
+      Tensor<2,dim> grad_grad;
+
       unsigned int indices[dim];
       compute_index (i, indices);
 
@@ -195,8 +224,11 @@ TensorProductPolynomialsConst<dim>::compute_grad_grad (const unsigned int i,
                 grad_grad[d1][d2] *= v[x][derivative];
               }
           }
+      return grad_grad; //return 0 for q0 node
     }
-  return grad_grad; //return 0 for q0 node
+  else
+    // this is for the constant function
+    return Tensor<2,dim>();
 }
 
 template <int dim>
