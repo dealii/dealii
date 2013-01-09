@@ -47,8 +47,8 @@ namespace
                  const std::vector<unsigned int> &,
                  MGLevelObject<dealii::Vector<number> > &v)
   {
-    for (unsigned int level=v.get_minlevel();
-         level<=v.get_maxlevel(); ++level)
+    for (unsigned int level=v.min_level();
+         level<=v.max_level(); ++level)
       {
         unsigned int n = mg_dof.n_dofs (level);
         v[level].reinit(n);
@@ -91,8 +91,8 @@ namespace
           std::vector<unsigned int>(n_target_blocks));
     MGTools::count_dofs_per_block (mg_dof, ndofs, target_component);
 
-    for (unsigned int level=v.get_minlevel();
-         level<=v.get_maxlevel(); ++level)
+    for (unsigned int level=v.min_level();
+         level<=v.max_level(); ++level)
       {
         v[level].reinit(n_target_blocks);
         for (unsigned int b=0; b<n_target_blocks; ++b)
@@ -122,8 +122,8 @@ namespace
     AssertThrow(tria!=NULL, ExcMessage("multigrid with Trilinos vectors only works with distributed Triangulation!"));
 
 #ifdef DEAL_II_USE_P4EST
-    for (unsigned int level=v.get_minlevel();
-         level<=v.get_maxlevel(); ++level)
+    for (unsigned int level=v.min_level();
+         level<=v.max_level(); ++level)
       {
         v[level].reinit(mg_dof.locally_owned_mg_dofs(level), tria->get_communicator());
       }

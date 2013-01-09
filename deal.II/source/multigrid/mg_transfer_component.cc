@@ -129,8 +129,8 @@ namespace
         MGTools::count_dofs_per_block (mg_dof, ndofs, target_component);
       }
 
-    for (unsigned int level=v.get_minlevel();
-         level<=v.get_maxlevel(); ++level)
+    for (unsigned int level=v.min_level();
+         level<=v.max_level(); ++level)
       {
         v[level].reinit(n_selected, 0);
         unsigned int k=0;
@@ -199,8 +199,8 @@ namespace
                                        target_component);
       }
 
-    for (unsigned int level=v.get_minlevel();
-         level<=v.get_maxlevel(); ++level)
+    for (unsigned int level=v.min_level();
+         level<=v.max_level(); ++level)
       {
         v[level].reinit(ndofs[level][selected_block]);
       }

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1932,7 +1932,7 @@ namespace MatrixTools
   namespace
   {
     template <typename Iterator>
-    bool column_less_than(const typename Iterator::value_type &p,
+    bool column_less_than(const typename Iterator::value_type p,
                           const unsigned int column)
     {
       return (p.column() < column);
@@ -2041,24 +2041,16 @@ namespace MatrixTools
             // elimination step
             const number diagonal_entry = matrix.diag_element(dof_number);
 
-            // we have to loop over all
-            // rows of the matrix which
-            // have a nonzero entry in
-            // the column which we work
-            // in presently. if the
-            // sparsity pattern is
-            // symmetric, then we can
-            // get the positions of
-            // these rows cheaply by
-            // looking at the nonzero
-            // column numbers of the
-            // present row. we need not
-            // look at the first entry,
-            // since that is the
-            // diagonal element and
-            // thus the present row
+            // we have to loop over all rows of the matrix which have
+            // a nonzero entry in the column which we work in
+            // presently. if the sparsity pattern is symmetric, then
+            // we can get the positions of these rows cheaply by
+            // looking at the nonzero column numbers of the present
+            // row. we need not look at the first entry of each row,
+            // since that is the diagonal element and thus the present
+            // row
             for (typename SparseMatrix<number>::iterator
-                q = matrix.begin(dof_number)++;
+                q = matrix.begin(dof_number)+1;
                 q != matrix.end(dof_number); ++q)
               {
                 const unsigned int row = q->column();
@@ -2066,24 +2058,25 @@ namespace MatrixTools
                 // find the position of
                 // element
                 // (row,dof_number)
-                bool (*comp)(const typename SparseMatrix<number>::iterator::value_type &p,
+                bool (*comp)(const typename SparseMatrix<number>::iterator::value_type p,
                              const unsigned int column)
                 = &column_less_than<typename SparseMatrix<number>::iterator>;
                 const typename SparseMatrix<number>::iterator
-                p = Utilities::lower_bound(matrix.begin(row)++,
+                p = Utilities::lower_bound(matrix.begin(row)+1,
                                            matrix.end(row),
                                            dof_number,
                                            comp);
 
-                // check whether this line has
-                // an entry in the regarding column
-                // (check for ==dof_number and
-                // != next_row, since if
-                // row==dof_number-1, *p is a
-                // past-the-end pointer but points
-                // to dof_number anyway...)
+                // check whether this line has an entry in the
+                // regarding column (check for ==dof_number and !=
+                // next_row, since if row==dof_number-1, *p is a
+                // past-the-end pointer but points to dof_number
+                // anyway...)
                 //
-                // there should be such an entry!
+                // there should be such an entry! we know this because
+                // we have assumed that the sparsity pattern is
+                // symmetric and we only walk over those rows for
+                // which the current row has a column entry
                 Assert ((p != matrix.end(row))
                         &&
                         (p->column() == dof_number),
@@ -2094,7 +2087,7 @@ namespace MatrixTools
                                         diagonal_entry * new_rhs;
 
                 // set matrix entry to zero
-                q->value() = 0.;
+                p->value() = 0.;
               }
           }
 
@@ -2293,6 +2286,11 @@ namespace MatrixTools
                 const SparsityPattern &transpose_sparsity
                   = sparsity_pattern.block (block_index.first, block_row);
 
+                SparseMatrix<number> &this_matrix
+                  = matrix.block(block_row, block_index.first);
+                SparseMatrix<number> &transpose_matrix
+                  = matrix.block(block_index.first, block_row);
+
                 // traverse the row of
                 // the transpose block
                 // to find the
@@ -2301,13 +2299,12 @@ namespace MatrixTools
                 // don't use the
                 // diagonal element of
                 // the diagonal block
-                const unsigned int
-                first = (block_index.first == block_row ?
-                         transpose_sparsity.get_rowstart_indices()[block_index.second]+1 :
-                         transpose_sparsity.get_rowstart_indices()[block_index.second]),
-                        last  = transpose_sparsity.get_rowstart_indices()[block_index.second+1];
-
-                for (unsigned int j=first; j<last; ++j)
+                for (typename SparseMatrix<number>::iterator
+                     q = (block_index.first == block_row ?
+                         transpose_matrix.begin(block_index.second)+1 :
+                         transpose_matrix.begin(block_index.second));
+                    q != transpose_matrix.end(block_index.second);
+                    ++q)
                   {
                     // get the number
                     // of the column in
@@ -2319,10 +2316,9 @@ namespace MatrixTools
                     // block which has
                     // an entry in the
                     // interesting row
-                    const unsigned int row = transpose_sparsity.get_column_numbers()[j];
+                    const unsigned int row = q->column();
 
-                    // find the
-                    // position of
+                    // find the position of
                     // element
                     // (row,dof_number)
                     // in this block
@@ -2334,64 +2330,52 @@ namespace MatrixTools
                     // cases with
                     // square
                     // sub-matrices
-                    const unsigned int *p = 0;
+                    bool (*comp)(const typename SparseMatrix<number>::iterator::value_type p,
+                                 const unsigned int column)
+                    = &column_less_than<typename SparseMatrix<number>::iterator>;
+
+                    typename SparseMatrix<number>::iterator p = this_matrix.end();
+
                     if (this_sparsity.n_rows() == this_sparsity.n_cols())
                       {
                         if (this_sparsity.get_column_numbers()
                             [this_sparsity.get_rowstart_indices()[row]]
                             ==
                             block_index.second)
-                          p = &this_sparsity.get_column_numbers()
-                              [this_sparsity.get_rowstart_indices()[row]];
+                          p = this_matrix.begin(row);
                         else
-                          p = Utilities::lower_bound(&this_sparsity.get_column_numbers()
-                                                     [this_sparsity.get_rowstart_indices()[row]+1],
-                                                     &this_sparsity.get_column_numbers()
-                                                     [this_sparsity.get_rowstart_indices()[row+1]],
-                                                     block_index.second);
+                          p = Utilities::lower_bound(this_matrix.begin(row)+1,
+                                                     this_matrix.end(row),
+                                                     block_index.second,
+                                                     comp);
                       }
                     else
-                      p = Utilities::lower_bound(&this_sparsity.get_column_numbers()
-                                                 [this_sparsity.get_rowstart_indices()[row]],
-                                                 &this_sparsity.get_column_numbers()
-                                                 [this_sparsity.get_rowstart_indices()[row+1]],
-                                                 block_index.second);
+                      p = Utilities::lower_bound(this_matrix.begin(row),
+                                                 this_matrix.end(row),
+                                                 block_index.second,
+                                                 comp);
 
-                    // check whether this line has
-                    // an entry in the regarding column
-                    // (check for ==dof_number and
-                    // != next_row, since if
-                    // row==dof_number-1, *p is a
-                    // past-the-end pointer but points
-                    // to dof_number anyway...)
+                    // check whether this line has an entry in the
+                    // regarding column (check for ==dof_number and !=
+                    // next_row, since if row==dof_number-1, *p is a
+                    // past-the-end pointer but points to dof_number
+                    // anyway...)
                     //
-                    // there should be
-                    // such an entry!
-                    // note, however,
-                    // that this
-                    // assertion will
-                    // fail sometimes
-                    // if the sparsity
-                    // pattern is not
-                    // symmetric!
-                    Assert ((*p == block_index.second) &&
-                            (p != &this_sparsity.get_column_numbers()
-                             [this_sparsity.get_rowstart_indices()[row+1]]),
+                    // there should be such an entry! we know this because
+                    // we have assumed that the sparsity pattern is
+                    // symmetric and we only walk over those rows for
+                    // which the current row has a column entry
+                    Assert ((p->column() == block_index.second) &&
+                            (p != this_matrix.end(row)),
                             ExcInternalError());
-
-                    const unsigned int global_entry
-                      = (p
-                         -
-                         &this_sparsity.get_column_numbers()
-                         [this_sparsity.get_rowstart_indices()[0]]);
 
                     // correct right hand side
                     right_hand_side.block(block_row)(row)
-                    -= matrix.block(block_row,block_index.first).global_entry(global_entry) /
+                    -= p->value() /
                        diagonal_entry * new_rhs;
 
                     // set matrix entry to zero
-                    matrix.block(block_row,block_index.first).global_entry(global_entry) = 0.;
+                    p->value() = 0.;
                   }
               }
           }

@@ -272,7 +272,7 @@ namespace hp
      * matrix also.
      *
      * As for
-     * DoFHandler::max_couplings_between_dofs(),
+     * ::DoFHandler::max_couplings_between_dofs(),
      * the result of this function is often
      * not very accurate for 3d and/or high
      * polynomial degrees. The consequences
@@ -289,6 +289,10 @@ namespace hp
      * The number is the same as for
      * @p max_coupling_between_dofs in one
      * dimension less.
+     *
+     * @note The same applies to this function as to max_couplings_per_dofs()
+     * as regards the performance of this function. Think about one of the
+     * dynamic sparsity pattern classes instead (see @ref Sparsity).
      */
     unsigned int max_couplings_between_boundary_dofs () const;
 

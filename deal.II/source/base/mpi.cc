@@ -2,7 +2,7 @@
 //      $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -367,23 +367,33 @@ namespace Utilities
       ::release_unused_memory ();
 #  endif
 
-      // Same for PETSc.
+      // Same for PETSc. only do this if PETSc hasn't been
+      // terminated yet since PETSc deletes all vectors that
+      // have been allocated but not freed at the time of
+      // calling PETScFinalize. running the calls below after
+      // PetscFinalize has already been called will therefore
+      // yield errors of double deallocations
 #ifdef DEAL_II_USE_PETSC
-      GrowingVectorMemory<PETScWrappers::MPI::Vector>
-      ::release_unused_memory ();
-      GrowingVectorMemory<PETScWrappers::MPI::BlockVector>
-      ::release_unused_memory ();
-      GrowingVectorMemory<PETScWrappers::Vector>
-      ::release_unused_memory ();
-      GrowingVectorMemory<PETScWrappers::BlockVector>
-      ::release_unused_memory ();
+      if ((PetscInitializeCalled == PETSC_TRUE)
+	  &&
+	  (PetscFinalizeCalled == PETSC_FALSE))
+	{
+	  GrowingVectorMemory<PETScWrappers::MPI::Vector>
+	    ::release_unused_memory ();
+	  GrowingVectorMemory<PETScWrappers::MPI::BlockVector>
+	    ::release_unused_memory ();
+	  GrowingVectorMemory<PETScWrappers::Vector>
+	    ::release_unused_memory ();
+	  GrowingVectorMemory<PETScWrappers::BlockVector>
+	    ::release_unused_memory ();
 
 #  ifdef DEAL_II_USE_SLEPC
-      // and now end SLEPc (with PETSc)
-      SlepcFinalize();
+	  // and now end SLEPc (with PETSc)
+	  SlepcFinalize();
 #  else
-      // or just end PETSc.
-      PetscFinalize();
+	  // or just end PETSc.
+	  PetscFinalize();
+	}
 #  endif
 #else
 
