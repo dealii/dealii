@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -55,6 +55,7 @@ SET(src_base
   table_handler.cc
   tensor_function.cc
   tensor_product_polynomials.cc
+  tensor_product_polynomials_const.cc
   thread_management.cc
   timer.cc
   utilities.cc
