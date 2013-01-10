@@ -108,7 +108,7 @@ namespace Step37
   // one CPU instruction. Newer processors with support for the so-called
   // advanced vector extensions (AVX) with 256 bit operands can use four
   // doubles and eight floats, respectively. Vectorization is a
-  // single-instruct/multiple-data (SIMD) concept, that is, one CPU
+  // single-instruction/multiple-data (SIMD) concept, that is, one CPU
   // instruction is used to process multiple data values at once. Often,
   // finite element programs do not use vectorization explicitly as the
   // benefits of this concept are only in arithmetic intensive operations. The
@@ -125,7 +125,7 @@ namespace Step37
   // vectorization, matrix-matrix products, fails on most compilers (as of
   // writing this tutorial in early 2012, neither gcc-4.6 nor the Intel
   // compiler v. 12 manage to produce useful vectorized code for the
-  // FullMatrix::mmult function, and not even on the more simpler case where
+  // FullMatrix::mmult function, and not even on the simpler case where
   // the matrix bounds are compile-time constants instead of run-time
   // constants as in FullMatrix::mmult). The main reason for this is that the
   // information to be processed at the innermost loop (that is where
@@ -419,7 +419,7 @@ namespace Step37
   LaplaceOperator<dim,fe_degree,number>::
   evaluate_coefficient (const Coefficient<dim> &coefficient_function)
   {
-    const unsigned int n_cells = data.get_size_info().n_macro_cells;
+    const unsigned int n_cells = data.n_macro_cells();
     FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi (data);
     coefficient.resize (n_cells * phi.n_q_points);
     for (unsigned int cell=0; cell<n_cells; ++cell)
@@ -450,7 +450,7 @@ namespace Step37
   // several cells, and the MatrixFree class groups the quadrature points of
   // several cells into one block to enable a higher degree of vectorization.
   // The number of such "cells" is stored in MatrixFree and can be queried
-  // through MatrixFree::get_size_info().n_macro_cells. Compared to the
+  // through MatrixFree::n_macro_cells(). Compared to the
   // deal.II cell iterators, in this class all cells are laid out in a plain
   // array with no direct knowledge of level or neighborship relations, which
   // makes it possible to index the cells by unsigned integers.
@@ -493,7 +493,7 @@ namespace Step37
   // gives complexity equal to $\mathcal O(d^2 (p+1)^{d+1})$ for polynomial
   // degree $p$ in $d$ dimensions, compared to the naive approach with loops
   // over all local degrees of freedom and quadrature points that is used in
-  // FEValues that costs $\mathcal O(d (p+1)^{2d})$.  <li>Next comes the
+  // FEValues and costs $\mathcal O(d (p+1)^{2d})$.  <li>Next comes the
   // application of the Jacobian transformation, the multiplication by the
   // variable coefficient and the quadrature weight. FEEvaluation has an
   // access function @p get_gradient that applies the Jacobian and returns the
@@ -531,8 +531,7 @@ namespace Step37
                const std::pair<unsigned int,unsigned int> &cell_range) const
   {
     FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi (data);
-    AssertDimension (coefficient.size(),
-                     data.get_size_info().n_macro_cells * phi.n_q_points);
+    AssertDimension (coefficient.size(), data.n_macro_cells() * phi.n_q_points);
 
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
