@@ -28,6 +28,15 @@ FIND_PACKAGE(deal.II 8.0 QUIET
 #
 # Are all dependencies fullfilled?
 #
+IF (NOT ${deal.II_FOUND})
+   MESSAGE(FATAL_ERROR
+           "\n\n"
+	   " *** Could not locate deal.II. *** "
+	   "\n\n"
+           " *** You may want to either pass the -DDEAL_II_DIR=/path/to/deal.II flag to cmake \n"
+           " *** or set an environment variable \"DEAL_II_DIR\" that contains this path.")
+ENDIF ()
+
 IF(NOT DEAL_II_WITH_PETSC OR NOT DEAL_II_WITH_P4EST OR DEAL_II_WITH_THREADS)
   MESSAGE(FATAL_ERROR "
 Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
@@ -37,15 +46,6 @@ Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
 which is required for this tutorial step."
     )
 ENDIF()
-
-IF (NOT ${deal.II_FOUND})
-   MESSAGE(FATAL_ERROR
-           "\n\n"
-	   " *** Could not locate deal.II. *** "
-	   "\n\n"
-           " *** You may want to either pass the -DDEAL_II_DIR=/path/to/deal.II flag to cmake \n"
-           " *** or set an environment variable \"DEAL_II_DIR\" that contains this path.")
-ENDIF ()
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(${TARGET})

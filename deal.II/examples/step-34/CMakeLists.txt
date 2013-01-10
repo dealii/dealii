@@ -28,14 +28,6 @@ FIND_PACKAGE(deal.II 8.0 QUIET
 #
 # Are all dependencies fullfilled?
 #
-IF(NOT DEAL_II_WITH_FUNCTIONPARSER)
-  MESSAGE(FATAL_ERROR "
-Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
-    DEAL_II_WITH_FUNCTIONPARSER = ON
-which is required for this tutorial step."
-    )
-ENDIF()
-
 IF (NOT ${deal.II_FOUND})
    MESSAGE(FATAL_ERROR
            "\n\n"
@@ -44,6 +36,14 @@ IF (NOT ${deal.II_FOUND})
            " *** You may want to either pass the -DDEAL_II_DIR=/path/to/deal.II flag to cmake \n"
            " *** or set an environment variable \"DEAL_II_DIR\" that contains this path.")
 ENDIF ()
+
+IF(NOT DEAL_II_WITH_FUNCTIONPARSER)
+  MESSAGE(FATAL_ERROR "
+Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
+    DEAL_II_WITH_FUNCTIONPARSER = ON
+which is required for this tutorial step."
+    )
+ENDIF()
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(${TARGET})
