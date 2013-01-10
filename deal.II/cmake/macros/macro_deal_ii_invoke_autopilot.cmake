@@ -86,6 +86,12 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
       COMMENT "distclean invoked"
       )
 
+    # Define a strip-comments target:
+    ADD_CUSTOM_TARGET(strip-comments
+      COMMAND perl -pi -e 's\#^[ \\t]*//.*\\n\#\#g;' ${TARGET_SRC}
+      COMMENT "strip comments"
+      )
+
     # Print out some usage information:
     MESSAGE(
 "###
