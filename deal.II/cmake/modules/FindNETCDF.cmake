@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -13,7 +13,9 @@
 #####
 
 #
-# Try to find the NETCDF library
+# Try to find the NETCDF library. In order to work with NETCDF, we
+# need to link with both the C++ and C libraries, typically provided
+# as libnetcdf_c++.so and libnetcdf.so
 #
 
 INCLUDE(FindPackageHandleStandardArgs)
@@ -31,7 +33,14 @@ FIND_PATH(NETCDF_INCLUDE_DIR netcdf.hh
 # TODO: netcdf might externally depend on hdf5. Check and fix this.
 #
 
-FIND_LIBRARY(NETCDF_LIBRARY NAMES netcdf_c++ netcdf_cpp
+FIND_LIBRARY(NETCDF_CPLUSCPLUS_LIBRARY NAMES netcdf_c++ netcdf_cpp
+  HINTS
+    ${NETCDF_DIR}
+  PATH_SUFFIXES
+    lib${LIB_SUFFIX} lib64 lib
+  )
+
+FIND_LIBRARY(NETCDF_C_LIBRARY NAMES netcdf
   HINTS
     ${NETCDF_DIR}
   PATH_SUFFIXES
@@ -39,13 +48,15 @@ FIND_LIBRARY(NETCDF_LIBRARY NAMES netcdf_c++ netcdf_cpp
   )
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(NETCDF DEFAULT_MSG
-  NETCDF_LIBRARY
+  NETCDF_CPLUSCPLUS_LIBRARY
+  NETCDF_C_LIBRARY
   NETCDF_INCLUDE_DIR
   )
 
 IF(NETCDF_FOUND)
   MARK_AS_ADVANCED(
-    NETCDF_LIBRARY
+    NETCDF_CPLUSCPLUS_LIBRARY
+    NETCDF_C_LIBRARY
     NETCDF_INCLUDE_DIR
     NETCDF_DIR
   )
@@ -54,4 +65,3 @@ ELSE()
     "An optional hint to a NETCDF installation"
     )
 ENDIF()
-
