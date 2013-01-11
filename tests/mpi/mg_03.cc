@@ -69,7 +69,10 @@ void test()
     deallog << "hyper_cube" << std::endl;
 
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
-
+/*  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
+					       Triangulation<dim>::none,
+					       parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+*/
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
   DoFHandler<dim> dofh(tr);
