@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2011, 2012 by deal.II authors
+//    Copyright (C) 2011, 2012, 2013 by deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1220,7 +1220,7 @@ namespace parallel
                                    vector_view.template operator !=
                                    <Number2>(v.vector_view)
                                    : 0 );
-      unsigned int result = 
+      unsigned int result =
         partitioner->n_mpi_processes() > 1
         ?
         Utilities::MPI::max(local_result, partitioner->get_communicator())
@@ -1769,7 +1769,7 @@ namespace parallel
       // but this might happen on some processors
       // for parallel implementation
       if (local_size()>0)
-        vector_view.scale (factor);
+        vector_view *= factor;
     }
 
 
