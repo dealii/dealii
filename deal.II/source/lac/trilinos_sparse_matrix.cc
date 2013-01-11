@@ -603,14 +603,6 @@ set_matrix_values:
     // and the specified sparsity pattern might be different, need to go
     // through the row for both these sparsity structures simultaneously in
     // order to really set the correct values.
-    const std::size_t *const in_rowstart_indices
-      = dealii_sparse_matrix.get_sparsity_pattern().get_rowstart_indices();
-    const unsigned int *const in_cols
-      = dealii_sparse_matrix.get_sparsity_pattern().get_column_numbers();
-    const unsigned int *cols = sparsity_pattern.get_column_numbers();
-    const std::size_t *rowstart_indices =
-      sparsity_pattern.get_rowstart_indices();
-
     unsigned int maximum_row_length = matrix->MaxNumEntries();
     std::vector<unsigned int> row_indices (maximum_row_length);
     std::vector<TrilinosScalar> values (maximum_row_length);
