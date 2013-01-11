@@ -2128,15 +2128,17 @@ namespace internal
         Assert (false, ExcNotImplemented());
 #else
 
-        // TODO: distributed geometric multigrid is not complete yet
-        Assert (false, ExcNotImplemented());
-        return;
-
         parallel::distributed::Triangulation< dim, spacedim > *tr
           = (dynamic_cast<parallel::distributed::Triangulation<dim,spacedim>*>
              (const_cast<dealii::Triangulation< dim, spacedim >*>
               (&dof_handler.get_tria())));
         Assert (tr != 0, ExcInternalError());
+
+        AssertThrow(
+            (tr->settings &  parallel::distributed::Triangulation< dim, spacedim >::construct_multigrid_hierarchy),
+            ExcMessage("Multigrid DoFs can only be distributed on a parallel Triangulation if the flag construct_multigrid_hierarchy is set in the constructor."));
+
+
         const unsigned int
         n_cpus = Utilities::MPI::n_mpi_processes (tr->get_communicator());
 
