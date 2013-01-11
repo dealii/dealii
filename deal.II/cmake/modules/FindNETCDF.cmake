@@ -13,16 +13,19 @@
 #####
 
 #
-# Try to find the NETCDF library. In order to work with NETCDF, we
-# need to link with both the C++ and C libraries, typically provided
-# as libnetcdf_c++.so and libnetcdf.so
+# Try to find the NETCDF C and C++ libraries
+#
+# This module exports
+#
+#   NETCDF_LIBRARIES
+#   NETCDF_INCLUDE_DIRS
 #
 
 INCLUDE(FindPackageHandleStandardArgs)
 
 SET_IF_EMPTY(NETCDF_DIR "$ENV{NETCDF_DIR}")
 
-FIND_PATH(NETCDF_INCLUDE_DIR netcdf.hh
+FIND_PATH(NETCDF_INCLUDE_DIRS netcdf.hh
   HINTS
     ${NETCDF_DIR}
   PATH_SUFFIXES
@@ -30,7 +33,10 @@ FIND_PATH(NETCDF_INCLUDE_DIR netcdf.hh
   )
 
 #
-# TODO: netcdf might externally depend on hdf5. Check and fix this.
+# TODO:
+#
+# - netcdf might externally depend on hdf5. Check and fix this.
+# - separate C++ and C library search
 #
 
 FIND_LIBRARY(NETCDF_CPLUSPLUS_LIBRARY NAMES netcdf_c++ netcdf_cpp
@@ -47,10 +53,15 @@ FIND_LIBRARY(NETCDF_C_LIBRARY NAMES netcdf
     lib${LIB_SUFFIX} lib64 lib
   )
 
+SET(NETCDF_LIBRARIES
+  ${NETCDF_CPLUSPLUS_LIBRARY}
+  ${NETCDF_C_LIBRARY}
+  )
+
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(NETCDF DEFAULT_MSG
   NETCDF_CPLUSPLUS_LIBRARY
   NETCDF_C_LIBRARY
-  NETCDF_INCLUDE_DIR
+  NETCDF_INCLUDE_DIRS
   )
 
 IF(NETCDF_FOUND)
