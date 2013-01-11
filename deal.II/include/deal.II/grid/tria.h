@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1475,7 +1475,7 @@ public:
      *
      * @deprecated
      */
-    virtual ~RefinementListener () DEAL_II_DEPRECATED;
+    virtual ~RefinementListener ();
 
     /**
      * Before refinement is actually
@@ -1493,7 +1493,7 @@ public:
      */
     virtual
     void
-    pre_refinement_notification (const Triangulation<dim, spacedim> &tria) DEAL_II_DEPRECATED;
+    pre_refinement_notification (const Triangulation<dim, spacedim> &tria);
 
     /**
      * After refinement is actually
@@ -1511,7 +1511,7 @@ public:
      */
     virtual
     void
-    post_refinement_notification (const Triangulation<dim, spacedim> &tria) DEAL_II_DEPRECATED;
+    post_refinement_notification (const Triangulation<dim, spacedim> &tria);
 
     /**
      * At the end of a call to
@@ -1537,7 +1537,7 @@ public:
     virtual
     void
     copy_notification (const Triangulation<dim, spacedim> &old_tria,
-                       const Triangulation<dim, spacedim> &new_tria) DEAL_II_DEPRECATED;
+                       const Triangulation<dim, spacedim> &new_tria);
 
     /**
      * At the end of a call to
@@ -1559,9 +1559,8 @@ public:
      */
     virtual
     void
-    create_notification (const Triangulation<dim, spacedim> &tria) DEAL_II_DEPRECATED;
-
-  };
+    create_notification (const Triangulation<dim, spacedim> &tria);
+  } DEAL_II_DEPRECATED;
 
   /**
    * A structure that is used as an
