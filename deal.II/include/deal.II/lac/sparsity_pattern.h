@@ -136,7 +136,7 @@ namespace SparsityPatternIterators
      * pattern's lifetime, you will iterate over elements that are not
      * valid. If this is so, then this function will return false.
      */
-    inline bool is_valid_entry () const;
+    bool is_valid_entry () const;
 
 
     /**
@@ -619,12 +619,12 @@ public:
    * iterator can be used to walk over all nonzero entries of the sparsity
    * pattern.
    */
-  inline iterator begin () const;
+  iterator begin () const;
 
   /**
    * Final iterator.
    */
-  inline iterator end () const;
+  iterator end () const;
 
   /**
    * STL-like iterator with the first entry of row <tt>r</tt>.
@@ -634,7 +634,7 @@ public:
    * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
    * that case.
    */
-  inline iterator begin (const unsigned int r) const;
+  iterator begin (const unsigned int r) const;
 
   /**
    * Final iterator of row <tt>r</tt>. It points to the first element past the
@@ -644,7 +644,7 @@ public:
    * particular the case if it is the end iterator for the last row of a
    * matrix.
    */
-  inline iterator end (const unsigned int r) const;
+  iterator end (const unsigned int r) const;
 
   /**
    * STL-like iterator with the first entry of row <tt>r</tt>.
@@ -654,7 +654,7 @@ public:
    * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
    * that case.
    */
-  inline row_iterator row_begin (const unsigned int r) const;
+  row_iterator row_begin (const unsigned int r) const;
 
   /**
    * Final iterator of row <tt>r</tt>. It points to the first element past the
@@ -664,7 +664,7 @@ public:
    * particular the case if it is the end iterator for the last row of a
    * matrix.
    */
-  inline row_iterator row_end (const unsigned int r) const;
+  row_iterator row_end (const unsigned int r) const;
 
 // @}
   /**
@@ -716,13 +716,13 @@ public:
    * Return number of rows of this matrix, which equals the dimension of the
    * image space.
    */
-  inline unsigned int n_rows () const;
+  unsigned int n_rows () const;
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
    * the range space.
    */
-  inline unsigned int n_cols () const;
+  unsigned int n_cols () const;
 
   /**
    * Number of entries in a specific row.
@@ -976,7 +976,7 @@ public:
    * yourself, you should also rename this function to avoid programs relying
    * on outdated information!
    */
-  inline const std::size_t *get_rowstart_indices () const;
+  const std::size_t *get_rowstart_indices () const;
 
   /**
    * @deprecated. Use @p row_length and @p column_number instead. Also, using
@@ -995,7 +995,7 @@ public:
    * yourself, you should also rename this function to avoid programs relying
    * on outdated information!
    */
-  inline const unsigned int *get_column_numbers () const;
+  const unsigned int *get_column_numbers () const;
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
   /** @addtogroup Exceptions
