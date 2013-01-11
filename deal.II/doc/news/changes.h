@@ -153,6 +153,11 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> New: finite element FE_Q_DG0 that implements polynomials
+of order k with an additional discontinuous constant function.
+<br>
+(Daniel Arndt, Timo Heister, 2013/01/07)
+
 <li> step-6 now uses ConstraintMatrix::distribute_local_to_global()
 instead of condense(), which is the preferred way to use a ConstraintMatrix
  (and the only sensible way in parallel).
@@ -172,6 +177,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The one-argument version of ConstraintMatrix::condense was
+not prepared to deal with parallel vectors. This is now fixed.
+<br>
+(Daniel Arndt, Wolfgang Bangerth, 2013/1/9)
+
 <li> New: Utilities::int_to_string can now deal with any 32-bit
 integer, not just those with up to 6 digits.
 <br>

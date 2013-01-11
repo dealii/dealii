@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -142,24 +142,36 @@ ConstraintMatrix::condense (VectorType &vec) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
 
-  // distribute all entries, and set them to zero
-  std::vector<ConstraintLine>::const_iterator constraint_line = lines.begin();
-  for (; constraint_line!=lines.end(); ++constraint_line)
+  // distribute all entries, and set them to zero. do so in
+  // two loops because in the first one we need to add to elements
+  // and in the second one we need to set elements to zero. for
+  // parallel vectors, this can only work if we can put a compress()
+  // in between, but we don't want to call compress() twice per entry
+  for (std::vector<ConstraintLine>::const_iterator
+	 constraint_line = lines.begin();
+       constraint_line!=lines.end(); ++constraint_line)
     {
-      for (unsigned int q=0; q!=constraint_line->entries.size(); ++q)
-        vec(constraint_line->entries[q].first)
-        += (static_cast<typename VectorType::value_type>
-            (vec(constraint_line->line)) *
-            constraint_line->entries[q].second);
-      vec(constraint_line->line) = 0.;
-
       // in case the constraint is
       // inhomogeneous, this function is not
       // appropriate. Throw an exception.
       Assert (constraint_line->inhomogeneity == 0.,
               ExcMessage ("Inhomogeneous constraint cannot be condensed "
                           "without any matrix specified."));
+
+      const typename VectorType::value_type old_value = vec(constraint_line->line);
+      for (unsigned int q=0; q!=constraint_line->entries.size(); ++q)
+        vec(constraint_line->entries[q].first)
+        += (static_cast<typename VectorType::value_type>
+            (old_value) *
+            constraint_line->entries[q].second);
     }
+
+  vec.compress();
+
+  for (std::vector<ConstraintLine>::const_iterator
+	 constraint_line = lines.begin();
+       constraint_line!=lines.end(); ++constraint_line)
+    vec(constraint_line->line) = 0.;
 }
 
 

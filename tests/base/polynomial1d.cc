@@ -116,7 +116,7 @@ int main ()
   for (unsigned int i=0;i<p.size();++i)
     for (unsigned int j=0;j<=i;++j)
       deallog << 'P' << i << " * P" << j
-	      << " =" << scalar_product(p[i], p[j]) << std::endl;
+	      << " = " << scalar_product(p[i], p[j]) << std::endl;
 
 
   deallog << "LagrangeEquidistant" << std::endl;
@@ -133,7 +133,7 @@ int main ()
   for (unsigned int i=0;i<p.size();++i)
     for (unsigned int j=0;j<p.size();++j)
       deallog << 'P' << i << "(x" << j
-	      << ") =" << p[i].value((double) j/p.size())+1.0001 << std::endl;
+	      << ") = " << p[i].value((double) j/p.size())+1.0001 << std::endl;
 
   for (unsigned int i=0;i<p.size();++i)
     {
@@ -176,13 +176,13 @@ int main ()
   for (unsigned int i=0;i<p.size();++i)
     {
       deallog << "N0(P" << i << ")"
-	      << " =" << p[i].value(0.) << std::endl;
+	      << " = " << p[i].value(0.) << std::endl;
     }
 
   for (unsigned int i=0;i<p.size();++i)
     {
       deallog << "N1(P" << i << ")"
-	      << " =" << p[i].value(1.) << std::endl;
+	      << " = " << p[i].value(1.) << std::endl;
     }
 
   std::vector<double> values (p.size());
@@ -197,7 +197,7 @@ int main ()
 	{
 	  p[i].value (.5, values);
 	  deallog << "N" << j << "(P" << i << ")"
-		  << " =" << values[j] * factor << std::endl;
+		  << " = " << values[j] * factor << std::endl;
 	}
     }
 }
