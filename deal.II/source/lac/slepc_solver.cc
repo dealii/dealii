@@ -1,9 +1,9 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //    Version: $Name$
-//    Author: Toby D. Young, Polish Academy of Sciences, 2008, 2009
+//    Author: Toby D. Young, Polish Academy of Sciences, 2008-2013
 //
-//    Copyright (C) 2009, 2012 by the deal.II authors
+//    Copyright (C) 2009-2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -101,13 +101,11 @@ namespace SLEPcWrappers
     AssertThrow (solver_data.get() == 0, ExcSLEPcWrappersUsageError());
     solver_data.reset (new SolverData());
 
-    // create eigensolver context and
-    // set operators
+    // create eigensolver context and set operators
     ierr = EPSCreate (mpi_communicator, &solver_data->eps);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    // set eigenspectrum problem type
-    // (general/standard)
+    // set eigenspectrum problem type (general/standard)
     AssertThrow (opA, ExcSLEPcWrappersUsageError());
     if (opB)
       ierr = EPSSetOperators (solver_data->eps, *opA, *opB);
@@ -136,20 +134,16 @@ namespace SLEPcWrappers
     // set runtime options
     set_solver_type (solver_data->eps);
 
-    // set which portion of the
-    // eigenspectrum to solve for
+    // set which portion of the eigenspectrum to solve for
     ierr = EPSSetWhichEigenpairs (solver_data->eps, set_which);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    // set number of eigenvectors to
-    // compute
+    // set number of eigenvectors to compute
     ierr = EPSSetDimensions (solver_data->eps, n_eigenvectors,
                              PETSC_DECIDE, PETSC_DECIDE);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    // set the solve options to the
-    // eigenvalue problem solver
-    // context
+    // set the solve options to the eigenvalue problem solver context
     ierr = EPSSetFromOptions (solver_data->eps);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
@@ -157,8 +151,7 @@ namespace SLEPcWrappers
     ierr = EPSSolve (solver_data->eps);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    // get number of converged
-    // eigenstates
+    // get number of converged eigenstates
     ierr = EPSGetConverged (solver_data->eps,
 #ifdef PETSC_USE_64BIT_INDICES
                             reinterpret_cast<PetscInt *>(n_converged));
@@ -254,7 +247,6 @@ namespace SLEPcWrappers
   }
 
   /* ---------------------- SolverKrylovSchur ------------------------ */
-
   SolverKrylovSchur::SolverKrylovSchur (SolverControl        &cn,
                                         const MPI_Comm       &mpi_communicator,
                                         const AdditionalData &data)
@@ -270,18 +262,14 @@ namespace SLEPcWrappers
     ierr = EPSSetType (eps, const_cast<char *>(EPSKRYLOVSCHUR));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    // hand over the absolute
-    // tolerance and the maximum
-    // number of iteration steps to
-    // the SLEPc convergence
-    // criterion.
+    // hand over the absolute tolerance and the maximum number of
+    // iteration steps to the SLEPc convergence criterion.
     ierr = EPSSetTolerances(eps, this->solver_control.tolerance(),
                             this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
   /* ---------------------- SolverArnoldi ------------------------ */
-
   SolverArnoldi::AdditionalData::
   AdditionalData (const bool delayed_reorthogonalization)
     :
@@ -303,18 +291,14 @@ namespace SLEPcWrappers
     ierr = EPSSetType (eps, const_cast<char *>(EPSARNOLDI));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    // hand over the absolute
-    // tolerance and the maximum
-    // number of iteration steps to
-    // the SLEPc convergence
-    // criterion.
+    // hand over the absolute tolerance and the maximum number of
+    // iteration steps to the SLEPc convergence criterion.
     ierr = EPSSetTolerances(eps, this->solver_control.tolerance(),
                             this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    // if requested, set delayed
-    // reorthogonalization in the
-    // Arnoldi iteration.
+    // if requested, set delayed reorthogonalization in the Arnoldi
+    // iteration.
     if (additional_data.delayed_reorthogonalization)
       {
         ierr = EPSArnoldiSetDelayed (eps, PETSC_TRUE);
@@ -323,7 +307,6 @@ namespace SLEPcWrappers
   }
 
   /* ---------------------- Lanczos ------------------------ */
-
   SolverLanczos::SolverLanczos (SolverControl        &cn,
                                 const MPI_Comm       &mpi_communicator,
                                 const AdditionalData &data)
@@ -339,18 +322,14 @@ namespace SLEPcWrappers
     ierr = EPSSetType (eps, const_cast<char *>(EPSLANCZOS));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    // hand over the absolute
-    // tolerance and the maximum
-    // number of iteration steps to
-    // the SLEPc convergence
-    // criterion.
+    // hand over the absolute tolerance and the maximum number of
+    // iteration steps to the SLEPc convergence criterion.
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
   /* ----------------------- Power ------------------------- */
-
   SolverPower::SolverPower (SolverControl        &cn,
                             const MPI_Comm       &mpi_communicator,
                             const AdditionalData &data)
@@ -366,17 +345,12 @@ namespace SLEPcWrappers
     ierr = EPSSetType (eps, const_cast<char *>(EPSPOWER));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    // hand over the absolute
-    // tolerance and the maximum
-    // number of iteration steps to
-    // the SLEPc convergence
-    // criterion.
+    // hand over the absolute tolerance and the maximum number of
+    // iteration steps to the SLEPc convergence criterion.
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
-
-#if DEAL_II_PETSC_VERSION_GTE(3,1,0)
 
   /* ---------------- Generalized Davidson ----------------- */
   SolverGeneralizedDavidson::SolverGeneralizedDavidson (SolverControl        &cn,
@@ -390,22 +364,27 @@ namespace SLEPcWrappers
   void
   SolverGeneralizedDavidson::set_solver_type (EPS &eps) const
   {
+#if DEAL_II_PETSC_VERSION_GTE(3,1,0)
     int ierr;
     ierr = EPSSetType (eps, const_cast<char *>(EPSGD));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    // hand over the absolute
-    // tolerance and the maximum
-    // number of iteration steps to
-    // the SLEPc convergence
-    // criterion.
+    // hand over the absolute tolerance and the maximum number of
+    // iteration steps to the SLEPc convergence criterion.
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+#else
+    // PETSc/SLEPc version must be > 3.1.0 (supress compiler warning
+    // by performing a void operation on eps).
+    Assert (false,
+            ExcMessage ("Your SLEPc installation does not include a copy of the "
+                        "Generalized Davidson solver. A SLEPc version > 3.1.0 is required."));
+    Assert (eps, ExcSLEPcWrappersUsageError());
+#endif
   }
 
   /* ------------------ Jacobi Davidson -------------------- */
-
   SolverJacobiDavidson::SolverJacobiDavidson (SolverControl        &cn,
 					      const MPI_Comm       &mpi_communicator,
 					      const AdditionalData &data)
@@ -417,26 +396,32 @@ namespace SLEPcWrappers
   void
   SolverJacobiDavidson::set_solver_type (EPS &eps) const
   {
+#if DEAL_II_PETSC_VERSION_GTE(3,1,0)
     int ierr;
     ierr = EPSSetType (eps, const_cast<char *>(EPSJD));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    // hand over the absolute
-    // tolerance and the maximum
-    // number of iteration steps to
-    // the SLEPc convergence
-    // criterion.
+    // hand over the absolute tolerance and the maximum number of
+    // iteration steps to the SLEPc convergence criterion.
     ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
-  }
+#else
+    // PETSc/SLEPc version must be > 3.1.0 (supress compiler warning
+    // by performing a void operation on eps).
+    Assert ((false),
+            ExcMessage ("Your SLEPc installation does not include a copy of the "
+                        "Jacobi-Davidson solver. A SLEPc version > 3.1.0 is required."));
+    Assert (eps, ExcSLEPcWrappersUsageError());
 #endif
+  }
 
 }
 
 DEAL_II_NAMESPACE_CLOSE
 
 #else
+
 // On gcc2.95 on Alpha OSF1, the native assembler does not like empty
 // files, so provide some dummy code
 namespace
