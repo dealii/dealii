@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -9638,10 +9638,10 @@ copy_triangulation (const Triangulation<dim, spacedim> &old_tria)
            (*old_tria.vertex_to_boundary_id_map_1d));
     }
 
-  // inform RefinementListeners of old_tria of
+  // inform those who are listening on old_tria of
   // the copy operation
   old_tria.signals.copy (*this);
-  // also inform all listeners that the
+  // also inform all listeners of the current triangulation that the
   // triangulation has been created
   signals.create();
 
@@ -12064,8 +12064,7 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
     Assert (satisfies_level1_at_vertex_rule (*this) == true,
             ExcInternalError());
 
-  // Inform RefinementListeners
-  // about beginning of refinement.
+  // Inform all listeners about beginning of refinement.
   signals.pre_refinement();
 
   execute_coarsening();
@@ -12084,8 +12083,7 @@ Triangulation<dim, spacedim>::execute_coarsening_and_refinement ()
   // information
   update_neighbors(*this);
 
-  // Inform RefinementListeners
-  // about end of refinement.
+  // Inform all listeners about end of refinement.
   signals.post_refinement();
 
   AssertThrow (cells_with_distorted_children.distorted_cells.size() == 0,
