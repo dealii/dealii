@@ -20,7 +20,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
 FIND_PACKAGE(deal.II 8.0 QUIET
   HINTS
-    ${DEAL_II_DIR} ../ ../../ ../../../ ../../../../../ $ENV{DEAL_II_DIR}
+    ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ ../../../ ../../../../../ $ENV{DEAL_II_DIR}
   #
   # If the deal.II library cannot be found (because it is not installed at a
   # default location or your project resides at an uncommon place), you
