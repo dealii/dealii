@@ -58,10 +58,11 @@ void check_simple(const FiniteElement<dim>& fe)
 {
   deallog << fe.get_name() << std::endl;
 
-  parallel::distributed::Triangulation<dim> tr(
-    MPI_COMM_WORLD,Triangulation<dim>::
-    limit_level_difference_at_vertices);
-  
+  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
+					       Triangulation<dim>::
+    limit_level_difference_at_vertices,
+					       parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
+   
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
 
