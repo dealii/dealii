@@ -259,24 +259,26 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
         // copy entries if column will not
         // be condensed away, distribute
         // otherwise
-        for (unsigned int j=uncondensed_struct.get_rowstart_indices()[row];
-             j<uncondensed_struct.get_rowstart_indices()[row+1]; ++j)
-          if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
-            condensed.add (new_line[row], new_line[uncondensed_struct.get_column_numbers()[j]],
-                           uncondensed.global_entry(j));
+	for (typename SparseMatrix<number>::const_iterator
+	       p = uncondensed.begin(row);
+	     p != uncondensed.end(row); ++p)
+          if (new_line[p->column()] != -1)
+            condensed.add (new_line[row],
+			   new_line[p->column()],
+                           p->value());
           else
             {
               // let c point to the
               // constraint of this column
               std::vector<ConstraintLine>::const_iterator c = lines.begin();
-              while (c->line != uncondensed_struct.get_column_numbers()[j])
+              while (c->line != p->column())
                 ++c;
 
               for (unsigned int q=0; q!=c->entries.size(); ++q)
                 // distribute to rows with
                 // appropriate weight
                 condensed.add (new_line[row], new_line[c->entries[q].first],
-                               uncondensed.global_entry(j) * c->entries[q].second);
+                               p->value() * c->entries[q].second);
 
               // take care of inhomogeneity:
               // need to subtract this element from the
@@ -285,7 +287,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
               // row of the inhomogeneous constraint in
               // the matrix with Gauss elimination
               if (use_vectors == true)
-                condensed_vector(new_line[row]) -= uncondensed.global_entry(j) *
+                condensed_vector(new_line[row]) -= p->value() *
                                                    c->inhomogeneity;
             }
 
