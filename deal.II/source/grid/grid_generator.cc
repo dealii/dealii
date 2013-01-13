@@ -373,9 +373,9 @@ GridGenerator::torus (Triangulation<2,3> &tria,
 template<>
 void
 GridGenerator::parallelogram (
-  Triangulation<2> &tria,
+  Triangulation<2>  &tria,
   const Tensor<2,2> &corners,
-  const bool      colorize)
+  const bool         colorize)
 {
   std::vector<Point<2> > vertices (GeometryInfo<2>::vertices_per_cell);
 
@@ -394,6 +394,79 @@ GridGenerator::parallelogram (
   if (colorize)
     colorize_hyper_rectangle (tria);
 }
+
+
+
+// Parallelepiped implementation in 1d, 2d, and 3d. @note The
+// implementation in 1d is equivalent to hyper_rectangle, and in 2d is
+// equivalent to parallelogram. Reordering of vertices to lexiographic
+// occurs if needed. For this reason the triangulation is explicitly
+// constructed for each dim here.
+template<int dim>
+void
+GridGenerator::parallelepiped (Triangulation<dim>   &tria,
+			       const Tensor<2, dim> &corners,
+			       const bool            colorize)
+{
+  // Check that none of the user defined vertices overlap
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i+1; j<dim; ++j)
+      Assert ((corners[i]!=corners[j]),
+              ExcMessage ("Invalid distance between corner points of parallelepiped."));
+  
+  // Note: vertex[0] is the origin and is initialised as so here:
+  std::vector<Point<dim> > vertices (GeometryInfo<dim>::vertices_per_cell);
+
+  switch (dim)
+    {
+      // A line (1d parallelepiped)
+    case 1:
+      vertices[1] = corners[0];
+      break;
+
+      // A parallelogram (2d parallelepiped)
+    case 2:
+      // assign corners to vertices:
+      vertices[1] = corners[0];
+      vertices[2] = corners[1];
+
+      // compose the remaining vertex:
+      vertices[3] = vertices[1] + vertices[2];
+      break;
+
+      // A parallelepiped (3d parallelepiped)
+    case 3:
+      // assign corners to vertices:
+      vertices[1] = corners[0];
+      vertices[2] = corners[1];
+      vertices[4] = corners[2];
+      
+      // compose the remaining vertices:
+      vertices[3] = vertices[1] + vertices[2];
+      vertices[5] = vertices[1] + vertices[4];
+      vertices[6] = vertices[2] + vertices[4];
+      vertices[7] = vertices[1] + vertices[2] + vertices[4];
+      break;
+
+    default:
+      Assert (false, ExcNotImplemented());
+    }
+
+  // Prepare cell data and wipe material identity
+  std::vector<CellData<dim> > cells (1);
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+    cells[0].vertices[i] = i;
+  cells[0].material_id = 0;
+  
+  // Check ordering of vertices and create triangulation
+  GridReordering<dim>::reorder_cells (cells);
+  tria.create_triangulation (vertices, cells, SubCellData());
+
+  // Finally assign boundary indicatorsaccording to hyper_rectangle
+  if (colorize)
+    colorize_hyper_rectangle (tria);
+}
+
 
 
 

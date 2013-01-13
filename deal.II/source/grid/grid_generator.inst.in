@@ -64,7 +64,12 @@ for (deal_II_dimension : DIMENSIONS)
       const Point<deal_II_dimension>                &,
       const bool                       );
   
-  
+
+    template void
+      GridGenerator::parallelepiped<deal_II_dimension> (
+	Triangulation<deal_II_dimension>               &,
+	const Tensor<2, deal_II_dimension>             &, 
+	const bool);  
   
   
 #if deal_II_dimension > 1
