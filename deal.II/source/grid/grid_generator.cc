@@ -367,8 +367,6 @@ GridGenerator::torus (Triangulation<2,3> &tria,
 }
 
 
-
-
 // Implementation for 2D only
 template<>
 void
@@ -398,22 +396,25 @@ GridGenerator::parallelogram (
 
 
 // Parallelepiped implementation in 1d, 2d, and 3d. @note The
-// implementation in 1d is equivalent to hyper_rectangle, and in 2d is
-// equivalent to parallelogram. Reordering of vertices to lexiographic
-// occurs if needed. For this reason the triangulation is explicitly
-// constructed for each dim here.
+// implementation in 1d is similar to hyper_rectangle(), and in 2d is
+// similar to parallelogram().
+//
+// The GridReordering::reorder_grid is made use of towards the end of
+// this function. Thus the triangulation is explicitly constructed for
+// all dim here since it is slightly different in that respect
+// (cf. hyper_rectangle(), parallelogram()).
 template<int dim>
 void
-GridGenerator::parallelepiped (Triangulation<dim>   &tria,
-			       const Tensor<2, dim> &corners,
-			       const bool            colorize)
+GridGenerator::parallelepiped (Triangulation<dim>  &tria,
+			      const Point<dim>   (&corners) [dim],
+			      const bool           colorize)
 {
   // Check that none of the user defined vertices overlap
   for (unsigned int i=0; i<dim; ++i)
     for (unsigned int j=i+1; j<dim; ++j)
       Assert ((corners[i]!=corners[j]),
               ExcMessage ("Invalid distance between corner points of parallelepiped."));
-  
+
   // Note: vertex[0] is the origin and is initialised as so here:
   std::vector<Point<dim> > vertices (GeometryInfo<dim>::vertices_per_cell);
 
@@ -428,7 +429,7 @@ GridGenerator::parallelepiped (Triangulation<dim>   &tria,
     case 2:
       // assign corners to vertices:
       vertices[1] = corners[0];
-      vertices[2] = corners[1];
+      vertices[2] = corners[0];
 
       // compose the remaining vertex:
       vertices[3] = vertices[1] + vertices[2];

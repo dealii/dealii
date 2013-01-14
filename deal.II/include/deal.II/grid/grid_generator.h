@@ -309,17 +309,20 @@ public:
 		  const Tensor<2,dim> &corners,
 		  const bool           colorize=false);
 
+
   /**
    * A parallelepiped. The first corner point is the origin. The
-   * <tt>dim</tt> adjacent points are the rank one subtensors of the
-   * tensor provided and additional points will be sums of those
-   * <tt>dim</tt> vectors. Thus in 1d this is a line, in 2d this is a
-   * parallelogram, and in 3d a parallelepiped. Colorizing is done
-   * according to hyper_rectangle().
+   * <tt>dim</tt> adjacent points are vectors describing the edges of
+   * the parallelepiped with respect to the origin. Additional points
+   * are sums of these dim vectors. Colorizing is done according to
+   * hyper_rectangle().
    *
    * @note This function silently reorders the vertices on the cells
-   * to lexiographic ordering if they are not already ordered that way
-   * (see GridReordering::reorder_grid()).
+   * to lexiographic ordering (see
+   * <code>GridReordering::reorder_grid</code>). In other words, if
+   * reodering of the vertices does occur, the ordering of vertices in
+   * the array of <code>corners</code> will no longer refer to the
+   * same triangulation.
    *
    * @note The triangulation needs to be void upon calling this
    * function.
@@ -327,9 +330,10 @@ public:
   template <int dim>
     static 
     void
-    parallelepiped (Triangulation<dim>   &tria,
-		    const Tensor<2, dim> &corners,
-		    const bool            colorize = false);
+    parallelepiped (Triangulation<dim>  &tria,
+		   const Point<dim>   (&corners) [dim],
+		   const bool           colorize = false);
+   
 
   /**
    * Hypercube with a layer of
