@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -284,31 +284,32 @@ public:
                               const bool                               colorize=false);
 
   /**
-   * A parallelogram. The first
-   * corner point is the
-   * origin. The <tt>dim</tt>
-   * adjacent points are the
-   * one-dimensional subtensors of
-   * the tensor provided and
-   * additional points will be sums
-   * of these two vectors.
-   * Colorizing is done according
-   * to hyper_rectangle().
+   * A parallelogram. The first corner point is the origin. The <tt>dim</tt>
+   * adjacent points are the ones given in the second argument and the fourth
+   * point will be the sum of these two vectors.  Colorizing is done in the
+   * same way as in hyper_rectangle().
    *
-   * @note This function is
-   * implemented in 2d only.
+   * @note This function is implemented in 2d only.
    *
-   * @note The triangulation needs to be
-   * void upon calling this
-   * function.
+   * @note The triangulation needs to be void upon calling this function.
    */
   template <int dim>
-  static 
-    void
-    parallelogram(Triangulation<dim> &tria,
-		  const Tensor<2,dim> &corners,
-		  const bool           colorize=false);
+  static
+  void
+  parallelogram(Triangulation<dim> &tria,
+		const Point<dim> (&corners)[dim],
+		const bool           colorize=false);
 
+
+  /**
+   * @deprecated Use the other function of same name.
+   */
+  template <int dim>
+  static
+  void
+  parallelogram(Triangulation<dim> &tria,
+		const Tensor<2,dim> &corners,
+		const bool           colorize=false) DEAL_II_DEPRECATED;
 
   /**
    * A parallelepiped. The first corner point is the origin. The
@@ -328,7 +329,7 @@ public:
    * function.
    */
   template <int dim>
-    static 
+    static
     void
     parallelepiped (Triangulation<dim>  &tria,
 		   const Point<dim>   (&corners) [dim],

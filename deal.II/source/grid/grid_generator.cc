@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -370,10 +370,9 @@ GridGenerator::torus (Triangulation<2,3> &tria,
 // Implementation for 2D only
 template<>
 void
-GridGenerator::parallelogram (
-  Triangulation<2>  &tria,
-  const Tensor<2,2> &corners,
-  const bool         colorize)
+GridGenerator::parallelogram (Triangulation<2>  &tria,
+			      const Point<2> (&corners)[2],
+			      const bool         colorize)
 {
   std::vector<Point<2> > vertices (GeometryInfo<2>::vertices_per_cell);
 
@@ -391,6 +390,18 @@ GridGenerator::parallelogram (
   // Assign boundary indicators
   if (colorize)
     colorize_hyper_rectangle (tria);
+}
+
+
+template<>
+void
+GridGenerator::parallelogram (Triangulation<2>  &tria,
+			      const Tensor<2,2> &corners,
+			      const bool         colorize)
+{
+  // simply pass everything to the other function of same name
+  const Point<2> x[2] = { corners[0], corners[1] };
+  parallelogram (tria, x, colorize);
 }
 
 
@@ -441,7 +452,7 @@ GridGenerator::parallelepiped (Triangulation<dim>  &tria,
       vertices[1] = corners[0];
       vertices[2] = corners[1];
       vertices[4] = corners[2];
-      
+
       // compose the remaining vertices:
       vertices[3] = vertices[1] + vertices[2];
       vertices[5] = vertices[1] + vertices[4];
@@ -458,7 +469,7 @@ GridGenerator::parallelepiped (Triangulation<dim>  &tria,
   for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
     cells[0].vertices[i] = i;
   cells[0].material_id = 0;
-  
+
   // Check ordering of vertices and create triangulation
   GridReordering<dim>::reorder_cells (cells);
   tria.create_triangulation (vertices, cells, SubCellData());
