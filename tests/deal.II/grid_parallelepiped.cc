@@ -36,7 +36,9 @@ std::ofstream logfile ("grid_parallelepiped/output");
 template<int dim>
 void check_parallelepiped (bool colorize, bool log)
 {
-  Tensor<2, dim> corners = Tensor<2, dim> ();
+  // Data structure defining dim coordinates that make up a
+  // parallelepiped.
+  Point<dim> (corners) [dim];
 
   // build corners for this particular dim:
   switch (dim)
