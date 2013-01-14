@@ -177,6 +177,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: All vector classes should now have a in_local_range()
+function indicating whether a given index is locally stored or not.
+<br>
+(Daniel Arndt, 2013/01/14)
+
 <li> Fixed: The one-argument version of ConstraintMatrix::condense was
 not prepared to deal with parallel vectors. This is now fixed.
 <br>

@@ -958,6 +958,13 @@ public:
   real_type linfty_norm () const;
 
   /**
+   * Returns true if the given global index is
+   * in the local range of this processor.
+   * Asks the corresponding block.
+   */
+  bool in_local_range (const types::global_dof_index global_index) const;
+
+  /**
    * Return whether the vector contains only
    * elements with value zero. This function
    * is mainly for internal consistency
@@ -1865,6 +1872,18 @@ BlockVectorBase<VectorType>::end() const
   return const_iterator(*this, size());
 }
 
+
+template <class VectorType>
+inline
+bool
+BlockVectorBase<VectorType>::in_local_range
+(const types::global_dof_index global_index) const
+{
+  const std::pair<unsigned int,unsigned int> local_index
+  = block_indices.global_to_local (global_index);
+  
+  return components[local_index.first].in_local_range (global_index);
+}
 
 
 template <class VectorType>
