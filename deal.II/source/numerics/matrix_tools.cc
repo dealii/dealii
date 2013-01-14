@@ -1981,9 +1981,6 @@ namespace MatrixTools
 
     std::map<unsigned int,double>::const_iterator dof  = boundary_values.begin(),
                                                   endd = boundary_values.end();
-    const SparsityPattern    &sparsity    = matrix.get_sparsity_pattern();
-    const std::size_t  *sparsity_rowstart = sparsity.get_rowstart_indices();
-    const unsigned int *sparsity_colnums  = sparsity.get_column_numbers();
     for (; dof != endd; ++dof)
       {
         Assert (dof->first < n_dofs, ExcInternalError());
@@ -2283,8 +2280,6 @@ namespace MatrixTools
                 // the transpose one
                 const SparsityPattern &this_sparsity
                   = sparsity_pattern.block (block_row, block_index.first);
-                const SparsityPattern &transpose_sparsity
-                  = sparsity_pattern.block (block_index.first, block_row);
 
                 SparseMatrix<number> &this_matrix
                   = matrix.block(block_row, block_index.first);

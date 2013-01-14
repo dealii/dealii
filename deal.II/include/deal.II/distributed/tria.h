@@ -240,11 +240,19 @@ namespace parallel
        * cell ordering, this flag is
        * required to get reproducible
        * behaviour after snapshot/resume.
+       *
+       * The flag construct_multigrid_hierarchy
+       * needs to be set to use the geometric
+       * multigrid functionality. This option
+       * requires additional computation and
+       * communication. Note: geometric
+       * multigrid is still a work in progress.
        */
       enum Settings
       {
         default_setting = 0x0,
-        mesh_reconstruction_after_repartitioning = 0x1
+        mesh_reconstruction_after_repartitioning = 0x1,
+        construct_multigrid_hierarchy = 0x2
       };
 
 
@@ -866,6 +874,21 @@ namespace parallel
        */
       std::vector<unsigned int> coarse_cell_to_p4est_tree_permutation;
       std::vector<unsigned int> p4est_tree_to_coarse_cell_permutation;
+
+      /**
+       * dummy settings
+       */
+      enum Settings
+      {
+        default_setting = 0x0,
+        mesh_reconstruction_after_repartitioning = 0x1,
+        construct_multigrid_hierarchy = 0x2
+      };
+      /**
+       * dummy settings object
+       */
+      Settings settings;
+
     };
   }
 }

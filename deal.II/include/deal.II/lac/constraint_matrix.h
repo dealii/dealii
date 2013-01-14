@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -787,10 +787,14 @@ public:
    *
    * The constraint matrix object must be
    * closed to call this function.
+   *
+   * @deprecated The functions converting an uncondensed matrix into
+   * its condensed form are deprecated. Use the functions doing the
+   * in-place condensation leaving the size of the linear system unchanged.
    */
   template<typename number>
   void condense (const SparseMatrix<number> &uncondensed,
-                 SparseMatrix<number>       &condensed) const;
+                 SparseMatrix<number>       &condensed) const DEAL_II_DEPRECATED;
 
   /**
    * This function does much the same as
@@ -829,10 +833,14 @@ public:
    * or Trilinos vector wrapper class, or
    * any other type having the same
    * interface.
+   *
+   * @deprecated The functions converting an uncondensed matrix into
+   * its condensed form are deprecated. Use the functions doing the
+   * in-place condensation leaving the size of the linear system unchanged.
    */
   template <class VectorType>
   void condense (const VectorType &uncondensed,
-                 VectorType       &condensed) const;
+                 VectorType       &condensed) const DEAL_II_DEPRECATED;
 
   /**
    * Condense the given vector
@@ -865,12 +873,16 @@ public:
    *
    * The constraint matrix object must be
    * closed to call this function.
+   *
+   * @deprecated The functions converting an uncondensed matrix into
+   * its condensed form are deprecated. Use the functions doing the
+   * in-place condensation leaving the size of the linear system unchanged.
    */
   template<typename number, class VectorType>
   void condense (const SparseMatrix<number> &uncondensed_matrix,
                  const VectorType           &uncondensed_vector,
                  SparseMatrix<number>       &condensed_matrix,
-                 VectorType                 &condensed_vector) const;
+                 VectorType                 &condensed_vector) const DEAL_II_DEPRECATED;
 
   /**
    * This function does much the same as
@@ -2158,4 +2170,3 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-

@@ -68,7 +68,9 @@ void test()
   if (myid == 0)
     deallog << "hyper_cube" << std::endl;
 
-  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
+  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
+					       Triangulation<dim>::none,
+					       parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
 
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
@@ -96,7 +98,7 @@ void test()
               cell->get_mg_dof_indices(dofs);
 
               for (unsigned int i=0;i<dofs.size();++i)
-                if (dofs[i]==types::invalid_dof_index)
+                if (dofs[i]==numbers::invalid_dof_index)
                   file << "- ";
                 else
                   file << dofs[i] << " ";

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -367,15 +367,12 @@ GridGenerator::torus (Triangulation<2,3>  &tria,
 }
 
 
-
-
 // Implementation for 2D only
 template<>
 void
-GridGenerator::parallelogram (
-  Triangulation<2>  &tria,
-  const Tensor<2,2> &corners,
-  const bool      colorize)
+GridGenerator::parallelogram (Triangulation<2>  &tria,
+			      const Point<2> (&corners)[2],
+			      const bool         colorize)
 {
   std::vector<Point<2> > vertices (GeometryInfo<2>::vertices_per_cell);
 
@@ -394,6 +391,94 @@ GridGenerator::parallelogram (
   if (colorize)
     colorize_hyper_rectangle (tria);
 }
+
+
+template<>
+void
+GridGenerator::parallelogram (Triangulation<2>  &tria,
+			      const Tensor<2,2> &corners,
+			      const bool         colorize)
+{
+  // simply pass everything to the other function of same name
+  const Point<2> x[2] = { corners[0], corners[1] };
+  parallelogram (tria, x, colorize);
+}
+
+
+
+// Parallelepiped implementation in 1d, 2d, and 3d. @note The
+// implementation in 1d is similar to hyper_rectangle(), and in 2d is
+// similar to parallelogram().
+//
+// The GridReordering::reorder_grid is made use of towards the end of
+// this function. Thus the triangulation is explicitly constructed for
+// all dim here since it is slightly different in that respect
+// (cf. hyper_rectangle(), parallelogram()).
+template<int dim>
+void
+GridGenerator::parallelepiped (Triangulation<dim>  &tria,
+			      const Point<dim>   (&corners) [dim],
+			      const bool           colorize)
+{
+  // Check that none of the user defined vertices overlap
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i+1; j<dim; ++j)
+      Assert ((corners[i]!=corners[j]),
+              ExcMessage ("Invalid distance between corner points of parallelepiped."));
+
+  // Note: vertex[0] is the origin and is initialised as so here:
+  std::vector<Point<dim> > vertices (GeometryInfo<dim>::vertices_per_cell);
+
+  switch (dim)
+    {
+      // A line (1d parallelepiped)
+    case 1:
+      vertices[1] = corners[0];
+      break;
+
+      // A parallelogram (2d parallelepiped)
+    case 2:
+      // assign corners to vertices:
+      vertices[1] = corners[0];
+      vertices[2] = corners[0];
+
+      // compose the remaining vertex:
+      vertices[3] = vertices[1] + vertices[2];
+      break;
+
+      // A parallelepiped (3d parallelepiped)
+    case 3:
+      // assign corners to vertices:
+      vertices[1] = corners[0];
+      vertices[2] = corners[1];
+      vertices[4] = corners[2];
+
+      // compose the remaining vertices:
+      vertices[3] = vertices[1] + vertices[2];
+      vertices[5] = vertices[1] + vertices[4];
+      vertices[6] = vertices[2] + vertices[4];
+      vertices[7] = vertices[1] + vertices[2] + vertices[4];
+      break;
+
+    default:
+      Assert (false, ExcNotImplemented());
+    }
+
+  // Prepare cell data and wipe material identity
+  std::vector<CellData<dim> > cells (1);
+  for (unsigned int i=0; i<GeometryInfo<dim>::vertices_per_cell; ++i)
+    cells[0].vertices[i] = i;
+  cells[0].material_id = 0;
+
+  // Check ordering of vertices and create triangulation
+  GridReordering<dim>::reorder_cells (cells);
+  tria.create_triangulation (vertices, cells, SubCellData());
+
+  // Finally assign boundary indicatorsaccording to hyper_rectangle
+  if (colorize)
+    colorize_hyper_rectangle (tria);
+}
+
 
 
 

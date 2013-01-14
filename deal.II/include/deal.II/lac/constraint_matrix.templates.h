@@ -259,24 +259,26 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
         // copy entries if column will not
         // be condensed away, distribute
         // otherwise
-        for (unsigned int j=uncondensed_struct.get_rowstart_indices()[row];
-             j<uncondensed_struct.get_rowstart_indices()[row+1]; ++j)
-          if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
-            condensed.add (new_line[row], new_line[uncondensed_struct.get_column_numbers()[j]],
-                           uncondensed.global_entry(j));
+	for (typename SparseMatrix<number>::const_iterator
+	       p = uncondensed.begin(row);
+	     p != uncondensed.end(row); ++p)
+          if (new_line[p->column()] != -1)
+            condensed.add (new_line[row],
+			   new_line[p->column()],
+                           p->value());
           else
             {
               // let c point to the
               // constraint of this column
               std::vector<ConstraintLine>::const_iterator c = lines.begin();
-              while (c->line != uncondensed_struct.get_column_numbers()[j])
+              while (c->line != p->column())
                 ++c;
 
               for (unsigned int q=0; q!=c->entries.size(); ++q)
                 // distribute to rows with
                 // appropriate weight
                 condensed.add (new_line[row], new_line[c->entries[q].first],
-                               uncondensed.global_entry(j) * c->entries[q].second);
+                               p->value() * c->entries[q].second);
 
               // take care of inhomogeneity:
               // need to subtract this element from the
@@ -285,7 +287,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
               // row of the inhomogeneous constraint in
               // the matrix with Gauss elimination
               if (use_vectors == true)
-                condensed_vector(new_line[row]) -= uncondensed.global_entry(j) *
+                condensed_vector(new_line[row]) -= p->value() *
                                                    c->inhomogeneity;
             }
 
@@ -295,15 +297,16 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
     else
       // line must be distributed
       {
-        for (unsigned int j=uncondensed_struct.get_rowstart_indices()[row];
-             j<uncondensed_struct.get_rowstart_indices()[row+1]; ++j)
+	for (typename SparseMatrix<number>::const_iterator
+	       p = uncondensed.begin(row);
+	     p != uncondensed.end(row); ++p)
           // for each column: distribute
-          if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
+          if (new_line[p->column()] != -1)
             // column is not constrained
             for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
               condensed.add (new_line[next_constraint->entries[q].first],
-                             new_line[uncondensed_struct.get_column_numbers()[j]],
-                             uncondensed.global_entry(j) *
+                             new_line[p->column()],
+                             p->value() *
                              next_constraint->entries[q].second);
 
           else
@@ -313,24 +316,24 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
               // let c point to the constraint
               // of this column
               std::vector<ConstraintLine>::const_iterator c = lines.begin();
-              while (c->line != uncondensed_struct.get_column_numbers()[j])
+              while (c->line != p->column())
                 ++c;
 
-              for (unsigned int p=0; p!=c->entries.size(); ++p)
+              for (unsigned int r=0; r!=c->entries.size(); ++r)
                 for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
                   condensed.add (new_line[next_constraint->entries[q].first],
-                                 new_line[c->entries[p].first],
-                                 uncondensed.global_entry(j) *
-                                 next_constraint->entries[q].second *
-                                 c->entries[p].second);
+                                 new_line[c->entries[r].first],
+                                 p->value() *
+                                 next_constraint->entries[r].second *
+                                 c->entries[r].second);
 
               if (use_vectors == true)
                 for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
                   condensed_vector (new_line[next_constraint->entries[q].first])
-                  -= uncondensed.global_entry(j) *
+		    -= p->value() *
                      next_constraint->entries[q].second *
                      c->inhomogeneity;
-            };
+            }
 
         // condense the vector
         if (use_vectors == true)

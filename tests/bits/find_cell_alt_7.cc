@@ -45,7 +45,7 @@ void check (Triangulation<2> &tria)
          deallog << cell.first << std::endl;
          for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
             deallog << "<" << cell.first->vertex(v) << "> ";
-         deallog << "[ " << cell.second << "] ";
+         deallog << "[ " << cell.second << " ] ";
 
          // Now transform back and check distance
          Point<2> pp = map.transform_unit_to_real_cell(cell.first, GeometryInfo<2>::project_to_unit_cell(cell.second));

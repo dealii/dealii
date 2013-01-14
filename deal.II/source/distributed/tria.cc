@@ -2691,10 +2691,9 @@ namespace parallel
 
 
       // fill level_subdomain_ids for geometric multigrid
-      // This is disabled for now until it works correctly.
       // the level ownership of a cell is defined as the owner if the cell is active or as the owner of child(0)
       // we need this information for all our ancestors and the same-level neighbors of our own cells (=level ghosts)
-      if (false)
+      if (settings & construct_multigrid_hierarchy)
         {
           // step 1: We set our own ids all the way down and all the others to -1. Note that we do not fill
           // other cells we could figure out the same way, because we might accidentally set an id for a

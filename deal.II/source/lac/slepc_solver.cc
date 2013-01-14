@@ -375,12 +375,13 @@ namespace SLEPcWrappers
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 #else
-    // PETSc/SLEPc version must be > 3.1.0 (supress compiler warning
-    // by performing a void operation on eps).
+    // Supress compiler warnings about unused paameters.
+    (void) eps;
+
+    // PETSc/SLEPc version must be > 3.1.0.
     Assert (false,
             ExcMessage ("Your SLEPc installation does not include a copy of the "
                         "Generalized Davidson solver. A SLEPc version > 3.1.0 is required."));
-    Assert (eps, ExcSLEPcWrappersUsageError());
 #endif
   }
 
@@ -407,12 +408,13 @@ namespace SLEPcWrappers
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 #else
-    // PETSc/SLEPc version must be > 3.1.0 (supress compiler warning
-    // by performing a void operation on eps).
+    // Supress compiler warnings about unused paameters.
+    (void) eps;
+
+    // PETSc/SLEPc version must be > 3.1.0.
     Assert ((false),
             ExcMessage ("Your SLEPc installation does not include a copy of the "
                         "Jacobi-Davidson solver. A SLEPc version > 3.1.0 is required."));
-    Assert (eps, ExcSLEPcWrappersUsageError());
 #endif
   }
 
