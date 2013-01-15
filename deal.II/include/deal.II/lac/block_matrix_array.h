@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -152,8 +152,8 @@ public:
    * Constructor fixing the
    * dimensions.
    *
-   * @deprecated the last argument
-   * is ignored.
+   * @deprecated The last argument is ignored. Use the constructor with only
+   * the first two arguments.
    */
   BlockMatrixArray (const unsigned int n_block_rows,
                     const unsigned int n_block_cols,
@@ -166,8 +166,8 @@ public:
    * created by the default
    * constructor.
    *
-   * @deprecated the last argument
-   * is ignored.
+   * @deprecated The last argument is ignored. Use the function with same name
+   * but only the first two arguments.
    */
   void initialize (const unsigned int n_block_rows,
                    const unsigned int n_block_cols,
@@ -212,8 +212,9 @@ public:
    * matrices not having functions
    * vmult_add() and TVmult_add().
    *
-   * @deprecated the first argument
-   * is ignored.
+   * @deprecated The first argument
+   * is ignored. Use the function with same name
+   * but without the first argument.
    */
   template <class MATRIX>
   void enter_aux (VectorMemory<Vector<number> > &mem,
@@ -484,7 +485,7 @@ public:
    * <tt>n_blocks</tt> is the
    * number of blocks in each direction.
    */
-  BlockTrianglePrecondition (unsigned int n_blocks);
+  BlockTrianglePrecondition (const unsigned int n_blocks);
 
   /**
    * Constructor. This matrix must be
@@ -492,12 +493,12 @@ public:
    * parameter allows for backward
    * insertion instead of forward.
    *
-   * @deprecated the second argument
-   * is ignored.
+   * @deprecated The second argument is ignored. Use the constructor with only
+   * the first and third argument.
    */
-  BlockTrianglePrecondition (unsigned int n_block_rows,
+  BlockTrianglePrecondition (const unsigned int n_block_rows,
                              VectorMemory<Vector<number> > &mem,
-                             bool backward = false) DEAL_II_DEPRECATED;
+                             const bool backward = false) DEAL_II_DEPRECATED;
 
   /**
    * Initialize object
@@ -506,18 +507,18 @@ public:
    * created by the default
    * constructor.
    *
-   * @deprecated the second argument
-   * is ignored.
+   * @deprecated The second argument
+   * is ignored. Use the function without that argument.
    */
   void initialize (const unsigned int n_block_rows,
                    VectorMemory<Vector<number> > &mem,
-                   bool backward = false) DEAL_II_DEPRECATED;
+                   const bool backward = false) DEAL_II_DEPRECATED;
 
   /**
    * Resize preconditioner to a new
    * size and clear all blocks.
    */
-  void reinit(const unsigned int n_block_rows);
+  void reinit (const unsigned int n_block_rows);
 
 
   /**
@@ -542,7 +543,7 @@ public:
    * matrices or preconditioners.
    *
    * @deprecated The first
-   * argument is ignored. User
+   * argument is ignored. Use
    * enter() instead.
    */
   template <class MATRIX>
