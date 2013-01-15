@@ -4510,11 +4510,6 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
                 }
               else
                 res0 = VectorizedArray<Number>();
-              if (mm % 2 == 1)
-                {
-                  val0  = shape_values[mid*n_q_points_1d+n_cols];
-                  res0 += val0 * in[stride*mid];
-                }
               if (add == false)
                 out[stride*n_cols]  = res0;
               else

@@ -50,7 +50,6 @@ void test ()
   ConstraintMatrix constraints (locally_relevant_dofs);
   constraints.clear();
   {
-    constraints.reinit (locally_relevant_dofs);
     IndexSet boundary_dofs (dof_handler.n_dofs());
     DoFTools::extract_boundary_dofs
       (dof_handler, std::vector<bool>(1,true),boundary_dofs);
@@ -59,10 +58,13 @@ void test ()
     while(boundary_dofs.is_element(first_nboundary_dof))
       first_nboundary_dof++;
 
-    constraints.add_line (first_nboundary_dof);
-    for (unsigned int i=0; i<dof_handler.n_dofs();++i)
-      if (boundary_dofs.is_element(i) == true)
-	constraints.add_entry (first_nboundary_dof, i, -1);
+    if (locally_relevant_dofs.is_element(first_nboundary_dof))
+      {
+	constraints.add_line (first_nboundary_dof);
+	for (unsigned int i=0; i<dof_handler.n_dofs();++i)
+	  if (boundary_dofs.is_element(i) == true)
+	    constraints.add_entry (first_nboundary_dof, i, -1);
+      }
   }
   constraints.close();
 

@@ -580,6 +580,14 @@ public:
   real_type linfty_norm () const;
 
   /**
+   * Returns true if the given global index is
+   * in the local range of this processor.
+   * Since this is not a distributed
+   * vector the method always returns true.
+   */
+  bool in_local_range (const types::global_dof_index global_index) const;
+
+  /**
    * Return dimension of the vector.
    */
   unsigned int size () const;
@@ -1186,6 +1194,15 @@ inline
 unsigned int Vector<Number>::size () const
 {
   return vec_size;
+}
+
+
+template <typename Number>
+inline
+bool Vector<Number>::in_local_range
+(const types::global_dof_index global_index) const
+{
+  return true;
 }
 
 

@@ -160,10 +160,11 @@ ConstraintMatrix::condense (VectorType &vec) const
 
       const typename VectorType::value_type old_value = vec(constraint_line->line);
       for (unsigned int q=0; q!=constraint_line->entries.size(); ++q)
-        vec(constraint_line->entries[q].first)
-        += (static_cast<typename VectorType::value_type>
-            (old_value) *
-            constraint_line->entries[q].second);
+        if (vec.in_local_range(constraint_line->entries[q].first) == true) 
+          vec(constraint_line->entries[q].first)
+          += (static_cast<typename VectorType::value_type>
+              (old_value) *
+              constraint_line->entries[q].second);
     }
 
   vec.compress();
@@ -171,7 +172,8 @@ ConstraintMatrix::condense (VectorType &vec) const
   for (std::vector<ConstraintLine>::const_iterator
 	 constraint_line = lines.begin();
        constraint_line!=lines.end(); ++constraint_line)
-    vec(constraint_line->line) = 0.;
+    if (vec.in_local_range(constraint_line->line) == true) 
+      vec(constraint_line->line) = 0.;
 }
 
 
@@ -2875,3 +2877,4 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
+
