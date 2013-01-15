@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2009, 2011, 2012, 2013 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -251,17 +251,18 @@ SparseLUDecomposition<number>::strengthen_diagonal_impl ()
 
       // get the global index of the first
       // non-diagonal element in this row
-      const unsigned int rowstart
-        = this->get_sparsity_pattern().get_rowstart_indices()[row] + 1;
-      number *const diagonal_element = &this->global_entry(rowstart-1);
+      Assert (this->cols->optimize_diagonal(),  ExcNotImplemented());
+      typename SparseMatrix<number>::iterator
+	diagonal_element = this->begin(row);
 
       number rowsum = 0;
-      for (unsigned int global_index=rowstart;
-           global_index<rowstart+rowlength; ++global_index)
-        rowsum += std::fabs(this->global_entry(global_index));
+      for (typename SparseMatrix<number>::iterator
+	     p = diagonal_element + 1;
+	   p != this->end(row); ++p)
+        rowsum += std::fabs(p->value());
 
-      *diagonal_element += this->get_strengthen_diagonal (rowsum, row)  *
-                           rowsum;
+      diagonal_element->value() += this->get_strengthen_diagonal (rowsum, row)  *
+				   rowsum;
     }
 }
 
