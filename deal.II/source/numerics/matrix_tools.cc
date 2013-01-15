@@ -1937,7 +1937,7 @@ namespace MatrixTools
     {
       return (p.column() < column);
     }
-  };
+  }
 
 //TODO:[WB] I don't think that the optimized storage of diagonals is needed (GK)
   template <typename number>
