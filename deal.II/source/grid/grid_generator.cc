@@ -440,7 +440,7 @@ GridGenerator::parallelepiped (Triangulation<dim>  &tria,
     case 2:
       // assign corners to vertices:
       vertices[1] = corners[0];
-      vertices[2] = corners[0];
+      vertices[2] = corners[1];
 
       // compose the remaining vertex:
       vertices[3] = vertices[1] + vertices[2];
