@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -759,8 +759,8 @@ namespace FETools
                                                          const Quadrature<dim-1>    &lhs_quadrature,
                                                          const Quadrature<dim-1>    &rhs_quadrature,
                                                          const typename DoFHandler<dim, spacedim>::active_cell_iterator &cell,
-                                                         unsigned int face,
-                                                         FullMatrix<double>       &X);
+                                                         const unsigned int          face,
+                                                         FullMatrix<double>         &X);
 
 
 
