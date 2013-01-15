@@ -198,10 +198,9 @@ SparseLUDecomposition<number>::copy_from (const SparseMatrix<somenumber> &matrix
       return;
     }
 
-  // preset the elements
-  std::fill_n (&this->global_entry(0),
-               this->n_nonzero_elements(),
-               0);
+  // preset the elements by zero. this needs to be written in a slightly
+  // awkward way so that we find the corresponding function in the base class.
+  SparseMatrix<number>::operator= (number(0));
 
   // note: pointers to the sparsity
   // pattern of the old matrix!
