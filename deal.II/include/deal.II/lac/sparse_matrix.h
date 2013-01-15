@@ -2243,14 +2243,14 @@ namespace SparseMatrixIterators
 	 ?
 	 sparsity.get_rowstart_indices()[(*this)->row()] + (*this)->index()
 	 :
-	 sparsity.get_rowstart_indices()[sparsity.n_rows()+1]);
+	 sparsity.get_rowstart_indices()[sparsity.n_rows()]);
 
     const unsigned int other_position
       = (other != (*this)->get_matrix().end()
 	 ?
 	 sparsity.get_rowstart_indices()[other->row()] + other->index()
 	 :
-	 sparsity.get_rowstart_indices()[sparsity.n_rows()+1]);
+	 sparsity.get_rowstart_indices()[sparsity.n_rows()]);
 
     return (this_position - other_position);
   }
