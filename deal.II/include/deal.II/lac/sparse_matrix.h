@@ -2237,10 +2237,20 @@ namespace SparseMatrixIterators
             ExcInternalError());
 
     const SparsityPattern &sparsity = accessor.get_matrix().get_sparsity_pattern();
+
     const unsigned int this_position
-      = sparsity.get_rowstart_indices()[(*this)->row()] + (*this)->index();
+      = (*this != (*this)->get_matrix().end()
+	 ?
+	 sparsity.get_rowstart_indices()[(*this)->row()] + (*this)->index()
+	 :
+	 sparsity.get_rowstart_indices()[sparsity.n_rows()+1]);
+
     const unsigned int other_position
-      = sparsity.get_rowstart_indices()[other->row()] + other->index();
+      = (other != (*this)->get_matrix().end()
+	 ?
+	 sparsity.get_rowstart_indices()[other->row()] + other->index()
+	 :
+	 sparsity.get_rowstart_indices()[sparsity.n_rows()+1]);
 
     return (this_position - other_position);
   }
