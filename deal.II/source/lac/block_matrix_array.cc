@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2008, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -277,18 +277,18 @@ BlockTrianglePrecondition<number>::BlockTrianglePrecondition()
 
 template <typename number>
 BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
-  unsigned int block_rows,
-  VectorMemory<Vector<number> > &mem,
-  bool backward)
+  const unsigned int block_rows,
+  VectorMemory<Vector<number> > &,
+  const bool backward)
   :
-  BlockMatrixArray<number> (block_rows, block_rows, mem),
+  BlockMatrixArray<number> (block_rows, block_rows),
   backward(backward)
 {}
 
 
 template <typename number>
 BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
-  unsigned int block_rows)
+  const unsigned int block_rows)
   :
   BlockMatrixArray<number> (block_rows, block_rows),
   backward(false)
@@ -298,11 +298,11 @@ BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
 template <typename number>
 void
 BlockTrianglePrecondition<number>::initialize(
-  unsigned int n_block_rows,
-  VectorMemory<Vector<number> > &memory,
-  bool backward)
+  const unsigned int n_block_rows,
+  VectorMemory<Vector<number> > &,
+  const bool backward)
 {
-  BlockMatrixArray<number>::initialize(n_block_rows, n_block_rows, memory);
+  BlockMatrixArray<number>::initialize(n_block_rows, n_block_rows);
   this->backward = backward;
 }
 
