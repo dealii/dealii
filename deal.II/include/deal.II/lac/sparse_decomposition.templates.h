@@ -76,8 +76,10 @@ void SparseLUDecomposition<number>::initialize (
 {
   const SparsityPattern &matrix_sparsity=matrix.get_sparsity_pattern();
 
+  const SparsityPattern *sparsity_pattern_to_use = 0;
+
   if (data.use_this_sparsity)
-    reinit(*data.use_this_sparsity);
+    sparsity_pattern_to_use = data.use_this_sparsity;
   else if (data.use_previous_sparsity &&
            !this->empty() &&
            (this->m()==matrix.m()))
@@ -90,12 +92,12 @@ void SparseLUDecomposition<number>::initialize (
       // case of several Newton
       // iteration steps on an
       // unchanged grid.
-      reinit(this->get_sparsity_pattern());
+      sparsity_pattern_to_use = &this->get_sparsity_pattern();
     }
   else if (data.extra_off_diagonals==0)
     {
       // Use same sparsity as matrix
-      reinit(matrix_sparsity);
+      sparsity_pattern_to_use = &matrix_sparsity;
     }
   else
     {
@@ -114,13 +116,23 @@ void SparseLUDecomposition<number>::initialize (
         }
 
       // and recreate
-      own_sparsity=new SparsityPattern(matrix_sparsity,
-                                       matrix_sparsity.max_entries_per_row()
-                                       +2*data.extra_off_diagonals,
-                                       data.extra_off_diagonals);
+      own_sparsity = new SparsityPattern(matrix_sparsity,
+					 matrix_sparsity.max_entries_per_row()
+					 +2*data.extra_off_diagonals,
+					 data.extra_off_diagonals);
       own_sparsity->compress();
-      reinit(*own_sparsity);
+      sparsity_pattern_to_use = own_sparsity;
     }
+
+  // now use this sparsity pattern
+  Assert (sparsity_pattern_to_use->optimize_diagonal(),
+          typename SparsityPattern::ExcDiagonalNotOptimized());
+  decomposed = false;
+  {
+    std::vector<const unsigned int *> tmp;
+    tmp.swap (prebuilt_lower_bound);
+  }
+  SparseMatrix<number>::reinit (*sparsity_pattern_to_use);
 }
 
 
@@ -147,11 +159,10 @@ void SparseLUDecomposition<number>::reinit (const SparsityPattern &sparsity)
   Assert (sparsity.optimize_diagonal(),
           typename SparsityPattern::ExcDiagonalNotOptimized());
   decomposed = false;
-  if (true)
-    {
-      std::vector<const unsigned int *> tmp;
-      tmp.swap (prebuilt_lower_bound);
-    };
+  {
+    std::vector<const unsigned int *> tmp;
+    tmp.swap (prebuilt_lower_bound);
+  }
   SparseMatrix<number>::reinit (sparsity);
 }
 
