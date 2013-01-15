@@ -55,16 +55,13 @@ void check_1d_parallelepiped_by_comparison (bool log)
       logfile << "\ncheck 1d parallelepiped (hyper_cube): ";
       if (GridTools::have_same_coarse_mesh (triangulation_parallelepiped,
 					    triangulation_cube))
-	logfile << "OK" << std::endl;
+	logfile << "OK";
       else
-	logfile << "not OK... coarse grids are different but they should be the same" 
-		<< std::endl;
+	logfile << "not OK... coarse grids are different but they should be the same";
     }
 }
 
-// @todo When the interface to parallelogram is updated, define TWO_D_TEST
 
-#ifdef TWO_D_TEST
 // Here is the implementation in 2d:
 void check_2d_parallelepiped_by_comparison (bool log)
 {
@@ -76,7 +73,7 @@ void check_2d_parallelepiped_by_comparison (bool log)
   
   Triangulation<2> triangulation_parallelepiped;
   GridGenerator::parallelepiped (triangulation_parallelepiped, corners, false);
-  
+
   Triangulation<2> triangulation_parallelogram;
   GridGenerator::parallelogram (triangulation_parallelogram, corners, false);
 
@@ -85,20 +82,17 @@ void check_2d_parallelepiped_by_comparison (bool log)
       logfile << "\ncheck 2d parallelepiped (parallelogram): ";
       if (GridTools::have_same_coarse_mesh (triangulation_parallelepiped,
 					    triangulation_parallelogram))
-	logfile << "OK" << std::endl;
+	logfile << "OK";
 
       else
-	logfile << "not OK... coarse grids are different but they should be the same" 
-		<< std::endl;
+	logfile << "not OK... coarse grids are different but they should be the same";
     }
 }
-#endif
 
 int main ()
 {
   // Check parallelepiped 
   check_1d_parallelepiped_by_comparison (true);
-#ifdef TWO_D_TEST
   check_2d_parallelepiped_by_comparison (true);
-#endif
+  logfile << "\n";
 }
