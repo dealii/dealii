@@ -252,13 +252,6 @@ SparseLUDecomposition<number>::strengthen_diagonal_impl ()
 {
   for (unsigned int row=0; row<this->m(); ++row)
     {
-      // get the length of the row
-      // (without the diagonal element)
-      const unsigned int rowlength
-        = (this->get_sparsity_pattern().get_rowstart_indices()[row+1]
-           -this->get_sparsity_pattern().get_rowstart_indices()[row]
-           -1);
-
       // get the global index of the first
       // non-diagonal element in this row
       Assert (this->cols->optimize_diagonal(),  ExcNotImplemented());
