@@ -44,12 +44,8 @@ void print_formatted (const FullMatrix<number> &A,
     {
       for (unsigned int j=0; j<A.n(); ++j)
 	{
-	  if (A(i,j) != 0)
-	    deallog << std::setw(width) << std::setprecision(precision)
-		    << A(i,j);
-	  else
-	    deallog << std::setw(width) << std::setprecision(precision)
-		    << "~";
+	  deallog << std::setw(width) << std::setprecision(precision)
+		  << A(i,j);
 	  deallog << ' ';
 	};
       deallog << std::endl;
