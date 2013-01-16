@@ -33,8 +33,11 @@ DEAL_II_NAMESPACE_OPEN
  * provides all values and derivatives of the shape functions. In case a
  * quadrature rule is given, the constructor creates a
  * TensorProductPolynomialsConst object that includes the tensor product of @p
- * Lagrange polynomials with the * support points from @p points and a locally
+ * Lagrange polynomials with the support points from @p points and a locally
  * constant function.
+ *
+ * Furthermore the constructor fills the @p interface_constrains, the @p
+ * prolongation (embedding) and the @p restriction matrices.
  *
  * <h3>Numbering of the degrees of freedom (DoFs)</h3>
  *
@@ -534,6 +537,20 @@ private:
    * from the constructor.
    */
   void initialize_constraints ();
+
+  /**
+   * Initialize the embedding
+   * matrices. Called from the
+   * constructor.
+   */
+  void initialize_embedding ();
+  
+  /**
+   * Initialize the restriction
+   * matrices. Called from the
+   * constructor.
+   */
+  void initialize_restriction ();
 
   /**
    * Initialize the

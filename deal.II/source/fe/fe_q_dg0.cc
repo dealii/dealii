@@ -57,6 +57,68 @@ namespace FE_Q_DG0_Helper
         out[in[i]]=i;
       return out;
     }
+
+    // in initialize_embedding() and
+    // initialize_restriction(), want to undo
+    // tensorization on inner loops for
+    // performance reasons. this clears a
+    // dim-array
+    template <int dim>
+    inline
+    void
+    zero_indices (unsigned int indices[dim])
+    {
+      for (unsigned int d=0; d<dim; ++d)
+        indices[d] = 0;
+    }
+    
+    // in initialize_embedding() and
+    // initialize_restriction(), want to undo
+    // tensorization on inner loops for
+    // performance reasons. this increments tensor
+    // product indices
+    template <int dim>
+    inline
+    void
+    increment_indices (unsigned int       indices[dim],
+                       const unsigned int dofs1d)
+    {
+      ++indices[0];
+      for (int d=0; d<dim-1; ++d)
+        if (indices[d]==dofs1d)
+        {
+          indices[d] = 0;
+          indices[d+1]++;
+        }
+    }
+    
+    // in initialize_embedding() and
+    // initialize_restriction(), want to undo
+    // tensorization on inner loops for
+    // performance reasons, and we need to again
+    // access 1D polynomials. This function
+    // creates them from dim-dimensional support
+    // points.
+    template <int dim>
+    inline
+    std::vector<Polynomials::Polynomial<double> >
+    generate_poly_space1d (const std::vector<Point<dim> >  &unit_support_points,
+                           const std::vector<unsigned int> &index_map_inverse,
+                           const unsigned int               dofs1d)
+    {
+      AssertDimension (Utilities::fixed_power<dim> (dofs1d)+1,
+                       unit_support_points.size());
+      std::vector<Point<1> > points1d (dofs1d);
+      for (unsigned int i=0; i<dofs1d; ++i)
+      {
+        const unsigned int j = index_map_inverse[i];
+        points1d[i] = Point<1>(unit_support_points[j](0));
+        for (unsigned int d=1; d<dim; ++d)
+          Assert (unit_support_points[j][d] == 0.,
+                  ExcInternalError());
+      }
+      return Polynomials::generate_complete_Lagrange_basis (points1d);
+    }
   }
 }
 
@@ -462,23 +524,12 @@ FE_Q_DG0<dim,spacedim>::FE_Q_DG0 (const unsigned int degree)
   // reinit constraints
   initialize_constraints ();
 
-  //TODO not working
-  // Reinit the vectors of restriction and
-  // prolongation matrices to the right sizes
-  // and compute the matrices
-  /*this->reinit_restriction_and_prolongation_matrices();
-  if (dim == spacedim)
-  {
-    FETools::compute_embedding_matrices (*this, this->prolongation);
-    FETools::compute_projection_matrices (*this, this->restriction);
-  }
-  else
-  {
-    FE_Q_DG0<dim> tmp (degree);
-    this->prolongation = tmp.prolongation;
-    this->restriction  = tmp.restriction;
-  }*/
-
+  // Reinit the vectors of restriction and prolongation matrices to the
+  // right sizes and compute the matrices
+  this->reinit_restriction_and_prolongation_matrices();
+  initialize_embedding();
+  initialize_restriction();
+ 
   initialize_quad_dof_index_permutation();
 }
 
@@ -522,12 +573,13 @@ FE_Q_DG0<dim,spacedim>::FE_Q_DG0 (const Quadrature<1> &points)
   // reinit constraints
   Implementation::initialize_constraints (points, *this);
 
-  // Reinit the vectors of restriction and
-  // prolongation matrices to the right sizes
-  // and compute the matrices
+  // Reinit the vectors of restriction and prolongation matrices to the
+  // right sizes and compute the matrices
   this->reinit_restriction_and_prolongation_matrices();
+  initialize_embedding();
+  initialize_restriction();
 
-  initialize_quad_dof_index_permutation();
+  initialize_quad_dof_index_permutation(); 
 }
 
 
@@ -1616,6 +1668,297 @@ FE_Q_DG0<dim,spacedim>::initialize_constraints ()
   QIterated<1> points (trapez,this->degree);
   Implementation::initialize_constraints (points, *this);
 }
+
+
+template <int dim, int spacedim>
+void
+FE_Q_DG0<dim,spacedim>::initialize_embedding ()
+{
+  // compute the interpolation matrices in  much the same way as we do for
+  // the constraints. it's actually simpler here, since we don't have this
+  // weird renumbering stuff going on. The trick is again that the
+  // interpolation matrix is formed by a permutation of the indices of the
+  // cell matrix. The value eps is used a threshold to decide when certain
+  // evaluations of the Lagrange polynomials are zero or one.
+  const double eps = 1e-15*this->degree*dim;
+  
+  #ifdef DEBUG
+  // in DEBUG mode, check that the evaluation of support points (except for
+  // the discontinuous node) in the current numbering gives the identity
+  // operation
+  for (unsigned int i=0; i<this->dofs_per_cell-1; ++i)
+  {
+    Assert (std::fabs (1.-this->poly_space.compute_value
+    (i, this->unit_support_points[i])) < eps,
+            ExcInternalError());
+    for (unsigned int j=0; j<this->dofs_per_cell-1; ++j)
+      if (j!=i)
+        Assert (std::fabs (this->poly_space.compute_value
+        (i, this->unit_support_points[j])) < eps,
+                ExcInternalError());
+  }
+  #endif
+  
+  // to efficiently evaluate the polynomial at the subcell, make use of the
+  // tensor product structure of this element and only evaluate 1D
+  // information from the polynomial. This makes the cost of this function
+  // almost negligible also for high order elements
+  const unsigned int dofs1d = this->degree+1;
+  std::vector<Table<2,double> >  subcell_evaluations
+    (dim, Table<2,double>(dofs1d, dofs1d));
+  const std::vector<unsigned int> &index_map_inverse =
+    this->poly_space.get_numbering_inverse();
+  
+  //  recreate 1D polynomials, the last entry is not used
+  std::vector<Polynomials::Polynomial<double> > poly_space1d =
+    FE_Q_DG0_Helper::generate_poly_space1d (this->unit_support_points,
+                                      index_map_inverse, dofs1d);
+  
+  // helper value: step size how to walk through diagonal and how many
+  // points we have left apart from the first dimension
+  unsigned int step_size_diag = 0;
+  {
+    unsigned int factor = 1;
+    for (unsigned int d=0; d<dim; ++d)
+    {
+      step_size_diag += factor;
+      factor *= dofs1d;
+    }
+  }
+  
+  // next evaluate the functions for the different refinement cases.
+  for (unsigned int ref=0; ref<RefinementCase<dim>::isotropic_refinement; ++ref)
+    for (unsigned int child=0;
+         child<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref+1));
+         ++child)
+         {
+           // go through the points in diagonal to capture variation in all
+           // directions simultaneously
+           for (unsigned int j=0; j<dofs1d; ++j)
+           {
+             const unsigned int diag_comp = index_map_inverse[j*step_size_diag];
+             const Point<dim> p_subcell = this->unit_support_points[diag_comp];
+             const Point<dim> p_cell =
+              GeometryInfo<dim>::child_to_cell_coordinates
+                (p_subcell, child, RefinementCase<dim>(ref+1));
+             for (unsigned int i=0; i<dofs1d; ++i)
+               for (unsigned int d=0; d<dim; ++d)
+               {
+                 const double cell_value = poly_space1d[i].value (p_cell[d]);
+                 
+                 // cut off values that are too small. note that we have here
+                 // Lagrange interpolation functions, so they should be zero at
+                 // almost all points, and one at the others, at least on the
+                 // subcells. so set them to their exact values.
+                 //
+                 // the actual cut-off value is somewhat fuzzy, but it works for
+                 // 2e-13*degree*dim (see above), which is kind of reasonable
+                 // given that we compute the values of the polynomials via an
+                 // degree-step recursion and then multiply the 1d-values. this
+                 // gives us a linear growth in degree*dim, times a small
+                 // constant.
+                 //
+                 // the embedding matrix is given by applying the inverse of the
+                 // subcell matrix on the cell_interpolation matrix. since the
+                 // subcell matrix is actually only a permutation vector, all we
+                 // need to do is to switch the rows we write the data into.
+                 // moreover, cut off very small values here
+                 if (std::fabs(cell_value) < eps)
+                   subcell_evaluations[d](j,i) = 0;
+                 else
+                   subcell_evaluations[d](j,i) = cell_value;
+               }
+           }
+           
+           // now expand from 1D info. block innermost dimension (x_0) in order
+           // to avoid difficult checks at innermost loop
+           unsigned int j_indices[dim];
+           FE_Q_DG0_Helper::zero_indices<dim> (j_indices);
+           for (unsigned int j=0; j<this->dofs_per_cell-1; j+=dofs1d)
+           {
+             unsigned int i_indices[dim];
+             FE_Q_DG0_Helper::zero_indices<dim> (i_indices);
+             for (unsigned int i=0; i<this->dofs_per_cell-1; i+=dofs1d)
+             {
+               double val_extra_dim = 1.;
+               for (unsigned int d=1; d<dim; ++d)
+                 val_extra_dim *= subcell_evaluations[d](j_indices[d-1],
+                                                         i_indices[d-1]);
+                 
+                 // innermost sum where we actually compute. the same as
+                 // this->prolongation[ref][child](j,i) =
+                 // this->poly_space.compute_value (i, p_cell);
+               for (unsigned int jj=0; jj<dofs1d; ++jj)
+               {
+                 const unsigned int j_ind = index_map_inverse[j+jj];
+                 for (unsigned int ii=0; ii<dofs1d; ++ii)
+                   
+                   this->prolongation[ref][child](j_ind,index_map_inverse[i+ii])
+                    = val_extra_dim * subcell_evaluations[0](jj,ii);
+               }
+               
+               // update indices that denote the tensor product position. a bit
+               // fuzzy and therefore not done for innermost x_0 direction
+               FE_Q_DG0_Helper::increment_indices<dim> (i_indices, dofs1d);
+             }
+             Assert (i_indices[dim-1] == 1, ExcInternalError());
+             FE_Q_DG0_Helper::increment_indices<dim> (j_indices, dofs1d);
+           }
+
+           // the discontinuous node is simply mapped on the discontinuous node
+           // on the child cell
+           for (unsigned int j=0; j<this->dofs_per_cell-1; j++)
+           {
+             this->prolongation[ref][child](j,this->dofs_per_cell-1) = 0.;
+             this->prolongation[ref][child](this->dofs_per_cell-1,j) = 0.;
+           }
+           this->prolongation[ref][child](this->dofs_per_cell-1,
+                                          this->dofs_per_cell-1) = 1.;
+           
+           // make sure that the row sum is one. this must be so since for this
+           // element, the continuous shape functions add up to one and the
+           // discontinuous node is mapped to the discontinuous node on the
+           // child cell
+           #ifdef DEBUG
+           for (unsigned int row=0; row<this->dofs_per_cell; ++row)
+           {
+             double sum = 0;
+             for (unsigned int col=0; col<this->dofs_per_cell; ++col)
+               sum += this->prolongation[ref][child](row,col);
+             Assert (std::fabs(sum-1.) < eps, ExcInternalError());
+           }
+           #endif
+         }
+}
+
+
+
+template <int dim, int spacedim>
+void
+FE_Q_DG0<dim,spacedim>::initialize_restriction ()
+{
+  // for these Lagrange interpolation polynomials, construction of the
+  // restriction matrices is relatively simple. the reason is that the
+  // interpolation points on the mother cell are (except for the case with
+  // arbitrary nonequidistant nodes and for the discontinuous node) always also
+  // interpolation points for some  shape function on one or the other child,
+  // because we have chosen equidistant Lagrange interpolation points for the
+  // polynomials
+  //
+  // so the only thing we have to find out is: for each shape function on
+  // the mother cell, which is the child cell (possibly more than one) on
+  // which it is located, and which is the corresponding shape function there.
+  // rather than doing it for the shape functions on the mother cell, we take
+  // the interpolation points there
+  //
+  // note that the interpolation point of a shape function can be on the
+  // boundary between subcells. in that case, restriction from children to
+  // mother may produce two or more entries for a dof on the mother cell.
+  // however, this doesn't hurt: since the element is continuous (apart from
+  // the discontinuous node), the contribution from each child should yield
+  // the same result, and since the element (apart from the discontinuous
+  // node) is non-additive we just overwrite one value (compute one one child)
+  // by the same value (compute on a later child), so we don't have to care
+  // about this.
+  // for the discontinuous node we just take the mean of all the child cells'
+  // contributions.
+  
+  const double eps = 1e-15*this->degree*dim;
+  const std::vector<unsigned int> &index_map_inverse =
+  this->poly_space.get_numbering_inverse();
+  
+  // recreate 1D polynomials for faster evaluation of polynomial, the last
+  // entry is not used
+  const unsigned int dofs1d = this->degree+1;
+  std::vector<Polynomials::Polynomial<double> > poly_space1d =
+    FE_Q_DG0_Helper::generate_poly_space1d (this->unit_support_points,
+                                            index_map_inverse, dofs1d);
+  std::vector<Tensor<1,dim> > evaluations1d (dofs1d);
+  
+  for (unsigned int i=0; i<this->dofs_per_cell-1; ++i)
+  {
+    unsigned int mother_dof = index_map_inverse[i];
+    const Point<dim> p_cell = this->unit_support_points[mother_dof];
+    
+    // then find the children on which the interpolation point is located
+    for (unsigned int ref=RefinementCase<dim>::cut_x;
+         ref<=RefinementCase<dim>::isotropic_refinement; ++ref)
+         for (unsigned int child=0;
+              child<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref));
+              ++child)
+              {
+                // check whether this interpolation point is inside this child
+                // cell
+                const Point<dim> p_subcell =
+                  GeometryInfo<dim>::cell_to_child_coordinates
+                    (p_cell, child, RefinementCase<dim>(ref));
+                if (GeometryInfo<dim>::is_inside_unit_cell (p_subcell))
+                {
+                  // same logic as in initialize_embedding to evaluate the
+                  // polynomial faster than from the tensor product: since we
+                  // evaluate all polynomials, it is much faster to just
+                  // compute the 1D values for all polynomials before and then
+                  // get the dim-data.
+                  for (unsigned int j=0; j<dofs1d; ++j)
+                    for (unsigned int d=0; d<dim; ++d)
+                      evaluations1d[j][d] = poly_space1d[j].value(p_subcell[d]);
+                    unsigned int j_indices[dim];
+                  FE_Q_DG0_Helper::zero_indices<dim> (j_indices);
+                  double sum_check = 0;
+                  for (unsigned int j = 0; j<this->dofs_per_cell-1; j += dofs1d)
+                  {
+                    double val_extra_dim = 1.;
+                    for (unsigned int d=1; d<dim; ++d)
+                      val_extra_dim *= evaluations1d[j_indices[d-1]][d];
+                    for (unsigned int jj=0; jj<dofs1d; ++jj)
+                    {
+                      
+                      // find the child shape function(s) corresponding
+                      // to this point. Usually this is just one function;
+                      // however, when we use FE_Q_DG0 on arbitrary nodes a
+                      // parent support point might not be a child support
+                      // point, and then we will get more than one nonzero
+                      // value per row. Still, the values should sum up to 1
+                      const double val = val_extra_dim * evaluations1d[jj][0];
+                      const unsigned int child_dof = index_map_inverse[j+jj];
+                      if (std::fabs (val-1.) < eps)
+                        this->restriction[ref-1][child]
+                                (mother_dof,child_dof)=1.;
+                      else if (std::fabs(val) > eps)
+                        this->restriction[ref-1][child]
+                                (mother_dof,child_dof)=val;
+                      sum_check += val;
+                    }
+                    FE_Q_DG0_Helper::increment_indices<dim> (j_indices, dofs1d);
+                  }
+                  Assert (std::fabs(sum_check-1) < eps,
+                          ExcInternalError());
+                }
+              }
+  }
+  // for the discontinuous node we take the mean of all the child cells'
+  // contributions. so there is also a diagonal entry equal to the inverse of
+  // n_children.
+  for (unsigned int ref=RefinementCase<dim>::cut_x;
+       ref<=RefinementCase<dim>::isotropic_refinement; ++ref)
+       for (unsigned int child=0;
+            child<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref));
+            ++child)
+            {
+              for (unsigned int i=0; i<this->dofs_per_cell-1; ++i)
+              {
+                this->restriction[ref-1][child](i,this->dofs_per_cell-1)=0.;
+                this->restriction[ref-1][child](this->dofs_per_cell-1,i)=0.;
+              }
+              this->restriction[ref-1][child]
+                (this->dofs_per_cell-1,this->dofs_per_cell-1) =
+                  1./(double)GeometryInfo<dim>::n_children
+                              (RefinementCase<dim>(ref));
+            }
+                
+}
+                
+
 
 //---------------------------------------------------------------------------
 // Data field initialization
