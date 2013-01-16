@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -285,38 +285,21 @@ public:
   virtual bool hp_constraints_are_implemented () const;
 
   /**
-   * If, on a vertex, several
-   * finite elements are active,
-   * the hp code first assigns the
-   * degrees of freedom of each of
-   * these FEs different global
-   * indices. It then calls this
-   * function to find out which of
-   * them should get identical
-   * values, and consequently can
-   * receive the same global DoF
-   * index. This function therefore
-   * returns a list of identities
-   * between DoFs of the present
-   * finite element object with the
-   * DoFs of @p fe_other, which is
-   * a reference to a finite
-   * element object representing
-   * one of the other finite
-   * elements active on this
-   * particular vertex. The
-   * function computes which of the
-   * degrees of freedom of the two
-   * finite element objects are
-   * equivalent, and returns a list
-   * of pairs of global dof indices
-   * in @p identities. The first
-   * index of each pair denotes one
-   * of the vertex dofs of the
-   * present element, whereas the
-   * second is the corresponding
-   * index of the other finite
-   * element.
+   * If, on a vertex, several finite elements are active, the hp code
+   * first assigns the degrees of freedom of each of these FEs
+   * different global indices. It then calls this function to find out
+   * which of them should get identical values, and consequently can
+   * receive the same global DoF index. This function therefore
+   * returns a list of identities between DoFs of the present finite
+   * element object with the DoFs of @p fe_other, which is a reference
+   * to a finite element object representing one of the other finite
+   * elements active on this particular vertex. The function computes
+   * which of the degrees of freedom of the two finite element objects
+   * are equivalent, both numbered between zero and the corresponding
+   * value of dofs_per_vertex of the two finite elements. The first
+   * index of each pair denotes one of the vertex dofs of the present
+   * element, whereas the second is the corresponding index of the
+   * other finite element.
    */
   virtual
   std::vector<std::pair<unsigned int, unsigned int> >
