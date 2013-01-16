@@ -12,7 +12,7 @@
 //----------------------------  injection_dgq.cc  ---------------------------
 
 
-char logname[] = "injection_dgq/output";
+char logname[] = "injection_q_dg0/output";
 
 
 #include "injection_common.h"
