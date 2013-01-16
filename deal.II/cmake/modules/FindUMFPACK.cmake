@@ -32,12 +32,9 @@ ENDFOREACH()
 #
 # UMFPACK depends on BLAS and LAPACK, so search for them:
 # TODO: There might be an external dependency for metis, ignore this for
-#       now.
+# now.
 #
-
-FIND_PACKAGE(BLAS)
 FIND_PACKAGE(LAPACK)
-
 
 #
 # Two macros to make life easier:
@@ -117,7 +114,6 @@ SET(UMFPACK_LIBRARIES
   ${AMD_LIBRARY}
   ${SuiteSparse_config_LIBRARY} # may be empty
   ${LAPACK_LIBRARIES}
-  ${BLAS_LIBRARIES}
   )
 
 SET(UMFPACK_INCLUDE_DIRS
@@ -127,7 +123,6 @@ SET(UMFPACK_INCLUDE_DIRS
   )
 
 SET(UMFPACK_LINKER_FLAGS
-  ${BLAS_LINKER_FLAGS}
   ${LAPACK_LINKER_FLAGS}
   )
 

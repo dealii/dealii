@@ -15,6 +15,8 @@
 #
 # Try to find the Threading Building Blocks library
 #
+# TODO: Obey naming convention "LIBRARIES" and "INCLUDE_DIRS"
+#
 
 INCLUDE(FindPackageHandleStandardArgs)
 

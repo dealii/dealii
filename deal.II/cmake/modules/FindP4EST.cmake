@@ -34,11 +34,9 @@ SET_IF_EMPTY(P4EST_DIR "$ENV{P4EST_DIR}")
 # to figure out how we can build deal.II against the two libraries
 # depending on whether we are in debug or optimized mode.
 #
-IF (P4EST_DIR
-    AND
-    EXISTS ${P4EST_DIR}/DEBUG
-    AND
-    EXISTS ${P4EST_DIR}/FAST)
+IF(P4EST_DIR
+   AND EXISTS ${P4EST_DIR}/DEBUG
+   AND EXISTS ${P4EST_DIR}/FAST)
   MESSAGE(STATUS "Found old-style p4est directory layout")
   SET (P4EST_DIR ${P4EST_DIR}/FAST)
 ENDIF()
@@ -78,9 +76,8 @@ SET(P4EST_INCLUDE_DIRS
   )
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(P4EST DEFAULT_MSG
-  P4EST_LIBRARY
-  P4EST_INCLUDE_DIR
-  SC_FOUND
+  P4EST_LIBRARIES
+  P4EST_INCLUDE_DIRS
   )
 
 IF(P4EST_FOUND)
