@@ -721,7 +721,10 @@ namespace Utilities
                const T    &val,
                const Comp  comp)
   {
-    Assert (last >= first,
+    // verify that the two iterators are properly ordered. since
+    // we need operator- for the iterator type anyway, do the
+    // test as follows, rather than via 'last >= first'
+    Assert (last - first >= 0,
 	    ExcMessage ("The given iterators do not satisfy the proper ordering."));
 
     unsigned int len = last-first;
