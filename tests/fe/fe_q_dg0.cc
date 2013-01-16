@@ -859,7 +859,7 @@ namespace Step22
                     << Utilities::int_to_string (degree, 1)
                     << ".tex";
     std::ofstream error_table_file(error_filename.str().c_str());
-    convergence_table.write_tex(error_table_file);
+				     //convergence_table.write_tex(error_table_file);
 
 
     convergence_table.add_column_to_supercolumn("cycle", "n cells");
