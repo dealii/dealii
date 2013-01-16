@@ -21,7 +21,7 @@
 #include <fstream>
 #include <string>
 
-#define PRECISION 6
+#define PRECISION 7
 
 
 
