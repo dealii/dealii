@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010, 2012 by the deal.II authors
+//    Copyright (C) 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -146,7 +146,9 @@
  * matrix have to be copied, not only those which are subject to constraints.
  *
  * This procedure is therefore not advocated and not discussed in the @ref
- * Tutorial.
+ * Tutorial. deal.II used to have functions that could perform these shrinking
+ * operations, but for the reasons outlined above they were inefficient, rarely
+ * used and consequently removed in version 8.0.
  *
  * <li> Use only one sparsity pattern and one matrix: doing it this way, the
  * condense functions add nonzero entries to the sparsity pattern of the large
