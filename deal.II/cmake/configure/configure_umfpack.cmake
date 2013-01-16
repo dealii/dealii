@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -72,7 +72,8 @@ MACRO(FEATURE_UMFPACK_ERROR_MESSAGE)
     "    $ UMFPACK_DIR=\"...\" cmake <...>\n"
     "    $ cmake -DUMFPACK_DIR=\"...\" <...>\n"
     "or set the relevant variables by hand in ccmake.\n"
-    "Relevant hints for UMFPACK are UMFPACK_DIR, AMD_DIR, SUITESPARSECONFIG_DIR.\n"
+    "Relevant hints for UMFPACK are SUITESPARSE_DIR, UMFPACK_DIR\n"
+    "(AMD_DIR, CHOLMOD_DIR, COLAMD_DIR, SUITESPARSECONFIG_DIR.)\n"
     "Alternatively you may choose to compile the bundled libraries\n"
     "by setting DEAL_II_ALLOW_BUNDLED=ON or DEAL_II_FORCE_BUNDLED_UMFPACK=ON.\n"
     "(BLAS and LAPACK have to be installed for bundled UMFPACK to be available)\n\n"
