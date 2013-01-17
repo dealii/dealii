@@ -131,6 +131,13 @@ namespace LinearAlgebraPETSc
      * for other blocks of the system matrix.
      */
     typedef PETScWrappers::PreconditionILU PreconditionILU;
+    
+    /**
+     * Typedef for the Incomplete Jacobi decomposition preconditioner used
+     * for other blocks of the system matrix.
+     */
+    typedef PETScWrappers::PreconditionJacobi PreconditionJacobi;
+    
   }
 
 }
