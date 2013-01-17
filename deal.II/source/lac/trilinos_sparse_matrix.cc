@@ -574,7 +574,7 @@ namespace TrilinosWrappers
         return;
       }
 
-    unsigned int n_rows = dealii_sparse_matrix.m();
+    const unsigned int n_rows = dealii_sparse_matrix.m();
 
     Assert (input_row_map.NumGlobalElements() == (int)n_rows,
             ExcDimensionMismatch (input_row_map.NumGlobalElements(),
@@ -587,17 +587,15 @@ namespace TrilinosWrappers
       (use_this_sparsity!=0)? *use_this_sparsity :
       dealii_sparse_matrix.get_sparsity_pattern();
 
-    if (matrix.get() != 0 && m() == n_rows &&
-        n_nonzero_elements() == sparsity_pattern.n_nonzero_elements())
-      goto set_matrix_values;
-
+    if (matrix.get() == 0 ||
+	m() != n_rows ||
+        n_nonzero_elements() != sparsity_pattern.n_nonzero_elements())
     {
       SparsityPattern trilinos_sparsity;
       trilinos_sparsity.reinit (input_row_map, input_col_map, sparsity_pattern);
       reinit (trilinos_sparsity);
     }
 
-set_matrix_values:
     // fill the values. the same as above: go through all rows of the matrix,
     // and then all columns. since the sparsity patterns of the input matrix
     // and the specified sparsity pattern might be different, need to go
