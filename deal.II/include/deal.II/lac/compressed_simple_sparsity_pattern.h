@@ -141,6 +141,12 @@ public:
                                    const IndexSet &rowset = IndexSet());
 
   /**
+   * Create a square matrix using
+   * the index set.
+   */
+  CompressedSimpleSparsityPattern (const IndexSet &indexset);
+
+  /**
    * Initialize a square matrix of
    * dimension @p n.
    */
