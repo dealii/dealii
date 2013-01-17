@@ -65,12 +65,14 @@ DEAL_II_NAMESPACE_CLOSE
 
 #ifdef DEAL_II_USE_PETSC
 
+#include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
 #include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #include <deal.II/lac/petsc_sparse_matrix.h>
 #include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
 #include <deal.II/lac/petsc_precondition.h>
+#include <deal.II/lac/petsc_solver.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -110,6 +112,8 @@ namespace LinearAlgebraPETSc
      */
     typedef PETScWrappers::MPI::BlockSparseMatrix BlockSparseMatrix;
 
+    typedef dealii::BlockCompressedSimpleSparsityPattern CompressedBlockSparsityPattern;
+
     /**
      * Typedef for the AMG preconditioner type used for the
      * top left block of the Stokes matrix.
@@ -139,6 +143,7 @@ DEAL_II_NAMESPACE_CLOSE
 
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_block_vector.h>
+#include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/block_sparsity_pattern.h>
@@ -202,6 +207,8 @@ namespace LinearAlgebraTrilinos
      * for other blocks of the system matrix.
      */
     typedef TrilinosWrappers::PreconditionJacobi PreconditionJacobi;
+
+    typedef TrilinosWrappers::SolverCG	SolverCG;
   }
 
 }
