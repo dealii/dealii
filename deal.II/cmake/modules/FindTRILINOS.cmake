@@ -74,13 +74,12 @@ FOREACH(_library ${Trilinos_LIBRARIES})
 ENDFOREACH()
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(TRILINOS DEFAULT_MSG
-  TRILINOS_LIBRARIES
-  TRILINOS_INCLUDE_DIRS
+  TRILINOS_LIBRARIES # cosmetic: Gives nice output
+  TRILINOS_FOUND
   )
 
 
 IF(TRILINOS_FOUND)
-
   #
   # Extract the major and minor version numbers:
   #

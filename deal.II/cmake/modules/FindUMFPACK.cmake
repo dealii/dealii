@@ -71,6 +71,7 @@ MACRO(FIND_UMFPACK_LIBRARY _comp _name)
   IF(NOT "${ARGN}" STREQUAL "REQUIRED")
     IF(${_comp}_LIBRARY MATCHES "-NOTFOUND")
       SET(${_comp}_LIBRARY "")
+      UNSET(${_comp}_LIBRARY CACHE)
     ENDIF()
   ENDIF()
 ENDMACRO()
@@ -79,7 +80,6 @@ ENDMACRO()
 #
 # Search for include directories:
 #
-
 FIND_UMFPACK_PATH(UMFPACK umfpack.h)
 FIND_UMFPACK_PATH(AMD amd.h)
 
@@ -92,10 +92,9 @@ IF(NOT UMFPACK_INCLUDE_DIR MATCHES "-NOTFOUND")
     REGEX "#include \"SuiteSparse_config.h\"")
   IF(NOT "${UMFPACK_SUITESPARSE_STRING}" STREQUAL "")
     FIND_UMFPACK_PATH(SuiteSparse_config SuiteSparse_config.h)
-    LIST(APPEND required_variables SuiteSparse_config_INCLUDE_DIR)
+    LIST(APPEND _required SuiteSparse_config_INCLUDE_DIR)
   ENDIF()
 ENDIF()
-
 
 #
 # Link against everything we can find to avoid underlinkage:
@@ -107,28 +106,36 @@ FIND_UMFPACK_LIBRARY(COLAMD colamd)
 FIND_UMFPACK_LIBRARY(SuiteSparse_config suitesparseconfig)
 
 
-SET(UMFPACK_LIBRARIES
-  ${UMFPACK_LIBRARY}
-  ${CHOLMOD_LIBRARY} # may be empty
-  ${COLAMD_LIBRARY} # may be empty
-  ${AMD_LIBRARY}
-  ${SuiteSparse_config_LIBRARY} # may be empty
-  ${LAPACK_LIBRARIES}
+SET(_output ${UMFPACK_LIBRARY} ${CHOLMOD_LIBRARY} ${COLAMD_LIBRARY} ${AMD_LIBRARY} ${SuiteSparse_config_LIBRARY})
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(UMFPACK DEFAULT_MSG
+  _output # Cosmetic: Gives nice output
+  UMFPACK_LIBRARY
+  AMD_LIBRARY
+  UMFPACK_INCLUDE_DIR
+  AMD_INCLUDE_DIR
+  ${_required}
+  LAPACK_FOUND
   )
 
-SET(UMFPACK_INCLUDE_DIRS
-  ${UMFPACK_INCLUDE_DIR}
-  ${AMD_INCLUDE_DIR}
-  ${SuiteSparse_config_INCLUDE_DIR} # may be empty
-  )
-
-SET(UMFPACK_LINKER_FLAGS
-  ${LAPACK_LINKER_FLAGS}
-  )
-
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(UMFPACK DEFAULT_MSG UMFPACK_LIBRARIES UMFPACK_INCLUDE_DIRS)
 
 IF(UMFPACK_FOUND)
+  SET(UMFPACK_LIBRARIES
+    ${UMFPACK_LIBRARY}
+    ${CHOLMOD_LIBRARY}
+    ${COLAMD_LIBRARY}
+    ${AMD_LIBRARY}
+    ${SuiteSparse_config_LIBRARY}
+    ${LAPACK_LIBRARIES}
+    )
+  SET(UMFPACK_INCLUDE_DIRS
+    ${UMFPACK_INCLUDE_DIR}
+    ${AMD_INCLUDE_DIR}
+    ${SuiteSparse_config_INCLUDE_DIR}
+    )
+  SET(UMFPACK_LINKER_FLAGS
+    ${LAPACK_LINKER_FLAGS}
+    )
+
   MARK_AS_ADVANCED(
     atlas_LIBRARY
     blas_LIBRARY

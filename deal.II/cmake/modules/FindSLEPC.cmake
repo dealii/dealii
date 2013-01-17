@@ -39,7 +39,7 @@ SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
 # mechanism.
 #
 
-FIND_LIBRARY(SLEPC_LIBRARIES
+FIND_LIBRARY(SLEPC_LIBRARY
   NAMES slepc
   HINTS
     # SLEPC is special. Account for that
@@ -50,15 +50,6 @@ FIND_LIBRARY(SLEPC_LIBRARIES
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
 )
 
-
-#
-# So, up to this point it was easy. Now, the tricky part:
-#
-
-
-#
-# Search for the first part of the includes:
-#
 FIND_PATH(SLEPC_INCLUDE_DIR_ARCH slepcconf.h
   HINTS
     # SLEPC is special. Account for that
@@ -70,19 +61,6 @@ FIND_PATH(SLEPC_INCLUDE_DIR_ARCH slepcconf.h
   PATH_SUFFIXES slepc include include/slepc
 )
 
-#
-# Sometimes, this is not enough...
-# If SLEPc is not installed but in source tree layout, there will be
-#   ${SLEPC_DIR}/${SLEPC_ARCH}/include - which we should have found by now.
-#   ${SLEPC_DIR}/include               - which we still have to find.
-#
-# Or it is installed in a non standard layout in the system (e.g. in
-# Gentoo), where there will be
-#   ${SLEPC_DIR}/${SLEPC_ARCH}/include
-#   /usr/include/slepc ...
-#
-# Either way, slepcversion.h should lie around:
-#
 FIND_PATH(SLEPC_INCLUDE_DIR_COMMON slepcversion.h
   HINTS
     ${SLEPC_DIR}
@@ -93,32 +71,24 @@ FIND_PATH(SLEPC_INCLUDE_DIR_COMMON slepcversion.h
   PATH_SUFFIXES slepc include include/slepc
 )
 
-#
-# And finally set SLEPC_INCLUDE_DIRS depending on the outcome of our crude
-# guess:
-#
-IF( SLEPC_INCLUDE_DIR_ARCH MATCHES "-NOTFOUND" OR
-    SLEPC_INCLUDE_DIR_COMMON MATCHES "-NOTFOUND" )
-  SET(SLEPC_INCLUDE_DIRS "SLEPC_INCLUDE_DIRS-NOTFOUND"
-    CACHE STRING "Include paths for SLEPC"
-    FORCE
-    )
-  UNSET(SLEPC_INCLUDE_DIR_ARCH CACHE)
-  UNSET(SLEPC_INCLUDE_DIR_COMMON CACHE)
-ELSE()
-  UNSET(SLEPC_INCLUDE_DIRS CACHE)
+
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(SLEPC DEFAULT_MSG
+  SLEPC_LIBRARY
+  SLEPC_INCLUDE_DIR_ARCH
+  SLEPC_INCLUDE_DIR_COMMON
+  PETSC_FOUND
+  )
+
+IF(SLEPC_FOUND)
   SET(SLEPC_INCLUDE_DIRS
     ${SLEPC_INCLUDE_DIR_ARCH}
     ${SLEPC_INCLUDE_DIR_COMMON}
     )
-ENDIF()
+  SET(SLEPC_LIBRARIES
+    ${SLEPC_LIBRARY}
+    ${PETSC_LIBRARIES}
+    )
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(SLEPC DEFAULT_MSG
-  SLEPC_LIBRARIES
-  SLEPC_INCLUDE_DIRS
-  )
-
-IF(SLEPC_FOUND)
   SET(SLEPC_SLEPCVERSION_H "${SLEPC_INCLUDE_DIR_COMMON}/slepcversion.h")
 
   FILE(STRINGS "${SLEPC_SLEPCVERSION_H}" SLEPC_VERSION_MAJOR_STRING

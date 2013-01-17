@@ -55,7 +55,7 @@ SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
 # against someday to avoid underlinkage
 #
 
-FIND_LIBRARY(PETSC_LIBRARIES
+FIND_LIBRARY(PETSC_LIBRARY
   NAMES petsc
   HINTS
     # petsc is special. Account for that
@@ -68,7 +68,6 @@ FIND_LIBRARY(PETSC_LIBRARIES
 #
 # So, up to this point it was easy. Now, the tricky part:
 #
-
 
 #
 # Search for the first part of the includes:
@@ -93,7 +92,7 @@ FIND_PATH(PETSC_INCLUDE_DIR_ARCH petscconf.h
 #   ${PETSC_DIR}/${PETSC_ARCH}/include
 #   /usr/include/petsc ...
 #
-# Either way, petscversion.h should lie around:
+# Either way, we must be able to find petscversion.h:
 #
 FIND_PATH(PETSC_INCLUDE_DIR_COMMON petscversion.h
   HINTS
@@ -103,32 +102,21 @@ FIND_PATH(PETSC_INCLUDE_DIR_COMMON petscversion.h
   PATH_SUFFIXES petsc include include/petsc
 )
 
-#
-# And finally set PETSC_INCLUDE_DIRS depending on the outcome of our crude
-# guess:
-#
-IF( PETSC_INCLUDE_DIR_ARCH MATCHES "-NOTFOUND" OR
-    PETSC_INCLUDE_DIR_COMMON MATCHES "-NOTFOUND" )
-  SET(PETSC_INCLUDE_DIRS "PETSC_INCLUDE_DIRS-NOTFOUND"
-    CACHE STRING "Include paths for petsc"
-    FORCE
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(PETSC DEFAULT_MSG
+  PETSC_LIBRARY
+  PETSC_INCLUDE_DIR_ARCH
+  PETSC_INCLUDE_DIR_COMMON
+  )
+
+IF(PETSC_FOUND)
+  SET(PETSC_LIBRARIES
+    ${PETSC_LIBRARY}
     )
-  UNSET(PETSC_INCLUDE_DIR_ARCH CACHE)
-  UNSET(PETSC_INCLUDE_DIR_COMMON CACHE)
-ELSE()
-  UNSET(PETSC_INCLUDE_DIRS CACHE)
   SET(PETSC_INCLUDE_DIRS
     ${PETSC_INCLUDE_DIR_ARCH}
     ${PETSC_INCLUDE_DIR_COMMON}
     )
-ENDIF()
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(PETSC DEFAULT_MSG
-  PETSC_LIBRARIES
-  PETSC_INCLUDE_DIRS
-  )
-
-IF(PETSC_FOUND)
   SET(PETSC_PETSCCONF_H "${PETSC_INCLUDE_DIR_ARCH}/petscconf.h")
   SET(PETSC_PETSCVERSION_H "${PETSC_INCLUDE_DIR_COMMON}/petscversion.h")
 
@@ -141,30 +129,6 @@ IF(PETSC_FOUND)
     SET(PETSC_WITH_MPIUNI FALSE)
   ELSE()
     SET(PETSC_WITH_MPIUNI TRUE)
-  ENDIF()
-
-  IF(PETSC_WITH_MPIUNI)
-    #
-    # TODO: Still needed? We have a way bigger problem with underlinkage so
-    #       far...
-    #
-    # If yes, add libmpiuni.so/a (if available)
-    # We need to link with it on some systems where PETSc is built without
-    # a real MPI and we need to handle trivial (one process) MPI
-    # functionality.
-    #
-    FIND_LIBRARY(PETSC_LIBMPIUNI
-      NAMES mpiuni
-      HINTS
-        ${PETSC_DIR}/${PETSC_ARCH}
-      PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
-      )
-    IF(NOT PETSC_LIBMPIUNI MATCHES "-NOTFOUND")
-      LIST(APPEND PETSC_LIBRARIES "${PETSC_LIBMPIUNI}")
-    ELSE()
-      SET(PETSC_LIBMPIUNI "")
-    ENDIF()
-    MARK_AS_ADVANCED(PETSC_LIBMPIUNI)
   ENDIF()
 
   FILE(STRINGS "${PETSC_PETSCVERSION_H}" PETSC_VERSION_MAJOR_STRING

@@ -28,12 +28,6 @@ SET_IF_EMPTY(BLACS_DIR "$ENV{BLACS_DIR}")
 
 INCLUDE(FindPackageHandleStandardArgs)
 
-#
-# SCALAPACK needs LAPACK and BLAS as dependency, search for them with the help
-# of the LAPACK find module:
-#
-FIND_PACKAGE(LAPACK)
-
 FIND_LIBRARY(SCALAPACK_LIBRARY NAMES scalapack
   HINTS
     ${SCALAPACK_DIR}
@@ -41,14 +35,11 @@ FIND_LIBRARY(SCALAPACK_LIBRARY NAMES scalapack
     lib${LIB_SUFFIX} lib64 lib
   )
 
-SET(SCALAPACK_LIBRARIES
-  ${SCALAPACK_LIBRARY}
-  ${LAPACK_LIBRARIES}
-  )
-
-SET(SCALAPACK_LINKER_FLAGS
-  ${LAPACK_LINKER_FLAGS}
-  )
+#
+# SCALAPACK needs LAPACK and BLAS as dependency, search for them with the help
+# of the LAPACK find module:
+#
+FIND_PACKAGE(LAPACK)
 
 #
 # Well, depending on the version of scalapack and the distribution it might
@@ -66,16 +57,30 @@ FOREACH(_lib blacs blacsCinit blacsF77init)
     PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib LIB
   )
   IF(NOT ${_lib_upper}_LIBRARY MATCHES "-NOTFOUND")
-    LIST(APPEND SCLAPACK_LIBRARIES
+    LIST(APPEND BLACS_LIBRARIES
       ${${_lib_upper}_LIBRARY}
       )
   ENDIF()
 ENDFOREACH()
 
 
-FIND_PACKAGE_HANDLE_STANDARD_ARGS(SCALAPACK DEFAULT_MSG SCALAPACK_LIBRARIES)
+SET(_output ${SCALAPACK_LIBRARY} ${BLACS_LIBRARIES})
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(SCALAPACK DEFAULT_MSG
+  _output # Cosmetic: Gives nice output
+  SCALAPACK_LIBRARY
+  LAPACK_FOUND
+  )
 
 IF(SCALAPACK_FOUND)
+  SET(SCALAPACK_LIBRARIES
+    ${SCALAPACK_LIBRARY}
+    ${LAPACK_LIBRARIES}
+    ${BLACS_LIBRARIES}
+    )
+  SET(SCALAPACK_LINKER_FLAGS
+    ${LAPACK_LINKER_FLAGS}
+    )
+
   MARK_AS_ADVANCED(
     lapack_LIBRARY
     atlas_LIBRARY

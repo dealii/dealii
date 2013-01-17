@@ -24,6 +24,7 @@
 INCLUDE(FindPackageHandleStandardArgs)
 
 SET_IF_EMPTY(P4EST_DIR "$ENV{P4EST_DIR}")
+SET_IF_EMPTY(SC_DIR "$ENV{SC_DIR}")
 
 #
 # We used to recommend installing p4est with a custom script that
@@ -46,15 +47,20 @@ ENDIF()
 # Search for the sc library, usually bundled with p4est. If no SC_DIR was
 # given, take what we chose for p4est.
 #
-SET_IF_EMPTY(SC_DIR "$ENV{SC_DIR}")
-SET_IF_EMPTY(SC_DIR "${P4EST_DIR}")
-FIND_PACKAGE(SC)
 
 FIND_PATH(P4EST_INCLUDE_DIR p4est.h
   HINTS
     ${P4EST_DIR}
   PATH_SUFFIXES
     p4est include/p4est include src
+  )
+
+FIND_PATH(SC_INCLUDE_DIR sc.h
+  HINTS
+    ${SC_DIR}
+    ${P4EST_DIR}
+  PATH_SUFFIXES
+    sc include/p4est include src sc/src
   )
 
 FIND_LIBRARY(P4EST_LIBRARY
@@ -65,22 +71,33 @@ FIND_LIBRARY(P4EST_LIBRARY
     lib${LIB_SUFFIX} lib64 lib src
   )
 
-SET(P4EST_LIBRARIES
-  ${P4EST_LIBRARY}
-  ${SC_LIBRARY}
+FIND_LIBRARY(SC_LIBRARY
+  NAMES sc
+  HINTS
+    ${SC_DIR}
+    ${P4EST_DIR}
+  PATH_SUFFIXES
+    lib${LIB_SUFFIX} lib64 lib src sc/src
   )
 
-SET(P4EST_INCLUDE_DIRS
-  ${P4EST_INCLUDE_DIR}
-  ${SC_INCLUDE_DIR}
-  )
-
+SET(_output ${P4EST_LIBRARY} ${SC_LIBRARY})
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(P4EST DEFAULT_MSG
-  P4EST_LIBRARIES
-  P4EST_INCLUDE_DIRS
+  P4EST_LIBRARY
+  SC_LIBRARY
+  P4EST_INCLUDE_DIR
+  SC_INCLUDE_DIR
   )
 
 IF(P4EST_FOUND)
+  SET(P4EST_LIBRARIES
+    ${P4EST_LIBRARY}
+    ${SC_LIBRARY}
+    )
+  SET(P4EST_INCLUDE_DIRS
+    ${P4EST_INCLUDE_DIR}
+    ${SC_INCLUDE_DIR}
+    )
+
   #
   # Determine mpi support of p4est:
   #
