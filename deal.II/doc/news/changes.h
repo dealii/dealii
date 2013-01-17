@@ -177,6 +177,14 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: Various variants of the TrilinosWrappers::SparseMatrix::reinit
+functions take a parameter <code>drop_tolerance</code> that allows to remove
+small values from the matrix and replace them by zero instead. This was not
+enforced for values on the diagonal of the matrix but only for off-diagonal
+ones. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2013/01/17)
+
 <li> New: All vector classes should now have a in_local_range()
 function indicating whether a given index is locally stored or not.
 <br>

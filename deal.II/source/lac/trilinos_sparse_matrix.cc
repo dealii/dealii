@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -623,8 +623,11 @@ set_matrix_values:
                                 "diagonal, the deal.II matrix must optimize it,"
                                 " too. And vice versa."));
               AssertDimension(it->column(), row);
-              values[col] = it->value();
-              row_indices[col++] = it->column();
+              if (std::fabs(it->value()) > drop_tolerance)
+		{
+		  values[col] = it->value();
+		  row_indices[col++] = it->column();
+		}
               ++select_index;
               ++it;
             }
