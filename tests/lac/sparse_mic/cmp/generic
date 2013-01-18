@@ -1,0 +1,28 @@
+
+DEAL::Size 4 Unknowns 9
+DEAL::Test 0
+DEAL::Relative residual with test vector 0:   left=0.071, right=0.170
+DEAL::Relative residual with test vector 1:   left=0.043, right=0.097
+DEAL::Relative residual with test vector 2:   left=0.073, right=0.146
+DEAL::Test 1
+DEAL::Relative residual with test vector 0:   left=0.093, right=0.210
+DEAL::Relative residual with test vector 1:   left=0.029, right=0.159
+DEAL::Relative residual with test vector 2:   left=0.110, right=0.192
+DEAL::Size 8 Unknowns 49
+DEAL::Test 0
+DEAL::Relative residual with test vector 0:   left=0.154, right=0.659
+DEAL::Relative residual with test vector 1:   left=0.204, right=0.561
+DEAL::Relative residual with test vector 2:   left=0.166, right=0.651
+DEAL::Test 1
+DEAL::Relative residual with test vector 0:   left=0.230, right=0.649
+DEAL::Relative residual with test vector 1:   left=0.148, right=0.629
+DEAL::Relative residual with test vector 2:   left=0.190, right=0.702
+DEAL::Size 16 Unknowns 225
+DEAL::Test 0
+DEAL::Relative residual with test vector 0:   left=0.305, right=1.589
+DEAL::Relative residual with test vector 1:   left=0.427, right=1.498
+DEAL::Relative residual with test vector 2:   left=0.333, right=1.572
+DEAL::Test 1
+DEAL::Relative residual with test vector 0:   left=0.278, right=1.428
+DEAL::Relative residual with test vector 1:   left=0.336, right=1.512
+DEAL::Relative residual with test vector 2:   left=0.390, right=1.476
