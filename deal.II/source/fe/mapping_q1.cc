@@ -739,8 +739,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
   std::vector<Point<spacedim> >                             &normal_vectors,
   CellSimilarity::Similarity                                &cell_similarity) const
 {
-  // ensure that the following cast
-  // is really correct:
+  // ensure that the following static_cast is really correct:
   Assert (dynamic_cast<InternalData *>(&mapping_data) != 0,
           ExcInternalError());
   InternalData &data = static_cast<InternalData &>(mapping_data);
@@ -754,10 +753,8 @@ MappingQ1<dim,spacedim>::fill_fe_values (
   const UpdateFlags update_flags(data.current_update_flags());
   const std::vector<double> &weights=q.get_weights();
 
-  // Multiply quadrature weights by
-  // Jacobian determinants or the area
-  // element g=sqrt(DX^t DX) in case of
-  // codim > 0
+  // Multiply quadrature weights by absolute value of Jacobian determinants or
+  // the area element g=sqrt(DX^t DX) in case of codim > 0
 
   if (update_flags & (update_normal_vectors
                       | update_JxW_values))
@@ -775,18 +772,22 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 
             if (dim == spacedim)
               {
-                JxW_values[point]
-                  = data.contravariant[point].determinant() * weights[point];
+                const double det = data.contravariant[point].determinant();
+
+                // check for distorted cells.
+
+                // TODO: this allows for anisotropies of up to 1e6 in 3D and
+                // 1e12 in 2D. might want to find a finer
+                // (dimension-independent) criterion
+                Assert (det > 1e-12*Utilities::fixed_power<dim>(cell->diameter()/
+                                                                std::sqrt(dim)),
+                        (typename Mapping<dim,spacedim>::ExcDistortedMappedCell(cell->center(), point)));
+
+                JxW_values[point] = weights[point] * det;
               }
-            // if dim==spacedim,
-            // then there is no
-            // cell normal to
-            // compute. since this
-            // is for FEValues (and
-            // not FEFaceValues),
-            // there are also no
-            // face normals to
-            // compute
+            // if dim==spacedim, then there is no cell normal to
+            // compute. since this is for FEValues (and not FEFaceValues),
+            // there are also no face normals to compute
             else //codim>0 case
               {
                 Tensor<1, spacedim> DX_t [dim];
@@ -836,8 +837,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
 
 
 
-  // copy values from InternalData to
-  // vector given by reference
+  // copy values from InternalData to vector given by reference
   if (update_flags & update_jacobians)
     {
       AssertDimension (jacobians.size(), n_q_points);
@@ -846,10 +846,8 @@ MappingQ1<dim,spacedim>::fill_fe_values (
           jacobians[point] = data.contravariant[point];
     }
 
-  // calculate values of the
-  // derivatives of the Jacobians. do
-  // it here, since we only do it for
-  // cells, not faces.
+  // calculate values of the derivatives of the Jacobians. do it here, since
+  // we only do it for cells, not faces.
   if (update_flags & update_jacobian_grads)
     {
       AssertDimension (jacobian_grads.size(), n_q_points);
@@ -883,9 +881,8 @@ MappingQ1<dim,spacedim>::fill_fe_values (
                           *
                           data.mapping_support_points[k][i]);
 
-              // never touch any data for j=dim in case
-              // dim<spacedim, so it will always be zero as
-              // it was initialized
+              // never touch any data for j=dim in case dim<spacedim, so it
+              // will always be zero as it was initialized
               for (unsigned int i=0; i<spacedim; ++i)
                 for (unsigned int j=0; j<dim; ++j)
                   for (unsigned int l=0; l<dim; ++l)
@@ -893,8 +890,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
             }
         }
     }
-  // copy values from InternalData to vector
-  // given by reference
+  // copy values from InternalData to vector given by reference
   if (update_flags & update_inverse_jacobians)
     {
       AssertDimension (inverse_jacobians.size(), n_q_points);
@@ -937,10 +933,8 @@ namespace internal
           if (update_flags & update_JxW_values)
             AssertDimension (JxW_values.size(), n_q_points);
 
-          // map the unit tangentials to the
-          // real cell. checking for d!=dim-1
-          // eliminates compiler warnings
-          // regarding unsigned int expressions <
+          // map the unit tangentials to the real cell. checking for d!=dim-1
+          // eliminates compiler warnings regarding unsigned int expressions <
           // 0.
           for (unsigned int d=0; d!=dim-1; ++d)
             {
@@ -957,30 +951,18 @@ namespace internal
                                  mapping_contravariant);
             }
 
-          // if dim==spacedim, we can use the
-          // unit tangentials to compute the
-          // boundary form by simply taking
-          // the cross product
+          // if dim==spacedim, we can use the unit tangentials to compute the
+          // boundary form by simply taking the cross product
           if (dim == spacedim)
             {
               for (unsigned int i=0; i<n_q_points; ++i)
                 switch (dim)
                   {
                   case 1:
-                    // in 1d, we don't
-                    // have access to
-                    // any of the
-                    // data.aux fields
-                    // (because it has
-                    // only dim-1
-                    // components), but
-                    // we can still
-                    // compute the
-                    // boundary form
-                    // simply by simply
-                    // looking at the
-                    // number of the
-                    // face
+                    // in 1d, we don't have access to any of the data.aux
+                    // fields (because it has only dim-1 components), but we
+                    // can still compute the boundary form simply by simply
+                    // looking at the number of the face
                     boundary_forms[i][0] = (face_no == 0 ?
                                             -1 : +1);
                     break;
@@ -996,16 +978,12 @@ namespace internal
             }
           else //(dim < spacedim)
             {
-              // in the codim-one case, the
-              // boundary form results from
-              // the cross product of all the
-              // face tangential vectors and
-              // the cell normal vector
+              // in the codim-one case, the boundary form results from the
+              // cross product of all the face tangential vectors and the cell
+              // normal vector
               //
-              // to compute the cell normal,
-              // use the same method used in
-              // fill_fe_values for cells
-              // above
+              // to compute the cell normal, use the same method used in
+              // fill_fe_values for cells above
               AssertDimension (data.contravariant.size(), n_q_points);
 
               for (unsigned int point=0; point<n_q_points; ++point)
@@ -1027,10 +1005,8 @@ namespace internal
                       cross_product(cell_normal,DX_t[0],DX_t[1]);
                       cell_normal /= cell_normal.norm();
 
-                      // then compute the face
-                      // normal from the face
-                      // tangent and the cell
-                      // normal:
+                      // then compute the face normal from the face tangent
+                      // and the cell normal:
                       cross_product (boundary_forms[point],
                                      data.aux[0][point], cell_normal);
 
