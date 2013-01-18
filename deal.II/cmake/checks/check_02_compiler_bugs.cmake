@@ -358,3 +358,37 @@ IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
 ENDIF()
 
 
+#
+# icc-13 triggers an internal compiler error when compiling
+# std::numeric_limits<...>::min() with -std=c++0x [1].
+# Just disable C++11 support completely in this case.
+#
+# Reported by Ted Kord.
+#
+# - Matthias Maier, 2013
+#
+# [1] http://software.intel.com/en-us/forums/topic/328902
+#
+CHECK_CXX_COMPILER_BUG(
+  "
+  #include <limits>
+  struct Integer
+  {
+    static const int min_int_value;
+    static const int max_int_value;
+  };
+  const int Integer::min_int_value = std::numeric_limits<int>::min();
+  const int Integer::max_int_value = std::numeric_limits<int>::max();
+  int main() { return 0; }
+  "
+  DEAL_II_ICC_NUMERICLIMITS_BUG)
+
+IF(DEAL_II_ICC_NUMERICLIMITS_BUG)
+  MESSAGE(STATUS
+    "DEAL_II_ICC_NUMERICLIMITS_BUG found, disabling c++11 support"
+    )
+  STRIP_FLAG(CMAKE_CXX_FLAGS "${DEAL_II_CXX11_FLAG}")
+  SET(DEAL_II_CAN_USE_CXX1X FALSE)
+  SET(DEAL_II_CAN_USE_CXX11 FALSE)
+ENDIF()
+
