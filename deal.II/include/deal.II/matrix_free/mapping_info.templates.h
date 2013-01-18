@@ -436,12 +436,9 @@ end_set:
                       current_data.jacobians.push_back (transpose(invert(jac)));
                       const Tensor<2,dim,VectorizedArray<Number> > &inv_jac = current_data.jacobians.back();
 
-                      // TODO: deal.II does not use abs on determinants. Is
-                      // there an assumption somewhere that negative
-                      // determinants are not allowed?
                       if (update_flags & update_JxW_values)
                         current_data.JxW_values.push_back
-                        (std::abs(det) * current_data.quadrature_weights[fe_index][q]);
+                        (det * current_data.quadrature_weights[fe_index][q]);
 
                       if (update_flags & update_jacobian_grads)
                         {
@@ -576,7 +573,7 @@ end_set:
                       cartesian_data[it->second].first[d] = 1./jac_d;
                       det *= jac_d;
                     }
-                  cartesian_data[it->second].second = std::abs(det);
+                  cartesian_data[it->second].second = det;
                 }
               affine_data.resize(affines.size());
               for (typename std::map<Tensor<2,dim,VEC_ARRAY>,
@@ -590,8 +587,8 @@ end_set:
                            v<VectorizedArray<Number>::n_array_elements; ++v)
                         jac[d][e][v] = it->first[d][e][v];
 
+                  affine_data[it->second].second = determinant(jac);
                   affine_data[it->second].first = transpose(invert(jac));
-                  affine_data[it->second].second = std::abs(determinant(jac));
                 }
             }
         }
