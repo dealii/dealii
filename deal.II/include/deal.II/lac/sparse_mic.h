@@ -28,11 +28,11 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>The decomposition</h3>
  *
- * Let a sparse matrix A is in the form A = - L - U + D, where -L and
- * -U are strictly lower and upper triangular matrices. The MIC(0)
- * decomposition of the matrix A is defined by B = (X-L)X^(-1)(X-U),
- * where X is a diagonal matrix, defined by the condition rowsum(A) =
- * rowsum(B).
+ * Let a sparse matrix $A$ be in the form $A = - L - U + D$, where $-L$ and
+ * $-U$ are strictly lower and upper triangular matrices. The MIC(0)
+ * decomposition of the matrix $A$ is defined by $B = (X-L)X^(-1)(X-U)$,
+ * where $X$ is a diagonal matrix, defined by the condition $\text{rowsum}(A) =
+ * \text{rowsum}(B)$.
  *
  * @author Stephen "Cheffo" Kolaroff, 2002, unified interface: Ralf
  * Hartmann 2003.
@@ -43,21 +43,23 @@ class SparseMIC : public SparseLUDecomposition<number>
 public:
   /**
    * Constructor. Does nothing, so
-   * you have to call @p reinit
+   * you have to call @p decompose
    * sometimes afterwards.
    */
   SparseMIC ();
 
   /**
-   * Constructor. Initialize the
-   * sparsity pattern of this
-   * object with the given
-   * argument.
+   * @deprecated This method is deprecated, and
+   * left for backward
+   * compatibility. It will be removed
+   * in later versions.
+   * Instead, pass the sparsity pattern that you want used for
+   * the decomposition in the AdditionalData structure.
    */
-  SparseMIC (const SparsityPattern &sparsity);
+  SparseMIC (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
 
   /**
-   * Destruction.
+   * Destructor.
    */
   virtual ~SparseMIC();
 
@@ -88,17 +90,45 @@ public:
   void reinit (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
 
   /**
-   * Same as @p decompose.
+   * Perform the incomplete LU
+   * factorization of the given
+   * matrix.
+   *
+   * This function needs to be
+   * called before an object of
+   * this class is used as
+   * preconditioner.
+   *
+   * For more details about
+   * possible parameters, see the
+   * class documentation of
+   * SparseLUDecomposition and the
+   * documentation of the
+   * @p SparseLUDecomposition::AdditionalData
+   * class.
+   *
+   * According to the
+   * @p parameters, this function
+   * creates a new SparsityPattern
+   * or keeps the previous sparsity
+   * or takes the sparsity given by
+   * the user to @p data. Then,
+   * this function performs the MIC
+   * decomposition.
+   *
+   * After this function is called
+   * the preconditioner is ready to
+   * be used.
    */
   template <typename somenumber>
   void initialize (const SparseMatrix<somenumber> &matrix,
-                   const AdditionalData parameters);
+                   const AdditionalData &parameters = AdditionalData());
 
   /**
-   * This method is deprecated, and
+   * @deprecate This method is deprecated, and
    * left for backward
    * compability. It will be
-   * removed in later versions.
+   * removed in later versions. Use initialize() instead.
    */
   template <typename somenumber>
   void decompose (const SparseMatrix<somenumber> &matrix,

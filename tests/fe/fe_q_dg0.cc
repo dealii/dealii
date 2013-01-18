@@ -456,13 +456,13 @@ namespace Step22
     const unsigned int n_u = dofs_per_block[0],
                        n_p = dofs_per_block[1];
 
-    std::cout << "   Number of active cells: "
-              << triangulation.n_active_cells()
-              << std::endl
-              << "   Number of degrees of freedom: "
-              << dof_handler.n_dofs()
-              << " (" << n_u << '+' << n_p << ')'
-              << std::endl;
+    deallog << "   Number of active cells: "
+	    << triangulation.n_active_cells()
+	    << std::endl
+	    << "   Number of degrees of freedom: "
+	    << dof_handler.n_dofs()
+	    << " (" << n_u << '+' << n_p << ')'
+	    << std::endl;
 
     {
       BlockCompressedSimpleSparsityPattern csp (2,2);
@@ -618,9 +618,7 @@ namespace Step22
                                                 local_dof_indices,
                                                 system_matrix, system_rhs);
       }
-
-    std::cout << "   Computing preconditioner..." << std::endl << std::flush;
-
+    
     A_preconditioner
       = std_cxx1x::shared_ptr<typename InnerPreconditioner<dim>::type>(new
           typename InnerPreconditioner<dim>::type());
@@ -662,11 +660,6 @@ namespace Step22
                 m_inverse);
 
       constraints.distribute (solution);
-
-      std::cout << "  "
-                << solver_control.last_step()
-                << " outer CG Schur complement iterations for pressure"
-                << std::endl;
 
     }
 
@@ -718,8 +711,8 @@ namespace Step22
       sqrt(difference_per_cell.mean_value()*n_active_cells);
 
     divergence_velocity(solution, difference_per_cell, quadrature, false);
-    std::cout<<"maximum divergence per cell: "
-             <<difference_per_cell.linfty_norm()<<std::endl;
+//    std::cout<<"maximum divergence per cell: "
+//             <<difference_per_cell.linfty_norm()<<std::endl;
 
     //int_\Omega (f(x)-c)^2 dx is minimized for c=1/|\Omega|\int_\Omega f(x)dx.
     //That gives \int_\Omega f(x)^2 dx - 1/|\Omega|(\int_\Omega f(x) dx)^2
@@ -733,16 +726,16 @@ namespace Step22
     double L2_error_pressure = difference_per_cell.l2_norm() *
                                difference_per_cell.l2_norm();
 
-    std::cout<<"l2 difference "<<L2_error_pressure<<std::endl;
+//    std::cout<<"l2 difference "<<L2_error_pressure<<std::endl;
 
     VectorTools::integrate_difference (dof_handler, solution, exactsolution,
                                        difference_per_cell, quadrature,
                                        VectorTools::mean,&pressure_mask);
     double integral = difference_per_cell.mean_value()*n_active_cells;
-    std::cout<<"mean difference "<<integral *integral<<std::endl;
+				     //std::cout<<"mean difference "<<integral *integral<<std::endl;
     L2_error_pressure -= integral*integral;
 
-    std::cout<<"Pressure error squared: "<<L2_error_pressure<<std::endl;
+//    std::cout<<"Pressure error squared: "<<L2_error_pressure<<std::endl;
     L2_error_pressure = (L2_error_pressure>0)?sqrt(L2_error_pressure):0;
 
     /*Vector<double> difference(dim+1);
@@ -800,31 +793,29 @@ namespace Step22
     for (unsigned int refinement_cycle = 0; refinement_cycle<5;
          ++refinement_cycle)
       {
-        std::cout << "Refinement cycle " << refinement_cycle << std::endl;
+        deallog << "Refinement cycle " << refinement_cycle << std::endl;
 
         if (refinement_cycle > 0)
           triangulation.refine_global(1);
 
         setup_dofs ();
 
-        std::cout << "   Assembling..." << std::endl << std::flush;
         assemble_system ();
 
-        std::cout << "   Solving..." << std::flush;
         solve ();
 
         output_results (refinement_cycle);
 
-        std::cout << std::endl;
+        deallog << std::endl;
       }
 
-    convergence_table.set_precision("L2_v", 3);
-    convergence_table.set_precision("H1_v", 3);
-    convergence_table.set_precision("Linfty_v", 3);
-    convergence_table.set_precision("L2_div_v", 3);
-    convergence_table.set_precision("L2_p", 3);
-    convergence_table.set_precision("H1_p", 3);
-    convergence_table.set_precision("Linfty_p", 3);
+    convergence_table.set_precision("L2_v", 7);
+    convergence_table.set_precision("H1_v", 7);
+    convergence_table.set_precision("Linfty_v", 7);
+    convergence_table.set_precision("L2_div_v", 7);
+    convergence_table.set_precision("L2_p", 7);
+    convergence_table.set_precision("H1_p", 7);
+    convergence_table.set_precision("Linfty_p", 7);
 
     convergence_table.set_scientific("L2_v", true);
     convergence_table.set_scientific("H1_v", true);
@@ -852,14 +843,6 @@ namespace Step22
 
     //std::cout << std::endl;
     //convergence_table.write_text(std::cout);
-
-
-    std::ostringstream error_filename;
-    error_filename  << "error-"
-                    << Utilities::int_to_string (degree, 1)
-                    << ".tex";
-    std::ofstream error_table_file(error_filename.str().c_str());
-    convergence_table.write_tex(error_table_file);
 
 
     convergence_table.add_column_to_supercolumn("cycle", "n cells");

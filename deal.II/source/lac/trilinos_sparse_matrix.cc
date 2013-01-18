@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -574,7 +574,7 @@ namespace TrilinosWrappers
         return;
       }
 
-    unsigned int n_rows = dealii_sparse_matrix.m();
+    const unsigned int n_rows = dealii_sparse_matrix.m();
 
     Assert (input_row_map.NumGlobalElements() == (int)n_rows,
             ExcDimensionMismatch (input_row_map.NumGlobalElements(),
@@ -587,17 +587,15 @@ namespace TrilinosWrappers
       (use_this_sparsity!=0)? *use_this_sparsity :
       dealii_sparse_matrix.get_sparsity_pattern();
 
-    if (matrix.get() != 0 && m() == n_rows &&
-        n_nonzero_elements() == sparsity_pattern.n_nonzero_elements())
-      goto set_matrix_values;
-
+    if (matrix.get() == 0 ||
+	m() != n_rows ||
+        n_nonzero_elements() != sparsity_pattern.n_nonzero_elements())
     {
       SparsityPattern trilinos_sparsity;
       trilinos_sparsity.reinit (input_row_map, input_col_map, sparsity_pattern);
       reinit (trilinos_sparsity);
     }
 
-set_matrix_values:
     // fill the values. the same as above: go through all rows of the matrix,
     // and then all columns. since the sparsity patterns of the input matrix
     // and the specified sparsity pattern might be different, need to go
@@ -623,8 +621,11 @@ set_matrix_values:
                                 "diagonal, the deal.II matrix must optimize it,"
                                 " too. And vice versa."));
               AssertDimension(it->column(), row);
-              values[col] = it->value();
-              row_indices[col++] = it->column();
+              if (std::fabs(it->value()) > drop_tolerance)
+		{
+		  values[col] = it->value();
+		  row_indices[col++] = it->column();
+		}
               ++select_index;
               ++it;
             }

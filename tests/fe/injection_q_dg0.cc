@@ -22,5 +22,11 @@ void test ()
 {
   for (unsigned int i=1; i<4; ++i)
     for (unsigned int j=i; j<4; ++j)
-      do_check (FE_Q_DG0<dim>(i), FE_Q_DG0<dim>(j));
+      {
+	deallog << "inj " << i << " " << j << ":" << std::endl;
+	
+	
+	do_check (FE_Q_DG0<dim>(i), FE_Q_DG0<dim>(j));
+      }
+  
 }

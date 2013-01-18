@@ -718,6 +718,20 @@ public:
    */
   DeclException0(ExcTransformationFailed);
 
+  /**
+   * deal.II assumes the Jacobian determinant to be positive. When the cell
+   * geometry is distorted under the image of the mapping, the mapping becomes
+   * invalid and this exception is thrown.
+   *
+   * @ingroup Exceptions
+   */
+  DeclException2 (ExcDistortedMappedCell,
+                  Point<spacedim>, int,
+                  << "The image of the mapping applied to cell with center ["
+                  << arg1 << "] is distorted. The cell geometry or the "
+                  << "mapping are invalid and yield non-positive volume "
+                  << "fractions in quadrature point " << arg2 << ".");
+
 private:
 
   /**

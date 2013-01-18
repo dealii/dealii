@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2009 by the deal.II authors
+//    Copyright (C) 2009, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -526,58 +526,13 @@ template <int dim>
 void LaplaceProblem<dim>::postprocess ()
 {
   Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
-  KellyErrorEstimator<dim>::estimate (dof_handler,
-				      face_quadrature_collection,
-				      typename FunctionMap<dim>::type(),
-				      solution,
-				      estimated_error_per_cell);
+  for (unsigned int i=0; i<estimated_error_per_cell.size(); ++i)
+    estimated_error_per_cell(i) = i;
 
-  Vector<float> smoothness_indicators (triangulation.n_active_cells());
-  estimate_smoothness (smoothness_indicators);
-
-
-  {
-    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-						     estimated_error_per_cell,
-						     0.3, 0.03);
-
-    float max_smoothness = *std::min_element (smoothness_indicators.begin(),
-					      smoothness_indicators.end()),
-	  min_smoothness = *std::max_element (smoothness_indicators.begin(),
-					      smoothness_indicators.end());
-    {
-      typename hp::DoFHandler<dim>::active_cell_iterator
-	cell = dof_handler.begin_active(),
-	endc = dof_handler.end();
-      for (unsigned int index=0; cell!=endc; ++cell, ++index)
-	if (cell->refine_flag_set())
-	  {
-	    max_smoothness = std::max (max_smoothness,
-				       smoothness_indicators(index));
-	    min_smoothness = std::min (min_smoothness,
-				       smoothness_indicators(index));
-	  }
-    }
-    const float threshold_smoothness = (max_smoothness + min_smoothness) / 2;
-
-    {
-      typename hp::DoFHandler<dim>::active_cell_iterator
-	cell = dof_handler.begin_active(),
-	endc = dof_handler.end();
-      for (unsigned int index=0; cell!=endc; ++cell, ++index)
-	if (cell->refine_flag_set()
-	    &&
-	    (smoothness_indicators(index) > threshold_smoothness)
-	    &&
-	    (cell->active_fe_index()+1 < fe_collection.size()))
-	  {
-	    cell->clear_refine_flag();
-	    cell->set_active_fe_index (cell->active_fe_index() + 1);
-	  }
-    } 
-
-    triangulation.execute_coarsening_and_refinement ();
-  }
+  GridRefinement::refine_and_coarsen_fixed_number (triangulation,
+						   estimated_error_per_cell,
+						   0.3, 0.03);
+  triangulation.execute_coarsening_and_refinement ();
 }
 
 

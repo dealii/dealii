@@ -1727,7 +1727,7 @@ namespace internals
   // the row of a SparseMatrix<number>.
   namespace dealiiSparseMatrix
   {
-    template <typename number>
+    template <typename SparseMatrixIterator>
     static inline
     void add_value (const double value,
                     const unsigned int row,
@@ -1735,22 +1735,22 @@ namespace internals
                     const unsigned int *col_ptr,
                     const bool   are_on_diagonal,
                     unsigned int &counter,
-                    number       *val_ptr)
+                    SparseMatrixIterator      val_ptr)
     {
       if (value != 0.)
         {
           Assert (col_ptr != 0,
-                  typename SparseMatrix<number>::ExcInvalidIndex (row, column));
+                  typename SparseMatrix<typename SparseMatrixIterator::MatrixType::value_type>::ExcInvalidIndex (row, column));
           if (are_on_diagonal)
             {
-              val_ptr[0] += value;
+              val_ptr->value() += value;
               return;
             }
           while (col_ptr[counter] < column)
             ++counter;
           Assert (col_ptr[counter] == column,
-                  typename SparseMatrix<number>::ExcInvalidIndex(row, column));
-          val_ptr[counter] += static_cast<number>(value);
+                  typename SparseMatrix<typename SparseMatrixIterator::MatrixType::value_type>::ExcInvalidIndex(row, column));
+          (val_ptr+counter)->value() += value;
         }
     }
   }
@@ -1788,8 +1788,10 @@ namespace internals
 
     const unsigned int *col_ptr = sparsity.row_length(row) == 0 ? 0 :
                                   &sparsity_struct[row_start[row]];
-    number *val_ptr = sparsity.row_length(row) == 0 ? 0 :
-                      &sparse_matrix->global_entry (row_start[row]);
+    typename SparseMatrix<number>::iterator
+    val_ptr = (sparsity.row_length(row) == 0 ?
+    		   sparse_matrix->end() :
+               sparse_matrix->begin(row));
     const bool optimize_diagonal = sparsity.optimize_diagonal();
     unsigned int counter = optimize_diagonal;
 
@@ -1843,7 +1845,7 @@ namespace internals
                                               global_rows.global_row(j), col_ptr,
                                               false, counter, val_ptr);
               }
-            val_ptr[0] += matrix_ptr[loc_row];
+            val_ptr->value() += matrix_ptr[loc_row];
             for (unsigned int j=i+1; j<column_end; ++j)
               {
                 const unsigned int loc_col = global_rows.local_row(j);
@@ -1863,8 +1865,8 @@ namespace internals
                                                global_rows.global_row(j), col_ptr,
                                                false, counter, val_ptr);
               }
-            val_ptr[0] += resolve_matrix_entry (global_rows, global_rows, i, i, loc_row,
-                                                local_matrix);
+            val_ptr->value() += resolve_matrix_entry (global_rows, global_rows, i, i, loc_row,
+                                                      local_matrix);
             for (unsigned int j=i+1; j<column_end; ++j)
               {
                 double col_val = resolve_matrix_entry (global_rows, global_rows, i, j,
