@@ -352,7 +352,7 @@ namespace SLEPcWrappers
     };
 
     /**
-     * Pointer to the <code>dealii::SolverData</code> object.
+     * Pointer to the <code>SolverData</code> object.
      */
     std_cxx1x::shared_ptr<SolverData> solver_data;
   };

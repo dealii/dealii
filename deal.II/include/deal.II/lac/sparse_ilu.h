@@ -118,10 +118,8 @@ public:
                    const AdditionalData &parameters = AdditionalData());
 
   /**
-   * @deprecate This method is deprecated, and
-   * left for backward
-   * compability. It will be
-   * removed in later versions.
+   * @deprecated This method is deprecated, and left for backward
+   * compability. It will be removed in later versions.
    */
   template <typename somenumber>
   void decompose (const SparseMatrix<somenumber> &matrix,
