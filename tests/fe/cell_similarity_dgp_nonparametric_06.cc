@@ -148,7 +148,7 @@ void test()
   subdivisions[0] = 2;
   GridGenerator::subdivided_hyper_rectangle(tr, subdivisions, p1, p2);
 
-  static const HyperBallBoundary<dim> boundary;
+  static const HyperBallBoundary<dim> boundary(tr.begin_active()->center());
   tr.set_boundary (1, boundary);
 
 				   // set boundary id on cell 1
