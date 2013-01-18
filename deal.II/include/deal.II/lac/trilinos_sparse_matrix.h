@@ -677,7 +677,14 @@ namespace TrilinosWrappers
      * This is a collective operation
      * that needs to be called on all
      * processors in order to avoid a
-     * dead lock.
+     * deadlock.
+     *
+     * @note If a different sparsity pattern is given in the last argument
+     * (i.e., one that differs from the one used in the sparse matrix given
+     * in the first argument), then the resulting Trilinos matrix will have
+     * the sparsity pattern so given. This of course also means that all
+     * entries in the given matrix that are not part of this separate
+     * sparsity pattern will in fact be dropped.
      */
     template <typename number>
     void reinit (const ::dealii::SparseMatrix<number> &dealii_sparse_matrix,
