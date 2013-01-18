@@ -57,11 +57,14 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-w2")
 #
 # Disable some warnings that lead to a lot of false positives:
 #
+#   -w68   integer conversion resulted in a change of sign
+#          (triggers a lot in functionparser)
 #   -w175  subscript out of range
 #   -w177  declared but not referenced
 #   -w1478 deprecation warning
 #   -w1572 floating-point equality and inequality comparisons are unreliable
 #
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd68")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd175")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd177")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1478")
