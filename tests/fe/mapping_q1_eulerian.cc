@@ -66,7 +66,7 @@ show_values(FiniteElement<dim>& fe,
 	{
 	  deallog << "Values: " << fe_values.shape_value(i,k);
 	  deallog << ",  Grad: " << fe_values.shape_grad(i,k);
-	  deallog << ",  2nd: " << fe_values.shape_2nd_derivative(i,k);
+	  deallog << ",  2nd: " << fe_values.shape_hessian(i,k);
 	  deallog << std::endl;
 	}
     }

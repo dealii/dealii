@@ -76,13 +76,13 @@ plot_shape_functions(Mapping<dim>& mapping,
 				(fe.shape_grad(i,k) ==
 				 fe.shape_grad_component(i,k,c))
 				&&
-				(fe.shape_2nd_derivative(i,k) ==
-				 fe.shape_2nd_derivative_component(i,k,c)),
+				(fe.shape_hessian(i,k) ==
+				 fe.shape_hessian_component(i,k,c)),
 				ExcInternalError())
 		      else
 			Assert ((fe.shape_value_component(i,k,c) == 0) &&
 				(fe.shape_grad_component(i,k,c) == Tensor<1,dim>()) &&
-				(fe.shape_2nd_derivative_component(i,k,c) == Tensor<2,dim>()),
+				(fe.shape_hessian_component(i,k,c) == Tensor<2,dim>()),
 				ExcInternalError());
 		    };
 		}
@@ -161,7 +161,7 @@ plot_face_shape_functions(
 				Assert((fe.shape_grad(i,k) == fe.shape_grad_component(i,k,c)),
 				       ExcInternalError());
 			      if (uflags & update_hessians)
-				Assert((fe.shape_2nd_derivative(i,k) == fe.shape_2nd_derivative_component(i,k,c)),
+				Assert((fe.shape_hessian(i,k) == fe.shape_hessian_component(i,k,c)),
 				       ExcInternalError());
 			    }
 			  else
@@ -173,7 +173,7 @@ plot_face_shape_functions(
 				Assert ((fe.shape_grad_component(i,k,c) == Tensor<1,dim>()),
 					ExcInternalError());
 			      if (uflags & update_hessians)
-				Assert ((fe.shape_2nd_derivative_component(i,k,c) == Tensor<2,dim>()),
+				Assert ((fe.shape_hessian_component(i,k,c) == Tensor<2,dim>()),
 					ExcInternalError());
 			    }
 			}
@@ -221,8 +221,8 @@ plot_face_shape_functions(
 				    }
 				  if (uflags & update_hessians)
 				    {
-				      const Tensor<2,dim> s1 = sub.shape_2nd_derivative(i,k),
-							  s2 = sub.shape_2nd_derivative_component(i,k,c);
+				      const Tensor<2,dim> s1 = sub.shape_hessian(i,k),
+							  s2 = sub.shape_hessian_component(i,k,c);
 				      Assert (s1 == s2, ExcInternalError());
 				    }
 				}
@@ -235,7 +235,7 @@ plot_face_shape_functions(
 				    Assert ((sub.shape_grad_component(i,k,c) == Tensor<1,dim>()),
 					    ExcInternalError());
 				  if (uflags & update_hessians)
-				    Assert ((sub.shape_2nd_derivative_component(i,k,c) == Tensor<2,dim>()),
+				    Assert ((sub.shape_hessian_component(i,k,c) == Tensor<2,dim>()),
 					    ExcInternalError());
 				}
 			    };
@@ -326,7 +326,7 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
       {
         for (unsigned int c=0; c<fe.n_components(); ++c)
           {
-            Tensor<2,dim> tmp=fe_values.shape_2nd_derivative_component(i,x,c);
+            Tensor<2,dim> tmp=fe_values.shape_hessian_component(i,x,c);
             tmp -= fe.shape_grad_grad_component(i,q.point(x),c);
             for (unsigned int j=0; j<dim; ++j)
               for (unsigned int k=0; k<dim; ++k)
@@ -342,11 +342,11 @@ check_values_and_derivatives (const FiniteElement<dim> &fe,
         if (fe.is_primitive(i))
           for (unsigned int c=0; c<fe.n_components(); ++c)
             Assert (((c == fe.system_to_component_index(i).first) &&
-                     (fe_values.shape_2nd_derivative(i,x) ==
-                      fe_values.shape_2nd_derivative_component(i,x,c)))
+                     (fe_values.shape_hessian(i,x) ==
+                      fe_values.shape_hessian_component(i,x,c)))
                     ||
                     ((c != fe.system_to_component_index(i).first) &&
-                     (fe_values.shape_2nd_derivative_component(i,x,c) == Tensor<2,dim>())),
+                     (fe_values.shape_hessian_component(i,x,c) == Tensor<2,dim>())),
                     ExcInternalError());
       }
 }

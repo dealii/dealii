@@ -55,7 +55,7 @@ plot_derivatives(Mapping<dim>& mapping,
 	      for (unsigned int i=0;i<finel.dofs_per_cell;++i)
 		{
 		  deallog << "\tGrad " << fe.shape_grad(i,k);
-		  deallog << "\t2nd " << fe.shape_2nd_derivative(i,k);
+		  deallog << "\t2nd " << fe.shape_hessian(i,k);
 		  deallog << std::endl;
 		}
 	      k++;
