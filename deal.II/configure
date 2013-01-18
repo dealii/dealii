@@ -4480,6 +4480,44 @@ $as_echo "no" >&6; }; all_cxx1x_classes_available=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for icc13 bug with C++11" >&5
+$as_echo_n "checking for icc13 bug with C++11... " >&6; }
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+       #include <limits>
+
+       struct Integer
+       {
+         static const int min_int_value;
+         static const int max_int_value;
+       };
+       const int Integer::min_int_value = std::numeric_limits<int>::min();
+       const int Integer::max_int_value = std::numeric_limits<int>::max();
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+       { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+else
+
+       { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }; all_cxx1x_classes_available=no
+
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
   CXXFLAGS="${OLD_CXXFLAGS}"
 
         { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether C++1x support is complete enough" >&5
@@ -5249,6 +5287,44 @@ $as_echo "yes" >&6; }
 else
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }; all_cxx1x_classes_available=no
+
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+
+
+                { $as_echo "$as_me:${as_lineno-$LINENO}: checking for icc13 bug with C++11" >&5
+$as_echo_n "checking for icc13 bug with C++11... " >&6; }
+  cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+       #include <limits>
+
+       struct Integer
+       {
+         static const int min_int_value;
+         static const int max_int_value;
+       };
+       const int Integer::min_int_value = std::numeric_limits<int>::min();
+       const int Integer::max_int_value = std::numeric_limits<int>::max();
+
+int
+main ()
+{
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+
+       { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+
+else
+
+       { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }; all_cxx1x_classes_available=no
+
 
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext

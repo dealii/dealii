@@ -9,7 +9,7 @@ dnl    In doc/Makefile some information on the kind of documentation
 dnl    is stored.
 dnl
 dnl
-dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+dnl Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 dnl
 dnl $Id$
 
@@ -1299,6 +1299,36 @@ AC_DEFUN(DEAL_II_CHECK_CXX1X_COMPONENTS, dnl
        [ AC_MSG_RESULT(yes) ],
        [ AC_MSG_RESULT(no); all_cxx1x_classes_available=no ]
        )
+
+
+  dnl icc-13 triggers an internal compiler error when compiling
+  dnl std::numeric_limits<...>::min() with -std=c++0x [1].
+  dnl Just disable C++11 support completely in this case.
+  dnl
+  dnl Reported by Ted Kord.
+  dnl
+  dnl [1] http://software.intel.com/en-us/forums/topic/328902
+  AC_MSG_CHECKING(for icc13 bug with C++11)
+  AC_TRY_COMPILE(
+      [
+       #include <limits>
+
+       struct Integer
+       {
+         static const int min_int_value;
+         static const int max_int_value;
+       };
+       const int Integer::min_int_value = std::numeric_limits<int>::min();
+       const int Integer::max_int_value = std::numeric_limits<int>::max();
+      ],
+      [],
+      [
+       AC_MSG_RESULT(no)
+      ],
+      [
+       AC_MSG_RESULT(yes); all_cxx1x_classes_available=no
+      ]
+     )
 
   CXXFLAGS="${OLD_CXXFLAGS}"
 
@@ -7486,4 +7516,3 @@ AC_DEFUN(DEAL_II_CONFIGURE_P4EST, dnl
     AC_MSG_RESULT(no)
   fi
 ])
-
