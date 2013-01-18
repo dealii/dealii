@@ -271,6 +271,8 @@ private:
                       unsigned int       (&indices)[(dim>0?dim:1)]) const;
 };
 
+/** @} */
+
 #ifndef DOXYGEN
 
 template <int dim>
