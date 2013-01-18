@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -10,9 +10,11 @@
 ##
 #####
 
-#
-# Check for various compiler bugs:
-#
+###########################################################################
+#                                                                         #
+#                    Check for various compiler bugs:                     #
+#                                                                         #
+###########################################################################
 
 
 #
@@ -316,8 +318,8 @@ CHECK_CXX_COMPILER_BUG(
   template class ConstIterator<S>;
   int main(){return 0;}
   "
-  DEAL_II_TYPE_QUALIFIER_BUG
-  )
+  DEAL_II_TYPE_QUALIFIER_BUG)
+
 IF(DEAL_II_TYPE_QUALIFIER_BUG)
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS -Wno-ignored-qualifiers)
   ENABLE_IF_SUPPORTED(CMAKE_C_FLAGS -Wno-ignored-qualifiers)
@@ -354,4 +356,5 @@ IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
     DEAL_II_BOOST_BIND_COMPILER_BUG
     )
 ENDIF()
+
 

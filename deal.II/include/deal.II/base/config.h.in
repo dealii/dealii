@@ -39,6 +39,171 @@
 #define DEAL_II_VERSION_MINOR @DEAL_II_VERSION_MINOR@
 
 
+/********************************************
+ * Configured in check_1_compiler_features: *
+ ********************************************/
+
+/* Defined if the compiler can use arithmetic operations on vectorized data types */
+#cmakedefine DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
+
+/* Defined if vector iterators are just plain pointers */
+#cmakedefine DEAL_II_VECTOR_ITERATOR_IS_POINTER
+
+/* Define if the compiler provides __builtin_expect */
+#cmakedefine HAVE_BUILTIN_EXPECT
+
+/* Define if the compiler provides __verbose_terminate_handler */
+#cmakedefine HAVE_VERBOSE_TERMINATE
+
+/* Define if deal.II is linked against a libc that provides stacktrace
+ * debug information that can be printed out in the exception class
+ * */
+#cmakedefine HAVE_GLIBC_STACKTRACE
+
+/* Defined if the std c++ library provides a demangler conforming to the
+ * GCC libstdc++ interface.
+ */
+#cmakedefine HAVE_LIBSTDCXX_DEMANGLER
+
+/* If already available, do not define at all. Otherwise, define to
+ * __func__ if that is available. In all other cases, indicate that no
+ * information about the present function is available for this compiler.
+ */
+#cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
+
+/* Set to the minimal number of elements a std::vector<T> can always hold,
+ * i.e. its minimal capacity.
+ */
+#define DEAL_II_MIN_VECTOR_CAPACITY @DEAL_II_MIN_VECTOR_CAPACITY@
+
+/* Set to the minimal number of elements a std::vector<bool> can always
+ * hold, i.e. its minimal capacity.
+ */
+#define DEAL_II_MIN_BOOL_VECTOR_CAPACITY @DEAL_II_MIN_BOOL_VECTOR_CAPACITY@
+
+/* If the compiler supports it, then this variable is defined to a string
+ * that when written after a function name makes the compiler emit a warning
+ * whenever this function is used somewhere that its use is deprecated.
+ */
+#cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
+
+
+/***************************************
+ * Configured in check_1_cpu_features: *
+ ***************************************/
+
+/* Defined if the system stores words with the most significant byte first */
+#cmakedefine DEAL_II_WORDS_BIGENDIAN
+
+/* Equal to 0 in the generic case, equal to 1 if CPU compiled for supports
+ * SSE2, equal to 2 if CPU compiled for supports AVX
+ */
+#define DEAL_II_COMPILER_VECTORIZATION_LEVEL @DEAL_II_COMPILER_VECTORIZATION_LEVEL@
+
+
+/***************************************
+ * Configured in check_1_cxx_features: *
+ ***************************************/
+
+/* Defined if the compiler we use supports the C++2011 standard well enough
+ * to allow using the standard library classes instead of the corresponding
+ * BOOST classes.
+ */
+#cmakedefine DEAL_II_CAN_USE_CXX1X
+
+/* Defined if isnan is available */
+#cmakedefine HAVE_ISNAN
+
+/* Defined if _isnan is available */
+#cmakedefine HAVE_UNDERSCORE_ISNAN
+
+/* Defined if std::isfinite is available */
+#cmakedefine DEAL_II_HAVE_ISFINITE
+
+
+/******************************************
+ * Configured in check_1_system_features: *
+ ******************************************/
+
+/* Defined if you have the <sys/resource.h> header file */
+#cmakedefine HAVE_SYS_RESOURCE_H
+
+/* Defined if you have the <sys/time.h> header file. */
+#cmakedefine HAVE_SYS_TIME_H
+
+/* Defined if you have the <sys/times.h> header file. */
+#cmakedefine HAVE_SYS_TIMES_H
+
+/* Defined if you have the <sys/types.h> header file. */
+#cmakedefine HAVE_SYS_TYPES_H
+
+/* Defined if you have the <unistd.h> header file. */
+#cmakedefine HAVE_UNISTD_H
+
+/* Defined if you have the "gethostname" function. */
+#cmakedefine HAVE_GETHOSTNAME
+
+/* Defined if you have the "getpid' function. */
+#cmakedefine HAVE_GETPID
+
+/* Defined if you have the "rand_r" function */
+#cmakedefine HAVE_RAND_R
+
+/* Defined if you have the "times" function. */
+#cmakedefine HAVE_TIMES
+
+/* Defined if you have the "jn" function. */
+#cmakedefine HAVE_JN
+
+/* Defined if deal.II was configured on a native Windows platform. */
+#cmakedefine DEAL_II_MSVC
+
+
+/****************************************
+ * Configured in check_2_compiler_bugs: *
+ ****************************************/
+
+/* Defined if we have to work around a bug where the compiler doesn't accept
+ * an explicit destructor call. See the aclocal.m4 file in the top-level
+ * directory for a description of this bug.
+ */
+#cmakedefine DEAL_II_EXPLICIT_DESTRUCTOR_BUG
+
+/* Defined if we have to work around a bug with some compilers that will not
+ * allow us to specify a fully specialized class of a template as a friend.
+ * See the aclocal.m4 file in the top-level directory for a description of
+ * this bug.
+ * */
+#cmakedefine DEAL_II_TEMPL_SPEC_FRIEND_BUG
+
+/* Defined if the compiler refuses to allow the explicit specialization of
+ * static member arrays. For the exact failure mode, look at aclocal.m4 in the
+ * top-level directory.
+ */
+#cmakedefine DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
+
+/* Defined if the compiler refuses to allow the explicit specialization of
+ * static member variables.
+ */
+#cmakedefine DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
+
+/* Defined if the compiler does not honor the explicit keyword on template
+ * constructors.
+ */
+#cmakedefine DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
+
+/* Defined if the compiler has a bug in deducing the type of pointers to const
+ * member functions.
+ */
+#cmakedefine DEAL_II_CONST_MEMBER_DEDUCTION_BUG
+
+/* Defined if the compiler gets an internal error compiling some code that
+ * involves boost::bind
+ */
+#cmakedefine DEAL_II_BOOST_BIND_COMPILER_BUG
+
+
+
 /*****************************************
  * Configured in configure_arpack.cmake: *
  *****************************************/
@@ -335,169 +500,6 @@
 #cmakedefine HAVE_LIBZ
 
 
-/**********************************************
- * Configured in check_for_compiler_features: *
- **********************************************/
-
-/* Defined if vector iterators are just plain pointers */
-#cmakedefine DEAL_II_VECTOR_ITERATOR_IS_POINTER
-
-/* Define if the compiler provides __builtin_expect */
-#cmakedefine HAVE_BUILTIN_EXPECT
-
-/* Define if the compiler provides __verbose_terminate_handler */
-#cmakedefine HAVE_VERBOSE_TERMINATE
-
-/* Define if deal.II is linked against a libc that provides stacktrace
- * debug information that can be printed out in the exception class
- * */
-#cmakedefine HAVE_GLIBC_STACKTRACE
-
-/* Defined if the std c++ library provides a demangler conforming to the
- * GCC libstdc++ interface.
- */
-#cmakedefine HAVE_LIBSTDCXX_DEMANGLER
-
-/* If already available, do not define at all. Otherwise, define to
- * __func__ if that is available. In all other cases, indicate that no
- * information about the present function is available for this compiler.
- */
-#cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
-
-/* Set to the minimal number of elements a std::vector<T> can always hold,
- * i.e. its minimal capacity.
- */
-#define DEAL_II_MIN_VECTOR_CAPACITY @DEAL_II_MIN_VECTOR_CAPACITY@
-
-/* Set to the minimal number of elements a std::vector<bool> can always
- * hold, i.e. its minimal capacity.
- */
-#define DEAL_II_MIN_BOOL_VECTOR_CAPACITY @DEAL_II_MIN_BOOL_VECTOR_CAPACITY@
-
-/* If the compiler supports it, then this variable is defined to a string
- * that when written after a function name makes the compiler emit a warning
- * whenever this function is used somewhere that its use is deprecated.
- */
-#cmakedefine DEAL_II_DEPRECATED @DEAL_II_DEPRECATED@
-
-
-
-/******************************************
- * Configured in check_for_compiler_bugs: *
- ******************************************/
-
-/* Defined if we have to work around a bug where the compiler doesn't accept
- * an explicit destructor call. See the aclocal.m4 file in the top-level
- * directory for a description of this bug.
- */
-#cmakedefine DEAL_II_EXPLICIT_DESTRUCTOR_BUG
-
-/* Defined if we have to work around a bug with some compilers that will not
- * allow us to specify a fully specialized class of a template as a friend.
- * See the aclocal.m4 file in the top-level directory for a description of
- * this bug.
- * */
-#cmakedefine DEAL_II_TEMPL_SPEC_FRIEND_BUG
-
-/* Defined if the compiler refuses to allow the explicit specialization of
- * static member arrays. For the exact failure mode, look at aclocal.m4 in the
- * top-level directory.
- */
-#cmakedefine DEAL_II_MEMBER_ARRAY_SPECIALIZATION_BUG
-
-/* Defined if the compiler refuses to allow the explicit specialization of
- * static member variables.
- */
-#cmakedefine DEAL_II_MEMBER_VAR_SPECIALIZATION_BUG
-
-/* Defined if the compiler does not honor the explicit keyword on template
- * constructors.
- */
-#cmakedefine DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
-
-/* Defined if the compiler has a bug in deducing the type of pointers to const
- * member functions.
- */
-#cmakedefine DEAL_II_CONST_MEMBER_DEDUCTION_BUG
-
-/* Defined if the compiler gets an internal error compiling some code that
- * involves boost::bind
- */
-#cmakedefine DEAL_II_BOOST_BIND_COMPILER_BUG
-
-
-
-/*****************************************
- * Configured in check_for_cxx_features: *
- *****************************************/
-
-/* Defined if the compiler we use supports the C++2011 standard well enough
- * to allow using the standard library classes instead of the corresponding
- * BOOST classes.
- */
-#cmakedefine DEAL_II_CAN_USE_CXX1X
-
-/* Defined if isnan is available */
-#cmakedefine HAVE_ISNAN
-
-/* Defined if _isnan is available */
-#cmakedefine HAVE_UNDERSCORE_ISNAN
-
-/* Defined if std::isfinite is available */
-#cmakedefine DEAL_II_HAVE_ISFINITE
-
-
-/********************************************
- * Configured in check_for_system_features: *
- ********************************************/
-
-/* Defined if the system stores words with the most significant byte first */
-#cmakedefine DEAL_II_WORDS_BIGENDIAN
-
-/* Equal to 0 in the generic case, equal to 1 if CPU compiled for supports
- * SSE2, equal to 2 if CPU compiled for supports AVX
- */
-#define DEAL_II_COMPILER_VECTORIZATION_LEVEL @DEAL_II_COMPILER_VECTORIZATION_LEVEL@
-
-/* Defined if the compiler can use arithmetic operations on vectorized data
- * types
- */
-#cmakedefine DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
-
-
-/* Defined if you have the <sys/resource.h> header file */
-#cmakedefine HAVE_SYS_RESOURCE_H
-
-/* Defined if you have the <sys/time.h> header file. */
-#cmakedefine HAVE_SYS_TIME_H
-
-/* Defined if you have the <sys/times.h> header file. */
-#cmakedefine HAVE_SYS_TIMES_H
-
-/* Defined if you have the <sys/types.h> header file. */
-#cmakedefine HAVE_SYS_TYPES_H
-
-/* Defined if you have the <unistd.h> header file. */
-#cmakedefine HAVE_UNISTD_H
-
-/* Defined if you have the "gethostname" function. */
-#cmakedefine HAVE_GETHOSTNAME
-
-/* Defined if you have the "getpid' function. */
-#cmakedefine HAVE_GETPID
-
-/* Defined if you have the "rand_r" function */
-#cmakedefine HAVE_RAND_R
-
-/* Defined if you have the "times" function. */
-#cmakedefine HAVE_TIMES
-
-/* Defined if you have the "jn" function. */
-#cmakedefine HAVE_JN
-
-
-/* Defined if deal.II was configured on a native Windows platform. */
-#cmakedefine DEAL_II_MSVC
 
 /* Disable a bunch of warnings for Microsoft Visual C++. */
 //#ifdef DEAL_II_MSVC
@@ -514,7 +516,6 @@
 //#  pragma warning( disable : 4789 ) /* destination of memory copy is too small */
 //#  pragma warning( disable : 4808 ) /* case 'value' is not a valid value for switch condition of type 'bool */
 //#endif // DEAL_II_MSVC
-
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/types.h>

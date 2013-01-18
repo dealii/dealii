@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -10,9 +10,55 @@
 ##
 #####
 
+###########################################################################
+#                                                                         #
+#                  Check for various compiler features:                   #
+#                                                                         #
+###########################################################################
+
 #
-# Check for various compiler features.
+# This file sets up:
 #
+#   DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS
+#   DEAL_II_VECTOR_ITERATOR_IS_POINTER
+#   HAVE_BUILTIN_EXPECT
+#   HAVE_VERBOSE_TERMINATE
+#   HAVE_GLIBC_STACKTRACE
+#   HAVE_LIBSTDCXX_DEMANGLER
+#   DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION
+#   DEAL_II_MIN_VECTOR_CAPACITY
+#   DEAL_II_MIN_BOOL_VECTOR_CAPACITY
+#   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
+#   DEAL_II_DEPRECATED
+#
+
+
+#
+# Check whether the compiler allows to use arithmetic operations
+# +-*/ on vectorized data types or whether we need to use
+# _mm_add_pd for addition and so on. +-*/ is preferred because
+# it allows the compiler to choose other optimizations like
+# fused multiply add, whereas _mm_add_pd explicitly enforces the
+# assembler command.
+#
+# - Matthias Maier, rewritten 2012
+#
+CHECK_CXX_SOURCE_COMPILES(
+  "
+  #include <emmintrin.h>
+  int main()
+  {
+    __m128d a, b;
+    a = _mm_set_sd (1.0);
+    b = _mm_set1_pd (2.1);
+    __m128d c = a + b;
+    __m128d d = b - c;
+    __m128d e = c * a + d;
+    __m128d f = e/a;
+    (void)f;
+  }
+  "
+  DEAL_II_COMPILER_USE_VECTOR_ARITHMETICS)
 
 
 #
@@ -107,16 +153,13 @@ CHECK_CXX_SOURCE_COMPILES(
 #
 # On Mac OS X, -rdynamic is accepted by the compiler (i.e.
 # it doesn't produce an error) but we always get a warning
-# that it isn't supported. That's pretty stupid because
-# we can't test for it. Consequently, only run the test
-# if not on OS X.
+# that it isn't supported. So, only enable -rdynamic on non-Darwin
+# platforms.
 #
 # - Matthias Maier, rewritten 2012
 #
 IF(HAVE_GLIBC_STACKTRACE AND NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
-
   ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-rdynamic")
-
 ENDIF()
 
 
@@ -234,11 +277,6 @@ GET_CXX_SOURCE_RETURN_VALUE(
   DEAL_II_MIN_VECTOR_CAPACITY_RETURN_VALUE)
 
 IF(NOT DEAL_II_MIN_VECTOR_CAPACITY)
-  # We have a problem...
-  MESSAGE(WARNING
-    "Could not determine DEAL_II_MIN_VECTOR_CAPACITY, "
-    "source might not compile..."
-    )
   SET(DEAL_II_MIN_VECTOR_CAPACITY 1)
 ELSE()
   SET(DEAL_II_MIN_VECTOR_CAPACITY
@@ -267,11 +305,6 @@ GET_CXX_SOURCE_RETURN_VALUE(
   DEAL_II_MIN_BOOL_VECTOR_CAPACITY_RETURN_VALUE)
 
 IF(NOT DEAL_II_MIN_BOOL_VECTOR_CAPACITY)
-  # We have a problem...
-  MESSAGE(WARNING
-    "Could not determine DEAL_II_MIN_VECTOR_CAPACITY, "
-    "source might not compile..."
-    )
   SET(DEAL_II_MIN_VECTOR_CAPACITY 1)
 ELSE()
   SET(DEAL_II_MIN_BOOL_VECTOR_CAPACITY

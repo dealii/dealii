@@ -86,6 +86,7 @@ ENDIF()
 # Run all system checks:
 #
 FILE(GLOB _check_files "cmake/checks/*.cmake")
+LIST(SORT _check_files)
 FOREACH(_file ${_check_files})
   MESSAGE(STATUS "")
   MESSAGE(STATUS "Include ${_file}")

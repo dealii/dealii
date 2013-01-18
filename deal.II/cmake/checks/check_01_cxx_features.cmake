@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -14,6 +14,16 @@
 
 #
 # Check for various C++ language features
+#
+# This file sets up
+#
+#   DEAL_II_HAVE_CXX11_FLAG
+#   DEAL_II_CXX11_FLAG
+#   DEAL_II_CAN_USE_CXX1X
+#   DEAL_II_CAN_USE_CXX11
+#   HAVE_ISNAN
+#   HAVE_UNDERSCORE_ISNAN
+#   DEAL_II_HAVE_ISFINITE
 #
 
 
