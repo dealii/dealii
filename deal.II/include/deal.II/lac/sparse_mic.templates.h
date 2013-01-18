@@ -140,14 +140,13 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
       const number temp = this->diag_element(row);
       number temp1 = 0;
 
-      unsigned int k = 0;
       // work on the lower left part of the matrix. we know
       // it's symmetric, so we can work with this alone
       for (typename SparseMatrix<somenumber>::const_iterator
     		  p = matrix.begin(row)+1;
     	   (p != matrix.end(row)) && (p->column() < p->row());
-    	   ++p, ++k)
-        temp1 += p->value() / diag[k] * inner_sums[k];
+    	   ++p)
+        temp1 += p->value() / diag[p->column()] * inner_sums[p->column()];
 
       Assert(temp-temp1 > 0, ExcStrengthenDiagonalTooSmall());
       diag[row] = temp - temp1;
