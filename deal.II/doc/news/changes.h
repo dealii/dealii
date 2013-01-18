@@ -183,7 +183,7 @@ added to the computation of the Jacobian determinants for the volume
 element that aborts whenever the Jacobian determinant in a quadrature
 point becomes too small or negative.
 <br>
-(Wolfgang Bangerth, 2013/01/17)
+(Martin Kronbichler, 2013/01/18)
 
 <li> Fixed: Various variants of the TrilinosWrappers::SparseMatrix::reinit
 functions take a parameter <code>drop_tolerance</code> that allows to remove
