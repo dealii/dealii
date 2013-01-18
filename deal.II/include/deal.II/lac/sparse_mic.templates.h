@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2011, 2012, 2013 by the deal.II authors
 //    by the deal.II authors and Stephen "Cheffo" Kolaroff
 //
 //    This file is subject to QPL and may not be  distributed
@@ -48,21 +48,18 @@ SparseMIC<number>::~SparseMIC()
 template <typename number>
 void SparseMIC<number>::clear()
 {
-  if (true)
-    {
-      std::vector<number> tmp;
-      tmp.swap (diag);
-    };
-  if (true)
-    {
-      std::vector<number> tmp;
-      tmp.swap (inv_diag);
-    };
-  if (true)
-    {
-      std::vector<number> tmp;
-      tmp.swap (inner_sums);
-    };
+  {
+    std::vector<number> tmp;
+    tmp.swap (diag);
+  }
+  {
+    std::vector<number> tmp;
+    tmp.swap (inv_diag);
+  }
+  {
+    std::vector<number> tmp;
+    tmp.swap (inner_sums);
+  }
 
   SparseLUDecomposition<number>::clear();
 }
@@ -84,21 +81,19 @@ void SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
 template <typename number>
 void SparseMIC<number>::reinit (const SparsityPattern &sparsity)
 {
-  if (true)
-    {
-      std::vector<number> tmp;
-      tmp.swap (diag);
-    };
-  if (true)
-    {
-      std::vector<number> tmp;
-      tmp.swap (inv_diag);
-    };
-  if (true)
-    {
-      std::vector<number> tmp;
-      tmp.swap (inner_sums);
-    };
+  {
+    std::vector<number> tmp;
+    tmp.swap (diag);
+  }
+  {
+    std::vector<number> tmp;
+    tmp.swap (inv_diag);
+  }
+  {
+    std::vector<number> tmp;
+    tmp.swap (inner_sums);
+  }
+
   SparseLUDecomposition<number>::reinit (sparsity);
 }
 
@@ -109,7 +104,6 @@ template <typename somenumber>
 void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
                                    const double                    strengthen_diagonal)
 {
-
   SparseLUDecomposition<number>::decompose(matrix, strengthen_diagonal);
 
   Assert (matrix.m()==matrix.n(), ExcNotQuadratic ());
@@ -136,24 +130,24 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
 
   // precalc sum(j=k+1, N, a[k][j]))
   for (unsigned int row=0; row<this->m(); row++)
-    {
-      inner_sums[row] = get_rowsum(row);
-    }
+    inner_sums[row] = get_rowsum(row);
 
   const unsigned int *const col_nums = this->get_sparsity_pattern().get_column_numbers();
   const std::size_t *const rowstarts = this->get_sparsity_pattern().get_rowstart_indices();
 
   for (unsigned int row=0; row<this->m(); row++)
     {
-      number temp = this->diag_element(row);
+      const number temp = this->diag_element(row);
       number temp1 = 0;
-      const unsigned int *const
-      first_after_diagonal = this->prebuilt_lower_bound[row];
 
       unsigned int k = 0;
-      for (const unsigned int *col=&col_nums[rowstarts[row]+1];
-           col<first_after_diagonal; ++col, ++k)
-        temp1 += matrix.global_entry (col-col_nums)/diag[k]*inner_sums[k];
+      // work on the lower left part of the matrix. we know
+      // it's symmetric, so we can work with this alone
+      for (typename SparseMatrix<somenumber>::const_iterator
+    		  p = matrix.begin(row)+1;
+    	   (p != matrix.end(row)) && (p->column() < p->row());
+    	   ++p, ++k)
+        temp1 += p->value() / diag[k] * inner_sums[k];
 
       Assert(temp-temp1 > 0, ExcStrengthenDiagonalTooSmall());
       diag[row] = temp - temp1;
@@ -169,18 +163,14 @@ inline number
 SparseMIC<number>::get_rowsum (const unsigned int row) const
 {
   Assert(this->m()==this->n(), ExcNotQuadratic());
-  // get start of this row. skip the
-  // diagonal element
-  const unsigned int *const column_numbers = this->get_sparsity_pattern().get_column_numbers();
-  const std::size_t   *const rowstart_indices = this->get_sparsity_pattern().get_rowstart_indices();
-  const unsigned int *const rowend = &column_numbers[rowstart_indices[row+1]];
 
-  // find the position where the part
-  // right of the diagonal starts
   const unsigned int *const first_after_diagonal = this->prebuilt_lower_bound[row];
   number rowsum =  0;
-  for (const unsigned int *col=first_after_diagonal; col!=rowend; ++col)
-    rowsum += this->global_entry (col-column_numbers);
+  for (typename SparseMatrix<number>::const_iterator
+      p = this->begin(row)+1;
+      p != this->end(row); ++p)
+    if (p->column() > p->row())
+    rowsum += p->value();
 
   return rowsum;
 }
@@ -214,13 +204,14 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
 
       // get start of this row. skip
       // the diagonal element
-      const unsigned int *const rowstart = &column_numbers[rowstart_indices[row]+1];
-      const unsigned int *const fad = this->prebuilt_lower_bound[row];
-      for (const unsigned int *col=rowstart; col!=fad; ++col)
-        dst(row) -= this->global_entry (col-column_numbers) * dst(*col);
+      for (typename SparseMatrix<number>::const_iterator
+          p = this->begin(row)+1;
+          (p != this->end(row)) && (p->column() < row);
+          ++p)
+        dst(row) -= p->value() * dst(p->column());
 
       dst(row) *= inv_diag[row];
-    };
+    }
 
   // Now: v = Xu
   for (unsigned int row=0; row<N; row++)
@@ -230,13 +221,15 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
   for (int row=N-1; row>=0; --row)
     {
       // get end of this row
-      const unsigned int *const rowend = &column_numbers[rowstart_indices[row+1]];
-      const  unsigned int *const fad = this->prebuilt_lower_bound[row];
-      for (const unsigned int *col=fad; col!=rowend; ++col)
-        dst(row) -= this->global_entry (col-column_numbers) * dst(*col);
+      for (typename SparseMatrix<number>::const_iterator
+          p = this->begin(row)+1;
+          p != this->end(row);
+          ++p)
+        if (p->column() > static_cast<unsigned int>(row))
+          dst(row) -= p->value() * dst(p->column());
 
       dst(row) *= inv_diag[row];
-    };
+    }
 }
 
 
