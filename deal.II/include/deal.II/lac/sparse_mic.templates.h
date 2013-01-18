@@ -72,7 +72,7 @@ template <typename number>
 template <typename somenumber>
 inline
 void SparseMIC<number>::initialize (const SparseMatrix<somenumber> &matrix,
-                                    const AdditionalData data)
+                                    const AdditionalData &data)
 {
   SparseLUDecomposition<number>::initialize(matrix, data);
 

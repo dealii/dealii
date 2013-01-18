@@ -40,7 +40,7 @@ SparseILU<number>::SparseILU (const SparsityPattern &sparsity) :
 template <typename number>
 template <typename somenumber>
 void SparseILU<number>::initialize (const SparseMatrix<somenumber> &matrix,
-                                    const AdditionalData data)
+                                    const AdditionalData &data)
 {
   SparseLUDecomposition<number>::initialize(matrix, data);
 

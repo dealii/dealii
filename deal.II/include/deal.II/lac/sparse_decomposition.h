@@ -25,8 +25,8 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 /**
- * Abstract base class for sparse LU decompositions of a sparse matrix
- * into another sparse matrix. This class can't be used by itself, but
+ * Abstract base class for incomplete decompositions of a sparse matrix
+ * into sparse factors. This class can't be used by itself, but
  * only as the base class of derived classes that actually implement
  * particular decompositions such as SparseILU or SparseMIC.
  *
@@ -39,10 +39,11 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>Fill-in</h3>
  *
- * The sparse LU decompositions are frequently used with additional
- * fill-in, i.e. the sparsity structure of the decomposition is denser
+ * Sparse decompositions are frequently used with additional
+ * fill-in, i.e., the sparsity structure of the decomposition is denser
  * than that of the matrix to be decomposed. The initialize()
- * function of this class allows this fill-in as long as all entries
+ * function of this class allows this fill-in via the AdditionalData
+ * object as long as all entries
  * present in the original matrix are present in the decomposition
  * also, i.e. the sparsity pattern of the decomposition is a superset
  * of the sparsity pattern in the original matrix.
@@ -148,10 +149,12 @@ protected:
   SparseLUDecomposition ();
 
   /**
-   * This method is deprecated, and
+   * @deprecated This method is deprecated, and
    * left for backward
-   * compability. It will be removed
+   * compatibility. It will be removed
    * in later versions.
+   * Instead, pass the sparsity pattern that you want used for
+   * the decomposition in the AdditionalData structure.
    */
   SparseLUDecomposition (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
 
