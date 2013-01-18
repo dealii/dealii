@@ -358,29 +358,12 @@ CHECK_CXX_SOURCE_COMPILES(
 
 	  int main () {}
   "
-  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
+  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
+  )
 
-# ...and then verify whether it actually errors out if
-# -Werror is given
-PUSH_TEST_FLAG("-Werror")
-CHECK_CXX_SOURCE_COMPILES(
-  "
-          int old_fn () __attribute__((deprecated));
-          int old_fn () { return 0; }
-          int (*fn_ptr)() = old_fn;
-
-	  int main () {}
-  "
-  DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED_WARNING)
-POP_TEST_FLAG()
-
-IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
-   AND
-   (NOT DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED_WARNING))
-  MESSAGE(STATUS "Compiler supports the deprecated attribute")
+IF(DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED)
   SET(DEAL_II_DEPRECATED "__attribute__((deprecated))")
 ELSE()
-  MESSAGE(STATUS "Compiler does not support the deprecated attribute")
   SET(DEAL_II_DEPRECATED " ")
 ENDIF()
 
