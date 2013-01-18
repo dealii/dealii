@@ -665,7 +665,6 @@ namespace SLEPcWrappers
                      std::vector<OutputVector>       &vr,
                      const unsigned int               n_eigenvectors = 1)
   {
-    int ierr;
     unsigned int n_converged = 0;
 
     // Set the matrices of the problem 
