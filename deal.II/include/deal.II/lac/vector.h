@@ -1200,7 +1200,7 @@ unsigned int Vector<Number>::size () const
 template <typename Number>
 inline
 bool Vector<Number>::in_local_range
-(const types::global_dof_index global_index) const
+(const types::global_dof_index) const
 {
   return true;
 }
