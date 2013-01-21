@@ -144,18 +144,13 @@ SparseMatrix<number>::operator = (const double d)
   Assert (cols != 0, ExcNotInitialized());
   Assert (cols->compressed || cols->empty(), SparsityPattern::ExcNotCompressed());
 
-  // do initial zeroing of elements in
-  // parallel. Try to achieve a similar layout
-  // as when doing matrix-vector products, as on
-  // some NUMA systems, a memory block is
-  // assigned to memory banks where the first
-  // access is generated. For sparse matrices,
-  // the first operations is usually the
-  // operator=. The grain size is chosen to
-  // reflect the number of rows in
-  // minimum_parallel_grain_size, weighted by
-  // the number of nonzero entries per row on
-  // average.
+  // do initial zeroing of elements in parallel. Try to achieve a similar
+  // layout as when doing matrix-vector products, as on some NUMA systems, a
+  // memory block is assigned to memory banks where the first access is
+  // generated. For sparse matrices, the first operations is usually the
+  // operator=. The grain size is chosen to reflect the number of rows in
+  // minimum_parallel_grain_size, weighted by the number of nonzero entries
+  // per row on average.
   const unsigned int matrix_size = cols->n_nonzero_elements();
   const unsigned int grain_size =
     internal::SparseMatrix::minimum_parallel_grain_size *
@@ -168,7 +163,7 @@ SparseMatrix<number>::operator = (const double d)
                                                   val),
                                   grain_size);
   else if (matrix_size > 0)
-    memset (&val[0], 0, matrix_size*sizeof(number));
+    std::memset (&val[0], 0, matrix_size*sizeof(number));
 
   return *this;
 }
