@@ -5,13 +5,13 @@ DEAL::Mass matrices are not equal.
 DEAL::Laplace matrices are not equal.
 DEAL::cell=0
 DEAL::mass_matrix:
-DEAL::0.9296 0.1103 -0.03228 
-DEAL::0.1103 0.4840 0.1078 
-DEAL::-0.03228 0.1078 0.3581 
+DEAL::2.000 -0.9088 0 
+DEAL::-0.9088 3.941 0 
+DEAL::0 0 5.556 
 DEAL::laplace_matrix:
 DEAL::0 0 0 
-DEAL::0 11.16 0 
-DEAL::0 0 11.16 
+DEAL::0 24.00 0 
+DEAL::0 0 24.00 
 DEAL::cell=1
 DEAL::mass_matrix:
 DEAL::1.000 3.464 0 
@@ -27,15 +27,15 @@ DEAL::Mass matrices are not equal.
 DEAL::Laplace matrices are not equal.
 DEAL::cell=0
 DEAL::mass_matrix:
-DEAL::0.8419 0.02942 -0.1157 -0.1157 
-DEAL::0.02942 0.7414 0.003550 0.003550 
-DEAL::-0.1157 0.003550 0.5949 0.05282 
-DEAL::-0.1157 0.003550 0.05282 0.5949 
+DEAL::1.936 -0.4737 0 0 
+DEAL::-0.4737 2.997 0 0 
+DEAL::0 0 4.038 0 
+DEAL::0 0 0 4.038 
 DEAL::laplace_matrix:
 DEAL::0 0 0 0 
-DEAL::0 10.10 0 0 
-DEAL::0 0 10.10 0 
-DEAL::0 0 0 10.10 
+DEAL::0 23.23 0 0 
+DEAL::0 0 23.23 0 
+DEAL::0 0 0 23.23 
 DEAL::cell=1
 DEAL::mass_matrix:
 DEAL::1.000 3.464 0 0 

@@ -153,6 +153,11 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> New: finite element FE_Q_DG0 that implements polynomials
+of order k with an additional discontinuous constant function.
+<br>
+(Daniel Arndt, Timo Heister, 2013/01/07)
+
 <li> step-6 now uses ConstraintMatrix::distribute_local_to_global()
 instead of condense(), which is the preferred way to use a ConstraintMatrix
  (and the only sensible way in parallel).
@@ -172,6 +177,38 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The FEValues machinery silently accepted the case when the
+mapped cell (or the cell geometry) were distorted. An assertion has been
+added to the computation of the Jacobian determinants for the volume
+element that aborts whenever the Jacobian determinant in a quadrature
+point becomes too small or negative.
+<br>
+(Martin Kronbichler, 2013/01/18)
+
+<li> Improved: SLEPcWrappers:: The interface to SLEPc has an improved
+handle on SolverControl such that solver data can be extracted at run
+tume. An example usage has been added to step-36. 
+<br>
+(Toby D> Young, 2013/01/18)
+
+<li> Fixed: Various variants of the TrilinosWrappers::SparseMatrix::reinit
+functions take a parameter <code>drop_tolerance</code> that allows to remove
+small values from the matrix and replace them by zero instead. This was not
+enforced for values on the diagonal of the matrix but only for off-diagonal
+ones. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2013/01/17)
+
+<li> New: All vector classes should now have a in_local_range()
+function indicating whether a given index is locally stored or not.
+<br>
+(Daniel Arndt, 2013/01/14)
+
+<li> Fixed: The one-argument version of ConstraintMatrix::condense was
+not prepared to deal with parallel vectors. This is now fixed.
+<br>
+(Daniel Arndt, Wolfgang Bangerth, 2013/1/9)
+
 <li> New: Utilities::int_to_string can now deal with any 32-bit
 integer, not just those with up to 6 digits.
 <br>
@@ -228,6 +265,13 @@ cells that differed in refinement level by more than one. This
 is now fixed.
 <br>
 (Wolfgang Bangerth, 2012/11/20)
+
+<li> Improved: The inner product, norm, and mean value computation
+of deal.II's own Vector class are now parallelized by threads.
+The parallelization does not change the order in which the additions
+take place, ensuring exact reproducibility from one run to the next.
+<br>
+(Martin Kronbichler, 2012/11/18)
 
 <li> New: The TrilinosWrappers::PreconditionBase class now has
 a function TrilinosWrappers::PreconditionBase::Tvmult that

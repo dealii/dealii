@@ -137,7 +137,7 @@ protected:
    */
   bool symmetric;
 
-  /*
+  /**
    * Use the transpose of the
    * relaxation method instead of
    * the method itself. This has no
@@ -152,6 +152,7 @@ protected:
    * nonzero.
    */
   unsigned int debug;
+
   /**
    * Memory for auxiliary vectors.
    */

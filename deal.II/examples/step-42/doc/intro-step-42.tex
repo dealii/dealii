@@ -11,15 +11,22 @@
 
 \section{Introduction}
 
-This example composes an advanced version of step-41 since it considers an
+This example is an extension of step-41, considering a contact problem with an
 elasto-plastic material behavior with isotropic hardening in three dimensions.
-That means that we have to take care of an additional nonlinearity by the
-material behavior. An other difference compared to step-41 is that
-the contact area is arranged at the boundary of the deformable body now.\\
-Since you can slightly reach a few million degrees of freedom in three dimensions,
-even with adaptive mesh refinement, we decided to use trilinos and p4est to run
-our code in parallel. On the other hand we have to deal with hanging nodes because
-of the adaptive mesh, which is an other advance of step-41.
+That means that we have to take care of an additional nonlinearity: the
+material behavior. Since we consider a three dimensional problem here, a
+separate difference to step-41 is that the contact area is at the boundary of
+the deformable body now, rather than in the interior. Finally, compared to
+step-41, we also have to deal with
+hanging nodes because of the adaptive mesh in both the handling of the linear
+system as well as of the inequality constraints; in the latter case, we will
+have to deal with prioritizing whether the constraints from the hanging nodes
+or from the inequalities are more important.
+
+Since you can very easily reach a few million degrees of freedom in three
+dimensions, even with adaptive mesh refinement, we decided to use Trilinos and
+p4est to run our code in parallel, building on the framework of step-40 for
+the parallelization.
 
 
 \section{Classical formulation}
@@ -35,12 +42,12 @@ The classical formulation of the problem possesses the following form:
 \end{align*}
 with $u\in H^2(\Omega)$.  The vector valued function $u$ denotes the
 displacement in the deformable body. The first two lines describe the elast-plastic
-material behaviour. Therein the equation shows the deformation $\varepsilon (u)$ as the additive
+material behavior. Therein the equation shows the deformation $\varepsilon (u)$ as the additive
 decomposition of the elastic part $A\sigma$ and the plastic part $\lambda$. $A$ is defined as
 the compliance tensor of fourth order which contains some material constants and $\sigma$ as the
 symmetric stress tensor of second order. So we have to consider the inequality in the second
 row component-by-component and furthermore we have to distinguish two cases.\\
-The continuous and convex function $\mathcal{F}$ denotes the von mises flow function
+The continuous and convex function $\mathcal{F}$ denotes the von Mises flow function
 $$\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0$$
 with $\sigma_0$ as yield stress. If there is no plastic deformation - that is $\lambda=0$ - this yields $\vert\sigma^D\vert < \sigma_0$
 and otherwise if $\lambda > 0$ it follows that $\vert\sigma^D\vert = \sigma_0$. That means if the stress is smaller as the yield stress
@@ -85,7 +92,7 @@ $$\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right
 $$\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+.$$
 Therein $\varepsilon$ denotes the linearised deformation tensor with $\varepsilon(u) := \dfrac{1}{2}\left(\nabla u + \nabla u^T\right)$ for small deformations.\\
 Most materials - especially metals - have the property that they show some hardening effects during the forming process.
-There are different constitutive laws to describe those material behaviour. The most simple one is called linear isotropic hardening
+There are different constitutive laws to describe those material behavior. The most simple one is called linear isotropic hardening
 with the flow function $\mathcal{F}(\tau,\eta) = \vert\tau^D\vert - (\sigma_0 + \gamma\eta)$.
 It can be considered by establishing an additional term in our primal-mixed formulation:\\
 Find a pair $\lbrace(\sigma,\xi),u\rbrace\in \Pi (W\times L^2(\Omega,\mathbb{R}))\times V^+$ with
@@ -119,15 +126,15 @@ In the next step we test in a pointwise sense where the deviator part of the str
 If there are such points we project the deviator stress in those points back to the yield surface. Methods of this kind
 are called projections algorithm or radial-return-algorithm.\\
 Now we have a primal formulation of our elasto-plastic contact problem which only depends on the displacement $u$.
-It consists of a nonlinear variational inequality and has a unique solution as it shows the theorem of Lions and Stampaccia 
+It consists of a nonlinear variational inequality and has a unique solution as it shows the theorem of Lions and Stampaccia
 (A proof can be found in Rodrigues: Obstacle Problems in Mathematical Physics, North-Holland, Amsterdam, 1987).\\
-To handle the nonlinearity of the constitutive law we use a newton method and to deal with the contact we apply an
-active set method like in step-41. To be more concrete we combine both methods to an inexact semi smooth newton
-method - inexact since we use an iterative solver for the linearised problems in each newton step.
+To handle the nonlinearity of the constitutive law we use a Newton method and to deal with the contact we apply an
+active set method like in step-41. To be more concrete we combine both methods to an inexact semi smooth Newton
+method - inexact since we use an iterative solver for the linearised problems in each Newton step.
 
-\section{Linearisation of the constitutive law for the newton method}
+\section{Linearisation of the constitutive law for the Newton method}
 
-For the newton method we have to linearise the following semi-linearform
+For the Newton method we have to linearise the following semi-linearform
 $$a(\psi;\varphi) := \left(P_{\Pi}(C\varepsilon(\varphi)),\varepsilon(\varphi)\right).$$
 Becaus we have to find the solution $u$ in the convex set $V^+$, we have to apply an SQP-method (SQP: sequential quadratic
 programming). That means we have to solve a minimisation problem for a known $u^i$ in every SQP-step of the form
@@ -208,14 +215,14 @@ $\mathcal{S}$ containts all the vertices at the contact boundary $\Gamma_C$ this
 time.
 
 \section{The primal-dual active set algorithm combined with the inexact semi smooth
-newton method}
+Newton method}
 
-Now we describe an algorithm that combines the newton-method, which we use for
-the nonlinear constitutive law, with the semismooth newton method for the contact. It
+Now we describe an algorithm that combines the Newton-method, which we use for
+the nonlinear constitutive law, with the semismooth Newton method for the contact. It
 works as follows:
 \begin{itemize}
  \item[(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that $\mathcal{S} = \mathcal{A}_k \cup \mathcal{F}_k$ and $\mathcal{A}_k \cap \mathcal{F}_k = \emptyset$ and set $k = 1$.
- \item[(1)] Assembel the newton matrix $a'(U^k;\varphi_i,\varphi_j)$ and the right-hand-side $F(U^k)$.
+ \item[(1)] Assemble the Newton matrix $a'(U^k;\varphi_i,\varphi_j)$ and the right-hand-side $F(U^k)$.
  \item[(2)] Find the primal-dual pair $(U^k,\Lambda^k)$ that satisfies
  \begin{align*}
  AU^k + B\Lambda^k & = F, &\\

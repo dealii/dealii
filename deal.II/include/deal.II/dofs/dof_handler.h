@@ -435,12 +435,6 @@ public:
                       const std::vector<unsigned int> &new_numbers);
 
   /**
-   * @deprecated Use
-   * CompressedSparsityPattern instead of
-   * initializing SparsityPattern with this
-   * value, see the discussion in step-2
-   * and the @ref Sparsity module.
-   *
    * Return the maximum number of
    * degrees of freedom a degree of freedom
    * in the given triangulation with the
@@ -486,15 +480,9 @@ public:
    * is also discussed in the documentation
    * of the module on @ref Sparsity.
    */
-  unsigned int max_couplings_between_dofs () const DEAL_II_DEPRECATED;
+  unsigned int max_couplings_between_dofs () const;
 
   /**
-   * @deprecated Use
-   * CompressedSparsityPattern
-   * instead of initializing
-   * SparsityPattern with this
-   * value.
-   *
    * Return the number of degrees of freedom
    * located on the boundary another dof on
    * the boundary can couple with.
@@ -502,8 +490,12 @@ public:
    * The number is the same as for
    * max_couplings_between_dofs() in one
    * dimension less.
+   *
+   * @note The same applies to this function as to max_couplings_per_dofs()
+   * as regards the performance of this function. Think about one of the
+   * dynamic sparsity pattern classes instead (see @ref Sparsity).
    */
-  unsigned int max_couplings_between_boundary_dofs () const DEAL_II_DEPRECATED;
+  unsigned int max_couplings_between_boundary_dofs () const;
 
   /*--------------------------------------*/
 

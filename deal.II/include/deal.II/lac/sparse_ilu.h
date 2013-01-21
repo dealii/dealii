@@ -25,11 +25,12 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 /**
- * Incomplete LU decomposition of a sparse matrix into another sparse matrix.
- * A given matrix is decomposed into a incomplete LU factorization, where
- * by incomplete we mean that also a sparse decomposition is used and entries
- * in the decomposition that do not fit into the sparsity structure of this
- * object are discarded.
+ * This class computes an Incomplete LU (ILU) decomposition of a sparse matrix,
+ * using either the same sparsity pattern or a different one.
+ * By incomplete we mean that unlike the exact decomposition, the incomplete
+ * one is also computed using sparse factors, and entries
+ * in the decomposition that do not fit into the given sparsity structure
+ * are discarded.
  *
  * The algorithm used by this class is essentially a copy of the
  * algorithm given in the book Y. Saad: "Iterative methods for sparse
@@ -62,10 +63,12 @@ public:
   SparseILU ();
 
   /**
-   * @deprecated This method is
-   * deprecated, and left for
-   * backward compability. It will
-   * be removed in later versions.
+   * @deprecated This method is deprecated, and
+   * left for backward
+   * compatibility. It will be removed
+   * in later versions.
+   * Instead, pass the sparsity pattern that you want used for
+   * the decomposition in the AdditionalData structure.
    */
   SparseILU (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
 
@@ -112,13 +115,11 @@ public:
    */
   template <typename somenumber>
   void initialize (const SparseMatrix<somenumber> &matrix,
-                   const AdditionalData parameters = AdditionalData());
+                   const AdditionalData &parameters = AdditionalData());
 
   /**
-   * This method is deprecated, and
-   * left for backward
-   * compability. It will be
-   * removed in later versions.
+   * @deprecated This method is deprecated, and left for backward
+   * compability. It will be removed in later versions.
    */
   template <typename somenumber>
   void decompose (const SparseMatrix<somenumber> &matrix,

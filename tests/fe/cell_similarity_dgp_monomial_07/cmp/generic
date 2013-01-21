@@ -5,13 +5,13 @@ DEAL::Mass matrices are not equal.
 DEAL::Laplace matrices are not equal.
 DEAL::cell=0
 DEAL::mass_matrix:
-DEAL::nan nan nan 
-DEAL::nan nan nan 
-DEAL::nan nan nan 
+DEAL::1.522 0.7273 0.7611 
+DEAL::0.7273 0.4736 0.3637 
+DEAL::0.7611 0.3637 0.5074 
 DEAL::laplace_matrix:
-DEAL::nan nan nan 
-DEAL::nan nan nan 
-DEAL::nan nan nan 
+DEAL::0 0 0 
+DEAL::0 1.202 0 
+DEAL::0 0 0.9390 
 DEAL::cell=1
 DEAL::mass_matrix:
 DEAL::1.000 0.5000 0.5000 

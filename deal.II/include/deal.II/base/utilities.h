@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -721,6 +721,12 @@ namespace Utilities
                const T    &val,
                const Comp  comp)
   {
+    // verify that the two iterators are properly ordered. since
+    // we need operator- for the iterator type anyway, do the
+    // test as follows, rather than via 'last >= first'
+    Assert (last - first >= 0,
+	    ExcMessage ("The given iterators do not satisfy the proper ordering."));
+
     unsigned int len = last-first;
 
     if (len==0)

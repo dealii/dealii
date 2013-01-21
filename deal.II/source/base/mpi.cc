@@ -2,7 +2,7 @@
 //      $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -90,7 +90,7 @@ namespace Utilities
     {
       int n_jobs=1;
       (void) MPI_Comm_size (mpi_communicator, &n_jobs);
-
+      
       return n_jobs;
     }
 
@@ -99,26 +99,26 @@ namespace Utilities
     {
       int rank=0;
       (void) MPI_Comm_rank (mpi_communicator, &rank);
-
+      
       return rank;
     }
-
-
+    
+    
     MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator)
     {
       MPI_Comm new_communicator;
       MPI_Comm_dup (mpi_communicator, &new_communicator);
       return new_communicator;
     }
-
-
+    
+    
     std::vector<unsigned int>
     compute_point_to_point_communication_pattern (const MPI_Comm &mpi_comm,
                                                   const std::vector<unsigned int> &destinations)
     {
       unsigned int myid = Utilities::MPI::this_mpi_process(mpi_comm);
       unsigned int n_procs = Utilities::MPI::n_mpi_processes(mpi_comm);
-
+      
       for (unsigned int i=0; i<destinations.size(); ++i)
         {
           Assert (destinations[i] < n_procs,
@@ -126,15 +126,15 @@ namespace Utilities
           Assert (destinations[i] != myid,
                   ExcMessage ("There is no point in communicating with ourselves."));
         }
-
-
+      
+      
       // let all processors
       // communicate the maximal
       // number of destinations they
       // have
       const unsigned int max_n_destinations
         = Utilities::MPI::max (destinations.size(), mpi_comm);
-
+      
       // now that we know the number
       // of data packets every
       // processor wants to send, set
@@ -146,7 +146,7 @@ namespace Utilities
                                                 numbers::invalid_unsigned_int);
       std::copy (destinations.begin(), destinations.end(),
                  my_destinations.begin());
-
+      
       // now exchange these (we could
       // communicate less data if we
       // used MPI_Allgatherv, but
@@ -160,7 +160,7 @@ namespace Utilities
       MPI_Allgather (&my_destinations[0], max_n_destinations, MPI_UNSIGNED,
                      &all_destinations[0], max_n_destinations, MPI_UNSIGNED,
                      mpi_comm);
-
+      
       // now we know who is going to
       // communicate with
       // whom. collect who is going
@@ -173,11 +173,11 @@ namespace Utilities
           else if (all_destinations[i*max_n_destinations + j] ==
                    numbers::invalid_unsigned_int)
             break;
-
+      
       return origins;
     }
-
-
+    
+    
     namespace
     {
       // custom MIP_Op for
@@ -189,9 +189,9 @@ namespace Utilities
       {
         const MinMaxAvg *in_lhs = static_cast<const MinMaxAvg *>(in_lhs_);
         MinMaxAvg *inout_rhs = static_cast<MinMaxAvg *>(inout_rhs_);
-
+	
         Assert(*len==1, ExcInternalError());
-
+	
         inout_rhs->sum += in_lhs->sum;
         if (inout_rhs->min>in_lhs->min)
           {
@@ -204,7 +204,7 @@ namespace Utilities
             if (inout_rhs->min_index > in_lhs->min_index)
               inout_rhs->min_index = in_lhs->min_index;
           }
-
+	
         if (inout_rhs->max < in_lhs->max)
           {
             inout_rhs->max = in_lhs->max;
@@ -218,24 +218,24 @@ namespace Utilities
           }
       }
     }
-
-
-
+    
+    
+    
     MinMaxAvg
     min_max_avg(const double my_value,
                 const MPI_Comm &mpi_communicator)
     {
       MinMaxAvg result;
-
+      
       const unsigned int my_id
         = dealii::Utilities::MPI::this_mpi_process(mpi_communicator);
       const unsigned int numproc
         = dealii::Utilities::MPI::n_mpi_processes(mpi_communicator);
-
+      
       MPI_Op op;
       int ierr = MPI_Op_create((MPI_User_function *)&max_reduce, true, &op);
       AssertThrow(ierr == MPI_SUCCESS, ExcInternalError());
-
+      
       MinMaxAvg in;
       in.sum = in.min = in.max = my_value;
       in.min_index = in.max_index = my_id;
@@ -264,34 +264,34 @@ namespace Utilities
     }
 
 #else
-
+    
     unsigned int n_mpi_processes (const MPI_Comm &)
     {
       return 1;
     }
-
-
-
+    
+    
+    
     unsigned int this_mpi_process (const MPI_Comm &)
     {
       return 0;
     }
-
-
+    
+    
     MPI_Comm duplicate_communicator (const MPI_Comm &mpi_communicator)
     {
       return mpi_communicator;
     }
-
-
-
-
+    
+    
+    
+    
     MinMaxAvg
     min_max_avg(const double my_value,
                 const MPI_Comm &)
     {
       MinMaxAvg result;
-
+      
       result.sum = my_value;
       result.avg = my_value;
       result.min = my_value;
@@ -333,7 +333,7 @@ namespace Utilities
       MPI_Initialized(&MPI_has_been_started);
       AssertThrow (MPI_has_been_started == 0,
                    ExcMessage ("MPI error. You can only start MPI once!"));
-
+      
       int mpi_err;
       mpi_err = MPI_Init (&argc, &argv);
       AssertThrow (mpi_err == 0,
@@ -346,15 +346,15 @@ namespace Utilities
       (void)argv;
       (void)owns_mpi;
 #endif
-
+      
       constructor_has_already_run = true;
     }
-
-
+    
+    
     MPI_InitFinalize::~MPI_InitFinalize()
     {
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
-
+      
       // make memory pool release all MPI-based vectors that are no
       // longer used at this point. this is relevant because the
       // static object destructors run for these vectors at the end of
@@ -362,34 +362,44 @@ namespace Utilities
       // to errors
 #  if defined(DEAL_II_USE_TRILINOS)
       GrowingVectorMemory<TrilinosWrappers::MPI::Vector>
-      ::release_unused_memory ();
+	::release_unused_memory ();
       GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>
-      ::release_unused_memory ();
+	::release_unused_memory ();
 #  endif
-
-      // Same for PETSc.
+      
+      // Same for PETSc. only do this if PETSc hasn't been
+      // terminated yet since PETSc deletes all vectors that
+      // have been allocated but not freed at the time of
+      // calling PETScFinalize. running the calls below after
+      // PetscFinalize has already been called will therefore
+      // yield errors of double deallocations
 #ifdef DEAL_II_USE_PETSC
-      GrowingVectorMemory<PETScWrappers::MPI::Vector>
-      ::release_unused_memory ();
-      GrowingVectorMemory<PETScWrappers::MPI::BlockVector>
-      ::release_unused_memory ();
-      GrowingVectorMemory<PETScWrappers::Vector>
-      ::release_unused_memory ();
-      GrowingVectorMemory<PETScWrappers::BlockVector>
-      ::release_unused_memory ();
-
+      if ((PetscInitializeCalled == PETSC_TRUE)
+	  &&
+	  (PetscFinalizeCalled == PETSC_FALSE))
+	{
+	  GrowingVectorMemory<PETScWrappers::MPI::Vector>
+	    ::release_unused_memory ();
+	  GrowingVectorMemory<PETScWrappers::MPI::BlockVector>
+	    ::release_unused_memory ();
+	  GrowingVectorMemory<PETScWrappers::Vector>
+	    ::release_unused_memory ();
+	  GrowingVectorMemory<PETScWrappers::BlockVector>
+	    ::release_unused_memory ();
+	  
 #  ifdef DEAL_II_USE_SLEPC
-      // and now end SLEPc (with PETSc)
-      SlepcFinalize();
+	  // and now end SLEPc (with PETSc)
+	  SlepcFinalize();
 #  else
-      // or just end PETSc.
-      PetscFinalize();
+	  // or just end PETSc.
+	  PetscFinalize();
 #  endif
+	}
 #else
-
+      
 
       int mpi_err = 0;
-
+      
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
       if (Utilities::System::job_supports_mpi() == true && owns_mpi == true &&
@@ -405,17 +415,17 @@ namespace Utilities
           else
             mpi_err = MPI_Finalize();
         }
-
-
+      
+      
       AssertThrow (mpi_err == 0,
                    ExcMessage ("An error occurred while calling MPI_Finalize()"));
 #endif
 #endif
     }
-
-
+    
+    
   } // end of namespace MPI
-
+  
 } // end of namespace Utilities
 
 DEAL_II_NAMESPACE_CLOSE

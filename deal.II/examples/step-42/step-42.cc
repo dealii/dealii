@@ -1198,7 +1198,7 @@ namespace Step42
         double a = 0;
         for (unsigned int i=0; (i<10)&&(!damped); i++)
           {
-            a=pow(0.5, static_cast<double>(i));
+            a=std::pow(0.5, static_cast<double>(i));
             old_solution = tmp_vector;
             old_solution.sadd(1-a,a, distributed_solution);
 

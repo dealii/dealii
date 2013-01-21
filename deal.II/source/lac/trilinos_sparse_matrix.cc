@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -574,7 +574,7 @@ namespace TrilinosWrappers
         return;
       }
 
-    unsigned int n_rows = dealii_sparse_matrix.m();
+    const unsigned int n_rows = dealii_sparse_matrix.m();
 
     Assert (input_row_map.NumGlobalElements() == (int)n_rows,
             ExcDimensionMismatch (input_row_map.NumGlobalElements(),
@@ -587,67 +587,68 @@ namespace TrilinosWrappers
       (use_this_sparsity!=0)? *use_this_sparsity :
       dealii_sparse_matrix.get_sparsity_pattern();
 
-    if (matrix.get() != 0 && m() == n_rows &&
-        n_nonzero_elements() == sparsity_pattern.n_nonzero_elements())
-      goto set_matrix_values;
-
+    if (matrix.get() == 0 ||
+	m() != n_rows ||
+        n_nonzero_elements() != sparsity_pattern.n_nonzero_elements())
     {
       SparsityPattern trilinos_sparsity;
       trilinos_sparsity.reinit (input_row_map, input_col_map, sparsity_pattern);
       reinit (trilinos_sparsity);
     }
 
-set_matrix_values:
-    // fill the values. the same as above: go
-    // through all rows of the matrix, and then
-    // all columns. since the sparsity patterns of
-    // the input matrix and the specified sparsity
-    // pattern might be different, need to go
-    // through the row for both these sparsity
-    // structures simultaneously in order to
-    // really set the correct values.
-    const std::size_t *const in_rowstart_indices
-      = dealii_sparse_matrix.get_sparsity_pattern().get_rowstart_indices();
-    const unsigned int *const in_cols
-      = dealii_sparse_matrix.get_sparsity_pattern().get_column_numbers();
-    const unsigned int *cols = sparsity_pattern.get_column_numbers();
-    const std::size_t *rowstart_indices =
-      sparsity_pattern.get_rowstart_indices();
-
+    // fill the values. the same as above: go through all rows of the matrix,
+    // and then all columns. since the sparsity patterns of the input matrix
+    // and the specified sparsity pattern might be different, need to go
+    // through the row for both these sparsity structures simultaneously in
+    // order to really set the correct values.
     unsigned int maximum_row_length = matrix->MaxNumEntries();
     std::vector<unsigned int> row_indices (maximum_row_length);
     std::vector<TrilinosScalar> values (maximum_row_length);
-    std::size_t in_index, index;
 
     for (unsigned int row=0; row<n_rows; ++row)
-      if (input_row_map.MyGID(static_cast<int>(row)))
+      // see if the row is locally stored on this processor
+      if (input_row_map.MyGID(static_cast<int>(row)) == true)
         {
-          index = rowstart_indices[row];
-          in_index = in_rowstart_indices[row];
+          ::dealii::SparsityPattern::iterator select_index =
+            sparsity_pattern.begin(row);
+          typename ::dealii::SparseMatrix<number>::const_iterator it =
+            dealii_sparse_matrix.begin(row);
           unsigned int col = 0;
           if (sparsity_pattern.optimize_diagonal())
             {
-              values[col] = dealii_sparse_matrix.global_entry(in_index);
-              row_indices[col++] = row;
-              ++index;
-              ++in_index;
+              Assert(dealii_sparse_matrix.get_sparsity_pattern().optimize_diagonal(),
+                     ExcMessage("If the manual sparsity pattern optimizes the "
+                                "diagonal, the deal.II matrix must optimize it,"
+                                " too. And vice versa."));
+              AssertDimension(it->column(), row);
+              if (std::fabs(it->value()) > drop_tolerance)
+		{
+		  values[col] = it->value();
+		  row_indices[col++] = it->column();
+		}
+              ++select_index;
+              ++it;
             }
 
-          while (in_index < in_rowstart_indices[row+1] &&
-                 index < rowstart_indices[row+1])
+          while (it != dealii_sparse_matrix.end(row) &&
+                 select_index != sparsity_pattern.end(row))
             {
-              while (cols[index] < in_cols[in_index] && index < rowstart_indices[row+1])
-                ++index;
-              while (in_cols[in_index] < cols[index] && in_index < in_rowstart_indices[row+1])
-                ++in_index;
+              while (select_index->column() < it->column() &&
+                     select_index != sparsity_pattern.end(row))
+                ++select_index;
+              while (it->column() < select_index->column() &&
+                     it != dealii_sparse_matrix.end(row))
+                ++it;
 
-              if (std::fabs(dealii_sparse_matrix.global_entry(in_index)) > drop_tolerance)
+              if (it == dealii_sparse_matrix.end(row))
+                break;
+              if (std::fabs(it->value()) > drop_tolerance)
                 {
-                  values[col] = dealii_sparse_matrix.global_entry(in_index);
-                  row_indices[col++] = in_cols[in_index];
+                  values[col] = it->value();
+                  row_indices[col++] = it->column();
                 }
-              ++index;
-              ++in_index;
+              ++select_index;
+              ++it;
             }
           set (row, col, reinterpret_cast<unsigned int *>(&row_indices[0]),
                &values[0], false);

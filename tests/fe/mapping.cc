@@ -1,6 +1,16 @@
-// mapping.cc,v 1.19 2004/01/30 09:56:19 hartmann Exp
-// Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010, 2011, 2012 Ralf Hartmann
+//----------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
 //
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2010, 2011, 2012, 2013 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------------------------------------------------
+
 // Shows the shape functions implemented and computes the area of cells.
 
 #include "../tests.h"
@@ -577,4 +587,3 @@ int main()
 				   // -----------------------
   mapping_test<3>();
 }
-

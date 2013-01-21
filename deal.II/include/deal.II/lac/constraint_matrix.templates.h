@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -142,24 +142,38 @@ ConstraintMatrix::condense (VectorType &vec) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
 
-  // distribute all entries, and set them to zero
-  std::vector<ConstraintLine>::const_iterator constraint_line = lines.begin();
-  for (; constraint_line!=lines.end(); ++constraint_line)
+  // distribute all entries, and set them to zero. do so in
+  // two loops because in the first one we need to add to elements
+  // and in the second one we need to set elements to zero. for
+  // parallel vectors, this can only work if we can put a compress()
+  // in between, but we don't want to call compress() twice per entry
+  for (std::vector<ConstraintLine>::const_iterator
+	 constraint_line = lines.begin();
+       constraint_line!=lines.end(); ++constraint_line)
     {
-      for (unsigned int q=0; q!=constraint_line->entries.size(); ++q)
-        vec(constraint_line->entries[q].first)
-        += (static_cast<typename VectorType::value_type>
-            (vec(constraint_line->line)) *
-            constraint_line->entries[q].second);
-      vec(constraint_line->line) = 0.;
-
       // in case the constraint is
       // inhomogeneous, this function is not
       // appropriate. Throw an exception.
       Assert (constraint_line->inhomogeneity == 0.,
               ExcMessage ("Inhomogeneous constraint cannot be condensed "
                           "without any matrix specified."));
+
+      const typename VectorType::value_type old_value = vec(constraint_line->line);
+      for (unsigned int q=0; q!=constraint_line->entries.size(); ++q)
+        if (vec.in_local_range(constraint_line->entries[q].first) == true) 
+          vec(constraint_line->entries[q].first)
+          += (static_cast<typename VectorType::value_type>
+              (old_value) *
+              constraint_line->entries[q].second);
     }
+
+  vec.compress();
+
+  for (std::vector<ConstraintLine>::const_iterator
+	 constraint_line = lines.begin();
+       constraint_line!=lines.end(); ++constraint_line)
+    if (vec.in_local_range(constraint_line->line) == true) 
+      vec(constraint_line->line) = 0.;
 }
 
 
@@ -247,24 +261,26 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
         // copy entries if column will not
         // be condensed away, distribute
         // otherwise
-        for (unsigned int j=uncondensed_struct.get_rowstart_indices()[row];
-             j<uncondensed_struct.get_rowstart_indices()[row+1]; ++j)
-          if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
-            condensed.add (new_line[row], new_line[uncondensed_struct.get_column_numbers()[j]],
-                           uncondensed.global_entry(j));
+	for (typename SparseMatrix<number>::const_iterator
+	       p = uncondensed.begin(row);
+	     p != uncondensed.end(row); ++p)
+          if (new_line[p->column()] != -1)
+            condensed.add (new_line[row],
+			   new_line[p->column()],
+                           p->value());
           else
             {
               // let c point to the
               // constraint of this column
               std::vector<ConstraintLine>::const_iterator c = lines.begin();
-              while (c->line != uncondensed_struct.get_column_numbers()[j])
+              while (c->line != p->column())
                 ++c;
 
               for (unsigned int q=0; q!=c->entries.size(); ++q)
                 // distribute to rows with
                 // appropriate weight
                 condensed.add (new_line[row], new_line[c->entries[q].first],
-                               uncondensed.global_entry(j) * c->entries[q].second);
+                               p->value() * c->entries[q].second);
 
               // take care of inhomogeneity:
               // need to subtract this element from the
@@ -273,7 +289,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
               // row of the inhomogeneous constraint in
               // the matrix with Gauss elimination
               if (use_vectors == true)
-                condensed_vector(new_line[row]) -= uncondensed.global_entry(j) *
+                condensed_vector(new_line[row]) -= p->value() *
                                                    c->inhomogeneity;
             }
 
@@ -283,15 +299,16 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
     else
       // line must be distributed
       {
-        for (unsigned int j=uncondensed_struct.get_rowstart_indices()[row];
-             j<uncondensed_struct.get_rowstart_indices()[row+1]; ++j)
+	for (typename SparseMatrix<number>::const_iterator
+	       p = uncondensed.begin(row);
+	     p != uncondensed.end(row); ++p)
           // for each column: distribute
-          if (new_line[uncondensed_struct.get_column_numbers()[j]] != -1)
+          if (new_line[p->column()] != -1)
             // column is not constrained
             for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
               condensed.add (new_line[next_constraint->entries[q].first],
-                             new_line[uncondensed_struct.get_column_numbers()[j]],
-                             uncondensed.global_entry(j) *
+                             new_line[p->column()],
+                             p->value() *
                              next_constraint->entries[q].second);
 
           else
@@ -301,24 +318,24 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
               // let c point to the constraint
               // of this column
               std::vector<ConstraintLine>::const_iterator c = lines.begin();
-              while (c->line != uncondensed_struct.get_column_numbers()[j])
+              while (c->line != p->column())
                 ++c;
 
-              for (unsigned int p=0; p!=c->entries.size(); ++p)
+              for (unsigned int r=0; r!=c->entries.size(); ++r)
                 for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
                   condensed.add (new_line[next_constraint->entries[q].first],
-                                 new_line[c->entries[p].first],
-                                 uncondensed.global_entry(j) *
-                                 next_constraint->entries[q].second *
-                                 c->entries[p].second);
+                                 new_line[c->entries[r].first],
+                                 p->value() *
+                                 next_constraint->entries[r].second *
+                                 c->entries[r].second);
 
               if (use_vectors == true)
                 for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
                   condensed_vector (new_line[next_constraint->entries[q].first])
-                  -= uncondensed.global_entry(j) *
+		    -= p->value() *
                      next_constraint->entries[q].second *
                      c->inhomogeneity;
-            };
+            }
 
         // condense the vector
         if (use_vectors == true)
@@ -1710,7 +1727,7 @@ namespace internals
   // the row of a SparseMatrix<number>.
   namespace dealiiSparseMatrix
   {
-    template <typename number>
+    template <typename SparseMatrixIterator>
     static inline
     void add_value (const double value,
                     const unsigned int row,
@@ -1718,22 +1735,22 @@ namespace internals
                     const unsigned int *col_ptr,
                     const bool   are_on_diagonal,
                     unsigned int &counter,
-                    number       *val_ptr)
+                    SparseMatrixIterator      val_ptr)
     {
       if (value != 0.)
         {
           Assert (col_ptr != 0,
-                  typename SparseMatrix<number>::ExcInvalidIndex (row, column));
+                  typename SparseMatrix<typename SparseMatrixIterator::MatrixType::value_type>::ExcInvalidIndex (row, column));
           if (are_on_diagonal)
             {
-              val_ptr[0] += value;
+              val_ptr->value() += value;
               return;
             }
           while (col_ptr[counter] < column)
             ++counter;
           Assert (col_ptr[counter] == column,
-                  typename SparseMatrix<number>::ExcInvalidIndex(row, column));
-          val_ptr[counter] += static_cast<number>(value);
+                  typename SparseMatrix<typename SparseMatrixIterator::MatrixType::value_type>::ExcInvalidIndex(row, column));
+          (val_ptr+counter)->value() += value;
         }
     }
   }
@@ -1771,8 +1788,10 @@ namespace internals
 
     const unsigned int *col_ptr = sparsity.row_length(row) == 0 ? 0 :
                                   &sparsity_struct[row_start[row]];
-    number *val_ptr = sparsity.row_length(row) == 0 ? 0 :
-                      &sparse_matrix->global_entry (row_start[row]);
+    typename SparseMatrix<number>::iterator
+    val_ptr = (sparsity.row_length(row) == 0 ?
+    		   sparse_matrix->end() :
+               sparse_matrix->begin(row));
     const bool optimize_diagonal = sparsity.optimize_diagonal();
     unsigned int counter = optimize_diagonal;
 
@@ -1826,7 +1845,7 @@ namespace internals
                                               global_rows.global_row(j), col_ptr,
                                               false, counter, val_ptr);
               }
-            val_ptr[0] += matrix_ptr[loc_row];
+            val_ptr->value() += matrix_ptr[loc_row];
             for (unsigned int j=i+1; j<column_end; ++j)
               {
                 const unsigned int loc_col = global_rows.local_row(j);
@@ -1846,8 +1865,8 @@ namespace internals
                                                global_rows.global_row(j), col_ptr,
                                                false, counter, val_ptr);
               }
-            val_ptr[0] += resolve_matrix_entry (global_rows, global_rows, i, i, loc_row,
-                                                local_matrix);
+            val_ptr->value() += resolve_matrix_entry (global_rows, global_rows, i, i, loc_row,
+                                                      local_matrix);
             for (unsigned int j=i+1; j<column_end; ++j)
               {
                 double col_val = resolve_matrix_entry (global_rows, global_rows, i, j,
@@ -2860,3 +2879,4 @@ add_entries_local_to_global (const std::vector<unsigned int> &local_dof_indices,
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
+

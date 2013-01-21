@@ -1,8 +1,8 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Author: Toby D. Young, Polish Academy of Sciences, 2008, 2009
+//    Author: Toby D. Young, Polish Academy of Sciences, 2008-2013
 //
-//    Copyright (C) 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2009-2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,7 +13,6 @@
 
 #ifndef __deal2__slepc_solver_h
 #define __deal2__slepc_solver_h
-
 
 #include <deal.II/base/config.h>
 
@@ -50,13 +49,10 @@ DEAL_II_NAMESPACE_OPEN
  * interface to SLEPc solvers that handle both of these problem sets.
  *
  * SLEPcWrappers can be implemented in application codes in the
- * following way:
- @verbatim
-  SolverControl solver_control (1000, 1e-9);
-  SolverArnoldi system (solver_control, mpi_communicator);
-  system.solve (A, B, lambda, x, size_of_spectrum);
- @endverbatim
- * for the generalized eigenvalue problem $Ax=B\lambda x$, where the
+ * following way: @verbatim SolverControl solver_control (1000, 1e-9);
+ * SolverArnoldi system (solver_control, mpi_communicator);
+ * system.solve (A, B, lambda, x, size_of_spectrum); @endverbatim for
+ * the generalized eigenvalue problem $Ax=B\lambda x$, where the
  * variable <code>const unsigned int size_of_spectrum</code> tells
  * SLEPc the number of eigenvector/eigenvalue pairs to solve for: See
  * also <code>step-36</code> for a hands-on example.
@@ -85,7 +81,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @ingroup SLEPcWrappers
  *
- * @author Toby D. Young 2008, 2009, 2010; and Rickard Armiento 2008.
+ * @author Toby D. Young 2008, 2009, 2010, 2011, 2013; and Rickard
+ * Armiento 2008.
  *
  * @note Various tweaks and enhancments contributed by Eloy Romero and
  * Jose E. Roman 2009, 2010.
@@ -95,26 +92,19 @@ namespace SLEPcWrappers
 {
 
   /**
-   * Base class for solver classes
-   * using the SLEPc solvers. Since
-   * solvers in SLEPc are selected
-   * based on flags passed to a
-   * generic solver object, basically
-   * all the actual solver calls
-   * happen in this class, and
-   * derived classes simply set the
-   * right flags to select one solver
-   * or another, or to set certain
-   * parameters for individual
-   * solvers.
+   * Base class for solver classes using the SLEPc solvers. Since
+   * solvers in SLEPc are selected based on flags passed to a generic
+   * solver object, basically all the actual solver calls happen in
+   * this class, and derived classes simply set the right flags to
+   * select one solver or another, or to set certain parameters for
+   * individual solvers.
    */
   class SolverBase
   {
   public:
 
     /**
-     * Constructor. Takes the MPI
-     * communicator over which parallel
+     * Constructor. Takes the MPI communicator over which parallel
      * computations are to happen.
      */
     SolverBase (SolverControl &cn,
@@ -126,41 +116,24 @@ namespace SLEPcWrappers
     virtual ~SolverBase ();
 
     /**
-     * Composite method that solves the
-     * eigensystem $Ax=\lambda x$. The
-     * eigenvector sent in has to have
-     * at least one element that we can
-     * use as a template when resizing,
-     * since we do not know the
-     * parameters of the specific
-     * vector class used
-     * (i.e. local_dofs for MPI
-     * vectors). However, while copying
-     * eigenvectors, at least twice the
-     * memory size of <tt>vr</tt> is
-     * being used (and can be more). To
-     * avoid doing this, the fairly
-     * standard calling sequence
-     * executed here is used:
-     * Initialise; Set up matrices for
-     * solving; Actually solve the
-     * system; Gather the solution(s);
-     * and reset.
+     * Composite method that solves the eigensystem $Ax=\lambda
+     * x$. The eigenvector sent in has to have at least one element
+     * that we can use as a template when resizing, since we do not
+     * know the parameters of the specific vector class used
+     * (i.e. local_dofs for MPI vectors). However, while copying
+     * eigenvectors, at least twice the memory size of <tt>vr</tt> is
+     * being used (and can be more). To avoid doing this, the fairly
+     * standard calling sequence executed here is used: Initialise;
+     * Set up matrices for solving; Actually solve the system; Gather
+     * the solution(s); and reset.
      *
-     * Note that the number of
-     * converged eigenvectors can be
-     * larger than the number of
-     * eigenvectors requested; this is
-     * due to a round off error
-     * (success) of the eigenproblem
-     * solver context. If this is found
-     * to be the case we simply do not
-     * bother with more eigenpairs than
-     * requested, but handle that it
-     * may be more than specified by
-     * ignoring any extras. By default
-     * one eigenvector/eigenvalue pair
-     * is computed.
+     * Note that the number of converged eigenvectors can be larger
+     * than the number of eigenvectors requested; this is due to a
+     * round off error (success) of the eigenproblem solver
+     * context. If this is found to be the case we simply do not
+     * bother with more eigenpairs than requested, but handle that it
+     * may be more than specified by ignoring any extras. By default
+     * one eigenvector/eigenvalue pair is computed.
      */
     template <typename OutputVector>
     void
@@ -170,8 +143,7 @@ namespace SLEPcWrappers
            const unsigned int              n_eigenvectors);
 
     /**
-     * Same as above, but here a
-     * composite method for solving the
+     * Same as above, but here a composite method for solving the
      * system $A x=\lambda B x$.
      */
     template <typename OutputVector>
@@ -183,70 +155,54 @@ namespace SLEPcWrappers
            const unsigned int               n_eigenvectors);
 
     /**
-     * Initialize solver for the linear
-     * system $Ax=\lambda x$. (Note:
-     * this is required before calling
-     * solve ())
+     * Initialize solver for the linear system $Ax=\lambda x$. (Note:
+     * this is required before calling solve ())
      */
     void
     set_matrices (const PETScWrappers::MatrixBase &A);
 
     /**
-     * Same as above, but here
-     * initialize solver for the linear
-     * system $A x=\lambda B x$.
+     * Same as above, but here initialize solver for the linear system
+     * $A x=\lambda B x$.
      */
     void
     set_matrices (const PETScWrappers::MatrixBase &A,
                   const PETScWrappers::MatrixBase &B);
 
     /**
-     * Set the initial vector for the
-     * solver.
+     * Set the initial vector for the solver.
      */
     void
     set_initial_vector
     (const PETScWrappers::VectorBase &this_initial_vector);
 
     /**
-     * Set the spectral transformation
-     * to be used.
+     * Set the spectral transformation to be used.
      */
     void
     set_transformation (SLEPcWrappers::TransformationBase &this_transformation);
 
     /**
-     * Indicate which part of the
-     * spectrum is to be computed. By
-     * default largest magnitude
-     * eigenvalues are computed.  For
-     * other allowed values see the
-     * SLEPc documentation.
+     * Indicate which part of the spectrum is to be computed. By
+     * default largest magnitude eigenvalues are computed.  For other
+     * allowed values see the SLEPc documentation.
      */
     void
     set_which_eigenpairs (EPSWhich set_which);
 
     /**
-     * Solve the linear system for
-     * n_eigenvectors
-     * eigenstates. Parameter
-     * <code>n_converged</code>
-     * contains the actual number of
-     * eigenstates that have .
-     * converged; this can be both
-     * fewer or more than
-     * n_eigenvectors, depending on the
+     * Solve the linear system for n_eigenvectors
+     * eigenstates. Parameter <code>n_converged</code> contains the
+     * actual number of eigenstates that have .  converged; this can
+     * be both fewer or more than n_eigenvectors, depending on the
      * SLEPc eigensolver used.
      */
     void
     solve (const unsigned int n_eigenvectors, unsigned int *n_converged);
 
-
     /**
-     * Access the solutions for a
-     * solved eigenvector problem, pair
-     * index solutions,
-     * $\text{index}\,\in\,0\hdots
+     * Access the solutions for a solved eigenvector problem, pair
+     * index solutions, $\text{index}\,\in\,0\hdots
      * \text{n\_converged}-1$.
      */
     void
@@ -259,36 +215,44 @@ namespace SLEPcWrappers
                    PETScWrappers::VectorBase &vr);
 
     /**
-     * Reset the solver, and return
-     * memory for eigenvectors
+     * Reset the solver, and return memory for eigenvectors
      */
     void
-    reset();
+    reset ();
 
     /**
-     * Retrieve the SLEPc solver object
-     * that is internally used.
+     * Retrieve the SLEPc solver object that is internally used.
      */
-    EPS *
-    get_EPS ();
-
+    EPS *get_eps ();
 
     /**
-     * Access to the object that
-     * controls convergence.
+     * Take the information provided from SLEPc and checks it against
+     * deal.II's own SolverControl objects to see if convergence has
+     * been reached.
+     */
+    void get_solver_state (const SolverControl::State state);
+
+    /**
+     * Access to the object that controls convergence.
      */
     SolverControl &control () const;
 
     /**
-     * Exceptions.
+     * Exception. Standard exception.
      */
     DeclException0 (ExcSLEPcWrappersUsageError);
 
+    /**
+     * Exception. SLEPc error with error number.
+     */
     DeclException1 (ExcSLEPcError,
                     int,
                     << "    An error with error number " << arg1
                     << " occurred while calling a SLEPc function");
 
+    /**
+     * Exception. Convergence failure on the number of eigenvectors.
+     */
     DeclException2 (ExcSLEPcEigenvectorConvergenceMismatchError,
                     int, int,
                     << "    The number of converged eigenvectors is " << arg1
@@ -297,94 +261,75 @@ namespace SLEPcWrappers
   protected:
 
     /**
-     * Reference to the object that
-     * controls convergence of the
+     * Reference to the object that controls convergence of the
      * iterative solver.
      */
     SolverControl &solver_control;
 
     /**
-     * Copy of the MPI communicator
-     * object to be used for the
-     * solver.
+     * Copy of the MPI communicator object to be used for the solver.
      */
     const MPI_Comm mpi_communicator;
 
     /**
-     * Function that takes an
-     * Eigenvalue Problem Solver
-     * context object, and sets the
-     * type of solver that is requested
-     * by the derived class.
+     * Function that takes an Eigenvalue Problem Solver context
+     * object, and sets the type of solver that is requested by the
+     * derived class.
      */
     virtual void set_solver_type (EPS &eps) const = 0;
 
     /**
-     * Which portion of the spectrum to
-     * solve from.
+     * Which portion of the spectrum to solve from.
      */
     EPSWhich set_which;
 
     /**
-     * The matrix $A$ of the
-     * generalized eigenvalue problem
-     * $Ax=B\lambda x$, or the standard
-     * eigenvalue problem $Ax=\lambda
+     * The matrix $A$ of the generalized eigenvalue problem
+     * $Ax=B\lambda x$, or the standard eigenvalue problem $Ax=\lambda
      * x$.
      */
     const PETScWrappers::MatrixBase *opA;
 
     /**
-     * The matrix $B$ of the
-     * generalized eigenvalue problem
+     * The matrix $B$ of the generalized eigenvalue problem
      * $Ax=B\lambda x$.
      */
     const PETScWrappers::MatrixBase *opB;
 
+    /**
+     * An initial vector used to "feed" some SLEPc solvers.
+     */
     const PETScWrappers::VectorBase *initial_vector;
 
     /**
-     * Pointer to an an object that
-     * describes transformations that
-     * can be applied to the eigenvalue
-     * problem.
+     * Pointer to an an object that describes transformations that can
+     * be applied to the eigenvalue problem.
      */
     SLEPcWrappers::TransformationBase *transformation;
 
   private:
 
     /**
-     * A function that is used in SLEPc
-     * as a callback to check on
-     * convergence. It takes the
-     * information provided from SLEPc
-     * and checks it against deal.II's
-     * own SolverControl objects to see
-     * if convergence has been reached.
+     * A function that can be used in SLEPc as a callback to check on
+     * convergence. 
+     *
+     * @note This function is redundant.
      */
-    static
+    static 
     int
-    convergence_test (EPS                 eps,
-#ifdef PETSC_USE_64BIT_INDICES
-                      const PetscInt      iteration,
-#else
-                      const int           iteration,
-#endif
-                      const PetscReal     residual_norm,
-                      EPSConvergedReason *reason,
-                      void               *solver_control);
-
+    convergence_test (EPS          eps,
+		      PetscScalar  kr,
+		      PetscScalar  ki,
+		      PetscReal    residual_norm,
+		      PetscReal   *estimated_error,
+                      void        *solver_control);
+    
     /**
-     * Objects of this type are
-     * explicitly created, but are
-     * destroyed when the surrounding
-     * solver object goes out of scope,
-     * or when we assign a new value to
-     * the pointer to this object. The
-     * respective Destroy functions are
-     * therefore written into the
-     * destructor of this object, even
-     * though the object does not have
+     * Objects of this type are explicitly created, but are destroyed
+     * when the surrounding solver object goes out of scope, or when
+     * we assign a new value to the pointer to this object. The
+     * respective Destroy functions are therefore written into the
+     * destructor of this object, even though the object does not have
      * a constructor.
      */
     struct SolverData
@@ -396,12 +341,19 @@ namespace SLEPcWrappers
       ~SolverData ();
 
       /**
-       * Objects for Eigenvalue Problem
-       * Solver.
+       * Objects for Eigenvalue Problem Solver.
        */
       EPS eps;
+
+      /**
+       * Convergence.
+       */
+      EPSConvergedReason reason;
     };
 
+    /**
+     * Pointer to the <code>SolverData</code> object.
+     */
     std_cxx1x::shared_ptr<SolverData> solver_data;
   };
 
@@ -411,6 +363,7 @@ namespace SLEPcWrappers
    * complex.
    *
    * @ingroup SLEPcWrappers
+   *
    * @author Toby D. Young 2008
    */
   class SolverKrylovSchur : public SolverBase
@@ -418,20 +371,16 @@ namespace SLEPcWrappers
   public:
 
     /**
-     * Standardized data struct to pipe
-     * additional data to the solver,
+     * Standardized data struct to pipe additional data to the solver,
      * should it be needed.
      */
     struct AdditionalData
     {};
 
     /**
-     * SLEPc solvers will want to have
-     * an MPI communicator context over
-     * which computations are
-     * parallelized. By default, this
-     * carries the same behaviour has
-     * the PETScWrappers, but you can
+     * SLEPc solvers will want to have an MPI communicator context
+     * over which computations are parallelized. By default, this
+     * carries the same behaviour has the PETScWrappers, but you can
      * change that.
      */
     SolverKrylovSchur (SolverControl        &cn,
@@ -441,16 +390,13 @@ namespace SLEPcWrappers
   protected:
 
     /**
-     * Store a copy of the flags for
-     * this particular solver.
+     * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Eigenvalue
-     * Problem Solver context object,
-     * and sets the type of solver that
-     * is appropriate for this class.
+     * Function that takes a Eigenvalue Problem Solver context object,
+     * and sets the type of solver that is appropriate for this class.
      */
     virtual void set_solver_type (EPS &eps) const;
   };
@@ -460,40 +406,34 @@ namespace SLEPcWrappers
    * solver. Usage: All spectrum, all problem types, complex.
    *
    * @ingroup SLEPcWrappers
+   *
    * @author Toby D. Young 2008, 2011
    */
   class SolverArnoldi : public SolverBase
   {
   public:
     /**
-     * Standardized data struct to pipe
-     * additional data to the solver,
+     * Standardized data struct to pipe additional data to the solver,
      * should it be needed.
      */
     struct AdditionalData
     {
       /**
-       * Constructor. By default, set the
-       * option of delayed
-       * reorthogonalization to false,
-       * i.e. don't do it.
+       * Constructor. By default, set the option of delayed
+       * reorthogonalization to false, i.e. don't do it.
        */
       AdditionalData (const bool delayed_reorthogonalization = false);
 
       /**
-       * Flag for delayed
-       * reorthogonalization.
+       * Flag for delayed reorthogonalization.
        */
       bool delayed_reorthogonalization;
     };
 
     /**
-     * SLEPc solvers will want to have
-     * an MPI communicator context over
-     * which computations are
-     * parallelized. By default, this
-     * carries the same behaviour has
-     * the PETScWrappers, but you can
+     * SLEPc solvers will want to have an MPI communicator context
+     * over which computations are parallelized. By default, this
+     * carries the same behaviour has the PETScWrappers, but you can
      * change that.
      */
     SolverArnoldi (SolverControl        &cn,
@@ -503,19 +443,15 @@ namespace SLEPcWrappers
   protected:
 
     /**
-     * Store a copy of the flags for
-     * this particular solver.
+     * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Eigenvalue
-     * Problem Solver context object,
-     * and sets the type of solver that
-     * is appropriate for this class.
+     * Function that takes a Eigenvalue Problem Solver context object,
+     * and sets the type of solver that is appropriate for this class.
      */
     virtual void set_solver_type (EPS &eps) const;
-
   };
 
   /**
@@ -523,26 +459,23 @@ namespace SLEPcWrappers
    * solver. Usage: All spectrum, all problem types, complex.
    *
    * @ingroup SLEPcWrappers
+   *
    * @author Toby D. Young 2009
    */
   class SolverLanczos : public SolverBase
   {
   public:
     /**
-     * Standardized data struct to pipe
-     * additional data to the solver,
+     * Standardized data struct to pipe additional data to the solver,
      * should it be needed.
      */
     struct AdditionalData
     {};
 
     /**
-     * SLEPc solvers will want to have
-     * an MPI communicator context over
-     * which computations are
-     * parallelized. By default, this
-     * carries the same behaviour has
-     * the PETScWrappers, but you can
+     * SLEPc solvers will want to have an MPI communicator context
+     * over which computations are parallelized. By default, this
+     * carries the same behaviour has the PETScWrappers, but you can
      * change that.
      */
     SolverLanczos (SolverControl        &cn,
@@ -552,47 +485,40 @@ namespace SLEPcWrappers
   protected:
 
     /**
-     * Store a copy of the flags for
-     * this particular solver.
+     * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Eigenvalue
-     * Problem Solver context object,
-     * and sets the type of solver that
-     * is appropriate for this class.
+     * Function that takes a Eigenvalue Problem Solver context object,
+     * and sets the type of solver that is appropriate for this class.
      */
     virtual void set_solver_type (EPS &eps) const;
-
   };
 
   /**
    * An implementation of the solver interface using the SLEPc Power
-   * solver. Usage: Largest values of spectrum only, all problem types,
-   * complex.
+   * solver. Usage: Largest values of spectrum only, all problem
+   * types, complex.
    *
-   * @ingroup SLEPcWrappers
+   * @ingroup SLEPcWrappers 
+   *
    * @author Toby D. Young 2010
    */
   class SolverPower : public SolverBase
   {
   public:
     /**
-     * Standardized data struct to pipe
-     * additional data to the solver,
+     * Standardized data struct to pipe additional data to the solver,
      * should it be needed.
      */
     struct AdditionalData
     {};
 
     /**
-     * SLEPc solvers will want to have
-     * an MPI communicator context over
-     * which computations are
-     * parallelized. By default, this
-     * carries the same behaviour has
-     * the PETScWrappers, but you can
+     * SLEPc solvers will want to have an MPI communicator context
+     * over which computations are parallelized. By default, this
+     * carries the same behaviour has the PETScWrappers, but you can
      * change that.
      */
     SolverPower (SolverControl        &cn,
@@ -602,71 +528,100 @@ namespace SLEPcWrappers
   protected:
 
     /**
-     * Store a copy of the flags for
-     * this particular solver.
+     * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Eigenvalue
-     * Problem Solver context object,
-     * and sets the type of solver that
-     * is appropriate for this class.
+     * Function that takes a Eigenvalue Problem Solver context object,
+     * and sets the type of solver that is appropriate for this class.
      */
     virtual void set_solver_type (EPS &eps) const;
-
   };
 
-#if DEAL_II_PETSC_VERSION_GTE(3,1,0)
   /**
-   * An implementation of the solver interface using the SLEPc Davidson
-   * solver. Usage (incomplete/untested): All problem types.
+   * An implementation of the solver interface using the SLEPc
+   * Davidson solver. Usage (incomplete/untested): All problem types.
    *
-   * @ingroup SLEPcWrappers
+   * @ingroup SLEPcWrappers 
+   *
    * @author Toby D. Young 2010
    */
-  class SolverDavidson : public SolverBase
+  class SolverGeneralizedDavidson : public SolverBase
   {
   public:
     /**
-     * Standardized data struct to pipe
-     * additional data to the solver,
+     * Standardized data struct to pipe additional data to the solver,
      * should it be needed.
      */
     struct AdditionalData
     {};
 
     /**
-     * SLEPc solvers will want to have
-     * an MPI communicator context over
-     * which computations are
-     * parallelized. By default, this
-     * carries the same behaviour has
-     * the PETScWrappers, but you can
+     * SLEPc solvers will want to have an MPI communicator context
+     * over which computations are parallelized. By default, this
+     * carries the same behaviour has the PETScWrappers, but you can
      * change that.
      */
-    SolverDavidson (SolverControl        &cn,
-                    const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-                    const AdditionalData &data = AdditionalData());
+    SolverGeneralizedDavidson (SolverControl        &cn,
+			       const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+			       const AdditionalData &data = AdditionalData());
 
   protected:
 
     /**
-     * Store a copy of the flags for
-     * this particular solver.
+     * Store a copy of the flags for this particular solver.
      */
     const AdditionalData additional_data;
 
     /**
-     * Function that takes a Eigenvalue
-     * Problem Solver context object,
-     * and sets the type of solver that
-     * is appropriate for this class.
+     * Function that takes a Eigenvalue Problem Solver context object,
+     * and sets the type of solver that is appropriate for this class.
      */
     virtual void set_solver_type (EPS &eps) const;
-
   };
-#endif
+
+  /**
+   * An implementation of the solver interface using the SLEPc
+   * Jacobi-Davidson solver. Usage: All problem types.
+   *
+   * @ingroup SLEPcWrappers 
+   *
+   * @author Toby D. Young 2013
+   */
+  class SolverJacobiDavidson : public SolverBase
+  {
+  public:
+    /**
+     * Standardized data struct to pipe additional data to the solver,
+     * should it be needed.
+     */
+    struct AdditionalData
+    {};
+
+    /**
+     * SLEPc solvers will want to have an MPI communicator context
+     * over which computations are parallelized. By default, this
+     * carries the same behaviour has the PETScWrappers, but you can
+     * change that.
+     */
+    SolverJacobiDavidson (SolverControl        &cn,
+			  const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+			  const AdditionalData &data = AdditionalData());
+
+  protected:
+
+    /**
+     * Store a copy of the flags for this particular solver.
+     */
+    const AdditionalData additional_data;
+
+    /**
+     * Function that takes a Eigenvalue Problem Solver context object,
+     * and sets the type of solver that is appropriate for this class.
+     */
+    virtual void set_solver_type (EPS &eps) const;
+  };
 
   // --------------------------- inline and template functions -----------
   /**
@@ -681,21 +636,24 @@ namespace SLEPcWrappers
                      std::vector<OutputVector>       &vr,
                      const unsigned int               n_eigenvectors = 1)
   {
-    unsigned int n_converged;
+    unsigned int n_converged = 0;
 
+    // Set the matrices of the problem 
     set_matrices (A);
-    solve (n_eigenvectors,&n_converged);
 
+    // and solve    
+    solve (n_eigenvectors, &n_converged);
+    
     if (n_converged > n_eigenvectors)
       n_converged = n_eigenvectors;
     AssertThrow (n_converged == n_eigenvectors,
                  ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
 
-    AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
+    AssertThrow (vr.size() != 0, ExcSLEPcWrappersUsageError());
     vr.resize (n_converged, vr.front());
     kr.resize (n_converged);
 
-    for (unsigned int index=0; index < n_converged; ++index)
+    for (unsigned int index=0; index<n_converged; ++index)
       get_eigenpair (index, kr[index], vr[index]);
   }
 
@@ -707,9 +665,12 @@ namespace SLEPcWrappers
                      std::vector<OutputVector>       &vr,
                      const unsigned int               n_eigenvectors = 1)
   {
-    unsigned int n_converged;
+    unsigned int n_converged = 0;
 
+    // Set the matrices of the problem 
     set_matrices (A, B);
+
+    // and solve
     solve (n_eigenvectors, &n_converged);
 
     if (n_converged >= n_eigenvectors)
@@ -717,12 +678,12 @@ namespace SLEPcWrappers
 
     AssertThrow (n_converged == n_eigenvectors,
                  ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
-    AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
+    AssertThrow (vr.size() != 0, ExcSLEPcWrappersUsageError());
 
     vr.resize (n_converged, vr.front());
     kr.resize (n_converged);
 
-    for (unsigned int index=0; index < n_converged; ++index)
+    for (unsigned int index=0; index<n_converged; ++index)
       get_eigenpair (index, kr[index], vr[index]);
   }
 }

@@ -21,6 +21,7 @@
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_q_dg0.h>
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_dgp.h>
@@ -43,12 +44,8 @@ void print_formatted (const FullMatrix<number> &A,
     {
       for (unsigned int j=0; j<A.n(); ++j)
 	{
-	  if (A(i,j) != 0)
-	    deallog << std::setw(width) << std::setprecision(precision)
-		    << A(i,j);
-	  else
-	    deallog << std::setw(width) << std::setprecision(precision)
-		    << "~";
+	  deallog << std::setw(width) << std::setprecision(precision)
+		  << A(i,j);
 	  deallog << ' ';
 	};
       deallog << std::endl;

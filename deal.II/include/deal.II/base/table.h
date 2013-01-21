@@ -436,7 +436,7 @@ namespace internal
  * two major differences. The first is that the Tensor class
  * stores only numeric values (as <tt>double</tt>s), while the Table
  * class stores arbitrary objects. The second is that the Tensor
- * class has fixed dimensions, also give as a template argument, while
+ * class has fixed dimensions, also given as a template argument, while
  * this class can handle arbitrary dimensions, which may also be
  * different between different indices.
  *

@@ -368,7 +368,7 @@ protected:
   /**
    * Initial value.
    */
-  double initial_val;
+  double       initial_val;
 
   /**
    * Last value of the convergence criterion.
@@ -387,7 +387,7 @@ protected:
    */
   bool         check_failure;
 
-  /*
+  /**
    * Stores the
    * @p rel_failure_residual set by
    * @p set_failure_criterion
@@ -410,6 +410,7 @@ protected:
    * @p deallog.
    */
   bool         m_log_history;
+
   /**
    * Log only every nth step.
    */
@@ -430,7 +431,7 @@ protected:
    * history data. Set by
    * enable_history_data().
    */
-  bool history_data_enabled;
+  bool         history_data_enabled;
 
   /**
    * Vector storing the result
@@ -620,13 +621,11 @@ SolverControl::log_history () const
 }
 
 
-
 inline void
 SolverControl::log_result (const bool newval)
 {
   m_log_result = newval;
 }
-
 
 
 inline bool
@@ -641,7 +640,6 @@ ReductionControl::reduction () const
 {
   return reduce;
 }
-
 
 
 inline double
