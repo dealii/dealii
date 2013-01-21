@@ -1243,23 +1243,14 @@ namespace DoFRenumbering
                            const std::vector<bool> &selected_dofs);
 
   /**
-   * Sort those degrees of freedom
-   * which are tagged with @p true
-   * in the @p selected_dofs array
-   * on the level #level
-   * to the back of the DoF
-   * numbers. The sorting is
-   * stable, i.e. the relative
-   * order within the tagged
-   * degrees of freedom is
-   * preserved, as is the relative
-   * order within the untagged
-   * ones.
+   * Sort those degrees of freedom which are tagged with @p true in
+   * the @p selected_dofs array on the level @p level to the back of
+   * the DoF numbers. The sorting is stable, i.e. the relative order
+   * within the tagged degrees of freedom is preserved, as is the
+   * relative order within the untagged ones.
    *
-   * @pre The @p selected_dofs
-   * array must have as many elements as
-   * the @p dof_handler has degrees of
-   * freedom on the given level.
+   * @pre The @p selected_dofs array must have as many elements as the
+   * @p dof_handler has degrees of freedom on the given level.
    */
   template <class DH>
   void

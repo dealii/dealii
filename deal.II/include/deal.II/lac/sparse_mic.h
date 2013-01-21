@@ -49,12 +49,10 @@ public:
   SparseMIC ();
 
   /**
-   * @deprecated This method is deprecated, and
-   * left for backward
-   * compatibility. It will be removed
-   * in later versions.
-   * Instead, pass the sparsity pattern that you want used for
-   * the decomposition in the AdditionalData structure.
+   * @deprecated This method is deprecated, and left for backward
+   * compatibility. It will be removed in later versions.  Instead,
+   * pass the sparsity pattern that you want used for the
+   * decomposition in the AdditionalData structure.
    */
   SparseMIC (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;
 
@@ -125,10 +123,9 @@ public:
                    const AdditionalData &parameters = AdditionalData());
 
   /**
-   * @deprecate This method is deprecated, and
-   * left for backward
-   * compability. It will be
-   * removed in later versions. Use initialize() instead.
+   * @deprecated This method is deprecated, and left for backward
+   * compability. It will be removed in later versions. Use
+   * initialize() instead.
    */
   template <typename somenumber>
   void decompose (const SparseMatrix<somenumber> &matrix,

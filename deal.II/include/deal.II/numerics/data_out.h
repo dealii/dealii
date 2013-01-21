@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -998,14 +998,19 @@ protected:
  * classes. You can give a parameter to the function which determines how many
  * subdivisions in each coordinate direction are to be performed, i.e. of how
  * many subcells each patch shall consist. Default is one, but you may want to
- * choose a higher number for higher order elements, so as two for quadratic
- * elements, three for cubic elements three, and so on. The purpose of this
- * parameter is because most graphics programs do not allow to specify higher
- * order shape functions in the file formats: only data at vertices can be
- * plotted and is then shown as a bilinear interpolation within the interior
- * of cells. This may be insufficient if you have higher order finite
- * elements, and the only way to achieve better output is to subdivide each
- * cell of the mesh into several cells for graphical output.
+ * choose a higher number for higher order elements, for example two for
+ * quadratic elements, three for cubic elements three, and so on. The purpose
+ * of this parameter is because most graphics programs do not allow to specify
+ * higher order polynomial functions in the file formats: only data at
+ * vertices can be plotted and is then shown as a bilinear interpolation
+ * within the interior of cells. This may be insufficient if you have higher
+ * order finite elements, and the only way to achieve better output is to
+ * subdivide each cell of the mesh into several cells for graphical output. Of
+ * course, what you get to see is still a bilinear interpolation on each cell
+ * of the output (where these cells are not subdivisions of the cells of the
+ * triangulation in use) due to the same limitations in output formats, but at
+ * least a bilinear interpolation of a higher order polynomial on a finer
+ * mesh.
  *
  * Note that after having called build_patches() once, you can call one or
  * more of the write() functions of DataOutInterface. You can therefore

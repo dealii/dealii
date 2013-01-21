@@ -21,14 +21,15 @@ examples/\step-36> make run
 ============================ Running \step-36
    Number of active cells:       1024
    Number of degrees of freedom: 1089
+   Solver converged in 67 iterations.
 
-   Eigenvalue 0 : 4.93877
-   Eigenvalue 1 : 12.3707
-   Eigenvalue 2 : 12.3707
-   Eigenvalue 3 : 19.8027
-   Eigenvalue 4 : 24.837
+      Eigenvalue 0 : 4.93877
+      Eigenvalue 1 : 12.3707
+      Eigenvalue 2 : 12.3707
+      Eigenvalue 3 : 19.8027
+      Eigenvalue 4 : 24.837
 
-Job done.  @endcode These eigenvalues are exactly the ones that
+   Job done.  @endcode These eigenvalues are exactly the ones that
 correspond to pairs $(m,n)=(1,1)$, $(1,2)$ and $(2,1)$, $(2,2)$, and
 $(3,1)$. A visualization of the corresponding eigenfunctions would
 look like this:

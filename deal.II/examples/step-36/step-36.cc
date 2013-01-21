@@ -68,7 +68,7 @@ namespace Step36
   private:
     void make_grid_and_dofs ();
     void assemble_system ();
-    void solve ();
+    unsigned int solve ();
     void output_results () const;
 
     Triangulation<dim> triangulation;
@@ -110,6 +110,7 @@ namespace Step36
     fe (1),
     dof_handler (triangulation)
   {
+//TODO investigate why the minimum number of refinement steps required to obtain the correct eigenvalue degeneracies is 6
     parameters.declare_entry ("Global mesh refinement steps", "5",
                               Patterns::Integer (0, 20),
                               "The number of times the 1-cell coarse mesh should "
@@ -295,7 +296,7 @@ namespace Step36
   // the kind of solver we want. Here we choose the Krylov-Schur solver of
   // SLEPc, a pretty fast and robust choice for this kind of problem:
   template <int dim>
-  void EigenvalueProblem<dim>::solve ()
+  unsigned int EigenvalueProblem<dim>::solve ()
   {
 
     // We start here, as we normally do, by assigning convergence control we
@@ -338,6 +339,9 @@ namespace Step36
     // equality is usually nearly true).
     for (unsigned int i=0; i<eigenfunctions.size(); ++i)
       eigenfunctions[i] /= eigenfunctions[i].linfty_norm ();
+
+    // Finally return the number of iterations it took to converge:
+    return solver_control.last_step ();
   }
 
 
@@ -399,15 +403,19 @@ namespace Step36
               << std::endl
               << "   Number of degrees of freedom: "
               << dof_handler.n_dofs ()
-              << std::endl
               << std::endl;
 
     assemble_system ();
-    solve ();
+
+    const unsigned int n_iterations = solve ();
+    std::cout << "   Solver converged in " << n_iterations
+	      << " iterations." << std::endl;
+
     output_results ();
 
+    std::cout << std::endl;
     for (unsigned int i=0; i<eigenvalues.size(); ++i)
-      std::cout << "   Eigenvalue " << i
+      std::cout << "      Eigenvalue " << i
                 << " : " << eigenvalues[i]
                 << std::endl;
   }
@@ -468,7 +476,7 @@ int main (int argc, char **argv)
   // If no exceptions are thrown, then we tell the program to stop monkeying
   // around and exit nicely:
   std::cout << std::endl
-            << "Job done."
+            << "   Job done."
             << std::endl;
 
   return 0;

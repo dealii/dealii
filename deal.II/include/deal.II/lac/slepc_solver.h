@@ -191,11 +191,11 @@ namespace SLEPcWrappers
     set_which_eigenpairs (EPSWhich set_which);
 
     /**
-     * Solve the linear system for <code>n_eigenvectors</code>
+     * Solve the linear system for n_eigenvectors
      * eigenstates. Parameter <code>n_converged</code> contains the
-     * actual number of eigenstates that have converged; this can be
-     * both fewer or more than <code>n_eigenvectors</code>, depending
-     * on the SLEPc eigensolver used.
+     * actual number of eigenstates that have .  converged; this can
+     * be both fewer or more than n_eigenvectors, depending on the
+     * SLEPc eigensolver used.
      */
     void
     solve (const unsigned int n_eigenvectors, unsigned int *n_converged);
@@ -218,13 +218,19 @@ namespace SLEPcWrappers
      * Reset the solver, and return memory for eigenvectors
      */
     void
-    reset();
+    reset ();
 
     /**
      * Retrieve the SLEPc solver object that is internally used.
      */
-    EPS *
-    get_EPS ();
+    EPS *get_eps ();
+
+    /**
+     * Take the information provided from SLEPc and checks it against
+     * deal.II's own SolverControl objects to see if convergence has
+     * been reached.
+     */
+    void get_solver_state (const SolverControl::State state);
 
     /**
      * Access to the object that controls convergence.
@@ -232,15 +238,21 @@ namespace SLEPcWrappers
     SolverControl &control () const;
 
     /**
-     * Exceptions.
+     * Exception. Standard exception.
      */
     DeclException0 (ExcSLEPcWrappersUsageError);
 
+    /**
+     * Exception. SLEPc error with error number.
+     */
     DeclException1 (ExcSLEPcError,
                     int,
                     << "    An error with error number " << arg1
                     << " occurred while calling a SLEPc function");
 
+    /**
+     * Exception. Convergence failure on the number of eigenvectors.
+     */
     DeclException2 (ExcSLEPcEigenvectorConvergenceMismatchError,
                     int, int,
                     << "    The number of converged eigenvectors is " << arg1
@@ -298,23 +310,20 @@ namespace SLEPcWrappers
   private:
 
     /**
-     * A function that is used in SLEPc as a callback to check on
-     * convergence. It takes the information provided from SLEPc and
-     * checks it against deal.II's own SolverControl objects to see if
-     * convergence has been reached.
+     * A function that can be used in SLEPc as a callback to check on
+     * convergence. 
+     *
+     * @note This function is redundant.
      */
-    static
+    static 
     int
-    convergence_test (EPS                 eps,
-#ifdef PETSC_USE_64BIT_INDICES
-                      const PetscInt      iteration,
-#else
-                      const int           iteration,
-#endif
-                      const PetscReal     residual_norm,
-                      EPSConvergedReason *reason,
-                      void               *solver_control);
-
+    convergence_test (EPS          eps,
+		      PetscScalar  kr,
+		      PetscScalar  ki,
+		      PetscReal    residual_norm,
+		      PetscReal   *estimated_error,
+                      void        *solver_control);
+    
     /**
      * Objects of this type are explicitly created, but are destroyed
      * when the surrounding solver object goes out of scope, or when
@@ -335,10 +344,15 @@ namespace SLEPcWrappers
        * Objects for Eigenvalue Problem Solver.
        */
       EPS eps;
+
+      /**
+       * Convergence.
+       */
+      EPSConvergedReason reason;
     };
 
     /**
-     * Pointer to the <code>dealii::SolverData</code> object.
+     * Pointer to the <code>SolverData</code> object.
      */
     std_cxx1x::shared_ptr<SolverData> solver_data;
   };
@@ -349,6 +363,7 @@ namespace SLEPcWrappers
    * complex.
    *
    * @ingroup SLEPcWrappers
+   *
    * @author Toby D. Young 2008
    */
   class SolverKrylovSchur : public SolverBase
@@ -391,6 +406,7 @@ namespace SLEPcWrappers
    * solver. Usage: All spectrum, all problem types, complex.
    *
    * @ingroup SLEPcWrappers
+   *
    * @author Toby D. Young 2008, 2011
    */
   class SolverArnoldi : public SolverBase
@@ -436,7 +452,6 @@ namespace SLEPcWrappers
      * and sets the type of solver that is appropriate for this class.
      */
     virtual void set_solver_type (EPS &eps) const;
-
   };
 
   /**
@@ -444,6 +459,7 @@ namespace SLEPcWrappers
    * solver. Usage: All spectrum, all problem types, complex.
    *
    * @ingroup SLEPcWrappers
+   *
    * @author Toby D. Young 2009
    */
   class SolverLanczos : public SolverBase
@@ -478,7 +494,6 @@ namespace SLEPcWrappers
      * and sets the type of solver that is appropriate for this class.
      */
     virtual void set_solver_type (EPS &eps) const;
-
   };
 
   /**
@@ -486,7 +501,8 @@ namespace SLEPcWrappers
    * solver. Usage: Largest values of spectrum only, all problem
    * types, complex.
    *
-   * @ingroup SLEPcWrappers
+   * @ingroup SLEPcWrappers 
+   *
    * @author Toby D. Young 2010
    */
   class SolverPower : public SolverBase
@@ -521,14 +537,15 @@ namespace SLEPcWrappers
      * and sets the type of solver that is appropriate for this class.
      */
     virtual void set_solver_type (EPS &eps) const;
-
   };
 
   /**
    * An implementation of the solver interface using the SLEPc
-   * Generalized Davidson solver. Usage: All problem types.
+   * Davidson solver. Usage (incomplete/untested): All problem types.
    *
-   * @ingroup SLEPcWrappers @author Toby D. Young 2013
+   * @ingroup SLEPcWrappers 
+   *
+   * @author Toby D. Young 2010
    */
   class SolverGeneralizedDavidson : public SolverBase
   {
@@ -562,14 +579,15 @@ namespace SLEPcWrappers
      * and sets the type of solver that is appropriate for this class.
      */
     virtual void set_solver_type (EPS &eps) const;
-
   };
 
   /**
    * An implementation of the solver interface using the SLEPc
    * Jacobi-Davidson solver. Usage: All problem types.
    *
-   * @ingroup SLEPcWrappers @author Toby D. Young 2013
+   * @ingroup SLEPcWrappers 
+   *
+   * @author Toby D. Young 2013
    */
   class SolverJacobiDavidson : public SolverBase
   {
@@ -603,7 +621,6 @@ namespace SLEPcWrappers
      * and sets the type of solver that is appropriate for this class.
      */
     virtual void set_solver_type (EPS &eps) const;
-
   };
 
   // --------------------------- inline and template functions -----------
@@ -619,21 +636,24 @@ namespace SLEPcWrappers
                      std::vector<OutputVector>       &vr,
                      const unsigned int               n_eigenvectors = 1)
   {
-    unsigned int n_converged;
+    unsigned int n_converged = 0;
 
+    // Set the matrices of the problem 
     set_matrices (A);
-    solve (n_eigenvectors,&n_converged);
 
+    // and solve    
+    solve (n_eigenvectors, &n_converged);
+    
     if (n_converged > n_eigenvectors)
       n_converged = n_eigenvectors;
     AssertThrow (n_converged == n_eigenvectors,
                  ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
 
-    AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
+    AssertThrow (vr.size() != 0, ExcSLEPcWrappersUsageError());
     vr.resize (n_converged, vr.front());
     kr.resize (n_converged);
 
-    for (unsigned int index=0; index < n_converged; ++index)
+    for (unsigned int index=0; index<n_converged; ++index)
       get_eigenpair (index, kr[index], vr[index]);
   }
 
@@ -645,9 +665,12 @@ namespace SLEPcWrappers
                      std::vector<OutputVector>       &vr,
                      const unsigned int               n_eigenvectors = 1)
   {
-    unsigned int n_converged;
+    unsigned int n_converged = 0;
 
+    // Set the matrices of the problem 
     set_matrices (A, B);
+
+    // and solve
     solve (n_eigenvectors, &n_converged);
 
     if (n_converged >= n_eigenvectors)
@@ -655,12 +678,12 @@ namespace SLEPcWrappers
 
     AssertThrow (n_converged == n_eigenvectors,
                  ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
-    AssertThrow (vr.size() >= 1, ExcSLEPcWrappersUsageError());
+    AssertThrow (vr.size() != 0, ExcSLEPcWrappersUsageError());
 
     vr.resize (n_converged, vr.front());
     kr.resize (n_converged);
 
-    for (unsigned int index=0; index < n_converged; ++index)
+    for (unsigned int index=0; index<n_converged; ++index)
       get_eigenpair (index, kr[index], vr[index]);
   }
 }

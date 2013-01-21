@@ -24,6 +24,9 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+
+//TODO: This class is an almost exact copy of the TensorProductPolynomials class. They should be unified. A simple way to do that would be to derive this one from the other and in the implemented member functions simply defer to the corresponding function in the base class whenever appropriate.
+
 /**
  * @addtogroup Polynomials
  * @{
@@ -270,6 +273,8 @@ private:
   void compute_index (const unsigned int i,
                       unsigned int       (&indices)[(dim>0?dim:1)]) const;
 };
+
+/** @} */
 
 #ifndef DOXYGEN
 
