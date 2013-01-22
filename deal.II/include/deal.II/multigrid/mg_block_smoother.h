@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -203,8 +203,8 @@ template <class MATRIX, class RELAX, typename number>
 inline void
 MGSmootherBlock<MATRIX, RELAX, number>::clear ()
 {
-  unsigned int i=matrices.get_minlevel(),
-               max_level=matrices.get_maxlevel();
+  unsigned int i=matrices.min_level(),
+               max_level=matrices.max_level();
   for (; i<=max_level; ++i)
     {
       smoothers[i] = 0;
@@ -220,8 +220,8 @@ MGSmootherBlock<MATRIX, RELAX, number>::initialize (
   const MGMATRIX &m,
   const MGRELAX &s)
 {
-  const unsigned int min = m.get_minlevel();
-  const unsigned int max = m.get_maxlevel();
+  const unsigned int min = m.min_level();
+  const unsigned int max = m.max_level();
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
