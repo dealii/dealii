@@ -14,6 +14,6 @@
 
 #include <deal.II/dofs/dof_accessor.h>
 
-#warning file mg_dof_accessor.h is deprecated use file dofs/dof_accessor.h instead.
+#pragma message ("File mg_dof_accessor.h is deprecated use file dofs/dof_accessor.h instead.")
 
 #endif

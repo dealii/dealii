@@ -2350,7 +2350,7 @@ namespace internal
                                      local_dof_indices.end(),
                                      DoFHandler<dim,spacedim>::invalid_dof_index))
                         {
-                          int warn; // TODO
+#pragma message("TODO: Fix the debug assertion in line 2353 of dof_handler_policy.cc")
                           //Assert(false, ExcMessage ("not all dofs got distributed!"));
                         }
                     }
