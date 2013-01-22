@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -288,25 +288,26 @@ public:
                   const FiniteElement<dim,spacedim> &fe);
 
   /**
-   * Go through the triangulation and
-   * distribute the degrees of freedoms
-   * needed for the given finite element
-   * according to the given distribution
-   * method. The purpose of this function
+   * Go through the triangulation and "distribute" the degrees of
+   * freedoms needed for the given finite element. "Distributing"
+   * degrees of freedom involved allocating memory to store the
+   * information that describes it (e.g., whether it is located on a
+   * vertex, edge, face, etc) and to sequentially enumerate all
+   * degrees of freedom. In other words, while the mesh and the finite
+   * element object by themselves simply define a finite element space
+   * $V_h$, the process of distributing degrees of freedom makes sure
+   * that there is a basis for this space and that the shape functions
+   * of this basis are enumerated in an indexable, predictable way.
+   *
+   * The purpose of this function
    * is first discussed in the introduction
    * to the step-2 tutorial program.
    *
-   * A pointer of the transferred
-   * finite element is
-   * stored. Therefore, the
-   * lifetime of the finite element
-   * object shall be longer than
-   * that of this object. If you
-   * don't want this behaviour, you
-   * may want to call the @p clear
-   * member function which also
-   * releases the lock of this
-   * object to the finite element.
+   * @note A pointer of the finite element given as argument is
+   * stored. Therefore, the lifetime of the finite element object
+   * shall be longer than that of this object. If you don't want this
+   * behavior, you may want to call the @p clear member function which
+   * also releases the lock of this object to the finite element.
    */
   virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe);
 
