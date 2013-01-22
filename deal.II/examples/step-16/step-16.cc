@@ -4,7 +4,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2003-2004, 2006-2012 by the deal.II authors                   */
+/*    Copyright (C) 2003-2004, 2006-2013 by the deal.II authors                   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -618,7 +618,7 @@ namespace Step16
     // need a smoother on each level. A common choice for this is to use the
     // application of a relaxation method (such as the SOR, Jacobi or
     // Richardson method) or a small number of iterations of a solver method
-    // (such as CG or GMRES). The MGSmootherRelaxation and
+    // (such as CG or GMRES). The mg::SmootherRelaxation and
     // MGSmootherPrecondition classes provide support for these two kinds of
     // smoothers. Here, we opt for the application of a single SOR
     // iteration. To this end, we define an appropriate <code>typedef</code>
@@ -646,9 +646,8 @@ namespace Step16
     // let the multilevel preconditioner make sure that we get a symmetric
     // operator even for nonsymmetric smoothers:
     typedef PreconditionSOR<SparseMatrix<double> > Smoother;
-    GrowingVectorMemory<>   vector_memory;
-    MGSmootherRelaxation<SparseMatrix<double>, Smoother, Vector<double> >
-    mg_smoother(vector_memory);
+    mg::SmootherRelaxation<Smoother, Vector<double> >
+    mg_smoother;
     mg_smoother.initialize(mg_matrices);
     mg_smoother.set_steps(2);
     mg_smoother.set_symmetric(true);
