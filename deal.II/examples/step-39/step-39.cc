@@ -2,7 +2,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2010-2012 by the deal.II authors */
+/*    Copyright (C) 2010-2013 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -517,8 +517,8 @@ namespace Step39
 
     // Now all objects are prepared to hold one sparsity pattern or matrix per
     // level. What's left is setting up the sparsity patterns on each level.
-    for (unsigned int level=mg_sparsity.get_minlevel();
-         level<=mg_sparsity.get_maxlevel(); ++level)
+    for (unsigned int level=mg_sparsity.min_level();
+         level<=mg_sparsity.max_level(); ++level)
       {
         // These are roughly the same lines as above for the global matrix,
         // now for each level.
@@ -690,8 +690,8 @@ namespace Step39
     // as our smoothing method.
     GrowingVectorMemory<Vector<double> > mem;
     typedef PreconditionSOR<SparseMatrix<double> > RELAXATION;
-    MGSmootherRelaxation<SparseMatrix<double>, RELAXATION, Vector<double> >
-    mg_smoother(mem);
+    mg::SmootherRelaxation<RELAXATION, Vector<double> >
+    mg_smoother;
     RELAXATION::AdditionalData smoother_data(1.);
     mg_smoother.initialize(mg_matrix, smoother_data);
 

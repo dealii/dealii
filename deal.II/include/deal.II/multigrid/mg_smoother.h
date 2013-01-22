@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -779,8 +779,8 @@ namespace mg
     const MGLevelObject<MATRIX2> &m,
     const typename RELAX::AdditionalData &data)
   {
-    const unsigned int min = m.get_minlevel();
-    const unsigned int max = m.get_maxlevel();
+    const unsigned int min = m.min_level();
+    const unsigned int max = m.max_level();
 
     this->resize(min, max);
 
@@ -796,8 +796,8 @@ namespace mg
     const MGLevelObject<MATRIX2> &m,
     const MGLevelObject<DATA> &data)
   {
-    const unsigned int min = std::max(m.get_minlevel(), data.get_minlevel());
-    const unsigned int max = std::min(m.get_maxlevel(), data.get_maxlevel());
+    const unsigned int min = std::max(m.min_level(), data.min_level());
+    const unsigned int max = std::min(m.max_level(), data.max_level());
 
     this->resize(min, max);
 
@@ -813,7 +813,7 @@ namespace mg
     VECTOR &u,
     const VECTOR &rhs) const
   {
-    unsigned int maxlevel = this->get_maxlevel();
+    unsigned int maxlevel = this->max_level();
     unsigned int steps2 = this->steps;
 
     if (this->variable)
@@ -872,8 +872,8 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::clear ()
 {
   smoothers.clear();
 
-  unsigned int i=matrices.get_minlevel(),
-               max_level=matrices.get_maxlevel();
+  unsigned int i=matrices.min_level(),
+               max_level=matrices.max_level();
   for (; i<=max_level; ++i)
     matrices[i]=0;
 }
@@ -886,8 +886,8 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
   const MGLevelObject<MATRIX2> &m,
   const typename RELAX::AdditionalData &data)
 {
-  const unsigned int min = m.get_minlevel();
-  const unsigned int max = m.get_maxlevel();
+  const unsigned int min = m.min_level();
+  const unsigned int max = m.max_level();
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -906,13 +906,13 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
   const MGLevelObject<MATRIX2> &m,
   const MGLevelObject<DATA> &data)
 {
-  const unsigned int min = m.get_minlevel();
-  const unsigned int max = m.get_maxlevel();
+  const unsigned int min = m.min_level();
+  const unsigned int max = m.max_level();
 
-  Assert (data.get_minlevel() == min,
-          ExcDimensionMismatch(data.get_minlevel(), min));
-  Assert (data.get_maxlevel() == max,
-          ExcDimensionMismatch(data.get_maxlevel(), max));
+  Assert (data.min_level() == min,
+          ExcDimensionMismatch(data.min_level(), min));
+  Assert (data.max_level() == max,
+          ExcDimensionMismatch(data.max_level(), max));
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -933,8 +933,8 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
   const unsigned int row,
   const unsigned int col)
 {
-  const unsigned int min = m.get_minlevel();
-  const unsigned int max = m.get_maxlevel();
+  const unsigned int min = m.min_level();
+  const unsigned int max = m.max_level();
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -955,13 +955,13 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::initialize (
   const unsigned int row,
   const unsigned int col)
 {
-  const unsigned int min = m.get_minlevel();
-  const unsigned int max = m.get_maxlevel();
+  const unsigned int min = m.min_level();
+  const unsigned int max = m.max_level();
 
-  Assert (data.get_minlevel() == min,
-          ExcDimensionMismatch(data.get_minlevel(), min));
-  Assert (data.get_maxlevel() == max,
-          ExcDimensionMismatch(data.get_maxlevel(), max));
+  Assert (data.min_level() == min,
+          ExcDimensionMismatch(data.min_level(), min));
+  Assert (data.max_level() == max,
+          ExcDimensionMismatch(data.max_level(), max));
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -981,7 +981,7 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::smooth(
   VECTOR &u,
   const VECTOR &rhs) const
 {
-  unsigned int maxlevel = smoothers.get_maxlevel();
+  unsigned int maxlevel = smoothers.max_level();
   unsigned int steps2 = this->steps;
 
   if (this->variable)
@@ -1041,8 +1041,8 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::clear ()
 {
   smoothers.clear();
 
-  unsigned int i=matrices.get_minlevel(),
-               max_level=matrices.get_maxlevel();
+  unsigned int i=matrices.min_level(),
+               max_level=matrices.max_level();
   for (; i<=max_level; ++i)
     matrices[i]=0;
 }
@@ -1056,8 +1056,8 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
   const MGLevelObject<MATRIX2> &m,
   const typename PRECONDITIONER::AdditionalData &data)
 {
-  const unsigned int min = m.get_minlevel();
-  const unsigned int max = m.get_maxlevel();
+  const unsigned int min = m.min_level();
+  const unsigned int max = m.max_level();
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -1078,13 +1078,13 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
   const MGLevelObject<MATRIX2> &m,
   const MGLevelObject<DATA> &data)
 {
-  const unsigned int min = m.get_minlevel();
-  const unsigned int max = m.get_maxlevel();
+  const unsigned int min = m.min_level();
+  const unsigned int max = m.max_level();
 
-  Assert (data.get_minlevel() == min,
-          ExcDimensionMismatch(data.get_minlevel(), min));
-  Assert (data.get_maxlevel() == max,
-          ExcDimensionMismatch(data.get_maxlevel(), max));
+  Assert (data.min_level() == min,
+          ExcDimensionMismatch(data.min_level(), min));
+  Assert (data.max_level() == max,
+          ExcDimensionMismatch(data.max_level(), max));
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -1107,8 +1107,8 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
   const unsigned int row,
   const unsigned int col)
 {
-  const unsigned int min = m.get_minlevel();
-  const unsigned int max = m.get_maxlevel();
+  const unsigned int min = m.min_level();
+  const unsigned int max = m.max_level();
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -1131,13 +1131,13 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::initialize (
   const unsigned int row,
   const unsigned int col)
 {
-  const unsigned int min = m.get_minlevel();
-  const unsigned int max = m.get_maxlevel();
+  const unsigned int min = m.min_level();
+  const unsigned int max = m.max_level();
 
-  Assert (data.get_minlevel() == min,
-          ExcDimensionMismatch(data.get_minlevel(), min));
-  Assert (data.get_maxlevel() == max,
-          ExcDimensionMismatch(data.get_maxlevel(), max));
+  Assert (data.min_level() == min,
+          ExcDimensionMismatch(data.min_level(), min));
+  Assert (data.max_level() == max,
+          ExcDimensionMismatch(data.max_level(), max));
 
   matrices.resize(min, max);
   smoothers.resize(min, max);
@@ -1158,7 +1158,7 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::smooth(
   VECTOR &u,
   const VECTOR &rhs) const
 {
-  unsigned int maxlevel = matrices.get_maxlevel();
+  unsigned int maxlevel = matrices.max_level();
   unsigned int steps2 = this->steps;
 
   if (this->variable)

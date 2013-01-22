@@ -186,10 +186,10 @@ point becomes too small or negative.
 (Martin Kronbichler, 2013/01/18)
 
 <li> Improved: SLEPcWrappers:: The interface to SLEPc has an improved
-handle on SolverControl such that solver data can be extracted at run
-tume. An example usage has been added to step-36. 
+handle on SolverControl and solver data can now be extracted at run
+time. An example usage has been added to step-36.
 <br>
-(Toby D> Young, 2013/01/18)
+(Toby D. Young, 2013/01/18)
 
 <li> Fixed: Various variants of the TrilinosWrappers::SparseMatrix::reinit
 functions take a parameter <code>drop_tolerance</code> that allows to remove
