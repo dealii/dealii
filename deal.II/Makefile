@@ -9,7 +9,7 @@ indent:
 	@for f in  $(style-h-files) $(style-cc-files) $(style-examples) ;\
 	do\
 	  echo $$f ;\
-	  astyle --options=common/astyle.rc $$f ;\
+	  astyle --options=contrib/utilities/astyle.rc $$f ;\
 	done
 
 .PHONY: indent
