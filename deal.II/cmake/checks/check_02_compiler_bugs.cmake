@@ -109,7 +109,7 @@ ENDIF()
 #
 
 # TODO: We use the mpi.h header file for this check. We should test this
-# bug with another header file than mpi.h ...
+# bug directly...
 CHECK_INCLUDE_FILE_CXX("mpi.h" HAVE_MPI_H)
 
 IF(HAVE_MPI_H)
