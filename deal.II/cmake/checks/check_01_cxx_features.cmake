@@ -104,30 +104,26 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
     "
     DEAL_II_HAVE_CXX11_SHARED_PTR)
 
-  CHECK_CXX_SOURCE_COMPILES(
-    "
-    #include <thread>
-    void f(int){}
-    int main(){ std::thread t(f,1); t.join(); return 0; }
-    "
-    DEAL_II_HAVE_CXX11_THREAD)
-
   #
   # On some systems with gcc 4.5.0, we can compile the code
-  # above but it will throw an exception when run. So test
-  # that as well. The test will only be successful if we have
-  # libpthread available, so link it in for this test. If
-  # multithreading is requested, it will be added to CXXFLAGS
-  # later on so there is no need to do this here.
+  # below but it will throw an exception when run. So test
+  # that as well.
   #
-  PUSH_TEST_FLAG("-lpthread")
+  # TODO: Get somehow rid of the platform introspection...
+  #
+  # TODO: This test will only succeed on platforms where "-pthread" is
+  #       recognized. But this isn't easily fixable:
+  #       configure_threads.cmake which will determine and setup threads
+  #       has to be called later...
+  #
+  PUSH_TEST_FLAG("-pthread")
   CHECK_CXX_SOURCE_RUNS(
     "
     #include <thread>
     void f(int){}
     int main(){ std::thread t(f,1); t.join(); return 0; }
     "
-    DEAL_II_HAVE_CXX11_THREAD_RUN_OK)
+    DEAL_II_HAVE_CXX11_THREAD)
   POP_TEST_FLAG()
 
   CHECK_CXX_SOURCE_COMPILES(
@@ -162,7 +158,6 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
       DEAL_II_HAVE_CXX11_FUNCTIONAL_GCCBUG35569_OK AND
       DEAL_II_HAVE_CXX11_SHARED_PTR AND
       DEAL_II_HAVE_CXX11_THREAD AND
-      DEAL_II_HAVE_CXX11_THREAD_RUN_OK AND
       DEAL_II_HAVE_CXX11_MUTEX AND
       DEAL_II_HAVE_CXX11_TUPLE AND
       DEAL_II_HAVE_CXX11_TYPE_TRAITS )
