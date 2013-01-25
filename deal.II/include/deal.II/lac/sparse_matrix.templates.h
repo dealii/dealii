@@ -992,8 +992,7 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
         &sp_A.get_column_numbers()[sp_A.get_rowstart_indices()[i+1]];
       for (; rows != end_rows; ++rows)
         {
-          const double A_val = global_entry
-                               (rows-&sp_A.get_column_numbers()[sp_A.get_rowstart_indices()[0]]);
+          const double A_val = val[rows-&sp_A.get_column_numbers()[sp_A.get_rowstart_indices()[0]]];
           const unsigned int col = *rows;
           const unsigned int *new_cols =
             (&sp_B.get_column_numbers()[sp_B.get_rowstart_indices()[col]]);
@@ -1002,8 +1001,8 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
           if (sp_B.optimize_diagonal())
             {
               C.add (i, *new_cols, A_val *
-                     B.global_entry(new_cols-&sp_B.get_column_numbers()
-                                    [sp_B.get_rowstart_indices()[0]]) *
+                     B.val[new_cols-&sp_B.get_column_numbers()
+                           [sp_B.get_rowstart_indices()[0]]] *
                      (use_vector ? V(col) : 1));
               ++new_cols;
             }
@@ -1151,14 +1150,13 @@ SparseMatrix<number>::Tmmult (SparseMatrix<numberC>       &C,
       for (; rows != end_rows; ++rows)
         {
           const unsigned int row = *rows;
-          const double A_val = global_entry
-                               (rows-&sp_A.get_column_numbers()[sp_A.get_rowstart_indices()[0]]);
+          const double A_val = val[rows-&sp_A.get_column_numbers()[sp_A.get_rowstart_indices()[0]]];
 
           // special treatment for diagonal
           if (sp_B.optimize_diagonal())
             C.add (row, i, A_val *
-                   B.global_entry(new_cols-1-&sp_B.get_column_numbers()
-                                  [sp_B.get_rowstart_indices()[0]]) *
+                   B.val[new_cols-1-&sp_B.get_column_numbers()
+                         [sp_B.get_rowstart_indices()[0]]] *
                    (use_vector ? V(i) : 1));
 
           // now the innermost loop that goes over
