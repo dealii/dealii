@@ -3011,11 +3011,13 @@ namespace DoFTools
 #if defined(DEBUG) && defined(DEAL_II_USE_P4EST)
     // Check whether we run on a non parallel mesh or on a
     // parallel::distributed::Triangulation in serial
-    typedef parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> PTRIA;
-    const PTRIA* ptria_p = dynamic_cast<const PTRIA*> (&dof_handler.get_tria());
-    Assert ((ptria_p == 0 || Utilities::MPI::n_mpi_processes(ptria_p->get_communicator()) == 1),
-            ExcMessage ("This function can not be used with distributed triangulations."
-                        "See the documentation for more information."));
+    {
+      typedef parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> PTRIA;
+      const PTRIA* ptria_p = dynamic_cast<const PTRIA*> (&dof_handler.get_tria());
+      Assert ((ptria_p == 0 || Utilities::MPI::n_mpi_processes(ptria_p->get_communicator()) == 1),
+	      ExcMessage ("This function can not be used with distributed triangulations."
+			  "See the documentation for more information."));
+    }
 #endif
 
     Assert (b_id1 != b_id2,
@@ -3103,11 +3105,13 @@ namespace DoFTools
 #if defined(DEBUG) && defined(DEAL_II_USE_P4EST)
     // Check whether we run on a non parallel mesh or on a
     // parallel::distributed::Triangulation in serial
-    typedef typename parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> PTRIA;
-    const PTRIA* ptria_p = dynamic_cast<const PTRIA*> (&dof_handler.get_tria());
-    Assert ((ptria_p == 0 || Utilities::MPI::n_mpi_processes(ptria_p->get_communicator()) == 1),
-            ExcMessage ("This function can not be used with distributed triangulations."
-                        "See the documentation for more information."));
+    {
+      typedef typename parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> PTRIA;
+      const PTRIA* ptria_p = dynamic_cast<const PTRIA*> (&dof_handler.get_tria());
+      Assert ((ptria_p == 0 || Utilities::MPI::n_mpi_processes(ptria_p->get_communicator()) == 1),
+	      ExcMessage ("This function can not be used with distributed triangulations."
+			  "See the documentation for more information."));
+    }
 #endif
 
     typedef typename DH::face_iterator FaceIterator;
