@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id:$
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
@@ -3008,7 +3008,7 @@ namespace DoFTools
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
-#ifdef DEBUG
+#if defined(DEBUG) && defined(DEAL_II_USE_P4EST)
     // Check whether we run on a non parallel mesh or on a
     // parallel::distributed::Triangulation in serial
     typedef parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> PTRIA;
@@ -3100,7 +3100,7 @@ namespace DoFTools
     Assert(dim == space_dim,
            ExcNotImplemented());
 
-#ifdef DEBUG
+#if defined(DEBUG) && defined(DEAL_II_USE_P4EST)
     // Check whether we run on a non parallel mesh or on a
     // parallel::distributed::Triangulation in serial
     typedef typename parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> PTRIA;
