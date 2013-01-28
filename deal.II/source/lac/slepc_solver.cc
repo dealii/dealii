@@ -99,23 +99,27 @@ namespace SLEPcWrappers
   {
     int ierr;
 
-    AssertThrow (solver_data.get() == 0, ExcSLEPcWrappersUsageError());
-    solver_data.reset (new SolverData());
+    // create a solver object if this is necessary
+    if (solver_data.get() == 0)
+      {
+	// reset solver dtaa
+	solver_data.reset (new SolverData());
 
-    // create eigensolver context and set operators
-    ierr = EPSCreate (mpi_communicator, &solver_data->eps);
-    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
-
-    // set eigenspectrum problem type (general/standard)
-    AssertThrow (opA, ExcSLEPcWrappersUsageError());
-    if (opB)
-      ierr = EPSSetOperators (solver_data->eps, *opA, *opB);
-    else
-      ierr = EPSSetOperators (solver_data->eps, *opA, PETSC_NULL);
-    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
-
-    // set runtime options
-    set_solver_type (solver_data->eps);
+	// create eigensolver context and set operators
+	ierr = EPSCreate (mpi_communicator, &solver_data->eps);
+	AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+	
+	// set eigenspectrum problem type (general/standard)
+	AssertThrow (opA, ExcSLEPcWrappersUsageError());
+	if (opB)
+	  ierr = EPSSetOperators (solver_data->eps, *opA, *opB);
+	else
+	  ierr = EPSSetOperators (solver_data->eps, *opA, PETSC_NULL);
+	AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+	
+	// set runtime options
+	set_solver_type (solver_data->eps);
+      }
 
     // set the initial vector(s) if any
     if (initial_vector && initial_vector->size() != 0)
