@@ -1,0 +1,4 @@
+
+check 1d parallelepiped (subdivided_parallelepiped): OK
+check 2d parallelepiped (subdivided_parallelepiped): OK
+check 3d parallelepiped (subdivided_parallelepiped): OK

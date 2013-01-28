@@ -334,6 +334,42 @@ public:
 		   const Point<dim>   (&corners) [dim],
 		   const bool           colorize = false);
    
+  /**
+   * A subdivided parallelepiped. The first corner point is the
+   * origin. The <tt>dim</tt> adjacent points are vectors describing
+   * the edges of the parallelepiped with respect to the
+   * origin. Additional points are sums of these dim vectors. The
+   * variable @p n_subdivisions designates the number of subdivisions
+   * in each of the <tt>dim</tt> directions. Colorizing is done
+   * according to hyper_rectangle().
+   *
+   * @note The triangulation needs to be void upon calling this
+   * function.
+   */
+  template <int dim>
+    static
+    void
+    subdivided_parallelepiped (Triangulation<dim>  &tria,
+			       const unsigned int   n_subdivisions,
+			       const Point<dim>   (&corners) [dim],
+			       const bool           colorize = false);
+
+  /**
+   * A subdivided parallelepiped, ie. the same as above, but where the
+   * number of subdivisions in each of the <tt>dim</tt> directions may
+   * vary. Colorizing is done according to hyper_rectangle().
+   *
+   * @note The triangulation needs to be void upon calling this
+   * function.
+   */
+  template <int dim>
+    static
+    void
+    subdivided_parallelepiped (Triangulation<dim>  &tria,
+			       const unsigned int ( n_subdivisions) [dim],
+			       const Point<dim>   (&corners) [dim],
+			       const bool           colorize = false);
+
 
   /**
    * Hypercube with a layer of
