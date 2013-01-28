@@ -25,6 +25,8 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
       atlas_LIBRARY
       blas_LIBRARY
       lapack_LIBRARY
+      refblas_LIBRARY
+      reflapack_LIBRARY
       )
     SET(${var} TRUE)
   ENDIF()
