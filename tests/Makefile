@@ -23,6 +23,7 @@ nofail-dirs = a-framework       \
 	      $(if $(DEAL_II_USE_MPI:no=),      $(if $(USE_CONTRIB_P4EST:no=),mpi,),) \
 	      $(if $(USE_CONTRIB_P4EST:no=),    distributed_grids,) \
 	      $(if $(USE_CONTRIB_PETSC:no=),    petsc,) \
+	      $(if $(USE_CONTRIB_SLEPC:no=),    slepc,) \
 	      $(if $(USE_CONTRIB_TRILINOS:no=), trilinos,) \
 	      $(if $(USE_CONTRIB_UMFPACK:no=),  umfpack,) \
 	      $(if $(USE_CONTRIB_METIS:no=),    metis,) \
