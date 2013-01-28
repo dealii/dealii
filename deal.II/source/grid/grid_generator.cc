@@ -474,12 +474,172 @@ GridGenerator::parallelepiped (Triangulation<dim>  &tria,
   GridReordering<dim>::reorder_cells (cells);
   tria.create_triangulation (vertices, cells, SubCellData());
 
-  // Finally assign boundary indicatorsaccording to hyper_rectangle
+  // Finally assign boundary indicators according to hyper_rectangle
   if (colorize)
     colorize_hyper_rectangle (tria);
 }
 
+template<int dim>
+void
+GridGenerator::subdivided_parallelepiped (Triangulation<dim>  &tria,
+					  const unsigned int   n_subdivisions,
+					  const Point<dim>   (&corners) [dim],
+					  const bool           colorize)
+{
+  // Equalise number of subdivisions in each dim-direction, heir
+  // validity will be checked later
+  unsigned int (n_subdivisions_) [dim];
+  for (unsigned int i=0; i<dim; ++i)
+    n_subdivisions_[i] = n_subdivisions;
 
+  // and call the function below
+  GridGenerator::subdivided_parallelepiped (tria, n_subdivisions_, 
+					    corners,
+					    colorize);
+}
+
+template<int dim>
+void
+GridGenerator::subdivided_parallelepiped (Triangulation<dim>  &tria,
+					  const unsigned int ( n_subdivisions) [dim],
+					  const Point<dim>   (&corners) [dim],
+					  const bool           colorize)
+{
+  // Zero n_subdivisions is the origin only, which makes no sense
+  for (unsigned int i=0; i<dim; ++i)
+    Assert (n_subdivisions[i]>0, ExcInvalidRepetitions(n_subdivisions[i]));
+
+  // Check corners do not overlap (unique)
+  for (unsigned int i=0; i<dim; ++i)
+    for (unsigned int j=i+1; j<dim; ++j)
+      Assert ((corners[i]!=corners[j]),
+              ExcMessage ("Invalid distance between corner points of parallelepiped."));
+
+  // Create a list of points
+  Point<dim> (delta) [dim];
+
+  for (unsigned int i=0; i<dim; ++i)
+    delta[i] = corners[i]/n_subdivisions[i];
+  std::vector<Point<dim> > points;
+
+  switch (dim)
+    {
+    case 1:
+      for (unsigned int x=0; x<=n_subdivisions[0]; ++x)
+	points.push_back (Point<dim> (x*delta[0]));
+      break;
+      
+    case 2:
+      for (unsigned int y=0; y<=n_subdivisions[1]; ++y)
+	for (unsigned int x=0; x<=n_subdivisions[0]; ++x)
+	  points.push_back (Point<dim> (x*delta[0] + y*delta[1]));
+      break;
+
+    case 3:
+      for (unsigned int z=0; z<=n_subdivisions[2]; ++z)
+	for (unsigned int y=0; y<=n_subdivisions[1]; ++y)
+	  for (unsigned int x=0; x<=n_subdivisions[0]; ++x)
+	    points.push_back (Point<dim> (x*delta[0] + y*delta[1] + z*delta[2]));
+      break;
+
+    default:
+      Assert (false, ExcNotImplemented());
+    }
+
+#ifdef DEBUG
+  // Debug block: Try to delete duplicates (a good grid has none) and
+  // then check none actually were deleted (this may be a superflous
+  // test; if the corners[] were unique, the points should be too)
+  unsigned int n_points = 1;
+  for (unsigned int i=0; i<dim; ++i)
+    n_points *= n_subdivisions[i]+1;
+
+  points.erase (std::unique (points.begin (), points.end ()), 
+    		points.end ());
+  Assert (points.size ()==n_points, 
+    	  ExcInternalError());
+#endif
+  
+  // Prepare cell data 
+  unsigned int n_cells = 1;
+  for (unsigned int i=0; i<dim; ++i)
+    n_cells *= n_subdivisions[i];
+  std::vector<CellData<dim> > cells (n_cells);
+
+  // Create fixed ordering of 
+  switch (dim)
+    {
+    case 1:
+      for (unsigned int x=0; x<n_subdivisions[0]; ++x)
+        {
+          cells[x].vertices[0] = x;
+          cells[x].vertices[1] = x+1;
+
+	  // wipe material id
+          cells[x].material_id = 0;
+        }
+      break;
+
+    case 2:
+      {
+	// Shorthand
+	const unsigned int n_dy = n_subdivisions[1];
+	const unsigned int n_dx = n_subdivisions[0];
+	
+	for (unsigned int y=0; y<n_dy; ++y)
+	  for (unsigned int x=0; x<n_dx; ++x)
+	    {
+	      const unsigned int c = y*n_dx         + x;
+	      cells[c].vertices[0] = y*(n_dx+1)     + x;
+	      cells[c].vertices[1] = y*(n_dx+1)     + x+1;
+	      cells[c].vertices[2] = (y+1)*(n_dx+1) + x;
+	      cells[c].vertices[3] = (y+1)*(n_dx+1) + x+1;
+	      
+	      // wipe material id
+	      cells[c].material_id = 0;
+	    }
+      }
+      break;
+      
+    case 3:
+      {
+	// Shorthand
+	const unsigned int n_dz = n_subdivisions[2];
+	const unsigned int n_dy = n_subdivisions[1];
+	const unsigned int n_dx = n_subdivisions[0];
+
+	for (unsigned int z=0; z<n_dz; ++z)
+	  for (unsigned int y=0; y<n_dy; ++y)
+	    for (unsigned int x=0; x<n_dx; ++x)
+	      {
+		const unsigned int c = z*n_dy*n_dx             + y*n_dx         + x;
+
+		cells[c].vertices[0] = z*(n_dy+1)*(n_dx+1)     + y*(n_dx+1)     + x;
+		cells[c].vertices[1] = z*(n_dy+1)*(n_dx+1)     + y*(n_dx+1)     + x+1;
+		cells[c].vertices[2] = z*(n_dy+1)*(n_dx+1)     + (y+1)*(n_dx+1) + x;
+		cells[c].vertices[3] = z*(n_dy+1)*(n_dx+1)     + (y+1)*(n_dx+1) + x+1;
+		cells[c].vertices[4] = (z+1)*(n_dy+1)*(n_dx+1) + y*(n_dx+1)     + x;
+		cells[c].vertices[5] = (z+1)*(n_dy+1)*(n_dx+1) + y*(n_dx+1)     + x+1;
+		cells[c].vertices[6] = (z+1)*(n_dy+1)*(n_dx+1) + (y+1)*(n_dx+1) + x;
+		cells[c].vertices[7] = (z+1)*(n_dy+1)*(n_dx+1) + (y+1)*(n_dx+1) + x+1;
+
+		// wipe material id
+		cells[c].material_id = 0;
+	      }
+	break;
+      }
+      
+    default:
+      Assert (false, ExcNotImplemented());
+    }
+
+  // Create triangulation
+  tria.create_triangulation (points, cells, SubCellData());
+
+  // Finally assign boundary indicators according to hyper_rectangle
+  if (colorize)
+    colorize_hyper_rectangle (tria);
+}
 
 
 template <int dim>
