@@ -15,6 +15,7 @@
 #ifndef __deal2__matrices_h
 #define __deal2__matrices_h
 
+#warning This file is deprecated. Use <matrix_tools.h> instead.
 #include <deal.II/numerics/matrix_tools.h>
 
 #endif
