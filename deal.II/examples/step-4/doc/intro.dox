@@ -7,7 +7,7 @@ deal.II has a unique feature which we call
 previous examples that many classes had a number in angle brackets
 suffixed to them. This is to indicate that for example the
 triangulation in two and three space dimensions are different, but
-related data %types. We could as well have called them 
+related data %types. We could as well have called them
 <code>Triangulation2d</code> and <code>Triangulation3d</code> instead
 of <code>Triangulation@<2@></code> and
 <code>Triangulation@<3@></code> to name the two classes, but this
@@ -63,7 +63,7 @@ example, like this,
   make_grid (triangulation);
 @endcode
 then the compiler will deduce that the function <code>make_grid</code> for
-<code>dim==2</code> was 
+<code>dim==2</code> was
 requested and will compile the template above into a function with dim replaced
 by 2 everywhere, i.e. it will compile the function as if it were defined
 as
@@ -112,7 +112,7 @@ amount of memory for the member variable; note that the size of a
 
 The deal.II library is build around this concept
 of dimension-independent programming, and therefore allows you to program in
-a way that will not need to 
+a way that will not need to
 distinguish between the space dimensions. It should be noted that in
 only a very few places is it necessary to actually compare the
 dimension using <code>if</code>s or <code>switch</code>es. However, since the compiler
@@ -131,3 +131,10 @@ dimensions at the same time. Other extensions are the use of a
 non-constant right hand side function and of non-zero boundary values.
 
 
+@note When using templates, C++ imposes all sorts of syntax constraints that
+make it sometimes a bit difficult to understand why exactly something has to
+be written this way. A typical example is the need to use the keyword
+<code>typename</code> in so many places. If you are not entirely familiar with
+this already, then several of these difficulties are explained in the deal.II
+Frequently Asked Questions (FAQ) linked to from the <a
+href="http://www.dealii.org/">deal.II homepage</a>.
