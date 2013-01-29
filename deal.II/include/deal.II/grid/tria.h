@@ -806,6 +806,7 @@ namespace internal
  *   indicator of a face can be changed using a call of the kind
  *   <code>cell-@>face(1)-@>set_boundary_indicator(42);</code>.
  *
+ *   @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
  *
  *
  *   <h3>History of a triangulation</h3>
@@ -1777,8 +1778,10 @@ public:
    * replaces the boundary object given
    * before by a straight boundary
    * approximation.
-  *
-  * @ingroup boundary
+   *
+   * @ingroup boundary
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void set_boundary (const types::boundary_id   number,
                      const Boundary<dim,spacedim> &boundary_object);
@@ -1791,8 +1794,10 @@ public:
    * undoes assignment of a different
    * boundary object by the function of
    * same name and two arguments.
-  *
-  * @ingroup boundary
+   *
+   * @ingroup boundary
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void set_boundary (const types::boundary_id number);
 
@@ -1802,8 +1807,10 @@ public:
    * this triangulation.  Number is
    * the same as in
    * @p set_boundary
-  *
-  * @ingroup boundary
+   *
+   * @ingroup boundary
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   const Boundary<dim,spacedim> &get_boundary (const types::boundary_id number) const;
 
@@ -1819,8 +1826,10 @@ public:
    * the number of different
    * indicators (which is greater
    * or equal one).
-  *
-  * @ingroup boundary
+   *
+   * @ingroup boundary
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   std::vector<types::boundary_id> get_boundary_indicators() const;
 

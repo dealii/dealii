@@ -759,6 +759,7 @@ namespace VectorTools
    * function with remapped
    * arguments.
    *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <class DH>
   void
@@ -774,6 +775,8 @@ namespace VectorTools
    * interpolate_boundary_values()
    * function, see above, with
    * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <class DH>
   void
@@ -897,6 +900,8 @@ namespace VectorTools
    * with remapped arguments.
    *
    * @ingroup constraints
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <class DH>
   void
@@ -914,6 +919,8 @@ namespace VectorTools
    * <tt>mapping=MappingQ1@<dim@>()</tt>.
    *
    * @ingroup constraints
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <class DH>
   void
@@ -1168,6 +1175,8 @@ namespace VectorTools
    * the face.
    *
    * @ingroup constraints
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim>
   void project_boundary_values_curl_conforming (const DoFHandler<dim> &dof_handler,
@@ -1181,6 +1190,8 @@ namespace VectorTools
    * Same as above for the hp-namespace.
    *
    * @ingroup constraints
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim>
   void project_boundary_values_curl_conforming (const hp::DoFHandler<dim> &dof_handler,
@@ -1254,6 +1265,8 @@ namespace VectorTools
    * boundary.
    *
    * @ingroup constraints
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template<int dim>
   void project_boundary_values_div_conforming (const DoFHandler<dim> &dof_handler,
@@ -1267,6 +1280,8 @@ namespace VectorTools
    * Same as above for the hp-namespace.
    *
    * @ingroup constraints
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template<int dim>
   void project_boundary_values_div_conforming (const hp::DoFHandler<dim> &dof_handler,
@@ -1591,9 +1606,10 @@ namespace VectorTools
    * these points.
    *
    * @ingroup constraints
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, template <int, int> class DH, int spacedim>
-
   void
   compute_no_normal_flux_constraints (const DH<dim,spacedim>         &dof_handler,
                                       const unsigned int     first_vector_component,
@@ -1773,6 +1789,8 @@ namespace VectorTools
    *
    * See the general documentation of this
    * class for further information.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim>
   void create_boundary_right_hand_side (const Mapping<dim,spacedim>      &mapping,
@@ -1787,6 +1805,8 @@ namespace VectorTools
    * create_boundary_right_hand_side()
    * function, see above, with
    * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim>
   void create_boundary_right_hand_side (const DoFHandler<dim,spacedim>   &dof,
@@ -1798,6 +1818,8 @@ namespace VectorTools
   /**
    * Same as the set of functions above,
    * but for hp objects.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim>
   void create_boundary_right_hand_side (const hp::MappingCollection<dim,spacedim>      &mapping,
@@ -1816,6 +1838,8 @@ namespace VectorTools
    * therefore will only work if
    * the only active fe index in
    * use is zero.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim>
   void create_boundary_right_hand_side (const hp::DoFHandler<dim,spacedim>   &dof,

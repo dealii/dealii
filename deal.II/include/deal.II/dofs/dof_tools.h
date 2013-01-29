@@ -1133,6 +1133,8 @@ namespace DoFTools
    * @note This function will not work for DoFHandler objects that are
    * built on a parallel::distributed::Triangulation object.
    *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+   *
    * @author Matthias Maier, 2012
    */
   template<typename DH>
@@ -1156,6 +1158,8 @@ namespace DoFTools
    *
    * @note This function will not work for DoFHandler objects that are
    * built on a parallel::distributed::Triangulation object.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    *
    * @author Matthias Maier, 2012
    */
@@ -1187,6 +1191,8 @@ namespace DoFTools
    *
    * @note This function will not work for DoFHandler objects that are
    * built on a parallel::distributed::Triangulation object.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template<typename DH>
   void
@@ -1212,6 +1218,8 @@ namespace DoFTools
    *
    * @note This function will not work for DoFHandler objects that are
    * built on a parallel::distributed::Triangulation object.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template<typename DH>
   void
@@ -1480,6 +1488,8 @@ namespace DoFTools
    *          If it is a non-empty list, then the function only considers
    *          boundary faces with the boundary indicators listed in this
    *          argument.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <class DH>
   void
@@ -1516,6 +1526,8 @@ namespace DoFTools
    *          If it is a non-empty list, then the function only considers
    *          boundary faces with the boundary indicators listed in this
    *          argument.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <class DH>
   void
@@ -1553,6 +1565,8 @@ namespace DoFTools
    * function says that it is
    * nonzero on any face on one of
    * the selected boundary parts.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <class DH>
   void
@@ -2598,6 +2612,8 @@ namespace DoFTools
    *
    * See the general doc of this
    * class for more information.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <class DH>
   void
@@ -2788,6 +2804,8 @@ namespace DoFTools
    *   degrees of freedom at the boundary will be considered.
    *
    * @ingroup constraints
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   template <int dim, int spacedim, template <int, int> class DH>
   void
