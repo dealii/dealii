@@ -1022,6 +1022,8 @@ public:
    * value numbers::internal_face_boundary_id,
    * then this object is in the
    * interior of the domain.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   types::boundary_id boundary_indicator () const;
 
@@ -1068,6 +1070,8 @@ public:
    * sense under the current circumstances.
    *
    * @ingroup boundary
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void set_boundary_indicator (const types::boundary_id) const;
 
@@ -1088,6 +1092,8 @@ public:
    * current function.
    *
    * @ingroup boundary
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void set_all_boundary_indicators (const types::boundary_id) const;
 
@@ -1955,6 +1961,8 @@ public:
    * value numbers::internal_face_boundary_id,
    * then this object is in the
    * interior of the domain.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   types::boundary_id boundary_indicator () const;
 
@@ -2092,6 +2100,8 @@ public:
    * sense under the current circumstances.
    *
    * @ingroup boundary
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void
   set_boundary_indicator (const types::boundary_id);
@@ -2103,6 +2113,8 @@ public:
    * argument.
    *
    * @ingroup boundary
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   void
   set_all_boundary_indicators (const types::boundary_id);

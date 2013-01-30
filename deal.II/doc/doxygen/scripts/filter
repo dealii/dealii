@@ -33,7 +33,7 @@ s/(::)?dealii::/::/g;
 # - things like step-12.solution.png that typically appear in
 #   @image commands.
 # - things in headings
-s/(?<![\"\\])step-(\d+)(?!\")/\@ref step_\1 \"step-\1\"/gi
+s/(?<![\"\\\/])step-(\d+)(?!\")/\@ref step_\1 \"step-\1\"/gi
   if !m/(\@page|\@image|<h\d>)/i;
 
 # If step-xx was explicitly escaped with a backslash, remove the

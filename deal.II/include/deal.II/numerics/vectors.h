@@ -15,6 +15,7 @@
 #ifndef __deal2__vectors_h
 #define __deal2__vectors_h
 
+#warning This file is deprecated. Use <vector_tools.h> instead.
 #include <deal.II/numerics/vector_tools.h>
 
 #endif

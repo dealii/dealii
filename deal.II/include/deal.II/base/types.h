@@ -67,12 +67,14 @@ namespace types
    * The type used to denote boundary indicators associated with every
    * piece of the boundary and, in the case of meshes that describe
    * manifolds in higher dimensions, associated with every cell.
-  *
-  * There is a special value, numbers::internal_face_boundary_id
-  * that is used to indicate an invalid value of this type and that
-  * is used as the boundary indicator for faces that are in the interior
-  * of the domain and therefore not part of any addressable boundary
-  * component.
+   *
+   * There is a special value, numbers::internal_face_boundary_id
+   * that is used to indicate an invalid value of this type and that
+   * is used as the boundary indicator for faces that are in the interior
+   * of the domain and therefore not part of any addressable boundary
+   * component.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   typedef unsigned char boundary_id;
 
@@ -141,6 +143,8 @@ namespace numbers
    * default value.  We assume that
    * all valid boundary_ids lie in the
    * range [0, invalid_boundary_id).
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   const types::boundary_id invalid_boundary_id = static_cast<types::boundary_id>(-1);
 
@@ -155,6 +159,8 @@ namespace numbers
    * differentiate between faces that lie at the boundary of the domain
    * and faces that lie in the interior of the domain. You should never try
    * to assign this boundary indicator to anything in user code.
+   *
+   * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
   const types::boundary_id internal_face_boundary_id = static_cast<types::boundary_id>(-1);
 
