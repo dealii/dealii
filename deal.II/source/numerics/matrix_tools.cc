@@ -26,7 +26,6 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/geometry_info.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/numerics/matrix_tools.h>
