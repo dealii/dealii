@@ -52,7 +52,7 @@ $$\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0$$
 with $\sigma_0$ as yield stress. If there is no plastic deformation - that is $\lambda=0$ - this yields $\vert\sigma^D\vert < \sigma_0$
 and otherwise if $\lambda > 0$ it follows that $\vert\sigma^D\vert = \sigma_0$. That means if the stress is smaller as the yield stress
 there are only elastic deformations. Therein the Index $D$ denotes the deviator part of the stress $\sigma$ which
-is dedined as
+is defined as
 $$\sigma^D = \sigma - \dfrac{1}{3}tr(\sigma).$$
 It describes the hydrostatic part of the stress tensor in contrast to the volumetric part. For metal the hydrostatic
 stress composes the main indicator for the plastic deformation.\\
@@ -196,8 +196,8 @@ as the additional, positive force $\sigma(u)n$ that the obstacle
 exerts on the boundary $\Gamma_C$ of the body.\\
 
 \noindent
-The existence and uniqueness of $(u,\lambda)\in V\times K$ of this saddle point
-problem has been stated in Glowinski, Lions and Tr\'{e}moli\`{e}res: Numerical
+The existence and uniqueness of the analytical solution $(u,\lambda)\in V\times
+K$ of this saddle point problem has been stated in Glowinski, Lions and Tr\'{e}moli\`{e}res: Numerical
 Analysis of Variational Inequalities, North-Holland, 1981.\\
 
 \noindent
@@ -219,7 +219,7 @@ Newton method}
 
 Now we describe an algorithm that combines the Newton-method, which we use for
 the nonlinear constitutive law, with the semismooth Newton method for the contact. It
-works as follows:
+sums up the results of the sections before and works as follows:
 \begin{itemize}
  \item[(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that $\mathcal{S} = \mathcal{A}_k \cup \mathcal{F}_k$ and $\mathcal{A}_k \cap \mathcal{F}_k = \emptyset$ and set $k = 1$.
  \item[(1)] Assemble the Newton matrix $a'(U^k;\varphi_i,\varphi_j)$ and the right-hand-side $F(U^k)$.
@@ -239,6 +239,12 @@ works as follows:
  F\left(U^{k+1}\right) \vert < \delta$ then stop, else set $k=k+1$ and go to
  step (1).
 \end{itemize}
+\noindent
+Compare to step-41 step (1) is added but it should be clear from the sections
+above that we only linearize the problem. In step (2) we have to solve a linear
+system of equations again. And now the solution has to fulfill two stopping criterias. $\mathcal{A}_{k+1} = \mathcal{A}_k$ makes sure that the contact zones
+are iterated and the second ensures an accurate enough residual which means that
+the plastic zones are also iterated.
 
 \section{Implementation}
 

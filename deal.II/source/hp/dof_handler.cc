@@ -13,6 +13,7 @@
 
 
 #include <deal.II/base/memory_consumption.h>
+#include <deal.II/base/geometry_info.h>
 #include <deal.II/base/std_cxx1x/bind.h>
 #include <deal.II/hp/dof_handler.h>
 #include <deal.II/hp/dof_objects.h>
@@ -23,7 +24,6 @@
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_levels.h>
 #include <deal.II/grid/tria.h>
-#include <deal.II/grid/geometry_info.h>
 #include <deal.II/fe/fe.h>
 
 #include <set>
