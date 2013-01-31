@@ -37,7 +37,10 @@ SET(DEAL_II_WITH_BOOST
 
 
 MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
-  FIND_PACKAGE (Boost COMPONENTS serialization thread)
+  #
+  # We require at least version 1.44
+  #
+  FIND_PACKAGE (Boost 1.44 COMPONENTS serialization thread)
 
   IF(Boost_THREAD_FOUND AND Boost_SERIALIZATION_FOUND)
     SET(${var} TRUE)
