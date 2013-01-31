@@ -63,6 +63,11 @@ namespace PETScWrappers
                      const PreconditionerBase &preconditioner)
   {
     int ierr;
+
+    Assert(A.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc Solver and Matrix need to use the same MPI_Comm."));
+    Assert(x.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc Solver and Vector need to use the same MPI_Comm."));
+    Assert(b.get_mpi_communicator()==mpi_communicator, ExcMessage("PETSc Solver and Vector need to use the same MPI_Comm."));
+
     // first create a solver object if this
     // is necessary
     if (solver_data.get() == 0)
