@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -94,6 +94,13 @@ OPTION(DEAL_II_FORCE_AUTODETECTION
   OFF
   )
 
+IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
+  SET(CMAKE_INSTALL_PREFIX
+    "${CMAKE_BINARY_DIR}"
+    CACHE STRING
+    "Install path prefix, prepended onto install directories."
+    )
+ENDIF()
 
 ###########################################################################
 #                                                                         #
