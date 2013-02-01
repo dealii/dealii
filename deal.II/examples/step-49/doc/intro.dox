@@ -1,0 +1,157 @@
+<a name="Intro"></a>
+<h1>Introduction</h1>
+
+<h3> About the tutorial </h3>
+
+Since this is the first tutorial program, let us comment first on how
+this tutorial and the rest of the deal.II documentation is supposed to
+work. The documentation for deal.II comes essentially at three
+different levels:
+- The tutorial: This is a collection of programs that shows how
+  deal.II is used in practice. It doesn't typically discuss individual
+  functions at the level of individual arguments, but rather wants to
+  give the big picture of how things work together. In other words, it
+  discusses "concepts": what are the building blocks of deal.II and
+  how are they used together in finite element programs.
+- The manual: This is the documentation of every single class and
+  every single (member) function in deal.II. You get there if, for
+  example, you click on the "Main page" or "Classes" tab at the top of
+  this page. This is the place where you would look up what the second
+  argument of Triangulation::create_triangulation_compatibility means,
+  to give just one slightly obscure example. You need this level of
+  documentation for when you know what you want to do, but forgot how
+  exactly the function was named, what its arguments are, or what it
+  returns. Note that you also get into the manual whenever you read
+  through the tutorial and click on any of the class or function
+  names, i.e. the tutorial contains a great many links into the manual
+  for whenever you need a more detailed description of a function or
+  class. On the other hand, the manual is not a good place to learn
+  deal.II since it gives you a microscopic view of things without
+  telling you how a function might fit into the bigger picture.
+- Modules: These are groups of classes and functions that work
+  together or have related functionality. If you click on the
+  "Modules" tab at the top of this page, you end up on a page that
+  lists a number of such groups. Each module discusses the underlying
+  principles of these classes; for example, the @ref Sparsity module
+  talks about all sorts of different issues related to storing
+  sparsity patterns of matrices. This is documentation at an
+  intermediate level: they give you an overview of what's there in a
+  particular area. For example when you wonder what finite element
+  classes exist, you would take a look at the @ref fe module. The
+  modules are, of course, also cross-linked to the manual (and, at
+  times, to the tutorial); if you click on a class name, say on
+  Triangulation, would will also at the very top right under the class
+  name get a link to the modules this class is a member of if you want
+  to learn more about its context.
+
+Let's come back to the tutorial, since you are looking at the first program
+(or "step") of it. Each tutorial program is subdivided into the following
+sections:
+<ol>
+  <li> <b>Introduction:</b> This is a discussion of what the program
+       does, including the mathematical model, and
+       what programming techniques are new compared to previous
+       tutorial programs.
+  <li> <b>The commented program:</b> An extensively documented listing of the
+       source code. Here, we often document individual lines, or
+       blocks of code, and discuss what they do, how they do it, and
+       why. The comments frequently reference the introduction,
+       i.e. you have to understand <i>what</i> the program wants to achieve
+       (a goal discussed in the introduction) before you can
+       understand <i>how</i> it intends to get there.
+  <li> <b>Results:</b> The output of the program, with comments and
+       interpretation. This section also frequently has a subsection
+       that gives suggestions on how to extend the program in various
+       direction; in the earlier programs, this is intended to give
+       you directions for little experiments designed to make your
+       familiar with deal.II, while in later programs it is more about
+       how to use more advanced numerical techniques.
+  <li> <b>The plain program:</b> The source code stripped of
+       all comments. This is useful if you want to see the "big
+       picture" of the code, since the commented version of the
+       program has so much text in between that it is often difficult
+       to see the entire code of a single function on the screen at
+       once.
+</ol>
+
+The tutorials are not only meant to be static documentation, but you
+should play with them. To this end, go to the
+<code>examples/step-1</code> directory (or whatever the number of the
+tutorial is that you're interested in) and type
+@code
+  make
+  make run
+@endcode
+The first command compiles the sources into an executable, while the
+second executes it (strictly speaking, <code>make run</code> will also
+compile the code if the executable doesn't exist yet, so you could
+have skipped the first command if you wanted). This is all that's
+needed to run the code and produce the output that is discussed in the
+"Results" section of the tutorial programs.
+
+When learning the library, you need to play with it and see what
+happens. To this end, open the <code>examples/step-1/step-1.cc</code>
+source file with your favorite editor and modify it in some way, save it and
+run it as above. A few suggestions for possibly modifications are given at the
+end of the results section of this program, where we also provide a few links
+to other useful pieces of information.
+
+
+<h3> What this program does </h3>
+
+Let's come back to step-1, the current program.
+In this first example, we don't actually do very much, but show two
+techniques: what is the syntax to generate triangulation objects, and
+some elements of simple loops over all cells. We create two grids, one
+which is a regularly refined square (not very exciting, but a common
+starting grid for some problems), and one more geometric attempt: a
+ring-shaped domain, which is refined towards the inner edge. Through
+this, you will get to know three things every finite element program
+will have to have somewhere: An object of type Triangulation for the
+mesh; a call to the GridGenerator functions to generate a mesh; and
+loops over all cells that involve iterators (iterators are a
+generalization of pointers and are frequently used in the C++ standard
+library; in the context of deal.II, the @ref Iterators module talks
+about them).
+
+The program is otherwise small enough that it doesn't need a whole lot
+of introduction. Let us just continue with its commented source.
+
+
+<h3> About scientific computing in general </h3>
+
+If you are reading through this tutorial program, chances are that you are
+interested in continuing to use deal.II for your own projects. Thus, you are
+about to embark on an exercise in programming using a large-scale scientific
+computing library. Unless you are already an experienced user of large-scale
+programming methods, this may be new territory for you &mdash; with all the
+new rules that go along with it such as the fact that you will have to deal
+with code written by others, that you may have to think about documenting your
+own code because you may not remember what exactly it is doing a year down the
+road (or because others will be using it as well), or coming up with ways to
+test that your program is doing the right thing. None of this is something
+that we typically train mathematicians, engineers, or scientists in but that
+is important when you start writing software of more than a few hundred
+lines. Remember: Producing software is not the same as just writing code.
+
+To make your life easier on this journey let us point to two resources that
+are worthwhile browsing through before you start any large-scale programming:
+
+- The <a
+  href="http://dealii.sourceforge.net/index.php/Deal.II_Questions_and_Answers">deal.II
+  Frequently Asked Questions</a>: This page has a good number of questions
+  that pertain to particular aspects of deal.II, but also to more general
+  questions such as "How do I debug scientific computing codes?" or "Can I
+  train myself to write code that has fewer bugs?".
+
+- The <a href="http://software-carpentry.org/">Software Carpentry project</a>
+  that provides introductions to many topics that are important to dealing
+  with software, such as version control, make files, testing, etc. It is
+  specifically written for scientists and engineers, not for computer
+  scientists, and has a focus on short, practical lessons.
+
+As a general recommendation: If you expect to spend more than a few days
+writing software in the future, do yourself the favor of learning tools that
+can make your life more productive, in particular debuggers and integrated
+development environments. You will find that you will get the time spent
+learning these tools back severalfold soon by being more productive!
