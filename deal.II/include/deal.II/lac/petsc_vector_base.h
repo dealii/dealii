@@ -810,6 +810,13 @@ namespace PETScWrappers
      */
     std::size_t memory_consumption () const;
 
+    /**
+     * Return a reference to the MPI
+     * communicator object in use with this
+     * object.
+     */
+    virtual const MPI_Comm &get_mpi_communicator () const;
+
   protected:
     /**
      * A generic vector object in
@@ -1182,6 +1189,14 @@ namespace PETScWrappers
     return operator()(index);
   }
 
+  inline
+  const MPI_Comm &
+  VectorBase::get_mpi_communicator () const
+  {
+    static MPI_Comm comm;
+    PetscObjectGetComm((PetscObject)vector, &comm);
+    return comm;
+  }
 
 #endif // DOXYGEN
 }
