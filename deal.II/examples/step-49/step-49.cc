@@ -8,6 +8,26 @@
  * further information on this license.
  */
 
+/*
+what do I want to talk about:
+  
+- use GridGenerator (already discussed in step-1)
+
+- construct your own mesh programmatically
+
+- how to use gmsh  
+
+- modify a mesh:
+  - merge meshes
+  - change boundary indicators
+  - move vertices
+  - transform via smooth function
+  - perturb mesh
+  
+- how to extrude a mesh  
+
+*/
+
 // @sect3{Include files}
 
 // The most fundamental class in the library is the Triangulation class, which
