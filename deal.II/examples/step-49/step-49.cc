@@ -75,131 +75,30 @@ void grid_1 ()
 }
 
 
-
-// @sect3{Creating the second mesh}
-
-// The grid in the following, second function is slightly more complicated in
-// that we use a ring domain and refine the result once globally.
-void second_grid ()
+// merge triangulations
+// note: the vertices have to be exactly on top of each other!
+void grid_2 ()
 {
-  // We start again by defining an object for a triangulation of a
-  // two-dimensional domain:
   Triangulation<2> triangulation;
 
-  // We then fill it with a ring domain. The center of the ring shall be the
-  // point (1,0), and inner and outer radius shall be 0.5 and 1. The number of
-  // circumferential cells could be adjusted automatically by this function,
-  // but we choose to set it explicitely to 10 as the last argument:
-  const Point<2> center (1,0);
-  const double inner_radius = 0.5,
-               outer_radius = 1.0;
-  GridGenerator::hyper_shell (triangulation,
-                              center, inner_radius, outer_radius,
-                              10);
-  // By default, the triangulation assumes that all boundaries are straight
-  // and given by the cells of the coarse grid (which we just created). It
-  // uses this information when cells at the boundary are refined and new
-  // points need to be introduced on the boundary; if the boundary is assumed
-  // to be straight, then new points will simply be in the middle of the
-  // surrounding ones.
-  //
-  // Here, however, we would like to have a curved boundary. Fortunately, some
-  // good soul implemented an object which describes the boundary of a ring
-  // domain; it only needs the center of the ring and automatically figures
-  // out the inner and outer radius when needed. Note that we associate this
-  // boundary object with that part of the boundary that has the "boundary
-  // indicator" zero. By default (at least in 2d and 3d, the 1d case is
-  // slightly different), all boundary parts have this number, but you can
-  // change this number for some parts of the boundary. In that case, the
-  // curved boundary thus associated with number zero will not apply on those
-  // parts with a non-zero boundary indicator, but other boundary description
-  // objects can be associated with those non-zero indicators. If no boundary
-  // description is associated with a particular boundary indicator, a
-  // straight boundary is implied.
-  const HyperShellBoundary<2> boundary_description(center);
-  triangulation.set_boundary (0, boundary_description);
+  Triangulation<2> tria1, tria2;
 
-  // In order to demonstrate how to write a loop over all cells, we will
-  // refine the grid in five steps towards the inner circle of the domain:
-  for (unsigned int step=0; step<5; ++step)
-    {
-      // Next, we need an iterator which points to a cell and which we will
-      // move over all active cells one by one (active cells are those that
-      // are not further refined, and the only ones that can be marked for
-      // further refinement, obviously). By convention, we almost always use
-      // the names <code>cell</code> and <code>endc</code> for the iterator
-      // pointing to the present cell and to the <code>one-past-the-end</code>
-      // iterator:
-      Triangulation<2>::active_cell_iterator
-      cell = triangulation.begin_active(),
-      endc = triangulation.end();
+  
+  GridGenerator::hyper_cube_with_cylindrical_hole (tria1, 0.25, 1.0);
+  std::vector< unsigned int > repetitions(2);
+  repetitions[0]=3;
+  repetitions[1]=2;
+  GridGenerator::subdivided_hyper_rectangle (tria2, repetitions,
+					     Point<2>(1.0,-1.0), Point<2>(4.0,1.0));
 
-      // The loop over all cells is then rather trivial, and looks like any
-      // loop involving pointers instead of iterators:
-      for (; cell!=endc; ++cell)
-        // Next, we want to loop over all vertices of the cells. Since we are
-        // in 2d, we know that each cell has exactly four vertices. However,
-        // instead of penning down a 4 in the loop bound, we make a first
-        // attempt at writing it in a dimension-independent way by which we
-        // find out about the number of vertices of a cell. Using the
-        // GeometryInfo class, we will later have an easier time getting the
-        // program to also run in 3d: we only have to change all occurrences
-        // of <code>&lt;2&gt;</code> to <code>&lt;3&gt;</code>, and do not
-        // have to audit our code for the hidden appearance of magic numbers
-        // like a 4 that needs to be replaced by an 8:
-        for (unsigned int v=0;
-             v < GeometryInfo<2>::vertices_per_cell;
-             ++v)
-          {
-            // If this cell is at the inner boundary, then at least one of its
-            // vertices must sit on the inner ring and therefore have a radial
-            // distance from the center of exactly 0.5, up to floating point
-            // accuracy. Compute this distance, and if we have found a vertex
-            // with this property flag this cell for later refinement. We can
-            // then also break the loop over all vertices and move on to the
-            // next cell.
-            const double distance_from_center
-              = center.distance (cell->vertex(v));
-
-            if (std::fabs(distance_from_center - inner_radius) < 1e-10)
-              {
-                cell->set_refine_flag ();
-                break;
-              }
-          }
-
-      // Now that we have marked all the cells that we want refined, we let
-      // the triangulation actually do this refinement. The function that does
-      // so owes its long name to the fact that one can also mark cells for
-      // coarsening, and the function does coarsening and refinement all at
-      // once:
-      triangulation.execute_coarsening_and_refinement ();
-    }
-
-
-  // Finally, after these five iterations of refinement, we want to again
-  // write the resulting mesh to a file, again in eps format. This works just
-  // as above:
+  GridGenerator::merge_triangulations	(tria1, tria2, triangulation);
+  
   std::ofstream out ("grid-2.eps");
   GridOut grid_out;
   grid_out.write_eps (triangulation, out);
-
-
-  // At this point, all objects created in this function will be destroyed in
-  // reverse order. Unfortunately, we defined the boundary object after the
-  // triangulation, which still has a pointer to it and the library will
-  // produce an error if the boundary object is destroyed before the
-  // triangulation. We therefore have to release it, which can be done as
-  // follows. Note that this sets the boundary object used for part "0" of the
-  // boundary back to a default object, over which the triangulation has full
-  // control.
-  triangulation.set_boundary (0);
-  // An alternative to doing so, and one that is frequently more convenient,
-  // would have been to declare the boundary object before the triangulation
-  // object. In that case, the triangulation would have let lose of the
-  // boundary object upon its destruction, and everything would have been
-  // fine.
 }
+
+
 
 
 
@@ -210,5 +109,5 @@ void second_grid ()
 int main ()
 {
   grid_1 ();
-  second_grid ();
+  grid_2 ();
 }
