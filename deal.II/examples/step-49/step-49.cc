@@ -98,7 +98,38 @@ void grid_2 ()
   grid_out.write_eps (triangulation, out);
 }
 
+// move vertices
+void grid_3 ()
+{
+  Triangulation<2> triangulation;
+  GridGenerator::hyper_cube_with_cylindrical_hole (triangulation, 0.25, 1.0);
 
+  Triangulation<2>::active_cell_iterator
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
+  for (; cell!=endc; ++cell)
+    {
+      for (unsigned int i=0;i<GeometryInfo<2>::vertices_per_cell;++i)
+	{	  
+	  Point<2> & v = cell->vertex(i);
+	  if (std::abs(v(1)-1.0)<1e-5)
+	    v(1)+=0.5;
+	}
+      
+    }
+  
+  const HyperBallBoundary<2> boundary_description(Point<2>(0,0),0.25);
+  triangulation.set_boundary (1, boundary_description);
+
+  triangulation.refine_global(2);
+  
+
+  triangulation.set_boundary (1);
+  
+  std::ofstream out ("grid-3.eps");
+  GridOut grid_out;
+  grid_out.write_eps (triangulation, out);
+}
 
 
 
@@ -110,4 +141,5 @@ int main ()
 {
   grid_1 ();
   grid_2 ();
+  grid_3 ();
 }
