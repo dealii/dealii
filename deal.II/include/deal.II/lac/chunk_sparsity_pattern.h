@@ -884,7 +884,7 @@ inline
 bool
 ChunkSparsityPattern::optimize_diagonal () const
 {
-  return sparsity_pattern.diagonal_optimized;
+  return sparsity_pattern.store_diagonal_first_in_row;
 }
 
 
