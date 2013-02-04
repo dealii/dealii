@@ -1,0 +1,79 @@
+<h1>Results</h1>
+
+The program has, after having been run, produced two grids, which look
+like this:
+
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      @image html step-1.grid-1.png
+    </td>
+
+    <td ALIGN="center">
+      @image html step-1.grid-2.png
+    </td>
+  </tr>
+</table>
+
+The left one, well, is not very exciting. The right one is &mdash; at least
+&mdash; unconventional.
+
+While the second mesh is entirely artificial and made-up, and
+certainly not very practical in applications, to everyone's surprise it
+has found its way into the literature: see the paper by M. Mu
+titled "PDE.MART: A network-based problem-solving environment", ACM
+Trans. Math. Software, vol. 31, pp. 508-531, 2005. Apparently it is
+good for some things at least.
+
+
+<h3> Possible extensions </h3>
+
+<h4> Different adaptive refinement strategies </h4>
+
+This program obviously does not have a whole lot of functionality, but
+in particular the <code>second_grid</code> function has a bunch of
+places where you can play with it. For example, you could modify the
+criterion by which we decide which cells to refine. An example would
+be to change the condition to this:
+@code
+      for (; cell!=endc; ++cell)
+        if (cell->center()[1] > 0)
+          cell->set_refine_flag ();
+@endcode
+This would refine all cells for which the $y$-coordinate of the cell's
+center is greater than zero (the <code>TriaAccessor::center</code>
+function that we call by dereferencing the <code>cell</code> iterator
+returns a Point<2> object; subscripting <code>[0]</code> would give
+the $x$-coordinate, subscripting <code>[1]</code> the
+$y$-coordinate). By looking at the functions that TriaAccessor
+provides, you can also use more complicated criteria for refinement.
+
+<h4> Different geometries </h4>
+
+Another possibility would be to generate meshes of entirely different
+geometries altogether. While for complex geometries there is no way around
+using meshes obtained from mesh generators, there is a good number of
+geometries for which deal.II can create meshes using the functions in the
+GridGenerator namespace. Take a look at what it provides and see how it could
+be used in a program like this.
+
+<h4> Comments about programming and debugging </h4>
+
+We close with a comment about modifying or writing programs with deal.II in
+general. When you start working with tutorial programs or your own
+applications, you will find that mistakes happen: your program will contain
+code that either aborts the program right away or bugs that simply lead to
+wrong results. In either case, you will find it extremely helpful to know how
+to work with a debugger: you may get by for a while by just putting debug
+output into your program, compiling it, and running it, but ultimately finding
+bugs with a debugger is much faster, much more convenient, and more reliable
+because you don't have to recompile the program all the time and because you
+can inspect the values of variables and how they change.
+
+Rather than postponing learning how to use a debugger till you really can't
+see any other way to find a bug, here's the one piece of
+advice we will provide in this program: learn how to use a debugger as soon as
+possible. It will be time well invested. The deal.II Frequently Asked
+Questions (FAQ) page linked to from the top-level <a
+href="http://www.dealii.org/">deal.II webpage</a> also provides a good number
+of hints on debugging deal.II programs.

@@ -278,6 +278,13 @@ namespace SparseMatrixIterators
   /**
    * STL conforming iterator for constant and non-constant matrices.
    *
+   * The typical use for these iterators is to iterate over the elements of
+   * a sparse matrix
+   * or over the elements of individual rows. Note that there is no guarantee
+   * that the elements of a row are actually traversed in an order in which
+   * columns monotonically increase. See the documentation of the
+   * SparsityPattern class for more information.
+   *
    * The first template argument denotes the underlying numeric type, the
    * second the constness of the matrix.
    *
@@ -400,6 +407,18 @@ namespace SparseMatrixIterators
  * locations without the SparsityPattern having to know this, and more
  * importantly one can associate more than one matrix with the same
  * sparsity pattern.
+ *
+ * The elements of a SparseMatrix are stored in the same order in which the
+ * SparsityPattern class stores its entries.
+ * Within each row, elements are generally stored left-to-right in increasing
+ * column index order; the exception to this rule is that if the matrix
+ * is square (n_rows() == n_columns()), then the diagonal entry is stored
+ * as the first element in each row to make operations like applying a
+ * Jacobi or SSOR preconditioner faster. As a consequence, if you traverse
+ * the elements of a row of a SparseMatrix with the help of iterators into
+ * this object (using SparseMatrix::begin and SparseMatrix::end) you
+ * will find that the elements are not sorted by column index within each row
+ * whenever the matrix is square.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
@@ -1299,6 +1318,9 @@ public:
   /**
    * STL-like iterator with the first entry of the matrix. This is the version
    * for constant matrices.
+   *
+   * Note the discussion in the general documentation of this class about
+   * the order in which elements are accessed.
    */
   const_iterator begin () const;
 
@@ -1310,6 +1332,9 @@ public:
   /**
    * STL-like iterator with the first entry of the matrix. This is the version
    * for non-constant matrices.
+   *
+   * Note the discussion in the general documentation of this class about
+   * the order in which elements are accessed.
    */
   iterator begin ();
 
@@ -1326,6 +1351,9 @@ public:
    * entries, then the iterator returned by this function equals
    * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
    * that case.
+   *
+   * Note also the discussion in the general documentation of this class about
+   * the order in which elements are accessed.
    */
   const_iterator begin (const unsigned int r) const;
 
@@ -1348,6 +1376,9 @@ public:
    * entries, then the iterator returned by this function equals
    * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
    * that case.
+   *
+   * Note the discussion in the general documentation of this class about
+   * the order in which elements are accessed.
    */
   iterator begin (const unsigned int r);
 

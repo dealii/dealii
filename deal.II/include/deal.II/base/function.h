@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -590,8 +590,11 @@ protected:
  * components are zero.  It is especially useful as a weight function
  * for VectorTools::integrate_difference, where it allows to
  * integrate only one or a few vector components, rather than the
- * entire vector-valued solution. See the step-20
- * tutorial program for a detailed explanation.
+ * entire vector-valued solution. In other words, it acts as a
+ * component mask with a single component selected (see the
+ * @ref GlossComponentMask "the glossary entry on component masks").
+ * See the step-20
+ * tutorial program for a detailed explanation and a use case.
  *
  * @ingroup functions
  * @author Guido Kanschat, 2000, Wolfgang Bangerth 2006
