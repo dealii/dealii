@@ -308,7 +308,7 @@ namespace SparseMatrixIterators
      * of the current kind.
      */
     typedef
-    const Accessor<number,Constness> & value_type;
+    const Accessor<number,Constness> &value_type;
 
     /**
      * Constructor. Create an iterator into the matrix @p matrix for the given
@@ -1556,7 +1556,7 @@ private:
    * doing here.
    */
   number nth_entry_in_row (const unsigned int row,
-			   const unsigned int index) const;
+                           const unsigned int index) const;
 
   // make all other sparse matrices friends
   template <typename somenumber> friend class SparseMatrix;
@@ -1893,7 +1893,7 @@ template <typename number>
 inline
 number
 SparseMatrix<number>::nth_entry_in_row (const unsigned int row,
-					const unsigned int index) const
+                                        const unsigned int index) const
 {
   Assert(row<cols->rows, ExcIndexRange(row,0,cols->rows));
   Assert(index<cols->row_length(row),
@@ -2029,7 +2029,7 @@ namespace SparseMatrixIterators
   Accessor<number, false>::Reference::operator number() const
   {
     return accessor->matrix->nth_entry_in_row(accessor->a_row,
-					      accessor->a_index);
+                                              accessor->a_index);
   }
 
 
@@ -2271,17 +2271,17 @@ namespace SparseMatrixIterators
 
     const unsigned int this_position
       = (*this != (*this)->get_matrix().end()
-	 ?
-	 sparsity.get_rowstart_indices()[(*this)->row()] + (*this)->index()
-	 :
-	 sparsity.get_rowstart_indices()[sparsity.n_rows()]);
+         ?
+         sparsity.get_rowstart_indices()[(*this)->row()] + (*this)->index()
+         :
+         sparsity.get_rowstart_indices()[sparsity.n_rows()]);
 
     const unsigned int other_position
       = (other != (*this)->get_matrix().end()
-	 ?
-	 sparsity.get_rowstart_indices()[other->row()] + other->index()
-	 :
-	 sparsity.get_rowstart_indices()[sparsity.n_rows()]);
+         ?
+         sparsity.get_rowstart_indices()[other->row()] + other->index()
+         :
+         sparsity.get_rowstart_indices()[sparsity.n_rows()]);
 
     return (this_position - other_position);
   }

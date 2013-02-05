@@ -297,8 +297,8 @@ public:
   static
   void
   parallelogram(Triangulation<dim> &tria,
-		const Point<dim> (&corners)[dim],
-		const bool           colorize=false);
+                const Point<dim> (&corners)[dim],
+                const bool           colorize=false);
 
 
   /**
@@ -308,8 +308,8 @@ public:
   static
   void
   parallelogram(Triangulation<dim> &tria,
-		const Tensor<2,dim> &corners,
-		const bool           colorize=false) DEAL_II_DEPRECATED;
+                const Tensor<2,dim> &corners,
+                const bool           colorize=false) DEAL_II_DEPRECATED;
 
   /**
    * A parallelepiped. The first corner point is the origin. The
@@ -329,12 +329,12 @@ public:
    * function.
    */
   template <int dim>
-    static
-    void
-    parallelepiped (Triangulation<dim>  &tria,
-		   const Point<dim>   (&corners) [dim],
-		   const bool           colorize = false);
-   
+  static
+  void
+  parallelepiped (Triangulation<dim>  &tria,
+                  const Point<dim>   (&corners) [dim],
+                  const bool           colorize = false);
+
   /**
    * A subdivided parallelepiped. The first corner point is the
    * origin. The <tt>dim</tt> adjacent points are vectors describing
@@ -348,12 +348,12 @@ public:
    * function.
    */
   template <int dim>
-    static
-    void
-    subdivided_parallelepiped (Triangulation<dim>  &tria,
-			       const unsigned int   n_subdivisions,
-			       const Point<dim>   (&corners) [dim],
-			       const bool           colorize = false);
+  static
+  void
+  subdivided_parallelepiped (Triangulation<dim>  &tria,
+                             const unsigned int   n_subdivisions,
+                             const Point<dim>   (&corners) [dim],
+                             const bool           colorize = false);
 
   /**
    * A subdivided parallelepiped, ie. the same as above, but where the
@@ -364,12 +364,12 @@ public:
    * function.
    */
   template <int dim>
-    static
-    void
-    subdivided_parallelepiped (Triangulation<dim>  &tria,
-			       const unsigned int ( n_subdivisions) [dim],
-			       const Point<dim>   (&corners) [dim],
-			       const bool           colorize = false);
+  static
+  void
+  subdivided_parallelepiped (Triangulation<dim>  &tria,
+                             const unsigned int ( n_subdivisions) [dim],
+                             const Point<dim>   (&corners) [dim],
+                             const bool           colorize = false);
 
 
   /**

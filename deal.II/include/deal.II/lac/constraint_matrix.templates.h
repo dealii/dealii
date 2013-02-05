@@ -148,7 +148,7 @@ ConstraintMatrix::condense (VectorType &vec) const
   // parallel vectors, this can only work if we can put a compress()
   // in between, but we don't want to call compress() twice per entry
   for (std::vector<ConstraintLine>::const_iterator
-	 constraint_line = lines.begin();
+       constraint_line = lines.begin();
        constraint_line!=lines.end(); ++constraint_line)
     {
       // in case the constraint is
@@ -160,7 +160,7 @@ ConstraintMatrix::condense (VectorType &vec) const
 
       const typename VectorType::value_type old_value = vec(constraint_line->line);
       for (unsigned int q=0; q!=constraint_line->entries.size(); ++q)
-        if (vec.in_local_range(constraint_line->entries[q].first) == true) 
+        if (vec.in_local_range(constraint_line->entries[q].first) == true)
           vec(constraint_line->entries[q].first)
           += (static_cast<typename VectorType::value_type>
               (old_value) *
@@ -170,9 +170,9 @@ ConstraintMatrix::condense (VectorType &vec) const
   vec.compress();
 
   for (std::vector<ConstraintLine>::const_iterator
-	 constraint_line = lines.begin();
+       constraint_line = lines.begin();
        constraint_line!=lines.end(); ++constraint_line)
-    if (vec.in_local_range(constraint_line->line) == true) 
+    if (vec.in_local_range(constraint_line->line) == true)
       vec(constraint_line->line) = 0.;
 }
 
@@ -261,12 +261,12 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
         // copy entries if column will not
         // be condensed away, distribute
         // otherwise
-	for (typename SparseMatrix<number>::const_iterator
-	       p = uncondensed.begin(row);
-	     p != uncondensed.end(row); ++p)
+        for (typename SparseMatrix<number>::const_iterator
+             p = uncondensed.begin(row);
+             p != uncondensed.end(row); ++p)
           if (new_line[p->column()] != -1)
             condensed.add (new_line[row],
-			   new_line[p->column()],
+                           new_line[p->column()],
                            p->value());
           else
             {
@@ -299,9 +299,9 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
     else
       // line must be distributed
       {
-	for (typename SparseMatrix<number>::const_iterator
-	       p = uncondensed.begin(row);
-	     p != uncondensed.end(row); ++p)
+        for (typename SparseMatrix<number>::const_iterator
+             p = uncondensed.begin(row);
+             p != uncondensed.end(row); ++p)
           // for each column: distribute
           if (new_line[p->column()] != -1)
             // column is not constrained
@@ -332,7 +332,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
               if (use_vectors == true)
                 for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
                   condensed_vector (new_line[next_constraint->entries[q].first])
-		    -= p->value() *
+                  -= p->value() *
                      next_constraint->entries[q].second *
                      c->inhomogeneity;
             }
@@ -1790,7 +1790,7 @@ namespace internals
                                   &sparsity_struct[row_start[row]];
     typename SparseMatrix<number>::iterator
     val_ptr = (sparsity.row_length(row) == 0 ?
-    		   sparse_matrix->end() :
+               sparse_matrix->end() :
                sparse_matrix->begin(row));
     const bool optimize_diagonal = sparsity.optimize_diagonal();
     unsigned int counter = optimize_diagonal;

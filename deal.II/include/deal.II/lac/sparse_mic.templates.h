@@ -143,9 +143,9 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
       // work on the lower left part of the matrix. we know
       // it's symmetric, so we can work with this alone
       for (typename SparseMatrix<somenumber>::const_iterator
-    		  p = matrix.begin(row)+1;
-    	   (p != matrix.end(row)) && (p->column() < p->row());
-    	   ++p)
+           p = matrix.begin(row)+1;
+           (p != matrix.end(row)) && (p->column() < p->row());
+           ++p)
         temp1 += p->value() / diag[p->column()] * inner_sums[p->column()];
 
       Assert(temp-temp1 > 0, ExcStrengthenDiagonalTooSmall());
@@ -166,8 +166,8 @@ SparseMIC<number>::get_rowsum (const unsigned int row) const
   const unsigned int *const first_after_diagonal = this->prebuilt_lower_bound[row];
   number rowsum = 0;
   for (typename SparseMatrix<number>::const_iterator
-      p = this->begin(row)+1;
-      p != this->end(row); ++p)
+       p = this->begin(row)+1;
+       p != this->end(row); ++p)
     if (p->column() > p->row())
       rowsum += p->value();
 
@@ -204,9 +204,9 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
       // get start of this row. skip
       // the diagonal element
       for (typename SparseMatrix<number>::const_iterator
-          p = this->begin(row)+1;
-          (p != this->end(row)) && (p->column() < row);
-          ++p)
+           p = this->begin(row)+1;
+           (p != this->end(row)) && (p->column() < row);
+           ++p)
         dst(row) -= p->value() * dst(p->column());
 
       dst(row) *= inv_diag[row];
@@ -221,9 +221,9 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
     {
       // get end of this row
       for (typename SparseMatrix<number>::const_iterator
-          p = this->begin(row)+1;
-          p != this->end(row);
-          ++p)
+           p = this->begin(row)+1;
+           p != this->end(row);
+           ++p)
         if (p->column() > static_cast<unsigned int>(row))
           dst(row) -= p->value() * dst(p->column());
 

@@ -2135,8 +2135,8 @@ namespace internal
         Assert (tr != 0, ExcInternalError());
 
         AssertThrow(
-            (tr->settings &  parallel::distributed::Triangulation< dim, spacedim >::construct_multigrid_hierarchy),
-            ExcMessage("Multigrid DoFs can only be distributed on a parallel Triangulation if the flag construct_multigrid_hierarchy is set in the constructor."));
+          (tr->settings &  parallel::distributed::Triangulation< dim, spacedim >::construct_multigrid_hierarchy),
+          ExcMessage("Multigrid DoFs can only be distributed on a parallel Triangulation if the flag construct_multigrid_hierarchy is set in the constructor."));
 
 
         const unsigned int

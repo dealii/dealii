@@ -1068,7 +1068,7 @@ MatrixFree<dim,Number>::constraint_pool_begin (const unsigned int row) const
 {
   AssertIndexRange (row, constraint_pool_row_index.size()-1);
   return constraint_pool_data.empty() ? 0 :
-    &constraint_pool_data[0] + constraint_pool_row_index[row];
+         &constraint_pool_data[0] + constraint_pool_row_index[row];
 }
 
 
@@ -1080,7 +1080,7 @@ MatrixFree<dim,Number>::constraint_pool_end (const unsigned int row) const
 {
   AssertIndexRange (row, constraint_pool_row_index.size()-1);
   return constraint_pool_data.empty() ? 0 :
-    &constraint_pool_data[0] + constraint_pool_row_index[row+1];
+         &constraint_pool_data[0] + constraint_pool_row_index[row+1];
 }
 
 

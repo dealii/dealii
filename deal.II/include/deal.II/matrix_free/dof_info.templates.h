@@ -1767,8 +1767,8 @@ not_connect:
                        ++cell)
                     {
                       const unsigned int
-                        *it = begin_indices (renumbering[cell]),
-                        *end_cell = end_indices (renumbering[cell]);
+                      *it = begin_indices (renumbering[cell]),
+                       *end_cell = end_indices (renumbering[cell]);
                       for ( ; it != end_cell; ++it)
                         if (row_lengths[*it]>0)
                           connectivity_dof.add(*it, block);
@@ -1780,8 +1780,8 @@ not_connect:
           else
             {
               const unsigned int
-                *it = begin_indices (block),
-                *end_cell = end_indices (block);
+              *it = begin_indices (block),
+               *end_cell = end_indices (block);
               for ( ; it != end_cell; ++it)
                 if (row_lengths[*it]>0)
                   connectivity_dof.add(*it, block);
@@ -1811,8 +1811,8 @@ not_connect:
                     {
                       // apply renumbering when we do blocking
                       const unsigned int
-                        *it = begin_indices (renumbering[cell]),
-                        *end_cell = end_indices (renumbering[cell]);
+                      *it = begin_indices (renumbering[cell]),
+                       *end_cell = end_indices (renumbering[cell]);
                       for ( ; it != end_cell; ++it)
                         if (row_lengths[*it] > 0)
                           {

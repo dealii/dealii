@@ -725,7 +725,7 @@ namespace Utilities
     // we need operator- for the iterator type anyway, do the
     // test as follows, rather than via 'last >= first'
     Assert (last - first >= 0,
-	    ExcMessage ("The given iterators do not satisfy the proper ordering."));
+            ExcMessage ("The given iterators do not satisfy the proper ordering."));
 
     unsigned int len = last-first;
 

@@ -27,38 +27,38 @@ using namespace dealii;
 // @sect3{Generate some output for a given mesh}
 
 template<int dim>
-void mesh_info(Triangulation<dim> & tria, const char * filename)
+void mesh_info(Triangulation<dim> &tria, const char *filename)
 {
-				   // some general info:
+  // some general info:
   std::cout << "Mesh info:" << std::endl
-	    << " dimension: " << dim << std::endl
-	    << " no. of cells: " << tria.n_active_cells() << std::endl;
+            << " dimension: " << dim << std::endl
+            << " no. of cells: " << tria.n_active_cells() << std::endl;
 
   // loop over all the cells and find how often each boundary indicator is used:
   {
     std::map<unsigned int, unsigned int> boundary_count;
     Triangulation<2>::active_cell_iterator
-      cell = tria.begin_active(),
-      endc = tria.end();
+    cell = tria.begin_active(),
+    endc = tria.end();
     for (; cell!=endc; ++cell)
       {
-	for (unsigned int face=0; face<GeometryInfo<2>::faces_per_cell; ++face)
-	  {
-	    if (cell->face(face)->at_boundary())
-	      boundary_count[cell->face(face)->boundary_indicator()]++;
-	  }
+        for (unsigned int face=0; face<GeometryInfo<2>::faces_per_cell; ++face)
+          {
+            if (cell->face(face)->at_boundary())
+              boundary_count[cell->face(face)->boundary_indicator()]++;
+          }
       }
-    
+
     std::cout << " boundary indicators: ";
     for (std::map<unsigned int, unsigned int>::iterator it=boundary_count.begin();
-	 it!=boundary_count.end();
-	 ++it)
+         it!=boundary_count.end();
+         ++it)
       {
-	std::cout << it->first << "(" << it->second << ") ";
+        std::cout << it->first << "(" << it->second << ") ";
       }
     std::cout  << std::endl;
   }
-  
+
   // Now we want to write a graphical representation of the mesh to an output
   // file.
   std::ofstream out (filename);
@@ -79,9 +79,9 @@ void grid_1 ()
   gridin.attach_triangulation(triangulation);
   std::ifstream f("untitled.msh");
   gridin.read_msh(f);
-  
+
   mesh_info(triangulation, "grid-1.eps");
-  
+
 }
 
 
@@ -93,16 +93,16 @@ void grid_2 ()
 
   Triangulation<2> tria1, tria2;
 
-  
+
   GridGenerator::hyper_cube_with_cylindrical_hole (tria1, 0.25, 1.0);
   std::vector< unsigned int > repetitions(2);
   repetitions[0]=3;
   repetitions[1]=2;
   GridGenerator::subdivided_hyper_rectangle (tria2, repetitions,
-					     Point<2>(1.0,-1.0), Point<2>(4.0,1.0));
+                                             Point<2>(1.0,-1.0), Point<2>(4.0,1.0));
 
-  GridGenerator::merge_triangulations	(tria1, tria2, triangulation);
-  
+  GridGenerator::merge_triangulations (tria1, tria2, triangulation);
+
   mesh_info(triangulation, "grid-2.eps");
 }
 
@@ -113,27 +113,27 @@ void grid_3 ()
   GridGenerator::hyper_cube_with_cylindrical_hole (triangulation, 0.25, 1.0);
 
   Triangulation<2>::active_cell_iterator
-    cell = triangulation.begin_active(),
-    endc = triangulation.end();
+  cell = triangulation.begin_active(),
+  endc = triangulation.end();
   for (; cell!=endc; ++cell)
     {
-      for (unsigned int i=0;i<GeometryInfo<2>::vertices_per_cell;++i)
-	{	  
-	  Point<2> & v = cell->vertex(i);
-	  if (std::abs(v(1)-1.0)<1e-5)
-	    v(1)+=0.5;
-	}
-      
+      for (unsigned int i=0; i<GeometryInfo<2>::vertices_per_cell; ++i)
+        {
+          Point<2> &v = cell->vertex(i);
+          if (std::abs(v(1)-1.0)<1e-5)
+            v(1)+=0.5;
+        }
+
     }
-  
+
   const HyperBallBoundary<2> boundary_description(Point<2>(0,0),0.25);
   triangulation.set_boundary (1, boundary_description);
   triangulation.refine_global(2);
 
   mesh_info(triangulation, "grid-3.eps");
 
-				   // remove boundary object from Triangulation again:
-  triangulation.set_boundary (1);  
+  // remove boundary object from Triangulation again:
+  triangulation.set_boundary (1);
 }
 
 

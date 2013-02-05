@@ -2147,7 +2147,7 @@ namespace VectorTools
 
     // set up sparsity structure
     CompressedSparsityPattern c_sparsity(dof.n_boundary_dofs (boundary_functions),
-					 dof.n_boundary_dofs (boundary_functions));
+                                         dof.n_boundary_dofs (boundary_functions));
     DoFTools::make_boundary_sparsity_pattern (dof,
                                               boundary_functions,
                                               dof_to_boundary_mapping,

@@ -1636,7 +1636,7 @@ namespace MGTools
 
     std::map<unsigned int, double> boundary_values;
     for (std::set<unsigned int>::const_iterator p=boundary_dofs.begin();
-        p != boundary_dofs.end(); ++p)
+         p != boundary_dofs.end(); ++p)
       boundary_values[*p] = 0;
 
     Vector<number> dummy(matrix.m());
@@ -1674,7 +1674,7 @@ namespace MGTools
 
     std::map<unsigned int, double> boundary_values;
     for (std::set<unsigned int>::const_iterator p=boundary_dofs.begin();
-        p != boundary_dofs.end(); ++p)
+         p != boundary_dofs.end(); ++p)
       boundary_values[*p] = 0;
 
     BlockVector<number> dummy(matrix.n_block_rows());

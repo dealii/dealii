@@ -3013,10 +3013,10 @@ namespace DoFTools
     // parallel::distributed::Triangulation in serial
     {
       typedef parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> PTRIA;
-      const PTRIA* ptria_p = dynamic_cast<const PTRIA*> (&dof_handler.get_tria());
+      const PTRIA *ptria_p = dynamic_cast<const PTRIA *> (&dof_handler.get_tria());
       Assert ((ptria_p == 0 || Utilities::MPI::n_mpi_processes(ptria_p->get_communicator()) == 1),
-	      ExcMessage ("This function can not be used with distributed triangulations."
-			  "See the documentation for more information."));
+              ExcMessage ("This function can not be used with distributed triangulations."
+                          "See the documentation for more information."));
     }
 #endif
 
@@ -3107,10 +3107,10 @@ namespace DoFTools
     // parallel::distributed::Triangulation in serial
     {
       typedef typename parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> PTRIA;
-      const PTRIA* ptria_p = dynamic_cast<const PTRIA*> (&dof_handler.get_tria());
+      const PTRIA *ptria_p = dynamic_cast<const PTRIA *> (&dof_handler.get_tria());
       Assert ((ptria_p == 0 || Utilities::MPI::n_mpi_processes(ptria_p->get_communicator()) == 1),
-	      ExcMessage ("This function can not be used with distributed triangulations."
-			  "See the documentation for more information."));
+              ExcMessage ("This function can not be used with distributed triangulations."
+                          "See the documentation for more information."));
     }
 #endif
 

@@ -1988,11 +1988,11 @@ namespace MatrixTools
 
         // set entries of this line to zero except for the diagonal
         // entry
-	for (typename SparseMatrix<number>::iterator
-	       p = matrix.begin(dof_number);
-	     p != matrix.end(dof_number); ++p)
-	  if (p->column() != dof_number)
-	    p->value() = 0.;
+        for (typename SparseMatrix<number>::iterator
+             p = matrix.begin(dof_number);
+             p != matrix.end(dof_number); ++p)
+          if (p->column() != dof_number)
+            p->value() = 0.;
 
         // set right hand side to
         // wanted value: if main diagonal
@@ -2045,8 +2045,8 @@ namespace MatrixTools
             // since that is the diagonal element and thus the present
             // row
             for (typename SparseMatrix<number>::iterator
-                q = matrix.begin(dof_number)+1;
-                q != matrix.end(dof_number); ++q)
+                 q = matrix.begin(dof_number)+1;
+                 q != matrix.end(dof_number); ++q)
               {
                 const unsigned int row = q->column();
 
@@ -2055,7 +2055,7 @@ namespace MatrixTools
                 // (row,dof_number)
                 bool (*comp)(const typename SparseMatrix<number>::iterator::value_type p,
                              const unsigned int column)
-                = &column_less_than<typename SparseMatrix<number>::iterator>;
+                  = &column_less_than<typename SparseMatrix<number>::iterator>;
                 const typename SparseMatrix<number>::iterator
                 p = Utilities::lower_bound(matrix.begin(row)+1,
                                            matrix.end(row),
@@ -2289,10 +2289,10 @@ namespace MatrixTools
                 // the diagonal block
                 for (typename SparseMatrix<number>::iterator
                      q = (block_index.first == block_row ?
-                         transpose_matrix.begin(block_index.second)+1 :
-                         transpose_matrix.begin(block_index.second));
-                    q != transpose_matrix.end(block_index.second);
-                    ++q)
+                          transpose_matrix.begin(block_index.second)+1 :
+                          transpose_matrix.begin(block_index.second));
+                     q != transpose_matrix.end(block_index.second);
+                     ++q)
                   {
                     // get the number
                     // of the column in
@@ -2320,7 +2320,7 @@ namespace MatrixTools
                     // sub-matrices
                     bool (*comp)(const typename SparseMatrix<number>::iterator::value_type p,
                                  const unsigned int column)
-                    = &column_less_than<typename SparseMatrix<number>::iterator>;
+                      = &column_less_than<typename SparseMatrix<number>::iterator>;
 
                     typename SparseMatrix<number>::iterator p = this_matrix.end();
 

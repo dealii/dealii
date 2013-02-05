@@ -82,10 +82,10 @@ namespace Utilities
                      (digits==3 && i>=1000) ||
                      (digits==4 && i>=10000)||
                      (digits==5 && i>=100000)||
-		     (digits==6 && i>=1000000)||
+                     (digits==6 && i>=1000000)||
                      (digits==7 && i>=10000000)||
                      (digits==8 && i>=100000000)||
-		     (digits==9 && i>=1000000000)||
+                     (digits==9 && i>=1000000000)||
                      (i>=1000000000)),
                   ExcInvalidNumber2StringConversersion(i, digits));
 

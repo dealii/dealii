@@ -117,9 +117,9 @@ void SparseLUDecomposition<number>::initialize (
 
       // and recreate
       own_sparsity = new SparsityPattern(matrix_sparsity,
-					 matrix_sparsity.max_entries_per_row()
-					 +2*data.extra_off_diagonals,
-					 data.extra_off_diagonals);
+                                         matrix_sparsity.max_entries_per_row()
+                                         +2*data.extra_off_diagonals,
+                                         data.extra_off_diagonals);
       own_sparsity->compress();
       sparsity_pattern_to_use = own_sparsity;
     }
@@ -256,16 +256,16 @@ SparseLUDecomposition<number>::strengthen_diagonal_impl ()
       // non-diagonal element in this row
       Assert (this->cols->optimize_diagonal(),  ExcNotImplemented());
       typename SparseMatrix<number>::iterator
-	diagonal_element = this->begin(row);
+      diagonal_element = this->begin(row);
 
       number rowsum = 0;
       for (typename SparseMatrix<number>::iterator
-	     p = diagonal_element + 1;
-	   p != this->end(row); ++p)
+           p = diagonal_element + 1;
+           p != this->end(row); ++p)
         rowsum += std::fabs(p->value());
 
       diagonal_element->value() += this->get_strengthen_diagonal (rowsum, row)  *
-				   rowsum;
+                                   rowsum;
     }
 }
 

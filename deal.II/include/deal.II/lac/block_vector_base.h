@@ -1880,8 +1880,8 @@ BlockVectorBase<VectorType>::in_local_range
 (const types::global_dof_index global_index) const
 {
   const std::pair<unsigned int,unsigned int> local_index
-  = block_indices.global_to_local (global_index);
-  
+    = block_indices.global_to_local (global_index);
+
   return components[local_index.first].in_local_range (global_index);
 }
 

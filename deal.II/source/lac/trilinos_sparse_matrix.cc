@@ -588,13 +588,13 @@ namespace TrilinosWrappers
       dealii_sparse_matrix.get_sparsity_pattern();
 
     if (matrix.get() == 0 ||
-	m() != n_rows ||
+        m() != n_rows ||
         n_nonzero_elements() != sparsity_pattern.n_nonzero_elements())
-    {
-      SparsityPattern trilinos_sparsity;
-      trilinos_sparsity.reinit (input_row_map, input_col_map, sparsity_pattern);
-      reinit (trilinos_sparsity);
-    }
+      {
+        SparsityPattern trilinos_sparsity;
+        trilinos_sparsity.reinit (input_row_map, input_col_map, sparsity_pattern);
+        reinit (trilinos_sparsity);
+      }
 
     // fill the values. the same as above: go through all rows of the matrix,
     // and then all columns. since the sparsity patterns of the input matrix
@@ -619,10 +619,10 @@ namespace TrilinosWrappers
               // optimized diagonal
               AssertDimension(it->column(), row);
               if (std::fabs(it->value()) > drop_tolerance)
-		{
-		  values[col] = it->value();
-		  row_indices[col++] = it->column();
-		}
+                {
+                  values[col] = it->value();
+                  row_indices[col++] = it->column();
+                }
               ++select_index;
               ++it;
             }
