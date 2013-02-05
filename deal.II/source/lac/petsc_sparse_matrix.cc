@@ -139,8 +139,9 @@ namespace PETScWrappers
   const MPI_Comm &
   SparseMatrix::get_mpi_communicator () const
   {
-    static const MPI_Comm communicator = MPI_COMM_SELF;
-    return communicator;
+    static MPI_Comm comm;
+    PetscObjectGetComm((PetscObject)matrix, &comm);
+    return comm;
   }
 
 
