@@ -27,7 +27,7 @@ example?
 
 <h2>Import from external programs</h2>
 
-import mesh from file, read using @GridIn class
+import mesh from file, read using GridIn class
 
 list of tools: cubeit, gmsh, more?
 problem: need to generate quads, tetrahedral meshes won't work
@@ -60,15 +60,28 @@ modify a mesh:
   - move vertices
   - transform via smooth function
   - perturb mesh
- 
+
+other things to mention:
+
+ GridTools::shift
+ GridTools::transform
+GridTools::rotate
+ GridTools::scale
+
 <h2>Merge Meshes</h2>
 
+use GridGenerator::merge_triangulations()
+
 note, vertices have to match exactly.
+
+example:
 
 @image html step-49.grid-2.png
 
 
 <h2>Move Vertices</h2>
+
+move individual vertices, first identify cells/vertices
 
 @image html step-49.grid-3.png
 
