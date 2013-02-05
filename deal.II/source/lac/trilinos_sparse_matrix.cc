@@ -614,12 +614,9 @@ namespace TrilinosWrappers
           typename ::dealii::SparseMatrix<number>::const_iterator it =
             dealii_sparse_matrix.begin(row);
           unsigned int col = 0;
-          if (sparsity_pattern.optimize_diagonal())
+          if (sparsity_pattern.n_rows() == sparsity_pattern.n_cols())
             {
-              Assert(dealii_sparse_matrix.get_sparsity_pattern().optimize_diagonal(),
-                     ExcMessage("If the manual sparsity pattern optimizes the "
-                                "diagonal, the deal.II matrix must optimize it,"
-                                " too. And vice versa."));
+              // optimized diagonal
               AssertDimension(it->column(), row);
               if (std::fabs(it->value()) > drop_tolerance)
 		{

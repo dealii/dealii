@@ -372,7 +372,7 @@ BlockSparsityPattern::reinit(
 
         if (row_lengths[j].size()==1)
           block(i,j).reinit(rows.block_size(i),
-                            cols.block_size(j), row_lengths[j][0], i==j);
+                            cols.block_size(j), row_lengths[j][0]);
         else
           {
             VectorSlice<const std::vector<unsigned int> >
