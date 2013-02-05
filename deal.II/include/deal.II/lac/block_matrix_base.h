@@ -682,6 +682,21 @@ public:
             const bool          col_indices_are_sorted = false);
 
   /**
+   * Add <tt>matrix</tt> scaled by
+   * <tt>factor</tt> to this matrix,
+   * i.e. the matrix
+   * <tt>factor*matrix</tt> is added to
+   * <tt>this</tt>. If the sparsity
+   * pattern of the calling matrix does
+   * not contain all the elements in
+   * the sparsity pattern of the input
+   * matrix, this function will throw
+   * an exception.
+   */
+  void add (const value_type                   factor,
+            const BlockMatrixBase<MatrixType> &matrix);
+
+  /**
    * Return the value of the entry
    * (i,j).  This may be an
    * expensive operation and you
@@ -759,28 +774,6 @@ public:
   BlockMatrixBase &operator /= (const value_type factor);
 
   /**
-   * Add <tt>matrix</tt> scaled by
-   * <tt>factor</tt> to this matrix,
-   * i.e. the matrix <tt>factor*matrix</tt>
-   * is added to <tt>this</tt>. This
-   * function throws an error if the
-   * sparsity patterns of the two involved
-   * matrices do not point to the same
-   * object, since in this case the
-   * operation is cheaper.
-   *
-   * The source matrix may be a sparse
-   * matrix over an arbitrary underlying
-   * scalar type, as long as its data type
-   * is convertible to the data type of
-   * this matrix.
-   */
-  template <class BlockMatrixType>
-  void add (const value_type       factor,
-            const BlockMatrixType &matrix);
-
-
-  /**
    * Adding Matrix-vector
    * multiplication. Add $M*src$ on
    * $dst$ with $M$ being this
@@ -850,6 +843,19 @@ public:
   value_type residual (BlockVectorType       &dst,
                        const BlockVectorType &x,
                        const BlockVectorType &b) const;
+
+  /**
+   * Print the matrix to the given
+   * stream, using the format
+   * <tt>(line,col) value</tt>, i.e. one
+   * nonzero entry of the matrix per
+   * line. The optional flag outputs the
+   * sparsity pattern in a different style
+   * according to the underlying
+   * sparsematrix type.
+   */
+  void print (std::ostream &out,
+              const bool    alternative_output = false) const;
 
   /**
    * STL-like iterator with the
@@ -2268,6 +2274,34 @@ BlockMatrixBase<MatrixType>::add (const unsigned int   row,
 
 template <class MatrixType>
 inline
+void
+BlockMatrixBase<MatrixType>::add (const value_type                   factor,
+                                  const BlockMatrixBase<MatrixType> &matrix)
+{
+  Assert (numbers::is_finite(factor), ExcNumberNotFinite());
+
+  prepare_add_operation();
+
+  // save some cycles for zero additions, but
+  // only if it is safe for the matrix we are
+  // working with
+  typedef typename MatrixType::Traits MatrixTraits;
+  if ((MatrixTraits::zero_addition_can_be_elided == true)
+      &&
+      (factor == 0))
+    return;
+
+  for (unsigned int row=0; row<n_block_rows(); ++row)
+    for (unsigned int col=0; col<n_block_cols(); ++col)
+      // This function should throw if the sparsity
+      // patterns of the two blocks differ
+      block(row, col).add(factor, matrix.block(row,col));
+}
+
+
+
+template <class MatrixType>
+inline
 typename BlockMatrixBase<MatrixType>::value_type
 BlockMatrixBase<MatrixType>::operator () (const unsigned int i,
                                           const unsigned int j) const
@@ -2680,6 +2714,24 @@ residual (BlockVectorType          &dst,
   for (unsigned int row=0; row<n_block_rows(); ++row)
     res += dst.block(row).norm_sqr ();
   return std::sqrt(res);
+}
+
+
+
+template <class MatrixType>
+inline
+void
+BlockMatrixBase<MatrixType>::print (std::ostream &out,
+                                    const bool    alternative_output) const
+{
+  for (unsigned int row=0; row<n_block_rows(); ++row)
+    for (unsigned int col=0; col<n_block_cols(); ++col)
+      {
+        if (!alternative_output)
+          out << "Block (" << row << ", " << col << ")" << std::endl;
+
+        block(row, col).print(out, alternative_output);
+      }
 }
 
 
