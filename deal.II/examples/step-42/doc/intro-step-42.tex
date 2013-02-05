@@ -79,7 +79,8 @@ deformable body.
 
 \section{Derivation of the variational inequality}
 
-As a starting point we want to minimise an energy functional:
+As a starting point to derive the equations above, let us imagine that we want
+to minimise an energy functional:
 $$E(\tau) := \dfrac{1}{2}\int\limits_{\Omega}\tau A \tau d\tau,\quad \tau\in \Pi W^{div}$$
 with
 $$W^{div}:=\lbrace \tau\in
@@ -88,14 +89,15 @@ $$\Pi \Sigma:=\lbrace \tau\in \Sigma, \mathcal{F}(\tau)\leq 0\rbrace$$
 as the set of admissible stresses which is defined
 by a continious, convex flow function $\mathcal{F}$.
 
-With the goal to derive the dual formulation of the minimisation problem, we define a lagrange function:
+With the goal of deriving the dual formulation of the minimisation
+problem, we define a lagrange function:
 $$L(\tau,\varphi) := E(\tau) + (\varphi, div(\tau)),\quad \lbrace\tau,\varphi\rbrace\in\Pi W^{div}\times V^+$$
 with
 $$V^+ := \lbrace u\in V: u_n\leq g \text{ on } \Gamma_C \rbrace$$
 $$V:=\left[ H_0^1 \right]^{dim}:=\lbrace u\in \left[H^1(\Omega)\right]^{dim}: u
 = 0 \text{ on } \Gamma_D\rbrace$$
-By building the fr\'echet derivatives of $L$ for both components we obtain the dual formulation for the stationary case
-which is known as \textbf{Hencky-Type-Model}:\\
+By building the Fr\'echet derivatives of $L$ for both components we obtain the
+dual formulation for the stationary case which is known as \textbf{Hencky-Type-Model}:\\
 Find a pair $\lbrace\sigma,u\rbrace\in \Pi W\times V^+$ with
 $$\left(A\sigma,\tau - \sigma\right) + \left(u, div(\tau) - div(\sigma)\right) \geq 0,\quad \forall \tau\in \Pi W^{div}$$
 $$-\left(div(\sigma),\varphi - u\right) \geq 0,\quad \forall \varphi\in V^+.$$
