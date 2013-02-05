@@ -28,41 +28,54 @@ dimensions, even with adaptive mesh refinement, we decided to use Trilinos and
 p4est to run our code in parallel, building on the framework of step-40 for
 the parallelization.
 
+\begin{huge}
+{distributed}
+\end{huge}
+
 
 \section{Classical formulation}
 
 The classical formulation of the problem possesses the following form:
 \begin{align*}
  \varepsilon(u) &= A\sigma + \lambda & &\quad\text{in } \Omega,\\
- \lambda(\tau - \sigma) &\geq 0\quad\forall\tau\text{ mit }\mathcal{F}(\tau)\leq 0 & &\quad\text{in } \Omega,\\
+ \lambda(\tau - \sigma) &\geq 0\quad\forall\tau\text{ with
+ }\mathcal{F}(\tau)\leq 0 & &\quad\text{in } \Omega,\\
  -\textrm{div}\ \sigma &= f & &\quad\text{in } \Omega,\\
  u(\mathbf x) &= 0 & &\quad\text{on }\Gamma_D,\\
  \sigma_t(u) &= 0,\quad\sigma_n(u)\leq 0 & &\quad\text{on }\Gamma_C,\\
 \sigma_n(u)(u_n - g) &= 0,\quad u_n(\mathbf x) - g(\mathbf x) \leq 0 & &\quad\text{on } \Gamma_C
 \end{align*}
-with $u\in H^2(\Omega)$.  The vector valued function $u$ denotes the
-displacement in the deformable body. The first two lines describe the elast-plastic
-material behavior. Therein the equation shows the deformation $\varepsilon (u)$ as the additive
-decomposition of the elastic part $A\sigma$ and the plastic part $\lambda$. $A$ is defined as
-the compliance tensor of fourth order which contains some material constants and $\sigma$ as the
+with $u\in H^2(\Omega),\Omega\subset\mathbb{R}^3$.  The vector valued
+function $u$ denotes the displacement in the deformable body. The first two lines describe the
+elasto-plastic material behavior. Therein the equation shows the
+strain of the deformation $\varepsilon (u)$ as the additive decomposition of the
+elastic part $A\sigma$ and the plastic part $\lambda$. $A$ is defined as the compliance tensor of fourth order which contains some material constants and $\sigma$ as the
 symmetric stress tensor of second order. So we have to consider the inequality in the second
 row component-by-component and furthermore we have to distinguish two cases.\\
 The continuous and convex function $\mathcal{F}$ denotes the von Mises flow function
-$$\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0$$
+$$\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0,\quad \tau^D = \tau -
+\dfrac{1}{3}tr(\tau)I$$
 with $\sigma_0$ as yield stress. If there is no plastic deformation - that is $\lambda=0$ - this yields $\vert\sigma^D\vert < \sigma_0$
-and otherwise if $\lambda > 0$ it follows that $\vert\sigma^D\vert = \sigma_0$. That means if the stress is smaller as the yield stress
-there are only elastic deformations. Therein the Index $D$ denotes the deviator part of the stress $\sigma$ which
-is defined as
-$$\sigma^D = \sigma - \dfrac{1}{3}tr(\sigma).$$
-It describes the hydrostatic part of the stress tensor in contrast to the volumetric part. For metal the hydrostatic
-stress composes the main indicator for the plastic deformation.\\
-The second equation is called equilibrium condition with a force of areal density $f$ which we will neglect in our example.
+and otherwise if $\lambda > 0$ it follows that $\vert\sigma^D\vert = \sigma_0$.
+That means if the stress is smaller than the yield stress there are only elastic
+deformations. Or to consider it the other way around. If the deviator stress is
+in a norm bigger or equal than the yield stress there are plastic deformations
+and $\lambda$ would be positiv.\\
+There the index $D$ denotes the deviator part of for example the stress where
+$tr(.)$ is the trace of a tensor. The definition shows an additive decomposition
+of the stress $\sigma$ into a hydrostatic part (or volumetric part) $\dfrac{1}{3}tr(\tau)I$ and the deviator
+part $\sigma^D$. For metal the deviator stress composes the main indicator for
+plastic deformations.\\
+The third equation is called equilibrium condition with a force of volume
+density $f$ which we will neglect in our example.
 The boundary of $\Omega$ separates as follows $\Gamma=\Gamma_D\bigcup\Gamma_C$ and $\Gamma_D\bigcap\Gamma_C=\emptyset$.
 At the boundary $\Gamma_D$ we have zero Dirichlet conditions. $\Gamma_C$ denotes the potential contact boundary.\\
 The last two lines decribe the so-called Signorini contact conditions. If there is no contact the normal  stress
 $$ \sigma_n =  \sigma n\cdot n$$
 is zero with the outward normal $n$. If there is contact ($u_n = g$) the tangential stress $\sigma_t = \sigma\cdot n - \sigma_n n$
-vanishes, because we consider a frictionless situation and the normal stress is negative.
+vanishes, because we consider a frictionless situation and the normal stress is
+negative. The gap $g$ comes with the start configuration of the obstacle and the
+deformable body.
 
 \section{Derivation of the variational inequality}
 
