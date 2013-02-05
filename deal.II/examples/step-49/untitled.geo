@@ -1,13 +1,20 @@
 cl1 = 1;
+// Box:
 Point(1) = {-1, 0.3, 0, 1};
 Point(2) = {0.5, 0.3, 0, 1};
 Point(3) = {-1, -0.5, 0, 1};
 Point(4) = {0.5, -0.5, 0, 1};
+
 Point(7) = {-0.3, -0.1, 0, 1};
 Point(8) = {-0.2, -0.1, 0, 1};
 Point(9) = {-0.3, 0.1, -0, 1};
 Point(10) = {-0.4, -0.1, 0, 1};
-Point(11) = {-0.3, -0.2, 0, 1};
+Point(11) = {-0.3, -0.3, 0, 1};
+
+Point(12) = {0.1, -0.1, 0, 1};
+Point(13) = {0.2, 0.0, 0, 1};
+Point(14) = {0.3, -0.1, 0, 1};
+
 Line(1) = {1, 2};
 Line(2) = {4, 2};
 Line(3) = {1, 3};
@@ -16,10 +23,28 @@ Ellipse(5) = {8, 7, 11, 9};
 Ellipse(6) = {9, 7, 11, 10};
 Ellipse(7) = {8, 7, 10, 11};
 Ellipse(8) = {11, 7, 8, 10};
-Physical Line(10) = {1, 2, 4, 3};
-Physical Line(11) = {6, 5, 8, 9};
+
+Line(9) = {12, 13};
+Line(10) = {13, 14};
+Line(11) = {14, 12};
+
 Line Loop(12) = {1, -2, -4, -3};
-Line Loop(13) = {5, 6, -9, -8};
 Line Loop(14) = {5, 6, -8, -7};
-Plane Surface(15) = {12, 14};
-Physical Surface(16) = {15};
+Line Loop(15) = {9,10,11};
+
+// these define the boundary indicators in deal.II:
+Physical Line(0) = {1, 2, 4, 3};
+Physical Line(1) = {6, 5, 8, 7};
+Physical Line(2) = {9, 10, 11};
+
+
+// you need the physical surface, because that is what deal.II reads in
+Plane Surface(16) = {12, 14, 15};
+Physical Surface(17) = {16};
+
+Mesh.Algorithm = 8;
+Mesh.RecombineAll = 1;
+Mesh.CharacteristicLengthFactor = 0.09;
+Mesh.SubdivisionAlgorithm = 1;
+Mesh.Smoothing = 20;
+Show "*";

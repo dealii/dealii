@@ -38,11 +38,14 @@ problem: need to generate quads
 
 gmsh:
 use physical lines/surfaces
+indices of "Physical Line" are boundary indicators in deal.II
+can write as a script or edit graphically, probably a combination
 
-this is how it looks like in gmsh:
+this is how the .geo looks like in gmsh:
 @image html gmsh_picture.png
 
-
+you generate the .msh by running:
+gmsh -2 untitled.geo
 
 this is the mesh read from gmsh:
 @image html step-49.grid-1.png
