@@ -40,7 +40,7 @@ The classical formulation of the problem possesses the following form:
  \varepsilon(u) &= A\sigma + \lambda & &\quad\text{in } \Omega,\\
  \lambda(\tau - \sigma) &\geq 0\quad\forall\tau\text{ with
  }\mathcal{F}(\tau)\leq 0 & &\quad\text{in } \Omega,\\
- -\textrm{div}\ \sigma &= f & &\quad\text{in } \Omega,\\
+ -\textrm{\textrm{div}}\ \sigma &= f & &\quad\text{in } \Omega,\\
  u(\mathbf x) &= 0 & &\quad\text{on }\Gamma_D,\\
  \sigma_t(u) &= 0,\quad\sigma_n(u)\leq 0 & &\quad\text{on }\Gamma_C,\\
 \sigma_n(u)(u_n - g) &= 0,\quad u_n(\mathbf x) - g(\mathbf x) \leq 0 & &\quad\text{on } \Gamma_C
@@ -51,16 +51,22 @@ elasto-plastic material behavior. Therein the equation shows the
 strain of the deformation $\varepsilon (u)$ as the additive decomposition of the
 elastic part $A\sigma$ and the plastic part $\lambda$. $A$ is defined as the compliance tensor of fourth order which contains some material constants and $\sigma$ as the
 symmetric stress tensor of second order. So we have to consider the inequality in the second
-row component-by-component and furthermore we have to distinguish two cases.\\
+row component-by-component and in a pointwise sense. Furthermore we have to
+distinguish two cases.\\
 The continuous and convex function $\mathcal{F}$ denotes the von Mises flow function
-$$\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0,\quad \tau^D = \tau -
-\dfrac{1}{3}tr(\tau)I$$
-with $\sigma_0$ as yield stress. If there is no plastic deformation - that is $\lambda=0$ - this yields $\vert\sigma^D\vert < \sigma_0$
-and otherwise if $\lambda > 0$ it follows that $\vert\sigma^D\vert = \sigma_0$.
+$$\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0¸\quad\text{with}\quad \tau^D
+= \tau - \dfrac{1}{3}tr(\tau)I$$
+and $\sigma_0$ as yield stress. If there are no plastic deformations in a
+particular point - that is $\lambda=0$ - this yields $\vert\sigma^D\vert <
+\sigma_0$ and otherwise if $\lambda > 0$ it follows that $\vert\sigma^D\vert = \sigma_0$.
 That means if the stress is smaller than the yield stress there are only elastic
-deformations. Or to consider it the other way around. If the deviator stress is
-in a norm bigger or equal than the yield stress there are plastic deformations
-and $\lambda$ would be positiv.\\
+deformations in that point.\\
+Or to consider it the other way around. If the deviator stress $\sigma^D$ is in
+a norm bigger than the yield stress then $\sigma^D$ has to be projected back to
+the yield surface and there are plastic deformations which means $\lambda$
+would be positiv for that particular point. We refer that the stresses are
+computed by Hooke's law for isotorpic materials. You can find the description at the end of section 3. Else if the norm of the deviator stress tensor is smaller or equal the yield stress then $\lambda$ is zero and there are no plastic deformations in
+that point.\\
 There the index $D$ denotes the deviator part of for example the stress where
 $tr(.)$ is the trace of a tensor. The definition shows an additive decomposition
 of the stress $\sigma$ into a hydrostatic part (or volumetric part) $\dfrac{1}{3}tr(\tau)I$ and the deviator
@@ -81,27 +87,28 @@ deformable body.
 
 As a starting point to derive the equations above, let us imagine that we want
 to minimise an energy functional:
-$$E(\tau) := \dfrac{1}{2}\int\limits_{\Omega}\tau A \tau d\tau,\quad \tau\in \Pi W^{div}$$
+$$E(\tau) := \dfrac{1}{2}\int\limits_{\Omega}\tau A \tau d\tau,\quad \tau\in \Pi W^{\textrm{div}}$$
 with
-$$W^{div}:=\lbrace \tau\in
-L^2(\Omega,\mathbb{R}^{dim\times\dim}_{sym}):div(\tau)\in L^2(\Omega,\mathbb{R}^{dim})\rbrace$$ and
+$$W^{\textrm{div}}:=\lbrace \tau\in
+L^2(\Omega,\mathbb{R}^{\textrm{dim}\times\textrm{dim}}_{\textrm{sym}}):\textrm{div}(\tau)\in L^2(\Omega,\mathbb{R}^{\textrm{dim}})\rbrace$$ and
 $$\Pi \Sigma:=\lbrace \tau\in \Sigma, \mathcal{F}(\tau)\leq 0\rbrace$$
 as the set of admissible stresses which is defined
 by a continious, convex flow function $\mathcal{F}$.
 
 With the goal of deriving the dual formulation of the minimisation
 problem, we define a lagrange function:
-$$L(\tau,\varphi) := E(\tau) + (\varphi, div(\tau)),\quad \lbrace\tau,\varphi\rbrace\in\Pi W^{div}\times V^+$$
+$$L(\tau,\varphi) := E(\tau) + (\varphi, \textrm{div}(\tau)),\quad \lbrace\tau,\varphi\rbrace\in\Pi W^{\textrm{div}}\times V^+$$
 with
 $$V^+ := \lbrace u\in V: u_n\leq g \text{ on } \Gamma_C \rbrace$$
-$$V:=\left[ H_0^1 \right]^{dim}:=\lbrace u\in \left[H^1(\Omega)\right]^{dim}: u
+$$V:=\left[ H_0^1 \right]^{\textrm{dim}}:=\lbrace u\in \left[H^1(\Omega)\right]^{\textrm{dim}}: u
 = 0 \text{ on } \Gamma_D\rbrace$$
 By building the Fr\'echet derivatives of $L$ for both components we obtain the
 dual formulation for the stationary case which is known as \textbf{Hencky-Type-Model}:\\
 Find a pair $\lbrace\sigma,u\rbrace\in \Pi W\times V^+$ with
-$$\left(A\sigma,\tau - \sigma\right) + \left(u, div(\tau) - div(\sigma)\right) \geq 0,\quad \forall \tau\in \Pi W^{div}$$
-$$-\left(div(\sigma),\varphi - u\right) \geq 0,\quad \forall \varphi\in V^+.$$
-By integrating by parts and multiplying the first inequality by $C=A^{-1}$  we achieve the primal-mixed version of our problem:\\
+$$\left(A\sigma,\tau - \sigma\right) + \left(u, \textrm{div}(\tau) - \textrm{div}(\sigma)\right) \geq 0,\quad \forall \tau\in \Pi W^{\textrm{div}}$$
+$$-\left(\textrm{div}(\sigma),\varphi - u\right) \geq 0,\quad \forall \varphi\in V^+.$$
+By integrating by parts and multiplying the first inequality by the elastic
+tensor $C=A^{-1}$ we achieve the primal-mixed version of our problem:\\
 Find a pair $\lbrace\sigma,u\rbrace\in \Pi W\times V^+$ with
 $$\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right) \geq 0,\quad \forall \tau\in \Pi W$$
 $$\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+.$$
@@ -136,7 +143,10 @@ $$\alpha := \sigma_0 + \dfrac{\gamma}{2\mu+\gamma}\left(\vert\tau^D\vert - \sigm
 with a further material parameter $\mu>0$ called shear modulus.\\
 So what we do is to calculate the stresses by using Hooke's law for linear elastic,  isotropic materials
 $$\sigma = C \varepsilon(u) = 2\mu \varepsilon^D(u) + \kappa tr(\varepsilon(u))I = \left[2\mu\left(\mathbb{I} -\dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I\right]\varepsilon(u)$$
-with the material parameter $\kappa>0$ (bulk modulus). The variables $I$ and $\mathbb{I}$ denote the identity tensors of second and forth order.\\
+with the material parameter $\kappa>0$ (bulk modulus). The variables $I$ and
+$\mathbb{I}$ denote the identity tensors of second and forth order. In that
+notation $2\mu \varepsilon^D(u)$ is the deviatoric part and $\kappa
+tr(\varepsilon(u))$ the volumetric part of the stress tensor.\\
 In the next step we test in a pointwise sense where the deviator part of the stress in a norm is bigger as the yield stress.
 If there are such points we project the deviator stress in those points back to the yield surface. Methods of this kind
 are called projections algorithm or radial-return-algorithm.\\
@@ -157,10 +167,10 @@ programming). That means we have to solve a minimisation problem for a known $u^
  & & a(u^{i};u^{i+1} - u^i) + \dfrac{1}{2}a'(u^i;u^{i+1} - u^i,u^{i+1} - u^i)\\
  &=&  a(u^i;u^{i+1}) -  a(u^i;u^i) +\\
  & & \dfrac{1}{2}\left( a'(u^i;u^{i+1},u^{i+1}) - 2a'(u^i;u^i,u^{i+1}) - a'(u^i;u^i,u^i)\right)\\
- &\rightarrow& min,\quad u^{i+1}\in V^+.
+ &\rightarrow& \textrm{min},\quad u^{i+1}\in V^+.
 \end{eqnarray*}
 Neglecting the constant terms $ a(u^i;u^i)$ and $ a'(u^i;u^i,u^i)$ we obtain the following minimisation problem
-$$\dfrac{1}{2} a'(u^i;u^{i+1},u^{i+1}) - F(u^i)\rightarrow min,\quad u^{i+1}\in V^+$$
+$$\dfrac{1}{2} a'(u^i;u^{i+1},u^{i+1}) - F(u^i)\rightarrow \textrm{min},\quad u^{i+1}\in V^+$$
 with
 $$F(\varphi) := \left(a'(\varphi;\varphi,u^{i+1}) -  a(\varphi;u^{i+1}) \right).$$
 In the case of our constitutive law the derivative of the semi-linearform $a(.;.)$ at the point $u^i$ is
@@ -190,7 +200,7 @@ $$K:=\{\mu\in W':\mu_T = 0,\quad\langle\mu n,v\rangle_{\Gamma_C}\geq 0,\quad
 of Lagrange multipliers, where $\langle\cdot,\cdot\rangle$
 denotes the duality pairing between $W'$ and $W$. Intuitively, $K$ is the cone
 of all "non-positive functions", except that $ K\subset
-\left( \left[ H_0^{\frac{1}{2}} \right]^{dim} \right)' $ and so contains other
+\left( \left[ H_0^{\frac{1}{2}} \right]^{\textrm{dim}} \right)' $ and so contains other
 objects besides regular functions as well. This yields:\\
 
 \noindent
