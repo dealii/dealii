@@ -16,9 +16,10 @@ What this program does:
 <h1>How to create meshes</h1>
 
 <h2>GridGenerator</h2>
+
 use GridGenerator (already discussed in step-1)
 
-examples: hyper_cube, hyper_shell, ...
+some examples: GridGenerator::hyper_cube(), GridGenerator::hyper_shell(), GridGenerator::hyper_ball(), GridGenerator::hyper_cube_with_cylindrical_hole() ...
 
 <h2>construct your own mesh programmatically</h2>
 
@@ -26,28 +27,28 @@ example?
 
 <h2>Import from external programs</h2>
 
-import mesh from file, read using GridIn
+import mesh from file, read using @GridIn class
 
 list of tools: cubeit, gmsh, more?
-problem: need to generate quads
-
-- how to use gmsh
-  - 2d
-  - 3d: mention difficulties
+problem: need to generate quads, tetrahedral meshes won't work
 
 
-gmsh:
-use physical lines/surfaces
-indices of "Physical Line" are boundary indicators in deal.II
-can write as a script or edit graphically, probably a combination
+Gmsh is an open source mesh generator available at http://geuz.org/gmsh/.
+It can generate unstructured 2d quad based meshes, but in 3d it can only extrude 2d meshes to get hexahedral meshes. 3D meshing of unstructured geometry is not supported.
 
-this is how the .geo looks like in gmsh:
+A mesh is described in a text based .geo file, that can be edited by hand and can contain computations, loops, variables, etc.. It is very flexible. The mesh is generated from a surface representation, which is build from a list of line loops, which is build from a list of lines, which are build from points.
+
+It is important that file contains "physical lines" and "physical surfaces". These give the boundary indicators and material ids for the use inside deal.II. 
+
+The .geo script can be written by hand or it can be generated automatically by creating objects graphically. In many cases it is best to combine both approaches. The file can be easily reloaded by pressing "reload" under the "Geometry" tab.
+
+This tutorial contains an example .geo file. This is how the .geo looks like in gmsh (displaying the boundary indicators):
 @image html gmsh_picture.png
 
-you generate the .msh by running:
+Deal.II can read the .msh format written by gmsh. You generate the .msh from the .geo by running:
 gmsh -2 untitled.geo
 
-this is the mesh read from gmsh:
+Now this is the mesh read from gmsh and saved again by deal.II as an image:
 @image html step-49.grid-1.png
 
 
