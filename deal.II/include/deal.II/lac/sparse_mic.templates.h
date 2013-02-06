@@ -132,12 +132,9 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
   for (unsigned int row=0; row<this->m(); row++)
     inner_sums[row] = get_rowsum(row);
 
-  const unsigned int *const col_nums = this->get_sparsity_pattern().get_column_numbers();
-  const std::size_t *const rowstarts = this->get_sparsity_pattern().get_rowstart_indices();
-
   for (unsigned int row=0; row<this->m(); row++)
     {
-      const number temp = this->diag_element(row);
+      const number temp = this->begin(row)->value();
       number temp1 = 0;
 
       // work on the lower left part of the matrix. we know
@@ -187,15 +184,10 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
 
   const unsigned int N=dst.size();
-  const std::size_t   *const rowstart_indices = this->get_sparsity_pattern().get_rowstart_indices();
-  const unsigned int *const column_numbers   = this->get_sparsity_pattern().get_column_numbers();
-  // We assume the underlying matrix A is:
-  // A = X - L - U, where -L and -U are
-  // strictly lower- and upper- diagonal
-  // parts of the system.
+  // We assume the underlying matrix A is: A = X - L - U, where -L and -U are
+  // strictly lower- and upper- diagonal parts of the system.
   //
-  // Solve (X-L)X{-1}(X-U) x = b
-  // in 3 steps:
+  // Solve (X-L)X{-1}(X-U) x = b in 3 steps:
   dst = src;
   for (unsigned int row=0; row<N; ++row)
     {
