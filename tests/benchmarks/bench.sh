@@ -47,6 +47,7 @@ while [ $PREVREVISION -lt $HEADREVISION ] ; do
       if [ "$words" -gt "0" ] ; then
 	  cp names.test ../names.$test
       fi ;
+      rm -rf names.test
       fi ;
       ./../gettimes/gettimes $NEXTREVISION >>../datatable.$test
       cd ..      
