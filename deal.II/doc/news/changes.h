@@ -177,6 +177,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: A new overload of BlockMatrixBase::add allows to add one block
+matrix to another, with a scaling factor.
+<br>
+(Jean-Paul Pelteret, 2013/02/05)
+
 <li> Fixed: The FEValues machinery silently accepted the case when the
 mapped cell (or the cell geometry) were distorted. An assertion has been
 added to the computation of the Jacobian determinants for the volume
