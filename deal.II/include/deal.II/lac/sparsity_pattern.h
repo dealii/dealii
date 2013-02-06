@@ -28,12 +28,19 @@ class SparsityPattern;
 class ChunkSparsityPattern;
 template <typename number> class FullMatrix;
 template <typename number> class SparseMatrix;
+template <typename number> class SparseLUDecomposition;
+template <typename number> class SparseILU;
 template <class VECTOR> class VectorSlice;
 
 class CompressedSparsityPattern;
 class CompressedSetSparsityPattern;
 class CompressedSimpleSparsityPattern;
 
+
+namespace ChunkSparsityPatternIterators
+{
+  class Accessor;
+}
 
 
 /*! @addtogroup Sparsity
@@ -87,9 +94,10 @@ namespace SparsityPatternIterators
    * also the base class for both const and non-const accessor classes
    * into sparse matrices.
    *
-   * Note that this class only allows read access to elements, providing
-   * their row and column number. It does not allow modifying the
-   * sparsity pattern itself.
+   * Note that this class only allows read access to elements, providing their
+   * row and column number (or alternatively the index within the complete
+   * sparsity pattern). It does not allow modifying the sparsity pattern
+   * itself.
    *
    * @author Wolfgang Bangerth
    * @date 2004
@@ -103,6 +111,12 @@ namespace SparsityPatternIterators
     Accessor (const SparsityPattern *matrix,
               const unsigned int     row,
               const unsigned int     index);
+
+    /**
+     * Constructor.
+     */
+    Accessor (const SparsityPattern *matrix,
+              const std::size_t      index_within_sparsity);
 
     /**
      * Constructor. Construct the end accessor for the given sparsity pattern.
@@ -138,12 +152,10 @@ namespace SparsityPatternIterators
      */
     bool is_valid_entry () const;
 
-
     /**
      * Comparison. True, if both iterators point to the same matrix position.
      */
     bool operator == (const Accessor &) const;
-
 
     /**
      * Comparison operator. Result is true if either the first row number is
@@ -153,6 +165,7 @@ namespace SparsityPatternIterators
      * sparsity pattern.
      */
     bool operator < (const Accessor &) const;
+
   protected:
     /**
      * The sparsity pattern we operate on accessed.
@@ -160,14 +173,9 @@ namespace SparsityPatternIterators
     const SparsityPattern *sparsity_pattern;
 
     /**
-     * Current row number.
+     * Index in global sparsity pattern.
      */
-    unsigned int a_row;
-
-    /**
-     * Current index in row.
-     */
-    unsigned int a_index;
+    std::size_t a_index;
 
     /**
      * Move the accessor to the next nonzero entry in the matrix.
@@ -178,6 +186,11 @@ namespace SparsityPatternIterators
      * Grant access to iterator class.
      */
     friend class Iterator;
+
+    /**
+     * Grant access to accessor class of ChunkSparsityPattern.
+     */
+    friend class ChunkSparsityPatternIterators::Accessor;
   };
 
 
@@ -203,6 +216,14 @@ namespace SparsityPatternIterators
     Iterator (const SparsityPattern *sp,
               const unsigned int     row,
               const unsigned int     index);
+
+    /**
+     * Constructor. Create an iterator into the sparsity pattern @p sp for the
+     * given global index (i.e., the index of the given element counting from
+     * the zeroth row).
+     */
+    Iterator (const SparsityPattern *sp,
+              const std::size_t      index_within_sparsity);
 
     /**
      * Prefix increment.
@@ -1196,7 +1217,7 @@ public:
    * yourself, you should also rename this function to avoid programs relying
    * on outdated information!
    */
-  const std::size_t *get_rowstart_indices () const;
+  const std::size_t *get_rowstart_indices () const DEAL_II_DEPRECATED;
 
   /**
    * @deprecated. Use @p row_length and @p column_number instead. Also, using
@@ -1215,7 +1236,7 @@ public:
    * yourself, you should also rename this function to avoid programs relying
    * on outdated information!
    */
-  const unsigned int *get_column_numbers () const;
+  const unsigned int *get_column_numbers () const DEAL_II_DEPRECATED;
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
   /** @addtogroup Exceptions
@@ -1354,9 +1375,18 @@ private:
    * Make all sparse matrices friends of this class.
    */
   template <typename number> friend class SparseMatrix;
+  template <typename number> friend class SparseLUDecomposition;
+  template <typename number> friend class SparseILU;
   template <typename number> friend class ChunkSparseMatrix;
 
   friend class ChunkSparsityPattern;
+
+  /**
+   * Also give access to internal details to the iterator/accessor
+   * classes.
+   */
+  friend class SparsityPatternIterators::Iterator;
+  friend class SparsityPatternIterators::Accessor;
 };
 
 
@@ -1375,7 +1405,16 @@ namespace SparsityPatternIterators
             const unsigned int     i)
     :
     sparsity_pattern(sparsity_pattern),
-    a_row(r),
+    a_index(sparsity_pattern->rowstart[r]+i)
+  {}
+
+
+  inline
+  Accessor::
+  Accessor (const SparsityPattern *sparsity_pattern,
+            const std::size_t      i)
+    :
+    sparsity_pattern(sparsity_pattern),
     a_index(i)
   {}
 
@@ -1385,8 +1424,7 @@ namespace SparsityPatternIterators
   Accessor (const SparsityPattern *sparsity_pattern)
     :
     sparsity_pattern(sparsity_pattern),
-    a_row(sparsity_pattern->n_rows()),
-    a_index(0)
+    a_index(sparsity_pattern->rowstart[sparsity_pattern->rows])
   {}
 
 
@@ -1394,9 +1432,9 @@ namespace SparsityPatternIterators
   bool
   Accessor::is_valid_entry () const
   {
-    return (sparsity_pattern
-            ->get_column_numbers()[sparsity_pattern
-                                   ->get_rowstart_indices()[a_row]+a_index]
+    return (a_index < sparsity_pattern->rowstart[sparsity_pattern->rows]
+            &&
+            sparsity_pattern->colnums[a_index]
             != SparsityPattern::invalid_entry);
   }
 
@@ -1407,7 +1445,11 @@ namespace SparsityPatternIterators
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
 
-    return a_row;
+    const std::size_t * insert_point =
+      std::upper_bound(sparsity_pattern->rowstart,
+                       sparsity_pattern->rowstart + sparsity_pattern->rows + 1,
+                       a_index);
+    return insert_point - sparsity_pattern->rowstart - 1;
   }
 
 
@@ -1417,9 +1459,7 @@ namespace SparsityPatternIterators
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
 
-    return (sparsity_pattern
-            ->get_column_numbers()[sparsity_pattern
-                                   ->get_rowstart_indices()[a_row]+a_index]);
+    return (sparsity_pattern->colnums[a_index]);
   }
 
 
@@ -1429,7 +1469,7 @@ namespace SparsityPatternIterators
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
 
-    return a_index;
+    return a_index - sparsity_pattern->rowstart[row()];
   }
 
 
@@ -1439,8 +1479,7 @@ namespace SparsityPatternIterators
   bool
   Accessor::operator == (const Accessor &other) const
   {
-    return (sparsity_pattern  == other.sparsity_pattern &&
-            a_row   == other.a_row &&
+    return (sparsity_pattern == other.sparsity_pattern &&
             a_index == other.a_index);
   }
 
@@ -1453,9 +1492,7 @@ namespace SparsityPatternIterators
     Assert (sparsity_pattern == other.sparsity_pattern,
             ExcInternalError());
 
-    return (a_row < other.a_row ||
-            (a_row == other.a_row &&
-             a_index < other.a_index));
+    return a_index < other.a_index;
   }
 
 
@@ -1463,21 +1500,9 @@ namespace SparsityPatternIterators
   void
   Accessor::advance ()
   {
-    Assert (a_row < sparsity_pattern->n_rows(), ExcIteratorPastEnd());
-
+    Assert (a_index < sparsity_pattern->rowstart[sparsity_pattern->rows],
+            ExcIteratorPastEnd());
     ++a_index;
-
-    // if at end of line: cycle until we find a row with a nonzero number of
-    // entries
-    while (a_index >= sparsity_pattern->row_length(a_row))
-      {
-        a_index = 0;
-        ++a_row;
-
-        // if we happened to find the end of the matrix, then stop here
-        if (a_row == sparsity_pattern->n_rows())
-          break;
-      }
   }
 
 
@@ -1488,6 +1513,15 @@ namespace SparsityPatternIterators
                       const unsigned int     i)
     :
     accessor(sparsity_pattern, r, i)
+  {}
+
+
+
+  inline
+  Iterator::Iterator (const SparsityPattern *sparsity_pattern,
+                      const std::size_t      i)
+    :
+    accessor(sparsity_pattern, i)
   {}
 
 
@@ -1562,14 +1596,7 @@ inline
 SparsityPattern::iterator
 SparsityPattern::begin () const
 {
-  // search for the first line with a nonzero number of entries
-  for (unsigned int r=0; r<n_rows(); ++r)
-    if (row_length(r) > 0)
-      return iterator(this, r, 0);
-
-  // alright, this matrix is completely empty. that's strange but ok. simply
-  // return the end() iterator
-  return end();
+  return iterator(this, rowstart[0]);
 }
 
 
@@ -1577,7 +1604,7 @@ inline
 SparsityPattern::iterator
 SparsityPattern::end () const
 {
-  return iterator(this, n_rows(), 0);
+  return iterator(this, rowstart[rows]);
 }
 
 
@@ -1588,10 +1615,7 @@ SparsityPattern::begin (const unsigned int r) const
 {
   Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
 
-  if (row_length(r) > 0)
-    return iterator(this, r, 0);
-  else
-    return end (r);
+  return iterator(this, rowstart[r]);
 }
 
 
@@ -1602,14 +1626,7 @@ SparsityPattern::end (const unsigned int r) const
 {
   Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
 
-  // place the iterator on the first entry past this line, or at the end of
-  // the matrix
-  for (unsigned int i=r+1; i<n_rows(); ++i)
-    if (row_length(i) > 0)
-      return iterator(this, i, 0);
-
-  // if there is no such line, then take the end iterator of the matrix
-  return end();
+  return iterator(this, rowstart[r+1]);
 }
 
 
