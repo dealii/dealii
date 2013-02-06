@@ -148,7 +148,7 @@ ConstraintMatrix::condense (VectorType &vec) const
   // parallel vectors, this can only work if we can put a compress()
   // in between, but we don't want to call compress() twice per entry
   for (std::vector<ConstraintLine>::const_iterator
-	 constraint_line = lines.begin();
+       constraint_line = lines.begin();
        constraint_line!=lines.end(); ++constraint_line)
     {
       // in case the constraint is
@@ -160,7 +160,7 @@ ConstraintMatrix::condense (VectorType &vec) const
 
       const typename VectorType::value_type old_value = vec(constraint_line->line);
       for (unsigned int q=0; q!=constraint_line->entries.size(); ++q)
-        if (vec.in_local_range(constraint_line->entries[q].first) == true) 
+        if (vec.in_local_range(constraint_line->entries[q].first) == true)
           vec(constraint_line->entries[q].first)
           += (static_cast<typename VectorType::value_type>
               (old_value) *
@@ -170,9 +170,9 @@ ConstraintMatrix::condense (VectorType &vec) const
   vec.compress();
 
   for (std::vector<ConstraintLine>::const_iterator
-	 constraint_line = lines.begin();
+       constraint_line = lines.begin();
        constraint_line!=lines.end(); ++constraint_line)
-    if (vec.in_local_range(constraint_line->line) == true) 
+    if (vec.in_local_range(constraint_line->line) == true)
       vec(constraint_line->line) = 0.;
 }
 
@@ -261,12 +261,12 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
         // copy entries if column will not
         // be condensed away, distribute
         // otherwise
-	for (typename SparseMatrix<number>::const_iterator
-	       p = uncondensed.begin(row);
-	     p != uncondensed.end(row); ++p)
+        for (typename SparseMatrix<number>::const_iterator
+             p = uncondensed.begin(row);
+             p != uncondensed.end(row); ++p)
           if (new_line[p->column()] != -1)
             condensed.add (new_line[row],
-			   new_line[p->column()],
+                           new_line[p->column()],
                            p->value());
           else
             {
@@ -299,9 +299,9 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
     else
       // line must be distributed
       {
-	for (typename SparseMatrix<number>::const_iterator
-	       p = uncondensed.begin(row);
-	     p != uncondensed.end(row); ++p)
+        for (typename SparseMatrix<number>::const_iterator
+             p = uncondensed.begin(row);
+             p != uncondensed.end(row); ++p)
           // for each column: distribute
           if (new_line[p->column()] != -1)
             // column is not constrained
@@ -332,7 +332,7 @@ ConstraintMatrix::condense (const SparseMatrix<number> &uncondensed,
               if (use_vectors == true)
                 for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
                   condensed_vector (new_line[next_constraint->entries[q].first])
-		    -= p->value() *
+                  -= p->value() *
                      next_constraint->entries[q].second *
                      c->inhomogeneity;
             }
@@ -1729,28 +1729,18 @@ namespace internals
   {
     template <typename SparseMatrixIterator>
     static inline
-    void add_value (const double value,
-                    const unsigned int row,
-                    const unsigned int column,
-                    const unsigned int *col_ptr,
-                    const bool   are_on_diagonal,
-                    unsigned int &counter,
-                    SparseMatrixIterator      val_ptr)
+    void add_value (const double          value,
+                    const unsigned int    row,
+                    const unsigned int    column,
+                    SparseMatrixIterator &matrix_values)
     {
       if (value != 0.)
         {
-          Assert (col_ptr != 0,
-                  typename SparseMatrix<typename SparseMatrixIterator::MatrixType::value_type>::ExcInvalidIndex (row, column));
-          if (are_on_diagonal)
-            {
-              val_ptr->value() += value;
-              return;
-            }
-          while (col_ptr[counter] < column)
-            ++counter;
-          Assert (col_ptr[counter] == column,
+          while (matrix_values->column() < column)
+            ++matrix_values;
+          Assert (matrix_values->column() == column,
                   typename SparseMatrix<typename SparseMatrixIterator::MatrixType::value_type>::ExcInvalidIndex(row, column));
-          (val_ptr+counter)->value() += value;
+          matrix_values->value() += value;
         }
     }
   }
@@ -1780,20 +1770,12 @@ namespace internals
     if (sparsity.n_nonzero_elements() == 0)
       return;
 
-    const std::size_t *row_start = sparsity.get_rowstart_indices();
-    const unsigned int *sparsity_struct = sparsity.get_column_numbers();
-
     const unsigned int row = global_rows.global_row(i);
     const unsigned int loc_row = global_rows.local_row(i);
 
-    const unsigned int *col_ptr = sparsity.row_length(row) == 0 ? 0 :
-                                  &sparsity_struct[row_start[row]];
     typename SparseMatrix<number>::iterator
-    val_ptr = (sparsity.row_length(row) == 0 ?
-    		   sparse_matrix->end() :
-               sparse_matrix->begin(row));
-    const bool optimize_diagonal = sparsity.optimize_diagonal();
-    unsigned int counter = optimize_diagonal;
+      matrix_values = sparse_matrix->begin(row);
+    const bool optimize_diagonal = sparsity.n_rows() == sparsity.n_cols();
 
     // distinguish three cases about what can
     // happen for checking whether the diagonal is
@@ -1814,8 +1796,7 @@ namespace internals
                 const double col_val = matrix_ptr[loc_col];
                 dealiiSparseMatrix::add_value (col_val, row,
                                                global_rows.global_row(j),
-                                               col_ptr, false, counter,
-                                               val_ptr);
+                                               matrix_values);
               }
           }
         else
@@ -1825,55 +1806,57 @@ namespace internals
                 double col_val = resolve_matrix_entry (global_rows, global_rows, i, j,
                                                        loc_row, local_matrix);
                 dealiiSparseMatrix::add_value (col_val, row,
-                                               global_rows.global_row(j), col_ptr,
-                                               false, counter, val_ptr);
+                                               global_rows.global_row(j),
+                                               matrix_values);
               }
           }
       }
     else if (i>=column_start && i<column_end) // case 2: can split loop
       {
+        ++matrix_values; // jump over diagonal element
         if (global_rows.have_indirect_rows() == false)
           {
             AssertIndexRange (loc_row, local_matrix.m());
             const double *matrix_ptr = &local_matrix(loc_row, 0);
 
+            sparse_matrix->begin(row)->value() += matrix_ptr[loc_row];
             for (unsigned int j=column_start; j<i; ++j)
               {
                 const unsigned int loc_col = global_rows.local_row(j);
                 const double col_val = matrix_ptr[loc_col];
                 dealiiSparseMatrix::add_value(col_val, row,
-                                              global_rows.global_row(j), col_ptr,
-                                              false, counter, val_ptr);
+                                              global_rows.global_row(j),
+                                              matrix_values);
               }
-            val_ptr->value() += matrix_ptr[loc_row];
             for (unsigned int j=i+1; j<column_end; ++j)
               {
                 const unsigned int loc_col = global_rows.local_row(j);
                 const double col_val = matrix_ptr[loc_col];
                 dealiiSparseMatrix::add_value(col_val, row,
-                                              global_rows.global_row(j), col_ptr,
-                                              false, counter, val_ptr);
+                                              global_rows.global_row(j),
+                                              matrix_values);
               }
           }
         else
           {
+            sparse_matrix->begin(row)->value() +=
+              resolve_matrix_entry (global_rows, global_rows, i, i,
+                                    loc_row, local_matrix);
             for (unsigned int j=column_start; j<i; ++j)
               {
                 double col_val = resolve_matrix_entry (global_rows, global_rows, i, j,
                                                        loc_row, local_matrix);
                 dealiiSparseMatrix::add_value (col_val, row,
-                                               global_rows.global_row(j), col_ptr,
-                                               false, counter, val_ptr);
+                                               global_rows.global_row(j),
+                                               matrix_values);
               }
-            val_ptr->value() += resolve_matrix_entry (global_rows, global_rows, i, i, loc_row,
-                                                      local_matrix);
             for (unsigned int j=i+1; j<column_end; ++j)
               {
                 double col_val = resolve_matrix_entry (global_rows, global_rows, i, j,
                                                        loc_row, local_matrix);
                 dealiiSparseMatrix::add_value (col_val, row,
-                                               global_rows.global_row(j), col_ptr,
-                                               false, counter, val_ptr);
+                                               global_rows.global_row(j),
+                                               matrix_values);
               }
           }
       }
@@ -1881,6 +1864,7 @@ namespace internals
     // the loop
     else if (global_rows.have_indirect_rows() == false)
       {
+        ++matrix_values; // jump over diagonal element
         AssertIndexRange (loc_row, local_matrix.m());
         const double *matrix_ptr = &local_matrix(loc_row, 0);
 
@@ -1888,22 +1872,27 @@ namespace internals
           {
             const unsigned int loc_col = global_rows.local_row(j);
             const double col_val = matrix_ptr[loc_col];
-            dealiiSparseMatrix::add_value(col_val, row,
-                                          global_rows.global_row(j), col_ptr,
-                                          row==global_rows.global_row(j),
-                                          counter, val_ptr);
+            if (row==global_rows.global_row(j))
+              sparse_matrix->begin(row)->value() += col_val;
+            else
+              dealiiSparseMatrix::add_value(col_val, row,
+                                            global_rows.global_row(j),
+                                            matrix_values);
           }
       }
     else
       {
+        ++matrix_values; // jump over diagonal element
         for (unsigned int j=column_start; j<column_end; ++j)
           {
-            double col_val = resolve_matrix_entry (global_rows, global_rows, i, j,
-                                                   loc_row, local_matrix);
-            dealiiSparseMatrix::add_value (col_val, row,
-                                           global_rows.global_row(j), col_ptr,
-                                           row==global_rows.global_row(j),
-                                           counter, val_ptr);
+            double col_val = resolve_matrix_entry (global_rows, global_rows, i,
+                                                   j, loc_row, local_matrix);
+            if (row==global_rows.global_row(j))
+              sparse_matrix->begin(row)->value() += col_val;
+            else
+              dealiiSparseMatrix::add_value (col_val, row,
+                                             global_rows.global_row(j),
+                                             matrix_values);
           }
       }
   }

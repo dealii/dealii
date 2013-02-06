@@ -43,10 +43,10 @@
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/constraint_matrix.h>
 
 #include <deal.II/base/function.h>
 #include <deal.II/base/quadrature_lib.h>
-#include <deal.II/dofs/dof_constraints.h>
 #include <deal.II/dofs/dof_tools.h>
 
 #include <deal.II/fe/fe_system.h>

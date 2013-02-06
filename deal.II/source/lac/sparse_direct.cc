@@ -544,47 +544,36 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
 
   const unsigned int
   n_rows           = sparsity_pattern->n_rows();
-  const std::size_t *const
-  rowstart_indices = sparsity_pattern->get_rowstart_indices();
-  const unsigned int *const
-  col_nums         = sparsity_pattern->get_column_numbers();
 
-  // first count number of nonzero
-  // elements in the upper right
-  // part. the matrix is symmetric,
-  // so this suffices
+  // first count number of nonzero elements in the upper right part. the
+  // matrix is symmetric, so this suffices
   n_nonzero_elements = 0;
   for (unsigned int row=0; row<n_rows; ++row)
-    for (const unsigned int *col=&col_nums[rowstart_indices[row]];
-         col != &col_nums[rowstart_indices[row+1]];
-         ++col)
-      if (row <= *col)
+    for (SparsityPattern::iterator col = sparsity_pattern->begin(row);
+         col < sparsity_pattern->end(row); ++col)
+      if (row <= col->column())
         ++n_nonzero_elements;
 
 
-  // fill the row numbers and column
-  // numbers arrays from the sparsity
-  // pattern. note that we have
-  // Fortran convention, i.e. indices
-  // need to be 1-base, as opposed to
-  // C's 0-based convention!
+  // fill the row numbers and column numbers arrays from the sparsity
+  // pattern. note that we have Fortran convention, i.e. indices need to be
+  // 1-base, as opposed to C's 0-based convention!
   row_numbers.resize (n_nonzero_elements);
   column_numbers.resize (n_nonzero_elements);
 
   unsigned int global_index = 0;
   for (unsigned int row=0; row<n_rows; ++row)
-    for (const unsigned int *col=&col_nums[rowstart_indices[row]];
-         col != &col_nums[rowstart_indices[row+1]];
-         ++col)
+    for (SparsityPattern::iterator col = sparsity_pattern->begin(row);
+         col < sparsity_pattern->end(row); ++col)
       // note that the matrix must be
       // symmetric, so only treat the
       // upper right part
-      if (row <= *col)
+      if (row <= col->column())
         {
           Assert (global_index < n_nonzero_elements, ExcInternalError());
 
           row_numbers[global_index] = row+1;
-          column_numbers[global_index] = *col+1;
+          column_numbers[global_index] = col->column()+1;
           ++global_index;
         };
   Assert (global_index == n_nonzero_elements, ExcInternalError());
@@ -874,40 +863,37 @@ SparseDirectMA27::fill_A (const SparseMatrix<number> &matrix)
   const SparsityPattern &sparsity_pattern = matrix.get_sparsity_pattern ();
 
   const unsigned int n_rows = sparsity_pattern.n_rows();
-  const std::size_t  *rowstart_indices = sparsity_pattern.get_rowstart_indices();
-  const unsigned int *col_nums         = sparsity_pattern.get_column_numbers();
 
   unsigned int global_index = 0;
   for (unsigned int row=0; row<n_rows; ++row)
-    for (const unsigned int *col=&col_nums[rowstart_indices[row]];
-         col != &col_nums[rowstart_indices[row+1]];
-         ++col)
+    for (typename SparseMatrix<number>::const_iterator col=matrix.begin(row);
+         col < matrix.end(row); ++col)
       // note that the matrix must be
       // symmetric, so only treat the
       // upper right part
-      if (row <= *col)
+      if (row <= col->column())
         {
           Assert (global_index < n_nonzero_elements, ExcInternalError());
 
-          A[global_index] = matrix(row,*col);
+          A[global_index] = col->value();
           ++global_index;
 
           // make sure that the symmetric
           // entry exists and has the same
           // value, unless this one is zero
-          Assert ((matrix(row,*col) == 0)
+          Assert ((col->value() == 0)
                   ||
-                  (std::fabs(matrix(row,*col) - matrix(*col,row))
-                   <= 1e-15 * std::fabs (matrix(row,*col))),
+                  (std::fabs(col->value() - matrix(col->column(),row))
+                   <= 1e-15 * std::fabs (col->value())),
                   ExcMatrixNotSymmetric());
         }
       else
         // lower left part. just check
         // symmetry
-        Assert ((matrix(row,*col) == 0)
+        Assert ((col->value() == 0)
                 ||
-                (std::fabs(matrix(row,*col) - matrix(*col,row))
-                 <= 1e-15 * std::fabs (matrix(row,*col))),
+                (std::fabs(col->value() - matrix(col->column(),row))
+                 <= 1e-15 * std::fabs (col->value())),
                 ExcMatrixNotSymmetric());
 
   Assert (global_index == n_nonzero_elements, ExcInternalError());
@@ -1121,10 +1107,6 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
 
   const unsigned int
   n_rows           = sparsity_pattern.n_rows();
-  const std::size_t *const
-  rowstart_indices = sparsity_pattern.get_rowstart_indices();
-  const unsigned int *const
-  col_nums         = sparsity_pattern.get_column_numbers();
 
   // first count number of nonzero
   // elements in the upper right
@@ -1132,12 +1114,10 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
   // so this suffices
   n_nonzero_elements = 0;
   for (unsigned int row=0; row<n_rows; ++row)
-    for (const unsigned int *col=&col_nums[rowstart_indices[row]];
-         col != &col_nums[rowstart_indices[row+1]];
-         ++col)
-      // skip zero elements, as
-      // required by the docs of MA47
-      if ((row <= *col) && (m(row,*col) != 0))
+    for (SparseMatrix<double>::const_iterator col = m.begin(row);
+         col < m.end(row); ++col)
+      // skip zero elements, as required by the docs of MA47
+      if (row <= col->column() && col->value() != 0)
         ++n_nonzero_elements;
 
 
@@ -1152,18 +1132,17 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
 
   unsigned int global_index = 0;
   for (unsigned int row=0; row<n_rows; ++row)
-    for (const unsigned int *col=&col_nums[rowstart_indices[row]];
-         col != &col_nums[rowstart_indices[row+1]];
-         ++col)
+    for (SparseMatrix<double>::const_iterator col = m.begin(row);
+         col < m.end(row); ++col)
       // note that the matrix must be
       // symmetric, so only treat the
       // upper right part
-      if ((row <= *col) && (m(row,*col) != 0))
+      if ((row <= col->column()) && (col->value() != 0))
         {
           Assert (global_index < n_nonzero_elements, ExcInternalError());
 
           row_numbers[global_index] = row+1;
-          column_numbers[global_index] = *col+1;
+          column_numbers[global_index] = col->column()+1;
           ++global_index;
         };
   Assert (global_index == n_nonzero_elements, ExcInternalError());
@@ -1393,38 +1372,35 @@ SparseDirectMA47::fill_A (const SparseMatrix<double> &matrix)
   const SparsityPattern &sparsity_pattern = matrix.get_sparsity_pattern ();
 
   const unsigned int n_rows = sparsity_pattern.n_rows();
-  const std::size_t  *rowstart_indices = sparsity_pattern.get_rowstart_indices();
-  const unsigned int *col_nums         = sparsity_pattern.get_column_numbers();
 
   unsigned int global_index = 0;
   for (unsigned int row=0; row<n_rows; ++row)
-    for (const unsigned int *col=&col_nums[rowstart_indices[row]];
-         col != &col_nums[rowstart_indices[row+1]];
-         ++col)
+    for (SparseMatrix<double>::const_iterator col=matrix.begin(row);
+         col < matrix.end(row); ++col)
       // note that the matrix must be
       // symmetric, so only treat the
       // upper right part
-      if ((row <= *col) && (matrix(row,*col) != 0))
+      if ((row <= col->column()) && (col->value() != 0))
         {
           Assert (global_index < n_nonzero_elements, ExcInternalError());
 
-          A[global_index] = matrix(row,*col);
+          A[global_index] = col->value();
           ++global_index;
 
           // make sure that the symmetric
           // entry exists and has the same
           // value, unless this one is zero
-          Assert ((matrix(row,*col) == 0)
+          Assert ((col->value() == 0)
                   ||
-                  (matrix(row,*col) == matrix(*col,row)),
+                  (col->value() == matrix(col->column(),row)),
                   ExcMatrixNotSymmetric());
         }
       else
         // lower left part. just check
         // symmetry
-        Assert ((matrix(row,*col) == 0)
+        Assert ((col->value() == 0)
                 ||
-                (matrix(row,*col) == matrix(*col,row)),
+                (col->value() == matrix(col->column(),row)),
                 ExcMatrixNotSymmetric());
 
   Assert (global_index == n_nonzero_elements, ExcInternalError());

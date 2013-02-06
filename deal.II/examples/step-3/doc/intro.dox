@@ -9,12 +9,15 @@ something. We
 will solve a simple version of Poisson's equation with zero boundary
 values, but a nonzero right hand side:
 @f{align*}
-  -\Delta u &= 1 \qquad\qquad & \text{in}\ \Omega,
+  -\Delta u &= f \qquad\qquad & \text{in}\ \Omega,
   \\
   u &= 0 \qquad\qquad & \text{on}\ \partial\Omega.
 @f}
 We will solve this equation on the unit square, $\Omega=[0,1]^2$, for which
-you've already learned how to generate a mesh in step-1 and step-2.
+you've already learned how to generate a mesh in step-1 and step-2. In
+this program, we will also only consider the particular case
+$f(\mathbf x)=1$ and come back to how to implement the more general
+case in the next tutorial program, step-4.
 
 If you've learned about the basics of the finite element method, you will
 remember the steps we need to take to approximate the solution $u$ by a finite

@@ -322,28 +322,28 @@ namespace PETScWrappers
         out.setf (std::ios::fixed, std::ios::floatfield);
 
       for ( unsigned int i = 0;
-	    i < Utilities::MPI::n_mpi_processes(communicator);
-	    i++)
-	{
-	  // This is slow, but most likely only used to debug.
-	  MPI_Barrier(communicator);
-	  if (i == Utilities::MPI::this_mpi_process(communicator))
-	    {
-	      if (across)
-		{
-		  out << "[Proc" << i << " " << istart << "-" << iend-1 << "]" << ' ';
-		  for (PetscInt i=0; i<nlocal; ++i)
-		    out << val[i] << ' ';
-		}
-	      else
-		{
-		  out << "[Proc " << i << " " << istart << "-" << iend-1 << "]" << std::endl;
-		  for (PetscInt i=0; i<nlocal; ++i)
-		    out << val[i] << std::endl;
-		}
-	      out << std::endl;
-	    }
-	}
+            i < Utilities::MPI::n_mpi_processes(communicator);
+            i++)
+        {
+          // This is slow, but most likely only used to debug.
+          MPI_Barrier(communicator);
+          if (i == Utilities::MPI::this_mpi_process(communicator))
+            {
+              if (across)
+                {
+                  out << "[Proc" << i << " " << istart << "-" << iend-1 << "]" << ' ';
+                  for (PetscInt i=0; i<nlocal; ++i)
+                    out << val[i] << ' ';
+                }
+              else
+                {
+                  out << "[Proc " << i << " " << istart << "-" << iend-1 << "]" << std::endl;
+                  for (PetscInt i=0; i<nlocal; ++i)
+                    out << val[i] << std::endl;
+                }
+              out << std::endl;
+            }
+        }
       // reset output format
       out.flags (old_flags);
       out.precision(old_precision);

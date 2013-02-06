@@ -678,7 +678,7 @@ SparsityPattern::copy_from (const CSP &csp)
 
 template <typename number>
 void SparsityPattern::copy_from (const FullMatrix<number> &matrix,
-                                 const bool optimize_diag)
+                                 const bool)
 {
   copy_from (matrix);
 }
@@ -848,12 +848,11 @@ SparsityPattern::add (const unsigned int i,
   Assert (j<cols, ExcIndexRange(j,0,cols));
   Assert (compressed==false, ExcMatrixIsCompressed());
 
-  for (unsigned int k=rowstart[i]; k<rowstart[i+1]; k++)
+  for (std::size_t k=rowstart[i]; k<rowstart[i+1]; k++)
     {
       // entry already exists
       if (colnums[k] == j) return;
-      // empty entry found, put new
-      // entry here
+      // empty entry found, put new entry here
       if (colnums[k] == invalid_entry)
         {
           colnums[k] = j;
@@ -861,9 +860,8 @@ SparsityPattern::add (const unsigned int i,
         };
     };
 
-  // if we came thus far, something went
-  // wrong: there was not enough space
-  // in this line
+  // if we came thus far, something went wrong: there was not enough space in
+  // this line
   Assert (false, ExcNotEnoughSpace(i, rowstart[i+1]-rowstart[i]));
 }
 
@@ -874,11 +872,43 @@ void
 SparsityPattern::add_entries (const unsigned int row,
                               ForwardIterator    begin,
                               ForwardIterator    end,
-                              const bool         /*indices_are_sorted*/)
+                              const bool         indices_are_sorted)
 {
-  // right now, just forward to the other function.
-  for (ForwardIterator it = begin; it != end; ++it)
-    add (row, *it);
+  if (indices_are_sorted == true)
+    {
+      if (begin != end)
+        {
+          ForwardIterator it = begin;
+          bool has_larger_entries = false;
+          std::size_t k=rowstart[row];
+          for ( ; k<rowstart[row+1]; k++)
+            if (colnums[k] == invalid_entry)
+              break;
+            else if (colnums[k] >= *it)
+              {
+                has_larger_entries = true;
+                break;
+              }
+          if (has_larger_entries == false)
+            for ( ; it != end; ++it, ++k)
+              {
+                Assert (k <= rowstart[row+1],
+                        ExcNotEnoughSpace(row, rowstart[row+1]-rowstart[row]));
+                colnums[k] = *it;
+              }
+          else
+            // cannot just append the new range at the end, forward to the
+            // other function
+            for (ForwardIterator it = begin; it != end; ++it)
+              add (row, *it);
+        }
+    }
+  else
+    {
+      // forward to the other function.
+      for (ForwardIterator it = begin; it != end; ++it)
+        add (row, *it);
+    }
 }
 
 

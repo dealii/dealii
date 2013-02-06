@@ -1484,7 +1484,8 @@ not_connect:
                                     {
                                       neighbor_neighbor_list.resize(0);
                                     }
-                                  break;//goto not_connected;
+                                  start_up--;
+                                  break;// not connected - start again
                                 }
                               index_before = index;
                             }
@@ -1746,8 +1747,8 @@ not_connect:
         if (row_lengths[row] == 1)
           row_lengths[row] = 0;
 
-      SparsityPattern connectivity_dof (n_rows, n_blocks, row_lengths, false);
-      cell_start = 0,mcell_start = 0;
+      SparsityPattern connectivity_dof (n_rows, n_blocks, row_lengths);
+      cell_start = 0, mcell_start = 0;
       for (unsigned int block = 0; block < n_blocks; ++block)
         {
           // if we have the blocking variant (used in the coloring scheme), we
@@ -1767,8 +1768,8 @@ not_connect:
                        ++cell)
                     {
                       const unsigned int
-                        *it = begin_indices (renumbering[cell]),
-                        *end_cell = end_indices (renumbering[cell]);
+                      *it = begin_indices (renumbering[cell]),
+                       *end_cell = end_indices (renumbering[cell]);
                       for ( ; it != end_cell; ++it)
                         if (row_lengths[*it]>0)
                           connectivity_dof.add(*it, block);
@@ -1780,8 +1781,8 @@ not_connect:
           else
             {
               const unsigned int
-                *it = begin_indices (block),
-                *end_cell = end_indices (block);
+              *it = begin_indices (block),
+               *end_cell = end_indices (block);
               for ( ; it != end_cell; ++it)
                 if (row_lengths[*it]>0)
                   connectivity_dof.add(*it, block);
@@ -1811,19 +1812,22 @@ not_connect:
                     {
                       // apply renumbering when we do blocking
                       const unsigned int
-                        *it = begin_indices (renumbering[cell]),
-                        *end_cell = end_indices (renumbering[cell]);
+                      *it = begin_indices (renumbering[cell]),
+                       *end_cell = end_indices (renumbering[cell]);
                       for ( ; it != end_cell; ++it)
                         if (row_lengths[*it] > 0)
                           {
-                            SparsityPattern::row_iterator sp = connectivity_dof.row_begin(*it);
+                            SparsityPattern::iterator sp = connectivity_dof.begin(*it);
+                            // jump over diagonal for square patterns
+                            if (connectivity_dof.n_rows()==connectivity_dof.n_cols())
+                              ++sp;
                             row_entries.reserve (row_entries.size() + end_cell - it);
                             std::vector<unsigned int>::iterator insert_pos = row_entries.begin();
-                            for ( ; sp != connectivity_dof.row_end(*it); ++sp)
-                              if (*sp >= block)
+                            for ( ; sp != connectivity_dof.end(*it); ++sp)
+                              if (sp->column() >= block)
                                 break;
                               else
-                                row_entries.insert (*sp, insert_pos);
+                                row_entries.insert (sp->column(), insert_pos);
                           }
                     }
                   cell_start +=n_comp;
@@ -1837,14 +1841,17 @@ not_connect:
               for ( ; it != end_cell; ++it)
                 if (row_lengths[*it] > 0)
                   {
-                    SparsityPattern::row_iterator sp = connectivity_dof.row_begin(*it);
+                    SparsityPattern::iterator sp = connectivity_dof.begin(*it);
+                    // jump over diagonal for square patterns
+                    if (connectivity_dof.n_rows()==connectivity_dof.n_cols())
+                      ++sp;
                     row_entries.reserve (row_entries.size() + end_cell - it);
                     std::vector<unsigned int>::iterator insert_pos = row_entries.begin();
-                    for ( ; sp != connectivity_dof.row_end(*it); ++sp)
-                      if (*sp >= block)
+                    for ( ; sp != connectivity_dof.end(*it); ++sp)
+                      if (sp->column() >= block)
                         break;
                       else
-                        row_entries.insert (*sp, insert_pos);
+                        row_entries.insert (sp->column(), insert_pos);
                   }
             }
           connectivity.add_entries (block, row_entries.begin(), row_entries.end());

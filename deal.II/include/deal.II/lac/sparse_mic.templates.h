@@ -132,20 +132,17 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
   for (unsigned int row=0; row<this->m(); row++)
     inner_sums[row] = get_rowsum(row);
 
-  const unsigned int *const col_nums = this->get_sparsity_pattern().get_column_numbers();
-  const std::size_t *const rowstarts = this->get_sparsity_pattern().get_rowstart_indices();
-
   for (unsigned int row=0; row<this->m(); row++)
     {
-      const number temp = this->diag_element(row);
+      const number temp = this->begin(row)->value();
       number temp1 = 0;
 
       // work on the lower left part of the matrix. we know
       // it's symmetric, so we can work with this alone
       for (typename SparseMatrix<somenumber>::const_iterator
-    		  p = matrix.begin(row)+1;
-    	   (p != matrix.end(row)) && (p->column() < p->row());
-    	   ++p)
+           p = matrix.begin(row)+1;
+           (p != matrix.end(row)) && (p->column() < p->row());
+           ++p)
         temp1 += p->value() / diag[p->column()] * inner_sums[p->column()];
 
       Assert(temp-temp1 > 0, ExcStrengthenDiagonalTooSmall());
@@ -163,11 +160,10 @@ SparseMIC<number>::get_rowsum (const unsigned int row) const
 {
   Assert(this->m()==this->n(), ExcNotQuadratic());
 
-  const unsigned int *const first_after_diagonal = this->prebuilt_lower_bound[row];
   number rowsum = 0;
   for (typename SparseMatrix<number>::const_iterator
-      p = this->begin(row)+1;
-      p != this->end(row); ++p)
+       p = this->begin(row)+1;
+       p != this->end(row); ++p)
     if (p->column() > p->row())
       rowsum += p->value();
 
@@ -187,15 +183,10 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
 
   const unsigned int N=dst.size();
-  const std::size_t   *const rowstart_indices = this->get_sparsity_pattern().get_rowstart_indices();
-  const unsigned int *const column_numbers   = this->get_sparsity_pattern().get_column_numbers();
-  // We assume the underlying matrix A is:
-  // A = X - L - U, where -L and -U are
-  // strictly lower- and upper- diagonal
-  // parts of the system.
+  // We assume the underlying matrix A is: A = X - L - U, where -L and -U are
+  // strictly lower- and upper- diagonal parts of the system.
   //
-  // Solve (X-L)X{-1}(X-U) x = b
-  // in 3 steps:
+  // Solve (X-L)X{-1}(X-U) x = b in 3 steps:
   dst = src;
   for (unsigned int row=0; row<N; ++row)
     {
@@ -204,9 +195,9 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
       // get start of this row. skip
       // the diagonal element
       for (typename SparseMatrix<number>::const_iterator
-          p = this->begin(row)+1;
-          (p != this->end(row)) && (p->column() < row);
-          ++p)
+           p = this->begin(row)+1;
+           (p != this->end(row)) && (p->column() < row);
+           ++p)
         dst(row) -= p->value() * dst(p->column());
 
       dst(row) *= inv_diag[row];
@@ -221,9 +212,9 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
     {
       // get end of this row
       for (typename SparseMatrix<number>::const_iterator
-          p = this->begin(row)+1;
-          p != this->end(row);
-          ++p)
+           p = this->begin(row)+1;
+           p != this->end(row);
+           ++p)
         if (p->column() > static_cast<unsigned int>(row))
           dst(row) -= p->value() * dst(p->column());
 

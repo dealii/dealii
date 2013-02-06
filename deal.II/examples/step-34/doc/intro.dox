@@ -660,14 +660,14 @@ that respects the continuous geometry behind the discrete initial
 mesh.
 
 For a sphere of radius $a$ translating at a velocity of $U$ in the $x$ direction, the potential reads
-\[
+@f{align*}
 \phi = -\frac{1}{2}U \left(\frac{a}{r}\right)3 r \cos\theta
-
-\] see, e.g. J.N. Newman, \emph{Marine Hydrodynamics}, 1977,
+@f}
+see, e.g. J. N. Newman, <i>Marine Hydrodynamics</i>, 1977,
 pp. 127. For unit speed and radius, and restricting $(x,y,z)$ to lie
 on the surface of the sphere,
-\[ \phi = -x/2.\] In the test problem,
+$\phi = -x/2$. In the test problem,
 the flow is $(1,1,1)$, so the appropriate exact solution on the
 surface of the sphere is the superposition of the above solution with
-the analogous solution along the $y$ and $z$ axes, or \[ \phi =
-\frac{1}{2}(x + y + z) \]
+the analogous solution along the $y$ and $z$ axes, or $\phi =
+\frac{1}{2}(x + y + z)$.

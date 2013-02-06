@@ -26,7 +26,11 @@ or from the inequalities are more important.
 Since you can very easily reach a few million degrees of freedom in three
 dimensions, even with adaptive mesh refinement, we decided to use Trilinos and
 p4est to run our code in parallel, building on the framework of step-40 for
-the parallelization.
+the parallelization.\\
+
+\begin{huge}
+{distributed}
+\end{huge}
 
 
 \section{Classical formulation}
@@ -34,73 +38,94 @@ the parallelization.
 The classical formulation of the problem possesses the following form:
 \begin{align*}
  \varepsilon(u) &= A\sigma + \lambda & &\quad\text{in } \Omega,\\
- \lambda(\tau - \sigma) &\geq 0\quad\forall\tau\text{ mit }\mathcal{F}(\tau)\leq 0 & &\quad\text{in } \Omega,\\
- -\textrm{div}\ \sigma &= f & &\quad\text{in } \Omega,\\
+ \lambda(\tau - \sigma) &\geq 0\quad\forall\tau\text{ with
+ }\mathcal{F}(\tau)\leq 0 & &\quad\text{in } \Omega,\\
+ -\textrm{\textrm{div}}\ \sigma &= f & &\quad\text{in } \Omega,\\
  u(\mathbf x) &= 0 & &\quad\text{on }\Gamma_D,\\
  \sigma_t(u) &= 0,\quad\sigma_n(u)\leq 0 & &\quad\text{on }\Gamma_C,\\
 \sigma_n(u)(u_n - g) &= 0,\quad u_n(\mathbf x) - g(\mathbf x) \leq 0 & &\quad\text{on } \Gamma_C
 \end{align*}
-with $u\in H^2(\Omega)$.  The vector valued function $u$ denotes the
-displacement in the deformable body. The first two lines describe the elast-plastic
-material behavior. Therein the equation shows the deformation $\varepsilon (u)$ as the additive
-decomposition of the elastic part $A\sigma$ and the plastic part $\lambda$. $A$ is defined as
-the compliance tensor of fourth order which contains some material constants and $\sigma$ as the
+with $u\in H^2(\Omega),\Omega\subset\mathbb{R}^3$.  The vector valued
+function $u$ denotes the displacement in the deformable body. The first two lines describe the
+elasto-plastic material behavior. Therein the equation shows the
+strain of the deformation $\varepsilon (u)$ as the additive decomposition of the
+elastic part $A\sigma$ and the plastic part $\lambda$. $A$ is defined as the compliance tensor of fourth order which contains some material constants and $\sigma$ as the
 symmetric stress tensor of second order. So we have to consider the inequality in the second
-row component-by-component and furthermore we have to distinguish two cases.\\
+row component-by-component and in a pointwise sense. Furthermore we have to
+distinguish two cases.\\
 The continuous and convex function $\mathcal{F}$ denotes the von Mises flow function
-$$\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0$$
-with $\sigma_0$ as yield stress. If there is no plastic deformation - that is $\lambda=0$ - this yields $\vert\sigma^D\vert < \sigma_0$
-and otherwise if $\lambda > 0$ it follows that $\vert\sigma^D\vert = \sigma_0$. That means if the stress is smaller as the yield stress
-there are only elastic deformations. Therein the Index $D$ denotes the deviator part of the stress $\sigma$ which
-is defined as
-$$\sigma^D = \sigma - \dfrac{1}{3}tr(\sigma).$$
-It describes the hydrostatic part of the stress tensor in contrast to the volumetric part. For metal the hydrostatic
-stress composes the main indicator for the plastic deformation.\\
-The second equation is called equilibrium condition with a force of areal density $f$ which we will neglect in our example.
+$$\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0¸\quad\text{with}\quad \tau^D
+= \tau - \dfrac{1}{3}tr(\tau)I$$
+and $\sigma_0$ as yield stress. If there are no plastic deformations in a
+particular point - that is $\lambda=0$ - this yields $\vert\sigma^D\vert <
+\sigma_0$ and otherwise if $\lambda > 0$ it follows that $\vert\sigma^D\vert = \sigma_0$.
+That means if the stress is smaller than the yield stress there are only elastic
+deformations in that point.\\
+To consider it the other way around if the deviator stress $\sigma^D$ is in a
+norm bigger than the yield stress then $\sigma^D$ has to be projected back to the yield surface and there are plastic deformations which means $\lambda$
+would be positiv for that particular point. We refer that the stresses are
+computed by Hooke's law for isotorpic materials. You can find the description at the end of section 3. Else if the norm of the deviator stress tensor is smaller or equal the yield stress then $\lambda$ is zero and there are no plastic deformations in
+that point.\\
+There the index $D$ denotes the deviator part of for example the stress where
+$tr(.)$ is the trace of a tensor. The definition shows an additive decomposition
+of the stress $\sigma$ into a hydrostatic part (or volumetric part) $\dfrac{1}{3}tr(\tau)I$ and the deviator
+part $\sigma^D$. For metal the deviator stress composes the main indicator for
+plastic deformations.\\
+The third equation is called equilibrium condition with a force of volume
+density $f$ which we will neglect in our example.
 The boundary of $\Omega$ separates as follows $\Gamma=\Gamma_D\bigcup\Gamma_C$ and $\Gamma_D\bigcap\Gamma_C=\emptyset$.
 At the boundary $\Gamma_D$ we have zero Dirichlet conditions. $\Gamma_C$ denotes the potential contact boundary.\\
 The last two lines decribe the so-called Signorini contact conditions. If there is no contact the normal  stress
 $$ \sigma_n =  \sigma n\cdot n$$
 is zero with the outward normal $n$. If there is contact ($u_n = g$) the tangential stress $\sigma_t = \sigma\cdot n - \sigma_n n$
-vanishes, because we consider a frictionless situation and the normal stress is negative.
+vanishes, because we consider a frictionless situation and the normal stress is
+negative. The gap $g$ comes with the start configuration of the obstacle and the
+deformable body.
 
 \section{Derivation of the variational inequality}
 
-As a starting point we want to minimise an energy functional:
-$$E(\tau) := \dfrac{1}{2}\int\limits_{\Omega}\tau A \tau d\tau,\quad \tau\in \Pi W^{div}$$
+As a starting point to derive the equations above, let us imagine that we want
+to minimise an energy functional:
+$$E(\tau) := \dfrac{1}{2}\int\limits_{\Omega}\tau A \tau d\tau,\quad \tau\in \Pi W^{\textrm{div}}$$
 with
-$$W^{div}:=\lbrace \tau\in
-L^2(\Omega,\mathbb{R}^{dim\times\dim}_{sym}):div(\tau)\in L^2(\Omega,\mathbb{R}^{dim})\rbrace$$ and
+$$W^{\textrm{div}}:=\lbrace \tau\in
+L^2(\Omega,\mathbb{R}^{\textrm{dim}\times\textrm{dim}}_{\textrm{sym}}):\textrm{div}(\tau)\in L^2(\Omega,\mathbb{R}^{\textrm{dim}})\rbrace$$ and
 $$\Pi \Sigma:=\lbrace \tau\in \Sigma, \mathcal{F}(\tau)\leq 0\rbrace$$
 as the set of admissible stresses which is defined
 by a continious, convex flow function $\mathcal{F}$.
 
-With the goal to derive the dual formulation of the minimisation problem, we define a lagrange function:
-$$L(\tau,\varphi) := E(\tau) + (\varphi, div(\tau)),\quad \lbrace\tau,\varphi\rbrace\in\Pi W^{div}\times V^+$$
+With the goal of deriving the dual formulation of the minimisation
+problem, we define a lagrange function:
+$$L(\tau,\varphi) := E(\tau) + (\varphi, \textrm{div}(\tau)),\quad \lbrace\tau,\varphi\rbrace\in\Pi W^{\textrm{div}}\times V^+$$
 with
 $$V^+ := \lbrace u\in V: u_n\leq g \text{ on } \Gamma_C \rbrace$$
-$$V:=\left[ H_0^1 \right]^{dim}:=\lbrace u\in \left[H^1(\Omega)\right]^{dim}: u
+$$V:=\left[ H_0^1 \right]^{\textrm{dim}}:=\lbrace u\in \left[H^1(\Omega)\right]^{\textrm{dim}}: u
 = 0 \text{ on } \Gamma_D\rbrace$$
-By building the fr\'echet derivatives of $L$ for both components we obtain the dual formulation for the stationary case
-which is known as \textbf{Hencky-Type-Model}:\\
+By building the Fr\'echet derivatives of $L$ for both components we obtain the
+dual formulation for the stationary case which is known as \textbf{Hencky-Type-Model}:\\
 Find a pair $\lbrace\sigma,u\rbrace\in \Pi W\times V^+$ with
-$$\left(A\sigma,\tau - \sigma\right) + \left(u, div(\tau) - div(\sigma)\right) \geq 0,\quad \forall \tau\in \Pi W^{div}$$
-$$-\left(div(\sigma),\varphi - u\right) \geq 0,\quad \forall \varphi\in V^+.$$
-By integrating by parts and multiplying the first inequality by $C=A^{-1}$  we achieve the primal-mixed version of our problem:\\
+$$\left(A\sigma,\tau - \sigma\right) + \left(u, \textrm{div}(\tau) - \textrm{div}(\sigma)\right) \geq 0,\quad \forall \tau\in \Pi W^{\textrm{div}}$$
+$$-\left(\textrm{div}(\sigma),\varphi - u\right) \geq 0,\quad \forall \varphi\in V^+.$$
+By integrating by parts and multiplying the first inequality by the elastic
+tensor $C=A^{-1}$ we achieve the primal-mixed version of our problem:\\
 Find a pair $\lbrace\sigma,u\rbrace\in \Pi W\times V^+$ with
 $$\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right) \geq 0,\quad \forall \tau\in \Pi W$$
 $$\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+.$$
 Therein $\varepsilon$ denotes the linearised deformation tensor with $\varepsilon(u) := \dfrac{1}{2}\left(\nabla u + \nabla u^T\right)$ for small deformations.\\
 Most materials - especially metals - have the property that they show some hardening effects during the forming process.
-There are different constitutive laws to describe those material behavior. The most simple one is called linear isotropic hardening
-with the flow function $\mathcal{F}(\tau,\eta) = \vert\tau^D\vert - (\sigma_0 + \gamma\eta)$.
+There are different constitutive laws to describe those material behaviors. The
+simplest one is called linear isotropic hardening described by the flow function
+$\mathcal{F}(\tau,\eta) = \vert\tau^D\vert - (\sigma_0 + \gamma\eta)$ where
+$\eta$ is the norm of the plastic strain $\eta = \vert \varepsilon -
+A\sigma\vert$.
 It can be considered by establishing an additional term in our primal-mixed formulation:\\
 Find a pair $\lbrace(\sigma,\xi),u\rbrace\in \Pi (W\times L^2(\Omega,\mathbb{R}))\times V^+$ with
 $$\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right) + \gamma\left( \xi, \eta - \xi\right) \geq 0,\quad \forall (\tau,\eta)\in \Pi (W,L^2(\Omega,\mathbb{R}))$$
 $$\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+,$$
 with the hardening parameter $\gamma > 0$.\\
 Now we want to derive a primal problem which only depends on the displacement $u$. For that purpose we
-set $\eta = \xi$ and eliminate the stress $\sigma$ by applying the projection theorem on\\
+set $\eta = \xi$ and eliminate the stress $\sigma$ by applying the projection
+theorem () on\\
 $$\left(\sigma - C\varepsilon(u), \tau - \sigma\right) \geq 0,\quad \forall \tau\in \Pi W,$$
 which yields with the second inequality:\\
 Find the displacement $u\in V^+$ with
@@ -121,13 +146,18 @@ $$\alpha := \sigma_0 + \dfrac{\gamma}{2\mu+\gamma}\left(\vert\tau^D\vert - \sigm
 with a further material parameter $\mu>0$ called shear modulus.\\
 So what we do is to calculate the stresses by using Hooke's law for linear elastic,  isotropic materials
 $$\sigma = C \varepsilon(u) = 2\mu \varepsilon^D(u) + \kappa tr(\varepsilon(u))I = \left[2\mu\left(\mathbb{I} -\dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I\right]\varepsilon(u)$$
-with the material parameter $\kappa>0$ (bulk modulus). The variables $I$ and $\mathbb{I}$ denote the identity tensors of second and forth order.\\
-In the next step we test in a pointwise sense where the deviator part of the stress in a norm is bigger as the yield stress.
-If there are such points we project the deviator stress in those points back to the yield surface. Methods of this kind
-are called projections algorithm or radial-return-algorithm.\\
+with the material parameter $\kappa>0$ (bulk modulus). The variables $I$ and
+$\mathbb{I}$ denote the identity tensors of second and forth order. In that
+notation $2\mu \varepsilon^D(u)$ is the deviatoric part and $\kappa
+tr(\varepsilon(u))$ the volumetric part of the stress tensor.\\
+In the next step we test in a pointwise sense where the deviator part of the
+stress in a norm is bigger than the yield stress. If there are such points we
+project the deviator stress in those points back to the yield surface. Methods of this kind are called projections algorithm or radial-return-algorithm.\\
 Now we have a primal formulation of our elasto-plastic contact problem which only depends on the displacement $u$.
-It consists of a nonlinear variational inequality and has a unique solution as it shows the theorem of Lions and Stampaccia
-(A proof can be found in Rodrigues: Obstacle Problems in Mathematical Physics, North-Holland, Amsterdam, 1987).\\
+It consists of a nonlinear variational inequality and has a unique solution as
+it satisfies the theorem of Lions and Stampaccia. A proof can be found in
+Rodrigues: Obstacle Problems in Mathematical Physics, North-Holland, Amsterdam,
+1987).\\
 To handle the nonlinearity of the constitutive law we use a Newton method and to deal with the contact we apply an
 active set method like in step-41. To be more concrete we combine both methods to an inexact semi smooth Newton
 method - inexact since we use an iterative solver for the linearised problems in each Newton step.
@@ -136,16 +166,16 @@ method - inexact since we use an iterative solver for the linearised problems in
 
 For the Newton method we have to linearise the following semi-linearform
 $$a(\psi;\varphi) := \left(P_{\Pi}(C\varepsilon(\varphi)),\varepsilon(\varphi)\right).$$
-Becaus we have to find the solution $u$ in the convex set $V^+$, we have to apply an SQP-method (SQP: sequential quadratic
-programming). That means we have to solve a minimisation problem for a known $u^i$ in every SQP-step of the form
+Because we have to find the solution $u$ in the convex set $V^+$, we have to
+apply an SQP-method (SQP: sequential quadratic programming). That means we have to solve a minimisation problem for a known $u^i$ in every SQP-step of the form
 \begin{eqnarray*}
  & & a(u^{i};u^{i+1} - u^i) + \dfrac{1}{2}a'(u^i;u^{i+1} - u^i,u^{i+1} - u^i)\\
  &=&  a(u^i;u^{i+1}) -  a(u^i;u^i) +\\
  & & \dfrac{1}{2}\left( a'(u^i;u^{i+1},u^{i+1}) - 2a'(u^i;u^i,u^{i+1}) - a'(u^i;u^i,u^i)\right)\\
- &\rightarrow& min,\quad u^{i+1}\in V^+.
+ &\rightarrow& \textrm{min},\quad u^{i+1}\in V^+.
 \end{eqnarray*}
 Neglecting the constant terms $ a(u^i;u^i)$ and $ a'(u^i;u^i,u^i)$ we obtain the following minimisation problem
-$$\dfrac{1}{2} a'(u^i;u^{i+1},u^{i+1}) - F(u^i)\rightarrow min,\quad u^{i+1}\in V^+$$
+$$\dfrac{1}{2} a'(u^i;u^{i+1},u^{i+1}) - F(u^i)\rightarrow \textrm{min},\quad u^{i+1}\in V^+$$
 with
 $$F(\varphi) := \left(a'(\varphi;\varphi,u^{i+1}) -  a(\varphi;u^{i+1}) \right).$$
 In the case of our constitutive law the derivative of the semi-linearform $a(.;.)$ at the point $u^i$ is
@@ -175,7 +205,7 @@ $$K:=\{\mu\in W':\mu_T = 0,\quad\langle\mu n,v\rangle_{\Gamma_C}\geq 0,\quad
 of Lagrange multipliers, where $\langle\cdot,\cdot\rangle$
 denotes the duality pairing between $W'$ and $W$. Intuitively, $K$ is the cone
 of all "non-positive functions", except that $ K\subset
-\left( \left[ H_0^{\frac{1}{2}} \right]^{dim} \right)' $ and so contains other
+\left( \left[ H_0^{\frac{1}{2}} \right]^{\textrm{dim}} \right)' $ and so contains other
 objects besides regular functions as well. This yields:\\
 
 \noindent
