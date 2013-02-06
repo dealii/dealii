@@ -546,20 +546,6 @@ GridGenerator::subdivided_parallelepiped (Triangulation<dim>  &tria,
       Assert (false, ExcNotImplemented());
     }
 
-#ifdef DEBUG
-  // Debug block: Try to delete duplicates (a good grid has none) and
-  // then check none actually were deleted (this may be a superflous
-  // test; if the corners[] were unique, the points should be too)
-  unsigned int n_points = 1;
-  for (unsigned int i=0; i<dim; ++i)
-    n_points *= n_subdivisions[i]+1;
-
-  points.erase (std::unique (points.begin (), points.end ()),
-                points.end ());
-  Assert (points.size ()==n_points,
-          ExcInternalError());
-#endif
-
   // Prepare cell data
   unsigned int n_cells = 1;
   for (unsigned int i=0; i<dim; ++i)
