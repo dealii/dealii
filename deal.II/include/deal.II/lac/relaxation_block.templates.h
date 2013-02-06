@@ -119,13 +119,13 @@ RelaxationBlock<MATRIX,inverse_type>::invert_diagblocks ()
           // Copy rows for this block
           // into the matrix for the
           // diagonal block
-          SparsityPattern::row_iterator row
-            = additional_data->block_list.row_begin(block);
+          SparsityPattern::iterator row
+            = additional_data->block_list.begin(block);
           for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
             {
 //TODO:[GK] Optimize here
-              for (typename MATRIX::const_iterator entry = M.begin(*row);
-                   entry != M.end(*row); ++entry)
+              for (typename MATRIX::const_iterator entry = M.begin(row->column());
+                   entry != M.end(row->column()); ++entry)
                 {
                   const unsigned int column = entry->column();
                   const unsigned int col_cell = additional_data->block_list.row_position(block, column);
@@ -205,20 +205,20 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
           b_cell.reinit(bs);
           x_cell.reinit(bs);
           // Collect off-diagonal parts
-          SparsityPattern::row_iterator row = additional_data->block_list.row_begin(block);
+          SparsityPattern::iterator row = additional_data->block_list.begin(block);
           for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
             {
-              b_cell(row_cell) = src(*row);
-              for (typename MATRIX::const_iterator entry = M.begin(*row);
-                   entry != M.end(*row); ++entry)
+              b_cell(row_cell) = src(row->column());
+              for (typename MATRIX::const_iterator entry = M.begin(row->column());
+                   entry != M.end(row->column()); ++entry)
                 b_cell(row_cell) -= entry->value() * prev(entry->column());
             }
           // Apply inverse diagonal
           this->inverse_vmult(block, x_cell, b_cell);
           // Store in result vector
-          row=additional_data->block_list.row_begin(block);
+          row=additional_data->block_list.begin(block);
           for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
-            dst(*row) = prev(*row) + additional_data->relaxation * x_cell(row_cell);
+            dst(row->column()) = prev(row->column()) + additional_data->relaxation * x_cell(row_cell);
         }
     }
 }
