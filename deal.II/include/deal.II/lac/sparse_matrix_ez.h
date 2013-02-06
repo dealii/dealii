@@ -790,7 +790,7 @@ public:
   void precondition_SSOR (Vector<somenumber>       &dst,
                           const Vector<somenumber> &src,
                           const number              om = 1.,
-                          const std::vector<unsigned int> &pos_right_of_diagonal = std::vector<unsigned int>()) const;
+                          const std::vector<std::size_t> &pos_right_of_diagonal = std::vector<std::size_t>()) const;
 
   /**
    * Apply SOR preconditioning matrix to @p src.
