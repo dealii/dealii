@@ -87,12 +87,17 @@ namespace SparsityTools
     // one more nuisance: we have to copy our
     // own data to arrays that store signed
     // integers :-(
-    std::vector<idx_t> int_rowstart (sparsity_pattern.get_rowstart_indices(),
-                                     sparsity_pattern.get_rowstart_indices() +
-                                     sparsity_pattern.n_rows()+1);
-    std::vector<idx_t> int_colnums (sparsity_pattern.get_column_numbers(),
-                                    sparsity_pattern.get_column_numbers()+
-                                    int_rowstart[sparsity_pattern.n_rows()]);
+    std::vector<idx_t> int_rowstart(1);
+    int_rowstart.reserve(sparsity_pattern.n_rows()+1);
+    std::vector<idx_t> int_colnums;
+    int_colnums.reserve(sparsity_pattern.n_nonzero_elements());
+    for (unsigned int row=0; row<sparsity_pattern.n_rows(); ++row)
+      {
+        for (SparsityPattern::iterator col=sparsity_pattern.begin(row);
+             col < sparsity_pattern.end(row); ++col)
+          int_colnums.push_back(col->column());
+        int_rowstart.push_back(int_colnums.size());
+      }
 
     std::vector<idx_t> int_partition_indices (sparsity_pattern.n_rows());
 
@@ -135,13 +140,9 @@ namespace SparsityTools
   namespace internal
   {
     /**
-     * Given a connectivity graph and
-     * a list of indices (where
-     * invalid_unsigned_int indicates
-     * that a node has not been
-     * numbered yet), pick a valid
-     * starting index among the
-     * as-yet unnumbered one.
+     * Given a connectivity graph and a list of indices (where
+     * invalid_unsigned_int indicates that a node has not been numbered yet),
+     * pick a valid starting index among the as-yet unnumbered one.
      */
     unsigned int
     find_unnumbered_starting_index (const SparsityPattern     &sparsity,
@@ -151,46 +152,31 @@ namespace SparsityTools
         unsigned int starting_point   = numbers::invalid_unsigned_int;
         unsigned int min_coordination = sparsity.n_rows();
         for (unsigned int row=0; row<sparsity.n_rows(); ++row)
-          // look over all as-yet
-          // unnumbered indices
+          // look over all as-yet unnumbered indices
           if (new_indices[row] == numbers::invalid_unsigned_int)
             {
-              unsigned int j;
+              SparsityPattern::iterator j = sparsity.begin(row);
 
-              // loop until we hit the end
-              // of this row's entries
-              for (j=sparsity.get_rowstart_indices()[row];
-                   j<sparsity.get_rowstart_indices()[row+1]; ++j)
-                if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
+              // loop until we hit the end of this row's entries
+              for ( ; j<sparsity.end(row); ++j)
+                if (j->is_valid_entry() == false)
                   break;
-              // post-condition after loop:
-              // coordination, i.e. the number
-              // of entries in this row is now
-              // j-rowstart[row]
-              if (j-sparsity.get_rowstart_indices()[row] <  min_coordination)
+              // post-condition after loop: coordination, i.e. the number of
+              // entries in this row is now j-rowstart[row]
+              if (j-sparsity.begin(row) <  min_coordination)
                 {
-                  min_coordination = j-sparsity.get_rowstart_indices()[row];
+                  min_coordination = j-sparsity.begin(row);
                   starting_point   = row;
                 }
             }
 
-        // now we still have to care
-        // for the case that no
-        // unnumbered dof has a
-        // coordination number less
-        // than
-        // sparsity.n_rows(). this
-        // rather exotic case only
-        // happens if we only have
-        // one cell, as far as I can
-        // see, but there may be
-        // others as well.
+        // now we still have to care for the case that no unnumbered dof has a
+        // coordination number less than sparsity.n_rows(). this rather exotic
+        // case only happens if we only have one cell, as far as I can see,
+        // but there may be others as well.
         //
-        // if that should be the
-        // case, we can chose an
-        // arbitrary dof as starting
-        // point, e.g. the first
-        // unnumbered one
+        // if that should be the case, we can chose an arbitrary dof as
+        // starting point, e.g. the first unnumbered one
         if (starting_point == numbers::invalid_unsigned_int)
           {
             for (unsigned int i=0; i<new_indices.size(); ++i)
@@ -225,13 +211,11 @@ namespace SparsityTools
       Assert (starting_indices[i] < sparsity.n_rows(),
               ExcMessage ("Invalid starting index"));
 
-    // store the indices of the dofs renumbered
-    // in the last round. Default to starting
-    // points
+    // store the indices of the dofs renumbered in the last round. Default to
+    // starting points
     std::vector<unsigned int> last_round_dofs (starting_indices);
 
-    // initialize the new_indices array with
-    // invalid values
+    // initialize the new_indices array with invalid values
     std::fill (new_indices.begin(), new_indices.end(),
                numbers::invalid_unsigned_int);
 
@@ -245,9 +229,7 @@ namespace SparsityTools
                     std::bind2nd(std::equal_to<unsigned int>(),
                                  numbers::invalid_unsigned_int));
 
-    // now if no valid points remain:
-    // find dof with lowest coordination
-    // number
+    // now if no valid points remain: find dof with lowest coordination number
     if (last_round_dofs.empty())
       last_round_dofs
       .push_back (internal::find_unnumbered_starting_index (sparsity,
@@ -272,12 +254,12 @@ namespace SparsityTools
         // dofs numbered in the last
         // round
         for (unsigned int i=0; i<last_round_dofs.size(); ++i)
-          for (unsigned int j=sparsity.get_rowstart_indices()[last_round_dofs[i]];
-               j<sparsity.get_rowstart_indices()[last_round_dofs[i]+1]; ++j)
-            if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
+          for (SparsityPattern::iterator j=sparsity.begin(last_round_dofs[i]);
+               j<sparsity.end(last_round_dofs[i]); ++j)
+            if (j->is_valid_entry() == false)
               break;
             else
-              next_round_dofs.push_back (sparsity.get_column_numbers()[j]);
+              next_round_dofs.push_back (j->column());
 
         // sort dof numbers
         std::sort (next_round_dofs.begin(), next_round_dofs.end());
@@ -354,9 +336,9 @@ namespace SparsityTools
              s!=next_round_dofs.end(); ++s)
           {
             unsigned int coordination = 0;
-            for (unsigned int j=sparsity.get_rowstart_indices()[*s];
-                 j<sparsity.get_rowstart_indices()[*s+1]; ++j)
-              if (sparsity.get_column_numbers()[j] == SparsityPattern::invalid_entry)
+            for (SparsityPattern::iterator j=sparsity.begin(*s);
+                 j<sparsity.end(*s); ++j)
+              if (j->is_valid_entry() == false)
                 break;
               else
                 ++coordination;

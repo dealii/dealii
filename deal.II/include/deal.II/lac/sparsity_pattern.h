@@ -264,6 +264,14 @@ namespace SparsityPatternIterators
      */
     bool operator < (const Iterator &) const;
 
+    /**
+     * Return the distance between the current iterator and the argument.
+     * The distance is given by how many times one has to apply operator++
+     * to the current iterator to get the argument (for a positive return
+     * value), or operator-- (for a negative return value).
+     */
+    int operator - (const Iterator &p) const;
+
   private:
     /**
      * Store an object of the accessor class.
@@ -1588,6 +1596,16 @@ namespace SparsityPatternIterators
     return accessor < other.accessor;
   }
 
+
+  inline
+  int
+  Iterator::operator - (const Iterator &other) const
+  {
+    Assert (accessor.sparsity_pattern == other.accessor.sparsity_pattern,
+            ExcInternalError());
+
+    return (*this)->a_index - other->a_index;
+  }
 }
 
 

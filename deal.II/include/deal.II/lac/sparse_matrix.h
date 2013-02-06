@@ -2320,8 +2320,6 @@ namespace SparseMatrixIterators
     Assert (&accessor.get_matrix() == &other.accessor.get_matrix(),
             ExcInternalError());
 
-    const SparsityPattern &sparsity = accessor.get_matrix().get_sparsity_pattern();
-
     return (*this)->a_index - other->a_index;
   }
 
