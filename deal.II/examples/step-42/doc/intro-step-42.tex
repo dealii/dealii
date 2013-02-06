@@ -55,9 +55,9 @@ row component-by-component and in a pointwise sense. Furthermore we have to
 distinguish two cases.\\
 The continuous and convex function $\mathcal{F}$ denotes the von Mises flow function
 $$\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0¸\quad\text{with}\quad \tau^D
-= \tau - \dfrac{1}{3}tr(\tau)I$$
-and $\sigma_0$ as yield stress. If there are no plastic deformations in a
-particular point - that is $\lambda=0$ - this yields $\vert\sigma^D\vert <
+= \tau - \dfrac{1}{3}tr(\tau)I,$$
+$\sigma_0$ as yield stress and $\vert .\vert$ as the frobenius norm. If there
+are no plastic deformations in a particular point - that is $\lambda=0$ - this yields $\vert\sigma^D\vert <
 \sigma_0$ and otherwise if $\lambda > 0$ it follows that $\vert\sigma^D\vert = \sigma_0$.
 That means if the stress is smaller than the yield stress there are only elastic
 deformations in that point.\\
@@ -125,7 +125,10 @@ $$\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall
 with the hardening parameter $\gamma > 0$.\\
 Now we want to derive a primal problem which only depends on the displacement $u$. For that purpose we
 set $\eta = \xi$ and eliminate the stress $\sigma$ by applying the projection
-theorem () on\\
+theorem (see Grossmann, Roos: Numerical Treatment of Partial Differential
+Equations, Springer-Verlag Berlin Heidelberg, 2007 and Frohne: FEM-Simulation
+der Umformtechnik metallischer Oberflächen im Mikrokosmos, Ph.D. thesis,
+University of Siegen, Germany, 2011) on\\
 $$\left(\sigma - C\varepsilon(u), \tau - \sigma\right) \geq 0,\quad \forall \tau\in \Pi W,$$
 which yields with the second inequality:\\
 Find the displacement $u\in V^+$ with
@@ -143,7 +146,8 @@ $$P_{\Pi}(\tau):=\begin{cases}
 			\alpha\dfrac{\tau^D}{\vert\tau^D\vert} + \dfrac{1}{3}tr(\tau), & \text{if }\vert\tau^D\vert > \sigma_0,
 			\end{cases}$$
 $$\alpha := \sigma_0 + \dfrac{\gamma}{2\mu+\gamma}\left(\vert\tau^D\vert - \sigma_0\right) ,$$
-with a further material parameter $\mu>0$ called shear modulus.\\
+with a further material parameter $\mu>0$ called shear modulus. We refer that
+this only possible for isotropic plasticity.\\
 So what we do is to calculate the stresses by using Hooke's law for linear elastic,  isotropic materials
 $$\sigma = C \varepsilon(u) = 2\mu \varepsilon^D(u) + \kappa tr(\varepsilon(u))I = \left[2\mu\left(\mathbb{I} -\dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I\right]\varepsilon(u)$$
 with the material parameter $\kappa>0$ (bulk modulus). The variables $I$ and
@@ -157,7 +161,7 @@ Now we have a primal formulation of our elasto-plastic contact problem which onl
 It consists of a nonlinear variational inequality and has a unique solution as
 it satisfies the theorem of Lions and Stampaccia. A proof can be found in
 Rodrigues: Obstacle Problems in Mathematical Physics, North-Holland, Amsterdam,
-1987).\\
+1987.\\
 To handle the nonlinearity of the constitutive law we use a Newton method and to deal with the contact we apply an
 active set method like in step-41. To be more concrete we combine both methods to an inexact semi smooth Newton
 method - inexact since we use an iterative solver for the linearised problems in each Newton step.
@@ -167,44 +171,49 @@ method - inexact since we use an iterative solver for the linearised problems in
 For the Newton method we have to linearise the following semi-linearform
 $$a(\psi;\varphi) := \left(P_{\Pi}(C\varepsilon(\varphi)),\varepsilon(\varphi)\right).$$
 Because we have to find the solution $u$ in the convex set $V^+$, we have to
-apply an SQP-method (SQP: sequential quadratic programming). That means we have to solve a minimisation problem for a known $u^i$ in every SQP-step of the form
+apply an SQP-method (SQP: sequential quadratic programming). That means we have
+to solve a minimisation problem for a known $u^i$ in every SQP-step of the form
 \begin{eqnarray*}
  & & a(u^{i};u^{i+1} - u^i) + \dfrac{1}{2}a'(u^i;u^{i+1} - u^i,u^{i+1} - u^i)\\
  &=&  a(u^i;u^{i+1}) -  a(u^i;u^i) +\\
  & & \dfrac{1}{2}\left( a'(u^i;u^{i+1},u^{i+1}) - 2a'(u^i;u^i,u^{i+1}) - a'(u^i;u^i,u^i)\right)\\
  &\rightarrow& \textrm{min},\quad u^{i+1}\in V^+.
 \end{eqnarray*}
-Neglecting the constant terms $ a(u^i;u^i)$ and $ a'(u^i;u^i,u^i)$ we obtain the following minimisation problem
-$$\dfrac{1}{2} a'(u^i;u^{i+1},u^{i+1}) - F(u^i)\rightarrow \textrm{min},\quad u^{i+1}\in V^+$$
-with
+Neglecting the constant terms $ a(u^i;u^i)$ and $ a'(u^i;u^i,u^i)$ we obtain the
+following minimisation problem $$\dfrac{1}{2} a'(u^i;u^{i+1},u^{i+1}) - F(u^i)\rightarrow \textrm{min},\quad u^{i+1}\in V^+$$ with
 $$F(\varphi) := \left(a'(\varphi;\varphi,u^{i+1}) -  a(\varphi;u^{i+1}) \right).$$
-In the case of our constitutive law the derivative of the semi-linearform $a(.;.)$ at the point $u^i$ is
+In the case of our constitutive law the Fr\'echet derivative of the
+semi-linearform $a(.;.)$ at the point $u^i$ is
 
-$$a'(u^i;\psi,\varphi) =$$
-$$
-\begin{cases}
-\left(\left[2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I\right]\varepsilon(\psi),\varepsilon(\varphi)\right), & \quad
-      \vert \tau^D \vert \leq \sigma_0\\
-\left(\left[\dfrac{\alpha}{\vert\tau^D\vert}2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I - \dfrac{\tau^D\otimes\tau^D}{\vert\tau^D\vert}\right) +
-      \kappa I\otimes I\right]\varepsilon(\psi),\varepsilon(\varphi) \right), &
- \quad \vert \tau^D \vert > \sigma_0
+$$a'(u^i;\psi,\varphi) =
+(I(x)\varepsilon(\psi),\varepsilon(\varphi)),\quad x\in\Omega,$$ $$
+I(x) := \begin{cases}
+2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I, &
+\quad \vert \tau^D \vert \leq \sigma_0\\
+\dfrac{\alpha}{\vert\tau^D\vert}2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I 
+- \dfrac{\tau^D\otimes\tau^D}{\vert\tau^D\vert}\right) + \kappa I\otimes I,
+&\quad \vert \tau^D \vert > \sigma_0
 \end{cases}
 $$
 with
 $$\tau^D :=  C\varepsilon^D(u^i).$$
+Remark that $a(.;.)$ is not differentiable in the common sense but it is
+slantly differentiable like the function for the contact problem and again we refer to
+Hintermueller, Ito, Kunisch: The primal-dual active set strategy as a semismooth newton method, SIAM J. OPTIM., 2003, Vol. 13, No. 3, pp. 865-888.
 Again the first case is for elastic and the second for plastic deformation.
 
 \section{Formulation as a saddle point problem}
 
-On the line of step-41 we compose a saddle point problem out of the minimisation problem. Again we do so to gain a formulation
-that allows us to solve a linear system of equations finally.\\
+Just as in step-41 we compose a saddle point problem out of the minimisation
+problem. Again we do so to gain a formulation that allows us to solve a linear
+system of equations finally.\\
 We introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset W'$,
 $W'$ dual space of the trace space $W$ of $V$ restricted to $\Gamma_C$,
 $$K:=\{\mu\in W':\mu_T = 0,\quad\langle\mu n,v\rangle_{\Gamma_C}\geq 0,\quad
 \forall v\in W, v \ge 0\text{ on }\Gamma_C \}$$
 of Lagrange multipliers, where $\langle\cdot,\cdot\rangle$
-denotes the duality pairing between $W'$ and $W$. Intuitively, $K$ is the cone
-of all "non-positive functions", except that $ K\subset
+denotes the duality pairing, i.e. a boundary integral, between $W'$ and $W$.
+Intuitively, $K$ is the cone of all "non-positive functions", except that $ K\subset
 \left( \left[ H_0^{\frac{1}{2}} \right]^{\textrm{dim}} \right)' $ and so contains other
 objects besides regular functions as well. This yields:\\
 
@@ -239,7 +248,7 @@ the starting condition of our deformable body.
 
 The linearized problem is essentially like a pure elastic problem with contact like
 in step-41. The only difference consists in the fact that the contact area
-adjudges at the boundary instead of in the domain. But this has no further consequence
+is at the boundary instead of in the domain. But this has no further consequence
 so that we refer to the documentation of step-41 with the only hint that
 $\mathcal{S}$ containts all the vertices at the contact boundary $\Gamma_C$ this
 time.
@@ -256,25 +265,42 @@ sums up the results of the sections before and works as follows:
  \item[(2)] Find the primal-dual pair $(U^k,\Lambda^k)$ that satisfies
  \begin{align*}
  AU^k + B\Lambda^k & = F, &\\
- \left[BU^k\right]_i & = G & & \forall i\in\mathcal{A}_k\\
- \Lambda^k_i & = 0 & & \forall i\in\mathcal{F}_k.
+ \left[B^TU^k\right]_i & = G_i & \forall i\in\mathcal{A}_k,\\
+ \Lambda^k_i & = 0 & \forall i\in\mathcal{F}_k.
  \end{align*}
-% Note that $\mathcal{S}$ contains only dofs related to the boundary $\Gamma_C$. So in contrast to step-41 there are much more than $\vert \mathcal{S}\vert$ equations necessary to determine $U$ and $\Lambda$.
  \item[(3)] Define the new active and inactive sets by
  $$\mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i +
- c\left(\left[BU^k\right]_i - G_i\right) > 0\rbrace,$$
+ c\left(\left[B^TU^k\right]_i - G_i\right) > 0\rbrace,$$
  $$\mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i +
- c\left(\left[BU^k\right]_i - G_i\right) \leq 0\rbrace.$$
+ c\left(\left[B^TU^k\right]_i - G_i\right) \leq 0\rbrace.$$
  \item[(4)] If $\mathcal{A}_{k+1} = \mathcal{A}_k$ and $\vert
  F\left(U^{k+1}\right) \vert < \delta$ then stop, else set $k=k+1$ and go to
  step (1).
 \end{itemize}
 \noindent
-Compare to step-41 step (1) is added but it should be clear from the sections
-above that we only linearize the problem. In step (2) we have to solve a linear
-system of equations again. And now the solution has to fulfill two stopping criterias. $\mathcal{A}_{k+1} = \mathcal{A}_k$ makes sure that the contact zones
-are iterated and the second ensures an accurate enough residual which means that
-the plastic zones are also iterated.
+The mass matrix $B\in\mathbb{R}^{n\times m}$, $n>m$, is quadratic in our
+situation since $\Lambda^k$ is only defined on $\Gamma_C$:
+$$B_{ij} = \begin{cases}
+\int\limits_{\Gamma_C}\varphi_i^2(x)dx, & \text{if}\quad i=j\\
+0, & \text{if}\quad i\neq j.
+\end{cases}$$
+So $m$ denotes the size of $\Lambda^k$ and $i$ a degree of freedom. In our
+programm we use the structure of a quadratic sparse for $B\in\mathbb{R}^{n\times
+n}$ and the length of $\Lambda^k$ is $n$ with $\Lambda^k_i = 0$ for $i>m$.
+The vector $G$ is defined by a suitable approximation $g_h$ of the gap $g$
+$$G_i = \begin{cases}
+\int\limits_{\Gamma_C}g_h(x)\varphi_i(x)dx, & \text{if}\quad i\leq m\\
+0, & \text{if}\quad i>m.
+\end{cases}$$\\
+Compared to step-41, step (1) is added but it should be clear
+from the sections above that we only linearize the problem. In step (2) we have to solve a linear
+system of equations again. And now the solution has to fulfill two stopping
+criteria. $\mathcal{A}_{k+1} = \mathcal{A}_k$ makes sure that the contact zones are iterated out and the second ensures an accurate enough residual which means
+that the plastic zones are also iterated out.\\
+The idea of this method can also be found in Brunssen, Schmid, Schaefer,
+Wohlmuth: A fast and robust iterative solver for nonlinear contact problems
+using a primal-dual active set strategy and algebraic multigrid, Int. J. Numer.
+Meth. Engng, 2007, 69, pp. 524-543.
 
 \section{Implementation}
 
