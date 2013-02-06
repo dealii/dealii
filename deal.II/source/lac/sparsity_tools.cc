@@ -163,7 +163,8 @@ namespace SparsityTools
                   break;
               // post-condition after loop: coordination, i.e. the number of
               // entries in this row is now j-rowstart[row]
-              if (j-sparsity.begin(row) <  min_coordination)
+              if (static_cast<unsigned int>(j-sparsity.begin(row)) <
+                  min_coordination)
                 {
                   min_coordination = j-sparsity.begin(row);
                   starting_point   = row;

@@ -678,7 +678,7 @@ SparsityPattern::copy_from (const CSP &csp)
 
 template <typename number>
 void SparsityPattern::copy_from (const FullMatrix<number> &matrix,
-                                 const bool optimize_diag)
+                                 const bool)
 {
   copy_from (matrix);
 }

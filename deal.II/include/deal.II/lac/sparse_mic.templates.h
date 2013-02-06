@@ -160,7 +160,6 @@ SparseMIC<number>::get_rowsum (const unsigned int row) const
 {
   Assert(this->m()==this->n(), ExcNotQuadratic());
 
-  const unsigned int *const first_after_diagonal = this->prebuilt_lower_bound[row];
   number rowsum = 0;
   for (typename SparseMatrix<number>::const_iterator
        p = this->begin(row)+1;
