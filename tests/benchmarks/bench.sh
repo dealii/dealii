@@ -4,7 +4,7 @@ source testlist.sh
 
 PREVREVISION="`svn info deal.II | grep Revision | sed s/Revision://`"
 HEADREVISION="`svn info https://svn.dealii.org/trunk/deal.II | grep Revision | sed s/Revision://`"
-MAKECMD="nice make -j20"
+MAKECMD="nice make -j10"
 export MAKECMD
 
 echo "previous $PREVREVISION"
