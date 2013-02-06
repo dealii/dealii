@@ -2267,9 +2267,7 @@ namespace MatrixTools
             // transpose block
             for (unsigned int block_row=0; block_row<blocks; ++block_row)
               {
-                // get pointers to the
-                // sparsity patterns of
-                // this block and of
+                // get pointers to the sparsity patterns of this block and of
                 // the transpose one
                 const SparsityPattern &this_sparsity
                   = sparsity_pattern.block (block_row, block_index.first);
@@ -2279,14 +2277,9 @@ namespace MatrixTools
                 SparseMatrix<number> &transpose_matrix
                   = matrix.block(block_index.first, block_row);
 
-                // traverse the row of
-                // the transpose block
-                // to find the
-                // interesting rows in
-                // the present block.
-                // don't use the
-                // diagonal element of
-                // the diagonal block
+                // traverse the row of the transpose block to find the
+                // interesting rows in the present block.  don't use the
+                // diagonal element of the diagonal block
                 for (typename SparseMatrix<number>::iterator
                      q = (block_index.first == block_row ?
                           transpose_matrix.begin(block_index.second)+1 :
@@ -2294,30 +2287,14 @@ namespace MatrixTools
                      q != transpose_matrix.end(block_index.second);
                      ++q)
                   {
-                    // get the number
-                    // of the column in
-                    // this row in
-                    // which a nonzero
-                    // entry is. this
-                    // is also the row
-                    // of the transpose
-                    // block which has
-                    // an entry in the
-                    // interesting row
+                    // get the number of the column in this row in which a
+                    // nonzero entry is. this is also the row of the transpose
+                    // block which has an entry in the interesting row
                     const unsigned int row = q->column();
 
-                    // find the position of
-                    // element
-                    // (row,dof_number)
-                    // in this block
-                    // (not in the
-                    // transpose
-                    // one). note that
-                    // we have to take
-                    // care of special
-                    // cases with
-                    // square
-                    // sub-matrices
+                    // find the position of element (row,dof_number) in this
+                    // block (not in the transpose one). note that we have to
+                    // take care of special cases with square sub-matrices
                     bool (*comp)(const typename SparseMatrix<number>::iterator::value_type p,
                                  const unsigned int column)
                       = &column_less_than<typename SparseMatrix<number>::iterator>;
@@ -2326,8 +2303,7 @@ namespace MatrixTools
 
                     if (this_sparsity.n_rows() == this_sparsity.n_cols())
                       {
-                        if (this_sparsity.get_column_numbers()
-                            [this_sparsity.get_rowstart_indices()[row]]
+                        if (this_matrix.begin(row)->column()
                             ==
                             block_index.second)
                           p = this_matrix.begin(row);
