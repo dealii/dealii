@@ -400,22 +400,6 @@ namespace Step42
         return_value = p(1);
       if (component == 2)
         {
-          //     double hz = 0.98;
-          //     double position_x = 0.5;
-          //     double alpha = 12.0;
-          //     double s_x = 0.5039649116;
-          //     double s_y = hz + 0.00026316298;
-          //     if (p(0) > position_x - R && p(0) < s_x)
-          //       {
-          //         return_value = -sqrt(R*R - (p(0)-position_x)*(p(0)-position_x)) + hz + R;
-          //       }
-          //     else if (p(0) >= s_x)
-          //       {
-          //         return_value = 12.0/90.0*p(0) + (s_y - alpha/90.0*s_x);
-          //       }
-          //     else
-          //       return_value = 1e+10;
-
           // Hindernis Dortmund
           double x1 = p(0);
           double x2 = p(1);
@@ -423,11 +407,6 @@ namespace Step42
             return_value = 0.999;
           else
             return_value = 1e+10;
-
-          // Hindernis Werkzeug TKSE
-          // double shift_walze_x = 0.0;
-          // double shift_walze_y = 0.0;
-          // return_value = 0.032 + data->dicke - input_copy->mikro_height (p(0) + shift_walze_x, p(1) + shift_walze_y, p(2));
 
           // Ball with radius R
           // double R = 1.0;
@@ -517,49 +496,6 @@ namespace Step42
         }
 
     triangulation.refine_global (n_refinements_global);
-
-    // Lokale Verfeinerung des Gitters
-//    for (int step=0; step<n_refinements_local; ++step)
-//      {
-//        cell = triangulation.begin_active();  // Iterator ueber alle Zellen
-//
-//        for (; cell!=endc; ++cell)
-//           for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
-//           {
-//  //     if (cell->face (face)->at_boundary()
-//  //         && cell->face (face)->boundary_indicator () == 9)
-//  //       {
-//  //         cell->set_refine_flag ();
-//  //         break;
-//  //       }
-//  //     else if (cell->level () == n_refinements + n_refinements_local - 1)
-//  //       {
-//  //         cell->set_refine_flag ();
-//  //         break;
-//  //       }
-//
-//  //     if (cell->face (face)->at_boundary()
-//  //         && cell->face (face)->boundary_indicator () == 9)
-//  //       {
-//  //         if (cell->face (face)->vertex (0)(0) <= 0.7 &&
-//  //             cell->face (face)->vertex (1)(0) >= 0.3 &&
-//  //       cell->face (face)->vertex (0)(1) <= 0.875 &&
-//  //             cell->face (face)->vertex (2)(1) >= 0.125)
-//  //             {
-//  //             cell->set_refine_flag ();
-//  //             break;
-//  //           }
-//  //       }
-//
-//              if (step == 0 &&
-//                  cell->center ()(2) < n_refinements_local*9.0/64.0)
-//               {
-//                 cell->set_refine_flag ();
-//                 break;
-//               }
-//          };
-//        triangulation.execute_coarsening_and_refinement ();
-//      };
   }
 
   template <int dim>
@@ -694,9 +630,6 @@ namespace Step42
                                                                  stress_strain_tensor,
                                                                  strain_tensor[q_point]);
 
-              //    if (q_point == 0)
-              //    std::cout<< stress_strain_tensor_linearized <<std::endl;
-              //    std::cout<< stress_strain_tensor <<std::endl;
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
                   stress_tensor = stress_strain_tensor_linearized * plast_lin_hard->get_strain(fe_values, i, q_point);
@@ -1215,11 +1148,6 @@ namespace Step42
             for (unsigned int n=start_res; n<end_res; ++n)
               if (constraints.is_inhomogeneously_constrained (n))
                 {
-                  // pcout<< i << ". " << constraints.get_inhomogeneity (n)
-                  //   << ". " << res (n)
-                  //   << ", start = " << start_res
-                  //   << ", end = " << end_res
-                  //   <<std::endl;
                   res(n) = 0;
                 }
 
