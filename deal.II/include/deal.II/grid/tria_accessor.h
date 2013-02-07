@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -446,27 +446,33 @@ public:
   int level () const;
 
   /**
-   *  Return the index of the
-   *  element presently pointed to
-   *  on the present level.
+   * Return the index of the
+   * element presently pointed to
+   * on the present level.
    *
-   * Note that these indices are not
-   * globally unique for cells (though they
-   * may be for faces or edges). Rather, a
-   * cell is identified by its refinement
-   * level and index within this refinement
-   * level, the latter piece of information
-   * being what this function
-   * returns. Consequently, there may be
-   * multiple cells on different refinement
-   * levels but with the same index within
-   * their level.
+   * Within a Triangulation object cells are uniquely identified by a
+   * pair <code>(level, index)</code> where the former is the cell's
+   * refinement level and the latter is the index of the cell within
+   * this refinement level (the latter being what this function
+   * returns). Consequently, there may be multiple cells on different
+   * refinement levels but with the same index within their level.
+   * Contrary to this, if the current object corresponds to a face or
+   * edge, then the object is uniquely identified solely by its index
+   * as faces and edges do not have a refinement level.
    *
-   * Similarly, the index returned by this
-   * function is not a contiguous set of
-   * numbers of each level: going from cell
-   * to cell, some of the indices in a
-   * level may be unused.
+   * @note The indices objects returned by this function are not a
+   * contiguous set of numbers on each level: going from cell to cell,
+   * some of the indices in a level may be unused.
+   *
+   * @note If the triangulation is actually of type
+   * parallel::distributed::Triangulation then the indices are
+   * relatively only to that part of the distributed triangulation
+   * that is stored on the current processor. In other words, cells
+   * living in the partitions of the triangulation stored on different
+   * processors may have the same index even if they refer to the same
+   * cell, and the may have different indices even if they do refer to
+   * the same cell (e.g., if a cell is owned by one processor but is a
+   * ghost cell on another).
    */
   int index () const;
 
