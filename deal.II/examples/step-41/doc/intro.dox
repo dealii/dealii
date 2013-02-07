@@ -166,7 +166,7 @@ statement above only appears to have the wrong sign because we have
 $\mu-\lambda<0$ at points where $\lambda=0$, given the definition of $K$.
 
 The existence and uniqueness of $(u,\lambda)\in V\times K$ of this saddle
-point problem has been stated in Glowinski, Lions and Tr\'{e}moli\`{e}res: Numerical Analysis of Variational
+point problem has been stated in Glowinski, Lions and Tr{&eacute}moli{&egrave}res: Numerical Analysis of Variational
 Inequalities, North-Holland, 1981.
 
 
