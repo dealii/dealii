@@ -756,6 +756,13 @@ public:
    *  associated with it. For this, see the
    *  @p DoFAccessor::vertex_dof_index
    *  functions.
+   *
+   *  @note Despite the name, the index returned here is only
+   *  global in the sense that it is specific to a particular
+   *  Triangulation object or, in the case the triangulation is
+   *  actually of type parallel::distributed::Triangulation,
+   *  specific to that part of the distributed triangulation stored
+   *  on the current processor.
    */
   unsigned int vertex_index (const unsigned int i) const;
 
@@ -1882,6 +1889,13 @@ public:
    *  associated with it. For this, see the
    *  @p DoFAccessor::vertex_dof_index
    *  functions.
+   *
+   *  @note Despite the name, the index returned here is only
+   *  global in the sense that it is specific to a particular
+   *  Triangulation object or, in the case the triangulation is
+   *  actually of type parallel::distributed::Triangulation,
+   *  specific to that part of the distributed triangulation stored
+   *  on the current processor.
    */
   unsigned int vertex_index (const unsigned int i = 0) const;
 
@@ -2276,6 +2290,13 @@ public:
   /**
    * Return the (global) index of the
    * @p ith face of this cell.
+   *
+   *  @note Despite the name, the index returned here is only
+   *  global in the sense that it is specific to a particular
+   *  Triangulation object or, in the case the triangulation is
+   *  actually of type parallel::distributed::Triangulation,
+   *  specific to that part of the distributed triangulation stored
+   *  on the current processor.
    */
   unsigned int
   face_index (const unsigned int i) const;
