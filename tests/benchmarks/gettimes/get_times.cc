@@ -52,9 +52,6 @@ int main(int argc, char *argv[]) {
 
 			
 			////cout << "first char at pos: " << first_char << endl;
-	
-			//Test case: char at position first_char is a letter
-			assert(isalpha(curr_line[first_char]));
 			
 			//Find end of string
 			int num_chars = 0;
