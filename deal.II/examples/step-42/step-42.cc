@@ -689,7 +689,7 @@ namespace Step42
         };
 
     system_matrix_newton.compress ();
-    system_rhs_newton.compress (Add);
+    system_rhs_newton.compress ();
   }
 
   template <int dim>
@@ -922,7 +922,7 @@ namespace Step42
                       active_set_locally_owned.add_index (index_z);
                   }
               }
-    distributed_solution.compress(Insert);
+    distributed_solution.compress();
 
     unsigned int sum_contact_constraints = Utilities::MPI::sum(active_set_locally_owned.n_elements (),
                                                                mpi_communicator);
