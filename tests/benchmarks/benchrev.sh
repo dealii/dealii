@@ -33,7 +33,7 @@ cd deal.II
       fi ;
       rm -rf names.test
       fi ;
-      ./../gettimes/gettimes $NEXTREVISION >>../datatable.$test
+      ./../gettimes/gettimes $PREVREVISION >>../datatable.$test
       cd ..      
   
   done  
