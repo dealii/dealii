@@ -1,52 +1,27 @@
 #!/bin/bash
 
-TESTS="step-22 tablehandler"
-
 PREVREVISION="`svn info deal.II | grep Revision | sed s/Revision://`"
-HEADREVISION="`svn info http://www.dealii.org/svn/dealii | grep Revision | sed s/Revision://`"
-MAKECMD="make -j2"
-export MAKECMD
+HEADREVISION="`svn info https://svn.dealii.org/trunk/deal.II | grep Revision | sed s/Revision://`"
 
 echo "previous $PREVREVISION"
 echo "HEAD: $HEADREVISION"
 
 while [ $PREVREVISION -lt $HEADREVISION ] ; do
 
-  NEXTREVISION=`expr $PREVREVISION "+" 100`
+  NEXTREVISION=`expr $PREVREVISION "+" 10`
   echo "Updating from $PREVREVISION to $NEXTREVISION"
   cd deal.II
-  svn up -r$NEXTREVISION >/dev/null
+  svn up -r$NEXTREVISION || exit 1
   if test -z "`svn diff -r$PREVREVISION:$NEXTREVISION .`" ; then
       echo "Skipping revision $NEXTREVISION" ;
+      PREVREVISION=$NEXTREVISION
+      cd ..
       continue ;
   fi
 
+  cd ..      
   PREVREVISION=$NEXTREVISION
-
-  echo "configure"
-  ./configure --disable-threads --with-petsc=no >/dev/null
-  echo "compiling" 
-  $MAKECMD optimized>/dev/null
-  
-  cd ..
-
-  for test in $TESTS ; do
-      cd $test
-      echo "** working on $test"
-      make clean >/dev/null
-      echo -n "" > temp.txt
-      for a in {1..3}; do
-	  echo "*" >> temp.txt
-          make run | grep "|" >> temp.txt
-      done
-      ./../gettimes/gettimes > names.test
-      if [[ -s names.test ]] ; then
-      cp names.test ../names.$test
-      fi ;
-      ./../gettimes/gettimes $NEXTREVISION >>../datatable.$test
-      cd ..      
-  
-  done  
+  . benchrev.sh 
 
 done
 

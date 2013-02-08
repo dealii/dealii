@@ -152,7 +152,7 @@ To make your life easier on this journey let us point to two resources that
 are worthwhile browsing through before you start any large-scale programming:
 
 - The <a
-  href="http://dealii.sourceforge.net/index.php/Deal.II_Questions_and_Answers">deal.II
+  href="http://code.google.com/p/dealii/wiki/FrequentlyAskedQuestions">deal.II
   Frequently Asked Questions</a>: This page has a good number of questions
   that pertain to particular aspects of deal.II, but also to more general
   questions such as "How do I debug scientific computing codes?" or "Can I

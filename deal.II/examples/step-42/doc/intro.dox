@@ -1,2 +1,331 @@
+<br>
+
+<i>This program was contributed by J&ouml;rg Frohne (University of Siegen,
+Germany) while on a long-term visit to Texas A&amp;M University.
+<br>
+</i>
+
+
+
 <a name="Intro"></a>
-<h1>Introduction</h1>
+<h3>Introduction</h3>
+
+This example is an extension of step-41, considering a contact problem with an
+elasto-plastic material behavior with isotropic hardening in three dimensions.
+That means that we have to take care of an additional nonlinearity: the
+material behavior. Since we consider a three dimensional problem here, a
+separate difference to step-41 is that the contact area is at the boundary of
+the deformable body now, rather than in the interior. Finally, compared to
+step-41, we also have to deal with hanging nodes because of the adaptive mesh
+in both the handling of the linear
+system as well as of the inequality constraints; in the latter case, we will
+have to deal with prioritizing whether the constraints from the hanging nodes
+or from the inequalities are more important.
+
+Since you can very easily reach a few million degrees of freedom in three
+dimensions, even with adaptive mesh refinement, we decided to use Trilinos and
+p4est to run our code in parallel, building on the framework of step-40 for
+the parallelization.
+
+@f{huge}
+{distributed}
+@f}
+
+
+<h3>Classical formulation</h3>
+
+The classical formulation of the problem possesses the following form:
+@f{align*}
+ \varepsilon(u) &= A\sigma + \lambda & &\quad\text{in } \Omega,\\
+ \lambda(\tau - \sigma) &\geq 0\quad\forall\tau\text{ with
+ }\mathcal{F}(\tau)\leq 0 & &\quad\text{in } \Omega,\\
+ -\textrm{\textrm{div}}\ \sigma &= f & &\quad\text{in } \Omega,\\
+ u(\mathbf x) &= 0 & &\quad\text{on }\Gamma_D,\\
+ \sigma_t(u) &= 0,\quad\sigma_n(u)\leq 0 & &\quad\text{on }\Gamma_C,\\
+\sigma_n(u)(u_n - g) &= 0,\quad u_n(\mathbf x) - g(\mathbf x) \leq 0 & &\quad\text{on } \Gamma_C
+@f}
+with $u\in H^2(\Omega),\Omega\subset\mathbb{R}^3$.  The vector valued
+function $u$ denotes the displacement in the deformable body. The first two lines describe the
+elasto-plastic material behavior. Therein the equation shows the
+strain of the deformation $\varepsilon (u)$ as the additive decomposition of the
+elastic part $A\sigma$ and the plastic part $\lambda$. $A$ is defined as the compliance tensor of fourth order which contains some material constants and $\sigma$ as the
+symmetric stress tensor of second order. So we have to consider the inequality in the second
+row component-by-component and in a pointwise sense. Furthermore we have to
+distinguish two cases.
+
+The continuous and convex function $\mathcal{F}$ denotes the von Mises flow function
+$$\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0¸\quad\text{with}\quad \tau^D
+= \tau - \dfrac{1}{3}tr(\tau)I,$$
+$\sigma_0$ as yield stress and $\vert .\vert$ as the frobenius norm. If there
+are no plastic deformations in a particular point - that is $\lambda=0$ - this yields $\vert\sigma^D\vert <
+\sigma_0$ and otherwise if $\lambda > 0$ it follows that $\vert\sigma^D\vert = \sigma_0$.
+That means if the stress is smaller than the yield stress there are only elastic
+deformations in that point.
+
+To consider it the other way around if the deviator stress $\sigma^D$ is in a
+norm bigger than the yield stress then $\sigma^D$ has to be projected back to the yield surface and there are plastic deformations which means $\lambda$
+would be positiv for that particular point. We refer that the stresses are
+computed by Hooke's law for isotorpic materials. You can find the description at the end of section 3. Else if the norm of the deviator stress tensor is smaller or equal the yield stress then $\lambda$ is zero and there are no plastic deformations in
+that point.
+
+There the index $D$ denotes the deviator part of for example the stress where
+$tr(.)$ is the trace of a tensor. The definition shows an additive decomposition
+of the stress $\sigma$ into a hydrostatic part (or volumetric part) $\dfrac{1}{3}tr(\tau)I$ and the deviator
+part $\sigma^D$. For metal the deviator stress composes the main indicator for
+plastic deformations.
+
+The third equation is called equilibrium condition with a force of volume
+density $f$ which we will neglect in our example.
+The boundary of $\Omega$ separates as follows $\Gamma=\Gamma_D\bigcup\Gamma_C$ and $\Gamma_D\bigcap\Gamma_C=\emptyset$.
+At the boundary $\Gamma_D$ we have zero Dirichlet conditions. $\Gamma_C$ denotes the potential contact boundary.\\
+The last two lines decribe the so-called Signorini contact conditions. If there is no contact the normal  stress
+$$ \sigma_n =  \sigma n\cdot n$$
+is zero with the outward normal $n$. If there is contact ($u_n = g$) the tangential stress $\sigma_t = \sigma\cdot n - \sigma_n n$
+vanishes, because we consider a frictionless situation and the normal stress is
+negative. The gap $g$ comes with the start configuration of the obstacle and the
+deformable body.
+
+
+<h3>Derivation of the variational inequality</h3>
+
+As a starting point to derive the equations above, let us imagine that we want
+to minimise an energy functional:
+$$E(\tau) := \dfrac{1}{2}\int\limits_{\Omega}\tau A \tau d\tau,\quad \tau\in \Pi W^{\textrm{div}}$$
+with
+$$W^{\textrm{div}}:=\lbrace \tau\in
+L^2(\Omega,\mathbb{R}^{\textrm{dim}\times\textrm{dim}}_{\textrm{sym}}):\textrm{div}(\tau)\in L^2(\Omega,\mathbb{R}^{\textrm{dim}})\rbrace$$ and
+$$\Pi \Sigma:=\lbrace \tau\in \Sigma, \mathcal{F}(\tau)\leq 0\rbrace$$
+as the set of admissible stresses which is defined
+by a continious, convex flow function $\mathcal{F}$.
+
+With the goal of deriving the dual formulation of the minimisation
+problem, we define a lagrange function:
+$$L(\tau,\varphi) := E(\tau) + (\varphi, \textrm{div}(\tau)),\quad \lbrace\tau,\varphi\rbrace\in\Pi W^{\textrm{div}}\times V^+$$
+with
+$$V^+ := \lbrace u\in V: u_n\leq g \text{ on } \Gamma_C \rbrace$$
+$$V:=\left[ H_0^1 \right]^{\textrm{dim}}:=\lbrace u\in \left[H^1(\Omega)\right]^{\textrm{dim}}: u
+= 0 \text{ on } \Gamma_D\rbrace$$
+By building the Fr&eacute;chet derivatives of $L$ for both components we obtain the
+dual formulation for the stationary case which is known as \textbf{Hencky-Type-Model}:\\
+Find a pair $\lbrace\sigma,u\rbrace\in \Pi W\times V^+$ with
+$$\left(A\sigma,\tau - \sigma\right) + \left(u, \textrm{div}(\tau) - \textrm{div}(\sigma)\right) \geq 0,\quad \forall \tau\in \Pi W^{\textrm{div}}$$
+$$-\left(\textrm{div}(\sigma),\varphi - u\right) \geq 0,\quad \forall \varphi\in V^+.$$
+By integrating by parts and multiplying the first inequality by the elastic
+tensor $C=A^{-1}$ we achieve the primal-mixed version of our problem:
+Find a pair $\lbrace\sigma,u\rbrace\in \Pi W\times V^+$ with
+$$\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right) \geq 0,\quad \forall \tau\in \Pi W$$
+$$\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+.$$
+Therein $\varepsilon$ denotes the linearised deformation tensor with $\varepsilon(u) := \dfrac{1}{2}\left(\nabla u + \nabla u^T\right)$ for small deformations.\\
+Most materials - especially metals - have the property that they show some hardening effects during the forming process.
+There are different constitutive laws to describe those material behaviors. The
+simplest one is called linear isotropic hardening described by the flow function
+$\mathcal{F}(\tau,\eta) = \vert\tau^D\vert - (\sigma_0 + \gamma\eta)$ where
+$\eta$ is the norm of the plastic strain $\eta = \vert \varepsilon -
+A\sigma\vert$.
+It can be considered by establishing an additional term in our primal-mixed formulation:\\
+Find a pair $\lbrace(\sigma,\xi),u\rbrace\in \Pi (W\times L^2(\Omega,\mathbb{R}))\times V^+$ with
+$$\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right) + \gamma\left( \xi, \eta - \xi\right) \geq 0,\quad \forall (\tau,\eta)\in \Pi (W,L^2(\Omega,\mathbb{R}))$$
+$$\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+,$$
+with the hardening parameter $\gamma > 0$.
+
+Now we want to derive a primal problem which only depends on the displacement $u$. For that purpose we
+set $\eta = \xi$ and eliminate the stress $\sigma$ by applying the projection
+theorem (see Grossmann, Roos: Numerical Treatment of Partial Differential
+Equations, Springer-Verlag Berlin Heidelberg, 2007 and Frohne: FEM-Simulation
+der Umformtechnik metallischer Oberflächen im Mikrokosmos, Ph.D. thesis,
+University of Siegen, Germany, 2011) on
+$$\left(\sigma - C\varepsilon(u), \tau - \sigma\right) \geq 0,\quad \forall \tau\in \Pi W,$$
+which yields with the second inequality:\\
+Find the displacement $u\in V^+$ with
+$$\left(P_{\Pi}(C\varepsilon(u)),\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+,$$
+with the projection:
+$$P_{\Pi}(\tau):=@f{cases}
+                        \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0 +  \gamma\xi,\\
+                        \hat\alpha\dfrac{\tau^D}{\vert\tau^D\vert} + \dfrac{1}{3}tr(\tau), & \text{if }\vert\tau^D\vert > \sigma_0 +  \gamma\xi,
+                        @f}$$
+with the radius
+$$\hat\alpha := \sigma_0 + \gamma\xi .$$
+With the relation $\xi = \vert\varepsilon(u) - A\sigma\vert$ it is possible to eliminate $\xi$ inside the projection $P_{\Pi}$:\\
+$$P_{\Pi}(\tau):=@f{cases}
+                        \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0,\\
+                        \alpha\dfrac{\tau^D}{\vert\tau^D\vert} + \dfrac{1}{3}tr(\tau), & \text{if }\vert\tau^D\vert > \sigma_0,
+                        @f}$$
+$$\alpha := \sigma_0 + \dfrac{\gamma}{2\mu+\gamma}\left(\vert\tau^D\vert - \sigma_0\right) ,$$
+with a further material parameter $\mu>0$ called shear modulus. We refer that
+this only possible for isotropic plasticity.
+
+So what we do is to calculate the stresses by using Hooke's law for linear elastic,  isotropic materials
+$$\sigma = C \varepsilon(u) = 2\mu \varepsilon^D(u) + \kappa tr(\varepsilon(u))I = \left[2\mu\left(\mathbb{I} -\dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I\right]\varepsilon(u)$$
+with the material parameter $\kappa>0$ (bulk modulus). The variables $I$ and
+$\mathbb{I}$ denote the identity tensors of second and forth order. In that
+notation $2\mu \varepsilon^D(u)$ is the deviatoric part and $\kappa
+tr(\varepsilon(u))$ the volumetric part of the stress tensor.
+
+In the next step we test in a pointwise sense where the deviator part of the
+stress in a norm is bigger than the yield stress. If there are such points we
+project the deviator stress in those points back to the yield surface. Methods of this kind are called projections algorithm or radial-return-algorithm.\\
+Now we have a primal formulation of our elasto-plastic contact problem which only depends on the displacement $u$.
+It consists of a nonlinear variational inequality and has a unique solution as
+it satisfies the theorem of Lions and Stampaccia. A proof can be found in
+Rodrigues: Obstacle Problems in Mathematical Physics, North-Holland, Amsterdam,
+1987.
+
+To handle the nonlinearity of the constitutive law we use a Newton method and to deal with the contact we apply an
+active set method like in step-41. To be more concrete we combine both methods to an inexact semi smooth Newton
+method - inexact since we use an iterative solver for the linearised problems in each Newton step.
+
+
+<h3>Linearisation of the constitutive law for the Newton method</h3>
+
+For the Newton method we have to linearise the following semi-linearform
+$$a(\psi;\varphi) := \left(P_{\Pi}(C\varepsilon(\varphi)),\varepsilon(\varphi)\right).$$
+Because we have to find the solution $u$ in the convex set $V^+$, we have to
+apply an SQP-method (SQP: sequential quadratic programming). That means we have
+to solve a minimisation problem for a known $u^i$ in every SQP-step of the form
+@f{eqnarray*}
+ & & a(u^{i};u^{i+1} - u^i) + \dfrac{1}{2}a'(u^i;u^{i+1} - u^i,u^{i+1} - u^i)\\
+ &=&  a(u^i;u^{i+1}) -  a(u^i;u^i) +\\
+ & & \dfrac{1}{2}\left( a'(u^i;u^{i+1},u^{i+1}) - 2a'(u^i;u^i,u^{i+1}) - a'(u^i;u^i,u^i)\right)\\
+ &\rightarrow& \textrm{min},\quad u^{i+1}\in V^+.
+@f}
+Neglecting the constant terms $ a(u^i;u^i)$ and $ a'(u^i;u^i,u^i)$ we obtain the
+following minimisation problem $$\dfrac{1}{2} a'(u^i;u^{i+1},u^{i+1}) - F(u^i)\rightarrow \textrm{min},\quad u^{i+1}\in V^+$$ with
+$$F(\varphi) := \left(a'(\varphi;\varphi,u^{i+1}) -  a(\varphi;u^{i+1}) \right).$$
+In the case of our constitutive law the Fr&eacute;chet derivative of the
+semi-linearform $a(.;.)$ at the point $u^i$ is
+
+$$a'(u^i;\psi,\varphi) =
+(I(x)\varepsilon(\psi),\varepsilon(\varphi)),\quad x\in\Omega,$$ $$
+I(x) := @f{cases}
+2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I, &
+\quad \vert \tau^D \vert \leq \sigma_0\\
+\dfrac{\alpha}{\vert\tau^D\vert}2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I 
+- \dfrac{\tau^D\otimes\tau^D}{\vert\tau^D\vert}\right) + \kappa I\otimes I,
+&\quad \vert \tau^D \vert > \sigma_0
+@f}
+$$
+with
+$$\tau^D :=  C\varepsilon^D(u^i).$$
+Remark that $a(.;.)$ is not differentiable in the common sense but it is
+slantly differentiable like the function for the contact problem and again we refer to
+Hintermueller, Ito, Kunisch: The primal-dual active set strategy as a semismooth newton method, SIAM J. OPTIM., 2003, Vol. 13, No. 3, pp. 865-888.
+Again the first case is for elastic and the second for plastic deformation.
+
+
+<h3>Formulation as a saddle point problem</h3>
+
+Just as in step-41 we compose a saddle point problem out of the minimisation
+problem. Again we do so to gain a formulation that allows us to solve a linear
+system of equations finally.
+
+We introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset W'$,
+$W'$ dual space of the trace space $W$ of $V$ restricted to $\Gamma_C$,
+$$K:=\{\mu\in W':\mu_T = 0,\quad\langle\mu n,v\rangle_{\Gamma_C}\geq 0,\quad
+\forall v\in W, v \ge 0\text{ on }\Gamma_C \}$$
+of Lagrange multipliers, where $\langle\cdot,\cdot\rangle$
+denotes the duality pairing, i.e. a boundary integral, between $W'$ and $W$.
+Intuitively, $K$ is the cone of all "non-positive functions", except that $ K\subset
+\left( \left[ H_0^{\frac{1}{2}} \right]^{\textrm{dim}} \right)' $ and so contains other
+objects besides regular functions as well. This yields:
+
+Find $u\in V$ and $\lambda\in K$ such that
+@f{align*}
+ \hat{a}(u,v) + b(v,\lambda) &= f(v),\quad &&v\in V\\
+ b(u,\mu - \lambda) &\leq \langle g,(\mu -
+ \lambda)n\rangle_{\Gamma_C},\quad&&\mu\in K,
+@f}
+with
+@f{align*}
+ \hat{a}(u,v) &:= a'(u^i;u,v)\\
+ b(u,\mu) &:= \langle un,\mu n\rangle_{\Gamma_C},\quad &&u\in V,\quad\mu\in W'.
+@f}
+As in the section before $u^i$ denotes the linearization point for the
+semi-linearform $a(.;.)$. In contrast to step-41 we directly consider $\lambda$
+as the additional, positive force $\sigma(u)n$ that the obstacle
+exerts on the boundary $\Gamma_C$ of the body.
+
+The existence and uniqueness of the analytical solution $(u,\lambda)\in V\times
+K$ of this saddle point problem has been stated in Glowinski, Lions and Tr\'{e}moli\`{e}res: Numerical
+Analysis of Variational Inequalities, North-Holland, 1981.
+
+NOTE: In this example as well as in the further documentation we make the
+assumption that the normal vector $n$ equals to $(0,0,1)$. This comes up with
+the starting condition of our deformable body.
+
+
+<h3>Active Set methods to solve the saddle point problem</h3>
+
+The linearized problem is essentially like a pure elastic problem with contact like
+in step-41. The only difference consists in the fact that the contact area
+is at the boundary instead of in the domain. But this has no further consequence
+so that we refer to the documentation of step-41 with the only hint that
+$\mathcal{S}$ containts all the vertices at the contact boundary $\Gamma_C$ this
+time.
+
+
+<h3>The primal-dual active set algorithm combined with the inexact semi smooth
+Newton method</h3>
+
+Now we describe an algorithm that combines the Newton-method, which we use for
+the nonlinear constitutive law, with the semismooth Newton method for the contact. It
+sums up the results of the sections before and works as follows:
+@f{itemize}
+ \item[(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that $\mathcal{S} = \mathcal{A}_k \cup \mathcal{F}_k$ and $\mathcal{A}_k \cap \mathcal{F}_k = \emptyset$ and set $k = 1$.
+ \item[(1)] Assemble the Newton matrix $a'(U^k;\varphi_i,\varphi_j)$ and the right-hand-side $F(U^k)$.
+ \item[(2)] Find the primal-dual pair $(U^k,\Lambda^k)$ that satisfies
+ @f{align*}
+ AU^k + B\Lambda^k & = F, &\\
+ \left[B^TU^k\right]_i & = G_i & \forall i\in\mathcal{A}_k,\\
+ \Lambda^k_i & = 0 & \forall i\in\mathcal{F}_k.
+ @f}
+ \item[(3)] Define the new active and inactive sets by
+ $$\mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i +
+ c\left(\left[B^TU^k\right]_i - G_i\right) > 0\rbrace,$$
+ $$\mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i +
+ c\left(\left[B^TU^k\right]_i - G_i\right) \leq 0\rbrace.$$
+ \item[(4)] If $\mathcal{A}_{k+1} = \mathcal{A}_k$ and $\vert
+ F\left(U^{k+1}\right) \vert < \delta$ then stop, else set $k=k+1$ and go to
+ step (1).
+@f}
+
+The mass matrix $B\in\mathbb{R}^{n\times m}$, $n>m$, is quadratic in our
+situation since $\Lambda^k$ is only defined on $\Gamma_C$:
+$$B_{ij} = @f{cases}
+\int\limits_{\Gamma_C}\varphi_i^2(x)dx, & \text{if}\quad i=j\\
+0, & \text{if}\quad i\neq j.
+@f}$$
+So $m$ denotes the size of $\Lambda^k$ and $i$ a degree of freedom. In our
+programm we use the structure of a quadratic sparse for $B\in\mathbb{R}^{n\times
+n}$ and the length of $\Lambda^k$ is $n$ with $\Lambda^k_i = 0$ for $i>m$.
+The vector $G$ is defined by a suitable approximation $g_h$ of the gap $g$
+$$G_i = @f{cases}
+\int\limits_{\Gamma_C}g_h(x)\varphi_i(x)dx, & \text{if}\quad i\leq m\\
+0, & \text{if}\quad i>m.
+@f}$$
+
+Compared to step-41, step (1) is added but it should be clear
+from the sections above that we only linearize the problem. In step (2) we have to solve a linear
+system of equations again. And now the solution has to fulfill two stopping
+criteria. $\mathcal{A}_{k+1} = \mathcal{A}_k$ makes sure that the contact zones are iterated out and the second ensures an accurate enough residual which means
+that the plastic zones are also iterated out.
+
+The idea of this method can also be found in Brunssen, Schmid, Sch&auml;fer,
+Wohlmuth: A fast and robust iterative solver for nonlinear contact problems
+using a primal-dual active set strategy and algebraic multigrid, Int. J. Numer.
+Meth. Engng, 2007, 69, pp. 524-543.
+
+
+<h3>Implementation</h3>
+
+This tutorial is essentailly a mixture of step-40 and step-41 but instead of
+PETSc we let the Trilinos library deal with parallelizing the linear algebra
+(like in step-32). Since we are trying to solve a similar problem like in 
+step-41 we will use the same methods but now in parallel.
+
+Another difficulty is the handling of the different constraints from
+(the dirichlet conditons), the hanging nodes and the inequality condition that 
+arises from the contact. For this purpose we create three objects of type 
+ConstraintMatrix.
+
+
+

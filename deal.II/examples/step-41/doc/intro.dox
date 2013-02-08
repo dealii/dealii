@@ -166,7 +166,7 @@ statement above only appears to have the wrong sign because we have
 $\mu-\lambda<0$ at points where $\lambda=0$, given the definition of $K$.
 
 The existence and uniqueness of $(u,\lambda)\in V\times K$ of this saddle
-point problem has been stated in Glowinski, Lions and Tr\'{e}moli\`{e}res: Numerical Analysis of Variational
+point problem has been stated in Glowinski, Lions and Tr&eacute;moli&egrave;res: Numerical Analysis of Variational
 Inequalities, North-Holland, 1981.
 
 
@@ -237,7 +237,7 @@ pp. 865-888.
 
 <h3>The primal-dual active set algorithm</h3>
 
-The algorithm for the primal-dual active set method works as follows:
+The algorithm for the primal-dual active set method works as follows (NOTE: $B = B^T$):
 
 - [(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that
  $\mathcal{S}=\mathcal{A}_k\cup\mathcal{F}_k$ and
@@ -245,7 +245,7 @@ The algorithm for the primal-dual active set method works as follows:
 - [(1)] Find the primal-dual pair $(U^k,\Lambda^k)$ that satisfies
  @f{align*}
   AU^k + B\Lambda^k &= F,\\
-  [BU^k]_i &= G\quad&&\forall i\in\mathcal{A}_k,\\
+  [BU^k]_i &= G_i\quad&&\forall i\in\mathcal{A}_k,\\
   \Lambda_i^k &= 0\quad&&\forall i\in\mathcal{F}_k.
  @f}
  Note that the second and third conditions imply that exactly $|S|$ unknowns

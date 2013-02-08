@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -162,7 +162,7 @@ struct SubCellData;
  * Cubit at this time. However, Cubit can export in UCD format using a simple
  * plug-in, and the resulting UCD file can then be read by this class. The
  * plug-in script can be found on the deal.II wiki page,
- * http://sourceforge.net/apps/mediawiki/dealii/index.php?title=Mesh_Input_and_Output_Interfaces .
+ * http://code.google.com/p/dealii/wiki/MeshInputAndOutput .
  *
  * There is also a little program, written by Jean-Paul Pelteret, that
  * can be found in the <code>contrib/mesh_conversion</code> directory and that can

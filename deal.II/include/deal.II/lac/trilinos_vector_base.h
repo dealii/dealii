@@ -349,7 +349,7 @@ namespace TrilinosWrappers
                    =::dealii::VectorOperation::unknown);
 
     /**
-    * @deprecated
+    * @deprecated Use compress(dealii::VectorOperation::values) instead.
     */
     void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
 
