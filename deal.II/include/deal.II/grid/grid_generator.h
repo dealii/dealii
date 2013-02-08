@@ -183,7 +183,7 @@ public:
    * surfaces are assigned, such
    * that the lower one in
    * @p x-direction is 0, the
-   * upper one is 1. The indicators
+   * upper one is 1 (the left and the right vertical face). The indicators
    * for the surfaces in
    * @p y-direction are 2 and 3,
    * the ones for @p z are 4 and
@@ -195,7 +195,8 @@ public:
    * direction <i>x<sub>i</sub></i>
    * adds 2<sup>i</sup>. For
    * instance, the center point
-   * (1,-1,1) yields a material id 5.
+   * (1,-1,1) yields a material id 5 (this means that in 2d only material
+   * ids 0,1,2,3 are assigned independent from the number of repetitions).
    *
    * Note that the @p colorize flag is
    * ignored in 1d and is assumed to always
