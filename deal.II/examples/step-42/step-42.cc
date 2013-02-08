@@ -565,7 +565,7 @@ namespace Step42
         diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
       number_iterations = 0;
 
-      diag_mass_matrix_vector.compress ();
+      diag_mass_matrix_vector.compress (VectorOperation::insert);
     }
   }
 
@@ -688,8 +688,8 @@ namespace Step42
                                                   system_matrix_newton, system_rhs_newton, true);
         };
 
-    system_matrix_newton.compress ();
-    system_rhs_newton.compress ();
+    system_matrix_newton.compress (VectorOperation::add);
+    system_rhs_newton.compress (VectorOperation::add);
   }
 
   template <int dim>
@@ -795,7 +795,7 @@ namespace Step42
           cell_number += 1;
         };
 
-    system_rhs_newton.compress ();
+    system_rhs_newton.compress (VectorOperation::add);
 
     unsigned int sum_elast_points = Utilities::MPI::sum(elast_points, mpi_communicator);
     unsigned int sum_plast_points = Utilities::MPI::sum(plast_points, mpi_communicator);
@@ -848,7 +848,7 @@ namespace Step42
                   mass_matrix);
             }
 
-    mass_matrix.compress ();
+    mass_matrix.compress (VectorOperation::add);
   }
 
   // @sect4{PlasticityContactProblem::update_solution_and_constraints}
@@ -922,7 +922,7 @@ namespace Step42
                       active_set_locally_owned.add_index (index_z);
                   }
               }
-    distributed_solution.compress();
+    distributed_solution.compress (VectorOperation::insert);
 
     unsigned int sum_contact_constraints = Utilities::MPI::sum(active_set_locally_owned.n_elements (),
                                                                mpi_communicator);
