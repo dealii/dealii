@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1882,7 +1882,7 @@ namespace DoFRenumbering
     std::fill (new_dof_indices.begin(), new_dof_indices.end(),
                numbers::invalid_unsigned_int);
     unsigned int next_free_index = 0;
-    for (unsigned int subdomain=0; subdomain<n_subdomains; ++subdomain)
+    for (types::subdomain_id subdomain=0; subdomain<n_subdomains; ++subdomain)
       for (unsigned int i=0; i<n_dofs; ++i)
         if (subdomain_association[i] == subdomain)
           {
