@@ -1178,8 +1178,7 @@ ChunkSparseMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),
-          typename ChunkSparsityPattern::ExcDiagonalNotOptimized());
+  Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
   Assert (src.size() == n(), ExcDimensionMismatch (src.size(), n()));
@@ -1202,8 +1201,7 @@ ChunkSparseMatrix<number>::precondition_SSOR (Vector<somenumber>       &dst,
   // which is much clearer...
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),
-          typename ChunkSparsityPattern::ExcDiagonalNotOptimized());
+  Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));
   Assert (src.size() == n(), ExcDimensionMismatch (src.size(), n()));
@@ -1221,8 +1219,7 @@ ChunkSparseMatrix<number>::precondition_SOR (Vector<somenumber> &dst,
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),
-          typename ChunkSparsityPattern::ExcDiagonalNotOptimized());
+  Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
 
   dst = src;
@@ -1239,8 +1236,7 @@ ChunkSparseMatrix<number>::precondition_TSOR (Vector<somenumber> &dst,
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),
-          typename ChunkSparsityPattern::ExcDiagonalNotOptimized());
+  Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
 
   dst = src;
@@ -1256,9 +1252,7 @@ ChunkSparseMatrix<number>::SOR (Vector<somenumber> &dst,
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),
-          typename ChunkSparsityPattern::ExcDiagonalNotOptimized());
-
+  Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
   Assert (false, ExcNotImplemented());
@@ -1273,9 +1267,7 @@ ChunkSparseMatrix<number>::TSOR (Vector<somenumber> &dst,
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),
-          typename ChunkSparsityPattern::ExcDiagonalNotOptimized());
-
+  Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 
   Assert (false, ExcNotImplemented());
@@ -1292,8 +1284,7 @@ ChunkSparseMatrix<number>::PSOR (Vector<somenumber> &dst,
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),
-          typename ChunkSparsityPattern::ExcDiagonalNotOptimized());
+  Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert (m() == permutation.size(),
@@ -1315,8 +1306,7 @@ ChunkSparseMatrix<number>::TPSOR (Vector<somenumber> &dst,
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),
-          typename ChunkSparsityPattern::ExcDiagonalNotOptimized());
+  Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
   Assert (m() == permutation.size(),
@@ -1338,8 +1328,7 @@ ChunkSparseMatrix<number>::SOR_step (Vector<somenumber> &v,
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),
-          typename ChunkSparsityPattern::ExcDiagonalNotOptimized());
+  Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert (m() == b.size(), ExcDimensionMismatch(m(),b.size()));
@@ -1358,8 +1347,7 @@ ChunkSparseMatrix<number>::TSOR_step (Vector<somenumber> &v,
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),
-          typename ChunkSparsityPattern::ExcDiagonalNotOptimized());
+  Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (m() == v.size(), ExcDimensionMismatch(m(),v.size()));
   Assert (m() == b.size(), ExcDimensionMismatch(m(),b.size()));
@@ -1390,8 +1378,7 @@ ChunkSparseMatrix<number>::SSOR (Vector<somenumber> &dst,
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),
-          typename ChunkSparsityPattern::ExcDiagonalNotOptimized());
+  Assert (m() == n(), ExcMessage("This operation is only valid on square matrices."));
 
   Assert (m() == dst.size(), ExcDimensionMismatch(m(),dst.size()));
 

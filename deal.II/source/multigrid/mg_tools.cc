@@ -1662,10 +1662,6 @@ namespace MGTools
             matrix.get_sparsity_pattern().get_column_indices(),
             ExcNotQuadratic());
 
-    for (unsigned int i=0; i<blocks; ++i)
-      Assert (matrix.block(i,i).get_sparsity_pattern().optimize_diagonal(),
-              SparsityPattern::ExcDiagonalNotOptimized());
-
     // this function is not documented and not tested in the testsuite
     // so it isn't quite clear what it's supposed to do. it also isn't
     // used anywhere else in the library. in avoiding the use of

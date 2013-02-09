@@ -721,6 +721,14 @@ SolutionTransfer<dim, VECTOR, DH>::Pointerstruct::memory_consumption () const
 
 
 /*-------------- Explicit Instantiations -------------------------------*/
+#ifdef SOLUTION_TRANSFER_INSTANTIATE_PART_TWO
+#define DIM_A 3
+#define DIM_B 3
+#else
+#define DIM_A 1
+#define DIM_B 2
+#endif
+
 #include "solution_transfer.inst"
 
 DEAL_II_NAMESPACE_CLOSE

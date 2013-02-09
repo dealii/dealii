@@ -50,17 +50,20 @@ int main(int argc, char *argv[]) {
 			if (curr_line[1] == ' ')
 				first_char++;
 
-			////cout << "first char at pos: " << first_char << endl;
-	
-			//Test case: char at position first_char is a letter
-			assert(isalpha(curr_line[first_char]));
 			
-			//Find position of first space that occurs after the word
+			////cout << "first char at pos: " << first_char << endl;
+			
+			//Find end of string
 			int num_chars = 0;
-			while(!isspace(curr_line[first_char + num_chars]))
+			while(curr_line[first_char + num_chars] != '|')
 				num_chars++;
-	
-			names.push_back(curr_line.substr(first_char, num_chars));
+
+			num_chars--;
+			
+			while(curr_line[first_char + num_chars] == ' ')
+			  num_chars--;
+			
+			names.push_back(curr_line.substr(first_char, num_chars+1));
 		}
 	}
 

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,7 +37,7 @@ ChunkSparsityPattern::ChunkSparsityPattern (const ChunkSparsityPattern &s)
   Assert (s.rows == 0, ExcInvalidConstructorCall());
   Assert (s.cols == 0, ExcInvalidConstructorCall());
 
-  reinit (0,0,0,0, false);
+  reinit (0,0,0,0);
 }
 
 
@@ -46,11 +46,22 @@ ChunkSparsityPattern::ChunkSparsityPattern (const types::global_dof_index m,
                                             const types::global_dof_index n,
                                             const unsigned int max_per_row,
                                             const unsigned int chunk_size,
-                                            const bool optimize_diag)
+                                            const bool)
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
 
-  reinit (m,n,max_per_row, chunk_size, optimize_diag);
+  reinit (m,n,max_per_row, chunk_size);
+}
+
+
+ChunkSparsityPattern::ChunkSparsityPattern (const unsigned int m,
+                                            const unsigned int n,
+                                            const unsigned int max_per_row,
+                                            const unsigned int chunk_size)
+{
+  Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
+
+  reinit (m,n,max_per_row, chunk_size);
 }
 
 
@@ -64,16 +75,29 @@ ChunkSparsityPattern::ChunkSparsityPattern (
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
 
-  reinit (m, n, row_lengths, chunk_size, optimize_diag);
+  reinit (m, n, row_lengths, chunk_size);
 }
 
 
 
-ChunkSparsityPattern::ChunkSparsityPattern (const types::global_dof_index n,
-                                            const unsigned int            max_per_row,
-                                            const unsigned int            chunk_size)
+ChunkSparsityPattern::ChunkSparsityPattern (
+  const unsigned int m,
+  const unsigned int n,
+  const std::vector<unsigned int> &row_lengths,
+  const unsigned int chunk_size)
 {
-  reinit (n, n, max_per_row, chunk_size, true);
+  Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
+
+  reinit (m, n, row_lengths, chunk_size);
+}
+
+
+
+ChunkSparsityPattern::ChunkSparsityPattern (const unsigned int n,
+                                            const unsigned int max_per_row,
+                                            const unsigned int chunk_size)
+{
+  reinit (n, n, max_per_row, chunk_size);
 }
 
 
@@ -86,7 +110,19 @@ ChunkSparsityPattern::ChunkSparsityPattern (
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
 
-  reinit (m, m, row_lengths, chunk_size, optimize_diag);
+  reinit (m, m, row_lengths, chunk_size);
+}
+
+
+
+ChunkSparsityPattern::ChunkSparsityPattern (
+  const unsigned int               m,
+  const std::vector<unsigned int> &row_lengths,
+  const unsigned int chunk_size)
+{
+  Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
+
+  reinit (m, m, row_lengths, chunk_size);
 }
 
 
@@ -116,14 +152,24 @@ ChunkSparsityPattern::reinit (const types::global_dof_index m,
                               const types::global_dof_index n,
                               const unsigned int max_per_row,
                               const unsigned int chunk_size,
-                              const bool optimize_diag)
+                              const bool)
+{
+  reinit (m, n, max_per_row, chunk_size);
+}
+
+
+void
+ChunkSparsityPattern::reinit (const unsigned int m,
+                              const unsigned int n,
+                              const unsigned int max_per_row,
+                              const unsigned int chunk_size)
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
 
   // simply map this function to the
   // other @p{reinit} function
   const std::vector<unsigned int> row_lengths (m, max_per_row);
-  reinit (m, n, row_lengths, chunk_size, optimize_diag);
+  reinit (m, n, row_lengths, chunk_size);
 }
 
 
@@ -134,7 +180,18 @@ ChunkSparsityPattern::reinit (
   const types::global_dof_index n,
   const VectorSlice<const std::vector<unsigned int> > &row_lengths,
   const unsigned int chunk_size,
-  const bool optimize_diag)
+  const bool)
+{
+  reinit (m, n, row_lengths, chunk_size);
+}
+
+
+void
+ChunkSparsityPattern::reinit (
+    const unsigned int m,
+    const unsigned int n,
+    const VectorSlice<const std::vector<unsigned int> > &row_lengths,
+    const unsigned int chunk_size)
 {
   Assert (row_lengths.size() == m, ExcInvalidNumber (m));
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
@@ -171,8 +228,7 @@ ChunkSparsityPattern::reinit (
 
   sparsity_pattern.reinit (m_chunks,
                            n_chunks,
-                           chunk_row_lengths,
-                           optimize_diag);
+                           chunk_row_lengths);
 }
 
 
@@ -189,7 +245,16 @@ template <typename SparsityType>
 void
 ChunkSparsityPattern::copy_from (const SparsityType &csp,
                                  const unsigned int  chunk_size,
-                                 const bool          optimize_diag)
+                                 const bool)
+{
+  copy_from (csp, chunk_size);
+}
+
+
+template <typename SparsityType>
+void
+ChunkSparsityPattern::copy_from (const SparsityType &csp,
+                                 const unsigned int  chunk_size)
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
 
@@ -202,7 +267,7 @@ ChunkSparsityPattern::copy_from (const SparsityType &csp,
 
   reinit (csp.n_rows(), csp.n_cols(),
           entries_per_row,
-          chunk_size, optimize_diag);
+          chunk_size);
 
   // then actually fill it
   for (unsigned int row = 0; row<csp.n_rows(); ++row)
@@ -225,6 +290,14 @@ void ChunkSparsityPattern::copy_from (const FullMatrix<number> &matrix,
                                       const unsigned int chunk_size,
                                       const bool         optimize_diag)
 {
+  copy_from (matrix, chunk_size);
+}
+
+
+template <typename number>
+void ChunkSparsityPattern::copy_from (const FullMatrix<number> &matrix,
+                                      const unsigned int chunk_size)
+{
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
 
   // count number of entries per row, then
@@ -238,7 +311,7 @@ void ChunkSparsityPattern::copy_from (const FullMatrix<number> &matrix,
 
   reinit (matrix.m(), matrix.n(),
           entries_per_row,
-          chunk_size, optimize_diag);
+          chunk_size);
 
   // then actually fill it
   for (unsigned int row=0; row<matrix.m(); ++row)
@@ -257,11 +330,22 @@ ChunkSparsityPattern::reinit (
   const types::global_dof_index n,
   const std::vector<unsigned int> &row_lengths,
   const unsigned int chunk_size,
-  const bool optimize_diag)
+  const bool)
+{
+  reinit (m, n, row_lengths, chunk_size);
+}
+
+
+void
+ChunkSparsityPattern::reinit (
+  const unsigned int m,
+  const unsigned int n,
+  const std::vector<unsigned int> &row_lengths,
+  const unsigned int chunk_size)
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
 
-  reinit(m, n, make_slice(row_lengths), chunk_size, optimize_diag);
+  reinit(m, n, make_slice(row_lengths), chunk_size);
 }
 
 
