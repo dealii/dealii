@@ -126,18 +126,21 @@ public:
    * @arg n number of columns
    * @arg max_per_row maximum
    * number of nonzero entries per row
-   *
-   * @arg optimize_diagonal store
-   * diagonal entries first in row;
-   * see optimize_diagonal(). This
-   * takes effect for quadratic
-   * matrices only.
+   */
+  ChunkSparsityPattern (const unsigned int m,
+                        const unsigned int n,
+                        const unsigned int max_chunks_per_row,
+                        const unsigned int chunk_size);
+
+  /**
+   * @deprecated This constructor is deprecated. Use the version
+   * without the last argument
    */
   ChunkSparsityPattern (const unsigned int m,
                         const unsigned int n,
                         const unsigned int max_chunks_per_row,
                         const unsigned int chunk_size,
-                        const bool optimize_diagonal = true);
+                        const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Initialize a rectangular
@@ -150,18 +153,21 @@ public:
    * number of nonzero entries for
    * each row.  This vector must
    * have one entry for each row.
-   *
-   * @arg optimize_diagonal store
-   * diagonal entries first in row;
-   * see optimize_diagonal(). This
-   * takes effect for quadratic
-   * matrices only.
+   */
+  ChunkSparsityPattern (const unsigned int               m,
+                        const unsigned int               n,
+                        const std::vector<unsigned int> &row_lengths,
+                        const unsigned int chunk_size);
+
+  /**
+   * @deprecated This constructor is deprecated. Use the version
+   * without the last argument
    */
   ChunkSparsityPattern (const unsigned int               m,
                         const unsigned int               n,
                         const std::vector<unsigned int> &row_lengths,
                         const unsigned int chunk_size,
-                        const bool optimize_diagonal = true);
+                        const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Initialize a quadratic matrix
@@ -189,15 +195,19 @@ public:
    * number of nonzero entries for
    * each row.  This vector must
    * have one entry for each row.
-   *
-   * @arg optimize_diagonal store
-   * diagonal entries first in row;
-   * see optimize_diagonal().
+   */
+  ChunkSparsityPattern (const unsigned int               m,
+                        const std::vector<unsigned int> &row_lengths,
+                        const unsigned int               chunk_size);
+
+  /**
+   * @deprecated This constructor is deprecated. Use the version
+   * without the last argument
    */
   ChunkSparsityPattern (const unsigned int               m,
                         const std::vector<unsigned int> &row_lengths,
                         const unsigned int               chunk_size,
-                        const bool optimize_diagonal = true);
+                        const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Destructor.
@@ -228,8 +238,17 @@ public:
   void reinit (const unsigned int m,
                const unsigned int n,
                const unsigned int max_per_row,
+               const unsigned int chunk_size);
+
+  /**
+   * @deprecated This function is deprecated. Use the function
+   * without the last argument
+   */
+  void reinit (const unsigned int m,
+               const unsigned int n,
+               const unsigned int max_per_row,
                const unsigned int chunk_size,
-               const bool optimize_diagonal = true);
+               const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Reallocate memory for a matrix
@@ -249,8 +268,7 @@ public:
    * of the heap.
    *
    * If the number of rows equals
-   * the number of columns and the
-   * last parameter is true,
+   * the number of columns then
    * diagonal elements are stored
    * first in each row to allow
    * optimized access in relaxation
@@ -259,8 +277,17 @@ public:
   void reinit (const unsigned int               m,
                const unsigned int               n,
                const std::vector<unsigned int> &row_lengths,
+               const unsigned int chunk_size);
+
+  /**
+   * @deprecated This function is deprecated. Use the function
+   * without the last argument
+   */
+  void reinit (const unsigned int               m,
+               const unsigned int               n,
+               const std::vector<unsigned int> &row_lengths,
                const unsigned int chunk_size,
-               const bool optimize_diagonal = true);
+               const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Same as above, but with a
@@ -269,8 +296,17 @@ public:
   void reinit (const unsigned int               m,
                const unsigned int               n,
                const VectorSlice<const std::vector<unsigned int> > &row_lengths,
+               const unsigned int chunk_size);
+
+  /**
+   * @deprecated This function is deprecated. Use the function
+   * without the last argument
+   */
+  void reinit (const unsigned int               m,
+               const unsigned int               n,
+               const VectorSlice<const std::vector<unsigned int> > &row_lengths,
                const unsigned int chunk_size,
-               const bool optimize_diagonal = true);
+               const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * This function compresses the sparsity
@@ -437,8 +473,19 @@ public:
                   const unsigned int    n_cols,
                   const ForwardIterator begin,
                   const ForwardIterator end,
+                  const unsigned int chunk_size);
+
+   /**
+    * @deprecated This function is deprecated. Use the function
+    * without the last argument
+    */
+  template <typename ForwardIterator>
+  void copy_from (const unsigned int    n_rows,
+                  const unsigned int    n_cols,
+                  const ForwardIterator begin,
+                  const ForwardIterator end,
                   const unsigned int chunk_size,
-                  const bool optimize_diagonal = true);
+                  const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Copy data from an object of type
@@ -451,8 +498,16 @@ public:
    */
   template <typename SparsityType>
   void copy_from (const SparsityType &csp,
+                  const unsigned int  chunk_size);
+
+  /**
+   * @deprecated This function is deprecated. Use the function
+   * without the last argument
+   */
+  template <typename SparsityType>
+  void copy_from (const SparsityType &csp,
                   const unsigned int  chunk_size,
-                  const bool          optimize_diagonal = true);
+                  const bool          optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Take a full matrix and use its
@@ -467,8 +522,16 @@ public:
    */
   template <typename number>
   void copy_from (const FullMatrix<number> &matrix,
+                  const unsigned int chunk_size);
+
+  /**
+   * @deprecated This function is deprecated. Use the function
+   * without the last argument
+   */
+  template <typename number>
+  void copy_from (const FullMatrix<number> &matrix,
                   const unsigned int chunk_size,
-                  const bool optimize_diagonal = true);
+                  const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Return whether the object is empty. It
@@ -578,62 +641,23 @@ public:
   bool is_compressed () const;
 
   /**
-   * Determine whether the matrix
-   * uses special convention for
-   * quadratic matrices.
+   * Determine whether the matrix uses the special convention for quadratic
+   * matrices that the diagonal entries are stored first in each row.
    *
-   * A return value <tt>true</tt> means
-   * that diagonal elements are stored
-   * first in each row. A number of
-   * functions in this class and the
-   * library in general, for example
-   * relaxation methods like Jacobi() and
-   * SOR(), require this to make their
-   * operations more efficient, since they
-   * need to quickly access the diagonal
-   * elements and do not have to search for
-   * them if they are the first element of
-   * each row. A side effect of this scheme
-   * is that each row contains at least one
-   * element, even if the row is empty
-   * (i.e. the diagonal element exists, but
-   * has value zero).
-   *
-   * A return value <tt>false</tt> means
-   * that diagonal elements are stored
-   * anywhere in the row, or not at all. In
-   * particular, a row or even the whole
-   * matrix may be empty. This can be used
-   * if you have block matrices where the
-   * off-diagonal blocks are quadratic but
-   * are never used for operations like the
-   * ones mentioned above. In this case,
-   * some memory can be saved by not using
-   * the diagonal storage optimization.
+   * @deprecated The function always returns true if the matrix is
+   * square and false if it is not.
    */
-  bool optimize_diagonal () const;
+  bool optimize_diagonal () const DEAL_II_DEPRECATED;
 
   /**
-   * Return whether this object stores only
-   * those entries that have been added
-   * explicitly, or if the sparsity pattern
-   * contains elements that have been added
-   * through other means (implicitly) while
-   * building it. For the current class,
-   * the result is false because we store
-   * entire chunks, not individual
-   * elements, and adding one entry to the
-   * sparsity pattern requires also adding
-   * all the other elements of a chunk. The
-   * only exception is if
-   * <code>chunk_size==1</code>, the
-   * sparsity pattern is nonsymmetric or
-   * optimize_diag has been set to false.
+   * Return whether this object stores only those entries that have been added
+   * explicitly, or if the sparsity pattern contains elements that have been
+   * added through other means (implicitly) while building it. For the current
+   * class, the result is true if and only if it is square because it then
+   * unconditionally stores the diagonal entries whether they have been added explicitly or not.
    *
-   * This function mainly serves the
-   * purpose of describing the current
-   * class in cases where several kinds of
-   * sparsity patterns can be passed as
+   * This function mainly serves the purpose of describing the current class
+   * in cases where several kinds of sparsity patterns can be passed as
    * template arguments.
    */
   bool stores_only_added_elements () const;
@@ -771,16 +795,6 @@ public:
    */
   DeclException0 (ExcInvalidConstructorCall);
   /**
-   * This exception is thrown if
-   * the matrix does not follow the
-   * convention of storing diagonal
-   * elements first in row. Refer
-   * to
-   * SparityPattern::optimize_diagonal()
-   * for more information.
-   */
-  DeclException0 (ExcDiagonalNotOptimized);
-  /**
    * Exception
    */
   DeclException2 (ExcIteratorRange,
@@ -896,7 +910,20 @@ ChunkSparsityPattern::copy_from (const unsigned int    n_rows,
                                  const ForwardIterator begin,
                                  const ForwardIterator end,
                                  const unsigned int    chunk_size,
-                                 const bool optimize_diag)
+                                 const bool)
+{
+  copy_from (n_rows, n_cols, begin, end, chunk_size);
+}
+
+
+
+template <typename ForwardIterator>
+void
+ChunkSparsityPattern::copy_from (const unsigned int    n_rows,
+                                 const unsigned int    n_cols,
+                                 const ForwardIterator begin,
+                                 const ForwardIterator end,
+                                 const unsigned int    chunk_size)
 {
   Assert (static_cast<unsigned int>(std::distance (begin, end)) == n_rows,
           ExcIteratorRange (std::distance (begin, end), n_rows));
@@ -911,7 +938,7 @@ ChunkSparsityPattern::copy_from (const unsigned int    n_rows,
   // bother to check whether that
   // diagonal entry is in a certain
   // row or not
-  const bool is_square = optimize_diag && (n_rows == n_cols);
+  const bool is_square = (n_rows == n_cols);
   std::vector<unsigned int> row_lengths;
   row_lengths.reserve(n_rows);
   for (ForwardIterator i=begin; i!=end; ++i)
