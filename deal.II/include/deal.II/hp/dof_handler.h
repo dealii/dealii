@@ -378,7 +378,7 @@ namespace hp
      * DoFs which are constrained by
      * hanging nodes, see @ref constraints.
      */
-   types::global_dof_index  n_dofs () const;
+   types::global_dof_index n_dofs () const;
 
     /**
     * The number of multilevel
@@ -389,7 +389,7 @@ namespace hp
     * numbers::invalid_unsigned
     * int independent of its argument.
     */
-    types::global_dof_index int n_dofs(const unsigned int level) const;
+    types::global_dof_index n_dofs(const unsigned int level) const;
 
     /**
      * Return the number of degrees of freedom
@@ -912,7 +912,7 @@ namespace hp
 
   template <int dim, int spacedim>
   inline
-  unsigned int
+  types::global_dof_index
   DoFHandler<dim,spacedim>::n_dofs (const unsigned int) const
   {
     return numbers::invalid_unsigned_int;
@@ -920,7 +920,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  unsigned int
+  types::global_dof_index
   DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
   {
     return number_cache.n_locally_owned_dofs;
@@ -936,7 +936,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  const std::vector<unsigned int> &
+  const std::vector<types::global_dof_index> &
   DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
   {
     return number_cache.n_locally_owned_dofs_per_processor;

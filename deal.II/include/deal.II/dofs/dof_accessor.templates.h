@@ -2681,7 +2681,7 @@ namespace internal
                            dofs_per_line   = accessor.get_fe().dofs_per_line,
                            dofs_per_cell   = accessor.get_fe().dofs_per_cell;
 
-        Assert (dof_indices.size() == dofs_per_cell,
+        Assert (local_dof_indices.size() == dofs_per_cell,
                 ExcInternalError());
 
         unsigned int index = 0;
@@ -2689,9 +2689,9 @@ namespace internal
         for (unsigned int vertex=0; vertex<2; ++vertex)
           for (unsigned int d=0; d<dofs_per_vertex; ++d, ++index)
             accessor.set_vertex_dof_index(vertex,d,
-                                          dof_indices[index]);
+                                          local_dof_indices[index]);
         for (unsigned int d=0; d<dofs_per_line; ++d, ++index)
-          accessor.dof_index(d, dof_indices[index]);
+          accessor.dof_index(d, local_dof_indices[index]);
 
         Assert (index == dofs_per_cell,
                 ExcInternalError());
@@ -2750,7 +2750,7 @@ namespace internal
                            dofs_per_hex    = accessor.get_fe().dofs_per_hex,
                            dofs_per_cell   = accessor.get_fe().dofs_per_cell;
 
-        Assert (dof_indices.size() == dofs_per_cell,
+        Assert (local_dof_indices.size() == dofs_per_cell,
                 ExcInternalError());
 
         unsigned int index = 0;
@@ -2758,7 +2758,7 @@ namespace internal
         for (unsigned int vertex=0; vertex<8; ++vertex)
           for (unsigned int d=0; d<dofs_per_vertex; ++d, ++index)
             accessor.set_vertex_dof_index(vertex,d,
-                                          dof_indices[index]);
+                                          local_dof_indices[index]);
         // now copy dof numbers into the line. for
         // lines with the wrong orientation, we have
         // already made sure that we're ok by picking
@@ -2775,7 +2775,7 @@ namespace internal
             accessor.line(line)->set_dof_index(accessor.dof_handler->get_fe().
                                                adjust_line_dof_index_for_line_orientation(d,
                                                    accessor.line_orientation(line)),
-                                               dof_indices[index]);
+                                               local_dof_indices[index]);
         // now copy dof numbers into the face. for
         // faces with the wrong orientation, we
         // have already made sure that we're ok by
@@ -2796,9 +2796,9 @@ namespace internal
                                                    accessor.face_orientation(quad),
                                                    accessor.face_flip(quad),
                                                    accessor.face_rotation(quad)),
-                                               dof_indices[index]);
+                                               local_dof_indices[index]);
         for (unsigned int d=0; d<dofs_per_hex; ++d, ++index)
-          accessor.set_dof_index(d, dof_indices[index]);
+          accessor.set_dof_index(d, local_dof_indices[index]);
 
         Assert (index == dofs_per_cell,
                 ExcInternalError());

@@ -311,8 +311,6 @@ public:
    */
   virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe);
 
-  virtual void distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe, const types::global_dof_index offset = 0);
-
   /**
    * Distribute multigrid degrees of freedom similar
    * to distribute_dofs() but on each level.
