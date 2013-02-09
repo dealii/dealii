@@ -149,7 +149,7 @@ void MixedElastoPlasticity<dim>::assemble_system()
 	const unsigned int dofs_per_cell = fe.dofs_per_cell;
 	deallog << "dofs_per_cell: " << fe.dofs_per_cell << std::endl;
 
-	std::vector<unsigned int> local_dof_indices(dofs_per_cell);
+	std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
 	const FEValuesExtractors::SymmetricTensor<2> stress(0);
 	const FEValuesExtractors::Scalar gamma(n_stress_components);

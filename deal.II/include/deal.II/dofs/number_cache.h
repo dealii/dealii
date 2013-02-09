@@ -55,7 +55,7 @@ namespace internal
        * processors that may
        * participate on this mesh.
        */
-      unsigned int n_global_dofs;
+      types::global_dof_index n_global_dofs;
 
       /**
        * Number of dofs owned by
@@ -64,7 +64,7 @@ namespace internal
        * computation, then this
        * equals n_global_dofs.
        */
-      unsigned int n_locally_owned_dofs;
+      types::global_dof_index n_locally_owned_dofs;
 
       /**
        * An index set denoting the
@@ -86,7 +86,7 @@ namespace internal
        * element equal to
        * n_global_dofs.
        */
-      std::vector<unsigned int> n_locally_owned_dofs_per_processor;
+      std::vector<types::global_dof_index> n_locally_owned_dofs_per_processor;
 
       /**
        * The dofs owned by each of

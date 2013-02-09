@@ -84,7 +84,7 @@ void EvaluateDerivative (DoFHandler<2> *dof_handler,
     double err_l2 = 0,
       err_hdiv = 0;
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     for (; cell!=endc; ++cell)
     {

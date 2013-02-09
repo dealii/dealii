@@ -49,7 +49,7 @@ DEAL_II_NAMESPACE_OPEN
  * shared memory. However, some other part of this work may need to be
  * synchronised and be done in order. In the example of assembling a matrix,
  * the computation of local contributions can be done entirely in parallel,
- * but copying the the local contributions into the global matrix requires
+ * but copying the local contributions into the global matrix requires
  * some care: First, several threads can't write at the same time, but need to
  * synchronise writing using a mutex; secondly, we want the order in which
  * local contributions are added to the global matrix to be always the same

@@ -290,7 +290,7 @@ void LaplaceProblem<dim>::assemble_reference ()
   FullMatrix<double>   cell_matrix;
   Vector<double>       cell_rhs;
 
-  std::vector<unsigned int> local_dof_indices;
+  std::vector<types::global_dof_index> local_dof_indices;
   
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -370,7 +370,7 @@ void LaplaceProblem<dim>::assemble_test_1 ()
   FullMatrix<double>   cell_matrix;
   Vector<double>       cell_rhs;
 
-  std::vector<unsigned int> local_dof_indices;
+  std::vector<types::global_dof_index> local_dof_indices;
   
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -443,7 +443,7 @@ void LaplaceProblem<dim>::assemble_test_2 ()
   FullMatrix<double>   cell_matrix;
   Vector<double>       cell_rhs;
 
-  std::vector<unsigned int> local_dof_indices;
+  std::vector<types::global_dof_index> local_dof_indices;
   
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),

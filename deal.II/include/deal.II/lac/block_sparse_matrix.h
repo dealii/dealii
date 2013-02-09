@@ -204,7 +204,7 @@ public:
    * Return the number of entries
    * in a specific row.
    */
-  unsigned int get_row_length (const unsigned int row) const;
+  unsigned int get_row_length (const types::global_dof_index row) const;
 
   /**
    * Return the number of nonzero

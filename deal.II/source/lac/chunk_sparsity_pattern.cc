@@ -42,8 +42,8 @@ ChunkSparsityPattern::ChunkSparsityPattern (const ChunkSparsityPattern &s)
 
 
 
-ChunkSparsityPattern::ChunkSparsityPattern (const unsigned int m,
-                                            const unsigned int n,
+ChunkSparsityPattern::ChunkSparsityPattern (const types::global_dof_index m,
+                                            const types::global_dof_index n,
                                             const unsigned int max_per_row,
                                             const unsigned int chunk_size,
                                             const bool optimize_diag)
@@ -56,8 +56,8 @@ ChunkSparsityPattern::ChunkSparsityPattern (const unsigned int m,
 
 
 ChunkSparsityPattern::ChunkSparsityPattern (
-  const unsigned int m,
-  const unsigned int n,
+  const types::global_dof_index m,
+  const types::global_dof_index n,
   const std::vector<unsigned int> &row_lengths,
   const unsigned int chunk_size,
   const bool optimize_diag)
@@ -69,9 +69,9 @@ ChunkSparsityPattern::ChunkSparsityPattern (
 
 
 
-ChunkSparsityPattern::ChunkSparsityPattern (const unsigned int n,
-                                            const unsigned int max_per_row,
-                                            const unsigned int chunk_size)
+ChunkSparsityPattern::ChunkSparsityPattern (const types::global_dof_index n,
+                                            const unsigned int            max_per_row,
+                                            const unsigned int            chunk_size)
 {
   reinit (n, n, max_per_row, chunk_size, true);
 }
@@ -79,7 +79,7 @@ ChunkSparsityPattern::ChunkSparsityPattern (const unsigned int n,
 
 
 ChunkSparsityPattern::ChunkSparsityPattern (
-  const unsigned int               m,
+  const types::global_dof_index m,
   const std::vector<unsigned int> &row_lengths,
   const unsigned int chunk_size,
   const bool optimize_diag)
@@ -112,8 +112,8 @@ ChunkSparsityPattern::operator = (const ChunkSparsityPattern &s)
 
 
 void
-ChunkSparsityPattern::reinit (const unsigned int m,
-                              const unsigned int n,
+ChunkSparsityPattern::reinit (const types::global_dof_index m,
+                              const types::global_dof_index n,
                               const unsigned int max_per_row,
                               const unsigned int chunk_size,
                               const bool optimize_diag)
@@ -130,8 +130,8 @@ ChunkSparsityPattern::reinit (const unsigned int m,
 
 void
 ChunkSparsityPattern::reinit (
-  const unsigned int m,
-  const unsigned int n,
+  const types::global_dof_index m,
+  const types::global_dof_index n,
   const VectorSlice<const std::vector<unsigned int> > &row_lengths,
   const unsigned int chunk_size,
   const bool optimize_diag)
@@ -253,8 +253,8 @@ void ChunkSparsityPattern::copy_from (const FullMatrix<number> &matrix,
 
 void
 ChunkSparsityPattern::reinit (
-  const unsigned int m,
-  const unsigned int n,
+  const types::global_dof_index m,
+  const types::global_dof_index n,
   const std::vector<unsigned int> &row_lengths,
   const unsigned int chunk_size,
   const bool optimize_diag)
@@ -283,8 +283,8 @@ ChunkSparsityPattern::max_entries_per_row () const
 
 
 void
-ChunkSparsityPattern::add (const unsigned int i,
-                           const unsigned int j)
+ChunkSparsityPattern::add (const types::global_dof_index i,
+                           const types::global_dof_index j)
 {
   Assert (i<rows, ExcInvalidIndex(i,rows));
   Assert (j<cols, ExcInvalidIndex(j,cols));
@@ -294,8 +294,8 @@ ChunkSparsityPattern::add (const unsigned int i,
 
 
 bool
-ChunkSparsityPattern::exists (const unsigned int i,
-                              const unsigned int j) const
+ChunkSparsityPattern::exists (const types::global_dof_index i,
+                              const types::global_dof_index j) const
 {
   Assert (i<rows, ExcIndexRange(i,0,rows));
   Assert (j<cols, ExcIndexRange(j,0,cols));
@@ -307,7 +307,7 @@ ChunkSparsityPattern::exists (const unsigned int i,
 
 
 unsigned int
-ChunkSparsityPattern::row_length (const unsigned int i) const
+ChunkSparsityPattern::row_length (const types::global_dof_index i) const
 {
   Assert (i<rows, ExcIndexRange(i,0,rows));
 

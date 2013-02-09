@@ -1337,7 +1337,7 @@ namespace FETools
     typename DH2<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active(),
                                                      endc2 = dof2.end();
 
-    std::vector<unsigned int> dofs;
+    std::vector<types::global_dof_index> dofs;
     dofs.reserve (DoFTools::max_dofs_per_cell (dof2));
 
     u2 = 0;
@@ -1431,7 +1431,7 @@ namespace FETools
     // for parallel vectors check,
     // if this component is owned by
     // this processor.
-    for (unsigned int i=0; i<dof2.n_dofs(); ++i)
+    for (types::global_dof_index i=0; i<dof2.n_dofs(); ++i)
       if (locally_owned_dofs.is_element(i))
         {
           Assert(touch_count(i)!=0, ExcInternalError());
@@ -1828,7 +1828,7 @@ namespace FETools
 
     Vector<double> u1_local(n1);
     Vector<double> u2_local(n2);
-    std::vector<unsigned int> dofs(n2);
+    std::vector<types::global_dof_index> dofs(n2);
 
     FullMatrix<double> matrix(n2,n1);
     get_projection_matrix(dof1.get_fe(), dof2.get_fe(), matrix);

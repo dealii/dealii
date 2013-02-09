@@ -101,8 +101,8 @@ public:
    *  use blocks of different
    *  sizes.
    */
-  explicit BlockVector (const unsigned int num_blocks = 0,
-                        const unsigned int block_size = 0);
+  explicit BlockVector (const unsigned int            num_blocks = 0,
+                        const types::global_dof_index block_size = 0);
 
   /**
    * Copy-Constructor. Dimension set to
@@ -157,7 +157,7 @@ public:
    * <tt>block_sizes[i]</tt> zero
    * elements.
    */
-  BlockVector (const std::vector<unsigned int> &block_sizes);
+  BlockVector (const std::vector<types::global_dof_index> &block_sizes);
 
   /**
    * Constructor. Initialize vector
@@ -271,7 +271,7 @@ public:
    * is filled with zeros.
    */
   void reinit (const unsigned int num_blocks,
-               const unsigned int block_size = 0,
+               const types::global_dof_index block_size = 0,
                const bool fast = false);
 
   /**
@@ -305,8 +305,8 @@ public:
    * since they may be routed to
    * the wrong block.
    */
-  void reinit (const std::vector<unsigned int> &N,
-               const bool                       fast=false);
+  void reinit (const std::vector<types::global_dof_index> &N,
+               const bool                                 fast=false);
 
   /**
    * Reinitialize the BlockVector

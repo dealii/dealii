@@ -408,7 +408,7 @@ private:
    * and stores all dof indices
    * of the cells that'll be refined
    */
-  std::vector<std::vector<unsigned int> > indices_on_cell;
+  std::vector<std::vector<types::global_dof_index> > indices_on_cell;
 
   /**
    * All cell data (the dof indices and

@@ -77,7 +77,7 @@ namespace internal
        * times
        * selected_fe.dofs_per_cell.
        */
-      std::vector<unsigned int> cell_dof_indices_cache;
+      std::vector<types::global_dof_index> cell_dof_indices_cache;
 
       /**
        * The object containing dof-indices

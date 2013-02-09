@@ -290,7 +290,7 @@ public:
    * matrix is of dimension
    * $m \times n$.
    */
-  unsigned int m () const;
+  types::global_dof_index m () const;
 
   /**
    * Return the dimension of the
@@ -298,7 +298,7 @@ public:
    * matrix is of dimension
    * $m \times n$.
    */
-  unsigned int n () const;
+  types::global_dof_index n () const;
 
   /**
    * Return the number of nonzero
@@ -361,8 +361,8 @@ public:
    * is allowed to store zero
    * values in non-existent fields.
    */
-  void set (const unsigned int i,
-            const unsigned int j,
+  void set (const types::global_dof_index i,
+            const types::global_dof_index j,
             const number value);
 
   /**
@@ -374,8 +374,8 @@ public:
    * is allowed to store zero
    * values in non-existent fields.
    */
-  void add (const unsigned int i,
-            const unsigned int j,
+  void add (const types::global_dof_index i,
+            const types::global_dof_index j,
             const number value);
 
   /**
@@ -574,8 +574,8 @@ public:
    * tailored better to a sparse matrix
    * structure.
    */
-  number operator () (const unsigned int i,
-                      const unsigned int j) const;
+  number operator () (const types::global_dof_index i,
+                      const types::global_dof_index j) const;
 
   /**
    * This function is mostly like
@@ -601,8 +601,8 @@ public:
    * tailored better to a sparse matrix
    * structure.
    */
-  number el (const unsigned int i,
-             const unsigned int j) const;
+  number el (const types::global_dof_index i,
+             const types::global_dof_index j) const;
 
   /**
    * Return the main diagonal
@@ -621,14 +621,14 @@ public:
    * involve searching for the
    * right column number.
    */
-  number diag_element (const unsigned int i) const;
+  number diag_element (const types::global_dof_index i) const;
 
   /**
    * Same as above, but return a
    * writeable reference. You're
    * sure you know what you do?
    */
-  number &diag_element (const unsigned int i);
+  number &diag_element (const types::global_dof_index i);
 
 //@}
   /**
@@ -1209,8 +1209,8 @@ private:
    * Return the location of entry
    * $(i,j)$ within the val array.
    */
-  unsigned int compute_location (const unsigned int i,
-                                 const unsigned int j) const;
+  unsigned int compute_location (const types::global_dof_index i,
+                                 const types::global_dof_index j) const;
 
   // make all other sparse matrices
   // friends
@@ -1226,7 +1226,7 @@ private:
 
 template <typename number>
 inline
-unsigned int ChunkSparseMatrix<number>::m () const
+types::global_dof_index ChunkSparseMatrix<number>::m () const
 {
   Assert (cols != 0, ExcNotInitialized());
   return cols->rows;
@@ -1235,7 +1235,7 @@ unsigned int ChunkSparseMatrix<number>::m () const
 
 template <typename number>
 inline
-unsigned int ChunkSparseMatrix<number>::n () const
+types::global_dof_index ChunkSparseMatrix<number>::n () const
 {
   Assert (cols != 0, ExcNotInitialized());
   return cols->cols;
@@ -1246,8 +1246,8 @@ unsigned int ChunkSparseMatrix<number>::n () const
 template <typename number>
 inline
 unsigned int
-ChunkSparseMatrix<number>::compute_location (const unsigned int i,
-                                             const unsigned int j) const
+ChunkSparseMatrix<number>::compute_location (const types::global_dof_index i,
+                                             const types::global_dof_index j) const
 {
   const unsigned int chunk_size = cols->get_chunk_size();
   const unsigned int chunk_index
@@ -1268,8 +1268,8 @@ ChunkSparseMatrix<number>::compute_location (const unsigned int i,
 
 template <typename number>
 inline
-void ChunkSparseMatrix<number>::set (const unsigned int i,
-                                     const unsigned int j,
+void ChunkSparseMatrix<number>::set (const types::global_dof_index i,
+                                     const types::global_dof_index j,
                                      const number value)
 {
 
@@ -1293,8 +1293,8 @@ void ChunkSparseMatrix<number>::set (const unsigned int i,
 
 template <typename number>
 inline
-void ChunkSparseMatrix<number>::add (const unsigned int i,
-                                     const unsigned int j,
+void ChunkSparseMatrix<number>::add (const types::global_dof_index i,
+                                     const types::global_dof_index j,
                                      const number value)
 {
 
@@ -1399,8 +1399,8 @@ ChunkSparseMatrix<number>::operator /= (const number factor)
 
 template <typename number>
 inline
-number ChunkSparseMatrix<number>::operator () (const unsigned int i,
-                                               const unsigned int j) const
+number ChunkSparseMatrix<number>::operator () (const types::global_dof_index i,
+                                               const types::global_dof_index j) const
 {
   Assert (cols != 0, ExcNotInitialized());
   AssertThrow (compute_location(i,j) != SparsityPattern::invalid_entry,
@@ -1412,8 +1412,8 @@ number ChunkSparseMatrix<number>::operator () (const unsigned int i,
 
 template <typename number>
 inline
-number ChunkSparseMatrix<number>::el (const unsigned int i,
-                                      const unsigned int j) const
+number ChunkSparseMatrix<number>::el (const types::global_dof_index i,
+                                      const types::global_dof_index j) const
 {
   Assert (cols != 0, ExcNotInitialized());
   const unsigned int index = compute_location(i,j);
@@ -1428,7 +1428,7 @@ number ChunkSparseMatrix<number>::el (const unsigned int i,
 
 template <typename number>
 inline
-number ChunkSparseMatrix<number>::diag_element (const unsigned int i) const
+number ChunkSparseMatrix<number>::diag_element (const types::global_dof_index i) const
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (cols->optimize_diagonal(),  ExcNotQuadratic());
@@ -1451,7 +1451,7 @@ number ChunkSparseMatrix<number>::diag_element (const unsigned int i) const
 
 template <typename number>
 inline
-number &ChunkSparseMatrix<number>::diag_element (const unsigned int i)
+number &ChunkSparseMatrix<number>::diag_element (const types::global_dof_index i)
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (cols->optimize_diagonal(),  ExcNotQuadratic());

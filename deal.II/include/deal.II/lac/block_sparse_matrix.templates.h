@@ -128,7 +128,7 @@ BlockSparseMatrix<number>::empty () const
 
 template <typename number>
 unsigned int
-BlockSparseMatrix<number>::get_row_length (const unsigned int row) const
+BlockSparseMatrix<number>::get_row_length (const types::global_dof_index row) const
 {
   return sparsity_pattern->row_length(row);
 }

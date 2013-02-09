@@ -23,7 +23,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename Number>
 BlockVector<Number>::BlockVector (const unsigned int n_blocks,
-                                  const unsigned int block_size)
+                                  const types::global_dof_index block_size)
 {
   reinit (n_blocks, block_size);
 }
@@ -31,7 +31,7 @@ BlockVector<Number>::BlockVector (const unsigned int n_blocks,
 
 
 template <typename Number>
-BlockVector<Number>::BlockVector (const std::vector<unsigned int> &n)
+BlockVector<Number>::BlockVector (const std::vector<types::global_dof_index> &n)
 {
   reinit (n, false);
 }
@@ -88,18 +88,18 @@ BlockVector<Number>::BlockVector (const TrilinosWrappers::BlockVector &v)
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const unsigned int n_bl,
-                                  const unsigned int bl_sz,
-                                  const bool         fast)
+void BlockVector<Number>::reinit (const unsigned int            n_bl,
+                                  const types::global_dof_index bl_sz,
+                                  const bool                    fast)
 {
-  std::vector<unsigned int> n(n_bl, bl_sz);
+  std::vector<types::global_dof_index> n(n_bl, bl_sz);
   reinit(n, fast);
 }
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const std::vector<unsigned int> &n,
-                                  const bool                       fast)
+void BlockVector<Number>::reinit (const std::vector<types::global_dof_index> &n,
+                                  const bool                                 fast)
 {
   this->block_indices.reinit (n);
   if (this->components.size() != this->n_blocks())

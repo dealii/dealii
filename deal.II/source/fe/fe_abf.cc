@@ -290,7 +290,7 @@ FE_ABF<dim>::initialize_support_points (const unsigned int deg)
 
 // This function is the same Raviart-Thomas interpolation performed by
 // interpolate. Still, we cannot use interpolate, since it was written
-// for smooth functions. Thefunctions interpolated here are not
+// for smooth functions. The functions interpolated here are not
 // smooth, maybe even not continuous. Therefore, we must double the
 // number of quadrature points in each direction in order to integrate
 // only smooth functions.

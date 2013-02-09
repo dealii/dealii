@@ -465,6 +465,46 @@ namespace Utilities
   }
 
 
+  template <typename Integer>
+  std::vector<Integer>
+  reverse_permutation (const std::vector<Integer> &permutation)
+  {
+    const unsigned int n = permutation.size();
+
+    std::vector<Integer> out (n);
+    for (unsigned int i=0; i<n; ++i)
+      out[i] = n - 1 - permutation[i];
+
+    return out;
+  }
+
+
+
+  template <typename Integer>
+  std::vector<Integer>
+  invert_permutation (const std::vector<Integer> &permutation)
+  {
+    const unsigned int n = permutation.size();
+
+    std::vector<Integer> out (n, numbers::invalid_unsigned_int);
+
+    for (unsigned int i=0; i<n; ++i)
+      {
+        Assert (permutation[i] < n, ExcIndexRange (permutation[i], 0, n));
+        out[permutation[i]] = i;
+      }
+
+    // check that we have actually reached
+    // all indices
+    for (unsigned int i=0; i<n; ++i)
+      Assert (out[i] != numbers::invalid_unsigned_int,
+              ExcMessage ("The given input permutation had duplicate entries!"));
+
+    return out;
+  }
+
+
+
 
   namespace System
   {

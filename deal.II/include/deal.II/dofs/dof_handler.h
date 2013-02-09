@@ -135,7 +135,7 @@ namespace internal
  * respective degree of freedom shall be assigned. This number may, for
  * example, be obtained by sorting the support points of the degrees of
  * freedom in downwind direction.  Then call the
- * <tt>renumber_dofs(vector<unsigned int>)</tt> function with the array, which
+ * <tt>renumber_dofs(vector<types::global_dof_index>)</tt> function with the array, which
  * converts old into new degree of freedom indices.
  *
  *
@@ -311,6 +311,8 @@ public:
    */
   virtual void distribute_dofs (const FiniteElement<dim,spacedim> &fe);
 
+  virtual void distribute_mg_dofs (const FiniteElement<dim, spacedim> &fe, const types::global_dof_index offset = 0);
+
   /**
    * Distribute multigrid degrees of freedom similar
    * to distribute_dofs() but on each level.
@@ -425,7 +427,7 @@ public:
    * case that only one processor
    * participates in the mesh.
    */
-  void renumber_dofs (const std::vector<unsigned int> &new_numbers);
+  void renumber_dofs (const std::vector<types::global_dof_index> &new_numbers);
 
   /**
    * The same function as above, but
@@ -433,7 +435,7 @@ public:
    * single level of a multigrid hierarchy.
    */
   void renumber_dofs (const unsigned int level,
-                      const std::vector<unsigned int> &new_numbers);
+                      const std::vector<types::global_dof_index> &new_numbers);
 
   /**
    * Return the maximum number of
@@ -603,7 +605,7 @@ public:
    * DoFs which are constrained by
    * hanging nodes, see @ref constraints.
    */
-  unsigned int n_dofs () const;
+  types::global_dof_index n_dofs () const;
 
   /**
    * The (global) number of multilevel
@@ -617,13 +619,13 @@ public:
    * returns the number of
    * degrees of freedom on this level.
    */
-  unsigned int n_dofs (const unsigned int level) const;
+  types::global_dof_index n_dofs (const unsigned int level) const;
 
   /**
    * Return the number of degrees of freedom
    * located on the boundary.
    */
-  unsigned int n_boundary_dofs () const;
+  types::global_dof_index n_boundary_dofs () const;
 
   /**
    * Return the number of degrees
@@ -638,7 +640,7 @@ public:
    * @p make_boundary_sparsity_pattern
    * function.
    */
-  unsigned int
+  types::global_dof_index
   n_boundary_dofs (const FunctionMap &boundary_indicators) const;
 
   /**
@@ -649,7 +651,7 @@ public:
    * indicators under
    * consideration.
    */
-  unsigned int
+  types::global_dof_index
   n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const;
 
   /**
@@ -779,7 +781,7 @@ public:
    * then the vector has a single
    * element equal to n_dofs().
    */
-  const std::vector<unsigned int> &
+  const std::vector<types::global_dof_index> &
   n_locally_owned_dofs_per_processor () const;
 
   /**
@@ -891,7 +893,7 @@ protected:
    * degrees of freedom located at
    * vertices.
    */
-  std::vector<unsigned int>      vertex_dofs;
+  std::vector<types::global_dof_index>      vertex_dofs;
 
 
 
@@ -971,8 +973,8 @@ private:
   private:
     unsigned int coarsest_level;
     unsigned int finest_level;
-    unsigned int *indices;
-    unsigned int *indices_offset;
+    types::global_dof_index *indices;
+    types::global_dof_index *indices_offset;
 
   public:
     DeclException0 (ExcNoMemory);
@@ -980,9 +982,9 @@ private:
     ~MGVertexDoFs ();
     unsigned int get_coarsest_level () const;
     unsigned int get_finest_level () const;
-    unsigned int get_index (const unsigned int level, const unsigned int dof_number) const;
+    types::global_dof_index get_index (const unsigned int level, const unsigned int dof_number) const;
     void init (const unsigned int coarsest_level, const unsigned int finest_level, const unsigned int dofs_per_vertex);
-    void set_index (const unsigned int level, const unsigned int dof_number, const unsigned int index);
+    void set_index (const unsigned int level, const unsigned int dof_number, const types::global_dof_index index);
   };
 
   void clear_mg_space ();
@@ -995,10 +997,10 @@ private:
   void reserve_space ();
 
   template <int structdim>
-  unsigned int get_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index) const;
+  types::global_dof_index get_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index) const;
 
   template<int structdim>
-  void set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const unsigned int global_index) const;
+  void set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index) const;
 
   /**
    * Space to store the DoF numbers
@@ -1044,13 +1046,13 @@ private:
 
 #ifndef DOXYGEN
 
-template <> unsigned int DoFHandler<1>::n_boundary_dofs () const;
-template <> unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
-template <> unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &) const;
+template <> types::global_dof_index DoFHandler<1>::n_boundary_dofs () const;
+template <> types::global_dof_index DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
+template <> types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &) const;
 
-template <> void DoFHandler<1>::renumber_dofs(unsigned int,const std::vector<unsigned int>  &new_numbers);
-template <> void DoFHandler<2>::renumber_dofs(unsigned int,const std::vector<unsigned int>  &new_numbers);
-template <> void DoFHandler<3>::renumber_dofs(unsigned int,const std::vector<unsigned int>  &new_numbers);
+template <> void DoFHandler<1>::renumber_dofs(unsigned int,const std::vector<types::global_dof_index>  &new_numbers);
+template <> void DoFHandler<2>::renumber_dofs(unsigned int,const std::vector<types::global_dof_index>  &new_numbers);
+template <> void DoFHandler<3>::renumber_dofs(unsigned int,const std::vector<types::global_dof_index>  &new_numbers);
 
 
 /* ----------------------- Inline functions ---------------------------------- */
@@ -1074,7 +1076,7 @@ DoFHandler<dim,spacedim>::has_active_dofs() const
 
 template <int dim, int spacedim>
 inline
-unsigned int
+types::global_dof_index
 DoFHandler<dim,spacedim>::n_dofs () const
 {
   return number_cache.n_global_dofs;
@@ -1114,7 +1116,7 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
 }
 
 template <int dim, int spacedim>
-const std::vector<unsigned int> &
+const std::vector<types::global_dof_index> &
 DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
 {
   return number_cache.n_locally_owned_dofs_per_processor;

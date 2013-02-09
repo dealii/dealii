@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2011-2012 by the deal.II authors
+//    Copyright (C) 2011-2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -69,13 +69,13 @@ namespace internal
       /**
        * Returns a pointer to the first index in the DoF row @p row.
        */
-      const unsigned int *begin_indices (const unsigned int row) const;
+      const types::global_dof_index *begin_indices (const unsigned int row) const;
 
       /**
        * Returns a pointer to the one past the last DoF index in the row @p
        * row.
        */
-      const unsigned int *end_indices (const unsigned int row) const;
+      const types::global_dof_index *end_indices (const unsigned int row) const;
 
       /**
        * Returns the number of entries in the indices field for the given row.
@@ -106,13 +106,13 @@ namespace internal
        * Returns a pointer to the first index in the DoF row @p row for plain
        * indices (i.e., the entries where constraints are not embedded).
        */
-      const unsigned int *begin_indices_plain (const unsigned int row) const;
+      const types::global_dof_index *begin_indices_plain (const unsigned int row) const;
 
       /**
        * Returns a pointer to the one past the last DoF index in the row @p
        * row (i.e., the entries where constraints are not embedded).
        */
-      const unsigned int *end_indices_plain (const unsigned int row) const;
+      const types::global_dof_index *end_indices_plain (const unsigned int row) const;
 
       /**
        * Returns the FE index for a given finite element degree. If not in hp
@@ -265,7 +265,7 @@ namespace internal
       /**
        * Renumbers the degrees of freedom to give good access for this class.
        */
-      void renumber_dofs (std::vector<unsigned int> &renumbering);
+      void renumber_dofs (std::vector<types::global_dof_index> &renumbering);
 
       /**
        * Returns the memory consumption in bytes of this class.
@@ -304,14 +304,14 @@ namespace internal
           unsigned int> > row_starts;
 
       /**
-       * Stores the indices of the degrees of freedom for each cell. This
+       * Stores the (global) indices of the degrees of freedom for each cell. This
        * array also includes the indirect contributions from constraints,
        * which are described by the @p constraint_indicator field. Because of
        * variable lengths of rows, this would be a vector of a
        * vector. However, we use one contiguous memory region and store the
        * rowstart in the variable @p row_starts.
        */
-      std::vector<unsigned int> dof_indices;
+      std::vector<types::global_dof_index> dof_indices;
 
       /**
        * This variable describes the position of constraints in terms of the
@@ -336,13 +336,13 @@ namespace internal
        * This stores a (sorted) list of all locally owned degrees of freedom
        * that are constrained.
        */
-      std::vector<unsigned int> constrained_dofs;
+      std::vector<types::global_dof_index> constrained_dofs;
 
       /**
        * Stores the rowstart indices of the compressed row storage in the @p
-       * dof_indices_plain fields.
+       * plain_dof_indices fields.
        */
-      std::vector<unsigned int> row_starts_plain_indices;
+      std::vector<types::global_dof_index> row_starts_plain_indices;
 
       /**
        * Stores the indices of the degrees of freedom for each cell. This
@@ -352,7 +352,7 @@ namespace internal
        * contiguous memory region and store the rowstart in the variable @p
        * row_starts_plain_indices.
        */
-      std::vector<unsigned int> plain_dof_indices;
+      std::vector<types::global_dof_index> plain_dof_indices;
 
       /**
        * Stores the number of components in the DoFHandler where the indices
@@ -398,7 +398,7 @@ namespace internal
        * calling @p assign_ghosts. Then, all information is collected by the
        * partitioner.
        */
-      std::vector<unsigned int> ghost_dofs;
+      std::vector<types::global_dof_index> ghost_dofs;
     };
 
 
@@ -407,7 +407,7 @@ namespace internal
 #ifndef DOXYGEN
 
     inline
-    const unsigned int *
+      const types::global_dof_index *
     DoFInfo::begin_indices (const unsigned int row) const
     {
       AssertIndexRange (row, row_starts.size()-1);
@@ -419,7 +419,7 @@ namespace internal
 
 
     inline
-    const unsigned int *
+      const types::global_dof_index *
     DoFInfo::end_indices (const unsigned int row) const
     {
       AssertIndexRange (row, row_starts.size()-1);

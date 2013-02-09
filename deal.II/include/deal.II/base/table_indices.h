@@ -142,7 +142,7 @@ public:
 };
 
 //TODO: Remove the default arguments and trickery below and put all
-//the constructors into the class demplate
+//the constructors into the class template
 
 /**
  * Array of indices of fixed size used for the TableBase

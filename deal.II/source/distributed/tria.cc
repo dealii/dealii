@@ -3001,7 +3001,11 @@ namespace parallel
       number_cache.n_global_active_cells
         = std::accumulate (number_cache.n_locally_owned_active_cells.begin(),
                            number_cache.n_locally_owned_active_cells.end(),
-                           0);
+                           /* ensure sum is
+                              computed with
+                              correct data
+                              type:*/
+                           static_cast<types::global_dof_index>(0));
       number_cache.n_global_levels = Utilities::MPI::max(this->n_levels(), mpi_communicator);
     }
 

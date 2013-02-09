@@ -42,8 +42,8 @@ IndexSet::do_compress () const
       next = i;
       ++next;
 
-      unsigned int first_index = i->begin;
-      unsigned int last_index  = i->end;
+      types::global_dof_index first_index = i->begin;
+      types::global_dof_index last_index  = i->end;
 
       // see if we can merge any of
       // the following ranges
@@ -174,8 +174,8 @@ IndexSet::n_intervals () const
 
 
 IndexSet
-IndexSet::get_view (const unsigned int begin,
-                    const unsigned int end) const
+IndexSet::get_view (const types::global_dof_index begin,
+                    const types::global_dof_index end) const
 {
   Assert (begin <= end,
           ExcMessage ("End index needs to be larger or equal to begin index!"));
@@ -225,12 +225,15 @@ IndexSet::write(std::ostream &out) const
 void
 IndexSet::read(std::istream &in)
 {
-  unsigned int s, numranges, b, e;
+  types::global_dof_index s;
+  unsigned int numranges;
+
   in >> s >> numranges;
   ranges.clear();
   set_size(s);
   for (unsigned int i=0; i<numranges; ++i)
     {
+      types::global_dof_index b, e;
       in >> b >> e;
       add_range(b,e);
     }
@@ -255,7 +258,7 @@ IndexSet::block_write(std::ostream &out) const
 void
 IndexSet::block_read(std::istream &in)
 {
-  unsigned int size;
+  types::global_dof_index size;
   size_t n_ranges;
   in.read(reinterpret_cast<char *>(&size), sizeof(size));
   in.read(reinterpret_cast<char *>(&n_ranges), sizeof(n_ranges));
@@ -351,7 +354,7 @@ IndexSet::subtract_set (const IndexSet &other)
 }
 
 
-void IndexSet::fill_index_vector(std::vector<unsigned int> &indices) const
+void IndexSet::fill_index_vector(std::vector<types::global_dof_index> &indices) const
 {
   compress();
 
@@ -361,7 +364,7 @@ void IndexSet::fill_index_vector(std::vector<unsigned int> &indices) const
   for (std::vector<Range>::iterator it = ranges.begin();
        it != ranges.end();
        ++it)
-    for (unsigned int i=it->begin; i<it->end; ++i)
+    for (types::global_dof_index i=it->begin; i<it->end; ++i)
       indices.push_back (i);
 
   Assert (indices.size() == n_elements(), ExcInternalError());
@@ -390,7 +393,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
 #endif
   else
     {
-      std::vector<unsigned int> indices;
+      std::vector<types::global_dof_index> indices;
       fill_index_vector(indices);
 
       return Epetra_Map (-1,
@@ -417,9 +420,9 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
 std::size_t
 IndexSet::memory_consumption () const
 {
-  return MemoryConsumption::memory_consumption (ranges) +
-         MemoryConsumption::memory_consumption (is_compressed) +
-         MemoryConsumption::memory_consumption (index_space_size);
+  return (MemoryConsumption::memory_consumption (ranges) +
+          MemoryConsumption::memory_consumption (is_compressed) +
+          MemoryConsumption::memory_consumption (index_space_size));
 }
 
 

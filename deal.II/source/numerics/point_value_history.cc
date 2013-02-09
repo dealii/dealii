@@ -268,7 +268,7 @@ void PointValueHistory<dim>
     }
 
 
-  std::vector<unsigned int>
+  std::vector<types::global_dof_index>
   local_dof_indices (dof_handler->get_fe ().dofs_per_cell);
   std::vector <int> new_solution_indices;
   current_cell->get_dof_indices (local_dof_indices);
@@ -411,7 +411,7 @@ void PointValueHistory<dim>
         }
     }
 
-  std::vector<unsigned int> local_dof_indices (dof_handler->get_fe ().dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dof_handler->get_fe ().dofs_per_cell);
   for (unsigned int point = 0; point < locations.size (); point++)
     {
       current_cell[point]->get_dof_indices (local_dof_indices);

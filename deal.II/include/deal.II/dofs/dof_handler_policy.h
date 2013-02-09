@@ -81,7 +81,7 @@ namespace internal
          */
         virtual
         NumberCache
-        renumber_dofs (const std::vector<unsigned int> &new_numbers,
+        renumber_dofs (const std::vector<types::global_dof_index> &new_numbers,
                        dealii::DoFHandler<dim,spacedim> &dof_handler) const = 0;
       };
 
@@ -118,7 +118,7 @@ namespace internal
          */
         virtual
         NumberCache
-        renumber_dofs (const std::vector<unsigned int> &new_numbers,
+        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers,
                        dealii::DoFHandler<dim,spacedim> &dof_handler) const;
       };
 
@@ -156,7 +156,7 @@ namespace internal
          */
         virtual
         NumberCache
-        renumber_dofs (const std::vector<unsigned int> &new_numbers,
+        renumber_dofs (const std::vector<types::global_dof_index>  &new_numbers,
                        dealii::DoFHandler<dim,spacedim> &dof_handler) const;
       };
     }

@@ -27,8 +27,8 @@ namespace internal
 
     struct ConstraintComparator
     {
-      bool operator()(const std::pair<unsigned int,double> &p1,
-                      const std::pair<unsigned int,double> &p2) const
+      bool operator()(const std::pair<types::global_dof_index,double> &p1,
+                      const std::pair<types::global_dof_index,double> &p2) const
       {
         return p1.second < p2.second;
       }
@@ -51,12 +51,13 @@ namespace internal
        * access later on.
        */
       unsigned short
-      insert_entries (const std::vector<std::pair<unsigned int,double> > &entries);
+      insert_entries (const std::vector<std::pair<types::global_dof_index,double> > &entries);
 
-      std::vector<std::pair<unsigned int, double> > constraint_entries;
-      std::vector<unsigned int> constraint_indices;
-      std::pair<std::vector<Number>,unsigned int> next_constraint;
-      std::map<std::vector<Number>,unsigned int,FPArrayComparator<double> > constraints;
+      std::vector<std::pair<types::global_dof_index, double> > constraint_entries;
+      std::vector<types::global_dof_index> constraint_indices;
+
+      std::pair<std::vector<Number>, types::global_dof_index> next_constraint;
+      std::map<std::vector<Number>, types::global_dof_index, FPArrayComparator<double> > constraints;
     };
 
 
@@ -69,7 +70,7 @@ namespace internal
     template <typename Number>
     unsigned short
     ConstraintValues<Number>::
-    insert_entries (const std::vector<std::pair<unsigned int,double> > &entries)
+      insert_entries (const std::vector<std::pair<types::global_dof_index,double> > &entries)
     {
       next_constraint.first.resize(entries.size());
       if (entries.size() > 0)
@@ -165,7 +166,7 @@ namespace internal
 
 
     void
-    DoFInfo::read_dof_indices (const std::vector<unsigned int> &local_indices,
+      DoFInfo::read_dof_indices (const std::vector<types::global_dof_index> &local_indices,
                                const std::vector<unsigned int> &lexicographic_inv,
                                const ConstraintMatrix          &constraints,
                                const unsigned int               cell_number,
@@ -174,8 +175,8 @@ namespace internal
     {
       Assert (vector_partitioner.get() !=0, ExcInternalError());
       const unsigned int n_mpi_procs = vector_partitioner->n_mpi_processes();
-      const unsigned int first_owned = vector_partitioner->local_range().first;
-      const unsigned int last_owned  = vector_partitioner->local_range().second;
+      const types::global_dof_index first_owned = vector_partitioner->local_range().first;
+      const types::global_dof_index last_owned  = vector_partitioner->local_range().second;
       const unsigned int n_owned     = last_owned - first_owned;
       std::pair<unsigned short,unsigned short> constraint_iterator (0,0);
 
@@ -183,7 +184,7 @@ namespace internal
                                     dofs_per_cell[0] : dofs_per_cell[cell_active_fe_index[cell_number]];
       for (unsigned int i=0; i<dofs_this_cell; i++)
         {
-          unsigned int current_dof =
+	  types::global_dof_index current_dof =
             local_indices[lexicographic_inv[i]];
           const std::vector<std::pair<unsigned int,double> >
           *entries_ptr =

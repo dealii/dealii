@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -438,11 +438,11 @@ public:
    * <code>cell-@>active_fe_index</code>
    * as last argument.
    */
-  void get_dof_indices (std::vector<unsigned int> &dof_indices,
+  void get_dof_indices (std::vector<types::global_dof_index> &dof_indices,
                         const unsigned int fe_index = DH::default_fe_index) const;
 
-  void get_mg_dof_indices (const int level, std::vector<unsigned int> &dof_indices, const unsigned int fe_index = DH::default_fe_index) const;
-  void set_mg_dof_indices (const int level, const std::vector<unsigned int> &dof_indices, const unsigned int fe_index = DH::default_fe_index);
+  void get_mg_dof_indices (const int level, std::vector<types::global_dof_index> &dof_indices, const unsigned int fe_index = DH::default_fe_index) const;
+  void set_mg_dof_indices (const int level, const std::vector<types::global_dof_index> &dof_indices, const unsigned int fe_index = DH::default_fe_index);
 
   /**
    * Global DoF index of the <i>i</i>
@@ -480,11 +480,11 @@ public:
    * match the result of
    * active_fe_index().
    */
-  unsigned int vertex_dof_index (const unsigned int vertex,
-                                 const unsigned int i,
-                                 const unsigned int fe_index = DH::default_fe_index) const;
+  types::global_dof_index vertex_dof_index (const unsigned int vertex,
+                                            const unsigned int i,
+                                            const unsigned int fe_index = DH::default_fe_index) const;
 
-  unsigned int mg_vertex_dof_index (const int level, const unsigned int vertex, const unsigned int i, const unsigned int fe_index = DH::default_fe_index) const;
+  types::global_dof_index mg_vertex_dof_index (const int level, const unsigned int vertex, const unsigned int i, const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
    * Index of the <i>i</i>th degree
@@ -540,10 +540,10 @@ public:
    * degrees are defined in the interior of
    * the face.
    */
-  unsigned int dof_index (const unsigned int i,
-                          const unsigned int fe_index = DH::default_fe_index) const;
+  types::global_dof_index dof_index (const unsigned int i,
+                                     const unsigned int fe_index = DH::default_fe_index) const;
 
-  unsigned int mg_dof_index (const int level, const unsigned int i) const;
+  types::global_dof_index mg_dof_index (const int level, const unsigned int i) const;
 
   /**
    * @}
@@ -754,10 +754,10 @@ protected:
    * active_fe_index().
    */
   void set_dof_index (const unsigned int i,
-                      const unsigned int index,
+                      const types::global_dof_index index,
                       const unsigned int fe_index = DH::default_fe_index) const;
 
-  void set_mg_dof_index (const int level, const unsigned int i, const unsigned int index) const;
+  void set_mg_dof_index (const int level, const unsigned int i, const types::global_dof_index index) const;
 
   /**
    * Set the global index of the <i>i</i>
@@ -797,10 +797,10 @@ protected:
    */
   void set_vertex_dof_index (const unsigned int vertex,
                              const unsigned int i,
-                             const unsigned int index,
+                             const types::global_dof_index index,
                              const unsigned int fe_index = DH::default_fe_index) const;
 
-  void set_mg_vertex_dof_index (const int level, const unsigned int vertex, const unsigned int i, const unsigned int index, const unsigned int fe_index = DH::default_fe_index) const;
+  void set_mg_vertex_dof_index (const int level, const unsigned int vertex, const unsigned int i, const types::global_dof_index index, const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
    * Iterator classes need to be friends
@@ -1149,7 +1149,7 @@ public:
    * <code>cell-@>active_fe_index</code>
    * as last argument.
    */
-  void get_dof_indices (std::vector<unsigned int> &dof_indices,
+  void get_dof_indices (std::vector<types::global_dof_index> &dof_indices,
                         const unsigned int fe_index = AccessorData::default_fe_index) const;
 
   /**
@@ -1188,9 +1188,9 @@ public:
    * match the result of
    * active_fe_index().
    */
-  unsigned int vertex_dof_index (const unsigned int vertex,
-                                 const unsigned int i,
-                                 const unsigned int fe_index = AccessorData::default_fe_index) const;
+  types::global_dof_index vertex_dof_index (const unsigned int vertex,
+                                            const unsigned int i,
+                                            const unsigned int fe_index = AccessorData::default_fe_index) const;
 
   /**
    * Index of the <i>i</i>th degree
@@ -1246,8 +1246,8 @@ public:
    * degrees are defined in the interior of
    * the face.
    */
-  unsigned int dof_index (const unsigned int i,
-                          const unsigned int fe_index = AccessorData::default_fe_index) const;
+  types::global_dof_index dof_index (const unsigned int i,
+                                     const unsigned int fe_index = AccessorData::default_fe_index) const;
 
   /**
    * @}
@@ -1436,7 +1436,7 @@ protected:
    * active_fe_index().
    */
   void set_dof_index (const unsigned int i,
-                      const unsigned int index,
+                      const types::global_dof_index index,
                       const unsigned int fe_index = AccessorData::default_fe_index) const;
 
   /**
@@ -1477,7 +1477,7 @@ protected:
    */
   void set_vertex_dof_index (const unsigned int vertex,
                              const unsigned int i,
-                             const unsigned int index,
+                             const types::global_dof_index index,
                              const unsigned int fe_index = AccessorData::default_fe_index) const;
 
   /**
@@ -2076,7 +2076,7 @@ public:
    *
    * Examples for this use are in the implementation of DoFRenumbering.
    */
-  void dof_indices (std::vector<unsigned int> &dof_indices) const;
+  void dof_indices (std::vector<types::global_dof_index> &dof_indices) const;
 
   /**
    * @deprecated Use dof_indices() instead.
@@ -2113,13 +2113,13 @@ public:
    *
    * @deprecated Currently, this function can also be called for non-active cells, if all degrees of freedom of the FiniteElement are located in vertices. This functionality will vanish in a future release.
    */
-  void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
+  void get_dof_indices (std::vector<types::global_dof_index> &dof_indices) const;
   /**
    * @deprecated Use dof_indices() with level_cell_iterator returned from begin_mg().
    *
    * Retrieve the global indices of the degrees of freedom on this cell in the level vector associated to the level of the cell.
    */
-  void get_mg_dof_indices (std::vector<unsigned int> &dof_indices) const;
+  void get_mg_dof_indices (std::vector<types::global_dof_index> &dof_indices) const;
 
   /**
    * @}
@@ -2169,8 +2169,8 @@ public:
    * cache, if one exists for the
    * given DoF handler class.
    */
-  void set_dof_indices (const std::vector<unsigned int> &dof_indices);
-  void set_mg_dof_indices (const std::vector<unsigned int> &dof_indices);
+  void set_dof_indices (const std::vector<types::global_dof_index> &dof_indices);
+  void set_mg_dof_indices (const std::vector<types::global_dof_index> &dof_indices);
 
   /**
    * Update the cache in which we

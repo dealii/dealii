@@ -490,7 +490,7 @@ namespace LaplaceSolver
 
     FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     for (typename hp::DoFHandler<dim>::active_cell_iterator cell=begin_cell;
 	 cell!=end_cell; ++cell)
@@ -673,7 +673,7 @@ namespace LaplaceSolver
 
     Vector<double>       cell_rhs (dofs_per_cell);
     std::vector<double>  rhs_values (n_q_points);
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     typename hp::DoFHandler<dim>::active_cell_iterator
       cell = this->dof_handler.begin_active(),
@@ -1222,7 +1222,7 @@ namespace DualFunctional
     const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
 
     Vector<double> cell_rhs (dofs_per_cell);
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     double total_volume = 0;
     

@@ -498,7 +498,7 @@ interpolate (const std::vector<VECTOR> &all_in,
                          " at the same time!"));
 
   Vector<typename VECTOR::value_type> local_values;
-  std::vector<unsigned int> dofs;
+  std::vector<types::global_dof_index> dofs;
 
   typename std::map<std::pair<unsigned int, unsigned int>, Pointerstruct>::const_iterator
   pointerstruct,

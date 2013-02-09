@@ -396,7 +396,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                entry = uncondensed.begin(row);
                entry != uncondensed.end(row); ++entry)
             {
-              const unsigned int column = entry->column();
+              const types::global_dof_index column = entry->column();
 
               // end of row reached?
               // this should not
@@ -442,7 +442,7 @@ ConstraintMatrix::condense (SparseMatrix<number> &uncondensed,
                entry = uncondensed.begin(row);
                entry != uncondensed.end(row); ++entry)
             {
-              const unsigned int column = entry->column();
+              const types::global_dof_index column = entry->column();
 
               // end of row reached?
               // this should not

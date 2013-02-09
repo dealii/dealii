@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -323,9 +323,9 @@ namespace internal
          */
         template <int spacedim>
         static
-        unsigned int
+        types::global_dof_index
         distribute_dofs_on_cell (const typename dealii::hp::DoFHandler<1,spacedim>::active_cell_iterator &cell,
-                                 unsigned int          next_free_dof)
+                                 types::global_dof_index                                                 next_free_dof)
         {
           const unsigned int dim = 1;
 
@@ -368,9 +368,9 @@ namespace internal
 
         template <int spacedim>
         static
-        unsigned int
+        types::global_dof_index
         distribute_dofs_on_cell (const typename dealii::hp::DoFHandler<2,spacedim>::active_cell_iterator &cell,
-                                 unsigned int          next_free_dof)
+                                 types::global_dof_index                                                 next_free_dof)
         {
           const unsigned int dim = 2;
 
@@ -431,9 +431,9 @@ namespace internal
 
         template <int spacedim>
         static
-        unsigned int
+        types::global_dof_index
         distribute_dofs_on_cell (const typename dealii::hp::DoFHandler<3,spacedim>::active_cell_iterator &cell,
-                                 unsigned int          next_free_dof)
+                                 types::global_dof_index                                                 next_free_dof)
         {
           const unsigned int dim = 3;
 
@@ -578,7 +578,7 @@ namespace internal
                 = std::vector<unsigned int> (dof_handler.tria->n_raw_lines(level),
                                              DoFHandler<dim,spacedim>::invalid_dof_index);
 
-              unsigned int next_free_dof = 0;
+              types::global_dof_index next_free_dof = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
@@ -589,8 +589,8 @@ namespace internal
                   }
 
               dof_handler.levels[level]->dof_object.dofs
-                = std::vector<unsigned int> (next_free_dof,
-                                             DoFHandler<dim,spacedim>::invalid_dof_index);
+                = std::vector<types::global_dof_index> (next_free_dof,
+                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
             }
 
           // safety check: make sure that
@@ -603,7 +603,7 @@ namespace internal
 #ifdef DEBUG
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
-              unsigned int counter = 0;
+              types::global_dof_index counter = 0;
               for (typename DoFHandler<dim,spacedim>::cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
@@ -694,7 +694,7 @@ namespace internal
                 = std::vector<unsigned int> (dof_handler.tria->n_raw_quads(level),
                                              DoFHandler<dim,spacedim>::invalid_dof_index);
 
-              unsigned int next_free_dof = 0;
+              types::global_dof_index next_free_dof = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
@@ -705,8 +705,8 @@ namespace internal
                   }
 
               dof_handler.levels[level]->dof_object.dofs
-                = std::vector<unsigned int> (next_free_dof,
-                                             DoFHandler<dim,spacedim>::invalid_dof_index);
+                = std::vector<types::global_dof_index> (next_free_dof,
+                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
             }
 
           // safety check: make sure that
@@ -719,7 +719,7 @@ namespace internal
 #ifdef DEBUG
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
-              unsigned int counter = 0;
+              types::global_dof_index counter = 0;
               for (typename DoFHandler<dim,spacedim>::cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
@@ -845,8 +845,8 @@ namespace internal
               = std::vector<unsigned int> (dof_handler.tria->n_raw_lines(),
                                            DoFHandler<dim,spacedim>::invalid_dof_index);
             dof_handler.faces->lines.dofs
-              = std::vector<unsigned int> (n_line_slots,
-                                           DoFHandler<dim,spacedim>::invalid_dof_index);
+              = std::vector<types::global_dof_index> (n_line_slots,
+                                                      DoFHandler<dim,spacedim>::invalid_dof_index);
 
             // with the memory now
             // allocated, loop over the
@@ -1058,7 +1058,7 @@ namespace internal
                 = std::vector<unsigned int> (dof_handler.tria->n_raw_hexs(level),
                                              DoFHandler<dim,spacedim>::invalid_dof_index);
 
-              unsigned int next_free_dof = 0;
+              types::global_dof_index next_free_dof = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
@@ -1069,8 +1069,8 @@ namespace internal
                   }
 
               dof_handler.levels[level]->dof_object.dofs
-                = std::vector<unsigned int> (next_free_dof,
-                                             DoFHandler<dim,spacedim>::invalid_dof_index);
+                = std::vector<types::global_dof_index> (next_free_dof,
+                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
             }
 
           // safety check: make sure that
@@ -1083,7 +1083,7 @@ namespace internal
 #ifdef DEBUG
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
-              unsigned int counter = 0;
+              types::global_dof_index counter = 0;
               for (typename DoFHandler<dim,spacedim>::cell_iterator
                    cell=dof_handler.begin_active(level);
                    cell!=dof_handler.end_active(level); ++cell)
@@ -1213,8 +1213,8 @@ namespace internal
                   = std::vector<unsigned int> (dof_handler.tria->n_raw_quads(),
                                                DoFHandler<dim,spacedim>::invalid_dof_index);
                 dof_handler.faces->quads.dofs
-                  = std::vector<unsigned int> (n_quad_slots,
-                                               DoFHandler<dim,spacedim>::invalid_dof_index);
+                  = std::vector<types::global_dof_index> (n_quad_slots,
+                                                          DoFHandler<dim,spacedim>::invalid_dof_index);
               }
 
             // with the memory now
@@ -1703,12 +1703,12 @@ namespace hp
 
 
   template <>
-  unsigned int DoFHandler<1>::n_boundary_dofs () const
+  types::global_dof_index DoFHandler<1>::n_boundary_dofs () const
   {
     Assert (finite_elements != 0, ExcNoFESelected());
 
     DoFHandler<1,1>::cell_iterator cell;
-    unsigned int n = 0;
+    types::global_dof_index n = 0;
 
     // search left-most cell
     cell = this->begin_active();
@@ -1728,7 +1728,7 @@ namespace hp
 
 
   template <>
-  unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
+  types::global_dof_index DoFHandler<1>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
   {
     Assert (finite_elements != 0, ExcNoFESelected());
 
@@ -1741,7 +1741,7 @@ namespace hp
               ExcInvalidBoundaryIndicator());
 
     DoFHandler<1,1>::active_cell_iterator cell;
-    unsigned int n = 0;
+    types::global_dof_index n = 0;
 
     // search left-most cell
     if (boundary_indicators.find (0) != boundary_indicators.end())
@@ -1767,7 +1767,7 @@ namespace hp
 
 
   template <>
-  unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
+  types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
   {
     Assert (finite_elements != 0, ExcNoFESelected());
 
@@ -1780,7 +1780,7 @@ namespace hp
               ExcInvalidBoundaryIndicator());
 
     DoFHandler<1,1>::active_cell_iterator cell;
-    unsigned int n = 0;
+    types::global_dof_index n = 0;
 
     // search left-most cell
     if (boundary_indicators.find (0) != boundary_indicators.end())
@@ -1805,21 +1805,21 @@ namespace hp
 
 
   template <>
-  unsigned int DoFHandler<1,2>::n_boundary_dofs () const
+  types::global_dof_index DoFHandler<1,2>::n_boundary_dofs () const
   {
     Assert(false,ExcNotImplemented());
     return 0;
   }
 
   template <>
-  unsigned int DoFHandler<1,2>::n_boundary_dofs (const FunctionMap &) const
+  types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const FunctionMap &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;
   }
 
   template <>
-  unsigned int DoFHandler<1,2>::n_boundary_dofs (const std::set<types::boundary_id> &) const
+  types::global_dof_index DoFHandler<1,2>::n_boundary_dofs (const std::set<types::boundary_id> &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;
@@ -1828,21 +1828,21 @@ namespace hp
 
 
   template <>
-  unsigned int DoFHandler<1,3>::n_boundary_dofs () const
+  types::global_dof_index DoFHandler<1,3>::n_boundary_dofs () const
   {
     Assert(false,ExcNotImplemented());
     return 0;
   }
 
   template <>
-  unsigned int DoFHandler<1,3>::n_boundary_dofs (const FunctionMap &) const
+  types::global_dof_index DoFHandler<1,3>::n_boundary_dofs (const FunctionMap &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;
   }
 
   template <>
-  unsigned int DoFHandler<1,3>::n_boundary_dofs (const std::set<types::boundary_id> &) const
+  types::global_dof_index DoFHandler<1,3>::n_boundary_dofs (const std::set<types::boundary_id> &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;
@@ -1850,12 +1850,12 @@ namespace hp
 
 
   template<int dim, int spacedim>
-  unsigned int DoFHandler<dim,spacedim>::n_boundary_dofs () const
+  types::global_dof_index DoFHandler<dim,spacedim>::n_boundary_dofs () const
   {
     Assert (finite_elements != 0, ExcNoFESelected());
 
-    std::set<int> boundary_dofs;
-    std::vector<unsigned int> dofs_on_face;
+    std::set<types::global_dof_index> boundary_dofs;
+    std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
 
     // loop over all faces to check
@@ -1888,7 +1888,7 @@ namespace hp
 
 
   template<int dim, int spacedim>
-  unsigned int
+  types::global_dof_index
   DoFHandler<dim,spacedim>::n_boundary_dofs (const FunctionMap &boundary_indicators) const
   {
     Assert (finite_elements != 0, ExcNoFESelected());
@@ -1898,8 +1898,8 @@ namespace hp
     // same as above, but with
     // additional checks for set of
     // boundary indicators
-    std::set<int> boundary_dofs;
-    std::vector<unsigned int> dofs_on_face;
+    std::set<types::global_dof_index> boundary_dofs;
+    std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
@@ -1924,7 +1924,7 @@ namespace hp
 
 
   template<int dim, int spacedim>
-  unsigned int
+  types::global_dof_index
   DoFHandler<dim,spacedim>::n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const
   {
     Assert (finite_elements != 0, ExcNoFESelected());
@@ -1934,8 +1934,8 @@ namespace hp
     // same as above, but with
     // additional checks for set of
     // boundary indicators
-    std::set<int> boundary_dofs;
-    std::vector<unsigned int> dofs_on_face;
+    std::set<types::global_dof_index> boundary_dofs;
+    std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (this->get_fe ().max_dofs_per_face());
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell = this->begin_active (),
@@ -1959,7 +1959,7 @@ namespace hp
 
 
   template <>
-  unsigned int DoFHandler<2,3>::n_boundary_dofs () const
+  types::global_dof_index DoFHandler<2,3>::n_boundary_dofs () const
   {
     Assert(false,ExcNotImplemented());
     return 0;
@@ -1968,7 +1968,7 @@ namespace hp
 
 
   template <>
-  unsigned int DoFHandler<2,3>::n_boundary_dofs (const FunctionMap &) const
+  types::global_dof_index DoFHandler<2,3>::n_boundary_dofs (const FunctionMap &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;
@@ -1977,7 +1977,7 @@ namespace hp
 
 
   template <>
-  unsigned int DoFHandler<2,3>::n_boundary_dofs (const std::set<types::boundary_id> &) const
+  types::global_dof_index DoFHandler<2,3>::n_boundary_dofs (const std::set<types::boundary_id> &) const
   {
     Assert(false,ExcNotImplemented());
     return 0;
@@ -2010,7 +2010,7 @@ namespace hp
   template<int dim, int spacedim>
   void
   DoFHandler<dim,spacedim>::
-  compute_vertex_dof_identities (std::vector<unsigned int> &new_dof_indices) const
+  compute_vertex_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const
   {
     // Note: we may wish to have
     // something here similar to what
@@ -2092,13 +2092,13 @@ namespace hp
                   = *vertex_dof_identities[first_fe_index][other_fe_index];
                 for (unsigned int i=0; i<identities.size(); ++i)
                   {
-                    const unsigned int lower_dof_index
+                    const types::global_dof_index lower_dof_index
                       = dealii::internal::DoFAccessor::Implementation::
                         get_vertex_dof_index (*this,
                                               vertex_index,
                                               first_fe_index,
                                               identities[i].first);
-                    const unsigned int higher_dof_index
+                    const types::global_dof_index higher_dof_index
                       = dealii::internal::DoFAccessor::Implementation::
                         get_vertex_dof_index (*this,
                                               vertex_index,
@@ -2123,7 +2123,7 @@ namespace hp
   template <>
   void
   DoFHandler<1,1>::
-  compute_line_dof_identities (std::vector<unsigned int> &) const
+  compute_line_dof_identities (std::vector<types::global_dof_index> &) const
   {}
 
 
@@ -2131,20 +2131,20 @@ namespace hp
   template <>
   void
   DoFHandler<1,2>::
-  compute_line_dof_identities (std::vector<unsigned int> &) const
+  compute_line_dof_identities (std::vector<types::global_dof_index> &) const
   {}
 
   template <>
   void
   DoFHandler<1,3>::
-  compute_line_dof_identities (std::vector<unsigned int> &) const
+  compute_line_dof_identities (std::vector<types::global_dof_index> &) const
   {}
 
 
   template<int dim, int spacedim>
   void
   DoFHandler<dim,spacedim>::
-  compute_line_dof_identities (std::vector<unsigned int> &new_dof_indices) const
+  compute_line_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const
   {
     // we will mark lines that we
     // have already treated, so first
@@ -2262,9 +2262,9 @@ namespace hp
 
                               for (unsigned int j=0; j<(*finite_elements)[fe_index_1].dofs_per_line; ++j)
                                 {
-                                  const unsigned int master_dof_index
+                                  const types::global_dof_index master_dof_index
                                     = line->dof_index (j, fe_index_1);
-                                  const unsigned int slave_dof_index
+                                  const types::global_dof_index slave_dof_index
                                     = line->dof_index (j, fe_index_2);
 
                                   // if master dof
@@ -2349,9 +2349,9 @@ namespace hp
                         = *line_dof_identities[most_dominating_fe_index][other_fe_index];
                       for (unsigned int i=0; i<identities.size(); ++i)
                         {
-                          const unsigned int master_dof_index
+                          const types::global_dof_index master_dof_index
                             = line->dof_index (identities[i].first, most_dominating_fe_index);
-                          const unsigned int slave_dof_index
+                          const types::global_dof_index slave_dof_index
                             = line->dof_index (identities[i].second, other_fe_index);
 
                           Assert ((new_dof_indices[master_dof_index] ==
@@ -2377,25 +2377,25 @@ namespace hp
   template <>
   void
   DoFHandler<1>::
-  compute_quad_dof_identities (std::vector<unsigned int> &) const
+  compute_quad_dof_identities (std::vector<types::global_dof_index> &) const
   {}
 
   template <>
   void
   DoFHandler<1,2>::
-  compute_quad_dof_identities (std::vector<unsigned int> &) const
+  compute_quad_dof_identities (std::vector<types::global_dof_index> &) const
   {}
 
   template <>
   void
   DoFHandler<1,3>::
-  compute_quad_dof_identities (std::vector<unsigned int> &) const
+  compute_quad_dof_identities (std::vector<types::global_dof_index> &) const
   {}
 
   template <>
   void
   DoFHandler<2>::
-  compute_quad_dof_identities (std::vector<unsigned int> &) const
+  compute_quad_dof_identities (std::vector<types::global_dof_index> &) const
   {}
 
 
@@ -2403,7 +2403,7 @@ namespace hp
   template <>
   void
   DoFHandler<2,3>::
-  compute_quad_dof_identities (std::vector<unsigned int> &) const
+  compute_quad_dof_identities (std::vector<types::global_dof_index> &) const
   {}
 
 
@@ -2411,7 +2411,7 @@ namespace hp
   template<int dim, int spacedim>
   void
   DoFHandler<dim,spacedim>::
-  compute_quad_dof_identities (std::vector<unsigned int> &new_dof_indices) const
+  compute_quad_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const
   {
     // we will mark quads that we
     // have already treated, so first
@@ -2487,9 +2487,9 @@ namespace hp
                     = *quad_dof_identities[most_dominating_fe_index][other_fe_index];
                   for (unsigned int i=0; i<identities.size(); ++i)
                     {
-                      const unsigned int master_dof_index
+                      const types::global_dof_index master_dof_index
                         = quad->dof_index (identities[i].first, most_dominating_fe_index);
-                      const unsigned int slave_dof_index
+                      const types::global_dof_index slave_dof_index
                         = quad->dof_index (identities[i].second, other_fe_index);
 
                       Assert ((new_dof_indices[master_dof_index] ==
@@ -2594,7 +2594,7 @@ namespace hp
     // Step 1: distribute DoFs on all
     // active entities
     {
-      unsigned int next_free_dof = 0;
+      types::global_dof_index next_free_dof = 0;
       active_cell_iterator cell = begin_active(),
                            endc = end();
 
@@ -2616,7 +2616,7 @@ namespace hp
     // faces and other
     // lower-dimensional objects
     // where elements come together
-    std::vector<unsigned int>
+    std::vector<types::global_dof_index>
     constrained_indices (number_cache.n_global_dofs, numbers::invalid_unsigned_int);
     compute_vertex_dof_identities (constrained_indices);
     compute_line_dof_identities (constrained_indices);
@@ -2625,10 +2625,10 @@ namespace hp
     // loop over all dofs and assign
     // new numbers to those which are
     // not constrained
-    std::vector<unsigned int>
+    std::vector<types::global_dof_index>
     new_dof_indices (number_cache.n_global_dofs, numbers::invalid_unsigned_int);
-    unsigned int next_free_dof = 0;
-    for (unsigned int i=0; i<number_cache.n_global_dofs; ++i)
+    types::global_dof_index next_free_dof = 0;
+    for (types::global_dof_index i=0; i<number_cache.n_global_dofs; ++i)
       if (constrained_indices[i] == numbers::invalid_unsigned_int)
         {
           new_dof_indices[i] = next_free_dof;
@@ -2638,7 +2638,7 @@ namespace hp
     // then loop over all those that
     // are constrained and record the
     // new dof number for those:
-    for (unsigned int i=0; i<number_cache.n_global_dofs; ++i)
+    for (types::global_dof_index i=0; i<number_cache.n_global_dofs; ++i)
       if (constrained_indices[i] != numbers::invalid_unsigned_int)
         {
           Assert (new_dof_indices[constrained_indices[i]] !=
@@ -2648,7 +2648,7 @@ namespace hp
           new_dof_indices[i] = new_dof_indices[constrained_indices[i]];
         }
 
-    for (unsigned int i=0; i<number_cache.n_global_dofs; ++i)
+    for (types::global_dof_index i=0; i<number_cache.n_global_dofs; ++i)
       {
         Assert (new_dof_indices[i] != numbers::invalid_unsigned_int,
                 ExcInternalError());
@@ -2670,10 +2670,11 @@ namespace hp
       = IndexSet (number_cache.n_global_dofs);
     number_cache.locally_owned_dofs.add_range (0,
                                                number_cache.n_global_dofs);
-
+    Assert (number_cache.n_global_dofs < std::numeric_limits<unsigned int>::max (),
+            ExcMessage ("Global number of degrees of freedom is too large."));
     number_cache.n_locally_owned_dofs_per_processor
       = std::vector<unsigned int> (1,
-                                   number_cache.n_global_dofs);
+                                   (unsigned int) number_cache.n_global_dofs);
 
     number_cache.locally_owned_dofs_per_processor
       = std::vector<IndexSet> (1,
@@ -2698,7 +2699,7 @@ namespace hp
 
 
   template<int dim, int spacedim>
-  void DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<unsigned int> &new_numbers)
+  void DoFHandler<dim,spacedim>::renumber_dofs (const std::vector<types::global_dof_index> &new_numbers)
   {
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
 #ifdef DEBUG
@@ -2706,10 +2707,10 @@ namespace hp
     // consecutively numbered
     if (true)
       {
-        std::vector<unsigned int> tmp(new_numbers);
+        std::vector<types::global_dof_index> tmp(new_numbers);
         std::sort (tmp.begin(), tmp.end());
-        std::vector<unsigned int>::const_iterator p = tmp.begin();
-        unsigned int                         i = 0;
+        std::vector<types::global_dof_index>::const_iterator p = tmp.begin();
+        types::global_dof_index                              i = 0;
         for (; p!=tmp.end(); ++p, ++i)
           Assert (*p == i, ExcNewNumbersNotConsecutive(i));
       }
@@ -2723,7 +2724,7 @@ namespace hp
   template<int dim, int spacedim>
   void
   DoFHandler<dim,spacedim>::
-  renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+  renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
                           dealii::internal::int2type<0>)
   {
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
@@ -2743,7 +2744,7 @@ namespace hp
 
             for (unsigned int d=0; d<(*finite_elements)[fe_index].dofs_per_vertex; ++d)
               {
-                const unsigned int vertex_dof_index
+                const types::global_dof_index vertex_dof_index
                   = dealii::internal::DoFAccessor::Implementation::
                     get_vertex_dof_index(*this,
                                          vertex_index,
@@ -2765,7 +2766,7 @@ namespace hp
   template<int dim, int spacedim>
   void
   DoFHandler<dim,spacedim>::
-  renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+  renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
                           dealii::internal::int2type<1>)
   {
     Assert (new_numbers.size() == n_dofs(), ExcRenumberingIncomplete());
@@ -2815,7 +2816,7 @@ namespace hp
   template<>
   void
   DoFHandler<2,2>::
-  renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+  renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
                           dealii::internal::int2type<2>)
   {
     const unsigned int dim = 2;
@@ -2867,7 +2868,7 @@ namespace hp
   template<>
   void
   DoFHandler<2,3>::
-  renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+  renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
                           dealii::internal::int2type<2>)
   {
     const unsigned int dim = 2;
@@ -2918,7 +2919,7 @@ namespace hp
   template<>
   void
   DoFHandler<3,3>::
-  renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+  renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
                           dealii::internal::int2type<2>)
   {
     const unsigned int dim = 3;
@@ -2969,7 +2970,7 @@ namespace hp
   template<>
   void
   DoFHandler<3,3>::
-  renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+  renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
                           dealii::internal::int2type<3>)
   {
     const unsigned int dim = 3;
@@ -3312,7 +3313,7 @@ namespace hp
 
   template <int dim, int spacedim>
   template <int structdim>
-  unsigned int
+  types::global_dof_index
   DoFHandler<dim,spacedim>::get_dof_index (const unsigned int,
                                            const unsigned int,
                                            const unsigned int,
@@ -3330,7 +3331,7 @@ namespace hp
                                            const unsigned int,
                                            const unsigned int,
                                            const unsigned int,
-                                           const unsigned int) const
+                                           const types::global_dof_index) const
   {
     Assert (false, ExcNotImplemented());
   }
@@ -3346,7 +3347,7 @@ namespace hp
     faces = NULL;
 
     {
-      std::vector<unsigned int> tmp;
+      std::vector<types::global_dof_index> tmp;
       std::swap (vertex_dofs, tmp);
     }
 

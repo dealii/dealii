@@ -81,7 +81,7 @@ namespace DoFTools
                   "associated DoF handler objects, asking for any subdomain other "
                   "than the locally owned one does not make sense."));
 
-    std::vector<unsigned int> dofs_on_this_cell;
+    std::vector<types::global_dof_index> dofs_on_this_cell;
     dofs_on_this_cell.reserve (max_dofs_per_cell(dof));
     typename DH::active_cell_iterator cell = dof.begin_active(),
                                       endc = dof.end();
@@ -192,7 +192,7 @@ namespace DoFTools
         }
 
 
-    std::vector<unsigned int> dofs_on_this_cell(fe_collection.max_dofs_per_cell());
+    std::vector<types::global_dof_index> dofs_on_this_cell(fe_collection.max_dofs_per_cell());
     typename DH::active_cell_iterator cell = dof.begin_active(),
                                       endc = dof.end();
 
@@ -263,9 +263,9 @@ namespace DoFTools
               cell_row->get_fe().dofs_per_cell;
             const unsigned int dofs_per_cell_col =
               cell_col->get_fe().dofs_per_cell;
-            std::vector<unsigned int>
+            std::vector<types::global_dof_index>
             local_dof_indices_row(dofs_per_cell_row);
-            std::vector<unsigned int>
+            std::vector<types::global_dof_index>
             local_dof_indices_col(dofs_per_cell_col);
             cell_row->get_dof_indices (local_dof_indices_row);
             cell_col->get_dof_indices (local_dof_indices_col);
@@ -286,9 +286,9 @@ namespace DoFTools
                   cell_row_child->get_fe().dofs_per_cell;
                 const unsigned int dofs_per_cell_col =
                   cell_col->get_fe().dofs_per_cell;
-                std::vector<unsigned int>
+                std::vector<types::global_dof_index>
                 local_dof_indices_row(dofs_per_cell_row);
-                std::vector<unsigned int>
+                std::vector<types::global_dof_index>
                 local_dof_indices_col(dofs_per_cell_col);
                 cell_row_child->get_dof_indices (local_dof_indices_row);
                 cell_col->get_dof_indices (local_dof_indices_col);
@@ -310,9 +310,9 @@ namespace DoFTools
                   cell_row->get_fe().dofs_per_cell;
                 const unsigned int dofs_per_cell_col =
                   cell_col_child->get_fe().dofs_per_cell;
-                std::vector<unsigned int>
+                std::vector<types::global_dof_index>
                 local_dof_indices_row(dofs_per_cell_row);
-                std::vector<unsigned int>
+                std::vector<types::global_dof_index>
                 local_dof_indices_col(dofs_per_cell_col);
                 cell_row->get_dof_indices (local_dof_indices_row);
                 cell_col_child->get_dof_indices (local_dof_indices_col);
@@ -331,7 +331,7 @@ namespace DoFTools
   void
   make_boundary_sparsity_pattern (
     const DH                        &dof,
-    const std::vector<unsigned int> &dof_to_boundary_mapping,
+    const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
     SparsityPattern                 &sparsity)
   {
     if (DH::dimension == 1)
@@ -356,8 +356,8 @@ namespace DoFTools
 #ifdef DEBUG
     if (sparsity.n_rows() != 0)
       {
-        unsigned int max_element = 0;
-        for (std::vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
+        types::global_dof_index max_element = 0;
+        for (std::vector<types::global_dof_index>::const_iterator i=dof_to_boundary_mapping.begin();
              i!=dof_to_boundary_mapping.end(); ++i)
           if ((*i != DH::invalid_dof_index) &&
               (*i > max_element))
@@ -366,7 +366,7 @@ namespace DoFTools
       };
 #endif
 
-    std::vector<unsigned int> dofs_on_this_face;
+    std::vector<types::global_dof_index> dofs_on_this_face;
     dofs_on_this_face.reserve (max_dofs_per_face(dof));
 
     // loop over all faces to check whether they are at a boundary. note
@@ -399,7 +399,7 @@ namespace DoFTools
   void make_boundary_sparsity_pattern (
     const DH                                        &dof,
     const typename FunctionMap<DH::space_dimension>::type &boundary_indicators,
-    const std::vector<unsigned int>                 &dof_to_boundary_mapping,
+    const std::vector<types::global_dof_index>                 &dof_to_boundary_mapping,
     SparsityPattern                                 &sparsity)
   {
     if (DH::dimension == 1)
@@ -421,7 +421,7 @@ namespace DoFTools
               cell = cell->child(direction);
 
             const unsigned int dofs_per_vertex = cell->get_fe().dofs_per_vertex;
-            std::vector<unsigned int> boundary_dof_boundary_indices (dofs_per_vertex);
+            std::vector<types::global_dof_index> boundary_dof_boundary_indices (dofs_per_vertex);
 
             // next get boundary mapped dof indices of boundary dofs
             for (unsigned int i=0; i<dofs_per_vertex; ++i)
@@ -448,8 +448,8 @@ namespace DoFTools
 #ifdef DEBUG
     if (sparsity.n_rows() != 0)
       {
-        unsigned int max_element = 0;
-        for (std::vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
+        types::global_dof_index max_element = 0;
+        for (std::vector<types::global_dof_index>::const_iterator i=dof_to_boundary_mapping.begin();
              i!=dof_to_boundary_mapping.end(); ++i)
           if ((*i != DH::invalid_dof_index) &&
               (*i > max_element))
@@ -458,7 +458,7 @@ namespace DoFTools
       };
 #endif
 
-    std::vector<unsigned int> dofs_on_this_face;
+    std::vector<types::global_dof_index> dofs_on_this_face;
     dofs_on_this_face.reserve (max_dofs_per_face(dof));
     typename DH::active_cell_iterator cell = dof.begin_active(),
                                       endc = dof.end();
@@ -511,8 +511,8 @@ namespace DoFTools
                   "associated DoF handler objects, asking for any subdomain other "
                   "than the locally owned one does not make sense."));
 
-    std::vector<unsigned int> dofs_on_this_cell;
-    std::vector<unsigned int> dofs_on_other_cell;
+    std::vector<types::global_dof_index> dofs_on_this_cell;
+    std::vector<types::global_dof_index> dofs_on_other_cell;
     dofs_on_this_cell.reserve (max_dofs_per_cell(dof));
     dofs_on_other_cell.reserve (max_dofs_per_cell(dof));
     typename DH::active_cell_iterator cell = dof.begin_active(),
@@ -709,8 +709,8 @@ namespace DoFTools
       {
         const FiniteElement<DH::dimension,DH::space_dimension> &fe = dof.get_fe();
 
-        std::vector<unsigned int> dofs_on_this_cell(fe.dofs_per_cell);
-        std::vector<unsigned int> dofs_on_other_cell(fe.dofs_per_cell);
+        std::vector<types::global_dof_index> dofs_on_this_cell(fe.dofs_per_cell);
+        std::vector<types::global_dof_index> dofs_on_other_cell(fe.dofs_per_cell);
 
         const Table<2,Coupling>
         int_dof_mask  = dof_couplings_from_component_couplings(fe, int_mask),
@@ -949,8 +949,8 @@ namespace DoFTools
 
         const dealii::hp::FECollection<dim,spacedim> &fe = dof.get_fe();
 
-        std::vector<unsigned int> dofs_on_this_cell(DoFTools::max_dofs_per_cell(dof));
-        std::vector<unsigned int> dofs_on_other_cell(DoFTools::max_dofs_per_cell(dof));
+        std::vector<types::global_dof_index> dofs_on_this_cell(DoFTools::max_dofs_per_cell(dof));
+        std::vector<types::global_dof_index> dofs_on_other_cell(DoFTools::max_dofs_per_cell(dof));
 
         const std::vector<Table<2,Coupling> >
         int_dof_mask
@@ -1173,7 +1173,7 @@ namespace DoFTools
     {
       inline bool
       check_master_dof_list (const FullMatrix<double> &face_interpolation_matrix,
-                             const std::vector<unsigned int> &master_dof_list)
+                             const std::vector<types::global_dof_index> &master_dof_list)
       {
         const unsigned int N = master_dof_list.size();
 
@@ -1322,7 +1322,7 @@ namespace DoFTools
         // that base element are independent of that of the other one. this
         // latter case shows up when running hp/hp_constraints_q_system_06
 
-        std::vector<unsigned int> master_dof_list;
+        std::vector<types::global_dof_index> master_dof_list;
         unsigned int index = 0;
         for (int v=0;
              v<static_cast<signed int>(GeometryInfo<dim>::vertices_per_face);
@@ -1412,7 +1412,7 @@ namespace DoFTools
 
         // finally copy the list into the mask
         std::fill (master_dof_mask.begin(), master_dof_mask.end(), false);
-        for (std::vector<unsigned int>::const_iterator i=master_dof_list.begin();
+        for (std::vector<types::global_dof_index>::const_iterator i=master_dof_list.begin();
              i!=master_dof_list.end(); ++i)
           master_dof_mask[*i] = true;
       }
@@ -1670,8 +1670,8 @@ namespace DoFTools
        * avoid making the sparsity pattern fuller than necessary.
        */
       void
-      filter_constraints (const std::vector<unsigned int> &master_dofs,
-                          const std::vector<unsigned int> &slave_dofs,
+      filter_constraints (const std::vector<types::global_dof_index> &master_dofs,
+                          const std::vector<types::global_dof_index> &slave_dofs,
                           const FullMatrix<double> &face_constraints,
                           ConstraintMatrix &constraints)
       {
@@ -1885,8 +1885,8 @@ namespace DoFTools
 
       const unsigned int spacedim = DH::space_dimension;
 
-      std::vector<unsigned int> dofs_on_mother;
-      std::vector<unsigned int> dofs_on_children;
+      std::vector<types::global_dof_index> dofs_on_mother;
+      std::vector<types::global_dof_index> dofs_on_children;
 
       // loop over all lines; only on lines there can be constraints. We do
       // so by looping over all active cells and checking whether any of
@@ -2009,8 +2009,8 @@ namespace DoFTools
     {
       const unsigned int dim = 3;
 
-      std::vector<unsigned int> dofs_on_mother;
-      std::vector<unsigned int> dofs_on_children;
+      std::vector<types::global_dof_index> dofs_on_mother;
+      std::vector<types::global_dof_index> dofs_on_children;
 
       // loop over all quads; only on quads there can be constraints. We do
       // so by looping over all active cells and checking whether any of
@@ -2227,9 +2227,9 @@ namespace DoFTools
 
       // similarly have arrays that will hold master and slave dof numbers,
       // as well as a scratch array needed for the complicated case below
-      std::vector<unsigned int> master_dofs;
-      std::vector<unsigned int> slave_dofs;
-      std::vector<unsigned int> scratch_dofs;
+      std::vector<types::global_dof_index> master_dofs;
+      std::vector<types::global_dof_index> slave_dofs;
+      std::vector<types::global_dof_index> scratch_dofs;
 
       // caches for the face and subface interpolation matrices between
       // different (or the same) finite elements. we compute them only
@@ -2908,8 +2908,8 @@ namespace DoFTools
 
     const unsigned int dofs_per_face = fe.dofs_per_face;
 
-    std::vector<unsigned int> dofs_1(dofs_per_face);
-    std::vector<unsigned int> dofs_2(dofs_per_face);
+    std::vector<types::global_dof_index> dofs_1(dofs_per_face);
+    std::vector<types::global_dof_index> dofs_2(dofs_per_face);
 
     face_1->get_dof_indices(dofs_1, face_1_index);
     face_2->get_dof_indices(dofs_2, face_2_index);
@@ -3269,7 +3269,7 @@ namespace DoFTools
         }
 
       // then loop over all cells and do the work
-      std::vector<unsigned int> indices;
+      std::vector<types::global_dof_index> indices;
       for (typename DH::active_cell_iterator c=dof.begin_active();
            c!=dof.end(); ++ c)
         if (c->is_locally_owned())
@@ -3333,7 +3333,7 @@ namespace DoFTools
         }
 
       // then loop over all cells and do the work
-      std::vector<unsigned int> indices;
+      std::vector<types::global_dof_index> indices;
       for (typename DH::active_cell_iterator c=dof.begin_active();
            c!=dof.end(); ++ c)
         if (c->is_locally_owned())
@@ -3395,7 +3395,7 @@ namespace DoFTools
 
     typename DH::active_cell_iterator cell = dof_handler.begin_active(),
                                       endc = dof_handler.end();
-    std::vector<unsigned int> dof_indices;
+    std::vector<types::global_dof_index> dof_indices;
     dof_indices.reserve (max_dofs_per_cell(dof_handler));
 
     for (unsigned int present_cell = 0; cell!=endc; ++cell, ++present_cell)
@@ -3669,7 +3669,7 @@ namespace DoFTools
          (component_mask.n_selected_components(n_components(dof_handler)) !=
           n_components(dof_handler)));
 
-    std::vector<unsigned int> face_dof_indices;
+    std::vector<types::global_dof_index> face_dof_indices;
     face_dof_indices.reserve (max_dofs_per_face(dof_handler));
 
     // now loop over all cells and check whether their faces are at the
@@ -3771,7 +3771,7 @@ namespace DoFTools
     // clear and reset array by default values
     selected_dofs.clear ();
     selected_dofs.resize (dof_handler.n_dofs(), false);
-    std::vector<unsigned int> cell_dof_indices;
+    std::vector<types::global_dof_index> cell_dof_indices;
     cell_dof_indices.reserve (max_dofs_per_cell(dof_handler));
 
     // now loop over all cells and check whether their faces are at the
@@ -3968,7 +3968,7 @@ namespace DoFTools
     // preset all values by false
     std::fill_n (selected_dofs.begin(), dof_handler.n_dofs(), false);
 
-    std::vector<unsigned int> local_dof_indices;
+    std::vector<types::global_dof_index> local_dof_indices;
     local_dof_indices.reserve (max_dofs_per_cell(dof_handler));
 
     // this function is similar to the make_sparsity_pattern function, see
@@ -4012,8 +4012,8 @@ namespace DoFTools
     // add the DoF on the adjacent ghost cells to the IndexSet, cache them
     // in a set. need to check each dof manually because we can't be sure
     // that the dof range of locally_owned_dofs is really contiguous.
-    std::vector<unsigned int> dof_indices;
-    std::set<unsigned int> global_dof_indices;
+    std::vector<types::global_dof_index> dof_indices;
+    std::set<types::global_dof_index> global_dof_indices;
 
     typename DH::active_cell_iterator cell = dof_handler.begin_active(),
                                       endc = dof_handler.end();
@@ -4023,7 +4023,7 @@ namespace DoFTools
           dof_indices.resize(cell->get_fe().dofs_per_cell);
           cell->get_dof_indices(dof_indices);
 
-          for (std::vector<unsigned int>::iterator it=dof_indices.begin();
+          for (std::vector<types::global_dof_index>::iterator it=dof_indices.begin();
                it!=dof_indices.end();
                ++it)
             if (!dof_set.is_element(*it))
@@ -4048,8 +4048,8 @@ namespace DoFTools
     // add the DoF on the adjacent ghost cells to the IndexSet, cache them
     // in a set. need to check each dof manually because we can't be sure
     // that the dof range of locally_owned_dofs is really contiguous.
-    std::vector<unsigned int> dof_indices;
-    std::set<unsigned int> global_dof_indices;
+    std::vector<types::global_dof_index> dof_indices;
+    std::set<types::global_dof_index> global_dof_indices;
 
     typename DH::active_cell_iterator cell = dof_handler.begin_active(),
                                       endc = dof_handler.end();
@@ -4059,7 +4059,7 @@ namespace DoFTools
           dof_indices.resize(cell->get_fe().dofs_per_cell);
           cell->get_dof_indices(dof_indices);
 
-          for (std::vector<unsigned int>::iterator it=dof_indices.begin();
+          for (std::vector<types::global_dof_index>::iterator it=dof_indices.begin();
                it!=dof_indices.end();
                ++it)
             if (!dof_set.is_element(*it))
@@ -4155,7 +4155,7 @@ namespace DoFTools
     std::fill_n (subdomain_association.begin(), dof_handler.n_dofs(),
                  numbers::invalid_subdomain_id);
 
-    std::vector<unsigned int> local_dof_indices;
+    std::vector<types::global_dof_index> local_dof_indices;
     local_dof_indices.reserve (max_dofs_per_cell(dof_handler));
 
     // pseudo-randomly assign variables which lie on the interface between
@@ -4236,7 +4236,7 @@ namespace DoFTools
 
     IndexSet index_set (dof_handler.n_dofs());
 
-    std::vector<unsigned int> local_dof_indices;
+    std::vector<types::global_dof_index> local_dof_indices;
     local_dof_indices.reserve (max_dofs_per_cell(dof_handler));
 
     // first generate an unsorted list of all indices which we fill from
@@ -4244,7 +4244,7 @@ namespace DoFTools
     // that inserts indices in the middle, which is an O(n^2) algorithm and
     // hence too expensive. Could also use std::set, but that is in general
     // more expensive than a vector
-    std::vector<unsigned int> subdomain_indices;
+    std::vector<types::global_dof_index> subdomain_indices;
 
     typename DH::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -4335,7 +4335,7 @@ namespace DoFTools
                         const std::vector<unsigned char> &dofs_by_component,
                         const std::vector<unsigned int> &target_component,
                         const bool                        only_once,
-                        std::vector<unsigned int>        &dofs_per_component,
+                        std::vector<types::global_dof_index>        &dofs_per_component,
                         unsigned int                     &component)
     {
       for (unsigned int b=0; b<fe.n_base_elements(); ++b)
@@ -4376,7 +4376,7 @@ namespace DoFTools
                         const std::vector<unsigned char> &dofs_by_component,
                         const std::vector<unsigned int> &target_component,
                         const bool                        only_once,
-                        std::vector<unsigned int>        &dofs_per_component,
+                        std::vector<types::global_dof_index>        &dofs_per_component,
                         unsigned int                     &component)
     {
       // assert that all elements in the collection have the same structure
@@ -4438,7 +4438,7 @@ namespace DoFTools
   void
   count_dofs_per_component (
     const DH      &dof_handler,
-    std::vector<unsigned int> &dofs_per_component,
+    std::vector<types::global_dof_index> &dofs_per_component,
     bool only_once,
     std::vector<unsigned int>  target_component)
   {
@@ -4520,7 +4520,7 @@ namespace DoFTools
   template <class DH>
   void
   count_dofs_per_block (const DH &dof_handler,
-                        std::vector<unsigned int> &dofs_per_block,
+                        std::vector<types::global_dof_index> &dofs_per_block,
                         const std::vector<unsigned int> &target_block_)
   {
     std::vector<unsigned int>  target_block = target_block_;
@@ -4596,7 +4596,7 @@ namespace DoFTools
   template <int dim, int spacedim>
   void
   count_dofs_per_component (const DoFHandler<dim,spacedim> &dof_handler,
-                            std::vector<unsigned int>      &dofs_per_component,
+                            std::vector<types::global_dof_index>      &dofs_per_component,
                             std::vector<unsigned int>       target_component)
   {
     count_dofs_per_component (dof_handler, dofs_per_component,
@@ -4681,7 +4681,7 @@ namespace DoFTools
         dealii::Vector<double> global_parameter_representation (n_fine_dofs);
 
         typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator cell;
-        std::vector<unsigned int> parameter_dof_indices (coarse_fe.dofs_per_cell);
+        std::vector<types::global_dof_index> parameter_dof_indices (coarse_fe.dofs_per_cell);
 
         for (cell=begin; cell!=end; ++cell)
           {
@@ -4920,7 +4920,7 @@ namespace DoFTools
             // if this is an interesting dof. finally count how many true's
             // there
             std::vector<bool> dof_is_interesting (fine_grid.n_dofs(), false);
-            std::vector<unsigned int>  local_dof_indices (fine_fe.dofs_per_cell);
+            std::vector<types::global_dof_index>  local_dof_indices (fine_fe.dofs_per_cell);
 
             for (typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
                  cell=fine_grid.begin_active();
@@ -4947,7 +4947,7 @@ namespace DoFTools
 
         if (true)
           {
-            std::vector<unsigned int> local_dof_indices(fine_fe.dofs_per_cell);
+            std::vector<types::global_dof_index> local_dof_indices(fine_fe.dofs_per_cell);
             unsigned int next_free_index=0;
             for (typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator
                  cell=fine_grid.begin_active();
@@ -5279,7 +5279,7 @@ namespace DoFTools
   template <class DH>
   void
   map_dof_to_boundary_indices (const DH                  &dof_handler,
-                               std::vector<unsigned int> &mapping)
+                               std::vector<types::global_dof_index> &mapping)
   {
     Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
 
@@ -5287,7 +5287,7 @@ namespace DoFTools
     mapping.insert (mapping.end(), dof_handler.n_dofs(),
                     DH::invalid_dof_index);
 
-    std::vector<unsigned int> dofs_on_face;
+    std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (max_dofs_per_face(dof_handler));
     unsigned int next_boundary_index = 0;
 
@@ -5321,7 +5321,7 @@ namespace DoFTools
   void map_dof_to_boundary_indices (
     const DH                      &dof_handler,
     const std::set<types::boundary_id> &boundary_indicators,
-    std::vector<unsigned int>     &mapping)
+    std::vector<types::global_dof_index>     &mapping)
   {
     Assert (&dof_handler.get_fe() != 0, ExcNoFESelected());
     Assert (boundary_indicators.find (numbers::internal_face_boundary_id) == boundary_indicators.end(),
@@ -5335,7 +5335,7 @@ namespace DoFTools
     if (boundary_indicators.size() == 0)
       return;
 
-    std::vector<unsigned int> dofs_on_face;
+    std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (max_dofs_per_face(dof_handler));
     unsigned int next_boundary_index = 0;
 
@@ -5366,7 +5366,7 @@ namespace DoFTools
       void
       map_dofs_to_support_points(const hp::MappingCollection<DH::dimension, DH::space_dimension> &mapping,
                                  const DH &dof_handler,
-                                 std::map<unsigned int,Point<DH::space_dimension> > &support_points)
+                                 std::map<types::global_dof_index,Point<DH::space_dimension> >  &support_points)
       {
         const unsigned int dim = DH::dimension;
         const unsigned int spacedim = DH::space_dimension;
@@ -5396,7 +5396,7 @@ namespace DoFTools
         typename DH::active_cell_iterator cell =
           dof_handler.begin_active(), endc = dof_handler.end();
 
-        std::vector<unsigned int> local_dof_indices;
+        std::vector<types::global_dof_index> local_dof_indices;
         for (; cell != endc; ++cell)
           // only work on locally relevant cells
           if (cell->is_artificial() == false)
@@ -5423,7 +5423,7 @@ namespace DoFTools
                                  std::vector<Point<DH::space_dimension> > &support_points)
       {
         // get the data in the form of the map as above
-        std::map<unsigned int,Point<DH::space_dimension> >  x_support_points;
+        std::map<types::global_dof_index,Point<DH::space_dimension> >  x_support_points;
         map_dofs_to_support_points(mapping, dof_handler, x_support_points);
 
         // now convert from the map to the linear vector. make sure every
@@ -5488,7 +5488,7 @@ namespace DoFTools
   void
   map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping,
                               const DoFHandler<dim,spacedim>    &dof_handler,
-                              std::map<unsigned int, Point<spacedim> > &support_points)
+                              std::map<types::global_dof_index, Point<spacedim> > &support_points)
   {
     support_points.clear();
 
@@ -5506,7 +5506,7 @@ namespace DoFTools
   void
   map_dofs_to_support_points(const hp::MappingCollection<dim, spacedim> &mapping,
                              const hp::DoFHandler<dim, spacedim> &dof_handler,
-                             std::map<unsigned int, Point<spacedim> > &support_points)
+                             std::map<types::global_dof_index, Point<spacedim> > &support_points)
   {
     support_points.clear();
 
@@ -5593,7 +5593,7 @@ namespace DoFTools
             VectorTools::ExcNoComponentSelected());
 
     // a field to store the indices
-    std::vector<unsigned int> face_dofs;
+    std::vector<types::global_dof_index> face_dofs;
     face_dofs.reserve (max_dofs_per_face(dof));
 
     typename DH<dim,spacedim>::active_cell_iterator
@@ -5662,7 +5662,7 @@ namespace DoFTools
     const DH &dof_handler,
     const unsigned int level,
     const std::vector<bool> &selected_dofs,
-    unsigned int offset)
+    types::global_dof_index offset)
   {
     typename DH::level_cell_iterator cell;
     typename DH::level_cell_iterator endc = dof_handler.end(level);

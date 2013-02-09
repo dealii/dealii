@@ -147,7 +147,7 @@ namespace
 
 
 
-  // return, wheter a given @p cell will be
+  // return, whether a given @p cell will be
   // coarsened, which is the case if all
   // children are active and have their coarsen
   // flag set. In case only part of the coarsen

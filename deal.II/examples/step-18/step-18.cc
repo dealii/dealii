@@ -1050,7 +1050,7 @@ namespace Step18
     FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       cell_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     BodyForce<dim>      body_force;
     std::vector<Vector<double> > body_force_values (n_q_points,

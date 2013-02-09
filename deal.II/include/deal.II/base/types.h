@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2009, 2012 by the deal.II authors
+//    Copyright (C) 2009, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,7 +14,6 @@
 
 
 #include <deal.II/base/config.h>
-
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -52,14 +51,56 @@ namespace types
    */
   const unsigned int artificial_subdomain_id DEAL_II_DEPRECATED = static_cast<subdomain_id>(-2);
 
+//#define DEAL_II_USE_LARGE_INDEX_TYPE
+#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
   /**
-   * The type used to denote global dof
-   * indices.
+   * The type used for global indices of
+   * degrees of freedom. While in sequential
+   * computations the 4 billion indices of
+   * 32-bit unsigned integers is plenty,
+   * parallel computations using the
+   * parallel::distributed::Triangulation
+   * class can overflow this number and we
+   * need a bigger index space.
+   *
+   * The data type always indicates an
+   * unsigned integer type.
    */
-  typedef unsigned int global_dof_index;
+  // TODO: we should check that unsigned long long int
+  // has the same size as uint64_t
+  typedef unsigned long long int global_dof_index;
 
   /**
-  *  @deprecated Use numbers::invalid_dof_index
+   * An identifier that denotes the MPI type
+   * associated with types::global_dof_index.
+   */
+#  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UNSIGNED_LONG_LONG
+#else
+  /**
+   * The type used for global indices of
+   * degrees of freedom. While in sequential
+   * computations the 4 billion indices of
+   * 32-bit unsigned integers is plenty,
+   * parallel computations using the
+   * parallel::distributed::Triangulation
+   * class can overflow this number and we
+   * need a bigger index space.
+   *
+   * The data type always indicates an
+   * unsigned integer type.
+   */
+   typedef unsigned int global_dof_index;
+
+   /**
+    * An identifier that denotes the MPI type
+    * associated with types::global_dof_index.
+    */
+#  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UNSIGNED
+#endif
+
+
+  /**
+   *  @deprecated Use numbers::invalid_dof_index
    */
   const global_dof_index invalid_dof_index DEAL_II_DEPRECATED = static_cast<global_dof_index>(-1);
 
@@ -98,6 +139,7 @@ namespace types
   typedef material_id material_id_t DEAL_II_DEPRECATED;
 
 }
+
 
 // this part of the namespace numbers got moved to the bottom types.h file,
 // because otherwise we get a circular inclusion of config.h, types.h, and
@@ -196,7 +238,6 @@ namespace numbers
    * more information.
    */
   const types::subdomain_id artificial_subdomain_id = static_cast<types::subdomain_id>(-2);
-
 }
 
 

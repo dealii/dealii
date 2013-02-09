@@ -133,8 +133,8 @@ public:
    * takes effect for quadratic
    * matrices only.
    */
-  ChunkSparsityPattern (const unsigned int m,
-                        const unsigned int n,
+  ChunkSparsityPattern (const types::global_dof_index m,
+                        const types::global_dof_index n,
                         const unsigned int max_chunks_per_row,
                         const unsigned int chunk_size,
                         const bool optimize_diagonal = true);
@@ -157,8 +157,8 @@ public:
    * takes effect for quadratic
    * matrices only.
    */
-  ChunkSparsityPattern (const unsigned int               m,
-                        const unsigned int               n,
+  ChunkSparsityPattern (const types::global_dof_index m,
+                        const types::global_dof_index n,
                         const std::vector<unsigned int> &row_lengths,
                         const unsigned int chunk_size,
                         const bool optimize_diagonal = true);
@@ -176,9 +176,9 @@ public:
    * taking row and column numbers
    * separately.
    */
-  ChunkSparsityPattern (const unsigned int n,
-                        const unsigned int max_per_row,
-                        const unsigned int chunk_size);
+  ChunkSparsityPattern (const types::global_dof_index n,
+                        const unsigned int            max_per_row,
+                        const unsigned int            chunk_size);
 
   /**
    * Initialize a quadratic matrix.
@@ -194,7 +194,7 @@ public:
    * diagonal entries first in row;
    * see optimize_diagonal().
    */
-  ChunkSparsityPattern (const unsigned int               m,
+  ChunkSparsityPattern (const types::global_dof_index    m,
                         const std::vector<unsigned int> &row_lengths,
                         const unsigned int               chunk_size,
                         const bool optimize_diagonal = true);
@@ -225,8 +225,8 @@ public:
    * operations to the other
    * <tt>reinit</tt> function.
    */
-  void reinit (const unsigned int m,
-               const unsigned int n,
+  void reinit (const types::global_dof_index m,
+               const types::global_dof_index n,
                const unsigned int max_per_row,
                const unsigned int chunk_size,
                const bool optimize_diagonal = true);
@@ -256,8 +256,8 @@ public:
    * optimized access in relaxation
    * methods of SparseMatrix.
    */
-  void reinit (const unsigned int               m,
-               const unsigned int               n,
+  void reinit (const types::global_dof_index m,
+               const types::global_dof_index n,
                const std::vector<unsigned int> &row_lengths,
                const unsigned int chunk_size,
                const bool optimize_diagonal = true);
@@ -266,8 +266,8 @@ public:
    * Same as above, but with a
    * VectorSlice argument instead.
    */
-  void reinit (const unsigned int               m,
-               const unsigned int               n,
+  void reinit (const types::global_dof_index m,
+               const types::global_dof_index n,
                const VectorSlice<const std::vector<unsigned int> > &row_lengths,
                const unsigned int chunk_size,
                const bool optimize_diagonal = true);
@@ -433,8 +433,8 @@ public:
    * pairs.
    */
   template <typename ForwardIterator>
-  void copy_from (const unsigned int    n_rows,
-                  const unsigned int    n_cols,
+  void copy_from (const types::global_dof_index n_rows,
+                  const types::global_dof_index n_cols,
                   const ForwardIterator begin,
                   const ForwardIterator end,
                   const unsigned int chunk_size,
@@ -503,8 +503,8 @@ public:
    * If the entry already exists, nothing
    * bad happens.
    */
-  void add (const unsigned int i,
-            const unsigned int j);
+  void add (const types::global_dof_index i,
+            const types::global_dof_index j);
 
   /**
    * Make the sparsity pattern
@@ -524,26 +524,26 @@ public:
    * matrix, which equals the dimension
    * of the image space.
    */
-  inline unsigned int n_rows () const;
+  inline types::global_dof_index n_rows () const;
 
   /**
    * Return number of columns of this
    * matrix, which equals the dimension
    * of the range space.
    */
-  inline unsigned int n_cols () const;
+  inline types::global_dof_index n_cols () const;
 
   /**
    * Check if a value at a certain
    * position may be non-zero.
    */
-  bool exists (const unsigned int i,
-               const unsigned int j) const;
+  bool exists (const types::global_dof_index i,
+               const types::global_dof_index j) const;
 
   /**
    * Number of entries in a specific row.
    */
-  unsigned int row_length (const unsigned int row) const;
+  unsigned int row_length (const types::global_dof_index row) const;
 
   /**
    * Compute the bandwidth of the matrix
@@ -811,13 +811,13 @@ private:
    * Number of rows that this sparsity
    * structure shall represent.
    */
-  unsigned int rows;
+  types::global_dof_index rows;
 
   /**
    * Number of columns that this sparsity
    * structure shall represent.
    */
-  unsigned int cols;
+  types::global_dof_index cols;
 
   /**
    * The size of chunks.
@@ -847,7 +847,7 @@ private:
 
 
 inline
-unsigned int
+types::global_dof_index
 ChunkSparsityPattern::n_rows () const
 {
   return rows;
@@ -855,7 +855,7 @@ ChunkSparsityPattern::n_rows () const
 
 
 inline
-unsigned int
+types::global_dof_index
 ChunkSparsityPattern::n_cols () const
 {
   return cols;
@@ -891,8 +891,8 @@ ChunkSparsityPattern::optimize_diagonal () const
 
 template <typename ForwardIterator>
 void
-ChunkSparsityPattern::copy_from (const unsigned int    n_rows,
-                                 const unsigned int    n_cols,
+ChunkSparsityPattern::copy_from (const types::global_dof_index n_rows,
+                                 const types::global_dof_index n_cols,
                                  const ForwardIterator begin,
                                  const ForwardIterator end,
                                  const unsigned int    chunk_size,

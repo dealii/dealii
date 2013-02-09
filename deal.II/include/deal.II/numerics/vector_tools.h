@@ -747,7 +747,7 @@ namespace VectorTools
   interpolate_boundary_values (const Mapping<DH::dimension,DH::space_dimension>            &mapping,
                                const DH                 &dof,
                                const typename FunctionMap<DH::space_dimension>::type &function_map,
-                               std::map<unsigned int,double> &boundary_values,
+                               std::map<types::global_dof_index,double> &boundary_values,
                                const ComponentMask       &component_mask = ComponentMask());
 
   /**
@@ -767,7 +767,7 @@ namespace VectorTools
                                const DH                 &dof,
                                const types::boundary_id            boundary_component,
                                const Function<DH::space_dimension>           &boundary_function,
-                               std::map<unsigned int,double> &boundary_values,
+                               std::map<types::global_dof_index,double> &boundary_values,
                                const ComponentMask       &component_mask = ComponentMask());
 
   /**
@@ -783,7 +783,7 @@ namespace VectorTools
   interpolate_boundary_values (const DH        &dof,
                                const types::boundary_id            boundary_component,
                                const Function<DH::space_dimension>           &boundary_function,
-                               std::map<unsigned int,double> &boundary_values,
+                               std::map<types::global_dof_index,double> &boundary_values,
                                const ComponentMask       &component_mask = ComponentMask());
 
 
@@ -797,7 +797,7 @@ namespace VectorTools
   void
   interpolate_boundary_values (const DH                &dof,
                                const typename FunctionMap<DH::space_dimension>::type &function_map,
-                               std::map<unsigned int,double>         &boundary_values,
+                               std::map<types::global_dof_index,double>         &boundary_values,
                                const ComponentMask               &component_mask = ComponentMask());
 
 
@@ -996,7 +996,7 @@ namespace VectorTools
                                 const DoFHandler<dim,spacedim>    &dof,
                                 const typename FunctionMap<spacedim>::type &boundary_functions,
                                 const Quadrature<dim-1>  &q,
-                                std::map<unsigned int,double> &boundary_values,
+                                std::map<types::global_dof_index,double> &boundary_values,
                                 std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**
@@ -1008,7 +1008,7 @@ namespace VectorTools
   void project_boundary_values (const DoFHandler<dim,spacedim>    &dof,
                                 const typename FunctionMap<spacedim>::type &boundary_function,
                                 const Quadrature<dim-1>  &q,
-                                std::map<unsigned int,double> &boundary_values,
+                                std::map<types::global_dof_index,double> &boundary_values,
                                 std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
   /**

@@ -167,12 +167,22 @@ namespace FETools
    * component in the local block
    * vector.
    *
-   * The second vector is organized
-   * such that there is a vector
-   * for each base element
-   * containing the start index for
-   * each component served by this
-   * base element.
+  * @param fe: The finite element
+   * used, typically an FESystem.
+  *
+  * @param renumbering: A vector
+   * with as many entries as
+   * <tt>fe</tt> has dofs per
+   * cell. The indices reference the
+   * local dofs on the cell, not the
+   * global dofs.
+  *
+   * @param <tt>start_indice</tt>:
+   * This vector is organized such
+   * that there is a vector for each
+   * base element containing the
+   * start index for each component
+   * served by this base element.
    *
    * While the first vector is
    * checked to have the correct
@@ -207,7 +217,7 @@ namespace FETools
   void compute_block_renumbering (
     const FiniteElement<dim,spacedim> &fe,
     std::vector<unsigned int> &renumbering,
-    std::vector<unsigned int> &block_data,
+    std::vector<types::global_dof_index> &block_data,
     bool return_start_indices = true);
 
   /**

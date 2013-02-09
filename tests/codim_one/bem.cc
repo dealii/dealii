@@ -264,8 +264,8 @@ BEM<spacedim>::assemble_system()
 
     std::vector< Point<spacedim> > cell_normals_i, cell_normals_j;
 
-    std::vector<unsigned int> local_dof_indices_i (dofs_per_cell);
-    std::vector<unsigned int> local_dof_indices_j (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices_i (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices_j (dofs_per_cell);
  
 
 //     std::cout
@@ -568,7 +568,7 @@ BEM<spacedim>::solve()
    
     std::vector< Point<spacedim> > cell_normals(q_iterated.size());
     std::vector< Point<spacedim> > cell_tangentials(q_iterated.size());
-    std::vector<unsigned int> local_dof_indices (fe_q.dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (fe_q.dofs_per_cell);
 
     typename DoFHandler<spacedim-1, spacedim>::active_cell_iterator
 	cell = dof_handler_q.begin_active(),

@@ -137,8 +137,8 @@ BlockSparseMatrixEZ<number>::collect_sizes ()
 {
   const unsigned int rows = n_block_rows();
   const unsigned int columns = n_block_cols();
-  std::vector<unsigned int> row_sizes (rows);
-  std::vector<unsigned int> col_sizes (columns);
+  std::vector<types::global_dof_index> row_sizes (rows);
+  std::vector<types::global_dof_index> col_sizes (columns);
 
   // first find out the row sizes
   // from the first block column

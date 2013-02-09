@@ -46,8 +46,8 @@ CompressedSetSparsityPattern (const CompressedSetSparsityPattern &s)
 
 
 
-CompressedSetSparsityPattern::CompressedSetSparsityPattern (const unsigned int m,
-                                                            const unsigned int n)
+CompressedSetSparsityPattern::CompressedSetSparsityPattern (const types::global_dof_index m,
+                                                            const types::global_dof_index n)
   :
   rows(0),
   cols(0)
@@ -57,7 +57,7 @@ CompressedSetSparsityPattern::CompressedSetSparsityPattern (const unsigned int m
 
 
 
-CompressedSetSparsityPattern::CompressedSetSparsityPattern (const unsigned int n)
+CompressedSetSparsityPattern::CompressedSetSparsityPattern (const types::global_dof_index n)
   :
   rows(0),
   cols(0)
@@ -82,8 +82,8 @@ CompressedSetSparsityPattern::operator = (const CompressedSetSparsityPattern &s)
 
 
 void
-CompressedSetSparsityPattern::reinit (const unsigned int m,
-                                      const unsigned int n)
+CompressedSetSparsityPattern::reinit (const types::global_dof_index m,
+                                      const types::global_dof_index n)
 {
   rows = m;
   cols = n;
@@ -123,8 +123,8 @@ CompressedSetSparsityPattern::max_entries_per_row () const
 
 
 bool
-CompressedSetSparsityPattern::exists (const unsigned int i,
-                                      const unsigned int j) const
+CompressedSetSparsityPattern::exists (const types::global_dof_index i,
+                                      const types::global_dof_index j) const
 {
   Assert (i<rows, ExcIndexRange(i, 0, rows));
   Assert (j<cols, ExcIndexRange(j, 0, cols));

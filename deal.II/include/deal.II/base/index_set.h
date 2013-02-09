@@ -64,7 +64,7 @@ public:
    * overall size of the index
    * range.
    */
-  explicit IndexSet (const unsigned int size);
+  explicit IndexSet (const types::global_dof_index size);
 
   /**
    * Remove all indices from this
@@ -136,7 +136,7 @@ public:
    * index is an element of the
    * index set.
    */
-  bool is_element (const unsigned int index) const;
+  bool is_element (const types::global_dof_index index) const;
 
   /**
    * Return whether the index set
@@ -151,7 +151,7 @@ public:
    * Return the number of elements
    * stored in this index set.
    */
-  unsigned int n_elements () const;
+  types::global_dof_index n_elements () const;
 
   /**
    * Return the global index of the local
@@ -160,7 +160,7 @@ public:
    * local_index obviously needs to be less
    * than n_elements().
    */
-  unsigned int nth_index_in_set (const unsigned int local_index) const;
+  types::global_dof_index nth_index_in_set (const unsigned int local_index) const;
 
   /**
    * Return the how-manyth element of this
@@ -172,7 +172,7 @@ public:
    * a member of this index set, i.e. if
    * is_element(global_index) is false.
    */
-  unsigned int index_within_set (const unsigned int global_index) const;
+  unsigned int index_within_set (const types::global_dof_index global_index) const;
 
   /**
    * Each index set can be
@@ -245,8 +245,8 @@ public:
    * to the range <tt>[0,
    * end-begin)</tt>.
    */
-  IndexSet get_view (const unsigned int begin,
-                     const unsigned int end) const;
+  IndexSet get_view (const types::global_dof_index begin,
+                     const types::global_dof_index end) const;
 
 
   /**
@@ -263,7 +263,7 @@ public:
    * Fills the given vector with all
    * indices contained in this IndexSet.
    */
-  void fill_index_vector(std::vector<unsigned int> &indices) const;
+  void fill_index_vector(std::vector<types::global_dof_index> &indices) const;
 
   /**
    * Fill the given vector with either
@@ -427,10 +427,10 @@ private:
    */
   struct Range
   {
-    unsigned int begin;
-    unsigned int end;
+    types::global_dof_index begin;
+    types::global_dof_index end;
 
-    unsigned int nth_index_in_set;
+    types::global_dof_index nth_index_in_set;
 
     /**
      * Default constructor. Since there is no useful choice for
@@ -449,8 +449,8 @@ private:
      * @param i1 Left end point of the interval.
      * @param i2 First index greater than the last index of the indicated range.
      **/
-    Range (const unsigned int i1,
-           const unsigned int i2);
+    Range (const types::global_dof_index i1,
+           const types::global_dof_index i2);
 
     friend
     inline bool operator< (const Range &range_1,
@@ -572,8 +572,8 @@ IndexSet::Range::Range ()
 
 
 inline
-IndexSet::Range::Range (const unsigned int i1,
-                        const unsigned int i2)
+IndexSet::Range::Range (const types::global_dof_index i1,
+                        const types::global_dof_index i2)
   :
   begin(i1),
   end(i2)
@@ -591,7 +591,7 @@ IndexSet::IndexSet ()
 
 
 inline
-IndexSet::IndexSet (const unsigned int size)
+IndexSet::IndexSet (const types::global_dof_index size)
   :
   is_compressed (true),
   index_space_size (size),
@@ -646,8 +646,8 @@ IndexSet::compress () const
 
 inline
 void
-IndexSet::add_range (const unsigned int begin,
-                     const unsigned int end)
+IndexSet::add_range (const types::global_dof_index begin,
+                     const types::global_dof_index end)
 {
   Assert ((begin < index_space_size)
           ||
@@ -680,7 +680,7 @@ IndexSet::add_range (const unsigned int begin,
 
 inline
 void
-IndexSet::add_index (const unsigned int index)
+IndexSet::add_index (const types::global_dof_index index)
 {
   Assert (index < index_space_size,
           ExcIndexRange (index, 0, index_space_size));
@@ -712,8 +712,8 @@ IndexSet::add_indices (const ForwardIterator &begin,
   // range
   for (ForwardIterator p=begin; p!=end;)
     {
-      const unsigned int begin_index = *p;
-      unsigned int       end_index   = begin_index + 1;
+      const types::global_dof_index begin_index = *p;
+      types::global_dof_index       end_index   = begin_index + 1;
       ForwardIterator q = p;
       ++q;
       while ((q != end) && (*q == end_index))
@@ -750,7 +750,7 @@ IndexSet::add_indices(const IndexSet &other)
 
 inline
 bool
-IndexSet::is_element (const unsigned int index) const
+IndexSet::is_element (const types::global_dof_index index) const
 {
   if (ranges.empty() == false)
     {
@@ -828,7 +828,7 @@ IndexSet::is_contiguous () const
 
 
 inline
-unsigned int
+types::global_dof_index
 IndexSet::n_elements () const
 {
   // make sure we have
@@ -858,7 +858,7 @@ IndexSet::n_elements () const
 
 inline
 unsigned int
-IndexSet::nth_index_in_set (const unsigned int n) const
+IndexSet::nth_index_in_set (const types::global_dof_index n) const
 {
   // to make this call thread-safe, compress()
   // must not be called through this function
@@ -908,7 +908,7 @@ IndexSet::nth_index_in_set (const unsigned int n) const
 
 
 inline
-unsigned int
+types::global_dof_index
 IndexSet::index_within_set (const unsigned int n) const
 {
   // to make this call thread-safe, compress()

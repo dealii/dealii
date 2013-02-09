@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -738,7 +738,7 @@ namespace DoFTools
   template <class DH, class SparsityPattern>
   void
   make_boundary_sparsity_pattern (const DH                        &dof,
-                                  const std::vector<unsigned int> &dof_to_boundary_mapping,
+                                  const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                   SparsityPattern                 &sparsity_pattern);
 
   /**
@@ -775,7 +775,7 @@ namespace DoFTools
   void
   make_boundary_sparsity_pattern (const DH &dof,
                                   const typename FunctionMap<DH::space_dimension>::type &boundary_indicators,
-                                  const std::vector<unsigned int> &dof_to_boundary_mapping,
+                                  const std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                   SparsityPattern    &sparsity);
 
   /**
@@ -2257,10 +2257,10 @@ namespace DoFTools
   template <class DH>
   void
   count_dofs_per_component (const DH      &dof_handler,
-                            std::vector<unsigned int> &dofs_per_component,
+                            std::vector<types::global_dof_index> &dofs_per_component,
                             const bool vector_valued_once = false,
-                            std::vector<unsigned int>  target_component
-                            = std::vector<unsigned int>());
+                            std::vector<types::global_dof_index>  target_component
+                            = std::vector<types::global_dof_index>());
 
   /**
    * Count the degrees of freedom
@@ -2296,9 +2296,9 @@ namespace DoFTools
   template <class DH>
   void
   count_dofs_per_block (const DH &dof,
-                        std::vector<unsigned int> &dofs_per_block,
-                        const std::vector<unsigned int> &target_block
-                        = std::vector<unsigned int>());
+                        std::vector<types::global_dof_index> &dofs_per_block,
+                        const std::vector<types::global_dof_index>  &target_block
+                        = std::vector<types::global_dof_index>());
 
   /**
    * @deprecated See the previous
@@ -2311,8 +2311,8 @@ namespace DoFTools
   template <int dim, int spacedim>
   void
   count_dofs_per_component (const DoFHandler<dim,spacedim>     &dof_handler,
-                            std::vector<unsigned int> &dofs_per_component,
-                            std::vector<unsigned int>  target_component) DEAL_II_DEPRECATED;
+                            std::vector<types::global_dof_index> &dofs_per_component,
+                            std::vector<types::global_dof_index>  target_component) DEAL_II_DEPRECATED;
 
   /**
    * This function can be used when
@@ -2600,7 +2600,7 @@ namespace DoFTools
   template <class DH>
   void
   map_dof_to_boundary_indices (const DH                   &dof_handler,
-                               std::vector<unsigned int> &mapping);
+                               std::vector<types::global_dof_index>  &mapping);
 
   /**
    * Same as the previous function,
@@ -2619,7 +2619,7 @@ namespace DoFTools
   void
   map_dof_to_boundary_indices (const DH                      &dof_handler,
                                const std::set<types::boundary_id> &boundary_indicators,
-                               std::vector<unsigned int>     &mapping);
+                               std::vector<types::global_dof_index>     &mapping);
 
   /**
    * Return a list of support
@@ -2742,7 +2742,7 @@ namespace DoFTools
   void
   map_support_points_to_dofs (const Mapping<DH::dimension, DH::space_dimension> &mapping,
                               const DH                                          &dof_handler,
-                              std::map<Point<DH::space_dimension>, unsigned int, Comp> &point_to_index_map);
+                              std::map<Point<DH::space_dimension>, types::global_dof_index, Comp> &point_to_index_map);
 
   /**
    * Map a coupling table from the
@@ -3073,7 +3073,7 @@ namespace DoFTools
   map_support_points_to_dofs (
     const Mapping<DH::dimension,DH::space_dimension>         &mapping,
     const DH                                                 &dof_handler,
-    std::map<Point<DH::space_dimension>, unsigned int, Comp> &point_to_index_map)
+    std::map<Point<DH::space_dimension>, types::global_dof_index, Comp> &point_to_index_map)
   {
     // let the checking of arguments be
     // done by the function first

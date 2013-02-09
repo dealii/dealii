@@ -110,8 +110,8 @@ compute_mapping_support_points
   // first, basic assertion
   // with respect to vector size,
 
-  const unsigned int n_dofs      = euler_dof_handler->n_dofs();
-  const unsigned int vector_size = euler_vector->size();
+  const types::global_dof_index n_dofs  = euler_dof_handler->n_dofs();
+  const types::global_dof_index vector_size = euler_vector->size();
 
   AssertDimension(vector_size,n_dofs);
 

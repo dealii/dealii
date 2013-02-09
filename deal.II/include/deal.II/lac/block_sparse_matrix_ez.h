@@ -189,7 +189,7 @@ public:
    * space. It is the sum of rows
    * of the rows of sub-matrices.
    */
-  unsigned int n_rows () const;
+  types::global_dof_index n_rows () const;
 
   /**
    * Return number of columns of
@@ -199,7 +199,7 @@ public:
    * columns of the columns of
    * sub-matrices.
    */
-  unsigned int n_cols () const;
+  types::global_dof_index n_cols () const;
 
   /**
    * Return the dimension of the
@@ -207,7 +207,7 @@ public:
    * matrix is of dimension
    * $m \times n$.
    */
-  unsigned int m () const;
+  types::global_dof_index m () const;
 
   /**
    * Return the dimension of the
@@ -215,7 +215,7 @@ public:
    * matrix is of dimension
    * $m \times n$.
    */
-  unsigned int n () const;
+  types::global_dof_index n () const;
 
   /**
    * Set the element <tt>(i,j)</tt>
@@ -226,8 +226,8 @@ public:
    * allowed to store zero values
    * in non-existent fields.
    */
-  void set (const unsigned int i,
-            const unsigned int j,
+  void set (const types::global_dof_index i,
+            const types::global_dof_index j,
             const Number value);
 
   /**
@@ -239,7 +239,7 @@ public:
    * is allowed to store zero
    * values in non-existent fields.
    */
-  void add (const unsigned int i, const unsigned int j,
+  void add (const types::global_dof_index i, const types::global_dof_index j,
             const Number value);
 
 
@@ -396,7 +396,7 @@ BlockSparseMatrixEZ<Number>::block (const unsigned int row,
 
 template <typename Number>
 inline
-unsigned int
+types::global_dof_index
 BlockSparseMatrixEZ<Number>::m () const
 {
   return n_rows();
@@ -406,7 +406,7 @@ BlockSparseMatrixEZ<Number>::m () const
 
 template <typename Number>
 inline
-unsigned int
+types::global_dof_index
 BlockSparseMatrixEZ<Number>::n () const
 {
   return n_cols();
@@ -417,14 +417,14 @@ BlockSparseMatrixEZ<Number>::n () const
 template <typename Number>
 inline
 void
-BlockSparseMatrixEZ<Number>::set (const unsigned int i,
-                                  const unsigned int j,
+BlockSparseMatrixEZ<Number>::set (const types::global_dof_index i,
+                                  const types::global_dof_index j,
                                   const Number value)
 {
 
   Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,types::global_dof_index>
   row_index = row_indices.global_to_local (i),
   col_index = column_indices.global_to_local (j);
   block(row_index.first,col_index.first).set (row_index.second,
@@ -437,14 +437,14 @@ BlockSparseMatrixEZ<Number>::set (const unsigned int i,
 template <typename Number>
 inline
 void
-BlockSparseMatrixEZ<Number>::add (const unsigned int i,
-                                  const unsigned int j,
+BlockSparseMatrixEZ<Number>::add (const types::global_dof_index i,
+                                  const types::global_dof_index j,
                                   const Number value)
 {
 
   Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,types::global_dof_index>
   row_index = row_indices.global_to_local (i),
   col_index = column_indices.global_to_local (j);
   block(row_index.first,col_index.first).add (row_index.second,

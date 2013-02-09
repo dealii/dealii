@@ -354,8 +354,8 @@ namespace internal
        * const or non-const
        * reference.
        */
-      Iterator (BlockVector    &parent,
-                const unsigned int  global_index);
+      Iterator (BlockVector                   &parent,
+                const types::global_dof_index global_index);
 
       /**
        * Copy constructor.
@@ -383,11 +383,11 @@ namespace internal
        * variables.
        */
       Iterator (BlockVector        &parent,
-                const unsigned int  global_index,
-                const unsigned int  current_block,
-                const unsigned int  index_within_block,
-                const unsigned int  next_break_forward,
-                const unsigned int  next_break_backward);
+                const types::global_dof_index  global_index,
+                const unsigned int             current_block,
+                const types::global_dof_index  index_within_block,
+                const types::global_dof_index  next_break_forward,
+                const types::global_dof_index  next_break_backward);
 
     public:
 
@@ -614,7 +614,7 @@ namespace internal
        * element to which we
        * presently point.
        */
-      unsigned int     global_index;
+      types::global_dof_index     global_index;
 
       /**
        * Current block and index
@@ -623,7 +623,7 @@ namespace internal
        * to.
        */
       unsigned int current_block;
-      unsigned int index_within_block;
+      types::global_dof_index index_within_block;
 
       /**
        * Indices of the global
@@ -637,8 +637,8 @@ namespace internal
        * efficient than always
        * asking the parent object.
        */
-      unsigned int next_break_forward;
-      unsigned int next_break_backward;
+      types::global_dof_index next_break_forward;
+      types::global_dof_index next_break_backward;
 
       /**
        * Move forward one element.
@@ -828,7 +828,7 @@ public:
    * is the sum of the dimensions of all
    * components.
    */
-  unsigned int size () const;
+  types::global_dof_index size () const;
 
   /**
    * Return an iterator pointing to
@@ -859,20 +859,20 @@ public:
   /**
    * Access components, returns U(i).
    */
-  value_type operator() (const unsigned int i) const;
+  value_type operator() (const types::global_dof_index i) const;
 
   /**
    * Access components, returns U(i)
    * as a writeable reference.
    */
-  reference operator() (const unsigned int i);
+  reference operator() (const types::global_dof_index i);
 
   /**
    * Access components, returns U(i).
    *
    * Exactly the same as operator().
    */
-  value_type operator[] (const unsigned int i) const;
+  value_type operator[] (const types::global_dof_index i) const;
 
   /**
    * Access components, returns U(i)
@@ -880,7 +880,7 @@ public:
    *
    * Exactly the same as operator().
    */
-  reference operator[] (const unsigned int i);
+  reference operator[] (const types::global_dof_index i);
 
   /**
    * Copy operator: fill all components of
@@ -1008,8 +1008,8 @@ public:
    * indices.
    */
   template <typename Number>
-  void add (const std::vector<unsigned int> &indices,
-            const std::vector<Number>       &values);
+  void add (const std::vector<types::global_dof_index> &indices,
+            const std::vector<Number>                  &values);
 
   /**
    * This is a second collective
@@ -1019,8 +1019,8 @@ public:
    * values.
    */
   template <typename Number>
-  void add (const std::vector<unsigned int> &indices,
-            const Vector<Number>            &values);
+  void add (const std::vector<types::global_dof_index> &indices,
+            const Vector<Number>                       &values);
 
   /**
    * Take an address where
@@ -1032,9 +1032,9 @@ public:
    * functions above.
    */
   template <typename Number>
-  void add (const unsigned int  n_elements,
-            const unsigned int *indices,
-            const Number       *values);
+  void add (const unsigned int            n_elements,
+            const types::global_dof_index *indices,
+            const Number                  *values);
 
   /**
    * $U(0-DIM)+=s$.  Addition of <tt>s</tt>
@@ -1229,11 +1229,11 @@ namespace internal
     inline
     Iterator<BlockVectorType,constness>::
     Iterator (BlockVector        &parent,
-              const unsigned int  global_index,
-              const unsigned int  current_block,
-              const unsigned int  index_within_block,
-              const unsigned int  next_break_forward,
-              const unsigned int  next_break_backward)
+              const types::global_dof_index  global_index,
+              const unsigned int             current_block,
+              const types::global_dof_index  index_within_block,
+              const types::global_dof_index  next_break_forward,
+              const types::global_dof_index  next_break_backward)
       :
       parent (&parent),
       global_index (global_index),
@@ -1637,8 +1637,8 @@ namespace internal
 
     template <class BlockVectorType, bool constness>
     Iterator<BlockVectorType,constness>::
-    Iterator (BlockVector       &parent,
-              const unsigned int global_index)
+    Iterator (BlockVector                   &parent,
+              const types::global_dof_index global_index)
       :
       parent (&parent),
       global_index (global_index)
@@ -1651,7 +1651,7 @@ namespace internal
       // past-the-end
       if (global_index < parent.size())
         {
-          const std::pair<unsigned int, unsigned int>
+          const std::pair<unsigned int, types::global_dof_index>
           indices = parent.block_indices.global_to_local(global_index);
           current_block      = indices.first;
           index_within_block = indices.second;
@@ -1759,7 +1759,7 @@ BlockVectorBase<VectorType>::BlockVectorBase ()
 
 template <class VectorType>
 inline
-unsigned int
+types::global_dof_index
 BlockVectorBase<VectorType>::size () const
 {
   return block_indices.total_size();
@@ -1814,7 +1814,7 @@ inline
 void
 BlockVectorBase<VectorType>::collect_sizes ()
 {
-  std::vector<unsigned int> sizes (n_blocks());
+  std::vector<types::global_dof_index> sizes (n_blocks());
 
   for (unsigned int i=0; i<n_blocks(); ++i)
     sizes[i] = block(i).size();
@@ -2022,8 +2022,8 @@ template <class VectorType>
 template <typename Number>
 inline
 void
-BlockVectorBase<VectorType>::add (const std::vector<unsigned int> &indices,
-                                  const std::vector<Number>       &values)
+BlockVectorBase<VectorType>::add (const std::vector<types::global_dof_index> &indices,
+                                  const std::vector<Number>                  &values)
 {
   Assert (indices.size() == values.size(),
           ExcDimensionMismatch(indices.size(), values.size()));
@@ -2036,8 +2036,8 @@ template <class VectorType>
 template <typename Number>
 inline
 void
-BlockVectorBase<VectorType>::add (const std::vector<unsigned int> &indices,
-                                  const Vector<Number>            &values)
+BlockVectorBase<VectorType>::add (const std::vector<types::global_dof_index> &indices,
+                                  const Vector<Number>                       &values)
 {
   Assert (indices.size() == values.size(),
           ExcDimensionMismatch(indices.size(), values.size()));
@@ -2052,9 +2052,9 @@ template <class VectorType>
 template <typename Number>
 inline
 void
-BlockVectorBase<VectorType>::add (const unsigned int  n_indices,
-                                  const unsigned int *indices,
-                                  const Number       *values)
+BlockVectorBase<VectorType>::add (const unsigned int            n_indices,
+                                  const types::global_dof_index *indices,
+                                  const Number                  *values)
 {
   for (unsigned int i=0; i<n_indices; ++i)
     (*this)(indices[i]) += values[i];
@@ -2408,9 +2408,9 @@ BlockVectorBase<VectorType>::operator /= (const value_type factor)
 template <class VectorType>
 inline
 typename BlockVectorBase<VectorType>::value_type
-BlockVectorBase<VectorType>::operator() (const unsigned int i) const
+BlockVectorBase<VectorType>::operator() (const types::global_dof_index i) const
 {
-  const std::pair<unsigned int,unsigned int> local_index
+  const std::pair<unsigned int,types::global_dof_index> local_index
     = block_indices.global_to_local (i);
   return components[local_index.first](local_index.second);
 }
@@ -2420,9 +2420,9 @@ BlockVectorBase<VectorType>::operator() (const unsigned int i) const
 template <class VectorType>
 inline
 typename BlockVectorBase<VectorType>::reference
-BlockVectorBase<VectorType>::operator() (const unsigned int i)
+BlockVectorBase<VectorType>::operator() (const types::global_dof_index i)
 {
-  const std::pair<unsigned int,unsigned int> local_index
+  const std::pair<unsigned int,types::global_dof_index> local_index
     = block_indices.global_to_local (i);
   return components[local_index.first](local_index.second);
 }
@@ -2432,7 +2432,7 @@ BlockVectorBase<VectorType>::operator() (const unsigned int i)
 template <class VectorType>
 inline
 typename BlockVectorBase<VectorType>::value_type
-BlockVectorBase<VectorType>::operator[] (const unsigned int i) const
+BlockVectorBase<VectorType>::operator[] (const types::global_dof_index i) const
 {
   return operator()(i);
 }
@@ -2442,7 +2442,7 @@ BlockVectorBase<VectorType>::operator[] (const unsigned int i) const
 template <class VectorType>
 inline
 typename BlockVectorBase<VectorType>::reference
-BlockVectorBase<VectorType>::operator[] (const unsigned int i)
+BlockVectorBase<VectorType>::operator[] (const types::global_dof_index i)
 {
   return operator()(i);
 }

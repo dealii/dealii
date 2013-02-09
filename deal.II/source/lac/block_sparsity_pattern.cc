@@ -199,12 +199,12 @@ BlockSparsityPatternBase<SparsityPatternBase>::max_entries_per_row () const
 
 
 template <class SparsityPatternBase>
-unsigned int
+types::global_dof_index
 BlockSparsityPatternBase<SparsityPatternBase>::n_rows () const
 {
   // only count in first column, since
   // all rows should be equivalent
-  unsigned int count = 0;
+  types::global_dof_index count = 0;
   for (unsigned int r=0; r<rows; ++r)
     count += sub_objects[r][0]->n_rows();
   return count;
@@ -213,12 +213,12 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_rows () const
 
 
 template <class SparsityPatternBase>
-unsigned int
+types::global_dof_index
 BlockSparsityPatternBase<SparsityPatternBase>::n_cols () const
 {
   // only count in first row, since
   // all rows should be equivalent
-  unsigned int count = 0;
+  types::global_dof_index count = 0;
   for (unsigned int c=0; c<columns; ++c)
     count += sub_objects[0][c]->n_cols();
   return count;
@@ -359,7 +359,7 @@ void
 BlockSparsityPattern::reinit(
   const BlockIndices &rows,
   const BlockIndices &cols,
-  const std::vector<std::vector<unsigned int> > &row_lengths)
+  const std::vector<std::vector<types::global_dof_index> > &row_lengths)
 {
   AssertDimension (row_lengths.size(), cols.size());
 
@@ -487,8 +487,8 @@ BlockCompressedSparsityPattern (
 
 BlockCompressedSparsityPattern::
 BlockCompressedSparsityPattern (
-  const std::vector<unsigned int> &row_indices,
-  const std::vector<unsigned int> &col_indices)
+  const std::vector<types::global_dof_index> &row_indices,
+  const std::vector<types::global_dof_index> &col_indices)
 {
   reinit(row_indices, col_indices);
 }
@@ -505,8 +505,8 @@ BlockCompressedSparsityPattern (
 
 void
 BlockCompressedSparsityPattern::reinit (
-  const std::vector< unsigned int > &row_block_sizes,
-  const std::vector< unsigned int > &col_block_sizes)
+  const std::vector< types::global_dof_index > &row_block_sizes,
+  const std::vector< types::global_dof_index > &col_block_sizes)
 {
   BlockSparsityPatternBase<CompressedSparsityPattern>::reinit(row_block_sizes.size(), col_block_sizes.size());
   for (unsigned int i=0; i<row_block_sizes.size(); ++i)
@@ -550,8 +550,8 @@ BlockCompressedSetSparsityPattern (
 
 BlockCompressedSetSparsityPattern::
 BlockCompressedSetSparsityPattern (
-  const std::vector<unsigned int> &row_indices,
-  const std::vector<unsigned int> &col_indices)
+  const std::vector<types::global_dof_index> &row_indices,
+  const std::vector<types::global_dof_index> &col_indices)
 {
   reinit(row_indices, col_indices);
 }
@@ -568,8 +568,8 @@ BlockCompressedSetSparsityPattern (
 
 void
 BlockCompressedSetSparsityPattern::reinit (
-  const std::vector< unsigned int > &row_block_sizes,
-  const std::vector< unsigned int > &col_block_sizes)
+  const std::vector< types::global_dof_index > &row_block_sizes,
+  const std::vector< types::global_dof_index > &col_block_sizes)
 {
   BlockSparsityPatternBase<CompressedSetSparsityPattern>::reinit(row_block_sizes.size(), col_block_sizes.size());
   for (unsigned int i=0; i<row_block_sizes.size(); ++i)
@@ -612,8 +612,8 @@ BlockCompressedSimpleSparsityPattern (const unsigned int n_rows,
 
 
 BlockCompressedSimpleSparsityPattern::
-BlockCompressedSimpleSparsityPattern (const std::vector<unsigned int> &row_indices,
-                                      const std::vector<unsigned int> &col_indices)
+BlockCompressedSimpleSparsityPattern (const std::vector<types::global_dof_index> &row_indices,
+                                      const std::vector<types::global_dof_index> &col_indices)
   :
   BlockSparsityPatternBase<CompressedSimpleSparsityPattern>(row_indices.size(),
                                                             col_indices.size())
@@ -643,8 +643,8 @@ BlockCompressedSimpleSparsityPattern (const std::vector<IndexSet> &partitioning)
 
 void
 BlockCompressedSimpleSparsityPattern::reinit (
-  const std::vector< unsigned int > &row_block_sizes,
-  const std::vector< unsigned int > &col_block_sizes)
+  const std::vector< types::global_dof_index > &row_block_sizes,
+  const std::vector< types::global_dof_index > &col_block_sizes)
 {
   BlockSparsityPatternBase<CompressedSimpleSparsityPattern>::
   reinit(row_block_sizes.size(), col_block_sizes.size());
@@ -689,8 +689,8 @@ namespace TrilinosWrappers
 
 
   BlockSparsityPattern::
-  BlockSparsityPattern (const std::vector<unsigned int> &row_indices,
-                        const std::vector<unsigned int> &col_indices)
+  BlockSparsityPattern (const std::vector<types::global_dof_index> &row_indices,
+                        const std::vector<types::global_dof_index> &col_indices)
     :
     BlockSparsityPatternBase<SparsityPattern>(row_indices.size(),
                                               col_indices.size())
@@ -738,8 +738,8 @@ namespace TrilinosWrappers
 
 
   void
-  BlockSparsityPattern::reinit (const std::vector<unsigned int> &row_block_sizes,
-                                const std::vector<unsigned int> &col_block_sizes)
+  BlockSparsityPattern::reinit (const std::vector<types::global_dof_index> &row_block_sizes,
+                                const std::vector<types::global_dof_index> &col_block_sizes)
   {
     dealii::BlockSparsityPatternBase<SparsityPattern>::
     reinit(row_block_sizes.size(), col_block_sizes.size());

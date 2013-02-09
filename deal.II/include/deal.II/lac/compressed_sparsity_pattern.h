@@ -131,14 +131,14 @@ public:
    * matrix with @p m rows and
    * @p n columns.
    */
-  CompressedSparsityPattern (const unsigned int m,
-                             const unsigned int n);
+  CompressedSparsityPattern (const types::global_dof_index m,
+                             const types::global_dof_index n);
 
   /**
    * Initialize a square matrix of
    * dimension @p n.
    */
-  CompressedSparsityPattern (const unsigned int n);
+  CompressedSparsityPattern (const types::global_dof_index n);
 
   /**
    * Copy operator. For this the
@@ -158,8 +158,8 @@ public:
    * max_entries_per_row() nonzero
    * entries per row.
    */
-  void reinit (const unsigned int m,
-               const unsigned int n);
+  void reinit (const types::global_dof_index m,
+               const types::global_dof_index n);
 
   /**
    * Since this object is kept
@@ -194,8 +194,8 @@ public:
    * matrix. If the entry already
    * exists, nothing bad happens.
    */
-  void add (const unsigned int i,
-            const unsigned int j);
+  void add (const types::global_dof_index i,
+            const types::global_dof_index j);
 
   /**
    * Add several nonzero entries to the
@@ -204,17 +204,17 @@ public:
    * happens.
    */
   template <typename ForwardIterator>
-  void add_entries (const unsigned int row,
-                    ForwardIterator    begin,
-                    ForwardIterator    end,
-                    const bool         indices_are_unique_and_sorted = false);
+  void add_entries (const types::global_dof_index row,
+                    ForwardIterator               begin,
+                    ForwardIterator               end,
+                    const bool                    indices_are_unique_and_sorted = false);
 
   /**
    * Check if a value at a certain
    * position may be non-zero.
    */
-  bool exists (const unsigned int i,
-               const unsigned int j) const;
+  bool exists (const types::global_dof_index i,
+               const types::global_dof_index j) const;
 
   /**
    * Make the sparsity pattern
@@ -270,27 +270,27 @@ public:
    * matrix, which equals the dimension
    * of the image space.
    */
-  unsigned int n_rows () const;
+  types::global_dof_index n_rows () const;
 
   /**
    * Return number of columns of this
    * matrix, which equals the dimension
    * of the range space.
    */
-  unsigned int n_cols () const;
+  types::global_dof_index n_cols () const;
 
   /**
    * Number of entries in a specific row.
    */
-  unsigned int row_length (const unsigned int row) const;
+  unsigned int row_length (const types::global_dof_index row) const;
 
   /**
    * Access to column number field.
    * Return the column number of
    * the @p indexth entry in @p row.
    */
-  unsigned int column_number (const unsigned int row,
-                              const unsigned int index) const;
+  unsigned int column_number (const types::global_dof_index row,
+                              const unsigned int            index) const;
 
   /**
    * Return an iterator that can loop over
@@ -298,12 +298,12 @@ public:
    * row. Dereferencing the iterator yields
    * a column index.
    */
-  row_iterator row_begin (const unsigned int row) const;
+  row_iterator row_begin (const types::global_dof_index row) const;
 
   /**
    * Returns the end of the current row.
    */
-  row_iterator row_end (const unsigned int row) const;
+  row_iterator row_end (const types::global_dof_index row) const;
 
   /**
    * Compute the bandwidth of the matrix
@@ -345,13 +345,13 @@ private:
    * Number of rows that this sparsity
    * structure shall represent.
    */
-  unsigned int rows;
+  types::global_dof_index rows;
 
   /**
    * Number of columns that this sparsity
    * structure shall represent.
    */
-  unsigned int cols;
+  types::global_dof_index cols;
 
   /**
    * Store some data for each row
@@ -447,7 +447,7 @@ private:
      * Add the given column number to
      * this line.
      */
-    void add (const unsigned int col_num);
+    void add (const types::global_dof_index col_num);
 
     /**
      * Add the columns specified by the
@@ -480,7 +480,7 @@ private:
 
 inline
 void
-CompressedSparsityPattern::Line::add (const unsigned int j)
+CompressedSparsityPattern::Line::add (const types::global_dof_index j)
 {
   // first check whether this entry is
   // already in the cache. if so, we can
@@ -502,7 +502,7 @@ CompressedSparsityPattern::Line::add (const unsigned int j)
 
 
 inline
-unsigned int
+types::global_dof_index
 CompressedSparsityPattern::n_rows () const
 {
   return rows;
@@ -511,7 +511,7 @@ CompressedSparsityPattern::n_rows () const
 
 
 inline
-unsigned int
+types::global_dof_index
 CompressedSparsityPattern::n_cols () const
 {
   return cols;
@@ -521,8 +521,8 @@ CompressedSparsityPattern::n_cols () const
 
 inline
 void
-CompressedSparsityPattern::add (const unsigned int i,
-                                const unsigned int j)
+CompressedSparsityPattern::add (const types::global_dof_index i,
+                                const types::global_dof_index j)
 {
   Assert (i<rows, ExcIndexRange(i, 0, rows));
   Assert (j<cols, ExcIndexRange(j, 0, cols));
@@ -535,7 +535,7 @@ CompressedSparsityPattern::add (const unsigned int i,
 template <typename ForwardIterator>
 inline
 void
-CompressedSparsityPattern::add_entries (const unsigned int row,
+CompressedSparsityPattern::add_entries (const types::global_dof_index row,
                                         ForwardIterator begin,
                                         ForwardIterator end,
                                         const bool      indices_are_sorted)
@@ -557,7 +557,7 @@ CompressedSparsityPattern::Line::Line ()
 
 inline
 unsigned int
-CompressedSparsityPattern::row_length (const unsigned int row) const
+CompressedSparsityPattern::row_length (const types::global_dof_index row) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
 
@@ -570,8 +570,8 @@ CompressedSparsityPattern::row_length (const unsigned int row) const
 
 inline
 unsigned int
-CompressedSparsityPattern::column_number (const unsigned int row,
-                                          const unsigned int index) const
+CompressedSparsityPattern::column_number (const types::global_dof_index row,
+                                          const unsigned int            index) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
   Assert (index < lines[row].entries.size(),
@@ -586,7 +586,7 @@ CompressedSparsityPattern::column_number (const unsigned int row,
 
 inline
 CompressedSparsityPattern::row_iterator
-CompressedSparsityPattern::row_begin (const unsigned int row) const
+CompressedSparsityPattern::row_begin (const types::global_dof_index row) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
 
@@ -599,7 +599,7 @@ CompressedSparsityPattern::row_begin (const unsigned int row) const
 
 inline
 CompressedSparsityPattern::row_iterator
-CompressedSparsityPattern::row_end (const unsigned int row) const
+CompressedSparsityPattern::row_end (const types::global_dof_index row) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
   return lines[row].entries.end();

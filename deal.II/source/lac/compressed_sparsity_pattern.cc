@@ -338,8 +338,8 @@ CompressedSparsityPattern (const CompressedSparsityPattern &s)
 
 
 
-CompressedSparsityPattern::CompressedSparsityPattern (const unsigned int m,
-                                                      const unsigned int n)
+CompressedSparsityPattern::CompressedSparsityPattern (const types::global_dof_index m,
+                                                      const types::global_dof_index n)
   :
   rows(0),
   cols(0)
@@ -349,7 +349,7 @@ CompressedSparsityPattern::CompressedSparsityPattern (const unsigned int m,
 
 
 
-CompressedSparsityPattern::CompressedSparsityPattern (const unsigned int n)
+CompressedSparsityPattern::CompressedSparsityPattern (const types::global_dof_index n)
   :
   rows(0),
   cols(0)
@@ -374,8 +374,8 @@ CompressedSparsityPattern::operator = (const CompressedSparsityPattern &s)
 
 
 void
-CompressedSparsityPattern::reinit (const unsigned int m,
-                                   const unsigned int n)
+CompressedSparsityPattern::reinit (const types::global_dof_index m,
+                                   const types::global_dof_index n)
 {
   rows = m;
   cols = n;
@@ -417,8 +417,8 @@ CompressedSparsityPattern::max_entries_per_row () const
 
 
 bool
-CompressedSparsityPattern::exists (const unsigned int i,
-                                   const unsigned int j) const
+CompressedSparsityPattern::exists (const types::global_dof_index i,
+                                   const types::global_dof_index j) const
 {
   Assert (i<rows, ExcIndexRange(i, 0, rows));
   Assert (j<cols, ExcIndexRange(j, 0, cols));
@@ -548,11 +548,11 @@ CompressedSparsityPattern::n_nonzero_elements () const
 
 
 // explicit instantiations
-template void CompressedSparsityPattern::Line::add_entries(unsigned int *,
-                                                           unsigned int *,
+template void CompressedSparsityPattern::Line::add_entries(types::global_dof_index *,
+                                                           types::global_dof_index *,
                                                            const bool);
-template void CompressedSparsityPattern::Line::add_entries(const unsigned int *,
-                                                           const unsigned int *,
+template void CompressedSparsityPattern::Line::add_entries(const types::global_dof_index *,
+                                                           const types::global_dof_index *,
                                                            const bool);
 #ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 template void CompressedSparsityPattern::Line::

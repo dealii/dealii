@@ -101,7 +101,7 @@ namespace internal
        * the degrees of freedom of each
        * hex in the @p hex_dofs array.
        */
-      std::vector<unsigned int> dof_offsets;
+      std::vector<types::global_dof_index> dof_offsets;
 
       /**
        * Store the global indices of
@@ -109,7 +109,7 @@ namespace internal
        * DoFLevel() for detailed
        * information.
        */
-      std::vector<unsigned int> dofs;
+      std::vector<types::global_dof_index > dofs;
 
       /**
        * Set the global index of
@@ -142,7 +142,7 @@ namespace internal
                      const unsigned int               obj_index,
                      const unsigned int               fe_index,
                      const unsigned int               local_index,
-                     const unsigned int               global_index,
+                     const types::global_dof_index    global_index,
                      const unsigned int               obj_level);
 
       /**
@@ -169,7 +169,7 @@ namespace internal
        * information.
        */
       template <int dimm, int spacedim>
-      unsigned int
+      types::global_dof_index
       get_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                      const unsigned int               obj_index,
                      const unsigned int               fe_index,
@@ -243,7 +243,7 @@ namespace internal
     template <int dim>
     template <int dimm, int spacedim>
     inline
-    unsigned int
+    types::global_dof_index
     DoFObjects<dim>::
     get_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                    const unsigned int                obj_index,
@@ -304,7 +304,7 @@ namespace internal
           // an exception if we can't
           // find a set for this
           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
+          const types::global_dof_index starting_offset = dof_offsets[obj_index];
           const unsigned int *pointer        = &dofs[starting_offset];
           while (true)
             {
@@ -330,7 +330,7 @@ namespace internal
                    const unsigned int                obj_index,
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
-                   const unsigned int                global_index,
+                   const types::global_dof_index     global_index,
                    const unsigned int                obj_level)
     {
       Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
@@ -386,7 +386,7 @@ namespace internal
           // an exception if we can't
           // find a set for this
           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
+          const types::global_dof_index starting_offset = dof_offsets[obj_index];
           unsigned int      *pointer         = &dofs[starting_offset];
           while (true)
             {
@@ -450,7 +450,7 @@ namespace internal
           // find a set for this
           // particular fe_index
           const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
+          const types::global_dof_index *pointer        = &dofs[starting_offset];
           unsigned int counter = 0;
           while (true)
             {
@@ -472,7 +472,7 @@ namespace internal
     template <int dim>
     template <int dimm, int spacedim>
     inline
-    unsigned int
+    types::global_dof_index
     DoFObjects<dim>::
     nth_active_fe_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                          const unsigned int                obj_level,
@@ -525,7 +525,7 @@ namespace internal
           // find a set for this
           // particular fe_index
           const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
+          const types::global_dof_index *pointer = &dofs[starting_offset];
           unsigned int counter = 0;
           while (true)
             {
@@ -607,7 +607,7 @@ namespace internal
           // find a set for this
           // particular fe_index
           const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
+          const types::global_dof_index  *pointer = &dofs[starting_offset];
           while (true)
             {
               if (*pointer == numbers::invalid_unsigned_int)
