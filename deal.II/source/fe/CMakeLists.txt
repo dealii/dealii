@@ -61,6 +61,7 @@ SET(inst_in_files
   fe_nothing.inst.in
   fe_poly.inst.in
   fe_poly_tensor.inst.in
+  fe_q_dg0.inst.in
   fe_q_hierarchical.inst.in
   fe_q.inst.in
   fe_raviart_thomas.inst.in
