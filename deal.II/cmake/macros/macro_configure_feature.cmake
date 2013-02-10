@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -44,7 +44,7 @@
 #    fullfilled. In this case all necessary variables for
 #    FEATURE_${feature}_CONFIGURE_EXTERNAL must be set. Otherwise
 #    var should remain unset.
-#    This macro should give an error (FATAL_ERROR or FATAL_ERROR).
+#    This macro should give an error (FATAL_ERROR).
 #
 # FEATURE_${feature}_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
 #    which should setup all necessary configuration for the feature with
