@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1005,8 +1005,9 @@ public:
    * Return whether this object stores only those entries that have been added
    * explicitly, or if the sparsity pattern contains elements that have been
    * added through other means (implicitly) while building it. For the current
-   * class, the result is true if and only if it is square because it then
-   * unconditionally stores the diagonal entries whether they have been added explicitly or not.
+   * class, the result is false if and only if it is square because it then
+   * unconditionally stores the diagonal entries whether they have been added
+   * explicitly or not.
    *
    * This function mainly serves the purpose of describing the current class
    * in cases where several kinds of sparsity patterns can be passed as
@@ -1705,7 +1706,7 @@ inline
 bool
 SparsityPattern::stores_only_added_elements () const
 {
-  return store_diagonal_first_in_row;
+  return (store_diagonal_first_in_row == false);
 }
 
 

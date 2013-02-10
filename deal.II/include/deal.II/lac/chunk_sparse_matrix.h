@@ -609,8 +609,7 @@ public:
    * element in the <i>i</i>th
    * row. This function throws an
    * error if the matrix is not
-   * quadratic (see
-   * ChunkSparsityPattern::optimize_diagonal()).
+   * quadratic.
    *
    * This function is considerably
    * faster than the operator()(),
@@ -1431,7 +1430,7 @@ inline
 number ChunkSparseMatrix<number>::diag_element (const unsigned int i) const
 {
   Assert (cols != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),  ExcNotQuadratic());
+  Assert (m() == n(),  ExcNotQuadratic());
   Assert (i<m(), ExcInvalidIndex1(i));
 
   // Use that the first element in each row
@@ -1454,7 +1453,7 @@ inline
 number &ChunkSparseMatrix<number>::diag_element (const unsigned int i)
 {
   Assert (cols != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),  ExcNotQuadratic());
+  Assert (m() == n(),  ExcNotQuadratic());
   Assert (i<m(), ExcInvalidIndex1(i));
 
   // Use that the first element in each row

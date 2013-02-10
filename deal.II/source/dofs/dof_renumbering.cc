@@ -1882,7 +1882,7 @@ namespace DoFRenumbering
     std::fill (new_dof_indices.begin(), new_dof_indices.end(),
                numbers::invalid_unsigned_int);
     unsigned int next_free_index = 0;
-    for (unsigned int subdomain=0; subdomain<n_subdomains; ++subdomain)
+    for (types::subdomain_id subdomain=0; subdomain<n_subdomains; ++subdomain)
       for (unsigned int i=0; i<n_dofs; ++i)
         if (subdomain_association[i] == subdomain)
           {
