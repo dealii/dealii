@@ -30,6 +30,7 @@ SET(src
   mesh_worker_vector_selector.cc
   point_value_history.cc
   solution_transfer.cc
+  solution_transfer_inst2.cc
   time_dependent.cc
   vector_tools.cc
   )

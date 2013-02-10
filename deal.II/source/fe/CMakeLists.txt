@@ -30,12 +30,14 @@ SET(src
   fe_poly.cc
   fe_poly_tensor.cc
   fe_q.cc
+  fe_q_dg0.cc
   fe_q_hierarchical.cc
   fe_raviart_thomas.cc
   fe_raviart_thomas_nodal.cc
   fe_system.cc
   fe_tools.cc
   fe_values.cc
+  fe_values_inst2.cc
   mapping_c1.cc
   mapping_cartesian.cc
   mapping.cc
