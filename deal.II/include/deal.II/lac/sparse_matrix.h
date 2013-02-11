@@ -102,7 +102,7 @@ namespace SparseMatrixIterators
      * Constructor.
      */
     Accessor (MatrixType         *matrix,
-              const std::size_t   index_with_matrix);
+              const std::size_t   index_within_matrix);
 
     /**
      * Constructor. Construct the end accessor for the given matrix.
@@ -303,6 +303,19 @@ namespace SparseMatrixIterators
    * Since there is a specialization of this class for
    * <tt>Constness=false</tt>, this class is for iterators to constant
    * matrices.
+   *
+   * @note This class operates directly on the internal data structures of the
+   * SparsityPattern and SparseMatrix classes. As a consequence, some operations
+   * are cheap and some are not. In particular, it is cheap to access the column
+   * index and the value of an entry pointed to. On the other hand, it is expensive
+   * to access the row index (this requires $O(\log(N))$ operations for a
+   * matrix with $N$ row). As a consequence, when you design algorithms that
+   * use these iterators, it is common practice to not loop over <i>all</i>
+   * elements of a sparse matrix at once, but to have an outer loop over
+   * all rows and within this loop iterate over the elements of this row.
+   * This way, you only ever need to dereference the iterator to obtain
+   * the column indices and values whereas the (expensive) lookup of the row index
+   * can be avoided by using the loop index instead.
    */
   template <typename number, bool Constness>
   class Iterator
@@ -1995,10 +2008,10 @@ namespace SparseMatrixIterators
   inline
   Accessor<number,true>::
   Accessor (const MatrixType   *matrix,
-            const std::size_t   index)
+            const std::size_t   index_within_matrix)
     :
     SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern(),
-                                        index),
+                                        index_within_matrix),
     matrix (matrix)
   {}
 
@@ -2031,8 +2044,8 @@ namespace SparseMatrixIterators
   number
   Accessor<number, true>::value () const
   {
-    AssertIndexRange(a_index, matrix->n_nonzero_elements());
-    return matrix->val[a_index];
+    AssertIndexRange(index_within_sparsity, matrix->n_nonzero_elements());
+    return matrix->val[index_within_sparsity];
   }
 
 
@@ -2061,8 +2074,8 @@ namespace SparseMatrixIterators
   inline
   Accessor<number, false>::Reference::operator number() const
   {
-    AssertIndexRange(accessor->a_index, accessor->matrix->n_nonzero_elements());
-    return accessor->matrix->val[accessor->a_index];
+    AssertIndexRange(accessor->index_within_sparsity, accessor->matrix->n_nonzero_elements());
+    return accessor->matrix->val[accessor->index_within_sparsity];
   }
 
 
@@ -2072,8 +2085,8 @@ namespace SparseMatrixIterators
   const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator = (const number n) const
   {
-    AssertIndexRange(accessor->a_index, accessor->matrix->n_nonzero_elements());
-    accessor->matrix->val[accessor->a_index] = n;
+    AssertIndexRange(accessor->index_within_sparsity, accessor->matrix->n_nonzero_elements());
+    accessor->matrix->val[accessor->index_within_sparsity] = n;
     return *this;
   }
 
@@ -2084,8 +2097,8 @@ namespace SparseMatrixIterators
   const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator += (const number n) const
   {
-    AssertIndexRange(accessor->a_index, accessor->matrix->n_nonzero_elements());
-    accessor->matrix->val[accessor->a_index] += n;
+    AssertIndexRange(accessor->index_within_sparsity, accessor->matrix->n_nonzero_elements());
+    accessor->matrix->val[accessor->index_within_sparsity] += n;
     return *this;
   }
 
@@ -2096,8 +2109,8 @@ namespace SparseMatrixIterators
   const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator -= (const number n) const
   {
-    AssertIndexRange(accessor->a_index, accessor->matrix->n_nonzero_elements());
-    accessor->matrix->val[accessor->a_index] -= n;
+    AssertIndexRange(accessor->index_within_sparsity, accessor->matrix->n_nonzero_elements());
+    accessor->matrix->val[accessor->index_within_sparsity] -= n;
     return *this;
   }
 
@@ -2108,8 +2121,8 @@ namespace SparseMatrixIterators
   const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator *= (const number n) const
   {
-    AssertIndexRange(accessor->a_index, accessor->matrix->n_nonzero_elements());
-    accessor->matrix->val[accessor->a_index] *= n;
+    AssertIndexRange(accessor->index_within_sparsity, accessor->matrix->n_nonzero_elements());
+    accessor->matrix->val[accessor->index_within_sparsity] *= n;
     return *this;
   }
 
@@ -2120,8 +2133,8 @@ namespace SparseMatrixIterators
   const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator /= (const number n) const
   {
-    AssertIndexRange(accessor->a_index, accessor->matrix->n_nonzero_elements());
-    accessor->matrix->val[accessor->a_index] /= n;
+    AssertIndexRange(accessor->index_within_sparsity, accessor->matrix->n_nonzero_elements());
+    accessor->matrix->val[accessor->index_within_sparsity] /= n;
     return *this;
   }
 
@@ -2320,7 +2333,7 @@ namespace SparseMatrixIterators
     Assert (&accessor.get_matrix() == &other.accessor.get_matrix(),
             ExcInternalError());
 
-    return (*this)->a_index - other->a_index;
+    return (*this)->index_within_sparsity - other->index_within_sparsity;
   }
 
 
