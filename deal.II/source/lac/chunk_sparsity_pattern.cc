@@ -300,14 +300,22 @@ void ChunkSparsityPattern::copy_from (const FullMatrix<number> &matrix,
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
 
-  // count number of entries per row, then
-  // initialize the underlying sparsity
-  // pattern
+  // count number of entries per row, then initialize the underlying sparsity
+  // pattern. remember to also allocate space for the diagonal entry (if that
+  // hasn't happened yet) if m==n since we always allocate that for diagonal
+  // matrices
   std::vector<unsigned int> entries_per_row (matrix.m(), 0);
   for (unsigned int row=0; row<matrix.m(); ++row)
-    for (unsigned int col=0; col<matrix.n(); ++col)
-      if (matrix(row,col) != 0)
-        ++entries_per_row[row];
+    {
+      for (unsigned int col=0; col<matrix.n(); ++col)
+	if (matrix(row,col) != 0)
+	  ++entries_per_row[row];
+
+      if ((matrix.m() == matrix.n())
+	  &&
+	  (matrix(row,row) == 0))
+	++entries_per_row[row];
+    }
 
   reinit (matrix.m(), matrix.n(),
           entries_per_row,

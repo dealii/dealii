@@ -49,8 +49,10 @@ int main (int argc,char **argv)
   deallog << "Original:" << std::endl;
   matrix.print_formatted (deallog.get_file_stream());
 
-  // create a separate sparsity pattern to use
-  SparsityPattern xsparsity (5,5,5,/*optimize_diagonal=*/false);
+  // create a separate sparsity pattern to use. note that this sparsity
+  // pattern stores the elements explicitly added here but also the diagonal
+  // entries (that's what SparsityPattern does for square matrices)
+  SparsityPattern xsparsity (5,5,5);
   xsparsity.add (1,2);
   xsparsity.add (2,3);
   xsparsity.add (2,4);

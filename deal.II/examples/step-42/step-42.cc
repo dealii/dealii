@@ -70,6 +70,8 @@ namespace Step42
 
   // @sect3{The <code>PlasticityContactProblem</code> class template}
 
+  template <int dim> class Input;
+
   // This class provides an interface
   // for a constitutive law. In this
   // example we are using an elastic
@@ -77,8 +79,6 @@ namespace Step42
   // isotropic hardening.
 
   template <int dim> class ConstitutiveLaw;
-
-  // @sect3{The <code>PlasticityContactProblem</code> class template}
 
   // This class supplies all function
   // and variables needed to describe
@@ -99,7 +99,7 @@ namespace Step42
   class PlasticityContactProblem
   {
   public:
-    PlasticityContactProblem (int _n_refinements_global, int _n_refinements_local);
+    PlasticityContactProblem (int _n_refinements_global);
     void run ();
 
   private:
@@ -117,7 +117,6 @@ namespace Step42
     void output_results (const std::string &title) const;
 
     int                  n_refinements_global;
-    int                  n_refinements_local;
 
     MPI_Comm             mpi_communicator;
 
@@ -151,13 +150,207 @@ namespace Step42
     TrilinosWrappers::PreconditionAMG preconditioner_u;
     TrilinosWrappers::PreconditionAMG preconditioner_t;
 
-    std::auto_ptr<ConstitutiveLaw<dim> > plast_lin_hard;
+    std::unique_ptr<Input<dim> >               input_obstacle;
+    std::unique_ptr<ConstitutiveLaw<dim> >     plast_lin_hard;
 
     double sigma_0;    // Yield stress
     double gamma;      // Parameter for the linear isotropic hardening
     double e_modul;    // E-Modul
     double nu;         // Poisson ratio
   };
+
+  template <int dim>
+  class Input
+  {
+   public:
+    Input (const char* _name) :
+      name (_name),
+      mpi_communicator (MPI_COMM_WORLD),
+      pcout (std::cout,
+               (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
+      HV (NULL),
+      lx (0),
+      ly (0),
+      nx (0),
+      ny (0)
+      {read_surface (name);}
+
+      double hv(int i, int j);
+
+      double& set_height(int i, int j);
+
+      double mikro_height(double x,double y, double z);
+
+      void read_surface(const char* name);
+
+   private:
+      const char*          name;
+      MPI_Comm             mpi_communicator;
+      ConditionalOStream   pcout;
+      double*              HV;
+      double               lx, ly;
+      double               hx, hy;
+      int                  nx, ny;
+  };
+
+  template <int dim>
+  double Input<dim>::hv(int i, int j) {
+      return HV[nx*j+i];  // i indiziert x-werte, j indiziert y-werte
+  }
+
+  template <int dim>
+  double& Input<dim>::set_height(int i, int j) {
+      return HV[nx*j+i];  // i indiziert x-werte, j indiziert y-werte
+  }
+
+  template <int dim>
+  double Input<dim>::mikro_height(double x,double y, double z) {
+    int ix = (int)(x/hx);
+    int iy = (int)(y/hy);
+
+      if (ix<0) {
+          ix = 0;
+          //      cerr << "hm\n";
+      }
+      if (iy<0) {
+          iy = 0;
+          //      cerr << "hm\n";
+      }
+
+      if (ix>=nx-1) {
+          ix = nx-2;
+      }
+      if (iy>=ny-1) {
+          iy = ny-2;
+      }
+
+      double val = 0.;
+      {
+          FullMatrix<double> H(4,4);
+          Vector<double>  X(4);
+          Vector<double>  b(4);
+
+          double xx = 0.;
+          double yy = 0.;
+
+          xx = (ix  )*hx;
+          yy = (iy  )*hy;
+          H(0,0) = xx;
+          H(0,1) = yy;
+          H(0,2) = xx*yy;
+          H(0,3) = 1.;
+          b(0)   = hv(ix  ,iy  );
+
+          xx = (ix+1)*hx;
+          yy = (iy  )*hy;
+          H(1,0) = xx;
+          H(1,1) = yy;
+          H(1,2) = xx*yy;
+          H(1,3) = 1.;
+          b(1)   = hv(ix+1,iy  );
+
+          xx = (ix+1)*hx;
+          yy = (iy+1)*hy;
+          H(2,0) = xx;
+          H(2,1) = yy;
+          H(2,2) = xx*yy;
+          H(2,3) = 1.;
+          b(2)   = hv(ix+1,iy+1);
+
+          xx = (ix  )*hx;
+          yy = (iy+1)*hy;
+          H(3,0) = xx;
+          H(3,1) = yy;
+          H(3,2) = xx*yy;
+          H(3,3) = 1.;
+          b(3)   = hv(ix  ,iy+1);
+
+          H.gauss_jordan();
+          H.vmult(X,b);
+
+          val = X(0)*x + X(1)*y + X(2)*x*y + X(3);
+      }
+
+      return val;
+  }
+
+  template <int dim>
+  void Input<dim>::read_surface(const char* name) {
+      int SZ = 100000;
+      FILE* fp = fopen(name,"r");
+      char* zeile   = new char[SZ];
+      char* hlp_str = new char[SZ];
+
+      double hlp;
+
+      int POS;
+      ////////////////////////////////
+      fgets(zeile,SZ,fp);
+      POS = strcspn(zeile,"=");
+      for (int i=0;i<=POS;i++) {
+          zeile[i] = ' ';
+      }
+      sscanf(zeile,"%d",&nx);
+      ////////////////////////////////
+      fgets(zeile,SZ,fp);
+      POS = strcspn(zeile,"=");
+      for (int i=0;i<=POS;i++) {
+          zeile[i] = ' ';
+      }
+      sscanf(zeile,"%d",&ny);
+      ////////////////////////////////
+      fgets(zeile,SZ,fp);
+      POS = strcspn(zeile,"=");
+      for (int i=0;i<=POS;i++) {
+          zeile[i] = ' ';
+      }
+      sscanf(zeile,"%lf",&lx);
+      ////////////////////////////////
+      fgets(zeile,SZ,fp);
+      POS = strcspn(zeile,"=");
+      for (int i=0;i<=POS;i++) {
+          zeile[i] = ' ';
+      }
+      sscanf(zeile,"%lf",&ly);
+
+      pcout<< nx << " " << ny << " " << lx << " " << ly << " " <<std::endl;
+
+      hx = lx/(nx-1);
+      hy = ly/(ny-1);
+
+      pcout<< "Solution of the scanned obstacle picture: " << hx << " " << hy <<std::endl;
+
+      if (HV) delete[] HV;
+      HV = new double [nx*ny];
+
+      int j=0;
+      double max_hlp=0;
+      double min_hlp=1e+10;
+      while (fgets(zeile,SZ,fp)) {
+          int reached = 0;
+          for (int k=0;!reached;k++) {
+              sscanf(zeile,"%lf",&hlp);
+
+              if (hlp > max_hlp)
+                max_hlp=hlp;
+              if (hlp < min_hlp)
+                min_hlp=hlp;
+
+              set_height(k,ny-1-j) = hlp;
+              int pos = strcspn(zeile,",");
+              if (!strpbrk(zeile,",")) {
+                  reached = 1;
+                  continue;
+              }
+              for (int i=0;i<=pos;i++) {
+                  zeile[i] = ' ';
+              }
+          }
+          j++;
+      }
+      pcout<< "/** highest point: " << max_hlp <<std::endl;
+      pcout<< "/** lowest point:  " << min_hlp <<std::endl;
+  }
 
   template <int dim>
   class ConstitutiveLaw
@@ -379,13 +572,18 @@ namespace Step42
     class Obstacle : public Function<dim>
     {
     public:
-      Obstacle () : Function<dim>(dim) {};
+      Obstacle (std::unique_ptr<Input<dim> > const &_input) :
+        Function<dim>(dim),
+        input_obstacle_copy(std::move (_input)) {};
 
       virtual double value (const Point<dim>   &p,
                             const unsigned int  component = 0) const;
 
       virtual void vector_value (const Point<dim> &p,
                                  Vector<double>   &values) const;
+
+    private:
+      std::unique_ptr<Input<dim> >  const &input_obstacle_copy;
     };
 
     template <int dim>
@@ -393,7 +591,7 @@ namespace Step42
                                  const unsigned int component) const
     {
       double R = 0.03;
-      double return_value = 0.0;
+      double return_value = 100.0;
       if (component == 0)
         return_value = p(0);
       if (component == 1)
@@ -401,12 +599,19 @@ namespace Step42
       if (component == 2)
         {
           // Hindernis Dortmund
-          double x1 = p(0);
-          double x2 = p(1);
-          if (((x2-0.5)*(x2-0.5)+(x1-0.5)*(x1-0.5)<=0.3*0.3)&&((x2-0.5)*(x2-0.5)+(x1-1.0)*(x1-1.0)>=0.4*0.4)&&((x2-0.5)*(x2-0.5)+x1*x1>=0.4*0.4))
-            return_value = 0.999;
-          else
-            return_value = 1e+10;
+//          double x1 = p(0);
+//          double x2 = p(1);
+//          if (((x2-0.5)*(x2-0.5)+(x1-0.5)*(x1-0.5)<=0.3*0.3)&&((x2-0.5)*(x2-0.5)+(x1-1.0)*(x1-1.0)>=0.4*0.4)&&((x2-0.5)*(x2-0.5)+x1*x1>=0.4*0.4))
+//            return_value = 0.999;
+//          else
+//            return_value = 1e+10;
+
+          // Hindernis Werkzeug TKSE
+           return_value = 1.999 - input_obstacle_copy->mikro_height (p(0), p(1), p(2));
+//           std::cout<< "Obstacle value: " << return_value
+//               << " p(0) = " << p(0)
+//               << " p(1) = " << p(1)
+//               <<std::endl;
 
           // Ball with radius R
           // double R = 1.0;
@@ -436,10 +641,9 @@ namespace Step42
   // above. As before, we will write everything
 
   template <int dim>
-  PlasticityContactProblem<dim>::PlasticityContactProblem (int _n_refinements_global, int _n_refinements_local)
+  PlasticityContactProblem<dim>::PlasticityContactProblem (int _n_refinements_global)
     :
     n_refinements_global (_n_refinements_global),
-    n_refinements_local (_n_refinements_local),
     mpi_communicator (MPI_COMM_WORLD),
     triangulation (mpi_communicator),
     fe (FE_Q<dim>(1), dim),
@@ -860,7 +1064,7 @@ namespace Step42
   {
     clock_t                        start_proj, end_proj;
 
-    const EquationData::Obstacle<dim>     obstacle;
+    const EquationData::Obstacle<dim>     obstacle (input_obstacle);
     std::vector<bool>                     vertex_touched (dof_handler.n_dofs (), false);
 
     typename DoFHandler<dim>::active_cell_iterator
@@ -1032,7 +1236,7 @@ namespace Step42
 
     PrimitiveVectorMemory<TrilinosWrappers::MPI::Vector> mem;
     TrilinosWrappers::MPI::Vector    tmp (system_rhs_newton);
-    const double solver_tolerance = 1e-4 *
+    const double solver_tolerance = 1e-3 *
                                     system_matrix_newton.residual (tmp, distributed_solution, system_rhs_newton);
 
     SolverControl solver_control (system_matrix_newton.m(), solver_tolerance);
@@ -1314,7 +1518,10 @@ namespace Step42
     Timer                          t;
     run_time.resize (8);
 
-    const unsigned int n_cycles = 5;
+    // Read in the obstacle data.
+    input_obstacle.reset (new Input<dim>("obstacle_file.dat"));
+
+    const unsigned int n_cycles = 6;
     for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
       {
         pcout << "Cycle " << cycle << ':' << std::endl;
@@ -1367,16 +1574,14 @@ int main (int argc, char *argv[])
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
   {
-    int _n_refinements_global = 2;
-    int _n_refinements_local = 1;
+    int _n_refinements_global = 3;
 
     if (argc == 3)
       {
         _n_refinements_global = atoi(argv[1]);
-        _n_refinements_local = atoi(argv[2]);
       }
 
-    PlasticityContactProblem<3> laplace_problem_3d (_n_refinements_global, _n_refinements_local);
+    PlasticityContactProblem<3> laplace_problem_3d (_n_refinements_global);
     laplace_problem_3d.run ();
   }
 

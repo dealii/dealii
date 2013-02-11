@@ -1,8 +1,8 @@
 //----------------------------  chunk_sparse_matrix_01a.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2008, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,14 +17,14 @@
 // ChunkSparseMatrix::el() returns zero and operator() throws an exception
 
 #include "../tests.h"
-#include <deal.II/lac/chunk_sparse_matrix.h>    
+#include <deal.II/lac/chunk_sparse_matrix.h>
 #include <fstream>
 #include <iomanip>
 
 
 void test (const unsigned int chunk_size)
 {
-  ChunkSparsityPattern sp (5,5,3,chunk_size,false);
+  ChunkSparsityPattern sp (5,5,3,chunk_size);
   for (unsigned int i=0; i<5; ++i)
     for (unsigned int j=0; j<5; ++j)
       if ((i+2*j+1) % 3 == 0)
@@ -32,7 +32,7 @@ void test (const unsigned int chunk_size)
   sp.compress ();
 
   ChunkSparseMatrix<double> m(sp);
-  
+
                                    // first set a few entries
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
@@ -60,7 +60,10 @@ void test (const unsigned int chunk_size)
 					   // to get an exception if we access
 					   // any other element. if
 					   // chunk_size>1, then this isn't
-					   // necessarily true
+					   // necessarily true. because the
+					   // matrix is square, we may also
+					   // always access the diagonal
+					   // element
           bool exc_thrown = false;
           try
             {
@@ -70,7 +73,7 @@ void test (const unsigned int chunk_size)
             {
               exc_thrown = true;
             }
-          Assert ((exc_thrown == true) || (chunk_size > 1),
+          Assert ((exc_thrown == true) || (chunk_size > 1) || (i==j),
 		  ExcInternalError());
         }
 
@@ -104,10 +107,10 @@ int main ()
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
 		<< "----------------------------------------------------"
