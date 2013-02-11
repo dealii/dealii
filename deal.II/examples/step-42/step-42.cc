@@ -194,162 +194,159 @@ namespace Step42
   };
 
   template <int dim>
-  double Input<dim>::hv(int i, int j) {
-      return HV[nx*j+i];  // i indiziert x-werte, j indiziert y-werte
+  double Input<dim>::hv(int i, int j)
+  {
+    return HV[nx*j+i];  // i indiziert x-werte, j indiziert y-werte
   }
 
   template <int dim>
-  double& Input<dim>::set_height(int i, int j) {
-      return HV[nx*j+i];  // i indiziert x-werte, j indiziert y-werte
+  double& Input<dim>::set_height(int i, int j)
+  {
+    return HV[nx*j+i];  // i indiziert x-werte, j indiziert y-werte
   }
 
   template <int dim>
-  double Input<dim>::mikro_height(double x,double y, double z) {
+  double Input<dim>::mikro_height(double x,double y, double z)
+  {
     int ix = (int)(x/hx);
     int iy = (int)(y/hy);
 
-      if (ix<0) {
-          ix = 0;
-          //      cerr << "hm\n";
-      }
-      if (iy<0) {
-          iy = 0;
-          //      cerr << "hm\n";
-      }
+    if (ix<0)
+      ix = 0;
 
-      if (ix>=nx-1) {
-          ix = nx-2;
-      }
-      if (iy>=ny-1) {
-          iy = ny-2;
-      }
+    if (iy<0)
+      iy = 0;
 
-      double val = 0.;
-      {
-          FullMatrix<double> H(4,4);
-          Vector<double>  X(4);
-          Vector<double>  b(4);
+    if (ix>=nx-1)
+      ix = nx-2;
 
-          double xx = 0.;
-          double yy = 0.;
+    if (iy>=ny-1)
+      iy = ny-2;
 
-          xx = (ix  )*hx;
-          yy = (iy  )*hy;
-          H(0,0) = xx;
-          H(0,1) = yy;
-          H(0,2) = xx*yy;
-          H(0,3) = 1.;
-          b(0)   = hv(ix  ,iy  );
+    double val = 0.0;
+    {
+      FullMatrix<double> H(4,4);
+      Vector<double>  X(4);
+      Vector<double>  b(4);
 
-          xx = (ix+1)*hx;
-          yy = (iy  )*hy;
-          H(1,0) = xx;
-          H(1,1) = yy;
-          H(1,2) = xx*yy;
-          H(1,3) = 1.;
-          b(1)   = hv(ix+1,iy  );
+      double xx = 0.0;
+      double yy = 0.0;
 
-          xx = (ix+1)*hx;
-          yy = (iy+1)*hy;
-          H(2,0) = xx;
-          H(2,1) = yy;
-          H(2,2) = xx*yy;
-          H(2,3) = 1.;
-          b(2)   = hv(ix+1,iy+1);
+      xx = ix*hx;
+      yy = iy*hy;
+      H(0,0) = xx;
+      H(0,1) = yy;
+      H(0,2) = xx*yy;
+      H(0,3) = 1.0;
+      b(0)   = hv (ix, iy);
 
-          xx = (ix  )*hx;
-          yy = (iy+1)*hy;
-          H(3,0) = xx;
-          H(3,1) = yy;
-          H(3,2) = xx*yy;
-          H(3,3) = 1.;
-          b(3)   = hv(ix  ,iy+1);
+      xx = (ix + 1)*hx;
+      yy = iy*hy;
+      H(1,0) = xx;
+      H(1,1) = yy;
+      H(1,2) = xx*yy;
+      H(1,3) = 1.0;
+      b(1)   = hv (ix + 1, iy);
 
-          H.gauss_jordan();
-          H.vmult(X,b);
+      xx = (ix + 1)*hx;
+      yy = (iy + 1)*hy;
+      H(2,0) = xx;
+      H(2,1) = yy;
+      H(2,2) = xx*yy;
+      H(2,3) = 1.0;
+      b(2)   = hv (ix + 1, iy + 1);
 
-          val = X(0)*x + X(1)*y + X(2)*x*y + X(3);
-      }
+      xx = ix*hx;
+      yy = (iy + 1)*hy;
+      H(3,0) = xx;
+      H(3,1) = yy;
+      H(3,2) = xx*yy;
+      H(3,3) = 1.0;
+      b(3)   = hv (ix, iy + 1);
 
-      return val;
+      H.gauss_jordan ();
+      H.vmult (X, b);
+
+      val = X(0)*x + X(1)*y + X(2)*x*y + X(3);
+    }
+
+    return val;
   }
 
   template <int dim>
-  void Input<dim>::read_surface(const char* name) {
-      int SZ = 100000;
-      FILE* fp = fopen(name,"r");
-      char* zeile   = new char[SZ];
-      char* hlp_str = new char[SZ];
+  void Input<dim>::read_surface(const char* name)
+  {
+    int SZ = 100000;
+    FILE* fp = fopen (name, "r");
+    char* zeile   = new char[SZ];
+    char* hlp_str = new char[SZ];
+    double hlp;
+    int POS;
 
-      double hlp;
+    fgets (zeile, SZ, fp);
+    POS = strcspn (zeile, "=");
+    for (int i=0; i<=POS; i++)
+      zeile[i] = ' ';
+    sscanf (zeile, "%d", &nx);
 
-      int POS;
-      ////////////////////////////////
-      fgets(zeile,SZ,fp);
-      POS = strcspn(zeile,"=");
-      for (int i=0;i<=POS;i++) {
-          zeile[i] = ' ';
-      }
-      sscanf(zeile,"%d",&nx);
-      ////////////////////////////////
-      fgets(zeile,SZ,fp);
-      POS = strcspn(zeile,"=");
-      for (int i=0;i<=POS;i++) {
-          zeile[i] = ' ';
-      }
-      sscanf(zeile,"%d",&ny);
-      ////////////////////////////////
-      fgets(zeile,SZ,fp);
-      POS = strcspn(zeile,"=");
-      for (int i=0;i<=POS;i++) {
-          zeile[i] = ' ';
-      }
-      sscanf(zeile,"%lf",&lx);
-      ////////////////////////////////
-      fgets(zeile,SZ,fp);
-      POS = strcspn(zeile,"=");
-      for (int i=0;i<=POS;i++) {
-          zeile[i] = ' ';
-      }
-      sscanf(zeile,"%lf",&ly);
+    fgets (zeile,SZ,fp);
+    POS = strcspn (zeile, "=");
+    for (int i=0; i<=POS; i++)
+      zeile[i] = ' ';
+    sscanf (zeile, "%d", &ny);
 
-      pcout<< nx << " " << ny << " " << lx << " " << ly << " " <<std::endl;
+    fgets (zeile, SZ, fp);
+    POS = strcspn (zeile, "=");
+    for (int i=0; i<=POS; i++)
+      zeile[i] = ' ';
+    sscanf (zeile, "%lf", &lx);
 
-      hx = lx/(nx-1);
-      hy = ly/(ny-1);
+    fgets (zeile, SZ, fp);
+    POS = strcspn(zeile,"=");
+    for (int i=0; i<=POS; i++)
+      zeile[i] = ' ';
+    sscanf(zeile,"%lf",&ly);
 
-      pcout<< "Solution of the scanned obstacle picture: " << hx << " " << hy <<std::endl;
+    hx = lx/(nx - 1);
+    hy = ly/(ny - 1);
 
-      if (HV) delete[] HV;
-      HV = new double [nx*ny];
+    pcout<< "Resolution of the scanned obstacle picture: " << nx << " x " << ny <<std::endl;
 
-      int j=0;
-      double max_hlp=0;
-      double min_hlp=1e+10;
-      while (fgets(zeile,SZ,fp)) {
-          int reached = 0;
-          for (int k=0;!reached;k++) {
-              sscanf(zeile,"%lf",&hlp);
+    if (HV) delete[] HV;
+    HV = new double [nx*ny];
 
-              if (hlp > max_hlp)
-                max_hlp=hlp;
-              if (hlp < min_hlp)
-                min_hlp=hlp;
+    int j = 0;
+    double max_hlp = 0;
+    double min_hlp = 1e+10;
+    while (fgets (zeile, SZ, fp))
+      {
+        int reached = 0;
+        for (int k=0; !reached; k++)
+          {
+            sscanf (zeile, "%lf", &hlp);
 
-              set_height(k,ny-1-j) = hlp;
-              int pos = strcspn(zeile,",");
-              if (!strpbrk(zeile,",")) {
-                  reached = 1;
-                  continue;
+            if (hlp > max_hlp)
+              max_hlp=hlp;
+            if (hlp < min_hlp)
+              min_hlp=hlp;
+
+            set_height (k, ny - 1 - j) = hlp;
+            int pos = strcspn (zeile, ",");
+            if (!strpbrk (zeile, ","))
+              {
+                reached = 1;
+                continue;
               }
-              for (int i=0;i<=pos;i++) {
-                  zeile[i] = ' ';
+
+            for (int i=0; i<=pos; i++)
+              {
+                zeile[i] = ' ';
               }
           }
-          j++;
+        j++;
       }
-      pcout<< "/** highest point: " << max_hlp <<std::endl;
-      pcout<< "/** lowest point:  " << min_hlp <<std::endl;
+    pcout<< "Highest point of the obstacle: " << max_hlp <<std::endl;
+    pcout<< "Lowest point of the obstacle:  " << min_hlp <<std::endl;
   }
 
   template <int dim>
@@ -723,13 +720,13 @@ namespace Step42
                                                constraints_hanging_nodes);
       constraints_hanging_nodes.close ();
 
-      pcout << "Number of active cells: "
+      pcout << "   Number of active cells: "
             << triangulation.n_active_cells()
             << std::endl
-            << "Total number of cells: "
+            << "   Total number of cells: "
             << triangulation.n_cells()
             << std::endl
-            << "Number of degrees of freedom: "
+            << "   Number of degrees of freedom: "
             << dof_handler.n_dofs ()
             << std::endl;
 
@@ -1003,8 +1000,8 @@ namespace Step42
 
     unsigned int sum_elast_points = Utilities::MPI::sum(elast_points, mpi_communicator);
     unsigned int sum_plast_points = Utilities::MPI::sum(plast_points, mpi_communicator);
-    pcout<< "Elast-Points = " << sum_elast_points <<std::endl;
-    pcout<< "Plast-Points = " << sum_plast_points <<std::endl;
+    pcout << "      Number of elastic quadrature points: " << sum_elast_points
+          << " and plastic quadrature points: " << sum_plast_points <<std::endl;
   }
 
   template <int dim>
@@ -1130,7 +1127,7 @@ namespace Step42
 
     unsigned int sum_contact_constraints = Utilities::MPI::sum(active_set_locally_owned.n_elements (),
                                                                mpi_communicator);
-    pcout << "Number of Contact-Constaints: " << sum_contact_constraints <<std::endl;
+    pcout << "         Size of active set: " << sum_contact_constraints <<std::endl;
 
     solution = distributed_solution;
 
@@ -1212,7 +1209,6 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::solve ()
   {
-    pcout << "Solving ..." << std::endl;
     Timer t;
 
     TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
@@ -1246,10 +1242,10 @@ namespace Step42
            AdditionalData(30, true));
     solver.solve(system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);
 
-    pcout << "Initial error: " << solver_control.initial_value() <<std::endl;
-    pcout << "   " << solver_control.last_step()
-          << " FGMRES iterations needed to obtain convergence with an error: "
-          <<  solver_control.last_value()
+    pcout << "         Error: " << solver_control.initial_value()
+          << " -> " << solver_control.last_value()
+          << " in " << solver_control.last_step()
+          << " FGMRES iterations."
           << std::endl;
 
     MPI_Barrier (mpi_communicator);
@@ -1287,14 +1283,14 @@ namespace Step42
     additional_data.smoother_sweeps = 2;
     additional_data.aggregation_threshold = 1e-2;
 
-    IndexSet                            active_set_old (active_set);
+    IndexSet                        active_set_old (active_set);
     unsigned int j = 0;
     unsigned int number_assemble_system = 0;
     for (; j<=100; j++)
       {
         pcout<< " " <<std::endl;
-        pcout<< j << ". Iteration of the inexact Newton-method." <<std::endl;
-        pcout<< "Update of active set" <<std::endl;
+        pcout<< "   Newton iteration " << j <<std::endl;
+        pcout<< "      Updating active set..." <<std::endl;
 
         MPI_Barrier (mpi_communicator);
         t.restart();
@@ -1306,7 +1302,7 @@ namespace Step42
         if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
           run_time[5] += t.wall_time();
 
-        pcout<< "Assembling ... " <<std::endl;
+        pcout<< "      Assembling system... " <<std::endl;
         MPI_Barrier (mpi_communicator);
         t.restart();
         system_matrix_newton = 0;
@@ -1321,6 +1317,7 @@ namespace Step42
 
         MPI_Barrier (mpi_communicator);
         t.restart();
+        pcout<< "      Solving system... " <<std::endl;
         solve ();
         MPI_Barrier (mpi_communicator);
         t.stop();
@@ -1351,30 +1348,27 @@ namespace Step42
             end_res       = (res.local_range().second);
             for (unsigned int n=start_res; n<end_res; ++n)
               if (constraints.is_inhomogeneously_constrained (n))
-                {
-                  res(n) = 0;
-                }
+                res(n) = 0;
 
             resid = res.l2_norm ();
-            pcout<< "Residual: " << resid <<std::endl;
 
             if (resid<resid_old)
-              {
-                pcout<< "Newton-damping parameter alpha = " << a <<std::endl;
-                damped=1;
-              }
+              damped=1;
+
             MPI_Barrier (mpi_communicator);
             t.stop();
             if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
               run_time[3] += t.wall_time();
+
+            pcout << "      Residual of the non-contact part of the system: " << resid
+                              << std::endl
+                              << "         with a damping parameter alpha = " << a
+                              << std::endl;
           }
 
         if (resid<1e-8)
-          {
-            pcout<< "Inexact Newton-method stopped with residual = " << resid <<std::endl;
-            pcout<< "Number of Assembling systems = " << number_assemble_system <<std::endl;
-            break;
-          }
+          break;
+
         resid_old=resid;
 
         resid_vector = system_rhs_newton;
@@ -1384,16 +1378,10 @@ namespace Step42
         active_set_old = active_set;
       } // End of active-set-loop
 
-    pcout<< "Number of Solver-Iterations = " << number_iterations <<std::endl;
-
-    pcout<< "%%%%%% Rechenzeit make grid and setup = " << run_time[0] <<std::endl;
-    pcout<< "%%%%%% Rechenzeit projection active set = " << run_time[5] <<std::endl;
-    pcout<< "%%%%%% Rechenzeit assemble system = " << run_time[1] <<std::endl;
-    pcout<< "%%%%%% Rechenzeit solve system = " << run_time[2] <<std::endl;
-    pcout<< "%%%%%% Rechenzeit preconditioner = " << run_time[6] <<std::endl;
-    pcout<< "%%%%%% Rechenzeit solve with CG = " << run_time[7] <<std::endl;
-    pcout<< "%%%%%% Rechenzeit error and lambda = " << run_time[3] <<std::endl;
-    pcout<< "%%%%%% Rechenzeit output = " << run_time[4] <<std::endl;
+    pcout << "" << std::endl
+          << "      Number of assembled systems = " << number_assemble_system
+          << std::endl
+          << "      Number of Solver-Iterations = " << number_iterations << std::endl;
   }
 
 
@@ -1420,8 +1408,6 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const
   {
-    pcout<< "Moving mesh." <<std::endl;
-
     std::vector<bool> vertex_touched (triangulation.n_vertices(),
                                       false);
 
@@ -1513,17 +1499,17 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::run ()
   {
-    pcout << "Solving problem in " << dim << " space dimensions." << std::endl;
-
-    Timer                          t;
-    run_time.resize (8);
-
-    // Read in the obstacle data.
+    pcout << "Read the obstacle from a file." << std::endl;
     input_obstacle.reset (new Input<dim>("obstacle_file.dat"));
+    pcout << "Ostacle is available now." << std::endl;
+
+    Timer             t;
+    run_time.resize (8);
 
     const unsigned int n_cycles = 6;
     for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
       {
+        pcout << "" <<std::endl;
         pcout << "Cycle " << cycle << ':' << std::endl;
 
         MPI_Barrier (mpi_communicator);
@@ -1544,7 +1530,7 @@ namespace Step42
 
         solve_newton ();
 
-        pcout<< "Creating output." <<std::endl;
+        pcout<< "      Writing graphical output..." <<std::endl;
         MPI_Barrier (mpi_communicator);
         t.restart();
         std::ostringstream filename_solution;
@@ -1555,6 +1541,16 @@ namespace Step42
         t.stop();
         if (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)
           run_time[4] += t.wall_time();
+
+        pcout << "      Computing time for:" << std::endl
+              << "         making grid and setup = " << run_time[0] << std::endl
+              << "         updating active set = " << run_time[5] <<std::endl
+              << "         assembling system = " << run_time[1] <<std::endl
+              << "         solving system = " << run_time[2] <<std::endl
+              << "         preconditioning = " << run_time[6] <<std::endl
+              << "         solving with FGMRES = " << run_time[7] <<std::endl
+              << "         computing error and lambda = " << run_time[3] <<std::endl
+              << "         writing graphical output = " << run_time[4] <<std::endl;
       }
   }
 }
