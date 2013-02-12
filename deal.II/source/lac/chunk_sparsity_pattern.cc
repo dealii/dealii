@@ -487,7 +487,7 @@ ChunkSparsityPattern::n_nonzero_elements () const
     	  // rather than all elements
     	  unsigned int n = 0;
 
-    	  for (int row = 0; row < n_rows(); ++row)
+    	  for (unsigned int row = 0; row < n_rows(); ++row)
     	    {
     	      SparsityPattern::const_iterator p = sparsity_pattern.begin(row);
     	      for (; p!=sparsity_pattern.end(row); ++p)
