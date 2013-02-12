@@ -480,37 +480,43 @@ ChunkSparsityPattern::n_nonzero_elements () const
 
       else
         {
-          // if columns don't align, then
-          // just iterate over all chunks and
-          // see what this leads to
-          SparsityPattern::const_iterator p = sparsity_pattern.begin();
-          unsigned int n = 0;
-          for (; p!=sparsity_pattern.end(); ++p)
-            if ((p->row() != sparsity_pattern.n_rows() - 1)
-                &&
-                (p->column() != sparsity_pattern.n_cols() - 1))
-              n += chunk_size * chunk_size;
-            else if ((p->row() == sparsity_pattern.n_rows() - 1)
-                     &&
-                     (p->column() != sparsity_pattern.n_cols() - 1))
-              // last chunk row, but not
-              // last chunk column. only a
-              // smaller number (n_rows %
-              // chunk_size) of rows
-              // actually exist
-              n += (n_rows() % chunk_size) * chunk_size;
-            else if ((p->row() != sparsity_pattern.n_rows() - 1)
-                     &&
-                     (p->column() == sparsity_pattern.n_cols() - 1))
-              // last chunk column, but
-              // not row
-              n += (n_cols() % chunk_size) * chunk_size;
-            else
-              // bottom right chunk
-              n += (n_cols() % chunk_size) *
-                   (n_rows() % chunk_size);
+    	  // if columns don't align, then
+    	  // just iterate over all chunks and
+    	  // see what this leads to. follow the advice in the documentation of
+    	  // the sparsity pattern iterators to do the loop over individual rows,
+    	  // rather than all elements
+    	  unsigned int n = 0;
 
-          return n;
+    	  for (int row = 0; row < n_rows(); ++row)
+    	    {
+    	      SparsityPattern::const_iterator p = sparsity_pattern.begin(row);
+    	      for (; p!=sparsity_pattern.end(row); ++p)
+    	        if ((row != sparsity_pattern.n_rows() - 1)
+    	            &&
+    	            (p->column() != sparsity_pattern.n_cols() - 1))
+    	          n += chunk_size * chunk_size;
+    	        else if ((row == sparsity_pattern.n_rows() - 1)
+    	            &&
+    	            (p->column() != sparsity_pattern.n_cols() - 1))
+    	          // last chunk row, but not
+    	          // last chunk column. only a
+    	          // smaller number (n_rows %
+    	          // chunk_size) of rows
+    	          // actually exist
+    	          n += (n_rows() % chunk_size) * chunk_size;
+    	        else if ((row != sparsity_pattern.n_rows() - 1)
+    	            &&
+    	            (p->column() == sparsity_pattern.n_cols() - 1))
+    	          // last chunk column, but
+    	          // not row
+    	          n += (n_cols() % chunk_size) * chunk_size;
+    	        else
+    	          // bottom right chunk
+    	          n += (n_cols() % chunk_size) *
+    	          (n_rows() % chunk_size);
+    	    }
+
+    	  return n;
         }
     }
 }
