@@ -183,8 +183,7 @@ enum UpdateFlags
    */
   update_volume_elements = 0x4000,
   /**
-   * Update the location of the mapped generalized support points of
-   * the element.
+   * @deprecated: this flag has no effect.
    */
   update_support_points = 0x10000,
   /**
