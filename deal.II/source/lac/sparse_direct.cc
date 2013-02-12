@@ -1726,16 +1726,21 @@ factorize (const Matrix &matrix)
     // not yet written to
     std::vector<long int> row_pointers = Ap;
 
-    for (typename Matrix::const_iterator p=matrix.begin();
-         p!=matrix.end(); ++p)
+    // loop over the elements of the matrix row by row, as suggested
+    // in the documentation of the sparse matrix iterator class
+    for (unsigned int row = 0; row < matrix.n(); ++row)
       {
-        // write entry into the first
-        // free one for this row
-        Ai[row_pointers[p->row()]] = p->column();
-        Ax[row_pointers[p->row()]] = p->value();
+        for (typename Matrix::const_iterator p=matrix.begin(row);
+            p!=matrix.end(row); ++p)
+          {
+            // write entry into the first
+            // free one for this row
+            Ai[row_pointers[row]] = p->column();
+            Ax[row_pointers[row]] = p->value();
 
-        // then move pointer ahead
-        ++row_pointers[p->row()];
+            // then move pointer ahead
+            ++row_pointers[row];
+          }
       }
 
     // at the end, we should have
@@ -1955,15 +1960,20 @@ void SparseDirectMUMPS::initialize_matrix (const Matrix &matrix)
 
       unsigned int index = 0;
 
-      for (typename Matrix::const_iterator ptr = matrix.begin ();
-           ptr != matrix.end (); ++ptr)
-        if (std::abs (ptr->value ()) > 0.0)
-          {
-            a[index]   = ptr->value ();
-            irn[index] = ptr->row () + 1;
-            jcn[index] = ptr->column () + 1;
-            ++index;
-          }
+      // loop over the elements of the matrix row by row, as suggested
+      // in the documentation of the sparse matrix iterator class
+      for (unsigned int row = 0; row < matrix.n(); ++row)
+        {
+          for (typename Matrix::const_iterator ptr = matrix.begin (row);
+              ptr != matrix.end (row); ++ptr)
+            if (std::abs (ptr->value ()) > 0.0)
+              {
+                a[index]   = ptr->value ();
+                irn[index] = row + 1;
+                jcn[index] = ptr->column () + 1;
+                ++index;
+              }
+        }
 
       id.n   = n;
       id.nz  = nz;
