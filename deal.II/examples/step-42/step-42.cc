@@ -774,7 +774,7 @@ namespace Step42
         diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
       number_iterations = 0;
 
-      diag_mass_matrix_vector.compress (VectorOperation::add);
+      diag_mass_matrix_vector.compress (VectorOperation::insert);
     }
   }
 
@@ -814,7 +814,6 @@ namespace Step42
 
     const FEValuesExtractors::Vector displacement (0);
 
-    TrilinosWrappers::MPI::Vector   test_rhs(solution);
     const double kappa = 1.0;
     for (; cell!=endc; ++cell)
       if (cell->is_locally_owned())
@@ -1132,7 +1131,7 @@ namespace Step42
                       active_set_locally_owned.add_index (index_z);
                   }
               }
-    distributed_solution.compress (VectorOperation::add);
+    distributed_solution.compress (VectorOperation::insert);
 
     unsigned int sum_contact_constraints = Utilities::MPI::sum(active_set_locally_owned.n_elements (),
                                                                mpi_communicator);
@@ -1225,6 +1224,8 @@ namespace Step42
 
     constraints_hanging_nodes.set_zero (distributed_solution);
     constraints_hanging_nodes.set_zero (system_rhs_newton);
+    distributed_solution.compress ();
+    system_rhs_newton.compress ();
 
     MPI_Barrier (mpi_communicator);
     t.restart();
@@ -1318,6 +1319,7 @@ namespace Step42
         t.restart();
         system_matrix_newton = 0;
         system_rhs_newton = 0;
+        system_matrix_newton.compress();
 	system_rhs_newton.compress();
         assemble_nl_system (solution);  //compute Newton-Matrix
         MPI_Barrier (mpi_communicator);
@@ -1347,12 +1349,12 @@ namespace Step42
             a=std::pow(0.5, static_cast<double>(i));
             old_solution = tmp_vector;
             old_solution.sadd(1-a,a, distributed_solution);
+            old_solution.compress (VectorOperation::add);
 
             MPI_Barrier (mpi_communicator);
             t.restart();
             system_rhs_newton = 0;
 	    system_rhs_newton.compress();
-
 
             solution = old_solution;
             residual_nl_system (solution);
@@ -1389,6 +1391,7 @@ namespace Step42
         resid_old=resid;
 
         resid_vector = system_rhs_newton;
+        resid_vector.compress (VectorOperation::insert);
 
         if (active_set == active_set_old && resid < 1e-10)
           break;
