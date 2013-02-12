@@ -1544,7 +1544,7 @@ namespace SparsityPatternIterators
                       const unsigned int     r,
                       const unsigned int     i)
     :
-    accessor(sparsity_pattern, r, i)
+    accessor(sparsity_pattern, sparsity_pattern->rowstart[r]+i)
   {}
 
 
