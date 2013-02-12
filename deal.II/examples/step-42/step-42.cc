@@ -940,6 +940,7 @@ namespace Step42
     unsigned int plast_points = 0;
     double       yield = 0;
     unsigned int cell_number = 0;
+
     for (; cell!=endc; ++cell)
       if (cell->is_locally_owned())
         {
@@ -1317,6 +1318,7 @@ namespace Step42
         t.restart();
         system_matrix_newton = 0;
         system_rhs_newton = 0;
+	system_rhs_newton.compress();
         assemble_nl_system (solution);  //compute Newton-Matrix
         MPI_Barrier (mpi_communicator);
         t.stop();
@@ -1349,6 +1351,9 @@ namespace Step42
             MPI_Barrier (mpi_communicator);
             t.restart();
             system_rhs_newton = 0;
+	    system_rhs_newton.compress();
+
+
             solution = old_solution;
             residual_nl_system (solution);
             res = system_rhs_newton;
@@ -1359,6 +1364,8 @@ namespace Step42
             for (unsigned int n=start_res; n<end_res; ++n)
               if (constraints.is_inhomogeneously_constrained (n))
                 res(n) = 0;
+
+	    res.compress(VectorOperation::insert);
 
             resid = res.l2_norm ();
 
