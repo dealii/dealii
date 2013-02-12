@@ -30,9 +30,10 @@ SparseILU<number>::SparseILU ()
 
 
 template <typename number>
-SparseILU<number>::SparseILU (const SparsityPattern &sparsity) :
-  SparseLUDecomposition<number> (sparsity)
-{}
+SparseILU<number>::SparseILU (const SparsityPattern &sparsity)
+{
+  SparseMatrix<number>::reinit(sparsity);
+}
 
 
 
