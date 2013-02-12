@@ -214,7 +214,6 @@ SparseLUDecomposition<number>::copy_from (const SparseMatrix<somenumber> &matrix
   SparseMatrix<number>::operator= (number(0));
 
   // both allow more and less entries in the new matrix
-  std::size_t in_index, index;
   for (unsigned int row=0; row<this->m(); ++row)
     {
       typename SparseMatrix<number>::iterator index = this->begin(row);

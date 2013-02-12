@@ -1654,8 +1654,6 @@ namespace MGTools
     BlockSparseMatrix<number> &matrix,
     const bool preserve_symmetry)
   {
-    const unsigned int blocks = matrix.n_block_rows();
-
     Assert (matrix.n_block_rows() == matrix.n_block_cols(),
             ExcNotQuadratic());
     Assert (matrix.get_sparsity_pattern().get_row_indices() ==

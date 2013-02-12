@@ -31,11 +31,12 @@ SparseMIC<number>::SparseMIC ()
 template <typename number>
 SparseMIC<number>::SparseMIC (const SparsityPattern &sparsity)
   :
-  SparseLUDecomposition<number> (sparsity),
   diag(0),
   inv_diag(0),
   inner_sums(0)
-{}
+{
+  SparseMatrix<number>::reinit (sparsity);
+}
 
 
 template <typename number>
@@ -94,7 +95,8 @@ void SparseMIC<number>::reinit (const SparsityPattern &sparsity)
     tmp.swap (inner_sums);
   }
 
-  SparseLUDecomposition<number>::reinit (sparsity);
+  SparseMatrix<number>::reinit(sparsity);
+  this->decomposed = false;
 }
 
 

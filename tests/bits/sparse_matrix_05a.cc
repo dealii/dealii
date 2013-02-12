@@ -1,8 +1,8 @@
 //----------------------------  sparse_matrix_05a.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2004, 2005 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,13 +16,13 @@
 // SparseMatrix when we don't store the diagonal elements explicitly
 
 #include "../tests.h"
-#include <deal.II/lac/sparse_matrix.h>    
+#include <deal.II/lac/sparse_matrix.h>
 #include <fstream>
 
 
 void test ()
 {
-  SparsityPattern sp (5,5,3,false);
+  SparsityPattern sp (5,5,3);
   for (unsigned int i=0; i<5; ++i)
     for (unsigned int j=0; j<5; ++j)
       if ((i+2*j+1) % 3 == 0)
@@ -30,17 +30,15 @@ void test ()
   sp.compress ();
 
   SparseMatrix<double> m(sp);
-  
+
                                    // first set a few entries. count how many
                                    // entries we have. note that for square
                                    // matrices we also always store the
-                                   // diagonal element, except when as above
-                                   // we set the special flag for the matrix
-                                   // sparsity pattern
+                                   // diagonal element
   unsigned int counter = 0;
   for (unsigned int i=0; i<m.m(); ++i)
     for (unsigned int j=0; j<m.n(); ++j)
-      if ((i+2*j+1) % 3 == 0)
+      if (((i+2*j+1) % 3 == 0) || (i==j))
         {
           m.set (i,j, i*j*.5+.5);
           ++counter;
@@ -49,7 +47,7 @@ void test ()
   deallog << m.n_nonzero_elements() << std::endl;
   Assert (m.n_nonzero_elements() == counter,
           ExcInternalError());
-  
+
   deallog << "OK" << std::endl;
 }
 
@@ -76,10 +74,10 @@ int main ()
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       deallog << std::endl << std::endl
 		<< "----------------------------------------------------"

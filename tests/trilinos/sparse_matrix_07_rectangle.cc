@@ -13,8 +13,7 @@
 
 
 // test TrilinosWrappers::SparseMatrix::reinit with a dealii::SparseMatrix
-// with a separate sparsity pattern that is a subset and for which we don't
-// even store the diagonal
+// with a separate sparsity pattern that is partly subset and partly superset
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
@@ -29,16 +28,16 @@ int main (int argc,char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
-  std::ofstream logfile("sparse_matrix_06/output");
+  std::ofstream logfile("sparse_matrix_07_rectangle/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  SparsityPattern sparsity (5,5,5);
+  SparsityPattern sparsity (4,5,5);
   sparsity.add (1,2);
   sparsity.add (2,3);
   sparsity.add (3,4);
-  sparsity.add (4,3);
+  sparsity.add (0,4);
   sparsity.compress();
   SparseMatrix<double> matrix(sparsity);
   {
@@ -51,16 +50,19 @@ int main (int argc,char **argv)
   matrix.print_formatted (deallog.get_file_stream());
 
   // create a separate sparsity pattern to use
-  SparsityPattern xsparsity (5,5,5,/*optimize_diagonal=*/false);
+  SparsityPattern xsparsity (4,5,5);
   xsparsity.add (1,2);
   xsparsity.add (2,3);
+  xsparsity.add (2,4);
+  xsparsity.add (2,1);
   xsparsity.compress();
 
 
   // now copy everything into a Trilinos matrix
-  Epetra_Map map(5,5,0,Utilities::Trilinos::comm_world());
+  Epetra_Map rowmap(4,4,0,Utilities::Trilinos::comm_world());
+  Epetra_Map colmap(5,5,0,Utilities::Trilinos::comm_world());
   TrilinosWrappers::SparseMatrix tmatrix;
-  tmatrix.reinit (map, map, matrix, 0, true, &xsparsity);
+  tmatrix.reinit (rowmap, colmap, matrix, 0, true, &xsparsity);
 
   deallog << "Copy structure only:" << std::endl;
   tmatrix.print (deallog.get_file_stream());

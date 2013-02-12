@@ -153,6 +153,15 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> Fixed: Starting in release 7.1, we first built the deal.II shared libraries
+in the local <code>/tmp</code> or similar directory rather than the final location
+because linking becomes very slow over remotely mounted file systems. Unfortunately,
+this schemes turns out not to work under Cygwin on Windows systems: executables
+cannot link with libraries that have been moved/renamed after linking. If we are
+running on Cygwin, we therefore revert to the old scheme.
+<br>
+(Wolfgang Bangerth, 2013/02/11)
+
 <li> New: finite element FE_Q_DG0 that implements polynomials
 of order k with an additional discontinuous constant function.
 <br>
@@ -177,6 +186,14 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> Improved: The iterator class of the deal.II SparseMatrix class
+and SparsityPattern have been revised for performance. Iterating over
+a row of the matrix and querying the column index and the value is now
+similarly fast as iterating over a vector.
+<br>
+(Martin Kronbichler, 2013/02/12)
+
 <li> New: A new overload of BlockMatrixBase::add allows to add one block
 matrix to another, with a scaling factor.
 <br>
