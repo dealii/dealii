@@ -71,7 +71,7 @@ ChunkSparsityPattern::ChunkSparsityPattern (
   const unsigned int n,
   const std::vector<unsigned int> &row_lengths,
   const unsigned int chunk_size,
-  const bool optimize_diag)
+  const bool)
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
 
@@ -106,7 +106,7 @@ ChunkSparsityPattern::ChunkSparsityPattern (
   const unsigned int               m,
   const std::vector<unsigned int> &row_lengths,
   const unsigned int chunk_size,
-  const bool optimize_diag)
+  const bool)
 {
   Assert (chunk_size > 0, ExcInvalidNumber (chunk_size));
 
@@ -288,7 +288,7 @@ ChunkSparsityPattern::copy_from (const SparsityType &csp,
 template <typename number>
 void ChunkSparsityPattern::copy_from (const FullMatrix<number> &matrix,
                                       const unsigned int chunk_size,
-                                      const bool         optimize_diag)
+                                      const bool)
 {
   copy_from (matrix, chunk_size);
 }
