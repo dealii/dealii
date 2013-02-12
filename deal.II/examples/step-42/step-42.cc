@@ -1267,8 +1267,6 @@ namespace Step42
 
     constraints.distribute (distributed_solution);
 
-    distributed_solution.compress (VectorOperation::add);
-
     solution = distributed_solution;
   }
 
@@ -1319,8 +1317,6 @@ namespace Step42
         t.restart();
         system_matrix_newton = 0;
         system_rhs_newton = 0;
-        system_matrix_newton.compress();
-	system_rhs_newton.compress();
         assemble_nl_system (solution);  //compute Newton-Matrix
         MPI_Barrier (mpi_communicator);
         t.stop();
@@ -1354,7 +1350,6 @@ namespace Step42
             MPI_Barrier (mpi_communicator);
             t.restart();
             system_rhs_newton = 0;
-	    system_rhs_newton.compress();
 
             solution = old_solution;
             residual_nl_system (solution);
