@@ -136,7 +136,7 @@ namespace internal
  * the dimension of the Triangulation this object refers to as well as
  * the dimension of the space into which it is embedded. Finally, the
  * template argument <code>level_dof_access</code> governs the
- * behavior of the function dof_indices(). See the section on Generic loops below.
+ * behavior of the function get_active_or_mg_dof_indices(). See the section on Generic loops below.
  *
  * <h3>Typedefs</h3>
  *
@@ -152,7 +152,7 @@ namespace internal
  * dofs of the active cells of the Triangulation or on the level dodfs
  * of a single level or the whole grid hierarchy. In order to use
  * polymorphism in such loops, they access degrees of freedom through
- * the function dof_indices(), which changes behavior according to the
+ * the function get_active_or_mg_dof_indices(), which changes behavior according to the
  * third template argument.  If the argument is false, then the active
  * dofs of active cells are accessed. If it is true, the level dofs
  * are used. DoFHandler has functions, for instance begin() and
@@ -160,7 +160,7 @@ namespace internal
  * they can be cast into each other, in case this is needed, since
  * they access the same data.
  *
- * It is highly recommended to use the function dof_indices() in
+ * It is highly recommended to use the function get_active_or_mg_dof_indices() in
  * generic loops in lieu of get_dof_indices() or get_mg_dof_indices().
  *
  * <h3>Inheritance</h3>
@@ -178,7 +178,7 @@ namespace internal
  *
  * @ingroup dofs
  * @ingroup Accessors
- * @author Wolfgang Bangerth, 1998, 2006, 2008, Timo Heister, Guido Kanschat, 2012
+ * @author Wolfgang Bangerth, 1998, 2006, 2008, Timo Heister, Guido Kanschat, 2012, 2013
  */
 template <int structdim, class DH, bool level_dof_access>
 class DoFAccessor : public dealii::internal::DoFAccessor::Inheritance<structdim, DH::dimension, DH::space_dimension>::BaseClass
@@ -306,7 +306,7 @@ public:
 
   /**
    * Tell the caller whether
-   * dof_indices() accesses active
+   * get_active_or_mg_dof_indices() accesses active
    * or level dofs.
    */
   static bool is_level_cell();
@@ -441,7 +441,23 @@ public:
   void get_dof_indices (std::vector<unsigned int> &dof_indices,
                         const unsigned int fe_index = DH::default_fe_index) const;
 
+  /**
+   * Return the indices of the dofs of this
+   * object in the standard ordering: dofs
+   * on vertex 0, dofs on vertex 1, ...
+   * dofs on line 0, dofs on line 1, ...,
+   * then quads, then hexes.
+   *
+   * It is assumed that the vector already
+   * has the right size beforehand. The
+   * indices refer to the local numbering
+   * for the level this line lives on.
+   */
   void get_mg_dof_indices (const int level, std::vector<unsigned int> &dof_indices, const unsigned int fe_index = DH::default_fe_index) const;
+
+  /**
+   * Sets the level DoF indices that are returned by get_mg_dof_indices.
+   */
   void set_mg_dof_indices (const int level, const std::vector<unsigned int> &dof_indices, const unsigned int fe_index = DH::default_fe_index);
 
   /**
@@ -484,6 +500,10 @@ public:
                                  const unsigned int i,
                                  const unsigned int fe_index = DH::default_fe_index) const;
 
+  /**
+   * Returns the Global DoF index of the <i>i degree associated with the @p
+   * vertexth vertex on the level @p level. Also see vertex_dof_index().
+   */
   unsigned int mg_vertex_dof_index (const int level, const unsigned int vertex, const unsigned int i, const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
@@ -543,6 +563,9 @@ public:
   unsigned int dof_index (const unsigned int i,
                           const unsigned int fe_index = DH::default_fe_index) const;
 
+  /**
+   * Returns the dof_index on the given level. Also see dof_index.
+   */
   unsigned int mg_dof_index (const int level, const unsigned int i) const;
 
   /**
@@ -2076,11 +2099,9 @@ public:
    *
    * Examples for this use are in the implementation of DoFRenumbering.
    */
-  void dof_indices (std::vector<unsigned int> &dof_indices) const;
+  void get_active_or_mg_dof_indices (std::vector<unsigned int> &dof_indices) const;
 
   /**
-   * @deprecated Use dof_indices() instead.
-   *
    * Return the indices of the dofs of this
    * quad in the standard ordering: dofs
    * on vertex 0, dofs on vertex 1, etc,
@@ -2111,11 +2132,13 @@ public:
    *
    * This is a function which requires that the cell be active.
    *
+   * Also see get_active_or_mg_dof_indices().
+   *
    * @deprecated Currently, this function can also be called for non-active cells, if all degrees of freedom of the FiniteElement are located in vertices. This functionality will vanish in a future release.
    */
   void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
   /**
-   * @deprecated Use dof_indices() with level_cell_iterator returned from begin_mg().
+   * @deprecated Use get_active_or_mg_dof_indices() with level_cell_iterator returned from begin_mg().
    *
    * Retrieve the global indices of the degrees of freedom on this cell in the level vector associated to the level of the cell.
    */
@@ -2170,6 +2193,11 @@ public:
    * given DoF handler class.
    */
   void set_dof_indices (const std::vector<unsigned int> &dof_indices);
+
+  /**
+   * Set the Level DoF indices of this
+   * cell to the given values.
+   */
   void set_mg_dof_indices (const std::vector<unsigned int> &dof_indices);
 
   /**

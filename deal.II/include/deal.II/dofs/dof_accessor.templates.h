@@ -3635,7 +3635,7 @@ void DoFCellAccessor<DH,lda>::set_mg_dof_indices (const std::vector<unsigned int
 
 template<class DH, bool lda>
 inline
-void DoFCellAccessor<DH,lda>::dof_indices (std::vector<unsigned int> &dof_indices) const
+void DoFCellAccessor<DH,lda>::get_active_or_mg_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
   if (lda)
     get_mg_dof_indices (dof_indices);
