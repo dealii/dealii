@@ -440,7 +440,7 @@ public:
 
   /**
    * Copy the elements of the current matrix object into a specified
-   * set of rows and columns of another matrix. This thus a scatter operation.
+   * set of rows and columns of another matrix. Thus, this is a scatter operation.
    *
    * @param row_index_set The rows of @p matrix into which to write.
    * @param column_index_set The columns of @p matrix into which to write.
