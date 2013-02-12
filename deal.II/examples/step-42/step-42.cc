@@ -396,7 +396,6 @@ namespace Step42
   {
     mu = E/(2*(1+nu));
     kappa = E/(3*(1-2*nu));
-    pcout<< "-----> mu = " << mu << ", kappa = " << kappa <<std::endl;
     stress_strain_tensor_kappa = kappa*outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>());
     stress_strain_tensor_mu = 2*mu*(identity_tensor<dim>() - outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>())/3.0);
   }
@@ -596,15 +595,15 @@ namespace Step42
       if (component == 2)
         {
           // Hindernis Dortmund
-//          double x1 = p(0);
-//          double x2 = p(1);
-//          if (((x2-0.5)*(x2-0.5)+(x1-0.5)*(x1-0.5)<=0.3*0.3)&&((x2-0.5)*(x2-0.5)+(x1-1.0)*(x1-1.0)>=0.4*0.4)&&((x2-0.5)*(x2-0.5)+x1*x1>=0.4*0.4))
-//            return_value = 0.999;
-//          else
-//            return_value = 1e+10;
+          double x1 = p(0);
+          double x2 = p(1);
+          if (((x2-0.5)*(x2-0.5)+(x1-0.5)*(x1-0.5)<=0.3*0.3)&&((x2-0.5)*(x2-0.5)+(x1-1.0)*(x1-1.0)>=0.4*0.4)&&((x2-0.5)*(x2-0.5)+x1*x1>=0.4*0.4))
+            return_value = 0.999;
+          else
+            return_value = 1e+10;
 
           // Hindernis Werkzeug TKSE
-           return_value = 1.999 - input_obstacle_copy->mikro_height (p(0), p(1), p(2));
+//           return_value = 1.999 - input_obstacle_copy->mikro_height (p(0), p(1), p(2));
 //           std::cout<< "Obstacle value: " << return_value
 //               << " p(0) = " << p(0)
 //               << " p(1) = " << p(1)
@@ -766,7 +765,7 @@ namespace Step42
         diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
       number_iterations = 0;
 
-      diag_mass_matrix_vector.compress (VectorOperation::insert);
+      diag_mass_matrix_vector.compress (VectorOperation::add);
     }
   }
 
@@ -889,7 +888,7 @@ namespace Step42
                                                   system_matrix_newton, system_rhs_newton, true);
         };
 
-    system_matrix_newton.compress (VectorOperation::add);
+    system_matrix_newton.compress ();
     system_rhs_newton.compress (VectorOperation::add);
   }
 
@@ -1049,7 +1048,7 @@ namespace Step42
                   mass_matrix);
             }
 
-    mass_matrix.compress (VectorOperation::add);
+    mass_matrix.compress ();
   }
 
   // @sect4{PlasticityContactProblem::update_solution_and_constraints}
@@ -1123,7 +1122,7 @@ namespace Step42
                       active_set_locally_owned.add_index (index_z);
                   }
               }
-    distributed_solution.compress (VectorOperation::insert);
+    distributed_solution.compress (VectorOperation::add);
 
     unsigned int sum_contact_constraints = Utilities::MPI::sum(active_set_locally_owned.n_elements (),
                                                                mpi_communicator);
@@ -1256,6 +1255,8 @@ namespace Step42
     number_iterations += solver_control.last_step();
 
     constraints.distribute (distributed_solution);
+
+    distributed_solution.compress (VectorOperation::add);
 
     solution = distributed_solution;
   }
