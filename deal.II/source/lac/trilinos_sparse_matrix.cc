@@ -361,6 +361,35 @@ namespace TrilinosWrappers
 
 
 
+  namespace internal
+  {
+    namespace
+    {
+    // distinguish between compressed sparsity types that define row_begin()
+    // and SparsityPattern that uses begin() as iterator type
+      template <typename Sparsity>
+      void copy_row (const Sparsity     &csp,
+                     const unsigned int  row,
+                     std::vector<int>   &row_indices)
+      {
+        typename Sparsity::row_iterator col_num = csp.row_begin (row);
+        for (unsigned int col=0; col_num != csp.row_end (row); ++col_num, ++col)
+          row_indices[col] = *col_num;
+      }
+
+      void copy_row (const dealii::SparsityPattern &csp,
+                     const unsigned int             row,
+                     std::vector<int>              &row_indices)
+      {
+        dealii::SparsityPattern::iterator col_num = csp.begin (row);
+        for (unsigned int col=0; col_num != csp.end (row); ++col_num, ++col)
+          row_indices[col] = col_num->column();
+      }
+    }
+  }
+
+
+
   template <typename SparsityType>
   void
   SparseMatrix::reinit (const Epetra_Map    &input_row_map,
@@ -372,14 +401,10 @@ namespace TrilinosWrappers
     temp_vector.clear();
     matrix.reset();
 
-    // if we want to exchange data, build
-    // a usual Trilinos sparsity pattern
-    // and let that handle the
-    // exchange. otherwise, manually
-    // create a CrsGraph, which consumes
-    // considerably less memory because it
-    // can set correct number of indices
-    // right from the start
+    // if we want to exchange data, build a usual Trilinos sparsity pattern
+    // and let that handle the exchange. otherwise, manually create a
+    // CrsGraph, which consumes considerably less memory because it can set
+    // correct number of indices right from the start
     if (exchange_data)
       {
         SparsityPattern trilinos_sparsity;
@@ -408,29 +433,19 @@ namespace TrilinosWrappers
     for (unsigned int row=first_row; row<last_row; ++row)
       n_entries_per_row[row-first_row] = sparsity_pattern.row_length(row);
 
-    // The deal.II notation of a Sparsity
-    // pattern corresponds to the Epetra
-    // concept of a Graph. Hence, we generate
-    // a graph by copying the sparsity pattern
-    // into it, and then build up the matrix
-    // from the graph. This is considerable
-    // faster than directly filling elements
-    // into the matrix. Moreover, it consumes
-    // less memory, since the internal
-    // reordering is done on ints only, and we
-    // can leave the doubles aside.
+    // The deal.II notation of a Sparsity pattern corresponds to the Epetra
+    // concept of a Graph. Hence, we generate a graph by copying the sparsity
+    // pattern into it, and then build up the matrix from the graph. This is
+    // considerable faster than directly filling elements into the
+    // matrix. Moreover, it consumes less memory, since the internal
+    // reordering is done on ints only, and we can leave the doubles aside.
 
-    // for more than one processor, need to
-    // specify only row map first and let the
-    // matrix entries decide about the column
-    // map (which says which columns are
-    // present in the matrix, not to be
-    // confused with the col_map that tells
-    // how the domain dofs of the matrix will
-    // be distributed). for only one
-    // processor, we can directly assign the
-    // columns as well. Compare this with bug
-    // # 4123 in the Sandia Bugzilla.
+    // for more than one processor, need to specify only row map first and let
+    // the matrix entries decide about the column map (which says which
+    // columns are present in the matrix, not to be confused with the col_map
+    // that tells how the domain dofs of the matrix will be distributed). for
+    // only one processor, we can directly assign the columns as well. Compare
+    // this with bug # 4123 in the Sandia Bugzilla.
     std_cxx1x::shared_ptr<Epetra_CrsGraph> graph;
     if (input_row_map.Comm().NumProc() > 1)
       graph.reset (new Epetra_CrsGraph (Copy, input_row_map,
@@ -439,10 +454,8 @@ namespace TrilinosWrappers
       graph.reset (new Epetra_CrsGraph (Copy, input_row_map, input_col_map,
                                         &n_entries_per_row[0], true));
 
-    // This functions assumes that the
-    // sparsity pattern sits on all processors
-    // (completely). The parallel version uses
-    // an Epetra graph that is already
+    // This functions assumes that the sparsity pattern sits on all processors
+    // (completely). The parallel version uses an Epetra graph that is already
     // distributed.
 
     // now insert the indices
@@ -455,24 +468,17 @@ namespace TrilinosWrappers
           continue;
 
         row_indices.resize (row_length, -1);
-
-        typename SparsityType::row_iterator col_num = sparsity_pattern.row_begin (row),
-                                            row_end = sparsity_pattern.row_end(row);
-        for (unsigned int col = 0; col_num != row_end; ++col_num, ++col)
-          row_indices[col] = *col_num;
-
+        internal::copy_row(sparsity_pattern, row, row_indices);
         graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
                                                      &row_indices[0]);
       }
 
-    // Eventually, optimize the graph
-    // structure (sort indices, make memory
+    // Eventually, optimize the graph structure (sort indices, make memory
     // contiguous, etc).
     graph->FillComplete(input_col_map, input_row_map);
     graph->OptimizeStorage();
 
-    // check whether we got the number of
-    // columns right.
+    // check whether we got the number of columns right.
     AssertDimension (sparsity_pattern.n_cols(),
                      static_cast<unsigned int>(graph->NumGlobalCols()));
 
@@ -480,9 +486,8 @@ namespace TrilinosWrappers
     matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
     last_action = Zero;
 
-    // In the end, the matrix needs to
-    // be compressed in order to be
-    // really ready.
+    // In the end, the matrix needs to be compressed in order to be really
+    // ready.
     compress();
   }
 

@@ -251,6 +251,35 @@ ChunkSparsityPattern::copy_from (const SparsityType &csp,
 }
 
 
+
+namespace internal
+{
+  namespace
+  {
+    // distinguish between compressed sparsity types that define row_begin()
+    // and SparsityPattern that uses begin() as iterator type
+    template <typename Sparsity>
+    void copy_row (const Sparsity       &csp,
+                   const unsigned int    row,
+                   ChunkSparsityPattern &dst)
+    {
+      typename Sparsity::row_iterator col_num = csp.row_begin (row);
+      for (; col_num != csp.row_end (row); ++col_num)
+        dst.add (row, *col_num);
+    }
+
+    void copy_row (const SparsityPattern &csp,
+                   const unsigned int     row,
+                   ChunkSparsityPattern  &dst)
+    {
+      SparsityPattern::iterator col_num = csp.begin (row);
+      for (; col_num != csp.end (row); ++col_num)
+        dst.add (row, col_num->column());
+    }
+  }
+}
+
+
 template <typename SparsityType>
 void
 ChunkSparsityPattern::copy_from (const SparsityType &csp,
@@ -271,12 +300,7 @@ ChunkSparsityPattern::copy_from (const SparsityType &csp,
 
   // then actually fill it
   for (unsigned int row = 0; row<csp.n_rows(); ++row)
-    {
-      typename SparsityType::row_iterator col_num = csp.row_begin (row);
-
-      for (; col_num != csp.row_end (row); ++col_num)
-        add (row, *col_num);
-    }
+    internal::copy_row(csp, row, *this);
 
   // finally compress
   compress ();
