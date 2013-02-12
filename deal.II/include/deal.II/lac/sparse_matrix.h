@@ -93,10 +93,13 @@ namespace SparseMatrixIterators
 
     /**
      * Constructor.
+     *
+     * @deprecated This constructor is deprecated. Use the other constructor
+     * with a global index instead.
      */
     Accessor (MatrixType         *matrix,
               const unsigned int  row,
-              const unsigned int  index);
+              const unsigned int  index) DEAL_II_DEPRECATED;
 
     /**
      * Constructor.
@@ -338,10 +341,13 @@ namespace SparseMatrixIterators
     /**
      * Constructor. Create an iterator into the matrix @p matrix for the given
      * row and the index within it.
+     *
+     * @deprecated This constructor is deprecated. Use the other constructor
+     * with a global index instead.
      */
     Iterator (MatrixType        *matrix,
               const unsigned int row,
-              const unsigned int index);
+              const unsigned int index) DEAL_II_DEPRECATED;
 
     /**
      * Constructor. Create an iterator into the matrix @p matrix for the given
@@ -1580,16 +1586,6 @@ private:
    */
   std::size_t max_len;
 
-  /**
-   * Return the value of the <tt>index</tt>th entry in <tt>row</tt>. Here,
-   * <tt>index</tt> refers to the internal representation of the matrix, not
-   * the column. This is an internal function because it exposes the actual
-   * format in which data is stored -- be sure to understand what you are
-   * doing here.
-   */
-  number nth_entry_in_row (const unsigned int row,
-                           const unsigned int index) const;
-
   // make all other sparse matrices friends
   template <typename somenumber> friend class SparseMatrix;
   template <typename somenumber> friend class SparseLUDecomposition;
@@ -1913,24 +1909,11 @@ number
 SparseMatrix<number>::raw_entry (const unsigned int row,
                                  const unsigned int index) const
 {
-  // this is the (deprecated) public version of the
-  // nth_entry_in_row() function. this function will soon
-  // go away.
-  return nth_entry_in_row (row, index);
-}
-
-
-
-template <typename number>
-inline
-number
-SparseMatrix<number>::nth_entry_in_row (const unsigned int row,
-                                        const unsigned int index) const
-{
   Assert(row<cols->rows, ExcIndexRange(row,0,cols->rows));
   Assert(index<cols->row_length(row),
          ExcIndexRange(index,0,cols->row_length(row)));
 
+  // this function will soon go away.
   return val[cols->rowstart[row]+index];
 }
 

@@ -107,10 +107,13 @@ namespace SparsityPatternIterators
   public:
     /**
      * Constructor.
+     *
+     * @deprecated This constructor is deprecated. Use the other constructor
+     * with a global index instead.
      */
     Accessor (const SparsityPattern *matrix,
               const unsigned int     row,
-              const unsigned int     index);
+              const unsigned int     index) DEAL_II_DEPRECATED;
 
     /**
      * Constructor.
@@ -229,10 +232,13 @@ namespace SparsityPatternIterators
     /**
      * Constructor. Create an iterator into the sparsity pattern @p sp for the
      * given row and the index within it.
+     *
+     * @deprecated This constructor is deprecated. Use the other constructor
+     * with a global index instead.
      */
     Iterator (const SparsityPattern *sp,
               const unsigned int     row,
-              const unsigned int     index);
+              const unsigned int     index) DEAL_II_DEPRECATED;
 
     /**
      * Constructor. Create an iterator into the sparsity pattern @p sp for the
