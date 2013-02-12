@@ -177,7 +177,7 @@ namespace Step42
 
       double hv(int i, int j);
 
-      double& set_height(int i, int j);
+      void set_height(int i, int j,double val);
 
       double mikro_height(double x,double y, double z);
 
@@ -196,13 +196,22 @@ namespace Step42
   template <int dim>
   double Input<dim>::hv(int i, int j)
   {
+    assert(i>=0 && i<nx);
+    assert(j>=0 && j<ny);
     return HV[nx*j+i];  // i indiziert x-werte, j indiziert y-werte
   }
 
   template <int dim>
-  double& Input<dim>::set_height(int i, int j)
+  void Input<dim>::set_height(int i, int j, double val)
   {
-    return HV[nx*j+i];  // i indiziert x-werte, j indiziert y-werte
+    if (i>=nx || j>=ny)
+      {
+	std::cout << "invalid:" << i << " " << j << " " << nx*j+i << std::endl;
+    return;
+      }
+    assert(i>=0 && i<nx);
+    assert(j>=0 && j<ny);
+    HV[nx*j+i]=val;  // i indiziert x-werte, j indiziert y-werte
   }
 
   template <int dim>
@@ -330,7 +339,7 @@ namespace Step42
             if (hlp < min_hlp)
               min_hlp=hlp;
 
-            set_height (k, ny - 1 - j) = hlp;
+            set_height (k, ny - 1 - j, hlp);
             int pos = strcspn (zeile, ",");
             if (!strpbrk (zeile, ","))
               {
