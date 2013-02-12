@@ -186,6 +186,14 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> Improved: The iterator class of the deal.II SparseMatrix class
+and SparsityPattern have been revised for performance. Iterating over
+a row of the matrix and querying the column index and the value is now
+similarly fast as iterating over a vector.
+<br>
+(Martin Kronbichler, 2013/02/12)
+
 <li> New: A new overload of BlockMatrixBase::add allows to add one block
 matrix to another, with a scaling factor.
 <br>
