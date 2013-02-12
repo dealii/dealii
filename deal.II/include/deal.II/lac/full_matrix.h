@@ -1520,10 +1520,17 @@ void
 FullMatrix<number>::copy_from (const MATRIX &M)
 {
   this->reinit (M.m(), M.n());
-  const typename MATRIX::const_iterator end = M.end();
-  for (typename MATRIX::const_iterator entry = M.begin();
-       entry != end; ++entry)
-    this->el(entry->row(), entry->column()) = entry->value();
+
+  // loop over the elements of the argument matrix row by row, as suggested
+  // in the documentation of the sparse matrix iterator class, and
+  // copy them into the current object
+  for (unsigned int row = 0; row < M.n(); ++row)
+    {
+      const typename MATRIX::const_iterator end_row = M.end(row);
+      for (typename MATRIX::const_iterator entry = M.begin(row);
+          entry != end_row; ++entry)
+        this->el(row, entry->column()) = entry->value();
+    }
 }
 
 
@@ -1534,10 +1541,17 @@ void
 FullMatrix<number>::copy_transposed (const MATRIX &M)
 {
   this->reinit (M.n(), M.m());
-  const typename MATRIX::const_iterator end = M.end();
-  for (typename MATRIX::const_iterator entry = M.begin();
-       entry != end; ++entry)
-    this->el(entry->column(), entry->row()) = entry->value();
+
+  // loop over the elements of the argument matrix row by row, as suggested
+  // in the documentation of the sparse matrix iterator class, and
+  // copy them into the current object
+  for (unsigned int row = 0; row < M.n(); ++row)
+    {
+      const typename MATRIX::const_iterator end_row = M.end(row);
+      for (typename MATRIX::const_iterator entry = M.begin(row);
+          entry != end_row; ++entry)
+        this->el(entry->column(), row) = entry->value();
+    }
 }
 
 
