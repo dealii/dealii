@@ -1224,8 +1224,8 @@ namespace Step42
 
     constraints_hanging_nodes.set_zero (distributed_solution);
     constraints_hanging_nodes.set_zero (system_rhs_newton);
-    distributed_solution.compress ();
-    system_rhs_newton.compress ();
+    distributed_solution.compress(VectorOperation::insert);
+    system_rhs_newton.compress(VectorOperation::insert);
 
     MPI_Barrier (mpi_communicator);
     t.restart();
