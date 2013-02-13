@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2012 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -121,14 +121,14 @@ get_projected_derivative (const FEValues<dim,spacedim> &fe_values,
   if (fe_values.get_fe().n_components() == 1)
     {
       std::vector<ProjectedDerivative> values (1);
-      fe_values.get_function_grads (solution, values);
+      fe_values.get_function_gradients (solution, values);
       return values[0];
     }
   else
     {
       std::vector<std::vector<ProjectedDerivative> > values
       (1, std::vector<ProjectedDerivative>(fe_values.get_fe().n_components()));
-      fe_values.get_function_grads (solution, values);
+      fe_values.get_function_gradients (solution, values);
       return values[0][component];
     };
 }
