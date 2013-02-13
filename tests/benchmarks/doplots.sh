@@ -9,3 +9,9 @@ for test in $TESTS ; do
     rm -rf script
     convert -density 150 $test.eps $test.png
 done
+
+
+/baselineplot.sh > script
+gnuplot script
+rm -rf script
+convert -density 150 baseline.eps baseline.png
