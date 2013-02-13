@@ -770,7 +770,7 @@ approximate_cell (const Mapping<dim,spacedim>                   &mapping,
   // first collect all neighbor
   // cells in a vector, and then
   // collect the data from them
-  GridTools::template get_active_neighbors<DH<dim,spacedim> >(cell, active_neighbors);
+  GridTools::get_active_neighbors<DH<dim,spacedim> >(cell, active_neighbors);
 
   // now loop over all active
   // neighbors and collect the
