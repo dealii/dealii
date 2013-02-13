@@ -393,7 +393,7 @@ namespace Step40
         }
 
     system_matrix.compress ();
-    system_rhs.compress ();
+    system_rhs.compress (VectorOperation::add);
   }
 
 

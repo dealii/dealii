@@ -48,8 +48,8 @@ namespace TrilinosWrappers
 
       // get a representation of the present
       // row
-      int ncols;
-      int colnums = sparsity_pattern->n_cols();
+      int_type ncols;
+      int_type colnums = sparsity_pattern->n_cols();
 
       int ierr;
       ierr = sparsity_pattern->graph->ExtractGlobalRowCopy((int_type)this->a_row,
@@ -271,6 +271,35 @@ namespace TrilinosWrappers
 
 
 
+  namespace internal
+  {
+    namespace
+    {
+    // distinguish between compressed sparsity types that define row_begin()
+    // and SparsityPattern that uses begin() as iterator type
+      template <typename Sparsity>
+      void copy_row (const Sparsity     &csp,
+                     const size_type     row,
+                     std::vector<int_type>   &row_indices)
+      {
+        typename Sparsity::row_iterator col_num = csp.row_begin (row);
+        for (size_type col=0; col_num != csp.row_end (row); ++col_num, ++col)
+          row_indices[col] = *col_num;
+      }
+
+      void copy_row (const dealii::SparsityPattern &csp,
+                     const size_type                row,
+                     std::vector<int_type>          &row_indices)
+      {
+        dealii::SparsityPattern::iterator col_num = csp.begin (row);
+        for (size_type col=0; col_num != csp.end (row); ++col_num, ++col)
+          row_indices[col] = col_num->column();
+      }
+    }
+  }
+
+
+
   template <typename SparsityType>
   void
   SparsityPattern::reinit (const Epetra_Map   &input_row_map,
@@ -323,12 +352,7 @@ namespace TrilinosWrappers
             continue;
 
           row_indices.resize (row_length, -1);
-
-          typename SparsityType::row_iterator col_num = sp.row_begin (row),
-                                              row_end = sp.row_end(row);
-          for (size_type col = 0; col_num != row_end; ++col_num, ++col)
-            row_indices[col] = *col_num;
-
+          internal::copy_row(sp, row, row_indices);
           graph->Epetra_CrsGraph::InsertGlobalIndices (row, row_length,
                                                        &row_indices[0]);
         }
@@ -340,13 +364,8 @@ namespace TrilinosWrappers
             continue;
 
           row_indices.resize (row_length, -1);
-
-          typename SparsityType::row_iterator col_num = sp.row_begin (row),
-                                              row_end = sp.row_end(row);
-          for (size_type col = 0; col_num != row_end; ++col_num, ++col)
-            row_indices[col] = *col_num;
-
-          graph->InsertGlobalIndices (1, reinterpret_cast<int_type *>(&row), 
+          internal::copy_row(sp, row, row_indices);
+          graph->InsertGlobalIndices (1, reinterpret_cast<int_type *>(&row),
                                       row_length, &row_indices[0]);
         }
 

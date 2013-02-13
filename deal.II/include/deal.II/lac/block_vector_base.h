@@ -789,9 +789,12 @@ public:
   * distributed objects" for more
   * information.
    */
-  void compress (::dealii::VectorOperation::values operation
-                 =::dealii::VectorOperation::unknown);
+  void compress (::dealii::VectorOperation::values operation);
 
+  /**
+   * @deprecated: use compress(VectorOperation::values) instead.
+   */
+  void compress () DEAL_II_DEPRECATED;
 
   /**
    * Access to a single block.
@@ -1831,6 +1834,16 @@ BlockVectorBase<VectorType>::compress (::dealii::VectorOperation::values operati
 {
   for (unsigned int i=0; i<n_blocks(); ++i)
     block(i).compress (operation);
+}
+
+
+
+template <class VectorType>
+inline
+void
+BlockVectorBase<VectorType>::compress ()
+{
+  compress(VectorOperation::unknown);
 }
 
 

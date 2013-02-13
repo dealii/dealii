@@ -96,7 +96,7 @@
 
 // The last step is as in all
 // previous programs:
-namespace Step16
+namespace Step50
 {
   using namespace dealii;
 
@@ -1029,7 +1029,7 @@ int main (int argc, char *argv[])
   try
     {
       using namespace dealii;
-      using namespace Step16;
+      using namespace Step50;
 
       LaplaceProblem<2> laplace_problem(1);
       laplace_problem.run ();

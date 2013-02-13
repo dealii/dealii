@@ -2079,7 +2079,7 @@ public:
   DeclException2 (ExcComponentIndexInvalid,
                   int, int,
                   << "The component-index pair (" << arg1 << ", " << arg2
-                  << ") is invalid, i.e. non-existent");
+                  << ") is invalid, i.e. non-existent.");
   /**
    * Exception
    * @ingroup Exceptions

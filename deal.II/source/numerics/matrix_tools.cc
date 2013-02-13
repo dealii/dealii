@@ -2295,7 +2295,7 @@ namespace MatrixTools
                     // find the position of element (row,dof_number) in this
                     // block (not in the transpose one). note that we have to
                     // take care of special cases with square sub-matrices
-                    bool (*comp)(const typename SparseMatrix<number>::iterator::value_type p,
+                    bool (*comp)(typename SparseMatrix<number>::iterator::value_type p,
                                  const unsigned int column)
                       = &column_less_than<typename SparseMatrix<number>::iterator>;
 
@@ -2384,13 +2384,6 @@ namespace MatrixTools
         Assert (local_range == solution.local_range(),
                 ExcInternalError());
 
-
-        // we have to read and write from this
-        // matrix (in this order). this will only
-        // work if we compress the matrix first,
-        // done here
-        matrix.compress ();
-
         // determine the first nonzero diagonal
         // entry from within the part of the
         // matrix that we can see. if we can't
@@ -2427,23 +2420,6 @@ namespace MatrixTools
         // treated in the other functions.
         matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
 
-        // the next thing is to set right hand
-        // side to the wanted value. there's one
-        // drawback: if we write to individual
-        // vector elements, then we have to do
-        // that on all processors. however, some
-        // processors may not need to set
-        // anything because their chunk of
-        // matrix/rhs do not contain any boundary
-        // nodes. therefore, rather than using
-        // individual calls, we use one call for
-        // all elements, thereby making sure that
-        // all processors call this function,
-        // even if some only have an empty set of
-        // elements to set
-        right_hand_side.compress ();
-        solution.compress ();
-
         std::vector<types::global_dof_index> indices;
         std::vector<PetscScalar>  solution_values;
         for (std::map<types::global_dof_index,double>::const_iterator
@@ -2467,8 +2443,8 @@ namespace MatrixTools
 
         // clean up
         matrix.compress ();
-        solution.compress ();
-        right_hand_side.compress ();
+        solution.compress (VectorOperation::insert);
+        right_hand_side.compress (VectorOperation::insert);
       }
     }
   }
@@ -2656,27 +2632,6 @@ namespace MatrixTools
         // matrix classes in deal.II.
         matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
 
-        // the next thing is to set right
-        // hand side to the wanted
-        // value. there's one drawback:
-        // if we write to individual
-        // vector elements, then we have
-        // to do that on all
-        // processors. however, some
-        // processors may not need to set
-        // anything because their chunk
-        // of matrix/rhs do not contain
-        // any boundary nodes. therefore,
-        // rather than using individual
-        // calls, we use one call for all
-        // elements, thereby making sure
-        // that all processors call this
-        // function, even if some only
-        // have an empty set of elements
-        // to set
-        right_hand_side.compress ();
-        solution.compress ();
-
         std::vector<types::global_dof_index> indices;
         std::vector<TrilinosScalar>  solution_values;
         for (std::map<types::global_dof_index,double>::const_iterator
@@ -2700,8 +2655,8 @@ namespace MatrixTools
 
         // clean up
         matrix.compress ();
-        solution.compress ();
-        right_hand_side.compress ();
+        solution.compress (VectorOperation::insert);
+        right_hand_side.compress (VectorOperation::insert);
       }
 
 

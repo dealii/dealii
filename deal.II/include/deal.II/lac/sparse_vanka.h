@@ -155,7 +155,7 @@ public:
    *
    * If @p conserve_mem is @p false,
    * then the inverses of the local
-   * systems are computed now, if
+   * systems are computed now; if
    * the flag is @p true, then they
    * are computed every time the
    * preconditioner is
@@ -163,7 +163,7 @@ public:
    * memory, but makes
    * preconditioning very
    * slow. Note also, that if the
-   * flag is @p false, the the
+   * flag is @p false, then the
    * contents of the matrix @p M at
    * the time of calling this
    * constructor are used, while if

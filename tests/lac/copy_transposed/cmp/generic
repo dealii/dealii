@@ -1,0 +1,6 @@
+
+DEAL::FullMatrix<float>::copy_transposed  SparseMatrixEZ<double>
+2.    5.    8.    ~     12.   
+~     6.    9.    ~     ~     
+3.    ~     10.   ~     13.   
+4.    7.    11.   ~     14.   

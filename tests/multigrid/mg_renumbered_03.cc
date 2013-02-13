@@ -31,9 +31,9 @@
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
-#include <deal.II/numerics/mesh_worker.h>
-#include <deal.II/numerics/mesh_worker_loop.h>
-#include <deal.II/numerics/mesh_worker_output.h>
+#include <deal.II/meshworker/local_results.h>
+#include <deal.II/meshworker/loop.h>
+#include <deal.II/meshworker/output.h>
 
 #include <deal.II/multigrid/multigrid.h>
 #include <deal.II/multigrid/mg_dof_handler.h>

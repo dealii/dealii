@@ -324,8 +324,7 @@ namespace Step47
         else
           {
 //TODO: verify that the order of support points equals the order of vertices
-//of the cells, as we use below TODO: remove update_support_points and
-//friends, since they aren't implemented anyway
+//of the cells, as we use below
             Assert (cell->active_fe_index() == 1, ExcInternalError());
             Assert (interface_intersects_cell(cell) == true, ExcInternalError());
 

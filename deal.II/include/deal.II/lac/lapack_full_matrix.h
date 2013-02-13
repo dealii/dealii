@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -705,10 +705,17 @@ inline void
 LAPACKFullMatrix<number>::copy_from (const MATRIX &M)
 {
   this->reinit (M.m(), M.n());
-  const typename MATRIX::const_iterator end = M.end();
-  for (typename MATRIX::const_iterator entry = M.begin();
-       entry != end; ++entry)
-    this->el(entry->row(), entry->column()) = entry->value();
+
+  // loop over the elements of the argument matrix row by row, as suggested
+  // in the documentation of the sparse matrix iterator class, and
+  // copy them into the current object
+  for (unsigned int row = 0; row < M.m(); ++row)
+    {
+      const typename MATRIX::const_iterator end_row = M.end(row);
+      for (typename MATRIX::const_iterator entry = M.begin(row);
+          entry != end_row; ++entry)
+        this->el(row, entry->column()) = entry->value();
+    }
 
   state = LAPACKSupport::matrix;
 }
@@ -727,17 +734,22 @@ LAPACKFullMatrix<number>::fill (
   const number factor,
   const bool transpose)
 {
-  const typename MATRIX::const_iterator end = M.end();
-  for (typename MATRIX::const_iterator entry = M.begin(src_offset_i);
-       entry != end; ++entry)
+  // loop over the elements of the argument matrix row by row, as suggested
+  // in the documentation of the sparse matrix iterator class
+  for (unsigned int row = src_offset_i; row < M.m(); ++row)
     {
-      const unsigned int i = transpose ? entry->column() : entry->row();
-      const unsigned int j = transpose ? entry->row() : entry->column();
+      const typename MATRIX::const_iterator end_row = M.end(row);
+      for (typename MATRIX::const_iterator entry = M.begin(row);
+          entry != end_row; ++entry)
+        {
+          const unsigned int i = transpose ? entry->column() : row;
+          const unsigned int j = transpose ? row : entry->column();
 
-      const unsigned int dst_i=dst_offset_i+i-src_offset_i;
-      const unsigned int dst_j=dst_offset_j+j-src_offset_j;
-      if (dst_i<this->n_rows() && dst_j<this->n_cols())
-        (*this)(dst_i, dst_j) = factor * entry->value();
+          const unsigned int dst_i=dst_offset_i+i-src_offset_i;
+          const unsigned int dst_j=dst_offset_j+j-src_offset_j;
+          if (dst_i<this->n_rows() && dst_j<this->n_cols())
+            (*this)(dst_i, dst_j) = factor * entry->value();
+        }
     }
 
   state = LAPACKSupport::matrix;

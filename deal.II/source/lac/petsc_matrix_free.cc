@@ -229,7 +229,6 @@ namespace PETScWrappers
     // be reimplemented in derived classes
     vmult (*y, *x);
 
-    y->compress();
     // copy the result back to dst
     ierr = VecCopy (&(*(*y)), dst);
     AssertThrow (ierr == 0, ExcPETScError(ierr));

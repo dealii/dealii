@@ -31,11 +31,12 @@ SparseMIC<number>::SparseMIC ()
 template <typename number>
 SparseMIC<number>::SparseMIC (const SparsityPattern &sparsity)
   :
-  SparseLUDecomposition<number> (sparsity),
   diag(0),
   inv_diag(0),
   inner_sums(0)
-{}
+{
+  SparseMatrix<number>::reinit (sparsity);
+}
 
 
 template <typename number>
@@ -94,7 +95,8 @@ void SparseMIC<number>::reinit (const SparsityPattern &sparsity)
     tmp.swap (inner_sums);
   }
 
-  SparseLUDecomposition<number>::reinit (sparsity);
+  SparseMatrix<number>::reinit(sparsity);
+  this->decomposed = false;
 }
 
 
@@ -141,7 +143,7 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
       // it's symmetric, so we can work with this alone
       for (typename SparseMatrix<somenumber>::const_iterator
            p = matrix.begin(row)+1;
-           (p != matrix.end(row)) && (p->column() < p->row());
+           (p != matrix.end(row)) && (p->column() < row);
            ++p)
         temp1 += p->value() / diag[p->column()] * inner_sums[p->column()];
 
@@ -164,7 +166,7 @@ SparseMIC<number>::get_rowsum (const unsigned int row) const
   for (typename SparseMatrix<number>::const_iterator
        p = this->begin(row)+1;
        p != this->end(row); ++p)
-    if (p->column() > p->row())
+    if (p->column() > row)
       rowsum += p->value();
 
   return rowsum;

@@ -296,8 +296,12 @@ namespace PETScWrappers
      * See @ref GlossCompress "Compressing distributed objects"
      * for more information.
      */
-    void compress (::dealii::VectorOperation::values operation
-                   =::dealii::VectorOperation::unknown);
+    void compress (::dealii::VectorOperation::values operation);
+
+    /**
+     * @deprecated: use compress(VectorOperation::values) instead.
+     */
+    void compress () DEAL_II_DEPRECATED;
 
     /**
      * Set all components of the vector to

@@ -1417,8 +1417,8 @@ namespace FETools
     // be cell2
     Assert (cell2 == endc2, ExcInternalError());
 
-    u2.compress();
-    touch_count.compress();
+    u2.compress(VectorOperation::add);
+    touch_count.compress(VectorOperation::add);
 
     // if we work on parallel distributed
     // vectors, we have to ensure, that we only
@@ -1439,12 +1439,9 @@ namespace FETools
         }
 
     // finish the work on parallel vectors
-    u2.compress();
+    u2.compress(VectorOperation::insert);
     // Apply hanging node constraints.
     constraints.distribute(u2);
-
-    // and finally update ghost values
-    u2.update_ghost_values();
   }
 
 
@@ -1522,10 +1519,8 @@ namespace FETools
         }
 
     // if we work on a parallel PETSc vector
-    // we have to finish the work and
-    // update ghost values
-    u1_interpolated.compress();
-    u1_interpolated.update_ghost_values();
+    // we have to finish the work
+    u1_interpolated.compress(VectorOperation::insert);
   }
 
 
@@ -1625,10 +1620,8 @@ namespace FETools
         };
 
     // if we work on a parallel PETSc vector
-    // we have to finish the work and
-    // update ghost values
-    u1_interpolated.compress();
-    u1_interpolated.update_ghost_values();
+    // we have to finish the work
+    u1_interpolated.compress(VectorOperation::insert);
   }
 
 
@@ -1771,8 +1764,7 @@ namespace FETools
     // if we work on a parallel PETSc vector
     // we have to finish the work and
     // update ghost values
-    u1_difference.compress();
-    u1_difference.update_ghost_values();
+    u1_difference.compress(VectorOperation::insert);
   }
 
 
@@ -1796,12 +1788,6 @@ namespace FETools
       {
         back_interpolate(dof1, constraints1, u1, dof2, constraints2, u1_difference);
         u1_difference.sadd(-1, u1);
-
-        // if we work on a parallel PETSc vector
-        // we have to finish the work and
-        // update ghost values
-        u1_difference.compress();
-        u1_difference.update_ghost_values();
       }
   }
 

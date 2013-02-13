@@ -945,7 +945,7 @@ ChunkSparsityPattern::copy_from (const unsigned int    n_rows,
     row_lengths.push_back (std::distance (i->begin(), i->end())
                            +
                            (is_square ? 1 : 0));
-  reinit (n_rows, n_cols, row_lengths, chunk_size, is_square);
+  reinit (n_rows, n_cols, row_lengths, chunk_size);
 
   // now enter all the elements into
   // the matrix

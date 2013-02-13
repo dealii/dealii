@@ -2072,68 +2072,13 @@ namespace internal
   {
     template <bool lda, class DH>
     inline
-    typename dealii::internal::DoFHandler::Iterators<DH>::line_iterator
-    get_line(const dealii::Triangulation<DH::dimension, DH::space_dimension> *tria,
-             const unsigned int index,
-             DH *dof_handler)
-    {
-      return typename dealii::internal::DoFHandler::Iterators<DH>::line_iterator
-             (
-               tria,
-               0,  // only sub-objects are allowed, which have no level
-               index,
-               dof_handler);
-    }
-
-    template <bool lda, class DH>
-    inline
     typename dealii::internal::DoFHandler::Iterators<DH, lda>::quad_iterator
     get_quad(const dealii::Triangulation<DH::dimension, DH::space_dimension> *tria,
              unsigned int index,
              DH *dof_handler)
     {
-      return typename dealii::internal::DoFHandler::Iterators<DH>::quad_iterator
-             (
-               tria,
-               0,  // only sub-objects are allowed, which have no level
-               index,
-               dof_handler);
     }
 
-    // None of these specializations should ever be called
-    template<bool lda>
-    inline
-    typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<1,1>, lda>::line_iterator
-    get_line(const dealii::Triangulation<1,1> *,
-             unsigned int,
-             dealii::DoFHandler<1,1> *)
-    {
-      Assert(false, ExcNotImplemented());
-      return typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<1,1>, lda>::line_iterator();
-    }
-
-
-    template<bool lda>
-    inline
-    typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<1,2>, lda>::line_iterator
-    get_line(const dealii::Triangulation<1,2> *,
-             unsigned int,
-             dealii::DoFHandler<1,2> *)
-    {
-      Assert(false, ExcNotImplemented());
-      return typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<1,2>, lda>::line_iterator();
-    }
-
-    template<bool lda>
-    inline
-    typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<1,3>, lda>::line_iterator
-    get_line(const dealii::Triangulation<1,3> *,
-             unsigned int,
-             dealii::DoFHandler<1,3> *)
-    {
-      Assert(false, ExcNotImplemented());
-      return typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<1,3>, lda>::line_iterator();
-    }
 
     template<bool lda>
     inline
@@ -2155,39 +2100,6 @@ namespace internal
     {
       Assert(false, ExcNotImplemented());
       return typename dealii::internal::DoFHandler::Iterators<dealii::DoFHandler<2,3>, lda>::line_iterator();
-    }
-
-    template<bool lda>
-    inline
-    typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<1,1>, lda>::line_iterator
-    get_line(const dealii::Triangulation<1,1> *,
-             unsigned int,
-             dealii::hp::DoFHandler<1,1> *)
-    {
-      Assert(false, ExcNotImplemented());
-      return typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<1,1>, lda>::line_iterator();
-    }
-
-    template<bool lda>
-    inline
-    typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<1,2>, lda>::line_iterator
-    get_line(const dealii::Triangulation<1,2> *,
-             unsigned int,
-             dealii::hp::DoFHandler<1,2> *)
-    {
-      Assert(false, ExcNotImplemented());
-      return typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<1,2>, lda>::line_iterator();
-    }
-
-    template<bool lda>
-    inline
-    typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<1,3>, lda>::line_iterator
-    get_line(const dealii::Triangulation<1,3> *,
-             unsigned int,
-             dealii::hp::DoFHandler<1,3> *)
-    {
-      Assert(false, ExcNotImplemented());
-      return typename dealii::internal::DoFHandler::Iterators<dealii::hp::DoFHandler<1,3>, lda>::line_iterator();
     }
 
     template<bool lda>
@@ -2220,11 +2132,9 @@ inline
 typename dealii::internal::DoFHandler::Iterators<DH,lda>::line_iterator
 DoFAccessor<structdim,DH,lda>::line (const unsigned int i) const
 {
-  // if we are asking for a
-  // particular line and this object
-  // refers to a line, then the only
-  // valid index is i==0 and we
-  // should return *this
+  // if we are asking for a particular line and this object refers to
+  // a line, then the only valid index is i==0 and we should return
+  // *this
   if (structdim == 1)
     {
       Assert (i==0, ExcMessage ("You can only ask for line zero if the "
@@ -2237,9 +2147,16 @@ DoFAccessor<structdim,DH,lda>::line (const unsigned int i) const
          &this->get_dof_handler());
     }
 
-  // checking of 'i' happens in
-  // line_index(i)
-  return dealii::internal::DoFAccessor::get_line<lda>(this->tria, this->line_index(i), this->dof_handler);
+  // otherwise we need to be in structdim>=2
+  Assert (structdim > 1, ExcImpossibleInDim(structdim));
+  Assert (DH::dimension > 1, ExcImpossibleInDim(DH::dimension));
+
+  // checking of 'i' happens in line_index(i)
+  return typename dealii::internal::DoFHandler::Iterators<DH,lda>::line_iterator
+    (this->tria,
+     0,  // only sub-objects are allowed, which have no level
+     this->line_index(i),
+     this->dof_handler);
 }
 
 
@@ -2265,13 +2182,16 @@ DoFAccessor<structdim,DH,lda>::quad (const unsigned int i) const
          &this->get_dof_handler());
     }
 
-  // otherwise we need to be in
-  // structdim>=3
+  // otherwise we need to be in structdim>=3
   Assert (structdim > 2, ExcImpossibleInDim(structdim));
-  // checking of 'i' happens in
-  // quad_index(i)
+  Assert (DH::dimension > 2, ExcImpossibleInDim(DH::dimension));
 
-  return dealii::internal::DoFAccessor::get_quad<lda>(this->tria, this->quad_index(i), this->dof_handler);
+  // checking of 'i' happens in quad_index(i)
+  return typename dealii::internal::DoFHandler::Iterators<DH,lda>::quad_iterator
+    (this->tria,
+     0,  // only sub-objects are allowed, which have no level
+     this->quad_index(i),
+     this->dof_handler);
 }
 
 
@@ -3654,7 +3574,7 @@ void DoFCellAccessor<DH,lda>::set_mg_dof_indices (const std::vector<types::globa
 
 template<class DH, bool lda>
 inline
-void DoFCellAccessor<DH,lda>::dof_indices (std::vector<types::global_dof_index> &dof_indices) const
+void DoFCellAccessor<DH,lda>::get_active_or_mg_dof_indices (std::vector<types::global_dof_index> &dof_indices) const
 {
   if (lda)
     get_mg_dof_indices (dof_indices);

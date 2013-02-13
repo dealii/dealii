@@ -107,10 +107,13 @@ namespace SparsityPatternIterators
   public:
     /**
      * Constructor.
+     *
+     * @deprecated This constructor is deprecated. Use the other constructor
+     * with a global index instead.
      */
     Accessor (const SparsityPattern *matrix,
               const unsigned int     row,
-              const unsigned int     index);
+              const unsigned int     index) DEAL_II_DEPRECATED;
 
     /**
      * Constructor.
@@ -130,7 +133,7 @@ namespace SparsityPatternIterators
     unsigned int row () const;
 
     /**
-     * Index in row of the element represented by this object. This function
+     * Index within the current row of the element represented by this object. This function
      * can only be called for entries for which is_valid_entry() is true.
      */
     unsigned int index () const;
@@ -173,9 +176,13 @@ namespace SparsityPatternIterators
     const SparsityPattern *sparsity_pattern;
 
     /**
-     * Index in global sparsity pattern.
+     * Index in global sparsity pattern. This index represents the location
+     * the iterator/accessor points to within the array of the SparsityPattern
+     * class that stores the column numbers. It is also the index within the
+     * values array of a sparse matrix that stores the corresponding value of
+     * this site.
      */
-    std::size_t a_index;
+    std::size_t index_within_sparsity;
 
     /**
      * Move the accessor to the next nonzero entry in the matrix.
@@ -205,6 +212,19 @@ namespace SparsityPatternIterators
    * that the elements of a row are actually traversed in an order in which
    * columns monotonically increase. See the documentation of the
    * SparsityPattern class for more information.
+   *
+   * @note This class operates directly on the internal data structures of the
+   * SparsityPattern class. As a consequence, some operations are cheap and
+   * some are not. In particular, it is cheap to access the column index of
+   * the sparsity pattern entry pointed to. On the other hand, it is expensive
+   * to access the row index (this requires $O(\log(N))$ operations for a
+   * matrix with $N$ row). As a consequence, when you design algorithms that
+   * use these iterators, it is common practice to not loop over <i>all</i>
+   * elements of a sparsity pattern at once, but to have an outer loop over
+   * all rows and within this loop iterate over the elements of this row.
+   * This way, you only ever need to dereference the iterator to obtain
+   * the column indices whereas the (expensive) lookup of the row index
+   * can be avoided by using the loop index instead.
    */
   class Iterator
   {
@@ -212,10 +232,13 @@ namespace SparsityPatternIterators
     /**
      * Constructor. Create an iterator into the sparsity pattern @p sp for the
      * given row and the index within it.
+     *
+     * @deprecated This constructor is deprecated. Use the other constructor
+     * with a global index instead.
      */
     Iterator (const SparsityPattern *sp,
               const unsigned int     row,
-              const unsigned int     index);
+              const unsigned int     index) DEAL_II_DEPRECATED;
 
     /**
      * Constructor. Create an iterator into the sparsity pattern @p sp for the
@@ -1414,7 +1437,7 @@ namespace SparsityPatternIterators
             const unsigned int     i)
     :
     sparsity_pattern(sparsity_pattern),
-    a_index(sparsity_pattern->rowstart[r]+i)
+    index_within_sparsity(sparsity_pattern->rowstart[r]+i)
   {}
 
 
@@ -1424,7 +1447,7 @@ namespace SparsityPatternIterators
             const std::size_t      i)
     :
     sparsity_pattern(sparsity_pattern),
-    a_index(i)
+    index_within_sparsity(i)
   {}
 
 
@@ -1433,7 +1456,7 @@ namespace SparsityPatternIterators
   Accessor (const SparsityPattern *sparsity_pattern)
     :
     sparsity_pattern(sparsity_pattern),
-    a_index(sparsity_pattern->rowstart[sparsity_pattern->rows])
+    index_within_sparsity(sparsity_pattern->rowstart[sparsity_pattern->rows])
   {}
 
 
@@ -1441,9 +1464,9 @@ namespace SparsityPatternIterators
   bool
   Accessor::is_valid_entry () const
   {
-    return (a_index < sparsity_pattern->rowstart[sparsity_pattern->rows]
+    return (index_within_sparsity < sparsity_pattern->rowstart[sparsity_pattern->rows]
             &&
-            sparsity_pattern->colnums[a_index]
+            sparsity_pattern->colnums[index_within_sparsity]
             != SparsityPattern::invalid_entry);
   }
 
@@ -1457,7 +1480,7 @@ namespace SparsityPatternIterators
     const std::size_t * insert_point =
       std::upper_bound(sparsity_pattern->rowstart,
                        sparsity_pattern->rowstart + sparsity_pattern->rows + 1,
-                       a_index);
+                       index_within_sparsity);
     return insert_point - sparsity_pattern->rowstart - 1;
   }
 
@@ -1468,7 +1491,7 @@ namespace SparsityPatternIterators
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
 
-    return (sparsity_pattern->colnums[a_index]);
+    return (sparsity_pattern->colnums[index_within_sparsity]);
   }
 
 
@@ -1478,7 +1501,7 @@ namespace SparsityPatternIterators
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
 
-    return a_index - sparsity_pattern->rowstart[row()];
+    return index_within_sparsity - sparsity_pattern->rowstart[row()];
   }
 
 
@@ -1489,7 +1512,7 @@ namespace SparsityPatternIterators
   Accessor::operator == (const Accessor &other) const
   {
     return (sparsity_pattern == other.sparsity_pattern &&
-            a_index == other.a_index);
+            index_within_sparsity == other.index_within_sparsity);
   }
 
 
@@ -1501,7 +1524,7 @@ namespace SparsityPatternIterators
     Assert (sparsity_pattern == other.sparsity_pattern,
             ExcInternalError());
 
-    return a_index < other.a_index;
+    return index_within_sparsity < other.index_within_sparsity;
   }
 
 
@@ -1509,9 +1532,9 @@ namespace SparsityPatternIterators
   void
   Accessor::advance ()
   {
-    Assert (a_index < sparsity_pattern->rowstart[sparsity_pattern->rows],
+    Assert (index_within_sparsity < sparsity_pattern->rowstart[sparsity_pattern->rows],
             ExcIteratorPastEnd());
-    ++a_index;
+    ++index_within_sparsity;
   }
 
 
@@ -1521,7 +1544,7 @@ namespace SparsityPatternIterators
                       const unsigned int     r,
                       const unsigned int     i)
     :
-    accessor(sparsity_pattern, r, i)
+    accessor(sparsity_pattern, sparsity_pattern->rowstart[r]+i)
   {}
 
 
@@ -1605,7 +1628,7 @@ namespace SparsityPatternIterators
     Assert (accessor.sparsity_pattern == other.accessor.sparsity_pattern,
             ExcInternalError());
 
-    return (*this)->a_index - other->a_index;
+    return (*this)->index_within_sparsity - other->index_within_sparsity;
   }
 }
 

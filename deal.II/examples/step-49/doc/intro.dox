@@ -1,58 +1,111 @@
+<i>This program was made by Timo Heister.</i>
+
 <a name="Intro"></a>
-<h1>Introduction</h1>
+<h1> Introduction </h1>
 
-<h3> About this tutorial </h3>
+This tutorial is an extension to step-1 and demonstrates several ways to
+obtain more involved meshes.
 
-intro:
-- complex geometries
-- this is challenging
-- some solutions here
+Generating complex geometries is a challenging task, especially in 3 space
+dimensions. We will discuss several ways to do this, but this list is not
+exhaustive. Additionally, there is not one approach that fits all problems.
 
-What this program does:
-- make/modify meshes
-- output them
-- nothing else
+The example program shows some of ways to create and modify meshes for
+computations and outputs them as .eps files. No other computations or adaptive
+refinements are done. Please note that the example program does not show all
+the ways to generate meshes that are discussed in this text.
 
-<h1>How to create meshes</h1>
+<h3>General concerns about meshes</h3>
 
-<h2>GridGenerator</h2>
+When you use adaptive mesh refinement, you definitely want the initial mesh to
+be as coarse as possible. The reason is that you can make it as fine as you
+want using adaptive refinement as long as you have memory and CPU time
+available. However, this requires that you don't waste mesh cells in parts of
+the domain where they don't pay off. As a consequence, you don't want to start
+with a mesh that is too fine to start with, because that takes up a good part
+of your cell budget already, and because you can't coarsen away cells that are
+in the initial mesh.
 
-use GridGenerator (already discussed in step-1)
+That said, your mesh needs to capture the given geometry adequately.
 
-some examples: GridGenerator::hyper_cube(), GridGenerator::hyper_shell(), GridGenerator::hyper_ball(), GridGenerator::hyper_cube_with_cylindrical_hole() ...
+<h3>How to create meshes</h3>
 
-<h2>construct your own mesh programmatically</h2>
+There are several ways to create an initial mesh. Meshes can be modified or
+combined in many ways as discussed later on.
 
-example?
+<h4>GridGenerator</h4>
 
-<h2>Import from external programs</h2>
+The easiest way to generate meshes is to use the GridGenerator, which is
+already discussed in step-1.  There are many different helper functions
+available, including GridGenerator::hyper_cube(),
+GridGenerator::hyper_shell(), GridGenerator::hyper_ball(),
+GridGenerator::hyper_cube_with_cylindrical_hole(), ...
 
-import mesh from file, read using GridIn class
+<h4>Construct your own mesh programmatically</h4>
 
-list of tools: cubeit, gmsh, more?
-problem: need to generate quads, tetrahedral meshes won't work
+If the is no good fit in the GridGenerator class, you can always create a
+Triangulation in your program "by hand". For that, you need a list of vertices
+with their coordinates and a list of cells referencing those vertices. You can
+find an example in the function create_coarse_grid in step-14. Additionally,
+all the functions in GridGenerator are implemented in this fashion.
 
+ We are happy to accept more functions to be added to GridGenerator. So, if
+you end up writing a function that might be useful for a larger audience,
+please contribute it.
 
-Gmsh is an open source mesh generator available at http://geuz.org/gmsh/.
-It can generate unstructured 2d quad based meshes, but in 3d it can only extrude 2d meshes to get hexahedral meshes. 3D meshing of unstructured geometry is not supported.
+<h4>Import from external programs</h4>
 
-A mesh is described in a text based .geo file, that can be edited by hand and can contain computations, loops, variables, etc.. It is very flexible. The mesh is generated from a surface representation, which is build from a list of line loops, which is build from a list of lines, which are build from points.
+The class GridIn can read many different mesh formats from a file from
+disk. How this is done is explained in step-5 and can be seen in the function
+grid_1 in this example.
 
-It is important that file contains "physical lines" and "physical surfaces". These give the boundary indicators and material ids for the use inside deal.II. 
+Meshes can be generated from different tools like <a
+href="http://geuz.org/gmsh/" rel="nofollow">gmsh</a>, <a
+href="https://lagrit.lanl.gov/" rel="nofollow">lagrit</a> and <a
+href="http://cubit.sandia.gov/" rel="nofollow">cubit</a>. The problem is that
+deal.II needs meshes that only consist of quads and hexas -- tetrahedral
+meshes won't work (this means tools like tetgen can not be used directly).
 
-The .geo script can be written by hand or it can be generated automatically by creating objects graphically. In many cases it is best to combine both approaches. The file can be easily reloaded by pressing "reload" under the "Geometry" tab.
+We will describe a possible workflow using Gmsh. Gmsh is the smallest and
+quickest to set up open source tool, that we know of. It can generate
+unstructured 2d quad based meshes, but in 3d it can only extrude 2d meshes to
+get hexahedral meshes. 3D meshing of unstructured geometry into hexas is not
+supported at the time of writing.
 
-This tutorial contains an example .geo file. This is how the .geo looks like in gmsh (displaying the boundary indicators):
-@image html gmsh_picture.png
+A mesh is described in a text based .geo file, that can be edited by hand and
+can contain computations, loops, variables, etc.. It is very flexible. The
+mesh is generated from a surface representation, which is build from a list of
+line loops, which is build from a list of lines, which are in turn build from
+points.
 
-Deal.II can read the .msh format written by gmsh. You generate the .msh from the .geo by running:
+It is important that file contains "physical lines" and "physical
+surfaces". These give the boundary indicators and material ids for the use
+inside deal.II. Without the physical entities, nothing will be imported into
+deal.II.  The .geo script can be written by hand or it can be generated
+automatically by creating objects graphically. In many cases it is best to
+combine both approaches. The file can be easily reloaded by pressing "reload"
+under the "Geometry" tab.
+
+This tutorial contains an example .geo file, that describes a box with two
+objects cut out in the interior. This is how untitled.geo looks like in gmsh
+(displaying the boundary indicators): 
+@image html gmsh_picture.png Mesh displayed in Gmsh
+
+You might want to open the .geo file in a text editor to see how it is
+structured. Deal.II can read the .msh format written by gmsh. You generate the
+.msh from the .geo by running: 
+
+<pre>
 gmsh -2 untitled.geo
+</pre>
 
-Now this is the mesh read from gmsh and saved again by deal.II as an image:
+or by clicking "Mesh" and then "2D" inside Gmsh after loading the file.  Now
+this is the mesh read from the .msh file and saved again by deal.II as an image (see the grid_1 function: 
+
 @image html step-49.grid-1.png
 
 
-<h1>Modify a Mesh</h1>
+<h3>Modify a Mesh</h3>
 
 modify a mesh:
   - merge meshes
@@ -60,6 +113,7 @@ modify a mesh:
   - move vertices
   - transform via smooth function
   - perturb mesh
+  - relax inner vertices?
 
 other things to mention:
 
@@ -68,7 +122,7 @@ other things to mention:
 GridTools::rotate
  GridTools::scale
 
-<h2>Merge Meshes</h2>
+<h4>Merge Meshes</h4>
 
 use GridGenerator::merge_triangulations()
 
@@ -79,7 +133,7 @@ example:
 @image html step-49.grid-2.png
 
 
-<h2>Move Vertices</h2>
+<h4>Move Vertices</h4>
 
 move individual vertices, first identify cells/vertices
 

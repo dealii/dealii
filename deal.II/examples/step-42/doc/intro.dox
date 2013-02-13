@@ -315,6 +315,15 @@ using a primal-dual active set strategy and algebraic multigrid, Int. J. Numer.
 Meth. Engng, 2007, 69, pp. 524-543.
 
 
+<h3>Adaptive mesh refinement</h3>
+
+Since we run our program in 3d, there is a good reason to use adaptive
+mesh refined. To make life a bit easier we are choosing the
+KellyErrorEstimator that is already implemented in deal.II. We hand the
+solution vector to it which contains the displacement $u$. As we will see in the
+results it yields a quite reasonable adaptive mesh for the contact zone.
+
+
 <h3>Implementation</h3>
 
 This tutorial is essentailly a mixture of step-40 and step-41 but instead of
@@ -327,5 +336,13 @@ Another difficulty is the handling of the different constraints from
 arises from the contact. For this purpose we create three objects of type 
 ConstraintMatrix.
 
-
-
+Beside the ConstitutiveLaw class there is another new class called Input. This
+class allows us to read in an obstacle from a file. In our example the file
+'obstacle\_file.dat' containts data which describe an Chinese, Japanese or
+Korean symbol for force or power. (See www.orientaloutpost.com/: "This word can be used for motivation - it
+can also mean power / motion / propulsion / force. It can be anything
+internal or external that keeps you going. This is the safest way to express
+motivation in Chinese. If your audience is Japanese, please see the other entry
+for motivation. This is a word in Japanese and Korean, but it means "motive
+power" or "kinetic energy" (without the motivation meaning that you are
+probably looking for)").
