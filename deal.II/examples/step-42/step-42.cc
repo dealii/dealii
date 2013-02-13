@@ -168,18 +168,18 @@ namespace Step42
       mpi_communicator (MPI_COMM_WORLD),
       pcout (std::cout,
                (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
-      HV (NULL),
-      lx (0),
-      ly (0),
+      obstacle_data (0),
+      lx (1.0), // length of the cube in x direction
+      ly (1.0), // length of the cube in y direction
+      hx (0),
+      hy (0),
       nx (0),
       ny (0)
       {read_surface (name);}
 
       double hv(int i, int j);
 
-      void set_height(int i, int j,double val);
-
-      double mikro_height(double x,double y, double z);
+      double mikro_height(double x,double y);
 
       void read_surface(const char* name);
 
@@ -187,7 +187,7 @@ namespace Step42
       const char*          name;
       MPI_Comm             mpi_communicator;
       ConditionalOStream   pcout;
-      double*              HV;
+      std::vector<double>  obstacle_data;
       double               lx, ly;
       double               hx, hy;
       int                  nx, ny;
@@ -198,24 +198,13 @@ namespace Step42
   {
     assert(i>=0 && i<nx);
     assert(j>=0 && j<ny);
-    return HV[nx*j+i];  // i indiziert x-werte, j indiziert y-werte
+//    if (nx*(ny-1-j)+i >25200)
+//      std::cout<< i << ", " << j << ", " << nx*(ny-1-j)+i <<std::endl;
+    return obstacle_data[nx*(ny-1-j)+i]; // i indiziert x-werte, j indiziert y-werte
   }
 
   template <int dim>
-  void Input<dim>::set_height(int i, int j, double val)
-  {
-    if (i>=nx || j>=ny)
-      {
-	std::cout << "invalid:" << i << " " << j << " " << nx*j+i << std::endl;
-    return;
-      }
-    assert(i>=0 && i<nx);
-    assert(j>=0 && j<ny);
-    HV[nx*j+i]=val;  // i indiziert x-werte, j indiziert y-werte
-  }
-
-  template <int dim>
-  double Input<dim>::mikro_height(double x,double y, double z)
+  double Input<dim>::mikro_height(double x,double y)
   {
     int ix = (int)(x/hx);
     int iy = (int)(y/hy);
@@ -287,75 +276,28 @@ namespace Step42
   {
     int SZ = 100000;
     FILE* fp = fopen (name, "r");
-    char* zeile   = new char[SZ];
     char* hlp_str = new char[SZ];
     double hlp;
-    int POS;
 
-    fgets (zeile, SZ, fp);
-    POS = strcspn (zeile, "=");
-    for (int i=0; i<=POS; i++)
-      zeile[i] = ' ';
-    sscanf (zeile, "%d", &nx);
+    fscanf (fp, "%s", hlp_str);
+    fscanf (fp, "%d", &nx);
+    fscanf (fp, "%d", &ny);
 
-    fgets (zeile,SZ,fp);
-    POS = strcspn (zeile, "=");
-    for (int i=0; i<=POS; i++)
-      zeile[i] = ' ';
-    sscanf (zeile, "%d", &ny);
+    assert(nx>0 && ny>0);
 
-    fgets (zeile, SZ, fp);
-    POS = strcspn (zeile, "=");
-    for (int i=0; i<=POS; i++)
-      zeile[i] = ' ';
-    sscanf (zeile, "%lf", &lx);
-
-    fgets (zeile, SZ, fp);
-    POS = strcspn(zeile,"=");
-    for (int i=0; i<=POS; i++)
-      zeile[i] = ' ';
-    sscanf(zeile,"%lf",&ly);
-
-    hx = lx/(nx - 1);
-    hy = ly/(ny - 1);
-
-    pcout<< "Resolution of the scanned obstacle picture: " << nx << " x " << ny <<std::endl;
-
-    if (HV) delete[] HV;
-    HV = new double [nx*ny];
-
-    int j = 0;
-    double max_hlp = 0;
-    double min_hlp = 1e+10;
-    while (fgets (zeile, SZ, fp))
+    for (int k=0; k<nx*ny; k++)
       {
-        int reached = 0;
-        for (int k=0; !reached; k++)
-          {
-            sscanf (zeile, "%lf", &hlp);
-
-            if (hlp > max_hlp)
-              max_hlp=hlp;
-            if (hlp < min_hlp)
-              min_hlp=hlp;
-
-            set_height (k, ny - 1 - j, hlp);
-            int pos = strcspn (zeile, ",");
-            if (!strpbrk (zeile, ","))
-              {
-                reached = 1;
-                continue;
-              }
-
-            for (int i=0; i<=pos; i++)
-              {
-                zeile[i] = ' ';
-              }
-          }
-        j++;
+        fscanf (fp, "%lf", &hlp);
+        obstacle_data.push_back (hlp);
       }
-    pcout<< "Highest point of the obstacle: " << max_hlp <<std::endl;
-    pcout<< "Lowest point of the obstacle:  " << min_hlp <<std::endl;
+
+    fclose (fp);
+    delete[] hlp_str;
+
+    hx = 1.0/(nx - 1);
+    hy = 1.0/(ny - 1);
+
+    pcout << "Resolution of the scanned obstacle picture: " << nx << " x " << ny << std::endl;
   }
 
   template <int dim>
@@ -603,28 +545,7 @@ namespace Step42
         return_value = p(1);
       if (component == 2)
         {
-          // Hindernis Dortmund
-          double x1 = p(0);
-          double x2 = p(1);
-          if (((x2-0.5)*(x2-0.5)+(x1-0.5)*(x1-0.5)<=0.3*0.3)&&((x2-0.5)*(x2-0.5)+(x1-1.0)*(x1-1.0)>=0.4*0.4)&&((x2-0.5)*(x2-0.5)+x1*x1>=0.4*0.4))
-            return_value = 0.999;
-          else
-            return_value = 1e+10;
-
-          // Hindernis Werkzeug TKSE
-//           return_value = 1.999 - input_obstacle_copy->mikro_height (p(0), p(1), p(2));
-//           std::cout<< "Obstacle value: " << return_value
-//               << " p(0) = " << p(0)
-//               << " p(1) = " << p(1)
-//               <<std::endl;
-
-          // Ball with radius R
-          // double R = 1.0;
-          // if (std::pow ((p(0)-1.0/2.0), 2) + std::pow ((p(1)-1.0/2.0), 2) < R*R)
-          //   return_value = 1.0 + R - 0.01 - sqrt (R*R  - std::pow ((p(0)-1.0/2.0), 2)
-          //           - std::pow ((p(1)-1.0/2.0), 2));
-          // else
-          //   return_value = 1e+5;
+          return_value = 1.999 - input_obstacle_copy->mikro_height (p(0), p(1));
         }
       return return_value;
     }
@@ -1515,7 +1436,9 @@ namespace Step42
   void PlasticityContactProblem<dim>::run ()
   {
     pcout << "Read the obstacle from a file." << std::endl;
-    input_obstacle.reset (new Input<dim>("obstacle_file.dat"));
+    input_obstacle.reset (new Input<dim>("li_kraft.pbm"));
+//    input_obstacle.reset (new Input<dim>("li_kraft_697x800.pbm"));
+
     pcout << "Ostacle is available now." << std::endl;
 
     Timer             t;
