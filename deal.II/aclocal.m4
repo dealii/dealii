@@ -1004,8 +1004,9 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
 	  dnl       theoretically useful, pgCC unfortunately gets this one
 	  dnl       wrong on legitimate code where no such parameter is
 	  dnl       hidden, see the email by ayaydemir on 9/3/2012)
-          CXXFLAGSG="$CXXFLAGSG -DDEBUG -g --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 155 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284 --diag_suppress 497"
-          CXXFLAGSO="$CXXFLAGSO -fast -O2 --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 155 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284 --diag_suppress 497"
+          dnl #1815: "type qualifiers are meaningless here"
+          CXXFLAGSG="$CXXFLAGSG -DDEBUG -g --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 155 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284 --diag_suppress 497 --diag_suppress 1815"
+          CXXFLAGSO="$CXXFLAGSO -fast -O2 --display_error_number --diag_suppress 68 --diag_suppress 111 --diag_suppress 128 --diag_suppress 155 --diag_suppress 177 --diag_suppress 175 --diag_suppress 185 --diag_suppress 236 --diag_suppress 284 --diag_suppress 497 --diag_suppress 1815"
           CXXFLAGSPIC="-Kpic"
 
           dnl pgCC can't (as of writing this, with version 12.5 in mid-2012) compile a part of BOOST.
