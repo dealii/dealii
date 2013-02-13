@@ -2295,7 +2295,7 @@ namespace MatrixTools
                     // find the position of element (row,dof_number) in this
                     // block (not in the transpose one). note that we have to
                     // take care of special cases with square sub-matrices
-                    bool (*comp)(const typename SparseMatrix<number>::iterator::value_type p,
+                    bool (*comp)(typename SparseMatrix<number>::iterator::value_type p,
                                  const unsigned int column)
                       = &column_less_than<typename SparseMatrix<number>::iterator>;
 
