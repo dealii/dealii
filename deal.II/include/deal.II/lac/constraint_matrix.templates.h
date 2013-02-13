@@ -167,13 +167,15 @@ ConstraintMatrix::condense (VectorType &vec) const
               constraint_line->entries[q].second);
     }
 
-  vec.compress();
+  vec.compress(VectorOperation::add);
 
   for (std::vector<ConstraintLine>::const_iterator
        constraint_line = lines.begin();
        constraint_line!=lines.end(); ++constraint_line)
     if (vec.in_local_range(constraint_line->line) == true)
       vec(constraint_line->line) = 0.;
+
+  vec.compress(VectorOperation::insert);
 }
 
 
@@ -777,6 +779,7 @@ namespace internal
       void set_zero_all(const dealii::ConstraintMatrix &cm, VEC &vec)
       {
         set_zero_in_parallel<VEC>(cm, vec, internal::bool2type<IsBlockVector<VEC>::value>());
+        vec.compress(VectorOperation::insert);
       }
 
 
