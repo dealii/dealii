@@ -345,8 +345,13 @@ namespace TrilinosWrappers
      * See @ref GlossCompress "Compressing distributed objects"
      * for more information.
      */
-    void compress (::dealii::VectorOperation::values operation
-                   =::dealii::VectorOperation::unknown);
+    void compress (::dealii::VectorOperation::values operation);
+
+    /**
+     * @deprecated: Use the compress(VectorOperation::values) function
+     * above instead.
+     */
+    void compress() DEAL_II_DEPRECATED;
 
     /**
     * @deprecated Use compress(dealii::VectorOperation::values) instead.
