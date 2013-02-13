@@ -156,9 +156,7 @@ SparseVanka<number>::compute_inverse (const unsigned int         row,
 
   const unsigned int row_length = structure.row_length(row);
 
-  FullMatrix<float> &this_inverse = *new FullMatrix<float> (row_length,
-                                                            row_length);
-  inverses[row] = &this_inverse;
+  inverses[row] = new FullMatrix<float> (row_length, row_length);
 
   // collect the dofs that couple
   // with @p row
@@ -167,31 +165,12 @@ SparseVanka<number>::compute_inverse (const unsigned int         row,
     local_indices[i] = structure.column_number(row, i);
 
   // Build local matrix
-  for (unsigned int i=0; i<row_length; ++i)
-    for (unsigned int j=0; j<row_length; ++j)
-      {
-        // if DoFs local_index[i] and
-        // local_index[j] couple with
-        // each other, then get the
-        // value from the global
-        // matrix. if not, then leave
-        // the value in the small
-        // matrix at zero
-        //
-        // the explicit use of operator()
-        // works around a bug in some gcc
-        // versions (see PR 18803)
-        const unsigned int global_entry =
-          structure.operator()(local_indices[i], local_indices[j]);
-        if (global_entry != SparsityPattern::invalid_entry)
-          // the explicit use of operator()
-          // works around a bug in some gcc
-          // versions (see PR 18803)
-          this_inverse.operator()(i,j) = matrix->global_entry(global_entry);
-      }
+  inverses[row]->extract_submatrix_from (*matrix,
+                                         local_indices,
+                                         local_indices);
 
   // Compute inverse
-  this_inverse.gauss_jordan();
+  inverses[row]->gauss_jordan();
 }
 
 
@@ -300,27 +279,24 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>         &dst,
             // row corresponding to DoF @p row.
             // runs between 0 and row_length
             const unsigned int i = is->second;
-            // number of DoFs coupling to
-            // irow (including irow itself)
-            const unsigned int irow_length = structure.row_length(irow);
 
             // copy rhs
             b(i) = src(irow);
 
             // for all the DoFs that irow
             // couples with
-            for (unsigned int j=0; j<irow_length; ++j)
+            // number of DoFs coupling to
+            // irow (including irow itself)
+            for (typename SparseMatrix<number>::const_iterator p=matrix->begin(row);
+                p != matrix->end(row); ++p)
               {
-                // col is the number of
-                // this dof
-                const unsigned int col = structure.column_number(irow, j);
                 // find out whether this DoF
                 // (that couples with @p irow,
                 // which itself couples with
                 // @p row) also couples with
                 // @p row.
                 const std::map<unsigned int, unsigned int>::const_iterator js
-                  = local_index.find(col);
+                  = local_index.find(p->column());
                 // if not, then still use
                 // this dof to modify the rhs
                 //
@@ -329,16 +305,16 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>         &dst,
                 if (js == local_index.end())
                   {
                     if (!range_is_restricted ||
-                        ((*dof_mask)[col] == true))
-                      b(i) -= matrix->raw_entry(irow,j) * dst(col);
+                        ((*dof_mask)[p->column()] == true))
+                      b(i) -= p->value() * dst(p->column());
                   }
                 else
                   // if so, then build the
                   // matrix out of it
                   if (conserve_mem == true)
-                    (*inverses[row])(i,js->second) = matrix->raw_entry(irow,j);
-              };
-          };
+                    (*inverses[row])(i,js->second) = p->value();
+              }
+          }
 
         // Compute new values
         if (conserve_mem == true)
@@ -359,14 +335,14 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>         &dst,
               dst(irow) = x(i);
             // do nothing if not in
             // the range
-          };
+          }
 
         // if we don't store the
         // inverses, then unalias the
         // local matrix
         if (conserve_mem == true)
           inverses[row] = 0;
-      };
+      }
 }
 
 

@@ -143,7 +143,7 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
       // it's symmetric, so we can work with this alone
       for (typename SparseMatrix<somenumber>::const_iterator
            p = matrix.begin(row)+1;
-           (p != matrix.end(row)) && (p->column() < p->row());
+           (p != matrix.end(row)) && (p->column() < row);
            ++p)
         temp1 += p->value() / diag[p->column()] * inner_sums[p->column()];
 
@@ -166,7 +166,7 @@ SparseMIC<number>::get_rowsum (const unsigned int row) const
   for (typename SparseMatrix<number>::const_iterator
        p = this->begin(row)+1;
        p != this->end(row); ++p)
-    if (p->column() > p->row())
+    if (p->column() > row)
       rowsum += p->value();
 
   return rowsum;

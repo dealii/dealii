@@ -99,12 +99,16 @@ namespace BlockMatrixIterators
     template <typename>
     friend class MatrixIterator;
   };
+
+
+
   /**
    * Accessor classes in
    * block matrices.
    */
   template <class BlockMatrix, bool ConstNess>
   class Accessor;
+
 
   /**
    * Block matrix accessor for non
