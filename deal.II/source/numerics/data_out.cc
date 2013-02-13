@@ -383,7 +383,7 @@ namespace internal
     get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                             std::vector<std::vector<Tensor<1,DH::space_dimension> > >   &patch_gradients_system) const
     {
-      fe_patch_values.get_function_grads (*vector, patch_gradients_system);
+      fe_patch_values.get_function_gradients (*vector, patch_gradients_system);
     }
 
 
@@ -394,7 +394,7 @@ namespace internal
     get_function_gradients (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                             std::vector<Tensor<1,DH::space_dimension> >       &patch_gradients) const
     {
-      fe_patch_values.get_function_grads (*vector, patch_gradients);
+      fe_patch_values.get_function_gradients (*vector, patch_gradients);
     }
 
 
