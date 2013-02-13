@@ -1840,6 +1840,16 @@ BlockVectorBase<VectorType>::compress (::dealii::VectorOperation::values operati
 
 template <class VectorType>
 inline
+void
+BlockVectorBase<VectorType>::compress ()
+{
+  compress(VectorOperation::unknown);
+}
+
+
+
+template <class VectorType>
+inline
 typename BlockVectorBase<VectorType>::iterator
 BlockVectorBase<VectorType>::begin()
 {
