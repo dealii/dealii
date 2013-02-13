@@ -772,6 +772,9 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl       #warning at one place)
           dnl #175: `subscript out of range' (doesn't take into account that
           dnl       some code is only reachable for some dimensions)
+	  dnl #279: `controlling expression is constant' (this happens
+	  dnl       in assertions placed into dead code branches such as
+	  dnl       "Assert (false, ...)"
           dnl #327: `NULL reference is not allowed' (this happens when we
           dnl       write "*static_cast<double*>(0)" or some such thing,
           dnl       which we do to create invalid references)
@@ -787,8 +790,8 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           dnl #1565: attributes are ignored on a class declaration that is not
 	  dnl        also a definition (this happens in BOOST in a number of
 	  dnl        places)
-          CXXFLAGSG="$CXXFLAGSG -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858 -wd1565"
-          CXXFLAGSO="$CXXFLAGSO -w0 -wd424 -wd11"
+          CXXFLAGSG="$CXXFLAGSG -w1 -wd175 -wd279 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858 -wd1565"
+          CXXFLAGSO="$CXXFLAGSO -w0 -wd175 -wd424 -wd11"
 
           dnl To reduce output, use -opt_report_levelmin where possible,
           dnl i.e. post icc5. from icc10 onwards, this flag is called
