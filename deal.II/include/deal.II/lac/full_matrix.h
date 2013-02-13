@@ -1545,7 +1545,7 @@ FullMatrix<number>::copy_transposed (const MATRIX &M)
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class, and
   // copy them into the current object
-  for (unsigned int row = 0; row < M.n(); ++row)
+  for (unsigned int row = 0; row < M.m(); ++row)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
