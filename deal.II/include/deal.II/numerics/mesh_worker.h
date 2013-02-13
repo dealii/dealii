@@ -15,5 +15,5 @@
  * @deprecated The contents of this file has moved to <tt>meshworker/local_results.h</tt>
  */
 
-#warning This file is deprecated. Use the corresponding file in the deal.II/mesh_worker directory instead.
+#warning This file is deprecated. Use deal.II/meshworker/local_results.h instead.
 #include <deal.II/meshworker/local_results.h>
