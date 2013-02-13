@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -436,7 +436,7 @@ namespace internal
       // function on this cell
       for (unsigned int n=0; n<n_solution_vectors; ++n)
         fe_face_values_cell.get_present_fe_values()
-        .get_function_grads (*solutions[n], parallel_data.psi[n]);
+        .get_function_gradients (*solutions[n], parallel_data.psi[n]);
 
       // now compute over the other side of
       // the face
@@ -470,8 +470,8 @@ namespace internal
           for (unsigned int n=0; n<n_solution_vectors; ++n)
             {
               fe_face_values_neighbor.get_present_fe_values()
-              .get_function_grads (*solutions[n],
-                                   parallel_data.neighbor_psi[n]);
+              .get_function_gradients (*solutions[n],
+				       parallel_data.neighbor_psi[n]);
 
               // compute the jump in the gradients
               for (unsigned int component=0; component<n_components; ++component)
@@ -687,14 +687,14 @@ namespace internal
           // solution in psi
           for (unsigned int n=0; n<n_solution_vectors; ++n)
             fe_subface_values.get_present_fe_values()
-            .get_function_grads (*solutions[n], parallel_data.psi[n]);
+            .get_function_gradients (*solutions[n], parallel_data.psi[n]);
 
           // store the gradient from the
           // neighbor's side in
           // @p{neighbor_psi}
           for (unsigned int n=0; n<n_solution_vectors; ++n)
             fe_face_values.get_present_fe_values()
-            .get_function_grads (*solutions[n], parallel_data.neighbor_psi[n]);
+            .get_function_gradients (*solutions[n], parallel_data.neighbor_psi[n]);
 
           // compute the jump in the gradients
           for (unsigned int n=0; n<n_solution_vectors; ++n)
@@ -1316,7 +1316,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
 
             for (unsigned int s=0; s<n_solution_vectors; ++s)
               fe_values.get_present_fe_values()
-              .get_function_grads (*solutions[s], gradients_here[s]);
+              .get_function_gradients (*solutions[s], gradients_here[s]);
 
             if (neighbor.state() == IteratorState::valid)
               {
@@ -1324,8 +1324,8 @@ estimate (const Mapping<1,spacedim>                    &mapping,
 
                 for (unsigned int s=0; s<n_solution_vectors; ++s)
                   fe_values.get_present_fe_values()
-                  .get_function_grads (*solutions[s],
-                                       gradients_neighbor[s]);
+                  .get_function_gradients (*solutions[s],
+					   gradients_neighbor[s]);
 
                 // extract the
                 // gradients of all the
