@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -405,7 +405,7 @@ namespace internal
     get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                            std::vector<std::vector<Tensor<2,DH::space_dimension> > >   &patch_hessians_system) const
     {
-      fe_patch_values.get_function_2nd_derivatives (*vector, patch_hessians_system);
+      fe_patch_values.get_function_hessians (*vector, patch_hessians_system);
     }
 
 
@@ -416,7 +416,7 @@ namespace internal
     get_function_hessians (const FEValuesBase<DH::dimension,DH::space_dimension> &fe_patch_values,
                            std::vector<Tensor<2,DH::space_dimension> >       &patch_hessians) const
     {
-      fe_patch_values.get_function_2nd_derivatives (*vector, patch_hessians);
+      fe_patch_values.get_function_hessians (*vector, patch_hessians);
     }
 
 
