@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1728,7 +1728,7 @@ factorize (const Matrix &matrix)
 
     // loop over the elements of the matrix row by row, as suggested
     // in the documentation of the sparse matrix iterator class
-    for (unsigned int row = 0; row < matrix.n(); ++row)
+    for (unsigned int row = 0; row < matrix.m(); ++row)
       {
         for (typename Matrix::const_iterator p=matrix.begin(row);
             p!=matrix.end(row); ++p)
@@ -1962,7 +1962,7 @@ void SparseDirectMUMPS::initialize_matrix (const Matrix &matrix)
 
       // loop over the elements of the matrix row by row, as suggested
       // in the documentation of the sparse matrix iterator class
-      for (unsigned int row = 0; row < matrix.n(); ++row)
+      for (unsigned int row = 0; row < matrix.m(); ++row)
         {
           for (typename Matrix::const_iterator ptr = matrix.begin (row);
               ptr != matrix.end (row); ++ptr)
