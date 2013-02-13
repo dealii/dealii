@@ -46,6 +46,11 @@ class TridiagonalMatrix
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef std::size_t size_type;
+
+  /**
    * @name Constructors and initalization.
    */
   /**
@@ -53,7 +58,7 @@ public:
    * empty matrix of dimension
    * <tt>n</tt>.
    */
-  TridiagonalMatrix(unsigned int n = 0,
+  TridiagonalMatrix(size_type    n = 0,
                     bool symmetric = false);
 
   /**
@@ -62,7 +67,7 @@ public:
    * to zero. The symmetry
    * properties may be set as well.
    */
-  void reinit(unsigned int n,
+  void reinit(size_type n,
               bool symmetric = false);
 
 
@@ -75,14 +80,14 @@ public:
    * To remember: this matrix is an
    * <i>m x m</i>-matrix.
    */
-  unsigned int m () const;
+  size_type m () const;
 
   /**
    * Number of columns of this matrix.
    * To remember: this matrix is an
    * <i>n x n</i>-matrix.
    */
-  unsigned int n () const;
+  size_type n () const;
 
   /**
    * Return whether the matrix
@@ -107,7 +112,7 @@ public:
    * the case where <i>|i-j| <=
    * 1</i>.
    */
-  number operator()(unsigned int i, unsigned int j) const;
+  number operator()(size_type i, size_type j) const;
 
   /**
    * Read-write access to a
@@ -124,7 +129,7 @@ public:
    * for matrix assembling in order
    * not to obtain doubled entries.
    */
-  number &operator()(unsigned int i, unsigned int j);
+  number &operator()(size_type i, size_type j);
 
 //@}
 ///@name Multiplications with vectors
@@ -294,7 +299,7 @@ public:
    * compute_eigenvalues(), you can
    * access each eigenvalue here.
    */
-  number eigenvalue(const unsigned int i) const;
+  number eigenvalue(const size_type i) const;
 //@}
 ///@name Miscellanea
 //@{
@@ -375,7 +380,7 @@ private:
 #ifndef DOXYGEN
 
 template<typename number>
-unsigned int
+size_type
 TridiagonalMatrix<number>::m() const
 {
   return diagonal.size();
@@ -384,7 +389,7 @@ TridiagonalMatrix<number>::m() const
 
 
 template<typename number>
-unsigned int
+size_type
 TridiagonalMatrix<number>::n() const
 {
   return diagonal.size();
@@ -394,7 +399,7 @@ TridiagonalMatrix<number>::n() const
 template<typename number>
 inline
 number
-TridiagonalMatrix<number>::operator()(unsigned int i, unsigned int j) const
+TridiagonalMatrix<number>::operator()(size_type i, size_type j) const
 {
   Assert(i<n(), ExcIndexRange(i,0,n()));
   Assert(j<n(), ExcIndexRange(j,0,n()));
@@ -422,7 +427,7 @@ TridiagonalMatrix<number>::operator()(unsigned int i, unsigned int j) const
 template<typename number>
 inline
 number &
-TridiagonalMatrix<number>::operator()(unsigned int i, unsigned int j)
+TridiagonalMatrix<number>::operator()(size_type i, size_type j)
 {
   Assert(i<n(), ExcIndexRange(i,0,n()));
   Assert(j<n(), ExcIndexRange(j,0,n()));
@@ -455,7 +460,7 @@ TridiagonalMatrix<number>::print (
   const unsigned int width,
   const unsigned int) const
 {
-  for (unsigned int i=0; i<n(); ++i)
+  for (size_type i=0; i<n(); ++i)
     {
       if (i>0)
         s << std::setw(width) << (*this)(i,i-1);

@@ -254,12 +254,17 @@ class GrowingVectorMemory : public VectorMemory<VECTOR>
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef std::size_t size_type;
+
+  /**
    * Constructor.  The argument
    * allows to preallocate a
    * certain number of vectors. The
    * default is not to do this.
    */
-  GrowingVectorMemory (const unsigned int initial_size = 0,
+  GrowingVectorMemory (const size_type initial_size = 0,
                        const bool log_statistics = false);
 
   /**
@@ -356,7 +361,7 @@ private:
      * nothing after first
      * initialization
      */
-    void initialize(const unsigned int size);
+    void initialize(const size_type size);
     /**
      * Pointer to the storage
      * object
@@ -376,13 +381,13 @@ private:
    * output at the end of an
    * object's lifetime.
    */
-  unsigned int total_alloc;
+  size_type total_alloc;
   /**
    * Number of vectors currently
    * allocated in this object; used
    * for detecting memory leaks.
    */
-  unsigned int current_alloc;
+  size_type current_alloc;
 
   /**
    * A flag controlling the logging

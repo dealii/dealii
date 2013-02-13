@@ -207,6 +207,11 @@ public:
   class const_iterator;
 
   /**
+   * Declare the type of container size.
+   */
+  typedef std::size_t size_type;
+
+  /**
    * Accessor class for iterators
    */
   class Accessor
@@ -218,7 +223,7 @@ public:
      * pointer is sufficient.
      */
     Accessor (const FilteredMatrix<VECTOR> *matrix,
-              const unsigned int index);
+              const size_type               index);
 
   public:
     /**
@@ -226,14 +231,14 @@ public:
      * represented by this
      * object.
      */
-    unsigned int row() const;
+    size_type row() const;
 
     /**
      * Column number of the
      * element represented by
      * this object.
      */
-    unsigned int column() const;
+    size_type column() const;
 
     /**
      * Value of the right hand
@@ -255,7 +260,7 @@ public:
     /**
      * Current row number.
      */
-    unsigned int index;
+    size_type index;
     /*
      * Make enclosing class a
      * friend.
@@ -273,7 +278,7 @@ public:
      * Constructor.
      */
     const_iterator(const FilteredMatrix<VECTOR> *matrix,
-                   const unsigned int index);
+                   const size_type index);
 
     /**
      * Prefix increment.
@@ -337,7 +342,7 @@ public:
    * freedom index and the value it
    * shall have.
    */
-  typedef std::pair<unsigned int, double> IndexValuePair;
+  typedef std::pair<size_type, double> IndexValuePair;
 
   /**
    * @name Constructors and initialization
@@ -416,7 +421,7 @@ public:
    * should have the value
    * <tt>v</tt>.
    */
-  void add_constraint (const unsigned int i, const double v);
+  void add_constraint (const size_type i, const double v);
 
   /**
    * Add a list of constraints to
@@ -655,7 +660,7 @@ template<class VECTOR>
 inline
 FilteredMatrix<VECTOR>::Accessor::Accessor(
   const FilteredMatrix<VECTOR> *matrix,
-  const unsigned int index)
+  const size_type index)
   :
   matrix(matrix),
   index(index)
@@ -668,7 +673,7 @@ FilteredMatrix<VECTOR>::Accessor::Accessor(
 
 template<class VECTOR>
 inline
-unsigned int
+size_type
 FilteredMatrix<VECTOR>::Accessor::row() const
 {
   return matrix->constraints[index].first;
@@ -678,7 +683,7 @@ FilteredMatrix<VECTOR>::Accessor::row() const
 
 template<class VECTOR>
 inline
-unsigned int
+size_type
 FilteredMatrix<VECTOR>::Accessor::column() const
 {
   return matrix->constraints[index].first;
@@ -712,7 +717,7 @@ template<class VECTOR>
 inline
 FilteredMatrix<VECTOR>::const_iterator::const_iterator(
   const FilteredMatrix<VECTOR> *matrix,
-  const unsigned int index)
+  const size_type index)
   :
   accessor(matrix, index)
 {}
@@ -860,7 +865,7 @@ FilteredMatrix<VECTOR>::operator = (const FilteredMatrix &fm)
 template <class VECTOR>
 inline
 void
-FilteredMatrix<VECTOR>::add_constraint (const unsigned int index, const double value)
+FilteredMatrix<VECTOR>::add_constraint (const size_type index, const double value)
 {
   // add new constraint to end
   constraints.push_back(IndexValuePair(index, value));
@@ -875,7 +880,7 @@ void
 FilteredMatrix<VECTOR>::add_constraints (const ConstraintList &new_constraints)
 {
   // add new constraints to end
-  const unsigned int old_size = constraints.size();
+  const size_type old_size = constraints.size();
   constraints.reserve (old_size + new_constraints.size());
   constraints.insert (constraints.end(),
                       new_constraints.begin(),

@@ -228,14 +228,15 @@ namespace TrilinosWrappers
       // create a vector that holds all the elements
       // contained in the block vector. need to
       // manually create an Epetra_Map.
-      unsigned int n_elements = 0, added_elements = 0, block_offset = 0;
-      for (unsigned int block=0; block<v.n_blocks(); ++block)
+      size_type n_elements = 0, added_elements = 0, block_offset = 0;
+      for (size_type block=0; block<v.n_blocks(); ++block)
         n_elements += v.block(block).local_size();
-      std::vector<int> global_ids (n_elements, -1);
-      for (unsigned int block=0; block<v.n_blocks(); ++block)
+      std::vector<int_type> global_ids (n_elements, -1);
+      for (size_type block=0; block<v.n_blocks(); ++block)
         {
-          int *glob_elements = v.block(block).vector_partitioner().MyGlobalElements();
-          for (unsigned int i=0; i<v.block(block).local_size(); ++i)
+          int_type *glob_elements = 
+            v.block(block).vector_partitioner().MyGlobalElements();
+          for (size_type i=0; i<v.block(block).local_size(); ++i)
             global_ids[added_elements++] = glob_elements[i] + block_offset;
           block_offset += v.block(block).size();
         }
@@ -255,7 +256,7 @@ namespace TrilinosWrappers
 
       TrilinosScalar *entries = (*actual_vec)[0];
       block_offset = 0;
-      for (unsigned int block=0; block<v.n_blocks(); ++block)
+      for (size_type block=0; block<v.n_blocks(); ++block)
         {
           v.block(block).trilinos_vector().ExtractCopy (entries, 0);
           entries += v.block(block).local_size();
@@ -263,7 +264,7 @@ namespace TrilinosWrappers
 
       if (import_data == true)
         {
-          AssertThrow (static_cast<unsigned int>(actual_vec->GlobalLength())
+          AssertThrow (static_cast<size_type>(actual_vec->GlobalLength())
                        == v.size(),
                        ExcDimensionMismatch (actual_vec->GlobalLength(),
                                              v.size()));
@@ -373,10 +374,10 @@ namespace TrilinosWrappers
 
 
 
-  Vector::Vector (const unsigned int n)
+  Vector::Vector (const size_type n)
   {
     last_action = Zero;
-    Epetra_LocalMap map ((int)n, 0, Utilities::Trilinos::comm_self());
+    Epetra_LocalMap map ((int_type)n, 0, Utilities::Trilinos::comm_self());
     vector.reset (new Epetra_FEVector (map));
   }
 
@@ -397,7 +398,7 @@ namespace TrilinosWrappers
                   const MPI_Comm &communicator)
   {
     last_action = Zero;
-    Epetra_LocalMap map (static_cast<int>(partitioning.size()),
+    Epetra_LocalMap map (static_cast<int_type>(partitioning.size()),
                          0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
                          Epetra_MpiComm(communicator));
@@ -431,12 +432,12 @@ namespace TrilinosWrappers
 
 
   void
-  Vector::reinit (const unsigned int n,
-                  const bool         fast)
+  Vector::reinit (const size_type n,
+                  const bool      fast)
   {
     if (size() != n)
       {
-        Epetra_LocalMap map ((int)n, 0,
+        Epetra_LocalMap map ((int_type)n, 0,
                              Utilities::Trilinos::comm_self());
         vector.reset (new Epetra_FEVector (map));
       }
@@ -487,9 +488,9 @@ namespace TrilinosWrappers
                   const bool      fast)
   {
     if (vector->Map().NumGlobalElements() !=
-        static_cast<int>(partitioning.size()))
+        static_cast<int_type>(partitioning.size()))
       {
-        Epetra_LocalMap map (static_cast<int>(partitioning.size()),
+        Epetra_LocalMap map (static_cast<int_type>(partitioning.size()),
                              0,
 #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
                              Epetra_MpiComm(communicator));

@@ -21,7 +21,7 @@ using namespace LAPACKSupport;
 
 template<typename number>
 TridiagonalMatrix<number>::TridiagonalMatrix(
-  unsigned int size,
+  size_type size,
   bool symmetric)
   :
   diagonal(size, 0.),
@@ -35,7 +35,7 @@ TridiagonalMatrix<number>::TridiagonalMatrix(
 template<typename number>
 void
 TridiagonalMatrix<number>::reinit(
-  unsigned int size,
+  size_type size,
   bool symmetric)
 {
   is_symmetric = symmetric;
@@ -86,7 +86,7 @@ TridiagonalMatrix<number>::vmult (
 
   // The actual loop skips the first
   // and last row
-  const unsigned int e=n()-1;
+  const size_type e=n()-1;
   // Let iterators point to the first
   // entry of each diagonal
   typename std::vector<number>::const_iterator d = diagonal.begin();
@@ -107,7 +107,7 @@ TridiagonalMatrix<number>::vmult (
       ++d;
       ++r;
       // All rows with three entries
-      for (unsigned int i=1; i<e; ++i,++d,++r,++l)
+      for (size_type i=1; i<e; ++i,++d,++r,++l)
         w(i) += (*l) * v(i-1) + (*d) * v(i) + (*r) * v(i+1);
       // Last row is special again
       w(e) += (*l) * v(e-1) + (*d) * v(e);
@@ -117,7 +117,7 @@ TridiagonalMatrix<number>::vmult (
       w(0) = (*d) * v(0) + (*r) * v(1);
       ++d;
       ++r;
-      for (unsigned int i=1; i<e; ++i,++d,++r,++l)
+      for (size_type i=1; i<e; ++i,++d,++r,++l)
         w(i) = (*l) * v(i-1) + (*d) * v(i) + (*r) * v(i+1);
       w(e) = (*l) * v(e-1) + (*d) * v(e);
     }
@@ -148,7 +148,7 @@ TridiagonalMatrix<number>::Tvmult (
 
   if (n()==0) return;
 
-  const unsigned int e=n()-1;
+  const size_type e=n()-1;
   typename std::vector<number>::const_iterator d = diagonal.begin();
   typename std::vector<number>::const_iterator r = right.begin();
   typename std::vector<number>::const_iterator l = left.begin();
@@ -162,7 +162,7 @@ TridiagonalMatrix<number>::Tvmult (
       w(0) += (*d) * v(0) + (*l) * v(1);
       ++d;
       ++l;
-      for (unsigned int i=1; i<e; ++i,++d,++r,++l)
+      for (size_type i=1; i<e; ++i,++d,++r,++l)
         w(i) += (*l) * v(i+1) + (*d) * v(i) + (*r) * v(i-1);
       w(e) += (*d) * v(e) + (*r) * v(e-1);
     }
@@ -171,7 +171,7 @@ TridiagonalMatrix<number>::Tvmult (
       w(0) = (*d) * v(0) + (*l) * v(1);
       ++d;
       ++l;
-      for (unsigned int i=1; i<e; ++i,++d,++r,++l)
+      for (size_type i=1; i<e; ++i,++d,++r,++l)
         w(i) = (*l) * v(i+1) + (*d) * v(i) + (*r) * v(i-1);
       w(e) = (*d) * v(e) + (*r) * v(e-1);
     }
@@ -196,7 +196,7 @@ TridiagonalMatrix<number>::matrix_scalar_product(
 {
   Assert(state == matrix, ExcState(state));
 
-  const unsigned int e=n()-1;
+  const size_type e=n()-1;
   typename std::vector<number>::const_iterator d = diagonal.begin();
   typename std::vector<number>::const_iterator r = right.begin();
   typename std::vector<number>::const_iterator l = left.begin();
@@ -208,7 +208,7 @@ TridiagonalMatrix<number>::matrix_scalar_product(
   number result = w(0) * ((*d) * v(0) + (*r) * v(1));
   ++d;
   ++r;
-  for (unsigned int i=1; i<e; ++i,++d,++r,++l)
+  for (size_type i=1; i<e; ++i,++d,++r,++l)
     result += w(i) * ((*l) * v(i-1)+ (*d) * v(i)+ (*r) * v(i+1));
   result += w(e) * ((*l) * v(e-1) + (*d) * v(e));
   return result;
@@ -246,7 +246,7 @@ TridiagonalMatrix<double>::compute_eigenvalues()
 
 template<typename number>
 number
-TridiagonalMatrix<number>::eigenvalue(const unsigned int i) const
+TridiagonalMatrix<number>::eigenvalue(const size_type i) const
 {
   Assert(state == eigenvalues, ExcState(state));
   Assert(i<n(), ExcIndexRange(i,0,n()));

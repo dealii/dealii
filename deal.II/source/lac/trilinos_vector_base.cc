@@ -40,7 +40,8 @@ namespace TrilinosWrappers
       // we can use []. Note that we
       // can only get local values.
 
-      const int local_index = vector.vector->Map().LID(static_cast<int>(index));
+      const int_type local_index = 
+        vector.vector->Map().LID(static_cast<int_type>(index));
       Assert (local_index >= 0,
               ExcAccessToNonLocalElement (index,
                                           vector.vector->Map().MinMyGID(),
@@ -152,9 +153,9 @@ namespace TrilinosWrappers
     //
     // let's hope this isn't a
     // particularly frequent operation
-    std::pair<unsigned int, unsigned int>
+    std::pair<size_type, size_type>
     local_range = this->local_range ();
-    for (unsigned int i=local_range.first; i<local_range.second; ++i)
+    for (size_type i=local_range.first; i<local_range.second; ++i)
       (*vector)[0][i-local_range.first] = v(i);
 
     return *this;
@@ -163,11 +164,11 @@ namespace TrilinosWrappers
 
 
   TrilinosScalar
-  VectorBase::el (const unsigned int index) const
+  VectorBase::el (const size_type index) const
   {
     // Extract local indices in
     // the vector.
-    int trilinos_i = vector->Map().LID(static_cast<int>(index));
+    int_type trilinos_i = vector->Map().LID(static_cast<int_type>(index));
     TrilinosScalar value = 0.;
 
     // If the element is not
@@ -191,11 +192,11 @@ namespace TrilinosWrappers
 
 
   TrilinosScalar
-  VectorBase::operator () (const unsigned int index) const
+  VectorBase::operator () (const size_type index) const
   {
     // Extract local indices in
     // the vector.
-    int trilinos_i = vector->Map().LID(static_cast<int>(index));
+    int_type trilinos_i = vector->Map().LID(static_cast<int_type>(index));
     TrilinosScalar value = 0.;
 
     // If the element is not present
@@ -246,7 +247,7 @@ namespace TrilinosWrappers
     if (local_size() != v.local_size())
       return false;
 
-    unsigned int i;
+    size_type i;
     for (i=0; i<local_size(); i++)
       if ((*(v.vector))[0][i]!=(*vector)[0][i]) return false;
 
@@ -349,7 +350,7 @@ namespace TrilinosWrappers
   {
     Assert (vector->GlobalLength()!=0, ExcEmptyObject());
 
-    for (unsigned int j=0; j<size(); ++j)
+    for (size_type j=0; j<size(); ++j)
       {
         double t = (*vector)[0][j];
 
@@ -389,10 +390,10 @@ namespace TrilinosWrappers
       out.setf (std::ios::fixed, std::ios::floatfield);
 
     if (across)
-      for (unsigned int i=0; i<size(); ++i)
+      for (size_type i=0; i<size(); ++i)
         out << static_cast<double>(val[i]) << ' ';
     else
-      for (unsigned int i=0; i<size(); ++i)
+      for (size_type i=0; i<size(); ++i)
         out << static_cast<double>(val[i]) << std::endl;
     out << std::endl;
 
@@ -422,7 +423,7 @@ namespace TrilinosWrappers
     //one index and the value per local
     //entry.
     return sizeof(*this)
-           + this->local_size()*( sizeof(double)+sizeof(int) );
+           + this->local_size()*( sizeof(double)+sizeof(int_type) );
   }
 
 } /* end of namespace TrilinosWrappers */

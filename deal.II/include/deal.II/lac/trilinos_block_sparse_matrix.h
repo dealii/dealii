@@ -71,6 +71,23 @@ namespace TrilinosWrappers
   {
   public:
     /**
+     * Declare the type for container size.
+     */
+    typedef std::size_t size_type;
+
+#ifdef EPETRA_NO_64BIT_GLOBAL_INDICES
+    /**
+     * Declare the type of integer.
+     */
+    typedef int int_type;
+#else
+    /**
+     * Declare the type of integer.
+     */
+    typedef long long int_type;
+#endif
+
+    /**
      * Typedef the base class for simpler
      * access to its own typedefs.
      */
@@ -175,8 +192,8 @@ namespace TrilinosWrappers
      * user call whatever function
      * she desires.
      */
-    void reinit (const unsigned int n_block_rows,
-                 const unsigned int n_block_columns);
+    void reinit (const size_type n_block_rows,
+                 const size_type n_block_columns);
 
     /**
      * Resize the matrix, by using an
@@ -289,7 +306,7 @@ namespace TrilinosWrappers
      * elements of this
      * matrix.
      */
-    unsigned int n_nonzero_elements () const;
+    size_type n_nonzero_elements () const;
 
     /**
      * Matrix-vector multiplication:
@@ -639,8 +656,8 @@ namespace TrilinosWrappers
   {
     Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
 
-    for (unsigned int r=0; r<this->n_block_rows(); ++r)
-      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+    for (size_type r=0; r<this->n_block_rows(); ++r)
+      for (size_type c=0; c<this->n_block_cols(); ++c)
         this->block(r,c) = d;
 
     return *this;
@@ -653,8 +670,8 @@ namespace TrilinosWrappers
   BlockSparseMatrix::is_compressed () const
   {
     bool compressed = true;
-    for (unsigned int row=0; row<n_block_rows(); ++row)
-      for (unsigned int col=0; col<n_block_cols(); ++col)
+    for (size_type row=0; row<n_block_rows(); ++row)
+      for (size_type col=0; col<n_block_cols(); ++col)
         if (block(row, col).is_compressed() == false)
           {
             compressed = false;

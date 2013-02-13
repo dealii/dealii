@@ -272,7 +272,7 @@ public:
    * i.e. the vector is replaced by
    * one of length zero.
    */
-  explicit Vector (const unsigned int n);
+  explicit Vector (const size_type n);
 
   /**
    * Initialize the vector with a
@@ -340,8 +340,8 @@ public:
    * classes to handle memory
    * separately.
    */
-  virtual void reinit (const unsigned int N,
-                       const bool         fast=false);
+  virtual void reinit (const size_type N,
+                       const bool      fast=false);
 
   /**
    * Change the dimension to that of the
@@ -590,7 +590,7 @@ public:
   /**
    * Return dimension of the vector.
    */
-  unsigned int size () const;
+  size_type size () const;
 
   /**
    * Return whether the vector contains only
@@ -655,13 +655,13 @@ public:
    * Access the value of the @p ith
    * component.
    */
-  Number operator() (const unsigned int i) const;
+  Number operator() (const size_type i) const;
 
   /**
    * Access the @p ith component
    * as a writeable reference.
    */
-  Number &operator() (const unsigned int i);
+  Number &operator() (const size_type i);
 
   /**
    * Access the value of the @p ith
@@ -669,7 +669,7 @@ public:
    *
    * Exactly the same as operator().
    */
-  Number operator[] (const unsigned int i) const;
+  Number operator[] (const size_type i) const;
 
   /**
    * Access the @p ith component
@@ -677,7 +677,7 @@ public:
    *
    * Exactly the same as operator().
    */
-  Number &operator[] (const unsigned int i);
+  Number &operator[] (const size_type i);
   //@}
 
 
@@ -707,7 +707,7 @@ public:
    * indices.
    */
   template <typename OtherNumber>
-  void add (const std::vector<unsigned int> &indices,
+  void add (const std::vector<size_type>   &indices,
             const std::vector<OtherNumber> &values);
 
   /**
@@ -718,8 +718,8 @@ public:
    * values.
    */
   template <typename OtherNumber>
-  void add (const std::vector<unsigned int> &indices,
-            const Vector<OtherNumber>       &values);
+  void add (const std::vector<size_type> &indices,
+            const Vector<OtherNumber>    &values);
 
   /**
    * Take an address where
@@ -731,8 +731,8 @@ public:
    * functions above.
    */
   template <typename OtherNumber>
-  void add (const unsigned int  n_elements,
-            const unsigned int *indices,
+  void add (const size_type    n_elements,
+            const size_type   *indices,
             const OtherNumber *values);
 
   /**
@@ -998,7 +998,7 @@ public:
    * memory consumption (in bytes)
    * of this object.
    */
-  std::size_t memory_consumption () const;
+  size_type memory_consumption () const;
   //@}
 
   /**
@@ -1025,7 +1025,7 @@ protected:
    * vector.  Get this number by
    * calling <tt>size()</tt>.
    */
-  unsigned int vec_size;
+  size_type vec_size;
 
   /**
    * Amount of memory actually
@@ -1039,7 +1039,7 @@ protected:
    * memory when the number of
    * needed elements is reduced.
    */
-  unsigned int max_vec_size;
+  size_type max_vec_size;
 
   /**
    * Pointer to the array of
@@ -1103,7 +1103,7 @@ Vector<Number>::Vector (const InputIterator first, const InputIterator last)
 
 template <typename Number>
 inline
-Vector<Number>::Vector (const unsigned int n)
+Vector<Number>::Vector (const size_type n)
   :
   vec_size(0),
   max_vec_size(0),
@@ -1129,7 +1129,7 @@ Vector<Number>::~Vector ()
 
 template <typename Number>
 inline
-void Vector<Number>::reinit (const unsigned int n, const bool fast)
+void Vector<Number>::reinit (const size_type n, const bool fast)
 {
   if (n==0)
     {
@@ -1191,7 +1191,7 @@ Vector<Number>::operator = (const Vector<Number2> &v)
 
 template <typename Number>
 inline
-unsigned int Vector<Number>::size () const
+size_type Vector<Number>::size () const
 {
   return vec_size;
 }
@@ -1249,7 +1249,7 @@ Vector<Number>::end () const
 
 template <typename Number>
 inline
-Number Vector<Number>::operator() (const unsigned int i) const
+Number Vector<Number>::operator() (const size_type i) const
 {
   Assert (i<vec_size, ExcIndexRange(i,0,vec_size));
   return val[i];
@@ -1259,7 +1259,7 @@ Number Vector<Number>::operator() (const unsigned int i) const
 
 template <typename Number>
 inline
-Number &Vector<Number>::operator() (const unsigned int i)
+Number &Vector<Number>::operator() (const size_type i)
 {
   Assert (i<vec_size, ExcIndexRange(i,0,vec_size));
   return val[i];
@@ -1269,7 +1269,7 @@ Number &Vector<Number>::operator() (const unsigned int i)
 
 template <typename Number>
 inline
-Number Vector<Number>::operator[] (const unsigned int i) const
+Number Vector<Number>::operator[] (const size_type i) const
 {
   return operator()(i);
 }
@@ -1278,7 +1278,7 @@ Number Vector<Number>::operator[] (const unsigned int i) const
 
 template <typename Number>
 inline
-Number &Vector<Number>::operator[] (const unsigned int i)
+Number &Vector<Number>::operator[] (const size_type i)
 {
   return operator()(i);
 }
@@ -1303,7 +1303,7 @@ template <typename Number>
 template <typename OtherNumber>
 inline
 void
-Vector<Number>::add (const std::vector<unsigned int> &indices,
+Vector<Number>::add (const std::vector<size_type> &indices,
                      const std::vector<OtherNumber> &values)
 {
   Assert (indices.size() == values.size(),
@@ -1317,8 +1317,8 @@ template <typename Number>
 template <typename OtherNumber>
 inline
 void
-Vector<Number>::add (const std::vector<unsigned int> &indices,
-                     const Vector<OtherNumber>       &values)
+Vector<Number>::add (const std::vector<size_type> &indices,
+                     const Vector<OtherNumber>    &values)
 {
   Assert (indices.size() == values.size(),
           ExcDimensionMismatch(indices.size(), values.size()));
@@ -1331,11 +1331,11 @@ template <typename Number>
 template <typename OtherNumber>
 inline
 void
-Vector<Number>::add (const unsigned int  n_indices,
-                     const unsigned int *indices,
+Vector<Number>::add (const size_type  n_indices,
+                     const size_type *indices,
                      const OtherNumber *values)
 {
-  for (unsigned int i=0; i<n_indices; ++i)
+  for (size_type i=0; i<n_indices; ++i)
     {
       Assert (indices[i] < vec_size, ExcIndexRange(indices[i],0,vec_size));
       Assert (numbers::is_finite(values[i]),

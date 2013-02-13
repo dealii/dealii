@@ -509,7 +509,7 @@ namespace TrilinosWrappers
   PreconditionAMG:: initialize (const SparseMatrix   &matrix,
                                 const AdditionalData &additional_data)
   {
-    const unsigned int n_rows = matrix.m();
+    const size_type n_rows = matrix.m();
 
     // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
@@ -574,7 +574,7 @@ namespace TrilinosWrappers
 
     const Epetra_Map &domain_map = matrix.domain_partitioner();
 
-    const unsigned int constant_modes_dimension =
+    const size_type constant_modes_dimension =
       additional_data.constant_modes.size();
     Epetra_MultiVector distributed_constant_modes (domain_map,
                                                    constant_modes_dimension);
@@ -584,14 +584,14 @@ namespace TrilinosWrappers
       {
         const bool constant_modes_are_global =
           additional_data.constant_modes[0].size() == n_rows;
-        const unsigned int n_relevant_rows =
+        const size_type n_relevant_rows =
           constant_modes_are_global ? n_rows : additional_data.constant_modes[0].size();
-        const unsigned int my_size = domain_map.NumMyElements();
+        const size_type my_size = domain_map.NumMyElements();
         if (constant_modes_are_global == false)
           Assert (n_relevant_rows == my_size,
                   ExcDimensionMismatch(n_relevant_rows, my_size));
         Assert (n_rows ==
-                static_cast<unsigned int>(distributed_constant_modes.GlobalLength()),
+                static_cast<size_type>(distributed_constant_modes.GlobalLength()),
                 ExcDimensionMismatch(n_rows,
                                      distributed_constant_modes.GlobalLength()));
 
@@ -599,10 +599,10 @@ namespace TrilinosWrappers
         // contiguous vector of
         // doubles so that Trilinos
         // can read from it.
-        for (unsigned int d=0; d<constant_modes_dimension; ++d)
-          for (unsigned int row=0; row<my_size; ++row)
+        for (size_type d=0; d<constant_modes_dimension; ++d)
+          for (size_type row=0; row<my_size; ++row)
             {
-              int global_row_id = constant_modes_are_global ? domain_map.GID(row) : row;
+              int_type global_row_id = constant_modes_are_global ? domain_map.GID(row) : row;
               distributed_constant_modes[d][row] =
                 additional_data.constant_modes[d][global_row_id];
             }
@@ -656,13 +656,13 @@ namespace TrilinosWrappers
               const ::dealii::SparsityPattern      *use_this_sparsity)
   {
     preconditioner.reset();
-    const unsigned int n_rows = deal_ii_sparse_matrix.m();
+    const size_type n_rows = deal_ii_sparse_matrix.m();
 
     // Init Epetra Matrix using an
     // equidistributed map; avoid
     // storing the nonzero
     // elements.
-    vector_distributor.reset (new Epetra_Map(static_cast<int>(n_rows), 0, communicator));
+    vector_distributor.reset (new Epetra_Map(static_cast<int_type>(n_rows), 0, communicator));
 
     if (trilinos_matrix.get() == 0)
       trilinos_matrix.reset (new SparseMatrix());
@@ -693,7 +693,7 @@ namespace TrilinosWrappers
 
 
 
-  std::size_t
+  size_type
   PreconditionAMG::memory_consumption() const
   {
     unsigned int memory = sizeof(this);

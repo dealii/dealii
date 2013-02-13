@@ -51,6 +51,11 @@ class EigenPower : private Solver<VECTOR>
 {
 public:
   /**
+   * Declare type of container size.
+   */
+  typedef std::size_t size_type;
+
+  /**
    * Standardized data struct to
    * pipe additional data to the
    * solver.
@@ -270,7 +275,7 @@ EigenPower<VECTOR>::solve (double       &value,
       // do a little trick to compute the sign
       // with not too much effect of round-off errors.
       double entry = 0.;
-      unsigned int i = 0;
+      size_type i = 0;
       double thresh = length/x.size();
       do
         {
@@ -365,7 +370,7 @@ EigenInverse<VECTOR>::solve (double       &value,
   x.scale(1./length);
 
   // Main loop
-  for (unsigned int iter=0; conv==SolverControl::iterate; iter++)
+  for (size_type iter=0; conv==SolverControl::iterate; iter++)
     {
       solver.solve (A_s, y, x, prec);
 
@@ -375,7 +380,7 @@ EigenInverse<VECTOR>::solve (double       &value,
       // do a little trick to compute the sign
       // with not too much effect of round-off errors.
       double entry = 0.;
-      unsigned int i = 0;
+      size_type i = 0;
       double thresh = length/x.size();
       do
         {

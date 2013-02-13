@@ -53,13 +53,10 @@ GrowingVectorMemory<VECTOR>::Pool::~Pool()
   // vectors. Actually, there should
   // be none, if there is no memory
   // leak
-  unsigned int n=0;
   for (typename std::vector<entry_type>::iterator i=data->begin();
        i != data->end();
        ++i)
     {
-      if (i->first == true)
-        ++n;
       delete i->second;
     }
   delete data;
@@ -69,7 +66,7 @@ GrowingVectorMemory<VECTOR>::Pool::~Pool()
 template <typename VECTOR>
 inline
 void
-GrowingVectorMemory<VECTOR>::Pool::initialize(const unsigned int size)
+GrowingVectorMemory<VECTOR>::Pool::initialize(const size_type size)
 {
   if (data == 0)
     {
@@ -88,7 +85,7 @@ GrowingVectorMemory<VECTOR>::Pool::initialize(const unsigned int size)
 
 template <typename VECTOR>
 inline
-GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const unsigned int initial_size,
+GrowingVectorMemory<VECTOR>::GrowingVectorMemory (const size_type initial_size,
                                                   const bool log_statistics)
 
   :

@@ -66,6 +66,11 @@ namespace TrilinosWrappers
   {
   public:
     /**
+     * Declare the type for container size.
+     */
+    typedef std::size_t size_type;
+
+    /**
      * Typedef the base class for simpler
      * access to its own typedefs.
      */
@@ -146,7 +151,7 @@ namespace TrilinosWrappers
      * fill appropriate data using a
      * reinit of the blocks.
      */
-    BlockVector (const unsigned int num_blocks);
+    BlockVector (const size_type num_blocks);
 
     /**
      * Constructor. Set the number of
@@ -156,7 +161,7 @@ namespace TrilinosWrappers
      *
      * References BlockVector.reinit().
      */
-    BlockVector (const std::vector<unsigned int> &N);
+    BlockVector (const std::vector<size_type> &N);
 
     /**
      * Constructor. Set the number of
@@ -177,9 +182,9 @@ namespace TrilinosWrappers
      * different blocks.
      */
     template <typename InputIterator>
-    BlockVector (const std::vector<unsigned int> &n,
-                 const InputIterator              first,
-                 const InputIterator              end);
+    BlockVector (const std::vector<size_type> &n,
+                 const InputIterator           first,
+                 const InputIterator           end);
 
     /**
      * Destructor. Clears memory
@@ -308,8 +313,8 @@ namespace TrilinosWrappers
      * If <tt>fast==false</tt>, the vector
      * is filled with zeros.
      */
-    void reinit (const std::vector<unsigned int> &N,
-                 const bool                       fast=false);
+    void reinit (const std::vector<size_type> &N,
+                 const bool                    fast=false);
 
     /**
      * Reinit the function
@@ -360,7 +365,7 @@ namespace TrilinosWrappers
      * calls <tt>collect_sizes</tt>
      * afterwards.
      */
-    void reinit (const unsigned int num_blocks);
+    void reinit (const size_type num_blocks);
 
     /**
      * Swap the contents of this
@@ -454,7 +459,7 @@ namespace TrilinosWrappers
 
 
   inline
-  BlockVector::BlockVector (const std::vector<unsigned int> &N)
+  BlockVector::BlockVector (const std::vector<size_type> &N)
   {
     reinit (N);
   }
@@ -462,21 +467,21 @@ namespace TrilinosWrappers
 
 
   template <typename InputIterator>
-  BlockVector::BlockVector (const std::vector<unsigned int> &n,
-                            const InputIterator              first,
-                            const InputIterator              end)
+  BlockVector::BlockVector (const std::vector<size_type> &n,
+                            const InputIterator           first,
+                            const InputIterator           end)
   {
     // first set sizes of blocks, but
     // don't initialize them as we will
     // copy elements soon
     reinit (n, true);
     InputIterator start = first;
-    for (unsigned int b=0; b<n.size(); ++b)
+    for (size_type b=0; b<n.size(); ++b)
       {
         InputIterator end = start;
-        std::advance (end, static_cast<signed int>(n[b]));
+        std::advance (end, static_cast<size_type>(n[b]));
 
-        for (unsigned int i=0; i<n[b]; ++i, ++start)
+        for (size_type i=0; i<n[b]; ++i, ++start)
           this->block(b)(i) = *start;
       }
     Assert (start == end, ExcIteratorRangeDoesNotMatchVectorSize());
@@ -485,7 +490,7 @@ namespace TrilinosWrappers
 
 
   inline
-  BlockVector::BlockVector (const unsigned int num_blocks)
+  BlockVector::BlockVector (const size_type num_blocks)
   {
     reinit (num_blocks);
   }
@@ -514,7 +519,7 @@ namespace TrilinosWrappers
     this->components.resize (v.n_blocks());
     this->block_indices = v.block_indices;
 
-    for (unsigned int i=0; i<this->n_blocks(); ++i)
+    for (size_type i=0; i<this->n_blocks(); ++i)
       this->components[i] = v.components[i];
   }
 
@@ -539,7 +544,7 @@ namespace TrilinosWrappers
     Assert (n_blocks() == v.n_blocks(),
             ExcDimensionMismatch(n_blocks(),v.n_blocks()));
 
-    for (unsigned int row=0; row<n_blocks(); ++row)
+    for (size_type row=0; row<n_blocks(); ++row)
       block(row).swap (v.block(row));
   }
 
@@ -550,13 +555,13 @@ namespace TrilinosWrappers
   {
     if (n_blocks() != v.n_blocks())
       {
-        std::vector<unsigned int> block_sizes (v.n_blocks(), 0);
+        std::vector<size_type> block_sizes (v.n_blocks(), 0);
         block_indices.reinit (block_sizes);
         if (components.size() != n_blocks())
           components.resize(n_blocks());
       }
 
-    for (unsigned int i=0; i<this->n_blocks(); ++i)
+    for (size_type i=0; i<this->n_blocks(); ++i)
       this->components[i] = v.block(i);
 
     collect_sizes();

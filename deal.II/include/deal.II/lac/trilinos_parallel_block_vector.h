@@ -68,6 +68,11 @@ namespace TrilinosWrappers
     {
     public:
       /**
+       * Declare the type for container size.
+       */
+      typedef std::size_t size_type;
+
+      /**
        * Typedef the base class for simpler
        * access to its own typedefs.
        */
@@ -140,7 +145,7 @@ namespace TrilinosWrappers
        * fill appropriate data using a
        * reinit of the blocks.
        */
-      BlockVector (const unsigned int num_blocks);
+      BlockVector (const size_type num_blocks);
 
       /**
        * Destructor. Clears memory
@@ -266,7 +271,7 @@ namespace TrilinosWrappers
        * calls <tt>collect_sizes</tt>
        * afterwards.
        */
-      void reinit (const unsigned int num_blocks);
+      void reinit (const size_type num_blocks);
 
       /**
        * This reinit function is meant to
@@ -420,7 +425,7 @@ namespace TrilinosWrappers
 
 
     inline
-    BlockVector::BlockVector (const unsigned int num_blocks)
+    BlockVector::BlockVector (const size_type num_blocks)
     {
       reinit (num_blocks);
     }
@@ -435,7 +440,7 @@ namespace TrilinosWrappers
       this->components.resize (v.n_blocks());
       this->block_indices = v.block_indices;
 
-      for (unsigned int i=0; i<this->n_blocks(); ++i)
+      for (size_type i=0; i<this->n_blocks(); ++i)
         this->components[i] = v.components[i];
     }
 
@@ -446,7 +451,7 @@ namespace TrilinosWrappers
     BlockVector::is_compressed () const
     {
       bool compressed = true;
-      for (unsigned int row=0; row<n_blocks(); ++row)
+      for (size_type row=0; row<n_blocks(); ++row)
         if (block(row).is_compressed() == false)
           {
             compressed = false;
@@ -482,13 +487,13 @@ namespace TrilinosWrappers
     {
       if (n_blocks() != v.n_blocks())
         {
-          std::vector<unsigned int> block_sizes (v.n_blocks(), 0);
+          std::vector<size_type> block_sizes (v.n_blocks(), 0);
           block_indices.reinit (block_sizes);
           if (components.size() != n_blocks())
             components.resize(n_blocks());
         }
 
-      for (unsigned int i=0; i<this->n_blocks(); ++i)
+      for (size_type i=0; i<this->n_blocks(); ++i)
         this->components[i] = v.block(i);
 
       collect_sizes();
@@ -504,7 +509,7 @@ namespace TrilinosWrappers
       Assert (n_blocks() == v.n_blocks(),
               ExcDimensionMismatch(n_blocks(),v.n_blocks()));
 
-      for (unsigned int row=0; row<n_blocks(); ++row)
+      for (size_type row=0; row<n_blocks(); ++row)
         block(row).swap (v.block(row));
     }
 

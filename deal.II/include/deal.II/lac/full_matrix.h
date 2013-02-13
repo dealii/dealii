@@ -61,6 +61,11 @@ class FullMatrix : public Table<2,number>
 {
 public:
   /**
+   * Declare type of container size.
+   */
+  typedef std::size_t size_type;
+
+  /**
    * Type of matrix entries. In analogy to
    * the STL container classes.
    */
@@ -104,22 +109,22 @@ public:
      * pointer is sufficient.
      */
     Accessor (const FullMatrix<number> *matrix,
-              const unsigned int row,
-              const unsigned int col);
+              const size_type row,
+              const size_type col);
 
     /**
      * Row number of the element
      * represented by this
      * object.
      */
-    unsigned int row() const;
+    size_type row() const;
 
     /**
      * Column number of the
      * element represented by
      * this object.
      */
-    unsigned int column() const;
+    size_type column() const;
 
     /**
      * Value of this matrix entry.
@@ -135,7 +140,7 @@ public:
     /**
      * Current row number.
      */
-    unsigned int a_row;
+    size_type a_row;
 
     /**
      * Current column number.
@@ -159,8 +164,8 @@ public:
      * Constructor.
      */
     const_iterator(const FullMatrix<number> *matrix,
-                   const unsigned int row,
-                   const unsigned int col);
+                   const size_type row,
+                   const size_type col);
 
     /**
      * Prefix increment.
@@ -237,15 +242,15 @@ public:
    * By default, no memory is
    * allocated.
    */
-  explicit FullMatrix (const unsigned int n = 0);
+  explicit FullMatrix (const size_type n = 0);
 
   /**
    * Constructor. Initialize the
    * matrix as a rectangular
    * matrix.
    */
-  FullMatrix (const unsigned int rows,
-              const unsigned int cols);
+  FullMatrix (const size_type rows,
+              const size_type cols);
 
   /**
    * Copy constructor. This
@@ -274,8 +279,8 @@ public:
    * is arranged line by line. No
    * range checking is performed.
    */
-  FullMatrix (const unsigned int rows,
-              const unsigned int cols,
+  FullMatrix (const size_type rows,
+              const size_type cols,
               const number *entries);
 
   /**
@@ -391,12 +396,12 @@ public:
   template <int dim>
   void
   copy_from (const Tensor<2,dim> &T,
-             const unsigned int src_r_i=0,
-             const unsigned int src_r_j=dim-1,
-             const unsigned int src_c_i=0,
-             const unsigned int src_c_j=dim-1,
-             const unsigned int dst_r=0,
-             const unsigned int dst_c=0);
+             const size_type src_r_i=0,
+             const size_type src_r_j=dim-1,
+             const size_type src_c_i=0,
+             const size_type src_c_j=dim-1,
+             const size_type dst_r=0,
+             const size_type dst_c=0);
 
   /**
    * Insert a submatrix (also
@@ -414,12 +419,12 @@ public:
   template <int dim>
   void
   copy_to(Tensor<2,dim> &T,
-          const unsigned int src_r_i=0,
-          const unsigned int src_r_j=dim-1,
-          const unsigned int src_c_i=0,
-          const unsigned int src_c_j=dim-1,
-          const unsigned int dst_r=0,
-          const unsigned int dst_c=0) const;
+          const size_type src_r_i=0,
+          const size_type src_r_j=dim-1,
+          const size_type src_c_i=0,
+          const size_type src_c_j=dim-1,
+          const size_type dst_r=0,
+          const size_type dst_c=0) const;
 
   /**
    * Copy a subset of the rows and columns of another matrix into the
@@ -435,8 +440,8 @@ public:
    */
   template <typename MatrixType>
   void extract_submatrix_from (const MatrixType &matrix,
-                               const std::vector<unsigned int> &row_index_set,
-                               const std::vector<unsigned int> &column_index_set);
+                               const std::vector<size_type> &row_index_set,
+                               const std::vector<size_type> &column_index_set);
 
   /**
    * Copy the elements of the current matrix object into a specified
@@ -452,8 +457,8 @@ public:
    */
   template <typename MatrixType>
   void
-  scatter_matrix_to (const std::vector<unsigned int> &row_index_set,
-                     const std::vector<unsigned int> &column_index_set,
+  scatter_matrix_to (const std::vector<size_type> &row_index_set,
+                     const std::vector<size_type> &column_index_set,
                      MatrixType &matrix) const;
 
   /**
@@ -476,10 +481,10 @@ public:
    */
   template<typename number2>
   void fill (const FullMatrix<number2> &src,
-             const unsigned int dst_offset_i = 0,
-             const unsigned int dst_offset_j = 0,
-             const unsigned int src_offset_i = 0,
-             const unsigned int src_offset_j = 0);
+             const size_type dst_offset_i = 0,
+             const size_type dst_offset_j = 0,
+             const size_type src_offset_i = 0,
+             const size_type src_offset_j = 0);
 
 
   /**
@@ -509,8 +514,8 @@ public:
    */
   template<typename number2>
   void fill_permutation (const FullMatrix<number2>       &src,
-                         const std::vector<unsigned int> &p_rows,
-                         const std::vector<unsigned int> &p_cols);
+                         const std::vector<size_type> &p_rows,
+                         const std::vector<size_type> &p_cols);
 
   /**
    * Set a particular entry of the matrix to a value. Thus, calling
@@ -522,8 +527,8 @@ public:
    * @param j The columns index of the element to be set.
    * @param value The value to be written into the element.
    */
-  void set (const unsigned int i,
-            const unsigned int j,
+  void set (const size_type i,
+            const size_type j,
             const number value);
   /**
    * @}
@@ -551,14 +556,14 @@ public:
    * To remember: this matrix is an
    * <i>m x n</i>-matrix.
    */
-  unsigned int m () const;
+  size_type m () const;
 
   /**
    * Number of columns of this matrix.
    * To remember: this matrix is an
    * <i>m x n</i>-matrix.
    */
-  unsigned int n () const;
+  size_type n () const;
 
   /**
    * Return whether the matrix
@@ -775,12 +780,12 @@ public:
    * STL-like iterator with the
    * first entry of row <tt>r</tt>.
    */
-  const_iterator begin (const unsigned int r) const;
+  const_iterator begin (const size_type r) const;
 
   /**
    * Final iterator of row <tt>r</tt>.
    */
-  const_iterator end (const unsigned int r) const;
+  const_iterator end (const size_type r) const;
 
 //@}
 ///@name Modifying operators
@@ -874,10 +879,10 @@ public:
   template<typename number2>
   void add (const FullMatrix<number2> &src,
             const number factor,
-            const unsigned int dst_offset_i = 0,
-            const unsigned int dst_offset_j = 0,
-            const unsigned int src_offset_i = 0,
-            const unsigned int src_offset_j = 0);
+            const size_type dst_offset_i = 0,
+            const size_type dst_offset_j = 0,
+            const size_type src_offset_i = 0,
+            const size_type src_offset_j = 0);
 
   /**
    * Weighted addition of the
@@ -915,17 +920,17 @@ public:
   template<typename number2>
   void Tadd (const FullMatrix<number2> &src,
              const number               factor,
-             const unsigned int dst_offset_i = 0,
-             const unsigned int dst_offset_j = 0,
-             const unsigned int src_offset_i = 0,
-             const unsigned int src_offset_j = 0);
+             const size_type dst_offset_i = 0,
+             const size_type dst_offset_j = 0,
+             const size_type src_offset_i = 0,
+             const size_type src_offset_j = 0);
 
   /**
    * Add a single element at the
    * given position.
    */
-  void add (const unsigned int row,
-            const unsigned int column,
+  void add (const size_type row,
+            const size_type column,
             const number value);
 
   /**
@@ -945,9 +950,9 @@ public:
    * implementation.
    */
   template <typename number2>
-  void add (const unsigned int  row,
-            const unsigned int  n_cols,
-            const unsigned int *col_indices,
+  void add (const size_type     row,
+            const size_type     n_cols,
+            const size_type    *col_indices,
             const number2      *values,
             const bool          elide_zero_values = true,
             const bool          col_indices_are_sorted = false);
@@ -957,51 +962,51 @@ public:
    * s*A(j,1...n)</i>.  Simple
    * addition of rows of this
    */
-  void add_row (const unsigned int i,
-                const number       s,
-                const unsigned int j);
+  void add_row (const size_type i,
+                const number    s,
+                const size_type j);
 
   /**
    * <i>A(i,1...n) += s*A(j,1...n) +
    * t*A(k,1...n)</i>.  Multiple
    * addition of rows of this.
    */
-  void add_row (const unsigned int i,
-                const number s, const unsigned int j,
-                const number t, const unsigned int k);
+  void add_row (const size_type i,
+                const number s, const size_type j,
+                const number t, const size_type k);
 
   /**
    * <i>A(1...n,i) += s*A(1...n,j)</i>.
    *  Simple addition of columns of this.
    */
-  void add_col (const unsigned int i,
-                const number       s,
-                const unsigned int j);
+  void add_col (const size_type i,
+                const number    s,
+                const size_type j);
 
   /**
    * <i>A(1...n,i) += s*A(1...n,j) +
    * t*A(1...n,k)</i>.  Multiple
    * addition of columns of this.
    */
-  void add_col (const unsigned int i,
-                const number s, const unsigned int j,
-                const number t, const unsigned int k);
+  void add_col (const size_type i,
+                const number s, const size_type j,
+                const number t, const size_type k);
 
   /**
    * Swap <i>A(i,1...n) <->
    * A(j,1...n)</i>.  Swap rows i
    * and j of this
    */
-  void swap_row (const unsigned int i,
-                 const unsigned int j);
+  void swap_row (const size_type i,
+                 const size_type j);
 
   /**
    *  Swap <i>A(1...n,i) <->
    *  A(1...n,j)</i>.  Swap columns
    *  i and j of this
    */
-  void swap_col (const unsigned int i,
-                 const unsigned int j);
+  void swap_col (const size_type int i,
+                 const size_type int j);
 
   /**
    * Add constant to diagonal
@@ -1444,7 +1449,7 @@ public:
    * Exception
    */
   DeclException3 (ExcInvalidDestination,
-                  int, int, int,
+                  size_type, size_type, size_type,
                   << "Target region not in matrix: size in this direction="
                   << arg1 << ", size of new matrix=" << arg2
                   << ", offset=" << arg3);
@@ -1471,7 +1476,7 @@ public:
 
 template <typename number>
 inline
-unsigned int
+size_type
 FullMatrix<number>::m() const
 {
   return this->n_rows();
@@ -1481,7 +1486,7 @@ FullMatrix<number>::m() const
 
 template <typename number>
 inline
-unsigned int
+size_type
 FullMatrix<number>::n() const
 {
   return this->n_cols();
@@ -1547,17 +1552,17 @@ template <typename MatrixType>
 inline
 void
 FullMatrix<number>::extract_submatrix_from (const MatrixType &matrix,
-                                            const std::vector<unsigned int> &row_index_set,
-                                            const std::vector<unsigned int> &column_index_set)
+                                            const std::vector<size_type> &row_index_set,
+                                            const std::vector<size_type> &column_index_set)
 {
   AssertDimension(row_index_set.size(), this->n_rows());
   AssertDimension(column_index_set.size(), this->n_cols());
 
-  const unsigned int n_rows_submatrix = row_index_set.size();
-  const unsigned int n_cols_submatrix = column_index_set.size();
+  const size_type n_rows_submatrix = row_index_set.size();
+  const size_type n_cols_submatrix = column_index_set.size();
 
-  for (unsigned int sub_row = 0; sub_row < n_rows_submatrix; ++sub_row)
-    for (unsigned int sub_col = 0; sub_col < n_cols_submatrix; ++sub_col)
+  for (size_type sub_row = 0; sub_row < n_rows_submatrix; ++sub_row)
+    for (size_type sub_col = 0; sub_col < n_cols_submatrix; ++sub_col)
       (*this)(sub_row, sub_col) = matrix.el(row_index_set[sub_row], column_index_set[sub_col]);
 }
 
@@ -1567,18 +1572,18 @@ template <typename number>
 template <typename MatrixType>
 inline
 void
-FullMatrix<number>::scatter_matrix_to (const std::vector<unsigned int> &row_index_set,
-                                       const std::vector<unsigned int> &column_index_set,
+FullMatrix<number>::scatter_matrix_to (const std::vector<size_type> &row_index_set,
+                                       const std::vector<size_type> &column_index_set,
                                        MatrixType &matrix) const
 {
   AssertDimension(row_index_set.size(), this->n_rows());
   AssertDimension(column_index_set.size(), this->n_cols());
 
-  const unsigned int n_rows_submatrix = row_index_set.size();
-  const unsigned int n_cols_submatrix = column_index_set.size();
+  const size_type n_rows_submatrix = row_index_set.size();
+  const size_type n_cols_submatrix = column_index_set.size();
 
-  for (unsigned int sub_row = 0; sub_row < n_rows_submatrix; ++sub_row)
-    for (unsigned int sub_col = 0; sub_col < n_cols_submatrix; ++sub_col)
+  for (size_type sub_row = 0; sub_row < n_rows_submatrix; ++sub_row)
+    for (size_type sub_col = 0; sub_col < n_cols_submatrix; ++sub_col)
       matrix.set(row_index_set[sub_row],
                  column_index_set[sub_col],
                  (*this)(sub_row, sub_col));
@@ -1588,8 +1593,8 @@ FullMatrix<number>::scatter_matrix_to (const std::vector<unsigned int> &row_inde
 template <typename number>
 inline
 void
-FullMatrix<number>::set (const unsigned int i,
-                         const unsigned int j,
+FullMatrix<number>::set (const size_type i,
+                         const size_type j,
                          const number value)
 {
   (*this)(i,j) = value;
@@ -1624,8 +1629,8 @@ template <typename number>
 inline
 FullMatrix<number>::Accessor::
 Accessor (const FullMatrix<number> *matrix,
-          const unsigned int r,
-          const unsigned int c)
+          const size_type r,
+          const size_type c)
   :
   matrix(matrix),
   a_row(r),
@@ -1635,7 +1640,7 @@ Accessor (const FullMatrix<number> *matrix,
 
 template <typename number>
 inline
-unsigned int
+size_type
 FullMatrix<number>::Accessor::row() const
 {
   return a_row;
@@ -1644,7 +1649,7 @@ FullMatrix<number>::Accessor::row() const
 
 template <typename number>
 inline
-unsigned int
+size_type
 FullMatrix<number>::Accessor::column() const
 {
   return a_col;
@@ -1665,8 +1670,8 @@ template <typename number>
 inline
 FullMatrix<number>::const_iterator::
 const_iterator(const FullMatrix<number> *matrix,
-               const unsigned int r,
-               const unsigned int c)
+               const size_type r,
+               const size_type c)
   :
   accessor(matrix, r, c)
 {}
@@ -1771,7 +1776,7 @@ FullMatrix<number>::end () const
 template <typename number>
 inline
 typename FullMatrix<number>::const_iterator
-FullMatrix<number>::begin (const unsigned int r) const
+FullMatrix<number>::begin (const size_type r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return const_iterator(this, r, 0);
@@ -1782,7 +1787,7 @@ FullMatrix<number>::begin (const unsigned int r) const
 template <typename number>
 inline
 typename FullMatrix<number>::const_iterator
-FullMatrix<number>::end (const unsigned int r) const
+FullMatrix<number>::end (const size_type r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return const_iterator(this, r+1, 0);
@@ -1793,7 +1798,7 @@ FullMatrix<number>::end (const unsigned int r) const
 template <typename number>
 inline
 void
-FullMatrix<number>::add (const unsigned int r, const unsigned int c, const number v)
+FullMatrix<number>::add (const size_type r, const size_type c, const number v)
 {
   AssertIndexRange(r, this->m());
   AssertIndexRange(c, this->n());
@@ -1807,15 +1812,15 @@ template <typename number>
 template <typename number2>
 inline
 void
-FullMatrix<number>::add (const unsigned int  row,
-                         const unsigned int  n_cols,
-                         const unsigned int *col_indices,
-                         const number2      *values,
+FullMatrix<number>::add (const size_type  row,
+                         const size_type  n_cols,
+                         const size_type *col_indices,
+                         const number2   *values,
                          const bool,
                          const bool)
 {
   AssertIndexRange(row, this->m());
-  for (unsigned int col=0; col<n_cols; ++col)
+  for (size_type col=0; col<n_cols; ++col)
     {
       AssertIndexRange(col_indices[col], this->n());
       this->operator()(row,col_indices[col]) += values[col];
@@ -1827,15 +1832,15 @@ template <typename number>
 template <class STREAM>
 inline
 void
-FullMatrix<number>::print (STREAM             &s,
-                           const unsigned int  w,
-                           const unsigned int  p) const
+FullMatrix<number>::print (STREAM          &s,
+                           const size_type  w,
+                           const size_type  p) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
-  for (unsigned int i=0; i<this->m(); ++i)
+  for (size_type i=0; i<this->m(); ++i)
     {
-      for (unsigned int j=0; j<this->n(); ++j)
+      for (size_type j=0; j<this->n(); ++j)
         s << std::setw(w) << std::setprecision(p) << this->el(i,j);
       s << std::endl;
     }
