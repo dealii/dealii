@@ -164,9 +164,11 @@ namespace PETScWrappers
     Vector &
     Vector::operator = (const PETScWrappers::Vector &v)
     {
-      // first flush buffers
-      compress ();
-
+      Assert(last_action==VectorOperation::unknown,
+          ExcMessage("Call to compress() required before calling operator=."));
+      //TODO [TH]: can not access v.last_action here. Implement is_compressed()?
+      //Assert(v.last_action==VectorOperation::unknown,
+      //    ExcMessage("Call to compress() required before calling operator=."));
       int ierr;
 
       // get a pointer to the local memory of

@@ -15,5 +15,5 @@
  * @deprecated The contents of this file has moved to <tt>meshworker/loop.h</tt>
  */
 
-#warning This file is deprecated. Use the corresponding file in the deal.II/mesh_worker directory instead.
+#warning This file is deprecated. Use the corresponding file in the deal.II/meshworker directory instead.
 #include <deal.II/meshworker/loop.h>

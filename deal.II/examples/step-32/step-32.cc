@@ -1738,7 +1738,7 @@ namespace Step32
                                                               matrix_for_bc);
         }
 
-    rhs.compress (Add);
+    rhs.compress (VectorOperation::add);
 
     // Now that we have the right linear system, we solve it using the CG
     // method with a simple Jacobi preconditioner:
@@ -2433,7 +2433,7 @@ namespace Step32
          StokesSystem<dim> (stokes_fe));
 
     stokes_matrix.compress();
-    stokes_rhs.compress(Add);
+    stokes_rhs.compress(VectorOperation::add);
 
     rebuild_stokes_matrix = false;
 
@@ -2843,7 +2843,7 @@ namespace Step32
          Assembly::CopyData::
          TemperatureRHS<dim> (temperature_fe));
 
-    temperature_rhs.compress(Add);
+    temperature_rhs.compress(VectorOperation::add);
   }
 
 

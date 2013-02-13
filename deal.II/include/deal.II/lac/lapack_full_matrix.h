@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -709,7 +709,7 @@ LAPACKFullMatrix<number>::copy_from (const MATRIX &M)
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class, and
   // copy them into the current object
-  for (unsigned int row = 0; row < M.n(); ++row)
+  for (unsigned int row = 0; row < M.m(); ++row)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
@@ -736,7 +736,7 @@ LAPACKFullMatrix<number>::fill (
 {
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class
-  for (unsigned int row = src_offset_i; row < M.n(); ++row)
+  for (unsigned int row = src_offset_i; row < M.m(); ++row)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);

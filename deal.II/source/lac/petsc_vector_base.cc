@@ -211,11 +211,7 @@ namespace PETScWrappers
 
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
-    // flush previously cached elements. this
-    // seems to be necessary since petsc
-    // 2.2.1, at least for parallel vectors
-    // (see test bits/petsc_65)
-    compress ();
+    //TODO[TH]: assert(is_compressed())
 
     const int ierr = VecSet (vector, s);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -986,8 +982,7 @@ namespace PETScWrappers
   void
   VectorBase::write_ascii (const PetscViewerFormat format)
   {
-    // First flush PETSc caches
-    compress();
+    //TODO[TH]:assert(is_compressed())
 
     // Set options
     PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,

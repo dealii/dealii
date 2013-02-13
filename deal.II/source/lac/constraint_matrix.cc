@@ -2106,7 +2106,7 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
       vec(it->line) = new_value;
     }
 
-  vec.compress ();
+  vec.compress (VectorOperation::insert);
 }
 
 
