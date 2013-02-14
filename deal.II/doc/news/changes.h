@@ -186,6 +186,13 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: VectorTools::interpolate did not work properly in 1d if
+boundary indicators had been set to anything but the default (i.e.,
+zero at the left and one at the right end of the domain). This was
+a hold-over from the past when these were the only possible values.
+This is now fixed.
+<br>
+(Kevin Dugan, Wolfgang Bangerth, 2013/02/14)
 
 <li> Improved: The iterator class of the deal.II SparseMatrix class
 and SparsityPattern have been revised for performance. Iterating over
