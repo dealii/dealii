@@ -199,7 +199,7 @@ semi-linearform $a(.;.)$ at the point $u^i$ is
 I(x) := @f{cases}
 2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I, &
 \quad \vert \tau^D \vert \leq \sigma_0\\
-\dfrac{\alpha}{\vert\tau^D\vert}2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I 
+\dfrac{\alpha}{\vert\tau^D\vert}2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I
 - \dfrac{\tau^D\otimes\tau^D}{\vert\tau^D\vert}\right) + \kappa I\otimes I,
 &\quad \vert \tau^D \vert > \sigma_0
 @f}
@@ -328,22 +328,23 @@ results it yields a quite reasonable adaptive mesh for the contact zone.
 
 This tutorial is essentially a mixture of step-40 and step-41 but instead of
 PETSc we let the Trilinos library deal with parallelizing the linear algebra
-(like in step-32). Since we are trying to solve a similar problem like in 
+(like in step-32). Since we are trying to solve a similar problem like in
 step-41 we will use the same methods but now in parallel.
 
 Another difficulty is the handling of the different constraints from
-(the dirichlet conditons), the hanging nodes and the inequality condition that 
-arises from the contact. For this purpose we create three objects of type 
+(the dirichlet conditons), the hanging nodes and the inequality condition that
+arises from the contact. For this purpose we create three objects of type
 ConstraintMatrix.
 
 Beside the ConstitutiveLaw class there is another new class called Input. This
 class allows us to read in an obstacle from a file. In our example the file
 'obstacle\_file.dat' containts data which describe an Chinese, Japanese or
-Korean symbol for force or power. (See www.orientaloutpost.com/: "This word can be used for motivation - it
-can also mean power / motion / propulsion / force. It can be anything
+Korean symbol for force or power. (See http://www.orientaloutpost.com/ :
+"This word can be used for motivation - it
+can also mean power/motion/propulsion/force. It can be anything
 internal or external that keeps you going. This is the safest way to express
 motivation in Chinese. If your audience is Japanese, please see the other entry
 for motivation. This is a word in Japanese and Korean, but it means "motive
 power" or "kinetic energy" (without the motivation meaning that you are
-probably looking for)").
+probably looking for)".)
 
