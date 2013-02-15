@@ -12,8 +12,8 @@
 //----------------------------  trilinos_ghost_03.cc  ---------------------------
 
 
-// check correct behaviour of Trilinos ghosted vectors and l2_norm().  The
-// test now checks that l2_norm() is disabled.
+// check correct behaviour of Trilinos ghosted vectors.  The
+// test now checks that v.l2_norm() and v(idx)=... is disabled.
 
 #include "../tests.h" 
 #include <deal.II/base/utilities.h>
@@ -59,6 +59,13 @@ void test ()
   try
     {
       v_tmp.l2_norm();
+    }
+  catch (...)
+    {
+    }
+  try
+    {
+      v_tmp(0)=3.0;
     }
   catch (...)
     {
