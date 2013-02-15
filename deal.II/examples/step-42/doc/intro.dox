@@ -132,7 +132,7 @@ Now we want to derive a primal problem which only depends on the displacement $u
 set $\eta = \xi$ and eliminate the stress $\sigma$ by applying the projection
 theorem (see Grossmann, Roos: Numerical Treatment of Partial Differential
 Equations, Springer-Verlag Berlin Heidelberg, 2007 and Frohne: FEM-Simulation
-der Umformtechnik metallischer Oberflächen im Mikrokosmos, Ph.D. thesis,
+der Umformtechnik metallischer Oberfl&auml;chen im Mikrokosmos, Ph.D. thesis,
 University of Siegen, Germany, 2011) on
 @f{gather*}\left(\sigma - C\varepsilon(u), \tau - \sigma\right) \geq 0,\quad \forall \tau\in \Pi W,@f}
 which yields with the second inequality:\\
