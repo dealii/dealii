@@ -501,10 +501,14 @@ public:
                                  const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
-   * Returns the Global DoF index of the <i>i degree associated with the @p
-   * vertexth vertex on the level @p level. Also see vertex_dof_index().
+   * Returns the Global DoF index of the <code>i</code>th degree of
+   * freedom associated with the <code>vertex</code>th vertex on
+   * level @p level. Also see vertex_dof_index().
    */
-  unsigned int mg_vertex_dof_index (const int level, const unsigned int vertex, const unsigned int i, const unsigned int fe_index = DH::default_fe_index) const;
+  unsigned int mg_vertex_dof_index (const int level,
+                                    const unsigned int vertex,
+                                    const unsigned int i,
+                                    const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
    * Index of the <i>i</i>th degree
