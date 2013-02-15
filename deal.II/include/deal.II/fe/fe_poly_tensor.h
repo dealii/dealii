@@ -92,7 +92,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @note The matrix #inverse_node_matrix should have dimensions zero
  * before this piece of code is executed. Only then,
- * shape_value_component() will return the raw bolynomial <i>j</i> as
+ * shape_value_component() will return the raw polynomial <i>j</i> as
  * defined in the polynomial space POLY.
  *
  * <h4>Setting the transformation</h4>

@@ -32,7 +32,7 @@ namespace parallel
      * coarsening a distributed grid and
      * handles the necessary communication.
      *
-     * @note: It is important to note, that if you use more than one
+     * @note It is important to note, that if you use more than one
      * SolutionTransfer object at the same time, that the calls to
      * prepare_*() and interpolate()/deserialize() need to be in the same order.
      *

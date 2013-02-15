@@ -2417,7 +2417,7 @@ protected:
    * the library, for example the
    * constructors of FESystem as
    * well as the hp::FECollection
-   * class, need to make copied of
+   * class, need to make copies of
    * finite elements without
    * knowing their exact type. They
    * do so through this function.
