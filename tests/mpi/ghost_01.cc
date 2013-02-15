@@ -39,16 +39,17 @@ void test ()
   IndexSet local_relevant(numproc*2);
   local_relevant.add_range(1,2);
 
-  PETScWrappers::MPI::Vector v_tmp(MPI_COMM_WORLD, local_active.size(), local_active.n_elements());
+  PETScWrappers::MPI::Vector vb(MPI_COMM_WORLD, local_active);
   PETScWrappers::MPI::Vector v(MPI_COMM_WORLD, local_active, local_relevant);
 
 				   // set local values
-  v(myid*2)=myid*2.0;
-  v(myid*2+1)=myid*2.0+1.0;
+  vb(myid*2)=myid*2.0;
+  vb(myid*2+1)=myid*2.0+1.0;
 
-  v.compress();
-  v*=2.0;
-  v.update_ghost_values();
+  vb.compress(VectorOperation::insert);
+  vb*=2.0;
+  v=vb;
+				   //v.update_ghost_values();
   
   
 				   // check local values
