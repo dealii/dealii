@@ -509,6 +509,8 @@ namespace PETScWrappers
       const int ierr = VecCopy (v.vector, vector);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+      if (has_ghost_elements())
+        update_ghost_values();
       return *this;
     }
 
