@@ -686,7 +686,7 @@ namespace VectorTools
    * map of boundary values.
    *
    * The parameter
-   * @p function_map argument
+   * @p function_map
    * provides a list of boundary
    * indicators to be handled by
    * this function and corresponding

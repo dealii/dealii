@@ -197,6 +197,8 @@ namespace PETScWrappers
       ierr = VecRestoreArray (static_cast<const Vec &>(v), &src_array);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+      if (has_ghost_elements())
+        update_ghost_values();
       return *this;
     }
 

@@ -286,9 +286,9 @@ public:
    * constructor, one can easily
    * create an identity matrix of
    * size <code>n</code> by saying
-   * @verbatim
+   * @code
    * FullMatrix<double> M(IdentityMatrix(n));
-   * @endverbatim
+   * @endcode
    */
   FullMatrix (const IdentityMatrix &id);
   /**
@@ -335,9 +335,9 @@ public:
    * the argument. This way, one can easily
    * create an identity matrix of
    * size <code>n</code> by saying
-   * @verbatim
+   * @code
    *   M = IdentityMatrix(n);
-   * @endverbatim
+   * @endcode
    */
   FullMatrix<number> &
   operator = (const IdentityMatrix &id);

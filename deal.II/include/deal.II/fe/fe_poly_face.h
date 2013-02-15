@@ -28,7 +28,7 @@ DEAL_II_NAMESPACE_OPEN
  * based on polynomial spaces like the TensorProductPolynomials or a
  * PolynomialSpace classes.
  *
- * Every class that implements following functions can be used as
+ * Every class that implements the following functions can be used as
  * template parameter POLY.
  *
  * @code

@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id$
+//    $Id: ghost_01.cc 24418 2011-09-26 12:52:19Z bangerth $
 //    Version: $Name$ 
 //
 //    Copyright (C) 2004, 2005, 2010 by the deal.II authors
@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-// Test correct handling of ghost elements in PETScWrappers::mpi::vectors
+// Test correct copying  of ghosted vectors in PETScWrappers::mpi::vectors
 
 #include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
@@ -41,7 +41,16 @@ void test ()
 
   PETScWrappers::MPI::Vector vb(MPI_COMM_WORLD, local_active);
   PETScWrappers::MPI::Vector v(MPI_COMM_WORLD, local_active, local_relevant);
+  PETScWrappers::MPI::Vector v2(MPI_COMM_WORLD, local_active, local_relevant);
 
+  vb = 1.5;
+  v2 = vb;
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+    deallog << "ghost: " << v2(1) << std::endl;
+  Assert(v2(1) == 1.5, ExcInternalError());
+  Assert(v2(myid*2) == 1.5, ExcInternalError());
+  Assert(v2(myid*2+1) == 1.5, ExcInternalError());
+  
 				   // set local values
   vb(myid*2)=myid*2.0;
   vb(myid*2+1)=myid*2.0+1.0;
@@ -49,7 +58,6 @@ void test ()
   vb.compress(VectorOperation::insert);
   vb*=2.0;
   v=vb;
-				   //v.update_ghost_values();
   
   
 				   // check local values
@@ -68,6 +76,14 @@ void test ()
     deallog << "ghost: " << v(1) << std::endl;
   Assert(v(1) == 2.0, ExcInternalError());
 
+				   //assignment from ghosted to ghosted
+  v2 = v;
+  Assert(v2(1) == 2.0, ExcInternalError());
+  Assert(v2(myid*2) == myid*4.0, ExcInternalError());
+  Assert(v2(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+    deallog << "ghost: " << v2(1) << std::endl;
+  
 				   // done
   if (myid==0)
     deallog << "OK" << std::endl;
@@ -77,14 +93,14 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  PetscInitialize(&argc,&argv,0,0);
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
   deallog.push(Utilities::int_to_string(myid));
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("ghost_01").c_str());
+      std::ofstream logfile(output_file_for_mpi("ghost_02").c_str());
       deallog.attach(logfile);
       deallog << std::setprecision(4);
       deallog.depth_console(0);
@@ -94,4 +110,6 @@ int main (int argc, char **argv)
     }
   else
     test();
+  
+  PetscFinalize();
 }

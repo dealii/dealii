@@ -457,18 +457,18 @@ namespace internal
  *  </ul>
  *
  *  For <tt>dim==1</tt>, these iterators are mapped as follows:
- *  @verbatim
+ *  @code
  *    typedef line_iterator        cell_iterator;
  *    typedef active_line_iterator active_cell_iterator;
- *  @endverbatim
+ *  @endcode
  *  while for @p dim==2 we have the additional face iterator:
- *  @verbatim
+ *  @code
  *    typedef quad_iterator        cell_iterator;
  *    typedef active_quad_iterator active_cell_iterator;
  *
 *    typedef line_iterator        face_iterator;
  *    typedef active_line_iterator active_face_iterator;
- *  @endverbatim
+ *  @endcode
  *
  *  By using the cell iterators, you can write code independent of
  *  the spatial dimension. The same applies for substructure iterators,
@@ -486,7 +486,7 @@ namespace internal
  *  the default value <code>dim</code>).
  *  <ul>
  *  <li> <em>Counting the number of cells on a specific level</em>
- *    @verbatim
+ *    @code
  *     template <int dim, int spacedim>
  *     int Triangulation<dim, spacedim>::n_cells (const int level) const {
  *        cell_iterator cell = begin (level),
@@ -496,9 +496,9 @@ namespace internal
  *          ++n;
  *        return n;
  *      };
- *    @endverbatim
+ *    @endcode
  *    Another way which uses the STL @p distance function would be to write
- *    @verbatim
+ *    @code
  *      template <int dim>
  *      int Triangulation<dim>::n_cells (const int level) const {
  *        int n=0;
@@ -509,10 +509,10 @@ namespace internal
  *                  n);
  *        return n;
  *      };
- *    @endverbatim
+ *    @endcode
  *
  *  <li> <em>Refining all cells of a triangulation</em>
- *    @verbatim
+ *    @code
  *      template <int dim>
  *      void Triangulation<dim>::refine_global () {
  *        active_cell_iterator cell = begin_active(),
@@ -522,7 +522,7 @@ namespace internal
  *          cell->set_refine_flag ();
  *        execute_coarsening_and_refinement ();
  *      };
- *    @endverbatim
+ *    @endcode
  *  </ul>
  *
  *
@@ -530,7 +530,7 @@ namespace internal
  *
  *  Usage of a Triangulation is mainly done through the use of iterators.
  *  An example probably shows best how to use it:
- *  @verbatim
+ *  @code
  *  void main () {
  *    Triangulation<2> tria;
  *
@@ -567,7 +567,7 @@ namespace internal
  *    ofstream out("grid.1");
  *    GridOut::write_gnuplot (tria, out);
  *  };
- *  @endverbatim
+ *  @endcode
  *
  *
  *  <h3>Creating a triangulation</h3>
@@ -814,7 +814,7 @@ namespace internal
  *   It is possible to reconstruct a grid from its refinement history, which
  *   can be stored and loaded through the @p save_refine_flags and
  *   @p load_refine_flags functions. Normally, the code will look like this:
- *   @verbatim
+ *   @code
  *                                 // open output file
  *     ofstream history("mesh.history");
  *                                 // do 10 refinement steps
@@ -825,10 +825,10 @@ namespace internal
  *       tria.save_refine_flags (history);
  *       tria.execute_coarsening_and_refinement ();
  *     };
- *   @endverbatim
+ *   @endcode
  *
  *   If you want to re-create the grid from the stored information, you write:
- *   @verbatim
+ *   @code
  *                                 // open input file
  *     ifstream history("mesh.history");
  *                                 // do 10 refinement steps
@@ -836,7 +836,7 @@ namespace internal
  *       tria.load_refine_flags (history);
  *       tria.execute_coarsening_and_refinement ();
  *     };
- *   @endverbatim
+ *   @endcode
  *
  *   The same scheme is employed for coarsening and the coarsening flags.
  *
@@ -898,7 +898,7 @@ namespace internal
  *   details. Usage with the Triangulation object is then like this
  *   (let @p Ball be a class derived from Boundary<tt><2></tt>):
  *
- *   @verbatim
+ *   @code
  *     void main () {
  *       Triangulation<2> tria;
  *                                        // set the boundary function
@@ -925,7 +925,7 @@ namespace internal
  *           tria.execute_coarsening_and_refinement();
  *         };
  *     };
- *   @endverbatim
+ *   @endcode
  *
  *   You should take note of one caveat: if you have concave
  *   boundaries, you must make sure that a new boundary vertex does

@@ -68,7 +68,15 @@ namespace Step42
 {
   using namespace dealii;
 
+
   // @sect3{The <code>PlasticityContactProblem</code> class template}
+
+  // This class has only the purpose
+  // to read in data from a picture file
+  // that has to be stored as a pbm ascii
+  // format. This data will be bilinear
+  // interpolated and provides in this way
+  // a function which describes an obstacle.
 
   template <int dim> class Input;
 
@@ -159,6 +167,28 @@ namespace Step42
     double nu;         // Poisson ratio
   };
 
+  // As explained above this class
+  // allocates the obstacle which
+  // will come into contact with our
+  // deformable body.
+  // The data which we read in by the
+  // function read_obstacle () from the file
+  // "obstacle_file.pbm" will be stored
+  // in a double std::vector named
+  // obstacle_data.
+  // This vector composes the base
+  // to calculate a piecewise bilinear
+  // function as a polynomial interpolation.
+  // This will be done by obstacle_function ().
+  //
+  // In the function run () of the class
+  // PlasticityContactProblem we create
+  // an object of the class Input which will
+  // be used in the class Obstacle to
+  // supply the obstacle function in
+  // update_solution_and_constraints () of
+  // the class PlasticityContactProblem.
+
   template <int dim>
   class Input
   {
@@ -171,17 +201,17 @@ namespace Step42
       obstacle_data (0),
       lx (1.0), // length of the cube in x direction
       ly (1.0), // length of the cube in y direction
-      hx (0),
+      hx (0), //
       hy (0),
       nx (0),
       ny (0)
-      {read_surface (name);}
+      {read_obstacle (name);}
 
-      double hv(int i, int j);
+      double hv (int i, int j);
 
-      double mikro_height(double x,double y);
+      double obstacle_function (double x,double y);
 
-      void read_surface(const char* name);
+      void read_obstacle (const char* name);
 
    private:
       const char*          name;
@@ -194,17 +224,15 @@ namespace Step42
   };
 
   template <int dim>
-  double Input<dim>::hv(int i, int j)
+  double Input<dim>::hv (int i, int j)
   {
     assert(i>=0 && i<nx);
     assert(j>=0 && j<ny);
-//    if (nx*(ny-1-j)+i >25200)
-//      std::cout<< i << ", " << j << ", " << nx*(ny-1-j)+i <<std::endl;
     return obstacle_data[nx*(ny-1-j)+i]; // i indiziert x-werte, j indiziert y-werte
   }
 
   template <int dim>
-  double Input<dim>::mikro_height(double x,double y)
+  double Input<dim>::obstacle_function (double x,double y)
   {
     int ix = (int)(x/hx);
     int iy = (int)(y/hy);
@@ -272,7 +300,7 @@ namespace Step42
   }
 
   template <int dim>
-  void Input<dim>::read_surface(const char* name)
+  void Input<dim>::read_obstacle (const char* name)
   {
     int SZ = 100000;
     FILE* fp = fopen (name, "r");
@@ -545,7 +573,7 @@ namespace Step42
         return_value = p(1);
       if (component == 2)
         {
-          return_value = 1.999 - input_obstacle_copy->mikro_height (p(0), p(1));
+          return_value = 1.999 - input_obstacle_copy->obstacle_function (p(0), p(1));
         }
       return return_value;
     }
@@ -1436,9 +1464,7 @@ namespace Step42
   void PlasticityContactProblem<dim>::run ()
   {
     pcout << "Read the obstacle from a file." << std::endl;
-    input_obstacle.reset (new Input<dim>("li_kraft.pbm"));
-//    input_obstacle.reset (new Input<dim>("li_kraft_697x800.pbm"));
-
+    input_obstacle.reset (new Input<dim>("obstacle_file.pbm"));
     pcout << "Ostacle is available now." << std::endl;
 
     Timer             t;

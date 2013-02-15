@@ -49,10 +49,13 @@ DEAL_II_NAMESPACE_OPEN
  * interface to SLEPc solvers that handle both of these problem sets.
  *
  * SLEPcWrappers can be implemented in application codes in the
- * following way: @verbatim SolverControl solver_control (1000, 1e-9);
- * SolverArnoldi system (solver_control, mpi_communicator);
- * system.solve (A, B, lambda, x, size_of_spectrum); @endverbatim for
- * the generalized eigenvalue problem $Ax=B\lambda x$, where the
+ * following way:
+ * @code
+ *  SolverControl solver_control (1000, 1e-9);
+ *  SolverArnoldi system (solver_control, mpi_communicator);
+ *  system.solve (A, B, lambda, x, size_of_spectrum);
+ * @endcode
+ * for the generalized eigenvalue problem $Ax=B\lambda x$, where the
  * variable <code>const unsigned int size_of_spectrum</code> tells
  * SLEPc the number of eigenvector/eigenvalue pairs to solve for: See
  * also <code>step-36</code> for a hands-on example.
@@ -63,7 +66,7 @@ DEAL_II_NAMESPACE_OPEN
  * rather than just one. This freedom is intended for use of the
  * SLEPcWrappers that require a greater handle on the eigenvalue
  * problem solver context. See also the API of:
- @verbatim
+ @code
   template <typename OutputVector>
   void
   SolverBase::solve (const PETScWrappers::MatrixBase &A,
@@ -72,7 +75,7 @@ DEAL_II_NAMESPACE_OPEN
                      std::vector<OutputVector>       &vr,
                      const unsigned int               n_eigenvectors)
   { ... }
- @endverbatim
+ @endcode
  * as an example on how to do this.
  *
  * For further information and explanations on handling the @ref

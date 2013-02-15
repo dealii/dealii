@@ -685,7 +685,7 @@ namespace MatrixCreator
  * or to the first nonzero main diagonal entry if it is zero for some reason.
  * Of course we have to change the right hand side appropriately. This is not
  * a very good strategy, but it at least should give the main diagonal entry a
- * value in the right order of dimension, which makes the solvution process a
+ * value in the right order of dimension, which makes the solution process a
  * bit more stable. A refined algorithm would set the entry to the mean of the
  * other diagonal entries, but this seems to be too expensive.
  *

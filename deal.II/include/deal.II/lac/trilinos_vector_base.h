@@ -1296,6 +1296,15 @@ namespace TrilinosWrappers
 
 
   inline
+  void
+  VectorBase::compress ()
+  {
+    compress(VectorOperation::unknown);
+  }
+
+
+
+  inline
   VectorBase &
   VectorBase::operator = (const TrilinosScalar s)
   {

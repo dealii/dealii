@@ -45,12 +45,12 @@ namespace parallel
  * preconditioner. Therefore, you must use the identity provided here
  * to avoid preconditioning. It can be used in the following way:
  *
- @verbatim
+ @code
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
   cg.solve (system_matrix, solution, system_rhs,
             PreconditionIdentity());
- @endverbatim
+ @endcode
  *
  * See the step-3 tutorial program for an example and
  * additional explanations.

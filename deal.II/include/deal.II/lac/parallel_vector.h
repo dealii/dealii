@@ -293,9 +293,12 @@ namespace parallel
        * distributed vectors and matrices"
        * in the glossary.
        */
-      void compress (::dealii::VectorOperation::values operation
-                     =::dealii::VectorOperation::unknown);
+      void compress (::dealii::VectorOperation::values operation);
 
+      /**
+       * @deprecated: use compress(VectorOperation::values) instead.
+       */
+      void compress () DEAL_II_DEPRECATED;
 
       /**
        * Fills the data field for ghost indices with
@@ -1144,6 +1147,13 @@ namespace parallel
         compress_finish (true);
     }
 
+    template <typename Number>
+    inline
+    void
+    Vector<Number>::compress ()
+    {
+      compress(VectorOperation::unknown);
+    }
 
 
     template <typename Number>
