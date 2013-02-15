@@ -438,10 +438,10 @@ public:
    * version hp::DoFHandler, since
    * one can then write code like
    * this:
-   * @verbatim
+   * @code
    *   dofs_per_cell
    *     = dof_handler->get_fe()[cell->active_fe_index()].dofs_per_cell;
-   * @endverbatim
+   * @endcode
    *
    * This code doesn't work in both
    * situations without the present

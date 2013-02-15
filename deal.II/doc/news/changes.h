@@ -153,6 +153,13 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> Fixed: Many places in the documentation have been made to consistently
+use doxygen markup that indicates that this is code, so that doxygen will
+cross-link the piece of code to class and function names. Many typos have also
+been fixed.
+<br>
+(Felix Gruber, 2013/02/15)
+
 <li> Fixed: Starting in release 7.1, we first built the deal.II shared libraries
 in the local <code>/tmp</code> or similar directory rather than the final location
 because linking becomes very slow over remotely mounted file systems. Unfortunately,

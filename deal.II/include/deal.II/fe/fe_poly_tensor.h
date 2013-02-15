@@ -70,7 +70,7 @@ DEAL_II_NAMESPACE_OPEN
  * Therefore, the constructor of a derived class should have a
  * structure like this (example for interpolation in support points):
  *
- * @verbatim
+ * @code
  *  fill_support_points();
  *
  *  const unsigned int n_dofs = this->dofs_per_cell;
@@ -88,7 +88,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  *  this->inverse_node_matrix.reinit(n_dofs, n_dofs);
  *  this->inverse_node_matrix.invert(N);
- * @endverbatim
+ * @endcode
  *
  * @note The matrix #inverse_node_matrix should have dimensions zero
  * before this piece of code is executed. Only then,
@@ -102,9 +102,9 @@ DEAL_II_NAMESPACE_OPEN
  * transformations can be selected from the set MappingType and stored
  * in #mapping_type. Therefore, each constructor should contain a line
  * like:
- * @verbatim
+ * @code
  * this->mapping_type = this->mapping_none;
- * @endverbatim
+ * @endcode
  *
  * @see PolynomialsBDM, PolynomialsRaviartThomas
  * @ingroup febase

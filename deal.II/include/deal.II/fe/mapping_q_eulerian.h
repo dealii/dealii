@@ -56,13 +56,13 @@ DEAL_II_NAMESPACE_OPEN
  * Typically, the DoFHandler operates on a finite element that
  * is constructed as a system element (FESystem) from continuous FE_Q()
  * objects. An example is shown below:
- * @verbatim
+ * @code
  *    FESystem<dim> fe(FE_Q<dim>(2), dim, FE_Q<dim>(1), 1);
  *    DoFHandler<dim> dof_handler(triangulation);
  *    dof_handler.distribute_dofs(fe);
  *    Vector<double> soln_vector(dof_handler.n_dofs());
  *    MappingQEulerian<dim> q2_mapping(2,soln_vector,dof_handler);
- * @endverbatim
+ * @endcode
  *
  * In this example, our element consists of <tt>(dim+1)</tt> components.
  * Only the first <tt>dim</tt> components will be used, however, to define

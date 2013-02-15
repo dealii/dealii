@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <h3>Usage</h3>
  * The simplest use of this class is the following:
- * @verbatim
+ * @code
  *                                  // generate a @p SolverControl and
  *                                  // a @p VectorMemory
  * SolverControl control;
@@ -59,26 +59,26 @@ DEAL_II_NAMESPACE_OPEN
  *                                  // call the @p solve function with this
  *                                  // preconditioning as last argument
  * solver_selector.solve(A,x,b,preconditioning);
- * @endverbatim
+ * @endcode
  * But the full usefulness of the @p SolverSelector class is not
  * clear until the presentation of the following example that assumes
  * the user using the @p ParameterHandler class and having declared a
  * "solver" entry, e.g. with
- * @verbatim
+ * @code
  * Parameter_Handler prm;
  * prm.declare_entry ("solver", "none",
  *                    Patterns::Selection(SolverSelector<>::get_solver_names()));
  * ...
- * @endverbatim
+ * @endcode
  * Assuming that in the users parameter file there exists the line
- * @verbatim
- * set solver = cg
- * @endverbatim
+ @verbatim
+ set solver = cg
+ @endverbatim
  * then `Line 3' of the above example reads
- * @verbatim
+ * @code
  * SolverSelector<SparseMatrix<double>, Vector<double> >
  *   solver_selector(prm.get("solver"), control, memory);
- * @endverbatim
+ * @endcode
  *
  *
  * If at some time there exists a new solver "xyz" then the user does not need

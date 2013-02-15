@@ -57,13 +57,13 @@ DEAL_II_NAMESPACE_OPEN
  * to it.
  *
  * An example is shown below:
- * @verbatim
+ * @code
  *    FESystem<dim> fe(FE_Q<dim>(1), dim);
  *    DoFHandler<dim> flowfield_dof_handler(triangulation);
  *    flowfield_dof_handler.distribute_dofs(fe);
  *    Vector<double> map_points(flowfield_dof_handler.n_dofs());
  *    MappingQ1Eulerian<dim> mymapping(map_points, flowfield_dof_handler);
- * @endverbatim
+ * @endcode
  *
  * Note that since the vector of shift values and the dof handler are
  * only associated to this object at construction time, you have to

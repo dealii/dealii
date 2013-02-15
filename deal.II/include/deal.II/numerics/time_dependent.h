@@ -186,7 +186,7 @@ template <int dim, int spacedim> class Triangulation;
  * The main loop of a program using this class will usually look like
  * the following one, taken modified from an application program that
  * isn't distributed as part of the library:
- * @verbatim
+ * @code
  *   template <int dim>
  *   void TimeDependent_Wave<dim>::run_sweep (const unsigned int sweep_no)
  *   {
@@ -215,7 +215,7 @@ template <int dim, int spacedim> class Triangulation;
  *     for (unsigned int sweep=0; sweep<number_of_sweeps; ++sweep)
  *       timestep_manager.run_sweep (sweep);
  *   };
- * @endverbatim
+ * @endcode
  * Here, @p timestep_manager is an object of type TimeDependent_Wave(), which
  * is a class derived from TimeDependent. @p start_sweep,
  * @p solve_primal_problem, @p solve_dual_problem, @p postprocess and @p end_sweep
@@ -223,7 +223,7 @@ template <int dim, int spacedim> class Triangulation;
  * timesteps within this object and call the respective function on each of
  * these objects. For example, here are two of the functions as they are
  * implemented by the library:
- * @verbatim
+ * @code
  *   void TimeDependent::start_sweep (const unsigned int s)
  *   {
  *     sweep_no = s;
@@ -254,7 +254,7 @@ template <int dim, int spacedim> class Triangulation;
  *              timestepping_data_primal,
  *              forward);
  *   };
- * @endverbatim
+ * @endcode
  * The latter function shows rather clear how most of the loops are
  * invoked (@p solve_primal_problem, @p solve_dual_problem, @p postprocess,
  * @p refine_grids and @p write_statistics all have this form, where the
@@ -275,7 +275,7 @@ template <int dim, int spacedim> class Triangulation;
  * the <tt>C++</tt> standard library, it is possible to do neat tricks, like
  * the following, also taken from the wave program, in this case from
  * the function @p refine_grids:
- * @verbatim
+ * @code
  *   ...
  *   compute the thresholds for refinement
  *   ...
@@ -286,7 +286,7 @@ template <int dim, int spacedim> class Triangulation;
  *                                                             bottom_threshold)),
  *            TimeDependent::TimeSteppingData (0,1),
  *            TimeDependent::forward);
- * @endverbatim
+ * @endcode
  * TimeStepBase_Wave::refine_grid is a function taking an argument, unlike
  * all the other functions used above within the loops. However, in this special
  * case the parameter was the same for all timesteps and known before the loop
@@ -299,7 +299,7 @@ template <int dim, int spacedim> class Triangulation;
  * brevity we have omitted the parts that deal with backward running loops
  * as well as the checks whether wake-up and sleep operations act on timesteps
  * outside <tt>0..n_timesteps-1</tt>.
- * @verbatim
+ * @code
  *   template <typename InitFunctionObject, typename LoopFunctionObject>
  *   void TimeDependent::do_loop (InitFunctionObject      init_function,
  *                           LoopFunctionObject      loop_function,
@@ -341,7 +341,7 @@ template <int dim, int spacedim> class Triangulation;
  *       for (int look_back=0; look_back<=timestepping_data.look_back; ++look_back)
  *         timesteps[step-look_back]->sleep(look_back);
  *   };
- * @endverbatim
+ * @endcode
  *
  *
  * @author Wolfgang Bangerth, 1999
@@ -492,10 +492,10 @@ public:
    *
    * This mechanism usually will result
    * in a set-up loop like this
-   * @verbatim
+   * @code
    * for (i=0; i<N; ++i)
    *   manager.add_timestep(new MyTimeStep());
-   * @endverbatim
+   * @endcode
    */
   void add_timestep (TimeStepBase *new_timestep);
 

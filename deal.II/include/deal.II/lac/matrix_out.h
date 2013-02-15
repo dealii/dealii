@@ -34,7 +34,7 @@ DEAL_II_NAMESPACE_OPEN
  * of the base class.
  *
  * A typical usage of this class would be as follows:
- * @verbatim
+ * @code
  *    FullMatrix<double> M;
  *    ...                // fill matrix M with some values
  *
@@ -43,7 +43,7 @@ DEAL_II_NAMESPACE_OPEN
  *    std::ofstream out ("M.gnuplot");
  *    matrix_out.build_patches (M, "M");
  *    matrix_out.write_gnuplot (out);
- * @endverbatim
+ * @endcode
  * Of course, you can as well choose a different graphical output
  * format. Also, this class supports any matrix, not only of type
  * FullMatrix, as long as it satisfies a number of requirements,
@@ -62,7 +62,7 @@ DEAL_II_NAMESPACE_OPEN
  * DataOutInterface does so as well, this does no harm, but
  * calms the compiler which is suspecting an access control conflict
  * otherwise. Testcase here:
- * @verbatim
+ * @code
  *    template <typename T> class V {};
  *
  *    struct B1 {
@@ -80,7 +80,7 @@ DEAL_II_NAMESPACE_OPEN
  *    };
  *
  *    D d;
- * @endverbatim
+ * @endcode
  *
  * @ingroup output
  * @author Wolfgang Bangerth, 2001

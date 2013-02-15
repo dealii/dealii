@@ -69,7 +69,7 @@ template <int dim, int spacedim> class DoFHandler;
  * which is suitable for quadratic finite elements in space, for
  * example.
  *
- * @verbatim
+ * @code
  *   DataOutStack<dim> data_out_stack;
  *
  *                                  // first declare the vectors
@@ -97,7 +97,7 @@ template <int dim, int spacedim> class DoFHandler;
  *       data_out_stack.build_patches (2);
  *       data_out_stack.finish_parameter_value ();
  *     };
- * @endverbatim
+ * @endcode
  *
  * @ingroup output
  * @author Wolfgang Bangerth, 1999

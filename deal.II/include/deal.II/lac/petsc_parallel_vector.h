@@ -111,7 +111,7 @@ namespace PETScWrappers
      * operation of the opposite kind, it calls compress() and flips the
      * state. This can sometimes lead to very confusing behavior, in code that may
      * for example look like this:
-     * @verbatim
+     * @code
      *   PETScWrappers::MPI::Vector vector;
      *   ...
      *                   // do some write operations on the vector
@@ -126,7 +126,7 @@ namespace PETScWrappers
      *
      *                   // do another collective operation
      *   const double norm = vector.l2_norm();
-     * @endverbatim
+     * @endcode
      *
      * This code can run into trouble: by the time we see the first addition
      * operation, we need to flush the overwrite buffers for the vector, and the
