@@ -208,7 +208,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator = (const PetscScalar s)
   {
-
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
     //TODO[TH]: assert(is_compressed())
