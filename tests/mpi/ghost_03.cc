@@ -63,7 +63,7 @@ void test ()
   catch (...){}
   try 
     {
-      v=2.0;      
+      v=0.0;
     }
   catch (...){}
   try 
