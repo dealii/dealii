@@ -229,7 +229,7 @@ namespace PETScWrappers
 
 
       /**
-       * Constructs a new parallel PETSc
+       * Constructs a new parallel ghosted PETSc
        * vector from an Indexset. Note that
        * @p local must be contiguous and
        * the global size of the vector is
@@ -245,11 +245,21 @@ namespace PETScWrappers
        * way, the ghost parameter can equal
        * the set of locally relevant
        * degrees of freedom, see step-32.
+       *
+       * @Note: This always creates a ghosted
+       * vector.
        */
       explicit Vector (const MPI_Comm     &communicator,
                        const IndexSet   &local,
-                       const IndexSet &ghost = IndexSet(0));
+                       const IndexSet &ghost);
 
+      /**
+       * Constructs a new parallel PETSc
+       * vector from an Indexset. This creates a non
+       * ghosted vector.
+       */
+      explicit Vector (const MPI_Comm     &communicator,
+                       const IndexSet   &local);
 
       /**
        * Copy the given vector. Resize the

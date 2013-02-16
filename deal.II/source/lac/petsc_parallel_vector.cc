@@ -85,7 +85,14 @@ namespace PETScWrappers
       Vector::create_vector(local.size(), local.n_elements(), ghost_set);
     }
 
-
+    Vector::Vector (const MPI_Comm     &communicator,
+                     const IndexSet   &local)
+    :
+          communicator (communicator)
+    {
+      Assert(local.is_contiguous(), ExcNotImplemented());
+      Vector::create_vector(local.size(), local.n_elements());
+    }
 
     void
     Vector::reinit (const MPI_Comm    &comm,
