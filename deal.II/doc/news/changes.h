@@ -193,6 +193,17 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> PETScWrappers::MPI::Vector with ghost entries are read-only
+now.
+<br>
+(Timo Heister, 2013/02/16)
+
+<li> PETScWrappers::*Vector::operator= now calls update_ghost_values()
+automatically if necessary. This means that update_ghost_values()
+does not need to be from user code at all anymore.
+<br>
+(Timo Heister, 2013/02/14)
+
 <li> Fixed: VectorTools::interpolate did not work properly in 1d if
 boundary indicators had been set to anything but the default (i.e.,
 zero at the left and one at the right end of the domain). This was
