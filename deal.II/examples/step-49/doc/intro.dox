@@ -62,9 +62,10 @@ grid_1 in this example.
 Meshes can be generated from different tools like <a
 href="http://geuz.org/gmsh/" rel="nofollow">gmsh</a>, <a
 href="https://lagrit.lanl.gov/" rel="nofollow">lagrit</a> and <a
-href="http://cubit.sandia.gov/" rel="nofollow">cubit</a>. The problem is that
-deal.II needs meshes that only consist of quads and hexas -- tetrahedral
-meshes won't work (this means tools like tetgen can not be used directly).
+href="http://cubit.sandia.gov/" rel="nofollow">cubit</a>. See the
+documentation of GridIn for more information. The problem is that deal.II
+needs meshes that only consist of quads and hexas -- tetrahedral meshes won't
+work (this means tools like tetgen can not be used directly).
 
 We will describe a possible workflow using Gmsh. Gmsh is the smallest and
 quickest to set up open source tool, that we know of. It can generate
@@ -120,12 +121,54 @@ a given mesh in various ways. The usage of the functions GridTools::shift,
 GridTools::rotate, GridTools::scale is fairly obvious, so we won't discuss
 those functions here.
 
+The function GridTools::transform allows you to transform the vertices of a
+given mesh using a smooth function.
 
- GridTools::transform
-  - transform via smooth function
+In the function grid_5() we perturb the y coordinate of a mesh with
+a sin curve:
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+        @image html step-49.grid-5a.png regular input mesh
+    </td>
+    <td ALIGN="center">
+        @image html step-49.grid-5.png output mesh 
+    </td>
+  </tr>
+</TABLE>
 
-  - perturb/randomize mesh
+Using the formula
+$(x,y) \mapsto (x,tanh(2*y)/tanh(2))$, we transform a regular refined
+unit square to a wall-adapted mesh in y direction. This is done in grid_6()
+of this tutorial:
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+        @image html step-49.grid-6a.png regular input mesh
+    </td>
+    <td ALIGN="center">
+        @image html step-49.grid-6.png wall-adapted output mesh 
+    </td>
+  </tr>
+</TABLE>
 
+The function Triangulation::distort_random allows you to move vertices in the
+mesh (optionally ignoring boundary nodes) by a random amount. This is
+demonstrated in grid_7() and the result is as follows:
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+        @image html step-49.grid-7a.png regular input mesh
+    </td>
+    <td ALIGN="center">
+        @image html step-49.grid-7.png perturbed output mesh 
+    </td>
+  </tr>
+</TABLE>
+
+Please note that while this allows you to negate some of the superconvergence
+effects one gets when studying convergence on regular meshes, it is better to
+work with a sequence of unstructured meshes (see possible extensions).
 
 
 <h4>Merge Meshes</h4>
@@ -208,4 +251,4 @@ above. This is the output from grid_4():
   - change boundary indicators
   - relax inner vertices
 - Database of unstructured meshes for convergence studies
-
+- GridTools::extract_boundary_mesh 
