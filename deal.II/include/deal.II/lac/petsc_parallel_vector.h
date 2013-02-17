@@ -391,8 +391,15 @@ namespace PETScWrappers
        */
       void reinit (const MPI_Comm     &communicator,
                    const IndexSet   &local,
-                   const IndexSet &ghost = IndexSet(0));
+                   const IndexSet &ghost);
 
+      /**
+       * Reinit as a vector without ghost elements. See
+       * constructor with same signature
+       * for more detais.
+       */
+      void reinit (const MPI_Comm     &communicator,
+                   const IndexSet   &local);
 
       /**
        * Return a reference to the MPI
