@@ -22,8 +22,8 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * This class gives a unified framework for the implementation of
- * FiniteElement classes based on a polynomial spaces like the
- * TensorProductPolynomials or a PolynomialSpace classes.
+ * FiniteElement classes based on polynomial spaces like the
+ * TensorProductPolynomials or PolynomialSpace classes.
  *
  * Every class conforming to the following interface can be used as
  * template parameter POLY.

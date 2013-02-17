@@ -93,10 +93,19 @@ namespace SparseMatrixIterators
 
     /**
      * Constructor.
+     *
+     * @deprecated This constructor is deprecated. Use the other constructor
+     * with a global index instead.
      */
     Accessor (MatrixType         *matrix,
               const unsigned int  row,
-              const unsigned int  index);
+              const unsigned int  index) DEAL_II_DEPRECATED;
+
+    /**
+     * Constructor.
+     */
+    Accessor (MatrixType         *matrix,
+              const std::size_t   index_within_matrix);
 
     /**
      * Constructor. Construct the end accessor for the given matrix.
@@ -235,6 +244,12 @@ namespace SparseMatrixIterators
               const unsigned int  index);
 
     /**
+     * Constructor.
+     */
+    Accessor (MatrixType         *matrix,
+              const std::size_t   index);
+
+    /**
      * Constructor. Construct the end accessor for the given matrix.
      */
     Accessor (MatrixType         *matrix);
@@ -278,12 +293,32 @@ namespace SparseMatrixIterators
   /**
    * STL conforming iterator for constant and non-constant matrices.
    *
+   * The typical use for these iterators is to iterate over the elements of
+   * a sparse matrix
+   * or over the elements of individual rows. Note that there is no guarantee
+   * that the elements of a row are actually traversed in an order in which
+   * columns monotonically increase. See the documentation of the
+   * SparsityPattern class for more information.
+   *
    * The first template argument denotes the underlying numeric type, the
    * second the constness of the matrix.
    *
    * Since there is a specialization of this class for
    * <tt>Constness=false</tt>, this class is for iterators to constant
    * matrices.
+   *
+   * @note This class operates directly on the internal data structures of the
+   * SparsityPattern and SparseMatrix classes. As a consequence, some operations
+   * are cheap and some are not. In particular, it is cheap to access the column
+   * index and the value of an entry pointed to. On the other hand, it is expensive
+   * to access the row index (this requires $O(\log(N))$ operations for a
+   * matrix with $N$ row). As a consequence, when you design algorithms that
+   * use these iterators, it is common practice to not loop over <i>all</i>
+   * elements of a sparse matrix at once, but to have an outer loop over
+   * all rows and within this loop iterate over the elements of this row.
+   * This way, you only ever need to dereference the iterator to obtain
+   * the column indices and values whereas the (expensive) lookup of the row index
+   * can be avoided by using the loop index instead.
    */
   template <typename number, bool Constness>
   class Iterator
@@ -301,15 +336,25 @@ namespace SparseMatrixIterators
      * of the current kind.
      */
     typedef
-    const Accessor<number,Constness> & value_type;
+    const Accessor<number,Constness> &value_type;
 
     /**
      * Constructor. Create an iterator into the matrix @p matrix for the given
      * row and the index within it.
+     *
+     * @deprecated This constructor is deprecated. Use the other constructor
+     * with a global index instead.
      */
     Iterator (MatrixType        *matrix,
               const unsigned int row,
-              const unsigned int index);
+              const unsigned int index) DEAL_II_DEPRECATED;
+
+    /**
+     * Constructor. Create an iterator into the matrix @p matrix for the given
+     * index in the complete matrix (counting from the zeroth entry).
+     */
+    Iterator (MatrixType        *matrix,
+              const std::size_t  index_within_matrix);
 
     /**
      * Constructor. Create the end iterator for the given matrix.
@@ -400,6 +445,18 @@ namespace SparseMatrixIterators
  * locations without the SparsityPattern having to know this, and more
  * importantly one can associate more than one matrix with the same
  * sparsity pattern.
+ *
+ * The elements of a SparseMatrix are stored in the same order in which the
+ * SparsityPattern class stores its entries.
+ * Within each row, elements are generally stored left-to-right in increasing
+ * column index order; the exception to this rule is that if the matrix
+ * is square (n_rows() == n_columns()), then the diagonal entry is stored
+ * as the first element in each row to make operations like applying a
+ * Jacobi or SSOR preconditioner faster. As a consequence, if you traverse
+ * the elements of a row of a SparseMatrix with the help of iterators into
+ * this object (using SparseMatrix::begin and SparseMatrix::end) you
+ * will find that the elements are not sorted by column index within each row
+ * whenever the matrix is square.
  *
  * @note Instantiations for this template are provided for <tt>@<float@> and
  * @<double@></tt>; others can be generated in application programs (see the
@@ -1179,7 +1236,7 @@ public:
   void precondition_SSOR (Vector<somenumber>             &dst,
                           const Vector<somenumber>       &src,
                           const number                    omega = 1.,
-                          const std::vector<unsigned int> &pos_right_of_diagonal=std::vector<unsigned int>()) const;
+                          const std::vector<std::size_t> &pos_right_of_diagonal=std::vector<std::size_t>()) const;
 
   /**
    * Apply SOR preconditioning matrix to <tt>src</tt>.
@@ -1299,6 +1356,9 @@ public:
   /**
    * STL-like iterator with the first entry of the matrix. This is the version
    * for constant matrices.
+   *
+   * Note the discussion in the general documentation of this class about
+   * the order in which elements are accessed.
    */
   const_iterator begin () const;
 
@@ -1310,6 +1370,9 @@ public:
   /**
    * STL-like iterator with the first entry of the matrix. This is the version
    * for non-constant matrices.
+   *
+   * Note the discussion in the general documentation of this class about
+   * the order in which elements are accessed.
    */
   iterator begin ();
 
@@ -1326,6 +1389,9 @@ public:
    * entries, then the iterator returned by this function equals
    * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
    * that case.
+   *
+   * Note also the discussion in the general documentation of this class about
+   * the order in which elements are accessed.
    */
   const_iterator begin (const unsigned int r) const;
 
@@ -1348,6 +1414,9 @@ public:
    * entries, then the iterator returned by this function equals
    * <tt>end(r)</tt>. Note also that the iterator may not be dereferencable in
    * that case.
+   *
+   * Note the discussion in the general documentation of this class about
+   * the order in which elements are accessed.
    */
   iterator begin (const unsigned int r);
 
@@ -1516,16 +1585,6 @@ private:
    * function.
    */
   std::size_t max_len;
-
-  /**
-   * Return the value of the <tt>index</tt>th entry in <tt>row</tt>. Here,
-   * <tt>index</tt> refers to the internal representation of the matrix, not
-   * the column. This is an internal function because it exposes the actual
-   * format in which data is stored -- be sure to understand what you are
-   * doing here.
-   */
-  number nth_entry_in_row (const unsigned int row,
-			   const unsigned int index) const;
 
   // make all other sparse matrices friends
   template <typename somenumber> friend class SparseMatrix;
@@ -1819,7 +1878,7 @@ inline
 number SparseMatrix<number>::diag_element (const unsigned int i) const
 {
   Assert (cols != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),  ExcNotQuadratic());
+  Assert (m() == n(),  ExcNotQuadratic());
   Assert (i<m(), ExcInvalidIndex1(i));
 
   // Use that the first element in each row of a quadratic matrix is the main
@@ -1834,7 +1893,7 @@ inline
 number &SparseMatrix<number>::diag_element (const unsigned int i)
 {
   Assert (cols != 0, ExcNotInitialized());
-  Assert (cols->optimize_diagonal(),  ExcNotQuadratic());
+  Assert (m() == n(),  ExcNotQuadratic());
   Assert (i<m(), ExcInvalidIndex1(i));
 
   // Use that the first element in each row of a quadratic matrix is the main
@@ -1850,24 +1909,11 @@ number
 SparseMatrix<number>::raw_entry (const unsigned int row,
                                  const unsigned int index) const
 {
-  // this is the (deprecated) public version of the
-  // nth_entry_in_row() function. this function will soon
-  // go away.
-  return nth_entry_in_row (row, index);
-}
-
-
-
-template <typename number>
-inline
-number
-SparseMatrix<number>::nth_entry_in_row (const unsigned int row,
-					const unsigned int index) const
-{
   Assert(row<cols->rows, ExcIndexRange(row,0,cols->rows));
   Assert(index<cols->row_length(row),
          ExcIndexRange(index,0,cols->row_length(row)));
 
+  // this function will soon go away.
   return val[cols->rowstart[row]+index];
 }
 
@@ -1944,6 +1990,19 @@ namespace SparseMatrixIterators
   template <typename number>
   inline
   Accessor<number,true>::
+  Accessor (const MatrixType   *matrix,
+            const std::size_t   index_within_matrix)
+    :
+    SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern(),
+                                        index_within_matrix),
+    matrix (matrix)
+  {}
+
+
+
+  template <typename number>
+  inline
+  Accessor<number,true>::
   Accessor (const MatrixType *matrix)
     :
     SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern()),
@@ -1968,7 +2027,8 @@ namespace SparseMatrixIterators
   number
   Accessor<number, true>::value () const
   {
-    return matrix->nth_entry_in_row(a_row, a_index);
+    AssertIndexRange(index_within_sparsity, matrix->n_nonzero_elements());
+    return matrix->val[index_within_sparsity];
   }
 
 
@@ -1997,8 +2057,8 @@ namespace SparseMatrixIterators
   inline
   Accessor<number, false>::Reference::operator number() const
   {
-    return accessor->matrix->nth_entry_in_row(accessor->a_row,
-					      accessor->a_index);
+    AssertIndexRange(accessor->index_within_sparsity, accessor->matrix->n_nonzero_elements());
+    return accessor->matrix->val[accessor->index_within_sparsity];
   }
 
 
@@ -2008,8 +2068,8 @@ namespace SparseMatrixIterators
   const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator = (const number n) const
   {
-//TODO: one could optimize this by not going again through the mapping from row/col index to global index
-    accessor->matrix->set (accessor->row(), accessor->column(), n);
+    AssertIndexRange(accessor->index_within_sparsity, accessor->matrix->n_nonzero_elements());
+    accessor->matrix->val[accessor->index_within_sparsity] = n;
     return *this;
   }
 
@@ -2020,9 +2080,8 @@ namespace SparseMatrixIterators
   const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator += (const number n) const
   {
-//TODO: one could optimize this by not going again through the mapping from row/col index to global index
-    accessor->matrix->set (accessor->row(), accessor->column(),
-                           static_cast<number>(*this) + n);
+    AssertIndexRange(accessor->index_within_sparsity, accessor->matrix->n_nonzero_elements());
+    accessor->matrix->val[accessor->index_within_sparsity] += n;
     return *this;
   }
 
@@ -2033,9 +2092,8 @@ namespace SparseMatrixIterators
   const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator -= (const number n) const
   {
-//TODO: one could optimize this by not going again through the mapping from row/col index to global index
-    accessor->matrix->set (accessor->row(), accessor->column(),
-                           static_cast<number>(*this) - n);
+    AssertIndexRange(accessor->index_within_sparsity, accessor->matrix->n_nonzero_elements());
+    accessor->matrix->val[accessor->index_within_sparsity] -= n;
     return *this;
   }
 
@@ -2046,9 +2104,8 @@ namespace SparseMatrixIterators
   const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator *= (const number n) const
   {
-//TODO: one could optimize this by not going again through the mapping from row/col index to global index
-    accessor->matrix->set (accessor->row(), accessor->column(),
-                           static_cast<number>(*this)*n);
+    AssertIndexRange(accessor->index_within_sparsity, accessor->matrix->n_nonzero_elements());
+    accessor->matrix->val[accessor->index_within_sparsity] *= n;
     return *this;
   }
 
@@ -2059,9 +2116,8 @@ namespace SparseMatrixIterators
   const typename Accessor<number, false>::Reference &
   Accessor<number, false>::Reference::operator /= (const number n) const
   {
-//TODO: one could optimize this by not going again through the mapping from row/col index to global index
-    accessor->matrix->set (accessor->row(), accessor->column(),
-                           static_cast<number>(*this)/n);
+    AssertIndexRange(accessor->index_within_sparsity, accessor->matrix->n_nonzero_elements());
+    accessor->matrix->val[accessor->index_within_sparsity] /= n;
     return *this;
   }
 
@@ -2076,6 +2132,19 @@ namespace SparseMatrixIterators
     :
     SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern(),
                                         row, index),
+    matrix (matrix)
+  {}
+
+
+
+  template <typename number>
+  inline
+  Accessor<number,false>::
+  Accessor (MatrixType         *matrix,
+            const std::size_t   index)
+    :
+    SparsityPatternIterators::Accessor (&matrix->get_sparsity_pattern(),
+                                        index),
     matrix (matrix)
   {}
 
@@ -2121,6 +2190,17 @@ namespace SparseMatrixIterators
             const unsigned int i)
     :
     accessor(matrix, r, i)
+  {}
+
+
+
+  template <typename number, bool Constness>
+  inline
+  Iterator<number, Constness>::
+  Iterator (MatrixType        *matrix,
+            const std::size_t  index)
+    :
+    accessor(matrix, index)
   {}
 
 
@@ -2236,23 +2316,7 @@ namespace SparseMatrixIterators
     Assert (&accessor.get_matrix() == &other.accessor.get_matrix(),
             ExcInternalError());
 
-    const SparsityPattern &sparsity = accessor.get_matrix().get_sparsity_pattern();
-
-    const unsigned int this_position
-      = (*this != (*this)->get_matrix().end()
-	 ?
-	 sparsity.get_rowstart_indices()[(*this)->row()] + (*this)->index()
-	 :
-	 sparsity.get_rowstart_indices()[sparsity.n_rows()]);
-
-    const unsigned int other_position
-      = (other != (*this)->get_matrix().end()
-	 ?
-	 sparsity.get_rowstart_indices()[other->row()] + other->index()
-	 :
-	 sparsity.get_rowstart_indices()[sparsity.n_rows()]);
-
-    return (this_position - other_position);
+    return (*this)->index_within_sparsity - other->index_within_sparsity;
   }
 
 
@@ -2279,14 +2343,7 @@ inline
 typename SparseMatrix<number>::const_iterator
 SparseMatrix<number>::begin () const
 {
-  // search for the first line with a nonzero number of entries
-  for (unsigned int r=0; r<m(); ++r)
-    if (cols->row_length(r) > 0)
-      return const_iterator(this, r, 0);
-
-  // alright, this matrix is completely empty. that's strange but ok. simply
-  // return the end() iterator
-  return end();
+  return const_iterator(this, 0);
 }
 
 
@@ -2304,14 +2361,7 @@ inline
 typename SparseMatrix<number>::iterator
 SparseMatrix<number>::begin ()
 {
-  // search for the first line with a nonzero number of entries
-  for (unsigned int r=0; r<m(); ++r)
-    if (cols->row_length(r) > 0)
-      return iterator(this, r, 0);
-
-  // alright, this matrix is completely empty. that's strange but ok. simply
-  // return the end() iterator
-  return end();
+  return iterator (this, 0);
 }
 
 
@@ -2320,7 +2370,7 @@ inline
 typename SparseMatrix<number>::iterator
 SparseMatrix<number>::end ()
 {
-  return iterator(this, m(), 0);
+  return iterator(this, cols->rowstart[cols->rows]);
 }
 
 
@@ -2331,10 +2381,7 @@ SparseMatrix<number>::begin (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
 
-  if (cols->row_length(r) > 0)
-    return const_iterator(this, r, 0);
-  else
-    return end (r);
+  return const_iterator(this, cols->rowstart[r]);
 }
 
 
@@ -2346,14 +2393,7 @@ SparseMatrix<number>::end (const unsigned int r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
 
-  // place the iterator on the first entry past this line, or at the end of
-  // the matrix
-  for (unsigned int i=r+1; i<m(); ++i)
-    if (cols->row_length(i) > 0)
-      return const_iterator(this, i, 0);
-
-  // if there is no such line, then take the end iterator of the matrix
-  return end();
+  return const_iterator(this, cols->rowstart[r+1]);
 }
 
 
@@ -2365,10 +2405,7 @@ SparseMatrix<number>::begin (const unsigned int r)
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
 
-  if (cols->row_length(r) > 0)
-    return iterator(this, r, 0);
-  else
-    return end (r);
+  return iterator(this, cols->rowstart[r]);
 }
 
 
@@ -2380,14 +2417,7 @@ SparseMatrix<number>::end (const unsigned int r)
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
 
-  // place the iterator on the first entry past this line, or at the end of
-  // the matrix
-  for (unsigned int i=r+1; i<m(); ++i)
-    if (cols->row_length(i) > 0)
-      return iterator(this, i, 0);
-
-  // if there is no such line, then take the end iterator of the matrix
-  return end();
+  return iterator(this, cols->rowstart[r+1]);
 }
 
 

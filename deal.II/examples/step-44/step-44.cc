@@ -21,7 +21,6 @@
 #include <deal.II/base/timer.h>
 #include <deal.II/base/work_stream.h>
 
-#include <deal.II/dofs/dof_constraints.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 
@@ -45,6 +44,7 @@
 #include <deal.II/lac/precondition_selector.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/sparse_direct.h>
+#include <deal.II/lac/constraint_matrix.h>
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>

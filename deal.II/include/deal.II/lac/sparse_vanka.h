@@ -89,7 +89,7 @@ template <typename number> class SparseBlockVanka;
  * This little example is taken from a program doing parameter optimization.
  * The Lagrange multiplier is the third component of the finite element
  * used. The system is solved by the GMRES method.
- * @verbatim
+ * @code
  *                        // tag the Lagrange multiplier variable
  *    vector<bool> signature(3);
  *    signature[0] = signature[1] = false;
@@ -109,7 +109,7 @@ template <typename number> class SparseBlockVanka;
  *                        // solve
  *    gmres.solve (global_matrix, solution, right_hand_side,
  *                 vanka);
- * @endverbatim
+ * @endcode
  *
  *
  * <h4>Implementor's remark</h4>
@@ -155,7 +155,7 @@ public:
    *
    * If @p conserve_mem is @p false,
    * then the inverses of the local
-   * systems are computed now, if
+   * systems are computed now; if
    * the flag is @p true, then they
    * are computed every time the
    * preconditioner is
@@ -163,7 +163,7 @@ public:
    * memory, but makes
    * preconditioning very
    * slow. Note also, that if the
-   * flag is @p false, the the
+   * flag is @p false, then the
    * contents of the matrix @p M at
    * the time of calling this
    * constructor are used, while if

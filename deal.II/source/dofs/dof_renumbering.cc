@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -287,7 +287,7 @@ namespace DoFRenumbering
 
           dofs_on_this_cell.resize (dofs_per_cell);
 
-          cell->dof_indices (dofs_on_this_cell);
+          cell->get_active_or_mg_dof_indices (dofs_on_this_cell);
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             for (unsigned int j=0; j<dofs_per_cell; ++j)
               if (dofs_on_this_cell[i] > dofs_on_this_cell[j])
@@ -668,7 +668,7 @@ namespace DoFRenumbering
           const unsigned int fe_index = cell->active_fe_index();
           const unsigned int dofs_per_cell = fe_collection[fe_index].dofs_per_cell;
           local_dof_indices.resize (dofs_per_cell);
-          cell->dof_indices (local_dof_indices);
+          cell->get_active_or_mg_dof_indices (local_dof_indices);
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             if (start->get_dof_handler().locally_owned_dofs().is_element(local_dof_indices[i]))
               component_to_dof_map[component_list[fe_index][i]].
@@ -974,7 +974,7 @@ namespace DoFRenumbering
           const unsigned int fe_index = cell->active_fe_index();
           const unsigned int dofs_per_cell =fe_collection[fe_index].dofs_per_cell;
           local_dof_indices.resize (dofs_per_cell);
-          cell->dof_indices (local_dof_indices);
+          cell->get_active_or_mg_dof_indices (local_dof_indices);
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             if (start->get_dof_handler().locally_owned_dofs().is_element(local_dof_indices[i]))
               block_to_dof_map[block_list[fe_index][i]].
@@ -1386,7 +1386,7 @@ namespace DoFRenumbering
         unsigned int n_cell_dofs = (*cell)->get_fe().n_dofs_per_cell();
         cell_dofs.resize(n_cell_dofs);
 
-        (*cell)->dof_indices(cell_dofs);
+        (*cell)->get_active_or_mg_dof_indices(cell_dofs);
 
         // Sort here to make sure that
         // degrees of freedom inside a
@@ -1459,7 +1459,7 @@ namespace DoFRenumbering
       {
         Assert ((*cell)->level() == (int) level, ExcInternalError());
 
-        (*cell)->dof_indices(cell_dofs);
+        (*cell)->get_active_or_mg_dof_indices(cell_dofs);
         std::sort(cell_dofs.begin(), cell_dofs.end());
 
         for (unsigned int i=0; i<n_cell_dofs; ++i)
@@ -1568,7 +1568,7 @@ namespace DoFRenumbering
             hp_fe_values.reinit (begin);
             const FEValues<DH::dimension> &fe_values =
               hp_fe_values.get_present_fe_values ();
-            begin->dof_indices(local_dof_indices);
+            begin->get_active_or_mg_dof_indices(local_dof_indices);
             const std::vector<Point<DH::space_dimension> > &points
               = fe_values.get_quadrature_points ();
             for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -1652,7 +1652,7 @@ namespace DoFRenumbering
         for ( ; begin != end; ++begin)
           {
             const typename Triangulation<DH::dimension,DH::space_dimension>::cell_iterator &begin_tria = begin;
-            begin->dof_indices(local_dof_indices);
+            begin->get_active_or_mg_dof_indices(local_dof_indices);
             fe_values.reinit (begin_tria);
             const std::vector<Point<DH::space_dimension> > &points
               = fe_values.get_quadrature_points ();
@@ -1882,7 +1882,7 @@ namespace DoFRenumbering
     std::fill (new_dof_indices.begin(), new_dof_indices.end(),
                numbers::invalid_unsigned_int);
     unsigned int next_free_index = 0;
-    for (unsigned int subdomain=0; subdomain<n_subdomains; ++subdomain)
+    for (types::subdomain_id subdomain=0; subdomain<n_subdomains; ++subdomain)
       for (unsigned int i=0; i<n_dofs; ++i)
         if (subdomain_association[i] == subdomain)
           {

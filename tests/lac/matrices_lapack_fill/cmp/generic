@@ -1,0 +1,12 @@
+
+DEAL::SparseMatrixEZ<float>::fill  SparseMatrixEZ<double>
+4.    ~     6.    8.    
+10.   12.   ~     14.   
+16.   18.   20.   22.   
+~     ~     ~     ~     
+24.   ~     26.   28.   
+DEAL::SparseMatrixEZ<float>::fill  SparseMatrixEZ<double>  transpose
+4.    10.   16.   ~     24.   
+~     12.   18.   ~     ~     
+6.    ~     20.   ~     26.   
+8.    14.   22.   ~     28.   

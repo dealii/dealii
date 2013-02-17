@@ -258,11 +258,11 @@ public:
    * Through this constructor, it is also
    * possible to construct objects for
    * derived iterators:
-   * @verbatim
+   * @code
    * DoFCellAccessor dof_accessor;
    * Triangulation::active_cell_iterator cell
    *   = accessor;
-   * @endverbatim
+   * @endcode
    */
   TriaRawIterator (const Accessor &a);
 

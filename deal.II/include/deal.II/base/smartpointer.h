@@ -24,7 +24,7 @@ DEAL_II_NAMESPACE_OPEN
  * but make sure that the object pointed to is not deleted in the course of
  * use of the pointer by signalling the pointee its use.
  *
- * Objects pointed to, that is ,the class T, should inherit
+ * Objects pointed to, i.e. the class T, should inherit
  * Subscriptor or must implement the same functionality. Null pointers
  * are an exception from this rule and are allowed, too.
  *

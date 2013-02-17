@@ -1050,7 +1050,8 @@ private:
  * <h4>Instantiations</h4>
  *
  * There are instantiations of this class for SparseMatrix<double>,
- * SparseMatrix<float>, BlockSparseMatrix<double>, and
+ * SparseMatrix<float>, SparseMatrixEZ<float>, SparseMatrixEZ<double>,
+ * BlockSparseMatrix<double>, and
  * BlockSparseMatrix<float>.
  *
  * @ingroup Solvers Preconditioners

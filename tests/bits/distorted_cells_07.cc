@@ -76,7 +76,13 @@ void check (const unsigned int testcase)
   QGauss<dim> quadrature(2);
   FEValues<dim> fe_values(dummy, quadrature, update_JxW_values);
   // should throw an assertion
-  fe_values.reinit(coarse_grid.begin());
+  try 
+    {
+      fe_values.reinit(coarse_grid.begin());
+    }
+  catch (...)
+    {
+    }
 }
 
 

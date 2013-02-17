@@ -358,7 +358,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
 {
   Triangulation<3> *tria;
   show.clear();
-  show.resize(5, std::vector<unsigned int> (mapping_size,0));
+  show.resize(4, std::vector<unsigned int> (mapping_size,0));
 
 				   // 2x2 cube
   if (1)
@@ -401,25 +401,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
       exact_areas.push_back(8.+pi/3*h*h*(3*r-h));
     }
 
-				   // eighth of ball
   if (3)
-    {
-      Point<3> p(0,0,0);
-      const double r=std::sqrt(3.);
-      Boundary<3> *boundary0=new HyperBallBoundary<3>(p, r);
-      boundary_ptr.push_back(boundary0);
-
-      tria=new Triangulation<3>();
-      tria_ptr.push_back(tria);
-      GridGenerator::hyper_cube(*tria, -1, 1.);
-      tria->set_boundary(0, *boundary0);
-      tria->refine_global(1);
-      const double pi=std::acos(-1.);
-      exact_areas.push_back(4/3.*pi*r*r*r/8.);
-      for (unsigned int i=0; i<4; ++i)
-	show[3][i]=1;
-    }
-  if (4)
     {
       tria=new Triangulation<3>();
       tria_ptr.push_back(tria);
@@ -433,7 +415,7 @@ void create_triangulations(std::vector<Triangulation<3> *> &tria_ptr,
       p1(2) = 6.;
       GridGenerator::hyper_rectangle(*tria, p0, p1);
       exact_areas.push_back(4.5);
-      show[4][4] = 1;
+      show[3][4] = 1;
     }
 }
 

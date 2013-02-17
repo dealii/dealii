@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -286,9 +286,9 @@ public:
    * constructor, one can easily
    * create an identity matrix of
    * size <code>n</code> by saying
-   * @verbatim
+   * @code
    * FullMatrix<double> M(IdentityMatrix(n));
-   * @endverbatim
+   * @endcode
    */
   FullMatrix (const IdentityMatrix &id);
   /**
@@ -335,9 +335,9 @@ public:
    * the argument. This way, one can easily
    * create an identity matrix of
    * size <code>n</code> by saying
-   * @verbatim
+   * @code
    *   M = IdentityMatrix(n);
-   * @endverbatim
+   * @endcode
    */
   FullMatrix<number> &
   operator = (const IdentityMatrix &id);
@@ -440,7 +440,7 @@ public:
 
   /**
    * Copy the elements of the current matrix object into a specified
-   * set of rows and columns of another matrix. This thus a scatter operation.
+   * set of rows and columns of another matrix. Thus, this is a scatter operation.
    *
    * @param row_index_set The rows of @p matrix into which to write.
    * @param column_index_set The columns of @p matrix into which to write.
@@ -1520,10 +1520,17 @@ void
 FullMatrix<number>::copy_from (const MATRIX &M)
 {
   this->reinit (M.m(), M.n());
-  const typename MATRIX::const_iterator end = M.end();
-  for (typename MATRIX::const_iterator entry = M.begin();
-       entry != end; ++entry)
-    this->el(entry->row(), entry->column()) = entry->value();
+
+  // loop over the elements of the argument matrix row by row, as suggested
+  // in the documentation of the sparse matrix iterator class, and
+  // copy them into the current object
+  for (unsigned int row = 0; row < M.m(); ++row)
+    {
+      const typename MATRIX::const_iterator end_row = M.end(row);
+      for (typename MATRIX::const_iterator entry = M.begin(row);
+          entry != end_row; ++entry)
+        this->el(row, entry->column()) = entry->value();
+    }
 }
 
 
@@ -1534,10 +1541,17 @@ void
 FullMatrix<number>::copy_transposed (const MATRIX &M)
 {
   this->reinit (M.n(), M.m());
-  const typename MATRIX::const_iterator end = M.end();
-  for (typename MATRIX::const_iterator entry = M.begin();
-       entry != end; ++entry)
-    this->el(entry->column(), entry->row()) = entry->value();
+
+  // loop over the elements of the argument matrix row by row, as suggested
+  // in the documentation of the sparse matrix iterator class, and
+  // copy them into the current object
+  for (unsigned int row = 0; row < M.m(); ++row)
+    {
+      const typename MATRIX::const_iterator end_row = M.end(row);
+      for (typename MATRIX::const_iterator entry = M.begin(row);
+          entry != end_row; ++entry)
+        this->el(entry->column(), row) = entry->value();
+    }
 }
 
 
@@ -1847,4 +1861,3 @@ FullMatrix<number>::print (STREAM             &s,
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-

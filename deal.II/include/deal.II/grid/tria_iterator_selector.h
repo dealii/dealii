@@ -44,11 +44,11 @@ namespace internal
      *  @p raw_line_iterator objects operate on all lines, used or not.
      *
      *  Since we are in one dimension, the following identities are declared:
-     *  @verbatim
+     *  @code
      *    typedef raw_line_iterator    raw_cell_iterator;
      *    typedef line_iterator        cell_iterator;
      *    typedef active_line_iterator active_cell_iterator;
-     *  @endverbatim
+     *  @endcode
      *
      *  To enable the declaration of @p begin_quad and the like in
      *  <tt>Triangulation<1></tt>, the @p quad_iterators are declared as
@@ -105,7 +105,7 @@ namespace internal
      *  are useless and will certainly make any involuntary use visible.
      *
      *  Since we are in two dimension, the following identities are declared:
-     *  @verbatim
+     *  @code
      *    typedef raw_quad_iterator    raw_cell_iterator;
      *    typedef quad_iterator        cell_iterator;
      *    typedef active_quad_iterator active_cell_iterator;
@@ -113,7 +113,7 @@ namespace internal
      *    typedef raw_line_iterator    raw_face_iterator;
      *    typedef line_iterator        face_iterator;
      *    typedef active_line_iterator active_face_iterator;
-     *  @endverbatim
+     *  @endcode
      *
      * @author Wolfgang Bangerth, 1998
      */
@@ -144,7 +144,7 @@ namespace internal
      *  For the declarations of the data types, more or less the same holds
      *  as for lower dimensions (see <tt>Iterators<[12]></tt>). The
      *  dimension specific data types are here, since we are in three dimensions:
-     *  @verbatim
+     *  @code
      *    typedef raw_hex_iterator    raw_cell_iterator;
      *    typedef hex_iterator        cell_iterator;
      *    typedef active_hex_iterator active_cell_iterator;
@@ -152,7 +152,7 @@ namespace internal
      *    typedef raw_quad_iterator    raw_face_iterator;
      *    typedef quad_iterator        face_iterator;
      *    typedef active_quad_iterator active_face_iterator;
-     *  @endverbatim
+     *  @endcode
      *
      * @author Wolfgang Bangerth, 1998
      */

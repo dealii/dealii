@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -790,7 +790,7 @@ public:
   void precondition_SSOR (Vector<somenumber>       &dst,
                           const Vector<somenumber> &src,
                           const number              om = 1.,
-                          const std::vector<unsigned int> &pos_right_of_diagonal = std::vector<unsigned int>()) const;
+                          const std::vector<std::size_t> &pos_right_of_diagonal = std::vector<std::size_t>()) const;
 
   /**
    * Apply SOR preconditioning matrix to @p src.
@@ -1611,15 +1611,18 @@ SparseMatrixEZ<number>::copy_from (const MATRIX &M)
 {
   reinit(M.m(), M.n());
 
-  typename MATRIX::const_iterator start = M.begin();
-  const typename MATRIX::const_iterator final = M.end();
-
-  while (start != final)
+  // loop over the elements of the argument matrix row by row, as suggested
+  // in the documentation of the sparse matrix iterator class, and
+  // copy them into the current object
+  for (unsigned int row = 0; row < M.m(); ++row)
     {
-      if (start->value() != 0.)
-        set(start->row(), start->column(), start->value());
-      ++start;
+      const typename MATRIX::const_iterator end_row = M.end(row);
+      for (typename MATRIX::const_iterator entry = M.begin(row);
+          entry != end_row; ++entry)
+        if (entry->value() != 0)
+          set(row, entry->column(), entry->value());
     }
+
   return *this;
 }
 
@@ -1636,14 +1639,16 @@ SparseMatrixEZ<number>::add (const number factor,
   if (factor == 0.)
     return;
 
-  typename MATRIX::const_iterator start = M.begin();
-  const typename MATRIX::const_iterator final = M.end();
-
-  while (start != final)
+  // loop over the elements of the argument matrix row by row, as suggested
+  // in the documentation of the sparse matrix iterator class, and
+  // add them into the current object
+  for (unsigned int row = 0; row < M.m(); ++row)
     {
-      if (start->value() != 0.)
-        add(start->row(), start->column(), factor * start->value());
-      ++start;
+      const typename MATRIX::const_iterator end_row = M.end(row);
+      for (typename MATRIX::const_iterator entry = M.begin(row);
+          entry != end_row; ++entry)
+        if (entry->value() != 0)
+          add(row, entry->column(), factor * entry->value());
     }
 }
 

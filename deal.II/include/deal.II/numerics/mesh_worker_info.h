@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,5 +16,6 @@
  * <tt>meshworker/dof_info.h</tt> and  <tt>meshworker/integration_info.h</tt>
  */
 
+#warning This file is deprecated. Use <deal.II/meshworker/dof_info.h.h> and <deal.II/meshworker/integration_info.h> instead.
 #include <deal.II/meshworker/dof_info.h>
 #include <deal.II/meshworker/integration_info.h>

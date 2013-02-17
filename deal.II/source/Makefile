@@ -1,5 +1,5 @@
 # $Id$
-# Copyright by the deal.II authors, 1998, 1999, 2000, 2001, 2002, 2010, 2011, 2012
+# Copyright by the deal.II authors, 1998, 1999, 2000, 2001, 2002, 2010, 2011, 2012, 2013
 
 
 ifneq ($(CLEAN),yes)
@@ -170,20 +170,40 @@ $(LIBDIR)/libdeal_II$(static-lib-suffix): $(o-files) $(extra-o-files)
 # slow on remotely mounted file systems. Consequently, we link in a
 # local file in the $TMPDIR directory, and only after the fact move
 # them to their final location
+#
+# That said, it turns out that on Cygwin, you can't simply rename a
+# shared library after it has been created. Consequently, we can't
+# use this trick on Cygwin. This is probably not half as bad since
+# it's not commonly the case that Windows file system are remotely
+# mounted as it likely is on other systems.
 $(LIBDIR)/libdeal_II.g$(shared-lib-suffix): $(go-files) $(extra-g.o-files)
 	@echo "=====deal.II==========debug======$(MT)== Linking library:   $(@F)"
 	@rm -f $@ $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II.g)
-	@WORKFILE=`mktemp $${TMPDIR:-/tmp}/tmpg.XXXXXXXXXX` && \
-		$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $$WORKFILE $(call DEAL_II_ADD_SONAME,deal_II.g) $(go-files) $(extra-g.o-files) $(deplibs.g) && \
-	 	mv $$WORKFILE $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II.g)
+	@case $(TARGET) in \
+		*cygwin*) \
+			$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II.g) $(call DEAL_II_ADD_SONAME,deal_II.g) $(go-files) $(extra-g.o-files) $(deplibs.g) \
+			;; \
+		*) \
+			WORKFILE=`mktemp $${TMPDIR:-/tmp}/tmpg.XXXXXXXXXX` && \
+			$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $$WORKFILE $(call DEAL_II_ADD_SONAME,deal_II.g) $(go-files) $(extra-g.o-files) $(deplibs.g) && \
+	 		mv $$WORKFILE $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II.g) \
+			;; \
+	 esac
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,deal_II.g) $@
 
 $(LIBDIR)/libdeal_II$(shared-lib-suffix): $(o-files) $(extra-o-files)
 	@echo "=====deal.II==========optimized==$(MT)== Linking library:   $(@F)"
 	@rm -f $@ $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II)
-	@WORKFILE=`mktemp $${TMPDIR:-/tmp}/tmpo.XXXXXXXXXX` && \
-		$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $$WORKFILE $(call DEAL_II_ADD_SONAME,deal_II) $(o-files) $(extra-o-files) $(deplibs.o) && \
-		mv $$WORKFILE $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II)
+	@case $(TARGET) in \
+		*cygwin*) \
+			$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II) $(call DEAL_II_ADD_SONAME,deal_II) $(o-files) $(extra-o-files) $(deplibs.o) \
+			;; \
+		*) \
+			WORKFILE=`mktemp $${TMPDIR:-/tmp}/tmpo.XXXXXXXXXX` && \
+			$(SHLIBLD) $(LDFLAGS) $(SHLIBFLAGS) -o $$WORKFILE $(call DEAL_II_ADD_SONAME,deal_II) $(o-files) $(extra-o-files) $(deplibs.o) && \
+			mv $$WORKFILE $(LIBDIR)/$(call DEAL_II_SHLIB_NAME,deal_II) \
+			;; \
+	 esac
 	@ln -f -s $(call DEAL_II_SHLIB_NAME,deal_II) $@
 
 

@@ -311,11 +311,11 @@ namespace MeshWorker
   {
     indices.resize(c->get_fe().dofs_per_cell);
     if (block_info == 0 || block_info->local().size() == 0)
-      c->dof_indices(indices);
+      c->get_active_or_mg_dof_indices(indices);
     else
       {
         indices_org.resize(c->get_fe().dofs_per_cell);
-        c->dof_indices(indices_org);
+        c->get_active_or_mg_dof_indices(indices_org);
         set_block_indices();
       }
   }

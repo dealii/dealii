@@ -45,11 +45,24 @@ void test ()
   deallog << "OK" << std::endl;
 
 				   // the following should yield an exception:
-  Assert (BlockMask(12,true).first_selected_block(13) == 0,
-	  ExcInternalError());
-				   // as should this:
-  Assert (BlockMask(12,false).first_selected_block() == 0,
-	  ExcInternalError());
+  try 
+    {
+      Assert (BlockMask(12,true).first_selected_block(13) == 0,
+	      ExcInternalError());
+    }
+  catch (...)
+    {
+    }
+  
+				   // as should this: 
+  try 
+    {
+      Assert (BlockMask(12,false).first_selected_block() == 0,
+	      ExcInternalError());
+    }
+  catch (...)
+    {
+    }
 }
 
 

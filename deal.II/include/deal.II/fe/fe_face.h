@@ -63,7 +63,7 @@ public:
    * Return a string that uniquely
    * identifies a finite
    * element. This class returns
-   * <tt>FE_DGQ<dim>(degree)</tt> , with
+   * <tt>FE_DGQ<dim>(degree)</tt>, with
    * <tt>dim</tt> and <tt>degree</tt>
    * replaced by appropriate
    * values.

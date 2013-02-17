@@ -248,7 +248,6 @@ namespace Step40
     locally_relevant_solution.reinit (mpi_communicator,
                                       locally_owned_dofs,
                                       locally_relevant_dofs);
-    locally_relevant_solution = 0;
     system_rhs.reinit (mpi_communicator,
                        locally_owned_dofs);
 
@@ -417,7 +416,7 @@ namespace Step40
         }
 
     system_matrix.compress ();
-    system_rhs.compress ();
+    system_rhs.compress (VectorOperation::add);
   }
 
 

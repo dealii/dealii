@@ -270,9 +270,9 @@ end_set:
           FPArrayComparator<Number> comparator(jacobian_size);
           typedef Tensor<1,VectorizedArray<Number>::n_array_elements,Number> VEC_ARRAY;
           std::map<Tensor<1,dim,VEC_ARRAY>, unsigned int,
-                   FPArrayComparator<Number> > cartesians(comparator);
+              FPArrayComparator<Number> > cartesians(comparator);
           std::map<Tensor<2,dim,VEC_ARRAY>, unsigned int,
-                   FPArrayComparator<Number> > affines(comparator);
+              FPArrayComparator<Number> > affines(comparator);
 
           // loop over all cells
           for (unsigned int cell=0; cell<n_macro_cells; ++cell)
@@ -560,8 +560,8 @@ end_set:
             {
               cartesian_data.resize(cartesians.size());
               for (typename std::map<Tensor<1,dim,VEC_ARRAY>,
-                     unsigned int, FPArrayComparator<Number> >::iterator
-                     it = cartesians.begin(); it != cartesians.end(); ++it)
+                   unsigned int, FPArrayComparator<Number> >::iterator
+                   it = cartesians.begin(); it != cartesians.end(); ++it)
                 {
                   VectorizedArray<Number> det = make_vectorized_array<Number>(1.);
                   for (unsigned int d=0; d<dim; ++d)
@@ -577,8 +577,8 @@ end_set:
                 }
               affine_data.resize(affines.size());
               for (typename std::map<Tensor<2,dim,VEC_ARRAY>,
-                     unsigned int, FPArrayComparator<Number> >::iterator
-                     it = affines.begin(); it != affines.end(); ++it)
+                   unsigned int, FPArrayComparator<Number> >::iterator
+                   it = affines.begin(); it != affines.end(); ++it)
                 {
                   Tensor<2,dim,VectorizedArray<Number> > jac;
                   for (unsigned int d=0; d<dim; ++d)
@@ -788,7 +788,7 @@ end_set:
                 }
             }
         } // end loop over all entries in vectorization (vectorization_length
-          // cells)
+      // cells)
 
       // set information for next cell
       for (unsigned int j=0; j<vectorization_length; ++j)

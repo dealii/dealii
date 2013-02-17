@@ -153,6 +153,22 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> Fixed: Many places in the documentation have been made to consistently
+use doxygen markup that indicates that this is code, so that doxygen will
+cross-link the piece of code to class and function names. Many typos have also
+been fixed.
+<br>
+(Felix Gruber, 2013/02/15)
+
+<li> Fixed: Starting in release 7.1, we first built the deal.II shared libraries
+in the local <code>/tmp</code> or similar directory rather than the final location
+because linking becomes very slow over remotely mounted file systems. Unfortunately,
+this schemes turns out not to work under Cygwin on Windows systems: executables
+cannot link with libraries that have been moved/renamed after linking. If we are
+running on Cygwin, we therefore revert to the old scheme.
+<br>
+(Wolfgang Bangerth, 2013/02/11)
+
 <li> New: finite element FE_Q_DG0 that implements polynomials
 of order k with an additional discontinuous constant function.
 <br>
@@ -177,6 +193,42 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: GridGenerator::extrude_triangulation() allows
+you to extrude a 2d mesh to turn it into a 3d mesh.
+<br>
+(Timo Heister, 2013/02/16)
+
+<li> PETScWrappers::MPI::Vector with ghost entries are read-only
+now.
+<br>
+(Timo Heister, 2013/02/16)
+
+<li> PETScWrappers::*Vector::operator= now calls update_ghost_values()
+automatically if necessary. This means that update_ghost_values()
+does not need to be from user code at all anymore.
+<br>
+(Timo Heister, 2013/02/14)
+
+<li> Fixed: VectorTools::interpolate did not work properly in 1d if
+boundary indicators had been set to anything but the default (i.e.,
+zero at the left and one at the right end of the domain). This was
+a hold-over from the past when these were the only possible values.
+This is now fixed.
+<br>
+(Kevin Dugan, Wolfgang Bangerth, 2013/02/14)
+
+<li> Improved: The iterator class of the deal.II SparseMatrix class
+and SparsityPattern have been revised for performance. Iterating over
+a row of the matrix and querying the column index and the value is now
+similarly fast as iterating over a vector.
+<br>
+(Martin Kronbichler, 2013/02/12)
+
+<li> New: A new overload of BlockMatrixBase::add allows to add one block
+matrix to another, with a scaling factor.
+<br>
+(Jean-Paul Pelteret, 2013/02/05)
+
 <li> Fixed: The FEValues machinery silently accepted the case when the
 mapped cell (or the cell geometry) were distorted. An assertion has been
 added to the computation of the Jacobian determinants for the volume
@@ -186,10 +238,10 @@ point becomes too small or negative.
 (Martin Kronbichler, 2013/01/18)
 
 <li> Improved: SLEPcWrappers:: The interface to SLEPc has an improved
-handle on SolverControl such that solver data can be extracted at run
-tume. An example usage has been added to step-36. 
+handle on SolverControl and solver data can now be extracted at run
+time. An example usage has been added to step-36.
 <br>
-(Toby D> Young, 2013/01/18)
+(Toby D. Young, 2013/01/18)
 
 <li> Fixed: Various variants of the TrilinosWrappers::SparseMatrix::reinit
 functions take a parameter <code>drop_tolerance</code> that allows to remove

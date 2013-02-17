@@ -111,7 +111,7 @@ namespace PETScWrappers
      * operation of the opposite kind, it calls compress() and flips the
      * state. This can sometimes lead to very confusing behavior, in code that may
      * for example look like this:
-     * @verbatim
+     * @code
      *   PETScWrappers::MPI::Vector vector;
      *   ...
      *                   // do some write operations on the vector
@@ -126,7 +126,7 @@ namespace PETScWrappers
      *
      *                   // do another collective operation
      *   const double norm = vector.l2_norm();
-     * @endverbatim
+     * @endcode
      *
      * This code can run into trouble: by the time we see the first addition
      * operation, we need to flush the overwrite buffers for the vector, and the
@@ -229,7 +229,7 @@ namespace PETScWrappers
 
 
       /**
-       * Constructs a new parallel PETSc
+       * Constructs a new parallel ghosted PETSc
        * vector from an Indexset. Note that
        * @p local must be contiguous and
        * the global size of the vector is
@@ -245,11 +245,21 @@ namespace PETScWrappers
        * way, the ghost parameter can equal
        * the set of locally relevant
        * degrees of freedom, see step-32.
+       *
+       * @Note: This always creates a ghosted
+       * vector.
        */
       explicit Vector (const MPI_Comm     &communicator,
                        const IndexSet   &local,
-                       const IndexSet &ghost = IndexSet(0));
+                       const IndexSet &ghost);
 
+      /**
+       * Constructs a new parallel PETSc
+       * vector from an Indexset. This creates a non
+       * ghosted vector.
+       */
+      explicit Vector (const MPI_Comm     &communicator,
+                       const IndexSet   &local);
 
       /**
        * Copy the given vector. Resize the
@@ -381,8 +391,15 @@ namespace PETScWrappers
        */
       void reinit (const MPI_Comm     &communicator,
                    const IndexSet   &local,
-                   const IndexSet &ghost = IndexSet(0));
+                   const IndexSet &ghost);
 
+      /**
+       * Reinit as a vector without ghost elements. See
+       * constructor with same signature
+       * for more detais.
+       */
+      void reinit (const MPI_Comm     &communicator,
+                   const IndexSet   &local);
 
       /**
        * Return a reference to the MPI
@@ -511,6 +528,8 @@ namespace PETScWrappers
       if (ghosted)
 	update_ghost_values();
       
+      if (has_ghost_elements())
+        update_ghost_values();
       return *this;
     }
 

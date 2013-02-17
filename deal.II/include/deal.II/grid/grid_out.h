@@ -739,18 +739,18 @@ namespace GridOutFlags
  * and the corresponding output function names.
  *
  * Usage is simple: either you use the direct form
- * @verbatim
+ * @code
  *   ofstream output_file("some_filename");
  *   GridOut().write_gnuplot (tria, output_file);
- * @endverbatim
+ * @endcode
  * if you know which format you want to have, or if you want the format to be
  * a runtime parameter, you can write
- * @verbatim
+ * @code
  *   GridOut::OutputFormat grid_format =
  *                   GridOut::parse_output_format(get_format_name_from_somewhere());
  *   ofstream output_file("some_filename" + GridOut::default_suffix(output_format));
  *   GridOut().write (tria, output_file, output_format);
- * @endverbatim
+ * @endcode
  * The function <tt>get_output_format_names()</tt> provides a list of possible names of
  * output formats in a string that is understandable by the ParameterHandler class.
  *
@@ -775,14 +775,14 @@ namespace GridOutFlags
  * format. These are collected in structures GridOutFlags::Eps(),
  * GridOutFlags::Gnuplot(), etc declared in the GridOutFlags
  * namespace, and you can set your preferred flags like this:
- * @verbatim
+ * @code
  *   GridOut grid_out;
  *   GridOutFlags::Ucd ucd_flags;
  *   ...    // set some fields in ucd_flags
  *   grid_out.set_flags (ucd_flags);
  *   ...
  *   ...    // write some file with data_out
- * @endverbatim
+ * @endcode
  * The respective output function then use the so-set flags. By default, they
  * are set to reasonable values as described above and in the documentation
  * of the different flags structures. Resetting the flags can

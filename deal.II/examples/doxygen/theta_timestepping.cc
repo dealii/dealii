@@ -16,9 +16,8 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 
-#include <deal.II/numerics/operator.h>
-#include <deal.II/numerics/theta_timestepping.h>
-#include <deal.II/numerics/operator.h>
+#include <deal.II/algorithms/operator.h>
+#include <deal.II/algorithms/theta_timestepping.h>
 
 #include <iostream>
 

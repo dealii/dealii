@@ -44,8 +44,15 @@ void test ()
 
 				   // this now must throw an exception,
 				   // though:
-  Assert (ComponentMask(12,true).n_selected_components(13) == 12,
-  	  ExcInternalError());
+  try 
+    {
+      Assert (ComponentMask(12,true).n_selected_components(13) == 12,
+	      ExcInternalError());
+    }
+  catch (...)
+    {
+    }
+  
 }
 
 

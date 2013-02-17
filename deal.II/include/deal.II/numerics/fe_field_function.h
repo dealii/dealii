@@ -41,7 +41,7 @@ namespace Functions
    * element function. In order to do so, it needs to find out where
    * the points lie.
    *
-   * If you know in advance in which cell your points lye, you can
+   * If you know in advance in which cell your points lie, you can
    * accelerate things a bit, by calling set_active_cell before
    * asking for values or gradients of the function. If you don't do
    * this, and your points don't lie in the cell that is currently

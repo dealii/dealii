@@ -28,7 +28,7 @@
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/fe/mapping_q.h>
 #include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/vectors.templates.h>
+#include <deal.II/numerics/vector_tools.templates.h>
 
 #include <fstream>
 

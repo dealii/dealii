@@ -36,11 +36,11 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The ArpackSolver can be used in application codes in the
  * following way:
- @verbatim
+ @code
   SolverControl solver_control (1000, 1e-9);
   ArpackSolver (solver_control);
   system.solve (A, B, lambda, x, size_of_spectrum);
- @endverbatim
+ @endcode
  * for the generalized eigenvalue problem $Ax=B\lambda x$, where
  * the variable <code>const unsigned int size_of_spectrum</code>
  * tells ARPACK the number of eigenvector/eigenvalue pairs to

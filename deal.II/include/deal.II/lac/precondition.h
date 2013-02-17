@@ -17,6 +17,7 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/parallel.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/lac/tridiagonal_matrix.h>
 #include <deal.II/lac/vector_memory.h>
@@ -25,6 +26,13 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename number> class Vector;
 template <typename number> class SparseMatrix;
+namespace parallel
+{
+  namespace distributed
+  {
+    template <typename number> class Vector;
+  }
+}
 
 /*! @addtogroup Preconditioners
  *@{
@@ -37,12 +45,12 @@ template <typename number> class SparseMatrix;
  * preconditioner. Therefore, you must use the identity provided here
  * to avoid preconditioning. It can be used in the following way:
  *
- @verbatim
+ @code
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
   cg.solve (system_matrix, solution, system_rhs,
             PreconditionIdentity());
- @endverbatim
+ @endcode
  *
  * See the step-3 tutorial program for an example and
  * additional explanations.
@@ -619,7 +627,7 @@ private:
    * row where the first position after
    * the diagonal is located.
    */
-  std::vector<unsigned int> pos_right_of_diagonal;
+  std::vector<std::size_t> pos_right_of_diagonal;
 };
 
 
@@ -1311,36 +1319,28 @@ PreconditionSSOR<MATRIX>::initialize (const MATRIX &rA,
 {
   this->PreconditionRelaxation<MATRIX>::initialize (rA, parameters);
 
-  // in case we have a SparseMatrix class,
-  // we can extract information about the
-  // diagonal.
+  // in case we have a SparseMatrix class, we can extract information about
+  // the diagonal.
   const SparseMatrix<typename MATRIX::value_type> *mat =
     dynamic_cast<const SparseMatrix<typename MATRIX::value_type> *>(&*this->A);
 
-  // calculate the positions first after
-  // the diagonal.
+  // calculate the positions first after the diagonal.
   if (mat != 0)
     {
-      const std::size_t   *rowstart_ptr =
-        mat->get_sparsity_pattern().get_rowstart_indices();
-      const unsigned int *const colnums =
-        mat->get_sparsity_pattern().get_column_numbers();
       const unsigned int n = this->A->n();
-      pos_right_of_diagonal.resize(n);
-      for (unsigned int row=0; row<n; ++row, ++rowstart_ptr)
+      pos_right_of_diagonal.resize(n, static_cast<std::size_t>(-1));
+      for (unsigned int row=0; row<n; ++row)
         {
-          // find the first element in this line
-          // which is on the right of the diagonal.
-          // we need to precondition with the
-          // elements on the left only.
-          // note: the first entry in each
-          // line denotes the diagonal element,
-          // which we need not check.
-          pos_right_of_diagonal[row] =
-            Utilities::lower_bound (&colnums[*rowstart_ptr+1],
-                                    &colnums[*(rowstart_ptr+1)],
-                                    row)
-            - colnums;
+          // find the first element in this line which is on the right of the
+          // diagonal.  we need to precondition with the elements on the left
+          // only. note: the first entry in each line denotes the diagonal
+          // element, which we need not check.
+          typename SparseMatrix<typename MATRIX::value_type>::const_iterator
+            it = mat->begin(row)+1;
+          for ( ; it < mat->end(row); ++it)
+            if (it->column() > row)
+              break;
+          pos_right_of_diagonal[row] = it - mat->begin();
         }
     }
 }
@@ -1648,7 +1648,8 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 
         // need at least two iterations to have
         // maximum and minimum eigenvalue
-        if (it > data.eig_cg_n_iterations || (it > 2 &&
+        if (res == 0. ||
+            it > data.eig_cg_n_iterations || (it > 2 &&
                                               res < data.eig_cg_residual))
           break;
 
@@ -1662,16 +1663,24 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
         offdiagonal.push_back(std::sqrt(beta)/alpha);
       }
 
-    TridiagonalMatrix<double> T(diagonal.size(), true);
-    for (unsigned int i=0; i<diagonal.size(); ++i)
+    if (diagonal.size() == 0)
+      min_eigenvalue = max_eigenvalue = 1.;
+    else
       {
-        T(i,i) = diagonal[i];
-        if (i< diagonal.size()-1)
-          T(i,i+1) = offdiagonal[i];
+        TridiagonalMatrix<double> T(diagonal.size(), true);
+        for (unsigned int i=0; i<diagonal.size(); ++i)
+          {
+            T(i,i) = diagonal[i];
+            if (i< diagonal.size()-1)
+              T(i,i+1) = offdiagonal[i];
+          }
+        T.compute_eigenvalues();
+        min_eigenvalue = T.eigenvalue(0);
+        if (diagonal.size() > 1)
+          max_eigenvalue = T.eigenvalue(T.n()-1);
+        else
+          max_eigenvalue = min_eigenvalue;
       }
-    T.compute_eigenvalues();
-    min_eigenvalue = T.eigenvalue(0);
-    max_eigenvalue = T.eigenvalue(T.n()-1);
   }
 
   // include a safety factor since the CG
@@ -1687,6 +1696,161 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 
 
 
+namespace internal
+{
+  namespace PreconditionChebyshev
+  {
+    // for deal.II vectors, perform updates for Chebyshev preconditioner all
+    // at once to reduce memory transfer. Here, we select between general
+    // vectors and deal.II vectors where we expand the loop over the (local)
+    // size of the vector
+
+    // generic part for non-deal.II vectors
+    template <typename VECTOR>
+    inline
+    void
+    vector_updates (const VECTOR &src,
+                    const VECTOR &matrix_diagonal_inverse,
+                    const bool    start_zero,
+                    const double  factor1,
+                    const double  factor2,
+                    VECTOR &update1,
+                    VECTOR &update2,
+                    VECTOR &dst)
+    {
+      if (start_zero)
+        {
+          dst.equ (factor2, src);
+          dst.scale (matrix_diagonal_inverse);
+          update1.equ(-1.,dst);
+        }
+      else
+        {
+          update2 -= src;
+          update2.scale (matrix_diagonal_inverse);
+          if (factor1 == 0.)
+            update1.equ(factor2, update2);
+          else
+            update1.sadd(factor1, factor2, update2);
+          dst -= update1;
+        }
+    }
+
+    // worker loop for deal.II vectors
+    template <typename Number>
+    struct VectorUpdatesRange : public parallel::ParallelForInteger
+    {
+      VectorUpdatesRange (const size_t  size,
+                          const Number *src,
+                          const Number *matrix_diagonal_inverse,
+                          const bool    start_zero,
+                          const Number  factor1,
+                          const Number  factor2,
+                          Number       *update1,
+                          Number       *update2,
+                          Number       *dst)
+        :
+        src (src),
+        matrix_diagonal_inverse (matrix_diagonal_inverse),
+        start_zero (start_zero),
+        factor1 (factor1),
+        factor2 (factor2),
+        update1 (update1),
+        update2 (update2),
+        dst (dst)
+      {
+        if (size < internal::Vector::minimum_parallel_grain_size)
+          apply_to_subrange (0, size);
+        else
+          apply_parallel (0, size,
+                          internal::Vector::minimum_parallel_grain_size);
+      }
+
+      ~VectorUpdatesRange()
+      {}
+
+      virtual void
+      apply_to_subrange (const size_t begin,
+                         const size_t end) const
+      {
+        if (factor1 == Number())
+          {
+            if (start_zero)
+              for (unsigned int i=begin; i<end; ++i)
+                {
+                  dst[i] = factor2 * src[i] * matrix_diagonal_inverse[i];
+                  update1[i] = -dst[i];
+                }
+            else
+              for (unsigned int i=begin; i<end; ++i)
+                {
+                  update1[i] = ((update2[i]-src[i]) *
+                                factor2*matrix_diagonal_inverse[i]);
+                  dst[i] -= update1[i];
+                }
+          }
+        else
+          for (unsigned int i=begin; i<end; ++i)
+            {
+              const Number update2i = ((update2[i] - src[i]) *
+                                       matrix_diagonal_inverse[i]);
+              update1[i] = factor1 * update1[i] + factor2 * update2i;
+              dst[i] -= update1[i];
+            }
+      }
+
+      const Number *src;
+      const Number *matrix_diagonal_inverse;
+      const bool start_zero;
+      const Number factor1;
+      const Number factor2;
+      mutable Number *update1;
+      mutable Number *update2;
+      mutable Number *dst;
+    };
+
+    // selection for deal.II vector
+    template <typename Number>
+    inline
+    void
+    vector_updates (const ::dealii::Vector<Number> &src,
+                    const ::dealii::Vector<Number> &matrix_diagonal_inverse,
+                    const bool    start_zero,
+                    const double  factor1,
+                    const double  factor2,
+                    ::dealii::Vector<Number> &update1,
+                    ::dealii::Vector<Number> &update2,
+                    ::dealii::Vector<Number> &dst)
+    {
+      VectorUpdatesRange<Number>(src.size(), src.begin(),
+                                 matrix_diagonal_inverse.begin(),
+                                 start_zero, factor1, factor2,
+                                 update1.begin(), update2.begin(), dst.begin());
+    }
+
+    // selection for parallel deal.II vector
+    template <typename Number>
+    inline
+    void
+    vector_updates (const parallel::distributed::Vector<Number> &src,
+                    const parallel::distributed::Vector<Number> &matrix_diagonal_inverse,
+                    const bool    start_zero,
+                    const double  factor1,
+                    const double  factor2,
+                    parallel::distributed::Vector<Number> &update1,
+                    parallel::distributed::Vector<Number> &update2,
+                    parallel::distributed::Vector<Number> &dst)
+    {
+      VectorUpdatesRange<Number>(src.local_size(), src.begin(),
+                                 matrix_diagonal_inverse.begin(),
+                                 start_zero, factor1, factor2,
+                                 update1.begin(), update2.begin(), dst.begin());
+    }
+  }
+}
+
+
+
 template <class MATRIX, class VECTOR>
 inline
 void
@@ -1697,29 +1861,25 @@ PreconditionChebyshev<MATRIX,VECTOR>::vmult (VECTOR &dst,
   double rhok  = delta / theta,  sigma = theta / delta;
   if (data.nonzero_starting && !dst.all_zero())
     {
-      matrix_ptr->vmult (update1, dst);
-      update1 -= src;
-      update1 /= theta;
-      update1.scale (data.matrix_diagonal_inverse);
-      dst -= update1;
+      matrix_ptr->vmult (update2, dst);
+      internal::PreconditionChebyshev::vector_updates
+      (src, data.matrix_diagonal_inverse, false, 0., 1./theta, update1,
+       update2, dst);
     }
   else
-    {
-      dst.equ (1./theta, src);
-      dst.scale (data.matrix_diagonal_inverse);
-      update1.equ(-1.,dst);
-    }
+    internal::PreconditionChebyshev::vector_updates
+    (src, data.matrix_diagonal_inverse, true, 0., 1./theta, update1,
+     update2, dst);
 
   for (unsigned int k=0; k<data.degree; ++k)
     {
       matrix_ptr->vmult (update2, dst);
-      update2 -= src;
-      update2.scale (data.matrix_diagonal_inverse);
       const double rhokp = 1./(2.*sigma-rhok);
       const double factor1 = rhokp * rhok, factor2 = 2.*rhokp/delta;
       rhok = rhokp;
-      update1.sadd (factor1, factor2, update2);
-      dst -= update1;
+      internal::PreconditionChebyshev::vector_updates
+      (src, data.matrix_diagonal_inverse, false, factor1, factor2, update1,
+       update2, dst);
     }
 }
 
@@ -1735,29 +1895,25 @@ PreconditionChebyshev<MATRIX,VECTOR>::Tvmult (VECTOR &dst,
   double rhok  = delta / theta,  sigma = theta / delta;
   if (data.nonzero_starting && !dst.all_zero())
     {
-      matrix_ptr->Tvmult (update1, dst);
-      update1 -= src;
-      update1 /= theta;
-      update1.scale (data.matrix_diagonal_inverse);
-      dst -= update1;
+      matrix_ptr->Tvmult (update2, dst);
+      internal::PreconditionChebyshev::vector_updates
+      (src, data.matrix_diagonal_inverse, false, 0., 1./theta, update1,
+       update2, dst);
     }
   else
-    {
-      dst.equ (1./theta, src);
-      dst.scale (data.matrix_diagonal_inverse);
-      update1.equ(-1.,dst);
-    }
+    internal::PreconditionChebyshev::vector_updates
+    (src, data.matrix_diagonal_inverse, true, 0., 1./theta, update1,
+     update2, dst);
 
   for (unsigned int k=0; k<data.degree-1; ++k)
     {
       matrix_ptr->Tvmult (update2, dst);
-      update2 -= src;
-      update2.scale (data.matrix_diagonal_inverse);
       const double rhokp = 1./(2.*sigma-rhok);
       const double factor1 = rhokp * rhok, factor2 = 2.*rhokp/delta;
       rhok = rhokp;
-      update1.sadd (factor1, factor2, update2);
-      dst -= update1;
+      internal::PreconditionChebyshev::vector_updates
+      (src, data.matrix_diagonal_inverse, false, factor1, factor2, update1,
+       update2, dst);
     }
 }
 

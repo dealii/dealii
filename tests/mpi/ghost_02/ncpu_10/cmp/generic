@@ -1,0 +1,8 @@
+
+DEAL:0::numproc=10
+DEAL:0::ghost: 1.500
+DEAL:0::0:0.000
+DEAL:0::1:2.000
+DEAL:0::ghost: 2.000
+DEAL:0::ghost: 2.000
+DEAL:0::OK

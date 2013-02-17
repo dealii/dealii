@@ -82,7 +82,7 @@ namespace internal
        *  of the cells. Convention is, that the
        *  neighbors of the cell with index @p i
        *  are stored in the fields following
-       *  $i*(2*real_space_dimension)$, e.g. in
+       *  $i*(2*real\_space\_dimension)$, e.g. in
        *  one spatial dimension, the neighbors
        *  of cell 0 are stored in <tt>neighbors[0]</tt>
        *  and <tt>neighbors[1]</tt>, the neighbors of

@@ -30,9 +30,10 @@ SparseILU<number>::SparseILU ()
 
 
 template <typename number>
-SparseILU<number>::SparseILU (const SparsityPattern &sparsity) :
-  SparseLUDecomposition<number> (sparsity)
-{}
+SparseILU<number>::SparseILU (const SparsityPattern &sparsity)
+{
+  SparseMatrix<number>::reinit(sparsity);
+}
 
 
 
@@ -66,15 +67,12 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
   if (strengthen_diagonal>0)
     this->strengthen_diagonal_impl();
 
-  // in the following, we implement
-  // algorithm 10.4 in the book by
-  // Saad by translating in essence
-  // the algorithm given at the end
-  // of section 10.3.2, using the
-  // names of variables used there
+  // in the following, we implement algorithm 10.4 in the book by Saad by
+  // translating in essence the algorithm given at the end of section 10.3.2,
+  // using the names of variables used there
   const SparsityPattern     &sparsity = this->get_sparsity_pattern();
-  const std::size_t   *const ia       = sparsity.get_rowstart_indices();
-  const unsigned int *const ja       = sparsity.get_column_numbers();
+  const std::size_t   *const ia      = sparsity.rowstart;
+  const unsigned int *const ja       = sparsity.colnums;
 
   number *luval = this->SparseMatrix<number>::val;
 
@@ -91,22 +89,14 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
       for (unsigned int j=j1; j<=j2; ++j)
         iw[ja[j]] = j;
 
-      // the algorithm in the book
-      // works on the elements of row
-      // k left of the
-      // diagonal. however, since we
-      // store the diagonal element
-      // at the first position, start
-      // at the element after the
-      // diagonal and run as long as
-      // we don't walk into the right
-      // half
+      // the algorithm in the book works on the elements of row k left of the
+      // diagonal. however, since we store the diagonal element at the first
+      // position, start at the element after the diagonal and run as long as
+      // we don't walk into the right half
       unsigned int j = j1+1;
 
-      // pathological case: the current row
-      // of the matrix has only the
-      // diagonal entry. then we have
-      // nothing to do.
+      // pathological case: the current row of the matrix has only the
+      // diagonal entry. then we have nothing to do.
       if (j > j2)
         goto label_200;
 
@@ -121,9 +111,7 @@ label_150:
         number t1 = luval[j] * luval[ia[jrow]];
         luval[j] = t1;
 
-        // jj runs from just right of
-        // the diagonal to the end of
-        // the row
+        // jj runs from just right of the diagonal to the end of the row
         unsigned int jj = ia[jrow]+1;
         while (ja[jj] < jrow)
           ++jj;
@@ -141,25 +129,15 @@ label_150:
 
 label_200:
 
-      // in the book there is an
-      // assertion that we have hit
-      // the diagonal element,
-      // i.e. that jrow==k. however,
-      // we store the diagonal
-      // element at the front, so
-      // jrow must actually be larger
-      // than k or j is already in
+      // in the book there is an assertion that we have hit the diagonal
+      // element, i.e. that jrow==k. however, we store the diagonal element at
+      // the front, so jrow must actually be larger than k or j is already in
       // the next row
       Assert ((jrow > k) || (j==ia[k+1]), ExcInternalError());
 
-      // now we have to deal with the
-      // diagonal element. in the
-      // book it is located at
-      // position 'j', but here we
-      // use the convention of
-      // storing the diagonal element
-      // first, so instead of j we
-      // use uptr[k]=ia[k]
+      // now we have to deal with the diagonal element. in the book it is
+      // located at position 'j', but here we use the convention of storing
+      // the diagonal element first, so instead of j we use uptr[k]=ia[k]
       Assert (luval[ia[k]] != 0, ExcInternalError());
 
       luval[ia[k]] = 1./luval[ia[k]];
@@ -181,10 +159,10 @@ void SparseILU<number>::vmult (Vector<somenumber>       &dst,
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
 
   const unsigned int N=dst.size();
-  const std::size_t   *const rowstart_indices
-    = this->get_sparsity_pattern().get_rowstart_indices();
+  const std::size_t  *const rowstart_indices
+    = this->get_sparsity_pattern().rowstart;
   const unsigned int *const column_numbers
-    = this->get_sparsity_pattern().get_column_numbers();
+    = this->get_sparsity_pattern().colnums;
 
   // solve LUx=b in two steps:
   // first Ly = b, then
@@ -256,9 +234,9 @@ void SparseILU<number>::Tvmult (Vector<somenumber>       &dst,
 
   const unsigned int N=dst.size();
   const std::size_t   *const rowstart_indices
-    = this->get_sparsity_pattern().get_rowstart_indices();
+    = this->get_sparsity_pattern().rowstart;
   const unsigned int *const column_numbers
-    = this->get_sparsity_pattern().get_column_numbers();
+    = this->get_sparsity_pattern().colnums;
 
   // solve (LU)'x=b in two steps:
   // first U'y = b, then

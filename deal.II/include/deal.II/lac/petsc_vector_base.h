@@ -296,8 +296,12 @@ namespace PETScWrappers
      * See @ref GlossCompress "Compressing distributed objects"
      * for more information.
      */
-    void compress (::dealii::VectorOperation::values operation
-                   =::dealii::VectorOperation::unknown);
+    void compress (::dealii::VectorOperation::values operation);
+
+    /**
+     * @deprecated: use compress(VectorOperation::values) instead.
+     */
+    void compress () DEAL_II_DEPRECATED;
 
     /**
      * Set all components of the vector to
@@ -953,6 +957,8 @@ namespace PETScWrappers
               ExcWrongMode (VectorOperation::insert,
                             vector.last_action));
 
+      Assert (!vector.has_ghost_elements(), ExcGhostsPresent());
+
 #ifdef PETSC_USE_64BIT_INDICES
       const PetscInt petsc_i = index;
 #else
@@ -979,6 +985,8 @@ namespace PETScWrappers
               (vector.last_action == VectorOperation::unknown),
               ExcWrongMode (VectorOperation::add,
                             vector.last_action));
+
+      Assert (!vector.has_ghost_elements(), ExcGhostsPresent());
 
       vector.last_action = VectorOperation::add;
 
@@ -1017,6 +1025,8 @@ namespace PETScWrappers
               (vector.last_action == VectorOperation::unknown),
               ExcWrongMode (VectorOperation::add,
                             vector.last_action));
+
+      Assert (!vector.has_ghost_elements(), ExcGhostsPresent());
 
       vector.last_action = VectorOperation::add;
 
@@ -1057,6 +1067,8 @@ namespace PETScWrappers
               ExcWrongMode (VectorOperation::insert,
                             vector.last_action));
 
+      Assert (!vector.has_ghost_elements(), ExcGhostsPresent());
+
       vector.last_action = VectorOperation::insert;
 
       // we have to do above actions in any
@@ -1096,6 +1108,8 @@ namespace PETScWrappers
               (vector.last_action == VectorOperation::unknown),
               ExcWrongMode (VectorOperation::insert,
                             vector.last_action));
+
+      Assert (!vector.has_ghost_elements(), ExcGhostsPresent());
 
       vector.last_action = VectorOperation::insert;
 

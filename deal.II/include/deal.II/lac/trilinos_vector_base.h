@@ -345,11 +345,16 @@ namespace TrilinosWrappers
      * See @ref GlossCompress "Compressing distributed objects"
      * for more information.
      */
-    void compress (::dealii::VectorOperation::values operation
-                   =::dealii::VectorOperation::unknown);
+    void compress (::dealii::VectorOperation::values operation);
 
     /**
-    * @deprecated
+     * @deprecated: Use the compress(VectorOperation::values) function
+     * above instead.
+     */
+    void compress() DEAL_II_DEPRECATED;
+
+    /**
+    * @deprecated Use compress(dealii::VectorOperation::values) instead.
     */
     void compress (const Epetra_CombineMode last_action) DEAL_II_DEPRECATED;
 
@@ -1295,6 +1300,15 @@ namespace TrilinosWrappers
     last_action = Zero;
 
     compressed = true;
+  }
+
+
+
+  inline
+  void
+  VectorBase::compress ()
+  {
+    compress(VectorOperation::unknown);
   }
 
 

@@ -37,9 +37,9 @@ DEAL_II_NAMESPACE_OPEN
  *
  * The main usefulness of this class lies in its ability to initialize
  * other matrix, like this:
- @verbatim
+ @code
    FullMatrix<double> identity (IdentityMatrix(10));
- @endverbatim
+ @endcode
  *
  * This creates a $10\times 10$ matrix with ones on the diagonal and
  * zeros everywhere else. Most matrix types, in particular FullMatrix
@@ -56,12 +56,12 @@ DEAL_II_NAMESPACE_OPEN
  * context as shown in the documentation of that class. The present
  * class can be used in much the same way, although without any
  * additional benefit:
- @verbatim
+ @code
   SolverControl           solver_control (1000, 1e-12);
   SolverCG<>              cg (solver_control);
   cg.solve (system_matrix, solution, system_rhs,
             IdentityMatrix(solution.size()));
- @endverbatim
+ @endcode
  *
  *
  * @author Wolfgang Bangerth, 2006

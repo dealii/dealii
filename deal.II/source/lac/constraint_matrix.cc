@@ -768,8 +768,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (uncondensed.is_compressed() == true, ExcMatrixNotClosed());
-  Assert (uncondensed.n_rows() == uncondensed.n_cols(),
-          ExcNotQuadratic());
+  Assert (uncondensed.n_rows() == uncondensed.n_cols(), ExcNotQuadratic());
 
 
   // store for each line of the matrix
@@ -811,28 +810,22 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 
 
   next_constraint = lines.begin();
-  // note: in this loop we need not check
-  // whether @p{next_constraint} is a valid
-  // iterator, since @p{next_constraint} is
-  // only evaluated so often as there are
-  // entries in new_line[*] which tells us
-  // which constraints exist
+  // note: in this loop we need not check whether @p{next_constraint} is a
+  // valid iterator, since @p{next_constraint} is only evaluated so often as
+  // there are entries in new_line[*] which tells us which constraints exist
   for (unsigned int row=0; row<uncondensed.n_rows(); ++row)
     if (new_line[row] != -1)
-      // line not constrained
-      // copy entries if column will not
-      // be condensed away, distribute
-      // otherwise
-      for (unsigned int j=uncondensed.get_rowstart_indices()[row];
-           j<uncondensed.get_rowstart_indices()[row+1]; ++j)
-        if (new_line[uncondensed.get_column_numbers()[j]] != -1)
-          condensed.add (new_line[row], new_line[uncondensed.get_column_numbers()[j]]);
+      // line not constrained copy entries if column will not be condensed
+      // away, distribute otherwise
+      for (SparsityPattern::iterator j=uncondensed.begin(row);
+           j<uncondensed.end(row); ++j)
+        if (new_line[j->column()])
+          condensed.add (new_line[row], new_line[j->column()]);
         else
           {
-            // let c point to the constraint
-            // of this column
+            // let c point to the constraint of this column
             std::vector<ConstraintLine>::const_iterator c = lines.begin();
-            while (c->line != uncondensed.get_column_numbers()[j])
+            while (c->line != j->column())
               ++c;
 
             for (unsigned int q=0; q!=c->entries.size(); ++q)
@@ -841,14 +834,14 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
     else
       // line must be distributed
       {
-        for (unsigned int j=uncondensed.get_rowstart_indices()[row];
-             j<uncondensed.get_rowstart_indices()[row+1]; ++j)
+        for (SparsityPattern::iterator j=uncondensed.begin(row);
+             j<uncondensed.end(row); ++j)
           // for each entry: distribute
-          if (new_line[uncondensed.get_column_numbers()[j]] != -1)
+          if (new_line[j->column()] != -1)
             // column is not constrained
             for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
               condensed.add (new_line[next_constraint->entries[q].first],
-                             new_line[uncondensed.get_column_numbers()[j]]);
+                             new_line[j->column()]);
 
           else
             // not only this line but
@@ -857,7 +850,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
               // let c point to the constraint
               // of this column
               std::vector<ConstraintLine>::const_iterator c = lines.begin();
-              while (c->line != uncondensed.get_column_numbers()[j]) ++c;
+              while (c->line != j->column()) ++c;
 
               for (unsigned int p=0; p!=c->entries.size(); ++p)
                 for (unsigned int q=0; q!=next_constraint->entries.size(); ++q)
@@ -877,8 +870,7 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 {
   Assert (sorted == true, ExcMatrixNotClosed());
   Assert (sparsity.is_compressed() == false, ExcMatrixIsClosed());
-  Assert (sparsity.n_rows() == sparsity.n_cols(),
-          ExcNotQuadratic());
+  Assert (sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
 
   // store for each index whether it must be
   // distributed or not. If entry is
@@ -898,28 +890,17 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
     {
       if (distribute[row] == numbers::invalid_unsigned_int)
         {
-          // regular line. loop over cols all
-          // valid cols. note that this
-          // changes the line we are
-          // presently working on: we add
-          // additional entries. these are
-          // put to the end of the
-          // row. however, as constrained
-          // nodes cannot be constrained to
-          // other constrained nodes, nothing
-          // will happen if we run into these
-          // added nodes, as they can't be
-          // distributed further. we might
-          // store the position of the last
-          // old entry and stop work there,
-          // but since operating on the newly
-          // added ones only takes two
-          // comparisons (column index valid,
-          // distribute[column] necessarily
-          // ==numbers::invalid_unsigned_int),
-          // it is cheaper to not do so and
-          // run right until the end of the
-          // line
+          // regular line. loop over cols all valid cols. note that this
+          // changes the line we are presently working on: we add additional
+          // entries. these are put to the end of the row. however, as
+          // constrained nodes cannot be constrained to other constrained
+          // nodes, nothing will happen if we run into these added nodes, as
+          // they can't be distributed further. we might store the position of
+          // the last old entry and stop work there, but since operating on
+          // the newly added ones only takes two comparisons (column index
+          // valid, distribute[column] necessarily
+          // ==numbers::invalid_unsigned_int), it is cheaper to not do so and
+          // run right until the end of the line
           for (SparsityPattern::iterator entry = sparsity.begin(row);
                ((entry != sparsity.end(row)) &&
                 entry->is_valid_entry());
@@ -2125,7 +2106,7 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
       vec(it->line) = new_value;
     }
 
-  vec.compress ();
+  vec.compress (VectorOperation::insert);
 }
 
 

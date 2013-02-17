@@ -13,6 +13,7 @@
 // See documentation of BlockCompressedSparsityPattern for documentation of this example
 
 #include <deal.II/lac/block_sparsity_pattern.h>
+#include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -20,7 +21,6 @@
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_constraints.h>
 #include <deal.II/dofs/dof_renumbering.h>
 #include <deal.II/dofs/dof_tools.h>
 

@@ -32,12 +32,12 @@ template <bool, typename> struct constraint_and_return_value;
  * is only considered in a call, if all parts of its signature can be
  * instantiated with the template parameter replaced by the respective
  * types/values in this particular call. Example:
- * @verbatim
+ * @code
  *   template <typename T>
  *   typename T::type  foo(T) {...};
  *   ...
  *   foo(1);
- * @endverbatim
+ * @endcode
  * The compiler should detect that in this call, the template
  * parameter T must be identified with the type "int". However,
  * the return type T::type does not exist. The trick now is
@@ -47,27 +47,27 @@ template <bool, typename> struct constraint_and_return_value;
  *
  * The idea is then to make the return type un-instantiatable if
  * certain constraints on the template types are not satisfied:
- * @verbatim
+ * @code
  *   template <bool, typename> struct constraint_and_return_value;
  *   template <typename T> struct constraint_and_return_value<true,T> {
  *     typedef T type;
  *   };
- * @endverbatim
+ * @endcode
  * constraint_and_return_value<false,T> is not defined. Given something like
- * @verbatim
+ * @code
  *   template <typename>
  *   struct int_or_double         { static const bool value = false;};
  *   template <>
  *   struct int_or_double<int>    { static const bool value = true; };
  *   template <>
  *   struct int_or_double<double> { static const bool value = true; };
- * @endverbatim
+ * @endcode
  * we can write a template
- * @verbatim
+ * @code
  *   template <typename T>
  *   typename constraint_and_return_value<int_or_double<T>::value,void>::type
  *   f (T);
- * @endverbatim
+ * @endcode
  * which can only be instantiated if T=int or T=double. A call to
  * f('c') will just fail with a compiler error: "no instance of
  * f(char) found". On the other hand, if the predicate in the first
@@ -191,7 +191,7 @@ namespace internal
    * A type that is sometimes used for template tricks. For example, in
    * some situations one would like to do this:
    *
-   * @verbatim
+   * @code
    *   template <int dim>
    *   class X {
    *     // do something on subdim-dimensional sub-objects of the big
@@ -207,13 +207,13 @@ namespace internal
    *   template <int dim, int subdim> void f(X<dim> &x) {
    *     x.f<subdim> ();
    *   }
-   * @endverbatim
+   * @endcode
    *
    * The problem is: the language doesn't allow us to specialize
    * <code>X::f()</code> without specializing the outer class first. One
    * of the common tricks is therefore to use something like this:
    *
-   * @verbatim
+   * @code
    *   template <int N> struct int2type {};
    *
    *   template <int dim>
@@ -236,7 +236,7 @@ namespace internal
    *   template <int dim, int subdim> void f(X<dim> &x) {
    *     x.f (int2type<subdim>());
    *   }
-   * @endverbatim
+   * @endcode
    *
    * Note that we have replaced specialization of <code>X::f()</code> by
    * overloading, but that from inside the function <code>g()</code>, we

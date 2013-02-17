@@ -48,7 +48,7 @@ The final solution, as written by the program at the end of the
 
 
 
-@image html step-6.solution.png
+<img src="http://www.dealii.org/images/steps/developer/step-6.solution.png" alt="">
 
 
 
@@ -60,37 +60,37 @@ format. These are shown in the following:
 <TABLE WIDTH="100%">
 <tr>
 <td>
-  @image html step-6.grid-0.png
+  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-0.png" alt="">
 </td>
 <td>
-  @image html step-6.grid-1.png
-</td>
-</tr>
-
-<tr>
-<td>
-  @image html step-6.grid-2.png
-</td>
-<td>
-  @image html step-6.grid-3.png
+  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-1.png" alt="">
 </td>
 </tr>
 
 <tr>
 <td>
-  @image html step-6.grid-4.png
+  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-2.png" alt="">
 </td>
 <td>
-  @image html step-6.grid-5.png
+  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-3.png" alt="">
 </td>
 </tr>
 
 <tr>
 <td>
-  @image html step-6.grid-6.png
+  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-4.png" alt="">
 </td>
 <td>
-  @image html step-6.grid-7.png
+  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-5.png" alt="">
+</td>
+</tr>
+
+<tr>
+<td>
+  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-6.png" alt="">
+</td>
+<td>
+  <img src="http://www.dealii.org/images/steps/developer/step-6.grid-7.png" alt="">
 </td>
 </tr>
 </table>
@@ -211,11 +211,11 @@ following results (left: iterations; right: CPU time):
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      @image html step-6.q2.dofs_vs_iterations.png
+      <img src="http://www.dealii.org/images/steps/developer/step-6.q2.dofs_vs_iterations.png" alt="">
     </td>
 
     <td ALIGN="center">
-      @image html step-6.q2.dofs_vs_time.png
+      <img src="http://www.dealii.org/images/steps/developer/step-6.q2.dofs_vs_time.png" alt="">
     </td>
   </tr>
 </table>
@@ -235,11 +235,11 @@ bi-linear one. If one makes this change, the results are as follows:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      @image html step-6.q1.dofs_vs_iterations.png
+      <img src="http://www.dealii.org/images/steps/developer/step-6.q1.dofs_vs_iterations.png" alt="">
     </td>
 
     <td ALIGN="center">
-      @image html step-6.q1.dofs_vs_time.png
+      <img src="http://www.dealii.org/images/steps/developer/step-6.q1.dofs_vs_time.png" alt="">
     </td>
   </tr>
 </table>

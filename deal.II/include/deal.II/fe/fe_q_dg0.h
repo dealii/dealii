@@ -531,7 +531,7 @@ private:
    * constructor.
    */
   void initialize_embedding ();
-  
+
   /**
    * Initialize the restriction
    * matrices. Called from the

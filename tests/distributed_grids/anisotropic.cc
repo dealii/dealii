@@ -36,7 +36,15 @@ void test(std::ostream& /*out*/)
   GridGenerator::hyper_cube(tr);
   tr.begin_active()->set_refine_flag(RefinementCase<dim>::cut_x);
 
-  tr.execute_coarsening_and_refinement ();
+
+  try
+    {
+      tr.execute_coarsening_and_refinement ();
+    }
+  catch (...)
+    {
+    }
+  
 }
 
 

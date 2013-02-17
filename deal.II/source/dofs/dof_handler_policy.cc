@@ -2135,8 +2135,8 @@ namespace internal
         Assert (tr != 0, ExcInternalError());
 
         AssertThrow(
-            (tr->settings &  parallel::distributed::Triangulation< dim, spacedim >::construct_multigrid_hierarchy),
-            ExcMessage("Multigrid DoFs can only be distributed on a parallel Triangulation if the flag construct_multigrid_hierarchy is set in the constructor."));
+          (tr->settings &  parallel::distributed::Triangulation< dim, spacedim >::construct_multigrid_hierarchy),
+          ExcMessage("Multigrid DoFs can only be distributed on a parallel Triangulation if the flag construct_multigrid_hierarchy is set in the constructor."));
 
 
         const unsigned int
@@ -2350,8 +2350,7 @@ namespace internal
                                      local_dof_indices.end(),
                                      DoFHandler<dim,spacedim>::invalid_dof_index))
                         {
-                          int warn; // TODO
-                          //Assert(false, ExcMessage ("not all dofs got distributed!"));
+                          Assert(false, ExcMessage ("not all dofs got distributed!"));
                         }
                     }
               }

@@ -71,8 +71,21 @@ void test ()
   deal_II_exceptions::disable_abort_on_exception();
   for (unsigned int i=0; i<m.m(); ++i)
     values[i] = 0.5*i - 1.5;
-  m.add(0,m.m(),&indices[0], &values[0], false, true);
-  m.add(m.m()-1,m.m(),&indices[0], &values[0], false, true);
+  try
+    {
+      m.add(0,m.m(),&indices[0], &values[0], false, true);
+    }
+  catch (...)
+    {
+    }
+
+  try
+    {
+      m.add(m.m()-1,m.m(),&indices[0], &values[0], false, true);
+    }
+  catch (...)
+    {
+    }
 
   deallog << "OK" << std::endl;
 }

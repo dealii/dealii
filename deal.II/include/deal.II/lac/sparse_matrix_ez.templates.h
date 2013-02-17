@@ -328,7 +328,7 @@ void
 SparseMatrixEZ<number>::precondition_SSOR (Vector<somenumber>       &dst,
                                            const Vector<somenumber> &src,
                                            const number              om,
-                                           const std::vector<unsigned int> &) const
+                                           const std::vector<std::size_t> &) const
 {
   Assert (m() == n(), ExcNotQuadratic());
   Assert (dst.size() == n(), ExcDimensionMismatch (dst.size(), n()));

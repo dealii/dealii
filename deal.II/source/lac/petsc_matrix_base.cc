@@ -602,7 +602,7 @@ namespace PETScWrappers
 
     // Set options
     PetscViewerSetFormat (PETSC_VIEWER_STDOUT_WORLD,
-    		format);
+                          format);
 
     // Write to screen
     MatView (matrix, PETSC_VIEWER_STDOUT_WORLD);

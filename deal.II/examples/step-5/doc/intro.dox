@@ -25,7 +25,7 @@ them are:
   <li> Finite element programs usually use extensive amounts of
        computing time, so some optimizations are sometimes
        necessary. We will show some of them.
-  <li> On the other side, finite element programs tend to be rather
+  <li> On the other hand, finite element programs tend to be rather
        complex, so debugging is an important aspect. We support safe
        programming by using assertions that check the validity of
        parameters and %internal states in a debug mode, but are removed
@@ -35,3 +35,35 @@ them are:
        preconditioned iterative solvers for the linear systems of
        equations.
 </ul>
+
+The equation to solve here is as follows:
+@f{align*}
+  -\nabla \cdot a(\mathbf x) \nabla u(\mathbf x) &= 1 \qquad\qquad & \text{in}\ \Omega,
+  \\
+  u &= 0 \qquad\qquad & \text{on}\ \partial\Omega.
+@f}
+If $a(\mathbf x)$ was a constant coefficient, this would simply be the Poisson
+equation. However, if it is indeed spatially variable, it is a more complex
+equation (often referred to as the "extended Poisson equation"). Depending on
+what the variable $u$ refers to it models a variety of situations with wide
+applicability:
+
+- If $u$ is the electric potential, then $-a\nabla u$ is the electric current
+  in a medium and the coefficient $a$ is the conductivity of the medium at any
+  given point. (In this situation, the right hand side of the equation would
+  be the electric source density and would usually be zero or consist of
+  localized, Delta-like, functions.)
+- If $u$ is the vertical deflection of a thin membrane, then $a$ would be a
+  measure of the local stiffness. This is the interpretation that will allow
+  us to interpret the images shown in the results section below.
+
+Since the Laplace/Poisson equation appears in so many contexts, there are many
+more interpretations than just the two listed above.
+
+When assembling the linear system for this equation, we need the weak form
+which here reads as follows:
+@f{align*}
+  (a \nabla \varphi, \nabla u) &= (\varphi, 1) \qquad \qquad \forall \varphi.
+@f}
+The implementation in the <code>assemble_system</code> function follows
+immediately from this.

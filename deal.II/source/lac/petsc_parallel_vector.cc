@@ -76,16 +76,17 @@ namespace PETScWrappers
       IndexSet ghost_set = ghost;
       ghost_set.subtract_set(local);
 
-      //possible optmization: figure out if
-      //there are ghost indices (collective
-      //operation!) and then create a
-      //non-ghosted vector.
-//      Vector::create_vector (local.size(), local.n_elements());
-
       Vector::create_vector(local.size(), local.n_elements(), ghost_set);
     }
 
-
+    Vector::Vector (const MPI_Comm     &communicator,
+                     const IndexSet   &local)
+    :
+          communicator (communicator)
+    {
+      Assert(local.is_contiguous(), ExcNotImplemented());
+      Vector::create_vector(local.size(), local.n_elements());
+    }
 
     void
     Vector::reinit (const MPI_Comm    &comm,
@@ -159,14 +160,25 @@ namespace PETScWrappers
       create_vector(local.size(), local.n_elements(), ghost_set);
     }
 
+    void
+    Vector::reinit (const MPI_Comm     &comm,
+                 const IndexSet   &local)
+    {
+      communicator = comm;
+
+      Assert(local.is_contiguous(), ExcNotImplemented());
+      create_vector(local.size(), local.n_elements());
+    }
 
 
     Vector &
     Vector::operator = (const PETScWrappers::Vector &v)
     {
-      // first flush buffers
-      compress ();
-
+      Assert(last_action==VectorOperation::unknown,
+          ExcMessage("Call to compress() required before calling operator=."));
+      //TODO [TH]: can not access v.last_action here. Implement is_compressed()?
+      //Assert(v.last_action==VectorOperation::unknown,
+      //    ExcMessage("Call to compress() required before calling operator=."));
       int ierr;
 
       // get a pointer to the local memory of
@@ -195,6 +207,8 @@ namespace PETScWrappers
       ierr = VecRestoreArray (static_cast<const Vec &>(v), &src_array);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+      if (has_ghost_elements())
+        update_ghost_values();
       return *this;
     }
 
@@ -204,6 +218,7 @@ namespace PETScWrappers
                            const unsigned int  local_size)
     {
       Assert (local_size <= n, ExcIndexRange (local_size, 0, n));
+      ghosted = false;
 
       const int ierr
         = VecCreateMPI (communicator, local_size, PETSC_DETERMINE,
@@ -322,28 +337,28 @@ namespace PETScWrappers
         out.setf (std::ios::fixed, std::ios::floatfield);
 
       for ( unsigned int i = 0;
-	    i < Utilities::MPI::n_mpi_processes(communicator);
-	    i++)
-	{
-	  // This is slow, but most likely only used to debug.
-	  MPI_Barrier(communicator);
-	  if (i == Utilities::MPI::this_mpi_process(communicator))
-	    {
-	      if (across)
-		{
-		  out << "[Proc" << i << " " << istart << "-" << iend-1 << "]" << ' ';
-		  for (PetscInt i=0; i<nlocal; ++i)
-		    out << val[i] << ' ';
-		}
-	      else
-		{
-		  out << "[Proc " << i << " " << istart << "-" << iend-1 << "]" << std::endl;
-		  for (PetscInt i=0; i<nlocal; ++i)
-		    out << val[i] << std::endl;
-		}
-	      out << std::endl;
-	    }
-	}
+            i < Utilities::MPI::n_mpi_processes(communicator);
+            i++)
+        {
+          // This is slow, but most likely only used to debug.
+          MPI_Barrier(communicator);
+          if (i == Utilities::MPI::this_mpi_process(communicator))
+            {
+              if (across)
+                {
+                  out << "[Proc" << i << " " << istart << "-" << iend-1 << "]" << ' ';
+                  for (PetscInt i=0; i<nlocal; ++i)
+                    out << val[i] << ' ';
+                }
+              else
+                {
+                  out << "[Proc " << i << " " << istart << "-" << iend-1 << "]" << std::endl;
+                  for (PetscInt i=0; i<nlocal; ++i)
+                    out << val[i] << std::endl;
+                }
+              out << std::endl;
+            }
+        }
       // reset output format
       out.flags (old_flags);
       out.precision(old_precision);

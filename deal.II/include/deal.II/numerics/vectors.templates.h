@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 #ifndef _deal2__vectors_templates_h
 #define _deal2__vectors_templates_h
 
+#warning This file is deprecated. Use <deal.II/numerics/vector_tools.templates.h> instead.
 #include <deal.II/numerics/vector_tools.templates.h>
 
 #endif

@@ -418,12 +418,12 @@ void MGTransferComponentBase::build_matrices (
             prolongation_sparsities[level]->block(i,j)
             .reinit(sizes[level+1][i],
                     sizes[level][j],
-                    dofs_per_cell+1, false);
+                    dofs_per_cell+1);
           else
             prolongation_sparsities[level]->block(i,j)
             .reinit(sizes[level+1][i],
                     sizes[level][j],
-                    0, false);
+                    0);
 
       prolongation_sparsities[level]->collect_sizes();
 

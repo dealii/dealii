@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -338,7 +338,7 @@ void
 do_copy_from (const FullMatrix<double> &sparsity,
 	      SP &sp4)
 {
-  sp4.copy_from (sparsity, false);
+  sp4.copy_from (sparsity);
 }
 
 
@@ -346,7 +346,7 @@ void
 do_copy_from (const FullMatrix<double> &sparsity,
 	      ChunkSparsityPattern &sp4)
 {
-  sp4.copy_from (sparsity, chunk_size, false);
+  sp4.copy_from (sparsity, chunk_size);
 }
 
 
@@ -367,13 +367,10 @@ void copy_from_1 ()
     {
       sparsity.push_back
 	(std::set<unsigned int,std::greater<unsigned int> >());
-      for (const unsigned int
-	     *p=(sparsity_pattern.get_column_numbers()
-		 +sparsity_pattern.get_rowstart_indices()[row]);
-	   p != (sparsity_pattern.get_column_numbers()
-		 +sparsity_pattern.get_rowstart_indices()[row+1]);
+      for (SparsityPattern::iterator p = sparsity_pattern.begin(row);
+	   p != sparsity_pattern.end(row);
 	   ++p)
-	sparsity.back().insert (*p);
+	sparsity.back().insert (p->column());
     }
   SP sp4;
   do_copy_from (sparsity, sp4);

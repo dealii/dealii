@@ -70,6 +70,8 @@
  * a different kind of boundary condition in the partial differential
  * equation.
  *
+ * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
+ *
  * @ingroup grid
  * @author Wolfgang Bangerth, 1998-2006
  */

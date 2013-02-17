@@ -43,7 +43,7 @@ template <class number> class SparseMatrix;
  *
  * <h3>Usage</h3>
  * The simplest use of this class is the following:
- * @verbatim
+ * @code
  *                                  // generate a @p SolverControl and
  *                                  // a @p VectorMemory
  * SolverControl control;
@@ -61,9 +61,9 @@ template <class number> class SparseMatrix;
  *                                  // call the @p solve function with this
  *                                  // preconditioning as last argument
  * solver.solve(A,x,b,preconditioning);
- * @endverbatim
+ * @endcode
  * The same example where also the @p SolverSelector class is used reads
- * @verbatim
+ * @code
  *                                  // generate a @p SolverControl and
  *                                  // a @p VectorMemory
  * SolverControl control;
@@ -79,7 +79,7 @@ template <class number> class SparseMatrix;
  * preconditioning.use_matrix(A);
  *
  * solver_selector.solve(A,x,b,preconditioning);
- * @endverbatim
+ * @endcode
  * Now the use of the @p SolverSelector in combination with the @p PreconditionSelector
  * allows the user to select both, the solver and the preconditioner, at the
  * beginning of his program and each time the

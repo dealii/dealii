@@ -4919,8 +4919,8 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
               ;;
           esac
 
-                                                                                                                                                                                              	  	            CXXFLAGSG="$CXXFLAGSG -w1 -wd175 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858 -wd1565"
-          CXXFLAGSO="$CXXFLAGSO -w0 -wd424 -wd11"
+                                                            	  	  	                                                                                                                                    	  	            CXXFLAGSG="$CXXFLAGSG -w1 -wd175 -wd279 -wd525 -wd327 -wd424 -wd11 -wd734 -wd858 -wd1565"
+          CXXFLAGSO="$CXXFLAGSO -w0 -wd175 -wd424 -wd11"
 
                                                                                                     case "$GXX_VERSION" in
             intel_icc5)

@@ -497,20 +497,19 @@ namespace Step17
           // not be associated with the cell we are presently treating, and
           // are therefore not represented in the local matrix and vector),
           // but it can be done while distributing the local system to the
-          // global one. This is what the following two calls do, i.e. they
+          // global one. This is what the following call does, i.e. we
           // distribute to the global objects and at the same time make sure
           // that hanging node constraints are taken care of:
           cell->get_dof_indices (local_dof_indices);
           hanging_node_constraints
-          .distribute_local_to_global (cell_matrix,
+          .distribute_local_to_global(cell_matrix, cell_rhs,
                                        local_dof_indices,
-                                       system_matrix);
-
-          hanging_node_constraints
-          .distribute_local_to_global (cell_rhs,
-                                       local_dof_indices,
-                                       system_rhs);
+                                       system_matrix, system_rhs);
         }
+
+    // Now compress the vector and the system matrix:
+    system_matrix.compress();
+    system_rhs.compress(VectorOperation::add);
 
     // The global matrix and right hand side vectors have now been
     // formed. Note that since we took care of this already above, we do not
@@ -600,11 +599,6 @@ namespace Step17
     // ones. Since we do the same operation on all processors, we end up with
     // a distributed vector that has all the constrained nodes fixed.
     solution = localized_solution;
-
-    // After this has happened, flush the PETSc buffers. This may or may not
-    // be strictly necessary here (the PETSc documentation is not very verbose
-    // on these things), but certainly doesn't hurt either.
-    solution.compress ();
 
     // Finally return the number of iterations it took to converge, to allow
     // for some output:
@@ -827,7 +821,7 @@ namespace Step17
     for (unsigned int i=0; i<local_error_per_cell.size(); ++i)
       if (local_error_per_cell(i) != 0)
         distributed_all_errors(i) = local_error_per_cell(i);
-    distributed_all_errors.compress ();
+    distributed_all_errors.compress (VectorOperation::insert);
 
 
     // So now we have this distributed vector out there that contains the

@@ -39,7 +39,13 @@ void test ()
     Assert (m[i] == v[i], ExcInternalError());
 
 				   // this needs to throw an exception
-  m[v.size()];
+  try
+    {
+      m[v.size()];
+    }
+  catch (...)
+    {
+    }
 
   deallog << "OK" << std::endl;
 }

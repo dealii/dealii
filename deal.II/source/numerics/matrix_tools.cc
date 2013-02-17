@@ -26,7 +26,6 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/grid/tria_iterator.h>
-#include <deal.II/grid/geometry_info.h>
 #include <deal.II/hp/fe_values.h>
 #include <deal.II/hp/mapping_collection.h>
 #include <deal.II/numerics/matrix_tools.h>
@@ -1948,14 +1947,13 @@ namespace MatrixTools
                          Vector<number>   &right_hand_side,
                          const bool        eliminate_columns)
   {
-    // Require that diagonals are first
-    // in each row
-    Assert (matrix.get_sparsity_pattern().optimize_diagonal(),
-            typename SparsityPattern::ExcDiagonalNotOptimized());
     Assert (matrix.n() == right_hand_side.size(),
             ExcDimensionMismatch(matrix.n(), right_hand_side.size()));
     Assert (matrix.n() == solution.size(),
             ExcDimensionMismatch(matrix.n(), solution.size()));
+    Assert (matrix.n() == matrix.m(),
+            ExcDimensionMismatch(matrix.n(), matrix.m()));
+
     // if no boundary values are to be applied
     // simply return
     if (boundary_values.size() == 0)
@@ -1990,11 +1988,11 @@ namespace MatrixTools
 
         // set entries of this line to zero except for the diagonal
         // entry
-	for (typename SparseMatrix<number>::iterator
-	       p = matrix.begin(dof_number);
-	     p != matrix.end(dof_number); ++p)
-	  if (p->column() != dof_number)
-	    p->value() = 0.;
+        for (typename SparseMatrix<number>::iterator
+             p = matrix.begin(dof_number);
+             p != matrix.end(dof_number); ++p)
+          if (p->column() != dof_number)
+            p->value() = 0.;
 
         // set right hand side to
         // wanted value: if main diagonal
@@ -2047,8 +2045,8 @@ namespace MatrixTools
             // since that is the diagonal element and thus the present
             // row
             for (typename SparseMatrix<number>::iterator
-                q = matrix.begin(dof_number)+1;
-                q != matrix.end(dof_number); ++q)
+                 q = matrix.begin(dof_number)+1;
+                 q != matrix.end(dof_number); ++q)
               {
                 const unsigned int row = q->column();
 
@@ -2057,7 +2055,7 @@ namespace MatrixTools
                 // (row,dof_number)
                 bool (*comp)(const typename SparseMatrix<number>::iterator::value_type p,
                              const unsigned int column)
-                = &column_less_than<typename SparseMatrix<number>::iterator>;
+                  = &column_less_than<typename SparseMatrix<number>::iterator>;
                 const typename SparseMatrix<number>::iterator
                 p = Utilities::lower_bound(matrix.begin(row)+1,
                                            matrix.end(row),
@@ -2120,11 +2118,6 @@ namespace MatrixTools
     Assert (matrix.get_sparsity_pattern().get_row_indices() ==
             right_hand_side.get_block_indices (),
             ExcBlocksDontMatch ());
-
-    for (unsigned int i=0; i<blocks; ++i)
-      Assert (matrix.block(i,i).get_sparsity_pattern().optimize_diagonal(),
-              SparsityPattern::ExcDiagonalNotOptimized());
-
 
     // if no boundary values are to be applied
     // simply return
@@ -2274,9 +2267,7 @@ namespace MatrixTools
             // transpose block
             for (unsigned int block_row=0; block_row<blocks; ++block_row)
               {
-                // get pointers to the
-                // sparsity patterns of
-                // this block and of
+                // get pointers to the sparsity patterns of this block and of
                 // the transpose one
                 const SparsityPattern &this_sparsity
                   = sparsity_pattern.block (block_row, block_index.first);
@@ -2286,55 +2277,33 @@ namespace MatrixTools
                 SparseMatrix<number> &transpose_matrix
                   = matrix.block(block_index.first, block_row);
 
-                // traverse the row of
-                // the transpose block
-                // to find the
-                // interesting rows in
-                // the present block.
-                // don't use the
-                // diagonal element of
-                // the diagonal block
+                // traverse the row of the transpose block to find the
+                // interesting rows in the present block.  don't use the
+                // diagonal element of the diagonal block
                 for (typename SparseMatrix<number>::iterator
                      q = (block_index.first == block_row ?
-                         transpose_matrix.begin(block_index.second)+1 :
-                         transpose_matrix.begin(block_index.second));
-                    q != transpose_matrix.end(block_index.second);
-                    ++q)
+                          transpose_matrix.begin(block_index.second)+1 :
+                          transpose_matrix.begin(block_index.second));
+                     q != transpose_matrix.end(block_index.second);
+                     ++q)
                   {
-                    // get the number
-                    // of the column in
-                    // this row in
-                    // which a nonzero
-                    // entry is. this
-                    // is also the row
-                    // of the transpose
-                    // block which has
-                    // an entry in the
-                    // interesting row
+                    // get the number of the column in this row in which a
+                    // nonzero entry is. this is also the row of the transpose
+                    // block which has an entry in the interesting row
                     const unsigned int row = q->column();
 
-                    // find the position of
-                    // element
-                    // (row,dof_number)
-                    // in this block
-                    // (not in the
-                    // transpose
-                    // one). note that
-                    // we have to take
-                    // care of special
-                    // cases with
-                    // square
-                    // sub-matrices
-                    bool (*comp)(const typename SparseMatrix<number>::iterator::value_type p,
+                    // find the position of element (row,dof_number) in this
+                    // block (not in the transpose one). note that we have to
+                    // take care of special cases with square sub-matrices
+                    bool (*comp)(typename SparseMatrix<number>::iterator::value_type p,
                                  const unsigned int column)
-                    = &column_less_than<typename SparseMatrix<number>::iterator>;
+                      = &column_less_than<typename SparseMatrix<number>::iterator>;
 
                     typename SparseMatrix<number>::iterator p = this_matrix.end();
 
                     if (this_sparsity.n_rows() == this_sparsity.n_cols())
                       {
-                        if (this_sparsity.get_column_numbers()
-                            [this_sparsity.get_rowstart_indices()[row]]
+                        if (this_matrix.begin(row)->column()
                             ==
                             block_index.second)
                           p = this_matrix.begin(row);
@@ -2415,13 +2384,6 @@ namespace MatrixTools
         Assert (local_range == solution.local_range(),
                 ExcInternalError());
 
-
-        // we have to read and write from this
-        // matrix (in this order). this will only
-        // work if we compress the matrix first,
-        // done here
-        matrix.compress ();
-
         // determine the first nonzero diagonal
         // entry from within the part of the
         // matrix that we can see. if we can't
@@ -2458,23 +2420,6 @@ namespace MatrixTools
         // treated in the other functions.
         matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
 
-        // the next thing is to set right hand
-        // side to the wanted value. there's one
-        // drawback: if we write to individual
-        // vector elements, then we have to do
-        // that on all processors. however, some
-        // processors may not need to set
-        // anything because their chunk of
-        // matrix/rhs do not contain any boundary
-        // nodes. therefore, rather than using
-        // individual calls, we use one call for
-        // all elements, thereby making sure that
-        // all processors call this function,
-        // even if some only have an empty set of
-        // elements to set
-        right_hand_side.compress ();
-        solution.compress ();
-
         std::vector<unsigned int> indices;
         std::vector<PetscScalar>  solution_values;
         for (std::map<unsigned int,double>::const_iterator
@@ -2498,8 +2443,8 @@ namespace MatrixTools
 
         // clean up
         matrix.compress ();
-        solution.compress ();
-        right_hand_side.compress ();
+        solution.compress (VectorOperation::insert);
+        right_hand_side.compress (VectorOperation::insert);
       }
     }
   }
@@ -2687,27 +2632,6 @@ namespace MatrixTools
         // matrix classes in deal.II.
         matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
 
-        // the next thing is to set right
-        // hand side to the wanted
-        // value. there's one drawback:
-        // if we write to individual
-        // vector elements, then we have
-        // to do that on all
-        // processors. however, some
-        // processors may not need to set
-        // anything because their chunk
-        // of matrix/rhs do not contain
-        // any boundary nodes. therefore,
-        // rather than using individual
-        // calls, we use one call for all
-        // elements, thereby making sure
-        // that all processors call this
-        // function, even if some only
-        // have an empty set of elements
-        // to set
-        right_hand_side.compress ();
-        solution.compress ();
-
         std::vector<unsigned int> indices;
         std::vector<TrilinosScalar>  solution_values;
         for (std::map<unsigned int,double>::const_iterator
@@ -2731,8 +2655,8 @@ namespace MatrixTools
 
         // clean up
         matrix.compress ();
-        solution.compress ();
-        right_hand_side.compress ();
+        solution.compress (VectorOperation::insert);
+        right_hand_side.compress (VectorOperation::insert);
       }
 
 

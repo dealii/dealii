@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -994,7 +994,7 @@ namespace MGTools
                                  const DoFHandler<dim,spacedim> &,
                                  const ComponentMask &,
                                  std::vector<bool> &)
-                  = &DoFTools::template extract_level_dofs<DoFHandler<dim,spacedim> >;
+                  = &DoFTools::extract_level_dofs<DoFHandler<dim,spacedim> >;
 
                 std::vector<bool> tmp(n_components, false);
                 tmp[i] = true;
@@ -1114,7 +1114,7 @@ namespace MGTools
                              const DH &,
                              const BlockMask &,
                              std::vector<bool> &)
-              = &DoFTools::template extract_level_dofs<DH>;
+              = &DoFTools::extract_level_dofs<DH>;
 
             std::vector<bool> tmp(n_blocks, false);
             tmp[i] = true;
@@ -1636,7 +1636,7 @@ namespace MGTools
 
     std::map<unsigned int, double> boundary_values;
     for (std::set<unsigned int>::const_iterator p=boundary_dofs.begin();
-        p != boundary_dofs.end(); ++p)
+         p != boundary_dofs.end(); ++p)
       boundary_values[*p] = 0;
 
     Vector<number> dummy(matrix.m());
@@ -1654,17 +1654,11 @@ namespace MGTools
     BlockSparseMatrix<number> &matrix,
     const bool preserve_symmetry)
   {
-    const unsigned int blocks = matrix.n_block_rows();
-
     Assert (matrix.n_block_rows() == matrix.n_block_cols(),
             ExcNotQuadratic());
     Assert (matrix.get_sparsity_pattern().get_row_indices() ==
             matrix.get_sparsity_pattern().get_column_indices(),
             ExcNotQuadratic());
-
-    for (unsigned int i=0; i<blocks; ++i)
-      Assert (matrix.block(i,i).get_sparsity_pattern().optimize_diagonal(),
-              SparsityPattern::ExcDiagonalNotOptimized());
 
     // this function is not documented and not tested in the testsuite
     // so it isn't quite clear what it's supposed to do. it also isn't
@@ -1674,7 +1668,7 @@ namespace MGTools
 
     std::map<unsigned int, double> boundary_values;
     for (std::set<unsigned int>::const_iterator p=boundary_dofs.begin();
-        p != boundary_dofs.end(); ++p)
+         p != boundary_dofs.end(); ++p)
       boundary_values[*p] = 0;
 
     BlockVector<number> dummy(matrix.n_block_rows());

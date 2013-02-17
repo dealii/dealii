@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -3007,10 +3007,18 @@ namespace DoFTools
     static const int space_dim = DH::space_dimension;
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
-    Assert ((dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
-             (&dof_handler.get_tria()) == 0),
-            ExcMessage ("This function can not be used with distributed triangulations."
-                        "See the documentation for more information."));
+
+#if defined(DEBUG) && defined(DEAL_II_USE_P4EST)
+    // Check whether we run on a non parallel mesh or on a
+    // parallel::distributed::Triangulation in serial
+    {
+      typedef parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> PTRIA;
+      const PTRIA *ptria_p = dynamic_cast<const PTRIA *> (&dof_handler.get_tria());
+      Assert ((ptria_p == 0 || Utilities::MPI::n_mpi_processes(ptria_p->get_communicator()) == 1),
+              ExcMessage ("This function can not be used with distributed triangulations."
+                          "See the documentation for more information."));
+    }
+#endif
 
     Assert (b_id1 != b_id2,
             ExcMessage ("The boundary indicators b_id1 and b_id2 must be"
@@ -3094,10 +3102,17 @@ namespace DoFTools
     Assert(dim == space_dim,
            ExcNotImplemented());
 
-    Assert ((dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
-             (&dof_handler.get_tria()) == 0),
-            ExcMessage ("This function can not be used with distributed triangulations."
-                        "See the documentation for more information."));
+#if defined(DEBUG) && defined(DEAL_II_USE_P4EST)
+    // Check whether we run on a non parallel mesh or on a
+    // parallel::distributed::Triangulation in serial
+    {
+      typedef typename parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> PTRIA;
+      const PTRIA *ptria_p = dynamic_cast<const PTRIA *> (&dof_handler.get_tria());
+      Assert ((ptria_p == 0 || Utilities::MPI::n_mpi_processes(ptria_p->get_communicator()) == 1),
+              ExcMessage ("This function can not be used with distributed triangulations."
+                          "See the documentation for more information."));
+    }
+#endif
 
     typedef typename DH::face_iterator FaceIterator;
     typedef std::map<FaceIterator, FaceIterator> FaceMap;
@@ -3608,8 +3623,7 @@ namespace DoFTools
   {
     Assert ((dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
              (&dof_handler.get_tria())
-             ==
-             0),
+             == 0),
             ExcMessage ("This function can not be used with distributed triangulations."
                         "See the documentation for more information."));
 

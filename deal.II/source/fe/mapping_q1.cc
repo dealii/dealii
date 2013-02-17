@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -780,7 +780,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
                 // 1e12 in 2D. might want to find a finer
                 // (dimension-independent) criterion
                 Assert (det > 1e-12*Utilities::fixed_power<dim>(cell->diameter()/
-                                                                std::sqrt(dim)),
+                                                                std::sqrt(double(dim))),
                         (typename Mapping<dim,spacedim>::ExcDistortedMappedCell(cell->center(), point)));
 
                 JxW_values[point] = weights[point] * det;

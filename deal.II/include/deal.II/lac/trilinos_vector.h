@@ -124,7 +124,7 @@ namespace TrilinosWrappers
      * compress() and flips the state. This can sometimes lead to very
      * confusing behavior, in code that may for example look like this:
      *
-     * @verbatim
+     * @code
      * TrilinosWrappers::Vector vector;
      * // do some write operations on the vector
      * for (unsigned int i=0; i<vector->size(); ++i)
@@ -138,7 +138,7 @@ namespace TrilinosWrappers
      *
      *                   // do another collective operation
      *   const double norm = vector->l2_norm();
-     * @endverbatim
+     * @endcode
      *
      * This code can run into trouble: by the time we see the first addition
      * operation, we need to flush the overwrite buffers for the vector, and

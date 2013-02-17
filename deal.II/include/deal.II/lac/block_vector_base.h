@@ -789,9 +789,12 @@ public:
   * distributed objects" for more
   * information.
    */
-  void compress (::dealii::VectorOperation::values operation
-                 =::dealii::VectorOperation::unknown);
+  void compress (::dealii::VectorOperation::values operation);
 
+  /**
+   * @deprecated: use compress(VectorOperation::values) instead.
+   */
+  void compress () DEAL_II_DEPRECATED;
 
   /**
    * Access to a single block.
@@ -1837,6 +1840,16 @@ BlockVectorBase<VectorType>::compress (::dealii::VectorOperation::values operati
 
 template <class VectorType>
 inline
+void
+BlockVectorBase<VectorType>::compress ()
+{
+  compress(VectorOperation::unknown);
+}
+
+
+
+template <class VectorType>
+inline
 typename BlockVectorBase<VectorType>::iterator
 BlockVectorBase<VectorType>::begin()
 {
@@ -1880,8 +1893,8 @@ BlockVectorBase<VectorType>::in_local_range
 (const types::global_dof_index global_index) const
 {
   const std::pair<unsigned int,unsigned int> local_index
-  = block_indices.global_to_local (global_index);
-  
+    = block_indices.global_to_local (global_index);
+
   return components[local_index.first].in_local_range (global_index);
 }
 

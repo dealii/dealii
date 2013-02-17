@@ -1511,21 +1511,16 @@ namespace VectorTools
       if (function_map.size() == 0)
         return;
 
-      for (typename FunctionMap<spacedim>::type::const_iterator i=function_map.begin();
-           i!=function_map.end(); ++i)
-        Assert (i->first < 2,
-                ExcInvalidBoundaryIndicator());
-
       for (typename DH::active_cell_iterator cell = dof.begin_active();
            cell != dof.end(); ++cell)
         for (unsigned int direction=0;
              direction<GeometryInfo<dim>::faces_per_cell; ++direction)
           if (cell->at_boundary(direction)
               &&
-              (function_map.find(direction) != function_map.end()))
+              (function_map.find(cell->face(direction)->boundary_indicator()) != function_map.end()))
             {
               const Function<DH::space_dimension> &boundary_function
-                = *function_map.find(direction)->second;
+                = *function_map.find(cell->face(direction)->boundary_indicator())->second;
 
               // get the FE corresponding to this
               // cell
@@ -2147,7 +2142,7 @@ namespace VectorTools
 
     // set up sparsity structure
     CompressedSparsityPattern c_sparsity(dof.n_boundary_dofs (boundary_functions),
-					 dof.n_boundary_dofs (boundary_functions));
+                                         dof.n_boundary_dofs (boundary_functions));
     DoFTools::make_boundary_sparsity_pattern (dof,
                                               boundary_functions,
                                               dof_to_boundary_mapping,

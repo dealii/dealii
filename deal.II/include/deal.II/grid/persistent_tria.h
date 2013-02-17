@@ -56,7 +56,7 @@ DEAL_II_NAMESPACE_OPEN
  * object of this class.
  *
  * Basically, usage looks like this:
- * @verbatim
+ * @code
  *   Triangulation<dim> coarse_grid;
  *   ...                     // initialize coarse grid
  *
@@ -85,7 +85,7 @@ DEAL_II_NAMESPACE_OPEN
  *                           // is not needed anymore, e.g.
  *                           // working with another grid
  *     };
- * @endverbatim
+ * @endcode
  *
  * Note that initially, the PersistentTriangulation object does not
  * constitute a triangulation; it only becomes one after @p restore is first

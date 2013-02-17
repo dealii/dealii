@@ -49,10 +49,13 @@ DEAL_II_NAMESPACE_OPEN
  * interface to SLEPc solvers that handle both of these problem sets.
  *
  * SLEPcWrappers can be implemented in application codes in the
- * following way: @verbatim SolverControl solver_control (1000, 1e-9);
- * SolverArnoldi system (solver_control, mpi_communicator);
- * system.solve (A, B, lambda, x, size_of_spectrum); @endverbatim for
- * the generalized eigenvalue problem $Ax=B\lambda x$, where the
+ * following way:
+ * @code
+ *  SolverControl solver_control (1000, 1e-9);
+ *  SolverArnoldi system (solver_control, mpi_communicator);
+ *  system.solve (A, B, lambda, x, size_of_spectrum);
+ * @endcode
+ * for the generalized eigenvalue problem $Ax=B\lambda x$, where the
  * variable <code>const unsigned int size_of_spectrum</code> tells
  * SLEPc the number of eigenvector/eigenvalue pairs to solve for: See
  * also <code>step-36</code> for a hands-on example.
@@ -63,7 +66,7 @@ DEAL_II_NAMESPACE_OPEN
  * rather than just one. This freedom is intended for use of the
  * SLEPcWrappers that require a greater handle on the eigenvalue
  * problem solver context. See also the API of:
- @verbatim
+ @code
   template <typename OutputVector>
   void
   SolverBase::solve (const PETScWrappers::MatrixBase &A,
@@ -72,7 +75,7 @@ DEAL_II_NAMESPACE_OPEN
                      std::vector<OutputVector>       &vr,
                      const unsigned int               n_eigenvectors)
   { ... }
- @endverbatim
+ @endcode
  * as an example on how to do this.
  *
  * For further information and explanations on handling the @ref
@@ -311,19 +314,19 @@ namespace SLEPcWrappers
 
     /**
      * A function that can be used in SLEPc as a callback to check on
-     * convergence. 
+     * convergence.
      *
      * @note This function is redundant.
      */
-    static 
+    static
     int
     convergence_test (EPS          eps,
-		      PetscScalar  kr,
-		      PetscScalar  ki,
-		      PetscReal    residual_norm,
-		      PetscReal   *estimated_error,
+                      PetscScalar  kr,
+                      PetscScalar  ki,
+                      PetscReal    residual_norm,
+                      PetscReal   *estimated_error,
                       void        *solver_control);
-    
+
     /**
      * Objects of this type are explicitly created, but are destroyed
      * when the surrounding solver object goes out of scope, or when
@@ -501,7 +504,7 @@ namespace SLEPcWrappers
    * solver. Usage: Largest values of spectrum only, all problem
    * types, complex.
    *
-   * @ingroup SLEPcWrappers 
+   * @ingroup SLEPcWrappers
    *
    * @author Toby D. Young 2010
    */
@@ -543,7 +546,7 @@ namespace SLEPcWrappers
    * An implementation of the solver interface using the SLEPc
    * Davidson solver. Usage (incomplete/untested): All problem types.
    *
-   * @ingroup SLEPcWrappers 
+   * @ingroup SLEPcWrappers
    *
    * @author Toby D. Young 2010
    */
@@ -564,8 +567,8 @@ namespace SLEPcWrappers
      * change that.
      */
     SolverGeneralizedDavidson (SolverControl        &cn,
-			       const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-			       const AdditionalData &data = AdditionalData());
+                               const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+                               const AdditionalData &data = AdditionalData());
 
   protected:
 
@@ -585,7 +588,7 @@ namespace SLEPcWrappers
    * An implementation of the solver interface using the SLEPc
    * Jacobi-Davidson solver. Usage: All problem types.
    *
-   * @ingroup SLEPcWrappers 
+   * @ingroup SLEPcWrappers
    *
    * @author Toby D. Young 2013
    */
@@ -606,8 +609,8 @@ namespace SLEPcWrappers
      * change that.
      */
     SolverJacobiDavidson (SolverControl        &cn,
-			  const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
-			  const AdditionalData &data = AdditionalData());
+                          const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+                          const AdditionalData &data = AdditionalData());
 
   protected:
 
@@ -638,12 +641,12 @@ namespace SLEPcWrappers
   {
     unsigned int n_converged = 0;
 
-    // Set the matrices of the problem 
+    // Set the matrices of the problem
     set_matrices (A);
 
-    // and solve    
+    // and solve
     solve (n_eigenvectors, &n_converged);
-    
+
     if (n_converged > n_eigenvectors)
       n_converged = n_eigenvectors;
     AssertThrow (n_converged == n_eigenvectors,
@@ -667,7 +670,7 @@ namespace SLEPcWrappers
   {
     unsigned int n_converged = 0;
 
-    // Set the matrices of the problem 
+    // Set the matrices of the problem
     set_matrices (A, B);
 
     // and solve
