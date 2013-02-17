@@ -133,7 +133,20 @@ note, vertices have to match exactly.
 
 example:
 
-@image html step-49.grid-2.png
+<TABLE WIDTH="80%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+        @image html step-49.grid-2a.png input mesh 1
+    </td>
+    <td ALIGN="center">
+        @image html step-49.grid-2b.png input mesh 2
+    </td>
+
+    <td ALIGN="center">
+        @image html step-49.grid-2.png merged mesh
+    </td>
+  </tr>
+</table>
 
 
 
@@ -141,29 +154,37 @@ example:
 
 move individual vertices, first identify cells/vertices
 
-@image html step-49.grid-3.png
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+        @image html step-49.grid-3a.png input mesh
+    </td>
 
+    <td ALIGN="center">
+        @image html step-49.grid-3.png top vertices moved upwards
+    </td>
+  </tr>
+</table>
 
 
 <h4>Extrude Meshes</h4>
 
-GridGenerator::extrude_triangulation()
-
-see grid_4() function in this tutorial.
-
-this example can of course be generated using the 3d hyper_cube_with_cylindrical_hole().
-
-usage for meshes generated from gmsh for example
-
+If you need a 3d mesh that can be created by extruding a given 2d mesh (that
+can be created in any of the ways given above), you can use the function
+GridGenerator::extrude_triangulation(). See grid_4() function in this tutorial
+for an example. Note that the given result could also be achieved using the 3d
+version of hyper_cube_with_cylindrical_hole(). The main usage is a 2d mesh
+generated for example with gmsh, that is read in from a .msh file as described
+above. This is the output from grid_4():
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      @image html step-49.grid-4base.png test
+      @image html step-49.grid-4base.png input mesh
     </td>
 
     <td ALIGN="center">
-      @image html step-49.grid-4.png
+      @image html step-49.grid-4.png extruded output mesh
     </td>
   </tr>
 </table>
