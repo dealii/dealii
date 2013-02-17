@@ -108,31 +108,41 @@ image (see the grid_1 function):
 
 <h3>Modify a Mesh</h3>
 
-modify a mesh:
-  - merge meshes
-  - change boundary indicators
-  - move vertices
-  - transform via smooth function
-  - perturb/randomize mesh
-  - relax inner vertices?
+After aquiring one (or several) meshes in the ways described above, there are
+many ways to manipulate them before using them in a finite element
+computation.
 
-other things to mention:
 
- GridTools::shift
+<h4>Transformations</h4>
+
+The GridTools namespace contains a collection of small functions to transform
+a given mesh in various ways. The usage of the functions GridTools::shift,
+GridTools::rotate, GridTools::scale is fairly obvious, so we won't discuss
+those functions here.
+
+
  GridTools::transform
-GridTools::rotate
- GridTools::scale
+  - transform via smooth function
+
+  - perturb/randomize mesh
 
 
 
 <h4>Merge Meshes</h4>
 
-use GridGenerator::merge_triangulations()
+The function GridGenerator::merge_triangulations() allows you to merge two
+given Triangulations into a single one. This only works, if the vertices of
+the to be shared edge or face match exactly. It is useful to use
+GridTools::shift and GridTools::scale to align the two meshes.  In the
+function grid_2() of this tutorial, we merge a square with a round hole
+(generated with hyper_cube_with_cylindrical_hole()) and a rectangle. The
+function GridTools::subdivided_hyper_rectangle() allows you to specify the
+number of repetitions and the positions of the corners, this way we do not
+need to shift it manually. You should inspect the mesh graphically to make
+sure, that cells line up correctly and no hanging nodes exist in the merged
+Triangulation.
 
-note, vertices have to match exactly.
-
-example:
-
+These are the input meshes and the output mesh:
 <TABLE WIDTH="80%" ALIGN="center">
   <tr>
     <td ALIGN="center">
@@ -149,10 +159,12 @@ example:
 </table>
 
 
-
 <h4>Move Vertices</h4>
 
-move individual vertices, first identify cells/vertices
+The function grid_3() demonstrates the ability to pick individual vertices and
+move them around in an existing mesh. Please be sure to not produce degenerate
+cells. Here, we create a box with a cylindrical hole, that is not exactly
+centered by moving the top vertices upwards:
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
@@ -189,4 +201,11 @@ above. This is the output from grid_4():
   </tr>
 </table>
 
+
+<h4>Possible Extensions</h4>
+
+- Modify a mesh:
+  - change boundary indicators
+  - relax inner vertices
+- Database of unstructured meshes for convergence studies
 

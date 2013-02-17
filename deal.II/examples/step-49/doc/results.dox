@@ -1,9 +1,3 @@
 <h1>Results</h1>
 
-The program has, after having been run, produced two grids, which look
-like this:
-
-
-
-<h3> Possible extensions </h3>
-
+The program produces a series of .eps files of the Triangulations. The methods are discussed above.
