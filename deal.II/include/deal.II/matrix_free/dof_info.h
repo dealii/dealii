@@ -51,6 +51,19 @@ namespace internal
      */
     struct DoFInfo
     {
+            
+      /**
+       * size_type of the dof_indicies object.
+       */
+      
+      typedef std::vector<types::global_dof_index>::size_type size_dof;
+      
+      /**
+       * size_type of the constraint_indicators object.
+       */
+      
+      typedef std::vector<std::pair<unsigned short, unsigned short> >::size_type size_constraint;
+
       /**
        * Default empty constructor.
        */
@@ -65,6 +78,7 @@ namespace internal
        * Clears all data fields in this class.
        */
       void clear ();
+      
 
       /**
        * Returns a pointer to the first index in the DoF row @p row.
@@ -299,8 +313,8 @@ namespace internal
        * certain structure in the indices, like indices for vector-valued
        * problems or for cells where not all vector components are filled.
        */
-      std::vector<std_cxx1x::tuple<unsigned int,
-          unsigned int,
+      std::vector<std_cxx1x::tuple<size_dof,
+          size_constraint,
           unsigned int> > row_starts;
 
       /**

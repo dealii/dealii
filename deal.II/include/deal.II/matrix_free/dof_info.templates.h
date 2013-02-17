@@ -41,6 +41,16 @@ namespace internal
     template <typename Number>
     struct ConstraintValues
     {
+      /**
+       * In the definition of next_constraint and constraints below,
+       * there is an argument that is in fact the size of constraints.
+       * To be clarified, we explicitly use the size_type of the 
+       * std::map container as the type. We define the size_type for 
+       * a container that contains <int, int> rather than the real
+       * types in the `constraints' object to avoid self-recursiveness.
+       */
+      typedef std::map<int, int>::size_type size_type;
+      
       ConstraintValues();
 
       /**
@@ -56,8 +66,8 @@ namespace internal
       std::vector<std::pair<types::global_dof_index, double> > constraint_entries;
       std::vector<types::global_dof_index> constraint_indices;
 
-      std::pair<std::vector<Number>, types::global_dof_index> next_constraint;
-      std::map<std::vector<Number>, types::global_dof_index, FPArrayComparator<double> > constraints;
+      std::pair<std::vector<Number>, size_type> next_constraint;
+      std::map<std::vector<Number>, size_type, FPArrayComparator<double> > constraints;
     };
 
 
@@ -79,7 +89,7 @@ namespace internal
           constraint_entries = entries;
           std::sort(constraint_entries.begin(), constraint_entries.end(),
                     ConstraintComparator());
-          for (unsigned int j=0; j<constraint_entries.size(); j++)
+          for (size_type j=0; j<constraint_entries.size(); j++)
             {
               // copy the indices of the constraint entries after sorting.
               constraint_indices[j] = constraint_entries[j].first;
@@ -97,10 +107,11 @@ namespace internal
       // equal. this was quite lenghty and now we use a std::map with a
       // user-defined comparator to compare floating point arrays to a
       // tolerance 1e-13.
-      std::pair<typename std::map<std::vector<double>, unsigned int,
+      std::pair<typename std::map<std::vector<double>, size_type,
           FPArrayComparator<double> >::iterator,
           bool> it = constraints.insert(next_constraint);
-      unsigned int insert_position = deal_II_numbers::invalid_unsigned_int;
+
+      size_type insert_position = deal_II_numbers::invalid_unsigned_int;
       if (it.second == false)
         insert_position = it.first->second;
       else
@@ -186,7 +197,7 @@ namespace internal
         {
 	  types::global_dof_index current_dof =
             local_indices[lexicographic_inv[i]];
-          const std::vector<std::pair<unsigned int,double> >
+          const std::vector<std::pair<types::global_dof_index,double> >
           *entries_ptr =
             constraints.get_constraint_entries(current_dof);
 
@@ -205,7 +216,7 @@ namespace internal
               // check whether this dof is identity constrained to another
               // dof. then we can simply insert that dof and there is no need
               // to actually resolve the constraint entries
-              const std::vector<std::pair<unsigned int,double> >
+              const std::vector<std::pair<types::global_dof_index,double> >
               &entries = *entries_ptr;
               const unsigned int n_entries = entries.size();
               if (n_entries == 1 && std::fabs(entries[0].second-1.)<1e-14)
@@ -227,7 +238,7 @@ namespace internal
               // space or mark it as ghost if necessary
               if (n_entries > 0)
                 {
-                  const std::vector<unsigned int> &constraint_indices =
+                  const std::vector<types::global_dof_index> &constraint_indices =
                     constraint_values.constraint_indices;
                   for (unsigned int j=0; j<n_entries; ++j)
                     {
@@ -279,8 +290,9 @@ no_constraint:
               constraint_iterator.first++;
             }
         }
-      row_starts[cell_number+1] = std_cxx1x::tuple<unsigned int,unsigned int,
-                                  unsigned int>
+      row_starts[cell_number+1] = std_cxx1x::tuple<size_dof, 
+						   size_constraint,
+						   unsigned int>
                                   (dof_indices.size(), constraint_indicator.size(), 0);
 
       // now to the plain indices: in case we have constraints on this cell,
@@ -297,7 +309,7 @@ no_constraint:
             {
               for (unsigned int i=0; i<dofs_this_cell; ++i)
                 {
-                  unsigned int current_dof =
+		  types::global_dof_index current_dof =
                     local_indices[lexicographic_inv[i]];
                   if (n_mpi_procs > 1 &&
                       (current_dof < first_owned ||
@@ -325,10 +337,10 @@ no_constraint:
       // sort ghost dofs and compress out duplicates
       const unsigned int n_owned  = (vector_partitioner->local_range().second-
                                      vector_partitioner->local_range().first);
-      const unsigned int n_ghosts = ghost_dofs.size();
+      const size_dof n_ghosts = ghost_dofs.size();
       unsigned int       n_unique_ghosts= 0;
 #ifdef DEBUG
-      for (std::vector<unsigned int>::iterator dof = dof_indices.begin();
+      for (std::vector<types::global_dof_index>::iterator dof = dof_indices.begin();
            dof!=dof_indices.end(); ++dof)
         AssertIndexRange (*dof, n_owned+n_ghosts);
 #endif
@@ -340,16 +352,17 @@ no_constraint:
           // since we need to go back to the local_to_global indices and
           // replace the temporary numbering of ghosts by the real number in
           // the index set, we need to store these values
-          std::vector<std::pair<unsigned int,unsigned int> > ghost_origin(n_ghosts);
-          for (unsigned int i=0; i<n_ghosts; ++i)
+          std::vector<std::pair<types::global_dof_index,unsigned int> > ghost_origin(n_ghosts);
+          for (size_dof i=0; i<n_ghosts; ++i)
             {
               ghost_origin[i].first = ghost_dofs[i];
               ghost_origin[i].second = i;
             }
           std::sort (ghost_origin.begin(), ghost_origin.end());
-          unsigned int last_contiguous_start = ghost_origin[0].first;
+	  
+	  types::global_dof_index last_contiguous_start = ghost_origin[0].first;
           ghost_numbering[ghost_origin[0].second] = 0;
-          for (unsigned int i=1; i<n_ghosts; i++)
+          for (size_dof i=1; i<n_ghosts; i++)
             {
               if (ghost_origin[i].first>ghost_origin[i-1].first+1)
                 {
@@ -370,7 +383,7 @@ no_constraint:
           // dofs. the ghost index set should store the same number
           {
             AssertDimension (n_unique_ghosts, ghost_indices.n_elements());
-            for (unsigned int i=0; i<n_ghosts; ++i)
+            for (size_dof i=0; i<n_ghosts; ++i)
               Assert (ghost_numbering[i] ==
                       ghost_indices.index_within_set(ghost_dofs[i]),
                       ExcInternalError());
@@ -383,9 +396,10 @@ no_constraint:
           const unsigned int n_boundary_cells = boundary_cells.size();
           for (unsigned int i=0; i<n_boundary_cells; ++i)
             {
-              unsigned int *data_ptr = const_cast<unsigned int *>
+	      types::global_dof_index *data_ptr = const_cast<types::global_dof_index *>
                                        (begin_indices(boundary_cells[i]));
-              const unsigned int   *row_end = end_indices(boundary_cells[i]);
+
+              const types::global_dof_index   *row_end = end_indices(boundary_cells[i]);
               for ( ; data_ptr != row_end; ++data_ptr)
                 *data_ptr = ((*data_ptr < n_owned)
                              ?
@@ -399,9 +413,9 @@ no_constraint:
                 {
                   if (row_length_indicators(boundary_cells[i]) > 0)
                     {
-                      unsigned int *data_ptr = const_cast<unsigned int *>
+                      types::global_dof_index *data_ptr = const_cast<types::global_dof_index *>
                                                (begin_indices_plain(boundary_cells[i]));
-                      const unsigned int *row_end =
+                      const types::global_dof_index *row_end =
                         (end_indices_plain(boundary_cells[i]));
                       for ( ; data_ptr != row_end; ++data_ptr)
                         *data_ptr = ((*data_ptr < n_owned)
@@ -415,7 +429,7 @@ no_constraint:
             }
         }
 
-      std::vector<unsigned int> new_ghosts;
+      std::vector<types::global_dof_index> new_ghosts;
       ghost_dofs.swap(new_ghosts);
 
       // set the ghost indices now. need to cast away constness here, but that
@@ -600,12 +614,12 @@ no_constraint:
           std::swap (new_active_fe_index, cell_active_fe_index);
         }
 
-      std::vector<std_cxx1x::tuple<unsigned int,unsigned int,
+      std::vector<std_cxx1x::tuple<size_dof, size_constraint,
           unsigned int> > new_row_starts;
-      std::vector<unsigned int> new_dof_indices;
+      std::vector<types::global_dof_index> new_dof_indices;
       std::vector<std::pair<unsigned short,unsigned short> >
       new_constraint_indicator;
-      std::vector<unsigned int> new_plain_indices, new_rowstart_plain;
+      std::vector<types::global_dof_index> new_plain_indices, new_rowstart_plain;
       unsigned int position_cell = 0;
       new_row_starts.resize (size_info.n_macro_cells + 1);
       new_dof_indices.reserve (dof_indices.size());
@@ -622,8 +636,8 @@ no_constraint:
       // vectors are adjacent, i.e., first dof index 0 for all vectors, then
       // dof index 1 for all vectors, and so on. This involves some extra
       // resorting.
-      std::vector<const unsigned int *> glob_indices (vectorization_length);
-      std::vector<const unsigned int *> plain_glob_indices (vectorization_length);
+      std::vector<const types::global_dof_index *> glob_indices (vectorization_length);
+      std::vector<const types::global_dof_index *> plain_glob_indices (vectorization_length);
       std::vector<const std::pair<unsigned short,unsigned short>*>
       constr_ind(vectorization_length), constr_end(vectorization_length);
       std::vector<unsigned int> index(vectorization_length);
@@ -633,7 +647,7 @@ no_constraint:
             dofs_per_cell[cell_active_fe_index.size() == 0 ? 0 :
                           cell_active_fe_index[i]] * vectorization_length;
           new_row_starts[i] =
-            std_cxx1x::tuple<unsigned int,unsigned int,unsigned int>
+            std_cxx1x::tuple<size_dof, size_constraint, unsigned int>
             (new_dof_indices.size(), new_constraint_indicator.size(),
              irregular_cells[i]);
 
@@ -693,7 +707,7 @@ no_constraint:
                   }
                 else
                   {
-                    const unsigned int constraint_loc = constr_ind[j]->second;
+                    const unsigned short constraint_loc = constr_ind[j]->second;
                     new_constraint_indicator.push_back
                     (std::pair<unsigned short,unsigned short> (m_index, constraint_loc));
                     for (unsigned int k=constraint_pool_row_index[constraint_loc];
@@ -717,7 +731,7 @@ no_constraint:
       AssertDimension (position_cell+1, row_starts.size());
 
       new_row_starts[size_info.n_macro_cells] =
-        std_cxx1x::tuple<unsigned int,unsigned int,unsigned int>
+        std_cxx1x::tuple<size_dof, size_constraint, unsigned int>
         (new_dof_indices.size(), new_constraint_indicator.size(), 0);
 
       AssertDimension(dof_indices.size(), new_dof_indices.size());
@@ -733,10 +747,10 @@ no_constraint:
 #ifdef DEBUG
       // sanity check 1: all indices should be smaller than the number of dofs
       // locally owned plus the number of ghosts
-      const unsigned int index_range = (vector_partitioner->local_range().second-
+      const types::global_dof_index index_range = (vector_partitioner->local_range().second-
                                         vector_partitioner->local_range().first)
                                        + vector_partitioner->ghost_indices().n_elements();
-      for (unsigned int i=0; i<dof_indices.size(); ++i)
+      for (size_dof i=0; i<dof_indices.size(); ++i)
         AssertIndexRange (dof_indices[i], index_range);
 
       // sanity check 2: for the constraint indicators, the first index should
@@ -758,20 +772,20 @@ no_constraint:
 
       // sanity check 3: all non-boundary cells should have indices that only
       // refer to the locally owned range
-      const unsigned int local_size = (vector_partitioner->local_range().second-
+      const types::global_dof_index local_size = (vector_partitioner->local_range().second-
                                        vector_partitioner->local_range().first);
       for (unsigned int row=0; row<size_info.boundary_cells_start; ++row)
         {
-          const unsigned int *ptr     = begin_indices(row);
-          const unsigned int *end_ptr = end_indices  (row);
+          const types::global_dof_index *ptr     = begin_indices(row);
+          const types::global_dof_index *end_ptr = end_indices  (row);
           for ( ; ptr != end_ptr; ++ptr)
             AssertIndexRange (*ptr, local_size);
         }
       for (unsigned int row=size_info.boundary_cells_end;
            row<size_info.n_macro_cells; ++row)
         {
-          const unsigned int *ptr     = begin_indices(row);
-          const unsigned int *end_ptr = end_indices  (row);
+          const types::global_dof_index *ptr     = begin_indices(row);
+          const types::global_dof_index *end_ptr = end_indices  (row);
           for ( ; ptr != end_ptr; ++ptr)
             AssertIndexRange (*ptr, local_size);
         }
@@ -1699,7 +1713,7 @@ not_connect:
       // first determine row lengths
       std::vector<unsigned int> row_lengths(n_rows);
       unsigned int cell_start = 0, mcell_start = 0;
-      std::vector<unsigned int> scratch;
+      std::vector<types::global_dof_index> scratch;
       for (unsigned int block = 0; block < n_blocks; ++block)
         {
           // if we have the blocking variant (used in the coloring scheme), we
@@ -1768,7 +1782,7 @@ not_connect:
                   for (unsigned int cell = cell_start; cell < cell_start+n_comp;
                        ++cell)
                     {
-                      const unsigned int
+                      const types::global_dof_index
                       *it = begin_indices (renumbering[cell]),
                        *end_cell = end_indices (renumbering[cell]);
                       for ( ; it != end_cell; ++it)
@@ -1781,7 +1795,7 @@ not_connect:
             }
           else
             {
-              const unsigned int
+              const types::global_dof_index
               *it = begin_indices (block),
                *end_cell = end_indices (block);
               for ( ; it != end_cell; ++it)
@@ -1812,7 +1826,7 @@ not_connect:
                        ++cell)
                     {
                       // apply renumbering when we do blocking
-                      const unsigned int
+                      const types::global_dof_index
                       *it = begin_indices (renumbering[cell]),
                        *end_cell = end_indices (renumbering[cell]);
                       for ( ; it != end_cell; ++it)
@@ -1823,7 +1837,7 @@ not_connect:
                             if (connectivity_dof.n_rows()==connectivity_dof.n_cols())
                               ++sp;
                             row_entries.reserve (row_entries.size() + end_cell - it);
-                            std::vector<unsigned int>::iterator insert_pos = row_entries.begin();
+                            std::vector<types::global_dof_index>::iterator insert_pos = row_entries.begin();
                             for ( ; sp != connectivity_dof.end(*it); ++sp)
                               if (sp->column() >= block)
                                 break;
@@ -1837,7 +1851,7 @@ not_connect:
             }
           else
             {
-              const unsigned int *it = begin_indices (block),
+              const types::global_dof_index *it = begin_indices (block),
                                   * end_cell = end_indices (block);
               for ( ; it != end_cell; ++it)
                 if (row_lengths[*it] > 0)
@@ -1847,7 +1861,7 @@ not_connect:
                     if (connectivity_dof.n_rows()==connectivity_dof.n_cols())
                       ++sp;
                     row_entries.reserve (row_entries.size() + end_cell - it);
-                    std::vector<unsigned int>::iterator insert_pos = row_entries.begin();
+                    std::vector<types::global_dof_index>::iterator insert_pos = row_entries.begin();
                     for ( ; sp != connectivity_dof.end(*it); ++sp)
                       if (sp->column() >= block)
                         break;
@@ -1862,7 +1876,7 @@ not_connect:
 
 
 
-    void DoFInfo::renumber_dofs (std::vector<unsigned int> &renumbering)
+    void DoFInfo::renumber_dofs (std::vector<types::global_dof_index> &renumbering)
     {
       // first renumber all locally owned degrees of freedom
       AssertDimension (vector_partitioner->local_size(),
@@ -1870,8 +1884,9 @@ not_connect:
       const unsigned int local_size = vector_partitioner->local_size();
       renumbering.resize (0);
       renumbering.resize (local_size, numbers::invalid_unsigned_int);
-      unsigned int counter = 0;
-      std::vector<unsigned int>::iterator dof_ind = dof_indices.begin(),
+      
+      types::global_dof_index counter = 0;
+      std::vector<types::global_dof_index>::iterator dof_ind = dof_indices.begin(),
                                           end_ind = dof_indices.end();
       for ( ; dof_ind != end_ind; ++dof_ind)
         {
@@ -1884,19 +1899,19 @@ not_connect:
         }
 
       AssertIndexRange (counter, local_size+1);
-      for (unsigned int i=0; i<renumbering.size(); ++i)
+      for (size_dof i=0; i<renumbering.size(); ++i)
         if (renumbering[i] == numbers::invalid_unsigned_int)
           renumbering[i] = counter++;
 
       // adjust the constrained DoFs
-      std::vector<unsigned int> new_constrained_dofs (constrained_dofs.size());
-      for (unsigned int i=0; i<constrained_dofs.size(); ++i)
+      std::vector<types::global_dof_index> new_constrained_dofs (constrained_dofs.size());
+      for (size_dof i=0; i<constrained_dofs.size(); ++i)
         new_constrained_dofs[i] = renumbering[constrained_dofs[i]];
 
       // the new constrained DoFs should be sorted already as they are not
       // contained in dof_indices and then get contiguous numbers
 #ifdef DEBUG
-      for (unsigned int i=1; i<new_constrained_dofs.size(); ++i)
+      for (size_dof i=1; i<new_constrained_dofs.size(); ++i)
         Assert (new_constrained_dofs[i] > new_constrained_dofs[i-1], ExcInternalError());
 #endif
       std::swap (constrained_dofs, new_constrained_dofs);
@@ -1910,8 +1925,8 @@ not_connect:
     DoFInfo::memory_consumption () const
     {
       std::size_t memory = sizeof(*this);
-      memory += (row_starts.capacity()*sizeof(std_cxx1x::tuple<unsigned int,
-                                              unsigned int, unsigned int>));
+      memory += (row_starts.capacity()*sizeof(std_cxx1x::tuple<size_dof,
+                                              size_constraint, unsigned int>));
       memory += MemoryConsumption::memory_consumption (dof_indices);
       memory += MemoryConsumption::memory_consumption (row_starts_plain_indices);
       memory += MemoryConsumption::memory_consumption (plain_dof_indices);
@@ -1929,8 +1944,7 @@ not_connect:
     {
       out << "       Memory row starts indices:    ";
       size_info.print_memory_statistics
-      (out, (row_starts.capacity()*sizeof(std_cxx1x::tuple<unsigned int,
-                                          unsigned int, unsigned int>)));
+	(out, (row_starts.capacity()*sizeof(std_cxx1x::tuple<size_dof, size_constraint, unsigned int>)));
       out << "       Memory dof indices:           ";
       size_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (dof_indices));
@@ -1958,7 +1972,7 @@ not_connect:
       for (unsigned int row=0 ; row<n_rows ; ++row)
         {
           out << "Entries row " << row << ": ";
-          const unsigned int
+          const types::global_dof_index
           *glob_indices = begin_indices(row),
            *end_row = end_indices(row);
           unsigned int index = 0;
