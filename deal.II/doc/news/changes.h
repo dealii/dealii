@@ -193,6 +193,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: GridGenerator::extrude_triangulation() allows
+you to extrude a 2d mesh to turn it into a 3d mesh.
+<br>
+(Timo Heister, 2013/02/16)
+
 <li> PETScWrappers::MPI::Vector with ghost entries are read-only
 now.
 <br>
