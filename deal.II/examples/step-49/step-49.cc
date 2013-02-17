@@ -37,12 +37,12 @@ void mesh_info(Triangulation<dim> &tria, const char *filename)
   // loop over all the cells and find how often each boundary indicator is used:
   {
     std::map<unsigned int, unsigned int> boundary_count;
-    Triangulation<2>::active_cell_iterator
+    typename Triangulation<dim>::active_cell_iterator
     cell = tria.begin_active(),
     endc = tria.end();
     for (; cell!=endc; ++cell)
       {
-        for (unsigned int face=0; face<GeometryInfo<2>::faces_per_cell; ++face)
+        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
           {
             if (cell->face(face)->at_boundary())
               boundary_count[cell->face(face)->boundary_indicator()]++;
@@ -136,6 +136,18 @@ void grid_3 ()
   triangulation.set_boundary (1);
 }
 
+// demonstrate extrude_triangulation
+void grid_4()
+{
+  Triangulation<2> triangulation;
+  Triangulation<3> out;
+  GridGenerator::hyper_cube_with_cylindrical_hole (triangulation, 0.25, 1.0);
+
+  GridGenerator::extrude_triangulation(triangulation, 3, 2.0, out);
+  mesh_info(out, "grid-4.eps");
+  
+}
+
 
 
 // @sect3{The main function}
@@ -147,4 +159,5 @@ int main ()
   grid_1 ();
   grid_2 ();
   grid_3 ();
+  grid_4 ();
 }

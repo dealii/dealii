@@ -100,7 +100,8 @@ gmsh -2 untitled.geo
 </pre>
 
 or by clicking "Mesh" and then "2D" inside Gmsh after loading the file.  Now
-this is the mesh read from the .msh file and saved again by deal.II as an image (see the grid_1 function: 
+this is the mesh read from the .msh file and saved again by deal.II as an
+image (see the grid_1 function):
 
 @image html step-49.grid-1.png
 
@@ -112,7 +113,7 @@ modify a mesh:
   - change boundary indicators
   - move vertices
   - transform via smooth function
-  - perturb mesh
+  - perturb/randomize mesh
   - relax inner vertices?
 
 other things to mention:
@@ -121,6 +122,8 @@ other things to mention:
  GridTools::transform
 GridTools::rotate
  GridTools::scale
+
+
 
 <h4>Merge Meshes</h4>
 
@@ -133,9 +136,36 @@ example:
 @image html step-49.grid-2.png
 
 
+
 <h4>Move Vertices</h4>
 
 move individual vertices, first identify cells/vertices
 
 @image html step-49.grid-3.png
+
+
+
+<h4>Extrude Meshes</h4>
+
+GridGenerator::extrude_triangulation()
+
+see grid_4() function in this tutorial.
+
+this example can of course be generated using the 3d hyper_cube_with_cylindrical_hole().
+
+usage for meshes generated from gmsh for example
+
+
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      @image html step-49.grid-4base.png test
+    </td>
+
+    <td ALIGN="center">
+      @image html step-49.grid-4.png
+    </td>
+  </tr>
+</table>
+
 
