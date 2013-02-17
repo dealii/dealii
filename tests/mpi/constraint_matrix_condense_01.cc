@@ -46,7 +46,7 @@ void test ()
 
   PETScWrappers::MPI::Vector force;
   force.reinit (mpi_communicator, locally_owned_dofs);
-  Assert(force.has_ghost_elements(), ExcInternalError());
+  Assert(!force.has_ghost_elements(), ExcInternalError());
 
   ConstraintMatrix constraints (locally_relevant_dofs);
   constraints.clear();
