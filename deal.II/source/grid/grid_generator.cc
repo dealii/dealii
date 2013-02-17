@@ -3405,7 +3405,7 @@ extrude_triangulation(const Triangulation<2, 2> & input,
       }
     }
 
-  for (typename Triangulation<2,2>::cell_iterator
+  for (Triangulation<2,2>::cell_iterator
       cell = input.begin(); cell != input.end(); ++cell)
     {
       for (unsigned int slice=0;slice<n_slices-1;++slice)
@@ -3427,7 +3427,7 @@ extrude_triangulation(const Triangulation<2, 2> & input,
   SubCellData s;
   types::boundary_id bid=0;
   s.boundary_quads.reserve(input.n_active_lines()*(n_slices-1) + input.n_active_cells()*2);
-  for (typename Triangulation<2,2>::cell_iterator
+  for (Triangulation<2,2>::cell_iterator
       cell = input.begin(); cell != input.end(); ++cell)
     {
       CellData<2> quad;
@@ -3447,7 +3447,7 @@ extrude_triangulation(const Triangulation<2, 2> & input,
           }
     }
 
-  for (typename Triangulation<2,2>::cell_iterator
+  for (Triangulation<2,2>::cell_iterator
       cell = input.begin(); cell != input.end(); ++cell)
     {
       CellData<2> quad;
