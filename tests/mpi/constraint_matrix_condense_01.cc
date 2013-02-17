@@ -45,7 +45,9 @@ void test ()
   DoFTools::extract_locally_relevant_dofs (dof_handler,locally_relevant_dofs);
 
   PETScWrappers::MPI::Vector force;
-  force.reinit (mpi_communicator, locally_owned_dofs, locally_relevant_dofs);
+  force.reinit (mpi_communicator, locally_owned_dofs);
+  std::cout << force.has_ghost_elements() << std::endl;
+  
 
   ConstraintMatrix constraints (locally_relevant_dofs);
   constraints.clear();
@@ -68,8 +70,6 @@ void test ()
   }
   constraints.close();
 
-  force=0.;
-  force.compress();
   constraints.condense(force);
 }
 

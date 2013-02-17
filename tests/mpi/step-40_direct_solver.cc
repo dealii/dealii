@@ -134,7 +134,6 @@ namespace Step40
     locally_relevant_solution.reinit (mpi_communicator,
                                       locally_owned_dofs,
                                       locally_relevant_dofs);
-    locally_relevant_solution = 0;
     system_rhs.reinit (mpi_communicator,
                        dof_handler.n_dofs(),
                        dof_handler.n_locally_owned_dofs());
@@ -255,7 +254,6 @@ namespace Step40
     constraints.distribute (completely_distributed_solution);
 
     locally_relevant_solution = completely_distributed_solution;
-    locally_relevant_solution.update_ghost_values();
   }
 
 

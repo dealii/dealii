@@ -77,6 +77,8 @@ void test()
 
     DoFTools::extract_locally_relevant_dofs (dh, locally_relevant_dofs);
 
+    PETScWrappers::MPI::Vector x (MPI_COMM_WORLD, locally_owned_dofs);
+    PETScWrappers::MPI::Vector x2 (MPI_COMM_WORLD, locally_owned_dofs);
     PETScWrappers::MPI::Vector solution (MPI_COMM_WORLD, locally_owned_dofs, locally_relevant_dofs);
     PETScWrappers::MPI::Vector solution2 (MPI_COMM_WORLD, locally_owned_dofs, locally_relevant_dofs);
 
@@ -86,16 +88,17 @@ void test()
     for (unsigned int i = 0;i < locally_owned_dofs.n_elements();++i)
       {
         unsigned int idx = locally_owned_dofs.nth_index_in_set (i);
-        solution (idx) = idx;
-        solution2 (idx) = 2 * idx;
+        x (idx) = idx;
+        x2 (idx) = 2 * idx;
 
 //	std::cout << '[' << idx << ']' << ' ' << solution(idx) << std::endl;
       }
 
-    solution.compress();
-    solution.update_ghost_values();
-    solution2.compress();
-    solution2.update_ghost_values();
+    x.compress(VectorOperation::insert);
+    solution=x;
+    x*=2.0;
+    solution2 = x;
+    
 
     soltrans.prepare_serialization (solution);
     soltrans2.prepare_serialization (solution2);
