@@ -3401,7 +3401,7 @@ extrude_triangulation(const Triangulation<2, 2> & input,
         const Point<2> & v = input.get_vertices()[i];
         points[i+slice*input.n_vertices()](0) = v(0);
         points[i+slice*input.n_vertices()](1) = v(1);
-        points[i+slice*input.n_vertices()](2) = height * slice / n_slices;
+        points[i+slice*input.n_vertices()](2) = height * slice / (n_slices-1);
       }
     }
 
