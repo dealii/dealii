@@ -246,7 +246,7 @@ namespace PETScWrappers
        * the set of locally relevant
        * degrees of freedom, see step-32.
        *
-       * @Note: This always creates a ghosted
+       * @note This operation always creates a ghosted
        * vector.
        */
       explicit Vector (const MPI_Comm     &communicator,
