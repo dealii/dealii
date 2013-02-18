@@ -208,7 +208,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator = (const PetscScalar s)
   {
-
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
     //TODO[TH]: assert(is_compressed())
@@ -567,7 +567,7 @@ namespace PETScWrappers
   VectorBase::normalize () const
   {
     real_type d;
-
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     const int ierr = VecNormalize (vector, &d);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -604,6 +604,8 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::abs ()
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
+
     const int ierr = VecAbs (vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -615,6 +617,8 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::conjugate ()
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
+
     const int ierr = VecConjugate (vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -626,6 +630,8 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::mult ()
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
+
     const int ierr = VecPointwiseMult (vector,vector,vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -636,6 +642,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::mult (const VectorBase &v)
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     const int ierr = VecPointwiseMult (vector,vector,v);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -647,6 +654,7 @@ namespace PETScWrappers
   VectorBase::mult (const VectorBase &u,
                     const VectorBase &v)
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     const int ierr = VecPointwiseMult (vector,u,v);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -741,7 +749,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator *= (const PetscScalar a)
   {
-
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
     const int ierr = VecScale (vector, a);
@@ -755,7 +763,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator /= (const PetscScalar a)
   {
-
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
     const PetscScalar factor = 1./a;
@@ -772,6 +780,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator += (const VectorBase &v)
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     const int ierr = VecAXPY (vector, 1, v);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -783,6 +792,7 @@ namespace PETScWrappers
   VectorBase &
   VectorBase::operator -= (const VectorBase &v)
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     const int ierr = VecAXPY (vector, -1, v);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -794,6 +804,7 @@ namespace PETScWrappers
   void
   VectorBase::add (const PetscScalar s)
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
     const int ierr = VecShift (vector, s);
@@ -814,6 +825,7 @@ namespace PETScWrappers
   VectorBase::add (const PetscScalar a,
                    const VectorBase     &v)
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
     const int ierr = VecAXPY (vector, a, v);
@@ -828,6 +840,7 @@ namespace PETScWrappers
                    const PetscScalar b,
                    const VectorBase &w)
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
@@ -844,6 +857,7 @@ namespace PETScWrappers
   VectorBase::sadd (const PetscScalar s,
                     const VectorBase &v)
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
     const int ierr = VecAYPX (vector, s, v);
@@ -857,7 +871,7 @@ namespace PETScWrappers
                     const PetscScalar a,
                     const VectorBase     &v)
   {
-
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
@@ -877,6 +891,7 @@ namespace PETScWrappers
                     const PetscScalar b,
                     const VectorBase     &w)
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
@@ -903,7 +918,7 @@ namespace PETScWrappers
                     const PetscScalar c,
                     const VectorBase     &x)
   {
-
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
@@ -925,6 +940,7 @@ namespace PETScWrappers
   void
   VectorBase::scale (const VectorBase &factors)
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     const int ierr
       = VecPointwiseMult (vector, factors, vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -936,7 +952,7 @@ namespace PETScWrappers
   VectorBase::equ (const PetscScalar a,
                    const VectorBase &v)
   {
-
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
 
     Assert (size() == v.size(),
@@ -959,7 +975,7 @@ namespace PETScWrappers
                    const PetscScalar b,
                    const VectorBase &w)
   {
-
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(a), ExcNumberNotFinite());
     Assert (numbers::is_finite(b), ExcNumberNotFinite());
 
@@ -981,6 +997,7 @@ namespace PETScWrappers
   VectorBase::ratio (const VectorBase &a,
                      const VectorBase &b)
   {
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     const int ierr = VecPointwiseDivide (vector, a, b);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
   }
@@ -1091,7 +1108,7 @@ namespace PETScWrappers
             (last_action == ::dealii::VectorOperation::unknown),
             internal::VectorReference::ExcWrongMode (action,
                                                      last_action));
-
+    Assert (!has_ghost_elements(), ExcGhostsPresent());
     // VecSetValues complains if we
     // come with an empty
     // vector. however, it is not a

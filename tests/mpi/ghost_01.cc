@@ -50,7 +50,9 @@ void test ()
   vb*=2.0;
   v=vb;
 				   //v.update_ghost_values();
-  
+
+  Assert(!vb.has_ghost_elements(), ExcInternalError());
+  Assert(v.has_ghost_elements(), ExcInternalError());
   
 				   // check local values
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)

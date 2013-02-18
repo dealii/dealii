@@ -43,9 +43,15 @@ void test()
     cell = tria.begin_active(), endc = tria.end();
   for ( ; cell != endc; ++cell)
     {
-      fe_val.reinit (cell);
+      try{
+	fe_val.reinit (cell);
       for (unsigned int q=0; q<quad.size(); ++q)
         integral += fe_val.JxW(q);
+      }
+      catch (...)
+	{
+	}
+      
     }
   deallog << "Integral = " << integral << std::endl;
 }

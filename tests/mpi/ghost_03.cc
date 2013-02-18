@@ -1,26 +1,25 @@
-//----------------------------  trilinos_ghost_03.cc  ---------------------------
-//    $Id$
+//---------------------------------------------------------------------------
+//    $Id: ghost_01.cc 28403 2013-02-15 05:23:40Z heister $
 //    Version: $Name$ 
 //
-//    Copyright (C) 2004, 2005, 2008, 2010 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2010 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  trilinos_ghost_03.cc  ---------------------------
+//---------------------------------------------------------------------------
 
 
-// check correct behaviour of Trilinos ghosted vectors.  The
-// test now checks that v.l2_norm() and v(idx)=... is disabled.
+// Test that ghosted vectors are read-only (not working right now)
 
-#include "../tests.h" 
-#include <deal.II/base/utilities.h>
+#include "../tests.h"
+#include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/base/index_set.h>
-#include <deal.II/lac/trilinos_vector.h>    
 #include <fstream>
 #include <iostream>
+#include <iomanip>
 #include <vector>
 
 
@@ -28,50 +27,53 @@ void test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
-
-  if (myid==0) deallog << "numproc=" << numproc << std::endl;
-
+  
+  if (myid==0)
+    deallog << "numproc=" << numproc << std::endl;
 
 				   // each processor owns 2 indices and all
-                                   // are ghosting element 1 (the second)
+				   // are ghosting Element 1 (the second)
+
   IndexSet local_active(numproc*2);
   local_active.add_range(myid*2,myid*2+2);
   IndexSet local_relevant(numproc*2);
-  local_relevant = local_active;
   local_relevant.add_range(1,2);
 
-  TrilinosWrappers::MPI::Vector v(local_active, MPI_COMM_WORLD);
-  TrilinosWrappers::MPI::Vector v_tmp(local_relevant, MPI_COMM_WORLD);
-  
+  PETScWrappers::MPI::Vector vb(MPI_COMM_WORLD, local_active);
+  PETScWrappers::MPI::Vector v(MPI_COMM_WORLD, local_active, local_relevant);
 
-                                     // set local values
-  v(myid*2)=1.0;
-  v(myid*2+1)=1.0;
+				   // set local values
+  vb(myid*2)=myid*2.0;
+  vb(myid*2+1)=myid*2.0+1.0;
 
-  v.compress();
-
-  v_tmp.reinit(v,false,true);
-
-  Assert (v_tmp.has_ghost_elements(), ExcInternalError());
+  vb.compress(VectorOperation::insert);
+  vb*=2.0;
+  v=vb;
 
   deal_II_exceptions::disable_abort_on_exception();
-
-  try
+  try 
     {
-      v_tmp.l2_norm();
+      v(0)=1.0;
     }
-  catch (...)
+  catch (...){}
+  try 
     {
+      v(0)*=2.0;      
     }
-  try
+  catch (...){}
+  try 
     {
-      v_tmp(0)=3.0;
+      v=0.0;
     }
-  catch (...)
+  catch (...){}
+  try 
     {
+      v+=v;      
     }
+  catch (...){}
   
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+				   // done
+  if (myid==0)
     deallog << "OK" << std::endl;
 }
 
@@ -80,13 +82,13 @@ void test ()
 int main (int argc, char **argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
-
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+
   deallog.push(Utilities::int_to_string(myid));
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("trilinos_ghost_03").c_str());
+      std::ofstream logfile(output_file_for_mpi("ghost_03").c_str());
       deallog.attach(logfile);
       deallog << std::setprecision(4);
       deallog.depth_console(0);
@@ -96,5 +98,4 @@ int main (int argc, char **argv)
     }
   else
     test();
-
 }

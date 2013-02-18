@@ -88,8 +88,13 @@ void test ()
   {
     DoFHandler<dim> dof_handler2 (tria);
     dof_handler2.distribute_dofs (fe);
-    Assert (! (dof_handler.begin_active() != dof_handler2.begin_active()),
-            ExcInternalError());
+    try 
+      {
+	(dof_handler.begin_active() != dof_handler2.begin_active());
+      }
+    catch (...)
+      {
+      }
   }
 }
 

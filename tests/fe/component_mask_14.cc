@@ -47,7 +47,13 @@ void test ()
 				     // now try to convert to a block
 				     // mask. this should not always
 				     // work
-    deallog << fe.block_mask (component_mask) << std::endl;
+    try
+      {
+	deallog << fe.block_mask (component_mask) << std::endl;
+      }
+    catch (...)
+      {
+      } 
   }
 
   deallog << "OK" << std::endl;

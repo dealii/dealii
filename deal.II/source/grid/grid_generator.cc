@@ -3376,6 +3376,101 @@ merge_triangulations (const Triangulation<dim, spacedim> &triangulation_1,
   result.create_triangulation (vertices, cells, subcell_data);
 }
 
+void
+GridGenerator::
+extrude_triangulation(const Triangulation<2, 2> & input,
+                      const unsigned int n_slices,
+                      const double height,
+                      Triangulation<3,3> &result)
+{
+  Assert (input.n_levels() == 1,
+          ExcMessage ("The input triangulations must be coarse meshes."));
+  Assert(result.n_cells()==0, ExcMessage("resultin Triangulation need to be empty upon calling extrude_triangulation."));
+  Assert(height>0, ExcMessage("The height in extrude_triangulation needs to be positive."));
+  Assert(n_slices>=2, ExcMessage("The number of slices in extrude_triangulation needs to be at least 2."));
+
+  std::vector<Point<3> > points(n_slices*input.n_vertices());
+  std::vector<CellData<3> > cells;
+  cells.reserve((n_slices-1)*input.n_active_cells());
+
+  for (unsigned int slice=0;slice<n_slices;++slice)
+    {
+      for (unsigned int i=0;i<input.n_vertices();++i)
+
+      {
+        const Point<2> & v = input.get_vertices()[i];
+        points[i+slice*input.n_vertices()](0) = v(0);
+        points[i+slice*input.n_vertices()](1) = v(1);
+        points[i+slice*input.n_vertices()](2) = height * slice / (n_slices-1);
+      }
+    }
+
+  for (Triangulation<2,2>::cell_iterator
+      cell = input.begin(); cell != input.end(); ++cell)
+    {
+      for (unsigned int slice=0;slice<n_slices-1;++slice)
+        {
+          CellData<3> this_cell;
+          for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
+            {
+              this_cell.vertices[v]
+                                 = cell->vertex_index(v)+slice*input.n_vertices();
+              this_cell.vertices[v+GeometryInfo<2>::vertices_per_cell]
+                                 = cell->vertex_index(v)+(slice+1)*input.n_vertices();
+            }
+
+          this_cell.material_id = cell->material_id();
+          cells.push_back(this_cell);
+        }
+    }
+
+  SubCellData s;
+  types::boundary_id bid=0;
+  s.boundary_quads.reserve(input.n_active_lines()*(n_slices-1) + input.n_active_cells()*2);
+  for (Triangulation<2,2>::cell_iterator
+      cell = input.begin(); cell != input.end(); ++cell)
+    {
+      CellData<2> quad;
+      for (unsigned int f=0; f<4;++f)
+        if (cell->at_boundary(f))
+          {
+            quad.boundary_id = cell->face(f)->boundary_indicator();
+            bid = std::max(bid, quad.boundary_id);
+          for (unsigned int slice=0;slice<n_slices-1;++slice)
+            {
+              quad.vertices[0] = cell->face(f)->vertex_index(0)+slice*input.n_vertices();
+              quad.vertices[1] = cell->face(f)->vertex_index(1)+slice*input.n_vertices();
+              quad.vertices[2] = cell->face(f)->vertex_index(0)+(slice+1)*input.n_vertices();
+              quad.vertices[3] = cell->face(f)->vertex_index(1)+(slice+1)*input.n_vertices();
+              s.boundary_quads.push_back(quad);
+            }
+          }
+    }
+
+  for (Triangulation<2,2>::cell_iterator
+      cell = input.begin(); cell != input.end(); ++cell)
+    {
+      CellData<2> quad;
+      quad.boundary_id = bid + 1;
+      quad.vertices[0] = cell->vertex_index(0);
+      quad.vertices[1] = cell->vertex_index(1);
+      quad.vertices[2] = cell->vertex_index(2);
+      quad.vertices[3] = cell->vertex_index(3);
+      s.boundary_quads.push_back(quad);
+
+      quad.boundary_id = bid + 2;
+      for (int i=0;i<4;++i)
+        quad.vertices[i] += (n_slices-1)*input.n_vertices();
+      s.boundary_quads.push_back(quad);
+    }
+
+
+
+  result.create_triangulation (
+    points,
+    cells,
+    s);
+}
 
 
 // make the following function inline. this is so that it becomes marked

@@ -14,6 +14,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_in.h>
@@ -37,12 +38,12 @@ void mesh_info(Triangulation<dim> &tria, const char *filename)
   // loop over all the cells and find how often each boundary indicator is used:
   {
     std::map<unsigned int, unsigned int> boundary_count;
-    Triangulation<2>::active_cell_iterator
+    typename Triangulation<dim>::active_cell_iterator
     cell = tria.begin_active(),
     endc = tria.end();
     for (; cell!=endc; ++cell)
       {
-        for (unsigned int face=0; face<GeometryInfo<2>::faces_per_cell; ++face)
+        for (unsigned int face=0; face<GeometryInfo<dim>::faces_per_cell; ++face)
           {
             if (cell->face(face)->at_boundary())
               boundary_count[cell->face(face)->boundary_indicator()]++;
@@ -136,7 +137,83 @@ void grid_3 ()
   triangulation.set_boundary (1);
 }
 
+// demonstrate extrude_triangulation
+void grid_4()
+{
+  Triangulation<2> triangulation;
+  Triangulation<3> out;
+  GridGenerator::hyper_cube_with_cylindrical_hole (triangulation, 0.25, 1.0);
 
+  GridGenerator::extrude_triangulation(triangulation, 3, 2.0, out);
+  mesh_info(out, "grid-4.eps");
+  
+}
+
+// demonstrate GridTools::transform
+void grid_5()
+{
+  Triangulation<2> tria;
+  std::vector< unsigned int > repetitions(2);
+  repetitions[0]=14;
+  repetitions[1]=2;
+  GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
+                                             Point<2>(0.0,0.0), Point<2>(10.0,1.0));
+
+  struct Func
+  {
+      Point<2> operator() (const Point<2> & in) const
+	{
+	  return Point<2>(in(0), in(1)+sin(in(0)/5.0*3.14159));
+	}      
+  };
+  
+  GridTools::transform(Func(), tria);
+  mesh_info(tria, "grid-5.eps");  
+}
+
+// demonstrate GridTools::transform
+void grid_6()
+{
+  Triangulation<2> tria;
+  std::vector< unsigned int > repetitions(2);
+  repetitions[0]=40;
+  repetitions[1]=40;
+  GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
+                                             Point<2>(0.0,0.0), Point<2>(1.0,1.0));
+
+  struct Func
+  {
+      double trans(double x) const
+	{
+					   //return atan((x-0.5)*3.14159);
+	  return tanh(2*x)/tanh(2);//(x-0.5)*3.14159);
+	}
+      
+      Point<2> operator() (const Point<2> & in) const
+	{
+	  return Point<2>((in(0)), trans(in(1)));
+	}      
+  };
+  
+  GridTools::transform(Func(), tria);
+  mesh_info(tria, "grid-6.eps");  
+}
+
+
+
+//demonstrate distort_random
+void grid_7()
+{
+  Triangulation<2> tria;
+  std::vector< unsigned int > repetitions(2);
+  repetitions[0]=16;
+  repetitions[1]=16;
+  GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
+                                             Point<2>(0.0,0.0), Point<2>(1.0,1.0));
+
+  tria.distort_random(0.3, true);
+  mesh_info(tria, "grid-7.eps");  
+}
 
 // @sect3{The main function}
 
@@ -147,4 +224,8 @@ int main ()
   grid_1 ();
   grid_2 ();
   grid_3 ();
+  grid_4 ();
+  grid_5 ();
+  grid_6 ();
+  grid_7 ();
 }

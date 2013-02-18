@@ -66,8 +66,6 @@ void test()
   DoFTools::extract_locally_relevant_dofs (dh,locally_relevant_dofs);
 
   PETScWrappers::MPI::Vector solution(MPI_COMM_WORLD,locally_owned_dofs,locally_relevant_dofs);
-  solution = 0;
-  solution.update_ghost_values();
 
   parallel::distributed::SolutionTransfer<2,PETScWrappers::MPI::Vector> soltrans(dh);
 
@@ -89,7 +87,6 @@ void test()
 
   solution.reinit(MPI_COMM_WORLD,locally_owned_dofs,locally_relevant_dofs);
   solution = tmp;
-  solution.update_ghost_values();
 
 				   // make sure no processor is
 				   // hanging

@@ -45,11 +45,24 @@ void test ()
   deallog << "OK" << std::endl;
 
 				   // the following should yield an exception:
-  Assert (ComponentMask(12,true).first_selected_component(13) == 0,
-	  ExcInternalError());
+  try 
+    {
+      Assert (ComponentMask(12,true).first_selected_component(13) == 0,
+	      ExcInternalError());
+    }
+  catch (...)
+    {
+    }
+  
 				   // as should this:
-  Assert (ComponentMask(12,false).first_selected_component() == 0,
-	  ExcInternalError());
+  try
+    {
+      Assert (ComponentMask(12,false).first_selected_component() == 0,
+	      ExcInternalError());
+    }
+  catch (...)
+    {
+    }
 }
 
 

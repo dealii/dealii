@@ -672,6 +672,21 @@ public:
                         const Triangulation<dim, spacedim> &triangulation_2,
                         Triangulation<dim, spacedim>       &result);
 
+
+  /**
+   * Take a 2d Triangulation that is being extruded in z direction
+   * by the total height of @p height using @p n_slices slices (minimum is 2).
+   * The boundary indicators of the faces of @p input are going to be assigned
+   * to the corresponding side walls in z direction. The bottom and top
+   * get the next two free boundary indicators.
+   */
+  static
+  void
+  extrude_triangulation(const Triangulation<2, 2> & input,
+                        const unsigned int n_slices,
+                        const double height,
+                        Triangulation<3,3> &result);
+
   /**
    * This function transformes the @p Triangulation @p tria smoothly to a
    * domain that is described by the boundary points in the map @p

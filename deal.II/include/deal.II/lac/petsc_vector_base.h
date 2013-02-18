@@ -957,6 +957,8 @@ namespace PETScWrappers
               ExcWrongMode (VectorOperation::insert,
                             vector.last_action));
 
+      Assert (!vector.has_ghost_elements(), ExcGhostsPresent());
+
 #ifdef PETSC_USE_64BIT_INDICES
       const PetscInt petsc_i = index;
 #else
@@ -983,6 +985,8 @@ namespace PETScWrappers
               (vector.last_action == VectorOperation::unknown),
               ExcWrongMode (VectorOperation::add,
                             vector.last_action));
+
+      Assert (!vector.has_ghost_elements(), ExcGhostsPresent());
 
       vector.last_action = VectorOperation::add;
 
@@ -1021,6 +1025,8 @@ namespace PETScWrappers
               (vector.last_action == VectorOperation::unknown),
               ExcWrongMode (VectorOperation::add,
                             vector.last_action));
+
+      Assert (!vector.has_ghost_elements(), ExcGhostsPresent());
 
       vector.last_action = VectorOperation::add;
 
@@ -1061,6 +1067,8 @@ namespace PETScWrappers
               ExcWrongMode (VectorOperation::insert,
                             vector.last_action));
 
+      Assert (!vector.has_ghost_elements(), ExcGhostsPresent());
+
       vector.last_action = VectorOperation::insert;
 
       // we have to do above actions in any
@@ -1100,6 +1108,8 @@ namespace PETScWrappers
               (vector.last_action == VectorOperation::unknown),
               ExcWrongMode (VectorOperation::insert,
                             vector.last_action));
+
+      Assert (!vector.has_ghost_elements(), ExcGhostsPresent());
 
       vector.last_action = VectorOperation::insert;
 

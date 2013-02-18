@@ -44,8 +44,15 @@ void test ()
 
 				   // this now must throw an exception,
 				   // though:
-  Assert (BlockMask(12,true).n_selected_blocks(13) == 12,
-  	  ExcInternalError());
+  try 
+    {
+      Assert (BlockMask(12,true).n_selected_blocks(13) == 12,
+	      ExcInternalError());
+    }
+  catch (...)
+    {
+    }
+  
 }
 
 

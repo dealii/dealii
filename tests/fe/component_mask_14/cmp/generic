@@ -1,34 +1,18 @@
 
 DEAL::[false,false]
 DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::[true,false]
-DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::[false,false]
-DEAL::[true,false]
-DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::[false,true]
-DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::[true,true]
-DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::[false,true]
-DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::[true,true]
-DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::[false,false]
-DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
 DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
 DEAL::[true,false]
 DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
 DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::[false,false]
 DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::[true,false]
+DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
+DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
+DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
+DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
+DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
 DEAL::[false,true]
 DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::[true,true]
 DEAL::ExcMessage ("The component mask argument given to this function " "is not a mask where the individual components belonging " "to one block of the finite element are either all " "selected or not selected. You can't call this function " "with a component mask that splits blocks.")
-DEAL::[false,true]
 DEAL::[true,true]
 DEAL::OK

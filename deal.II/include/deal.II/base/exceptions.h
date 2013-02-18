@@ -839,6 +839,11 @@ namespace StandardExceptions
   DeclException0 (ExcNeedsNetCDF);
 
   /**
+   * Parallel vectors with ghost elements are read-only vectors.
+   */
+  DeclException0 (ExcGhostsPresent);
+
+  /**
    * A configuration option disabled this feature. In order to use it,
    * you must reconfigure and recompile the libraries.
    */
