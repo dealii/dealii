@@ -139,17 +139,17 @@ which yields with the second inequality:\\
 Find the displacement $u\in V^+$ with
 @f{gather*}\left(P_{\Pi}(C\varepsilon(u)),\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+,@f}
 with the projection:
-@f{gather*}P_{\Pi}(\tau):=@f{cases}
+@f{gather*}P_{\Pi}(\tau):=\begin{cases}
                         \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0 +  \gamma\xi,\\
                         \hat\alpha\dfrac{\tau^D}{\vert\tau^D\vert} + \dfrac{1}{3}tr(\tau), & \text{if }\vert\tau^D\vert > \sigma_0 +  \gamma\xi,
-                        @f}@f}
+                        \end{cases}@f}
 with the radius
 @f{gather*}\hat\alpha := \sigma_0 + \gamma\xi .@f}
 With the relation $\xi = \vert\varepsilon(u) - A\sigma\vert$ it is possible to eliminate $\xi$ inside the projection $P_{\Pi}$:\\
-@f{gather*}P_{\Pi}(\tau):=@f{cases}
+@f{gather*}P_{\Pi}(\tau):=\begin{cases}
                         \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0,\\
                         \alpha\dfrac{\tau^D}{\vert\tau^D\vert} + \dfrac{1}{3}tr(\tau), & \text{if }\vert\tau^D\vert > \sigma_0,
-                        @f}@f}
+                        \end{cases}@f}
 @f{gather*}\alpha := \sigma_0 + \dfrac{\gamma}{2\mu+\gamma}\left(\vert\tau^D\vert - \sigma_0\right) ,@f}
 with a further material parameter $\mu>0$ called shear modulus. We refer that
 this only possible for isotropic plasticity.
@@ -196,13 +196,13 @@ semi-linearform $a(.;.)$ at the point $u^i$ is
 
 @f{gather*}a'(u^i;\psi,\varphi) =
 (I(x)\varepsilon(\psi),\varepsilon(\varphi)),\quad x\in\Omega,@f} @f{gather*}
-I(x) := @f{cases}
+I(x) := \begin{cases}
 2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I, &
 \quad \vert \tau^D \vert \leq \sigma_0\\
 \dfrac{\alpha}{\vert\tau^D\vert}2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I
 - \dfrac{\tau^D\otimes\tau^D}{\vert\tau^D\vert}\right) + \kappa I\otimes I,
 &\quad \vert \tau^D \vert > \sigma_0
-@f}
+\end{cases}
 @f}
 with
 @f{gather*}\tau^D :=  C\varepsilon^D(u^i).@f}
@@ -347,4 +347,3 @@ motivation in Chinese. If your audience is Japanese, please see the other entry
 for motivation. This is a word in Japanese and Korean, but it means "motive
 power" or "kinetic energy" (without the motivation meaning that you are
 probably looking for)".)
-
