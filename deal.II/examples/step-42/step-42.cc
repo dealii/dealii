@@ -180,6 +180,7 @@ namespace Step42
   // to calculate a piecewise bilinear
   // function as a polynomial interpolation.
   // This will be done by obstacle_function ().
+  //
   // In the function run () of the class
   // PlasticityContactProblem we create
   // an object of the class Input which will
@@ -200,7 +201,7 @@ namespace Step42
       obstacle_data (0),
       lx (1.0), // length of the cube in x direction
       ly (1.0), // length of the cube in y direction
-      hx (0),
+      hx (0), //
       hy (0),
       nx (0),
       ny (0)
@@ -1463,9 +1464,7 @@ namespace Step42
   void PlasticityContactProblem<dim>::run ()
   {
     pcout << "Read the obstacle from a file." << std::endl;
-    input_obstacle.reset (new Input<dim>("li_kraft.pbm"));
-//    input_obstacle.reset (new Input<dim>("li_kraft_697x800.pbm"));
-
+    input_obstacle.reset (new Input<dim>("obstacle_file.pbm"));
     pcout << "Ostacle is available now." << std::endl;
 
     Timer             t;

@@ -104,14 +104,14 @@ public:
    * the set of indices represented
    * by this class.
    */
-  void add_range (const unsigned int begin,
-                  const unsigned int end);
+  void add_range (const types::global_dof_index begin,
+                  const types::global_dof_index end);
 
   /**
    * Add an individual index to the
    * set of indices.
    */
-  void add_index (const unsigned int index);
+  void add_index (const types::global_dof_index index);
 
   /**
    * Add a whole set of indices
@@ -857,8 +857,8 @@ IndexSet::n_elements () const
 
 
 inline
-unsigned int
-IndexSet::nth_index_in_set (const types::global_dof_index n) const
+types::global_dof_index
+IndexSet::nth_index_in_set (const unsigned int n) const
 {
   // to make this call thread-safe, compress()
   // must not be called through this function

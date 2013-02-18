@@ -1191,7 +1191,7 @@ Vector<Number>::operator = (const Vector<Number2> &v)
 
 template <typename Number>
 inline
-size_type Vector<Number>::size () const
+std::size_t Vector<Number>::size () const
 {
   return vec_size;
 }

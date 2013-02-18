@@ -65,7 +65,7 @@ template <typename number> class SparseMatrix;
  * <h3>Usage</h3>
  *
  * Use this class as follows:
- * @verbatim
+ * @code
  * CompressedSetSparsityPattern compressed_pattern (dof_handler.n_dofs());
  * DoFTools::make_sparsity_pattern (dof_handler,
  *                                  compressed_pattern);
@@ -73,7 +73,7 @@ template <typename number> class SparseMatrix;
  *
  * SparsityPattern sp;
  * sp.copy_from (compressed_pattern);
- * @endverbatim
+ * @endcode
  *
  * See also step-11 and step-18 for usage
  * patterns of the related CompressedSparsityPattern class, and

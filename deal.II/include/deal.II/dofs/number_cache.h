@@ -28,7 +28,7 @@ namespace internal
      * A structure used by the
      * DoFHandler classes to store
      * information about the degrees
-     * of freedom they deals with.
+     * of freedom they deal with.
      */
     struct NumberCache
     {

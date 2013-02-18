@@ -65,7 +65,7 @@ template <typename number> class SparseMatrix;
  * <h3>Usage</h3>
  *
  * Use this class as follows:
- * @verbatim
+ * @code
  * CompressedSparsityPattern compressed_pattern (dof_handler.n_dofs());
  * DoFTools::make_sparsity_pattern (dof_handler,
  *                                  compressed_pattern);
@@ -73,7 +73,7 @@ template <typename number> class SparseMatrix;
  *
  * SparsityPattern sp;
  * sp.copy_from (compressed_pattern);
- * @endverbatim
+ * @endcode
  *
  * See also step-11 and step-18 for usage
  * patterns.
@@ -507,7 +507,7 @@ CompressedSparsityPattern::Line::add (const size_type j)
 
 
 inline
-size_type
+std::size_t
 CompressedSparsityPattern::n_rows () const
 {
   return rows;
@@ -516,7 +516,7 @@ CompressedSparsityPattern::n_rows () const
 
 
 inline
-size_type
+std::size_t
 CompressedSparsityPattern::n_cols () const
 {
   return cols;
@@ -561,7 +561,7 @@ CompressedSparsityPattern::Line::Line ()
 
 
 inline
-size_type 
+std::size_t 
 CompressedSparsityPattern::row_length (const size_type row) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
@@ -574,7 +574,7 @@ CompressedSparsityPattern::row_length (const size_type row) const
 
 
 inline
-size_type 
+std::size_t 
 CompressedSparsityPattern::column_number (const size_type row,
                                           const size_type index) const
 {

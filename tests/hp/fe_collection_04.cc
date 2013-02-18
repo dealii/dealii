@@ -42,13 +42,14 @@ void test ()
   fe_collection.push_back (FESystem<dim>(FE_Q<dim>(2),dim));
 
 				   // we will get an assertion failure in
-				   // n_blocks here. what it returns instead
-				   // is then meaningless but it will in fact
-				   // be the number of blocks of the first
-				   // element of the collection, which here is
-				   // one
-  Assert (fe_collection.n_blocks() == 1,
-	  ExcInternalError());
+				   // n_blocks here.
+  try
+    {
+      fe_collection.n_blocks();
+    }
+  catch (...)
+    {
+    }
 
   deallog << "OK" << std::endl;
 }

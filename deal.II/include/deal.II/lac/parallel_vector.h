@@ -85,11 +85,6 @@ namespace parallel
     {
     public:
       /**
-       * Declare the type for container size.
-       */
-      typedef std::size_t size_type;
-
-      /**
        * Declare standard types used in all
        * containers. These types parallel those in
        * the <tt>C++</tt> standard libraries
@@ -1378,7 +1373,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    size_type Vector<Number>::size () const
+    std::size_t Vector<Number>::size () const
     {
       return partitioner->size();
     }
@@ -1387,7 +1382,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    size_type Vector<Number>::local_size () const
+    std::size_t Vector<Number>::local_size () const
     {
       return partitioner->local_size();
     }
@@ -1396,7 +1391,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    std::pair<size_type, size_type>
+    std::pair<std::size_t,std::size_t>
     Vector<Number>::local_range () const
     {
       return partitioner->local_range();
@@ -1417,7 +1412,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    size_type 
+    std::size_t 
     Vector<Number>::n_ghost_entries () const
     {
       return partitioner->n_ghost_indices();

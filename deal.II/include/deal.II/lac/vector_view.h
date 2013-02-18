@@ -136,7 +136,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef std::size_t int size_type;
+  typedef std::size_t size_type;
 
   /**
    * Read write constructor. Takes the size

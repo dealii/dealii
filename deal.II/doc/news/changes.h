@@ -153,6 +153,13 @@ never working correctly and it is not used.
 
 
 <ol>
+<li> Fixed: Many places in the documentation have been made to consistently
+use doxygen markup that indicates that this is code, so that doxygen will
+cross-link the piece of code to class and function names. Many typos have also
+been fixed.
+<br>
+(Felix Gruber, 2013/02/15)
+
 <li> Fixed: Starting in release 7.1, we first built the deal.II shared libraries
 in the local <code>/tmp</code> or similar directory rather than the final location
 because linking becomes very slow over remotely mounted file systems. Unfortunately,
@@ -186,6 +193,30 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: GridGenerator::extrude_triangulation() allows
+you to extrude a 2d mesh to turn it into a 3d mesh.
+<br>
+(Timo Heister, 2013/02/16)
+
+<li> PETScWrappers::MPI::Vector objects with ghost entries are read-only
+now.
+<br>
+(Timo Heister, 2013/02/16)
+
+<li> PETScWrappers::Vector::operator= and PETScWrappers::MPI::Vector::operator=
+now call update_ghost_values()
+automatically if necessary. This means that update_ghost_values()
+does not need to be called from user code at all any more.
+<br>
+(Timo Heister, 2013/02/14)
+
+<li> Fixed: VectorTools::interpolate did not work properly in 1d if
+boundary indicators had been set to anything but the default (i.e.,
+zero at the left and one at the right end of the domain). This was
+a hold-over from the past when these were the only possible values.
+This is now fixed.
+<br>
+(Kevin Dugan, Wolfgang Bangerth, 2013/02/14)
 
 <li> Improved: The iterator class of the deal.II SparseMatrix class
 and SparsityPattern have been revised for performance. Iterating over

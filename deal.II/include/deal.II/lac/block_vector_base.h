@@ -1767,7 +1767,7 @@ BlockVectorBase<VectorType>::BlockVectorBase ()
 
 template <class VectorType>
 inline
-size_type
+std::size_t
 BlockVectorBase<VectorType>::size () const
 {
   return block_indices.total_size();
@@ -1777,7 +1777,7 @@ BlockVectorBase<VectorType>::size () const
 
 template <class VectorType>
 inline
-size_type 
+unsigned int
 BlockVectorBase<VectorType>::n_blocks () const
 {
   return block_indices.size();

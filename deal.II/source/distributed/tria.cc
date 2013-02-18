@@ -2837,6 +2837,18 @@ namespace parallel
           return;
         }
 
+      // do not allow anisotropic refinement
+#ifdef DEBUG
+      for (typename Triangulation<dim,spacedim>::active_cell_iterator
+                 cell = this->begin_active();
+                 cell != this->end(); ++cell)
+              if (cell->is_locally_owned() && cell->refine_flag_set())
+                  Assert (cell->refine_flag_set() ==
+                          RefinementPossibilities<dim>::isotropic_refinement,
+                          ExcMessage ("This class does not support anisotropic refinement"));
+#endif
+
+
       // now do the work we're
       // supposed to do when we are
       // in charge
@@ -2856,17 +2868,6 @@ namespace parallel
             cell->clear_refine_flag ();
             cell->clear_coarsen_flag ();
           }
-        else
-          // if this is a cell we do
-          // own, make sure they are
-          // not refined
-          // anisotropically since we
-          // don't support this
-          if (cell->refine_flag_set())
-            Assert (cell->refine_flag_set() ==
-                    RefinementPossibilities<dim>::isotropic_refinement,
-                    ExcMessage ("This class does not support anisotropic refinement"));
-
 
 
       // count how many cells will be refined

@@ -1921,7 +1921,7 @@ ConstraintMatrix::set_inhomogeneity (const size_type line,
 
 
 inline
-size_type 
+std::size_t 
 ConstraintMatrix::n_constraints () const
 {
   return lines.size();
@@ -1962,7 +1962,7 @@ ConstraintMatrix::is_inhomogeneously_constrained (const size_type index) const
 
 
 inline
-const std::vector<std::pair<size_type,double> > *
+const std::vector<std::pair<std::size_t,double> > *
 ConstraintMatrix::get_constraint_entries (const size_type line) const
 {
   // check whether the entry is
@@ -1995,7 +1995,7 @@ ConstraintMatrix::get_inhomogeneity (const size_type line) const
 
 
 
-inline size_type 
+inline std::size_t 
 ConstraintMatrix::calculate_line_index (const size_type line) const
 {
   //IndexSet is unused (serial case)

@@ -67,7 +67,7 @@ template <class VECTOR> class FilteredMatrixBlock;
  * available.
  *
  * A typical code snippet showing the above steps is as follows:
- * @verbatim
+ * @code
  *   ... // set up sparse matrix A and right hand side b somehow
  *
  *                     // initialize filtered matrix with
@@ -91,7 +91,7 @@ template <class VECTOR> class FilteredMatrixBlock;
  *
  *                     // solve for solution vector x
  *   solver.solve (filtered_A, x, b, filtered_prec);
- * @endverbatim
+ * @endcode
  *
  *
  * <h3>Connection to other classes</h3>

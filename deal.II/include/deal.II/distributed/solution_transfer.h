@@ -32,7 +32,7 @@ namespace parallel
      * coarsening a distributed grid and
      * handles the necessary communication.
      *
-     * @note: It is important to note, that if you use more than one
+     * @note It is important to note, that if you use more than one
      * SolutionTransfer object at the same time, that the calls to
      * prepare_*() and interpolate()/deserialize() need to be in the same order.
      *
@@ -48,7 +48,7 @@ namespace parallel
      * <h3>Transfering a solution</h3>
      * Here VECTOR is your favorite vector type, e.g. PETScWrappers::MPI::Vector,
      * TrilinosWrappers::MPI::Vector, or corresponding blockvectors.
-     * @verbatim
+     * @code
      SolutionTransfer<dim, VECTOR> soltrans(dof_handler);
                                          // flag some cells for refinement
                                          // and coarsening, e.g.
@@ -69,7 +69,7 @@ namespace parallel
      VECTOR interpolated_solution;
      //create VECTOR in the right size here
      soltrans.interpolate(interpolated_solution);
-    @endverbatim
+    @endcode
      *
      * <h3>Use for Serialization</h3>
      *
@@ -77,21 +77,21 @@ namespace parallel
      * to a file. If you use more than one DoFHandler and therefore more than one SolutionTransfer object, they need to be serialized and deserialized in the same order.
      *
      * If vector has the locally relevant DoFs, serialization works as follows:
-     *@verbatim
+     *@code
 
     parallel::distributed::SolutionTransfer<dim,VECTOR> sol_trans(dof_handler);
     sol_trans.prepare_serialization (vector);
 
     triangulation.save(filename);
-    @endverbatim
+    @endcode
     * For deserialization the vector needs to be a distributed vector (without ghost elements):
-    * @verbatim
+    * @code
     //[create coarse mesh...]
     triangulation.load(filename);
 
     parallel::distributed::SolutionTransfer<dim,VECTOR> sol_trans(dof_handler);
     sol_trans.deserialize (distributed_vector);
-    @endverbatim
+    @endcode
      *
      * @ingroup distributed
      * @author Timo Heister, 2009-2011

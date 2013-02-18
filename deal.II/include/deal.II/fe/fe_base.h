@@ -302,7 +302,7 @@ public:
 
   /**
    * Constructor, computing all necessary values from the distribution of dofs
-   * to geometrcal objects.
+   * to geometrical objects.
    *
    * @param dofs_per_object Number of dofs on geometrical objects for each
    * dimension. In this vector, entry 0 refers to dofs on vertices, entry 1 on

@@ -62,9 +62,10 @@ grid_1 in this example.
 Meshes can be generated from different tools like <a
 href="http://geuz.org/gmsh/" rel="nofollow">gmsh</a>, <a
 href="https://lagrit.lanl.gov/" rel="nofollow">lagrit</a> and <a
-href="http://cubit.sandia.gov/" rel="nofollow">cubit</a>. The problem is that
-deal.II needs meshes that only consist of quads and hexas -- tetrahedral
-meshes won't work (this means tools like tetgen can not be used directly).
+href="http://cubit.sandia.gov/" rel="nofollow">cubit</a>. See the
+documentation of GridIn for more information. The problem is that deal.II
+needs meshes that only consist of quads and hexas -- tetrahedral meshes won't
+work (this means tools like tetgen can not be used directly).
 
 We will describe a possible workflow using Gmsh. Gmsh is the smallest and
 quickest to set up open source tool, that we know of. It can generate
@@ -100,42 +101,154 @@ gmsh -2 untitled.geo
 </pre>
 
 or by clicking "Mesh" and then "2D" inside Gmsh after loading the file.  Now
-this is the mesh read from the .msh file and saved again by deal.II as an image (see the grid_1 function: 
+this is the mesh read from the .msh file and saved again by deal.II as an
+image (see the grid_1 function):
 
 @image html step-49.grid-1.png
 
 
 <h3>Modify a Mesh</h3>
 
-modify a mesh:
-  - merge meshes
-  - change boundary indicators
-  - move vertices
-  - transform via smooth function
-  - perturb mesh
-  - relax inner vertices?
+After aquiring one (or several) meshes in the ways described above, there are
+many ways to manipulate them before using them in a finite element
+computation.
 
-other things to mention:
 
- GridTools::shift
- GridTools::transform
-GridTools::rotate
- GridTools::scale
+<h4>Transformations</h4>
+
+The GridTools namespace contains a collection of small functions to transform
+a given mesh in various ways. The usage of the functions GridTools::shift,
+GridTools::rotate, GridTools::scale is fairly obvious, so we won't discuss
+those functions here.
+
+The function GridTools::transform allows you to transform the vertices of a
+given mesh using a smooth function.
+
+In the function grid_5() we perturb the y coordinate of a mesh with
+a sin curve:
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+        @image html step-49.grid-5a.png regular input mesh
+    </td>
+    <td ALIGN="center">
+        @image html step-49.grid-5.png output mesh 
+    </td>
+  </tr>
+</TABLE>
+
+Using the formula
+$(x,y) \mapsto (x,tanh(2*y)/tanh(2))$, we transform a regular refined
+unit square to a wall-adapted mesh in y direction. This is done in grid_6()
+of this tutorial:
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+        @image html step-49.grid-6a.png regular input mesh
+    </td>
+    <td ALIGN="center">
+        @image html step-49.grid-6.png wall-adapted output mesh 
+    </td>
+  </tr>
+</TABLE>
+
+The function Triangulation::distort_random allows you to move vertices in the
+mesh (optionally ignoring boundary nodes) by a random amount. This is
+demonstrated in grid_7() and the result is as follows:
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+        @image html step-49.grid-7a.png regular input mesh
+    </td>
+    <td ALIGN="center">
+        @image html step-49.grid-7.png perturbed output mesh 
+    </td>
+  </tr>
+</TABLE>
+
+Please note that while this allows you to negate some of the superconvergence
+effects one gets when studying convergence on regular meshes, it is better to
+work with a sequence of unstructured meshes (see possible extensions).
+
 
 <h4>Merge Meshes</h4>
 
-use GridGenerator::merge_triangulations()
+The function GridGenerator::merge_triangulations() allows you to merge two
+given Triangulations into a single one. This only works, if the vertices of
+the to be shared edge or face match exactly. It is useful to use
+GridTools::shift and GridTools::scale to align the two meshes.  In the
+function grid_2() of this tutorial, we merge a square with a round hole
+(generated with hyper_cube_with_cylindrical_hole()) and a rectangle. The
+function GridTools::subdivided_hyper_rectangle() allows you to specify the
+number of repetitions and the positions of the corners, this way we do not
+need to shift it manually. You should inspect the mesh graphically to make
+sure, that cells line up correctly and no hanging nodes exist in the merged
+Triangulation.
 
-note, vertices have to match exactly.
+These are the input meshes and the output mesh:
+<TABLE WIDTH="80%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+        @image html step-49.grid-2a.png input mesh 1
+    </td>
+    <td ALIGN="center">
+        @image html step-49.grid-2b.png input mesh 2
+    </td>
 
-example:
-
-@image html step-49.grid-2.png
+    <td ALIGN="center">
+        @image html step-49.grid-2.png merged mesh
+    </td>
+  </tr>
+</table>
 
 
 <h4>Move Vertices</h4>
 
-move individual vertices, first identify cells/vertices
+The function grid_3() demonstrates the ability to pick individual vertices and
+move them around in an existing mesh. Please be sure to not produce degenerate
+cells. Here, we create a box with a cylindrical hole, that is not exactly
+centered by moving the top vertices upwards:
 
-@image html step-49.grid-3.png
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+        @image html step-49.grid-3a.png input mesh
+    </td>
 
+    <td ALIGN="center">
+        @image html step-49.grid-3.png top vertices moved upwards
+    </td>
+  </tr>
+</table>
+
+
+<h4>Extrude Meshes</h4>
+
+If you need a 3d mesh that can be created by extruding a given 2d mesh (that
+can be created in any of the ways given above), you can use the function
+GridGenerator::extrude_triangulation(). See grid_4() function in this tutorial
+for an example. Note that the given result could also be achieved using the 3d
+version of hyper_cube_with_cylindrical_hole(). The main usage is a 2d mesh
+generated for example with gmsh, that is read in from a .msh file as described
+above. This is the output from grid_4():
+
+<TABLE WIDTH="60%" ALIGN="center">
+  <tr>
+    <td ALIGN="center">
+      @image html step-49.grid-4base.png input mesh
+    </td>
+
+    <td ALIGN="center">
+      @image html step-49.grid-4.png extruded output mesh
+    </td>
+  </tr>
+</table>
+
+
+<h4>Possible Extensions</h4>
+
+- Modify a mesh:
+  - change boundary indicators
+  - relax inner vertices
+- Database of unstructured meshes for convergence studies
+- GridTools::extract_boundary_mesh 

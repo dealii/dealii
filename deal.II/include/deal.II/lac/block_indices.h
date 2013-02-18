@@ -17,6 +17,7 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
+#include <cstddef>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -226,13 +227,13 @@ inline
 LogStream &
 operator << (LogStream &s, const BlockIndices &bi)
 {
-  const size_type n = bi.size();
+  const std::size_t n = bi.size();
   s << n << ":[";
   // Write first size without leading space
   if (n>0)
     s << bi.block_size(0);
   // Write all other sizes
-  for (size_type i=1; i<n; ++i)
+  for (std::size_t i=1; i<n; ++i)
     s << ' ' << bi.block_size(i);
   s << "]->" << bi.total_size();
   return s;
@@ -402,7 +403,7 @@ BlockIndices::push_back(const size_type sz)
 
 
 inline
-std::pair<size_type,size_type>
+std::pair<std::size_t,std::size_t>
 BlockIndices::global_to_local (const size_type i) const
 {
   Assert (i<total_size(), ExcIndexRange(i, 0, total_size()));
@@ -417,7 +418,7 @@ BlockIndices::global_to_local (const size_type i) const
 
 
 inline
-size_type
+std::size_t
 BlockIndices::local_to_global (const size_type block,
                                const size_type index) const
 {
@@ -430,7 +431,7 @@ BlockIndices::local_to_global (const size_type block,
 
 
 inline
-size_type 
+std::size_t
 BlockIndices::size () const
 {
   return n_blocks;
@@ -439,7 +440,7 @@ BlockIndices::size () const
 
 
 inline
-size_type
+std::size_t
 BlockIndices::total_size () const
 {
   if (n_blocks == 0) return 0;
@@ -449,7 +450,7 @@ BlockIndices::total_size () const
 
 
 inline
-size_type 
+std::size_t
 BlockIndices::block_size (const size_type block) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
@@ -459,7 +460,7 @@ BlockIndices::block_size (const size_type block) const
 
 
 inline
-size_type
+std::size_t
 BlockIndices::block_start (const size_type block) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));

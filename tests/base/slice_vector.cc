@@ -55,5 +55,12 @@ int main()
 
   f(v);
 
-  make_slice(v, 3, 5);
+  try
+    {
+      make_slice(v, 3, 5);
+    }
+  catch(...)
+    {
+    }
+  
 }

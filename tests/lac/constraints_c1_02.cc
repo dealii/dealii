@@ -49,8 +49,15 @@ run()
 
   deallog << "Closing" << std::endl;
   deal_II_exceptions::disable_abort_on_exception();
-  constraints.close();
 
+  try
+    {
+      constraints.close();
+    }
+  catch (...)
+    {
+    }
+  
   deallog << "Closed" << std::endl;
 
 }

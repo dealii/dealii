@@ -14,6 +14,7 @@
 
 
 #include <deal.II/base/config.h>
+#include <cstddef>
 DEAL_II_NAMESPACE_OPEN
 
 /**
@@ -179,8 +180,8 @@ namespace numbers
    * array size, and the
    * like.
    */
-  static const size_type
-  invalid_size_type = static_cast<size_type> (-1);
+  static const std::size_t
+  invalid_size_type = static_cast<std::size_t> (-1);
 
   /**
                            * An invalid value for indices of degrees

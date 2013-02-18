@@ -220,7 +220,7 @@ namespace Utilities
    * enabling its use e.g. in other
    * templates.
    *
-   * Use this function with the arguments
+   * Use this class as in
    * <code>fixed_int_power@<5,2@>::value</code>
    * to compute 5<sup>2</sup>.
    */

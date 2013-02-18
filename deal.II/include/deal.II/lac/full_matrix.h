@@ -291,9 +291,9 @@ public:
    * constructor, one can easily
    * create an identity matrix of
    * size <code>n</code> by saying
-   * @verbatim
+   * @code
    * FullMatrix<double> M(IdentityMatrix(n));
-   * @endverbatim
+   * @endcode
    */
   FullMatrix (const IdentityMatrix &id);
   /**
@@ -340,9 +340,9 @@ public:
    * the argument. This way, one can easily
    * create an identity matrix of
    * size <code>n</code> by saying
-   * @verbatim
+   * @code
    *   M = IdentityMatrix(n);
-   * @endverbatim
+   * @endcode
    */
   FullMatrix<number> &
   operator = (const IdentityMatrix &id);
@@ -1005,8 +1005,8 @@ public:
    *  A(1...n,j)</i>.  Swap columns
    *  i and j of this
    */
-  void swap_col (const size_type int i,
-                 const size_type int j);
+  void swap_col (const size_type i,
+                 const size_type j);
 
   /**
    * Add constant to diagonal
@@ -1476,7 +1476,7 @@ public:
 
 template <typename number>
 inline
-size_type
+std::size_t
 FullMatrix<number>::m() const
 {
   return this->n_rows();
@@ -1486,7 +1486,7 @@ FullMatrix<number>::m() const
 
 template <typename number>
 inline
-size_type
+std::size_t
 FullMatrix<number>::n() const
 {
   return this->n_cols();
@@ -1654,7 +1654,7 @@ Accessor (const FullMatrix<number> *matrix,
 
 template <typename number>
 inline
-size_type
+std::size_t
 FullMatrix<number>::Accessor::row() const
 {
   return a_row;
@@ -1663,7 +1663,7 @@ FullMatrix<number>::Accessor::row() const
 
 template <typename number>
 inline
-size_type
+std::size_t
 FullMatrix<number>::Accessor::column() const
 {
   return a_col;
@@ -1846,9 +1846,9 @@ template <typename number>
 template <class STREAM>
 inline
 void
-FullMatrix<number>::print (STREAM          &s,
-                           const size_type  w,
-                           const size_type  p) const
+FullMatrix<number>::print (STREAM             &s,
+                           const unsigned int  w,
+                           const unsigned int  p) const
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 

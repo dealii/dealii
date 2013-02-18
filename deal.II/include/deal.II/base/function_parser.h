@@ -52,7 +52,7 @@ template <typename> class Vector;
  * function parser (see the ReadMe file of deal.II on instructions for this).
  *
  * The following example shows how to use this class:
- * @verbatim
+ * @code
   // Define some constants that will be used by the function parser
   std::map<std::string,double> constants;
   constants["pi"] = numbers::PI;
@@ -73,11 +73,11 @@ template <typename> class Vector;
   vector_function.initialize(variables,
                              expressions,
                              constants);
-  @endverbatim
+  @endcode
 
  * FunctionParser also provides an option to use <b>units</b> in expressions.
  * We illustrate the use of this functionality with the following example:
- * @verbatim
+ * @code
  // Define some constants that will be used by the function parser
   std::map<std::string> constants;
   std::map<std::string> units;
@@ -110,7 +110,7 @@ template <typename> class Vector;
     " @point " << "[" << point << "]" << " is " <<
     "[" <<  vector_function.value(point) << "]" << std::endl;
 
- * @endverbatim
+ * @endcode
  *
  * Units are similar to <b>constants</b> in the way they are passed to the
  * parser, i.e. via std::map<std::string,double>.  But units are slightly different
@@ -259,7 +259,7 @@ template <typename> class Vector;
  * strings each defining one vector component.
  *
  * An example of time dependent scalar function is the following:
-      @verbatim
+      @code
 
       // Empty constants object
       std::map<std::string> constants;
@@ -282,11 +282,11 @@ template <typename> class Vector;
                                         // and there is another variable
                                         // to be taken into account (t).
 
-     @endverbatim
+     @endcode
 
  * The following is another example of how to instantiate a
  * vector valued function by using a single string:
-     @verbatim
+     @code
 
       // Empty constants object
       std::map<std::string> constants;
@@ -305,7 +305,7 @@ template <typename> class Vector;
                           expression,
                           constants);
 
-     @endverbatim
+     @endcode
  *
  *
  * @ingroup functions

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -611,6 +611,7 @@ namespace GridOutFlags
      */
     void parse_parameters (ParameterHandler &param);
   };
+
   /**
    * Flags for XFig output.
    *
@@ -622,6 +623,7 @@ namespace GridOutFlags
      * Draw boundary lines. Default is true.
      */
     bool draw_boundary;
+
     /**
      * An enum used for deciding which field is used for coloring the cells.
      */
@@ -636,8 +638,10 @@ namespace GridOutFlags
       /// Convert the level subdomain id into the cell color
       level_subdomain_id
     } color_by;
+
     /**
-     * @deprecated Use the #color_by enum instead. If #color_by is different from #material_id, this flag is ignored.
+     * @deprecated Use the color_by enum instead. If color_by is different
+     * from material_id, this flag is ignored.
      *
      * Change color depending on
      * level. Default is false, therefore,
@@ -645,6 +649,7 @@ namespace GridOutFlags
      * boundary id.
      */
     bool level_color;
+
     /**
      * Code level to depth. Default is
      * true. If false, color depends on
@@ -654,6 +659,7 @@ namespace GridOutFlags
      * this value is true.
      */
     bool level_depth;
+
     /**
      * Additional points for curved
      * boundaries. Default is none.
@@ -666,6 +672,7 @@ namespace GridOutFlags
      * one inch.
      */
     Point<2> scaling;
+
     /**
      * Offset of the graph. Before
      * scaling, the coordinates are
@@ -674,6 +681,7 @@ namespace GridOutFlags
      * each direction.
      */
     Point<2> offset;
+
     /**
      * Style for filling cells. Default is
      * solid fill (20). This value is
@@ -683,6 +691,7 @@ namespace GridOutFlags
      * object of XFig.
      */
     int fill_style;
+
     /**
      * Style for drawing border lines of
      * polygons. Defaults to solid (0) and
@@ -739,18 +748,18 @@ namespace GridOutFlags
  * and the corresponding output function names.
  *
  * Usage is simple: either you use the direct form
- * @verbatim
+ * @code
  *   ofstream output_file("some_filename");
  *   GridOut().write_gnuplot (tria, output_file);
- * @endverbatim
+ * @endcode
  * if you know which format you want to have, or if you want the format to be
  * a runtime parameter, you can write
- * @verbatim
+ * @code
  *   GridOut::OutputFormat grid_format =
  *                   GridOut::parse_output_format(get_format_name_from_somewhere());
  *   ofstream output_file("some_filename" + GridOut::default_suffix(output_format));
  *   GridOut().write (tria, output_file, output_format);
- * @endverbatim
+ * @endcode
  * The function <tt>get_output_format_names()</tt> provides a list of possible names of
  * output formats in a string that is understandable by the ParameterHandler class.
  *
@@ -775,14 +784,14 @@ namespace GridOutFlags
  * format. These are collected in structures GridOutFlags::Eps(),
  * GridOutFlags::Gnuplot(), etc declared in the GridOutFlags
  * namespace, and you can set your preferred flags like this:
- * @verbatim
+ * @code
  *   GridOut grid_out;
  *   GridOutFlags::Ucd ucd_flags;
  *   ...    // set some fields in ucd_flags
  *   grid_out.set_flags (ucd_flags);
  *   ...
  *   ...    // write some file with data_out
- * @endverbatim
+ * @endcode
  * The respective output function then use the so-set flags. By default, they
  * are set to reasonable values as described above and in the documentation
  * of the different flags structures. Resetting the flags can

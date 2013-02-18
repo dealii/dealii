@@ -76,16 +76,17 @@ namespace PETScWrappers
       IndexSet ghost_set = ghost;
       ghost_set.subtract_set(local);
 
-      //possible optmization: figure out if
-      //there are ghost indices (collective
-      //operation!) and then create a
-      //non-ghosted vector.
-//      Vector::create_vector (local.size(), local.n_elements());
-
       Vector::create_vector(local.size(), local.n_elements(), ghost_set);
     }
 
-
+    Vector::Vector (const MPI_Comm     &communicator,
+                     const IndexSet   &local)
+    :
+          communicator (communicator)
+    {
+      Assert(local.is_contiguous(), ExcNotImplemented());
+      Vector::create_vector(local.size(), local.n_elements());
+    }
 
     void
     Vector::reinit (const MPI_Comm    &comm,
@@ -159,6 +160,15 @@ namespace PETScWrappers
       create_vector(local.size(), local.n_elements(), ghost_set);
     }
 
+    void
+    Vector::reinit (const MPI_Comm     &comm,
+                 const IndexSet   &local)
+    {
+      communicator = comm;
+
+      Assert(local.is_contiguous(), ExcNotImplemented());
+      create_vector(local.size(), local.n_elements());
+    }
 
 
     Vector &
@@ -197,6 +207,8 @@ namespace PETScWrappers
       ierr = VecRestoreArray (static_cast<const Vec &>(v), &src_array);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
+      if (has_ghost_elements())
+        update_ghost_values();
       return *this;
     }
 
@@ -206,6 +218,7 @@ namespace PETScWrappers
                            const unsigned int  local_size)
     {
       Assert (local_size <= n, ExcIndexRange (local_size, 0, n));
+      ghosted = false;
 
       const int ierr
         = VecCreateMPI (communicator, local_size, PETSC_DETERMINE,

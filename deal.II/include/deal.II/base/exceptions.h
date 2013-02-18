@@ -192,7 +192,9 @@ namespace deal_II_exceptions
 
   /**
    * Calling this function switches off the use of std::abort() when an
-   * exception is created using the Assert() macro. Generally, you want
+   * exception is created using the Assert() macro. Instead, the Exception
+   * will be thrown using 'throw', so it can be caught if desired.
+   *  Generally, you want
    * to abort the execution of a program when Assert() is called, but it
    * needs to be switched off if you want to log all exceptions created,
    * or if you want to test if an assertion is working correctly. This is
@@ -835,6 +837,11 @@ namespace StandardExceptions
    * standard path nor configured with --with-netcdf.
    */
   DeclException0 (ExcNeedsNetCDF);
+
+  /**
+   * Parallel vectors with ghost elements are read-only vectors.
+   */
+  DeclException0 (ExcGhostsPresent);
 
   /**
    * A configuration option disabled this feature. In order to use it,

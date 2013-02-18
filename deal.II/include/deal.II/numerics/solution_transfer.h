@@ -41,7 +41,7 @@ DEAL_II_NAMESPACE_OPEN
  * <ul>
  * <li> If the grid will only be refined
  * (i.e. no cells are coarsened) then use @p SolutionTransfer as follows:
- * @verbatim
+ * @code
  * SolutionTransfer<dim, double> soltrans(*dof_handler);
  *                                     // flag some cells for refinement, e.g.
  * GridRefinement::refine_and_coarsen_fixed_fraction(
@@ -56,10 +56,10 @@ DEAL_II_NAMESPACE_OPEN
  * tria->execute_coarsening_and_refinement();
  *                                     // and redistribute dofs.
  * dof_handler->distribute_dofs (fe);
- * @endverbatim
+ * @endcode
  *
  * Then to proceed do
- * @verbatim
+ * @code
  *                                     // take a copy of the solution vector
  * Vector<double> solution_old(solution);
  *                                     // resize solution vector to the correct
@@ -69,24 +69,24 @@ DEAL_II_NAMESPACE_OPEN
  * solution.reinit(dof_handler->n_dofs());
  *                                     // and finally interpolate
  * soltrans.refine_interpolate(solution_old, solution);
- * @endverbatim
+ * @endcode
  *
  * Although the @p refine_interpolate functions are allowed to be
  * called multiple times, e.g. for interpolating several solution
  * vectors, there is following possibility of interpolating several
  * functions simultaneously.
- * @verbatim
+ * @code
  * vector<Vector<double> > solutions_old(n_vectors, Vector<double> (n));
  * ...
  * vector<Vector<double> > solutions(n_vectors, Vector<double> (n));
  * soltrans.refine_interpolate(solutions_old, solutions);
- * @endverbatim
+ * @endcode
  * This is used in several of the tutorial programs, for example
  * step-31.
  *
  * <li> If the grid has cells that will be coarsened,
  * then use @p SolutionTransfer as follows:
- * @verbatim
+ * @code
  * SolutionTransfer<dim, Vector<double> > soltrans(*dof_handler);
  *                                     // flag some cells for refinement
  *                                     // and coarsening, e.g.
@@ -106,7 +106,7 @@ DEAL_II_NAMESPACE_OPEN
  *                                     // and interpolate the solution
  * Vector<double> interpolate_solution(dof_handler->n_dofs());
  * soltrans.interpolate(solution, interpolated_solution);
- * @endverbatim
+ * @endcode
  *
  * Multiple calls to the function
  * <tt>interpolate (const Vector<number> &in, Vector<number> &out)</tt>

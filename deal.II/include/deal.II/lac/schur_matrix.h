@@ -80,11 +80,11 @@ DEAL_II_NAMESPACE_OPEN
  * Applying these transformations, the solution of the system above by a
  * @p SchurMatrix @p schur is coded as follows:
  *
- * @verbatim
+ * @code
  *   schur.prepare_rhs (g, f);
  *   solver.solve (schur, p, g, precondition);
  *   schur.postprocess (u, p);
- * @endverbatim
+ * @endcode
  *
  * @see @ref GlossBlockLA "Block (linear algebra)"
  * @author Guido Kanschat, 2000, 2001, 2002

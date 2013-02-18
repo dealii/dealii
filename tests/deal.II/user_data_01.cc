@@ -168,7 +168,13 @@ user_pointers(Triangulation<dim>& tr)
 				   // Check if they are still the same
   check_user_pointers(tr);
 				   // Create two pointer index clashes here
-  tr.begin()->user_index();
+  try
+    {
+      tr.begin()->user_index();
+    }
+  catch (...)
+    {
+    }
   tr.begin()->user_pointer();
 
 
@@ -239,8 +245,15 @@ user_indices(Triangulation<dim>& tr)
 				   // Check if they are still the same
   check_user_indices(tr);
 				   // Create two pointer index clashes here
-  tr.begin()->user_pointer();
+  try
+    {
+      tr.begin()->user_pointer();
+    }
+  catch (...)
+    {
+    }
   tr.begin()->user_index();
+  
 
 
 				   // Check if save and load work
