@@ -34,7 +34,7 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
   if (n_elements <= 0)
     return;
 
-  const unsigned int stop_size = entries.size() + n_elements;
+  const size_type stop_size = entries.size() + n_elements;
 
   if (indices_are_sorted == true && n_elements > 3)
     {
@@ -60,8 +60,8 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
       // first entry is a duplicate before
       // actually doing something.
       ForwardIterator my_it = begin;
-      unsigned int col = *my_it;
-      std::vector<unsigned int>::iterator it =
+      size_type col = *my_it;
+      std::vector<size_type>::iterator it =
         Utilities::lower_bound(entries.begin(), entries.end(), col);
       while (*it == col)
         {
@@ -90,14 +90,14 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
 
       // resize vector by just inserting the
       // list
-      const unsigned int pos1 = it - entries.begin();
+      const size_type pos1 = it - entries.begin();
       Assert (pos1 <= entries.size(), ExcInternalError());
       entries.insert (it, my_it, end);
       it = entries.begin() + pos1;
-      Assert (entries.size() >= (unsigned int)(it-entries.begin()), ExcInternalError());
+      Assert (entries.size() >= (size_type)(it-entries.begin()), ExcInternalError());
 
       // now merge the two lists.
-      std::vector<unsigned int>::iterator it2 = it + (end-my_it);
+      std::vector<size_type>::iterator it2 = it + (end-my_it);
 
       // as long as there are indices both in
       // the end of the entries list and in the
@@ -125,7 +125,7 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
         *it++ = *it2++;
 
       // resize and return
-      const unsigned int new_size = it - entries.begin();
+      const size_type new_size = it - entries.begin();
       Assert (new_size <= stop_size, ExcInternalError());
       entries.resize (new_size);
       return;
@@ -140,8 +140,8 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
   if (stop_size > entries.capacity())
     entries.reserve (stop_size);
 
-  unsigned int col = *my_it;
-  std::vector<unsigned int>::iterator it, it2;
+  size_type col = *my_it;
+  std::vector<size_type>::iterator it, it2;
   // insert the first element as for one
   // entry only first check the last
   // element (or if line is still empty)
@@ -209,7 +209,7 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
 std::size_t
 CompressedSimpleSparsityPattern::Line::memory_consumption () const
 {
-  return entries.capacity()*sizeof(unsigned int)+sizeof(Line);
+  return entries.capacity()*sizeof(size_type)+sizeof(Line);
 }
 
 
@@ -236,8 +236,8 @@ CompressedSimpleSparsityPattern (const CompressedSimpleSparsityPattern &s)
 
 
 
-CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const types::global_dof_index m,
-    const types::global_dof_index n,
+CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const size_type m,
+    const size_type n,
     const IndexSet &rowset_
                                                                  )
   :
@@ -250,7 +250,7 @@ CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const types::g
 
 
 
-CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const types::global_dof_index n)
+CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const size_type n)
   :
   rows(0),
   cols(0),
@@ -276,8 +276,8 @@ CompressedSimpleSparsityPattern::operator = (const CompressedSimpleSparsityPatte
 
 
 void
-CompressedSimpleSparsityPattern::reinit (const types::global_dof_index m,
-                                         const types::global_dof_index n,
+CompressedSimpleSparsityPattern::reinit (const size_type m,
+                                         const size_type n,
                                          const IndexSet &rowset_)
 {
   rows = m;
@@ -306,13 +306,13 @@ CompressedSimpleSparsityPattern::empty () const
 
 
 
-unsigned int
+size_type 
 CompressedSimpleSparsityPattern::max_entries_per_row () const
 {
-  unsigned int m = 0;
-  for (unsigned int i=0; i<lines.size(); ++i)
+  size_type m = 0;
+  for (size_type i=0; i<lines.size(); ++i)
     {
-      m = std::max (m, static_cast<unsigned int>(lines[i].entries.size()));
+      m = std::max (m, static_cast<size_type>(lines[i].entries.size()));
     }
 
   return m;
@@ -321,14 +321,14 @@ CompressedSimpleSparsityPattern::max_entries_per_row () const
 
 
 bool
-CompressedSimpleSparsityPattern::exists (const types::global_dof_index i,
-                                         const types::global_dof_index j) const
+CompressedSimpleSparsityPattern::exists (const size_type i,
+                                         const size_type j) const
 {
   Assert (i<rows, ExcIndexRange(i, 0, rows));
   Assert (j<cols, ExcIndexRange(j, 0, cols));
   Assert( rowset.size()==0 || rowset.is_element(i), ExcInternalError());
 
-  const unsigned int rowindex =
+  const size_type rowindex =
     rowset.size()==0 ? i : rowset.index_within_set(i);
 
   return std::binary_search (lines[rowindex].entries.begin(),
@@ -354,12 +354,12 @@ CompressedSimpleSparsityPattern::symmetrize ()
   // 2. that the @p{add} function can
   // be called on elements that
   // already exist without any harm
-  for (unsigned int row=0; row<lines.size(); ++row)
+  for (size_type row=0; row<lines.size(); ++row)
     {
-      const unsigned int rowindex =
+      const size_type rowindex =
         rowset.size()==0 ? row : rowset.nth_index_in_set(row);
 
-      for (std::vector<unsigned int>::const_iterator
+      for (std::vector<size_type>::const_iterator
            j=lines[row].entries.begin();
            j != lines[row].entries.end();
            ++j)
@@ -375,11 +375,11 @@ CompressedSimpleSparsityPattern::symmetrize ()
 void
 CompressedSimpleSparsityPattern::print (std::ostream &out) const
 {
-  for (unsigned int row=0; row<lines.size(); ++row)
+  for (size_type row=0; row<lines.size(); ++row)
     {
       out << '[' << (rowset.size()==0 ? row : rowset.nth_index_in_set(row));
 
-      for (std::vector<unsigned int>::const_iterator
+      for (std::vector<size_type >::const_iterator
            j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
         out << ',' << *j;
@@ -395,12 +395,12 @@ CompressedSimpleSparsityPattern::print (std::ostream &out) const
 void
 CompressedSimpleSparsityPattern::print_gnuplot (std::ostream &out) const
 {
-  for (unsigned int row=0; row<lines.size(); ++row)
+  for (size_type row=0; row<lines.size(); ++row)
     {
-      const unsigned int rowindex =
+      const size_type rowindex =
         rowset.size()==0 ? row : rowset.nth_index_in_set(row);
 
-      for (std::vector<unsigned int>::const_iterator
+      for (std::vector<size_type >::const_iterator
            j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
         // while matrix entries are usually
@@ -419,19 +419,19 @@ CompressedSimpleSparsityPattern::print_gnuplot (std::ostream &out) const
 
 
 
-unsigned int
+size_type 
 CompressedSimpleSparsityPattern::bandwidth () const
 {
-  unsigned int b=0;
-  for (unsigned int row=0; row<lines.size(); ++row)
+  size_type b=0;
+  for (size_type row=0; row<lines.size(); ++row)
     {
-      const unsigned int rowindex =
+      const size_type rowindex =
         rowset.size()==0 ? row : rowset.nth_index_in_set(row);
 
-      for (std::vector<unsigned int>::const_iterator
+      for (std::vector<size_type>::const_iterator
            j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
-        if (static_cast<unsigned int>(std::abs(static_cast<int>(rowindex-*j))) > b)
+        if (static_cast<size_type>(std::abs(static_cast<int>(rowindex-*j))) > b)
           b = std::abs(static_cast<signed int>(rowindex-*j));
     }
 
@@ -440,11 +440,11 @@ CompressedSimpleSparsityPattern::bandwidth () const
 
 
 
-unsigned int
+size_type 
 CompressedSimpleSparsityPattern::n_nonzero_elements () const
 {
-  unsigned int n=0;
-  for (unsigned int i=0; i<lines.size(); ++i)
+  size_type n=0;
+  for (size_type i=0; i<lines.size(); ++i)
     {
       n += lines[i].entries.size();
     }
@@ -453,12 +453,12 @@ CompressedSimpleSparsityPattern::n_nonzero_elements () const
 }
 
 
-std::size_t
+size_type
 CompressedSimpleSparsityPattern::memory_consumption () const
 {
   //TODO: IndexSet...
-  std::size_t mem = sizeof(CompressedSimpleSparsityPattern);
-  for (unsigned int i=0; i<lines.size(); ++i)
+  size_type mem = sizeof(CompressedSimpleSparsityPattern);
+  for (size_type i=0; i<lines.size(); ++i)
     mem += MemoryConsumption::memory_consumption (lines[i]);
 
   return mem;
@@ -466,16 +466,16 @@ CompressedSimpleSparsityPattern::memory_consumption () const
 
 
 // explicit instantiations
-template void CompressedSimpleSparsityPattern::Line::add_entries(types::global_dof_index *,
-    types::global_dof_index *,
+template void CompressedSimpleSparsityPattern::Line::add_entries(size_type *,
+    size_type *,
     const bool);
-template void CompressedSimpleSparsityPattern::Line::add_entries(const types::global_dof_index *,
-    const types::global_dof_index *,
+template void CompressedSimpleSparsityPattern::Line::add_entries(const size_type *,
+    const size_type *,
     const bool);
 #ifndef DEAL_II_VECTOR_ITERATOR_IS_POINTER
 template void CompressedSimpleSparsityPattern::Line::
-add_entries(std::vector<unsigned int>::iterator,
-            std::vector<unsigned int>::iterator,
+add_entries(std::vector<size_type>::iterator,
+            std::vector<size_type>::iterator,
             const bool);
 #endif
 

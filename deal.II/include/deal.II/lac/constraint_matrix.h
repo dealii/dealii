@@ -54,8 +54,8 @@ namespace internals
 
 
 //TODO[WB]: We should have a function of the kind
-//   ConstraintMatrix::add_constraint (const types::global_dof_index constrained_dof,
-//                const std::vector<std::pair<types::global_dof_index, double> > &entries,
+//   ConstraintMatrix::add_constraint (const size_type constrained_dof,
+//                const std::vector<std::pair<size_type, double> > &entries,
 //                const double inhomogeneity = 0);
 // rather than building up constraints piecemeal through add_line/add_entry
 // etc. This would also eliminate the possibility of accidentally changing
@@ -140,6 +140,11 @@ class ConstraintMatrix : public Subscriptor
 {
 public:
   /**
+   * Declare the type for container size.
+   */
+  typedef std::size_t size_type;
+
+  /**
    * An enum that describes what should
    * happen if the two ConstraintMatrix
    * objects involved in a call to the
@@ -221,7 +226,7 @@ public:
    * line. Always returns true if not in
    * the distributed case.
    */
-  bool can_store_line (const types::global_dof_index line_index) const;
+  bool can_store_line (const size_type line_index) const;
 
   /**
    * This function copies the content of @p
@@ -271,7 +276,7 @@ public:
    * line already exists, then the function
    * simply returns without doing anything.
    */
-  void add_line (const types::global_dof_index line);
+  void add_line (const size_type line);
 
   /**
    * Call the first add_line() function for
@@ -315,7 +320,7 @@ public:
    * inhomogeneities using
    * set_inhomogeneity().
    */
-  void add_lines (const std::set<types::global_dof_index> &lines);
+  void add_lines (const std::set<size_type> &lines);
 
   /**
    * Call the first add_line() function for
@@ -360,8 +365,8 @@ public:
    * same. Thus, it does no harm to
    * enter a constraint twice.
    */
-  void add_entry (const types::global_dof_index line,
-                  const types::global_dof_index column,
+  void add_entry (const size_type line,
+                  const size_type column,
                   const double value);
 
   /**
@@ -373,8 +378,8 @@ public:
    * function several times, but is
    * faster.
    */
-  void add_entries (const types::global_dof_index                                  line,
-                    const std::vector<std::pair<types::global_dof_index,double> > &col_val_pairs);
+  void add_entries (const size_type                                  line,
+                    const std::vector<std::pair<size_type,double> > &col_val_pairs);
 
   /**
    * Set an imhomogeneity to the
@@ -385,8 +390,8 @@ public:
    * @note the line needs to be added with
    * one of the add_line() calls first.
    */
-  void set_inhomogeneity (const types::global_dof_index line,
-                          const double       value);
+  void set_inhomogeneity (const size_type line,
+                          const double    value);
 
   /**
    * Close the filling of entries. Since
@@ -471,7 +476,7 @@ public:
    * finally merge() them together
    * again.
    */
-  void shift (const types::global_dof_index offset);
+  void shift (const size_type offset);
 
   /**
    * Clear all entries of this
@@ -499,7 +504,7 @@ public:
    * Return number of constraints stored in
    * this matrix.
    */
-  unsigned int n_constraints () const;
+  size_type n_constraints () const;
 
   /**
    * Return whether the degree of freedom
@@ -515,7 +520,7 @@ public:
    * called, we have to perform a linear
    * search through all entries.
    */
-  bool is_constrained (const types::global_dof_index index) const;
+  bool is_constrained (const size_type index) const;
 
   /**
    * Return whether the dof is
@@ -536,7 +541,7 @@ public:
    * freedom but with a weight different
    * from one.
    */
-  bool is_identity_constrained (const types::global_dof_index index) const;
+  bool is_identity_constrained (const size_type index) const;
 
   /**
    * Return the maximum number of other
@@ -555,7 +560,7 @@ public:
    * constrained node are indirected to
    * the nodes it is constrained to.
    */
-  unsigned int max_constraint_indirections () const;
+  size_type max_constraint_indirections () const;
 
   /**
    * Returns <tt>true</tt> in case the
@@ -563,7 +568,7 @@ public:
    * non-trivial inhomogeneous valeus set
    * to the dof.
    */
-  bool is_inhomogeneously_constrained (const types::global_dof_index index) const;
+  bool is_inhomogeneously_constrained (const size_type index) const;
 
   /**
    * Returns <tt>false</tt> if all
@@ -580,8 +585,8 @@ public:
    * zero pointer in case the dof is not
    * constrained.
    */
-  const std::vector<std::pair<types::global_dof_index,double> > *
-  get_constraint_entries (const types::global_dof_index line) const;
+  const std::vector<std::pair<size_type,double> > *
+  get_constraint_entries (const size_type line) const;
 
   /**
    * Returns the value of the inhomogeneity
@@ -589,7 +594,7 @@ public:
    * line. Unconstrained dofs also return a
    * zero value.
    */
-  double get_inhomogeneity (const types::global_dof_index line) const;
+  double get_inhomogeneity (const size_type line) const;
 
   /**
    * Print the constraint lines. Mainly
@@ -631,7 +636,7 @@ public:
    * consumption (in bytes) of this
    * object.
    */
-  std::size_t memory_consumption () const;
+  size_type memory_consumption () const;
 
   /**
    * @}
@@ -985,9 +990,9 @@ public:
    */
   template <class InVector, class OutVector>
   void
-  distribute_local_to_global (const InVector                  &local_vector,
-                              const std::vector<types::global_dof_index> &local_dof_indices,
-                              OutVector                       &global_vector) const;
+  distribute_local_to_global (const InVector               &local_vector,
+                              const std::vector<size_type> &local_dof_indices,
+                              OutVector                    &global_vector) const;
 
   /**
    * This function takes a vector of
@@ -1062,10 +1067,10 @@ public:
    */
   template <typename VectorType>
   void
-  distribute_local_to_global (const Vector<double>            &local_vector,
-                              const std::vector<types::global_dof_index> &local_dof_indices,
-                              VectorType                      &global_vector,
-                              const FullMatrix<double>        &local_matrix) const;
+  distribute_local_to_global (const Vector<double>         &local_vector,
+                              const std::vector<size_type> &local_dof_indices,
+                              VectorType                   &global_vector,
+                              const FullMatrix<double>     &local_matrix) const;
 
   /**
    * Enter a single value into a
@@ -1073,9 +1078,9 @@ public:
    */
   template <class VectorType>
   void
-  distribute_local_to_global (const unsigned int index,
-                              const double       value,
-                              VectorType        &global_vector) const;
+  distribute_local_to_global (const size_type index,
+                              const double    value,
+                              VectorType     &global_vector) const;
 
   /**
    * This function takes a pointer to a
@@ -1195,9 +1200,9 @@ public:
    */
   template <typename MatrixType>
   void
-  distribute_local_to_global (const FullMatrix<double>        &local_matrix,
-                              const std::vector<types::global_dof_index> &local_dof_indices,
-                              MatrixType                      &global_matrix) const;
+  distribute_local_to_global (const FullMatrix<double>     &local_matrix,
+                              const std::vector<size_type> &local_dof_indices,
+                              MatrixType                   &global_matrix) const;
 
   /**
    * Does the same as the function
@@ -1206,10 +1211,10 @@ public:
    */
   template <typename MatrixType>
   void
-  distribute_local_to_global (const FullMatrix<double>        &local_matrix,
-                              const std::vector<types::global_dof_index> &row_indices,
-                              const std::vector<types::global_dof_index> &col_indices,
-                              MatrixType                      &global_matrix) const;
+  distribute_local_to_global (const FullMatrix<double>     &local_matrix,
+                              const std::vector<size_type> &row_indices,
+                              const std::vector<size_type> &col_indices,
+                              MatrixType                   &global_matrix) const;
 
   /**
    * This function simultaneously
@@ -1231,12 +1236,12 @@ public:
    */
   template <typename MatrixType, typename VectorType>
   void
-  distribute_local_to_global (const FullMatrix<double>        &local_matrix,
-                              const Vector<double>            &local_vector,
-                              const std::vector<types::global_dof_index> &local_dof_indices,
-                              MatrixType                      &global_matrix,
-                              VectorType                      &global_vector,
-                              bool                            use_inhomogeneities_for_rhs = false) const;
+  distribute_local_to_global (const FullMatrix<double>      &local_matrix,
+                              const Vector<double>          &local_vector,
+                              const std::vector<size_type>  &local_dof_indices,
+                              MatrixType                    &global_matrix,
+                              VectorType                    &global_vector,
+                              bool                          use_inhomogeneities_for_rhs = false) const;
 
   /**
    * Do a similar operation as the
@@ -1319,9 +1324,9 @@ public:
    */
   template <typename SparsityType>
   void
-  add_entries_local_to_global (const std::vector<types::global_dof_index> &local_dof_indices,
-                               SparsityType                    &sparsity_pattern,
-                               const bool                       keep_constrained_entries = true,
+  add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
+                               SparsityType                 &sparsity_pattern,
+                               const bool                    keep_constrained_entries = true,
                                const Table<2,bool>             &dof_mask = default_empty_table) const;
 
   /**
@@ -1332,11 +1337,11 @@ public:
 
   template <typename SparsityType>
   void
-  add_entries_local_to_global (const std::vector<types::global_dof_index> &row_indices,
-                               const std::vector<types::global_dof_index> &col_indices,
-                               SparsityType                    &sparsity_pattern,
-                               const bool                       keep_constrained_entries = true,
-                               const Table<2,bool>             &dof_mask = default_empty_table) const;
+  add_entries_local_to_global (const std::vector<size_type> &row_indices,
+                               const std::vector<size_type> &col_indices,
+                               SparsityType                 &sparsity_pattern,
+                               const bool                    keep_constrained_entries = true,
+                               const Table<2,bool>          &dof_mask = default_empty_table) const;
 
   /**
    * This function imports values from a
@@ -1451,7 +1456,7 @@ public:
    * @ingroup Exceptions
    */
   DeclException1 (ExcLineInexistant,
-                  types::global_dof_index,
+                  size_type,
                   << "The specified line " << arg1
                   << " does not exist.");
   /**
@@ -1520,7 +1525,7 @@ private:
      * of entries that make up the homogenous
      * part of a constraint.
      */
-    typedef std::vector<std::pair<types::global_dof_index,double> > Entries;
+    typedef std::vector<std::pair<size_type,double> > Entries;
 
     /**
      * Number of this line. Since only
@@ -1529,7 +1534,7 @@ private:
      * and have to store the line
      * number explicitly.
      */
-    types::global_dof_index line;
+    size_type line;
 
     /**
      * Row numbers and values of the
@@ -1601,7 +1606,7 @@ private:
   std::vector<ConstraintLine> lines;
 
   /**
-   * A list of unsigned integers that
+   * A list of size_type that
    * contains the position of the
    * ConstraintLine of a constrained degree
    * of freedom, or
@@ -1658,7 +1663,7 @@ private:
    * contributions into vectors and
    * matrices.
    */
-  std::vector<types::global_dof_index> lines_cache;
+  std::vector<size_type> lines_cache;
 
   /**
    * This IndexSet is used to limit the
@@ -1681,7 +1686,7 @@ private:
    * index of line @p line in the vector
    * lines_cache using local_lines.
    */
-  unsigned int calculate_line_index (const types::global_dof_index line) const;
+  size_type calculate_line_index (const size_type line) const;
 
   /**
    * Return @p true if the weight of an
@@ -1690,7 +1695,7 @@ private:
    * used to delete entries with zero
    * weight.
    */
-  static bool check_zero_weight (const std::pair<types::global_dof_index, double> &p);
+  static bool check_zero_weight (const std::pair<size_type, double> &p);
 
   /**
    * Dummy table that serves as default
@@ -1706,12 +1711,12 @@ private:
    */
   template <typename MatrixType, typename VectorType>
   void
-  distribute_local_to_global (const FullMatrix<double>        &local_matrix,
-                              const Vector<double>            &local_vector,
-                              const std::vector<types::global_dof_index> &local_dof_indices,
-                              MatrixType                      &global_matrix,
-                              VectorType                      &global_vector,
-                              bool                            use_inhomogeneities_for_rhs,
+  distribute_local_to_global (const FullMatrix<double>     &local_matrix,
+                              const Vector<double>         &local_vector,
+                              const std::vector<size_type> &local_dof_indices,
+                              MatrixType                   &global_matrix,
+                              VectorType                   &global_vector,
+                              bool                          use_inhomogeneities_for_rhs,
                               internal::bool2type<false>) const;
 
   /**
@@ -1721,12 +1726,12 @@ private:
    */
   template <typename MatrixType, typename VectorType>
   void
-  distribute_local_to_global (const FullMatrix<double>        &local_matrix,
-                              const Vector<double>            &local_vector,
-                              const std::vector<types::global_dof_index> &local_dof_indices,
-                              MatrixType                      &global_matrix,
-                              VectorType                      &global_vector,
-                              bool                            use_inhomogeneities_for_rhs,
+  distribute_local_to_global (const FullMatrix<double>     &local_matrix,
+                              const Vector<double>         &local_vector,
+                              const std::vector<size_type> &local_dof_indices,
+                              MatrixType                   &global_matrix,
+                              VectorType                   &global_vector,
+                              bool                          use_inhomogeneities_for_rhs,
                               internal::bool2type<true>) const;
 
   /**
@@ -1736,10 +1741,10 @@ private:
    */
   template <typename SparsityType>
   void
-  add_entries_local_to_global (const std::vector<types::global_dof_index> &local_dof_indices,
-                               SparsityType                    &sparsity_pattern,
-                               const bool                       keep_constrained_entries,
-                               const Table<2,bool>             &dof_mask,
+  add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
+                               SparsityType                 &sparsity_pattern,
+                               const bool                    keep_constrained_entries,
+                               const Table<2,bool>          &dof_mask,
                                internal::bool2type<false>) const;
 
   /**
@@ -1749,10 +1754,10 @@ private:
    */
   template <typename SparsityType>
   void
-  add_entries_local_to_global (const std::vector<types::global_dof_index> &local_dof_indices,
-                               SparsityType                    &sparsity_pattern,
-                               const bool                       keep_constrained_entries,
-                               const Table<2,bool>             &dof_mask,
+  add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
+                               SparsityType                 &sparsity_pattern,
+                               const bool                    keep_constrained_entries,
+                               const Table<2,bool>          &dof_mask,
                                internal::bool2type<true>) const;
 
   /**
@@ -1766,7 +1771,7 @@ private:
    * row indices.
    */
   void
-  make_sorted_row_list (const std::vector<types::global_dof_index> &local_dof_indices,
+  make_sorted_row_list (const std::vector<size_type> &local_dof_indices,
                         internals::GlobalRowsFromLocal &global_rows) const;
 
   /**
@@ -1780,18 +1785,18 @@ private:
    * function.
    */
   void
-  make_sorted_row_list (const std::vector<types::global_dof_index> &local_dof_indices,
-                        std::vector<types::global_dof_index>       &active_dofs) const;
+  make_sorted_row_list (const std::vector<size_type> &local_dof_indices,
+                        std::vector<size_type>       &active_dofs) const;
 
   /**
    * Internal helper function for
    * distribute_local_to_global function.
    */
   double
-  resolve_vector_entry (const types::global_dof_index                    i,
+  resolve_vector_entry (const size_type                       i,
                         const internals::GlobalRowsFromLocal &global_rows,
                         const Vector<double>                 &local_vector,
-                        const std::vector<types::global_dof_index>      &local_dof_indices,
+                        const std::vector<size_type>         &local_dof_indices,
                         const FullMatrix<double>             &local_matrix) const;
 };
 
@@ -1822,7 +1827,7 @@ ConstraintMatrix::ConstraintMatrix (const ConstraintMatrix &constraint_matrix)
 
 inline
 void
-ConstraintMatrix::add_line (const types::global_dof_index line)
+ConstraintMatrix::add_line (const size_type line)
 {
   Assert (sorted==false, ExcMatrixIsClosed());
 
@@ -1838,7 +1843,7 @@ ConstraintMatrix::add_line (const types::global_dof_index line)
   // :-)
   Assert (line != numbers::invalid_unsigned_int,
           ExcInternalError());
-  const unsigned int line_index = calculate_line_index (line);
+  const size_type line_index = calculate_line_index (line);
 
   // check whether line already exists; it
   // may, in which case we can just quit
@@ -1848,7 +1853,7 @@ ConstraintMatrix::add_line (const types::global_dof_index line)
   // if necessary enlarge vector of
   // existing entries for cache
   if (line_index >= lines_cache.size())
-    lines_cache.resize (std::max(2*static_cast<unsigned int>(lines_cache.size()),
+    lines_cache.resize (std::max(2*static_cast<size_type>(lines_cache.size()),
                                  line_index+1),
                         numbers::invalid_unsigned_int);
 
@@ -1864,9 +1869,9 @@ ConstraintMatrix::add_line (const types::global_dof_index line)
 
 inline
 void
-ConstraintMatrix::add_entry (const types::global_dof_index line,
-                             const types::global_dof_index column,
-                             const double       value)
+ConstraintMatrix::add_entry (const size_type line,
+                             const size_type column,
+                             const double    value)
 {
   Assert (sorted==false, ExcMatrixIsClosed());
   Assert (line != column,
@@ -1901,10 +1906,10 @@ ConstraintMatrix::add_entry (const types::global_dof_index line,
 
 inline
 void
-ConstraintMatrix::set_inhomogeneity (const types::global_dof_index line,
-                                     const double       value)
+ConstraintMatrix::set_inhomogeneity (const size_type line,
+                                     const double    value)
 {
-  const unsigned int line_index = calculate_line_index(line);
+  const size_type line_index = calculate_line_index(line);
   Assert( line_index < lines_cache.size() &&
           lines_cache[line_index] != numbers::invalid_unsigned_int,
           ExcMessage("call add_line() before calling set_inhomogeneity()"));
@@ -1916,7 +1921,7 @@ ConstraintMatrix::set_inhomogeneity (const types::global_dof_index line,
 
 
 inline
-unsigned int
+size_type 
 ConstraintMatrix::n_constraints () const
 {
   return lines.size();
@@ -1926,9 +1931,9 @@ ConstraintMatrix::n_constraints () const
 
 inline
 bool
-ConstraintMatrix::is_constrained (const types::global_dof_index index) const
+ConstraintMatrix::is_constrained (const size_type index) const
 {
-  const unsigned int line_index = calculate_line_index(index);
+  const size_type line_index = calculate_line_index(index);
   return ((line_index < lines_cache.size())
           &&
           (lines_cache[line_index] != numbers::invalid_unsigned_int));
@@ -1938,12 +1943,12 @@ ConstraintMatrix::is_constrained (const types::global_dof_index index) const
 
 inline
 bool
-ConstraintMatrix::is_inhomogeneously_constrained (const types::global_dof_index index) const
+ConstraintMatrix::is_inhomogeneously_constrained (const size_type index) const
 {
   // check whether the entry is
   // constrained. could use is_constrained, but
   // that means computing the line index twice
-  const unsigned int line_index = calculate_line_index(index);
+  const size_type line_index = calculate_line_index(index);
   if (line_index >= lines_cache.size() ||
       lines_cache[line_index] == numbers::invalid_unsigned_int)
     return false;
@@ -1957,13 +1962,13 @@ ConstraintMatrix::is_inhomogeneously_constrained (const types::global_dof_index 
 
 
 inline
-const std::vector<std::pair<types::global_dof_index,double> > *
-ConstraintMatrix::get_constraint_entries (const types::global_dof_index line) const
+const std::vector<std::pair<size_type,double> > *
+ConstraintMatrix::get_constraint_entries (const size_type line) const
 {
   // check whether the entry is
   // constrained. could use is_constrained, but
   // that means computing the line index twice
-  const unsigned int line_index = calculate_line_index(line);
+  const size_type line_index = calculate_line_index(line);
   if (line_index >= lines_cache.size() ||
       lines_cache[line_index] == numbers::invalid_unsigned_int)
     return 0;
@@ -1975,12 +1980,12 @@ ConstraintMatrix::get_constraint_entries (const types::global_dof_index line) co
 
 inline
 double
-ConstraintMatrix::get_inhomogeneity (const types::global_dof_index line) const
+ConstraintMatrix::get_inhomogeneity (const size_type line) const
 {
   // check whether the entry is
   // constrained. could use is_constrained, but
   // that means computing the line index twice
-  const unsigned int line_index = calculate_line_index(line);
+  const size_type line_index = calculate_line_index(line);
   if (line_index >= lines_cache.size() ||
       lines_cache[line_index] == numbers::invalid_unsigned_int)
     return 0;
@@ -1990,8 +1995,8 @@ ConstraintMatrix::get_inhomogeneity (const types::global_dof_index line) const
 
 
 
-inline unsigned int
-ConstraintMatrix::calculate_line_index (const types::global_dof_index line) const
+inline size_type 
+ConstraintMatrix::calculate_line_index (const size_type line) const
 {
   //IndexSet is unused (serial case)
   if (!local_lines.size())
@@ -2006,7 +2011,7 @@ ConstraintMatrix::calculate_line_index (const types::global_dof_index line) cons
 
 
 inline bool
-ConstraintMatrix::can_store_line (types::global_dof_index line_index) const
+ConstraintMatrix::can_store_line (size_type line_index) const
 {
   return !local_lines.size() || local_lines.is_element(line_index);
 }
@@ -2016,9 +2021,9 @@ ConstraintMatrix::can_store_line (types::global_dof_index line_index) const
 template <class VectorType>
 inline
 void ConstraintMatrix::distribute_local_to_global (
-  const types::global_dof_index index,
-  const double       value,
-  VectorType        &global_vector) const
+  const size_type index,
+  const double    value,
+  VectorType     &global_vector) const
 {
   Assert (lines.empty() || sorted == true, ExcMatrixNotClosed());
 
@@ -2028,7 +2033,7 @@ void ConstraintMatrix::distribute_local_to_global (
     {
       const ConstraintLine &position =
         lines[lines_cache[calculate_line_index(index)]];
-      for (unsigned int j=0; j<position.entries.size(); ++j)
+      for (size_type j=0; j<position.entries.size(); ++j)
         global_vector(position.entries[j].first)
         += value * position.entries[j].second;
     }
@@ -2054,7 +2059,7 @@ void ConstraintMatrix::distribute_local_to_global (
         {
           const ConstraintLine &position =
             lines[lines_cache[calculate_line_index(*local_indices_begin)]];
-          for (unsigned int j=0; j<position.entries.size(); ++j)
+          for (size_type j=0; j<position.entries.size(); ++j)
             global_vector(position.entries[j].first)
             += *local_vector_begin * position.entries[j].second;
         }
@@ -2066,9 +2071,9 @@ template <class InVector, class OutVector>
 inline
 void
 ConstraintMatrix::distribute_local_to_global (
-  const InVector                  &local_vector,
-  const std::vector<unsigned int> &local_dof_indices,
-  OutVector                       &global_vector) const
+  const InVector               &local_vector,
+  const std::vector<size_type> &local_dof_indices,
+  OutVector                    &global_vector) const
 {
   Assert (local_vector.size() == local_dof_indices.size(),
           ExcDimensionMismatch(local_vector.size(), local_dof_indices.size()));
@@ -2097,7 +2102,7 @@ void ConstraintMatrix::get_dof_values (const VectorType &global_vector,
           const ConstraintLine &position =
             lines[lines_cache[calculate_line_index(*local_indices_begin)]];
           typename VectorType::value_type value = position.inhomogeneity;
-          for (unsigned int j=0; j<position.entries.size(); ++j)
+          for (size_type j=0; j<position.entries.size(); ++j)
             value += (global_vector(position.entries[j].first) *
                       position.entries[j].second);
           *local_vector_begin = value;
@@ -2111,9 +2116,9 @@ template <typename MatrixType>
 inline
 void
 ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<double>        &local_matrix,
-                            const std::vector<types::global_dof_index> &local_dof_indices,
-                            MatrixType                      &global_matrix) const
+distribute_local_to_global (const FullMatrix<double>     &local_matrix,
+                            const std::vector<size_type> &local_dof_indices,
+                            MatrixType                   &global_matrix) const
 {
   // create a dummy and hand on to the
   // function actually implementing this
@@ -2130,12 +2135,12 @@ template <typename MatrixType, typename VectorType>
 inline
 void
 ConstraintMatrix::
-distribute_local_to_global (const FullMatrix<double>        &local_matrix,
-                            const Vector<double>            &local_vector,
-                            const std::vector<types::global_dof_index> &local_dof_indices,
-                            MatrixType                      &global_matrix,
-                            VectorType                      &global_vector,
-                            bool                            use_inhomogeneities_for_rhs) const
+distribute_local_to_global (const FullMatrix<double>     &local_matrix,
+                            const Vector<double>         &local_vector,
+                            const std::vector<size_type> &local_dof_indices,
+                            MatrixType                   &global_matrix,
+                            VectorType                   &global_vector,
+                            bool                          use_inhomogeneities_for_rhs) const
 {
   // enter the internal function with the
   // respective block information set, the
@@ -2152,10 +2157,10 @@ template <typename SparsityType>
 inline
 void
 ConstraintMatrix::
-add_entries_local_to_global (const std::vector<types::global_dof_index> &local_dof_indices,
-                             SparsityType                    &sparsity_pattern,
-                             const bool                       keep_constrained_entries,
-                             const Table<2,bool>             &dof_mask) const
+add_entries_local_to_global (const std::vector<size_type> &local_dof_indices,
+                             SparsityType                 &sparsity_pattern,
+                             const bool                    keep_constrained_entries,
+                             const Table<2,bool>          &dof_mask) const
 {
   // enter the internal function with the
   // respective block information set, the

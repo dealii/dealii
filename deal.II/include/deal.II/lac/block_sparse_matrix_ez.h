@@ -48,6 +48,11 @@ class BlockSparseMatrixEZ : public Subscriptor
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef std::size_t size_type;
+
+  /**
    * Default constructor. The
    * result is an empty object with
    * zero dimensions.
@@ -61,8 +66,8 @@ public:
    * blocks themselves still have
    * zero dimension.
    */
-  BlockSparseMatrixEZ (const unsigned int block_rows,
-                       const unsigned int block_cols);
+  BlockSparseMatrixEZ (const size_type block_rows,
+                       const size_type block_cols);
 
   /**
    * Copy constructor. This is
@@ -123,8 +128,8 @@ public:
    * called to update internal data
    * structures.
    */
-  void reinit (const unsigned int n_block_rows,
-               const unsigned int n_block_cols);
+  void reinit (const size_type n_block_rows,
+               const size_type n_block_cols);
   /**
    * This function collects the
    * sizes of the sub-objects and
@@ -144,8 +149,8 @@ public:
    * given coordinates.
    */
   SparseMatrixEZ<Number> &
-  block (const unsigned int row,
-         const unsigned int column);
+  block (const size_type row,
+         const size_type column);
 
 
   /**
@@ -154,20 +159,20 @@ public:
    * constant objects.
    */
   const SparseMatrixEZ<Number> &
-  block (const unsigned int row,
-         const unsigned int column) const;
+  block (const size_type row,
+         const size_type column) const;
 
   /**
    * Return the number of blocks in a
    * column.
    */
-  unsigned int n_block_rows () const;
+  size_type n_block_rows () const;
 
   /**
    * Return the number of blocks in a
    * row.
    */
-  unsigned int n_block_cols () const;
+  size_type n_block_cols () const;
 
   /**
    * Return whether the object is
@@ -189,7 +194,7 @@ public:
    * space. It is the sum of rows
    * of the rows of sub-matrices.
    */
-  types::global_dof_index n_rows () const;
+  size_type n_rows () const;
 
   /**
    * Return number of columns of
@@ -199,7 +204,7 @@ public:
    * columns of the columns of
    * sub-matrices.
    */
-  types::global_dof_index n_cols () const;
+  size_type n_cols () const;
 
   /**
    * Return the dimension of the
@@ -207,7 +212,7 @@ public:
    * matrix is of dimension
    * $m \times n$.
    */
-  types::global_dof_index m () const;
+  size_type m () const;
 
   /**
    * Return the dimension of the
@@ -215,7 +220,7 @@ public:
    * matrix is of dimension
    * $m \times n$.
    */
-  types::global_dof_index n () const;
+  size_type n () const;
 
   /**
    * Set the element <tt>(i,j)</tt>
@@ -226,8 +231,8 @@ public:
    * allowed to store zero values
    * in non-existent fields.
    */
-  void set (const types::global_dof_index i,
-            const types::global_dof_index j,
+  void set (const size_type i,
+            const size_type j,
             const Number value);
 
   /**
@@ -239,7 +244,7 @@ public:
    * is allowed to store zero
    * values in non-existent fields.
    */
-  void add (const types::global_dof_index i, const types::global_dof_index j,
+  void add (const size_type i, const size_type j,
             const Number value);
 
 
@@ -328,7 +333,7 @@ private:
 
 template <typename Number>
 inline
-unsigned int
+size_type
 BlockSparseMatrixEZ<Number>::n_block_rows () const
 {
   return row_indices.size();
@@ -338,7 +343,7 @@ BlockSparseMatrixEZ<Number>::n_block_rows () const
 
 template <typename Number>
 inline
-unsigned int
+size_type
 BlockSparseMatrixEZ<Number>::n_rows () const
 {
   return row_indices.total_size();
@@ -348,7 +353,7 @@ BlockSparseMatrixEZ<Number>::n_rows () const
 
 template <typename Number>
 inline
-unsigned int
+size_type
 BlockSparseMatrixEZ<Number>::n_block_cols () const
 {
   return column_indices.size();
@@ -358,7 +363,7 @@ BlockSparseMatrixEZ<Number>::n_block_cols () const
 
 template <typename Number>
 inline
-unsigned int
+size_type
 BlockSparseMatrixEZ<Number>::n_cols () const
 {
   return column_indices.total_size();
@@ -369,8 +374,8 @@ BlockSparseMatrixEZ<Number>::n_cols () const
 template <typename Number>
 inline
 SparseMatrixEZ<Number> &
-BlockSparseMatrixEZ<Number>::block (const unsigned int row,
-                                    const unsigned int column)
+BlockSparseMatrixEZ<Number>::block (const size_type row,
+                                    const size_type column)
 {
   Assert (row<n_block_rows(), ExcIndexRange (row, 0, n_block_rows()));
   Assert (column<n_block_cols(), ExcIndexRange (column, 0, n_block_cols()));
@@ -383,8 +388,8 @@ BlockSparseMatrixEZ<Number>::block (const unsigned int row,
 template <typename Number>
 inline
 const SparseMatrixEZ<Number> &
-BlockSparseMatrixEZ<Number>::block (const unsigned int row,
-                                    const unsigned int column) const
+BlockSparseMatrixEZ<Number>::block (const size_type row,
+                                    const size_type column) const
 {
   Assert (row<n_block_rows(), ExcIndexRange (row, 0, n_block_rows()));
   Assert (column<n_block_cols(), ExcIndexRange (column, 0, n_block_cols()));
@@ -396,7 +401,7 @@ BlockSparseMatrixEZ<Number>::block (const unsigned int row,
 
 template <typename Number>
 inline
-types::global_dof_index
+size_type
 BlockSparseMatrixEZ<Number>::m () const
 {
   return n_rows();
@@ -406,7 +411,7 @@ BlockSparseMatrixEZ<Number>::m () const
 
 template <typename Number>
 inline
-types::global_dof_index
+size_type
 BlockSparseMatrixEZ<Number>::n () const
 {
   return n_cols();
@@ -417,14 +422,14 @@ BlockSparseMatrixEZ<Number>::n () const
 template <typename Number>
 inline
 void
-BlockSparseMatrixEZ<Number>::set (const types::global_dof_index i,
-                                  const types::global_dof_index j,
+BlockSparseMatrixEZ<Number>::set (const size_type i,
+                                  const size_type j,
                                   const Number value)
 {
 
   Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
-  const std::pair<unsigned int,types::global_dof_index>
+  const std::pair<size_type,size_type>
   row_index = row_indices.global_to_local (i),
   col_index = column_indices.global_to_local (j);
   block(row_index.first,col_index.first).set (row_index.second,
@@ -437,14 +442,14 @@ BlockSparseMatrixEZ<Number>::set (const types::global_dof_index i,
 template <typename Number>
 inline
 void
-BlockSparseMatrixEZ<Number>::add (const types::global_dof_index i,
-                                  const types::global_dof_index j,
+BlockSparseMatrixEZ<Number>::add (const size_type i,
+                                  const size_type j,
                                   const Number value)
 {
 
   Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
-  const std::pair<unsigned int,types::global_dof_index>
+  const std::pair<size_type,size_type>
   row_index = row_indices.global_to_local (i),
   col_index = column_indices.global_to_local (j);
   block(row_index.first,col_index.first).add (row_index.second,
@@ -466,8 +471,8 @@ BlockSparseMatrixEZ<Number>::vmult (BlockVector<somenumber>       &dst,
 
   dst = 0.;
 
-  for (unsigned int row=0; row<n_block_rows(); ++row)
-    for (unsigned int col=0; col<n_block_cols(); ++col)
+  for (size_type row=0; row<n_block_rows(); ++row)
+    for (size_type col=0; col<n_block_cols(); ++col)
       block(row,col).vmult_add (dst.block(row),
                                 src.block(col));
 }
@@ -486,8 +491,8 @@ vmult_add (BlockVector<somenumber>       &dst,
   Assert (src.n_blocks() == n_block_cols(),
           ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
-  for (unsigned int row=0; row<n_block_rows(); ++row)
-    for (unsigned int col=0; col<n_block_cols(); ++col)
+  for (size_type row=0; row<n_block_rows(); ++row)
+    for (size_type col=0; col<n_block_cols(); ++col)
       block(row,col).vmult_add (dst.block(row),
                                 src.block(col));
 }
@@ -509,8 +514,8 @@ Tvmult (BlockVector<somenumber>       &dst,
 
   dst = 0.;
 
-  for (unsigned int row=0; row<n_block_rows(); ++row)
-    for (unsigned int col=0; col<n_block_cols(); ++col)
+  for (size_type row=0; row<n_block_rows(); ++row)
+    for (size_type col=0; col<n_block_cols(); ++col)
       block(row,col).Tvmult_add (dst.block(col),
                                  src.block(row));
 }
@@ -529,9 +534,9 @@ Tvmult_add (BlockVector<somenumber>       &dst,
   Assert (src.n_blocks() == n_block_rows(),
           ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
-  for (unsigned int row=0; row<n_block_rows(); ++row)
+  for (size_type row=0; row<n_block_rows(); ++row)
     {
-      for (unsigned int col=0; col<n_block_cols(); ++col)
+      for (size_type col=0; col<n_block_cols(); ++col)
         block(row,col).Tvmult_add (dst.block(col),
                                    src.block(row));
     };
@@ -544,18 +549,18 @@ inline
 void
 BlockSparseMatrixEZ<number>::print_statistics (STREAM &out, bool full)
 {
-  unsigned int used_total = 0;
-  unsigned int allocated_total = 0;
-  unsigned int reserved_total = 0;
-  std::vector<unsigned int> used_by_line_total;
+  size_type used_total = 0;
+  size_type allocated_total = 0;
+  size_type reserved_total = 0;
+  std::vector<size_type> used_by_line_total;
 
-  unsigned int used;
-  unsigned int allocated;
-  unsigned int reserved;
-  std::vector<unsigned int> used_by_line;
+  size_type used;
+  size_type allocated;
+  size_type reserved;
+  std::vector<size_type> used_by_line;
 
-  for (unsigned int i=0; i<n_block_rows(); ++i)
-    for (unsigned int j=0; j<n_block_cols(); ++j)
+  for (size_type i=0; i<n_block_rows(); ++i)
+    for (size_type j=0; j<n_block_cols(); ++j)
       {
         used_by_line.clear();
         out << "block:\t" << i << '\t' << j << std::endl;
@@ -573,7 +578,7 @@ BlockSparseMatrixEZ<number>::print_statistics (STREAM &out, bool full)
         if (full)
           {
             used_by_line_total.resize(used_by_line.size());
-            for (unsigned int i=0; i< used_by_line.size(); ++i)
+            for (size_type i=0; i< used_by_line.size(); ++i)
               if (used_by_line[i] != 0)
                 {
                   out << "row-entries\t" << i
@@ -587,7 +592,7 @@ BlockSparseMatrixEZ<number>::print_statistics (STREAM &out, bool full)
       << "used:" << used_total << std::endl
       << "allocated:" << allocated_total << std::endl
       << "reserved:" << reserved_total << std::endl;
-  for (unsigned int i=0; i< used_by_line_total.size(); ++i)
+  for (size_type i=0; i< used_by_line_total.size(); ++i)
     if (used_by_line_total[i] != 0)
       {
         out << "row-entries\t" << i

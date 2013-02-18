@@ -23,7 +23,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <typename Number>
 BlockVector<Number>::BlockVector (const unsigned int n_blocks,
-                                  const types::global_dof_index block_size)
+                                  const size_type block_size)
 {
   reinit (n_blocks, block_size);
 }
@@ -31,7 +31,7 @@ BlockVector<Number>::BlockVector (const unsigned int n_blocks,
 
 
 template <typename Number>
-BlockVector<Number>::BlockVector (const std::vector<types::global_dof_index> &n)
+BlockVector<Number>::BlockVector (const std::vector<size_type> &n)
 {
   reinit (n, false);
 }
@@ -52,7 +52,7 @@ BlockVector<Number>::BlockVector (const BlockVector<Number> &v)
   this->components.resize (v.n_blocks());
   this->block_indices = v.block_indices;
 
-  for (unsigned int i=0; i<this->n_blocks(); ++i)
+  for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i] = v.components[i];
 }
 
@@ -78,7 +78,7 @@ BlockVector<Number>::BlockVector (const TrilinosWrappers::BlockVector &v)
   this->block_indices = v.get_block_indices();
   this->components.resize(this->n_blocks());
 
-  for (unsigned int i=0; i<this->n_blocks(); ++i)
+  for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i] = v.block(i);
 
   BaseClass::collect_sizes();
@@ -88,24 +88,24 @@ BlockVector<Number>::BlockVector (const TrilinosWrappers::BlockVector &v)
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const unsigned int            n_bl,
-                                  const types::global_dof_index bl_sz,
-                                  const bool                    fast)
+void BlockVector<Number>::reinit (const size_type  n_bl,
+                                  const szie_type  bl_sz,
+                                  const bool       fast)
 {
-  std::vector<types::global_dof_index> n(n_bl, bl_sz);
+  std::vector<size_type> n(n_bl, bl_sz);
   reinit(n, fast);
 }
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const std::vector<types::global_dof_index> &n,
-                                  const bool                                 fast)
+void BlockVector<Number>::reinit (const std::vector<size_type> &n,
+                                  const bool                    fast)
 {
   this->block_indices.reinit (n);
   if (this->components.size() != this->n_blocks())
     this->components.resize(this->n_blocks());
 
-  for (unsigned int i=0; i<this->n_blocks(); ++i)
+  for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i].reinit(n[i], fast);
 }
 
@@ -119,7 +119,7 @@ void BlockVector<Number>::reinit (
   if (this->components.size() != this->n_blocks())
     this->components.resize(this->n_blocks());
 
-  for (unsigned int i=0; i<this->n_blocks(); ++i)
+  for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i].reinit(n.block_size(i), fast);
 }
 
@@ -133,7 +133,7 @@ void BlockVector<Number>::reinit (const BlockVector<Number2> &v,
   if (this->components.size() != this->n_blocks())
     this->components.resize(this->n_blocks());
 
-  for (unsigned int i=0; i<this->n_blocks(); ++i)
+  for (size_type i=0; i<this->n_blocks(); ++i)
     this->block(i).reinit(v.block(i), fast);
 }
 
@@ -161,7 +161,7 @@ void BlockVector<Number>::swap (BlockVector<Number> &v)
   Assert (this->n_blocks() == v.n_blocks(),
           ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
 
-  for (unsigned int i=0; i<this->n_blocks(); ++i)
+  for (size_type i=0; i<this->n_blocks(); ++i)
     dealii::swap (this->components[i], v.components[i]);
   dealii::swap (this->block_indices, v.block_indices);
 }
@@ -174,7 +174,7 @@ void BlockVector<Number>::print (std::ostream       &out,
                                  const bool          scientific,
                                  const bool          across) const
 {
-  for (unsigned int i=0; i<this->n_blocks(); ++i)
+  for (size_type i=0; i<this->n_blocks(); ++i)
     {
       if (across)
         out << 'C' << i << ':';
@@ -189,7 +189,7 @@ void BlockVector<Number>::print (std::ostream       &out,
 template <typename Number>
 void BlockVector<Number>::block_write (std::ostream &out) const
 {
-  for (unsigned int i=0; i<this->n_blocks(); ++i)
+  for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i].block_write(out);
 }
 
@@ -198,7 +198,7 @@ void BlockVector<Number>::block_write (std::ostream &out) const
 template <typename Number>
 void BlockVector<Number>::block_read (std::istream &in)
 {
-  for (unsigned int i=0; i<this->n_blocks(); ++i)
+  for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i].block_read(in);
 }
 

@@ -112,7 +112,7 @@ NATASHA source/hp/dof_objects.cc
 BRUNO source/hp/fe_collection.cc
 MARKUS source/hp/fe_values.cc
 BRUNO source/hp/mapping_collection.cc
-source/lac/block_matrix_array.cc
+BRUNO source/lac/block_matrix_array.cc
 MARKUS source/lac/block_sparse_matrix.cc
 MARKUS source/lac/block_sparse_matrix_ez.cc
 MARKUS source/lac/block_sparsity_pattern.cc
@@ -356,11 +356,11 @@ BRUNO include/deal.II/integrators/laplace.h
 BRUNO include/deal.II/integrators/local_integrators.h
 BRUNO include/deal.II/integrators/maxwell.h
 BRUNO include/deal.II/integrators/patches.h
-include/deal.II/lac/arpack_solver.h
-include/deal.II/lac/block_indices.h
-include/deal.II/lac/block_list.h
-include/deal.II/lac/block_matrix_array.h
-include/deal.II/lac/block_matrix_base.h
+BRUNO include/deal.II/lac/arpack_solver.h
+BRUNO include/deal.II/lac/block_indices.h
+BRUNO include/deal.II/lac/block_list.h
+BRUNO include/deal.II/lac/block_matrix_array.h
+BRUNO include/deal.II/lac/block_matrix_base.h
 include/deal.II/lac/block_matrix.h
 MARKUS include/deal.II/lac/block_sparse_matrix_ez.h
 MARKUS include/deal.II/lac/block_sparse_matrix_ez.templates.h

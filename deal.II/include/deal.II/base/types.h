@@ -165,6 +165,24 @@ namespace numbers
   invalid_unsigned_int = static_cast<unsigned int> (-1);
 
   /**
+   * Representation of the
+   * largest number that
+   * can be put into a
+   * size_type. This value 
+   * is used throughout 
+   * the library as a 
+   * marker for an
+   * invalid size_type
+   * value, such as
+   * an invalid array
+   * index, an invalid
+   * array size, and the
+   * like.
+   */
+  static const size_type
+  invalid_size_type = static_cast<size_type> (-1);
+
+  /**
                            * An invalid value for indices of degrees
                            * of freedom.
                            */

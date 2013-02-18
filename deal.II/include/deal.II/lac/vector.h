@@ -585,7 +585,7 @@ public:
    * Since this is not a distributed
    * vector the method always returns true.
    */
-  bool in_local_range (const types::global_dof_index global_index) const;
+  bool in_local_range (const size_type global_index) const;
 
   /**
    * Return dimension of the vector.
@@ -1200,7 +1200,7 @@ size_type Vector<Number>::size () const
 template <typename Number>
 inline
 bool Vector<Number>::in_local_range
-(const types::global_dof_index) const
+(const size_type) const
 {
   return true;
 }

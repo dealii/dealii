@@ -46,6 +46,10 @@ template <typename> class ChunkSparseMatrix;
 class ChunkSparsityPattern : public Subscriptor
 {
 public:
+  /**
+   * Declare the type for container size.
+   */
+  typedef std::size_t size_type;
 
   /**
    * Define a value which is used
@@ -71,7 +75,7 @@ public:
    * but the actual value of the
    * variable may change over time.
    */
-  static const unsigned int invalid_entry = SparsityPattern::invalid_entry;
+  static const size_type invalid_entry = SparsityPattern::invalid_entry;
 
   /**
    * Initialize the matrix empty,
@@ -127,19 +131,19 @@ public:
    * @arg max_per_row maximum
    * number of nonzero entries per row
    */
-  ChunkSparsityPattern (const types::global_dof_index m,
-                        const types::global_dof_index n,
-                        const unsigned int max_chunks_per_row,
-                        const unsigned int chunk_size);
+  ChunkSparsityPattern (const size_type m,
+                        const size_type n,
+                        const size_type max_chunks_per_row,
+                        const size_type chunk_size);
 
   /**
    * @deprecated This constructor is deprecated. Use the version
    * without the last argument
    */
-  ChunkSparsityPattern (const unsigned int m,
-                        const unsigned int n,
-                        const unsigned int max_chunks_per_row,
-                        const unsigned int chunk_size,
+  ChunkSparsityPattern (const size_type m,
+                        const size_type n,
+                        const size_type max_chunks_per_row,
+                        const size_type chunk_size,
                         const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -154,19 +158,19 @@ public:
    * each row.  This vector must
    * have one entry for each row.
    */
-  ChunkSparsityPattern (const types::global_dof_index m,
-                        const types::global_dof_index n,
-                        const std::vector<unsigned int> &row_lengths,
-                        const unsigned int chunk_size);
+  ChunkSparsityPattern (const size_type m,
+                        const size_type n,
+                        const std::vector<size_type> &row_lengths,
+                        const size_type chunk_size);
 
   /**
    * @deprecated This constructor is deprecated. Use the version
    * without the last argument
    */
-  ChunkSparsityPattern (const unsigned int               m,
-                        const unsigned int               n,
-                        const std::vector<unsigned int> &row_lengths,
-                        const unsigned int chunk_size,
+  ChunkSparsityPattern (const size_type               m,
+                        const size_type               n,
+                        const std::vector<size_type> &row_lengths,
+                        const size_type chunk_size,
                         const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -182,9 +186,9 @@ public:
    * taking row and column numbers
    * separately.
    */
-  ChunkSparsityPattern (const types::global_dof_index n,
-                        const unsigned int            max_per_row,
-                        const unsigned int            chunk_size);
+  ChunkSparsityPattern (const size_type n,
+                        const size_type max_per_row,
+                        const size_type chunk_size);
 
   /**
    * Initialize a quadratic matrix.
@@ -196,17 +200,17 @@ public:
    * each row.  This vector must
    * have one entry for each row.
    */
-  ChunkSparsityPattern (const types::global_dof_index    m,
-                        const std::vector<unsigned int> &row_lengths,
-                        const unsigned int               chunk_size);
+  ChunkSparsityPattern (const size_type                m,
+                        const std::vector<size_type>  &row_lengths,
+                        const size_type                chunk_size);
 
   /**
    * @deprecated This constructor is deprecated. Use the version
    * without the last argument
    */
-  ChunkSparsityPattern (const unsigned int               m,
-                        const std::vector<unsigned int> &row_lengths,
-                        const unsigned int               chunk_size,
+  ChunkSparsityPattern (const size_type               m,
+                        const std::vector<size_type> &row_lengths,
+                        const size_type               chunk_size,
                         const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -235,19 +239,19 @@ public:
    * operations to the other
    * <tt>reinit</tt> function.
    */
-  void reinit (const types::global_dof_index m,
-               const types::global_dof_index n,
-               const unsigned int max_per_row,
-               const unsigned int chunk_size);
+  void reinit (const size_type m,
+               const size_type n,
+               const size_type max_per_row,
+               const size_type chunk_size);
 
   /**
    * @deprecated This function is deprecated. Use the function
    * without the last argument
    */
-  void reinit (const unsigned int m,
-               const unsigned int n,
-               const unsigned int max_per_row,
-               const unsigned int chunk_size,
+  void reinit (const size_type m,
+               const size_type n,
+               const size_type max_per_row,
+               const size_type chunk_size,
                const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -274,38 +278,38 @@ public:
    * optimized access in relaxation
    * methods of SparseMatrix.
    */
-  void reinit (const types::global_dof_index m,
-               const types::global_dof_index n,
-               const std::vector<unsigned int> &row_lengths,
-               const unsigned int chunk_size);
+  void reinit (const size_type m,
+               const size_type n,
+               const std::vector<size_type> &row_lengths,
+               const size_type chunk_size);
 
   /**
    * @deprecated This function is deprecated. Use the function
    * without the last argument
    */
-  void reinit (const unsigned int               m,
-               const unsigned int               n,
-               const std::vector<unsigned int> &row_lengths,
-               const unsigned int chunk_size,
-               const bool optimize_diagonal) DEAL_II_DEPRECATED;
+  void reinit (const size_type                m,
+               const size_type                n,
+               const std::vector<size_type > &row_lengths,
+               const size_type                chunk_size,
+               const bool                     optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Same as above, but with a
    * VectorSlice argument instead.
    */
-  void reinit (const types::global_dof_index m,
-               const types::global_dof_index n,
-               const VectorSlice<const std::vector<unsigned int> > &row_lengths,
-               const unsigned int chunk_size);
+  void reinit (const size_type m,
+               const size_type n,
+               const VectorSlice<const std::vector<size_type> > &row_lengths,
+               const size_type chunk_size);
 
   /**
    * @deprecated This function is deprecated. Use the function
    * without the last argument
    */
-  void reinit (const unsigned int               m,
-               const unsigned int               n,
-               const VectorSlice<const std::vector<unsigned int> > &row_lengths,
-               const unsigned int chunk_size,
+  void reinit (const size_type m,
+               const size_type n,
+               const VectorSlice<const std::vector<size_type> > &row_lengths,
+               const size_type chunk_size,
                const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -376,13 +380,13 @@ public:
    * contents of one
    * line. Dereferencing these
    * inner iterators must either
-   * yield a pair of an unsigned
-   * integer as column index and a
+   * yield a pair of a size_type 
+   * as column index and a
    * value of arbitrary type (such
    * a type would be used if we
    * wanted to describe a sparse
    * matrix with one such object),
-   * or simply an unsigned integer
+   * or simply a size_type
    * (of we only wanted to describe
    * a sparsity pattern). The
    * function is able to determine
@@ -407,8 +411,8 @@ public:
    * may be used to fill a sparsity
    * pattern:
    * @code
-   * std::vector<std::vector<unsigned int> > column_indices (n_rows);
-   * for (unsigned int row=0; row<n_rows; ++row)
+   * std::vector<std::vector<size_type> > column_indices (n_rows);
+   * for (size_type row=0; row<n_rows; ++row)
    *         // generate necessary columns in this row
    *   fill_row (column_indices[row]);
    *
@@ -424,7 +428,7 @@ public:
    * <tt>end</tt> (namely
    * <tt>std::vector</tt>s), and the
    * inner iterators dereferenced
-   * yield unsigned integers as
+   * yield size_type as
    * column indices. Note that we
    * could have replaced each of
    * the two <tt>std::vector</tt>
@@ -437,8 +441,8 @@ public:
    * whole matrix, not only a
    * sparsity pattern:
    * @code
-   * std::vector<std::map<unsigned int,double> > entries (n_rows);
-   * for (unsigned int row=0; row<n_rows; ++row)
+   * std::vector<std::map<size_type,double> > entries (n_rows);
+   * for (size_type row=0; row<n_rows; ++row)
    *         // generate necessary pairs of columns
    *         // and corresponding values in this row
    *   fill_row (entries[row]);
@@ -454,37 +458,37 @@ public:
    * This example works because
    * dereferencing iterators of the
    * inner type yields a pair of
-   * unsigned integers and a value,
+   * size_type and a value,
    * the first of which we take as
    * column index. As previously,
    * the outer <tt>std::vector</tt>
    * could be replaced by
    * <tt>std::list</tt>, and the inner
-   * <tt>std::map<unsigned int,double></tt>
+   * <tt>std::map<size_type,double></tt>
    * could be replaced by
-   * <tt>std::vector<std::pair<unsigned int,double> ></tt>,
+   * <tt>std::vector<std::pair<size_type,double> ></tt>,
    * or a list or set of such
    * pairs, as they all return
    * iterators that point to such
    * pairs.
    */
   template <typename ForwardIterator>
-  void copy_from (const types::global_dof_index n_rows,
-                  const types::global_dof_index n_cols,
+  void copy_from (const size_type n_rows,
+                  const size_type n_cols,
                   const ForwardIterator begin,
                   const ForwardIterator end,
-                  const unsigned int chunk_size);
+                  const size_type chunk_size);
 
    /**
     * @deprecated This function is deprecated. Use the function
     * without the last argument
     */
   template <typename ForwardIterator>
-  void copy_from (const unsigned int    n_rows,
-                  const unsigned int    n_cols,
+  void copy_from (const size_type       n_rows,
+                  const size_type       n_cols,
                   const ForwardIterator begin,
                   const ForwardIterator end,
-                  const unsigned int chunk_size,
+                  const size_type       chunk_size,
                   const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -498,7 +502,7 @@ public:
    */
   template <typename SparsityType>
   void copy_from (const SparsityType &csp,
-                  const unsigned int  chunk_size);
+                  const size_type     chunk_size);
 
   /**
    * @deprecated This function is deprecated. Use the function
@@ -506,7 +510,7 @@ public:
    */
   template <typename SparsityType>
   void copy_from (const SparsityType &csp,
-                  const unsigned int  chunk_size,
+                  const size_type     chunk_size,
                   const bool          optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -522,7 +526,7 @@ public:
    */
   template <typename number>
   void copy_from (const FullMatrix<number> &matrix,
-                  const unsigned int chunk_size);
+                  const size_type chunk_size);
 
   /**
    * @deprecated This function is deprecated. Use the function
@@ -530,7 +534,7 @@ public:
    */
   template <typename number>
   void copy_from (const FullMatrix<number> &matrix,
-                  const unsigned int chunk_size,
+                  const size_type chunk_size,
                   const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -546,7 +550,7 @@ public:
    * argument when constructing this
    * object.
    */
-  unsigned int get_chunk_size () const;
+  size_type get_chunk_size () const;
 
   /**
    * Return the maximum number of entries per
@@ -556,7 +560,7 @@ public:
    * number of entries actually allocated by
    * the user.
    */
-  unsigned int max_entries_per_row () const;
+  size_type max_entries_per_row () const;
 
   /**
    * Add a nonzero entry to the matrix.
@@ -566,8 +570,8 @@ public:
    * If the entry already exists, nothing
    * bad happens.
    */
-  void add (const types::global_dof_index i,
-            const types::global_dof_index j);
+  void add (const size_type i,
+            const size_type j);
 
   /**
    * Make the sparsity pattern
@@ -587,26 +591,26 @@ public:
    * matrix, which equals the dimension
    * of the image space.
    */
-  inline types::global_dof_index n_rows () const;
+  inline size_type n_rows () const;
 
   /**
    * Return number of columns of this
    * matrix, which equals the dimension
    * of the range space.
    */
-  inline types::global_dof_index n_cols () const;
+  inline size_type n_cols () const;
 
   /**
    * Check if a value at a certain
    * position may be non-zero.
    */
-  bool exists (const types::global_dof_index i,
-               const types::global_dof_index j) const;
+  bool exists (const size_type i,
+               const size_type j) const;
 
   /**
    * Number of entries in a specific row.
    */
-  unsigned int row_length (const types::global_dof_index row) const;
+  size_type row_length (const size_type row) const;
 
   /**
    * Compute the bandwidth of the matrix
@@ -618,7 +622,7 @@ public:
    * bandwidth a $n\times m$ matrix can
    * have is $\max\{n-1,m-1\}$.
    */
-  unsigned int bandwidth () const;
+  size_type bandwidth () const;
 
   /**
    * Return the number of nonzero elements of
@@ -632,7 +636,7 @@ public:
    * matrix struct is compressed. It does not
    * make too much sense otherwise anyway.
    */
-  unsigned int n_nonzero_elements () const;
+  size_type n_nonzero_elements () const;
 
   /**
    * Return whether the structure is
@@ -825,18 +829,18 @@ private:
    * Number of rows that this sparsity
    * structure shall represent.
    */
-  types::global_dof_index rows;
+  size_type rows;
 
   /**
    * Number of columns that this sparsity
    * structure shall represent.
    */
-  types::global_dof_index cols;
+  size_type cols;
 
   /**
    * The size of chunks.
    */
-  unsigned int chunk_size;
+  size_type chunk_size;
 
   /**
    * The reduced sparsity pattern. We store
@@ -861,7 +865,7 @@ private:
 
 
 inline
-types::global_dof_index
+size_type
 ChunkSparsityPattern::n_rows () const
 {
   return rows;
@@ -869,7 +873,7 @@ ChunkSparsityPattern::n_rows () const
 
 
 inline
-types::global_dof_index
+size_type
 ChunkSparsityPattern::n_cols () const
 {
   return cols;
@@ -878,7 +882,7 @@ ChunkSparsityPattern::n_cols () const
 
 
 inline
-unsigned int
+size_type 
 ChunkSparsityPattern::get_chunk_size () const
 {
   return chunk_size;
@@ -905,11 +909,11 @@ ChunkSparsityPattern::optimize_diagonal () const
 
 template <typename ForwardIterator>
 void
-ChunkSparsityPattern::copy_from (const types::global_dof_index n_rows,
-                                 const types::global_dof_index n_cols,
+ChunkSparsityPattern::copy_from (const size_type n_rows,
+                                 const size_type n_cols,
                                  const ForwardIterator begin,
                                  const ForwardIterator end,
-                                 const unsigned int    chunk_size,
+                                 const size_type chunk_size,
                                  const bool)
 {
   copy_from (n_rows, n_cols, begin, end, chunk_size);
@@ -919,13 +923,13 @@ ChunkSparsityPattern::copy_from (const types::global_dof_index n_rows,
 
 template <typename ForwardIterator>
 void
-ChunkSparsityPattern::copy_from (const unsigned int    n_rows,
-                                 const unsigned int    n_cols,
+ChunkSparsityPattern::copy_from (const size_type       n_rows,
+                                 const size_type       n_cols,
                                  const ForwardIterator begin,
                                  const ForwardIterator end,
-                                 const unsigned int    chunk_size)
+                                 const size_type       chunk_size)
 {
-  Assert (static_cast<unsigned int>(std::distance (begin, end)) == n_rows,
+  Assert (static_cast<size_type>(std::distance (begin, end)) == n_rows,
           ExcIteratorRange (std::distance (begin, end), n_rows));
 
   // first determine row lengths for
@@ -939,7 +943,7 @@ ChunkSparsityPattern::copy_from (const unsigned int    n_rows,
   // diagonal entry is in a certain
   // row or not
   const bool is_square = (n_rows == n_cols);
-  std::vector<unsigned int> row_lengths;
+  std::vector<size_type> row_lengths;
   row_lengths.reserve(n_rows);
   for (ForwardIterator i=begin; i!=end; ++i)
     row_lengths.push_back (std::distance (i->begin(), i->end())
@@ -949,14 +953,14 @@ ChunkSparsityPattern::copy_from (const unsigned int    n_rows,
 
   // now enter all the elements into
   // the matrix
-  unsigned int row = 0;
+  size_type row = 0;
   typedef typename std::iterator_traits<ForwardIterator>::value_type::const_iterator inner_iterator;
   for (ForwardIterator i=begin; i!=end; ++i, ++row)
     {
       const inner_iterator end_of_row = i->end();
       for (inner_iterator j=i->begin(); j!=end_of_row; ++j)
         {
-          const unsigned int col
+          const size_type col
             = internal::SparsityPatternTools::get_column_index_from_iterator(*j);
           Assert (col < n_cols, ExcInvalidIndex(col,n_cols));
 

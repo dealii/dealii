@@ -51,8 +51,8 @@ BlockMatrixArray<number>::BlockMatrixArray ()
 
 template <typename number>
 BlockMatrixArray<number>::BlockMatrixArray (
-  const unsigned int n_block_rows,
-  const unsigned int n_block_cols)
+  const size_type n_block_rows,
+  const size_type n_block_cols)
   : block_rows (n_block_rows),
     block_cols (n_block_cols)
 {}
@@ -60,8 +60,8 @@ BlockMatrixArray<number>::BlockMatrixArray (
 
 template <typename number>
 BlockMatrixArray<number>::BlockMatrixArray (
-  const unsigned int n_block_rows,
-  const unsigned int n_block_cols,
+  const size_type n_block_rows,
+  const size_type n_block_cols,
   VectorMemory<Vector<number> > &)
   : block_rows (n_block_rows),
     block_cols (n_block_cols)
@@ -71,8 +71,8 @@ BlockMatrixArray<number>::BlockMatrixArray (
 template <typename number>
 void
 BlockMatrixArray<number>::initialize (
-  const unsigned int n_block_rows,
-  const unsigned int n_block_cols,
+  const size_type n_block_rows,
+  const size_type n_block_cols,
   VectorMemory<Vector<number> > &)
 {
   block_rows = n_block_rows;
@@ -83,8 +83,8 @@ BlockMatrixArray<number>::initialize (
 template <typename number>
 void
 BlockMatrixArray<number>::initialize (
-  const unsigned int n_block_rows,
-  const unsigned int n_block_cols)
+  const size_type n_block_rows,
+  const size_type n_block_cols)
 {
   block_rows = n_block_rows;
   block_cols = n_block_cols;
@@ -95,8 +95,8 @@ BlockMatrixArray<number>::initialize (
 template <typename number>
 void
 BlockMatrixArray<number>::reinit (
-  const unsigned int n_block_rows,
-  const unsigned int n_block_cols)
+  const size_type n_block_rows,
+  const size_type n_block_cols)
 {
   clear();
   block_rows = n_block_rows;
@@ -218,7 +218,7 @@ BlockMatrixArray<number>::matrix_scalar_product (
 
   number result = 0.;
 
-  for (unsigned int i=0; i<block_rows; ++i)
+  for (size_type i=0; i<block_rows; ++i)
     {
       aux.reinit(u.block(i));
       for (m = entries.begin(); m != end ; ++m)
@@ -249,7 +249,7 @@ BlockMatrixArray<number>::matrix_norm_square (
 
 
 template <typename number>
-unsigned int
+size_type 
 BlockMatrixArray<number>::n_block_rows () const
 {
   return block_rows;
@@ -258,7 +258,7 @@ BlockMatrixArray<number>::n_block_rows () const
 
 
 template <typename number>
-unsigned int
+size_type 
 BlockMatrixArray<number>::n_block_cols () const
 {
   return block_cols;
@@ -277,7 +277,7 @@ BlockTrianglePrecondition<number>::BlockTrianglePrecondition()
 
 template <typename number>
 BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
-  const unsigned int block_rows,
+  const size_type block_rows,
   VectorMemory<Vector<number> > &,
   const bool backward)
   :
@@ -288,7 +288,7 @@ BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
 
 template <typename number>
 BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
-  const unsigned int block_rows)
+  const size_type block_rows)
   :
   BlockMatrixArray<number> (block_rows, block_rows),
   backward(false)
@@ -298,7 +298,7 @@ BlockTrianglePrecondition<number>::BlockTrianglePrecondition(
 template <typename number>
 void
 BlockTrianglePrecondition<number>::initialize(
-  const unsigned int n_block_rows,
+  const size_type n_block_rows,
   VectorMemory<Vector<number> > &,
   const bool backward)
 {
@@ -310,7 +310,7 @@ BlockTrianglePrecondition<number>::initialize(
 template <typename number>
 void
 BlockTrianglePrecondition<number>::reinit (
-  const unsigned int n)
+  const size_type n)
 {
   BlockMatrixArray<number>::reinit(n,n);
 }
@@ -320,7 +320,7 @@ template <typename number>
 void
 BlockTrianglePrecondition<number>::do_row (
   BlockVector<number> &dst,
-  unsigned int row_num) const
+  size_type row_num) const
 {
   GrowingVectorMemory<Vector<number> > mem;
   typename std::vector<typename BlockMatrixArray<number>::Entry>::const_iterator
@@ -339,12 +339,12 @@ BlockTrianglePrecondition<number>::do_row (
   // they are not ordered by rows.
   for (; m != end ; ++m)
     {
-      const unsigned int i=m->row;
+      const size_type i=m->row;
       // Ignore everything not in
       // this row
       if (i != row_num)
         continue;
-      const unsigned int j=m->col;
+      const size_type j=m->col;
       // Only use the lower (upper)
       // triangle for forward
       // (backward) substitution
@@ -379,7 +379,7 @@ BlockTrianglePrecondition<number>::do_row (
   else
     {
       aux = 0.;
-      for (unsigned int i=0; i<diagonals.size(); ++i)
+      for (size_type i=0; i<diagonals.size(); ++i)
         {
           m = diagonals[i];
           // First, divide by the current
@@ -432,12 +432,12 @@ BlockTrianglePrecondition<number>::vmult (
 
   if (backward)
     {
-      for (unsigned int i=n_block_rows(); i>0;)
+      for (size_type i=n_block_rows(); i>0;)
         do_row(dst, --i);
     }
   else
     {
-      for (unsigned int i=0; i<n_block_rows(); ++i)
+      for (size_type i=0; i<n_block_rows(); ++i)
         do_row(dst, i);
     }
 

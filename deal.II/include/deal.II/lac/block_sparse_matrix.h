@@ -46,6 +46,11 @@ class BlockSparseMatrix : public BlockMatrixBase<SparseMatrix<number> >
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef std::size_t size_type;
+
+  /**
    * Typedef the base class for simpler
    * access to its own typedefs.
    */
@@ -204,7 +209,7 @@ public:
    * Return the number of entries
    * in a specific row.
    */
-  unsigned int get_row_length (const types::global_dof_index row) const;
+  size_type get_row_length (const size_type row) const;
 
   /**
    * Return the number of nonzero
@@ -215,7 +220,7 @@ public:
    * the entries should happen to
    * be zero, it is counted anyway.
    */
-  unsigned int n_nonzero_elements () const;
+  size_type n_nonzero_elements () const;
 
   /**
    * Return the number of actually
@@ -224,7 +229,7 @@ public:
    * (with absolute value larger than
    * threshold) of all the blocks.
    */
-  unsigned int n_actually_nonzero_elements (const double threshold = 0.0) const;
+  size_type n_actually_nonzero_elements (const double threshold = 0.0) const;
 
   /**
    * Return a (constant) reference
@@ -470,8 +475,8 @@ BlockSparseMatrix<number>::operator = (const double d)
 {
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
 
-  for (unsigned int r=0; r<this->n_block_rows(); ++r)
-    for (unsigned int c=0; c<this->n_block_cols(); ++c)
+  for (size_type r=0; r<this->n_block_rows(); ++r)
+    for (size_type c=0; c<this->n_block_cols(); ++c)
       this->block(r,c) = d;
 
   return *this;
@@ -596,7 +601,7 @@ precondition_Jacobi (BlockVectorType       &dst,
 
   // do a diagonal preconditioning. uses only
   // the diagonal blocks of the matrix
-  for (unsigned int i=0; i<this->n_block_rows(); ++i)
+  for (size_type i=0; i<this->n_block_rows(); ++i)
     this->block(i,i).precondition_Jacobi (dst.block(i),
                                           src.block(i),
                                           omega);

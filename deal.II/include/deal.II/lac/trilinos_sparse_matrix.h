@@ -103,7 +103,7 @@ namespace TrilinosWrappers
        */
       typedef std::size_t size_type;
 
-#ifdef EPETRA_NO_64BIT_GLOBAL_INDICES
+#ifdef DEAL_II_EPETRA_NO_64BIT_GLOBAL_INDICES
       /**
        * Declare type of integer.
        */

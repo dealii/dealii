@@ -48,8 +48,13 @@ class BlockList :
   public Subscriptor
 {
 public:
+  /**
+   * Declare the type for container size.
+   */
+  typedef std::size_t size_type;
+
   /// The container for each index set
-  typedef std::vector<unsigned int> block_container;
+  typedef std::vector<size_type> block_container;
   /// The iterator for individual indices
   typedef block_container::const_iterator const_iterator;
 
@@ -65,7 +70,7 @@ public:
    * argument is the dimension of
    * the vector space.
    */
-  void create_sparsity_pattern(SparsityPattern &sparsity, unsigned int n) const;
+  void create_sparsity_pattern(SparsityPattern &sparsity, size_type n) const;
 
   /**
    * Add the indices in
@@ -73,7 +78,7 @@ public:
    * <tt>block</tt>, eliminating
    * repeated indices.
    */
-  void add(unsigned int block, const std::vector<unsigned int> &indices);
+  void add(size_type block, const std::vector<size_type> &indices);
 
   /**
    * Add the indices in
@@ -83,16 +88,16 @@ public:
    * those indices for which
    * <tt>selected_indices</tt> is true.
    */
-  void add(unsigned int block,
-           const std::vector<unsigned int> &indices,
+  void add(size_type block,
+           const std::vector<size_type> &indices,
            const std::vector<bool> &selected_indices,
-           unsigned int offset = 0);
+           size_type offset = 0);
 
   /**
    * Just set up the correct size
    * and assign indices to blocks later.
    */
-  void initialize(unsigned int n_blocks);
+  void initialize(size_type n_blocks);
 
   /**
    * Set up all index sets using an
@@ -110,7 +115,7 @@ public:
    * blocks as its first argument.
    */
   template <typename ITERATOR>
-  void initialize(unsigned int n_blocks,
+  void initialize(size_type n_blocks,
                   const ITERATOR begin,
                   const typename identity<ITERATOR>::type end);
 
@@ -133,7 +138,7 @@ public:
    * blocks as its first argument.
    */
   template <typename ITERATOR>
-  void initialize_mg(unsigned int n_blocks,
+  void initialize_mg(size_type n_blocks,
                      const ITERATOR begin,
                      const typename identity<ITERATOR>::type end) DEAL_II_DEPRECATED;
 
@@ -169,11 +174,11 @@ public:
    * blocks as its first argument.
    */
   template <typename ITERATOR>
-  void initialize(unsigned int n_blocks,
+  void initialize(size_type n_blocks,
                   const ITERATOR begin,
                   const typename identity<ITERATOR>::type end,
                   const std::vector<bool> &selected_dofs,
-                  unsigned int offset = 0) DEAL_II_DEPRECATED;
+                  size_type offset = 0) DEAL_II_DEPRECATED;
   /**
    * @deprecated This function will
    * move to DoFTools.
@@ -206,11 +211,11 @@ public:
    * blocks as its first argument.
    */
   template <typename ITERATOR>
-  void initialize_mg(unsigned int n_blocks,
+  void initialize_mg(size_type n_blocks,
                      const ITERATOR begin,
                      const typename identity<ITERATOR>::type end,
                      const std::vector<bool> &selected_dofs,
-                     unsigned int offset = 0) DEAL_II_DEPRECATED;
+                     size_type offset = 0) DEAL_II_DEPRECATED;
 
   /**
    * @deprecated This function will
@@ -224,11 +229,11 @@ public:
    * around a vertex.
    */
   template <int dim, typename ITERATOR>
-  void initialize_vertex_patches_mg(unsigned int n_blocks,
+  void initialize_vertex_patches_mg(size_type n_blocks,
                                     const ITERATOR begin,
                                     const typename identity<ITERATOR>::type end,
                                     const std::vector<bool> &selected_dofs = std::vector<bool>(),
-                                    unsigned int offset = 0) DEAL_II_DEPRECATED;
+                                    size_type offset = 0) DEAL_II_DEPRECATED;
 
   /**
    * @deprecated This function will
@@ -255,29 +260,29 @@ public:
   /**
    * The number of blocks.
    */
-  unsigned int size() const;
+  size_type size() const;
 
   /**
    * The size of a single block.
    */
-  unsigned int block_size(unsigned int block) const;
+  size_type block_size(size_type block) const;
 
   /**
    * Iterator to the first index in block.
    */
-  const_iterator begin(unsigned int block) const;
+  const_iterator begin(size_type block) const;
   /**
    * End iterator for a single block.
    */
-  const_iterator end(unsigned int block) const;
+  const_iterator end(size_type block) const;
   /**
    * Return the position of
    * <tt>index</tt> in
    * <tt>block</tt>, or
-   * numbers::invalid_unsigned_int,
+   * numbers::invalid_size_type,
    * if the index is not in the block.
    */
-  unsigned int local_index(unsigned int block, unsigned int index) const;
+  size_type local_index(size_type block, size_type index) const;
 
 private:
   /**
@@ -289,14 +294,14 @@ private:
 
 inline
 void
-BlockList::create_sparsity_pattern(SparsityPattern &sparsity, unsigned int n) const
+BlockList::create_sparsity_pattern(SparsityPattern &sparsity, size_type n) const
 {
-  std::vector<unsigned int> sizes(size());
-  for (unsigned int b=0; b<size(); ++b)
+  std::vector<size_type> sizes(size());
+  for (size_type b=0; b<size(); ++b)
     sizes[b] = block_size(b);
 
   sparsity.reinit(size(), n, sizes);
-  for (unsigned int b=0; b<size(); ++b)
+  for (size_type b=0; b<size(); ++b)
     {
       for (const_iterator i = begin(b); i != end(b); ++i)
         sparsity.add(b,*i);
@@ -307,14 +312,14 @@ BlockList::create_sparsity_pattern(SparsityPattern &sparsity, unsigned int n) co
 
 inline
 void
-BlockList::add(const unsigned int block, const std::vector<unsigned int> &indices)
+BlockList::add(const size_type block, const std::vector<size_type> &indices)
 {
   AssertIndexRange(block, index_sets.size());
 
-  for (unsigned int i=0; i<indices.size(); ++i)
+  for (size_type i=0; i<indices.size(); ++i)
     {
-      const unsigned int k = indices[i];
-      if (k==numbers::invalid_unsigned_int)
+      const size_type k = indices[i];
+      if (k==numbers::invalid_size_type)
         continue;
       if (std::find(index_sets[block].begin(), index_sets[block].end(), k)
           == index_sets[block].end())
@@ -326,18 +331,18 @@ BlockList::add(const unsigned int block, const std::vector<unsigned int> &indice
 inline
 void
 BlockList::add(
-  const unsigned int block,
-  const std::vector<unsigned int> &indices,
+  const size_type block,
+  const std::vector<size_type> &indices,
   const std::vector<bool> &selected,
-  unsigned int offset)
+  size_type offset)
 {
   AssertIndexRange(block, index_sets.size());
   AssertDimension(indices.size(), selected.size());
 
-  for (unsigned int i=0; i<indices.size(); ++i)
+  for (size_type i=0; i<indices.size(); ++i)
     {
-      const unsigned int k = indices[i];
-      if (k==numbers::invalid_unsigned_int)
+      const types_global_dof_indices k = indices[i];
+      if (k==numbers::invalid_size_type)
         continue;
       if (selected[i] && std::find(index_sets[block].begin(), index_sets[block].end(), k-offset)
           == index_sets[block].end())
@@ -348,7 +353,7 @@ BlockList::add(
 
 inline
 void
-BlockList::initialize(unsigned int n_blocks)
+BlockList::initialize(size_type n_blocks)
 {
   index_sets.resize(n_blocks);
 }
@@ -357,11 +362,11 @@ BlockList::initialize(unsigned int n_blocks)
 template <typename ITERATOR>
 inline
 void
-BlockList::initialize(unsigned int n_blocks, const ITERATOR begin, const typename identity<ITERATOR>::type end)
+BlockList::initialize(size_type n_blocks, const ITERATOR begin, const typename identity<ITERATOR>::type end)
 {
   index_sets.resize(n_blocks);
-  std::vector<unsigned int> indices;
-  unsigned int k = 0;
+  std::vector<size_type> indices;
+  size_type k = 0;
   for (ITERATOR cell = begin; cell != end; ++cell, ++k)
     {
       indices.resize(cell->get_fe().dofs_per_cell);
@@ -374,11 +379,11 @@ BlockList::initialize(unsigned int n_blocks, const ITERATOR begin, const typenam
 template <typename ITERATOR>
 inline
 void
-BlockList::initialize_mg(unsigned int n_blocks, const ITERATOR begin, const typename identity<ITERATOR>::type end)
+BlockList::initialize_mg(size_type n_blocks, const ITERATOR begin, const typename identity<ITERATOR>::type end)
 {
   index_sets.resize(n_blocks);
-  std::vector<unsigned int> indices;
-  unsigned int k = 0;
+  std::vector<size_type> indices;
+  size_type k = 0;
   for (ITERATOR cell = begin; cell != end; ++cell, ++k)
     {
       indices.resize(cell->get_fe().dofs_per_cell);
@@ -392,15 +397,15 @@ template <typename ITERATOR>
 inline
 void
 BlockList::initialize(
-  unsigned int n_blocks,
+  size_type n_blocks,
   const ITERATOR begin,
   const typename identity<ITERATOR>::type end,
   const std::vector<bool> &selected_dofs,
-  unsigned int offset)
+  size_type offset)
 {
   index_sets.resize(n_blocks);
-  std::vector<unsigned int> indices;
-  unsigned int k = 0;
+  std::vector<size_type> indices;
+  size_type k = 0;
   for (ITERATOR cell = begin; cell != end; ++cell, ++k)
     {
       indices.resize(cell->get_fe().dofs_per_cell);
@@ -416,15 +421,15 @@ template <typename ITERATOR>
 inline
 void
 BlockList::initialize_mg(
-  unsigned int n_blocks,
+  size_type n_blocks,
   const ITERATOR begin,
   const typename identity<ITERATOR>::type end,
   const std::vector<bool> &selected_dofs,
-  unsigned int offset)
+  size_type offset)
 {
   index_sets.resize(n_blocks);
-  std::vector<unsigned int> indices;
-  unsigned int k = 0;
+  std::vector<size_type> indices;
+  size_type k = 0;
   for (ITERATOR cell = begin; cell != end; ++cell, ++k)
     {
       indices.resize(cell->get_fe().dofs_per_cell);
@@ -494,11 +499,11 @@ template <int dim, typename ITERATOR>
 inline
 void
 BlockList::initialize_vertex_patches_mg(
-  unsigned int n_blocks,
+  size_type n_blocks,
   const ITERATOR begin,
   const typename identity<ITERATOR>::type end,
   const std::vector<bool> &selected_dofs,
-  unsigned int offset)
+  size_type offset)
 {
   Assert(selected_dofs.size() == 0, ExcNotImplemented());
   Assert(offset==0, ExcNotImplemented());
@@ -506,8 +511,8 @@ BlockList::initialize_vertex_patches_mg(
   Assert(fe.dofs_per_vertex == 0, ExcNotImplemented());
 
   index_sets.resize(n_blocks);
-  std::vector<unsigned int> indices;
-  unsigned int k = 0;
+  std::vector<size_type> indices;
+  size_type k = 0;
   for (ITERATOR cell = begin; cell != end; ++cell)
     {
       if (cell_generates_vertex_patch<dim>(cell, true))
@@ -520,52 +525,52 @@ BlockList::initialize_vertex_patches_mg(
               cell->neighbor(4)->get_mg_dof_indices(indices);
               for (unsigned int i=0; i<fe.dofs_per_face; ++i)
                 {
-                  indices[fe.face_to_cell_index(i,1)] = numbers::invalid_unsigned_int;
-                  indices[fe.face_to_cell_index(i,3)] = numbers::invalid_unsigned_int;
-                  indices[fe.face_to_cell_index(i,4)] = numbers::invalid_unsigned_int;
+                  indices[fe.face_to_cell_index(i,1)] = numbers::invalid_dof_index;
+                  indices[fe.face_to_cell_index(i,3)] = numbers::invalid_dof_index;
+                  indices[fe.face_to_cell_index(i,4)] = numbers::invalid_dof_index;
                 }
               add(k, indices);
               cell->neighbor(4)->neighbor(0)->get_mg_dof_indices(indices);
               for (unsigned int i=0; i<fe.dofs_per_face; ++i)
                 {
-                  indices[fe.face_to_cell_index(i,0)] = numbers::invalid_unsigned_int;
-                  indices[fe.face_to_cell_index(i,3)] = numbers::invalid_unsigned_int;
-                  indices[fe.face_to_cell_index(i,4)] = numbers::invalid_unsigned_int;
+                  indices[fe.face_to_cell_index(i,0)] = numbers::invalid_dof_index;
+                  indices[fe.face_to_cell_index(i,3)] = numbers::invalid_dof_index;
+                  indices[fe.face_to_cell_index(i,4)] = numbers::invalid_dof_index;
                 }
               add(k, indices);
               cell->neighbor(4)->neighbor(2)->get_mg_dof_indices(indices);
               for (unsigned int i=0; i<fe.dofs_per_face; ++i)
                 {
-                  indices[fe.face_to_cell_index(i,1)] = numbers::invalid_unsigned_int;
-                  indices[fe.face_to_cell_index(i,2)] = numbers::invalid_unsigned_int;
-                  indices[fe.face_to_cell_index(i,4)] = numbers::invalid_unsigned_int;
+                  indices[fe.face_to_cell_index(i,1)] = numbers::invalid_dof_index;
+                  indices[fe.face_to_cell_index(i,2)] = numbers::invalid_dof_index;
+                  indices[fe.face_to_cell_index(i,4)] = numbers::invalid_dof_index;
                 }
               add(k, indices);
               cell->neighbor(4)->neighbor(2)->neighbor(0)->get_mg_dof_indices(indices);
               for (unsigned int i=0; i<fe.dofs_per_face; ++i)
                 {
-                  indices[fe.face_to_cell_index(i,0)] = numbers::invalid_unsigned_int;
-                  indices[fe.face_to_cell_index(i,2)] = numbers::invalid_unsigned_int;
-                  indices[fe.face_to_cell_index(i,4)] = numbers::invalid_unsigned_int;
+                  indices[fe.face_to_cell_index(i,0)] = numbers::invalid_dof_index;
+                  indices[fe.face_to_cell_index(i,2)] = numbers::invalid_dof_index;
+                  indices[fe.face_to_cell_index(i,4)] = numbers::invalid_dof_index;
                 }
               add(k, indices);
             case 2:
               cell->neighbor(2)->get_mg_dof_indices(indices);
               for (unsigned int i=0; i<fe.dofs_per_face; ++i)
                 {
-                  indices[fe.face_to_cell_index(i,1)] = numbers::invalid_unsigned_int;
-                  indices[fe.face_to_cell_index(i,2)] = numbers::invalid_unsigned_int;
+                  indices[fe.face_to_cell_index(i,1)] = numbers::invalid_dof_index;
+                  indices[fe.face_to_cell_index(i,2)] = numbers::invalid_dof_index;
                   if (dim>2)
-                    indices[fe.face_to_cell_index(i,5)] = numbers::invalid_unsigned_int;
+                    indices[fe.face_to_cell_index(i,5)] = numbers::invalid_dof_index;
                 }
               add(k, indices);
               cell->neighbor(2)->neighbor(0)->get_mg_dof_indices(indices);
               for (unsigned int i=0; i<fe.dofs_per_face; ++i)
                 {
-                  indices[fe.face_to_cell_index(i,0)] = numbers::invalid_unsigned_int;
-                  indices[fe.face_to_cell_index(i,2)] = numbers::invalid_unsigned_int;
+                  indices[fe.face_to_cell_index(i,0)] = numbers::invalid_dof_index;
+                  indices[fe.face_to_cell_index(i,2)] = numbers::invalid_dof_index;
                   if (dim>2)
-                    indices[fe.face_to_cell_index(i,5)] = numbers::invalid_unsigned_int;
+                    indices[fe.face_to_cell_index(i,5)] = numbers::invalid_dof_index;
                 }
               add(k, indices);
               // no break here
@@ -573,21 +578,21 @@ BlockList::initialize_vertex_patches_mg(
               cell->get_mg_dof_indices(indices);
               for (unsigned int i=0; i<fe.dofs_per_face; ++i)
                 {
-                  indices[fe.face_to_cell_index(i,1)] = numbers::invalid_unsigned_int;
+                  indices[fe.face_to_cell_index(i,1)] = numbers::invalid_dof_index;
                   if (dim>1)
-                    indices[fe.face_to_cell_index(i,3)] = numbers::invalid_unsigned_int;
+                    indices[fe.face_to_cell_index(i,3)] = numbers::invalid_dof_index;
                   if (dim>2)
-                    indices[fe.face_to_cell_index(i,5)] = numbers::invalid_unsigned_int;
+                    indices[fe.face_to_cell_index(i,5)] = numbers::invalid_dof_index;
                 }
               add(k, indices);
               cell->neighbor(0)->get_mg_dof_indices(indices);
               for (unsigned int i=0; i<fe.dofs_per_face; ++i)
                 {
-                  indices[fe.face_to_cell_index(i,0)] = numbers::invalid_unsigned_int;
+                  indices[fe.face_to_cell_index(i,0)] = numbers::invalid_dof_index;
                   if (dim>1)
-                    indices[fe.face_to_cell_index(i,3)] = numbers::invalid_unsigned_int;
+                    indices[fe.face_to_cell_index(i,3)] = numbers::invalid_dof_index;
                   if (dim>2)
-                    indices[fe.face_to_cell_index(i,5)] = numbers::invalid_unsigned_int;
+                    indices[fe.face_to_cell_index(i,5)] = numbers::invalid_dof_index;
                 }
               add(k, indices);
               break;
@@ -602,7 +607,7 @@ BlockList::initialize_vertex_patches_mg(
 
 
 inline
-unsigned int
+size_type 
 BlockList::size() const
 {
   return index_sets.size();
@@ -610,8 +615,8 @@ BlockList::size() const
 
 
 inline
-unsigned int
-BlockList::block_size(unsigned int block) const
+size_type 
+BlockList::block_size(size_type block) const
 {
   return index_sets[block].size();
 }
@@ -619,7 +624,7 @@ BlockList::block_size(unsigned int block) const
 
 inline
 BlockList::const_iterator
-BlockList::begin(unsigned int block) const
+BlockList::begin(size_type block) const
 {
   AssertIndexRange(block, index_sets.size());
   return index_sets[block].begin();
@@ -628,7 +633,7 @@ BlockList::begin(unsigned int block) const
 
 inline
 BlockList::const_iterator
-BlockList::end(unsigned int block) const
+BlockList::end(size_type block) const
 {
   AssertIndexRange(block, index_sets.size());
   return index_sets[block].end();
@@ -636,15 +641,15 @@ BlockList::end(unsigned int block) const
 
 
 inline
-unsigned int
-BlockList::local_index(unsigned int block, unsigned int index) const
+size_type 
+BlockList::local_index(size_type block, size_type int index) const
 {
   AssertIndexRange(block, index_sets.size());
   const block_container &b = index_sets[block];
-  for (unsigned int i=0; i<b.size(); ++i)
+  for (size_type i=0; i<b.size(); ++i)
     if (b[i] == index)
       return i;
-  return numbers::invalid_unsigned_int;
+  return numbers::invalid_size_type;
 }
 
 

@@ -85,6 +85,11 @@ namespace parallel
     {
     public:
       /**
+       * Declare the type for container size.
+       */
+      typedef std::size_t size_type;
+
+      /**
        * Declare standard types used in all
        * containers. These types parallel those in
        * the <tt>C++</tt> standard libraries
@@ -120,7 +125,7 @@ namespace parallel
        * global size without any actual parallel
        * distribution.
        */
-      Vector (const unsigned int size);
+      Vector (const size_type size);
 
       /**
        * Constructs a parallel vector. The local
@@ -165,8 +170,8 @@ namespace parallel
        * size without any actual parallel
        * distribution.
        */
-      void reinit (const unsigned int size,
-                   const bool         fast = false);
+      void reinit (const size_type size,
+                   const bool      fast = false);
 
       /**
        * Uses the parallel layout of the input
@@ -487,13 +492,13 @@ namespace parallel
        * equal to the sum of the number of locally
        * owned indices among all the processors.
        */
-      types::global_dof_index size () const;
+      size_type size () const;
 
       /**
        * Returns the local size of the vector, i.e.,
        * the number of indices owned locally.
        */
-      unsigned int local_size() const;
+      size_type local_size() const;
 
       /**
        * Returns the half-open interval that
@@ -502,19 +507,19 @@ namespace parallel
        * local_range().second -
        * local_range().first</code>.
        */
-      std::pair<types::global_dof_index, types::global_dof_index> local_range () const;
+      std::pair<size_type, size_type> local_range () const;
 
       /**
        * Returns true if the given global index is
        * in the local range of this processor.
        */
-      bool in_local_range (const types::global_dof_index global_index) const;
+      bool in_local_range (const size_type global_index) const;
 
       /**
        * Returns the number of ghost elements
        * present on the vector.
        */
-      unsigned int n_ghost_entries () const;
+      size_type n_ghost_entries () const;
 
       /**
        * Returns whether the given global index is a
@@ -523,7 +528,7 @@ namespace parallel
        * are owned locally and for indices not
        * present at all.
        */
-      bool is_ghost_entry (const types::global_dof_index global_index) const;
+      bool is_ghost_entry (const size_type global_index) const;
 
       /**
        * Make the @p Vector class a bit like
@@ -569,7 +574,7 @@ namespace parallel
        * vector or be specified as a ghost
        * index at construction.
        */
-      Number operator () (const types::global_dof_index global_index) const;
+      Number operator () (const size_type global_index) const;
 
       /**
        * Read and write access to the data
@@ -579,7 +584,7 @@ namespace parallel
        * vector or be specified as a ghost
        * index at construction.
        */
-      Number &operator () (const types::global_dof_index global_index);
+      Number &operator () (const size_type global_index);
 
       /**
        * Read access to the data in the
@@ -592,7 +597,7 @@ namespace parallel
        * This function does the same thing
        * as operator().
        */
-      Number operator [] (const types::global_dof_index global_index) const;
+      Number operator [] (const size_type global_index) const;
 
       /**
        * Read and write access to the data
@@ -605,7 +610,7 @@ namespace parallel
        * This function does the same thing
        * as operator().
        */
-      Number &operator [] (const types::global_dof_index global_index);
+      Number &operator [] (const size_type global_index);
 
       /**
        * Read access to the data field specified by
@@ -616,7 +621,7 @@ namespace parallel
        * <code>[local_size,local_size+
        * n_ghost_entries]</code>.
        */
-      Number local_element (const unsigned int local_index) const;
+      Number local_element (const size_type local_index) const;
 
       /**
        * Read and write access to the data field
@@ -626,7 +631,7 @@ namespace parallel
        * indices with indices
        * <code>[local_size,local_size+n_ghosts]</code>.
        */
-      Number &local_element (const unsigned int local_index);
+      Number &local_element (const size_type local_index);
       //@}
 
 
@@ -656,7 +661,7 @@ namespace parallel
        * indices.
        */
       template <typename OtherNumber>
-      void add (const std::vector<unsigned int> &indices,
+      void add (const std::vector<size_type>   &indices,
                 const std::vector<OtherNumber> &values);
 
       /**
@@ -667,7 +672,7 @@ namespace parallel
        * values.
        */
       template <typename OtherNumber>
-      void add (const std::vector<unsigned int>     &indices,
+      void add (const std::vector<size_type>        &indices,
                 const ::dealii::Vector<OtherNumber> &values);
 
       /**
@@ -680,8 +685,8 @@ namespace parallel
        * functions above.
        */
       template <typename OtherNumber>
-      void add (const unsigned int  n_elements,
-                const unsigned int *indices,
+      void add (const size_type    n_elements,
+                const size_type   *indices,
                 const OtherNumber *values);
 
       /**
@@ -896,7 +901,7 @@ namespace parallel
        * The size that is currently allocated in the
        * val array.
        */
-      unsigned int    allocated_size;
+      size_type allocated_size;
 
       /**
        * Pointer to the array of
@@ -963,7 +968,7 @@ namespace parallel
        * A helper function that is used to resize
        * the val array.
        */
-      void resize_val (const unsigned int new_allocated_size);
+      void resize_val (const size_type new_allocated_size);
 
       /*
        * Make all other vector types
@@ -1026,7 +1031,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    Vector<Number>::Vector (const unsigned int size)
+    Vector<Number>::Vector (const size_type size)
       :
       allocated_size (0),
       val (0),
@@ -1086,7 +1091,7 @@ namespace parallel
         reinit (c, true);
       else if (partitioner.get() != c.partitioner.get())
         {
-          unsigned int local_ranges_different_loc = (local_range() !=
+          size_type local_ranges_different_loc = (local_range() !=
                                                      c.local_range());
           if ((partitioner->n_mpi_processes() > 1 &&
                Utilities::MPI::max(local_ranges_different_loc,
@@ -1118,7 +1123,7 @@ namespace parallel
         reinit (c, true);
       else if (partitioner.get() != c.partitioner.get())
         {
-          unsigned int local_ranges_different_loc = (local_range() !=
+          size_type local_ranges_different_loc = (local_range() !=
                                                      c.local_range());
           if ((partitioner->n_mpi_processes() > 1 &&
                Utilities::MPI::max(local_ranges_different_loc,
@@ -1373,7 +1378,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    types::global_dof_index Vector<Number>::size () const
+    size_type Vector<Number>::size () const
     {
       return partitioner->size();
     }
@@ -1382,7 +1387,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    unsigned int Vector<Number>::local_size () const
+    size_type Vector<Number>::local_size () const
     {
       return partitioner->local_size();
     }
@@ -1391,7 +1396,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    std::pair<types::global_dof_index, types::global_dof_index>
+    std::pair<size_type, size_type>
     Vector<Number>::local_range () const
     {
       return partitioner->local_range();
@@ -1403,7 +1408,7 @@ namespace parallel
     inline
     bool
     Vector<Number>::in_local_range
-    (const types::global_dof_index global_index) const
+    (const size_type global_index) const
     {
       return partitioner->in_local_range (global_index);
     }
@@ -1412,7 +1417,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    unsigned int
+    size_type 
     Vector<Number>::n_ghost_entries () const
     {
       return partitioner->n_ghost_indices();
@@ -1423,7 +1428,7 @@ namespace parallel
     template <typename Number>
     inline
     bool
-    Vector<Number>::is_ghost_entry (const types::global_dof_index global_index) const
+    Vector<Number>::is_ghost_entry (const size_type global_index) const
     {
       return partitioner->is_ghost_entry (global_index);
     }
@@ -1473,7 +1478,7 @@ namespace parallel
     template <typename Number>
     inline
     Number
-    Vector<Number>::operator() (const types::global_dof_index global_index) const
+    Vector<Number>::operator() (const size_type global_index) const
     {
       return val[partitioner->global_to_local(global_index)];
     }
@@ -1483,7 +1488,7 @@ namespace parallel
     template <typename Number>
     inline
     Number &
-    Vector<Number>::operator() (const types::global_dof_index global_index)
+    Vector<Number>::operator() (const size_type global_index)
     {
       return val[partitioner->global_to_local (global_index)];
     }
@@ -1493,7 +1498,7 @@ namespace parallel
     template <typename Number>
     inline
     Number
-    Vector<Number>::operator[] (const types::global_dof_index global_index) const
+    Vector<Number>::operator[] (const size_type global_index) const
     {
       return operator()(global_index);
     }
@@ -1503,7 +1508,7 @@ namespace parallel
     template <typename Number>
     inline
     Number &
-    Vector<Number>::operator[] (const types::global_dof_index global_index)
+    Vector<Number>::operator[] (const size_type global_index)
     {
       return operator()(global_index);
     }
@@ -1513,7 +1518,7 @@ namespace parallel
     template <typename Number>
     inline
     Number
-    Vector<Number>::local_element (const unsigned int local_index) const
+    Vector<Number>::local_element (const size_type local_index) const
     {
       AssertIndexRange (local_index,
                         partitioner->local_size()+
@@ -1526,7 +1531,7 @@ namespace parallel
     template <typename Number>
     inline
     Number &
-    Vector<Number>::local_element (const unsigned int local_index)
+    Vector<Number>::local_element (const size_type local_index)
     {
       AssertIndexRange (local_index,
                         partitioner->local_size()+
@@ -1589,7 +1594,7 @@ namespace parallel
     template <typename OtherNumber>
     inline
     void
-    Vector<Number>::add (const std::vector<unsigned int> &indices,
+    Vector<Number>::add (const std::vector<size_type> &indices,
                          const std::vector<OtherNumber> &values)
     {
       AssertDimension (indices.size(), values.size());
@@ -1602,7 +1607,7 @@ namespace parallel
     template <typename OtherNumber>
     inline
     void
-    Vector<Number>::add (const std::vector<unsigned int>    &indices,
+    Vector<Number>::add (const std::vector<size_type>    &indices,
                          const ::dealii::Vector<OtherNumber> &values)
     {
       AssertDimension (indices.size(), values.size());
@@ -1615,11 +1620,11 @@ namespace parallel
     template <typename OtherNumber>
     inline
     void
-    Vector<Number>::add (const unsigned int  n_indices,
-                         const unsigned int *indices,
+    Vector<Number>::add (const size_type    n_indices,
+                         const size_type   *indices,
                          const OtherNumber *values)
     {
-      for (unsigned int i=0; i<n_indices; ++i)
+      for (size_type i=0; i<n_indices; ++i)
         {
           Assert (numbers::is_finite(values[i]),
                   ExcMessage("The given value is not finite but either infinite or Not A Number (NaN)"));

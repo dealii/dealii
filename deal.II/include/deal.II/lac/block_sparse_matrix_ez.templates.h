@@ -28,8 +28,8 @@ BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ ()
 
 template <typename number>
 BlockSparseMatrixEZ<number>::
-BlockSparseMatrixEZ (const unsigned int rows,
-                     const unsigned int cols)
+BlockSparseMatrixEZ (const size_type rows,
+                     const size_type cols)
   :
   row_indices (rows, 0),
   column_indices (cols, 0)
@@ -60,8 +60,8 @@ operator = (const BlockSparseMatrixEZ<number> &m)
   // anything except than checking
   // whether the base objects want to
   // do something
-  for (unsigned int r=0; r<n_block_rows(); ++r)
-    for (unsigned int c=0; c<n_block_cols(); ++c)
+  for (size_type r=0; r<n_block_rows(); ++r)
+    for (size_type c=0; c<n_block_cols(); ++c)
       block(r,c) = m.block(r,c);
   return *this;
 }
@@ -74,8 +74,8 @@ BlockSparseMatrixEZ<number>::operator = (const double d)
 {
   Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
 
-  for (unsigned int r=0; r<n_block_rows(); ++r)
-    for (unsigned int c=0; c<n_block_cols(); ++c)
+  for (size_type r=0; r<n_block_rows(); ++r)
+    for (size_type c=0; c<n_block_cols(); ++c)
       block(r,c) = 0;
 
   return *this;
@@ -97,8 +97,8 @@ BlockSparseMatrixEZ<number>::BlockSparseMatrixEZ (
 
 template <typename number>
 void
-BlockSparseMatrixEZ<number>::reinit (const unsigned int rows,
-                                     const unsigned int cols)
+BlockSparseMatrixEZ<number>::reinit (const size_type rows,
+                                     const size_type cols)
 {
   row_indices.reinit(rows, 0);
   column_indices.reinit(cols, 0);
@@ -122,8 +122,8 @@ template <typename number>
 bool
 BlockSparseMatrixEZ<number>::empty () const
 {
-  for (unsigned int r=0; r<n_block_rows(); ++r)
-    for (unsigned int c=0; c<n_block_cols(); ++c)
+  for (size_type r=0; r<n_block_rows(); ++r)
+    for (size_type c=0; c<n_block_cols(); ++c)
       if (block(r,c).empty () == false)
         return false;
   return true;
@@ -135,20 +135,20 @@ template <typename number>
 void
 BlockSparseMatrixEZ<number>::collect_sizes ()
 {
-  const unsigned int rows = n_block_rows();
-  const unsigned int columns = n_block_cols();
-  std::vector<types::global_dof_index> row_sizes (rows);
-  std::vector<types::global_dof_index> col_sizes (columns);
+  const size_type rows = n_block_rows();
+  const size_type columns = n_block_cols();
+  std::vector<size_type> row_sizes (rows);
+  std::vector<size_type> col_sizes (columns);
 
   // first find out the row sizes
   // from the first block column
-  for (unsigned int r=0; r<rows; ++r)
+  for (size_type r=0; r<rows; ++r)
     row_sizes[r] = blocks[r][0].m();
   // then check that the following
   // block columns have the same
   // sizes
-  for (unsigned int c=1; c<columns; ++c)
-    for (unsigned int r=0; r<rows; ++r)
+  for (size_type c=1; c<columns; ++c)
+    for (size_type r=0; r<rows; ++r)
       Assert (row_sizes[r] == blocks[r][c].m(),
               ExcDimensionMismatch (row_sizes[r], blocks[r][c].m()));
 
@@ -158,10 +158,10 @@ BlockSparseMatrixEZ<number>::collect_sizes ()
 
 
   // then do the same with the columns
-  for (unsigned int c=0; c<columns; ++c)
+  for (size_type c=0; c<columns; ++c)
     col_sizes[c] = blocks[0][c].n();
-  for (unsigned int r=1; r<rows; ++r)
-    for (unsigned int c=0; c<columns; ++c)
+  for (size_type r=1; r<rows; ++r)
+    for (size_type c=0; c<columns; ++c)
       Assert (col_sizes[c] == blocks[r][c].n(),
               ExcDimensionMismatch (col_sizes[c], blocks[r][c].n()));
 
