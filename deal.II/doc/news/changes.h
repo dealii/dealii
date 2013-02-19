@@ -24,6 +24,15 @@ inconvenience this causes.
 </p>
 
 <ol>
+
+<li> Changed: There are various changes to PETScWrappers::MPI::Vector
+to minimize usage errors and to make the behavior similar to Trilinos:
+objects with ghost elements are now read-only, the function
+update_ghost_values() is no longer required (but called automatically
+if needed). This requires some changes in user code.
+<br>
+(Timo Heister, 2013/02/16)
+
 <li>Changed: Over the past few years, deal.II has accumulated a
 number of things that we would like to change but that would introduce
 incompatibility. Examples are inconsistent naming of functions or types,
@@ -195,11 +204,6 @@ DoFHandler, in particular removal of specializations.
 <ol>
 <li> New: GridGenerator::extrude_triangulation() allows
 you to extrude a 2d mesh to turn it into a 3d mesh.
-<br>
-(Timo Heister, 2013/02/16)
-
-<li> PETScWrappers::MPI::Vector objects with ghost entries are read-only
-now.
 <br>
 (Timo Heister, 2013/02/16)
 
