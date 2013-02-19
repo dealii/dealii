@@ -127,6 +127,8 @@ void grid_3 ()
 
     }
 
+  // here we are going to set a boundary descriptor for the round hole
+  // and refine the mesh twice.
   const HyperBallBoundary<2> boundary_description(Point<2>(0,0),0.25);
   triangulation.set_boundary (1, boundary_description);
   triangulation.refine_global(2);
@@ -149,6 +151,15 @@ void grid_4()
   
 }
 
+struct Grid5Func
+{
+    Point<2> operator() (const Point<2> & in) const
+      {
+	return Point<2>(in(0), in(1)+sin(in(0)/5.0*3.14159));
+      }      
+};
+
+
 // demonstrate GridTools::transform
 void grid_5()
 {
@@ -159,17 +170,24 @@ void grid_5()
   GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
                                              Point<2>(0.0,0.0), Point<2>(10.0,1.0));
 
-  struct Func
-  {
-      Point<2> operator() (const Point<2> & in) const
-	{
-	  return Point<2>(in(0), in(1)+sin(in(0)/5.0*3.14159));
-	}      
-  };
   
-  GridTools::transform(Func(), tria);
+  GridTools::transform(Grid5Func(), tria);
   mesh_info(tria, "grid-5.eps");  
 }
+
+struct Grid6Func
+{
+    double trans(double x) const
+      {
+	return tanh(2*x)/tanh(2);
+      }
+    
+    Point<2> operator() (const Point<2> & in) const
+      {
+	return Point<2>((in(0)), trans(in(1)));
+      }      
+};
+  
 
 // demonstrate GridTools::transform
 void grid_6()
@@ -181,21 +199,7 @@ void grid_6()
   GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
                                              Point<2>(0.0,0.0), Point<2>(1.0,1.0));
 
-  struct Func
-  {
-      double trans(double x) const
-	{
-					   //return atan((x-0.5)*3.14159);
-	  return tanh(2*x)/tanh(2);//(x-0.5)*3.14159);
-	}
-      
-      Point<2> operator() (const Point<2> & in) const
-	{
-	  return Point<2>((in(0)), trans(in(1)));
-	}      
-  };
-  
-  GridTools::transform(Func(), tria);
+  GridTools::transform(Grid6Func(), tria);
   mesh_info(tria, "grid-6.eps");  
 }
 
