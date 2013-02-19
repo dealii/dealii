@@ -127,6 +127,13 @@ namespace PETScWrappers
                    const std::vector<unsigned int> &local_elements);
 
       /**
+       * Create a BlockVector with parallel_partitioning.size() blocks,
+       * each initialized with the given IndexSet.
+       */
+      explicit BlockVector (const std::vector<IndexSet> &parallel_partitioning,
+                            const MPI_Comm &communicator = MPI_COMM_WORLD);
+
+      /**
        * Destructor. Clears memory
        */
       ~BlockVector ();
@@ -266,6 +273,13 @@ namespace PETScWrappers
                    const bool         fast=false);
 
       /**
+       * Reinitialize the BlockVector using IndexSets. See the constructor
+       * with the same arguments for details.
+       */
+      void reinit (const std::vector<IndexSet> &parallel_partitioning,
+                   const MPI_Comm              &communicator);
+
+      /**
        * Return a reference to the MPI
        * communicator object in use with
        * this vector.
@@ -365,6 +379,12 @@ namespace PETScWrappers
         this->components[i] = v.components[i];
     }
 
+    inline
+    BlockVector::BlockVector (const std::vector<IndexSet> &parallel_partitioning,
+                 const MPI_Comm              &communicator)
+    {
+      reinit(parallel_partitioning, communicator);
+    }
 
 
     inline
@@ -438,6 +458,22 @@ namespace PETScWrappers
         block(i).reinit(v.block(i), fast);
     }
 
+    inline
+    void
+    BlockVector::reinit (const std::vector<IndexSet> &parallel_partitioning,
+                 const MPI_Comm              &communicator)
+    {
+      std::vector<unsigned int> sizes(parallel_partitioning.size());
+      for (unsigned int i=0; i<parallel_partitioning.size(); ++i)
+        sizes[i] = parallel_partitioning[i].size();
+
+      this->block_indices.reinit(sizes);
+      if (this->components.size() != this->n_blocks())
+        this->components.resize(this->n_blocks());
+
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        block(i).reinit(communicator, parallel_partitioning[i]);
+    }
 
 
     inline

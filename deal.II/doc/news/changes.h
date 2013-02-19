@@ -208,6 +208,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: PETScWrappers::MPI::BlockVector now has a constructor and reinit
+that takes a std::vector<IndexSet> (same interface as in Trilinos).
+<br>
+(Timo Heister, 2013/02/19)
+
 <li> New: PETScWrappers::*Matrix::add(other, factor) to
 add a scaled other matrix to the current matrix.
 <br>
