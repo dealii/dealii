@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -74,8 +74,6 @@ namespace SparsityTools
     idx_t
     n       = static_cast<signed int>(sparsity_pattern.n_rows()),
     ncon    = 1,                              // number of balancing constraints (should be >0)
-    wgtflag = 0,                              // no weights on nodes or edges
-    numflag = 0,                              // C-style 0-based numbering
     nparts  = static_cast<int>(n_partitions), // number of subdomains to create
     dummy;                                    // the numbers of edges cut by the
     // resulting partition
