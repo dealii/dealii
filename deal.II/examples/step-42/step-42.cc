@@ -150,6 +150,7 @@ namespace Step42
     TrilinosWrappers::MPI::Vector       system_rhs_newton;
     TrilinosWrappers::MPI::Vector       resid_vector;
     TrilinosWrappers::MPI::Vector       diag_mass_matrix_vector;
+    Vector<float>                       cell_constitution;
     IndexSet                            active_set;
 
     ConditionalOStream pcout;
@@ -703,6 +704,7 @@ namespace Step42
       old_solution.reinit (system_rhs_newton);
       resid_vector.reinit (system_rhs_newton);
       diag_mass_matrix_vector.reinit (system_rhs_newton);
+      cell_constitution.reinit (triangulation.n_active_cells ());
       active_set.clear ();
       active_set.set_size (locally_relevant_dofs.size ());
     }
@@ -914,7 +916,7 @@ namespace Step42
 
               plast_lin_hard->plast_linear_hardening (stress_strain_tensor, strain_tensor[q_point],
                                                       elast_points, plast_points, yield);
-
+              cell_constitution (cell_number) += yield;
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
                   cell_rhs(i) -= (strain_tensor[q_point] * stress_strain_tensor * //(stress_tensor) *
@@ -959,6 +961,7 @@ namespace Step42
           cell_number += 1;
         };
 
+    cell_constitution /= n_q_points;
     system_rhs_newton.compress (VectorOperation::add);
 
     unsigned int sum_elast_points = Utilities::MPI::sum(elast_points, mpi_communicator);
@@ -1315,6 +1318,7 @@ namespace Step42
             a=std::pow(0.5, static_cast<double>(i));
             old_solution = tmp_vector;
             old_solution.sadd(1-a,a, distributed_solution);
+//            constraints.distribute (old_solution);
             old_solution.compress (VectorOperation::add);
 
             MPI_Barrier (mpi_communicator);
@@ -1450,6 +1454,8 @@ namespace Step42
     for (unsigned int i=0; i<subdomain.size(); ++i)
       subdomain(i) = triangulation.locally_owned_subdomain();
     data_out.add_data_vector (subdomain, "subdomain");
+
+    data_out.add_data_vector (cell_constitution, "CellConstitution");
 
     data_out.build_patches ();
 
