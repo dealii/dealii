@@ -1707,7 +1707,7 @@ namespace PETScWrappers
 #ifndef PETSC_USE_64BIT_INDICES
     if (elide_zero_values == false)
       {
-        col_index_ptr = (int*)col_indices;
+        col_index_ptr = (int *)col_indices;
         col_value_ptr = values;
         n_columns = n_cols;
       }
