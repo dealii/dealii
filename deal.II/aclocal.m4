@@ -1460,6 +1460,31 @@ AC_DEFUN(DEAL_II_CHECK_DEPRECATED, dnl
 	       defined to a string that when written after a function
 	       name makes the compiler emit a warning whenever this
 	       function is used somewhere that its use is deprecated.])
+
+
+    dnl Now also find out whether there is a flag so that we can
+    dnl switch off these deprecation warnings (for internal use in
+    dnl compiling the library)
+    CXXFLAGS="-Wno-deprecated-declarations -Werror"
+    AC_MSG_CHECKING(whether the compiler supports -Wno-deprecated)
+    AC_TRY_COMPILE(
+        [
+          int old_fn () __attribute__((deprecated));
+          int old_fn ();
+          int (*fn_ptr)() = old_fn;
+        ],
+        [;],
+        [
+          AC_MSG_RESULT(yes)
+          DEAL_II_SUPPRESS_DEPRECATION_WARNING="-Wno-deprecated-declarations"
+	  AC_SUBST(DEAL_II_SUPPRESS_DEPRECATION_WARNING)
+        ],
+        [
+          AC_MSG_RESULT(no)
+          dnl Nothing to do here then. We can't disable it if the
+          dnl flag doesn't exist
+        ])
+
   else
     AC_MSG_RESULT(no)
     AC_DEFINE(DEAL_II_DEPRECATED, [],
@@ -1468,6 +1493,7 @@ AC_DEFUN(DEAL_II_CHECK_DEPRECATED, dnl
 	       name makes the compiler emit a warning whenever this
 	       function is used somewhere that its use is deprecated.])
   fi
+
 ])
 
 
