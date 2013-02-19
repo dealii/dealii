@@ -150,6 +150,7 @@ namespace Step42
     TrilinosWrappers::MPI::Vector       system_rhs_newton;
     TrilinosWrappers::MPI::Vector       resid_vector;
     TrilinosWrappers::MPI::Vector       diag_mass_matrix_vector;
+    Vector<float>                       cell_constitution;
     IndexSet                            active_set;
 
     ConditionalOStream pcout;
@@ -350,6 +351,7 @@ namespace Step42
     inline SymmetricTensor<2,dim> get_strain (const FEValues<dim> &fe_values,
                                               const unsigned int  shape_func,
                                               const unsigned int  q_point) const;
+    void set_sigma_0 (double sigma_hlp) {sigma_0 = sigma_hlp;}
 
   private:
     SymmetricTensor<4,dim>  stress_strain_tensor_mu;
@@ -404,7 +406,6 @@ namespace Step42
       {
         SymmetricTensor<2,dim> stress_tensor;
         stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)*strain_tensor;
-        double tmp = E/((1+nu)*(1-2*nu));
 
         SymmetricTensor<2,dim> deviator_stress_tensor = deviator(stress_tensor);
 
@@ -413,10 +414,12 @@ namespace Step42
         yield = 0;
         stress_strain_tensor = stress_strain_tensor_mu;
         double beta = 1.0;
-        if (deviator_stress_tensor_norm >= sigma_0)
+        if (deviator_stress_tensor_norm >
+            sigma_0)
           {
-            beta = (sigma_0 + gamma)/deviator_stress_tensor_norm;
-            stress_strain_tensor *= beta;
+//            beta = (sigma_0 + gamma/(2*mu + gamma)*(deviator_stress_tensor_norm - sigma_0))/deviator_stress_tensor_norm;
+            beta = sigma_0/deviator_stress_tensor_norm;
+            stress_strain_tensor *= (gamma + (1 - gamma)*beta);
             yield = 1;
             plast_points += 1;
           }
@@ -436,23 +439,27 @@ namespace Step42
       {
         SymmetricTensor<2,dim> stress_tensor;
         stress_tensor = (stress_strain_tensor_kappa + stress_strain_tensor_mu)*strain_tensor;
-        double tmp = E/((1+nu)*(1-2*nu));
-
-        stress_strain_tensor = stress_strain_tensor_mu;
-        stress_strain_tensor_linearized = stress_strain_tensor_mu;
 
         SymmetricTensor<2,dim> deviator_stress_tensor = deviator(stress_tensor);
 
         double deviator_stress_tensor_norm = deviator_stress_tensor.norm ();
 
+        stress_strain_tensor = stress_strain_tensor_mu;
+        stress_strain_tensor_linearized = stress_strain_tensor_mu;
         double beta = 1.0;
-        if (deviator_stress_tensor_norm >= sigma_0)
+        if (deviator_stress_tensor_norm >
+            sigma_0)
           {
-            beta = (sigma_0 + gamma)/deviator_stress_tensor_norm;
-            stress_strain_tensor *= beta;
-            stress_strain_tensor_linearized *= beta;
+//            beta = (sigma_0 + gamma/(2*mu + gamma)*(deviator_stress_tensor_norm - sigma_0))/deviator_stress_tensor_norm;
+            beta = sigma_0/deviator_stress_tensor_norm;
+            stress_strain_tensor *= (gamma + (1 - gamma)*beta);
+            stress_strain_tensor_linearized *= (gamma + (1 - gamma)*beta);
             deviator_stress_tensor /= deviator_stress_tensor_norm;
-            stress_strain_tensor_linearized -= beta*2*mu*outer_product(deviator_stress_tensor, deviator_stress_tensor);
+            stress_strain_tensor_linearized -= (1 - gamma)*beta*2*mu*outer_product(deviator_stress_tensor, deviator_stress_tensor);
+
+//            std::cout << "Plastisch mit beta = " << beta
+//                << ", sigma_0 = " << sigma_0
+//                << std::endl;
           }
 
         stress_strain_tensor += stress_strain_tensor_kappa;
@@ -605,8 +612,8 @@ namespace Step42
     pcout (std::cout,
            (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
     sigma_0 (400),
-    gamma (1.e-2),
-    e_modul (2.0e5),
+    gamma (0.01),
+    e_modul (2.0e+5),
     nu (0.3)
   {
     // double _E, double _nu, double _sigma_0, double _gamma
@@ -697,6 +704,7 @@ namespace Step42
       old_solution.reinit (system_rhs_newton);
       resid_vector.reinit (system_rhs_newton);
       diag_mass_matrix_vector.reinit (system_rhs_newton);
+      cell_constitution.reinit (triangulation.n_active_cells ());
       active_set.clear ();
       active_set.set_size (locally_relevant_dofs.size ());
     }
@@ -888,6 +896,7 @@ namespace Step42
     unsigned int plast_points = 0;
     double       yield = 0;
     unsigned int cell_number = 0;
+    cell_constitution = 0;
 
     for (; cell!=endc; ++cell)
       if (cell->is_locally_owned())
@@ -908,7 +917,7 @@ namespace Step42
 
               plast_lin_hard->plast_linear_hardening (stress_strain_tensor, strain_tensor[q_point],
                                                       elast_points, plast_points, yield);
-
+              cell_constitution (cell_number) += yield;
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
                   cell_rhs(i) -= (strain_tensor[q_point] * stress_strain_tensor * //(stress_tensor) *
@@ -953,6 +962,7 @@ namespace Step42
           cell_number += 1;
         };
 
+    cell_constitution /= n_q_points;
     system_rhs_newton.compress (VectorOperation::add);
 
     unsigned int sum_elast_points = Utilities::MPI::sum(elast_points, mpi_communicator);
@@ -1060,6 +1070,12 @@ namespace Step42
                 double obstacle_value = obstacle.value (point, 2);
                 double solution_index_z = solution (index_z);
                 double gap = obstacle_value - point (2);
+
+
+//                std::cout << "lambda = " << lambda (index_z)
+//                          << ", solution_index_z - gap = " << solution_index_z - gap
+//                          << ", diag_mass_matrix_vector_relevant = " << diag_mass_matrix_vector_relevant (index_z)
+//                          << std::endl;
 
                 if (lambda (index_z) +
                     c *
@@ -1235,6 +1251,8 @@ namespace Step42
                                       ComponentMask(),
                                       constant_modes);
 
+    double sigma_hlp = sigma_0;
+
     additional_data.elliptic = true;
     additional_data.n_cycles = 1;
     additional_data.w_cycle = false;
@@ -1247,6 +1265,12 @@ namespace Step42
     unsigned int number_assemble_system = 0;
     for (; j<=100; j++)
       {
+        // Solve an elastic problem to obtain a better start solution
+        if (j == 0)
+          plast_lin_hard->set_sigma_0 (1e+10);
+        else if (j == 1)
+          plast_lin_hard->set_sigma_0 (sigma_hlp);
+
         pcout<< " " <<std::endl;
         pcout<< "   Newton iteration " << j <<std::endl;
         pcout<< "      Updating active set..." <<std::endl;
@@ -1288,12 +1312,14 @@ namespace Step42
 
         int damped = 0;
         tmp_vector = old_solution;
+//        constraints.distribute (old_solution);
         double a = 0;
         for (unsigned int i=0; (i<10)&&(!damped); i++)
           {
             a=std::pow(0.5, static_cast<double>(i));
             old_solution = tmp_vector;
             old_solution.sadd(1-a,a, distributed_solution);
+//            constraints.distribute (old_solution);
             old_solution.compress (VectorOperation::add);
 
             MPI_Barrier (mpi_communicator);
@@ -1429,6 +1455,8 @@ namespace Step42
     for (unsigned int i=0; i<subdomain.size(); ++i)
       subdomain(i) = triangulation.locally_owned_subdomain();
     data_out.add_data_vector (subdomain, "subdomain");
+
+    data_out.add_data_vector (cell_constitution, "CellConstitution");
 
     data_out.build_patches ();
 
