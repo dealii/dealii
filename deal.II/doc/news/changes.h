@@ -208,6 +208,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: PETScWrappers::*Matrix::add(other, factor) to
+add a scaled other matrix to the current matrix.
+<br>
+(Jose Javier Munoz Criollo, 2013/02/19)
+
 <li> New: GridGenerator::extrude_triangulation() allows
 you to extrude a 2d mesh to turn it into a 3d mesh.
 <br>

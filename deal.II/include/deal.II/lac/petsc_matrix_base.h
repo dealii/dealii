@@ -927,6 +927,13 @@ namespace PETScWrappers
     MatrixBase &operator /= (const PetscScalar factor);
 
     /**
+     * Add the matrix @p other scaled by the factor @p factor to the current
+     * matrix.
+     */
+    MatrixBase & add (const MatrixBase &other,
+		      const PetscScalar factor);
+
+    /**
      * Matrix-vector multiplication:
      * let <i>dst = M*src</i> with
      * <i>M</i> being this matrix.
@@ -1700,7 +1707,7 @@ namespace PETScWrappers
 #ifndef PETSC_USE_64BIT_INDICES
     if (elide_zero_values == false)
       {
-        col_index_ptr = (int *)col_indices;
+        col_index_ptr = (int*)col_indices;
         col_value_ptr = values;
         n_columns = n_cols;
       }
