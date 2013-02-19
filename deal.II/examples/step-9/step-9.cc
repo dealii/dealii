@@ -2,7 +2,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2000-2004, 2006-2008, 2010-2012 by the deal.II authors */
+/*    Copyright (C) 2000-2004, 2006-2008, 2010-2013 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -128,13 +128,13 @@ namespace Step9
     // has to wait), then write to the matrix and finally release the
     // lock. Note that if the library was not compiled to support
     // multithreading (which you have to specify at the time you call the
-    // <code>./configure</code> script in the top-level directory), then a
-    // dummy the actual data type of the typedef
-    // <code>Threads::ThreadMutex</code> is a class that provides all the
+    // <code>./configure</code> script in the top-level directory), then
+    // the actual data type of the typedef
+    // <code>Threads::Mutex</code> is a dummy class that provides all the
     // functions needed for a mutex, but does nothing when they are called;
     // this is reasonable, of course, since if only one thread is running at a
     // time, there is no need to synchronize with other threads.
-    Threads::ThreadMutex     assembler_lock;
+    Threads::Mutex     assembler_lock;
   };
 
 
