@@ -896,6 +896,7 @@ namespace Step42
     unsigned int plast_points = 0;
     double       yield = 0;
     unsigned int cell_number = 0;
+    cell_constitution = 0;
 
     for (; cell!=endc; ++cell)
       if (cell->is_locally_owned())
