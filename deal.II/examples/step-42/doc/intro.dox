@@ -54,7 +54,7 @@ row component-by-component and in a pointwise sense. Furthermore we have to
 distinguish two cases.
 
 The continuous and convex function $\mathcal{F}$ denotes the von Mises flow function
-@f{gather*}\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0¸\quad\text{with}\quad \tau^D
+@f{gather*}\mathcal{F}(\tau) = \vert\tau^D\vert - \sigma_0ï¿½\quad\text{with}\quad \tau^D
 = \tau - \dfrac{1}{3}tr(\tau)I,@f}
 $\sigma_0$ as yield stress and $\vert .\vert$ as the Frobenius norm. If there
 are no plastic deformations in a particular point - that is $\lambda=0$ - this yields $\vert\sigma^D\vert <
@@ -119,14 +119,14 @@ Therein $\varepsilon$ denotes the linearised deformation tensor with $\varepsilo
 Most materials - especially metals - have the property that they show some hardening effects during the forming process.
 There are different constitutive laws to describe those material behaviors. The
 simplest one is called linear isotropic hardening described by the flow function
-$\mathcal{F}(\tau,\eta) = \vert\tau^D\vert - (\sigma_0 + \gamma\eta)$ where
+$\mathcal{F}(\tau,\eta) = \vert\tau^D\vert - (\sigma_0 + \gamma{\text{iso}}\eta)$ where
 $\eta$ is the norm of the plastic strain $\eta = \vert \varepsilon -
 A\sigma\vert$.
 It can be considered by establishing an additional term in our primal-mixed formulation:\\
 Find a pair $\lbrace(\sigma,\xi),u\rbrace\in \Pi (W\times L^2(\Omega,\mathbb{R}))\times V^+$ with
-@f{gather*}\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right) + \gamma\left( \xi, \eta - \xi\right) \geq 0,\quad \forall (\tau,\eta)\in \Pi (W,L^2(\Omega,\mathbb{R}))@f}
+@f{gather*}\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right) + \gamma{\text{iso}}\left( \xi, \eta - \xi\right) \geq 0,\quad \forall (\tau,\eta)\in \Pi (W,L^2(\Omega,\mathbb{R}))@f}
 @f{gather*}\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+,@f}
-with the hardening parameter $\gamma > 0$.
+with the hardening parameter $\gamma{\text{iso}} > 0$.
 
 Now we want to derive a primal problem which only depends on the displacement $u$. For that purpose we
 set $\eta = \xi$ and eliminate the stress $\sigma$ by applying the projection
@@ -140,19 +140,35 @@ Find the displacement $u\in V^+$ with
 @f{gather*}\left(P_{\Pi}(C\varepsilon(u)),\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+,@f}
 with the projection:
 @f{gather*}P_{\Pi}(\tau):=\begin{cases}
-                        \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0 +  \gamma\xi,\\
-                        \hat\alpha\dfrac{\tau^D}{\vert\tau^D\vert} + \dfrac{1}{3}tr(\tau), & \text{if }\vert\tau^D\vert > \sigma_0 +  \gamma\xi,
+                        \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0 +  \gamma{\text{iso}}\xi,\\
+                        \hat\alpha\dfrac{\tau^D}{\vert\tau^D\vert} + \dfrac{1}{3}tr(\tau), & \text{if }\vert\tau^D\vert > \sigma_0 +  \gamma{\text{iso}}\xi,
                         \end{cases}@f}
 with the radius
-@f{gather*}\hat\alpha := \sigma_0 + \gamma\xi .@f}
+@f{gather*}\hat\alpha := \sigma_0 + \gamma{\text{iso}}\xi .@f}
 With the relation $\xi = \vert\varepsilon(u) - A\sigma\vert$ it is possible to eliminate $\xi$ inside the projection $P_{\Pi}$:\\
 @f{gather*}P_{\Pi}(\tau):=\begin{cases}
                         \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0,\\
                         \alpha\dfrac{\tau^D}{\vert\tau^D\vert} + \dfrac{1}{3}tr(\tau), & \text{if }\vert\tau^D\vert > \sigma_0,
                         \end{cases}@f}
-@f{gather*}\alpha := \sigma_0 + \dfrac{\gamma}{2\mu+\gamma}\left(\vert\tau^D\vert - \sigma_0\right) ,@f}
+@f{gather*}\alpha := \sigma_0 + \dfrac{\gamma{\text{iso}}}{2\mu+\gamma{\text{iso}}}\left(\vert\tau^D\vert - \sigma_0\right) ,@f}
 with a further material parameter $\mu>0$ called shear modulus. We refer that
 this only possible for isotropic plasticity.
+
+To make things a bit easier from now on we denote
+@f{gather*}\gamma := \dfrac{\gamma^{\text{iso}}}{2\mu +
+\gamma^{\text{iso}}}\in[0,1)\text{ with }\gamma^{\text{iso}}\in[0,\infty),@f}
+@f{gather*}\beta :=\dfrac{\sigma_0}{\vert\tau^D\vert}.@f}
+If $\gamma^{\text{iso}}$ tends to zero $\gamma$ tends also to zero. And if $\gamma^{\text{iso}}$ tends to
+infinity $\gamma$ tends to one. This allows us to reformulate our problem as
+follows
+@f{gather*}P_{\Pi}(\tau):=\begin{cases}
+                        \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0,\\
+                        \gamma\tau^D + (1-\gamma)\beta\tau^D
+                        + \dfrac{1}{3}tr(\tau), & \text{if }\vert\tau^D\vert >
+                        \sigma_0, \end{cases}.@f}
+For further details e.g., see Suttmeier: On Plasticity with Hardening:
+An Adaptive Finite Element Discretisation, International Mathematical Forum, 5,
+2010, no. 52, 2591-2601.
 
 So what we do is to calculate the stresses by using Hooke's law for linear elastic,  isotropic materials
 @f{gather*}\sigma = C \varepsilon(u) = 2\mu \varepsilon^D(u) + \kappa tr(\varepsilon(u))I = \left[2\mu\left(\mathbb{I} -\dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I\right]\varepsilon(u)@f}
@@ -195,16 +211,21 @@ In the case of our constitutive law the Fr&eacute;chet derivative of the
 semi-linearform $a(.;.)$ at the point $u^i$ is
 
 @f{gather*}a'(u^i;\psi,\varphi) =
-(I(x)\varepsilon(\psi),\varepsilon(\varphi)),\quad x\in\Omega,@f} @f{gather*}
+(I(x)\varepsilon(\psi),\varepsilon(\varphi)),\quad x\in\Omega,@f}
+@f{gather*}
 I(x) := \begin{cases}
-2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I\right) + \kappa I\otimes I, &
+C_{\mu} + C_{\kappa}, &
 \quad \vert \tau^D \vert \leq \sigma_0\\
-\dfrac{\alpha}{\vert\tau^D\vert}2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes I
-- \dfrac{\tau^D\otimes\tau^D}{\vert\tau^D\vert}\right) + \kappa I\otimes I,
-&\quad \vert \tau^D \vert > \sigma_0
+\gamma C_{\mu} + (1-\gamma)\beta\left(C_{\mu} -
+2\mu\dfrac{\tau^D\otimes\tau^D}{\vert\tau^D\vert^2}\right) + C_{\kappa}, &\quad
+\vert \tau^D \vert > \sigma_0
 \end{cases}
 @f}
 with
+@f{gather*}C_{\mu} := 2\mu\left(\mathbb{I}  - \dfrac{1}{3} I\otimes
+I\right)\quad\text{(shear part of the stress strain tensor)},@f}
+@f{gather*}C_{\kappa} := \kappa I\otimes I\quad\text{(bulk part of the stress strain
+tensor)},@f}
 @f{gather*}\tau^D :=  C\varepsilon^D(u^i).@f}
 Remark that $a(.;.)$ is not differentiable in the common sense but it is
 slantly differentiable like the function for the contact problem and again we refer to
