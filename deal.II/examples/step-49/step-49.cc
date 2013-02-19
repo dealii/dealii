@@ -14,6 +14,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_in.h>
@@ -126,6 +127,8 @@ void grid_3 ()
 
     }
 
+  // here we are going to set a boundary descriptor for the round hole
+  // and refine the mesh twice.
   const HyperBallBoundary<2> boundary_description(Point<2>(0,0),0.25);
   triangulation.set_boundary (1, boundary_description);
   triangulation.refine_global(2);
@@ -148,7 +151,73 @@ void grid_4()
   
 }
 
+struct Grid5Func
+{
+    Point<2> operator() (const Point<2> & in) const
+      {
+	return Point<2>(in(0), in(1)+sin(in(0)/5.0*3.14159));
+      }      
+};
 
+
+// demonstrate GridTools::transform
+void grid_5()
+{
+  Triangulation<2> tria;
+  std::vector< unsigned int > repetitions(2);
+  repetitions[0]=14;
+  repetitions[1]=2;
+  GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
+                                             Point<2>(0.0,0.0), Point<2>(10.0,1.0));
+
+  
+  GridTools::transform(Grid5Func(), tria);
+  mesh_info(tria, "grid-5.eps");  
+}
+
+struct Grid6Func
+{
+    double trans(double x) const
+      {
+	return tanh(2*x)/tanh(2);
+      }
+    
+    Point<2> operator() (const Point<2> & in) const
+      {
+	return Point<2>((in(0)), trans(in(1)));
+      }      
+};
+  
+
+// demonstrate GridTools::transform
+void grid_6()
+{
+  Triangulation<2> tria;
+  std::vector< unsigned int > repetitions(2);
+  repetitions[0]=40;
+  repetitions[1]=40;
+  GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
+                                             Point<2>(0.0,0.0), Point<2>(1.0,1.0));
+
+  GridTools::transform(Grid6Func(), tria);
+  mesh_info(tria, "grid-6.eps");  
+}
+
+
+
+//demonstrate distort_random
+void grid_7()
+{
+  Triangulation<2> tria;
+  std::vector< unsigned int > repetitions(2);
+  repetitions[0]=16;
+  repetitions[1]=16;
+  GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
+                                             Point<2>(0.0,0.0), Point<2>(1.0,1.0));
+
+  tria.distort_random(0.3, true);
+  mesh_info(tria, "grid-7.eps");  
+}
 
 // @sect3{The main function}
 
@@ -160,4 +229,7 @@ int main ()
   grid_2 ();
   grid_3 ();
   grid_4 ();
+  grid_5 ();
+  grid_6 ();
+  grid_7 ();
 }

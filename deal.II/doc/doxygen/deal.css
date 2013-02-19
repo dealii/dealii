@@ -5,3 +5,10 @@ table.tutorial {
     padding: 5px;
     font-size: 95%;
 }
+h3 {
+        font-size: 120%;
+        text-decoration:underline;
+}
+h4 {
+	font-size: 100%;
+}

@@ -246,7 +246,7 @@ namespace PETScWrappers
        * the set of locally relevant
        * degrees of freedom, see step-32.
        *
-       * @Note: This always creates a ghosted
+       * @note This operation always creates a ghosted
        * vector.
        */
       explicit Vector (const MPI_Comm     &communicator,
@@ -529,7 +529,14 @@ namespace PETScWrappers
 	update_ghost_values();
       
       if (has_ghost_elements())
-        update_ghost_values();
+        {
+          int ierr;
+
+          ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+          ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+        }
       return *this;
     }
 

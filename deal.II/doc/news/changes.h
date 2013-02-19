@@ -24,6 +24,15 @@ inconvenience this causes.
 </p>
 
 <ol>
+
+<li> Changed: There are various changes to PETScWrappers::MPI::Vector
+to minimize usage errors and to make the behavior similar to Trilinos:
+objects with ghost elements are now read-only, the function
+update_ghost_values() is no longer required (but called automatically
+if needed). This requires some changes in user code.
+<br>
+(Timo Heister, 2013/02/16)
+
 <li>Changed: Over the past few years, deal.II has accumulated a
 number of things that we would like to change but that would introduce
 incompatibility. Examples are inconsistent naming of functions or types,
@@ -153,6 +162,12 @@ never working correctly and it is not used.
 
 
 <ol>
+
+<li> New: step-49 demonstrates advanced techniques for mesh creation and
+manipulation.
+<br>
+(Timo Heister, 2013/02/19)
+
 <li> Fixed: Many places in the documentation have been made to consistently
 use doxygen markup that indicates that this is code, so that doxygen will
 cross-link the piece of code to class and function names. Many typos have also
@@ -198,14 +213,10 @@ you to extrude a 2d mesh to turn it into a 3d mesh.
 <br>
 (Timo Heister, 2013/02/16)
 
-<li> PETScWrappers::MPI::Vector with ghost entries are read-only
-now.
-<br>
-(Timo Heister, 2013/02/16)
-
-<li> PETScWrappers::*Vector::operator= now calls update_ghost_values()
+<li> PETScWrappers::Vector::operator= and PETScWrappers::MPI::Vector::operator=
+now call update_ghost_values()
 automatically if necessary. This means that update_ghost_values()
-does not need to be from user code at all anymore.
+does not need to be called from user code at all any more.
 <br>
 (Timo Heister, 2013/02/14)
 

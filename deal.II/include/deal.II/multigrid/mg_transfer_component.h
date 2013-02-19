@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -69,12 +69,12 @@ protected:
    * This function is only called
    * by derived classes. These can
    * also set the member variables
-   * #selected and #mg_selected to
+   * <code>selected_component</code> and <code>mg_selected_component</code> member variables to
    * restrict the transfer matrices
    * to certain components.
    * Furthermore, they use
-   * #target_component and
-   * #mg_target_component for
+   * <code>target_component</code> and
+   * <code>mg_target_component</code> for
    * re-ordering and grouping of
    * components.
    */
