@@ -53,7 +53,7 @@ public:
   /**
    * Declare type of container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * Standardized data struct to

@@ -730,6 +730,8 @@ namespace internal
   {
     namespace
     {
+      typedef types::global_dof_index size_type;
+
       // TODO: in general we should iterate over the constraints and not over all DoFs
       // for performance reasons
       template<class VEC>
@@ -1007,6 +1009,8 @@ ConstraintMatrix::distribute (VectorType &vec) const
 // local_to_global functions.
 namespace internals
 {
+  typedef types::global_dof_index size_type;
+
   // this struct contains all the information
   // we need to store about each of the
   // global entries (global_row): are they

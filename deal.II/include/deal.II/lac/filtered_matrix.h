@@ -209,7 +209,7 @@ public:
   /**
    * Declare the type of container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * Accessor class for iterators
@@ -673,7 +673,7 @@ FilteredMatrix<VECTOR>::Accessor::Accessor(
 
 template<class VECTOR>
 inline
-size_type
+types::global_dof_index
 FilteredMatrix<VECTOR>::Accessor::row() const
 {
   return matrix->constraints[index].first;
@@ -683,7 +683,7 @@ FilteredMatrix<VECTOR>::Accessor::row() const
 
 template<class VECTOR>
 inline
-size_type
+types::global_dof_index
 FilteredMatrix<VECTOR>::Accessor::column() const
 {
   return matrix->constraints[index].first;

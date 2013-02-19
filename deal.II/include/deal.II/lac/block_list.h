@@ -51,7 +51,7 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /// The container for each index set
   typedef std::vector<size_type> block_container;
@@ -341,7 +341,7 @@ BlockList::add(
 
   for (size_type i=0; i<indices.size(); ++i)
     {
-      const types_global_dof_indices k = indices[i];
+      const size_type k = indices[i];
       if (k==numbers::invalid_size_type)
         continue;
       if (selected[i] && std::find(index_sets[block].begin(), index_sets[block].end(), k-offset)
@@ -607,7 +607,7 @@ BlockList::initialize_vertex_patches_mg(
 
 
 inline
-size_type 
+BlockList::size_type 
 BlockList::size() const
 {
   return index_sets.size();
@@ -615,7 +615,7 @@ BlockList::size() const
 
 
 inline
-size_type 
+BlockList::size_type 
 BlockList::block_size(size_type block) const
 {
   return index_sets[block].size();
@@ -641,8 +641,8 @@ BlockList::end(size_type block) const
 
 
 inline
-size_type 
-BlockList::local_index(size_type block, size_type int index) const
+BlockList::size_type 
+BlockList::local_index(size_type block, size_type index) const
 {
   AssertIndexRange(block, index_sets.size());
   const block_container &b = index_sets[block];

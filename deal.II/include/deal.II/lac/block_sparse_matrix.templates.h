@@ -127,7 +127,7 @@ BlockSparseMatrix<number>::empty () const
 
 
 template <typename number>
-size_type 
+typename BlockSparseMatrix<number>::size_type
 BlockSparseMatrix<number>::get_row_length (const size_type row) const
 {
   return sparsity_pattern->row_length(row);
@@ -136,7 +136,7 @@ BlockSparseMatrix<number>::get_row_length (const size_type row) const
 
 
 template <typename number>
-size_type 
+typename BlockSparseMatrix<number>::size_type
 BlockSparseMatrix<number>::n_nonzero_elements () const
 {
   return sparsity_pattern->n_nonzero_elements ();
@@ -145,7 +145,7 @@ BlockSparseMatrix<number>::n_nonzero_elements () const
 
 
 template <typename number>
-size_type 
+typename BlockSparseMatrix<number>::size_type
 BlockSparseMatrix<number>::n_actually_nonzero_elements (const double threshold) const
 {
   size_type count = 0;

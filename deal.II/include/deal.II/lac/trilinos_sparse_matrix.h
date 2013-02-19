@@ -101,19 +101,7 @@ namespace TrilinosWrappers
       /**
        * Declare the type for container size.
        */
-      typedef std::size_t size_type;
-
-#ifdef DEAL_II_EPETRA_NO_64BIT_GLOBAL_INDICES
-      /**
-       * Declare type of integer.
-       */
-      typedef int int_type;
-#else
-      /**
-       * Declare type of integer.
-       */
-      typedef long long int_type;
-#endif
+      typedef types::global_dof_index size_type;
 
       /**
        * Constructor.
@@ -395,7 +383,7 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      typedef std::size_t size_type;
+      typedef types::global_dof_index size_type;
 
       /**
        * Typedef for the matrix type
@@ -3029,7 +3017,7 @@ namespace TrilinosWrappers
   bool
   SparseMatrix::in_local_range (const size_type index) const
   {
-    int_type begin, end;
+    TrilinosWrapper::types::int_type begin, end;
     begin = matrix->RowMap().MinMyGID();
     end = matrix->RowMap().MaxMyGID()+1;
 
@@ -3176,15 +3164,15 @@ namespace TrilinosWrappers
 
     last_action = Insert;
 
-    int_type *col_index_ptr;
+    TrilinosWrapper::types::int_type *col_index_ptr;
     TrilinosScalar const *col_value_ptr;
-    int_type n_columns;
+    TrilinosWrapper::types::int_typeint_type n_columns;
 
     // If we don't elide zeros, the pointers
     // are already available...
     if (elide_zero_values == false)
       {
-        col_index_ptr = (int_type *)col_indices;
+        col_index_ptr = (TrilinosWrapper::types::int_type *)col_indices;
         col_value_ptr = values;
         n_columns = n_cols;
       }
@@ -3212,9 +3200,9 @@ namespace TrilinosWrappers
               }
           }
 
-        Assert(n_columns <= (int_type)n_cols, ExcInternalError());
+        Assert(n_columns <= (TrilinosWrapper::types::int_type)n_cols, ExcInternalError());
 
-        col_index_ptr = (int_type *)&column_indices[0];
+        col_index_ptr = (TrilinosWrapper::types::int_type *)&column_indices[0];
         col_value_ptr = &column_values[0];
       }
 
@@ -3233,7 +3221,7 @@ namespace TrilinosWrappers
     // add the possibility to insert new values,
     // and in the second we just replace
     // data.
-    if (row_partitioner().MyGID(static_cast<int_type>(row)) == true)
+    if (row_partitioner().MyGID(static_cast<TrilinosWrapper::types::int_type>(row)) == true)
       {
         if (matrix->Filled() == false)
           {
@@ -3270,7 +3258,8 @@ namespace TrilinosWrappers
 
         if (matrix->Filled() == false)
           {
-            ierr = matrix->InsertGlobalValues (1, (int_type *)&row,
+            ierr = matrix->InsertGlobalValues (1, 
+                                               (TrilinosWrapper::types::int_type *)&row,
                                                n_columns, col_index_ptr,
                                                &col_value_ptr,
                                                Epetra_FECrsMatrix::ROW_MAJOR);
@@ -3278,7 +3267,8 @@ namespace TrilinosWrappers
               ierr = 0;
           }
         else
-          ierr = matrix->ReplaceGlobalValues (1, (int_type *)&row,
+          ierr = matrix->ReplaceGlobalValues (1, 
+                                              (TrilinosWrapper::types::int_type *)&row,
                                               n_columns, col_index_ptr,
                                               &col_value_ptr,
                                               Epetra_FECrsMatrix::ROW_MAJOR);
@@ -3404,15 +3394,15 @@ namespace TrilinosWrappers
 
     last_action = Add;
 
-    int_type *col_index_ptr;
+    TrilinosWrapper::types::int_type *col_index_ptr;
     TrilinosScalar const *col_value_ptr;
-    int_type n_columns;
+    TrilinosWrapper::types::int_type n_columns;
 
     // If we don't elide zeros, the pointers
     // are already available...
     if (elide_zero_values == false)
       {
-        col_index_ptr = (int_type *)col_indices;
+        col_index_ptr = (TrilinosWrapper::types::int_type *)col_indices;
         col_value_ptr = values;
         n_columns = n_cols;
 #ifdef DEBUG
@@ -3443,9 +3433,9 @@ namespace TrilinosWrappers
               }
           }
 
-        Assert(n_columns <= (int_type)n_cols, ExcInternalError());
+        Assert(n_columns <= (TrilinosWrapper::types::int_type)n_cols, ExcInternalError());
 
-        col_index_ptr = (int_type *)&column_indices[0];
+        col_index_ptr = (TrilinosWrapper::types::int_type *)&column_indices[0];
         col_value_ptr = &column_values[0];
       }
 
@@ -3454,7 +3444,7 @@ namespace TrilinosWrappers
     // can directly call the Epetra_CrsMatrix
     // input function, which is much faster
     // than the Epetra_FECrsMatrix function.
-    if (row_partitioner().MyGID(static_cast<int_type>(row)) == true)
+    if (row_partitioner().MyGID(static_cast<TrilinosWrapper::types::int_type>(row)) == true)
       {
         ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(row, n_columns,
                                                              const_cast<double *>(col_value_ptr),
@@ -3474,7 +3464,8 @@ namespace TrilinosWrappers
         // one element at a time).
         compressed = false;
 
-        ierr = matrix->SumIntoGlobalValues (1, (int_type *)&row, n_columns,
+        ierr = matrix->SumIntoGlobalValues (1, 
+                                            (TrilinosWrapper::types::int_type *)&row, n_columns,
                                             col_index_ptr,
                                             &col_value_ptr,
                                             Epetra_FECrsMatrix::ROW_MAJOR);
@@ -3488,15 +3479,15 @@ namespace TrilinosWrappers
         std::cout << "Got error " << ierr << " in row " << row
                   << " of proc " << row_partitioner().Comm().MyPID()
                   << " when trying to add the columns:" << std::endl;
-        for (int_type i=0; i<n_columns; ++i)
+        for (TrilinosWrapper::types::int_type i=0; i<n_columns; ++i)
           std::cout << col_index_ptr[i] << " ";
         std::cout << std::endl << std::endl;
         std::cout << "Matrix row has the following indices:" << std::endl;
-        int_type n_indices, *indices;
-        trilinos_sparsity_pattern().ExtractMyRowView(row_partitioner().LID(static_cast<int_type>(row)),
+        TrilinosWrapper::types::int_type n_indices, *indices;
+        trilinos_sparsity_pattern().ExtractMyRowView(row_partitioner().LID(static_cast<TrilinosWrapper::types::int_type>(row)),
                                                      n_indices,
                                                      indices);
-        for (int_type i=0; i<n_indices; ++i)
+        for (TrilinosWrapper::types::int_type i=0; i<n_indices; ++i)
           std::cout << indices[i] << " ";
         std::cout << endl << std::endl;
         Assert (ierr <= 0,

@@ -73,19 +73,7 @@ namespace TrilinosWrappers
     /**
      * Declare the type for container size.
      */
-    typedef std::size_t size_type;
-
-#ifdef DEAL_II_EPETRA_NO_64BIT_GLOBAL_INDICES
-    /**
-     * Declare the type of integer.
-     */
-    typedef int int_type;
-#else
-    /**
-     * Declare the type of integer.
-     */
-    typedef long long int_type;
-#endif
+    typedef types::global_dof_index size_type;
 
     /**
      * Typedef the base class for simpler

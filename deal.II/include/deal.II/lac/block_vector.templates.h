@@ -88,9 +88,9 @@ BlockVector<Number>::BlockVector (const TrilinosWrappers::BlockVector &v)
 
 
 template <typename Number>
-void BlockVector<Number>::reinit (const size_type  n_bl,
-                                  const szie_type  bl_sz,
-                                  const bool       fast)
+void BlockVector<Number>::reinit (const unsigned int n_bl,
+                                  const size_type    bl_sz,
+                                  const bool         fast)
 {
   std::vector<size_type> n(n_bl, bl_sz);
   reinit(n, fast);

@@ -41,16 +41,6 @@ namespace internal
     template <typename Number>
     struct ConstraintValues
     {
-      /**
-       * In the definition of next_constraint and constraints below,
-       * there is an argument that is in fact the size of constraints.
-       * To be clarified, we explicitly use the size_type of the 
-       * std::map container as the type. We define the size_type for 
-       * a container that contains <int, int> rather than the real
-       * types in the `constraints' object to avoid self-recursiveness.
-       */
-      typedef std::map<int, int>::size_type size_type;
-      
       ConstraintValues();
 
       /**
@@ -66,8 +56,8 @@ namespace internal
       std::vector<std::pair<types::global_dof_index, double> > constraint_entries;
       std::vector<types::global_dof_index> constraint_indices;
 
-      std::pair<std::vector<Number>, size_type> next_constraint;
-      std::map<std::vector<Number>, size_type, FPArrayComparator<double> > constraints;
+      std::pair<std::vector<Number>, types::global_dof_index> next_constraint;
+      std::map<std::vector<Number>, types::global_dof_index, FPArrayComparator<double> > constraints;
     };
 
 
@@ -89,7 +79,7 @@ namespace internal
           constraint_entries = entries;
           std::sort(constraint_entries.begin(), constraint_entries.end(),
                     ConstraintComparator());
-          for (size_type j=0; j<constraint_entries.size(); j++)
+          for (types::global_dof_index j=0; j<constraint_entries.size(); j++)
             {
               // copy the indices of the constraint entries after sorting.
               constraint_indices[j] = constraint_entries[j].first;
@@ -107,11 +97,11 @@ namespace internal
       // equal. this was quite lenghty and now we use a std::map with a
       // user-defined comparator to compare floating point arrays to a
       // tolerance 1e-13.
-      std::pair<typename std::map<std::vector<double>, size_type,
+      std::pair<typename std::map<std::vector<double>, types::global_dof_index,
           FPArrayComparator<double> >::iterator,
           bool> it = constraints.insert(next_constraint);
 
-      size_type insert_position = deal_II_numbers::invalid_unsigned_int;
+      types::global_dof_index insert_position = deal_II_numbers::invalid_dof_index;
       if (it.second == false)
         insert_position = it.first->second;
       else

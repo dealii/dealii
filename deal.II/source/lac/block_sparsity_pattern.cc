@@ -180,7 +180,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::empty () const
 
 
 template <class SparsityPatternBase>
-size_type 
+typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
 BlockSparsityPatternBase<SparsityPatternBase>::max_entries_per_row () const
 {
   size_type max_entries = 0;
@@ -199,7 +199,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::max_entries_per_row () const
 
 
 template <class SparsityPatternBase>
-size_type
+typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
 BlockSparsityPatternBase<SparsityPatternBase>::n_rows () const
 {
   // only count in first column, since
@@ -213,7 +213,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_rows () const
 
 
 template <class SparsityPatternBase>
-size_type
+typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
 BlockSparsityPatternBase<SparsityPatternBase>::n_cols () const
 {
   // only count in first row, since
@@ -227,7 +227,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_cols () const
 
 
 template <class SparsityPatternBase>
-size_type 
+typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
 BlockSparsityPatternBase<SparsityPatternBase>::n_nonzero_elements () const
 {
   size_type count = 0;

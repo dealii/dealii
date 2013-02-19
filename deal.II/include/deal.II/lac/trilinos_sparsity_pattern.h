@@ -73,20 +73,7 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      typedef std::size_t size_type;
-
-#ifdef DEAL_II_EPETRA_NO_64BIT_GLOBAL_INDICES
-      /**
-       * Declare type of integer.
-       */
-      typedef int int_type;
-#else
-      /**
-       * Declare type of integer.
-       */
-      typedef long long int_type;
-#endif
-
+      typedef types::global_dof_index size_type;
 
       /**
        * Constructor.
@@ -1597,7 +1584,7 @@ namespace TrilinosWrappers
   bool
   SparsityPattern::in_local_range (const size_type index) const
   {
-    int_type begin, end;
+    TrilinosWrapper::types::int_type begin, end;
     begin = graph->RowMap().MinMyGID();
     end = graph->RowMap().MaxMyGID()+1;
 
@@ -1646,11 +1633,14 @@ namespace TrilinosWrappers
     if (begin == end)
       return;
 
-    int_type *col_index_ptr = (int_type *)(&*begin);
-    const int_type n_cols = static_cast<int_type>(end - begin);
+    TrilinosWrapper::types::int_type *col_index_ptr = 
+      (TrilinosWrapper::types::int_type *)(&*begin);
+    const TrilinosWrapper::types::int_type n_cols = 
+      static_cast<TrilinosWrapper::types::int_type>(end - begin);
     compressed = false;
 
-    const int ierr = graph->InsertGlobalIndices (1, (int_type *)&row,
+    const int ierr = graph->InsertGlobalIndices (1, 
+                                                 (TrilinosWrapper::types::int_type *)&row,
                                                  n_cols, col_index_ptr);
 
     AssertThrow (ierr >= 0, ExcTrilinosError(ierr));
@@ -1819,7 +1809,7 @@ namespace TrilinosWrappers
   SparsityPattern::reinit (const IndexSet     &row_parallel_partitioning,
                            const IndexSet     &col_parallel_partitioning,
                            const MPI_Comm     &communicator,
-                           const std::vector<int_type> &n_entries_per_row)
+                           const std::vector<TrilinosWrapper::types::int_type> &n_entries_per_row)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);

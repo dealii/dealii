@@ -302,7 +302,7 @@ namespace internal
       /**
        * Declare the type for container size.
        */
-      typedef std::size_t size_type;
+      typedef types::global_dof_index size_type;
 
       /**
        * Type of the number this
@@ -739,8 +739,7 @@ public:
   typedef dealii::internal::BlockVectorIterators::Iterator<BlockVectorBase,true>  const_iterator;
   typedef typename BlockType::reference       reference;
   typedef typename BlockType::const_reference const_reference;
-
-  typedef std::size_t                     size_type;
+  typedef types::global_dof_index             size_type;
 
   /**
    * Declare a type that has holds
@@ -836,7 +835,7 @@ public:
    * is the sum of the dimensions of all
    * components.
    */
-  size_type size () const;
+  std::size_t size () const;
 
   /**
    * Return an iterator pointing to

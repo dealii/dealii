@@ -43,6 +43,11 @@ namespace internal
   namespace ChunkSparseMatrix
   {
     /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
+    /**
      * Add the result of multiplying a chunk
      * of size chunk_size times chunk_size by
      * a source vector fragment of size
@@ -363,7 +368,7 @@ ChunkSparseMatrix<number>::empty () const
 
 
 template <typename number>
-size_type 
+typename ChunkSparseMatrix<number>::size_type 
 ChunkSparseMatrix<number>::n_nonzero_elements () const
 {
   Assert (cols != 0, ExcNotInitialized());
@@ -373,7 +378,7 @@ ChunkSparseMatrix<number>::n_nonzero_elements () const
 
 
 template <typename number>
-size_type 
+typename ChunkSparseMatrix<number>::size_type 
 ChunkSparseMatrix<number>::n_actually_nonzero_elements () const
 {
   Assert (cols != 0, ExcNotInitialized());

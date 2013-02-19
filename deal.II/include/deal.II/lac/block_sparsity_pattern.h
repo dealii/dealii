@@ -85,7 +85,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * Define a value which is used
@@ -1302,7 +1302,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::exists (const size_type i,
 
 template <class SparsityPatternBase>
 inline
-size_type 
+typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
 BlockSparsityPatternBase<SparsityPatternBase>::
 row_length (const size_type row) const
 {
@@ -1321,7 +1321,7 @@ row_length (const size_type row) const
 
 template <class SparsityPatternBase>
 inline
-size_type 
+typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
 BlockSparsityPatternBase<SparsityPatternBase>::n_block_cols () const
 {
   return columns;
@@ -1331,7 +1331,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_block_cols () const
 
 template <class SparsityPatternBase>
 inline
-size_type 
+typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
 BlockSparsityPatternBase<SparsityPatternBase>::n_block_rows () const
 {
   return rows;
@@ -1339,7 +1339,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_block_rows () const
 
 
 inline
-size_type 
+BlockCompressedSimpleSparsityPattern::size_type
 BlockCompressedSimpleSparsityPattern::column_number (const size_type row,
                                                      const size_type index) const
 {

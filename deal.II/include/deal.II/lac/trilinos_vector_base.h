@@ -97,19 +97,7 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      typedef std::size_t size_type;
-
-#ifdef DEAL_II_EPETRA_NO_64BIT_GLOBAL_INDICES
-      /**
-       * Declare type of integer.
-       */
-      typedef int int_type;
-#else
-      /**
-       * Declare type of integer.
-       */
-      typedef long long int_type;
-#endif
+      typedef types::global_dof_index size_type;
 
       /**
        * This looks like a copy
@@ -282,21 +270,9 @@ namespace TrilinosWrappers
      */
     typedef TrilinosScalar            value_type;
     typedef TrilinosScalar            real_type;
-    typedef std::size_t               size_type;
+    typedef types::global_dof_index   size_type;
     typedef internal::VectorReference reference;
     typedef const internal::VectorReference const_reference;
-
-#ifdef EPETRA_NO_64BIT_GLOBAL_INDICES
-      /**
-       * Declare type of integer.
-       */
-      typedef int int_type;
-#else
-      /**
-       * Declare type of integer.
-       */
-      typedef long long int_type;
-#endif
 
     /**
      * @name 1: Basic Object-handling
@@ -1405,11 +1381,11 @@ namespace TrilinosWrappers
     for (size_type i=0; i<n_elements; ++i)
       {
         const size_type row = indices[i];
-        const int_type local_row = vector->Map().LID(static_cast<int_type>(row));
+        const TrilinosWrapper::types::int_type local_row = vector->Map().LID(static_cast<TrilinosWrapper::Types::int_type>(row));
         if (local_row == -1)
           {
             const int ierr = vector->ReplaceGlobalValues (1,
-                                                          (const int_type *)(&row),
+                                                          (const TrilinosWrapper::types::int_type *)(&row),
                                                           &values[i]);
             AssertThrow (ierr == 0, ExcTrilinosError(ierr));
             compressed = false;
@@ -1473,11 +1449,11 @@ namespace TrilinosWrappers
     for (size_type i=0; i<n_elements; ++i)
       {
         const size_type row = indices[i];
-        const int_type local_row = vector->Map().LID(static_cast<int_type>(row));
+        const TrilinosWrapper::types::int_type local_row = vector->Map().LID(static_cast<TrilinosWrapper::Types::int_type>(row));
         if (local_row == -1)
           {
             const int ierr = vector->SumIntoGlobalValues (1,
-                                                          (const int_type *)(&row),
+                                                          (const TrilinosWrapper::types::int_type *)(&row),
                                                           &values[i]);
             AssertThrow (ierr == 0, ExcTrilinosError(ierr));
             compressed = false;
@@ -1512,7 +1488,7 @@ namespace TrilinosWrappers
   std::pair<size_type, size_type>
   VectorBase::local_range () const
   {
-    int_type begin, end;
+    TrilinosWrapper::types::int_type begin, end;
     begin = vector->Map().MinMyGID();
     end = vector->Map().MaxMyGID()+1;
     return std::make_pair (begin, end);

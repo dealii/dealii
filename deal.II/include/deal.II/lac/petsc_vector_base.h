@@ -252,7 +252,7 @@ namespace PETScWrappers
      */
     typedef PetscScalar               value_type;
     typedef PetscReal                 real_type;
-    typedef std::size_t               size_type;
+    typedef types::global_dof_index   size_type;
     typedef internal::VectorReference reference;
     typedef const internal::VectorReference const_reference;
 

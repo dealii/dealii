@@ -101,7 +101,7 @@ public:
    *  use blocks of different
    *  sizes.
    */
-  explicit BlockVector (const size_type num_blocks = 0,
+  explicit BlockVector (const unsigned int num_blocks = 0,
                         const size_type block_size = 0);
 
   /**

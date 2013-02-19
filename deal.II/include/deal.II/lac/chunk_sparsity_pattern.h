@@ -49,7 +49,7 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * Define a value which is used
@@ -865,7 +865,7 @@ private:
 
 
 inline
-size_type
+ChunkSparsityPattern::size_type
 ChunkSparsityPattern::n_rows () const
 {
   return rows;
@@ -873,7 +873,7 @@ ChunkSparsityPattern::n_rows () const
 
 
 inline
-size_type
+ChunkSparsityPattern::size_type
 ChunkSparsityPattern::n_cols () const
 {
   return cols;
@@ -882,7 +882,7 @@ ChunkSparsityPattern::n_cols () const
 
 
 inline
-size_type 
+ChunkSparsityPattern::size_type
 ChunkSparsityPattern::get_chunk_size () const
 {
   return chunk_size;

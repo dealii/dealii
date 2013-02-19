@@ -103,7 +103,7 @@ ChunkSparsityPattern::ChunkSparsityPattern (const size_type n,
 
 
 ChunkSparsityPattern::ChunkSparsityPattern (
-  const types::global_dof_index m,
+  const size_type m,
   const std::vector<size_type> &row_lengths,
   const size_type chunk_size,
   const bool)
@@ -176,8 +176,8 @@ ChunkSparsityPattern::reinit (const size_type m,
 
 void
 ChunkSparsityPattern::reinit (
-  const types::global_dof_index m,
-  const types::global_dof_index n,
+  const size_type m,
+  const size_type n,
   const VectorSlice<const std::vector<size_type> > &row_lengths,
   const size_type chunk_size,
   const bool)
@@ -256,6 +256,11 @@ namespace internal
 {
   namespace
   {
+    /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
     // distinguish between compressed sparsity types that define row_begin()
     // and SparsityPattern that uses begin() as iterator type
     template <typename Sparsity>
@@ -390,7 +395,7 @@ ChunkSparsityPattern::empty () const
 
 
 
-size_type 
+ChunkSparsityPattern::size_type 
 ChunkSparsityPattern::max_entries_per_row () const
 {
   return sparsity_pattern.max_entries_per_row() * chunk_size;
@@ -422,7 +427,7 @@ ChunkSparsityPattern::exists (const size_type i,
 
 
 
-size_type 
+ChunkSparsityPattern::size_type 
 ChunkSparsityPattern::row_length (const size_type i) const
 {
   Assert (i<rows, ExcIndexRange(i,0,rows));
@@ -447,7 +452,7 @@ ChunkSparsityPattern::symmetrize ()
 
 
 
-size_type 
+ChunkSparsityPattern::size_type 
 ChunkSparsityPattern::n_nonzero_elements () const
 {
   if ((n_rows() % chunk_size == 0)
@@ -590,7 +595,7 @@ ChunkSparsityPattern::print_gnuplot (std::ostream &out) const
 
 
 
-size_type 
+ChunkSparsityPattern::size_type 
 ChunkSparsityPattern::bandwidth () const
 {
   // calculate the bandwidth from that of the

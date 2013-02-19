@@ -117,7 +117,7 @@ public:
   typedef const value_type                                 *const_iterator;
   typedef value_type                                       &reference;
   typedef const value_type                                 &const_reference;
-  typedef std::size_t                                       size_type;
+  typedef types::global_dof_index                           size_type;
 
   /**
    * Declare a type that has holds
@@ -590,7 +590,7 @@ public:
   /**
    * Return dimension of the vector.
    */
-  size_type size () const;
+  std::size_t size () const;
 
   /**
    * Return whether the vector contains only
@@ -998,7 +998,7 @@ public:
    * memory consumption (in bytes)
    * of this object.
    */
-  size_type memory_consumption () const;
+  std::size_t memory_consumption () const;
   //@}
 
   /**

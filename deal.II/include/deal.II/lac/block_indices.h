@@ -53,7 +53,7 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * Default
@@ -75,14 +75,14 @@ public:
    * Specialized constructor for a
    * structure with blocks of equal size.
    */
-  explicit BlockIndices(const size_type n_blocks, const size_type block_size = 0);
+  explicit BlockIndices(const unsigned int n_blocks, const size_type block_size = 0);
 
   /**
    * Reinitialize the number of
    * blocks and assign each block
    * the same number of elements.
    */
-  void reinit (const size_type n_blocks,
+  void reinit (const unsigned int n_blocks,
                const size_type n_elements_per_block);
 
   /**
@@ -111,7 +111,7 @@ public:
   /**
    * Number of blocks in index field.
    */
-  size_type size () const;
+  unsigned int size () const;
 
   /**
    * Return the total number of
@@ -120,12 +120,12 @@ public:
    * of the vector space of the
    * block vector.
    */
-  size_type total_size () const;
+  std::size_t total_size () const;
 
   /**
    * The size of the @p ith block.
    */
-  size_type block_size (const size_type i) const;
+  std::size_t block_size (const size_type i) const;
 
   //@}
 
@@ -152,14 +152,14 @@ public:
    * the block, the second the
    * index within it.
    */
-  std::pair<size_type,size_type>
+  std::pair<unsigned int,size_type>
   global_to_local (const size_type i) const;
 
   /**
    * Return the global index of
    * @p index in block @p block.
    */
-  size_type local_to_global (const size_type block,
+  size_type local_to_global (const unsigned int block,
                              const size_type index) const;
 
   /**
@@ -203,7 +203,7 @@ private:
    * we cache this value for faster
    * access.
    */
-  size_type n_blocks;
+  unsigned int n_blocks;
 
   /**
    * Global starting index of each
@@ -333,7 +333,7 @@ const bool IsBlockMatrix<MatrixType>::value;
 
 inline
 void
-BlockIndices::reinit (const size_type nb,
+BlockIndices::reinit (const unsigned int nb,
                       const size_type block_size)
 {
   n_blocks = nb;
@@ -370,7 +370,7 @@ BlockIndices::BlockIndices ()
 
 inline
 BlockIndices::BlockIndices (
-  const size_type n_blocks,
+  const unsigned int n_blocks,
   const size_type block_size)
   :
   n_blocks(n_blocks),
@@ -403,7 +403,7 @@ BlockIndices::push_back(const size_type sz)
 
 
 inline
-std::pair<std::size_t,std::size_t>
+std::pair<unsigned int,BlockIndices::size_type>
 BlockIndices::global_to_local (const size_type i) const
 {
   Assert (i<total_size(), ExcIndexRange(i, 0, total_size()));
@@ -418,8 +418,8 @@ BlockIndices::global_to_local (const size_type i) const
 
 
 inline
-std::size_t
-BlockIndices::local_to_global (const size_type block,
+BlockIndices::size_type
+BlockIndices::local_to_global (const unsigned int block,
                                const size_type index) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
@@ -431,7 +431,7 @@ BlockIndices::local_to_global (const size_type block,
 
 
 inline
-std::size_t
+unsigned int
 BlockIndices::size () const
 {
   return n_blocks;
@@ -460,7 +460,7 @@ BlockIndices::block_size (const size_type block) const
 
 
 inline
-std::size_t
+BlockIndices::size_type
 BlockIndices::block_start (const size_type block) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));

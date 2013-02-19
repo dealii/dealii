@@ -50,7 +50,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * Default constructor. The
@@ -333,7 +333,7 @@ private:
 
 template <typename Number>
 inline
-size_type
+typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::n_block_rows () const
 {
   return row_indices.size();
@@ -343,7 +343,7 @@ BlockSparseMatrixEZ<Number>::n_block_rows () const
 
 template <typename Number>
 inline
-size_type
+typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::n_rows () const
 {
   return row_indices.total_size();
@@ -353,7 +353,7 @@ BlockSparseMatrixEZ<Number>::n_rows () const
 
 template <typename Number>
 inline
-size_type
+typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::n_block_cols () const
 {
   return column_indices.size();
@@ -363,7 +363,7 @@ BlockSparseMatrixEZ<Number>::n_block_cols () const
 
 template <typename Number>
 inline
-size_type
+typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::n_cols () const
 {
   return column_indices.total_size();
@@ -401,7 +401,7 @@ BlockSparseMatrixEZ<Number>::block (const size_type row,
 
 template <typename Number>
 inline
-size_type
+typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::m () const
 {
   return n_rows();
@@ -411,7 +411,7 @@ BlockSparseMatrixEZ<Number>::m () const
 
 template <typename Number>
 inline
-size_type
+typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::n () const
 {
   return n_cols();

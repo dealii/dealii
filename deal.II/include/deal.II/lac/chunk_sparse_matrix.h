@@ -52,7 +52,7 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * Type of matrix entries. In analogy to
@@ -1230,7 +1230,8 @@ private:
 
 template <typename number>
 inline
-size_type ChunkSparseMatrix<number>::m () const
+typename ChunkSparseMatrix<number>::size_type
+ChunkSparseMatrix<number>::m () const
 {
   Assert (cols != 0, ExcNotInitialized());
   return cols->rows;
@@ -1239,7 +1240,8 @@ size_type ChunkSparseMatrix<number>::m () const
 
 template <typename number>
 inline
-size_type ChunkSparseMatrix<number>::n () const
+typename ChunkSparseMatrix<number>::size_type 
+ChunkSparseMatrix<number>::n () const
 {
   Assert (cols != 0, ExcNotInitialized());
   return cols->cols;
@@ -1249,7 +1251,7 @@ size_type ChunkSparseMatrix<number>::n () const
 
 template <typename number>
 inline
-size_type 
+typename ChunkSparseMatrix<number>::size_type 
 ChunkSparseMatrix<number>::compute_location (const size_type i,
                                              const size_type j) const
 {

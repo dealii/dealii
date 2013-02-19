@@ -400,7 +400,7 @@ CompressedSparsityPattern::empty () const
 
 
 
-size_type 
+CompressedSparsityPattern::size_type 
 CompressedSparsityPattern::max_entries_per_row () const
 {
   size_type m = 0;
@@ -511,7 +511,7 @@ CompressedSparsityPattern::print_gnuplot (std::ostream &out) const
 
 
 
-size_type 
+CompressedSparsityPattern::size_type 
 CompressedSparsityPattern::bandwidth () const
 {
   size_type b=0;
@@ -532,7 +532,7 @@ CompressedSparsityPattern::bandwidth () const
 
 
 
-size_type 
+CompressedSparsityPattern::size_type 
 CompressedSparsityPattern::n_nonzero_elements () const
 {
   size_type n=0;

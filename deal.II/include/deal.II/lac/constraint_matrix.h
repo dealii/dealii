@@ -142,7 +142,7 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * An enum that describes what should
@@ -636,7 +636,7 @@ public:
    * consumption (in bytes) of this
    * object.
    */
-  size_type memory_consumption () const;
+  std::size_t memory_consumption () const;
 
   /**
    * @}
@@ -1921,7 +1921,7 @@ ConstraintMatrix::set_inhomogeneity (const size_type line,
 
 
 inline
-std::size_t 
+types::global_dof_index
 ConstraintMatrix::n_constraints () const
 {
   return lines.size();
@@ -1962,7 +1962,7 @@ ConstraintMatrix::is_inhomogeneously_constrained (const size_type index) const
 
 
 inline
-const std::vector<std::pair<std::size_t,double> > *
+const std::vector<std::pair<types::global_dof_index,double> > *
 ConstraintMatrix::get_constraint_entries (const size_type line) const
 {
   // check whether the entry is
@@ -1995,7 +1995,7 @@ ConstraintMatrix::get_inhomogeneity (const size_type line) const
 
 
 
-inline std::size_t 
+inline types::global_dof_index
 ConstraintMatrix::calculate_line_index (const size_type line) const
 {
   //IndexSet is unused (serial case)

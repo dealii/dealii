@@ -48,14 +48,14 @@ namespace TrilinosWrappers
 
       // get a representation of the present
       // row
-      int_type ncols;
-      int_type colnums = sparsity_pattern->n_cols();
+      TrilinosWrapper::types::int_type ncols;
+      TrilinosWrapper::types::int_type colnums = sparsity_pattern->n_cols();
 
       int ierr;
-      ierr = sparsity_pattern->graph->ExtractGlobalRowCopy((int_type)this->a_row,
+      ierr = sparsity_pattern->graph->ExtractGlobalRowCopy((TrilinosWrapper::types::int_type)this->a_row,
                                                            colnums,
                                                            ncols,
-                                                           (int_type *)&(*colnum_cache)[0]);
+                                                           (TrilinosWrapper::types::int_type *)&(*colnum_cache)[0]);
       AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
       // copy it into our caches if the
@@ -177,8 +177,8 @@ namespace TrilinosWrappers
                            const size_type  n,
                            const size_type  n_entries_per_row)
   {
-    const Epetra_Map rows (static_cast<int_type>(m), 0, Utilities::Trilinos::comm_self());
-    const Epetra_Map columns (static_cast<int_type>(n), 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map rows (static_cast<TrilinosWrapper::types::int_type>(m), 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map columns (static_cast<TrilinosWrapper::types::int_type>(n), 0, Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, n_entries_per_row);
   }
@@ -227,8 +227,10 @@ namespace TrilinosWrappers
                            const size_type  n,
                            const std::vector<size_type> &n_entries_per_row)
   {
-    const Epetra_Map rows (static_cast<int_type>(m), 0, Utilities::Trilinos::comm_self());
-    const Epetra_Map columns (static_cast<int_type>(n), 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map rows (static_cast<TrilinosWrapper::types::int_type>(m), 0, 
+        Utilities::Trilinos::comm_self());
+    const Epetra_Map columns (static_cast<TrilinosWrapper::types::int_type>(n), 0, 
+        Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, n_entries_per_row);
   }
@@ -238,7 +240,7 @@ namespace TrilinosWrappers
   void
   SparsityPattern::reinit (const Epetra_Map   &input_row_map,
                            const Epetra_Map   &input_col_map,
-                           const std::vector<int_type> &n_entries_per_row)
+                           const std::vector<TrilinosWrapper::types::int_type> &n_entries_per_row)
   {
     // release memory before reallocation
     graph.reset ();
@@ -280,7 +282,7 @@ namespace TrilinosWrappers
       template <typename Sparsity>
       void copy_row (const Sparsity     &csp,
                      const size_type     row,
-                     std::vector<int_type>   &row_indices)
+                     std::vector<TrilinosWrapper::types::int_type>   &row_indices)
       {
         typename Sparsity::row_iterator col_num = csp.row_begin (row);
         for (size_type col=0; col_num != csp.row_end (row); ++col_num, ++col)
@@ -289,7 +291,7 @@ namespace TrilinosWrappers
 
       void copy_row (const dealii::SparsityPattern &csp,
                      const size_type                row,
-                     std::vector<int_type>          &row_indices)
+                     std::vector<TrilinosWrapper::types::int_type>          &row_indices)
       {
         dealii::SparsityPattern::iterator col_num = csp.begin (row);
         for (size_type col=0; col_num != csp.end (row); ++col_num, ++col)
@@ -322,7 +324,7 @@ namespace TrilinosWrappers
 
     const size_type first_row = input_row_map.MinMyGID(),
                        last_row = input_row_map.MaxMyGID()+1;
-    std::vector<int_type> n_entries_per_row(last_row - first_row);
+    std::vector<TrilinosWrapper::type::int_type> n_entries_per_row(last_row - first_row);
 
     for (size_type row=first_row; row<last_row; ++row)
       n_entries_per_row[row-first_row] = sp.row_length(row);
@@ -339,7 +341,7 @@ namespace TrilinosWrappers
     AssertDimension (sp.n_rows(),
                      static_cast<size_type>(graph->NumGlobalRows()));
 
-    std::vector<int_type> row_indices;
+    std::vector<TrilinosWrapper::types::int_type> row_indices;
 
     // Include possibility to exchange data
     // since CompressedSimpleSparsityPattern is
@@ -347,7 +349,7 @@ namespace TrilinosWrappers
     if (exchange_data==false)
       for (size_type row=first_row; row<last_row; ++row)
         {
-          const int_type row_length = sp.row_length(row);
+          const TrilinosWrapper::types::int_type row_length = sp.row_length(row);
           if (row_length == 0)
             continue;
 
@@ -359,13 +361,14 @@ namespace TrilinosWrappers
     else
       for (size_type row=0; row<sp.n_rows(); ++row)
         {
-          const int_type row_length = sp.row_length(row);
+          const TrilinosWrapper::types::int_type row_length = sp.row_length(row);
           if (row_length == 0)
             continue;
 
           row_indices.resize (row_length, -1);
           internal::copy_row(sp, row, row_indices);
-          graph->InsertGlobalIndices (1, reinterpret_cast<int_type *>(&row),
+          graph->InsertGlobalIndices (1, 
+                                      reinterpret_cast<TrilinosWrapper::types::int_type *>(&row),
                                       row_length, &row_indices[0]);
         }
 
@@ -387,8 +390,8 @@ namespace TrilinosWrappers
   void
   SparsityPattern::copy_from (const SparsityType &sp)
   {
-    const Epetra_Map rows (static_cast<int_type>(sp.n_rows()), 0, Utilities::Trilinos::comm_self());
-    const Epetra_Map columns (static_cast<int_type>(sp.n_cols()), 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map rows (static_cast<TrilinosWrapper::types::int_type>(sp.n_rows()), 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map columns (static_cast<TrilinosWrapper::types::int_type>(sp.n_cols()), 0, Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, sp);
   }
@@ -436,7 +439,9 @@ namespace TrilinosWrappers
   {
     // Extract local indices in
     // the matrix.
-    int_type trilinos_i = graph->LRID(static_cast<int_type>(i)), trilinos_j = graph->LCID(static_cast<int_type>(j));
+    TrilinosWrapper::types::int_type trilinos_i = 
+      graph->LRID(static_cast<TrilinosWrapper::types::int_type>(i)), 
+      trilinos_j = graph->LCID(static_cast<TrilinosWrapper::types::int_type>(j));
 
     // If the data is not on the
     // present processor, we throw
@@ -455,9 +460,9 @@ namespace TrilinosWrappers
         // local indices.
         if (graph->Filled() == false)
           {
-            int_type nnz_present = graph->NumGlobalIndices(i);
-            int_type nnz_extracted;
-            int_type *col_indices;
+            TrilinosWrapper::types::int_type nnz_present = graph->NumGlobalIndices(i);
+            TrilinosWrapper::types::int_type nnz_extracted;
+            TrilinosWrapper::types::int_type *col_indices;
 
             // Generate the view and make
             // sure that we have not generated
@@ -469,10 +474,11 @@ namespace TrilinosWrappers
                     ExcDimensionMismatch(nnz_present, nnz_extracted));
 
             // Search the index
-            int_type *el_find = std::find(col_indices, col_indices + nnz_present,
-                                     trilinos_j);
+            TrilinosWrapper::types::int_type *el_find = 
+              std::find(col_indices, col_indices + nnz_present, trilinos_j);
 
-            int_type local_col_index = (int_type)(el_find - col_indices);
+            TrilinosWrapper::types::int_type local_col_index = 
+              (TrilinosWrapper::types::int_type)(el_find - col_indices);
 
             if (local_col_index == nnz_present)
               return false;
@@ -481,9 +487,9 @@ namespace TrilinosWrappers
           {
             // Prepare pointers for extraction
             // of a view of the row.
-            int_type nnz_present = graph->NumGlobalIndices(i);
-            int_type nnz_extracted;
-            int_type *col_indices;
+            TrilinosWrapper::types::int_type nnz_present = graph->NumGlobalIndices(i);
+            TrilinosWrapper::types::int_type nnz_extracted;
+            TrilinosWrapper::types::int_type *col_indices;
 
             // Generate the view and make
             // sure that we have not generated
@@ -496,10 +502,11 @@ namespace TrilinosWrappers
                     ExcDimensionMismatch(nnz_present, nnz_extracted));
 
             // Search the index
-            int_type *el_find = std::find(col_indices, col_indices + nnz_present,
-                                     trilinos_j);
+            TrilinosWrapper::types::int_type *el_find = std::find(col_indices, 
+                col_indices + nnz_present, trilinos_j);
 
-            int_type local_col_index = (int_type)(el_find - col_indices);
+            TrilinosWrapper::types::int_type local_col_index = 
+              (TrilinosWrapper::types::int_type)(el_find - col_indices);
 
             if (local_col_index == nnz_present)
               return false;
@@ -515,11 +522,11 @@ namespace TrilinosWrappers
   SparsityPattern::bandwidth () const
   {
     size_type local_b=0;
-    int_type global_b=0;
+    TrilinosWrapper::types::int_type global_b=0;
     for (size_type i=0; i<local_size(); ++i)
       {
-        int_type *indices;
-        int_type num_entries;
+        TrilinosWrapper::types::int_type *indices;
+        TrilinosWrapper::types::int_type num_entries;
         graph->ExtractMyRowView(i, num_entries, indices);
         for (size_type j=0; j<(size_type)num_entries; ++j)
           {
@@ -527,7 +534,7 @@ namespace TrilinosWrappers
               local_b = std::abs(static_cast<size_type>(i-indices[j]));
           }
       }
-    graph->Comm().MaxAll((int_type *)&local_b, &global_b, 1);
+    graph->Comm().MaxAll((TrilinosWrapper::types::int_type *)&local_b, &global_b, 1);
     return static_cast<size_type>(global_b);
   }
 
@@ -536,7 +543,7 @@ namespace TrilinosWrappers
   size_type
   SparsityPattern::n_rows () const
   {
-    const int_type n_rows = graph -> NumGlobalRows();
+    const TrilinosWrapper::types::int_type n_rows = graph -> NumGlobalRows();
     return n_rows;
   }
 
@@ -545,7 +552,7 @@ namespace TrilinosWrappers
   size_type
   SparsityPattern::n_cols () const
   {
-    int_type n_cols;
+    TrilinosWrapper::types::int_type n_cols;
     if (graph->Filled() == true)
       n_cols = graph -> NumGlobalCols();
     else
@@ -559,7 +566,7 @@ namespace TrilinosWrappers
   size_type
   SparsityPattern::local_size () const
   {
-    int_type n_rows = graph -> NumMyRows();
+    TrilinosWrapper::types::int_type n_rows = graph -> NumMyRows();
 
     return n_rows;
   }
@@ -581,7 +588,7 @@ namespace TrilinosWrappers
   size_type
   SparsityPattern::n_nonzero_elements () const
   {
-    int_type nnz = graph->NumGlobalEntries();
+    TrilinosWrapper::types::int_type nnz = graph->NumGlobalEntries();
 
     return static_cast<size_type>(nnz);
   }
@@ -591,7 +598,7 @@ namespace TrilinosWrappers
   size_type
   SparsityPattern::max_entries_per_row () const
   {
-    int_type nnz = graph->MaxNumIndices();
+    TrilinosWrapper::types::int_type nnz = graph->MaxNumIndices();
 
     return static_cast<size_type>(nnz);
   }
@@ -605,8 +612,9 @@ namespace TrilinosWrappers
 
     // get a representation of the
     // present row
-    int_type ncols = -1;
-    int_type local_row = graph->LRID(static_cast<int_type>(row));
+    TrilinosWrapper::types::int_type ncols = -1;
+    TrilinosWrapper::types::int_type local_row = 
+      graph->LRID(static_cast<TrilinosWrapper::types::int_type>(row));
 
     // on the processor who owns this
     // row, we'll have a non-negative
@@ -638,13 +646,13 @@ namespace TrilinosWrappers
       out << *graph;
     else
       {
-        int_type *indices;
-        int_type num_entries;
+        TrilinosWrapper::types::int_type *indices;
+        TrilinosWrapper::types::int_type num_entries;
 
-        for (int_type i=0; i<graph->NumMyRows(); ++i)
+        for (TrilinosWrapper::types::int_type i=0; i<graph->NumMyRows(); ++i)
           {
             graph->ExtractMyRowView (i, num_entries, indices);
-            for (int_type j=0; j<num_entries; ++j)
+            for (TrilinosWrapper::types::int_type j=0; j<num_entries; ++j)
               out << "(" << i << "," << indices[graph->GRID(j)] << ") "
                   << std::endl;
           }
@@ -661,8 +669,8 @@ namespace TrilinosWrappers
     Assert (graph->Filled() == true, ExcInternalError());
     for (size_type row=0; row<local_size(); ++row)
       {
-        signed int_type *indices;
-        int_type num_entries;
+        signed TrilinosWrapper::types::int_type *indices;
+        TrilinosWrapper::types::int_type num_entries;
         graph->ExtractMyRowView (row, num_entries, indices);
 
         for (size_type j=0; j<(size_type)num_entries; ++j)
@@ -671,8 +679,9 @@ namespace TrilinosWrappers
           // j horizontal, gnuplot output is
           // x-y, that is we have to exchange
           // the order of output
-          out << indices[graph->GRID(static_cast<int_type>(j))] << " " << -static_cast<signed int_type>(row)
-              << std::endl;
+          out << indices[graph->GRID(static_cast<TrilinosWrapper::types::int_type>(j))]
+            << " " << -static_cast<signed TrilinosWrapper::types::int_type>(row)
+            << std::endl;
       }
 
     AssertThrow (out, ExcIO());

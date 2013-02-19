@@ -48,7 +48,7 @@ public:
   /**
    * Declare type for container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * @name Constructors and initalization.
@@ -380,7 +380,7 @@ private:
 #ifndef DOXYGEN
 
 template<typename number>
-size_type
+types::global_dof_index
 TridiagonalMatrix<number>::m() const
 {
   return diagonal.size();
@@ -389,7 +389,7 @@ TridiagonalMatrix<number>::m() const
 
 
 template<typename number>
-size_type
+types::global_dof_index
 TridiagonalMatrix<number>::n() const
 {
   return diagonal.size();

@@ -206,7 +206,7 @@ CompressedSimpleSparsityPattern::Line::add_entries (ForwardIterator begin,
 }
 
 
-std::size_t
+CompressedSimpleSparsityPattern::size_type
 CompressedSimpleSparsityPattern::Line::memory_consumption () const
 {
   return entries.capacity()*sizeof(size_type)+sizeof(Line);
@@ -306,7 +306,7 @@ CompressedSimpleSparsityPattern::empty () const
 
 
 
-size_type 
+CompressedSimpleSparsityPattern::size_type 
 CompressedSimpleSparsityPattern::max_entries_per_row () const
 {
   size_type m = 0;
@@ -419,7 +419,7 @@ CompressedSimpleSparsityPattern::print_gnuplot (std::ostream &out) const
 
 
 
-size_type 
+CompressedSimpleSparsityPattern::size_type 
 CompressedSimpleSparsityPattern::bandwidth () const
 {
   size_type b=0;
@@ -440,7 +440,7 @@ CompressedSimpleSparsityPattern::bandwidth () const
 
 
 
-size_type 
+CompressedSimpleSparsityPattern::size_type 
 CompressedSimpleSparsityPattern::n_nonzero_elements () const
 {
   size_type n=0;
@@ -453,7 +453,7 @@ CompressedSimpleSparsityPattern::n_nonzero_elements () const
 }
 
 
-size_type
+CompressedSimpleSparsityPattern::size_type
 CompressedSimpleSparsityPattern::memory_consumption () const
 {
   //TODO: IndexSet...

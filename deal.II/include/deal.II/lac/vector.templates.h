@@ -322,6 +322,8 @@ namespace internal
 {
   namespace Vector
   {
+    typedef types::global_dof_index size_type;
+
     template<typename T>
     void set_subrange (const T            s,
                        const size_type begin,
@@ -1432,7 +1434,7 @@ void Vector<Number>::block_read (std::istream &in)
 
 
 template <typename Number>
-size_type
+std::size_t
 Vector<Number>::memory_consumption () const
 {
   return sizeof(*this) + (max_vec_size * sizeof(Number));

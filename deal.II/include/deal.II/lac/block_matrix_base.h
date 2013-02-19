@@ -54,6 +54,11 @@ namespace BlockMatrixIterators
   {
   public:
     /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
+    /**
      * Typedef the value type of the
      * matrix we point into.
      */
@@ -120,6 +125,11 @@ namespace BlockMatrixIterators
     public AccessorBase<BlockMatrix>
   {
   public:
+    /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
     /**
      * Type of the matrix used in
      * this accessor.
@@ -212,7 +222,12 @@ namespace BlockMatrixIterators
   {
   public:
     /**
-     * Thype of the matrix used in
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
+    /**
+     * Type of the matrix used in
      * this accessor.
      */
     typedef const BlockMatrix MatrixType;
@@ -376,7 +391,7 @@ public:
   typedef const value_type       *const_pointer;
   typedef value_type             &reference;
   typedef const value_type       &const_reference;
-  typedef std::size_t             size_type;
+  typedef types::global_dof_index size_type;
 
   typedef
   MatrixIterator<BlockMatrixIterators::Accessor<BlockMatrixBase, false> >
@@ -1274,7 +1289,7 @@ namespace BlockMatrixIterators
 
   template <class BlockMatrix>
   inline
-  size_type 
+  typename AccessorBase<BlockMatrix>::size_type
   AccessorBase<BlockMatrix>::block_row() const
   {
     Assert (row_block != numbers::invalid_size_type,
@@ -1286,7 +1301,7 @@ namespace BlockMatrixIterators
 
   template <class BlockMatrix>
   inline
-  size_type 
+  typename AccessorBase<BlockMatrix>::size_type
   AccessorBase<BlockMatrix>::block_column() const
   {
     Assert (col_block != numbers::invalid_size_type,
@@ -1374,7 +1389,7 @@ namespace BlockMatrixIterators
 
   template <class BlockMatrix>
   inline
-  size_type
+  typename Accessor<BlockMatrix, true>::size_type
   Accessor<BlockMatrix, true>::row() const
   {
     Assert (this->row_block != numbers::invalid_size_type,
@@ -1387,7 +1402,7 @@ namespace BlockMatrixIterators
 
   template <class BlockMatrix>
   inline
-  size_type
+  typename Accessor<BlockMatrix, true>::size_type
   Accessor<BlockMatrix, true>::column() const
   {
     Assert (this->col_block != numbers::invalid_size_type,
@@ -1558,7 +1573,7 @@ namespace BlockMatrixIterators
 
   template <class BlockMatrix>
   inline
-  size_type
+  typename Accessor<BlockMatrix, false>::size_type
   Accessor<BlockMatrix, false>::row() const
   {
     Assert (this->row_block != numbers::invalid_size_type,
@@ -1571,7 +1586,7 @@ namespace BlockMatrixIterators
 
   template <class BlockMatrix>
   inline
-  size_type
+  typename Accessor<BlockMatrix, false>::size_type
   Accessor<BlockMatrix, false>::column() const
   {
     Assert (this->col_block != numbers::invalid_size_type,
@@ -1602,7 +1617,7 @@ namespace BlockMatrixIterators
   void
   Accessor<BlockMatrix, false>::set_value (typename Accessor<BlockMatrix, false>::value_type newval) const
   {
-    Assert (this->row_block != numbers::invalid_size_type
+    Assert (this->row_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
     Assert (this->col_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
@@ -1806,7 +1821,7 @@ BlockMatrixBase<MatrixType>::block (const size_type row,
 
 template <class MatrixType>
 inline
-size_type
+typename BlockMatrixBase<MatrixType>::size_type
 BlockMatrixBase<MatrixType>::m () const
 {
   return row_block_indices.total_size();
@@ -1816,7 +1831,7 @@ BlockMatrixBase<MatrixType>::m () const
 
 template <class MatrixType>
 inline
-size_type
+typename BlockMatrixBase<MatrixType>::size_type
 BlockMatrixBase<MatrixType>::n () const
 {
   return column_block_indices.total_size();
@@ -1826,7 +1841,7 @@ BlockMatrixBase<MatrixType>::n () const
 
 template <class MatrixType>
 inline
-size_type 
+typename BlockMatrixBase<MatrixType>::size_type
 BlockMatrixBase<MatrixType>::n_block_cols () const
 {
   return column_block_indices.size();
@@ -1836,7 +1851,7 @@ BlockMatrixBase<MatrixType>::n_block_cols () const
 
 template <class MatrixType>
 inline
-size_type 
+typename BlockMatrixBase<MatrixType>::size_type
 BlockMatrixBase<MatrixType>::n_block_rows () const
 {
   return row_block_indices.size();

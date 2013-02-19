@@ -169,20 +169,7 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      typedef std::size_t size_type;
-
-#ifdef DEAL_II_EPETRA_NO_64BIT_GLOBAL_INDICES
-      /**
-       * Declare type of integer.
-       */
-      typedef int int_type;
-#else
-      /**
-       * Declare type of integer.
-       */
-      typedef long long int_type;
-#endif
-
+      typedef types::global_dof_index size_type;
 
       /**
        * @name Basic constructors and initalization.
@@ -528,12 +515,12 @@ namespace TrilinosWrappers
 
       has_ghosts = vector->Map().UniqueGIDs()==false;
 
-      const int_type size = parallel_partitioner.NumMyElements();
+      const TrilinosWrapper::types::int_type size = parallel_partitioner.NumMyElements();
 
       // Need to copy out values, since the
       // deal.II might not use doubles, so
       // that a direct access is not possible.
-      for (int_type i=0; i<size; ++i)
+      for (Trilinos::Wrapper::Types::int_type i=0; i<size; ++i)
         (*vector)[0][i] = v(parallel_partitioner.GID(i));
     }
 
@@ -589,27 +576,10 @@ namespace TrilinosWrappers
   class Vector : public VectorBase
   {
   public:
-#ifdef EPETRA_NO_64BIT_GLOBAL_INDICES
-      /**
-       * Declare type for container size.
-       */
-      typedef unsigned int size_type;
-
-      /**
-       * Declare type of integer.
-       */
-      typedef int int_type;
-#else
-      /**
-       * Declare type for container size.
-       */
-      typedef uint64_t size_type;
-
-      /**
-       * Declare type of integer.
-       */
-      typedef long long int_type;
-#endif
+    /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
 
     /**
      * Default constructor that
@@ -811,7 +781,7 @@ namespace TrilinosWrappers
   template <typename number>
   Vector::Vector (const dealii::Vector<number> &v)
   {
-    Epetra_LocalMap map ((int_type)v.size(), 0, Utilities::Trilinos::comm_self());
+    Epetra_LocalMap map ((TrilinosWrapper::types::int_type)v.size(), 0, Utilities::Trilinos::comm_self());
     vector.reset (new Epetra_FEVector(map));
     *this = v;
   }
@@ -837,13 +807,13 @@ namespace TrilinosWrappers
       {
         vector.reset();
 
-        Epetra_LocalMap map ((int_type)v.size(), 0,
+        Epetra_LocalMap map ((TrilinosWrapper::types::int_type)v.size(), 0,
                              Utilities::Trilinos::comm_self());
         vector.reset (new Epetra_FEVector(map));
       }
 
     const Epetra_Map &map = vector_partitioner();
-    const int_type size = map.NumMyElements();
+    const TrilinosWrapper::types::int_type size = map.NumMyElements();
 
     Assert (map.MaxLID() == size-1,
             ExcDimensionMismatch(map.MaxLID(), size-1));
@@ -851,7 +821,7 @@ namespace TrilinosWrappers
     // Need to copy out values, since the
     // deal.II might not use doubles, so
     // that a direct access is not possible.
-    for (int_type i=0; i<size; ++i)
+    for (TrilinosWrapper::types::int_type i=0; i<size; ++i)
       (*vector)[0][i] = v(i);
 
     return *this;

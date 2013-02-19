@@ -66,11 +66,6 @@ namespace TrilinosWrappers
   {
   public:
     /**
-     * Declare the type for container size.
-     */
-    typedef std::size_t size_type;
-
-    /**
      * Typedef the base class for simpler
      * access to its own typedefs.
      */

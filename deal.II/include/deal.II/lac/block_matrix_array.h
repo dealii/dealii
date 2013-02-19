@@ -126,7 +126,7 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * Default constructor creating a
@@ -476,6 +476,11 @@ class BlockTrianglePrecondition
   : private BlockMatrixArray<number>
 {
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
   /**
    * Default constructor creating a
    * useless object. initialize()

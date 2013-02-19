@@ -63,7 +63,7 @@ public:
   /**
    * Declare type of container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * Type of matrix entries. In analogy to
@@ -1476,7 +1476,7 @@ public:
 
 template <typename number>
 inline
-std::size_t
+types::global_dof_index
 FullMatrix<number>::m() const
 {
   return this->n_rows();
@@ -1486,7 +1486,7 @@ FullMatrix<number>::m() const
 
 template <typename number>
 inline
-std::size_t
+types::global_dof_index
 FullMatrix<number>::n() const
 {
   return this->n_cols();
@@ -1654,7 +1654,7 @@ Accessor (const FullMatrix<number> *matrix,
 
 template <typename number>
 inline
-std::size_t
+types::global_dof_index
 FullMatrix<number>::Accessor::row() const
 {
   return a_row;
@@ -1663,7 +1663,7 @@ FullMatrix<number>::Accessor::row() const
 
 template <typename number>
 inline
-std::size_t
+types::global_dof_index
 FullMatrix<number>::Accessor::column() const
 {
   return a_col;

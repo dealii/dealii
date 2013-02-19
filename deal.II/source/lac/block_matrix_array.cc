@@ -249,7 +249,7 @@ BlockMatrixArray<number>::matrix_norm_square (
 
 
 template <typename number>
-size_type 
+typename BlockMatrixArray<number>::size_type
 BlockMatrixArray<number>::n_block_rows () const
 {
   return block_rows;
@@ -258,7 +258,7 @@ BlockMatrixArray<number>::n_block_rows () const
 
 
 template <typename number>
-size_type 
+typename BlockMatrixArray<number>::size_type
 BlockMatrixArray<number>::n_block_cols () const
 {
   return block_cols;

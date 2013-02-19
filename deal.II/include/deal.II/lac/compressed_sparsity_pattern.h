@@ -91,7 +91,7 @@ public:
   /**
    * Declare the type for container size.
    */
-  typedef std::size_t size_type;
+  typedef types::global_dof_index size_type;
 
   /**
    * An iterator that can be used to
@@ -507,7 +507,7 @@ CompressedSparsityPattern::Line::add (const size_type j)
 
 
 inline
-std::size_t
+types::global_dof_index
 CompressedSparsityPattern::n_rows () const
 {
   return rows;
@@ -516,7 +516,7 @@ CompressedSparsityPattern::n_rows () const
 
 
 inline
-std::size_t
+types::global_dof_index
 CompressedSparsityPattern::n_cols () const
 {
   return cols;
@@ -561,7 +561,7 @@ CompressedSparsityPattern::Line::Line ()
 
 
 inline
-std::size_t 
+types::global_dof_index
 CompressedSparsityPattern::row_length (const size_type row) const
 {
   Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
@@ -574,7 +574,7 @@ CompressedSparsityPattern::row_length (const size_type row) const
 
 
 inline
-std::size_t 
+types::global_dof_index
 CompressedSparsityPattern::column_number (const size_type row,
                                           const size_type index) const
 {

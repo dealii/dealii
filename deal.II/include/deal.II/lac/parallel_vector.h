@@ -97,7 +97,7 @@ namespace parallel
       typedef const value_type                                 *const_iterator;
       typedef value_type                                       &reference;
       typedef const value_type                                 &const_reference;
-      typedef size_t                                            size_type;
+      typedef types::global_dof_index                           size_type;
       typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
       /**
@@ -1373,7 +1373,8 @@ namespace parallel
 
     template <typename Number>
     inline
-    std::size_t Vector<Number>::size () const
+    typename Vector<Number>::size_type
+    Vector<Number>::size () const
     {
       return partitioner->size();
     }
@@ -1382,7 +1383,8 @@ namespace parallel
 
     template <typename Number>
     inline
-    std::size_t Vector<Number>::local_size () const
+    typename Vector<Number>::size_type
+    Vector<Number>::local_size () const
     {
       return partitioner->local_size();
     }
@@ -1391,7 +1393,8 @@ namespace parallel
 
     template <typename Number>
     inline
-    std::pair<std::size_t,std::size_t>
+    std::pair<typename Vector<Number>::size_type,
+      typename Vector<Number>::size_type>
     Vector<Number>::local_range () const
     {
       return partitioner->local_range();
@@ -1412,7 +1415,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    std::size_t 
+    typename Vector<Number>::size_type 
     Vector<Number>::n_ghost_entries () const
     {
       return partitioner->n_ghost_indices();

@@ -141,6 +141,24 @@ namespace types
 
 }
 
+namespace TrilinosWrapper
+{
+  namespace types
+  {
+#ifdef DEAL_II_EPETRA_NO_64BIT_GLOBAL_INDICES
+    /**
+     * Declare type of integer used in the Epetra package of Trilinos.
+     */
+    typedef int int_type;
+#else
+    /**
+     * Declare type of integer used in the Epetra package of Trilinos.
+     */
+    typedef long long int_type;
+#endif
+  }
+}
+
 
 // this part of the namespace numbers got moved to the bottom types.h file,
 // because otherwise we get a circular inclusion of config.h, types.h, and
@@ -178,10 +196,12 @@ namespace numbers
    * an invalid array
    * index, an invalid
    * array size, and the
-   * like.
+   * like. Invalid_size_type
+   * is equivalent to
+   * invalid_dof_index.
    */
-  static const std::size_t
-  invalid_size_type = static_cast<std::size_t> (-1);
+  const types::global_dof_index
+  invalid_size_type = static_cast<types::global_dof_index> (-1);
 
   /**
                            * An invalid value for indices of degrees

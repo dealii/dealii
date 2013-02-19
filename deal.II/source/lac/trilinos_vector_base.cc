@@ -40,8 +40,8 @@ namespace TrilinosWrappers
       // we can use []. Note that we
       // can only get local values.
 
-      const int_type local_index = 
-        vector.vector->Map().LID(static_cast<int_type>(index));
+      const TrilinosWrapper::types::int_type local_index = 
+        vector.vector->Map().LID(static_cast<TrilinosWrapper::types::int_type>(index));
       Assert (local_index >= 0,
               ExcAccessToNonLocalElement (index,
                                           vector.vector->Map().MinMyGID(),
@@ -168,7 +168,8 @@ namespace TrilinosWrappers
   {
     // Extract local indices in
     // the vector.
-    int_type trilinos_i = vector->Map().LID(static_cast<int_type>(index));
+    TrilinosWrapper::types::int_type trilinos_i = 
+      vector->Map().LID(static_cast<TrilinosWrapper::types::int_type>(index));
     TrilinosScalar value = 0.;
 
     // If the element is not
@@ -196,7 +197,8 @@ namespace TrilinosWrappers
   {
     // Extract local indices in
     // the vector.
-    int_type trilinos_i = vector->Map().LID(static_cast<int_type>(index));
+    TrilinosWrapper::types::int_type trilinos_i = 
+      vector->Map().LID(static_cast<TrilinosWrapper::types::int_type>(index));
     TrilinosScalar value = 0.;
 
     // If the element is not present
@@ -423,7 +425,8 @@ namespace TrilinosWrappers
     //one index and the value per local
     //entry.
     return sizeof(*this)
-           + this->local_size()*( sizeof(double)+sizeof(int_type) );
+           + this->local_size()*( sizeof(double)+
+               sizeof(TrilinosWrapper::types::int_type) );
   }
 
 } /* end of namespace TrilinosWrappers */
