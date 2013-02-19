@@ -580,7 +580,8 @@ namespace Step42
         return_value = p(1);
       if (component == 2)
         {
-          return_value = 1.999 - input_obstacle_copy->obstacle_function (p(0), p(1));
+          return_value = -std::sqrt (0.36 - (p(0)-0.5)*(p(0)-0.5) - (p(1)-0.5)*(p(1)-0.5)) + 1.59;
+//          return_value = 1.999 - input_obstacle_copy->obstacle_function (p(0), p(1));
         }
       return return_value;
     }
@@ -1353,6 +1354,12 @@ namespace Step42
                               << std::endl
                               << "         with a damping parameter alpha = " << a
                               << std::endl;
+
+            // The previous iteration of step 0 is the solution of an elastic problem.
+            // So a linear combination of a plastic and an elastic solution makes no sense
+            // since the elastic solution is not in the konvex set of the plastic solution.
+            if (j == 1)
+              break;
           }
 
         if (resid<1e-8)
