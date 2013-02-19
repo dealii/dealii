@@ -162,6 +162,12 @@ never working correctly and it is not used.
 
 
 <ol>
+
+<li> New: step-49 demonstrates advanced techniques for mesh creation and
+manipulation.
+<br>
+(Timo Heister, 2013/02/19)
+
 <li> Fixed: Many places in the documentation have been made to consistently
 use doxygen markup that indicates that this is code, so that doxygen will
 cross-link the piece of code to class and function names. Many typos have also
