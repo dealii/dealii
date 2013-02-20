@@ -249,4 +249,6 @@ above. This is the output from grid_4():
   - change boundary indicators
   - relax inner vertices
 - Database of unstructured meshes for convergence studies
-- GridTools::extract_boundary_mesh 
+- discuss GridTools::extract_boundary_mesh 
+- how to remove or disable a cell inside a mesh
+
