@@ -173,16 +173,15 @@ work with a sequence of unstructured meshes (see possible extensions).
 <h4>Merging Meshes</h4>
 
 The function GridGenerator::merge_triangulations() allows you to merge two
-given Triangulations into a single one. This only works, if the vertices of
-the to be shared edge or face match exactly. It is useful to use
-GridTools::shift and GridTools::scale to align the two meshes.  In the
-function grid_2() of this tutorial, we merge a square with a round hole
-(generated with hyper_cube_with_cylindrical_hole()) and a rectangle. The
-function GridTools::subdivided_hyper_rectangle() allows you to specify the
-number of repetitions and the positions of the corners, this way we do not
-need to shift it manually. You should inspect the mesh graphically to make
-sure, that cells line up correctly and no hanging nodes exist in the merged
-Triangulation.
+given Triangulations into a single one.  For this to work, the vertices of the
+shared edge or face have to match exactly.  Lining up the two meshes can be
+achieved using GridTools::shift and GridTools::scale.  In the function
+grid_2() of this tutorial, we merge a square with a round hole (generated with
+hyper_cube_with_cylindrical_hole()) and a rectangle. The function
+GridTools::subdivided_hyper_rectangle() allows you to specify the number of
+repetitions and the positions of the corners, this way we do not need to shift
+it manually. You should inspect the mesh graphically to make sure, that cells
+line up correctly and no hanging nodes exist in the merged Triangulation.
 
 These are the input meshes and the output mesh:
 <TABLE WIDTH="80%" ALIGN="center">
