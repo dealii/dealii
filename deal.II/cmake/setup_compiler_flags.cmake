@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -71,6 +71,7 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   #
   # *Hooray* We are allowed to set compiler flags :-]
   #
+  MESSAGE(STATUS "")
   MESSAGE(STATUS "Set up default compiler flags.")
 
   #
@@ -83,18 +84,21 @@ IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   ENDIF()
 
   #
-  # Setup for ICC (version >= 10) compiler:
+  # Setup for ICC compiler (version >= 10):
   #
   IF(CMAKE_CXX_COMPILER_ID MATCHES "Intel")
     INCLUDE(setup_compiler_flags_intel)
     SET(DEAL_II_KNOWN_COMPILER TRUE)
   ENDIF()
 
-  IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+  #
+  # Setup for MSVC compiler (version >= 2012):
+  #
+   IF(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     INCLUDE(setup_compiler_flags_msvc)
     SET(DEAL_II_KNOWN_COMPILER TRUE)
   ENDIF()
-  
+
   IF(NOT DEAL_II_KNOWN_COMPILER)
     MESSAGE(FATAL_ERROR "\n"
       "Unknown compiler!\n"

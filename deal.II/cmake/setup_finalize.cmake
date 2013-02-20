@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -62,11 +62,11 @@ SET(_log "${CMAKE_BINARY_DIR}/summary.log")
 FILE(WRITE ${_log}
 "###
 #
-#  deal.II configuration:
+#  ${DEAL_II_PACKAGE_NAME} configuration:
 #
 #        CMAKE_BUILD_TYPE:       ${CMAKE_BUILD_TYPE}
 #        CMAKE_INSTALL_PREFIX:   ${CMAKE_INSTALL_PREFIX}
-#        CMAKE_SOURCE_DIR:       ${CMAKE_SOURCE_DIR}
+#        CMAKE_SOURCE_DIR:       ${CMAKE_SOURCE_DIR} (Version ${DEAL_II_PACKAGE_VERSION})
 #        CMAKE_BINARY_DIR:       ${CMAKE_BINARY_DIR}
 #        CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME}
 #                                ${CMAKE_CXX_COMPILER}

@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -32,6 +32,7 @@ SET(VERSION "8.0.pre")
 # General configuration for cmake:
 #
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
 
 SET(CMAKE_INCLUDE_CURRENT_DIR true)
 
@@ -45,10 +46,8 @@ LIST(APPEND CMAKE_MODULE_PATH
 #
 FILE(GLOB _macro_files "cmake/macros/*.cmake")
 FOREACH(_file ${_macro_files})
-  MESSAGE(STATUS "Include ${_file}")
   INCLUDE(${_file})
 ENDFOREACH()
-
 INCLUDE(setup_external_macros)
 
 #
