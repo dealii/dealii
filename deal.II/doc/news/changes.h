@@ -208,6 +208,11 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The ArpackSolver interface to the ARPACK eigenvalue solver could
+not be compiled with newer C++ compilers. This is now fixed.
+<br>
+(Juan Carlos Araujo Cabarcas, Wolfgang Bangerth, 2013/02/20)
+
 <li> New: PETScWrappers::MPI::BlockVector now has a constructor and reinit
 that takes a std::vector<IndexSet> (same interface as in Trilinos).
 <br>
