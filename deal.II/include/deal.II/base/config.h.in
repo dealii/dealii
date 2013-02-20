@@ -502,7 +502,8 @@
 
 
 /* Disable a bunch of warnings for Microsoft Visual C++. */
-//#ifdef DEAL_II_MSVC
+#ifdef DEAL_II_MSVC
+
 //#  pragma warning( disable : 4244 ) /* implied downcasting from double to float */
 //#  pragma warning( disable : 4267 ) /* implied downcasting from size_t to unsigned int */
 //#  pragma warning( disable : 4996 ) /* unsafe functions, such as strcat and sprintf */
@@ -515,7 +516,17 @@
 //#  pragma warning( disable : 4700 ) /* uninitialized local variable */
 //#  pragma warning( disable : 4789 ) /* destination of memory copy is too small */
 //#  pragma warning( disable : 4808 ) /* case 'value' is not a valid value for switch condition of type 'bool */
-//#endif // DEAL_II_MSVC
+
+/*
+ * On Windows systems with MS Visual C/C++, there is a
+ * #define for 'max' that collides with std::max. So, if
+ * we find that this is indeed the case, #undef it
+ */
+#  if defined(max)
+#    undef max
+#  endif
+#endif // DEAL_II_MSVC
+
 
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/types.h>
