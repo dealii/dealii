@@ -75,7 +75,7 @@ bool file_exists(const std::string & file)
   int error = stat (file.c_str(), &buf);
 
     return ((error == 0) &&
-	    S_ISREG(buf.st_mode));
+	    (buf.st_mode & S_IFMT == S_IFREG));
 }
 
 
