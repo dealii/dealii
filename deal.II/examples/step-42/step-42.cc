@@ -896,7 +896,7 @@ namespace Step42
     unsigned int elast_points = 0;
     unsigned int plast_points = 0;
     double       yield = 0;
-    unsigned int cell_number = 0;
+    double       cell_number = 0;
     cell_constitution = 0;
 
     for (; cell!=endc; ++cell)
@@ -918,6 +918,7 @@ namespace Step42
 
               plast_lin_hard->plast_linear_hardening (stress_strain_tensor, strain_tensor[q_point],
                                                       elast_points, plast_points, yield);
+
               cell_constitution (cell_number) += yield;
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
@@ -961,9 +962,15 @@ namespace Step42
               system_rhs_newton);
 
           cell_number += 1;
+        }
+      else
+        {
+          cell_constitution (cell_number) = 0;
+          cell_number += 1;
         };
 
     cell_constitution /= n_q_points;
+    cell_constitution.compress (VectorOperation::add);
     system_rhs_newton.compress (VectorOperation::add);
 
     unsigned int sum_elast_points = Utilities::MPI::sum(elast_points, mpi_communicator);
