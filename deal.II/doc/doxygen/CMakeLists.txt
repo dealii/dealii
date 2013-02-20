@@ -98,7 +98,7 @@ ADD_CUSTOM_COMMAND(
     ${CMAKE_CURRENT_BINARY_DIR}/doxygen.log
   COMMAND ${DOXYGEN_EXECUTABLE}
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
-    > ${CMAKE_CURRENT_BINARY_DIR}/doxygen.log 2>&1 # *pssst*
+    > ${CMAKE_BINARY_DIR}/doxygen.log 2>&1 # *pssst*
   WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
   DEPENDS
     tutorial
