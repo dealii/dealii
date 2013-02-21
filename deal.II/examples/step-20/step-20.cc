@@ -607,8 +607,15 @@ namespace Step20
   // step. Consequently, the class also does not have to store a pointer to an
   // inverse mass matrix object.
   //
-  // Since InverseIterate follows the standard convention for matrices, we
-  // need to provide a <tt>Tvmult</tt> function here as well.
+  // We will later use this class as a template argument to the
+  // IterativeInverse class which will in turn want to use it as a
+  // template argument for the PointerMatrix class. The latter class
+  // has a function that requires us to also write a function that
+  // provides the product with the transpose of the matrix this object
+  // represents. As a consequence, in the code below, we also
+  // implement a <tt>Tvmult</tt> function here that represents the
+  // product of the transpose matrix with a vector. It is easy to see
+  // how this needs to be implemented here.
   class ApproximateSchurComplement : public Subscriptor
   {
   public:
