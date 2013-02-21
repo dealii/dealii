@@ -677,8 +677,7 @@ namespace Step20
   void MixedLaplaceProblem<dim>::solve ()
   {
     PreconditionIdentity identity;
-    IterativeInverse<Vector<double> >
-    m_inverse;
+    IterativeInverse<Vector<double> > m_inverse;
     m_inverse.initialize(system_matrix.block(0,0), identity);
     m_inverse.solver.select("cg");
     static ReductionControl inner_control(1000, 0., 1.e-13);
