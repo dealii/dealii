@@ -42,7 +42,7 @@ IF(NOT DEAL_II_WITH_PETSC OR NOT DEAL_II_WITH_SLEPC OR DEAL_II_WITH_THREADS)
 Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
     DEAL_II_WITH_PETSC = ON
     DEAL_II_WITH_SLEPC = ON
-    DEAL_II_WITH_THREADS = ON
+    DEAL_II_WITH_THREADS = OFF
 which is required for this tutorial step."
     )
 ENDIF()
