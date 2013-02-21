@@ -344,7 +344,7 @@ namespace Step42
                                  SymmetricTensor<2,dim> &strain_tensor,
                                  unsigned int            &elast_points,
                                  unsigned int            &plast_points,
-                                 double                  &yield);
+                                 unsigned int            &yield);
     void linearized_plast_linear_hardening (SymmetricTensor<4,dim> &stress_strain_tensor_linearized,
                                             SymmetricTensor<4,dim> &stress_strain_tensor,
                                             SymmetricTensor<2,dim> &strain_tensor);
@@ -400,7 +400,7 @@ namespace Step42
                                                      SymmetricTensor<2,dim> &strain_tensor,
                                                      unsigned int            &elast_points,
                                                      unsigned int            &plast_points,
-                                                     double                  &yield)
+                                                     unsigned int            &yield)
   {
     if (dim == 3)
       {
@@ -894,8 +894,8 @@ namespace Step42
 
     unsigned int elast_points = 0;
     unsigned int plast_points = 0;
-    double       yield = 0;
-    double       cell_number = 0;
+    unsigned int yield = 0;
+    unsigned int cell_number = 0;
     cell_constitution = 0;
 
     for (; cell!=endc; ++cell)
@@ -1496,6 +1496,7 @@ namespace Step42
           refine_grid ();
 
         setup_system ();
+
 
         computing_timer.exit_section("Mesh refinement and setup system");
 
