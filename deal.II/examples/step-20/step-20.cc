@@ -260,7 +260,7 @@ namespace Step20
   // In the constructor of this class, we first store the value that was
   // passed in concerning the degree of the finite elements we shall use (a
   // degree of zero, for example, means to use RT(0) and DG(0)), and then
-  // construct the vector valued element belonging to the space X_h described
+  // construct the vector valued element belonging to the space $X_h$ described
   // in the introduction. The rest of the constructor is as in the early
   // tutorial programs.
   //
@@ -313,7 +313,7 @@ namespace Step20
     // end, we first have to make sure that the indices corresponding to
     // velocities and pressures are not intermingled: First all velocity
     // degrees of freedom, then all pressure DoFs. This way, the global matrix
-    // separates nicely into a 2x2 system. To achieve this, we have to
+    // separates nicely into a $2 \times 2$ system. To achieve this, we have to
     // renumber degrees of freedom base on their vector component, an
     // operation that conveniently is already implemented:
     DoFRenumbering::component_wise (dof_handler);
@@ -351,7 +351,7 @@ namespace Step20
     // maximal number of nonzero entries per row (this could be done more
     // efficiently in this case, but we only want to solve relatively small
     // problems for which this is not so important). In the second step, we
-    // allocate a 2x2 block pattern and then reinitialize each of the blocks
+    // allocate a $2 \times 2$ block pattern and then reinitialize each of the blocks
     // to its correct size using the <code>n_u</code> and <code>n_p</code>
     // variables defined above that hold the number of velocity and pressure
     // variables. In this second step, we only operate on the individual
