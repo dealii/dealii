@@ -31,7 +31,7 @@ namespace PETScWrappers
 
 
 
-  Vector::Vector (const unsigned int n)
+  Vector::Vector (const size_type n)
   {
     Vector::create_vector (n);
   }
@@ -61,8 +61,8 @@ namespace PETScWrappers
 
 
   void
-  Vector::reinit (const unsigned int n,
-                  const bool         fast)
+  Vector::reinit (const size_type n,
+                  const bool      fast)
   {
     // only do something if the sizes
     // mismatch
@@ -107,7 +107,7 @@ namespace PETScWrappers
 
 
   void
-  Vector::create_vector (const unsigned int n)
+  Vector::create_vector (const size_type n)
   {
     const int ierr
       = VecCreateSeq (PETSC_COMM_SELF, n, &vector);

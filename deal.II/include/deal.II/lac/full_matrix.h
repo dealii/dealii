@@ -1476,7 +1476,7 @@ public:
 
 template <typename number>
 inline
-types::global_dof_index
+typename FullMatrix<number>::size_type
 FullMatrix<number>::m() const
 {
   return this->n_rows();
@@ -1486,7 +1486,7 @@ FullMatrix<number>::m() const
 
 template <typename number>
 inline
-types::global_dof_index
+typename FullMatrix<number>::size_type
 FullMatrix<number>::n() const
 {
   return this->n_cols();
@@ -1529,7 +1529,7 @@ FullMatrix<number>::copy_from (const MATRIX &M)
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class, and
   // copy them into the current object
-  for (unsigned int row = 0; row < M.m(); ++row)
+  for (size_type row = 0; row < M.m(); ++row)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
@@ -1550,7 +1550,7 @@ FullMatrix<number>::copy_transposed (const MATRIX &M)
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class, and
   // copy them into the current object
-  for (unsigned int row = 0; row < M.m(); ++row)
+  for (size_type row = 0; row < M.m(); ++row)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
@@ -1654,7 +1654,7 @@ Accessor (const FullMatrix<number> *matrix,
 
 template <typename number>
 inline
-types::global_dof_index
+typename FullMatrix<number>::size_type
 FullMatrix<number>::Accessor::row() const
 {
   return a_row;
@@ -1663,7 +1663,7 @@ FullMatrix<number>::Accessor::row() const
 
 template <typename number>
 inline
-types::global_dof_index
+typename FullMatrix<number>::size_type
 FullMatrix<number>::Accessor::column() const
 {
   return a_col;

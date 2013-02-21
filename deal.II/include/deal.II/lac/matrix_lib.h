@@ -327,10 +327,15 @@ class MeanValueFilter : public Subscriptor
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Constructor, optionally
    * selecting a component.
    */
-  MeanValueFilter(unsigned int component = numbers::invalid_unsigned_int);
+  MeanValueFilter(size_type component = numbers::invalid_size_type);
 
   /**
    * Subtract mean value from @p v.
@@ -395,7 +400,7 @@ private:
   /**
    * Component for filtering block vectors.
    */
-  unsigned int component;
+  size_type component;
 };
 
 

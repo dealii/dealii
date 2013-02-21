@@ -91,7 +91,7 @@ namespace PETScWrappers
      *  sizes.
      */
     explicit BlockVector (const unsigned int num_blocks = 0,
-                          const unsigned int block_size = 0);
+                          const size_type    block_size = 0);
 
     /**
      * Copy-Constructor. Dimension set to
@@ -192,7 +192,7 @@ namespace PETScWrappers
      * is filled with zeros.
      */
     void reinit (const unsigned int num_blocks,
-                 const unsigned int block_size,
+                 const size_type    block_size,
                  const bool fast = false);
 
     /**
@@ -227,8 +227,8 @@ namespace PETScWrappers
      * since they may be routed to
      * the wrong block.
      */
-    void reinit (const std::vector<unsigned int> &N,
-                 const bool                       fast=false);
+    void reinit (const std::vector<size_type> &N,
+                 const bool                   fast=false);
 
     /**
      * Change the dimension to that
@@ -317,7 +317,7 @@ namespace PETScWrappers
 
   inline
   BlockVector::BlockVector (const unsigned int n_blocks,
-                            const unsigned int block_size)
+                            const size_type    block_size)
   {
     reinit (n_blocks, block_size);
   }
@@ -325,7 +325,7 @@ namespace PETScWrappers
 
 
   inline
-  BlockVector::BlockVector (const std::vector<unsigned int> &n)
+  BlockVector::BlockVector (const std::vector<size_type> &n)
   {
     reinit (n, false);
   }
@@ -360,9 +360,9 @@ namespace PETScWrappers
 
 
   template <typename InputIterator>
-  BlockVector::BlockVector (const std::vector<unsigned int> &n,
-                            const InputIterator              first,
-                            const InputIterator              end)
+  BlockVector::BlockVector (const std::vector<size_type> &n,
+                            const InputIterator           first,
+                            const InputIterator           end)
   {
     // first set sizes of blocks, but
     // don't initialize them as we will
@@ -374,7 +374,7 @@ namespace PETScWrappers
         InputIterator end = start;
         std::advance (end, static_cast<signed int>(n[b]));
 
-        for (unsigned int i=0; i<n[b]; ++i, ++start)
+        for (size_type i=0; i<n[b]; ++i, ++start)
           this->block(b)(i) = *start;
       }
     Assert (start == end, ExcIteratorRangeDoesNotMatchVectorSize());
@@ -420,10 +420,10 @@ namespace PETScWrappers
   inline
   void
   BlockVector::reinit (const unsigned int n_bl,
-                       const unsigned int bl_sz,
+                       const size_type    bl_sz,
                        const bool         fast)
   {
-    std::vector<unsigned int> n(n_bl, bl_sz);
+    std::vector<size_type> n(n_bl, bl_sz);
     reinit(n, fast);
   }
 
@@ -431,8 +431,8 @@ namespace PETScWrappers
 
   inline
   void
-  BlockVector::reinit (const std::vector<unsigned int> &n,
-                       const bool                       fast)
+  BlockVector::reinit (const std::vector<size_type> &n,
+                       const bool                    fast)
   {
     block_indices.reinit (n);
     if (this->components.size() != this->n_blocks())

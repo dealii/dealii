@@ -37,20 +37,20 @@ namespace PETScWrappers
 
 
 
-  SparseMatrix::SparseMatrix (const unsigned int m,
-                              const unsigned int n,
-                              const unsigned int n_nonzero_per_row,
-                              const bool         is_symmetric)
+  SparseMatrix::SparseMatrix (const size_type m,
+                              const size_type n,
+                              const size_type n_nonzero_per_row,
+                              const bool      is_symmetric)
   {
     do_reinit (m, n, n_nonzero_per_row, is_symmetric);
   }
 
 
 
-  SparseMatrix::SparseMatrix (const unsigned int m,
-                              const unsigned int n,
-                              const std::vector<unsigned int> &row_lengths,
-                              const bool         is_symmetric)
+  SparseMatrix::SparseMatrix (const size_type               m,
+                              const size_type               n,
+                              const std::vector<size_type> &row_lengths,
+                              const bool                    is_symmetric)
   {
     do_reinit (m, n, row_lengths, is_symmetric);
   }
@@ -77,10 +77,10 @@ namespace PETScWrappers
 
 
   void
-  SparseMatrix::reinit (const unsigned int m,
-                        const unsigned int n,
-                        const unsigned int n_nonzero_per_row,
-                        const bool         is_symmetric)
+  SparseMatrix::reinit (const size_type m,
+                        const size_type n,
+                        const size_type n_nonzero_per_row,
+                        const bool      is_symmetric)
   {
     // get rid of old matrix and generate a
     // new one
@@ -97,10 +97,10 @@ namespace PETScWrappers
 
 
   void
-  SparseMatrix::reinit (const unsigned int m,
-                        const unsigned int n,
-                        const std::vector<unsigned int> &row_lengths,
-                        const bool         is_symmetric)
+  SparseMatrix::reinit (const size_type               m,
+                        const size_type               n,
+                        const std::vector<size_type> &row_lengths,
+                        const bool                    is_symmetric)
   {
     // get rid of old matrix and generate a
     // new one
@@ -147,10 +147,10 @@ namespace PETScWrappers
 
 
   void
-  SparseMatrix::do_reinit (const unsigned int m,
-                           const unsigned int n,
-                           const unsigned int n_nonzero_per_row,
-                           const bool         is_symmetric)
+  SparseMatrix::do_reinit (const size_type m,
+                           const size_type n,
+                           const size_type n_nonzero_per_row,
+                           const bool      is_symmetric)
   {
     // use the call sequence indicating only
     // a maximal number of elements per row
@@ -178,10 +178,10 @@ namespace PETScWrappers
 
 
   void
-  SparseMatrix::do_reinit (const unsigned int m,
-                           const unsigned int n,
-                           const std::vector<unsigned int> &row_lengths,
-                           const bool         is_symmetric)
+  SparseMatrix::do_reinit (const size_type               m,
+                           const size_type               n,
+                           const std::vector<size_type> &row_lengths,
+                           const bool                    is_symmetric)
   {
     Assert (row_lengths.size() == m,
             ExcDimensionMismatch (row_lengths.size(), m));
@@ -227,8 +227,8 @@ namespace PETScWrappers
   SparseMatrix::do_reinit (const SparsityType &sparsity_pattern,
                            const bool          preset_nonzero_locations)
   {
-    std::vector<unsigned int> row_lengths (sparsity_pattern.n_rows());
-    for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
+    std::vector<size_type> row_lengths (sparsity_pattern.n_rows());
+    for (size_type i=0; i<sparsity_pattern.n_rows(); ++i)
       row_lengths[i] = sparsity_pattern.row_length (i);
 
     do_reinit (sparsity_pattern.n_rows(),
@@ -257,11 +257,11 @@ namespace PETScWrappers
 #endif
         row_entries;
         std::vector<PetscScalar> row_values;
-        for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
+        for (size_type i=0; i<sparsity_pattern.n_rows(); ++i)
           {
             row_entries.resize (row_lengths[i]);
             row_values.resize (row_lengths[i], 0.0);
-            for (unsigned int j=0; j<row_lengths[i]; ++j)
+            for (size_type j=0; j<row_lengths[i]; ++j)
               row_entries[j] = sparsity_pattern.column_number (i,j);
 
 #ifdef PETSC_USE_64BIT_INDICES

@@ -84,9 +84,14 @@ namespace PETScWrappers
        * class to create it.
        */
       VectorReference (const VectorBase &vector,
-                       const unsigned int index);
+                       const size_type   index);
 
     public:
+      /**
+       * Declare type for container size.
+       */
+      typedef types::global_dof_index size_type;
+
       /**
        * This looks like a copy operator,
        * but does something different than
@@ -201,7 +206,7 @@ namespace PETScWrappers
        * Index of the referenced element of
        * the vector.
        */
-      const unsigned int  index;
+      const size_type index;
 
       /**
        * Make the vector class a friend, so
@@ -349,7 +354,7 @@ namespace PETScWrappers
      * Return the global dimension of the
      * vector.
      */
-    unsigned int size () const;
+    size_type size () const;
 
     /**
      * Return the local dimension of the
@@ -364,7 +369,7 @@ namespace PETScWrappers
      * exactly are stored locally,
      * use local_range().
      */
-    unsigned int local_size () const;
+    size_type local_size () const;
 
     /**
      * Return a pair of indices
@@ -382,7 +387,7 @@ namespace PETScWrappers
      * a pair (i,i+n), where
      * <tt>n=local_size()</tt>.
      */
-    std::pair<unsigned int, unsigned int>
+    std::pair<size_type, size_type>
     local_range () const;
 
     /**
@@ -390,7 +395,7 @@ namespace PETScWrappers
      * in the local range or not,
      * see also local_range().
      */
-    bool in_local_range (const unsigned int index) const;
+    bool in_local_range (const size_type index) const;
 
     /**
      * Return if the vector contains ghost
@@ -403,14 +408,14 @@ namespace PETScWrappers
      * both read and write.
      */
     reference
-    operator () (const unsigned int index);
+    operator () (const size_type index);
 
     /**
      * Provide read-only access to an
      * element.
      */
     PetscScalar
-    operator () (const unsigned int index) const;
+    operator () (const size_type index) const;
 
     /**
      * Provide access to a given
@@ -419,7 +424,7 @@ namespace PETScWrappers
      * Exactly the same as operator().
      */
     reference
-    operator [] (const unsigned int index);
+    operator [] (const size_type index);
 
     /**
      * Provide read-only access to an
@@ -429,7 +434,7 @@ namespace PETScWrappers
      * Exactly the same as operator().
      */
     PetscScalar
-    operator [] (const unsigned int index) const;
+    operator [] (const size_type index) const;
 
     /**
      * A collective set operation: instead
@@ -441,7 +446,7 @@ namespace PETScWrappers
      * the corresponding values in the
      * second.
      */
-    void set (const std::vector<unsigned int> &indices,
+    void set (const std::vector<size_type>   &indices,
               const std::vector<PetscScalar> &values);
 
     /**
@@ -450,7 +455,7 @@ namespace PETScWrappers
      * stored in @p values to the vector
      * components specified by @p indices.
      */
-    void add (const std::vector<unsigned int> &indices,
+    void add (const std::vector<size_type> &indices,
               const std::vector<PetscScalar> &values);
 
     /**
@@ -460,7 +465,7 @@ namespace PETScWrappers
      * takes a deal.II vector of
      * values.
      */
-    void add (const std::vector<unsigned int>     &indices,
+    void add (const std::vector<size_type>        &indices,
               const ::dealii::Vector<PetscScalar> &values);
 
     /**
@@ -472,8 +477,8 @@ namespace PETScWrappers
      * other two <tt>add()</tt>
      * functions above.
      */
-    void add (const unsigned int  n_elements,
-              const unsigned int *indices,
+    void add (const size_type    n_elements,
+              const size_type   *indices,
               const PetscScalar *values);
 
     /**
@@ -879,10 +884,10 @@ namespace PETScWrappers
      * @p add_values flag set to the
      * corresponding value.
      */
-    void do_set_add_operation (const unsigned int  n_elements,
-                               const unsigned int *indices,
+    void do_set_add_operation (const size_type    n_elements,
+                               const size_type   *indices,
                                const PetscScalar *values,
-                               const bool add_values);
+                               const bool         add_values);
 
 
   };
@@ -910,7 +915,7 @@ namespace PETScWrappers
   {
     inline
     VectorReference::VectorReference (const VectorBase &vector,
-                                      const unsigned int index)
+                                      const size_type   index)
       :
       vector (vector),
       index (index)
@@ -1144,7 +1149,7 @@ namespace PETScWrappers
 
   inline
   bool
-  VectorBase::in_local_range (const unsigned int index) const
+  VectorBase::in_local_range (const size_type index) const
   {
 #ifdef PETSC_USE_64BIT_INDICES
     PetscInt begin, end;
@@ -1156,8 +1161,8 @@ namespace PETScWrappers
                                            &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-    return ((index >= static_cast<unsigned int>(begin)) &&
-            (index < static_cast<unsigned int>(end)));
+    return ((index >= static_cast<size_type>(begin)) &&
+            (index < static_cast<size_type>(end)));
   }
 
   inline
@@ -1171,7 +1176,7 @@ namespace PETScWrappers
 
   inline
   internal::VectorReference
-  VectorBase::operator () (const unsigned int index)
+  VectorBase::operator () (const size_type index)
   {
     return internal::VectorReference (*this, index);
   }
@@ -1180,7 +1185,7 @@ namespace PETScWrappers
 
   inline
   PetscScalar
-  VectorBase::operator () (const unsigned int index) const
+  VectorBase::operator () (const size_type index) const
   {
     return static_cast<PetscScalar>(internal::VectorReference (*this, index));
   }
@@ -1189,7 +1194,7 @@ namespace PETScWrappers
 
   inline
   internal::VectorReference
-  VectorBase::operator [] (const unsigned int index)
+  VectorBase::operator [] (const size_type index)
   {
     return operator()(index);
   }
@@ -1198,7 +1203,7 @@ namespace PETScWrappers
 
   inline
   PetscScalar
-  VectorBase::operator [] (const unsigned int index) const
+  VectorBase::operator [] (const size_type index) const
   {
     return operator()(index);
   }

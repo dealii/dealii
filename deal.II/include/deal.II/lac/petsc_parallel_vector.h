@@ -154,6 +154,11 @@ namespace PETScWrappers
     {
     public:
       /**
+       * Declare type for container size.
+       */
+      typedef types::global_dof_index size_type;
+
+      /**
        * Default constructor. Initialize the
        * vector as empty.
        */
@@ -183,9 +188,9 @@ namespace PETScWrappers
        * vector is replaced by one of
        * length zero.
        */
-      explicit Vector (const MPI_Comm     &communicator,
-                       const unsigned int  n,
-                       const unsigned int  local_size);
+      explicit Vector (const MPI_Comm  &communicator,
+                       const size_type  n,
+                       const size_type  local_size);
 
 
       /**
@@ -204,9 +209,9 @@ namespace PETScWrappers
        * shall communicate
        */
       template <typename Number>
-      explicit Vector (const MPI_Comm         &communicator,
+      explicit Vector (const MPI_Comm               &communicator,
                        const dealii::Vector<Number> &v,
-                       const unsigned int      local_size);
+                       const size_type               local_size);
 
 
       /**
@@ -225,7 +230,7 @@ namespace PETScWrappers
        */
       explicit Vector (const MPI_Comm     &communicator,
                        const VectorBase   &v,
-                       const unsigned int  local_size);
+                       const size_type     local_size);
 
 
       /**
@@ -362,10 +367,10 @@ namespace PETScWrappers
        * elements are left an unspecified
        * state.
        */
-      void reinit (const MPI_Comm     &communicator,
-                   const unsigned int  N,
-                   const unsigned int  local_size,
-                   const bool          fast = false);
+      void reinit (const MPI_Comm  &communicator,
+                   const size_type  N,
+                   const size_type  local_size,
+                   const bool       fast = false);
 
       /**
        * Change the dimension to that of
@@ -442,8 +447,8 @@ namespace PETScWrappers
        * how many of these elements shall
        * be stored locally.
        */
-      virtual void create_vector (const unsigned int n,
-                                  const unsigned int local_size);
+      virtual void create_vector (const size_type n,
+                                  const size_type local_size);
 
 
 
@@ -455,8 +460,8 @@ namespace PETScWrappers
        * call update_ghost_values() before
        * accessing those.
        */
-      virtual void create_vector (const unsigned int  n,
-                                  const unsigned int  local_size,
+      virtual void create_vector (const size_type n,
+                                  const size_type local_size,
                                   const IndexSet &ghostnodes);
 
 
@@ -492,7 +497,7 @@ namespace PETScWrappers
     template <typename number>
     Vector::Vector (const MPI_Comm         &communicator,
                     const dealii::Vector<number> &v,
-                    const unsigned int      local_size)
+                    const size_type         local_size)
       :
       communicator (communicator)
     {
@@ -583,7 +588,7 @@ namespace PETScWrappers
       // that would take a pointer to an array
       // of PetscScalar values and simply copy
       // n elements verbatim into the vector...
-      for (unsigned int i=0; i<v.size(); ++i)
+      for (size_type i=0; i<v.size(); ++i)
         (*this)(i) = v(i);
 
       compress (::dealii::VectorOperation::insert);

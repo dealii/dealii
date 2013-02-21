@@ -89,6 +89,11 @@ class MatrixOut : public DataOutInterface<2,2>
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Class holding various
    * variables which are used to
    * modify the output of the
@@ -124,7 +129,7 @@ public:
      *
      * Default value is one.
      */
-    unsigned int block_size;
+    size_type block_size;
 
     /**
      * If true, plot
@@ -139,9 +144,9 @@ public:
      * structure to their default
      * values.
      */
-    Options (const bool         show_absolute_values = false,
-             const unsigned int block_size           = 1,
-             const bool         discontinuous        = false);
+    Options (const bool      show_absolute_values = false,
+             const size_type block_size           = 1,
+             const bool      discontinuous        = false);
   };
 
   /**
@@ -250,8 +255,8 @@ private:
    */
   template <typename number>
   static double get_element (const SparseMatrix<number> &matrix,
-                             const unsigned int          i,
-                             const unsigned int          j);
+                             const size_type             i,
+                             const size_type             j);
 
   /**
    * Return the element with given
@@ -260,8 +265,8 @@ private:
    */
   template <typename number>
   static double get_element (const BlockSparseMatrix<number> &matrix,
-                             const unsigned int               i,
-                             const unsigned int               j);
+                             const size_type                  i,
+                             const size_type                  j);
 
   /**
    * Return the element with given
@@ -273,8 +278,8 @@ private:
    */
   template <class Matrix>
   static double get_element (const Matrix       &matrix,
-                             const unsigned int  i,
-                             const unsigned int  j);
+                             const size_type     i,
+                             const size_type     j);
 
   /**
    * Get the value of the matrix at
@@ -291,8 +296,8 @@ private:
    */
   template <class Matrix>
   static double get_gridpoint_value (const Matrix       &matrix,
-                                     const unsigned int  i,
-                                     const unsigned int  j,
+                                     const size_type     i,
+                                     const size_type     j,
                                      const Options      &options);
 };
 
@@ -304,8 +309,8 @@ template <typename number>
 inline
 double
 MatrixOut::get_element (const SparseMatrix<number> &matrix,
-                        const unsigned int          i,
-                        const unsigned int          j)
+                        const size_type             i,
+                        const size_type             j)
 {
   return matrix.el(i,j);
 }
@@ -317,8 +322,8 @@ template <typename number>
 inline
 double
 MatrixOut::get_element (const BlockSparseMatrix<number> &matrix,
-                        const unsigned int               i,
-                        const unsigned int               j)
+                        const size_type                  i,
+                        const size_type                  j)
 {
   return matrix.el(i,j);
 }
@@ -329,9 +334,9 @@ MatrixOut::get_element (const BlockSparseMatrix<number> &matrix,
 template <class Matrix>
 inline
 double
-MatrixOut::get_element (const Matrix       &matrix,
-                        const unsigned int  i,
-                        const unsigned int  j)
+MatrixOut::get_element (const Matrix   &matrix,
+                        const size_type i,
+                        const size_type j)
 {
   return matrix(i,j);
 }
@@ -341,10 +346,10 @@ MatrixOut::get_element (const Matrix       &matrix,
 template <class Matrix>
 inline
 double
-MatrixOut::get_gridpoint_value (const Matrix       &matrix,
-                                const unsigned int  i,
-                                const unsigned int  j,
-                                const Options      &options)
+MatrixOut::get_gridpoint_value (const Matrix   &matrix,
+                                const size_type i,
+                                const size_type j,
+                                const Options  &options)
 {
   // special case if block size is
   // one since we then don't need all
@@ -360,10 +365,10 @@ MatrixOut::get_gridpoint_value (const Matrix       &matrix,
   // if blocksize greater than one,
   // then compute average of elements
   double average = 0;
-  unsigned int n_elements = 0;
-  for (unsigned int row=i*options.block_size;
+  size_type n_elements = 0;
+  for (size_type row=i*options.block_size;
        row < std::min(matrix.m(), (i+1)*options.block_size); ++row)
-    for (unsigned int col=j*options.block_size;
+    for (size_type col=j*options.block_size;
          col < std::min(matrix.m(), (j+1)*options.block_size); ++col, ++n_elements)
       if (options.show_absolute_values == true)
         average += std::fabs(get_element (matrix, row, col));
@@ -381,7 +386,7 @@ MatrixOut::build_patches (const Matrix      &matrix,
                           const std::string &name,
                           const Options      options)
 {
-  unsigned int
+  size_type 
   gridpoints_x = (matrix.n() / options.block_size
                   +
                   (matrix.n() % options.block_size != 0 ? 1 : 0)),
@@ -403,9 +408,9 @@ MatrixOut::build_patches (const Matrix      &matrix,
   patches.resize ((gridpoints_x) * (gridpoints_y));
 
   // now build the patches
-  unsigned int index=0;
-  for (unsigned int i=0; i<gridpoints_y; ++i)
-    for (unsigned int j=0; j<gridpoints_x; ++j, ++index)
+  size_type index=0;
+  for (size_type i=0; i<gridpoints_y; ++i)
+    for (size_type j=0; j<gridpoints_x; ++j, ++index)
       {
         // within each patch, order
         // the points in such a way

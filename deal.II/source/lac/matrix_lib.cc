@@ -17,7 +17,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-MeanValueFilter::MeanValueFilter(unsigned int component)
+MeanValueFilter::MeanValueFilter(size_type component)
   :
   component(component)
 {}

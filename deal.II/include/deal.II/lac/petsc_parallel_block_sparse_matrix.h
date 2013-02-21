@@ -63,6 +63,11 @@ namespace PETScWrappers
     {
     public:
       /**
+       * Declare type for container size.
+       */
+      typedef types::global_dof_index size_type;
+
+      /**
        * Typedef the base class for simpler
        * access to its own typedefs.
        */
@@ -169,8 +174,8 @@ namespace PETScWrappers
        * user call whatever function
        * she desires.
        */
-      void reinit (const unsigned int n_block_rows,
-                   const unsigned int n_block_columns);
+      void reinit (const size_type n_block_rows,
+                   const size_type n_block_columns);
 
       /**
        * Matrix-vector multiplication:
@@ -292,8 +297,8 @@ namespace PETScWrappers
     {
       Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
 
-      for (unsigned int r=0; r<this->n_block_rows(); ++r)
-        for (unsigned int c=0; c<this->n_block_cols(); ++c)
+      for (size_type r=0; r<this->n_block_rows(); ++r)
+        for (size_type c=0; c<this->n_block_cols(); ++c)
           this->block(r,c) = d;
 
       return *this;

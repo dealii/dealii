@@ -52,6 +52,11 @@ class Householder : private FullMatrix<number>
 {
 public:
   /**
+   * Declare type of container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Create an empty object.
    */
   Householder ();
@@ -139,7 +144,7 @@ template <typename number2>
 void
 Householder<number>::initialize(const FullMatrix<number2> &M)
 {
-  const unsigned int m = M.n_rows(), n = M.n_cols();
+  const size_type m = M.n_rows(), n = M.n_cols();
   this->reinit(m, n);
   this->fill(M);
   Assert (!this->empty(), typename FullMatrix<number2>::ExcEmptyMatrix());
@@ -149,10 +154,10 @@ Householder<number>::initialize(const FullMatrix<number2> &M)
   Assert (this->n_cols() <= this->n_rows(),
           ExcDimensionMismatch(this->n_cols(), this->n_rows()));
 
-  for (unsigned int j=0 ; j<n ; ++j)
+  for (size_type j=0 ; j<n ; ++j)
     {
       number2 sigma = 0;
-      unsigned int i;
+      size_type i;
       // sigma = ||v||^2
       for (i=j ; i<m ; ++i)
         sigma += this->el(i,j)*this->el(i,j);
@@ -176,7 +181,7 @@ Householder<number>::initialize(const FullMatrix<number2> &M)
 
       // For all subsequent columns do
       // the Householder reflexion
-      for (unsigned int k=j+1 ; k<n ; ++k)
+      for (size_type k=j+1 ; k<n ; ++k)
         {
           number2 sum = diagonal[j]*this->el(j,k);
           for (i=j+1 ; i<m ; ++i)
@@ -208,7 +213,7 @@ Householder<number>::least_squares (Vector<number2> &dst,
   AssertDimension(dst.size(), this->n());
   AssertDimension(src.size(), this->m());
 
-  const unsigned int m = this->m(), n = this->n();
+  const size_type m = this->m(), n = this->n();
 
   GrowingVectorMemory<Vector<number2> > mem;
   Vector<number2> *aux = mem.alloc();
@@ -218,20 +223,20 @@ Householder<number>::least_squares (Vector<number2> &dst,
 
   // Multiply Q_n ... Q_2 Q_1 src
   // Where Q_i = I-v_i v_i^T
-  for (unsigned int j=0; j<n; ++j)
+  for (size_type j=0; j<n; ++j)
     {
       // sum = v_i^T dst
       number2 sum = diagonal[j]* (*aux)(j);
-      for (unsigned int i=j+1 ; i<m ; ++i)
+      for (size_type i=j+1 ; i<m ; ++i)
         sum += this->el(i,j)*(*aux)(i);
       // dst -= v * sum
       (*aux)(j) -= sum*diagonal[j];
-      for (unsigned int i=j+1 ; i<m ; ++i)
+      for (size_type i=j+1 ; i<m ; ++i)
         (*aux)(i) -= sum*this->el(i,j);
     }
   // Compute norm of residual
   number2 sum = 0.;
-  for (unsigned int i=n ; i<m ; ++i)
+  for (size_type i=n ; i<m ; ++i)
     sum += (*aux)(i) * (*aux)(i);
   Assert(numbers::is_finite(sum), ExcNumberNotFinite());
 
@@ -253,7 +258,7 @@ Householder<number>::least_squares (BlockVector<number2> &dst,
   AssertDimension(dst.size(), this->n());
   AssertDimension(src.size(), this->m());
 
-  const unsigned int m = this->m(), n = this->n();
+  const size_type m = this->m(), n = this->n();
 
   GrowingVectorMemory<BlockVector<number2> > mem;
   BlockVector<number2> *aux = mem.alloc();
@@ -263,20 +268,20 @@ Householder<number>::least_squares (BlockVector<number2> &dst,
 
   // Multiply Q_n ... Q_2 Q_1 src
   // Where Q_i = I-v_i v_i^T
-  for (unsigned int j=0; j<n; ++j)
+  for (size_type j=0; j<n; ++j)
     {
       // sum = v_i^T dst
       number2 sum = diagonal[j]* (*aux)(j);
-      for (unsigned int i=j+1 ; i<m ; ++i)
+      for (size_type i=j+1 ; i<m ; ++i)
         sum += this->el(i,j)*(*aux)(i);
       // dst -= v * sum
       (*aux)(j) -= sum*diagonal[j];
-      for (unsigned int i=j+1 ; i<m ; ++i)
+      for (size_type i=j+1 ; i<m ; ++i)
         (*aux)(i) -= sum*this->el(i,j);
     }
   // Compute norm of residual
   number2 sum = 0.;
-  for (unsigned int i=n ; i<m ; ++i)
+  for (size_type i=n ; i<m ; ++i)
     sum += (*aux)(i) * (*aux)(i);
   Assert(numbers::is_finite(sum), ExcNumberNotFinite());
 

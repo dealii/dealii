@@ -97,10 +97,10 @@ namespace PETScWrappers
      * ICC. The default value of this flag
      * is @p false.
      */
-    SparseMatrix (const unsigned int m,
-                  const unsigned int n,
-                  const unsigned int n_nonzero_per_row,
-                  const bool         is_symmetric = false);
+    SparseMatrix (const size_type m,
+                  const size_type n,
+                  const size_type n_nonzero_per_row,
+                  const bool      is_symmetric = false);
 
     /**
      * Initialize a rectangular matrix with
@@ -130,10 +130,10 @@ namespace PETScWrappers
      * ICC. The default value of this flag
      * is @p false.
      */
-    SparseMatrix (const unsigned int               m,
-                  const unsigned int               n,
-                  const std::vector<unsigned int> &row_lengths,
-                  const bool                       is_symmetric = false);
+    SparseMatrix (const size_type               m,
+                  const size_type               n,
+                  const std::vector<size_type> &row_lengths,
+                  const bool                    is_symmetric = false);
 
     /**
      * Initialize a sparse matrix using the
@@ -197,10 +197,10 @@ namespace PETScWrappers
      * the same argument list as the
      * present function.
      */
-    void reinit (const unsigned int m,
-                 const unsigned int n,
-                 const unsigned int n_nonzero_per_row,
-                 const bool         is_symmetric = false);
+    void reinit (const size_type m,
+                 const size_type n,
+                 const size_type n_nonzero_per_row,
+                 const bool      is_symmetric = false);
 
     /**
      * Throw away the present matrix and
@@ -209,11 +209,11 @@ namespace PETScWrappers
      * the constructor of this class with
      * the same argument list as the
      * present function.
-     */
-    void reinit (const unsigned int               m,
-                 const unsigned int               n,
-                 const std::vector<unsigned int> &row_lengths,
-                 const bool                       is_symmetric = false);
+     */                           
+    void reinit (const size_type               m,
+                 const size_type               n,
+                 const std::vector<size_type> &row_lengths,
+                 const bool                    is_symmetric = false);
 
     /**
      * Initialize a sparse matrix using the
@@ -285,18 +285,18 @@ namespace PETScWrappers
      * matrix. Getting rid of the previous
      * matrix is left to the caller.
      */
-    void do_reinit (const unsigned int m,
-                    const unsigned int n,
-                    const unsigned int n_nonzero_per_row,
-                    const bool         is_symmetric = false);
+    void do_reinit (const size_type m,
+                    const size_type n,
+                    const size_type n_nonzero_per_row,
+                    const bool      is_symmetric = false);
 
     /**
      * Same as previous function.
      */
-    void do_reinit (const unsigned int               m,
-                    const unsigned int               n,
-                    const std::vector<unsigned int> &row_lengths,
-                    const bool                       is_symmetric = false);
+    void do_reinit (const size_type               m,
+                    const size_type               n,
+                    const std::vector<size_type> &row_lengths,
+                    const bool                    is_symmetric = false);
 
     /**
      * Same as previous function.

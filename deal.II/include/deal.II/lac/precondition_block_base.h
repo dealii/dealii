@@ -52,6 +52,11 @@ class PreconditionBlockBase
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Choose a method for inverting
    * the blocks, and thus the data
    * type for the inverses.
@@ -105,7 +110,7 @@ public:
    * then only one block will be
    * stored.
    */
-  void reinit(unsigned int nblocks, unsigned int blocksize, bool compress,
+  void reinit(unsigned int nblocks, size_type blocksize, bool compress,
               Inversion method = gauss_jordan);
 
   /**
@@ -164,69 +169,69 @@ public:
    * if the inverse diagonal blocks
    * are stored.
    */
-  number el(unsigned int i, unsigned int j) const;
+  number el(size_type i, size_type j) const;
 
   /**
    * Multiply with the inverse
    * block at position <tt>i</tt>.
    */
   template <typename number2>
-  void inverse_vmult(unsigned int i, Vector<number2> &dst, const Vector<number2> &src) const;
+  void inverse_vmult(size_type i, Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
    * Multiply with the transposed inverse
    * block at position <tt>i</tt>.
    */
   template <typename number2>
-  void inverse_Tvmult(unsigned int i, Vector<number2> &dst, const Vector<number2> &src) const;
+  void inverse_Tvmult(size_type i, Vector<number2> &dst, const Vector<number2> &src) const;
 
   /**
    * Access to the inverse diagonal
    * blocks if Inversion is #gauss_jordan.
    */
-  FullMatrix<number> &inverse (unsigned int i);
+  FullMatrix<number> &inverse (size_type i);
 
   /**
    * Access to the inverse diagonal
    * blocks if Inversion is #householder.
    */
-  Householder<number> &inverse_householder (unsigned int i);
+  Householder<number> &inverse_householder (size_type i);
 
   /**
    * Access to the inverse diagonal
    * blocks if Inversion is #householder.
    */
-  LAPACKFullMatrix<number> &inverse_svd (unsigned int i);
+  LAPACKFullMatrix<number> &inverse_svd (size_type i);
 
   /**
    * Access to the inverse diagonal
    * blocks.
    */
-  const FullMatrix<number> &inverse (unsigned int i) const;
+  const FullMatrix<number> &inverse (size_type i) const;
 
   /**
    * Access to the inverse diagonal
    * blocks if Inversion is #householder.
    */
-  const Householder<number> &inverse_householder (unsigned int i) const;
+  const Householder<number> &inverse_householder (size_type i) const;
 
   /**
    * Access to the inverse diagonal
    * blocks if Inversion is #householder.
    */
-  const LAPACKFullMatrix<number> &inverse_svd (unsigned int i) const;
+  const LAPACKFullMatrix<number> &inverse_svd (size_type i) const;
 
   /**
    * Access to the diagonal
    * blocks.
    */
-  FullMatrix<number> &diagonal (unsigned int i);
+  FullMatrix<number> &diagonal (size_type i);
 
   /**
    * Access to the diagonal
    * blocks.
    */
-  const FullMatrix<number> &diagonal (unsigned int i) const;
+  const FullMatrix<number> &diagonal (size_type i) const;
 
   /**
    * Print some statistics about
@@ -383,7 +388,7 @@ PreconditionBlockBase<number>::clear()
 template <typename number>
 inline
 void
-PreconditionBlockBase<number>::reinit(unsigned int n, unsigned int b, bool compress,
+PreconditionBlockBase<number>::reinit(unsigned int n, size_type b, bool compress,
                                       Inversion method)
 {
   inversion = method;
@@ -472,9 +477,9 @@ template <typename number2>
 inline
 void
 PreconditionBlockBase<number>::inverse_vmult(
-  unsigned int i, Vector<number2> &dst, const Vector<number2> &src) const
+  size_type i, Vector<number2> &dst, const Vector<number2> &src) const
 {
-  const unsigned int ii = same_diagonal() ? 0U : i;
+  const size_type ii = same_diagonal() ? 0U : i;
 
   switch (inversion)
     {
@@ -501,9 +506,9 @@ template <typename number2>
 inline
 void
 PreconditionBlockBase<number>::inverse_Tvmult(
-  unsigned int i, Vector<number2> &dst, const Vector<number2> &src) const
+  size_type i, Vector<number2> &dst, const Vector<number2> &src) const
 {
-  const unsigned int ii = same_diagonal() ? 0U : i;
+  const size_type ii = same_diagonal() ? 0U : i;
 
   switch (inversion)
     {
@@ -528,7 +533,7 @@ PreconditionBlockBase<number>::inverse_Tvmult(
 template <typename number>
 inline
 const FullMatrix<number> &
-PreconditionBlockBase<number>::inverse(unsigned int i) const
+PreconditionBlockBase<number>::inverse(size_type i) const
 {
   if (same_diagonal())
     return var_inverse_full[0];
@@ -541,7 +546,7 @@ PreconditionBlockBase<number>::inverse(unsigned int i) const
 template <typename number>
 inline
 const Householder<number> &
-PreconditionBlockBase<number>::inverse_householder(unsigned int i) const
+PreconditionBlockBase<number>::inverse_householder(size_type i) const
 {
   if (same_diagonal())
     return var_inverse_householder[0];
@@ -554,7 +559,7 @@ PreconditionBlockBase<number>::inverse_householder(unsigned int i) const
 template <typename number>
 inline
 const LAPACKFullMatrix<number> &
-PreconditionBlockBase<number>::inverse_svd(unsigned int i) const
+PreconditionBlockBase<number>::inverse_svd(size_type i) const
 {
   if (same_diagonal())
     return var_inverse_svd[0];
@@ -567,7 +572,7 @@ PreconditionBlockBase<number>::inverse_svd(unsigned int i) const
 template <typename number>
 inline
 const FullMatrix<number> &
-PreconditionBlockBase<number>::diagonal(unsigned int i) const
+PreconditionBlockBase<number>::diagonal(size_type i) const
 {
   Assert(store_diagonals(), ExcDiagonalsNotStored());
 
@@ -582,7 +587,7 @@ PreconditionBlockBase<number>::diagonal(unsigned int i) const
 template <typename number>
 inline
 FullMatrix<number> &
-PreconditionBlockBase<number>::inverse(unsigned int i)
+PreconditionBlockBase<number>::inverse(size_type i)
 {
   Assert(var_inverse_full.size() != 0, ExcInverseNotAvailable());
 
@@ -597,7 +602,7 @@ PreconditionBlockBase<number>::inverse(unsigned int i)
 template <typename number>
 inline
 Householder<number> &
-PreconditionBlockBase<number>::inverse_householder(unsigned int i)
+PreconditionBlockBase<number>::inverse_householder(size_type i)
 {
   Assert(var_inverse_householder.size() != 0, ExcInverseNotAvailable());
 
@@ -612,7 +617,7 @@ PreconditionBlockBase<number>::inverse_householder(unsigned int i)
 template <typename number>
 inline
 LAPACKFullMatrix<number> &
-PreconditionBlockBase<number>::inverse_svd(unsigned int i)
+PreconditionBlockBase<number>::inverse_svd(size_type i)
 {
   Assert(var_inverse_svd.size() != 0, ExcInverseNotAvailable());
 
@@ -627,7 +632,7 @@ PreconditionBlockBase<number>::inverse_svd(unsigned int i)
 template <typename number>
 inline
 FullMatrix<number> &
-PreconditionBlockBase<number>::diagonal(unsigned int i)
+PreconditionBlockBase<number>::diagonal(size_type i)
 {
   Assert(store_diagonals(), ExcDiagonalsNotStored());
 
@@ -683,10 +688,10 @@ PreconditionBlockBase<number>::log_statistics () const
       double sigmin = 1.e300, sigmax= -1.e300;
       double kappamin = 1.e300, kappamax= -1.e300;
 
-      for (unsigned int b=0; b<size(); ++b)
+      for (size_type b=0; b<size(); ++b)
         {
           const LAPACKFullMatrix<number> &matrix = inverse_svd(b);
-          unsigned int k=1;
+          size_type k=1;
           while (k <= matrix.n_cols() && matrix.singular_value(matrix.n_cols()-k) == 0)
             ++k;
           const double s0 = matrix.singular_value(0);
@@ -724,9 +729,9 @@ std::size_t
 PreconditionBlockBase<number>::memory_consumption () const
 {
   std::size_t mem = sizeof(*this);
-  for (unsigned int i=0; i<var_inverse_full.size(); ++i)
+  for (size_type i=0; i<var_inverse_full.size(); ++i)
     mem += MemoryConsumption::memory_consumption(var_inverse_full[i]);
-  for (unsigned int i=0; i<var_diagonal.size(); ++i)
+  for (size_type i=0; i<var_diagonal.size(); ++i)
     mem += MemoryConsumption::memory_consumption(var_diagonal[i]);
   return mem;
 }

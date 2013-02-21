@@ -111,9 +111,9 @@ RelaxationBlock<MATRIX,inverse_type>::invert_diagblocks ()
     }
   else
     {
-      for (unsigned int block=0; block<additional_data->block_list.n_rows(); ++block)
+      for (size_type block=0; block<additional_data->block_list.n_rows(); ++block)
         {
-          const unsigned int bs = additional_data->block_list.row_length(block);
+          const size_type bs = additional_data->block_list.row_length(block);
           M_cell.reinit(bs, bs);
 
           // Copy rows for this block
@@ -121,14 +121,14 @@ RelaxationBlock<MATRIX,inverse_type>::invert_diagblocks ()
           // diagonal block
           SparsityPattern::iterator row
             = additional_data->block_list.begin(block);
-          for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
+          for (size_type row_cell=0; row_cell<bs; ++row_cell, ++row)
             {
 //TODO:[GK] Optimize here
               for (typename MATRIX::const_iterator entry = M.begin(row->column());
                    entry != M.end(row->column()); ++entry)
                 {
-                  const unsigned int column = entry->column();
-                  const unsigned int col_cell = additional_data->block_list.row_position(block, column);
+                  const size_type column = entry->column();
+                  const size_type col_cell = additional_data->block_list.row_position(block, column);
                   if (col_cell != numbers::invalid_unsigned_int)
                     M_cell(row_cell, col_cell) = entry->value();
                 }
@@ -183,7 +183,7 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
   const bool permutation_empty = additional_data->order.size() == 0;
   const unsigned int n_permutations = (permutation_empty)
                                       ? 1U : additional_data->order.size();
-  const unsigned int n_blocks = additional_data->block_list.n_rows();
+  const size_type n_blocks = additional_data->block_list.n_rows();
 
   if (!permutation_empty)
     for (unsigned int i=0; i<additional_data->order.size(); ++i)
@@ -200,13 +200,13 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
                                         ? (additional_data->order[n_permutations-1-perm][raw_block])
                                         : (additional_data->order[perm][raw_block]));
 
-          const unsigned int bs = additional_data->block_list.row_length(block);
+          const size_type bs = additional_data->block_list.row_length(block);
 
           b_cell.reinit(bs);
           x_cell.reinit(bs);
           // Collect off-diagonal parts
           SparsityPattern::iterator row = additional_data->block_list.begin(block);
-          for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
+          for (size_type row_cell=0; row_cell<bs; ++row_cell, ++row)
             {
               b_cell(row_cell) = src(row->column());
               for (typename MATRIX::const_iterator entry = M.begin(row->column());
@@ -217,7 +217,7 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
           this->inverse_vmult(block, x_cell, b_cell);
           // Store in result vector
           row=additional_data->block_list.begin(block);
-          for (unsigned int row_cell=0; row_cell<bs; ++row_cell, ++row)
+          for (size_type row_cell=0; row_cell<bs; ++row_cell, ++row)
             dst(row->column()) = prev(row->column()) + additional_data->relaxation * x_cell(row_cell);
         }
     }

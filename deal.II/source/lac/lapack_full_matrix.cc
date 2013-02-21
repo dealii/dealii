@@ -26,7 +26,7 @@ DEAL_II_NAMESPACE_OPEN
 using namespace LAPACKSupport;
 
 template <typename number>
-LAPACKFullMatrix<number>::LAPACKFullMatrix(const unsigned int n)
+LAPACKFullMatrix<number>::LAPACKFullMatrix(const size_type n)
   :
   TransposeTable<number> (n,n),
   state(matrix)
@@ -35,8 +35,8 @@ LAPACKFullMatrix<number>::LAPACKFullMatrix(const unsigned int n)
 
 template <typename number>
 LAPACKFullMatrix<number>::LAPACKFullMatrix(
-  const unsigned int m,
-  const unsigned int n)
+  const size_type m,
+  const size_type n)
   :
   TransposeTable<number> (m,n),
   state(matrix)
@@ -68,8 +68,8 @@ LAPACKFullMatrix<number>::operator = (const FullMatrix<number2> &M)
 {
   Assert (this->n_rows() == M.m(), ExcDimensionMismatch(this->n_rows(), M.m()));
   Assert (this->n_cols() == M.n(), ExcDimensionMismatch(this->n_cols(), M.n()));
-  for (unsigned int i=0; i<this->n_rows(); ++i)
-    for (unsigned int j=0; j<this->n_cols(); ++j)
+  for (size_type i=0; i<this->n_rows(); ++i)
+    for (size_type j=0; j<this->n_cols(); ++j)
       (*this)(i,j) = M(i,j);
 
   state = LAPACKSupport::matrix;
@@ -123,7 +123,7 @@ LAPACKFullMatrix<number>::vmult (
       work.resize(std::max(mm,nn));
       gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.val, &one, &null, &work[0], &one);
       // Multiply by singular values
-      for (unsigned int i=0; i<wr.size(); ++i)
+      for (size_type i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with U
       gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, &work[0], &one, &beta, w.val, &one);
@@ -137,7 +137,7 @@ LAPACKFullMatrix<number>::vmult (
       work.resize(std::max(mm,nn));
       gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.val, &one, &null, &work[0], &one);
       // Multiply by singular values
-      for (unsigned int i=0; i<wr.size(); ++i)
+      for (size_type i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with V
       gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, &work[0], &one, &beta, w.val, &one);
@@ -182,7 +182,7 @@ LAPACKFullMatrix<number>::Tvmult (
       work.resize(std::max(mm,nn));
       gemv("T", &mm, &mm, &alpha, &svd_u->values[0], &mm, v.val, &one, &null, &work[0], &one);
       // Multiply by singular values
-      for (unsigned int i=0; i<wr.size(); ++i)
+      for (size_type i=0; i<wr.size(); ++i)
         work[i] *= wr[i];
       // Multiply with V
       gemv("T", &nn, &nn, &alpha, &svd_vt->values[0], &nn, &work[0], &one, &beta, w.val, &one);
@@ -196,7 +196,7 @@ LAPACKFullMatrix<number>::Tvmult (
         work.resize(std::max(mm,nn));
         gemv("N", &nn, &nn, &alpha, &svd_vt->values[0], &nn, v.val, &one, &null, &work[0], &one);
         // Multiply by singular values
-        for (unsigned int i=0; i<wr.size(); ++i)
+        for (size_type i=0; i<wr.size(); ++i)
           work[i] *= wr[i];
         // Multiply with U
         gemv("N", &mm, &mm, &alpha, &svd_u->values[0], &mm, &work[0], &one, &beta, w.val, &one);
@@ -290,7 +290,7 @@ LAPACKFullMatrix<number>::compute_inverse_svd(const double threshold)
   Assert (state==LAPACKSupport::svd, ExcState(state));
 
   const double lim = wr[0]*threshold;
-  for (unsigned int i=0; i<wr.size(); ++i)
+  for (size_type i=0; i<wr.size(); ++i)
     {
       if (wr[i] > lim)
         wr[i] = 1./wr[i];
@@ -414,7 +414,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues(
   lwork = 4*nn;                    // no query mode
 #endif
   // resize workspace array
-  work.resize((unsigned int) lwork);
+  work.resize((size_type ) lwork);
 
   // Finally compute the eigenvalues.
   geev(jobvl, jobvr, &nn, values, &nn,
@@ -445,7 +445,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
 {
   Assert(state == matrix, ExcState(state));
   const int nn = (this->n_cols() > 0 ? this->n_cols() : 1);
-  Assert(static_cast<unsigned int>(nn) == this->n_rows(), ExcNotQuadratic());
+  Assert(static_cast<size_type>(nn) == this->n_rows(), ExcNotQuadratic());
 
   wr.resize(nn);
   LAPACKFullMatrix<number> matrix_eigenvectors(nn, nn);
@@ -460,8 +460,8 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
   const char *const uplo(&U);
   const char *const range(&V);
   const int *const  dummy(&one);
-  std::vector<int> iwork(static_cast<unsigned int> (5*nn));
-  std::vector<int> ifail(static_cast<unsigned int> (nn));
+  std::vector<int> iwork(static_cast<size_type> (5*nn));
+  std::vector<int> ifail(static_cast<size_type> (nn));
 
 
   // Optimal workspace query:
@@ -507,7 +507,7 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
   lwork = 8*nn > 1 ? 8*nn : 1; // no query mode
 #endif
   // resize workspace arrays
-  work.resize(static_cast<unsigned int> (lwork));
+  work.resize(static_cast<size_type> (lwork));
 
   // Finally compute the eigenvalues.
   syevx (jobz, range,
@@ -527,11 +527,11 @@ LAPACKFullMatrix<number>::compute_eigenvalues_symmetric(
 
   eigenvalues.reinit(n_eigenpairs);
   eigenvectors.reinit(nn, n_eigenpairs, true);
-  for (unsigned int i=0; i < static_cast<unsigned int> (n_eigenpairs); ++i)
+  for (size_type i=0; i < static_cast<size_type> (n_eigenpairs); ++i)
     {
       eigenvalues(i) = wr[i];
-      unsigned int col_begin(i*nn);
-      for (unsigned int j=0; j < static_cast<unsigned int> (nn); ++j)
+      size_type col_begin(i*nn);
+      for (size_type j=0; j < static_cast<size_type> (nn); ++j)
         {
           eigenvectors(j,i) = values_eigenvectors[col_begin+j];
         }
@@ -554,9 +554,9 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
 {
   Assert(state == matrix, ExcState(state));
   const int nn = (this->n_cols() > 0 ? this->n_cols() : 1);
-  Assert(static_cast<unsigned int>(nn) == this->n_rows(), ExcNotQuadratic());
+  Assert(static_cast<size_type>(nn) == this->n_rows(), ExcNotQuadratic());
   Assert(B.n_rows() == B.n_cols(), ExcNotQuadratic());
-  Assert(static_cast<unsigned int>(nn) == B.n_cols(),
+  Assert(static_cast<size_type>(nn) == B.n_cols(),
          ExcDimensionMismatch (nn, B.n_cols()));
 
   wr.resize(nn);
@@ -573,8 +573,8 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   const char *const uplo(&U);
   const char *const range(&V);
   const int *const  dummy(&one);
-  std::vector<int> iwork(static_cast<unsigned int> (5*nn));
-  std::vector<int> ifail(static_cast<unsigned int> (nn));
+  std::vector<int> iwork(static_cast<size_type> (5*nn));
+  std::vector<int> ifail(static_cast<size_type> (nn));
 
 
   // Optimal workspace query:
@@ -618,7 +618,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
   lwork = 8*nn > 1 ? 8*nn : 1; // no query mode
 #endif
   // resize workspace arrays
-  work.resize(static_cast<unsigned int> (lwork));
+  work.resize(static_cast<size_type> (lwork));
 
   // Finally compute the generalized
   // eigenvalues.
@@ -637,12 +637,12 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric(
 
   eigenvalues.reinit(n_eigenpairs);
   eigenvectors.resize(n_eigenpairs);
-  for (unsigned int i=0; i < static_cast<unsigned int> (n_eigenpairs); ++i)
+  for (size_type i=0; i < static_cast<size_type> (n_eigenpairs); ++i)
     {
       eigenvalues(i) = wr[i];
-      unsigned int col_begin(i*nn);
+      size_type col_begin(i*nn);
       eigenvectors[i].reinit(nn, true);
-      for (unsigned int j=0; j < static_cast<unsigned int> (nn); ++j)
+      for (size_type j=0; j < static_cast<size_type> (nn); ++j)
         {
           eigenvectors[i](j) = values_eigenvectors[col_begin+j];
         }
@@ -661,11 +661,11 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
 {
   Assert(state == matrix, ExcState(state));
   const int nn = this->n_cols();
-  Assert(static_cast<unsigned int>(nn) == this->n_rows(), ExcNotQuadratic());
+  Assert(static_cast<size_type>(nn) == this->n_rows(), ExcNotQuadratic());
   Assert(B.n_rows() == B.n_cols(), ExcNotQuadratic());
-  Assert(static_cast<unsigned int>(nn) == B.n_cols(),
+  Assert(static_cast<size_type>(nn) == B.n_cols(),
          ExcDimensionMismatch (nn, B.n_cols()));
-  Assert(eigenvectors.size() <= static_cast<unsigned int>(nn),
+  Assert(eigenvectors.size() <= static_cast<size_type>(nn),
          ExcMessage ("eigenvectors.size() > matrix.n_cols()"));
 
   wr.resize(nn);
@@ -719,7 +719,7 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   lwork = 3*nn-1 > 1 ? 3*nn-1 : 1; // no query mode
 #endif
   // resize workspace array
-  work.resize((unsigned int) lwork);
+  work.resize((size_type) lwork);
 
   // Finally compute the generalized
   // eigenvalues.
@@ -734,11 +734,11 @@ LAPACKFullMatrix<number>::compute_generalized_eigenvalues_symmetric (
   if (info != 0)
     std::cerr << "LAPACK error in sygv" << std::endl;
 
-  for (unsigned int i=0; i < eigenvectors.size(); ++i)
+  for (size_type i=0; i < eigenvectors.size(); ++i)
     {
-      unsigned int col_begin(i*nn);
+      size_type col_begin(i*nn);
       eigenvectors[i].reinit(nn, true);
-      for (unsigned int j=0; j < static_cast<unsigned int>(nn); ++j)
+      for (size_type j=0; j < static_cast<size_type>(nn); ++j)
         {
           eigenvectors[i](j) = values_A[col_begin+j];
         }
@@ -805,9 +805,9 @@ LAPACKFullMatrix<number>::print_formatted (
         width = precision+2;
     }
 
-  for (unsigned int i=0; i<this->n_rows(); ++i)
+  for (size_type i=0; i<this->n_rows(); ++i)
     {
-      for (unsigned int j=0; j<this->n_cols(); ++j)
+      for (size_type j=0; j<this->n_cols(); ++j)
         if (std::fabs(this->el(i,j)) > threshold)
           out << std::setw(width)
               << this->el(i,j) * denominator << ' ';
