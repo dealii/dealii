@@ -685,7 +685,7 @@ namespace Step20
 
     Vector<double> tmp (solution.block(0).size());
 
-    // Now on to the first equation. The right hand side of it is BM^{-1}F-G,
+    // Now on to the first equation. The right hand side of it is $B^TM^{-1}F-G$,
     // which is what we compute in the first few lines. We then declare the
     // objects representing the Schur complement, its approximation, and the
     // inverse of the approximation. Finally, we declare a solver object and
@@ -725,7 +725,7 @@ namespace Step20
     }
 
     // After we have the pressure, we can compute the velocity. The equation
-    // reads MU=-B^TP+F, and we solve it by first computing the right hand
+    // reads $MU=-BP+F$, and we solve it by first computing the right hand
     // side, and then multiplying it with the object that represents the
     // inverse of the mass matrix:
     {
