@@ -80,9 +80,9 @@ public:
   AdditionalData;
 
   /**
-   * This method is deprecated, and
+   * @deprecated This method is deprecated, and
    * left for backward
-   * compability. It will be
+   * compatibility. It will be
    * removed in later versions.
    */
   void reinit (const SparsityPattern &sparsity) DEAL_II_DEPRECATED;

@@ -809,7 +809,7 @@ private:
    * The preconditioner to use.
    */
   SmartPointer<const PRECONDITION,PreconditionLACSolver<SOLVER,MATRIX,PRECONDITION> > precondition;
-};
+} DEAL_II_DEPRECATED;
 
 
 
@@ -870,7 +870,7 @@ private:
    * Memory pool for vectors.
    */
   VectorMemory<VECTOR> &mem;
-};
+} DEAL_II_DEPRECATED;
 
 
 

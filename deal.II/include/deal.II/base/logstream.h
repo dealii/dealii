@@ -208,8 +208,6 @@ public:
   const std::string &get_prefix () const;
 
   /**
-   * @deprecated Use Prefix instead
-   *
    * Push another prefix on the
    * stack. Prefixes are
    * automatically separated by a
@@ -219,8 +217,6 @@ public:
   void push (const std::string &text);
 
   /**
-   * @deprecated Use Prefix instead
-   *
    * Remove the last prefix.
    */
   void pop ();

@@ -802,7 +802,7 @@ public:
    * Scale each element of the
    * vector by the given factor.
    *
-   * This function is deprecated
+   * @deprecated This function is deprecated
    * and will be removed in a
    * future version. Use
    * <tt>operator *=</tt> and

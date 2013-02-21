@@ -103,8 +103,8 @@ public:
   SolverSelector ();
 
   /**
-   * @deprecated Use deafult
-   * constructor and select.
+   * @deprecated Use the default
+   * constructor, set_control() and select().
    *
    * Constructor. Use the arguments
    * to initialize actual solver
@@ -113,7 +113,7 @@ public:
    */
   SolverSelector (const std::string    &solvername,
                   SolverControl        &control,
-                  VectorMemory<VECTOR> &vector_memory);
+                  VectorMemory<VECTOR> &vector_memory) DEAL_II_DEPRECATED;
 
   /**
    * Destructor
