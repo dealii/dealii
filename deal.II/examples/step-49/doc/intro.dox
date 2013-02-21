@@ -2,7 +2,6 @@
 
 <a name="Intro"></a>
 <h1> Introduction </h1>
-
 This tutorial is an extension to step-1 and demonstrates several ways to
 obtain more involved meshes.
 
@@ -33,7 +32,7 @@ That said, your mesh needs to capture the given geometry adequately.
 There are several ways to create an initial mesh. Meshes can be modified or
 combined in many ways as discussed later on.
 
-<h4>GridGenerator</h4>
+<h4>Using GridGenerator</h4>
 
 The easiest way to generate meshes is to use the GridGenerator, which is
 already discussed in step-1.  There are many different helper functions
@@ -41,7 +40,7 @@ available, including GridGenerator::hyper_cube(),
 GridGenerator::hyper_shell(), GridGenerator::hyper_ball(),
 GridGenerator::hyper_cube_with_cylindrical_hole(), ...
 
-<h4>Construct your own mesh programmatically</h4>
+<h4>Constructing your own mesh programmatically</h4>
 
 If the is no good fit in the GridGenerator class, you can always create a
 Triangulation in your program "by hand". For that, you need a list of vertices
@@ -53,7 +52,7 @@ all the functions in GridGenerator are implemented in this fashion.
 you end up writing a function that might be useful for a larger audience,
 please contribute it.
 
-<h4>Import from external programs</h4>
+<h4>Importing from external programs</h4>
 
 The class GridIn can read many different mesh formats from a file from
 disk. How this is done is explained in step-5 and can be seen in the function
@@ -107,7 +106,7 @@ image (see the grid_1 function):
 @image html step-49.grid-1.png
 
 
-<h3>Modify a Mesh</h3>
+<h3>Modifying a Mesh</h3>
 
 After aquiring one (or several) meshes in the ways described above, there are
 many ways to manipulate them before using them in a finite element
@@ -171,19 +170,18 @@ effects one gets when studying convergence on regular meshes, it is better to
 work with a sequence of unstructured meshes (see possible extensions).
 
 
-<h4>Merge Meshes</h4>
+<h4>Merging Meshes</h4>
 
 The function GridGenerator::merge_triangulations() allows you to merge two
-given Triangulations into a single one. This only works, if the vertices of
-the to be shared edge or face match exactly. It is useful to use
-GridTools::shift and GridTools::scale to align the two meshes.  In the
-function grid_2() of this tutorial, we merge a square with a round hole
-(generated with hyper_cube_with_cylindrical_hole()) and a rectangle. The
-function GridTools::subdivided_hyper_rectangle() allows you to specify the
-number of repetitions and the positions of the corners, this way we do not
-need to shift it manually. You should inspect the mesh graphically to make
-sure, that cells line up correctly and no hanging nodes exist in the merged
-Triangulation.
+given Triangulations into a single one.  For this to work, the vertices of the
+shared edge or face have to match exactly.  Lining up the two meshes can be
+achieved using GridTools::shift and GridTools::scale.  In the function
+grid_2() of this tutorial, we merge a square with a round hole (generated with
+hyper_cube_with_cylindrical_hole()) and a rectangle. The function
+GridTools::subdivided_hyper_rectangle() allows you to specify the number of
+repetitions and the positions of the corners, this way we do not need to shift
+it manually. You should inspect the mesh graphically to make sure, that cells
+line up correctly and no hanging nodes exist in the merged Triangulation.
 
 These are the input meshes and the output mesh:
 <TABLE WIDTH="80%" ALIGN="center">
@@ -202,7 +200,7 @@ These are the input meshes and the output mesh:
 </table>
 
 
-<h4>Move Vertices</h4>
+<h4>Moving Vertices</h4>
 
 The function grid_3() demonstrates the ability to pick individual vertices and
 move them around in an existing mesh. Please be sure to not produce degenerate
@@ -222,7 +220,7 @@ centered by moving the top vertices upwards:
 </table>
 
 
-<h4>Extrude Meshes</h4>
+<h4>Extruding Meshes</h4>
 
 If you need a 3d mesh that can be created by extruding a given 2d mesh (that
 can be created in any of the ways given above), you can use the function
@@ -251,4 +249,6 @@ above. This is the output from grid_4():
   - change boundary indicators
   - relax inner vertices
 - Database of unstructured meshes for convergence studies
-- GridTools::extract_boundary_mesh 
+- discuss GridTools::extract_boundary_mesh 
+- how to remove or disable a cell inside a mesh
+

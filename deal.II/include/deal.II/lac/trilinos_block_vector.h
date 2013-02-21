@@ -105,7 +105,7 @@ namespace TrilinosWrappers
      * used, just the global size of the
      * partitioner.
      */
-    BlockVector (const std::vector<Epetra_Map> &partitioner);
+    explicit BlockVector (const std::vector<Epetra_Map> &partitioner);
 
     /**
      * Constructor. Generate a block
@@ -116,8 +116,8 @@ namespace TrilinosWrappers
      * used, just the global size of the
      * partitioner.
      */
-    BlockVector (const std::vector<IndexSet> &partitioner,
-                 const MPI_Comm              &communicator = MPI_COMM_WORLD);
+    explicit BlockVector (const std::vector<IndexSet> &partitioner,
+                          const MPI_Comm              &communicator = MPI_COMM_WORLD);
 
     /**
      * Copy-Constructor. Set all the
@@ -146,7 +146,7 @@ namespace TrilinosWrappers
      * fill appropriate data using a
      * reinit of the blocks.
      */
-    BlockVector (const size_type num_blocks);
+    explicit BlockVector (const size_type num_blocks);
 
     /**
      * Constructor. Set the number of
@@ -156,7 +156,7 @@ namespace TrilinosWrappers
      *
      * References BlockVector.reinit().
      */
-    BlockVector (const std::vector<size_type> &N);
+    explicit BlockVector (const std::vector<size_type> &N);
 
     /**
      * Constructor. Set the number of

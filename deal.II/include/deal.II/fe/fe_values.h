@@ -2648,7 +2648,7 @@ public:
 
   /**
    * Return a pointer to the vector of
-   * quadrature points.
+   * quadrature points in real space.
    */
   const std::vector<Point<spacedim> > &get_quadrature_points () const;
 

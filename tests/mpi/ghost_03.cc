@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-// Test that ghosted vectors are read-only (not working right now)
+// Test that ghosted vectors are read-only
 
 #include "../tests.h"
 #include <deal.II/lac/petsc_parallel_vector.h>
@@ -50,6 +50,9 @@ void test ()
   vb*=2.0;
   v=vb;
 
+  Assert(!vb.has_ghost_elements(), ExcInternalError());
+  Assert(v.has_ghost_elements(), ExcInternalError());
+  
   deal_II_exceptions::disable_abort_on_exception();
   try 
     {

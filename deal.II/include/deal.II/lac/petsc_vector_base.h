@@ -737,11 +737,12 @@ namespace PETScWrappers
 
     /**
      * Updates the ghost values of this
-     * vector. This is necessary after any
-     * modification before reading ghost
-     * values.
+     * vector. As ghosted vectors are now read-only and assignments
+     * from a non-ghosted vector update the ghost values automatically,
+     * this method does not need to be called in user code.
+     * @deprecated: calling this method is no longer necessary.
      */
-    void update_ghost_values() const;
+    void update_ghost_values() const DEAL_II_DEPRECATED;
 
 
     /**

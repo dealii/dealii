@@ -532,7 +532,14 @@ namespace PETScWrappers
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       if (has_ghost_elements())
-        update_ghost_values();
+        {
+          int ierr;
+
+          ierr = VecGhostUpdateBegin(vector, INSERT_VALUES, SCATTER_FORWARD);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+          ierr = VecGhostUpdateEnd(vector, INSERT_VALUES, SCATTER_FORWARD);
+          AssertThrow (ierr == 0, ExcPETScError(ierr));
+        }
       return *this;
     }
 

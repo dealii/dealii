@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2192,8 +2192,14 @@ namespace Threads
    * non-member or static member
    * functions with no arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<>,0>
+  spawn (RT (*fun_ptr)()) DEAL_II_DEPRECATED;
+
+
   template <typename RT>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<>,0>
@@ -2208,8 +2214,14 @@ namespace Threads
    * function for member functions with
    * no arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<>,0>
+  spawn (C &c, RT (C::*fun_ptr)()) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<>,0>
@@ -2225,8 +2237,14 @@ namespace Threads
    * const member functions with no
    * arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<>,0>
+  spawn (const C &c, RT (C::*fun_ptr)() const) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<>,0>
@@ -2247,8 +2265,14 @@ namespace Threads
    * non-member or static member
    * functions with 1 argument.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename Arg1>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1>,1>
+  spawn (RT (*fun_ptr)(Arg1)) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename Arg1>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1>,1>
@@ -2264,8 +2288,14 @@ namespace Threads
    * function for member functions with
    * 1 argument.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C, typename Arg1>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1>,1>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1)) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C, typename Arg1>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1>,1>
@@ -2281,8 +2311,14 @@ namespace Threads
    * const member functions with 1
    * argument.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C, typename Arg1>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1>,1>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1) const) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C, typename Arg1>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1>,1>
@@ -2301,8 +2337,14 @@ namespace Threads
    * non-member or static member
    * functions with 2 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename Arg1, typename Arg2>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2>,2>
+  spawn (RT (*fun_ptr)(Arg1,Arg2)) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename Arg1, typename Arg2>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2>,2>
@@ -2318,8 +2360,14 @@ namespace Threads
    * function for member functions with
    * 2 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C, typename Arg1, typename Arg2>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2>,2>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2)) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C, typename Arg1, typename Arg2>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2>,2>
@@ -2335,8 +2383,14 @@ namespace Threads
    * const member functions with 2
    * arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C, typename Arg1, typename Arg2>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2>,2>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2) const) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C, typename Arg1, typename Arg2>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2>,2>
@@ -2355,8 +2409,15 @@ namespace Threads
    * non-member or static member
    * functions with 3 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT,
+           typename Arg1, typename Arg2, typename Arg3>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3>,3>
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3)) DEAL_II_DEPRECATED;
+
+
   template <typename RT,
            typename Arg1, typename Arg2, typename Arg3>
   inline
@@ -2373,8 +2434,15 @@ namespace Threads
    * function for member functions with
    * 3 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+           typename Arg1, typename Arg2, typename Arg3>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3>,3>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3)) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
            typename Arg1, typename Arg2, typename Arg3>
   inline
@@ -2391,8 +2459,15 @@ namespace Threads
    * const member functions with 3
    * arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+           typename Arg1, typename Arg2, typename Arg3>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3>,3>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3) const) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
            typename Arg1, typename Arg2, typename Arg3>
   inline
@@ -2413,8 +2488,15 @@ namespace Threads
    * non-member or static member
    * functions with 4 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT,
+           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) DEAL_II_DEPRECATED;
+
+
   template <typename RT,
            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
@@ -2431,8 +2513,15 @@ namespace Threads
    * function for member functions with
    * 4 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4)) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
@@ -2449,8 +2538,15 @@ namespace Threads
    * const member functions with 4
    * arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+           typename Arg1, typename Arg2, typename Arg3, typename Arg4>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4>,4>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4) const) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
            typename Arg1, typename Arg2, typename Arg3, typename Arg4>
   inline
@@ -2470,8 +2566,16 @@ namespace Threads
    * non-member or static member
    * functions with 5 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT,
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) DEAL_II_DEPRECATED;
+
+
   template <typename RT,
            typename Arg1, typename Arg2, typename Arg3,
            typename Arg4, typename Arg5>
@@ -2489,8 +2593,16 @@ namespace Threads
    * function for member functions with
    * 5 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5)) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
            typename Arg1, typename Arg2, typename Arg3,
            typename Arg4, typename Arg5>
@@ -2508,8 +2620,16 @@ namespace Threads
    * const member functions with 5
    * arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5>,5>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5) const) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
            typename Arg1, typename Arg2, typename Arg3,
            typename Arg4, typename Arg5>
@@ -2530,8 +2650,16 @@ namespace Threads
    * non-member or static member
    * functions with 6 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT,
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5, typename Arg6>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) DEAL_II_DEPRECATED;
+
+
   template <typename RT,
            typename Arg1, typename Arg2, typename Arg3,
            typename Arg4, typename Arg5, typename Arg6>
@@ -2549,8 +2677,16 @@ namespace Threads
    * function for member functions with
    * 6 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5, typename Arg6>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6)) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
            typename Arg1, typename Arg2, typename Arg3,
            typename Arg4, typename Arg5, typename Arg6>
@@ -2568,8 +2704,17 @@ namespace Threads
    * const member functions with 6
    * arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5, typename Arg6>
+  inline
+  internal::fun_encapsulator<RT,
+           std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
            typename Arg1, typename Arg2, typename Arg3,
            typename Arg4, typename Arg5, typename Arg6>
@@ -2591,8 +2736,18 @@ namespace Threads
    * non-member or static member
    * functions with 7 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT,
+  typename Arg1, typename Arg2, typename Arg3,
+  typename Arg4, typename Arg5, typename Arg6,
+  typename Arg7>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
+           Arg4, Arg5, Arg6, Arg7>,7>
+  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) DEAL_II_DEPRECATED;
+
+
   template <typename RT,
   typename Arg1, typename Arg2, typename Arg3,
   typename Arg4, typename Arg5, typename Arg6,
@@ -2612,8 +2767,18 @@ namespace Threads
    * function for member functions with
    * 7 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+  typename Arg1, typename Arg2, typename Arg3,
+  typename Arg4, typename Arg5, typename Arg6,
+  typename Arg7>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
+           Arg4, Arg5, Arg6, Arg7>,7>
+  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
   typename Arg1, typename Arg2, typename Arg3,
   typename Arg4, typename Arg5, typename Arg6,
@@ -2633,8 +2798,19 @@ namespace Threads
    * const member functions with 7
    * arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+  typename Arg1, typename Arg2, typename Arg3,
+  typename Arg4, typename Arg5, typename Arg6,
+  typename Arg7>
+  inline
+  internal::fun_encapsulator<RT,
+           std_cxx1x::tuple<Arg1, Arg2, Arg3,
+           Arg4, Arg5, Arg6, Arg7>,7>
+  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
   typename Arg1, typename Arg2, typename Arg3,
   typename Arg4, typename Arg5, typename Arg6,
@@ -2658,8 +2834,20 @@ namespace Threads
    * non-member or static member
    * functions with 8 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT,
+  typename Arg1, typename Arg2, typename Arg3,
+  typename Arg4, typename Arg5, typename Arg6,
+  typename Arg7, typename Arg8>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
+           Arg4, Arg5, Arg6,
+           Arg7, Arg8>,8>
+           spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                Arg6,Arg7,Arg8)) DEAL_II_DEPRECATED;
+
+
   template <typename RT,
   typename Arg1, typename Arg2, typename Arg3,
   typename Arg4, typename Arg5, typename Arg6,
@@ -2681,8 +2869,20 @@ namespace Threads
    * function for member functions with
    * 8 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+  typename Arg1, typename Arg2, typename Arg3,
+  typename Arg4, typename Arg5, typename Arg6,
+  typename Arg7, typename Arg8>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
+           Arg4, Arg5, Arg6,
+           Arg7, Arg8>,8>
+           spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                         Arg6,Arg7,Arg8)) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
   typename Arg1, typename Arg2, typename Arg3,
   typename Arg4, typename Arg5, typename Arg6,
@@ -2704,8 +2904,21 @@ namespace Threads
    * const member functions with 8
    * arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+  typename Arg1, typename Arg2, typename Arg3,
+  typename Arg4, typename Arg5, typename Arg6,
+  typename Arg7, typename Arg8>
+  inline
+  internal::fun_encapsulator<RT,
+           std_cxx1x::tuple<Arg1, Arg2, Arg3,
+           Arg4, Arg5, Arg6,
+           Arg7, Arg8>,8>
+           spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                               Arg6,Arg7,Arg8) const) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
   typename Arg1, typename Arg2, typename Arg3,
   typename Arg4, typename Arg5, typename Arg6,
@@ -2731,8 +2944,20 @@ namespace Threads
    * non-member or static member
    * functions with 9 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT,
+  typename Arg1, typename Arg2, typename Arg3,
+  typename Arg4, typename Arg5, typename Arg6,
+  typename Arg7, typename Arg8, typename Arg9>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
+           Arg4, Arg5, Arg6,
+           Arg7, Arg8, Arg9>,9>
+           spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                Arg6,Arg7,Arg8,Arg9)) DEAL_II_DEPRECATED;
+
+
   template <typename RT,
   typename Arg1, typename Arg2, typename Arg3,
   typename Arg4, typename Arg5, typename Arg6,
@@ -2754,8 +2979,20 @@ namespace Threads
    * function for member functions with
    * 9 arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+  typename Arg1, typename Arg2, typename Arg3,
+  typename Arg4, typename Arg5, typename Arg6,
+  typename Arg7, typename Arg8, typename Arg9>
+  inline
+  internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
+           Arg4, Arg5, Arg6,
+           Arg7, Arg8, Arg9>,9>
+           spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                         Arg6,Arg7,Arg8,Arg9)) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
   typename Arg1, typename Arg2, typename Arg3,
   typename Arg4, typename Arg5, typename Arg6,
@@ -2777,8 +3014,21 @@ namespace Threads
    * const member functions with 9
    * arguments.
    *
-   * @deprecated
+   * @deprecated Use new_thread() instead.
    */
+  template <typename RT, typename C,
+  typename Arg1, typename Arg2, typename Arg3,
+  typename Arg4, typename Arg5, typename Arg6,
+  typename Arg7, typename Arg8, typename Arg9>
+  inline
+  internal::fun_encapsulator<RT,
+           std_cxx1x::tuple<Arg1, Arg2, Arg3,
+           Arg4, Arg5, Arg6,
+           Arg7, Arg8, Arg9>,9>
+           spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,
+                                               Arg6,Arg7,Arg8,Arg9) const) DEAL_II_DEPRECATED;
+
+
   template <typename RT, typename C,
   typename Arg1, typename Arg2, typename Arg3,
   typename Arg4, typename Arg5, typename Arg6,

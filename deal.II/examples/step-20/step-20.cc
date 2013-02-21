@@ -607,8 +607,19 @@ namespace Step20
   // step. Consequently, the class also does not have to store a pointer to an
   // inverse mass matrix object.
   //
-  // Since InverseIterate follows the standard convention for matrices, we
-  // need to provide a <tt>Tvmult</tt> function here as well.
+  // We will later use this class as a template argument to the
+  // IterativeInverse class which will in turn want to use it as a
+  // template argument for the PointerMatrix class. The latter class
+  // has a function that requires us to also write a function that
+  // provides the product with the transpose of the matrix this object
+  // represents. As a consequence, in the code below, we also
+  // implement a <tt>Tvmult</tt> function here that represents the
+  // product of the transpose matrix with a vector. It is easy to see
+  // how this needs to be implemented here. (Note, however, that even
+  // though we implement this function here, there will in fact not be
+  // any need for it as long as we use SolverCG as the solver since
+  // that solver does not ever call the function that provides this
+  // operation.)
   class ApproximateSchurComplement : public Subscriptor
   {
   public:
@@ -666,8 +677,7 @@ namespace Step20
   void MixedLaplaceProblem<dim>::solve ()
   {
     PreconditionIdentity identity;
-    IterativeInverse<Vector<double> >
-    m_inverse;
+    IterativeInverse<Vector<double> > m_inverse;
     m_inverse.initialize(system_matrix.block(0,0), identity);
     m_inverse.solver.select("cg");
     static ReductionControl inner_control(1000, 0., 1.e-13);

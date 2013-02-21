@@ -3,7 +3,7 @@
 //    Authors: Bärbel Janssen, University of Heidelberg,
 //    Agnieszka Miedler, TU Berlin, 2010
 //
-//    Copyright (C) 2010, 2012 by the deal.II authors
+//    Copyright (C) 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -496,10 +496,8 @@ void ArpackSolver::solve (
       AssertDimension (eigenvalues.size(), eigenvalues_im.size());
 
       for (size_type i=0; i<eigenvalues.size(); ++i)
-        {
-          eigenvalues[i].real() = eigenvalues_real[i];
-          eigenvalues[i].imag() = eigenvalues_im[i];
-        }
+	eigenvalues[i] = std::complex<double> (eigenvalues_real[i],
+					       eigenvalues_im[i]);
     }
 }
 

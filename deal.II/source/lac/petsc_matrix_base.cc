@@ -477,6 +477,19 @@ namespace PETScWrappers
   }
 
 
+  MatrixBase &
+  MatrixBase::add (const MatrixBase &other,
+		   const PetscScalar factor)
+  {
+    const int ierr = MatAXPY (matrix, factor,
+			      other, DIFFERENT_NONZERO_PATTERN);
+
+    Assert (ierr == 0, ExcPETScError(ierr));
+
+    return *this;
+  }
+  
+
   void
   MatrixBase::vmult (VectorBase       &dst,
                      const VectorBase &src) const

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -99,6 +99,16 @@ public:
    * the block, the prefix will
    * automatically be removed, when
    * this object is destroyed.
+   *
+   * In other words, the scope of the object so created
+   * determines the lifetime of the prefix. The advantage of
+   * using such an object is that the prefix is removed
+   * whichever way you exit the scope -- by <code>continue</code>,
+   * <code>break</code>, <code>return</code>, <code>throw</code>,
+   * or by simply reaching the closing brace. In all of these
+   * cases, it is not necessary to remember to pop the prefix
+   * manually using LogStream::pop. In this, it works just like
+   * the better known Threads::Mutex::ScopedLock class.
    */
   class Prefix
   {
@@ -117,7 +127,8 @@ public:
      * be removed when the
      * variable is destroyed .
      */
-    Prefix(const std::string &text, LogStream &stream);
+    Prefix(const std::string &text,
+	   LogStream &stream);
 
     /**
      * Remove the prefix
@@ -208,20 +219,20 @@ public:
   const std::string &get_prefix () const;
 
   /**
-   * @deprecated Use Prefix instead
-   *
    * Push another prefix on the
    * stack. Prefixes are
    * automatically separated by a
    * colon and there is a double
    * colon after the last prefix.
+   *
+   * A simpler way to add a prefix (without the manual
+   * need to add the corresponding pop()) is to use the
+   * Prefix class.
    */
   void push (const std::string &text);
 
   /**
-   * @deprecated Use Prefix instead
-   *
-   * Remove the last prefix.
+   * Remove the last prefix added with push().
    */
   void pop ();
 

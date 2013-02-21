@@ -2138,6 +2138,7 @@ public:
    * @deprecated Currently, this function can also be called for non-active cells, if all degrees of freedom of the FiniteElement are located in vertices. This functionality will vanish in a future release.
    */
   void get_dof_indices (std::vector<types::global_dof_index> &dof_indices) const;
+
   /**
    * @deprecated Use get_active_or_mg_dof_indices() with level_cell_iterator returned from begin_mg().
    *

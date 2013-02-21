@@ -38,10 +38,10 @@ optimized: $(LIBDIR)/libdeal_II$(lib-suffix)
 # rules how to generate object files from source files.
 $(LIBDIR)/debug/%.$(OBJEXT) :
 	@echo "======================debug======$(MT)== $(<:$D/source/%=%)"
-	@$(CXX) $(CXXFLAGS.g) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.g) $(DEAL_II_SUPPRESS_DEPRECATION_WARNING) -c $< -o $@
 $(LIBDIR)/optimized/%.$(OBJEXT) :
 	@echo "======================optimized==$(MT)== $(<:$D/source/%=%)"
-	@$(CXX) $(CXXFLAGS.o) -c $< -o $@
+	@$(CXX) $(CXXFLAGS.o) $(DEAL_II_SUPPRESS_DEPRECATION_WARNING) -c $< -o $@
 
 
 

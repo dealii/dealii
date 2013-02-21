@@ -107,7 +107,7 @@ namespace TrilinosWrappers
        * distribution of data among the MPI
        * processes.
        */
-      BlockVector (const std::vector<Epetra_Map> &parallel_partitioning);
+      explicit BlockVector (const std::vector<Epetra_Map> &parallel_partitioning);
 
       /**
        * Constructor. Generate a block
@@ -119,7 +119,7 @@ namespace TrilinosWrappers
        * distribution of data among the MPI
        * processes.
        */
-      BlockVector (const std::vector<IndexSet> &parallel_partitioning,
+      explicit BlockVector (const std::vector<IndexSet> &parallel_partitioning,
                    const MPI_Comm              &communicator = MPI_COMM_WORLD);
 
       /**
@@ -140,7 +140,7 @@ namespace TrilinosWrappers
        * fill appropriate data using a
        * reinit of the blocks.
        */
-      BlockVector (const size_type num_blocks);
+      explicit BlockVector (const size_type num_blocks);
 
       /**
        * Destructor. Clears memory

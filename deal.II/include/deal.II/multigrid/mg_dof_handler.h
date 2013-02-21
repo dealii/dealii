@@ -148,7 +148,7 @@ public:
 
   //@}
 
-};
+} DEAL_II_DEPRECATED;
 
 /*@}*/
 
