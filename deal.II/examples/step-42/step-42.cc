@@ -1512,6 +1512,7 @@ namespace Step42
         computing_timer.exit_section("Graphical output");
 
         computing_timer.print_summary();
+        computing_timer.disable_output();
       }
   }
 }
