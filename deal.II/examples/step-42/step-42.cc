@@ -344,7 +344,7 @@ namespace Step42
                                  SymmetricTensor<2,dim> &strain_tensor,
                                  unsigned int            &elast_points,
                                  unsigned int            &plast_points,
-                                 unsigned int            &yield);
+                                 double                  &yield);
     void linearized_plast_linear_hardening (SymmetricTensor<4,dim> &stress_strain_tensor_linearized,
                                             SymmetricTensor<4,dim> &stress_strain_tensor,
                                             SymmetricTensor<2,dim> &strain_tensor);
@@ -400,7 +400,7 @@ namespace Step42
                                                      SymmetricTensor<2,dim> &strain_tensor,
                                                      unsigned int            &elast_points,
                                                      unsigned int            &plast_points,
-                                                     unsigned int            &yield)
+                                                     double                  &yield)
   {
     if (dim == 3)
       {
@@ -894,7 +894,7 @@ namespace Step42
 
     unsigned int elast_points = 0;
     unsigned int plast_points = 0;
-    unsigned int yield = 0;
+    double       yield = 0;
     unsigned int cell_number = 0;
     cell_constitution = 0;
 
@@ -1533,7 +1533,7 @@ int main (int argc, char *argv[])
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
   {
-    int _n_refinements_global = 3;
+    int _n_refinements_global = 2;
 
     if (argc == 3)
       {
