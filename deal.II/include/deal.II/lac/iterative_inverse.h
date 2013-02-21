@@ -14,8 +14,6 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>
-//#include <deal.II/base/template_constraints.h>
-//#include <deal.II/lac/tridiagonal_matrix.h>
 #include <deal.II/lac/solver_selector.h>
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/pointer_matrix.h>
@@ -114,15 +112,6 @@ private:
    * The preconditioner to use.
    */
   std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > preconditioner;
-  /**
-   * The transpose of the matrix in use.
-   */
-  std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > transpose_matrix;
-
-  /**
-   * The transpose of the preconditioner to use.
-   */
-  std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > transpose_preconditioner;
 };
 
 
