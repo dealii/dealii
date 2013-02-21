@@ -615,7 +615,11 @@ namespace Step20
   // represents. As a consequence, in the code below, we also
   // implement a <tt>Tvmult</tt> function here that represents the
   // product of the transpose matrix with a vector. It is easy to see
-  // how this needs to be implemented here.
+  // how this needs to be implemented here. (Note, however, that even
+  // though we implement this function here, there will in fact not be
+  // any need for it as long as we use SolverCG as the solver since
+  // that solver does not ever call the function that provides this
+  // operation.)
   class ApproximateSchurComplement : public Subscriptor
   {
   public:
