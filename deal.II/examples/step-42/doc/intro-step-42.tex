@@ -278,21 +278,30 @@ Now we describe an algorithm that combines the Newton-method, which we use for
 the nonlinear constitutive law, with the semismooth Newton method for the contact. It
 sums up the results of the sections before and works as follows:
 \begin{itemize}
- \item[(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that $\mathcal{S} = \mathcal{A}_k \cup \mathcal{F}_k$ and $\mathcal{A}_k \cap \mathcal{F}_k = \emptyset$ and set $k = 1$.
- \item[(1)] Assemble the Newton matrix $a'(U^k;\varphi_i,\varphi_j)$ and the right-hand-side $F(U^k)$.
- \item[(2)] Find the primal-dual pair $(U^k,\Lambda^k)$ that satisfies
+ \item[(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that
+ $\mathcal{S} = \mathcal{A}_k \cup \mathcal{F}_k$ and $\mathcal{A}_k \cap
+ \mathcal{F}_k = \emptyset$ and set $k = 1$. The start value $U^0$ fullfills our
+ obstacle condition.
+ \item[(1)] Assemble the Newton matrix $a'(U^{k-1};\varphi_i,\varphi_j)$ and the
+ right-hand-side $F(U^{k-1})$.
+ \item[(2)] Find the primal-dual pair $(\tilde U^k,\Lambda^k)$ that satisfies
  \begin{align*}
- AU^k + B\Lambda^k & = F, &\\
- \left[B^TU^k\right]_i & = G_i & \forall i\in\mathcal{A}_k,\\
+ A\tilde U^k + B\Lambda^k & = F, &\\
+ \left[B^T\tilde U^k\right]_i & = G_i & \forall i\in\mathcal{A}_k,\\
  \Lambda^k_i & = 0 & \forall i\in\mathcal{F}_k.
  \end{align*}
- \item[(3)] Define the new active and inactive sets by
+ \item[(3)] Damping for $k>2$ by applying a line search and calculating a linear
+ combination of $U^{k-1}$ and $\tilde U^k$. Find an
+ $\alpha_i:=2^{-i},(i=0,\ldots,10)$ so that $$U^k := \alpha_i\tilde U^k +
+ (1-\alpha_i)U^{k-1}$$ yields $$\vert
+ F\left(U^{k}\right) \vert < \vert F\left(U^{k-1}\right) \vert.$$
+ \item[(4)] Define the new active and inactive sets by
  $$\mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i +
  c\left(\left[B^TU^k\right]_i - G_i\right) > 0\rbrace,$$
  $$\mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i +
  c\left(\left[B^TU^k\right]_i - G_i\right) \leq 0\rbrace.$$
- \item[(4)] If $\mathcal{A}_{k+1} = \mathcal{A}_k$ and $\vert
- F\left(U^{k+1}\right) \vert < \delta$ then stop, else set $k=k+1$ and go to
+ \item[(5)] If $\mathcal{A}_{k+1} = \mathcal{A}_k$ and $\vert
+ F\left(U^{k}\right) \vert < \delta$ then stop, else set $k=k+1$ and go to
  step (1).
 \end{itemize}
 \noindent
@@ -311,14 +320,25 @@ $$G_i = \begin{cases}
 0, & \text{if}\quad i>m.
 \end{cases}$$\\
 Compared to step-41, step (1) is added but it should be clear
-from the sections above that we only linearize the problem. In step (2) we have to solve a linear
-system of equations again. And now the solution has to fulfill two stopping
-criteria. $\mathcal{A}_{k+1} = \mathcal{A}_k$ makes sure that the contact zones are iterated out and the second ensures an accurate enough residual which means
-that the plastic zones are also iterated out.\\
-The idea of this method can also be found in Brunssen, Schmid, Schaefer,
-Wohlmuth: A fast and robust iterative solver for nonlinear contact problems
-using a primal-dual active set strategy and algebraic multigrid, Int. J. Numer.
-Meth. Engng, 2007, 69, pp. 524-543.
+from the sections above that we only linearize the problem. In step (2) we have
+to solve a linear system of equations again. And now the solution has to fulfill two stopping
+criteria. $\mathcal{A}_{k+1} = \mathcal{A}_k$ makes sure that the contact zones
+are iterated out and the second ensures an accurate enough residual which means that the plastic zones are also iterated out.\\
+A similar method can also be found in Brunssen, Schmid, Schaefer, Wohlmuth: A
+fast and robust iterative solver for nonlinear contact problems using a 
+primal-dual active set strategy and algebraic multigrid, Int. J. Numer.
+Meth. Engng, 2007, 69, pp. 524-543. But in advance we apply a line search to
+obtain a more robust method regarding the start value. Solving an elastic
+problem in the very first step ($k=0$) we get a reasonable start value but as you
+can see in the results damping is important if we choose for example a ball as
+obstacle.\\
+Damping our Newton method is more important for the nonlinearity cause by the
+constitutive law as for the contact. For this reason we start to damp our method
+for $k>2$ when we have two plastic iterations. Note that $U^1$ is a solution of
+an elastic problem.
+
+\large{Umformulierung des Algorithmus, so dass $U^0$ Lösung des elastischen
+Startproblems ist.}
 
 \section{Adaptive mesh refinement}
 
