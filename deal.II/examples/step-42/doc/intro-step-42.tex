@@ -274,25 +274,25 @@ time.
 \section{The primal-dual active set algorithm combined with the inexact semi smooth
 Newton method}
 
-Now we describe an algorithm that combines the Newton-method, which we use for
-the nonlinear constitutive law, with the semismooth Newton method for the contact. It
-sums up the results of the sections before and works as follows:
+Now we describe an algorithm that combines the damped semismooth Newton-method,
+which we use for the nonlinear constitutive law, with the semismooth Newton
+method for the contact. It sums up the results of the sections before and works as follows:
 \begin{itemize}
  \item[(0)] Initialize $\mathcal{A}_k$ and $\mathcal{F}_k$, such that
  $\mathcal{S} = \mathcal{A}_k \cup \mathcal{F}_k$ and $\mathcal{A}_k \cap
- \mathcal{F}_k = \emptyset$ and set $k = 1$. The start value $U^0$ fullfills our
- obstacle condition.
- \item[(1)] Assemble the Newton matrix $a'(U^{k-1};\varphi_i,\varphi_j)$ and the
- right-hand-side $F(U^{k-1})$.
- \item[(2)] Find the primal-dual pair $(\tilde U^k,\Lambda^k)$ that satisfies
+ \mathcal{F}_k = \emptyset$ and set $k = 1$. The start value $\hat U^0 :=
+ P_{\mathcal{A}_k}(0)$ fullfills our obstacle condition.
+ \item[(1)] Assemble the Newton matrix $A := a'(\hat
+ U^{k-1};\varphi_i,\varphi_j)$ and the right-hand-side $F(\hat U^{k-1})$.
+ \item[(2)] Find the primal-dual pair $(\bar U^k,\Lambda^k)$ that satisfies
  \begin{align*}
- A\tilde U^k + B\Lambda^k & = F, &\\
- \left[B^T\tilde U^k\right]_i & = G_i & \forall i\in\mathcal{A}_k,\\
+ A\bar U^k + B\Lambda^k & = F, &\\
+ \left[B^T\bar U^k\right]_i & = G_i & \forall i\in\mathcal{A}_k,\\
  \Lambda^k_i & = 0 & \forall i\in\mathcal{F}_k.
  \end{align*}
  \item[(3)] Damping for $k>2$ by applying a line search and calculating a linear
- combination of $U^{k-1}$ and $\tilde U^k$. Find an
- $\alpha_i:=2^{-i},(i=0,\ldots,10)$ so that $$U^k := \alpha_i\tilde U^k +
+ combination of $U^{k-1}$ and $\bar U^k$. Find an
+ $\alpha_i:=2^{-i},(i=0,\ldots,10)$ so that $$U^k := \alpha_i\bar U^k +
  (1-\alpha_i)U^{k-1}$$ yields $$\vert
  F\left(U^{k}\right) \vert < \vert F\left(U^{k-1}\right) \vert.$$
  \item[(4)] Define the new active and inactive sets by
@@ -300,13 +300,24 @@ sums up the results of the sections before and works as follows:
  c\left(\left[B^TU^k\right]_i - G_i\right) > 0\rbrace,$$
  $$\mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i +
  c\left(\left[B^TU^k\right]_i - G_i\right) \leq 0\rbrace.$$
+ Projection $U^k$ so that it holds the second equation in (2)
+ $$\hat U^K := P_{\mathcal{A}_{k+1}}(U^k).$$ 
  \item[(5)] If $\mathcal{A}_{k+1} = \mathcal{A}_k$ and $\vert
  F\left(U^{k}\right) \vert < \delta$ then stop, else set $k=k+1$ and go to
  step (1).
 \end{itemize}
 \noindent
-The mass matrix $B\in\mathbb{R}^{n\times m}$, $n>m$, is quadratic in our
-situation since $\Lambda^k$ is only defined on $\Gamma_C$:
+The meaning of the decorated and none decorated $U$ is as follows: $\bar U$
+denotes the solution of the linear system of equations in (2), $U$ is the
+damped solution and equals to $\bar U$ if the damping parameter $\alpha_0 =
+1$ and $\hat U := P_{\mathcal{A}}(U)$ is the projection of the active
+components in $\mathcal{A}$ to the gap
+$$P_{\mathcal{A}}(U):=\begin{cases}
+U_i, & \textrm{if}\quad i\notin\mathcal{A}\\
+{}^{G_i}/_{B^T_i}, & \textrm{if}\quad
+i\in\mathcal{A}.
+\end{cases}$$\\
+The mass matrix $B\in\mathbb{R}^{n\times m}$, $n>m$, is quadratic in our situation since $\Lambda^k$ is only defined on $\Gamma_C$:
 $$B_{ij} = \begin{cases}
 \int\limits_{\Gamma_C}\varphi_i^2(x)dx, & \text{if}\quad i=j\\
 0, & \text{if}\quad i\neq j.
@@ -329,16 +340,15 @@ fast and robust iterative solver for nonlinear contact problems using a
 primal-dual active set strategy and algebraic multigrid, Int. J. Numer.
 Meth. Engng, 2007, 69, pp. 524-543. But in advance we apply a line search to
 obtain a more robust method regarding the start value. Solving an elastic
-problem in the very first step ($k=0$) we get a reasonable start value but as you
-can see in the results damping is important if we choose for example a ball as
+problem in the very first step ($k=1$) we get a reasonable start value but as
+you can see in the results damping is important if we choose for example a ball as
 obstacle.\\
 Damping our Newton method is more important for the nonlinearity cause by the
 constitutive law as for the contact. For this reason we start to damp our method
 for $k>2$ when we have two plastic iterations. Note that $U^1$ is a solution of
-an elastic problem.
-
-\large{Umformulierung des Algorithmus, so dass $U^0$ Lösung des elastischen
-Startproblems ist.}
+an elastic problem and $U^2$ is the first plastic solution. A linear combination
+between these both results in stresses which are not in the convex set
+of the feasible stresses.
 
 \section{Adaptive mesh refinement}
 
