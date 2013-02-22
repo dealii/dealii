@@ -386,7 +386,7 @@ endif
 
 ifeq ($(BUILDTEST),yes)
 print-summary:
-	@svn info .. | perl -ne 'print "dealii-feature: revision=$$_\n" if s/Revision: //; print "dealii-feature: branch=$$1\n" if m/svn\.dealii\.org\/(.+)\/deal.II/;'
+	@svn info .. | perl -ne 'print "dealii-feature: revision=$$_\n" if s/Last Change Rev: //; print "dealii-feature: branch=$$1\n" if m/svn\.dealii\.org\/(.+)\/deal.II/;'
 	@echo "dealii-feature: user=$(USER)"
 	@echo "dealii-feature: host=`hostname`"
 	@echo "dealii-feature: target=$(TARGET)"
