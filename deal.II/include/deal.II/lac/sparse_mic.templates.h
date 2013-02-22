@@ -131,10 +131,10 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
   inner_sums.resize (this->m());
 
   // precalc sum(j=k+1, N, a[k][j]))
-  for (unsigned int row=0; row<this->m(); row++)
+  for (size_type row=0; row<this->m(); row++)
     inner_sums[row] = get_rowsum(row);
 
-  for (unsigned int row=0; row<this->m(); row++)
+  for (size_type row=0; row<this->m(); row++)
     {
       const number temp = this->begin(row)->value();
       number temp1 = 0;
@@ -158,7 +158,7 @@ void SparseMIC<number>::decompose (const SparseMatrix<somenumber> &matrix,
 
 template <typename number>
 inline number
-SparseMIC<number>::get_rowsum (const unsigned int row) const
+SparseMIC<number>::get_rowsum (const size_type row) const
 {
   Assert(this->m()==this->n(), ExcNotQuadratic());
 
@@ -184,13 +184,13 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
   Assert (dst.size() == src.size(), ExcDimensionMismatch(dst.size(), src.size()));
   Assert (dst.size() == this->m(), ExcDimensionMismatch(dst.size(), this->m()));
 
-  const unsigned int N=dst.size();
+  const size_type N=dst.size();
   // We assume the underlying matrix A is: A = X - L - U, where -L and -U are
   // strictly lower- and upper- diagonal parts of the system.
   //
   // Solve (X-L)X{-1}(X-U) x = b in 3 steps:
   dst = src;
-  for (unsigned int row=0; row<N; ++row)
+  for (size_type row=0; row<N; ++row)
     {
       // Now: (X-L)u = b
 
@@ -206,7 +206,7 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
     }
 
   // Now: v = Xu
-  for (unsigned int row=0; row<N; row++)
+  for (size_type row=0; row<N; row++)
     dst(row) *= diag[row];
 
   // x = (X-U)v
@@ -217,7 +217,7 @@ SparseMIC<number>::vmult (Vector<somenumber>       &dst,
            p = this->begin(row)+1;
            p != this->end(row);
            ++p)
-        if (p->column() > static_cast<unsigned int>(row))
+        if (p->column() > static_cast<size_type>(row))
           dst(row) -= p->value() * dst(p->column());
 
       dst(row) *= inv_diag[row];

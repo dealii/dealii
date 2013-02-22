@@ -49,16 +49,18 @@ namespace HSL
 {
   namespace MA27
   {
+    typedef types::global_dof_index size_type;
+
     extern "C"
-    void ma27ad_ (const unsigned int *,
-                  const unsigned int *,
-                  const unsigned int *,
-                  const unsigned int *,
-                  unsigned int *,
-                  const unsigned int *,
-                  unsigned int *,
-                  unsigned int *,
-                  unsigned int *,
+    void ma27ad_ (const size_type *,
+                  const size_type *,
+                  const size_type *,
+                  const size_type *,
+                  size_type *,
+                  const size_type *,
+                  size_type *,
+                  size_type *,
+                  size_type *,
                   int *)
     {
       AssertThrow (false,
@@ -69,18 +71,18 @@ namespace HSL
 
 
     extern "C"
-    void ma27bd_ (const unsigned int *,
-                  const unsigned int *,
-                  const unsigned int *,
-                  const unsigned int *,
+    void ma27bd_ (const size_type *,
+                  const size_type *,
+                  const size_type *,
+                  const size_type *,
                   double *,
-                  const unsigned int *,
-                  unsigned int *,
-                  const unsigned int *,
-                  const unsigned int *,
-                  const unsigned int *,
-                  unsigned int *,
-                  unsigned int *,
+                  const size_type *,
+                  size_type *,
+                  const size_type *,
+                  const size_type *,
+                  const size_type *,
+                  size_type *,
+                  size_type *,
                   int *)
     {
       AssertThrow (false,
@@ -91,16 +93,16 @@ namespace HSL
 
 
     extern "C"
-    void ma27cd_ (const unsigned int *,
+    void ma27cd_ (const size_type *,
                   const double *,
-                  const unsigned int *,
-                  const unsigned int *,
-                  const unsigned int *,
+                  const size_type *,
+                  const size_type *,
+                  const size_type *,
                   double *,
-                  const unsigned int *,
+                  const size_type *,
                   double *,
-                  const unsigned int *,
-                  const unsigned int *)
+                  const size_type *,
+                  const size_type *)
     {
       AssertThrow (false,
                    ExcMessage("You can only use the HSL functions after putting "
@@ -109,7 +111,7 @@ namespace HSL
     }
 
 
-    extern "C" void ma27x1_ (unsigned int *)
+    extern "C" void ma27x1_ (size_type *)
     {
       AssertThrow (false,
                    ExcMessage("You can only use the HSL functions after putting "
@@ -118,7 +120,7 @@ namespace HSL
     }
 
 
-    extern "C" void ma27x2_ (unsigned int *)
+    extern "C" void ma27x2_ (size_type *)
     {
       AssertThrow (false,
                    ExcMessage("You can only use the HSL functions after putting "
@@ -127,7 +129,7 @@ namespace HSL
     }
 
 
-    extern "C" void ma27x3_ (const unsigned int *)
+    extern "C" void ma27x3_ (const size_type *)
     {
       AssertThrow (false,
                    ExcMessage("You can only use the HSL functions after putting "
@@ -144,9 +146,11 @@ namespace HSL
 {
   namespace MA47
   {
+    typedef types::global_dof_index size_type;
+
     extern "C"
     void ma47id_ (double *,
-                  unsigned int *)
+                  size_type *)
     {
       AssertThrow (false,
                    ExcMessage("You can only use the HSL functions after putting "
@@ -156,14 +160,14 @@ namespace HSL
 
 
     extern "C"
-    void ma47ad_ (const unsigned int *,
-                  const unsigned int *,
-                  unsigned int *,
-                  unsigned int *,
-                  unsigned int *,
-                  const unsigned int *,
-                  unsigned int *,
-                  const unsigned int *,
+    void ma47ad_ (const size_type *,
+                  const size_type *,
+                  size_type *,
+                  size_type *,
+                  size_type *,
+                  const size_type *,
+                  size_type *,
+                  const size_type *,
                   double *,
                   int *)
     {
@@ -175,17 +179,17 @@ namespace HSL
 
 
     extern "C"
-    void ma47bd_ (const unsigned int *,
-                  const unsigned int *,
-                  const unsigned int *,
+    void ma47bd_ (const size_type *,
+                  const size_type *,
+                  const size_type *,
                   double *,
-                  const unsigned int *,
-                  unsigned int *,
-                  const unsigned int *,
-                  const unsigned int *,
+                  const size_type *,
+                  size_type *,
+                  const size_type *,
+                  const size_type *,
                   const double *,
-                  const unsigned int *,
-                  unsigned int *,
+                  const size_type *,
+                  size_type *,
                   double *,
                   int *)
     {
@@ -197,15 +201,15 @@ namespace HSL
 
 
     extern "C"
-    void ma47cd_ (const unsigned int *,
+    void ma47cd_ (const size_type *,
                   const double *,
-                  const unsigned int *,
-                  const unsigned int *,
-                  const unsigned int *,
+                  const size_type *,
+                  const size_type *,
+                  const size_type *,
                   double *,
                   double *,
-                  unsigned int *,
-                  const unsigned int *)
+                  size_type *,
+                  const size_type *)
     {
       AssertThrow (false,
                    ExcMessage("You can only use the HSL functions after putting "
@@ -293,7 +297,7 @@ struct SparseDirectMA27::DetachedModeData
             const std::size_t N,
             const char * /*debug_info*/) const
   {
-    unsigned int count = 0;
+    size_type count = 0;
     while (count < sizeof(T)*N)
       {
         // repeat writing until
@@ -332,7 +336,7 @@ struct SparseDirectMA27::DetachedModeData
             const std::size_t N,
             const char * /*debug_info*/) const
   {
-    unsigned int count = 0;
+    size_type count = 0;
     while (count < sizeof(T)*N)
       {
         int ret = -1;
@@ -532,19 +536,19 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
   // requested
   if (suppress_output)
     {
-      const unsigned int LP = 0;
+      const size_type LP = 0;
       call_ma27x3 (&LP);
     };
 
   sparsity_pattern = &sp;
 
-  const unsigned int
+  const size_type 
   n_rows           = sparsity_pattern->n_rows();
 
   // first count number of nonzero elements in the upper right part. the
   // matrix is symmetric, so this suffices
   n_nonzero_elements = 0;
-  for (unsigned int row=0; row<n_rows; ++row)
+  for (size_type row=0; row<n_rows; ++row)
     for (SparsityPattern::iterator col = sparsity_pattern->begin(row);
          col < sparsity_pattern->end(row); ++col)
       if (row <= col->column())
@@ -557,8 +561,8 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
   row_numbers.resize (n_nonzero_elements);
   column_numbers.resize (n_nonzero_elements);
 
-  unsigned int global_index = 0;
-  for (unsigned int row=0; row<n_rows; ++row)
+  size_type global_index = 0;
+  for (size_type row=0; row<n_rows; ++row)
     for (SparsityPattern::iterator col = sparsity_pattern->begin(row);
          col < sparsity_pattern->end(row); ++col)
       // note that the matrix must be
@@ -576,7 +580,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
 
   // initialize scratch arrays and
   // variables
-  LIW = static_cast<unsigned int>((2*n_nonzero_elements + 3*n_rows + 1) *
+  LIW = static_cast<size_type>((2*n_nonzero_elements + 3*n_rows + 1) *
                                   LIW_factor_1);
   IW.resize    (detached_mode_set() ? 0 : LIW);
   IKEEP.resize (detached_mode_set() ? 0 : 3*n_rows);
@@ -604,7 +608,7 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
         break;
 
       // otherwise: increase LIW and retry
-      LIW = static_cast<unsigned int>(LIW * LIW_increase_factor_1);
+      LIW = static_cast<size_type>(LIW * LIW_increase_factor_1);
       IW.resize (LIW);
     }
   while (true);
@@ -652,11 +656,11 @@ SparseDirectMA27::factorize (const SparseMatrix<number> &matrix)
   // if necessary extend IW
   if (LIW < NIRNEC * LIW_factor_2)
     {
-      LIW = static_cast<unsigned int>(NIRNEC * LIW_factor_2);
+      LIW = static_cast<size_type>(NIRNEC * LIW_factor_2);
       IW.resize (LIW);
     };
 
-  const unsigned int n_rows = matrix.get_sparsity_pattern().n_rows();
+  const size_type n_rows = matrix.get_sparsity_pattern().n_rows();
 
   // loop until memory requirements
   // are satisfied or we are not
@@ -678,7 +682,7 @@ SparseDirectMA27::factorize (const SparseMatrix<number> &matrix)
       // more used
       if (call_succeeded)
         {
-          std::vector<unsigned int> tmp1, tmp2, tmp3;
+          std::vector<size_type> tmp1, tmp2, tmp3;
           row_numbers.swap (tmp1);
           column_numbers.swap (tmp2);
           IKEEP.swap (tmp3);
@@ -697,7 +701,7 @@ SparseDirectMA27::factorize (const SparseMatrix<number> &matrix)
           if (LIW_increase_factor_2 <= 1)
             goto exit_loop;
 
-          LIW = static_cast<unsigned int>(LIW * LIW_increase_factor_2);
+          LIW = static_cast<size_type>(LIW * LIW_increase_factor_2);
           IW.resize (LIW);
           break;
         };
@@ -739,7 +743,7 @@ SparseDirectMA27::factorize (const SparseMatrix<number> &matrix)
           // allocation.
           std::cout << "<*>" << std::flush;
 
-          LA  = static_cast<unsigned int>(LA * LA_increase_factor);
+          LA  = static_cast<size_type>(LA * LA_increase_factor);
           if (true)
             {
               std::vector<double> tmp;
@@ -783,7 +787,7 @@ SparseDirectMA27::solve (Vector<double> &rhs_and_solution) const
 {
   Assert (factorize_called == true, ExcFactorizeNotCalled());
 
-  const unsigned int n_rows = rhs_and_solution.size();
+  const size_type n_rows = rhs_and_solution.size();
   call_ma27cd (&n_rows, &A[0], &LA,
                &IW[0], &LIW, &MAXFRT,
                &rhs_and_solution(0), &IW1[0], &NSTEPS);
@@ -802,7 +806,7 @@ SparseDirectMA27::solve (Vector<float> &rhs_and_solution) const
   Vector<double> tmp (rhs_and_solution.size());
   tmp = rhs_and_solution;
 
-  const unsigned int n_rows = rhs_and_solution.size();
+  const size_type n_rows = rhs_and_solution.size();
   call_ma27cd (&n_rows, &A[0], &LA,
                &IW[0], &LIW, &MAXFRT,
                &tmp(0), &IW1[0], &NSTEPS);
@@ -858,10 +862,10 @@ SparseDirectMA27::fill_A (const SparseMatrix<number> &matrix)
 
   const SparsityPattern &sparsity_pattern = matrix.get_sparsity_pattern ();
 
-  const unsigned int n_rows = sparsity_pattern.n_rows();
+  const size_type n_rows = sparsity_pattern.n_rows();
 
-  unsigned int global_index = 0;
-  for (unsigned int row=0; row<n_rows; ++row)
+  size_type global_index = 0;
+  for (size_type row=0; row<n_rows; ++row)
     for (typename SparseMatrix<number>::const_iterator col=matrix.begin(row);
          col < matrix.end(row); ++col)
       // note that the matrix must be
@@ -898,16 +902,16 @@ SparseDirectMA27::fill_A (const SparseMatrix<number> &matrix)
 
 
 
-void SparseDirectMA27::call_ma27ad (const unsigned int *N,
-                                    const unsigned int *NZ,
-                                    const unsigned int *IRN,
-                                    const unsigned int *ICN,
-                                    unsigned int       *IW,
-                                    const unsigned int *LIW,
-                                    unsigned int       *IKEEP,
-                                    unsigned int       *IW1,
-                                    unsigned int       *NSTEPS,
-                                    int                *IFLAG)
+void SparseDirectMA27::call_ma27ad (const size_type *N,
+                                    const size_type *NZ,
+                                    const size_type *IRN,
+                                    const size_type *ICN,
+                                    size_type       *IW,
+                                    const size_type *LIW,
+                                    size_type       *IKEEP,
+                                    size_type       *IW1,
+                                    size_type       *NSTEPS,
+                                    int             *IFLAG)
 {
   if (detached_mode_set() == false)
     HSL::MA27::ma27ad_ (N, NZ, IRN, ICN, IW, LIW,
@@ -942,19 +946,19 @@ void SparseDirectMA27::call_ma27ad (const unsigned int *N,
 
 
 
-void SparseDirectMA27::call_ma27bd (const unsigned int *N,
-                                    const unsigned int *NZ,
-                                    const unsigned int *IRN,
-                                    const unsigned int *ICN,
-                                    double             *A,
-                                    const unsigned int *LA,
-                                    unsigned int       *IW,
-                                    const unsigned int *LIW,
-                                    const unsigned int *IKEEP,
-                                    const unsigned int *NSTEPS,
-                                    unsigned int       *MAXFRT,
-                                    unsigned int       *IW1,
-                                    int                *IFLAG)
+void SparseDirectMA27::call_ma27bd (const size_type *N,
+                                    const size_type *NZ,
+                                    const size_type *IRN,
+                                    const size_type *ICN,
+                                    double          *A,
+                                    const size_type *LA,
+                                    size_type       *IW,
+                                    const size_type *LIW,
+                                    const size_type *IKEEP,
+                                    const size_type *NSTEPS,
+                                    size_type       *MAXFRT,
+                                    size_type       *IW1,
+                                    int             *IFLAG)
 {
   if (detached_mode_set() == false)
     HSL::MA27::ma27bd_ (N, NZ, IRN, ICN, A, LA, IW, LIW,
@@ -978,15 +982,15 @@ void SparseDirectMA27::call_ma27bd (const unsigned int *N,
 
 
 
-void SparseDirectMA27::call_ma27cd (const unsigned int *N,
-                                    const double       *A,
-                                    const unsigned int *LA,
-                                    const unsigned int *IW,
-                                    const unsigned int *LIW,
-                                    const unsigned int *MAXFRT,
-                                    double             *RHS,
-                                    const unsigned int *IW1,
-                                    const unsigned int *NSTEPS) const
+void SparseDirectMA27::call_ma27cd (const size_type *N,
+                                    const double    *A,
+                                    const size_type *LA,
+                                    const size_type *IW,
+                                    const size_type *LIW,
+                                    const size_type *MAXFRT,
+                                    double          *RHS,
+                                    const size_type *IW1,
+                                    const size_type *NSTEPS) const
 {
   if (detached_mode_set() == false)
     {
@@ -1006,7 +1010,7 @@ void SparseDirectMA27::call_ma27cd (const unsigned int *N,
 
 
 
-void SparseDirectMA27::call_ma27x1 (unsigned int *NRLNEC)
+void SparseDirectMA27::call_ma27x1 (size_type *NRLNEC)
 {
   if (detached_mode_set() == false)
     HSL::MA27::ma27x1_ (NRLNEC);
@@ -1023,7 +1027,7 @@ void SparseDirectMA27::call_ma27x1 (unsigned int *NRLNEC)
 
 
 
-void SparseDirectMA27::call_ma27x2 (unsigned int *NIRNEC)
+void SparseDirectMA27::call_ma27x2 (size_type *NIRNEC)
 {
   if (detached_mode_set() == false)
     HSL::MA27::ma27x2_ (NIRNEC);
@@ -1040,7 +1044,7 @@ void SparseDirectMA27::call_ma27x2 (unsigned int *NIRNEC)
 
 
 
-void SparseDirectMA27::call_ma27x3 (const unsigned int *LP)
+void SparseDirectMA27::call_ma27x3 (const size_type *LP)
 {
   if (detached_mode_set() == false)
     HSL::MA27::ma27x3_ (LP);
@@ -1101,7 +1105,7 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
   matrix = &m;
   const SparsityPattern &sparsity_pattern = matrix->get_sparsity_pattern();
 
-  const unsigned int
+  const size_type 
   n_rows           = sparsity_pattern.n_rows();
 
   // first count number of nonzero
@@ -1109,7 +1113,7 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
   // part. the matrix is symmetric,
   // so this suffices
   n_nonzero_elements = 0;
-  for (unsigned int row=0; row<n_rows; ++row)
+  for (size_type row=0; row<n_rows; ++row)
     for (SparseMatrix<double>::const_iterator col = m.begin(row);
          col < m.end(row); ++col)
       // skip zero elements, as required by the docs of MA47
@@ -1126,8 +1130,8 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
   row_numbers.resize (n_nonzero_elements);
   column_numbers.resize (n_nonzero_elements);
 
-  unsigned int global_index = 0;
-  for (unsigned int row=0; row<n_rows; ++row)
+  size_type global_index = 0;
+  for (size_type row=0; row<n_rows; ++row)
     for (SparseMatrix<double>::const_iterator col = m.begin(row);
          col < m.end(row); ++col)
       // note that the matrix must be
@@ -1145,7 +1149,7 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
 
   // initialize scratch arrays and
   // variables
-  LIW = static_cast<unsigned int>((2*n_nonzero_elements + 5*n_rows + 4) *
+  LIW = static_cast<size_type>((2*n_nonzero_elements + 5*n_rows + 4) *
                                   LIW_factor_1);
   IW.resize (LIW);
   KEEP.resize (n_nonzero_elements + 5*n_rows + 2);
@@ -1166,7 +1170,7 @@ SparseDirectMA47::initialize (const SparseMatrix<double> &m)
         break;
 
       // otherwise: increase LIW and retry
-      LIW = static_cast<unsigned int>(LIW * LIW_increase_factor_1);
+      LIW = static_cast<size_type>(LIW * LIW_increase_factor_1);
       IW.resize (LIW);
     }
   while (true);
@@ -1205,11 +1209,11 @@ SparseDirectMA47::factorize (const SparseMatrix<double> &m)
   // if necessary extend IW
   if (LIW < INFO[6] * LIW_factor_2)
     {
-      LIW = static_cast<unsigned int>(INFO[6] * LIW_factor_2);
+      LIW = static_cast<size_type>(INFO[6] * LIW_factor_2);
       IW.resize (LIW);
     };
 
-  const unsigned int n_rows = m.get_sparsity_pattern().n_rows();
+  const size_type n_rows = m.get_sparsity_pattern().n_rows();
   IW1.resize (2*n_rows+2);
 
   // output info flags
@@ -1237,7 +1241,7 @@ SparseDirectMA47::factorize (const SparseMatrix<double> &m)
           if (LIW_increase_factor_2 <= 1)
             goto exit_loop;
 
-          LIW = static_cast<unsigned int>(LIW * LIW_increase_factor_2);
+          LIW = static_cast<size_type>(LIW * LIW_increase_factor_2);
           IW.resize (LIW);
           break;
         };
@@ -1279,7 +1283,7 @@ SparseDirectMA47::factorize (const SparseMatrix<double> &m)
           // allocation.
           std::cout << "<*>" << std::flush;
 
-          LA  = static_cast<unsigned int>(LA * LA_increase_factor);
+          LA  = static_cast<size_type>(LA * LA_increase_factor);
           if (true)
             {
               std::vector<double> tmp;
@@ -1319,7 +1323,7 @@ SparseDirectMA47::solve (Vector<double> &rhs_and_solution)
 {
   Assert (factorize_called == true, ExcFactorizeNotCalled());
 
-  const unsigned int n_rows = rhs_and_solution.size();
+  const size_type n_rows = rhs_and_solution.size();
   call_ma47cd (&n_rows, &A[0], &LA,
                &IW[0], &LIW,
                &rhs_and_solution(0), &IW1[0], &ICNTL[0]);
@@ -1367,10 +1371,10 @@ SparseDirectMA47::fill_A (const SparseMatrix<double> &matrix)
 
   const SparsityPattern &sparsity_pattern = matrix.get_sparsity_pattern ();
 
-  const unsigned int n_rows = sparsity_pattern.n_rows();
+  const size_type n_rows = sparsity_pattern.n_rows();
 
-  unsigned int global_index = 0;
-  for (unsigned int row=0; row<n_rows; ++row)
+  size_type global_index = 0;
+  for (size_type row=0; row<n_rows; ++row)
     for (SparseMatrix<double>::const_iterator col=matrix.begin(row);
          col < matrix.end(row); ++col)
       // note that the matrix must be
@@ -1415,13 +1419,13 @@ SparseDirectMA47::call_ma47id (double       *CNTL,   // length 2
 
 void
 SparseDirectMA47::
-call_ma47ad (const unsigned int *n_rows,             //scalar
-             const unsigned int *n_nonzero_elements, //scalar
-             unsigned int       *row_numbers,        //length n_nonzero
-             unsigned int       *column_numbers,     //length n_nonzero
-             unsigned int       *IW,                 //length LIW
-             const unsigned int *LIW,                //scalar
-             unsigned int       *KEEP,               //n_nonzero+5*n_rows+2
+call_ma47ad (const size_type    *n_rows,             //scalar
+             const size_type    *n_nonzero_elements, //scalar
+             size_type          *row_numbers,        //length n_nonzero
+             size_type          *column_numbers,     //length n_nonzero
+             size_type          *IW,                 //length LIW
+             const size_type    *LIW,                //scalar
+             size_type          *KEEP,               //n_nonzero+5*n_rows+2
              const unsigned int *ICNTL,              //length 7
              int                *INFO)               //length 24
 {
@@ -1436,17 +1440,17 @@ call_ma47ad (const unsigned int *n_rows,             //scalar
 
 void
 SparseDirectMA47::
-call_ma47bd (const unsigned int *n_rows,             //scalar
-             const unsigned int *n_nonzero_elements, //scalar
-             const unsigned int *column_numbers,     //length n_nonzero
+call_ma47bd (const size_type    *n_rows,             //scalar
+             const size_type    *n_nonzero_elements, //scalar
+             const size_type    *column_numbers,     //length n_nonzero
              double             *A,                  //length LA
-             const unsigned int *LA,                 //scalar
-             unsigned int       *IW,                 //length LIW
-             const unsigned int *LIW,                //scalar
-             const unsigned int *KEEP,               //n_nonzero+5*n_rows+2
+             const size_type    *LA,                 //scalar
+             size_type          *IW,                 //length LIW
+             const size_type    *LIW,                //scalar
+             const size_type    *KEEP,               //n_nonzero+5*n_rows+2
              const double       *CNTL,               //length 2
              const unsigned int *ICNTL,              //length 7
-             unsigned int       *IW1,                //2*n_rows+2
+             size_type          *IW1,                //2*n_rows+2
              int                *INFO)               //length 24
 {
   double RINFO[4];
@@ -1460,13 +1464,13 @@ call_ma47bd (const unsigned int *n_rows,             //scalar
 
 void
 SparseDirectMA47::
-call_ma47cd (const unsigned int *n_rows,           //scalar
+call_ma47cd (const size_type    *n_rows,           //scalar
              const double       *A,                //length LA
-             const unsigned int *LA,               //scalar
-             const unsigned int *IW,               //length LIW
-             const unsigned int *LIW,              //scalar
+             const size_type    *LA,               //scalar
+             const size_type    *IW,               //length LIW
+             const size_type    *LIW,              //scalar
              double             *rhs_and_solution, //length n_rows
-             unsigned int       *IW1,              //length 2*n_rows+2
+             size_type          *IW1,              //length 2*n_rows+2
              const unsigned int *ICNTL)            //length 7
 {
   std::vector<double> W(*n_rows);
@@ -1555,7 +1559,7 @@ sort_arrays (const SparseMatrix<number> &matrix)
   // second entry in a row
   //
   // ignore rows with only one or no entry
-  for (unsigned int row=0; row<matrix.m(); ++row)
+  for (size_type row=0; row<matrix.m(); ++row)
     {
       // we may have to move some elements
       // that are left of the diagonal but
@@ -1595,7 +1599,7 @@ SparseDirectUMFPACK::
 sort_arrays (const SparseMatrixEZ<number> &matrix)
 {
   //same thing for SparseMatrixEZ
-  for (unsigned int row=0; row<matrix.m(); ++row)
+  for (size_type row=0; row<matrix.m(); ++row)
     {
       long int cursor = Ap[row];
       while ((cursor < Ap[row+1]-1) &&
@@ -1626,10 +1630,10 @@ sort_arrays (const BlockSparseMatrix<number> &matrix)
   // columns. we can do the same
   // thing as above, but we have to
   // do it multiple times
-  for (unsigned int row=0; row<matrix.m(); ++row)
+  for (size_type row=0; row<matrix.m(); ++row)
     {
       long int cursor = Ap[row];
-      for (unsigned int block=0; block<matrix.n_block_cols(); ++block)
+      for (size_type block=0; block<matrix.n_block_cols(); ++block)
         {
 
           // find the next
@@ -1669,7 +1673,7 @@ factorize (const Matrix &matrix)
 
   clear ();
 
-  const unsigned int N = matrix.m();
+  const size_type N = matrix.m();
 
   // copy over the data from the matrix to
   // the data structures UMFPACK wants. note
@@ -1706,9 +1710,9 @@ factorize (const Matrix &matrix)
 
   // first fill row lengths array
   Ap[0] = 0;
-  for (unsigned int row=1; row<=N; ++row)
+  for (size_type row=1; row<=N; ++row)
     Ap[row] = Ap[row-1] + matrix.get_row_length(row-1);
-  Assert (static_cast<unsigned int>(Ap.back()) == Ai.size(),
+  Assert (static_cast<size_type>(Ap.back()) == Ai.size(),
           ExcInternalError());
 
   // then copy over matrix
@@ -1728,7 +1732,7 @@ factorize (const Matrix &matrix)
 
     // loop over the elements of the matrix row by row, as suggested
     // in the documentation of the sparse matrix iterator class
-    for (unsigned int row = 0; row < matrix.m(); ++row)
+    for (size_type row = 0; row < matrix.m(); ++row)
       {
         for (typename Matrix::const_iterator p=matrix.begin(row);
             p!=matrix.end(row); ++p)
@@ -1745,7 +1749,7 @@ factorize (const Matrix &matrix)
 
     // at the end, we should have
     // written all rows completely
-    for (unsigned int i=0; i<Ap.size()-1; ++i)
+    for (size_type i=0; i<Ap.size()-1; ++i)
       Assert (row_pointers[i] == Ap[i+1], ExcInternalError());
   }
 
@@ -1958,11 +1962,11 @@ void SparseDirectMUMPS::initialize_matrix (const Matrix &matrix)
       irn = new int[nz];
       jcn = new int[nz];
 
-      unsigned int index = 0;
+      size_type index = 0;
 
       // loop over the elements of the matrix row by row, as suggested
       // in the documentation of the sparse matrix iterator class
-      for (unsigned int row = 0; row < matrix.m(); ++row)
+      for (size_type row = 0; row < matrix.m(); ++row)
         {
           for (typename Matrix::const_iterator ptr = matrix.begin (row);
               ptr != matrix.end (row); ++ptr)
@@ -2004,7 +2008,7 @@ void SparseDirectMUMPS::initialize (const Matrix &matrix,
       // Object denoting a MUMPS data structure
       rhs = new double[n];
 
-      for (unsigned int i = 0; i < n; ++i)
+      for (size_type i = 0; i < n; ++i)
         rhs[i] = vector (i);
 
       id.rhs = rhs;
@@ -2016,7 +2020,7 @@ void SparseDirectMUMPS::copy_solution (Vector<double> &vector)
   // Copy solution into the given vector
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-      for (unsigned int i=0; i<n; ++i)
+      for (size_type i=0; i<n; ++i)
         vector(i) = rhs[i];
 
       delete[] rhs;
@@ -2066,7 +2070,7 @@ void SparseDirectMUMPS::vmult (Vector<double>       &dst,
       // Object denoting a MUMPS data structure:
       rhs = new double[n];
 
-      for (unsigned int i = 0; i < n; ++i)
+      for (size_type i = 0; i < n; ++i)
         rhs[i] = src (i);
 
       id.rhs = rhs;

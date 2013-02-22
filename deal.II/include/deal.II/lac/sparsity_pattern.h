@@ -52,12 +52,17 @@ namespace internals
   namespace SparsityPatternTools
   {
     /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
+    /**
      * Helper function to get the column index from a dereferenced iterator in
      * the copy_from() function, if the inner iterator type points to plain
      * unsigned integers.
      */
-    unsigned int
-    get_column_index_from_iterator (const unsigned int i);
+    size_type 
+    get_column_index_from_iterator (const size_type i);
 
     /**
      * Helper function to get the column index from a dereferenced iterator in
@@ -65,8 +70,8 @@ namespace internals
      * unsigned integers and some other value.
      */
     template <typename value>
-    unsigned int
-    get_column_index_from_iterator (const std::pair<unsigned int, value> &i);
+    size_type 
+    get_column_index_from_iterator (const std::pair<size_type, value> &i);
 
     /**
      * Likewise, but sometimes needed for certain types of containers that
@@ -74,8 +79,8 @@ namespace internals
      * <tt>std::map</tt>).
      */
     template <typename value>
-    unsigned int
-    get_column_index_from_iterator (const std::pair<const unsigned int, value> &i);
+    size_type 
+    get_column_index_from_iterator (const std::pair<const size_type, value> &i);
 
   }
 }
@@ -88,6 +93,11 @@ namespace SparsityPatternIterators
 {
   // forward declaration
   class Iterator;
+
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
 
   /**
    * Accessor class for iterators into sparsity patterns. This class is
@@ -112,8 +122,8 @@ namespace SparsityPatternIterators
      * with a global index instead.
      */
     Accessor (const SparsityPattern *matrix,
-              const unsigned int     row,
-              const unsigned int     index) DEAL_II_DEPRECATED;
+              const size_type        row,
+              const size_type        index) DEAL_II_DEPRECATED;
 
     /**
      * Constructor.
@@ -130,19 +140,19 @@ namespace SparsityPatternIterators
      * Row number of the element represented by this object. This function can
      * only be called for entries for which is_valid_entry() is true.
      */
-    unsigned int row () const;
+    size_type row () const;
 
     /**
      * Index within the current row of the element represented by this object. This function
      * can only be called for entries for which is_valid_entry() is true.
      */
-    unsigned int index () const;
+    size_type index () const;
 
     /**
      * Column number of the element represented by this object. This function
      * can only be called for entries for which is_valid_entry() is true.
      */
-    unsigned int column () const;
+    size_type column () const;
 
     /**
      * Return whether the sparsity pattern entry pointed to by this iterator
@@ -237,8 +247,8 @@ namespace SparsityPatternIterators
      * with a global index instead.
      */
     Iterator (const SparsityPattern *sp,
-              const unsigned int     row,
-              const unsigned int     index) DEAL_II_DEPRECATED;
+              const size_type        row,
+              const size_type        index) DEAL_II_DEPRECATED;
 
     /**
      * Constructor. Create an iterator into the sparsity pattern @p sp for the
@@ -335,6 +345,11 @@ class SparsityPattern : public Subscriptor
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Typedef an iterator class that allows to walk over all nonzero elements
    * of a sparsity pattern.
    */
@@ -349,7 +364,7 @@ public:
    * @deprecated This typedef is deprecated. Use proper iterators instead.
    */
   typedef
-  const unsigned int *row_iterator;
+  const size_type *row_iterator;
 
   /**
    * Typedef an iterator class that allows to walk over all nonzero elements
@@ -377,7 +392,7 @@ public:
    * perform some optimizations, but the actual value of the variable may
    * change over time.
    */
-  static const unsigned int invalid_entry = numbers::invalid_unsigned_int;
+  static const size_type invalid_entry = numbers::invalid_size_type;
 
   /**
    * @name Construction and setup
@@ -419,9 +434,9 @@ public:
    * @deprecated Use the constructor without the last argument since
    *   it is ignored.
    */
-  SparsityPattern (const unsigned int m,
-                   const unsigned int n,
-                   const unsigned int max_per_row,
+  SparsityPattern (const size_type m,
+                   const size_type n,
+                   const size_type max_per_row,
                    const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -431,9 +446,9 @@ public:
    * @arg n number of columns
    * @arg max_per_row maximum number of nonzero entries per row
    */
-  SparsityPattern (const unsigned int m,
-                   const unsigned int n,
-                   const unsigned int max_per_row);
+  SparsityPattern (const size_type m,
+                   const size_type n,
+                   const size_type max_per_row);
 
   /**
    * Initialize a rectangular matrix.
@@ -447,9 +462,9 @@ public:
    * @deprecated Use the constructor without the last argument since
    *   it is ignored.
    */
-  SparsityPattern (const unsigned int               m,
-                   const unsigned int               n,
-                   const std::vector<unsigned int> &row_lengths,
+  SparsityPattern (const size_type               m,
+                   const size_type               n,
+                   const std::vector<size_type> &row_lengths,
                    const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -460,9 +475,9 @@ public:
    * @arg row_lengths possible number of nonzero entries for each row.  This
    * vector must have one entry for each row.
    */
-  SparsityPattern (const unsigned int               m,
-                   const unsigned int               n,
-                   const std::vector<unsigned int> &row_lengths);
+  SparsityPattern (const size_type               m,
+                   const size_type               n,
+                   const std::vector<size_type> &row_lengths);
 
   /**
    * Initialize a quadratic matrix of dimension <tt>n</tt> with at most
@@ -472,8 +487,8 @@ public:
    * elements. To avoid this, use the constructor taking row and column
    * numbers separately.
    */
-  SparsityPattern (const unsigned int n,
-                   const unsigned int max_per_row);
+  SparsityPattern (const size_type n,
+                   const size_type max_per_row);
 
   /**
    * Initialize a quadratic matrix.
@@ -486,8 +501,8 @@ public:
    * @deprecated Use the constructor without the last argument since
    *   it is ignored.
    */
-  SparsityPattern (const unsigned int               m,
-                   const std::vector<unsigned int> &row_lengths,
+  SparsityPattern (const size_type               m,
+                   const std::vector<size_type> &row_lengths,
                    const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -497,8 +512,8 @@ public:
    * @arg row_lengths possible number of nonzero entries for each row.  This
    * vector must have one entry for each row.
    */
-  SparsityPattern (const unsigned int               m,
-                   const std::vector<unsigned int> &row_lengths);
+  SparsityPattern (const size_type               m,
+                   const std::vector<size_type> &row_lengths);
 
   /**
    * Make a copy with extra off-diagonals.
@@ -523,8 +538,8 @@ public:
    * compressed after this function finishes.
    */
   SparsityPattern (const SparsityPattern &original,
-                   const unsigned int      max_per_row,
-                   const unsigned int      extra_off_diagonals);
+                   const size_type        max_per_row,
+                   const size_type        extra_off_diagonals);
 
   /**
    * Destructor.
@@ -549,9 +564,9 @@ public:
    * @deprecated The last argument of this function is ignored. Use the
    *     version of this function without the last argument.
    */
-  void reinit (const unsigned int m,
-               const unsigned int n,
-               const unsigned int max_per_row,
+  void reinit (const size_type m,
+               const size_type n,
+               const size_type max_per_row,
                const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -562,9 +577,9 @@ public:
    * This function simply maps its operations to the other <tt>reinit</tt>
    * function.
    */
-  void reinit (const unsigned int m,
-               const unsigned int n,
-               const unsigned int max_per_row);
+  void reinit (const size_type m,
+               const size_type n,
+               const size_type max_per_row);
 
   /**
    * Reallocate memory for a matrix of size <tt>m x n</tt>. The number of
@@ -583,9 +598,9 @@ public:
    * @deprecated The last argument of this function is ignored. Use the
    *     version of this function without the last argument.
    */
-  void reinit (const unsigned int               m,
-               const unsigned int               n,
-               const std::vector<unsigned int> &row_lengths,
+  void reinit (const size_type               m,
+               const size_type               n,
+               const std::vector<size_type> &row_lengths,
                const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -602,9 +617,9 @@ public:
    * is true, diagonal elements are stored first in each row to allow
    * optimized access in relaxation methods of SparseMatrix.
    */
-  void reinit (const unsigned int               m,
-               const unsigned int               n,
-               const std::vector<unsigned int> &row_lengths);
+  void reinit (const size_type               m,
+               const size_type               n,
+               const std::vector<size_type> &row_lengths);
 
   /**
    * Same as above, but with a VectorSlice argument instead.
@@ -612,17 +627,17 @@ public:
    * @deprecated The last argument of this function is ignored. Use the
    *     version of this function without the last argument.
    */
-  void reinit (const unsigned int               m,
-               const unsigned int               n,
-               const VectorSlice<const std::vector<unsigned int> > &row_lengths,
+  void reinit (const size_type                                   m,
+               const size_type                                   n,
+               const VectorSlice<const std::vector<size_type> > &row_lengths,
                const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
    * Same as above, but with a VectorSlice argument instead.
    */
-  void reinit (const unsigned int               m,
-               const unsigned int               n,
-               const VectorSlice<const std::vector<unsigned int> > &row_lengths);
+  void reinit (const size_type                                   m,
+               const size_type                                   n,
+               const VectorSlice<const std::vector<size_type> > &row_lengths);
 
   /**
    * This function compresses the sparsity structure that this object
@@ -718,8 +733,8 @@ public:
    *     version of this function without the last argument.
    */
   template <typename ForwardIterator>
-  void copy_from (const unsigned int    n_rows,
-                  const unsigned int    n_cols,
+  void copy_from (const size_type       n_rows,
+                  const size_type       n_cols,
                   const ForwardIterator begin,
                   const ForwardIterator end,
                   const bool optimize_diagonal) DEAL_II_DEPRECATED;
@@ -801,8 +816,8 @@ public:
    * iterators that point to such pairs.
    */
   template <typename ForwardIterator>
-  void copy_from (const unsigned int    n_rows,
-                  const unsigned int    n_cols,
+  void copy_from (const size_type n_rows,
+                  const size_type n_cols,
                   const ForwardIterator begin,
                   const ForwardIterator end);
 
@@ -867,8 +882,8 @@ public:
    *
    * If the entry already exists, nothing bad happens.
    */
-  void add (const unsigned int i,
-            const unsigned int j);
+  void add (const size_type i,
+            const size_type j);
 
   /**
    * Add several nonzero entries to the specified matrix row.  This function
@@ -877,10 +892,10 @@ public:
    * If some of the entries already exist, nothing bad happens.
    */
   template <typename ForwardIterator>
-  void add_entries (const unsigned int row,
-                    ForwardIterator    begin,
-                    ForwardIterator    end,
-                    const bool         indices_are_sorted = false);
+  void add_entries (const size_type row,
+                    ForwardIterator begin,
+                    ForwardIterator end,
+                    const bool      indices_are_sorted = false);
 
 // @}
   /**
@@ -914,7 +929,7 @@ public:
    * Note also the discussion in the general documentation of this class about
    * the order in which elements are accessed.
    */
-  iterator begin (const unsigned int r) const;
+  iterator begin (const size_type r) const;
 
   /**
    * Final iterator of row <tt>r</tt>. It points to the first element past the
@@ -924,7 +939,7 @@ public:
    * particular the case if it is the end iterator for the last row of a
    * matrix.
    */
-  iterator end (const unsigned int r) const;
+  iterator end (const size_type r) const;
 
   /**
    * STL-like iterator with the first entry of row <tt>r</tt>.
@@ -937,7 +952,7 @@ public:
    * @deprecated Use the iterators provided by the begin() and end()
    * functions instead.
    */
-  row_iterator row_begin (const unsigned int r) const DEAL_II_DEPRECATED;
+  row_iterator row_begin (const size_type r) const DEAL_II_DEPRECATED;
 
   /**
    * Final iterator of row <tt>r</tt>. It points to the first element past the
@@ -950,7 +965,7 @@ public:
    * @deprecated Use the iterators provided by the begin() and end()
    * functions instead.
    */
-  row_iterator row_end (const unsigned int r) const DEAL_II_DEPRECATED;
+  row_iterator row_end (const size_type r) const DEAL_II_DEPRECATED;
 
 // @}
   /**
@@ -973,7 +988,7 @@ public:
    * equals the number given to the constructor, while after compression, it
    * equals the maximum number of entries actually allocated by the user.
    */
-  unsigned int max_entries_per_row () const;
+  size_type max_entries_per_row () const;
 
   /**
    * Compute the bandwidth of the matrix represented by this structure. The
@@ -981,7 +996,7 @@ public:
    * represents a nonzero entry of the matrix. Consequently, the maximum
    * bandwidth a $n\times m$ matrix can have is $\max\{n-1,m-1\}$.
    */
-  unsigned int bandwidth () const;
+  size_type bandwidth () const;
 
   /**
    * Return the number of nonzero elements of this matrix. Actually, it
@@ -991,7 +1006,7 @@ public:
    * This function may only be called if the matrix struct is compressed. It
    * does not make too much sense otherwise anyway.
    */
-  std::size_t n_nonzero_elements () const;
+  size_type n_nonzero_elements () const;
 
   /**
    * Return whether the structure is compressed or not.
@@ -1002,18 +1017,18 @@ public:
    * Return number of rows of this matrix, which equals the dimension of the
    * image space.
    */
-  unsigned int n_rows () const;
+  size_type n_rows () const;
 
   /**
    * Return number of columns of this matrix, which equals the dimension of
    * the range space.
    */
-  unsigned int n_cols () const;
+  size_type n_cols () const;
 
   /**
    * Number of entries in a specific row.
    */
-  unsigned int row_length (const unsigned int row) const;
+  size_type row_length (const size_type row) const;
 
   /**
    * Determine whether the matrix uses the special convention for quadratic
@@ -1071,8 +1086,8 @@ public:
    * single row. In such cases, it is more efficient to use iterators over
    * the elements of the sparsity pattern or of the sparse matrix.
    */
-  unsigned int operator() (const unsigned int i,
-                           const unsigned int j) const;
+  size_type operator() (const size_type i,
+                        const size_type j) const;
 
   /**
    * This is the inverse operation to operator()(): given a global index, find
@@ -1085,14 +1100,14 @@ public:
    * If <tt>N</tt> is the number of rows of this matrix, then the complexity
    * of this function is <i>log(N)</i>.
    */
-  std::pair<unsigned int, unsigned int>
-  matrix_position (const unsigned int global_index) const;
+  std::pair<size_type, size_type>
+  matrix_position (const size_type global_index) const;
 
   /**
    * Check if a value at a certain position may be non-zero.
    */
-  bool exists (const unsigned int i,
-               const unsigned int j) const;
+  bool exists (const size_type i,
+               const size_type j) const;
 
   /**
    * The index of a global matrix entry in its row.
@@ -1101,8 +1116,8 @@ public:
    * with respect to the total field, but only with respect to the row
    * <tt>j</tt>.
    */
-  unsigned int row_position(const unsigned int i,
-                            const unsigned int j) const;
+  size_type row_position(const size_type i,
+                         const size_type j) const;
 
   /**
    * Access to column number field.  Return the column number of the
@@ -1115,8 +1130,8 @@ public:
    * i.e. <tt>column_number(row,i)</tt> <tt><</tt>
    * <tt>column_number(row,i+1)</tt>.
    */
-  unsigned int column_number (const unsigned int row,
-                              const unsigned int index) const;
+  size_type column_number (const size_type row,
+                           const size_type index) const;
 
 
 // @}
@@ -1268,7 +1283,7 @@ public:
    * yourself, you should also rename this function to avoid programs relying
    * on outdated information!
    */
-  const unsigned int *get_column_numbers () const DEAL_II_DEPRECATED;
+  const size_type *get_column_numbers () const DEAL_II_DEPRECATED;
 
   BOOST_SERIALIZATION_SPLIT_MEMBER()
   /** @addtogroup Exceptions
@@ -1326,24 +1341,24 @@ private:
    * be larger than #rows and in this case #rowstart has more elements than
    * are used.
    */
-  unsigned int max_dim;
+  size_type max_dim;
 
   /**
    * Number of rows that this sparsity structure shall represent.
    */
-  unsigned int rows;
+  size_type rows;
 
   /**
    * Number of columns that this sparsity structure shall represent.
    */
-  unsigned int cols;
+  size_type cols;
 
   /**
    * Size of the actually allocated array #colnums. Here, the same applies as
    * for the #rowstart array, i.e. it may be larger than the actually used
    * part of the array.
    */
-  std::size_t max_vec_len;
+  size_type max_vec_len;
 
   /**
    * Maximum number of elements per row. This is set to the value given to the
@@ -1352,7 +1367,7 @@ private:
    * reinit versions are called. Its value is more or less meaningless after
    * compress() has been called.
    */
-  unsigned int max_row_length;
+  size_type max_row_length;
 
   /**
    * Array which hold for each row which is the first element in #colnums
@@ -1391,7 +1406,7 @@ private:
    * sorted, such that finding whether an element exists and determining its
    * position can be done by a binary search.
    */
-  unsigned int *colnums;
+  size_type *colnums;
 
   /**
    * Store whether the compress() function was called for this object.
@@ -1433,8 +1448,8 @@ namespace SparsityPatternIterators
   inline
   Accessor::
   Accessor (const SparsityPattern *sparsity_pattern,
-            const unsigned int     r,
-            const unsigned int     i)
+            const size_type        r,
+            const size_type        i)
     :
     sparsity_pattern(sparsity_pattern),
     index_within_sparsity(sparsity_pattern->rowstart[r]+i)
@@ -1472,7 +1487,7 @@ namespace SparsityPatternIterators
 
 
   inline
-  unsigned int
+  size_type 
   Accessor::row() const
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
@@ -1486,7 +1501,7 @@ namespace SparsityPatternIterators
 
 
   inline
-  unsigned int
+  size_type 
   Accessor::column() const
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
@@ -1496,7 +1511,7 @@ namespace SparsityPatternIterators
 
 
   inline
-  unsigned int
+  size_type 
   Accessor::index() const
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
@@ -1541,8 +1556,8 @@ namespace SparsityPatternIterators
 
   inline
   Iterator::Iterator (const SparsityPattern *sparsity_pattern,
-                      const unsigned int     r,
-                      const unsigned int     i)
+                      const size_type        r,
+                      const size_type        i)
     :
     accessor(sparsity_pattern, sparsity_pattern->rowstart[r]+i)
   {}
@@ -1653,7 +1668,7 @@ SparsityPattern::end () const
 
 inline
 SparsityPattern::iterator
-SparsityPattern::begin (const unsigned int r) const
+SparsityPattern::begin (const size_type r) const
 {
   Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
 
@@ -1664,7 +1679,7 @@ SparsityPattern::begin (const unsigned int r) const
 
 inline
 SparsityPattern::iterator
-SparsityPattern::end (const unsigned int r) const
+SparsityPattern::end (const size_type r) const
 {
   Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
 
@@ -1675,7 +1690,7 @@ SparsityPattern::end (const unsigned int r) const
 
 inline
 SparsityPattern::row_iterator
-SparsityPattern::row_begin (const unsigned int r) const
+SparsityPattern::row_begin (const size_type r) const
 {
   Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
   return &colnums[rowstart[r]];
@@ -1685,7 +1700,7 @@ SparsityPattern::row_begin (const unsigned int r) const
 
 inline
 SparsityPattern::row_iterator
-SparsityPattern::row_end (const unsigned int r) const
+SparsityPattern::row_end (const size_type r) const
 {
   Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
   return &colnums[rowstart[r+1]];
@@ -1694,7 +1709,7 @@ SparsityPattern::row_end (const unsigned int r) const
 
 
 inline
-unsigned int
+SparsityPattern::size_type 
 SparsityPattern::n_rows () const
 {
   return rows;
@@ -1702,7 +1717,7 @@ SparsityPattern::n_rows () const
 
 
 inline
-unsigned int
+SparsityPattern::size_type 
 SparsityPattern::n_cols () const
 {
   return cols;
@@ -1742,7 +1757,7 @@ SparsityPattern::get_rowstart_indices () const
 
 
 inline
-const unsigned int *
+const SparsityPattern::size_type *
 SparsityPattern::get_column_numbers () const
 {
   return colnums;
@@ -1751,8 +1766,8 @@ SparsityPattern::get_column_numbers () const
 
 
 inline
-unsigned int
-SparsityPattern::row_length (const unsigned int row) const
+SparsityPattern::size_type 
+SparsityPattern::row_length (const size_type row) const
 {
   Assert(row<rows, ExcIndexRange(row,0,rows));
   return rowstart[row+1]-rowstart[row];
@@ -1761,9 +1776,9 @@ SparsityPattern::row_length (const unsigned int row) const
 
 
 inline
-unsigned int
-SparsityPattern::column_number (const unsigned int row,
-                                const unsigned int index) const
+SparsityPattern::size_type 
+SparsityPattern::column_number (const size_type row,
+                                const size_type index) const
 {
   Assert(row<rows, ExcIndexRange(row,0,rows));
   Assert(index<row_length(row), ExcIndexRange(index,0,row_length(row)));
@@ -1773,7 +1788,7 @@ SparsityPattern::column_number (const unsigned int row,
 
 
 inline
-std::size_t
+SparsityPattern::size_type
 SparsityPattern::n_nonzero_elements () const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
@@ -1786,7 +1801,7 @@ SparsityPattern::n_nonzero_elements () const
 template <class Archive>
 inline
 void
-SparsityPattern::save (Archive &ar, const unsigned int) const
+SparsityPattern::save (Archive &ar, const size_type) const
 {
   // forward to serialization function in the base class.
   ar   &static_cast<const Subscriptor &>(*this);
@@ -1802,15 +1817,15 @@ SparsityPattern::save (Archive &ar, const unsigned int) const
 template <class Archive>
 inline
 void
-SparsityPattern::load (Archive &ar, const unsigned int)
+SparsityPattern::load (Archive &ar, const size_type)
 {
   // forward to serialization function in the base class.
   ar   &static_cast<Subscriptor &>(*this);
 
   ar &max_dim &rows &cols &max_vec_len &max_row_length &compressed &store_diagonal_first_in_row;
 
-  rowstart = new std::size_t [max_dim + 1];
-  colnums = new unsigned int [max_vec_len];
+  rowstart = new size_type [max_dim + 1];
+  colnums = new size_type [max_vec_len];
 
   ar &boost::serialization::make_array(rowstart, max_dim + 1);
   ar &boost::serialization::make_array(colnums, max_vec_len);
@@ -1832,11 +1847,11 @@ SparsityPattern::operator == (const SparsityPattern &sp2)  const
       store_diagonal_first_in_row != sp2.store_diagonal_first_in_row)
     return false;
 
-  for (unsigned int i = 0; i < rows+1; ++i)
+  for (size_type i = 0; i < rows+1; ++i)
     if (rowstart[i] != sp2.rowstart[i])
       return false;
 
-  for (unsigned int i = 0; i < rowstart[rows]; ++i)
+  for (size_type i = 0; i < rowstart[rows]; ++i)
     if (colnums[i] != sp2.colnums[i])
       return false;
 
@@ -1848,10 +1863,15 @@ SparsityPattern::operator == (const SparsityPattern &sp2)  const
 namespace internal
 {
   namespace SparsityPatternTools
-  {
+  { 
+    /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;       
+   
     inline
-    unsigned int
-    get_column_index_from_iterator (const unsigned int i)
+    size_type 
+    get_column_index_from_iterator (const size_type i)
     {
       return i;
     }
@@ -1860,8 +1880,8 @@ namespace internal
 
     template <typename value>
     inline
-    unsigned int
-    get_column_index_from_iterator (const std::pair<unsigned int, value> &i)
+    size_type 
+    get_column_index_from_iterator (const std::pair<size_type, value> &i)
     {
       return i.first;
     }
@@ -1870,8 +1890,8 @@ namespace internal
 
     template <typename value>
     inline
-    unsigned int
-    get_column_index_from_iterator (const std::pair<const unsigned int, value> &i)
+    size_type 
+    get_column_index_from_iterator (const std::pair<const size_type, value> &i)
     {
       return i.first;
     }
@@ -1882,8 +1902,8 @@ namespace internal
 
 template <typename ForwardIterator>
 void
-SparsityPattern::copy_from (const unsigned int    n_rows,
-                            const unsigned int    n_cols,
+SparsityPattern::copy_from (const size_type       n_rows,
+                            const size_type       n_cols,
                             const ForwardIterator begin,
                             const ForwardIterator end,
                             const bool)
@@ -1895,12 +1915,12 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
 
 template <typename ForwardIterator>
 void
-SparsityPattern::copy_from (const unsigned int    n_rows,
-                            const unsigned int    n_cols,
+SparsityPattern::copy_from (const size_type       n_rows,
+                            const size_type       n_cols,
                             const ForwardIterator begin,
                             const ForwardIterator end)
 {
-  Assert (static_cast<unsigned int>(std::distance (begin, end)) == n_rows,
+  Assert (static_cast<size_type>(std::distance (begin, end)) == n_rows,
           ExcIteratorRange (std::distance (begin, end), n_rows));
 
   // first determine row lengths for each row. if the matrix is quadratic,
@@ -1908,7 +1928,7 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
   // is not yet present. as we have to call compress anyway later on, don't
   // bother to check whether that diagonal entry is in a certain row or not
   const bool is_square = (n_rows == n_cols);
-  std::vector<unsigned int> row_lengths;
+  std::vector<size_type> row_lengths;
   row_lengths.reserve(n_rows);
   for (ForwardIterator i=begin; i!=end; ++i)
     row_lengths.push_back (std::distance (i->begin(), i->end())
@@ -1921,15 +1941,15 @@ SparsityPattern::copy_from (const unsigned int    n_rows,
   //
   // for use in the inner loop, we define a typedef to the type of the inner
   // iterators
-  unsigned int row = 0;
+  size_type row = 0;
   typedef typename std::iterator_traits<ForwardIterator>::value_type::const_iterator inner_iterator;
   for (ForwardIterator i=begin; i!=end; ++i, ++row)
     {
-      unsigned int *cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
+      size_type *cols = &colnums[rowstart[row]] + (is_square ? 1 : 0);
       const inner_iterator end_of_row = i->end();
       for (inner_iterator j=i->begin(); j!=end_of_row; ++j)
         {
-          const unsigned int col
+          const size_type col
             = internal::SparsityPatternTools::get_column_index_from_iterator(*j);
           Assert (col < n_cols, ExcIndexRange(col,0,n_cols));
 

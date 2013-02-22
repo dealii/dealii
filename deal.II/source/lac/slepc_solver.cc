@@ -95,7 +95,7 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::solve (const unsigned int n_eigenvectors, unsigned int *n_converged)
+  SolverBase::solve (const size_type n_eigenvectors, size_type *n_converged)
   {
     int ierr;
 
@@ -204,7 +204,7 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::get_eigenpair (const unsigned int         index,
+  SolverBase::get_eigenpair (const size_type            index,
 #ifndef PETSC_USE_COMPLEX
                              double                    &kr,
 #else

@@ -192,6 +192,11 @@ class SparseDirectMA27 : public Subscriptor
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index  size_type;
+
+  /**
    * Constructor. See the
    * documentation of this class
    * for the meaning of the
@@ -458,14 +463,14 @@ private:
    * the sparsity pattern on and
    * above the diagonal.
    */
-  unsigned int n_nonzero_elements;
+  size_type n_nonzero_elements;
 
   /**
    * Arrays holding row and column
    * indices.
    */
-  std::vector<unsigned int> row_numbers;
-  std::vector<unsigned int> column_numbers;
+  std::vector<size_type> row_numbers;
+  std::vector<size_type> column_numbers;
 
   /**
    * Array to hold the matrix
@@ -477,7 +482,7 @@ private:
   /**
    * Length of the <tt>A</tt> array.
    */
-  unsigned int         LA;
+  size_type                 LA;
 
   /**
    * Scratch arrays and variables
@@ -488,13 +493,13 @@ private:
    * letters as is usual in
    * Fortran.
    */
-  unsigned int LIW;
-  std::vector<unsigned int> IW;
-  std::vector<unsigned int> IKEEP;
-  std::vector<unsigned int> IW1;
+  size_type LIW;
+  std::vector<size_type> IW;
+  std::vector<size_type> IKEEP;
+  std::vector<size_type> IW1;
 
-  unsigned int NSTEPS;
-  unsigned int MAXFRT;
+  size_type NSTEPS;
+  size_type MAXFRT;
 
   /**
    * Two values that live inside a
@@ -506,8 +511,8 @@ private:
    * from the Fortran functions to
    * the outside world.
    */
-  unsigned int NRLNEC;
-  unsigned int NIRNEC;
+  size_type NRLNEC;
+  size_type NIRNEC;
 
   /**
    * Flag indicating the level of
@@ -536,71 +541,71 @@ private:
    * with the given args, either
    * locally or remote.
    */
-  void call_ma27ad (const unsigned int *N,
-                    const unsigned int *NZ,
-                    const unsigned int *IRN,
-                    const unsigned int *ICN,
-                    unsigned int       *IW,
-                    const unsigned int *LIW,
-                    unsigned int       *IKEEP,
-                    unsigned int       *IW1,
-                    unsigned int       *NSTEPS,
-                    int                *IFLAG);
+  void call_ma27ad (const size_type *N,
+                    const size_type *NZ,
+                    const size_type *IRN,
+                    const size_type *ICN,
+                    size_type       *IW,
+                    const size_type *LIW,
+                    size_type       *IKEEP,
+                    size_type       *IW1,
+                    size_type       *NSTEPS,
+                    int             *IFLAG);
 
   /**
    * Call the respective function
    * with the given args, either
    * locally or remote.
    */
-  void call_ma27bd (const unsigned int *N,
-                    const unsigned int *NZ,
-                    const unsigned int *IRN,
-                    const unsigned int *ICN,
-                    double             *A,
-                    const unsigned int *LA,
-                    unsigned int       *IW,
-                    const unsigned int *LIW,
-                    const unsigned int *IKEEP,
-                    const unsigned int *NSTEPS,
-                    unsigned int       *MAXFRT,
-                    unsigned int       *IW1,
-                    int                *IFLAG);
+  void call_ma27bd (const size_type *N,
+                    const size_type *NZ,
+                    const size_type *IRN,
+                    const size_type *ICN,
+                    double          *A,
+                    const size_type *LA,
+                    size_type       *IW,
+                    const size_type *LIW,
+                    const size_type *IKEEP,
+                    const size_type *NSTEPS,
+                    size_type       *MAXFRT,
+                    size_type       *IW1,
+                    int             *IFLAG);
 
   /**
    * Call the respective function
    * with the given args, either
    * locally or remote.
    */
-  void call_ma27cd (const unsigned int *N,
-                    const double       *A,
-                    const unsigned int *LA,
-                    const unsigned int *IW,
-                    const unsigned int *LIW,
-                    const unsigned int *MAXFRT,
-                    double             *RHS,
-                    const unsigned int *IW1,
-                    const unsigned int *NSTEPS) const;
+  void call_ma27cd (const size_type *N,
+                    const double    *A,
+                    const size_type *LA,
+                    const size_type *IW,
+                    const size_type *LIW,
+                    const size_type *MAXFRT,
+                    double          *RHS,
+                    const size_type *IW1,
+                    const size_type *NSTEPS) const;
 
   /**
    * Call the respective function
    * with the given args, either
    * locally or remote.
    */
-  void call_ma27x1 (unsigned int *NRLNEC);
+  void call_ma27x1 (size_type *NRLNEC);
 
   /**
    * Call the respective function
    * with the given args, either
    * locally or remote.
    */
-  void call_ma27x2 (unsigned int *NIRNEC);
+  void call_ma27x2 (size_type *NIRNEC);
 
   /**
    * Call the respective function
    * with the given args, either
    * locally or remote.
    */
-  void call_ma27x3 (const unsigned int *LP);
+  void call_ma27x3 (const size_type *LP);
 };
 
 
@@ -681,6 +686,11 @@ private:
 class SparseDirectMA47 : public Subscriptor
 {
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
   /**
    * Constructor. See the
    * documentation of this class
@@ -896,13 +906,13 @@ private:
    * the sparsity pattern on and
    * above the diagonal.
    */
-  unsigned int n_nonzero_elements;
+  size_type n_nonzero_elements;
 
   /**
    * Control values set by <tt>MA47ID</tt>.
    */
-  double       CNTL[2];
-  unsigned int ICNTL[7];
+  double    CNTL[2];
+  size_type ICNTL[7];
 
   /**
    * Info field filled by the MA47
@@ -915,8 +925,8 @@ private:
    * Arrays holding row and column
    * indices.
    */
-  std::vector<unsigned int> row_numbers;
-  std::vector<unsigned int> column_numbers;
+  std::vector<size_type> row_numbers;
+  std::vector<size_type> column_numbers;
 
   /**
    * Array to hold the matrix
@@ -928,7 +938,7 @@ private:
   /**
    * Length of the <tt>A</tt> array.
    */
-  unsigned int         LA;
+  size_type                 LA;
 
   /**
    * Scratch arrays and variables
@@ -939,10 +949,10 @@ private:
    * letters as is usual in
    * Fortran.
    */
-  unsigned int LIW;
-  std::vector<unsigned int> IW;
-  std::vector<unsigned int> KEEP;
-  std::vector<unsigned int> IW1;
+  size_type LIW;
+  std::vector<size_type> IW;
+  std::vector<size_type> KEEP;
+  std::vector<size_type> IW1;
 
   /**
    * Mutex for synchronising access
@@ -961,52 +971,52 @@ private:
    * Call the <tt>ma47id</tt> function
    * with the given args.
    */
-  void call_ma47id (double       *CNTL,
-                    unsigned int *ICNTL);
+  void call_ma47id (double    *CNTL,
+                    size_type *ICNTL);
 
   /**
    * Call the <tt>ma47ad</tt> function
    * with the given args.
    */
-  void call_ma47ad (const unsigned int *n_rows,
-                    const unsigned int *n_nonzero_elements,
-                    unsigned int       *row_numbers,
-                    unsigned int       *column_numbers,
-                    unsigned int       *IW,
-                    const unsigned int *LIW,
-                    unsigned int       *KEEP,
-                    const unsigned int *ICNTL,
-                    int                *INFO);
+  void call_ma47ad (const size_type *n_rows,
+                    const size_type *n_nonzero_elements,
+                    size_type       *row_numbers,
+                    size_type       *column_numbers,
+                    size_type       *IW,
+                    const size_type *LIW,
+                    size_type       *KEEP,
+                    const size_type *ICNTL,
+                    int             *INFO);
 
   /**
    * Call the <tt>ma47bd</tt> function
    * with the given args.
    */
-  void call_ma47bd (const unsigned int *n_rows,
-                    const unsigned int *n_nonzero_elements,
-                    const unsigned int *column_numbers,
-                    double             *A,
-                    const unsigned int *LA,
-                    unsigned int       *IW,
-                    const unsigned int *LIW,
-                    const unsigned int *KEEP,
-                    const double       *CNTL,
-                    const unsigned int *ICNTL,
-                    unsigned int       *IW1,
-                    int                *INFO);
+  void call_ma47bd (const size_type *n_rows,
+                    const size_type *n_nonzero_elements,
+                    const size_type *column_numbers,
+                    double          *A,
+                    const size_type *LA,
+                    size_type       *IW,
+                    const size_type *LIW,
+                    const size_type *KEEP,
+                    const double    *CNTL,
+                    const size_type *ICNTL,
+                    size_type       *IW1,
+                    int             *INFO);
 
   /**
    * Call the <tt>ma47bd</tt> function
    * with the given args.
    */
-  void call_ma47cd (const unsigned int *n_rows,
-                    const double       *A,
-                    const unsigned int *LA,
-                    const unsigned int *IW,
-                    const unsigned int *LIW,
-                    double             *rhs_and_solution,
-                    unsigned int       *IW1,
-                    const unsigned int *ICNTL);
+  void call_ma47cd (const size_type *n_rows,
+                    const double    *A,
+                    const size_type *LA,
+                    const size_type *IW,
+                    const size_type *LIW,
+                    double          *rhs_and_solution,
+                    size_type       *IW1,
+                    const size_type *ICNTL);
 };
 
 
@@ -1304,12 +1314,12 @@ private:
   DMUMPS_STRUC_C id;
 #endif // DEAL_II_USE_MUMPS
 
-  double       *a;
-  double       *rhs;
-  int          *irn;
-  int          *jcn;
-  unsigned int  n;
-  unsigned int  nz;
+  double   *a;
+  double   *rhs;
+  int      *irn;
+  int      *jcn;
+  types::global_dof_index n;
+  types::global_dof_index nz;
 
   /**
    * This function initializes a MUMPS instance
@@ -1333,6 +1343,10 @@ private:
   bool initialize_called;
 
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
 
   /**
    * Constructor

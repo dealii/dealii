@@ -54,6 +54,11 @@ class SparseILU : public SparseLUDecomposition<number>
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Constructor. Does nothing.
    *
    * Call the @p initialize

@@ -72,6 +72,11 @@ class SolverCG : public Solver<VECTOR>
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Standardized data struct to pipe
    * additional data to the solver.
    */
@@ -403,7 +408,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
           if (additional_data.compute_all_condition_numbers && (diagonal.size()>1))
             {
               TridiagonalMatrix<double> T(diagonal.size(), true);
-              for (unsigned int i=0; i<diagonal.size(); ++i)
+              for (size_type i=0; i<diagonal.size(); ++i)
                 {
                   T(i,i) = diagonal[i];
                   if (i< diagonal.size()-1)
@@ -427,7 +432,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   if (do_eigenvalues)
     {
       TridiagonalMatrix<double> T(diagonal.size(), true);
-      for (unsigned int i=0; i<diagonal.size(); ++i)
+      for (size_type i=0; i<diagonal.size(); ++i)
         {
           T(i,i) = diagonal[i];
           if (i< diagonal.size()-1)
@@ -441,7 +446,7 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
                 T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
       if (additional_data.compute_eigenvalues)
         {
-          for (unsigned int i=0; i<T.n(); ++i)
+          for (size_type i=0; i<T.n(); ++i)
             deallog << ' ' << T.eigenvalue(i);
           deallog << std::endl;
         }

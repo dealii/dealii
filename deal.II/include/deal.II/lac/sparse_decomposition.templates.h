@@ -54,7 +54,7 @@ void SparseLUDecomposition<number>::clear()
 {
   decomposed = false;
 
-  std::vector<const unsigned int *> tmp;
+  std::vector<const size_type *> tmp;
   tmp.swap (prebuilt_lower_bound);
 
   SparseMatrix<number>::clear();
@@ -129,7 +129,7 @@ void SparseLUDecomposition<number>::initialize (
           typename SparsityPattern::ExcDiagonalNotOptimized());
   decomposed = false;
   {
-    std::vector<const unsigned int *> tmp;
+    std::vector<const size_type *> tmp;
     tmp.swap (prebuilt_lower_bound);
   }
   SparseMatrix<number>::reinit (*sparsity_pattern_to_use);
@@ -160,7 +160,7 @@ void SparseLUDecomposition<number>::reinit (const SparsityPattern &sparsity)
           typename SparsityPattern::ExcDiagonalNotOptimized());
   decomposed = false;
   {
-    std::vector<const unsigned int *> tmp;
+    std::vector<const size_type *> tmp;
     tmp.swap (prebuilt_lower_bound);
   }
   SparseMatrix<number>::reinit (sparsity);
@@ -172,15 +172,15 @@ template<typename number>
 void
 SparseLUDecomposition<number>::prebuild_lower_bound()
 {
-  const unsigned int *const
+  const size_type *const
     column_numbers = this->get_sparsity_pattern().colnums;
   const std::size_t *const
     rowstart_indices = this->get_sparsity_pattern().rowstart;
-  const unsigned int N = this->m();
+  const size_type N = this->m();
  
    prebuilt_lower_bound.resize (N);
  
-   for (unsigned int row=0; row<N; row++)
+   for (size_type row=0; row<N; row++)
      {
        prebuilt_lower_bound[row]
          = Utilities::lower_bound (&column_numbers[rowstart_indices[row]+1],
@@ -214,7 +214,7 @@ SparseLUDecomposition<number>::copy_from (const SparseMatrix<somenumber> &matrix
   SparseMatrix<number>::operator= (number(0));
 
   // both allow more and less entries in the new matrix
-  for (unsigned int row=0; row<this->m(); ++row)
+  for (size_type row=0; row<this->m(); ++row)
     {
       typename SparseMatrix<number>::iterator index = this->begin(row);
       typename SparseMatrix<somenumber>::const_iterator
@@ -240,7 +240,7 @@ template <typename number>
 void
 SparseLUDecomposition<number>::strengthen_diagonal_impl ()
 {
-  for (unsigned int row=0; row<this->m(); ++row)
+  for (size_type row=0; row<this->m(); ++row)
     {
       // get the global index of the first
       // non-diagonal element in this row

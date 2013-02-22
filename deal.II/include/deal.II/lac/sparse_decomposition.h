@@ -160,6 +160,11 @@ protected:
 
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Destruction. Mark the
    * destructor pure to ensure that
    * this class isn't used
@@ -389,7 +394,7 @@ protected:
    * <tt>strengthen_diagonal</tt>'s
    * value.
    */
-  virtual number get_strengthen_diagonal(const number rowsum, const unsigned int row) const;
+  virtual number get_strengthen_diagonal(const number rowsum, const size_type row) const;
 
   /**
    * State flag. If not in
@@ -421,7 +426,7 @@ protected:
    * available after invocation of
    * decompose().
    */
-  std::vector<const unsigned int *> prebuilt_lower_bound;
+  std::vector<const size_type *> prebuilt_lower_bound;
 
 private:
   /**
@@ -460,7 +465,7 @@ template <typename number>
 inline number
 SparseLUDecomposition<number>::
 get_strengthen_diagonal(const number /*rowsum*/,
-                        const unsigned int /*row*/) const
+                        const size_type /*row*/) const
 {
   return strengthen_diagonal;
 }

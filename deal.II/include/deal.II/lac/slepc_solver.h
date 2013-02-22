@@ -105,6 +105,10 @@ namespace SLEPcWrappers
   class SolverBase
   {
   public:
+    /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
 
     /**
      * Constructor. Takes the MPI communicator over which parallel
@@ -143,7 +147,7 @@ namespace SLEPcWrappers
     solve (const PETScWrappers::MatrixBase &A,
            std::vector<double>             &kr,
            std::vector<OutputVector>       &vr,
-           const unsigned int              n_eigenvectors);
+           const size_type                  n_eigenvectors);
 
     /**
      * Same as above, but here a composite method for solving the
@@ -155,7 +159,7 @@ namespace SLEPcWrappers
            const PETScWrappers::MatrixBase &B,
            std::vector<double>             &kr,
            std::vector<OutputVector>       &vr,
-           const unsigned int               n_eigenvectors);
+           const size_type                  n_eigenvectors);
 
     /**
      * Initialize solver for the linear system $Ax=\lambda x$. (Note:
@@ -201,7 +205,7 @@ namespace SLEPcWrappers
      * SLEPc eigensolver used.
      */
     void
-    solve (const unsigned int n_eigenvectors, unsigned int *n_converged);
+    solve (const size_type n_eigenvectors, size_type *n_converged);
 
     /**
      * Access the solutions for a solved eigenvector problem, pair
@@ -209,7 +213,7 @@ namespace SLEPcWrappers
      * \text{n\_converged}-1$.
      */
     void
-    get_eigenpair (const unsigned int index,
+    get_eigenpair (const size_type index,
 #ifndef PETSC_USE_COMPLEX
                    double                    &kr,
 #else
@@ -637,9 +641,9 @@ namespace SLEPcWrappers
   SolverBase::solve (const PETScWrappers::MatrixBase &A,
                      std::vector<double>             &kr,
                      std::vector<OutputVector>       &vr,
-                     const unsigned int               n_eigenvectors = 1)
+                     const size_type                  n_eigenvectors = 1)
   {
-    unsigned int n_converged = 0;
+    size_type n_converged = 0;
 
     // Set the matrices of the problem
     set_matrices (A);
@@ -656,7 +660,7 @@ namespace SLEPcWrappers
     vr.resize (n_converged, vr.front());
     kr.resize (n_converged);
 
-    for (unsigned int index=0; index<n_converged; ++index)
+    for (size_type index=0; index<n_converged; ++index)
       get_eigenpair (index, kr[index], vr[index]);
   }
 
@@ -666,9 +670,9 @@ namespace SLEPcWrappers
                      const PETScWrappers::MatrixBase &B,
                      std::vector<double>             &kr,
                      std::vector<OutputVector>       &vr,
-                     const unsigned int               n_eigenvectors = 1)
+                     const size_type                  n_eigenvectors = 1)
   {
-    unsigned int n_converged = 0;
+    size_type n_converged = 0;
 
     // Set the matrices of the problem
     set_matrices (A, B);
@@ -686,7 +690,7 @@ namespace SLEPcWrappers
     vr.resize (n_converged, vr.front());
     kr.resize (n_converged);
 
-    for (unsigned int index=0; index<n_converged; ++index)
+    for (size_type index=0; index<n_converged; ++index)
       get_eigenpair (index, kr[index], vr[index]);
   }
 }
