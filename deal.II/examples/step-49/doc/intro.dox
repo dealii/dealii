@@ -103,7 +103,7 @@ or by clicking "Mesh" and then "2D" inside Gmsh after loading the file.  Now
 this is the mesh read from the .msh file and saved again by deal.II as an
 image (see the grid_1 function):
 
-@image html step-49.grid-1.png
+<img src="http://www.dealii.org/images/steps/developer/step-49.grid-1.png" alt="">
 
 
 <h3>Modifying a Mesh</h3>
@@ -128,10 +128,10 @@ a sin curve:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        @image html step-49.grid-5a.png regular input mesh
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-5a.png" alt=""> regular input mesh
     </td>
     <td ALIGN="center">
-        @image html step-49.grid-5.png output mesh 
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-5.png" alt=""> output mesh 
     </td>
   </tr>
 </TABLE>
@@ -143,10 +143,10 @@ of this tutorial:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        @image html step-49.grid-6a.png regular input mesh
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-6a.png" alt=""> regular input mesh
     </td>
     <td ALIGN="center">
-        @image html step-49.grid-6.png wall-adapted output mesh 
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-6.png" alt=""> wall-adapted output mesh 
     </td>
   </tr>
 </TABLE>
@@ -157,10 +157,10 @@ demonstrated in grid_7() and the result is as follows:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        @image html step-49.grid-7a.png regular input mesh
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-7a.png" alt=""> regular input mesh
     </td>
     <td ALIGN="center">
-        @image html step-49.grid-7.png perturbed output mesh 
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-7.png" alt=""> perturbed output mesh 
     </td>
   </tr>
 </TABLE>
@@ -187,14 +187,14 @@ These are the input meshes and the output mesh:
 <TABLE WIDTH="80%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        @image html step-49.grid-2a.png input mesh 1
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt=""> input mesh 1
     </td>
     <td ALIGN="center">
-        @image html step-49.grid-2b.png input mesh 2
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2b.png" alt=""> input mesh 2
     </td>
 
     <td ALIGN="center">
-        @image html step-49.grid-2.png merged mesh
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2.png" alt=""> merged mesh
     </td>
   </tr>
 </table>
@@ -210,11 +210,11 @@ centered by moving the top vertices upwards:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        @image html step-49.grid-3a.png input mesh
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-3a.png" alt=""> input mesh
     </td>
 
     <td ALIGN="center">
-        @image html step-49.grid-3.png top vertices moved upwards
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-3.png" alt=""> top vertices moved upwards
     </td>
   </tr>
 </table>
@@ -233,11 +233,11 @@ above. This is the output from grid_4():
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      @image html step-49.grid-4base.png input mesh
+      <img src="http://www.dealii.org/images/steps/developer/step-49.grid-4base.png" alt=""> input mesh
     </td>
 
     <td ALIGN="center">
-      @image html step-49.grid-4.png extruded output mesh
+      <img src="http://www.dealii.org/images/steps/developer/step-49.grid-4.png" alt=""> extruded output mesh
     </td>
   </tr>
 </table>
