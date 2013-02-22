@@ -51,7 +51,7 @@ other hand, one can achieve this by choosing a different formulation.
 
 To this end, one first introduces a second variable, called the flux,
 ${\mathbf u}=-K\nabla p$. By its definition, the flux is a vector in the
-negative 
+negative
 direction of the pressure gradient, multiplied by the permeability tensor. If
 the permeability tensor is proportional to the unit matrix, this equation is
 easy to understand and intuitive: the higher the permeability, the higher the
@@ -153,7 +153,7 @@ non-zero component of shape function <code>i</code> at quadrature point
 <code>q_point</code>.
 
 For non-primitive shape functions, this is clearly not going to work: there is
-no single non-zero vector component of shape function <code>i</code>, and the call 
+no single non-zero vector component of shape function <code>i</code>, and the call
 to <code>fe_values.shape_value(i,q_point)</code> would consequently not make
 much sense. However, deal.II offers a second function call,
 <code>fe_values.shape_value_component(i,q_point,comp)</code> that returns the
@@ -180,24 +180,24 @@ components. For example, in 2d, the first term could be rewritten like this
 If we implemented this, we would get code like this:
 
 @code
-  for (unsigned int q=0; q<n_q_points; ++q) 
+  for (unsigned int q=0; q<n_q_points; ++q)
     for (unsigned int i=0; i<dofs_per_cell; ++i)
       for (unsigned int j=0; j<dofs_per_cell; ++j)
         local_matrix(i,j) += (k_inverse_values[q][0][0] *
                               fe_values.shape_value_component(i,q,0) *
-                              fe_values.shape_value_component(j,q,0) 
+                              fe_values.shape_value_component(j,q,0)
                               +
                               k_inverse_values[q][0][1] *
                               fe_values.shape_value_component(i,q,0) *
-                              fe_values.shape_value_component(j,q,1) 
+                              fe_values.shape_value_component(j,q,1)
                               +
                               k_inverse_values[q][1][0] *
                               fe_values.shape_value_component(i,q,1) *
-                              fe_values.shape_value_component(j,q,0) 
+                              fe_values.shape_value_component(j,q,0)
                               +
                               k_inverse_values[q][1][1] *
                               fe_values.shape_value_component(i,q,1) *
-                              fe_values.shape_value_component(j,q,1) 
+                              fe_values.shape_value_component(j,q,1)
                              )
                              *
                              fe_values.JxW(q);
@@ -215,7 +215,7 @@ program we do that in the following way:
 
   ...
 
-  for (unsigned int q=0; q<n_q_points; ++q) 
+  for (unsigned int q=0; q<n_q_points; ++q)
     for (unsigned int i=0; i<dofs_per_cell; ++i)
       for (unsigned int j=0; j<dofs_per_cell; ++j)
         local_matrix(i,j) += (fe_values[velocities].value (i, q) *
@@ -241,7 +241,7 @@ $\{{\mathbf u}_h^i,p_h^i\}$, then the function returns the velocity part of this
 tuple. Note that the velocity is of course a <code>dim</code>-dimensional tensor, and
 that the function returns a corresponding object. Similarly, where we
 subscript with the pressure extractor, we extract the scalar pressure
-component. The whole mechanism is described in more detail in the 
+component. The whole mechanism is described in more detail in the
 @ref vector_valued module.
 
 In practice, it turns out that we can do a bit better if we evaluate the shape
@@ -266,20 +266,20 @@ The final result then looks like this, working in every space dimension:
                                   rhs_values);
       k_inverse.value_list (fe_values.get_quadrature_points(),
                             k_inverse_values);
-      
-      for (unsigned int q=0; q<n_q_points; ++q) 
+
+      for (unsigned int q=0; q<n_q_points; ++q)
         for (unsigned int i=0; i<dofs_per_cell; ++i)
           {
             const Tensor<1,dim> phi_i_u     = fe_values[velocities].value (i, q);
             const double        div_phi_i_u = fe_values[velocities].divergence (i, q);
             const double        phi_i_p     = fe_values[pressure].value (i, q);
-            
+
             for (unsigned int j=0; j<dofs_per_cell; ++j)
               {
 		const Tensor<1,dim> phi_j_u     = fe_values[velocities].value (j, q);
 		const double        div_phi_j_u = fe_values[velocities].divergence (j, q);
 		const double        phi_j_p     = fe_values[pressure].value (j, q);
-                
+
                 local_matrix(i,j) += (phi_i_u * k_inverse_values[q] * phi_j_u
                                       - div_phi_i_u * phi_j_p
                                       - phi_i_p * div_phi_j_u) *
@@ -311,12 +311,12 @@ the same way as above, i.e. the extractor classes also work on FEFaceValues obje
 	if (cell->at_boundary(face_no))
 	  {
 	    fe_face_values.reinit (cell, face_no);
-	    
+
 	    pressure_boundary_values
 	      .value_list (fe_face_values.get_quadrature_points(),
 			   boundary_values);
 
-	    for (unsigned int q=0; q<n_face_q_points; ++q) 
+	    for (unsigned int q=0; q<n_face_q_points; ++q)
 	      for (unsigned int i=0; i<dofs_per_cell; ++i)
 		local_rhs(i) += -(fe_face_values[velocities].value (i, q) *
 				  fe_face_values.normal_vector(q) *
@@ -356,10 +356,10 @@ but that the goal is to introduce techniques rather than optimal solvers.
 In view of the difficulties using standard solvers and preconditioners
 mentioned above, let us take another look at the matrix. If we sort our
 degrees of freedom so that all velocity come before all pressure variables,
-then we can subdivide the linear system $AX=B$ into the following blocks:
+then we can subdivide the linear system $Ax=h$ into the following blocks:
 @f{eqnarray*}
   \left(\begin{array}{cc}
-    M & B^T \\ B & 0
+    M & B \\ B^T & 0
   \end{array}\right)
   \left(\begin{array}{cc}
     U \\ P
@@ -370,42 +370,51 @@ then we can subdivide the linear system $AX=B$ into the following blocks:
   \end{array}\right),
 @f}
 where $U,P$ are the values of velocity and pressure degrees of freedom,
-respectively, $M$ is the mass matrix on the velocity space, $B$ corresponds to
-the negative divergence operator, and $B^T$ is its transpose and corresponds
-to the negative gradient.
+respectively, $M$ is the mass matrix on the velocity space, $B^T$ corresponds to
+the negative divergence operator, and $B$ is its transpose and corresponds
+to the gradient.
 
 By block elimination, we can then re-order this system in the following way
-(multiply the first row of the system by $BM^{-1}$ and then subtract the
+(multiply the first row of the system by $B^TM^{-1}$ and then subtract the
 second row from it):
 @f{eqnarray*}
-  BM^{-1}B^T P &=& BM^{-1} F - G, \\
-  MU &=& F - B^TP.
+  B^TM^{-1}B P &=& B^TM^{-1} F - G, \\
+  MU &=& F - BP.
 @f}
-Here, the matrix $S=BM^{-1}B^T$ (called the <em>Schur complement</em> of $A$)
+Here, the matrix $S=B^TM^{-1}B$ (called the <em>Schur complement</em> of $A$)
 is obviously symmetric and, owing to the positive definiteness of $M$ and the
-fact that $B^T$ has full column rank, $S$ is also positive
-definite. 
+fact that $B$ has full column rank, $S$ is also positive
+definite.
 
 Consequently, if we could compute $S$, we could apply the Conjugate Gradient
-method to it. However, computing $S$ is expensive, and $S$ is most
-likely also a full matrix. On the other hand, the CG algorithm doesn't require
+method to it. However, computing $S$ is expensive, and $S$ is in fact
+also a full matrix. On the other hand, the CG algorithm doesn't require
 us to actually have a representation of $S$, it is sufficient to form
-matrix-vector products with it. We can do so in steps: to compute $Sv$, we 
+matrix-vector products with it. We can do so in steps: to compute $Sv=B^TM^{-1}Bv=B^T(M^{-1}(Bv))$, we
 <ol>
- <li> form $w = B^T v$;
+ <li> form $w = T v$;
  <li> solve $My = w$ for $y=M^{-1}w$, using the CG method applied to the
   positive definite and symmetric mass matrix $M$;
- <li> form $z=By$ to obtain $Sv=z$.
+ <li> form $z=B^Ty$ to obtain $Sv=z$.
 </ol>
-This is accomplished by using the class IterativeInverse.
+Note how we evaluate the expression $B^TM^{-1}Bv$ right to left to
+avoid matrix-matrix products; this way, all we have to do is evaluate
+matrix-vector products.
 
-Using this class, we can then write a class that implements the Schur
-complement in much the same way: to act as a matrix, it only needs to offer a
+Using this strategy, we can then implement a class that provides the
+function <code>vmult()</code> that is all that the SolverCG class
+requires from an object representing a matrix. We can make our life a
+bit easier by also introducing an object that represents $M^{-1}$ and
+that has its own <code>vmult()</code> function that, if called, solves
+the linear system with $M$; in fact, such a class already exists in
+deal.II: this is accomplished by using the class
+IterativeInverse. Using it, the class that implements the Schur
+only needs to offer the <code>vmult()</code>
 function to perform a matrix-vector multiplication, using the algorithm
 above. Here are again the relevant parts of the code:
 
 @code
-class SchurComplement 
+class SchurComplement
 {
   public:
     SchurComplement (const BlockSparseMatrix<double> &A,
@@ -417,7 +426,7 @@ class SchurComplement
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
     const SmartPointer<const InverseMatrix>              m_inverse;
-    
+
     mutable Vector<double> tmp1, tmp2;
 };
 
@@ -425,20 +434,20 @@ class SchurComplement
 void SchurComplement::vmult (Vector<double>       &dst,
                              const Vector<double> &src) const
 {
-  system_matrix->block(0,1).vmult (tmp1, src);
-  m_inverse->vmult (tmp2, tmp1);
-  system_matrix->block(1,0).vmult (dst, tmp2);
+  system_matrix->block(0,1).vmult (tmp1, src); // multiply with the top right block: B
+  m_inverse->vmult (tmp2, tmp1);               // multiply with M^-1
+  system_matrix->block(1,0).vmult (dst, tmp2); // multiply with the bottom left block: B^T
 }
 @endcode
 
 In this code, the constructor takes a reference to a block sparse matrix for
-the entire system, and a reference to an object representing the inverse of
+the entire system, and a reference to the object representing the inverse of
 the mass matrix. It stores these using <code>SmartPointer</code> objects (see
 step-7), and additionally allocates two temporary vectors <code>tmp1</code> and
 <code>tmp2</code> for the vectors labeled $w,y$ in the list above.
 
 In the matrix-vector multiplication function, the product $Sv$ is performed in
-exactly the order outlined above. Note how we access the blocks $B^T$ and $B$
+exactly the order outlined above. Note how we access the blocks $B$ and $B^T$
 by calling <code>system_matrix->block(0,1)</code> and
 <code>system_matrix->block(1,0)</code> respectively, thereby picking out
 individual blocks of the block system. Multiplication by $M^{-1}$ happens
@@ -451,11 +460,11 @@ matrix and the mass matrix, respectively:
 
 @code
 template <int dim>
-void MixedLaplaceProblem<dim>::solve () 
+void MixedLaplaceProblem<dim>::solve ()
 {
   const InverseMatrix m_inverse (system_matrix.block(0,0));
   Vector<double> tmp (solution.block(0).size());
-  
+
   {
     Vector<double> schur_rhs (solution.block(1).size());
 
@@ -476,7 +485,7 @@ void MixedLaplaceProblem<dim>::solve ()
     system_matrix.block(0,1).vmult (tmp, solution.block(1));
     tmp *= -1;
     tmp += system_rhs.block(0);
-    
+
     m_inverse.vmult (solution.block(0), tmp);
   }
 }
@@ -488,7 +497,7 @@ the first block of the solution, i.e. with as many entries as there are
 velocity unknowns), and the two blocks surrounded by braces then solve the two
 equations for $P$ and $U$, in this order. Most of the code in each of the two
 blocks is actually devoted to constructing the proper right hand sides. For
-the first equation, this would be $BM^{-1}F-G$, and $-B^TP+G$ for the second
+the first equation, this would be $B^TM^{-1}F-G$, and $-BP+F$ for the second
 one. The first hand side is then solved with the Schur complement matrix, and
 the second simply multiplied with $M^{-1}$. The code as shown uses no
 preconditioner (i.e. the identity matrix as preconditioner) for the Schur
@@ -499,7 +508,7 @@ complement.
 <h4>A preconditioner for the Schur complement</h4>
 
 One may ask whether it would help if we had a preconditioner for the Schur
-complement $S=BM^{-1}B^T$. The general answer, as usual, is: of course. The
+complement $S=B^TM^{-1}B$. The general answer, as usual, is: of course. The
 problem is only, we don't know anything about this Schur complement matrix. We
 do not know its entries, all we know is its action. On the other hand, we have
 to realize that our solver is expensive since in each iteration we have to do
@@ -510,7 +519,7 @@ There are different approaches to preconditioning such a matrix. On the one
 extreme is to use something that is cheap to apply and therefore has no real
 impact on the work done in each iteration. The other extreme is a
 preconditioner that is itself very expensive, but in return really brings down
-the number of iterations required to solve with $S$. 
+the number of iterations required to solve with $S$.
 
 We will try something along the second approach, as much to improve the
 performance of the program as to demonstrate some techniques. To this end, let
@@ -527,7 +536,8 @@ the inverse of its diagonal, which is cheap.
 
 The next step is to define a class that represents the approximate Schur
 complement. This should look very much like the Schur complement class itself,
-except that it doesn't need the object representing $M^{-1}$ any more:
+except that it doesn't need the object representing $M^{-1}$ any more
+since we can compute the inverse of the diagonal of $M$ on the fly:
 
 @code
 class ApproximateSchurComplement : public Subscriptor
@@ -540,7 +550,7 @@ class ApproximateSchurComplement : public Subscriptor
 
   private:
     const SmartPointer<const BlockSparseMatrix<double> > system_matrix;
-    
+
     mutable Vector<double> tmp1, tmp2;
 };
 
@@ -556,7 +566,11 @@ void ApproximateSchurComplement::vmult (Vector<double>       &dst,
 
 Note how the <code>vmult</code> function differs in simply doing one Jacobi sweep
 (i.e. multiplying with the inverses of the diagonal) instead of multiplying
-with the full $M^{-1}$.
+with the full $M^{-1}$. (This is how a single Jacobi preconditioner
+step with $M$ is defined: it is the multiplication with the inverse of
+the diagonal of $M$; in other words, the operation $({\textrm{diag}\
+}M)^{-1}x$ on a vector $x$ is exactly what the function
+SparseMatrix::precondition_Jacobi above does.)
 
 With all this, we already have the preconditioner: it should be the inverse of
 the approximate Schur complement, i.e. we need code like this:
@@ -564,7 +578,7 @@ the approximate Schur complement, i.e. we need code like this:
 @code
     ApproximateSchurComplement
       approximate_schur_complement (system_matrix);
-      
+
     InverseMatrix<ApproximateSchurComplement>
       preconditioner (approximate_schur_complement)
 @endcode
@@ -583,13 +597,13 @@ look like this:
 
     SchurComplement
       schur_complement (system_matrix, m_inverse);
-    
+
     ApproximateSchurComplement
       approximate_schur_complement (system_matrix);
-      
+
     InverseMatrix<ApproximateSchurComplement>
       preconditioner (approximate_schur_complement);
-    
+
     SolverControl solver_control (system_matrix.block(0,0).m(),
                                   1e-6*schur_rhs.l2_norm());
     SolverCG<>    cg (solver_control);
@@ -637,12 +651,12 @@ solution inside the program, we choose right hand side, boundary conditions,
 and the coefficient so that we recover a solution function known to us. In
 particular, we choose the pressure solution
 @f{eqnarray*}
-  p = -\left(\frac \alpha 2 xy^2 + \beta x - \frac \alpha 6 x^2\right),
+  p = -\left(\frac \alpha 2 xy^2 + \beta x - \frac \alpha 6 x^3\right),
 @f}
 and for the coefficient we choose the unit matrix $K_{ij}=\delta_{ij}$ for
 simplicity. Consequently, the exact velocity satisfies
 @f{eqnarray*}
-  {\mathbf u} = 
+  {\mathbf u} =
   \left(\begin{array}{cc}
     \frac \alpha 2 y^2 + \beta - \frac \alpha 2 x^2 \\
     \alpha xy
@@ -654,5 +668,5 @@ hand side equals $f=0$, and as boundary values we have to choose
 $g=p|_{\partial\Omega}$.
 
 For the computations in this program, we choose $\alpha=0.3,\beta=1$. You can
-find the resulting solution in the ``Results'' section below, after the
-commented program.
+find the resulting solution in the <a name="#Results">results section
+below</a>, after the commented program.

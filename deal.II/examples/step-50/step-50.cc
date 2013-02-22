@@ -4,7 +4,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors                   */
+/*    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors                   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -817,15 +817,6 @@ namespace Step50
     // appropriate <code>typedef</code> and
     // then setup a smoother object.
     //
-    // Since this smoother needs temporary
-    // vectors to store intermediate results,
-    // we need to provide a VectorMemory
-    // object. Since these vectors will be
-    // reused over and over, the
-    // GrowingVectorMemory is more time
-    // efficient than the PrimitiveVectorMemory
-    // class in the current case.
-    //
     // The last step is to initialize the
     // smoother object with our level matrices
     // and to set some smoothing parameters.
@@ -855,9 +846,7 @@ namespace Step50
     // symmetric operator even for nonsymmetric
     // smoothers:
     typedef TrilinosWrappers::PreconditionSOR Smoother;
-    GrowingVectorMemory<vector_t>   vector_memory;
-    MGSmootherPrecondition<matrix_t, Smoother, vector_t >
-    mg_smoother(vector_memory);
+    MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices);
     mg_smoother.set_steps(2);
     mg_smoother.set_symmetric(true);

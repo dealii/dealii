@@ -249,7 +249,7 @@ namespace MGTools
                       const ComponentMask               &component_mask = ComponentMask());
 
   /**
-   * Maybe no longer needed.
+   * @deprecated
    */
   template <typename number>
   void
@@ -258,6 +258,9 @@ namespace MGTools
                          const bool preserve_symmetry,
                          const bool ignore_zeros = false) DEAL_II_DEPRECATED;
 
+  /**
+   * @deprecated
+   */
   template <typename number>
   void
   apply_boundary_values (const std::set<unsigned int> &boundary_dofs,

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,8 +14,6 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/smartpointer.h>
-//#include <deal.II/base/template_constraints.h>
-//#include <deal.II/lac/tridiagonal_matrix.h>
 #include <deal.II/lac/solver_selector.h>
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/pointer_matrix.h>
@@ -97,13 +95,6 @@ public:
   void vmult (VECTOR &dst, const VECTOR &src) const;
 
   /**
-   * Solve the transposed system
-   * for right hand side
-   * <tt>src</tt>.
-   */
-//    void Tvmult (VECTOR& dst, const VECTOR& src) const;
-
-  /**
    * The solver, which allows
    * selection of the actual solver
    * as well as adjuxtment of
@@ -121,15 +112,6 @@ private:
    * The preconditioner to use.
    */
   std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > preconditioner;
-  /**
-   * The transpose of the matrix in use.
-   */
-  std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > transpose_matrix;
-
-  /**
-   * The transpose of the preconditioner to use.
-   */
-  std_cxx1x::shared_ptr<PointerMatrixBase<VECTOR> > transpose_preconditioner;
 };
 
 
@@ -165,14 +147,6 @@ IterativeInverse<VECTOR>::vmult (VECTOR &dst, const VECTOR &src) const
   solver.solve(*matrix, dst, src, *preconditioner);
 }
 
-
-// template <class VECTOR>
-// inline void
-// IterativeInverse<VECTOR>::Tvmult (VECTOR& dst, const VECTOR& src) const
-// {
-//   TransposeMatrix<
-//   solver.solve(*matrix, dst, src, *preconditioner);
-// }
 
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -291,6 +291,20 @@ namespace MeshWorker
    * @ingroup MeshWorker
    * @author Guido Kanschat, 2009
    */
+  template<int dim, int spacedim, class ITERATOR, class ASSEMBLER>
+  void integration_loop(ITERATOR begin,
+                        typename identity<ITERATOR>::type end,
+                        DoFInfo<dim, spacedim> &dof_info,
+                        IntegrationInfoBox<dim, spacedim> &box,
+                        const std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &cell_worker,
+                        const std_cxx1x::function<void (DoFInfo<dim>&, IntegrationInfo<dim, spacedim>&)> &boundary_worker,
+                        const std_cxx1x::function<void (DoFInfo<dim> &, DoFInfo<dim> &,
+                                                        IntegrationInfo<dim, spacedim> &,
+                                                        IntegrationInfo<dim, spacedim> &)> &face_worker,
+                        ASSEMBLER &assembler,
+                        bool cells_first = true) DEAL_II_DEPRECATED;
+
+
   template<int dim, int spacedim, class ITERATOR, class ASSEMBLER>
   void integration_loop(ITERATOR begin,
                         typename identity<ITERATOR>::type end,

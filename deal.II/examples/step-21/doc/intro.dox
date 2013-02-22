@@ -324,7 +324,12 @@ M^S_{ij} &=&
 (S^n,\phi_i)_\Omega +\triangle t \sum_K  \left(F(S^n) q^{n+1}, \phi_i\right)_K.
 @f}
 
-Note the following complication, however: Since the matrix $H_{ij}$
+@note Due to historical accidents, the role of matrices $B$ and $B^T$
+has been reverted in this program compared to step-20. In other words,
+here $B$ refers to the divergence and $B^T$ to the gradient operators
+when it was the other way around in step-20.
+
+The system above presents a complication: Since the matrix $H_{ij}$
 depends on $\mathbf u^{n+1}$ implicitly (the velocities are needed to
 determine which parts of the boundaries $\partial K$ of cells are
 influx or outflux parts), we can only assemble this matrix after we

@@ -103,7 +103,7 @@ or by clicking "Mesh" and then "2D" inside Gmsh after loading the file.  Now
 this is the mesh read from the .msh file and saved again by deal.II as an
 image (see the grid_1 function):
 
-@image html step-49.grid-1.png
+<img src="http://www.dealii.org/images/steps/developer/step-49.grid-1.png" alt="">
 
 
 <h3>Modifying a Mesh</h3>
@@ -128,10 +128,10 @@ a sin curve:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        @image html step-49.grid-5a.png regular input mesh
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-5a.png" alt=""> regular input mesh
     </td>
     <td ALIGN="center">
-        @image html step-49.grid-5.png output mesh 
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-5.png" alt=""> output mesh 
     </td>
   </tr>
 </TABLE>
@@ -143,10 +143,10 @@ of this tutorial:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        @image html step-49.grid-6a.png regular input mesh
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-6a.png" alt=""> regular input mesh
     </td>
     <td ALIGN="center">
-        @image html step-49.grid-6.png wall-adapted output mesh 
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-6.png" alt=""> wall-adapted output mesh 
     </td>
   </tr>
 </TABLE>
@@ -157,10 +157,10 @@ demonstrated in grid_7() and the result is as follows:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        @image html step-49.grid-7a.png regular input mesh
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-7a.png" alt=""> regular input mesh
     </td>
     <td ALIGN="center">
-        @image html step-49.grid-7.png perturbed output mesh 
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-7.png" alt=""> perturbed output mesh 
     </td>
   </tr>
 </TABLE>
@@ -173,29 +173,28 @@ work with a sequence of unstructured meshes (see possible extensions).
 <h4>Merging Meshes</h4>
 
 The function GridGenerator::merge_triangulations() allows you to merge two
-given Triangulations into a single one. This only works, if the vertices of
-the to be shared edge or face match exactly. It is useful to use
-GridTools::shift and GridTools::scale to align the two meshes.  In the
-function grid_2() of this tutorial, we merge a square with a round hole
-(generated with hyper_cube_with_cylindrical_hole()) and a rectangle. The
-function GridTools::subdivided_hyper_rectangle() allows you to specify the
-number of repetitions and the positions of the corners, this way we do not
-need to shift it manually. You should inspect the mesh graphically to make
-sure, that cells line up correctly and no hanging nodes exist in the merged
-Triangulation.
+given Triangulations into a single one.  For this to work, the vertices of the
+shared edge or face have to match exactly.  Lining up the two meshes can be
+achieved using GridTools::shift and GridTools::scale.  In the function
+grid_2() of this tutorial, we merge a square with a round hole (generated with
+hyper_cube_with_cylindrical_hole()) and a rectangle. The function
+GridTools::subdivided_hyper_rectangle() allows you to specify the number of
+repetitions and the positions of the corners, this way we do not need to shift
+it manually. You should inspect the mesh graphically to make sure, that cells
+line up correctly and no hanging nodes exist in the merged Triangulation.
 
 These are the input meshes and the output mesh:
 <TABLE WIDTH="80%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        @image html step-49.grid-2a.png input mesh 1
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt=""> input mesh 1
     </td>
     <td ALIGN="center">
-        @image html step-49.grid-2b.png input mesh 2
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2b.png" alt=""> input mesh 2
     </td>
 
     <td ALIGN="center">
-        @image html step-49.grid-2.png merged mesh
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2.png" alt=""> merged mesh
     </td>
   </tr>
 </table>
@@ -211,11 +210,11 @@ centered by moving the top vertices upwards:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        @image html step-49.grid-3a.png input mesh
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-3a.png" alt=""> input mesh
     </td>
 
     <td ALIGN="center">
-        @image html step-49.grid-3.png top vertices moved upwards
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-3.png" alt=""> top vertices moved upwards
     </td>
   </tr>
 </table>
@@ -234,11 +233,11 @@ above. This is the output from grid_4():
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      @image html step-49.grid-4base.png input mesh
+      <img src="http://www.dealii.org/images/steps/developer/step-49.grid-4base.png" alt=""> input mesh
     </td>
 
     <td ALIGN="center">
-      @image html step-49.grid-4.png extruded output mesh
+      <img src="http://www.dealii.org/images/steps/developer/step-49.grid-4.png" alt=""> extruded output mesh
     </td>
   </tr>
 </table>
@@ -250,4 +249,6 @@ above. This is the output from grid_4():
   - change boundary indicators
   - relax inner vertices
 - Database of unstructured meshes for convergence studies
-- GridTools::extract_boundary_mesh 
+- discuss GridTools::extract_boundary_mesh 
+- how to remove or disable a cell inside a mesh
+

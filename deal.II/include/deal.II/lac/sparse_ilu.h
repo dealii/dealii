@@ -126,9 +126,9 @@ public:
                   const double                    strengthen_diagonal=0.) DEAL_II_DEPRECATED;
 
   /**
-   * This method is deprecated, and
+   * @deprecated This method is deprecated, and
    * left for backward
-   * compability. It will be
+   * compatibility. It will be
    * removed in later versions.
    */
   template <typename somenumber>
