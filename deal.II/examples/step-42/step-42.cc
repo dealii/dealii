@@ -572,8 +572,8 @@ namespace Step42
         return_value = p(1);
       if (component == 2)
         {
-          return_value = -std::sqrt (0.36 - (p(0)-0.5)*(p(0)-0.5) - (p(1)-0.5)*(p(1)-0.5)) + 1.59;
-//          return_value = 1.999 - input_obstacle_copy->obstacle_function (p(0), p(1));
+	  return_value = -std::sqrt (0.36 - (p(0)-0.5)*(p(0)-0.5) - (p(1)-0.5)*(p(1)-0.5)) + 1.59;
+          // return_value = 1.999 - input_obstacle_copy->obstacle_function (p(0), p(1));
         }
       return return_value;
     }
@@ -1263,14 +1263,14 @@ namespace Step42
     additional_data.aggregation_threshold = 1e-2;
 
     IndexSet                        active_set_old (active_set);
-    unsigned int j = 0;
+    unsigned int j = 1;
     unsigned int number_assemble_system = 0;
     for (; j<=100; j++)
       {
         // Solve an elastic problem to obtain a better start solution
-        if (j == 0)
+        if (j == 1)
           plast_lin_hard->set_sigma_0 (1e+10);
-        else if (j == 1)
+        else if (j == 2)
           plast_lin_hard->set_sigma_0 (sigma_hlp);
 
         pcout<< " " <<std::endl;
@@ -1336,7 +1336,7 @@ namespace Step42
             // The previous iteration of step 0 is the solution of an elastic problem.
             // So a linear combination of a plastic and an elastic solution makes no sense
             // since the elastic solution is not in the konvex set of the plastic solution.
-            if (j == 1)
+            if (j == 2)
               break;
           }
 
@@ -1533,7 +1533,7 @@ int main (int argc, char *argv[])
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
   {
-    int _n_refinements_global = 2;
+    int _n_refinements_global = 3;
 
     if (argc == 3)
       {
