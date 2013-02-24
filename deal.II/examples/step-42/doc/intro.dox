@@ -390,10 +390,11 @@ of the feasible stresses.
 <h3>Adaptive mesh refinement</h3>
 
 Since we run our program in 3d, there is a good reason to use adaptive
-mesh refined. To make life a bit easier we are choosing the
+mesh refinement. To make things a bit easier we are choosing the
 KellyErrorEstimator that is already implemented in deal.II. We hand the
 solution vector to it which contains the displacement $u$. As we will see in the
-results it yields a quite reasonable adaptive mesh for the contact zone.
+results it yields a quite reasonable adaptive mesh for the contact zone as well
+as for plasticity!
 
 
 <h3>Implementation</h3>
