@@ -283,12 +283,12 @@ method for the contact. It sums up the results of the sections before and works 
  \mathcal{F}_k = \emptyset$ and set $k = 1$. The start value $\hat U^0 :=
  P_{\mathcal{A}_k}(0)$ fullfills our obstacle condition.
  \item[(1)] Assemble the Newton matrix $A := a'(\hat
- U^{k-1};\varphi_i,\varphi_j)$ and the right-hand-side $F(\hat U^{k-1})$.
+ U^{k-1};\varphi_p,\varphi_q)$ and the right-hand-side $F(\hat U^{k-1})$.
  \item[(2)] Find the primal-dual pair $(\bar U^k,\Lambda^k)$ that satisfies
  \begin{align*}
  A\bar U^k + B\Lambda^k & = F, &\\
- \left[B^T\bar U^k\right]_i & = G_i & \forall i\in\mathcal{A}_k,\\
- \Lambda^k_i & = 0 & \forall i\in\mathcal{F}_k.
+ \left[B^T\bar U^k\right]_p & = G_p & \forall p\in\mathcal{A}_k,\\
+ \Lambda^k_p & = 0 & \forall p\in\mathcal{F}_k.
  \end{align*}
  \item[(3)] Damping for $k>2$ by applying a line search and calculating a linear
  combination of $U^{k-1}$ and $\bar U^k$. Find an
@@ -296,10 +296,10 @@ method for the contact. It sums up the results of the sections before and works 
  (1-\alpha_i)U^{k-1}$$ yields $$\vert
  F\left(U^{k}\right) \vert < \vert F\left(U^{k-1}\right) \vert.$$
  \item[(4)] Define the new active and inactive sets by
- $$\mathcal{A}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i +
- c\left(\left[B^TU^k\right]_i - G_i\right) > 0\rbrace,$$
- $$\mathcal{F}_{k+1}:=\lbrace i\in\mathcal{S}:\Lambda^k_i +
- c\left(\left[B^TU^k\right]_i - G_i\right) \leq 0\rbrace.$$
+ $$\mathcal{A}_{k+1}:=\lbrace p\in\mathcal{S}:\Lambda^k_p +
+ c\left(\left[B^TU^k\right]_p - G_p\right) > 0\rbrace,$$
+ $$\mathcal{F}_{k+1}:=\lbrace p\in\mathcal{S}:\Lambda^k_p +
+ c\left(\left[B^TU^k\right]_p - G_p\right) \leq 0\rbrace.$$
  Projection $U^k$ so that it holds the second equation in (2)
  $$\hat U^K := P_{\mathcal{A}_{k+1}}(U^k).$$ 
  \item[(5)] If $\mathcal{A}_{k+1} = \mathcal{A}_k$ and $\vert
@@ -307,32 +307,46 @@ method for the contact. It sums up the results of the sections before and works 
  step (1).
 \end{itemize}
 \noindent
-The meaning of the decorated and none decorated $U$ is as follows: $\bar U$
-denotes the solution of the linear system of equations in (2), $U$ is the
+The subscript $p$ denotes a vertex and the meaning of the
+decorated and none decorated $U$ is as follows: $\bar U$ denotes the solution of the linear system of equations in (2), $U$ is the
 damped solution and equals to $\bar U$ if the damping parameter $\alpha_0 =
 1$ and $\hat U := P_{\mathcal{A}}(U)$ is the projection of the active
 components in $\mathcal{A}$ to the gap
 $$P_{\mathcal{A}}(U):=\begin{cases}
-U_i, & \textrm{if}\quad i\notin\mathcal{A}\\
-{}^{G_i}/_{B^T_i}, & \textrm{if}\quad
-i\in\mathcal{A}.
+U_p, & \textrm{if}\quad p\notin\mathcal{A}\\
+g_{h,p}, & \textrm{if}\quad
+p\in\mathcal{A}.
 \end{cases}$$\\
-The mass matrix $B\in\mathbb{R}^{n\times m}$, $n>m$, is quadratic in our situation since $\Lambda^k$ is only defined on $\Gamma_C$:
-$$B_{ij} = \begin{cases}
-\int\limits_{\Gamma_C}\varphi_i^2(x)dx, & \text{if}\quad i=j\\
-0, & \text{if}\quad i\neq j.
+The matrix $B\in\mathbb{R}^{n\times m}$, $n>m$ describes the coupling of the
+bases for the displacements and lagrange multiplier (contact forces)
+and it is not quadratic in our situation since $\Lambda^k$ is only defined on
+$\Gamma_C$. Due to the ansatz functions $\psi_i$ (scalar valued) of the
+lagrange multiplier are fullfilling the following biorthogonal condition (see Hüeber, Wohlmuth: A primal–dual active
+set strategy for non-linear multibody contact problems, Comput. Methods Appl. Mech. Engrg.
+194, 2005, pp. 3147-3166)
+$$ \int\limits_{\Gamma_C}\psi_i(x)\varphi_j(x)dx =
+\delta_{ij}\int\limits_{\Gamma_C}\varphi_j(x)dx$$
+this yields
+$$B_{pq} = \begin{cases}
+\int\limits_{\Gamma_C}\varphi_p(x)dxI_3, & \text{if}\quad p=q,\quad
+p,q\in\mathcal{S}\\
+0I_3, & \text{if}\quad p\neq q,\quad p\textrm{ or }q\notin\mathcal{S}.
 \end{cases}$$
-So $m$ denotes the size of $\Lambda^k$ and $i$ a degree of freedom. In our
-programm we use the structure of a quadratic sparse for $B\in\mathbb{R}^{n\times
-n}$ and the length of $\Lambda^k$ is $n$ with $\Lambda^k_i = 0$ for $i>m$.
+Here $I_3$ denotes the threedimensional identity matrix.
+In our programm we use the structure of a quadratic sparse for
+$B\in\mathbb{R}^{n\times n}$ and for $\Lambda^k$ a vector with length $n$ where
+$\Lambda^k_p = 0$ for $p\notin \mathcal{S}$.
 The vector $G$ is defined by a suitable approximation $g_h$ of the gap $g$
-$$G_i = \begin{cases}
-\int\limits_{\Gamma_C}g_h(x)\varphi_i(x)dx, & \text{if}\quad i\leq m\\
-0, & \text{if}\quad i>m.
+$$G_p = \begin{cases}
+g_{h,p}\int\limits_{\Gamma_C}\varphi_p(x)dx, & \text{if}\quad p\in\mathcal{S}\\
+0, & \text{if}\quad p\notin\mathcal{S}.
 \end{cases}$$\\
-Compared to step-41, step (1) is added but it should be clear
-from the sections above that we only linearize the problem. In step (2) we have
-to solve a linear system of equations again. And now the solution has to fulfill two stopping
+Note that $G_p$ is a threedimensional vector and that again we applied the
+biorthogonal property of the lagrange multiplier ansatz functions to the
+integral $\int\limits_{\Gamma_C}g_h(x)\varphi_p(x)dx$ with $g_h(x)=\sum\limits_i
+g_{h,p}\varphi_p(x)$ (see the reference mentioned above).\\
+Compared to step-41, step (1) is added but it should be clear from the sections
+above that we only linearize the problem. In step (2) we have to solve a linear system of equations again. And now the solution has to fulfill two stopping
 criteria. $\mathcal{A}_{k+1} = \mathcal{A}_k$ makes sure that the contact zones
 are iterated out and the second ensures an accurate enough residual which means that the plastic zones are also iterated out.\\
 A similar method can also be found in Brunssen, Schmid, Schaefer, Wohlmuth: A
