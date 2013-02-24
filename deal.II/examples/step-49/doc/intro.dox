@@ -81,37 +81,48 @@ unstructured 2d quad meshes, but in 3d it can only extrude 2d meshes to
 get hexahedral meshes. 3D meshing of unstructured geometry into hexahedra is not
 supported at the time of writing this tutorial (early 2013).
 
-In gmsh, a mesh is described in a text based .geo file, that can be edited by
-hand and
-can contain computations, loops, variables, etc. It is very flexible. The
-mesh is generated from a surface representation, which is build from a list of
-line loops, which is build from a list of lines, which are in turn built from
-points.
+In gmsh, a mesh is described in a text based <code>.geo</code> file, that can
+contain computations, loops, variables, etc. It is very flexible. The mesh is
+generated from a surface representation, which is build from a list of line
+loops, which is build from a list of lines, which are in turn built from
+points. The <code>.geo</code> script can be written and edited by hand or it
+can be generated automatically by creating objects graphically inside gmsh. In
+many cases it is best to combine both approaches. The file can be easily
+reloaded by pressing "reload" under the "Geometry" tab.
 
-It is important that file contains "physical lines" and "physical
-surfaces". These give the boundary indicators and material ids for the use
-inside deal.II. Without the physical entities, nothing will be imported into
-deal.II.  The .geo script can be written by hand or it can be generated
-automatically by creating objects graphically. In many cases it is best to
-combine both approaches. The file can be easily reloaded by pressing "reload"
-under the "Geometry" tab.
+This tutorial contains an example <code>.geo</code> file, that describes a box
+with two objects cut out in the interior. This is how
+<code>untitled.geo</code> looks like in gmsh (displaying the boundary
+indicators as well as the mesh discussed further down below):
 
-This tutorial contains an example .geo file, that describes a box with two
-objects cut out in the interior. This is how untitled.geo looks like in gmsh
-(displaying the boundary indicators):
 @image html gmsh_picture.png Mesh displayed in Gmsh
 
-You might want to open the .geo file in a text editor to see how it is
-structured. Deal.II can read the .msh format written by gmsh. You generate the
-.msh from the .geo by running:
+You might want to open the <code>untitled.geo</code> file in a text editor (it
+is located in the same directory as the <code>step-49.cc</code> source file) to
+see how it is structured. You can see how the boundary of the domain is
+composed of a number of lines and how later on we combine several lines into
+"physical lines" (or "physical surfaces") that list the logical lines'
+numbers. "Physical" object are the ones that carry information about the
+boundary indicator (see @ref GlossBoundaryIndicator "this glossary entry").
 
-<pre>
+@note It is important that this file contain "physical lines" and "physical
+surfaces". These give the boundary indicators and material ids for use
+in deal.II. Without these physical entities, nothing will be imported into
+deal.II.
+
+deal.II's GridIn class can read the <code>.msh</code> format written by
+gmsh and that contains a mesh created for the geometry described by the
+<code>.geo</code> file. You generate the <code>.msh</code> from the
+<code>.geo</code> by running the commands
+
+@code
 gmsh -2 untitled.geo
-</pre>
+@endcode
 
-or by clicking "Mesh" and then "2D" inside Gmsh after loading the file.  Now
-this is the mesh read from the .msh file and saved again by deal.II as an
-image (see the grid_1 function):
+on the command line, or by clicking "Mesh" and then "2D" inside Gmsh after
+loading the file.  Now this is the mesh read from the <code>.msh</code> file
+and saved again by deal.II as an image (see the <code>grid_1</code> function
+of the current program):
 
 <img src="http://www.dealii.org/images/steps/developer/step-49.grid-1.png" alt="">
 
@@ -131,10 +142,10 @@ GridTools::rotate, GridTools::scale is fairly obvious, so we won't discuss
 those functions here.
 
 The function GridTools::transform allows you to transform the vertices of a
-given mesh using a smooth function.
-
-In the function grid_5() we perturb the y coordinate of a mesh with
-a sin curve:
+given mesh using a smooth function. An example of its use is also given in the
+results section of step-38 but let us show a simpler example here:
+In the function <code>grid_5()</code> of the current program, we perturb the y
+coordinate of a mesh with a sine curve:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
@@ -146,9 +157,9 @@ a sin curve:
   </tr>
 </TABLE>
 
-Using the formula
-$(x,y) \mapsto (x,tanh(2*y)/tanh(2))$, we transform a regular refined
-unit square to a wall-adapted mesh in y direction. This is done in grid_6()
+Similarly, we can transform a regularly refined
+unit square to a wall-adapted mesh in y direction using the formula
+$(x,y) \mapsto (x,\tanh(2*y)/\tanh(2))$. This is done in <code>grid_6()</code>
 of this tutorial:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
@@ -161,9 +172,9 @@ of this tutorial:
   </tr>
 </TABLE>
 
-The function Triangulation::distort_random allows you to move vertices in the
+Finally, the function Triangulation::distort_random allows you to move vertices in the
 mesh (optionally ignoring boundary nodes) by a random amount. This is
-demonstrated in grid_7() and the result is as follows:
+demonstrated in <code>grid_7()</code> and the result is as follows:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
@@ -175,36 +186,43 @@ demonstrated in grid_7() and the result is as follows:
   </tr>
 </TABLE>
 
-Please note that while this allows you to negate some of the superconvergence
-effects one gets when studying convergence on regular meshes, it is better to
-work with a sequence of unstructured meshes (see possible extensions).
+This function is primarily intended to negate some of the superconvergence
+effects one gets when studying convergence on regular meshes, as well as to
+suppress some optimizations in deal.II that can exploit the fact that cells
+are similar in shape. In practice, it is of course always better to
+work with a sequence of unstructured meshes (see possible extensions at the
+end of the this section).
 
 
 <h4>Merging Meshes</h4>
 
 The function GridGenerator::merge_triangulations() allows you to merge two
-given Triangulations into a single one.  For this to work, the vertices of the
-shared edge or face have to match exactly.  Lining up the two meshes can be
-achieved using GridTools::shift and GridTools::scale.  In the function
-grid_2() of this tutorial, we merge a square with a round hole (generated with
-hyper_cube_with_cylindrical_hole()) and a rectangle. The function
-GridTools::subdivided_hyper_rectangle() allows you to specify the number of
-repetitions and the positions of the corners, this way we do not need to shift
-it manually. You should inspect the mesh graphically to make sure, that cells
-line up correctly and no hanging nodes exist in the merged Triangulation.
+given Triangulation objects into a single one.  For this to work, the vertices
+of the shared edge or face have to match exactly.  Lining up the two meshes
+can be achieved using GridTools::shift and GridTools::scale.  In the function
+<code>grid_2()</code> of this tutorial, we merge a square with a round hole
+(generated with GridGenerator::hyper_cube_with_cylindrical_hole()) and a
+rectangle (generated with GridGenerator::subdivided_hyper_rectangle()). The
+function GridGenerator::subdivided_hyper_rectangle() allows you to specify the
+number of repetitions and the positions of the corners, so there is no need to
+shift the triangulation manually here. You should inspect the mesh graphically
+to make sure that cells line up correctly and no unpaired nodes exist in the
+merged Triangulation.
 
 These are the input meshes and the output mesh:
 <TABLE WIDTH="80%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2a.png" alt=""> input mesh 1
+        <img
+	src="http://www.dealii.org/images/steps/developer/step-49.grid-2a.png"
+	alt="" height="200px"> input mesh 1
     </td>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2b.png" alt=""> input mesh 2
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2b.png" alt="" height="200px"> input mesh 2
     </td>
 
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2.png" alt=""> merged mesh
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-2.png" alt="" height="200px"> merged mesh
     </td>
   </tr>
 </table>
@@ -212,33 +230,37 @@ These are the input meshes and the output mesh:
 
 <h4>Moving Vertices</h4>
 
-The function grid_3() demonstrates the ability to pick individual vertices and
-move them around in an existing mesh. Please be sure to not produce degenerate
-cells. Here, we create a box with a cylindrical hole, that is not exactly
+The function <code>grid_3()</code> demonstrates the ability to pick individual vertices and
+move them around in an existing mesh. Note that this has the potential to produce degenerate
+or inverted cells and you shouldn't expect anything useful to come of using
+such meshes. Here, we create a box with a cylindrical hole that is not exactly
 centered by moving the top vertices upwards:
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-3a.png" alt=""> input mesh
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-3a.png" alt="" height="200px"> input mesh
     </td>
 
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-3.png" alt=""> top vertices moved upwards
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-3.png" alt="" height="200px"> top vertices moved upwards
     </td>
   </tr>
 </table>
+
+For the exact way how this is done, see the code below.
 
 
 <h4>Extruding Meshes</h4>
 
 If you need a 3d mesh that can be created by extruding a given 2d mesh (that
 can be created in any of the ways given above), you can use the function
-GridGenerator::extrude_triangulation(). See grid_4() function in this tutorial
-for an example. Note that the given result could also be achieved using the 3d
-version of hyper_cube_with_cylindrical_hole(). The main usage is a 2d mesh
-generated for example with gmsh, that is read in from a .msh file as described
-above. This is the output from grid_4():
+GridGenerator::extrude_triangulation(). See the <code>grid_4()</code> function
+in this tutorial for an example. Note that for this particular case, the given
+result could also be achieved using the 3d version of
+GridGenerator::hyper_cube_with_cylindrical_hole(). The main usage is a 2d
+mesh, generated for example with gmsh, that is read in from a
+<code>.msh</code> file as described above. This is the output from grid_4():
 
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
@@ -253,6 +275,8 @@ above. This is the output from grid_4():
 </table>
 
 
+<!--
+
 <h4>Possible Extensions</h4>
 
 - Modify a mesh:
@@ -261,3 +285,4 @@ above. This is the output from grid_4():
 - Database of unstructured meshes for convergence studies
 - discuss GridTools::extract_boundary_mesh
 - how to remove or disable a cell inside a mesh
+-->
