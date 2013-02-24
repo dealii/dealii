@@ -1,18 +1,22 @@
-<i>This program was made by Timo Heister.</i>
+<i>This program was contributed by Timo Heister.</i>
 
 <a name="Intro"></a>
 <h1> Introduction </h1>
 This tutorial is an extension to step-1 and demonstrates several ways to
-obtain more involved meshes.
+obtain more involved meshes than the ones shown there.
 
-Generating complex geometries is a challenging task, especially in 3 space
+Generating complex geometries is a challenging task, especially in three space
 dimensions. We will discuss several ways to do this, but this list is not
 exhaustive. Additionally, there is not one approach that fits all problems.
 
-The example program shows some of ways to create and modify meshes for
-computations and outputs them as .eps files. No other computations or adaptive
-refinements are done. Please note that the example program does not show all
-the ways to generate meshes that are discussed in this text.
+This example program shows some of ways to create and modify meshes for
+computations and outputs them as <code>.eps</code> files in much the same way
+as we do in step-1. No other computations or adaptive
+refinements are done; the idea is that you can use the techniques used here as
+building blocks in other, more involved simulators. Please note that the
+example program does not show all the ways to generate meshes that are
+discussed in this introduction.
+
 
 <h3>General concerns about meshes</h3>
 
@@ -27,6 +31,7 @@ in the initial mesh.
 
 That said, your mesh needs to capture the given geometry adequately.
 
+
 <h3>How to create meshes</h3>
 
 There are several ways to create an initial mesh. Meshes can be modified or
@@ -34,48 +39,53 @@ combined in many ways as discussed later on.
 
 <h4>Using GridGenerator</h4>
 
-The easiest way to generate meshes is to use the GridGenerator, which is
-already discussed in step-1.  There are many different helper functions
+The easiest way to generate meshes is to use the functions in namespace
+GridGenerator, as already discussed in step-1.  There are many different
+helper functions
 available, including GridGenerator::hyper_cube(),
 GridGenerator::hyper_shell(), GridGenerator::hyper_ball(),
 GridGenerator::hyper_cube_with_cylindrical_hole(), ...
 
+
 <h4>Constructing your own mesh programmatically</h4>
 
-If the is no good fit in the GridGenerator class, you can always create a
+If there is no good fit in the GridGenerator namespace for what you want to
+do, you can always create a
 Triangulation in your program "by hand". For that, you need a list of vertices
 with their coordinates and a list of cells referencing those vertices. You can
-find an example in the function create_coarse_grid in step-14. Additionally,
-all the functions in GridGenerator are implemented in this fashion.
+find an example in the function create_coarse_grid in step-14.
+All the functions in GridGenerator are implemented in this fashion.
 
- We are happy to accept more functions to be added to GridGenerator. So, if
+We are happy to accept more functions to be added to GridGenerator. So, if
 you end up writing a function that might be useful for a larger audience,
 please contribute it.
+
 
 <h4>Importing from external programs</h4>
 
 The class GridIn can read many different mesh formats from a file from
 disk. How this is done is explained in step-5 and can be seen in the function
-grid_1 in this example.
+<code>grid_1</code> in this example, see the code below.
 
 Meshes can be generated from different tools like <a
-href="http://geuz.org/gmsh/" rel="nofollow">gmsh</a>, <a
-href="https://lagrit.lanl.gov/" rel="nofollow">lagrit</a> and <a
-href="http://cubit.sandia.gov/" rel="nofollow">cubit</a>. See the
+href="http://geuz.org/gmsh/" target="_top">gmsh</a>, <a
+href="https://lagrit.lanl.gov/" target="_top">lagrit</a> and <a
+href="http://cubit.sandia.gov/" target="_top">cubit</a>. See the
 documentation of GridIn for more information. The problem is that deal.II
 needs meshes that only consist of quads and hexas -- tetrahedral meshes won't
 work (this means tools like tetgen can not be used directly).
 
 We will describe a possible workflow using Gmsh. Gmsh is the smallest and
-quickest to set up open source tool, that we know of. It can generate
-unstructured 2d quad based meshes, but in 3d it can only extrude 2d meshes to
-get hexahedral meshes. 3D meshing of unstructured geometry into hexas is not
-supported at the time of writing.
+most quickly set up open source tool we are aware of. It can generate
+unstructured 2d quad meshes, but in 3d it can only extrude 2d meshes to
+get hexahedral meshes. 3D meshing of unstructured geometry into hexahedra is not
+supported at the time of writing this tutorial (early 2013).
 
-A mesh is described in a text based .geo file, that can be edited by hand and
-can contain computations, loops, variables, etc.. It is very flexible. The
+In gmsh, a mesh is described in a text based .geo file, that can be edited by
+hand and
+can contain computations, loops, variables, etc. It is very flexible. The
 mesh is generated from a surface representation, which is build from a list of
-line loops, which is build from a list of lines, which are in turn build from
+line loops, which is build from a list of lines, which are in turn built from
 points.
 
 It is important that file contains "physical lines" and "physical
@@ -88,12 +98,12 @@ under the "Geometry" tab.
 
 This tutorial contains an example .geo file, that describes a box with two
 objects cut out in the interior. This is how untitled.geo looks like in gmsh
-(displaying the boundary indicators): 
+(displaying the boundary indicators):
 @image html gmsh_picture.png Mesh displayed in Gmsh
 
 You might want to open the .geo file in a text editor to see how it is
 structured. Deal.II can read the .msh format written by gmsh. You generate the
-.msh from the .geo by running: 
+.msh from the .geo by running:
 
 <pre>
 gmsh -2 untitled.geo
@@ -131,7 +141,7 @@ a sin curve:
         <img src="http://www.dealii.org/images/steps/developer/step-49.grid-5a.png" alt=""> regular input mesh
     </td>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-5.png" alt=""> output mesh 
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-5.png" alt=""> output mesh
     </td>
   </tr>
 </TABLE>
@@ -146,7 +156,7 @@ of this tutorial:
         <img src="http://www.dealii.org/images/steps/developer/step-49.grid-6a.png" alt=""> regular input mesh
     </td>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-6.png" alt=""> wall-adapted output mesh 
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-6.png" alt=""> wall-adapted output mesh
     </td>
   </tr>
 </TABLE>
@@ -160,7 +170,7 @@ demonstrated in grid_7() and the result is as follows:
         <img src="http://www.dealii.org/images/steps/developer/step-49.grid-7a.png" alt=""> regular input mesh
     </td>
     <td ALIGN="center">
-        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-7.png" alt=""> perturbed output mesh 
+        <img src="http://www.dealii.org/images/steps/developer/step-49.grid-7.png" alt=""> perturbed output mesh
     </td>
   </tr>
 </TABLE>
@@ -249,6 +259,5 @@ above. This is the output from grid_4():
   - change boundary indicators
   - relax inner vertices
 - Database of unstructured meshes for convergence studies
-- discuss GridTools::extract_boundary_mesh 
+- discuss GridTools::extract_boundary_mesh
 - how to remove or disable a cell inside a mesh
-
