@@ -1,4 +1,4 @@
-gTH: things to check:
+TH: things to check:
 1. std::accumulate with different data types
 2. numbers::invalid_unsigned_int
 
@@ -94,13 +94,13 @@ BRUNO source/grid/grid_generator.cc
 BRUNO source/grid/grid_in.cc
 BRUNO source/grid/grid_out.cc
 BRUNO source/grid/grid_refinement.cc
-source/grid/grid_reordering.cc
-source/grid/grid_tools.cc
-source/grid/intergrid_map.cc
-source/grid/persistent_tria.cc
-source/grid/tria_accessor.cc
-source/grid/tria_boundary.cc
-source/grid/tria_boundary_lib.cc
+BRUNO source/grid/grid_reordering.cc
+BRUNO source/grid/grid_tools.cc
+BRUNO source/grid/intergrid_map.cc
+BRUNO source/grid/persistent_tria.cc
+BRUNO source/grid/tria_accessor.cc
+BRUNO source/grid/tria_boundary.cc
+BRUNO source/grid/tria_boundary_lib.cc
 BRUNO source/grid/tria.cc
 BRUNO source/grid/tria_faces.cc
 BRUNO source/grid/tria_levels.cc
@@ -172,7 +172,6 @@ BRUNO source/lac/vector.cc
 BRUNO source/lac/vector_memory.cc
 BRUNO source/lac/vector_view.cc
 KAINAN source/multigrid/mg_base.cc
-source/multigrid/mg_dof_accessor.cc
 KAINAN source/multigrid/mg_dof_handler.cc
 KAINAN source/multigrid/mg_tools.cc
 KAINAN source/multigrid/mg_transfer_block.cc
@@ -322,16 +321,16 @@ BRUNO include/deal.II/grid/grid_generator.h
 BRUNO include/deal.II/grid/grid_in.h
 BRUNO include/deal.II/grid/grid_out.h
 BRUNO include/deal.II/grid/grid_refinement.h
-include/deal.II/grid/grid_reordering.h
-include/deal.II/grid/grid_reordering_internal.h
-include/deal.II/grid/grid_tools.h
-include/deal.II/grid/intergrid_map.h
-include/deal.II/grid/magic_numbers.h
-include/deal.II/grid/persistent_tria.h
-include/deal.II/grid/tria_accessor.h
-include/deal.II/grid/tria_accessor.templates.h
-include/deal.II/grid/tria_boundary.h
-include/deal.II/grid/tria_boundary_lib.h
+BRUNO include/deal.II/grid/grid_reordering.h
+BRUNO include/deal.II/grid/grid_reordering_internal.h
+BRUNO include/deal.II/grid/grid_tools.h
+BRUNO include/deal.II/grid/intergrid_map.h
+BRUNO include/deal.II/grid/magic_numbers.h
+BRUNO include/deal.II/grid/persistent_tria.h
+BRUNO include/deal.II/grid/tria_accessor.h
+BRUNO include/deal.II/grid/tria_accessor.templates.h
+BRUNO include/deal.II/grid/tria_boundary.h
+BRUNO include/deal.II/grid/tria_boundary_lib.h
 BRUNO include/deal.II/grid/tria_faces.h
 BRUNO include/deal.II/grid/tria.h
 BRUNO include/deal.II/grid/tria_iterator_base.h

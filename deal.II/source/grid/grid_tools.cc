@@ -1221,7 +1221,6 @@ next_cell:
 
     // finally loop over all cells and set the
     // subdomain ids
-    std::vector<unsigned int> dof_indices(1);
     unsigned int index = 0;
     for (typename Triangulation<dim,spacedim>::active_cell_iterator
          cell = triangulation.begin_active();
