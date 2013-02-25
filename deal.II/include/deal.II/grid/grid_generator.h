@@ -590,17 +590,17 @@ public:
 
   /**
    * This class produces a square on the <i>xy</i>-plane with a circular hole
-   * in the middle, times the interval [0.L] (only in 3d).
+   * in the middle. Square and circle are centered at the origin. In 3d, this
+   * geometry is extruded in $z$ direction to the interval $[0,L]$.
    *
    *  @image html cubes_hole.png
    *
    * It is implemented in 2d and 3d, and takes the following arguments:
    *
-   * @arg @p inner_radius: size of the
+   * @arg @p inner_radius: radius of the
    *    internal hole
-   * @arg @p  outer_radius: size of the
-   *    biggest enclosed cylinder
-   * @arg @p L: extension on the @p z-direction
+   * @arg @p  outer_radius: half of the edge length of the square
+   * @arg @p L: extension in @p z-direction (only used in 3d)
    * @arg @p repetitions: number of subdivisions
    *      along the @p z-direction
    * @arg @p colorize: wether to assign different
