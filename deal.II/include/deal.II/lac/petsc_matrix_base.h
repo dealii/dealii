@@ -672,8 +672,13 @@ namespace PETScWrappers
      * for more information.
      * more information.
      */
-    void compress (::dealii::VectorOperation::values operation
-                   =::dealii::VectorOperation::unknown);
+    void compress (::dealii::VectorOperation::values operation);
+
+    /**
+     * @deprecated: use compress() with VectorOperation instead.
+     */
+    void compress () DEAL_II_DEPRECATED;
+
     /**
      * Return the value of the entry
      * (<i>i,j</i>).  This may be an

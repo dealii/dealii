@@ -163,6 +163,12 @@ never working correctly and it is not used.
 
 <ol>
 
+<li> Changed: parallel sparse matrices now also require the use of
+compress(VectorOperation) like vectors do. See the glossary for details.
+Old functions are now deprecated.
+<br>
+(Timo Heister, 2013/02/25)
+
 <li> New: step-49 demonstrates advanced techniques for mesh creation and
 manipulation.
 <br>
