@@ -84,17 +84,17 @@ namespace Step39
   // cell and face matrices. It is used to assemble the global matrix as well
   // as the level matrices.
   template <int dim>
-  class MatrixIntegrator : public Subscriptor
+  class MatrixIntegrator : public MeshWorker::LocalIntegrator<dim>
   {
   public:
-    static void cell(MeshWorker::DoFInfo<dim> &dinfo,
-                     typename MeshWorker::IntegrationInfo<dim> &info);
-    static void boundary(MeshWorker::DoFInfo<dim> &dinfo,
-                         typename MeshWorker::IntegrationInfo<dim> &info);
-    static void face(MeshWorker::DoFInfo<dim> &dinfo1,
-                     MeshWorker::DoFInfo<dim> &dinfo2,
-                     typename MeshWorker::IntegrationInfo<dim> &info1,
-                     typename MeshWorker::IntegrationInfo<dim> &info2);
+    void cell(MeshWorker::DoFInfo<dim> &dinfo,
+	      typename MeshWorker::IntegrationInfo<dim> &info) const;
+    void boundary(MeshWorker::DoFInfo<dim> &dinfo,
+		  typename MeshWorker::IntegrationInfo<dim> &info) const;
+    void face(MeshWorker::DoFInfo<dim> &dinfo1,
+	      MeshWorker::DoFInfo<dim> &dinfo2,
+	      typename MeshWorker::IntegrationInfo<dim> &info1,
+	      typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
 
 
@@ -110,7 +110,7 @@ namespace Step39
   template <int dim>
   void MatrixIntegrator<dim>::cell(
     MeshWorker::DoFInfo<dim> &dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info)
+    typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     LocalIntegrators::Laplace::cell_matrix(dinfo.matrix(0,false).matrix, info.fe_values());
   }
@@ -119,7 +119,7 @@ namespace Step39
   template <int dim>
   void MatrixIntegrator<dim>::boundary(
     MeshWorker::DoFInfo<dim> &dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info)
+    typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const unsigned int deg = info.fe_values(0).get_fe().tensor_degree();
     LocalIntegrators::Laplace::nitsche_matrix(
@@ -133,7 +133,7 @@ namespace Step39
     MeshWorker::DoFInfo<dim> &dinfo1,
     MeshWorker::DoFInfo<dim> &dinfo2,
     typename MeshWorker::IntegrationInfo<dim> &info1,
-    typename MeshWorker::IntegrationInfo<dim> &info2)
+    typename MeshWorker::IntegrationInfo<dim> &info2) const
   {
     const unsigned int deg = info1.fe_values(0).get_fe().tensor_degree();
     LocalIntegrators::Laplace::ip_matrix(
@@ -147,25 +147,25 @@ namespace Step39
   // the right hand side function is zero, such that only the boundary
   // condition is set here in weak form.
   template <int dim>
-  class RHSIntegrator : public Subscriptor
+  class RHSIntegrator : public MeshWorker::LocalIntegrator<dim>
   {
   public:
-    static void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info);
-    static void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info);
-    static void face(MeshWorker::DoFInfo<dim> &dinfo1,
-                     MeshWorker::DoFInfo<dim> &dinfo2,
-                     typename MeshWorker::IntegrationInfo<dim> &info1,
-                     typename MeshWorker::IntegrationInfo<dim> &info2);
+    void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
+    void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
+    void face(MeshWorker::DoFInfo<dim> &dinfo1,
+	      MeshWorker::DoFInfo<dim> &dinfo2,
+	      typename MeshWorker::IntegrationInfo<dim> &info1,
+	      typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
 
 
   template <int dim>
-  void RHSIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &, typename MeshWorker::IntegrationInfo<dim> &)
+  void RHSIntegrator<dim>::cell(MeshWorker::DoFInfo<dim> &, typename MeshWorker::IntegrationInfo<dim> &) const
   {}
 
 
   template <int dim>
-  void RHSIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info)
+  void RHSIntegrator<dim>::boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe = info.fe_values();
     Vector<double> &local_vector = dinfo.vector(0).block(0);
@@ -188,7 +188,7 @@ namespace Step39
   void RHSIntegrator<dim>::face(MeshWorker::DoFInfo<dim> &,
                                 MeshWorker::DoFInfo<dim> &,
                                 typename MeshWorker::IntegrationInfo<dim> &,
-                                typename MeshWorker::IntegrationInfo<dim> &)
+                                typename MeshWorker::IntegrationInfo<dim> &) const
   {}
 
 
@@ -196,22 +196,22 @@ namespace Step39
   // error estimate. This is the standard energy estimator due to Karakashian
   // and Pascal (2003).
   template <int dim>
-  class Estimator : public Subscriptor
+  class Estimator : public MeshWorker::LocalIntegrator<dim>
   {
   public:
-    static void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info);
-    static void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info);
-    static void face(MeshWorker::DoFInfo<dim> &dinfo1,
-                     MeshWorker::DoFInfo<dim> &dinfo2,
-                     typename MeshWorker::IntegrationInfo<dim> &info1,
-                     typename MeshWorker::IntegrationInfo<dim> &info2);
+    void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
+    void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
+    void face(MeshWorker::DoFInfo<dim> &dinfo1,
+	      MeshWorker::DoFInfo<dim> &dinfo2,
+	      typename MeshWorker::IntegrationInfo<dim> &info1,
+	      typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
 
 
   // The cell contribution is the Laplacian of the discrete solution, since
   // the right hand side is zero.
   template <int dim>
-  void Estimator<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info)
+  void Estimator<dim>::cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe = info.fe_values();
 
@@ -228,7 +228,7 @@ namespace Step39
   // namely the norm of the difference between the finite element solution and
   // the correct boundary condition.
   template <int dim>
-  void Estimator<dim>::boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info)
+  void Estimator<dim>::boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe = info.fe_values();
 
@@ -253,7 +253,7 @@ namespace Step39
   void Estimator<dim>::face(MeshWorker::DoFInfo<dim> &dinfo1,
                             MeshWorker::DoFInfo<dim> &dinfo2,
                             typename MeshWorker::IntegrationInfo<dim> &info1,
-                            typename MeshWorker::IntegrationInfo<dim> &info2)
+                            typename MeshWorker::IntegrationInfo<dim> &info2) const
   {
     const FEValuesBase<dim> &fe = info1.fe_values();
     const std::vector<double> &uh1 = info1.values[0][0];
@@ -292,15 +292,15 @@ namespace Step39
   // 2\sigma_F\|u\|^2_F @f]
 
   template <int dim>
-  class ErrorIntegrator : public Subscriptor
+  class ErrorIntegrator : public MeshWorker::LocalIntegrator<dim>
   {
   public:
-    static void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info);
-    static void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info);
-    static void face(MeshWorker::DoFInfo<dim> &dinfo1,
-                     MeshWorker::DoFInfo<dim> &dinfo2,
-                     typename MeshWorker::IntegrationInfo<dim> &info1,
-                     typename MeshWorker::IntegrationInfo<dim> &info2);
+    void cell(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
+    void boundary(MeshWorker::DoFInfo<dim> &dinfo, typename MeshWorker::IntegrationInfo<dim> &info) const;
+    void face(MeshWorker::DoFInfo<dim> &dinfo1,
+	      MeshWorker::DoFInfo<dim> &dinfo2,
+	      typename MeshWorker::IntegrationInfo<dim> &info1,
+	      typename MeshWorker::IntegrationInfo<dim> &info2) const;
   };
 
   // Here we have the integration on cells. There is currently no good
@@ -318,7 +318,7 @@ namespace Step39
   template <int dim>
   void ErrorIntegrator<dim>::cell(
     MeshWorker::DoFInfo<dim> &dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info)
+    typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe = info.fe_values();
     std::vector<Tensor<1,dim> > exact_gradients(fe.n_quadrature_points);
@@ -350,7 +350,7 @@ namespace Step39
   template <int dim>
   void ErrorIntegrator<dim>::boundary(
     MeshWorker::DoFInfo<dim> &dinfo,
-    typename MeshWorker::IntegrationInfo<dim> &info)
+    typename MeshWorker::IntegrationInfo<dim> &info) const
   {
     const FEValuesBase<dim> &fe = info.fe_values();
 
@@ -376,7 +376,7 @@ namespace Step39
     MeshWorker::DoFInfo<dim> &dinfo1,
     MeshWorker::DoFInfo<dim> &dinfo2,
     typename MeshWorker::IntegrationInfo<dim> &info1,
-    typename MeshWorker::IntegrationInfo<dim> &info2)
+    typename MeshWorker::IntegrationInfo<dim> &info2) const
   {
     const FEValuesBase<dim> &fe = info1.fe_values();
     const std::vector<double> &uh1 = info1.values[0][0];
@@ -573,11 +573,16 @@ namespace Step39
     // assembler to distribute the information into the global matrix.
     MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
-    // Finally, we need an object that assembles the local matrix into the
-    // global matrix.
+    // Furthermore, we need an object that assembles the local matrix into the
+    // global matrix. These assembler objects have all the knowledge
+    // of the structures of the target object, in this case a
+    // SparseMatrix, possible constraints and the mesh structure.
     MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> > assembler;
     assembler.initialize(matrix);
 
+    // Now comes the part we coded ourselves, the local
+    // integrator. This is the only part which is problem dependent.
+    MatrixIntegrator<dim> integrator;
     // Now, we throw everything into a MeshWorker::loop(), which here
     // traverses all active cells of the mesh, computes cell and face matrices
     // and assembles them into the global matrix. We use the variable
@@ -586,10 +591,7 @@ namespace Step39
     MeshWorker::integration_loop<dim, dim>(
       dof_handler.begin_active(), dof_handler.end(),
       dof_info, info_box,
-      &MatrixIntegrator<dim>::cell,
-      &MatrixIntegrator<dim>::boundary,
-      &MatrixIntegrator<dim>::face,
-      assembler);
+      integrator, assembler);
   }
 
 
@@ -612,7 +614,8 @@ namespace Step39
     MeshWorker::Assembler::MGMatrixSimple<SparseMatrix<double> > assembler;
     assembler.initialize(mg_matrix);
     assembler.initialize_fluxes(mg_matrix_dg_up, mg_matrix_dg_down);
-
+    
+    MatrixIntegrator<dim> integrator;
     // Here is the other difference to the previous function: we run over all
     // cells, not only the active ones. And we use <tt>mg_dof_handler</tt>,
     // since we need the degrees of freedom on each level, not the global
@@ -620,10 +623,7 @@ namespace Step39
     MeshWorker::integration_loop<dim, dim> (
       mg_dof_handler.begin(), mg_dof_handler.end(),
       dof_info, info_box,
-      &MatrixIntegrator<dim>::cell,
-      &MatrixIntegrator<dim>::boundary,
-      &MatrixIntegrator<dim>::face,
-      assembler);
+      integrator, assembler);
   }
 
 
@@ -651,13 +651,11 @@ namespace Step39
     data.add(rhs, "RHS");
     assembler.initialize(data);
 
+    RHSIntegrator<dim> integrator;
     MeshWorker::integration_loop<dim, dim>(
       dof_handler.begin_active(), dof_handler.end(),
       dof_info, info_box,
-      &RHSIntegrator<dim>::cell,
-      &RHSIntegrator<dim>::boundary,
-      &RHSIntegrator<dim>::face,
-      assembler);
+      integrator, assembler);
 
     right_hand_side *= -1.;
   }
@@ -790,13 +788,11 @@ namespace Step39
     out_data.add(est, "cells");
     assembler.initialize(out_data, false);
 
+    Estimator<dim> integrator;
     MeshWorker::integration_loop<dim, dim> (
       dof_handler.begin_active(), dof_handler.end(),
       dof_info, info_box,
-      &Estimator<dim>::cell,
-      &Estimator<dim>::boundary,
-      &Estimator<dim>::face,
-      assembler);
+      integrator, assembler);
 
     // Right before we return the result of the error estimate, we restore the
     // old user indices.
@@ -847,13 +843,11 @@ namespace Step39
     out_data.add(est, "cells");
     assembler.initialize(out_data, false);
 
+    ErrorIntegrator<dim> integrator;
     MeshWorker::integration_loop<dim, dim> (
       dof_handler.begin_active(), dof_handler.end(),
       dof_info, info_box,
-      &ErrorIntegrator<dim>::cell,
-      &ErrorIntegrator<dim>::boundary,
-      &ErrorIntegrator<dim>::face,
-      assembler);
+      integrator, assembler);
 
     deallog << "energy-error: " << errors.block(0).l2_norm() << std::endl;
     deallog << "L2-error:     " << errors.block(1).l2_norm() << std::endl;
