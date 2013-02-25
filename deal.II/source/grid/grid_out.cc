@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -302,7 +302,6 @@ namespace GridOutFlags
     :
     draw_boundary(true),
     color_by(material_id),
-    level_color(false),
     level_depth(true),
     n_boundary_face_points(0),
     scaling(1.,1.),
@@ -332,7 +331,6 @@ namespace GridOutFlags
   void XFig::parse_parameters (ParameterHandler &param)
   {
     draw_boundary = param.get_bool("Boundary");
-    level_color = param.get_bool("Level color");
     level_depth = param.get_bool("Level depth");
     n_boundary_face_points = param.get_integer("Boundary points");
     fill_style = param.get_integer("Fill style");
@@ -1176,10 +1174,7 @@ void GridOut::write_xfig (
         {
 //TODO[GK]: Simplify after deprecation period is over
         case GridOutFlags::XFig::material_id:
-          if (xfig_flags.level_color)
-            out << cell->level()   + 32;
-          else
-            out << static_cast<unsigned int>(cell->material_id()) + 32;
+	  out << static_cast<unsigned int>(cell->material_id()) + 32;
           break;
         case GridOutFlags::XFig::level_number:
           out << cell->level() + 8;

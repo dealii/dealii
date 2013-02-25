@@ -157,7 +157,6 @@ protected:
    * Memory for auxiliary vectors.
    */
   SmartPointer<VectorMemory<VECTOR>, MGSmoother<VECTOR> > mem;
-
 };
 
 
@@ -355,14 +354,25 @@ class MGSmootherRelaxation : public MGSmoother<VECTOR>
 {
 public:
   /**
+   * Constructor. Sets smoothing parameters.
+   */
+  MGSmootherRelaxation(const unsigned int steps = 1,
+                       const bool variable = false,
+                       const bool symmetric = false,
+                       const bool transpose = false);
+
+  /**
    * Constructor. Sets memory and
    * smoothing parameters.
+   *
+   * @deprecated Use the constructor without the vector memory
+   * object
    */
   MGSmootherRelaxation(VectorMemory<VECTOR> &mem,
                        const unsigned int steps = 1,
                        const bool variable = false,
                        const bool symmetric = false,
-                       const bool transpose = false);
+                       const bool transpose = false) DEAL_II_DEPRECATED;
 
   /**
    * Initialize for matrices. This
@@ -524,14 +534,25 @@ class MGSmootherPrecondition : public MGSmoother<VECTOR>
 {
 public:
   /**
+   * Constructor. Sets smoothing parameters.
+   */
+  MGSmootherPrecondition(const unsigned int steps = 1,
+                         const bool variable = false,
+                         const bool symmetric = false,
+                         const bool transpose = false);
+
+  /**
    * Constructor. Sets memory and
    * smoothing parameters.
+   *
+   * @deprecated Use the constructor without the vector memory
+   * object
    */
   MGSmootherPrecondition(VectorMemory<VECTOR> &mem,
                          const unsigned int steps = 1,
                          const bool variable = false,
                          const bool symmetric = false,
-                         const bool transpose = false);
+                         const bool transpose = false) DEAL_II_DEPRECATED;
 
   /**
    * Initialize for matrices. This
@@ -866,6 +887,20 @@ MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::MGSmootherRelaxation(
 {}
 
 
+
+template <class MATRIX, class RELAX, class VECTOR>
+inline
+MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::MGSmootherRelaxation(
+  const unsigned int steps,
+  const bool variable,
+  const bool symmetric,
+  const bool transpose)
+  :
+  MGSmoother<VECTOR>(steps, variable, symmetric, transpose)
+{}
+
+
+
 template <class MATRIX, class RELAX, class VECTOR>
 inline void
 MGSmootherRelaxation<MATRIX, RELAX, VECTOR>::clear ()
@@ -1031,6 +1066,19 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::MGSmootherPrecondition(
   const bool transpose)
   :
   MGSmoother<VECTOR>(mem, steps, variable, symmetric, transpose)
+{}
+
+
+
+template <class MATRIX, class PRECONDITIONER, class VECTOR>
+inline
+MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::MGSmootherPrecondition(
+  const unsigned int steps,
+  const bool variable,
+  const bool symmetric,
+  const bool transpose)
+  :
+  MGSmoother<VECTOR>(steps, variable, symmetric, transpose)
 {}
 
 

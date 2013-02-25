@@ -108,8 +108,8 @@ Here is some output generated in the 12th cycle of the program, i.e. with roughl
 300,000 unknowns:
 
 
-@image html step-17.12-ux.png
-@image html step-17.12-uy.png
+<img src="http://www.dealii.org/images/steps/developer/step-17.12-ux.png" alt="">
+<img src="http://www.dealii.org/images/steps/developer/step-17.12-uy.png" alt="">
 
 
 
@@ -121,8 +121,8 @@ separate scalar fields. What may be more interesting,
 though, is to look at the mesh and partition at this step:
 
 
-@image html step-17.12-grid.png
-@image html step-17.12-partition.png
+<img src="http://www.dealii.org/images/steps/developer/step-17.12-grid.png" alt="">
+<img src="http://www.dealii.org/images/steps/developer/step-17.12-partition.png" alt="">
 
 
 Again, the mesh (left) shows the same refinement pattern as seen
@@ -203,8 +203,8 @@ this job is rather large (cycle 5 already prints around 82 MB of GMV data), so
 we contend ourselves with showing output from cycle 4:
 
 
-@image html step-17.4-3d-partition.png
-@image html step-17.4-3d-ux.png
+<img src="http://www.dealii.org/images/steps/developer/step-17.4-3d-partition.png" alt="">
+<img src="http://www.dealii.org/images/steps/developer/step-17.4-3d-ux.png" alt="">
 
 
 The left picture shows the partitioning of the cube into 16 processes, whereas

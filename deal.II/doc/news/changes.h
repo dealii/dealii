@@ -208,6 +208,21 @@ DoFHandler, in particular removal of specializations.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The ArpackSolver interface to the ARPACK eigenvalue solver could
+not be compiled with newer C++ compilers. This is now fixed.
+<br>
+(Juan Carlos Araujo Cabarcas, Wolfgang Bangerth, 2013/02/20)
+
+<li> New: PETScWrappers::MPI::BlockVector now has a constructor and reinit
+that takes a std::vector<IndexSet> (same interface as in Trilinos).
+<br>
+(Timo Heister, 2013/02/19)
+
+<li> New: PETScWrappers::*Matrix::add(other, factor) to
+add a scaled other matrix to the current matrix.
+<br>
+(Jose Javier Munoz Criollo, 2013/02/19)
+
 <li> New: GridGenerator::extrude_triangulation() allows
 you to extrude a 2d mesh to turn it into a 3d mesh.
 <br>

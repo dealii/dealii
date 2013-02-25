@@ -2,7 +2,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2005-2008, 2010-2012 by the deal.II authors */
+/*    Copyright (C) 2005-2008, 2010-2013 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -260,7 +260,7 @@ namespace Step20
   // In the constructor of this class, we first store the value that was
   // passed in concerning the degree of the finite elements we shall use (a
   // degree of zero, for example, means to use RT(0) and DG(0)), and then
-  // construct the vector valued element belonging to the space X_h described
+  // construct the vector valued element belonging to the space $X_h$ described
   // in the introduction. The rest of the constructor is as in the early
   // tutorial programs.
   //
@@ -313,7 +313,7 @@ namespace Step20
     // end, we first have to make sure that the indices corresponding to
     // velocities and pressures are not intermingled: First all velocity
     // degrees of freedom, then all pressure DoFs. This way, the global matrix
-    // separates nicely into a 2x2 system. To achieve this, we have to
+    // separates nicely into a $2 \times 2$ system. To achieve this, we have to
     // renumber degrees of freedom base on their vector component, an
     // operation that conveniently is already implemented:
     DoFRenumbering::component_wise (dof_handler);
@@ -351,7 +351,7 @@ namespace Step20
     // maximal number of nonzero entries per row (this could be done more
     // efficiently in this case, but we only want to solve relatively small
     // problems for which this is not so important). In the second step, we
-    // allocate a 2x2 block pattern and then reinitialize each of the blocks
+    // allocate a $2 \times 2$ block pattern and then reinitialize each of the blocks
     // to its correct size using the <code>n_u</code> and <code>n_p</code>
     // variables defined above that hold the number of velocity and pressure
     // variables. In this second step, we only operate on the individual
@@ -607,8 +607,21 @@ namespace Step20
   // step. Consequently, the class also does not have to store a pointer to an
   // inverse mass matrix object.
   //
-  // Since InverseIterate follows the standard convention for matrices, we
-  // need to provide a <tt>Tvmult</tt> function here as well.
+  // We will later use this class as a template argument to the
+  // IterativeInverse class which will in turn want to use it as a
+  // template argument for the PointerMatrix class. The latter class
+  // has a function that requires us to also write a function that
+  // provides the product with the transpose of the matrix this object
+  // represents. As a consequence, in the code below, we also
+  // implement a <tt>Tvmult</tt> function here that represents the
+  // product of the transpose matrix with a vector. It is easy to see
+  // how this needs to be implemented here: since the matrix is
+  // symmetric, we can as well call <code>vmult</code> wherever the
+  // product with the transpose matrix is required. (Note, however,
+  // that even though we implement this function here, there will in
+  // fact not be any need for it as long as we use SolverCG as the
+  // solver since that solver does not ever call the function that
+  // provides this operation.)
   class ApproximateSchurComplement : public Subscriptor
   {
   public:
@@ -646,9 +659,7 @@ namespace Step20
   void ApproximateSchurComplement::Tvmult (Vector<double>       &dst,
                                            const Vector<double> &src) const
   {
-    system_matrix->block(1,0).Tvmult (dst, tmp2);
-    system_matrix->block(0,0).precondition_Jacobi (tmp2, tmp1);
-    system_matrix->block(0,1).Tvmult (tmp1, src);
+    vmult (dst, src);
   }
 
 
@@ -666,8 +677,7 @@ namespace Step20
   void MixedLaplaceProblem<dim>::solve ()
   {
     PreconditionIdentity identity;
-    IterativeInverse<Vector<double> >
-    m_inverse;
+    IterativeInverse<Vector<double> > m_inverse;
     m_inverse.initialize(system_matrix.block(0,0), identity);
     m_inverse.solver.select("cg");
     static ReductionControl inner_control(1000, 0., 1.e-13);
@@ -675,7 +685,7 @@ namespace Step20
 
     Vector<double> tmp (solution.block(0).size());
 
-    // Now on to the first equation. The right hand side of it is BM^{-1}F-G,
+    // Now on to the first equation. The right hand side of it is $B^TM^{-1}F-G$,
     // which is what we compute in the first few lines. We then declare the
     // objects representing the Schur complement, its approximation, and the
     // inverse of the approximation. Finally, we declare a solver object and
@@ -715,7 +725,7 @@ namespace Step20
     }
 
     // After we have the pressure, we can compute the velocity. The equation
-    // reads MU=-B^TP+F, and we solve it by first computing the right hand
+    // reads $MU=-BP+F$, and we solve it by first computing the right hand
     // side, and then multiplying it with the object that represents the
     // inverse of the mass matrix:
     {
