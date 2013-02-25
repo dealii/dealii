@@ -40,6 +40,9 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "/EHsc")
 #enable warnings:
 ADD_FLAGS(CMAKE_CXX_FLAGS "/W3")
 
+# Globally disable some legacy min and max macros that cause problems:
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "/NOMINMAX")
+
 #############################
 #                           #
 #    For Release target:    #
