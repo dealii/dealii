@@ -565,6 +565,22 @@
  * Some of the objects are also indifferent and can figure out what to
  * do without being told. The TrilinosWrappers::SparseMatrix can do that,
  * for example.
+ *
+ * In short, you need to call compress() in the following cases (and
+ * only in those cases, though calling compress() in other cases
+ * just costs some performance):
+ *
+ * 1. At the end of your assembly loop on matrices and vectors. This needs to
+ * be done if you write entries directly and if you use
+ * ConstraintMatrix::distribute_local_to_global. Use VectorOperation::add.
+ *
+ * 2. When you are done setting individual elements in a matrix/vector before
+ * any other operations are done (adding to elements, other operations like
+ * scaling, solving, reading, etc.). Use VectorOperation::insert.
+ *
+ * 3. Like in 2., but for adding values to individual elements. Use
+ * VectorOperation::add.
+ *
  * </dd>
  *
  *
