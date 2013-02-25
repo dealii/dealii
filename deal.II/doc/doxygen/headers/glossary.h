@@ -581,6 +581,8 @@
  * 3. Like in 2., but for adding values to individual elements. Use
  * VectorOperation::add.
  *
+ * All other operations like scaling or adding vectors, assignments, or solvers
+ * do not require calls to compress().
  * </dd>
  *
  *
