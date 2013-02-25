@@ -123,7 +123,7 @@ protected:
   /**
    * Sizes of the multi-level vectors.
    */
-  mutable std::vector<std::vector<unsigned int> > sizes;
+  mutable std::vector<std::vector<types::global_dof_index> > sizes;
 
   /**
    * Start index of each block.
@@ -520,7 +520,7 @@ private:
 
 /*@}*/
 
-//---------------------------------------------------------------------------
+//----------inline function definition--------------------------------------------------
 template <typename number>
 inline void
 MGTransferBlockSelect<number>::select(const unsigned int block)

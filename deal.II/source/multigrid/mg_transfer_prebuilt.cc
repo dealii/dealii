@@ -116,8 +116,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // two fields which will store the
   // indices of the multigrid dofs
   // for a cell and one of its children
-  std::vector<unsigned int> dof_indices_parent (dofs_per_cell);
-  std::vector<unsigned int> dof_indices_child (dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices_parent (dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices_child (dofs_per_cell);
 
   // for each level: first build the sparsity
   // pattern of the matrices and then build the
@@ -139,7 +139,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       // element will be stored
       CompressedSimpleSparsityPattern csp (sizes[level+1],
                                            sizes[level]);
-      std::vector<unsigned int> entries (dofs_per_cell);
+      std::vector<types::global_dof_index> entries (dofs_per_cell);
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children())
@@ -219,7 +219,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   if (mg_constrained_dofs != 0)
     if (mg_constrained_dofs->set_boundary_values())
       {
-        std::vector<unsigned int> constrain_indices;
+        std::vector<types::global_dof_index> constrain_indices;
         for (int level=n_levels-2; level>=0; --level)
           {
             if (mg_constrained_dofs->get_boundary_indices()[level].size() == 0)
@@ -232,14 +232,14 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
             // need to filter away.
             constrain_indices.resize (0);
             constrain_indices.resize (prolongation_matrices[level]->n(), 0);
-            std::set<unsigned int>::const_iterator dof
+            std::set<types::global_dof_index>::const_iterator dof
             = mg_constrained_dofs->get_boundary_indices()[level].begin(),
             endd = mg_constrained_dofs->get_boundary_indices()[level].end();
             for (; dof != endd; ++dof)
               constrain_indices[*dof] = 1;
 
-            const unsigned int n_dofs = prolongation_matrices[level]->m();
-            for (unsigned int i=0; i<n_dofs; ++i)
+            const types::global_dof_index n_dofs = prolongation_matrices[level]->m();
+            for (types::global_dof_index i=0; i<n_dofs; ++i)
               {
                 typename internal::MatrixSelector<VECTOR>::Matrix::iterator
                 start_row = prolongation_matrices[level]->begin(i),
@@ -265,9 +265,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // levels.
 
   copy_indices.resize(n_levels);
-  std::vector<unsigned int> temp_copy_indices;
-  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
-  std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
+  std::vector<types::global_dof_index> temp_copy_indices;
+  std::vector<types::global_dof_index> global_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> level_dof_indices  (dofs_per_cell);
   for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
     {
       copy_indices[level].clear();
@@ -308,16 +308,16 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       // copy_indices object. Then, insert the pairs
       // of global index and level index into
       // copy_indices.
-      const unsigned int n_active_dofs =
+      const types::global_dof_index n_active_dofs =
         std::count_if (temp_copy_indices.begin(), temp_copy_indices.end(),
-                       std::bind2nd(std::not_equal_to<unsigned int>(),
+                       std::bind2nd(std::not_equal_to<types::global_dof_index>(),
                                     numbers::invalid_unsigned_int));
       copy_indices[level].resize (n_active_dofs);
-      unsigned int counter = 0;
-      for (unsigned int i=0; i<temp_copy_indices.size(); ++i)
+      types::global_dof_index counter = 0;
+      for (types::global_dof_index i=0; i<temp_copy_indices.size(); ++i)
         if (temp_copy_indices[i] != numbers::invalid_unsigned_int)
           copy_indices[level][counter++] =
-            std::pair<unsigned int, unsigned int> (temp_copy_indices[i], i);
+            std::pair<types::global_dof_index, unsigned int> (temp_copy_indices[i], i);
       Assert (counter == n_active_dofs, ExcInternalError());
     }
 }

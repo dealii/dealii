@@ -130,8 +130,8 @@ namespace MGTools
 
     const typename DoFHandler<dim,spacedim>::cell_iterator end = dofs.end(level);
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell;
-    std::vector<unsigned int> cell_indices;
-    std::vector<unsigned int> neighbor_indices;
+    std::vector<types::global_dof_index> cell_indices;
+    std::vector<types::global_dof_index> neighbor_indices;
 
     // We loop over cells and go from
     // cells to lower dimensional
@@ -304,8 +304,8 @@ namespace MGTools
 
     const typename DoFHandler<dim,spacedim>::cell_iterator end = dofs.end(level);
     typename DoFHandler<dim,spacedim>::active_cell_iterator cell;
-    std::vector<unsigned int> cell_indices;
-    std::vector<unsigned int> neighbor_indices;
+    std::vector<types::global_dof_index> cell_indices;
+    std::vector<types::global_dof_index> neighbor_indices;
 
     // We have to translate the
     // couplings from components to
@@ -542,7 +542,7 @@ namespace MGTools
     SparsityPattern         &sparsity,
     const unsigned int       level)
   {
-    const unsigned int n_dofs = dof.n_dofs(level);
+    const types::global_dof_index n_dofs = dof.n_dofs(level);
 
     Assert (sparsity.n_rows() == n_dofs,
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
@@ -550,7 +550,7 @@ namespace MGTools
             ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-    std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
+    std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
     typename DH::cell_iterator cell = dof.begin(level),
                                endc = dof.end(level);
     for (; cell!=endc; ++cell)
@@ -574,7 +574,7 @@ namespace MGTools
     SparsityPattern       &sparsity,
     const unsigned int level)
   {
-    const unsigned int n_dofs = dof.n_dofs(level);
+    const types::global_dof_index n_dofs = dof.n_dofs(level);
 
     Assert (sparsity.n_rows() == n_dofs,
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
@@ -634,8 +634,8 @@ namespace MGTools
     Assert ((level>=1) && (level<dof.get_tria().n_levels()),
             ExcIndexRange(level, 1, dof.get_tria().n_levels()));
 
-    const unsigned int fine_dofs = dof.n_dofs(level);
-    const unsigned int coarse_dofs = dof.n_dofs(level-1);
+    const types::global_dof_index fine_dofs = dof.n_dofs(level);
+    const types::global_dof_index coarse_dofs = dof.n_dofs(level-1);
 
     // Matrix maps from fine level to coarse level
 
@@ -645,8 +645,8 @@ namespace MGTools
             ExcDimensionMismatch (sparsity.n_cols(), fine_dofs));
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-    std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
-    std::vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
+    std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
+    std::vector<types::global_dof_index> dofs_on_other_cell(dofs_per_cell);
     typename DoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
                                                      endc = dof.end(level);
     for (; cell!=endc; ++cell)
@@ -693,7 +693,7 @@ namespace MGTools
     const Table<2,DoFTools::Coupling> &flux_mask)
   {
     const FiniteElement<dim> &fe = dof.get_fe();
-    const unsigned int n_dofs = dof.n_dofs(level);
+    const types::global_dof_index n_dofs = dof.n_dofs(level);
     const unsigned int n_comp = fe.n_components();
 
     Assert (sparsity.n_rows() == n_dofs,
@@ -710,8 +710,8 @@ namespace MGTools
             ExcDimensionMismatch (flux_mask.n_cols(), n_comp));
 
     const unsigned int total_dofs = fe.dofs_per_cell;
-    std::vector<unsigned int> dofs_on_this_cell(total_dofs);
-    std::vector<unsigned int> dofs_on_other_cell(total_dofs);
+    std::vector<types::global_dof_index> dofs_on_this_cell(total_dofs);
+    std::vector<types::global_dof_index> dofs_on_other_cell(total_dofs);
     Table<2,bool> support_on_face(total_dofs, GeometryInfo<dim>::faces_per_cell);
 
     typename DoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
@@ -874,8 +874,8 @@ namespace MGTools
     Assert ((level>=1) && (level<dof.get_tria().n_levels()),
             ExcIndexRange(level, 1, dof.get_tria().n_levels()));
 
-    const unsigned int fine_dofs = dof.n_dofs(level);
-    const unsigned int coarse_dofs = dof.n_dofs(level-1);
+    const types::global_dof_index fine_dofs = dof.n_dofs(level);
+    const types::global_dof_index coarse_dofs = dof.n_dofs(level-1);
 
     // Matrix maps from fine level to coarse level
 
@@ -889,8 +889,8 @@ namespace MGTools
             ExcDimensionMismatch (flux_mask.n_cols(), n_comp));
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-    std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
-    std::vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
+    std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
+    std::vector<types::global_dof_index> dofs_on_other_cell(dofs_per_cell);
     Table<2,bool> support_on_face(dofs_per_cell, GeometryInfo<dim>::faces_per_cell);
 
     typename DoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
@@ -943,9 +943,9 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   count_dofs_per_component (const DoFHandler<dim,spacedim> &dof_handler,
-                            std::vector<std::vector<unsigned int> > &result,
+                            std::vector<std::vector<types::global_dof_index> > &result,
                             bool                              only_once,
-                            std::vector<unsigned int>         target_component)
+                            std::vector<types::global_dof_index>         target_component)
   {
     const FiniteElement<dim> &fe = dof_handler.get_fe();
     const unsigned int n_components = fe.n_components();
@@ -1045,8 +1045,8 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   count_dofs_per_component (const DoFHandler<dim,spacedim>        &dof_handler,
-                            std::vector<std::vector<unsigned int> > &result,
-                            std::vector<unsigned int>            target_component)
+                            std::vector<std::vector<types::global_dof_index> > &result,
+                            std::vector<types::global_dof_index>            target_component)
   {
     count_dofs_per_component (dof_handler, result,
                               false, target_component);
@@ -1058,8 +1058,8 @@ namespace MGTools
   void
   count_dofs_per_block (
     const DH     &dof_handler,
-    std::vector<std::vector<unsigned int> > &dofs_per_block,
-    std::vector<unsigned int>  target_block)
+    std::vector<std::vector<types::global_dof_index> > &dofs_per_block,
+    std::vector<types::global_dof_index>  target_block)
   {
     const FiniteElement<DH::dimension,DH::space_dimension> &fe = dof_handler.get_fe();
     const unsigned int n_blocks = fe.n_blocks();
@@ -1141,7 +1141,7 @@ namespace MGTools
   make_boundary_list(
     const DoFHandler<1,1> &,
     const FunctionMap<1>::type &,
-    std::vector<std::set<unsigned int> > &,
+    std::vector<std::set<types::global_dof_index> > &,
     const ComponentMask &)
   {
     Assert(false, ExcNotImplemented());
@@ -1154,7 +1154,7 @@ namespace MGTools
   make_boundary_list(
     const DoFHandler<1,2> &,
     const FunctionMap<1>::type &,
-    std::vector<std::set<unsigned int> > &,
+    std::vector<std::set<types::global_dof_index> > &,
     const ComponentMask &)
   {
     Assert(false, ExcNotImplemented());
@@ -1167,7 +1167,7 @@ namespace MGTools
   make_boundary_list(
     const DoFHandler<dim,spacedim> &dof,
     const typename FunctionMap<dim>::type &function_map,
-    std::vector<std::set<unsigned int> > &boundary_indices,
+    std::vector<std::set<types::global_dof_index> > &boundary_indices,
     const ComponentMask &component_mask)
   {
     // if for whatever reason we were
@@ -1185,7 +1185,7 @@ namespace MGTools
 
     AssertDimension (boundary_indices.size(), n_levels);
 
-    std::vector<unsigned int> local_dofs;
+    std::vector<types::global_dof_index> local_dofs;
     local_dofs.reserve (DoFTools::max_dofs_per_face(dof));
     std::fill (local_dofs.begin (),
                local_dofs.end (),
@@ -1383,7 +1383,7 @@ namespace MGTools
             ExcDimensionMismatch (boundary_indices.size(),
                                   dof.get_tria().n_levels()));
 
-    std::vector<std::set<unsigned int> >
+    std::vector<std::set<types::global_dof_index> >
     my_boundary_indices (dof.get_tria().n_levels());
     make_boundary_list (dof, function_map, my_boundary_indices, component_mask);
     for (unsigned int i=0; i<dof.get_tria().n_levels(); ++i)
@@ -1422,7 +1422,7 @@ namespace MGTools
     const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int   dofs_per_face   = fe.dofs_per_face;
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     std::vector<bool> cell_dofs(dofs_per_cell, false);
 
     typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
@@ -1463,7 +1463,7 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_non_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                              std::vector<std::set<unsigned int> >  &non_interface_dofs)
+                              std::vector<std::set<types::global_dof_index> >  &non_interface_dofs)
   {
     Assert (non_interface_dofs.size() == mg_dof_handler.get_tria().n_levels(),
             ExcDimensionMismatch (non_interface_dofs.size(),
@@ -1474,7 +1474,7 @@ namespace MGTools
     const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int   dofs_per_face   = fe.dofs_per_face;
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     std::vector<bool> cell_dofs(dofs_per_cell, false);
     std::vector<bool> cell_dofs_interface(dofs_per_cell, false);
 
@@ -1560,8 +1560,8 @@ namespace MGTools
     const unsigned int   dofs_per_cell   = fe.dofs_per_cell;
     const unsigned int   dofs_per_face   = fe.dofs_per_face;
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
-    std::vector<unsigned int> face_dof_indices (dofs_per_face);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> face_dof_indices (dofs_per_face);
 
     std::vector<bool> cell_dofs(dofs_per_cell, false);
     std::vector<bool> boundary_cell_dofs(dofs_per_cell, false);
@@ -1623,7 +1623,7 @@ namespace MGTools
   template <typename number>
   void
   apply_boundary_values (
-    const std::set<unsigned int> &boundary_dofs,
+    const std::set<types::global_dof_index> &boundary_dofs,
     SparseMatrix<number> &matrix,
     const bool preserve_symmetry,
     const bool /*ignore_zeros*/)
@@ -1634,8 +1634,8 @@ namespace MGTools
     // a deprecated function, I therefore threw away the original function
     // and replaced it by the following, which I believe should work
 
-    std::map<unsigned int, double> boundary_values;
-    for (std::set<unsigned int>::const_iterator p=boundary_dofs.begin();
+    std::map<types::global_dof_index, double> boundary_values;
+    for (std::set<types::global_dof_index>::const_iterator p=boundary_dofs.begin();
          p != boundary_dofs.end(); ++p)
       boundary_values[*p] = 0;
 
@@ -1650,7 +1650,7 @@ namespace MGTools
   template <typename number>
   void
   apply_boundary_values (
-    const std::set<unsigned int> &boundary_dofs,
+    const std::set<types::global_dof_index> &boundary_dofs,
     BlockSparseMatrix<number> &matrix,
     const bool preserve_symmetry)
   {
@@ -1666,8 +1666,8 @@ namespace MGTools
     // a deprecated function, I therefore threw away the original function
     // and replaced it by the following, which I believe should work
 
-    std::map<unsigned int, double> boundary_values;
-    for (std::set<unsigned int>::const_iterator p=boundary_dofs.begin();
+    std::map<types::global_dof_index, double> boundary_values;
+    for (std::set<types::global_dof_index>::const_iterator p=boundary_dofs.begin();
          p != boundary_dofs.end(); ++p)
       boundary_values[*p] = 0;
 
@@ -1689,16 +1689,16 @@ namespace MGTools
 namespace MGTools
 {
   template void apply_boundary_values (
-    const std::set<unsigned int> &,
+    const std::set<types::global_dof_index> &,
     SparseMatrix<float> &, const bool, const bool);
   template void apply_boundary_values (
-    const std::set<unsigned int> &,
+    const std::set<types::global_dof_index> &,
     SparseMatrix<double> &, const bool, const bool);
   template void apply_boundary_values (
-    const std::set<unsigned int> &,
+    const std::set<types::global_dof_index> &,
     BlockSparseMatrix<float> &, const bool);
   template void apply_boundary_values (
-    const std::set<unsigned int> &,
+    const std::set<types::global_dof_index> &,
     BlockSparseMatrix<double> &, const bool);
 }
 

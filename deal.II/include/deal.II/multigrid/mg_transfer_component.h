@@ -125,18 +125,18 @@ protected:
   /**
    * Sizes of the multi-level vectors.
    */
-  mutable std::vector<std::vector<unsigned int> > sizes;
+  mutable std::vector<std::vector<types::global_dof_index> > sizes;
 
   /**
    * Start index of each component.
    */
-  std::vector<unsigned int> component_start;
+  std::vector<types::global_dof_index> component_start;
 
   /**
    * Start index of each component on
    * all levels.
    */
-  std::vector<std::vector<unsigned int> > mg_component_start;
+  std::vector<std::vector<types::global_dof_index> > mg_component_start;
 
   /**
    * Call build_matrices()
@@ -165,7 +165,7 @@ protected:
    * The data is first the global
    * index, then the level index.
    */
-  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
   copy_to_and_from_indices;
 
   /**
@@ -174,7 +174,7 @@ protected:
    * boundary values in the
    * restriction matrix.
    */
-  std::vector<std::set<unsigned int> > boundary_indices;
+  std::vector<std::set<types::global_dof_index> > boundary_indices;
 };
 
 //TODO:[GK] Update documentation for copy_* functions
@@ -268,8 +268,8 @@ public:
                        = std::vector<unsigned int>(),
                        const std::vector<unsigned int> &mg_target_component
                        = std::vector<unsigned int>(),
-                       const std::vector<std::set<unsigned int> > &boundary_indices
-                       = std::vector<std::set<unsigned int> >()
+                       const std::vector<std::set<types::global_dof_index> > &boundary_indices
+                       = std::vector<std::set<types::global_dof_index> >()
                       );
 
   /**

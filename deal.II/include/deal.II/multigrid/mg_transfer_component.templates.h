@@ -169,7 +169,7 @@ MGTransferSelect<number>::do_copy_from_mg (
   for (; level_cell != endc; ++level_cell)
     {
       const unsigned int level = level_cell->level();
-      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
+      typedef std::vector<std::pair<types::global_dof_index, unsigned int> >::const_iterator IT;
       for (IT i=copy_to_and_from_indices[level].begin();
            i != copy_to_and_from_indices[level].end(); ++i)
         dst(i->first) = src[level](i->second);
@@ -188,8 +188,8 @@ MGTransferSelect<number>::do_copy_from_mg_add (
   const FiniteElement<dim> &fe = mg_dof_handler.get_fe();
   const unsigned int dofs_per_cell = fe.dofs_per_cell;
 
-  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
-  std::vector<unsigned int> level_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> global_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> level_dof_indices (dofs_per_cell);
 
   typename DoFHandler<dim,spacedim>::active_cell_iterator
   level_cell = mg_dof_handler.begin_active();
@@ -206,7 +206,7 @@ MGTransferSelect<number>::do_copy_from_mg_add (
   for (; level_cell != endc; ++level_cell)
     {
       const unsigned int level = level_cell->level();
-      typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
+      typedef std::vector<std::pair<types::global_dof_index, unsigned int> >::const_iterator IT;
       for (IT i=copy_to_and_from_indices[level].begin();
            i != copy_to_and_from_indices[level].end(); ++i)
         dst(i->first) += src[level](i->second);

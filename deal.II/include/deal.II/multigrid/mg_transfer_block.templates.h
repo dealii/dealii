@@ -33,7 +33,6 @@ DEAL_II_NAMESPACE_OPEN
 typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
 
 
-
 template <typename number>
 template <int dim, typename number2, int spacedim>
 void

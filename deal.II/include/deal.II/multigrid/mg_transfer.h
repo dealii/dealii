@@ -242,7 +242,7 @@ private:
    * The data is first the global
    * index, then the level index.
    */
-  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
   copy_indices;
 
   /**
