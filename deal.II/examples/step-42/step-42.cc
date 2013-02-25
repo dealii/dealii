@@ -851,7 +851,7 @@ namespace Step42
                                                   system_matrix_newton, system_rhs_newton, true);
         };
 
-    system_matrix_newton.compress ();
+    system_matrix_newton.compress (VectorOperation::add);
     system_rhs_newton.compress (VectorOperation::add);
 
     computing_timer.exit_section("Assembling");
@@ -1026,7 +1026,7 @@ namespace Step42
                   mass_matrix);
             }
 
-    mass_matrix.compress ();
+    mass_matrix.compress (VectorOperation::add);
   }
 
   // @sect4{PlasticityContactProblem::update_solution_and_constraints}
