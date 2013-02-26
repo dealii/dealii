@@ -34,7 +34,7 @@ SET(VERSION "8.0.pre")
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
 
-SET(CMAKE_INCLUDE_CURRENT_DIR true)
+SET(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
 LIST(APPEND CMAKE_MODULE_PATH
   ${CMAKE_SOURCE_DIR}/cmake/
@@ -68,7 +68,7 @@ ENDIF()
 INCLUDE(setup_cached_variables)
 
 #
-# Now, set the project and setup the rest:
+# Now, set the project and set up the rest:
 #
 PROJECT(deal.II)
 INCLUDE(setup_deal_ii)
@@ -96,9 +96,7 @@ ENDFOREACH()
 # Feature configuration:
 #
 FILE(GLOB _configure_files "cmake/configure/configure_*.cmake")
-# Make sure the configure_*.cmake files are included in alphabetical order
-# to fullfill some dependencies...
-LIST(SORT _configure_files)
+LIST(SORT _configure_files) # make sure to include in alphabetical order
 FOREACH(_file ${_configure_files})
   MESSAGE(STATUS "")
   MESSAGE(STATUS "Include ${_file}")
