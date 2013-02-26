@@ -1,5 +1,7 @@
 This folder contains the deal.II CMake build system
 
+Extensive documentation can be found at /doc/development/cmake.html
+
 It is structured as follows:
 
 ./checks
