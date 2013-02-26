@@ -51,7 +51,7 @@ MACRO(FIND_UMFPACK_PATH _comp _file)
       ${UMFPACK_DIR}/${_comp}
       ${UMFPACK_DIR}
     PATH_SUFFIXES
-      ${_comp_lowercase} include/${_comp_lowercase} include Include ${_comp}/Include
+      ${_comp_lowercase} include/${_comp_lowercase} include Include ${_comp}/Include suitesparse
     )
 ENDMACRO()
 
