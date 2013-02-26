@@ -75,7 +75,6 @@ TO_STRING(doxygen_input_string ${doxygen_input})
 
 file(GLOB doxygen_image_path
   ${CMAKE_CURRENT_SOURCE_DIR}/images
-  ${CMAKE_SOURCE_DIR}/examples/*/doc
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/images
 
   ${CMAKE_CURRENT_BINARY_DIR}/images
