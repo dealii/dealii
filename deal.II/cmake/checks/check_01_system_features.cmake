@@ -15,16 +15,16 @@
 #
 # This file sets up:
 #
+#   HAVE_GETHOSTNAME
+#   HAVE_GETPID
+#   HAVE_JN
+#   HAVE_RAND_R
 #   HAVE_SYS_RESOURCE_H
 #   HAVE_SYS_TIME_H
 #   HAVE_SYS_TIMES_H
 #   HAVE_SYS_TYPES_H
-#   HAVE_UNISTD_H
-#   HAVE_GETHOSTNAME
-#   HAVE_GETPID
-#   HAVE_RAND_R
 #   HAVE_TIMES
-#   HAVE_JN
+#   HAVE_UNISTD_H
 #   DEAL_II_MSVC
 #
 
@@ -35,24 +35,23 @@
 #                                                                         #
 ###########################################################################
 
-CHECK_INCLUDE_FILE_CXX("sys/resource.h"  HAVE_SYS_RESOURCE_H)
+#
+# Check for various posix (and linux) specific header files and symbols
+#
+CHECK_INCLUDE_FILE_CXX("sys/resource.h" HAVE_SYS_RESOURCE_H)
+
 CHECK_INCLUDE_FILE_CXX("sys/time.h" HAVE_SYS_TIME_H)
+
 CHECK_INCLUDE_FILE_CXX("sys/times.h" HAVE_SYS_TIMES_H)
+CHECK_CXX_SYMBOL_EXISTS("times" "sys/times.h" HAVE_TIMES)
+
 CHECK_INCLUDE_FILE_CXX("sys/types.h" HAVE_SYS_TYPES_H)
 
-
-#
-# Check for various posix specific functions. On a posix system they should
-# be all defined in unistd.h. On other platforms, most notably
-# Windows/MinGW unistd.h is available but not all posix functions. So test
-# for each funtion as well.
-#
 CHECK_INCLUDE_FILE_CXX("unistd.h" HAVE_UNISTD_H)
-CHECK_FUNCTION_EXISTS(gethostname HAVE_GETHOSTNAME)
-CHECK_FUNCTION_EXISTS(getpid HAVE_GETPID)
-CHECK_FUNCTION_EXISTS(rand_r HAVE_RAND_R)
-CHECK_FUNCTION_EXISTS(times HAVE_TIMES)
+CHECK_CXX_SYMBOL_EXISTS("gethostname" "unistd.h" HAVE_GETHOSTNAME)
+CHECK_CXX_SYMBOL_EXISTS("getpid" "unistd.h" HAVE_GETPID)
 
+CHECK_CXX_SYMBOL_EXISTS("rand_r" "stdlib.h" HAVE_RAND_R)
 
 #
 # Do we have the Bessel function jn?
@@ -62,7 +61,7 @@ MARK_AS_ADVANCED(m_lib)
 
 IF(NOT m_lib MATCHES "-NOTFOUND")
   SET(CMAKE_REQUIRED_LIBRARIES ${m_lib})
-  CHECK_FUNCTION_EXISTS(jn HAVE_JN)
+  CHECK_CXX_SYMBOL_EXISTS("jn" "math.h" HAVE_JN)
   SET(CMAKE_REQUIRED_LIBRARIES)
   IF(HAVE_JN)
     LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${m_lib})
