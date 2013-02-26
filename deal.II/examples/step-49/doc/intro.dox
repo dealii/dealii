@@ -172,7 +172,7 @@ of this tutorial:
   </tr>
 </TABLE>
 
-Finally, the function Triangulation::distort_random allows you to move vertices in the
+Finally, the function GridTools::distort_random allows you to move vertices in the
 mesh (optionally ignoring boundary nodes) by a random amount. This is
 demonstrated in <code>grid_7()</code> and the result is as follows:
 <TABLE WIDTH="60%" ALIGN="center">
