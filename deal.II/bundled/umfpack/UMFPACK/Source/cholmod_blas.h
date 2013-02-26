@@ -16,6 +16,8 @@
 #ifndef CHOLMOD_BLAS_H
 #define CHOLMOD_BLAS_H
 
+extern "C" {
+
 /* ========================================================================== */
 /* === Architecture ========================================================= */
 /* ========================================================================== */
@@ -447,5 +449,7 @@ void BLAS_ZGERU (BLAS_INT *m, BLAS_INT *n, double *alpha,
 	BLAS_ZGER (&M, &N, alpha, X, &INCX, Y, &INCY, A, &LDA) ; \
     } \
 }
+
+} /*extern "C"*/
 
 #endif

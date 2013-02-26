@@ -37,9 +37,7 @@ DEAL_II_NAMESPACE_OPEN
 
 // include UMFPACK file.
 #ifdef HAVE_LIBUMFPACK
-extern "C" {
 #  include <umfpack.h>
-}
 #endif
 
 // if the HSL functions are not there, define them empty and throw an
