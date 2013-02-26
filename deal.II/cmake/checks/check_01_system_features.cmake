@@ -35,10 +35,10 @@
 #                                                                         #
 ###########################################################################
 
-CHECK_INCLUDE_FILE("sys/resource.h"  HAVE_SYS_RESOURCE_H)
-CHECK_INCLUDE_FILE("sys/time.h" HAVE_SYS_TIME_H)
-CHECK_INCLUDE_FILE("sys/times.h" HAVE_SYS_TIMES_H)
-CHECK_INCLUDE_FILE("sys/types.h" HAVE_SYS_TYPES_H)
+CHECK_INCLUDE_FILE_CXX("sys/resource.h"  HAVE_SYS_RESOURCE_H)
+CHECK_INCLUDE_FILE_CXX("sys/time.h" HAVE_SYS_TIME_H)
+CHECK_INCLUDE_FILE_CXX("sys/times.h" HAVE_SYS_TIMES_H)
+CHECK_INCLUDE_FILE_CXX("sys/types.h" HAVE_SYS_TYPES_H)
 
 
 #
@@ -47,7 +47,7 @@ CHECK_INCLUDE_FILE("sys/types.h" HAVE_SYS_TYPES_H)
 # Windows/MinGW unistd.h is available but not all posix functions. So test
 # for each funtion as well.
 #
-CHECK_INCLUDE_FILE("unistd.h" HAVE_UNISTD_H)
+CHECK_INCLUDE_FILE_CXX("unistd.h" HAVE_UNISTD_H)
 CHECK_FUNCTION_EXISTS(gethostname HAVE_GETHOSTNAME)
 CHECK_FUNCTION_EXISTS(getpid HAVE_GETPID)
 CHECK_FUNCTION_EXISTS(rand_r HAVE_RAND_R)

@@ -149,31 +149,3 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
   ENDIF()
 ENDIF()
 
-
-#########################
-#                       #
-#    Set up C FLAGS:    #
-#                       #
-#########################
-
-#
-# For the moment we assume that CC and CXX are the same compiler and that
-# we can set (almost) the same default flags for both:
-#
-SET(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS})
-SET(DEAL_II_C_FLAGS_RELEASE ${DEAL_II_CXX_FLAGS_RELEASE})
-SET(DEAL_II_C_FLAGS_DEBUG ${DEAL_II_CXX_FLAGS_DEBUG})
-
-#
-# OK, touché, touché. We have to strip flags not supported by a C target:
-#
-STRIP_FLAG(CMAKE_C_FLAGS "-Wsynth")
-STRIP_FLAG(DEAL_II_C_FLAGS_RELEASE "-felide-constructors")
-
-#
-# and disable some warnings:
-#
-STRIP_FLAG(CMAKE_C_FLAGS "-Wall") # There is no other way to disable -Wunknown-pragma atm...
-STRIP_FLAG(CMAKE_C_FLAGS "-Wsign-compare")
-STRIP_FLAG(CMAKE_C_FLAGS "-Wwrite-strings")
-

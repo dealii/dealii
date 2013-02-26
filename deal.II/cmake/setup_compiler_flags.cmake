@@ -48,13 +48,8 @@
 
 
 #
-# We need a C compiler only for the compilation of the bundled umfpack
-# library, so we don't make much fuss about configuration and setup of the
-# C compiler and assume that CC and CXX are the same compiler brand, hence
-# supporting almost the same compiler flags.
-# (See setup in setup_compiler_flags_*.cmake)
-#
-# So, give a prominent error message in case CC and CXX differ:
+# TODO: Is there a way to set CMAKE_C_COMPILER to the same brand as
+# CMAKE_CXX_COMPILER?
 #
 IF(NOT ( "${CMAKE_C_COMPILER_ID}" STREQUAL "${CMAKE_CXX_COMPILER_ID}" AND
          "${CMAKE_C_COMPILER_VERSION}" STREQUAL "${CMAKE_CXX_COMPILER_VERSION}" ) )

@@ -71,18 +71,3 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "/Zi")
 ENDIF()
 
-
-#########################
-#                       #
-#    Set up C FLAGS:    #
-#                       #
-#########################
-
-#
-# For the moment we assume that CC and CXX are the same compiler and that
-# we can set (almost) the same default flags for both:
-#
-SET(CMAKE_C_FLAGS ${CMAKE_CXX_FLAGS})
-SET(DEAL_II_C_FLAGS_RELEASE ${DEAL_II_CXX_FLAGS_RELEASE})
-SET(DEAL_II_C_FLAGS_DEBUG ${DEAL_II_CXX_FLAGS_DEBUG})
-

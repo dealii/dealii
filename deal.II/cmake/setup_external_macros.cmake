@@ -19,7 +19,8 @@
 INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(CheckCXXSourceCompiles)
 INCLUDE(CheckCXXSourceRuns)
-INCLUDE(CheckFunctionExists)
-INCLUDE(CheckIncludeFile)
+INCLUDE(CheckCXXSymbolExists)
 INCLUDE(CheckIncludeFileCXX)
+
+INCLUDE(CheckFunctionExists)
 
