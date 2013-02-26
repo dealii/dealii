@@ -14,9 +14,6 @@ Some last bits and thoughts:
 * Clean up Platform introspection (search for sse2 and avx) and document
   how to disable it (important for building for a different target system)
 
-* Always requiring a C compiler is a big annoyance because it is only
-  needed for bundled UMFPACK.
-
 * Provide a configuration template for cross compiling with CMake,
 
 * Set VERSION in CMakeLists.txt or in an extra file?

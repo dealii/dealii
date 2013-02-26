@@ -48,8 +48,7 @@
 
 
 #
-# TODO: Is there a way to set CMAKE_C_COMPILER to the same brand as
-# CMAKE_CXX_COMPILER?
+# CMAKE_C_COMPILER and CMAKE_CXX_COMPILER have to be of the same brand.
 #
 IF(NOT ( "${CMAKE_C_COMPILER_ID}" STREQUAL "${CMAKE_CXX_COMPILER_ID}" AND
          "${CMAKE_C_COMPILER_VERSION}" STREQUAL "${CMAKE_CXX_COMPILER_VERSION}" ) )
