@@ -250,6 +250,29 @@ namespace GridTools
               Triangulation<dim, spacedim> &triangulation);
 
   /**
+   * Distort the given triangulation by randomly
+   * moving around all the vertices
+   * of the grid.  The direction of
+   * movement of each vertex is random, while the
+   * length of the shift vector has
+   * a value of @p factor times
+   * the minimal length of the
+   * active edges adjacent to this
+   * vertex. Note that @p factor
+   * should obviously be well below
+   * <tt>0.5</tt>.
+   *
+   * If @p keep_boundary is set to
+   * @p true (which is the
+   * default), then boundary
+   * vertices are not moved.
+   */
+  template <int dim, int spacedim>
+  void distort_random (const double factor,
+                       Triangulation<dim, spacedim> &triangulation,
+                       const bool   keep_boundary=true);
+
+  /**
    * Find and return the number of
    * the used vertex in a given
    * Container that is located closest

@@ -602,6 +602,17 @@ namespace GridTools
   }
 
 
+  template <int dim, int spacedim>
+  void
+  distort_random (const double        factor,
+                  Triangulation<dim, spacedim> &triangulation,
+                  const bool          keep_boundary)
+  {
+    //TODO: Move implementation of this function into the current
+    // namespace
+    triangulation.distort_random (factor, keep_boundary);
+  }
+
 
   template <int dim, template <int, int> class Container, int spacedim>
   unsigned int
