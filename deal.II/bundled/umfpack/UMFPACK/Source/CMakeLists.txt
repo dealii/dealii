@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -18,95 +18,95 @@
 #
 
 SET(src_umfpack_UMF
-  umf_2by2.c
-  umf_analyze.c
-  umf_apply_order.c
-  umf_assemble.c
-  umf_blas3_update.c
-  umf_build_tuples.c
-  umf_colamd.c
-  umf_create_element.c
-  umf_dump.c
-  umf_extend_front.c
-  umf_free.c
-  umf_fsize.c
-  umf_garbage_collection.c
-  umf_get_memory.c
-  umf_grow_front.c
-  umf_init_front.c
-  umf_is_permutation.c
-  umf_kernel.c
-  umf_kernel_init.c
-  umf_kernel_wrapup.c
-  umf_local_search.c
-  umf_lsolve.c
-  umf_ltsolve.c
-  umf_malloc.c
-  umf_mem_alloc_element.c
-  umf_mem_alloc_head_block.c
-  umf_mem_alloc_tail_block.c
-  umf_mem_free_tail_block.c
-  umf_mem_init_memoryspace.c
+  umf_2by2.cc
+  umf_analyze.cc
+  umf_apply_order.cc
+  umf_assemble.cc
+  umf_blas3_update.cc
+  umf_build_tuples.cc
+  umf_colamd.cc
+  umf_create_element.cc
+  umf_dump.cc
+  umf_extend_front.cc
+  umf_free.cc
+  umf_fsize.cc
+  umf_garbage_collection.cc
+  umf_get_memory.cc
+  umf_grow_front.cc
+  umf_init_front.cc
+  umf_is_permutation.cc
+  umf_kernel.cc
+  umf_kernel_init.cc
+  umf_kernel_wrapup.cc
+  umf_local_search.cc
+  umf_lsolve.cc
+  umf_ltsolve.cc
+  umf_malloc.cc
+  umf_mem_alloc_element.cc
+  umf_mem_alloc_head_block.cc
+  umf_mem_alloc_tail_block.cc
+  umf_mem_free_tail_block.cc
+  umf_mem_init_memoryspace.cc
   #
   # Don't ever think about including
-  # umf_multicompile.c, we do it by hand below
+  # umf_multicompile.cc, we do it by hand below
   #
-  umf_realloc.c
-  umf_report_perm.c
-  umf_report_vector.c
-  umf_row_search.c
-  umf_scale.c
-  umf_scale_column.c
-  umf_set_stats.c
-  umf_singletons.c
-  umf_solve.c
-  umf_start_front.c
-  umf_store_lu.c
-  umf_symbolic_usage.c
-  umf_transpose.c
-  umf_triplet.c
-  umf_tuple_lengths.c
-  umf_usolve.c
-  umf_utsolve.c
-  umf_valid_numeric.c
-  umf_valid_symbolic.c
+  umf_realloc.cc
+  umf_report_perm.cc
+  umf_report_vector.cc
+  umf_row_search.cc
+  umf_scale.cc
+  umf_scale_column.cc
+  umf_set_stats.cc
+  umf_singletons.cc
+  umf_solve.cc
+  umf_start_front.cc
+  umf_store_lu.cc
+  umf_symbolic_usage.cc
+  umf_transpose.cc
+  umf_triplet.cc
+  umf_tuple_lengths.cc
+  umf_usolve.cc
+  umf_utsolve.cc
+  umf_valid_numeric.cc
+  umf_valid_symbolic.cc
   )
 
 SET(src_umfpack_UMFPACK
-  umfpack_col_to_triplet.c
-  umfpack_defaults.c
-  umfpack_free_numeric.c
-  umfpack_free_symbolic.c
-  umfpack_get_determinant.c
-  umfpack_get_lunz.c
-  umfpack_get_numeric.c
-  umfpack_get_symbolic.c
-  umfpack_load_numeric.c
-  umfpack_load_symbolic.c
-  umfpack_numeric.c
-  umfpack_qsymbolic.c
-  umfpack_report_control.c
-  umfpack_report_info.c
-  umfpack_report_matrix.c
-  umfpack_report_numeric.c
-  umfpack_report_perm.c
-  umfpack_report_status.c
-  umfpack_report_symbolic.c
-  umfpack_report_triplet.c
-  umfpack_report_vector.c
-  umfpack_save_numeric.c
-  umfpack_save_symbolic.c
-  umfpack_scale.c
-  umfpack_solve.c
-  umfpack_symbolic.c
-  umfpack_transpose.c
-  umfpack_triplet_to_col.c
+  umfpack_col_to_triplet.cc
+  umfpack_defaults.cc
+  umfpack_free_numeric.cc
+  umfpack_free_symbolic.cc
+  umfpack_get_determinant.cc
+  umfpack_get_lunz.cc
+  umfpack_get_numeric.cc
+  umfpack_get_symbolic.cc
+  umfpack_load_numeric.cc
+  umfpack_load_symbolic.cc
+  umfpack_numeric.cc
+  umfpack_qsymbolic.cc
+  umfpack_report_control.cc
+  umfpack_report_info.cc
+  umfpack_report_matrix.cc
+  umfpack_report_numeric.cc
+  umfpack_report_perm.cc
+  umfpack_report_status.cc
+  umfpack_report_symbolic.cc
+  umfpack_report_triplet.cc
+  umfpack_report_vector.cc
+  umfpack_save_numeric.cc
+  umfpack_save_symbolic.cc
+  umfpack_scale.cc
+  umfpack_solve.cc
+  umfpack_symbolic.cc
+  umfpack_transpose.cc
+  umfpack_triplet_to_col.cc
   )
 
 SET(src_umfpack_GENERAL
-  umfpack_global.c
-  umfpack_tictoc.c
-  umfpack_timer.c
+  umfpack_global.cc
+  umfpack_tictoc.cc
+  umfpack_timer.cc
   )
 
 
@@ -114,71 +114,71 @@ SET(src_umfpack_GENERAL
 # compile each int and long routine (with no real/complex version)
 #-------------------------------------------------------------------------------
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_I_UMF OBJECT ${src_umfpack_UMF})
+DEAL_II_ADD_LIBRARY(obj_umfpack_I_UMF OBJECT ${src_umfpack_UMF})
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_I_UMF "DINT")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_L_UMF OBJECT ${src_umfpack_UMF})
+DEAL_II_ADD_LIBRARY(obj_umfpack_L_UMF OBJECT ${src_umfpack_UMF})
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_L_UMF "DLONG")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_I_UMFPACK OBJECT ${src_umfpack_UMFPACK})
+DEAL_II_ADD_LIBRARY(obj_umfpack_I_UMFPACK OBJECT ${src_umfpack_UMFPACK})
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_I_UMFPACK "DINT")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_L_UMFPACK OBJECT ${src_umfpack_UMFPACK})
+DEAL_II_ADD_LIBRARY(obj_umfpack_L_UMFPACK OBJECT ${src_umfpack_UMFPACK})
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_L_UMFPACK "DLONG")
 
 #-------------------------------------------------------------------------------
 # compile each routine in the DI version
 #-------------------------------------------------------------------------------
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DI_TSOLVE OBJECT umf_ltsolve.c umf_utsolve.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DI_TSOLVE OBJECT umf_ltsolve.cc umf_utsolve.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_TSOLVE "DINT" "CONJUGATE_SOLVE")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DI_TRIPLET_MAP_NOX OBJECT umf_triplet.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DI_TRIPLET_MAP_NOX OBJECT umf_triplet.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_TRIPLET_MAP_NOX "DINT" "DO_MAP")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DI_TRIPLET_MAP_X OBJECT umf_triplet.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DI_TRIPLET_MAP_X OBJECT umf_triplet.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_TRIPLET_MAP_X "DINT" "DO_MAP" "DO_VALUES")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DI_TRIPLET_NOMAP_X OBJECT umf_triplet.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DI_TRIPLET_NOMAP_X OBJECT umf_triplet.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_TRIPLET_NOMAP_X "DINT" "DO_VALUES")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DI_STORE OBJECT umf_store_lu.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DI_STORE OBJECT umf_store_lu.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_STORE "DINT" "DROP")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DI_ASSEMBLE OBJECT umf_assemble.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DI_ASSEMBLE OBJECT umf_assemble.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_ASSEMBLE "DINT" "FIXQ")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DI_SOLVE OBJECT umfpack_solve.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DI_SOLVE OBJECT umfpack_solve.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DI_SOLVE "DINT" "WSOLVE")
 
 #-------------------------------------------------------------------------------
 # compile each routine in the DL version
 #-------------------------------------------------------------------------------
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DL_TSOLVE OBJECT umf_ltsolve.c umf_utsolve.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DL_TSOLVE OBJECT umf_ltsolve.cc umf_utsolve.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_TSOLVE "DLONG" "CONJUGATE_SOLVE")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DL_TRIPLET_MAP_NOX OBJECT umf_triplet.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DL_TRIPLET_MAP_NOX OBJECT umf_triplet.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_TRIPLET_MAP_NOX "DLONG" "DO_MAP")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DL_TRIPLET_MAP_X OBJECT umf_triplet.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DL_TRIPLET_MAP_X OBJECT umf_triplet.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_TRIPLET_MAP_X "DLONG" "DO_MAP" "DO_VALUES")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DL_TRIPLET_NOMAP_X OBJECT umf_triplet.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DL_TRIPLET_NOMAP_X OBJECT umf_triplet.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_TRIPLET_NOMAP_X "DLONG" "DO_VALUES")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DL_STORE OBJECT umf_store_lu.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DL_STORE OBJECT umf_store_lu.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_STORE "DLONG" "DROP")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DL_ASSEMBLE OBJECT umf_assemble.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DL_ASSEMBLE OBJECT umf_assemble.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_ASSEMBLE "DLONG" "FIXQ")
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_DL_SOLVE OBJECT umfpack_solve.c)
+DEAL_II_ADD_LIBRARY(obj_umfpack_DL_SOLVE OBJECT umfpack_solve.cc)
 DEAL_II_ADD_DEFINITIONS(obj_umfpack_DL_SOLVE "DLONG" "WSOLVE")
 
 #-------------------------------------------------------------------------------
 # Create the generic routines (GN) using a generic rule
 #-------------------------------------------------------------------------------
 
-DEAL_II_ADD_C_LIBRARY(obj_umfpack_GENERIC OBJECT ${src_umfpack_GENERAL})
+DEAL_II_ADD_LIBRARY(obj_umfpack_GENERIC OBJECT ${src_umfpack_GENERAL})
 

@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -13,25 +13,25 @@
 #####
 
 SET(src_amd
-  amd_1.c
-  amd_2.c
-  amd_aat.c
-  amd_control.c
-  amd_defaults.c
-  amd_dump.c
-  amd_info.c
-  amd_order.c
-  amd_postorder.c
-  amd_post_tree.c
-  amd_preprocess.c
-  amd_valid.c
+  amd_1.cc
+  amd_2.cc
+  amd_aat.cc
+  amd_control.cc
+  amd_defaults.cc
+  amd_dump.cc
+  amd_info.cc
+  amd_order.cc
+  amd_postorder.cc
+  amd_post_tree.cc
+  amd_preprocess.cc
+  amd_valid.cc
   )
 
-DEAL_II_ADD_C_LIBRARY(obj_amd_int OBJECT ${src_amd})
+DEAL_II_ADD_LIBRARY(obj_amd_int OBJECT ${src_amd})
 DEAL_II_ADD_DEFINITIONS(obj_amd_int "DINT")
 
-DEAL_II_ADD_C_LIBRARY(obj_amd_long OBJECT ${src_amd})
+DEAL_II_ADD_LIBRARY(obj_amd_long OBJECT ${src_amd})
 DEAL_II_ADD_DEFINITIONS(obj_amd_long "DLONG")
 
-DEAL_II_ADD_C_LIBRARY(obj_amd_global OBJECT "amd_global.c")
+DEAL_II_ADD_LIBRARY(obj_amd_global OBJECT "amd_global.cc")
 
