@@ -73,6 +73,11 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wswitch")
 #
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-local-typedefs")
 
+#
+# Disable deprecation warnings
+#
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-deprecated")
+
 
 IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   #
