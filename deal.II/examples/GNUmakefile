@@ -17,6 +17,7 @@ configure_examples:
 	do\
 	  cd $$f ;\
 	  cmake .;\
+	  cd ..;\
 	done
 
 .PHONY: configure_examples
