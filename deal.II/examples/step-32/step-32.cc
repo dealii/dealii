@@ -2235,7 +2235,7 @@ namespace Step32
          Assembly::CopyData::
          StokesPreconditioner<dim> (stokes_fe));
 
-    stokes_preconditioner_matrix.compress();
+    stokes_preconditioner_matrix.compress(VectorOperation::add);
   }
 
 
@@ -2432,7 +2432,7 @@ namespace Step32
          Assembly::CopyData::
          StokesSystem<dim> (stokes_fe));
 
-    stokes_matrix.compress();
+    stokes_matrix.compress(VectorOperation::add);
     stokes_rhs.compress(VectorOperation::add);
 
     rebuild_stokes_matrix = false;
@@ -2542,8 +2542,8 @@ namespace Step32
          Assembly::CopyData::
          TemperatureMatrix<dim> (temperature_fe));
 
-    temperature_mass_matrix.compress();
-    temperature_stiffness_matrix.compress();
+    temperature_mass_matrix.compress(VectorOperation::add);
+    temperature_stiffness_matrix.compress(VectorOperation::add);
 
     rebuild_temperature_matrices = false;
     rebuild_temperature_preconditioner = true;
@@ -2785,7 +2785,6 @@ namespace Step32
         temperature_matrix.copy_from (temperature_mass_matrix);
         temperature_matrix.add (time_step, temperature_stiffness_matrix);
       }
-    temperature_matrix.compress();
 
     if (rebuild_temperature_preconditioner == true)
       {

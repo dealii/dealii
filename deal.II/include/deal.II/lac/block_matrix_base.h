@@ -762,8 +762,12 @@ public:
   * distributed objects" for more
   * information.
    */
-  void compress (::dealii::VectorOperation::values operation
-                 =::dealii::VectorOperation::unknown);
+  void compress (::dealii::VectorOperation::values operation);
+
+  /**
+   * @deprecated: use compress() with VectorOperation instead.
+   */
+  void compress () DEAL_II_DEPRECATED;
 
   /**
    * Multiply the entire matrix by a
@@ -2357,6 +2361,14 @@ BlockMatrixBase<MatrixType>::compress (::dealii::VectorOperation::values operati
   for (unsigned int r=0; r<n_block_rows(); ++r)
     for (unsigned int c=0; c<n_block_cols(); ++c)
       block(r,c).compress (operation);
+}
+
+template <class MatrixType>
+inline
+void
+BlockMatrixBase<MatrixType>::compress ()
+{
+  compress(::dealii::VectorOperation::unknown);
 }
 
 

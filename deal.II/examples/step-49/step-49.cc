@@ -76,9 +76,9 @@ void mesh_info(const Triangulation<dim> &tria,
          it!=boundary_count.end();
          ++it)
       {
-        std::cout << it->first << "(" << it->second << ") ";
+        std::cout << it->first << "(" << it->second << " times) ";
       }
-    std::cout  << std::endl;
+    std::cout << std::endl;
   }
 
   // Finally, produce a graphical representation of the mesh to an output
@@ -86,7 +86,9 @@ void mesh_info(const Triangulation<dim> &tria,
   std::ofstream out (filename.c_str());
   GridOut grid_out;
   grid_out.write_eps (tria, out);
-  std::cout << " written to " << filename << std::endl;
+  std::cout << " written to " << filename
+	    << std::endl
+	    << std::endl;
 }
 
 // @sect3{Main routines}
@@ -222,16 +224,13 @@ void grid_4()
 // be called like a function as arguments. This function-like argument can be
 // simply the address of a function as in the current case, or an object that
 // has an <code>operator()</code> as in the next example, or for example a
-// <code>std::function@<Point@<2@>(const Point@<2@>)</code> object one can get
+// <code>std::function@<Point@<2@>(const Point@<2@>)@></code> object one can get
 // via <code>std::bind</code> in more complex cases.
-struct Grid5Func
+Point<2> grid_5_transform (const Point<2> &in)
 {
-    Point<2> operator() (const Point<2> & in) const
-      {
-	return Point<2>(in(0),
-			in(1) + std::sin(in(0)/5.0*3.14159));
-      }
-};
+  return Point<2>(in(0),
+		  in(1) + std::sin(in(0)/5.0*3.14159));
+}
 
 
 void grid_5()
@@ -244,7 +243,7 @@ void grid_5()
                                              Point<2>(0.0,0.0),
 					     Point<2>(10.0,1.0));
 
-  GridTools::transform(Grid5Func(), tria);
+  GridTools::transform(&grid_5_transform, tria);
   mesh_info(tria, "grid-5.eps");
 }
 
@@ -262,9 +261,9 @@ void grid_5()
 // vertices.
 struct Grid6Func
 {
-    double trans(const double x) const
+    double trans(const double y) const
       {
-	return std::tanh(2*x)/tanh(2);
+	return std::tanh(2*y)/tanh(2);
       }
 
     Point<2> operator() (const Point<2> & in) const
@@ -279,10 +278,10 @@ void grid_6()
 {
   Triangulation<2> tria;
   std::vector< unsigned int > repetitions(2);
-  repetitions[0]=40;
-  repetitions[1]=40;
+  repetitions[0] = repetitions[1] = 40;
   GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
-                                             Point<2>(0.0,0.0), Point<2>(1.0,1.0));
+                                             Point<2>(0.0,0.0),
+					     Point<2>(1.0,1.0));
 
   GridTools::transform(Grid6Func(), tria);
   mesh_info(tria, "grid-6.eps");
@@ -306,7 +305,7 @@ void grid_7()
                                              Point<2>(0.0,0.0),
 					     Point<2>(1.0,1.0));
 
-  tria.distort_random(0.3, true);
+  GridTools::distort_random (0.3, tria, true);
   mesh_info(tria, "grid-7.eps");
 }
 

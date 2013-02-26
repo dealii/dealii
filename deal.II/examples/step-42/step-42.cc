@@ -851,7 +851,7 @@ namespace Step42
                                                   system_matrix_newton, system_rhs_newton, true);
         };
 
-    system_matrix_newton.compress ();
+    system_matrix_newton.compress (VectorOperation::add);
     system_rhs_newton.compress (VectorOperation::add);
 
     computing_timer.exit_section("Assembling");
@@ -981,7 +981,7 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix)
   {
-    QTrapez<dim-1>  face_quadrature_formula;
+	QTrapez<dim-1>  face_quadrature_formula;
 
     FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula,
                                       update_values   |
@@ -992,6 +992,9 @@ namespace Step42
     const unsigned int   n_face_q_points    = face_quadrature_formula.size();
 
     FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
+    Tensor<1,dim,double> ones (dim);
+    for (unsigned i=0; i<dim; i++)
+    	ones[i] = 1.0;
 
     std::vector<unsigned int> local_dof_indices (dofs_per_cell);
 
@@ -1013,7 +1016,7 @@ namespace Step42
               for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
                   cell_matrix(i,i) += (fe_values_face[displacement].value (i, q_point) *
-                                       fe_values_face[displacement].value (i, q_point) *
+                		  	  	  	   ones *
                                        fe_values_face.JxW (q_point));
 
               cell->get_dof_indices (local_dof_indices);
@@ -1023,7 +1026,7 @@ namespace Step42
                   mass_matrix);
             }
 
-    mass_matrix.compress ();
+    mass_matrix.compress (VectorOperation::add);
   }
 
   // @sect4{PlasticityContactProblem::update_solution_and_constraints}

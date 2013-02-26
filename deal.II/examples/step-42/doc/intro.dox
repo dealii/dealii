@@ -49,8 +49,9 @@ function $u$ denotes the displacement in the deformable body. The first two line
 elasto-plastic material behavior. Therein the equation shows the
 strain of the deformation $\varepsilon (u)$ as the additive decomposition of the
 elastic part $A\sigma$ and the plastic part $\lambda$. $A$ is defined as the compliance tensor of fourth order which contains some material constants and $\sigma$ as the
-symmetric stress tensor of second order. So we have to consider the inequality in the second
-row component-by-component and in a pointwise sense. Furthermore we have to
+symmetric stress tensor of second order. So we have to consider
+the inequality in the second row in a pointwise sense where $\lambda(\tau -
+\sigma)$ is the inner product of two symmetric tensors of second order. Furthermore we have to
 distinguish two cases.
 
 The continuous and convex function $\mathcal{F}$ denotes the von Mises flow function
@@ -119,14 +120,14 @@ Therein $\varepsilon$ denotes the linearised deformation tensor with $\varepsilo
 Most materials - especially metals - have the property that they show some hardening effects during the forming process.
 There are different constitutive laws to describe those material behaviors. The
 simplest one is called linear isotropic hardening described by the flow function
-$\mathcal{F}(\tau,\eta) = \vert\tau^D\vert - (\sigma_0 + \gamma{\text{iso}}\eta)$ where
+$\mathcal{F}(\tau,\eta) = \vert\tau^D\vert - (\sigma_0 + \gamma^{\text{iso}}\eta)$ where
 $\eta$ is the norm of the plastic strain $\eta = \vert \varepsilon -
 A\sigma\vert$.
-It can be considered by establishing an additional term in our primal-mixed formulation:\\
+It can be considered by establishing an additional term in our primal-mixed formulation:
 Find a pair $\lbrace(\sigma,\xi),u\rbrace\in \Pi (W\times L^2(\Omega,\mathbb{R}))\times V^+$ with
-@f{gather*}\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right) + \gamma{\text{iso}}\left( \xi, \eta - \xi\right) \geq 0,\quad \forall (\tau,\eta)\in \Pi (W,L^2(\Omega,\mathbb{R}))@f}
+@f{gather*}\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right) + \gamma^{\text{iso}}\left( \xi, \eta - \xi\right) \geq 0,\quad \forall (\tau,\eta)\in \Pi (W,L^2(\Omega,\mathbb{R}))@f}
 @f{gather*}\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+,@f}
-with the hardening parameter $\gamma{\text{iso}} > 0$.
+with the hardening parameter $\gamma^{\text{iso}} > 0$.
 
 Now we want to derive a primal problem which only depends on the displacement $u$. For that purpose we
 set $\eta = \xi$ and eliminate the stress $\sigma$ by applying the projection
@@ -140,17 +141,17 @@ Find the displacement $u\in V^+$ with
 @f{gather*}\left(P_{\Pi}(C\varepsilon(u)),\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+,@f}
 with the projection:
 @f{gather*}P_{\Pi}(\tau):=\begin{cases}
-                        \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0 +  \gamma{\text{iso}}\xi,\\
-                        \hat\alpha\dfrac{\tau^D}{\vert\tau^D\vert} + \dfrac{1}{3}tr(\tau), & \text{if }\vert\tau^D\vert > \sigma_0 +  \gamma{\text{iso}}\xi,
+                        \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0 +  \gamma^{\text{iso}}\xi,\\
+                        \hat\alpha\dfrac{\tau^D}{\vert\tau^D\vert} + \dfrac{1}{3}tr(\tau), & \text{if }\vert\tau^D\vert > \sigma_0 +  \gamma^{\text{iso}}\xi,
                         \end{cases}@f}
 with the radius
-@f{gather*}\hat\alpha := \sigma_0 + \gamma{\text{iso}}\xi .@f}
+@f{gather*}\hat\alpha := \sigma_0 + \gamma^{\text{iso}}\xi .@f}
 With the relation $\xi = \vert\varepsilon(u) - A\sigma\vert$ it is possible to eliminate $\xi$ inside the projection $P_{\Pi}$:\\
 @f{gather*}P_{\Pi}(\tau):=\begin{cases}
                         \tau, & \text{if }\vert\tau^D\vert \leq \sigma_0,\\
                         \alpha\dfrac{\tau^D}{\vert\tau^D\vert} + \dfrac{1}{3}tr(\tau), & \text{if }\vert\tau^D\vert > \sigma_0,
                         \end{cases}@f}
-@f{gather*}\alpha := \sigma_0 + \dfrac{\gamma{\text{iso}}}{2\mu+\gamma{\text{iso}}}\left(\vert\tau^D\vert - \sigma_0\right) ,@f}
+@f{gather*}\alpha := \sigma_0 + \dfrac{\gamma^{\text{iso}}}{2\mu+\gamma^{\text{iso}}}\left(\vert\tau^D\vert - \sigma_0\right) ,@f}
 with a further material parameter $\mu>0$ called shear modulus. We refer that
 this only possible for isotropic plasticity.
 
