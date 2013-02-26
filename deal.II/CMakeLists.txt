@@ -117,12 +117,16 @@ INCLUDE(setup_finalize)
 #                                                                         #
 ###########################################################################
 
+IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
+  ADD_SUBDIRECTORY(bundled)
+ENDIF()
+
 ADD_SUBDIRECTORY(cmake/scripts)
 
 ADD_SUBDIRECTORY(include)
 
-IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
-  ADD_SUBDIRECTORY(bundled)
+IF(DEAL_II_HAVE_DOC_DIRECTORY)
+  ADD_SUBDIRECTORY(doc)
 ENDIF()
 
 ADD_SUBDIRECTORY(source)
@@ -130,10 +134,6 @@ ADD_SUBDIRECTORY(source)
 ADD_SUBDIRECTORY(cmake/config) # has to be included after source
 
 ADD_SUBDIRECTORY(contrib) # has to be included after source
-
-IF(DEAL_II_HAVE_DOC_DIRECTORY)
-  ADD_SUBDIRECTORY(doc)
-ENDIF()
 
 ADD_SUBDIRECTORY(examples)
 

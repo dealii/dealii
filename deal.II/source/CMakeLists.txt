@@ -21,12 +21,14 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_SOURCE_DIR}/include/
   )
 
-# list the directories where we have source files. the ones with the longest
+#
+# List the directories where we have source files. the ones with the longest
 # compile jobs come first so that 'make -j N' saturates many processors also
 # towards the end of compiling rather than having to wait for one long
 # compilation that, because it has been listed last, is started towards the
 # end of everything (e.g. numerics/vectors.cc takes several minutes to
 # compile...)
+#
 ADD_SUBDIRECTORY(numerics)
 ADD_SUBDIRECTORY(fe)
 ADD_SUBDIRECTORY(dofs)
