@@ -17,6 +17,14 @@
 # (... where everything is explained contrary to this... mess)
 #
 
+#
+# *Shush!*
+#
+STRIP_FLAG(CMAKE_CXX_FLAGS "-pedantic")
+STRIP_FLAG(CMAKE_CXX_FLAGS "-Wall")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-sign-compare")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-write-strings")
+
 SET(src_umfpack_UMF
   umf_2by2.cc
   umf_analyze.cc
