@@ -198,7 +198,7 @@ method - inexact since we use an iterative solver for the linearised problems in
 <h3>Linearisation of the constitutive law for the Newton method</h3>
 
 For the Newton method we have to linearise the following semi-linearform
-@f{gather*}a(\psi;\varphi) := \left(P_{\Pi}(C\varepsilon(\varphi)),\varepsilon(\varphi)\right).@f}
+@f{gather*}a(\psi;\varphi) := \left(P_{\Pi}(C\varepsilon(\psi)),\varepsilon(\varphi)\right).@f}
 Because we have to find the solution $u$ in the convex set $V^+$, we have to
 apply an SQP-method (SQP: sequential quadratic programming). That means we have
 to solve a minimisation problem for a known $u^i$ in every SQP-step of the form
@@ -244,13 +244,14 @@ problem. Again we do so to gain a formulation that allows us to solve a linear
 system of equations finally.
 
 We introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset W'$,
-$W'$ dual space of the trace space $W$ of $V$ restricted to $\Gamma_C$,
+$W'$ dual space of the trace space $W:=\left[ H_0^{\frac{1}{2}}(\Gamma_C)
+\right]^{\textrm{dim}$ of $V$ restricted to $\Gamma_C$,
 @f{gather*}K:=\{\mu\in W':\mu_T = 0,\quad\langle\mu n,v\rangle_{\Gamma_C}\geq 0,\quad
-\forall v\in W, v \ge 0\text{ on }\Gamma_C \}@f}
+\forall v\in H_0^{\frac{1}{2}}(\Gamma_C), v \ge 0\text{ on }\Gamma_C \}@f}
 of Lagrange multipliers, where $\langle\cdot,\cdot\rangle$
 denotes the duality pairing, i.e. a boundary integral, between $W'$ and $W$.
 Intuitively, $K$ is the cone of all "non-positive functions", except that $ K\subset
-\left( \left[ H_0^{\frac{1}{2}} \right]^{\textrm{dim}} \right)' $ and so contains other
+\left( \left[ H_0^{\frac{1}{2}}(\Gamma_C) \right]^{\textrm{dim}} \right)' $ and so contains other
 objects besides regular functions as well. This yields:
 
 Find $u\in V$ and $\lambda\in K$ such that
