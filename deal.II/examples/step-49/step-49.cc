@@ -207,8 +207,8 @@ void grid_3 ()
 // size not overly dramatic. Nevertheless, sometimes one does want to move
 // vertices by a significant distance, and in that case one needs to move
 // internal nodes as well. One way to do that automatically is to call the
-// function GridGenerator::laplace_transformation that takes a set of
-// transformed nodes and moves all of the other nodes in such a way that the
+// function GridTools::laplace_transform that takes a set of transformed
+// vertex coordinates and moves all of the other vertices in such a way that the
 // resulting mesh has, in some sense, a small distortion.
 
 
