@@ -111,7 +111,7 @@ public:
   unsigned int degree () const;
 
   /**
-   * Return the name of the space ,
+   * Return the name of the space,
    * which is <tt>ABF</tt>.
    */
   std::string name () const;

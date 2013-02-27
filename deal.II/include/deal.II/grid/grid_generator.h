@@ -698,10 +698,13 @@ public:
    * (overwritten).
    *
    * In 1d, this function is not currently implemented.
+   *
+   * @deprecated This function has been moved to GridTools::laplace_transform
    */
   template <int dim>
-  static void laplace_transformation (Triangulation<dim> &tria,
-                                      const std::map<unsigned int,Point<dim> > &new_points);
+  static
+  void laplace_transformation (Triangulation<dim> &tria,
+                               const std::map<unsigned int,Point<dim> > &new_points) DEAL_II_DEPRECATED;
 
   /**
    * Exception

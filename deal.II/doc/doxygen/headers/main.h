@@ -123,13 +123,12 @@
  *   each vertex, line, or cell of the triangulation has the correct
  *   number of them. It also gives them a global numbering.
  *
- *   A different viewpoint is this: While the mesh and finite element
- *   describe abstract properties of the the finite dimensional space
- *   $V_h$ in which we seek the discrete solution, the %DoFHandler
- *   classes enumerate a concrete basis of this space so that we can
- *   represent the discrete solution as $u_h(\mathbf x)=
- *   \sum_j U_j \varphi_i(\mathbf x)$ by an ordered set of coefficients
- *   $U_j$.
+ *   A different viewpoint is this: While the mesh and finite element describe
+ *   abstract properties of the the finite dimensional space $V_h$ in which we
+ *   seek the discrete solution, the %DoFHandler classes enumerate a concrete
+ *   basis of this space so that we can represent the discrete solution as
+ *   $u_h(\mathbf x)= \sum_j U_j \varphi_i(\mathbf x)$ by an ordered set of
+ *   coefficients $U_j$.
  *
  *   Just as with triangulation objects, most operations on
  *   DoFHandlers are done by looping over all cells and doing something
@@ -264,7 +263,7 @@
  * TAGFILES = deal.tag=http://www.dealii.org/X.Y.Z/doxygen/deal.II
  *</pre>
  * where <code>X.Y.Z</code> refers to the release you want to link to. Be sure you use
- * the matching tag file. In theorey, you can also link against the developing revisions
+ * the matching tag file. In theory, you can also link against the developing revisions
  * of deal.II, but then you have to fear that your links may become invalid if
  * the deal.II structure changes.
  */

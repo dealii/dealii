@@ -138,7 +138,7 @@ namespace numbers
   /**
    * A structure that, together with
    * its partial specializations
-   * NumberTraits<std::complex<number> > ,
+   * NumberTraits<std::complex<number> >,
    * provides traits and member
    * functions that make it possible
    * to write templates that work on

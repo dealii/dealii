@@ -33,9 +33,9 @@ DEAL_II_NAMESPACE_OPEN
  *
  * @todo This is for 2D only.
  *
- * @todo Transformation works only for uniform, Cartesian meshes
+ * @todo Transformation works only for uniform, Cartesian meshes.
  *
- * The matching pressure psace for FE_BDM of order <i>k</i> is the
+ * The matching pressure space for FE_BDM of order <i>k</i> is the
  * element FE_DGP of order <i>k</i>.
  *
  * The BDM element of order @p p has <i>p+1</i> degrees of freedom on

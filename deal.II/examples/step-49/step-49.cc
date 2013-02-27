@@ -197,6 +197,21 @@ void grid_3 ()
   triangulation.set_boundary (1);
 }
 
+// There is one snag to doing things as shown above: If one moves the nodes on
+// the boundary as shown here, one often ends up with cells in the interior
+// that are badly distorted since the interior nodes were not moved around. This
+// is not that much of a problem in the current case since the mesh did not
+// contain any internal nodes when the nodes were moved -- it was the coarse
+// mesh and it so happened that all vertices are at the boundary. It's also
+// the case that the movement we had here was, compared to the average cell
+// size not overly dramatic. Nevertheless, sometimes one does want to move
+// vertices by a significant distance, and in that case one needs to move
+// internal nodes as well. One way to do that automatically is to call the
+// function GridTools::laplace_transform that takes a set of transformed
+// vertex coordinates and moves all of the other vertices in such a way that the
+// resulting mesh has, in some sense, a small distortion.
+
+
 
 // @sect4{grid_4: Demonstrating extrude_triangulation}
 

@@ -157,7 +157,7 @@ namespace Functions
      *
      *  @code
      *
-     *  set Function constants = lambda=1. , alpha=2., gamma=3.
+     *  set Function constants = lambda=1., alpha=2., gamma=3.
      *
      *  @endcode
      *

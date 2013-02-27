@@ -407,7 +407,7 @@ public:
    * Return a string that uniquely
    * identifies a finite
    * element. This class returns
-   * <tt>FE_DGQArbitraryNodes<dim>(degree)</tt> ,
+   * <tt>FE_DGQArbitraryNodes<dim>(degree)</tt>,
    * with <tt>dim</tt> and <tt>degree</tt>
    * replaced by appropriate
    * values.

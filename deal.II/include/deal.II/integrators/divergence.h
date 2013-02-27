@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -71,6 +71,9 @@ namespace LocalIntegrators
      * This is the strong divergence operator and the trial
      * space should be at least <b>H</b><sup>div</sup>. The test functions
      * may be discontinuous.
+     *
+     * @author Guido Kanschat
+     * @date 2011
      */
     template <int dim>
     void cell_matrix (
@@ -114,6 +117,9 @@ namespace LocalIntegrators
      *
      * The function cell_matrix() is the Frechet derivative of this function with respect
      * to the test functions.
+     *
+     * @author Guido Kanschat
+     * @date 2011
      */
     template <int dim>
     void cell_residual(
@@ -145,6 +151,9 @@ namespace LocalIntegrators
      * This is the strong gradient and the trial space
      * should be at least in <i>H</i><sup>1</sup>. The test functions can
      * be discontinuous.
+     *
+     * @author Guido Kanschat
+     * @date 2011
      */
     template <int dim>
     void gradient_matrix(
@@ -187,7 +196,10 @@ namespace LocalIntegrators
      * space should be at least <b>H</b><sup>1</sup>. The test functions
      * may be discontinuous.
      *
-     * The function cell_residual() is the Frechet derivative of this function with respect to the test functions.
+     * The function gradient_matrix() is the Frechet derivative of this function with respect to the test functions.
+     *
+     * @author Guido Kanschat
+     * @date 2011
      */
     template <int dim>
     void gradient_residual(
@@ -216,6 +228,9 @@ namespace LocalIntegrators
      * normal component of the vector valued trial space and the test
      * space.
      * @f[ \int_F (\mathbf u\cdot \mathbf n) v \,ds @f]
+     *
+     * @author Guido Kanschat
+     * @date 2011
      */
     template<int dim>
     void
@@ -254,6 +269,9 @@ namespace LocalIntegrators
      * @f[
      * \int_F (\mathbf u\cdot \mathbf n) v \,ds
      * @f]
+     *
+     * @author Guido Kanschat
+     * @date 2011
      */
     template<int dim>
     void
@@ -291,6 +309,9 @@ namespace LocalIntegrators
      * @f[
      * \int_F (\mathbf u_1\cdot \mathbf n_1 + \mathbf u_2 \cdot \mathbf n_2) \frac{v_1+v_2}{2} \,ds
      * @f]
+     *
+     * @author Guido Kanschat
+     * @date 2011
      */
     template<int dim>
     void
@@ -346,6 +367,9 @@ namespace LocalIntegrators
      * @f[
      *  \int_Z \nabla\!\cdot\!u \nabla\!\cdot\!v \,dx
      * @f]
+     *
+     * @author Guido Kanschat
+     * @date 2011
      */
     template <int dim>
     void grad_div_matrix (
@@ -386,6 +410,9 @@ namespace LocalIntegrators
      *  (\mathbf v_1\cdot \mathbf n_1 + \mathbf v_2 \cdot \mathbf n_2)
      * \,ds
      * @f]
+     *
+     * @author Guido Kanschat
+     * @date 2011
      */
     template<int dim>
     void
@@ -430,7 +457,19 @@ namespace LocalIntegrators
                 }
         }
     }
-
+    
+    /**
+     * The <i>L</i><sup>2</sup>-norm of the divergence over the
+     * quadrature set determined by the FEValuesBase object.
+     *
+     * The vector is expected to consist of dim vectors of length
+     * equal to the number of quadrature points. The number of
+     * components of the finite element has to be equal to the space
+     * dimension.
+     *
+     * @author Guido Kanschat
+     * @date 2013
+     */
     template <int dim>
     double norm(const FEValuesBase<dim> &fe,
                 const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &Du)
@@ -446,7 +485,7 @@ namespace LocalIntegrators
           double div = Du[0][k][0];
           for (unsigned int d=1; d<dim; ++d)
             div += Du[d][k][d];
-          result += div*div;
+          result += div*div*fe.JxW(k);
         }
       return result;
     }

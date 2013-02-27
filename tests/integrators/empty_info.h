@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010, 2011, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,7 +13,7 @@
 
 // Provide scratch data objects with no contents for the MeshWorker::loop()
 
-#include <deal.II/numerics/mesh_worker_info.h>
+#include <deal.II/meshworker/dof_info.h>
 
 class EmptyInfo
 {
