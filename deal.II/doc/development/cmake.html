@@ -1027,12 +1027,12 @@
         to work.) The features must be given with the full option toggle
         DEAL_II_WITH_[...]
 
-    FEATURE_&lt;FEATURE&gt;_FIND_EXTERNAL(var)  (macro, mandatory)
+    FEATURE_&lt;FEATURE&gt;_FIND_EXTERNAL(var)  (macro, optional)
       - which should set var to TRUE if all dependencies for the feature are
         fulfilled. In this case all necessary variables for
         FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL must be set. Otherwise
         var should remain unset.
-        This macro must not give an error (SEND_ERROR or FATAL_ERROR).
+        If not defined, FIND_PACKAGE(${feature}) is called.
 
     FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
       - which should setup all necessary configuration for the feature with
@@ -1041,17 +1041,15 @@
 
     FEATURE_&lt;FEATURE&gt;_CONFIGURE_BUNDLED(var)  (macro, optional)
       - which should setup all necessary configuration for the feature with
-        bundled source dependencies. var set to TRUE indicates success.
-
-    FEATURE_&lt;FEATURE&gt;_CUSTOM_ERROR_MESSAGE() (variable, optional)
-      - which should either be set to TRUE if FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE
-        is set up, or be undefined.
+        bundled source dependencies. var set to TRUE indicates success,
+        otherwise this script should issue a FATAL_ERROR.
 
     FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE()  (macro, optional)
       - which should print a meaningful error message (with FATAL_ERROR) for
         the case that no external library was found (and bundled is not
         allowed to be used.) If not defined, a suitable default error message
         will be printed.
+
 	  </pre>
 
 	<li>

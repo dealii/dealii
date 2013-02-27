@@ -38,7 +38,7 @@ MACRO(SETUP_THREADING var)
     SET(DEAL_II_USE_MT TRUE)
 
     #
-    # Change -lphtread to -pthread for more compatibility on non linux
+    # Change -lphtread to -pthread for better compatibility on non linux
     # platforms:
     #
     IF("${CMAKE_THREAD_LIBS_INIT}" MATCHES "-lpthread")
@@ -88,7 +88,6 @@ MACRO(SETUP_THREADING var)
 
   ENDIF(Threads_FOUND)
 ENDMACRO()
-
 
 
 #

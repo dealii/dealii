@@ -19,9 +19,7 @@
 #     CONFIGURE_FEATURE(feature)
 #
 #
-# For a feature ${feature} (written in all caps) the following options,
-# variables and macros have to be defined (except marked as optional):
-#
+# This macro uses the following variables and macros:
 #
 # FEATURE_${feature}_DEPENDS (variable, optional)
 #    a variable which contains an optional list of other features
@@ -39,21 +37,17 @@
 #    bundled source dependencies. var set to TRUE indicates success,
 #    otherwise this script should issue a FATAL_ERROR.
 #
-# FEATURE_${feature}_FIND_EXTERNAL(var)  (macro, mandatory)
+# FEATURE_${feature}_FIND_EXTERNAL(var)  (macro, optional)
 #    which should set var to TRUE if all dependencies for the feature are
 #    fullfilled. In this case all necessary variables for
 #    FEATURE_${feature}_CONFIGURE_EXTERNAL must be set. Otherwise
 #    var should remain unset.
-#    This macro should give an error (FATAL_ERROR).
+#    If not defined, FIND_PACKAGE(${feature}) is called.
 #
 # FEATURE_${feature}_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
 #    which should setup all necessary configuration for the feature with
 #    external dependencies. var set to TRUE indicates success,
 #    otherwise this script gives an error.
-#
-# FEATURE_${feature}_CUSTOM_ERROR_MESSAGE() (variable, optional)
-#    which should either be set to TRUE if FEATURE_${feature}_ERROR_MESSAGE
-#    is set up, or be undefined.
 #
 # FEATURE_${feature}_ERROR_MESSAGE()  (macro, optional)
 #    which should print a meaningfull error message (with FATAL_ERROR) for
@@ -64,9 +58,11 @@
 #
 
 
-#
-# Some helper macros:
-#
+###########################################################################
+#                                                                         #
+#                             Helper Macros:                              #
+#                                                                         #
+###########################################################################
 
 #
 # Some black magic to have substitution in command names:
@@ -116,6 +112,23 @@ MACRO(FEATURE_ERROR_MESSAGE _feature)
   ENDIF()
 ENDMACRO()
 
+
+#
+# Default macro for finding an external library:
+#
+MACRO(FEATURE_FIND_EXTERNAL _feature _var)
+  FIND_PACKAGE(${_feature})
+  IF(${_feature}_FOUND)
+    SET(${_var} TRUE)
+  ENDIF()
+ENDMACRO()
+
+
+###########################################################################
+#                                                                         #
+#                           CONFIGURE_FEATURE:                            #
+#                                                                         #
+###########################################################################
 
 MACRO(CONFIGURE_FEATURE _feature)
   #
@@ -185,15 +198,10 @@ MACRO(CONFIGURE_FEATURE _feature)
         #
         # First case: DEAL_II_FORCE_BUNDLED_${_feature} is defined:
         #
-
         IF(FEATURE_${_feature}_HAVE_BUNDLED)
-          RUN_COMMAND(
-            "FEATURE_${_feature}_CONFIGURE_BUNDLED(FEATURE_${_feature}_BUNDLED_CONFIGURED)"
-            )
+          RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_BUNDLED(FEATURE_${_feature}_BUNDLED_CONFIGURED)")
           IF(FEATURE_${_feature}_BUNDLED_CONFIGURED)
-            MESSAGE(STATUS
-              "DEAL_II_WITH_${_feature} successfully set up with bundled packages."
-              )
+            MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
             SET_CACHED_OPTION(${_feature} ON)
           ELSE()
             # This should not happen. So give an error
@@ -213,23 +221,18 @@ MACRO(CONFIGURE_FEATURE _feature)
         #
         # Second case: We are allowed to search for an external library
         #
-
-        RUN_COMMAND(
-          "FEATURE_${_feature}_FIND_EXTERNAL(FEATURE_${_feature}_EXTERNAL_FOUND)"
-          )
+        IF(COMMAND FEATURE_${_feature}_FIND_EXTERNAL)
+          RUN_COMMAND("FEATURE_${_feature}_FIND_EXTERNAL(FEATURE_${_feature}_EXTERNAL_FOUND)")
+        ELSE()
+          FEATURE_FIND_EXTERNAL(${_feature} FEATURE_${_feature}_EXTERNAL_FOUND)
+        ENDIF()
 
         IF(FEATURE_${_feature}_EXTERNAL_FOUND)
-          MESSAGE(STATUS
-            "All external dependencies for DEAL_II_WITH_${_feature} are fullfilled."
-            )
-          RUN_COMMAND(
-            "FEATURE_${_feature}_CONFIGURE_EXTERNAL(FEATURE_${_feature}_EXTERNAL_CONFIGURED)"
-            )
+          MESSAGE(STATUS "All external dependencies for DEAL_II_WITH_${_feature} are fullfilled.")
+          RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_EXTERNAL(FEATURE_${_feature}_EXTERNAL_CONFIGURED)")
 
           IF(FEATURE_${_feature}_EXTERNAL_CONFIGURED)
-            MESSAGE(STATUS
-              "DEAL_II_WITH_${_feature} successfully set up with external dependencies."
-              )
+            MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with external dependencies.")
             SET_CACHED_OPTION(${_feature} ON)
           ELSE()
             # This should not happen. So give an error
@@ -241,18 +244,12 @@ MACRO(CONFIGURE_FEATURE _feature)
 
         ELSE(FEATURE_${_feature}_EXTERNAL_FOUND)
 
-          MESSAGE(STATUS
-            "DEAL_II_WITH_${_feature} has unmet external dependencies."
-            )
+          MESSAGE(STATUS "DEAL_II_WITH_${_feature} has unmet external dependencies.")
 
           IF(FEATURE_${_feature}_HAVE_BUNDLED AND DEAL_II_ALLOW_BUNDLED)
-            RUN_COMMAND(
-              "FEATURE_${_feature}_CONFIGURE_BUNDLED(FEATURE_${_feature}_BUNDLED_CONFIGURED)"
-              )
+            RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_BUNDLED(FEATURE_${_feature}_BUNDLED_CONFIGURED)")
             IF(FEATURE_${_feature}_BUNDLED_CONFIGURED)
-              MESSAGE(STATUS
-                "DEAL_II_WITH_${_feature} successfully set up with bundled packages."
-                )
+              MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
               SET_CACHED_OPTION(${_feature} ON)
             ELSE()
               # This should not happen. So give an error
@@ -263,7 +260,7 @@ MACRO(CONFIGURE_FEATURE _feature)
             ENDIF()
           ELSE()
             IF(DEAL_II_WITH_${_feature})
-              IF(FEATURE_${_feature}_CUSTOM_ERROR_MESSAGE)
+              IF(COMMAND FEATURE_${_feature}_ERROR_MESSAGE)
                 RUN_COMMAND("FEATURE_${_feature}_ERROR_MESSAGE()")
               ELSE()
                 FEATURE_ERROR_MESSAGE(${_feature})
