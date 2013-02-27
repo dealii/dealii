@@ -29,6 +29,7 @@
 #
 # Options regarding compilation and linking:
 #
+#     DEAL_II_ALLOW_PLATFORM_INTROSPECTION
 #     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
 #     CMAKE_BUILD_TYPE
 #     BUILD_SHARED_LIBS
@@ -105,6 +106,11 @@ ENDIF()
 #                        Compilation and linking:                         #
 #                                                                         #
 ###########################################################################
+
+SET(DEAL_II_ALLOW_PLATFORM_INTROSPECTION ON CACHE BOOL
+  "Allow platform introspection for CPU command set, SSE and AVX"
+  )
+MARK_AS_ADVANCED(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
 
 OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
   "Configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."

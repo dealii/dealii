@@ -44,11 +44,11 @@ LIST(APPEND CMAKE_MODULE_PATH
 #
 # Load all macros:
 #
+INCLUDE(setup_external_macros)
 FILE(GLOB _macro_files "cmake/macros/*.cmake")
 FOREACH(_file ${_macro_files})
   INCLUDE(${_file})
 ENDFOREACH()
-INCLUDE(setup_external_macros)
 
 #
 # Check whether the doc and bundled folders are available:

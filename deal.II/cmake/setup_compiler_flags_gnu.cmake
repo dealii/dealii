@@ -35,6 +35,13 @@ ENDIF()
 ########################
 
 #
+# Enable all supported CPU instruction sets:
+#
+IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-march=native")
+ENDIF()
+
+#
 # Set the pic flag.
 #
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
