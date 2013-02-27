@@ -33,6 +33,7 @@
 #     CMAKE_BUILD_TYPE
 #     BUILD_SHARED_LIBS
 #     CMAKE_INSTALL_RPATH_USE_LINK_PATH
+#     CMAKE_C_FLAGS
 #     CMAKE_CXX_FLAGS                   *)
 #     CMAKE_SHARED_LINKER_FLAGS         *)
 #     DEAL_II_CXX_FLAGS_DEBUG
@@ -106,7 +107,7 @@ ENDIF()
 ###########################################################################
 
 OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
-  "configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
+  "Configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
   ON
   )
 MARK_AS_ADVANCED(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
