@@ -605,8 +605,8 @@ namespace GridTools
 
   template <int dim>
   void
-  laplace_transformation (const std::map<unsigned int,Point<dim> > &new_points,
-                          Triangulation<dim> &triangulation)
+  laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
+                     Triangulation<dim> &triangulation)
   {
     //TODO: Move implementation of this function into the current
     // namespace

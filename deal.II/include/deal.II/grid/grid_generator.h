@@ -700,7 +700,7 @@ public:
    *
    * In 1d, this function is not currently implemented.
    *
-   * @deprecated This function has been moved to GridTools::laplace_transformation
+   * @deprecated This function has been moved to GridTools::laplace_transform
    */
   template <int dim>
   static

@@ -157,8 +157,8 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 #if deal_II_dimension == deal_II_space_dimension  
     template
     void
-    laplace_transformation (const std::map<unsigned int,Point<deal_II_dimension> > &new_points,
-                          Triangulation<deal_II_dimension> &triangulation);
+    laplace_transform (const std::map<unsigned int,Point<deal_II_dimension> > &new_points,
+                       Triangulation<deal_II_dimension> &triangulation);
 
     template
       Triangulation<deal_II_dimension,deal_II_space_dimension>::DistortedCellList

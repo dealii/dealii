@@ -244,8 +244,8 @@ namespace GridTools
    * In 1d, this function is not currently implemented.
    */
   template <int dim>
-  void laplace_transformation (const std::map<unsigned int,Point<dim> > &new_points,
-                               Triangulation<dim> &tria);
+  void laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
+                          Triangulation<dim> &tria);
 
   /**
    * Scale the entire triangulation
