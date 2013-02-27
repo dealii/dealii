@@ -15,7 +15,7 @@
 
 #include <deal.II/lac/slepc_solver.h>
 
-#ifdef DEAL_II_USE_SLEPC
+#ifdef DEAL_II_WITH_SLEPC
 
 #  include <deal.II/lac/petsc_matrix_base.h>
 #  include <deal.II/lac/petsc_vector_base.h>
@@ -468,5 +468,5 @@ namespace
 {
   void dummy () {}
 }
-#endif // DEAL_II_USE_SLEPC
+#endif // DEAL_II_WITH_SLEPC
 

@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
 #  include <tbb/enumerable_thread_specific.h>
 #endif
 
@@ -121,7 +121,7 @@ namespace Threads
     ThreadLocalStorage<T> &operator = (const T &t);
 
   private:
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
     /**
      * The data element we store. If we support threads, then this
      * object will be of a type that provides a separate object
@@ -163,7 +163,7 @@ namespace Threads
   T &
   ThreadLocalStorage<T>::get ()
   {
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
     return data.local();
 #else
     return data;

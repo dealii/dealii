@@ -162,18 +162,18 @@ contributor's names are abbreviated by WB (Wolfgang Bangerth), GK
 
   <li> <p> 
        Changed: Previously, we just set the preprocessor variable
-       <code>DEAL_II_USE_MT</code>, when <code>--with-multithreading</code> was
+       <code>DEAL_II_WITH_THREADS</code>, when <code>--with-multithreading</code> was
        given as argument to <code>./configure</code>. Tests in the code
-       therefore looked like <code>#ifdef DEAL_II_USE_MT</code>. This has been
+       therefore looked like <code>#ifdef DEAL_II_WITH_THREADS</code>. This has been
        changed so that the variable is always defined, but its value is now
        equal to <code>1</code> 
        when multithreading was requested, and zero otherwise. The reason for
-       this is that you can now write <code>if (DEAL_II_USE_MT && ...)</code>
+       this is that you can now write <code>if (DEAL_II_WITH_THREADS && ...)</code>
        conditions, and need not interleave if-else clauses from regular code
        and the preprocessor, if conditions involve both the state of this
        preprocessor variable and the run-time state of your program. However,
        this change requires that all appearances of <code>#ifdef
-       DEAL_II_USE_MT</code> be changed to <code>#if DEAL_II_USE_MT ==
+       DEAL_II_WITH_THREADS</code> be changed to <code>#if DEAL_II_WITH_THREADS ==
        1</code>, since the variable is now defined unconditionally.
        <br>
        (WB 2002/11/14)

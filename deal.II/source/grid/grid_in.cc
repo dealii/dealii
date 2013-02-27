@@ -26,7 +26,7 @@
 #include <cctype>
 
 
-#ifdef HAVE_LIBNETCDF
+#ifdef DEAL_II_WITH_NETCDF
 #include <netcdfcpp.h>
 #endif
 
@@ -1179,7 +1179,7 @@ void GridIn<2, 3>::read_netcdf (const std::string &)
 template <>
 void GridIn<2>::read_netcdf (const std::string &filename)
 {
-#ifndef HAVE_LIBNETCDF
+#ifndef DEAL_II_WITH_NETCDF
   // do something with unused
   // filename
   filename.c_str();
@@ -1451,7 +1451,7 @@ void GridIn<2>::read_netcdf (const std::string &filename)
 template <>
 void GridIn<3>::read_netcdf (const std::string &filename)
 {
-#ifndef HAVE_LIBNETCDF
+#ifndef DEAL_II_WITH_NETCDF
   // do something with the function argument
   // to make sure it at least looks used,
   // even if it is not

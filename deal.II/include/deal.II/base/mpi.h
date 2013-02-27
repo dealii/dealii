@@ -16,7 +16,7 @@
 #include <deal.II/base/config.h>
 #include <vector>
 
-#if defined(DEAL_II_COMPILER_SUPPORTS_MPI) || defined(DEAL_II_USE_PETSC)
+#if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
 #  include <mpi.h>
 // Check whether <mpi.h> is a suitable
 // include for us (if MPI_SEEK_SET is not
@@ -336,7 +336,7 @@ namespace Utilities
 
     namespace internal
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       /**
        * Return the corresponding MPI data
        * type id for the argument given.
@@ -390,7 +390,7 @@ namespace Utilities
     T sum (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       T sum;
       MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
                      &sum, 1, internal::mpi_type_id(&t), MPI_SUM,
@@ -409,7 +409,7 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&sums)[N])
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&values[0])),
                      &sums[0], N, internal::mpi_type_id(values), MPI_SUM,
                      mpi_communicator);
@@ -427,7 +427,7 @@ namespace Utilities
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &sums)
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       sums.resize (values.size());
       MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&values[0])),
                      &sums[0], values.size(), internal::mpi_type_id((T *)0), MPI_SUM,
@@ -444,7 +444,7 @@ namespace Utilities
     T max (const T &t,
            const MPI_Comm &mpi_communicator)
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       T sum;
       MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&t)),
                      &sum, 1, internal::mpi_type_id(&t), MPI_MAX,
@@ -463,7 +463,7 @@ namespace Utilities
               const MPI_Comm &mpi_communicator,
               T (&maxima)[N])
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&values[0])),
                      &maxima[0], N, internal::mpi_type_id(values), MPI_MAX,
                      mpi_communicator);
@@ -481,7 +481,7 @@ namespace Utilities
               const MPI_Comm       &mpi_communicator,
               std::vector<T>       &maxima)
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       maxima.resize (values.size());
       MPI_Allreduce (const_cast<void *>(static_cast<const void *>(&values[0])),
                      &maxima[0], values.size(), internal::mpi_type_id((T *)0), MPI_MAX,

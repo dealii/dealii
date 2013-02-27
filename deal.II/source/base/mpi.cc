@@ -19,8 +19,8 @@
 #include <cstddef>
 #include <iostream>
 
-#ifdef DEAL_II_USE_TRILINOS
-#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #    include <deal.II/lac/vector_memory.h>
 #    include <deal.II/lac/trilinos_vector.h>
@@ -28,8 +28,8 @@
 #  endif
 #endif
 
-#ifdef DEAL_II_USE_PETSC
-#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_MPI
 #    include <petscsys.h>
 #    include <deal.II/lac/petsc_block_vector.h>
 #    include <deal.II/lac/petsc_parallel_block_vector.h>
@@ -38,8 +38,8 @@
 #  endif
 #endif
 
-#ifdef DEAL_II_USE_SLEPC
-#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_SLEPC
+#  ifdef DEAL_II_WITH_MPI
 #    include <slepcsys.h>
 #  endif
 #endif
@@ -52,7 +52,7 @@ namespace Utilities
 
   namespace MPI
   {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     // Unfortunately, we have to work
     // around an oddity in the way PETSc
     // and some gcc versions interact. If
@@ -317,11 +317,11 @@ namespace Utilities
               ExcMessage ("You can only create a single object of this class "
                           "in a program since it initializes the MPI system."));
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       // if we have PETSc, we will initialize it and let it handle MPI.
       // Otherwise, we will do it.
-#ifdef DEAL_II_USE_PETSC
-#  ifdef DEAL_II_USE_SLEPC
+#ifdef DEAL_II_WITH_PETSC
+#  ifdef DEAL_II_WITH_SLEPC
       // Initialise SLEPc (with PETSc):
       SlepcInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
 #  else
@@ -353,14 +353,14 @@ namespace Utilities
 
     MPI_InitFinalize::~MPI_InitFinalize()
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
 
       // make memory pool release all MPI-based vectors that are no
       // longer used at this point. this is relevant because the
       // static object destructors run for these vectors at the end of
       // the program would run after MPI_Finalize is called, leading
       // to errors
-#  if defined(DEAL_II_USE_TRILINOS)
+#  if defined(DEAL_II_WITH_TRILINOS)
       GrowingVectorMemory<TrilinosWrappers::MPI::Vector>
       ::release_unused_memory ();
       GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>
@@ -373,7 +373,7 @@ namespace Utilities
       // calling PETScFinalize. running the calls below after
       // PetscFinalize has already been called will therefore
       // yield errors of double deallocations
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
       if ((PetscInitializeCalled == PETSC_TRUE)
           &&
           (PetscFinalizeCalled == PETSC_FALSE))
@@ -387,7 +387,7 @@ namespace Utilities
           GrowingVectorMemory<PETScWrappers::BlockVector>
           ::release_unused_memory ();
 
-#  ifdef DEAL_II_USE_SLEPC
+#  ifdef DEAL_II_WITH_SLEPC
           // and now end SLEPc (with PETSc)
           SlepcFinalize();
 #  else

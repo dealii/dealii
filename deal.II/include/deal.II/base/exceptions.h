@@ -905,7 +905,7 @@ namespace StandardExceptions
 /**
  * Assert support for the LAPACK library
  */
-#ifdef HAVE_LIBLAPACK
+#ifdef DEAL_II_WITH_LAPACK
 #  define AssertLAPACK {}
 #else
 #  define AssertLAPACK Assert(false, ExcNeedsLAPACK())
@@ -914,7 +914,7 @@ namespace StandardExceptions
 /**
  * Assert support for the UMFPACK library
  */
-#ifdef HAVE_LIBUMFPACK
+#ifdef DEAL_II_WITH_UMFPACK
 #  define AssertUMFPACK {}
 #else
 #  define AssertUMFPACK Assert(false, ExcNeedsUMFPACK())

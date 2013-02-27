@@ -145,7 +145,7 @@ void SwappableVector<number>::reload ()
 template <typename number>
 void SwappableVector<number>::alert ()
 {
-#ifndef DEAL_II_USE_MT
+#ifndef DEAL_II_WITH_THREADS
   // note: this function does nothing
   // in non-MT mode
   return;
@@ -186,7 +186,7 @@ void SwappableVector<number>::reload_vector (const bool set_flag)
   this->block_read (tmp_in);
   tmp_in.close ();
 
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
   // release the lock that was
   // acquired by the calling
   // functions

@@ -57,7 +57,7 @@ namespace
     }
 
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
     PetscScalar
     max_element (const PETScWrappers::Vector &criteria)
     {
@@ -85,7 +85,7 @@ namespace
 #endif
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
     TrilinosScalar
     max_element (const TrilinosWrappers::Vector &criteria)
     {

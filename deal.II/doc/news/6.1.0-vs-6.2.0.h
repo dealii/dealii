@@ -536,7 +536,7 @@ inconvenience this causes.
   <li>
   <p>
   New: If the compiler allows to do <code>\#include @<mpi.h@></code>, then
-  the preprocessor flag <code>DEAL_II_COMPILER_SUPPORTS_MPI</code> is now set in
+  the preprocessor flag <code>DEAL_II_WITH_MPI</code> is now set in
   <code>base/include/base/config.h</code>. This also fixes a problem in
   <code>base/include/base/utilities.h</code> if a compiler capable of
   including <code>mpi.h</code> was used but not PETSc.

@@ -147,7 +147,7 @@ void Subscriptor::do_subscribe (const char *id) const
   Threads::Mutex::ScopedLock lock (subscription_lock);
   ++counter;
 
-#ifndef DEAL_II_USE_MT
+#ifndef DEAL_II_WITH_THREADS
   const char *const name = (id != 0) ? id : unknown_subscriber;
 
   map_iterator it = counter_map.find(name);
@@ -174,7 +174,7 @@ void Subscriptor::do_unsubscribe (const char *id) const
   Threads::Mutex::ScopedLock lock (subscription_lock);
   --counter;
 
-#ifndef DEAL_II_USE_MT
+#ifndef DEAL_II_WITH_THREADS
   map_iterator it = counter_map.find(name);
   Assert (it != counter_map.end(), ExcNoSubscriber(object_info->name(), name));
   Assert (it->second > 0, ExcNoSubscriber(object_info->name(), name));
@@ -193,7 +193,7 @@ unsigned int Subscriptor::n_subscriptions () const
 
 void Subscriptor::list_subscribers () const
 {
-#ifndef DEAL_II_USE_MT
+#ifndef DEAL_II_WITH_THREADS
   for (map_iterator it = counter_map.begin();
        it != counter_map.end(); ++it)
     deallog << it->second << '/'

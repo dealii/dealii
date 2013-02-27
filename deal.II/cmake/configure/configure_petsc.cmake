@@ -46,9 +46,9 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     # _NOT_ enabled.
     # So we check for this:
     #
-    IF( (PETSC_WITH_MPIUNI AND DEAL_II_COMPILER_SUPPORTS_MPI)
+    IF( (PETSC_WITH_MPIUNI AND DEAL_II_WITH_MPI)
          OR
-         (NOT PETSC_WITH_MPIUNI AND NOT DEAL_II_COMPILER_SUPPORTS_MPI))
+         (NOT PETSC_WITH_MPIUNI AND NOT DEAL_II_WITH_MPI))
       MESSAGE(WARNING "\n"
         "Could not find a sufficient petsc installation: "
         "Petsc has to be configured with the same MPI configuration as deal.II.\n\n"
@@ -75,8 +75,6 @@ MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL var)
   LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
     ${PETSC_LIBRARIES}
     )
-
-  SET(DEAL_II_USE_PETSC TRUE)
 
   #
   # Disable a bunch of warnings when compiling with petsc:

@@ -33,11 +33,6 @@ MACRO(SETUP_THREADING var)
     SET(${var} TRUE)
 
     #
-    # We support threading. Go on and configure the rest:
-    #
-    SET(DEAL_II_USE_MT TRUE)
-
-    #
     # Change -lphtread to -pthread for better compatibility on non linux
     # platforms:
     #

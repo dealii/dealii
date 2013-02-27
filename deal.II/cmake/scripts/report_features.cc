@@ -15,30 +15,30 @@
 
 #include <iostream>
 
-#ifdef HAVE_LIBUMFPACK
+#ifdef DEAL_II_WITH_UMFPACK
 extern "C" {
 #include <umfpack.h>
 }
 #endif
 
-#if defined(DEAL_II_COMPILER_SUPPORTS_MPI)
+#if defined(DEAL_II_WITH_MPI)
 #include <mpi.h>
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 #  include <Trilinos_version.h>
 #endif
 
-#ifdef DEAL_II_USE_MUMPS
+#ifdef DEAL_II_WITH_MUMPS
 #  include <deal.II/base/utilities.h>
 #  include <dmumps_c.h>
 #endif
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 #  include <petscversion.h>
 #endif
 
-#ifdef DEAL_II_USE_SLEPC
+#ifdef DEAL_II_WITH_SLEPC
 #  include <slepcversion.h>
 #endif
 
@@ -55,18 +55,18 @@ int main()
   std::cout << "dealii-feature: BLAS=yes" << std::endl;
 #endif
 
-#ifdef HAVE_LIBLAPACK
+#ifdef DEAL_II_WITH_LAPACK
   std::cout << "dealii-feature: LAPACK=yes" << std::endl;
 #endif
 
-#ifdef HAVE_LIBUMFPACK
+#ifdef DEAL_II_WITH_UMFPACK
   std::cout << "dealii-feature: UMFPACK="
 	    << UMFPACK_MAIN_VERSION << '.'
 	    << UMFPACK_SUB_VERSION << '.'
 	    << UMFPACK_SUBSUB_VERSION << std::endl;
 #endif
 
-#if defined(DEAL_II_COMPILER_SUPPORTS_MPI)
+#if defined(DEAL_II_WITH_MPI)
 #  ifdef OMPI_MAJOR_VERSION
   std::cout << "dealii-feature: MPI=OpenMPI-"
 	    << OMPI_MAJOR_VERSION << '.'
@@ -79,7 +79,7 @@ int main()
 #  endif
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 #  ifdef TRILINOS_VERSION_STRING
   std::cout << "dealii-feature: Trilinos=" << TRILINOS_VERSION_STRING << std::endl;
 #  else
@@ -92,11 +92,11 @@ int main()
 #  endif
 #endif
 
-#ifdef DEAL_II_USE_MUMPS
+#ifdef DEAL_II_WITH_MUMPS
   std::cout << "dealii-feature: MUMPS=yes" << std::endl;
 #endif
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
   std::cout << "dealii-feature: PETSc="
 	    << PETSC_VERSION_MAJOR << '.'
 	    << PETSC_VERSION_MINOR << '.'
@@ -104,7 +104,7 @@ int main()
 	    << PETSC_VERSION_PATCH << std::endl;
 #endif
 
-#ifdef DEAL_II_USE_SLEPC
+#ifdef DEAL_II_WITH_SLEPC
   std::cout << "dealii-feature: SLEPc="
 	    << SLEPC_VERSION_MAJOR << '.'
 	    << SLEPC_VERSION_MINOR << '.'
@@ -123,11 +123,11 @@ int main()
   std::cout << std::endl;
 #endif
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
   std::cout << "dealii-feature: P4est=yes" << std::endl;
 #endif
 
-#ifdef DEAL_II_HAVE_HDF5
+#ifdef DEAL_II_WITH_HDF5
    std::cout << "dealii-feature: HDF5=yes" << std::endl;
 #endif
 
@@ -135,15 +135,15 @@ int main()
    std::cout << "dealii-feature: Tecplot=yes" << std::endl;
 #endif
    
-#ifdef HAVE_LIBNETCDF
+#ifdef DEAL_II_WITH_NETCDF
   std::cout << "dealii-feature: NetCDF=yes" << std::endl;
 #endif
 
-#ifdef HAVE_LIBZ
+#ifdef DEAL_II_WITH_ZLIB
   std::cout << "dealii-feature: LibZ=yes" << std::endl;
 #endif
 
-#ifdef HAVE_FUNCTIONPARSER
+#ifdef DEAL_II_WITH_FUNCTIONPARSER
   std::cout << "dealii-feature: parser=yes" << std::endl;
 #else
   std::cout << "dealii-feature: parser=no" << std::endl;

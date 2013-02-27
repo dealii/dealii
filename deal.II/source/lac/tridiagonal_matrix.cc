@@ -228,7 +228,7 @@ template<>
 void
 TridiagonalMatrix<double>::compute_eigenvalues()
 {
-#ifdef HAVE_LIBLAPACK
+#ifdef DEAL_II_WITH_LAPACK
   Assert(state == matrix, ExcState(state));
   Assert(is_symmetric, ExcNotImplemented());
 

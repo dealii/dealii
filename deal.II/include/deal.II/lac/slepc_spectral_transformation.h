@@ -17,7 +17,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_SLEPC
+#ifdef DEAL_II_WITH_SLEPC
 
 #  include <deal.II/base/std_cxx1x/shared_ptr.h>
 #  include <deal.II/lac/exceptions.h>
@@ -320,7 +320,7 @@ namespace SLEPcWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_SLEPC
+#endif // DEAL_II_WITH_SLEPC
 
 /*--------------------   slepc_spectral_transformation.h   ------------------*/
 

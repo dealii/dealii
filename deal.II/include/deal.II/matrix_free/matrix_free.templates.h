@@ -72,7 +72,7 @@ namespace internal
   void assert_communicator_equality (const dealii::Triangulation<dim> &tria,
                                      const MPI_Comm                  &comm_mf)
   {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     const parallel::distributed::Triangulation<dim> *dist_tria =
       dynamic_cast<const parallel::distributed::Triangulation<dim>*>(&tria);
     if (dist_tria != 0)
@@ -136,7 +136,7 @@ internal_reinit(const Mapping<dim>                          &mapping,
 
       // initialize the basic multithreading information that needs to be
       // passed to the DoFInfo structure
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
       if (additional_data.tasks_parallel_scheme != AdditionalData::none)
         {
           task_info.use_multithreading = true;
@@ -231,7 +231,7 @@ internal_reinit(const Mapping<dim>                            &mapping,
 
       // initialize the basic multithreading information that needs to be
       // passed to the DoFInfo structure
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
       if (additional_data.tasks_parallel_scheme != AdditionalData::none)
         {
           task_info.use_multithreading = true;
@@ -913,7 +913,7 @@ namespace internal
       /*
       // try to balance the number of cells before and after the boundary part
       // on each processor. probably not worth it!
-      #ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+      #ifdef DEAL_II_WITH_MPI
       MPI_Allreduce (&n_boundary_cells, &n_max_boundary_cells, 1, MPI_UNSIGNED,
                      MPI_MAX, size_info.communicator);
       #endif

@@ -205,7 +205,7 @@ void TimeDependent::start_sweep (const unsigned int s)
 
 void TimeDependent::end_sweep (const unsigned int n_threads)
 {
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
   if (n_threads > 1)
     {
       const unsigned int stride = timesteps.size() / n_threads;

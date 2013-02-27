@@ -90,9 +90,9 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # Trilinos has to be configured with the same MPI configuration as
     # deal.II.
     #
-    IF( (TRILINOS_WITH_MPI AND NOT DEAL_II_COMPILER_SUPPORTS_MPI)
+    IF( (TRILINOS_WITH_MPI AND NOT DEAL_II_WITH_MPI)
          OR
-         (NOT TRILINOS_WITH_MPI AND DEAL_II_COMPILER_SUPPORTS_MPI))
+         (NOT TRILINOS_WITH_MPI AND DEAL_II_WITH_MPI))
       MESSAGE(WARNING "\n"
         "Trilinos has to be configured with the same MPI configuration as deal.II.\n\n"
         )
@@ -171,8 +171,6 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL var)
     # easy :-)
     ${Trilinos_TPL_LIBRARIES}
     )
-
-  SET(DEAL_II_USE_TRILINOS TRUE)
 
   SET(DEAL_II_EXPAND_TRILINOS_VECTOR "TrilinosWrappers::Vector")
   SET(DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR "TrilinosWrappers::BlockVector")

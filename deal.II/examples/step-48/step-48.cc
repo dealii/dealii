@@ -286,7 +286,7 @@ namespace Step48
     void assemble_system ();
     void output_results (const unsigned int timestep_number) const;
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
     parallel::distributed::Triangulation<dim>   triangulation;
 #else
     Triangulation<dim>   triangulation;
@@ -323,7 +323,7 @@ namespace Step48
     :
     pcout (std::cout,
            Utilities::System::get_this_mpi_process(MPI_COMM_WORLD)==0),
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
     triangulation (MPI_COMM_WORLD),
 #endif
     fe (QGaussLobatto<1>(fe_degree+1)),
@@ -371,7 +371,7 @@ namespace Step48
     }
 
     pcout << "   Number of global active cells: "
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
           << triangulation.n_global_active_cells()
 #else
           << triangulation.n_active_cells()

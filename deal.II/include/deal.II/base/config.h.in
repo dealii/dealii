@@ -158,6 +158,22 @@
 /* Defined if deal.II was configured on a native Windows platform. */
 #cmakedefine DEAL_II_MSVC
 
+/* Disable a bunch of warnings for Microsoft Visual C++. */
+//#ifdef DEAL_II_MSVC
+//#  pragma warning( disable : 4244 ) /* implied downcasting from double to float */
+//#  pragma warning( disable : 4267 ) /* implied downcasting from size_t to unsigned int */
+//#  pragma warning( disable : 4996 ) /* unsafe functions, such as strcat and sprintf */
+//#  pragma warning( disable : 4355 ) /* 'this' : used in base member initializer list */
+//#  pragma warning( disable : 4661 ) /* no suitable definition provided for explicit template instantiation request */
+//#  pragma warning( disable : 4800 ) /* forcing value to bool 'true' or 'false' (performance warning) */
+//#  pragma warning( disable : 4146 ) /* unary minus operator applied to unsigned type, result still unsigned */
+//#  pragma warning( disable : 4667 ) /* no function template defined that matches forced instantiation */
+//#  pragma warning( disable : 4520 ) /* multiple default constructors specified */
+//#  pragma warning( disable : 4700 ) /* uninitialized local variable */
+//#  pragma warning( disable : 4789 ) /* destination of memory copy is too small */
+//#  pragma warning( disable : 4808 ) /* case 'value' is not a valid value for switch condition of type 'bool */
+//#endif // DEAL_II_MSVC
+
 
 /****************************************
  * Configured in check_2_compiler_bugs: *
@@ -203,150 +219,68 @@
 #cmakedefine DEAL_II_BOOST_BIND_COMPILER_BUG
 
 
-
 /*****************************************
  * Configured in configure_arpack.cmake: *
  *****************************************/
 
-/* Defined if an ARPACK installation was found and is going to be used */
 #cmakedefine DEAL_II_USE_ARPACK
-
 
 /*************************************************
  * Configured in configure_functionparser.cmake: *
  *************************************************/
 
-/* Defined if you have the `functionparser' library */
-#cmakedefine HAVE_FUNCTIONPARSER
-
+#cmakedefine DEAL_II_WITH_FUNCTIONPARSER
 
 /***************************************
  * Configured in configure_hdf5.cmake: *
  ***************************************/
 
-/* Defined if deal.II was configured with hdf5 support */
-#cmakedefine DEAL_II_HAVE_HDF5
-
+#cmakedefine DEAL_II_WITH_HDF5
 
 /*****************************************
  * Configured in configure_lapack.cmake: *
  *****************************************/
 
-/* Defined if deal.II was configured with LAPACK support */
-#cmakedefine HAVE_LIBLAPACK
+#cmakedefine DEAL_II_WITH_LAPACK
 
-/* Defined if you have the `daxpy_' function. */
+/* Defined if the corresponding BLAS or LAPACK function is available */
 #cmakedefine HAVE_DAXPY_
-
-/* Defined if you have the `dgeevx_' function. */
 #cmakedefine HAVE_DGEEVX_
-
-/* Defined if you have the `dgeev_' function. */
 #cmakedefine HAVE_DGEEV_
-
-/* Defined if you have the `dgelsd_' function. */
 #cmakedefine HAVE_DGELSD_
-
-/* Defined if you have the `dgemm_' function. */
 #cmakedefine HAVE_DGEMM_
-
-/* Defined if you have the `dgemv_' function. */
 #cmakedefine HAVE_DGEMV_
-
-/* Defined if you have the `dgeqrf_' function. */
 #cmakedefine HAVE_DGEQRF_
-
-/* Defined if you have the `dgesdd_' function. */
 #cmakedefine HAVE_DGESDD_
-
-/* Defined if you have the `dgesvd_' function. */
 #cmakedefine HAVE_DGESVD_
-
-/* Defined if you have the `dgetrf_' function. */
 #cmakedefine HAVE_DGETRF_
-
-/* Defined if you have the `dgetri_' function. */
 #cmakedefine HAVE_DGETRI_
-
-/* Defined if you have the `dgetrs_' function. */
 #cmakedefine HAVE_DGETRS_
-
-/* Defined if you have the `dorgqr_' function. */
 #cmakedefine HAVE_DORGQR_
-
-/* Defined if you have the `dormqr_' function. */
 #cmakedefine HAVE_DORMQR_
-
-/* Defined if you have the `dstev_' function. */
 #cmakedefine HAVE_DSTEV_
-
-/* Defined if you have the `dsyevx_' function. */
 #cmakedefine HAVE_DSYEVX_
-
-/* Defined if you have the `dsygv_' function. */
 #cmakedefine HAVE_DSYGV_
-
-/* Defined if you have the `dsygvx_' function. */
 #cmakedefine HAVE_DSYGVX_
-
-/* Defined if you have the `dtrtrs_' function. */
 #cmakedefine HAVE_DTRTRS_
-
-/* Defined if you have the `saxpy_' function. */
 #cmakedefine HAVE_SAXPY_
-
-/* Defined if you have the `sgeevx_' function. */
 #cmakedefine HAVE_SGEEVX_
-
-/* Defined if you have the `sgeev_' function. */
 #cmakedefine HAVE_SGEEV_
-
-/* Defined if you have the `sgelsd_' function. */
 #cmakedefine HAVE_SGELSD_
-
-/* Defined if you have the `sgemm_' function. */
 #cmakedefine HAVE_SGEMM_
-
-/* Defined if you have the `sgemv_' function. */
 #cmakedefine HAVE_SGEMV_
-
-/* Defined if you have the `sgeqrf_' function. */
 #cmakedefine HAVE_SGEQRF_
-
-/* Defined if you have the `sgesdd_' function. */
 #cmakedefine HAVE_SGESDD_
-
-/* Defined if you have the `sgesvd_' function. */
 #cmakedefine HAVE_SGESVD_
-
-/* Defined if you have the `sgetrf_' function. */
 #cmakedefine HAVE_SGETRF_
-
-/* Defined if you have the `sgetri_' function. */
 #cmakedefine HAVE_SGETRI_
-
-/* Defined if you have the `sgetrs_' function. */
 #cmakedefine HAVE_SGETRS_
-
-/* Defined if you have the `sorgqr_' function. */
 #cmakedefine HAVE_SORGQR_
-
-/* Defined if you have the `sormqr_' function. */
 #cmakedefine HAVE_SORMQR_
-
-/* Defined if you have the `sstev_' function. */
 #cmakedefine HAVE_SSTEV_
-
-/* Defined if you have the `ssyevx_' function. */
 #cmakedefine HAVE_SSYEVX_
-
-/* Defined if you have the `ssygv_' function. */
 #cmakedefine HAVE_SSYGV_
-
-/* Defined if you have the `ssygvx_' function. */
 #cmakedefine HAVE_SSYGVX_
-
-/* Defined if you have the `strtrs_' function. */
 #cmakedefine HAVE_STRTRS_
 
 
@@ -354,49 +288,43 @@
  * Configured in configure_metis.cmake: *
  ****************************************/
 
-/* Defined if a Metis installation was found and is going to be used */
-#cmakedefine DEAL_II_USE_METIS
+#cmakedefine DEAL_II_WITH_METIS
 
 
 /**************************************
  * Configured in configure_mpi.cmake: *
  **************************************/
 
-/* Defined if the compiler supports mpi */
-#cmakedefine DEAL_II_COMPILER_SUPPORTS_MPI
+#cmakedefine DEAL_II_WITH_MPI
 
 
 /*****************************************
  * Configured in configure_mumps.cmake:  *
  *****************************************/
 
-/* Defined if an MUMPS installation was found and is going to be used */
-#cmakedefine DEAL_II_USE_MUMPS
+#cmakedefine DEAL_II_WITH_MUMPS
 
 
 /*****************************************
  * Configured in configure_netcdf.cmake: *
  *****************************************/
 
-/* Defined if you have the `NetCDF' library */
-#cmakedefine HAVE_LIBNETCDF
+#cmakedefine DEAL_II_WITH_NETCDF
 
 
 /****************************************
  * Configured in configure_p4est.cmake: *
  ****************************************/
 
-/* Defined if we are to use the p4est library to distribute meshes on a
-   cluster computer. */
-#cmakedefine DEAL_II_USE_P4EST
+#cmakedefine DEAL_II_WITH_P4EST
 
 
 /****************************************
  * Configured in configure_petsc.cmake: *
  ****************************************/
 
-/* Defined if a PETSc installation was found and is going to be used */
-#cmakedefine DEAL_II_USE_PETSC
+#cmakedefine DEAL_II_WITH_PETSC
+
 
 /*
  * Note: The following definitions will be set in petscconf.h and
@@ -436,23 +364,18 @@
     >=  \
     (major)*10000 + (minor)*100 + (subminor))
 
-
 /****************************************
  * Configured in configure_slepc.cmake: *
  ****************************************/
 
-/* Defined if a SLEPc installation was found and is going to be used */
-#cmakedefine DEAL_II_USE_SLEPC
+#cmakedefine DEAL_II_WITH_SLEPC
 
 
 /********************************************
  * Configured in configure_1_threads.cmake: *
  ********************************************/
 
-/* Flag indicating whether the library shall be compiled for multithreaded
- * applications. If so, then it is set to one, otherwise to zero.
- */
-#cmakedefine DEAL_II_USE_MT
+#cmakedefine DEAL_II_WITH_THREADS
 
 /* Defined if multi-threading is to be achieved by using the POSIX functions
  */
@@ -469,7 +392,7 @@
  * volatile. We do this here in a very old-fashioned C-style, but still
  * convenient way.
  */
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
 #  define DEAL_VOLATILE volatile
 #else
 #  define DEAL_VOLATILE
@@ -480,41 +403,21 @@
  * Configured in configure_trilinos.cmake: *
  *******************************************/
 
-/* Defined if a Trilinos installation was found and is going to be used */
-#cmakedefine DEAL_II_USE_TRILINOS
+#cmakedefine DEAL_II_WITH_TRILINOS
 
 
 /******************************************
  * Configured in configure_umfpack.cmake: *
  ******************************************/
 
-/* Defined if deal.II was configured with UMFPACK support */
-#cmakedefine HAVE_LIBUMFPACK
+#cmakedefine DEAL_II_WITH_UMFPACK
 
 
 /***************************************
  * Configured in configure_zlib.cmake: *
  ***************************************/
 
-/* Defined if deal.II was configure with zlib support */
-#cmakedefine HAVE_LIBZ
-
-
-/* Disable a bunch of warnings for Microsoft Visual C++. */
-#ifdef DEAL_II_MSVC
-//#  pragma warning( disable : 4244 ) /* implied downcasting from double to float */
-//#  pragma warning( disable : 4267 ) /* implied downcasting from size_t to unsigned int */
-//#  pragma warning( disable : 4996 ) /* unsafe functions, such as strcat and sprintf */
-//#  pragma warning( disable : 4355 ) /* 'this' : used in base member initializer list */
-//#  pragma warning( disable : 4661 ) /* no suitable definition provided for explicit template instantiation request */
-//#  pragma warning( disable : 4800 ) /* forcing value to bool 'true' or 'false' (performance warning) */
-//#  pragma warning( disable : 4146 ) /* unary minus operator applied to unsigned type, result still unsigned */
-//#  pragma warning( disable : 4667 ) /* no function template defined that matches forced instantiation */
-//#  pragma warning( disable : 4520 ) /* multiple default constructors specified */
-//#  pragma warning( disable : 4700 ) /* uninitialized local variable */
-//#  pragma warning( disable : 4789 ) /* destination of memory copy is too small */
-//#  pragma warning( disable : 4808 ) /* case 'value' is not a valid value for switch condition of type 'bool */
-#endif // DEAL_II_MSVC
+#cmakedefine DEAL_II_WITH_ZLIB
 
 
 #include <deal.II/base/numbers.h>

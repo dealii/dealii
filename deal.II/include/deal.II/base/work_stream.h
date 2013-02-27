@@ -19,7 +19,7 @@
 #include <deal.II/base/std_cxx1x/function.h>
 #include <deal.II/base/std_cxx1x/bind.h>
 
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
 #  include <deal.II/base/thread_management.h>
 #  include <tbb/pipeline.h>
 #endif
@@ -125,7 +125,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace WorkStream
 {
 
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
 
 
   namespace internal
@@ -439,7 +439,7 @@ namespace WorkStream
   }
 
 
-#endif // DEAL_II_USE_MT
+#endif // DEAL_II_WITH_THREADS
 
 
 
@@ -527,7 +527,7 @@ namespace WorkStream
     if (!(begin != end))
       return;
 
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
     // create the three stages of the
     // pipeline
     internal::IteratorRangeToItemStream<Iterator,ScratchData,CopyData>

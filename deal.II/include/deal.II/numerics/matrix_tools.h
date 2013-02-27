@@ -46,7 +46,7 @@ namespace hp
 }
 
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   class SparseMatrix;
@@ -61,7 +61,7 @@ namespace PETScWrappers
 }
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   class SparseMatrix;
@@ -828,7 +828,7 @@ namespace MatrixTools
                          BlockVector<number>                 &right_hand_side,
                          const bool           eliminate_columns = true);
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
   /**
    * Apply dirichlet boundary conditions to
    * the system matrix and vectors as
@@ -928,7 +928,7 @@ namespace MatrixTools
 
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * Apply dirichlet boundary
    * conditions to the system matrix

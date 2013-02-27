@@ -992,15 +992,15 @@ INCLUDE_FILE_PATTERNS  =
 
 PREDEFINED             = DOXYGEN=1 \
                          DEBUG=1 \
-                         DEAL_II_USE_PETSC=1 \
-                         DEAL_II_USE_SLEPC=1 \
-                         DEAL_II_USE_TRILINOS=1 \
-                         DEAL_II_USE_MT=1 \
+                         DEAL_II_WITH_PETSC=1 \
+                         DEAL_II_WITH_SLEPC=1 \
+                         DEAL_II_WITH_TRILINOS=1 \
+                         DEAL_II_WITH_THREADS=1 \
                          DEAL_II_USE_MT_POSIX=1 \
 			 DEAL_II_USE_ARPACK=1 \
-			 DEAL_II_USE_METIS=1 \
-			 DEAL_II_USE_MUMPS=1 \
-			 DEAL_II_USE_P4EST=1
+			 DEAL_II_WITH_METIS=1 \
+			 DEAL_II_WITH_MUMPS=1 \
+			 DEAL_II_WITH_P4EST=1
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then
 # this tag can be used to specify a list of macro names that should be expanded.

@@ -1298,7 +1298,7 @@ namespace FETools
     Assert(u2.size()==dof2.n_dofs(),
            ExcDimensionMismatch(u2.size(), dof2.n_dofs()));
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
     if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1) != 0)
       if (dynamic_cast<const DoFHandler<dim>*>(&dof1) != 0)
         {
@@ -1459,7 +1459,7 @@ namespace FETools
     Assert(u1_interpolated.size()==dof1.n_dofs(),
            ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
     if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1) != 0)
       if (dynamic_cast<const DoFHandler<dim>*>(&dof1) != 0)
         {
@@ -1539,7 +1539,7 @@ namespace FETools
     Assert(u1_interpolated.size() == dof1.n_dofs(),
            ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
     if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1) != 0)
       if (dynamic_cast<const DoFHandler<dim>*>(&dof1) != 0)
         {
@@ -1656,7 +1656,7 @@ namespace FETools
         // interpolate back to dof1
         // taking into account
         // constraints1
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
         if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1) != 0)
           {
             AssertThrow (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1_interpolated) != 0,
@@ -1701,7 +1701,7 @@ namespace FETools
     Assert(u1_difference.size()==dof1.n_dofs(),
            ExcDimensionMismatch(u1_difference.size(), dof1.n_dofs()));
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
     if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1) != 0)
       if (dynamic_cast<const DoFHandler<dim>*>(&dof1) != 0)
         {

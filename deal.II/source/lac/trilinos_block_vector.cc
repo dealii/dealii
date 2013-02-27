@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/trilinos_block_vector.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/lac/trilinos_block_sparse_matrix.h>
 

@@ -919,7 +919,7 @@ namespace parallel
        */
       VectorView<Number> vector_view;
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       /**
        * A vector that collects all requests from @p
        * compress() operations. This class uses

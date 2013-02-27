@@ -62,7 +62,7 @@ template <typename number>
 void
 SparseVanka<number>::compute_inverses ()
 {
-#ifndef DEAL_II_USE_MT
+#ifndef DEAL_II_WITH_THREADS
   compute_inverses (0, matrix->m());
 #else
   const unsigned int n_inverses = std::count (selected.begin(),
@@ -556,7 +556,7 @@ void SparseBlockVanka<number>::vmult (Vector<number2>       &dst,
   else
     // otherwise: blocking requested
     {
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
       // spawn threads. since
       // some compilers have
       // trouble finding out

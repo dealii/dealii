@@ -36,7 +36,7 @@ DEAL_II_NAMESPACE_OPEN
 #endif
 
 // include UMFPACK file.
-#ifdef HAVE_LIBUMFPACK
+#ifdef DEAL_II_WITH_UMFPACK
 #  include <umfpack.h>
 #endif
 
@@ -1491,7 +1491,7 @@ initialize (const SparsityPattern &)
 {}
 
 
-#ifdef HAVE_LIBUMFPACK
+#ifdef DEAL_II_WITH_UMFPACK
 
 SparseDirectUMFPACK::SparseDirectUMFPACK ()
   :
@@ -1904,7 +1904,7 @@ SparseDirectUMFPACK::Tvmult_add (
   Assert(false, ExcNotImplemented());
 }
 
-#ifdef DEAL_II_USE_MUMPS
+#ifdef DEAL_II_WITH_MUMPS
 SparseDirectMUMPS::SparseDirectMUMPS ()
   :
   initialize_called (false)
@@ -2080,7 +2080,7 @@ void SparseDirectMUMPS::vmult (Vector<double>       &dst,
   copy_solution (dst);
 }
 
-#endif // DEAL_II_USE_MUMPS
+#endif // DEAL_II_WITH_MUMPS
 
 // explicit instantiations for SparseMatrixMA27
 template
@@ -2117,7 +2117,7 @@ InstantiateUMFPACK(BlockSparseMatrix<double>)
 InstantiateUMFPACK(BlockSparseMatrix<float>)
 
 // explicit instantiations for SparseDirectMUMPS
-#ifdef DEAL_II_USE_MUMPS
+#ifdef DEAL_II_WITH_MUMPS
 #define InstantiateMUMPS(MATRIX) \
   template \
   void SparseDirectMUMPS::initialize (const MATRIX &, const Vector<double> &);
