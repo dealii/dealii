@@ -182,9 +182,9 @@ To handle the nonlinearity of the constitutive law we use a Newton method and to
 active set method like in step-41. To be more concrete we combine both methods to an inexact semi smooth Newton
 method - inexact since we use an iterative solver for the linearised problems in each Newton step.
 
-\section{Linearisation of the constitutive law for the Newton method}
+\section{Linearization of the constitutive law for the Newton method}
 
-For the Newton method we have to linearise the following semi-linearform
+To apply Newton method we have to linearise the following semi-linearform
 $$a(\psi;\varphi) := \left(P_{\Pi}(C\varepsilon(\varphi)),\varepsilon(\varphi)\right).$$
 Because we have to find the solution $u$ in the convex set $V^+$, we have to
 apply an SQP-method (SQP: sequential quadratic programming). That means we have
@@ -196,8 +196,9 @@ to solve a minimisation problem for a known $u^i$ in every SQP-step of the form
  &\rightarrow& \textrm{min},\quad u^{i+1}\in V^+.
 \end{eqnarray*}
 Neglecting the constant terms $ a(u^i;u^i)$ and $ a'(u^i;u^i,u^i)$ we obtain the
-following minimisation problem $$\dfrac{1}{2} a'(u^i;u^{i+1},u^{i+1}) - F(u^i)\rightarrow \textrm{min},\quad u^{i+1}\in V^+$$ with
-$$F(\varphi) := \left(a'(\varphi;\varphi,u^{i+1}) -  a(\varphi;u^{i+1}) \right).$$
+following minimisation problem $$\dfrac{1}{2} a'(u^i;u^{i+1},u^{i+1}) -
+F(u^{i+1})\rightarrow \textrm{min},\quad u^{i+1}\in V^+$$ with $$F(\varphi) :=
+\left(a'(u^{i};u^{i},\varphi) -  a(u^{i},\varphi) \right).$$
 In the case of our constitutive law the Fr\'echet derivative of the
 semi-linearform $a(.;.)$ at the point $u^i$ is
 
