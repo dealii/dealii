@@ -73,7 +73,7 @@ namespace LocalIntegrators
      * Laplacian residual operator in weak form
      *
      * \f[
-     * -(\nabla u, \nabla v)
+     * \int_Z \nu \nabla u \cdot \nabla v \, dx.
      * \f]
      */
     template <int dim>
@@ -102,7 +102,7 @@ namespace LocalIntegrators
      * Vector-valued Laplacian residual operator in weak form
      *
      * \f[
-     * -(\nabla u, \nabla v)
+     * \int_Z \nu \nabla u : \nabla v \, dx.
      * \f]
      */
     template <int dim>
