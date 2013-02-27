@@ -740,6 +740,15 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSO="$CXXFLAGS -O2 -Wno-array-bounds -Wno-parentheses -Wno-delete-non-virtual-dtor -Wno-unneeded-internal-declaration -Wno-unused-function -Wno-unused-variable"
           CXXFLAGSPIC="-fPIC"
           LDFLAGSPIC="-fPIC"
+
+	  dnl On Apple OS X, it appears as if we also need to add -lstdc++
+	  dnl to the command line, for whatever reason
+          case "$target" in
+            *apple-darwin*)
+	      LDFLAGS="$LDFLAGS -lstdc++"
+	      ;;
+          esac
+
           ;;
 
       intel_icc*)
