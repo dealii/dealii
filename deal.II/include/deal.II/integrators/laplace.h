@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -44,7 +44,6 @@ namespace LocalIntegrators
      * the latter case, the Laplacian is applied to each component
      * separately.
      *
-     * @ingroup Integrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
@@ -143,7 +142,6 @@ namespace LocalIntegrators
      * Here, $\gamma$ is the <tt>penalty</tt> parameter suitably computed
      * with compute_penalty().
      *
-     * @ingroup Integrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
@@ -187,7 +185,6 @@ namespace LocalIntegrators
      * boundary value in the argument <tt>data</tt>. $\gamma$ is the usual
      * penalty parameter.
      *
-     * @ingroup Integrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
@@ -237,7 +234,6 @@ namespace LocalIntegrators
      * boundary value in the argument <tt>data</tt>. $\gamma$ is the usual
      * penalty parameter.
      *
-     * @ingroup Integrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
@@ -291,7 +287,6 @@ namespace LocalIntegrators
      * the same on both sides. If factors differ, note that the penalty
      * parameter has to be computed accordingly.
      *
-     * @ingroup Integrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
@@ -352,7 +347,6 @@ namespace LocalIntegrators
     /**
      * Residual term for the symmetric interior penalty method.
      *
-     * @ingroup Integrators
      * @author Guido Kanschat
      * @date 2012
      */
@@ -415,7 +409,6 @@ namespace LocalIntegrators
     /**
      * Vector-valued residual term for the symmetric interior penalty method.
      *
-     * @ingroup Integrators
      * @author Guido Kanschat
      * @date 2012
      */
@@ -490,7 +483,6 @@ namespace LocalIntegrators
      * <i>h<sub>i</sub></i> is the length of <i>Z<sub>i</sub></i>
      * orthogonal to the current face.
      *
-     * @ingroup Integrators
      * @author Guido Kanschat
      * @date 2010
      */
