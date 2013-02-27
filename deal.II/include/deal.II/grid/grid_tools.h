@@ -232,6 +232,22 @@ namespace GridTools
                Triangulation<2> &triangulation);
 
   /**
+   * This function transformes the @p Triangulation @p tria smoothly to a
+   * domain that is described by the boundary points in the map @p
+   * new_points. This map maps the point indices to the boundary points in the
+   * transformed domain.
+   *
+   * Note, that the @p Triangulation is changed in-place, therefore you don't
+   * need to keep two triangulations, but the given triangulation is changed
+   * (overwritten).
+   *
+   * In 1d, this function is not currently implemented.
+   */
+  template <int dim>
+  void laplace_transformation (const std::map<unsigned int,Point<dim> > &new_points,
+                               Triangulation<dim> &tria);
+
+  /**
    * Scale the entire triangulation
    * by the given factor. To
    * preserve the orientation of
