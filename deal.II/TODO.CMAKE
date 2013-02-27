@@ -1,24 +1,10 @@
 Some last bits and thoughts:
 
-* Simplify the LAPACK setup. Don't search for every single symbol...
-
-* What about migrating the testsuite to ctest/cdash? This would have
-  several advantages
-    - good integration with the cmake build system (*cough*)
-    - automatic build (!) and regression tests
-    - cdash is quite nice and we don't have to write the web front end by
-      hand...
-
 * A TECPLOT feature has to be written
 
 * Enable compilation of bundled TBB under Windows/Cygwin and Windows/MinGW
 
-* Clean up Platform introspection (search for sse2 and avx) and document
-  how to disable it (important for building for a different target system)
-
 * Provide a configuration template for cross compiling with CMake,
-
-* Set VERSION in CMakeLists.txt or in an extra file?
 
 * Some failing tests:
 
