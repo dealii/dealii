@@ -412,7 +412,7 @@ ConstraintMatrix.
 
 Beside the ConstitutiveLaw class there is another new class called Input. This
 class allows us to read in an obstacle from a file. In our example the file
-'obstacle\_file.dat' containts data which describe an Chinese, Japanese or
+'obstacle_file.dat' containts data which describe an Chinese, Japanese or
 Korean symbol for force or power. (See http://www.orientaloutpost.com/ :
 "This word can be used for motivation - it
 can also mean power/motion/propulsion/force. It can be anything
