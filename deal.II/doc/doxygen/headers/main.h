@@ -263,7 +263,7 @@
  * TAGFILES = deal.tag=http://www.dealii.org/X.Y.Z/doxygen/deal.II
  *</pre>
  * where <code>X.Y.Z</code> refers to the release you want to link to. Be sure you use
- * the matching tag file. In theorey, you can also link against the developing revisions
+ * the matching tag file. In theory, you can also link against the developing revisions
  * of deal.II, but then you have to fear that your links may become invalid if
  * the deal.II structure changes.
  */
