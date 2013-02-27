@@ -196,7 +196,7 @@ namespace LocalIntegrators
      * space should be at least <b>H</b><sup>1</sup>. The test functions
      * may be discontinuous.
      *
-     * The function cell_residual() is the Frechet derivative of this function with respect to the test functions.
+     * The function gradient_matrix() is the Frechet derivative of this function with respect to the test functions.
      *
      * @author Guido Kanschat
      * @date 2011
