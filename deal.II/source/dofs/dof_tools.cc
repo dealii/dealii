@@ -5131,8 +5131,8 @@ namespace DoFTools
     // innocent block of code. basically, it must be the
     // ConstraintMatrix::add_entry call which takes the bulk of the time,
     // but it is not known to the author how to make it faster...
-    std::vector<std::pair<unsigned int,double> > constraint_line;
-    for (unsigned int global_dof=0; global_dof<n_fine_dofs; ++global_dof)
+    std::vector<std::pair<types::global_dof_index,double> > constraint_line;
+    for (types::global_dof_index global_dof=0; global_dof<n_fine_dofs; ++global_dof)
       if (weight_mapping[global_dof] != -1)
         // this global dof is a parameter dof, so it may carry a constraint
         // note that for each global dof, the sum of weights shall be one,
@@ -5178,8 +5178,8 @@ namespace DoFTools
               const std::map<unsigned int,float>::const_iterator
               j = weights[row].find(col);
               if ((j != weights[row].end()) && (j->second != 0))
-                constraint_line.push_back (std::pair<unsigned int,double>(representants[row],
-                                                                          j->second));
+                constraint_line.push_back (std::pair<types::global_dof_index,double>(representants[row],
+                                                                                     j->second));
             };
 
           constraints.add_entries (global_dof, constraint_line);

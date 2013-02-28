@@ -210,7 +210,7 @@ namespace internal
        * on this object.
        */
       template <int dimm, int spacedim>
-      unsigned int
+      types::global_dof_index
       nth_active_fe_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                            const unsigned int               obj_level,
                            const unsigned int               obj_index,
@@ -305,7 +305,7 @@ namespace internal
           // find a set for this
           // particular fe_index
           const types::global_dof_index starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
+          const types::global_dof_index *pointer        = &dofs[starting_offset];
           while (true)
             {
               Assert (*pointer != numbers::invalid_unsigned_int,
@@ -387,7 +387,7 @@ namespace internal
           // find a set for this
           // particular fe_index
           const types::global_dof_index starting_offset = dof_offsets[obj_index];
-          unsigned int      *pointer         = &dofs[starting_offset];
+          types::global_dof_index      *pointer         = &dofs[starting_offset];
           while (true)
             {
               Assert (*pointer != numbers::invalid_unsigned_int,

@@ -454,7 +454,7 @@ namespace hp
      * cells are also not necessarily
      * included.
      */
-    unsigned int n_locally_owned_dofs() const;
+    types::global_dof_index n_locally_owned_dofs() const;
 
     /**
      * Return an IndexSet describing
@@ -512,7 +512,7 @@ namespace hp
      * then the vector has a single
      * element equal to n_dofs().
      */
-    const std::vector<unsigned int> &
+    const std::vector<types::global_dof_index> &
     n_locally_owned_dofs_per_processor () const;
 
     /**

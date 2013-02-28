@@ -3366,7 +3366,7 @@ namespace VectorTools
 
     std::vector<bool> dofs_processed (dofs_per_face);
     std::vector<double> dof_values (dofs_per_face);
-    std::vector<unsigned int> face_dof_indices (dofs_per_face);
+    std::vector<types::global_dof_index> face_dof_indices (dofs_per_face);
     typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active ();
 
     switch (dim)
@@ -3943,7 +3943,7 @@ namespace VectorTools
                                             const Function<dim> &,
                                             const std::vector<DerivativeForm<1,dim,dim> > &,
                                             std::vector<double> &,
-                                            std::vector<unsigned int> &)
+                                            std::vector<types::global_dof_index> &)
     {
       Assert (false, ExcNotImplemented ());
     }

@@ -206,13 +206,13 @@ public:
   /**
    * Number of degrees of freedom on a vertex.
    */
-  const unsigned int dofs_per_vertex;
+  const types::global_dof_index dofs_per_vertex;
 
   /**
    * Number of degrees of freedom in a line; not including the degrees of
    * freedom on the vertices of the line.
    */
-  const unsigned int dofs_per_line;
+  const types::global_dof_index dofs_per_line;
 
   /**
    * Number of degrees of freedom in a quadrilateral; not including the

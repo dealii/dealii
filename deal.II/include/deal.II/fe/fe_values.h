@@ -4783,7 +4783,7 @@ inline
 void
 FEValuesBase<dim,spacedim>::get_function_grads (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Tensor<1,spacedim> > &values) const
 {
   get_function_gradients(fe_function, indices, values);
@@ -4810,7 +4810,7 @@ inline
 void
 FEValuesBase<dim,spacedim>::get_function_grads (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<std::vector<Tensor<1,spacedim> > > &values,
   bool q_points_fastest) const
 {

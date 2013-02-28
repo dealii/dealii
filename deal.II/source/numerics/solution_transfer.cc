@@ -76,7 +76,7 @@ void SolutionTransfer<dim, VECTOR, DH>::prepare_for_pure_refinement()
   n_dofs_old=dof_handler->n_dofs();
 
   // efficient reallocation of indices_on_cell
-  std::vector<std::vector<unsigned int> > (n_active_cells)
+  std::vector<std::vector<types::global_dof_index> > (n_active_cells)
   .swap(indices_on_cell);
 
   typename DH::active_cell_iterator cell = dof_handler->begin_active(),
@@ -291,7 +291,7 @@ prepare_for_coarsening_and_refinement(const std::vector<VECTOR> &all_in)
   // allocate the needed memory. initialize
   // the following arrays in an efficient
   // way, without copying much
-  std::vector<std::vector<unsigned int> >
+  std::vector<std::vector<types::global_dof_index> >
   (n_cells_to_stay_or_refine)
   .swap(indices_on_cell);
 
@@ -516,7 +516,7 @@ interpolate (const std::vector<VECTOR> &all_in,
 
       if (pointerstruct!=cell_map_end)
         {
-          const std::vector<unsigned int> *const indexptr
+          const std::vector<types::global_dof_index> *const indexptr
             =pointerstruct->second.indices_ptr;
 
           const std::vector<Vector<typename VECTOR::value_type> > *const valuesptr

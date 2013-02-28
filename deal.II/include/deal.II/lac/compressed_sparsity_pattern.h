@@ -430,7 +430,7 @@ private:
      * the cache. This array is always
      * kept sorted.
      */
-    mutable std::vector<unsigned int> entries;
+    mutable std::vector<size_type> entries;
 
     /**
      * Cache of entries that have not yet

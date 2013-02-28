@@ -284,7 +284,7 @@ for (deal_II_dimension : DIMENSIONS)
           const MGDoFHandler<deal_II_dimension> &,
           const types::boundary_id,
           const Function<deal_II_dimension>   &,
-          std::map<unsigned int,double>       &,
+          std::map<types::global_dof_index,double>       &,
           const ComponentMask    &);
     \}
 }
@@ -299,7 +299,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
         (const Mapping<deal_II_dimension,deal_II_space_dimension>    &,
          const DH<deal_II_dimension,deal_II_space_dimension> &,
          const FunctionMap<deal_II_space_dimension>::type &,
-         std::map<unsigned int,double>       &,
+         std::map<types::global_dof_index,double>       &,
          const ComponentMask    &);
 
       template
@@ -308,7 +308,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
          const DH<deal_II_dimension,deal_II_space_dimension> &,
          const types::boundary_id,
          const Function<deal_II_space_dimension>   &,
-         std::map<unsigned int,double>       &,
+         std::map<types::global_dof_index,double>       &,
          const ComponentMask    &);
 
       template
@@ -316,14 +316,14 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS;
           const DH<deal_II_dimension,deal_II_space_dimension> &,
           const types::boundary_id,
           const Function<deal_II_space_dimension>   &,
-          std::map<unsigned int,double>       &,
+          std::map<types::global_dof_index,double>       &,
           const ComponentMask    &);
 
       template
         void interpolate_boundary_values
         (const DH<deal_II_dimension,deal_II_space_dimension> &,
          const FunctionMap<deal_II_space_dimension>::type &,
-         std::map<unsigned int,double>       &,
+         std::map<types::global_dof_index,double>       &,
          const ComponentMask    &);
 
       template
@@ -511,7 +511,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
          const DoFHandler<deal_II_dimension>  &,
          const FunctionMap<deal_II_dimension>::type &,
          const Quadrature<deal_II_dimension-1>&,
-         std::map<unsigned int,double>&, std::vector<unsigned int>);
+         std::map<types::global_dof_index,double>&, std::vector<unsigned int>);
 #endif
 
       template
@@ -519,7 +519,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
         (const DoFHandler<deal_II_dimension>  &,
          const FunctionMap<deal_II_dimension>::type &,
          const Quadrature<deal_II_dimension-1>&,
-         std::map<unsigned int,double>&, std::vector<unsigned int>);
+         std::map<types::global_dof_index,double>&, std::vector<unsigned int>);
 
 
       template

@@ -978,15 +978,15 @@ private:
    * Call the <tt>ma47ad</tt> function
    * with the given args.
    */
-  void call_ma47ad (const size_type *n_rows,
-                    const size_type *n_nonzero_elements,
-                    size_type       *row_numbers,
-                    size_type       *column_numbers,
-                    size_type       *IW,
-                    const size_type *LIW,
-                    size_type       *KEEP,
-                    const size_type *ICNTL,
-                    int             *INFO);
+  void call_ma47ad (const size_type    *n_rows,
+                    const size_type    *n_nonzero_elements,
+                    size_type          *row_numbers,
+                    size_type          *column_numbers,
+                    size_type          *IW,
+                    const size_type    *LIW,
+                    size_type          *KEEP,
+                    const unsigned int *ICNTL,
+                    int                *INFO);
 
   /**
    * Call the <tt>ma47bd</tt> function

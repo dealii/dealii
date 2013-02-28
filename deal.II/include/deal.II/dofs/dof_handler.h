@@ -232,7 +232,7 @@ public:
    * certain value, but rather take
    * its symbolic name.
    */
-  static const unsigned int invalid_dof_index = numbers::invalid_unsigned_int;
+  static const types::global_dof_index invalid_dof_index = numbers::invalid_dof_index;
 
   /**
    * The default index of the
@@ -1082,7 +1082,7 @@ DoFHandler<dim,spacedim>::n_dofs () const
 
 template<int dim, int spacedim>
 inline
-unsigned int DoFHandler<dim, spacedim>::n_dofs (const unsigned int level) const
+types::global_dof_index DoFHandler<dim, spacedim>::n_dofs (const unsigned int level) const
 {
   Assert(has_level_dofs(), ExcMessage("n_dofs(level) can only be called after distribute_mg_dofs()"));
   Assert (level < mg_number_cache.size (), ExcInvalidLevel (level));
@@ -1231,7 +1231,7 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
 
 template<int dim, int spacedim>
 inline
-unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (
+types::global_dof_index DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (
   const unsigned int level,
   const unsigned int dof_number) const
 {
@@ -1245,7 +1245,7 @@ inline
 void DoFHandler<dim, spacedim>::MGVertexDoFs::set_index (
   const unsigned int level,
   const unsigned int dof_number,
-  const unsigned int index)
+  const types::global_dof_index index)
 {
   Assert ((level >= coarsest_level) && (level <= finest_level), ExcInvalidLevel (level));
   indices[indices_offset[level - coarsest_level] + dof_number] = index;

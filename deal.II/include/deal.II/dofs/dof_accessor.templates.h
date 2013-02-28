@@ -1434,7 +1434,7 @@ namespace internal
       static
       void set_mg_dof_indices (const dealii::DoFAccessor<1,DH,lda> &,
                                const int,
-                               const std::vector<unsigned int> &,
+                               const std::vector<types::global_dof_index> &,
                                const unsigned int)
       {
         AssertThrow (false, ExcNotImplemented ()); //TODO[TH]: implement
@@ -1446,11 +1446,11 @@ namespace internal
       static
       void set_mg_dof_indices (dealii::DoFAccessor<2, DH,lda> &accessor,
                                const int level,
-                               const std::vector<unsigned int> &dof_indices,
+                               const std::vector<types::global_dof_index> &dof_indices,
                                const unsigned int fe_index)
       {
         const FiniteElement<DH::dimension, DH::space_dimension> &fe = accessor.get_dof_handler ().get_fe ()[fe_index];
-        std::vector<unsigned int>::const_iterator next = dof_indices.begin ();
+        std::vector<types::global_dof_index>::const_iterator next = dof_indices.begin ();
 
         for (unsigned int vertex = 0; vertex < GeometryInfo<2>::vertices_per_cell; ++vertex)
           for (unsigned int dof = 0; dof < fe.dofs_per_vertex; ++dof)
@@ -1472,7 +1472,7 @@ namespace internal
       static
       void set_mg_dof_indices (const dealii::DoFAccessor<3, DH,lda> &,
                                const int,
-                               const std::vector<unsigned int> &,
+                               const std::vector<types::global_dof_index> &,
                                const unsigned int)
       {
         AssertThrow (false, ExcNotImplemented ()); //TODO[TH]: implement
@@ -3547,7 +3547,7 @@ DoFCellAccessor<DH,lda>::face (const unsigned int i) const
 template <class DH, bool lda>
 inline
 void
-DoFCellAccessor<DH,lda>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
+DoFCellAccessor<DH,lda>::get_dof_indices (std::vector<types::global_dof_index> &dof_indices) const
 {
   Assert (this->is_artificial() == false,
           ExcMessage ("Can't ask for DoF indices on artificial cells."));

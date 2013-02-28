@@ -20,7 +20,7 @@ my $vector_functions = <<'EOT'
 template void ConstraintMatrix::condense<V1 >(const V1 &, V1&) const;
 template void ConstraintMatrix::condense<V1 >(V1 &vec) const;
 template void ConstraintMatrix::distribute_local_to_global<V1 > (
-    const Vector<double>&, const std::vector<unsigned int> &, V1&, const FullMatrix<double>&) const;
+    const Vector<double>&, const std::vector<types::global_dof_index> &, V1&, const FullMatrix<double>&) const;
 template void ConstraintMatrix::distribute<V1 >(const V1 &, V1&) const;
 template void ConstraintMatrix::distribute<V1 >(V1 &) const;
 EOT

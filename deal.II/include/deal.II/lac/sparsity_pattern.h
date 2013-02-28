@@ -1801,7 +1801,7 @@ SparsityPattern::n_nonzero_elements () const
 template <class Archive>
 inline
 void
-SparsityPattern::save (Archive &ar, const size_type) const
+SparsityPattern::save (Archive &ar, const unsigned int) const
 {
   // forward to serialization function in the base class.
   ar   &static_cast<const Subscriptor &>(*this);
@@ -1817,7 +1817,7 @@ SparsityPattern::save (Archive &ar, const size_type) const
 template <class Archive>
 inline
 void
-SparsityPattern::load (Archive &ar, const size_type)
+SparsityPattern::load (Archive &ar, const unsigned int)
 {
   // forward to serialization function in the base class.
   ar   &static_cast<Subscriptor &>(*this);

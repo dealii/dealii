@@ -1641,7 +1641,7 @@ not_connect:
     namespace internal
     {
       // rudimentary version of a vector that keeps entries always ordered
-      class ordered_vector : public std::vector<unsigned int>
+      class ordered_vector : public std::vector<types::global_dof_index>
       {
       public:
         ordered_vector ()
@@ -1649,20 +1649,20 @@ not_connect:
           reserve (2000);
         }
 
-        void reserve (const unsigned int size)
+        void reserve (const types::global_dof_index size)
         {
           if (size > 0)
-            this->std::vector<unsigned int>::reserve (size);
+            this->std::vector<types::global_dof_index>::reserve (size);
         }
 
 
         // insert a given entry. dat is a pointer within this vector (the user
         // needs to make sure that it really stays there)
-        void insert (const unsigned int entry,
-                     std::vector<unsigned int>::iterator &dat)
+        void insert (const types::global_dof_index entry,
+                     std::vector<types::global_dof_index>::iterator &dat)
         {
-          AssertIndexRange (static_cast<unsigned int>(dat - begin()), size()+1);
-          AssertIndexRange (static_cast<unsigned int>(end() - dat), size()+1);
+          AssertIndexRange (static_cast<types::global_dof_index>(dat - begin()), size()+1);
+          AssertIndexRange (static_cast<types::global_dof_index>(end() - dat), size()+1);
           AssertIndexRange (size(), capacity());
           while (dat != end() && *dat < entry)
             ++dat;
@@ -1674,7 +1674,7 @@ not_connect:
             }
           else if (*dat > entry)
             {
-              dat = this->std::vector<unsigned int>::insert (dat, entry);
+              dat = this->std::vector<types::global_dof_index>::insert (dat, entry);
               ++dat;
             }
           else
@@ -1694,17 +1694,18 @@ not_connect:
      CompressedSimpleSparsityPattern &connectivity) const
     {
       AssertDimension (row_starts.size()-1, size_info.n_active_cells);
-      const unsigned int n_rows = (vector_partitioner->local_range().second-
+      const types::global_dof_index n_rows = 
+                                  (vector_partitioner->local_range().second-
                                    vector_partitioner->local_range().first)
                                   + vector_partitioner->ghost_indices().n_elements();
-      const unsigned int n_blocks = (do_blocking == true) ?
+      const types::global_dof_index n_blocks = (do_blocking == true) ?
                                     task_info.n_blocks : size_info.n_active_cells;
 
       // first determine row lengths
-      std::vector<unsigned int> row_lengths(n_rows);
+      std::vector<types::global_dof_index> row_lengths(n_rows);
       unsigned int cell_start = 0, mcell_start = 0;
       std::vector<types::global_dof_index> scratch;
-      for (unsigned int block = 0; block < n_blocks; ++block)
+      for (types::global_dof_index block = 0; block < n_blocks; ++block)
         {
           // if we have the blocking variant (used in the coloring scheme), we
           // want to build a graph with the blocks with interaction with
@@ -1748,7 +1749,7 @@ not_connect:
         }
 
       // disregard dofs that only sit on one cell
-      for (unsigned int row=0; row<n_rows; ++row)
+      for (types::global_dof_index row=0; row<n_rows; ++row)
         if (row_lengths[row] == 1)
           row_lengths[row] = 0;
 

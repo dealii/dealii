@@ -411,7 +411,7 @@ void MatrixFree<dim,Number>::initialize_indices
   AssertDimension (n_fe, locally_owned_set.size());
   AssertDimension (n_fe, constraint.size());
 
-  std::vector<unsigned int> local_dof_indices;
+  std::vector<types::global_dof_index> local_dof_indices;
   std::vector<std::vector<unsigned int> > ghost_dofs(n_fe);
   std::vector<std::vector<std::vector<unsigned int> > > lexicographic_inv(n_fe);
 
@@ -684,7 +684,7 @@ void MatrixFree<dim,Number>::initialize_indices
   }
 
   // set constraint pool from the std::map and reorder the indices
-  typename std::map<std::vector<double>, unsigned int,
+  typename std::map<std::vector<double>, types::global_dof_index,
            internal::MatrixFreeFunctions::FPArrayComparator<double> >::iterator
            it = constraint_values.constraints.begin(),
            end = constraint_values.constraints.end();

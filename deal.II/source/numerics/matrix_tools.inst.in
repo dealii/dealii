@@ -85,7 +85,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
        SparseMatrix<double>      &matrix,
        const FunctionMap<deal_II_space_dimension>::type &rhs,
        Vector<double>            &rhs_vector,
-       std::vector<unsigned int> &dof_to_boundary_mapping,
+       std::vector<types::global_dof_index> &dof_to_boundary_mapping,
        const Function<deal_II_space_dimension> * const a,
        std::vector<unsigned int>);
 
@@ -97,7 +97,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
        SparseMatrix<double>      &matrix,
        const FunctionMap<deal_II_space_dimension>::type &rhs,
        Vector<double>            &rhs_vector,
-       std::vector<unsigned int> &dof_to_boundary_mapping,
+       std::vector<types::global_dof_index> &dof_to_boundary_mapping,
        const Function<deal_II_space_dimension> * const a,
        std::vector<unsigned int>);
 
@@ -192,7 +192,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
        SparseMatrix<double>&,
        const FunctionMap<deal_II_dimension>::type&,
        Vector<double>&,
-       std::vector<unsigned int>&,
+       std::vector<types::global_dof_index>&,
        const Function<deal_II_dimension> * const,
        std::vector<unsigned int>);
 
@@ -203,7 +203,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
        SparseMatrix<double>&,
        const FunctionMap<deal_II_dimension>::type&,
        Vector<double>&,
-       std::vector<unsigned int>&,
+       std::vector<types::global_dof_index>&,
        const Function<deal_II_dimension> * const,
        std::vector<unsigned int>);
 

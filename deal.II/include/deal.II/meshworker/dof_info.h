@@ -298,7 +298,7 @@ namespace MeshWorker
   template <class DH>
   DoFInfo<dim,spacedim,number>::DoFInfo(const DH &dof_handler)
   {
-    std::vector<unsigned int> aux(1);
+    std::vector<types::global_dof_index> aux(1);
     aux[0] = dof_handler.get_fe().dofs_per_cell;
     aux_local_indices.reinit(aux);
   }

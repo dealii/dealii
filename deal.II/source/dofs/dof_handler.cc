@@ -120,7 +120,7 @@ namespace internal
         // nodes)
         // count lines -> 28 (don't forget to count
         // mother and children separately!)
-        unsigned int max_couplings;
+        types::global_dof_index max_couplings;
         switch (dof_handler.tria->max_adjacent_cells())
           {
           case 4:
@@ -223,7 +223,7 @@ namespace internal
         const unsigned int max_adjacent_cells
           = dof_handler.tria->max_adjacent_cells();
 
-        unsigned int max_couplings;
+        types::global_dof_index max_couplings;
         if (max_adjacent_cells <= 8)
           max_couplings=7*7*7*dof_handler.selected_fe->dofs_per_vertex +
                         7*6*7*3*dof_handler.selected_fe->dofs_per_line +
@@ -364,7 +364,7 @@ namespace internal
         for (unsigned int i = 0; i < n_levels; ++i)
           {
             dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<1>);
-            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<unsigned int> (tria.n_raw_lines (i) * dofs_per_line, DoFHandler<1>::invalid_dof_index);
+            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines (i) * dofs_per_line, DoFHandler<1>::invalid_dof_index);
           }
 
         const unsigned int &n_vertices = tria.n_vertices ();
@@ -420,11 +420,11 @@ namespace internal
         for (unsigned int i = 0; i < n_levels; ++i)
           {
             dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<2>);
-            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<unsigned int> (tria.n_raw_quads (i) * fe.dofs_per_quad, DoFHandler<2>::invalid_dof_index);
+            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads (i) * fe.dofs_per_quad, DoFHandler<2>::invalid_dof_index);
           }
 
         dof_handler.mg_faces = new internal::DoFHandler::DoFFaces<2>;
-        dof_handler.mg_faces->lines.dofs = std::vector<unsigned int> (tria.n_raw_lines () * fe.dofs_per_line, DoFHandler<2>::invalid_dof_index);
+        dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, DoFHandler<2>::invalid_dof_index);
 
         const unsigned int &n_vertices = tria.n_vertices ();
 
@@ -479,12 +479,12 @@ namespace internal
         for (unsigned int i = 0; i < n_levels; ++i)
           {
             dof_handler.mg_levels.push_back (new internal::DoFHandler::DoFLevel<3>);
-            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<unsigned int> (tria.n_raw_hexs (i) * fe.dofs_per_hex, DoFHandler<3>::invalid_dof_index);
+            dof_handler.mg_levels.back ()->dof_object.dofs = std::vector<types::global_dof_index> (tria.n_raw_hexs (i) * fe.dofs_per_hex, DoFHandler<3>::invalid_dof_index);
           }
 
         dof_handler.mg_faces = new internal::DoFHandler::DoFFaces<3>;
-        dof_handler.mg_faces->lines.dofs = std::vector<unsigned int> (tria.n_raw_lines () * fe.dofs_per_line, DoFHandler<3>::invalid_dof_index);
-        dof_handler.mg_faces->quads.dofs = std::vector<unsigned int> (tria.n_raw_quads () * fe.dofs_per_quad, DoFHandler<3>::invalid_dof_index);
+        dof_handler.mg_faces->lines.dofs = std::vector<types::global_dof_index> (tria.n_raw_lines () * fe.dofs_per_line, DoFHandler<3>::invalid_dof_index);
+        dof_handler.mg_faces->quads.dofs = std::vector<types::global_dof_index> (tria.n_raw_quads () * fe.dofs_per_quad, DoFHandler<3>::invalid_dof_index);
 
         const unsigned int &n_vertices = tria.n_vertices ();
 
@@ -1283,7 +1283,7 @@ void DoFHandler<1>::renumber_dofs (const unsigned int level,
       for (unsigned int d=0; d<this->get_fe().dofs_per_vertex; ++d)
         i->set_index (level, d, new_numbers[i->get_index (level, d)]);
 
-  for (std::vector<unsigned int>::iterator i=mg_levels[level]->dof_object.dofs.begin();
+  for (std::vector<types::global_dof_index>::iterator i=mg_levels[level]->dof_object.dofs.begin();
        i!=mg_levels[level]->dof_object.dofs.end(); ++i)
     {
       if (*i != DoFHandler<1>::invalid_dof_index)
@@ -1342,7 +1342,7 @@ void DoFHandler<2>::renumber_dofs (const unsigned int  level,
       const_cast<Triangulation<2> &>(this->get_tria()).load_user_flags (user_flags);
     }
 
-  for (std::vector<unsigned int>::iterator i=mg_levels[level]->dof_object.dofs.begin();
+  for (std::vector<types::global_dof_index>::iterator i=mg_levels[level]->dof_object.dofs.begin();
        i!=mg_levels[level]->dof_object.dofs.end(); ++i)
     {
       if (*i != DoFHandler<2>::invalid_dof_index)
@@ -1436,7 +1436,7 @@ void DoFHandler<3>::renumber_dofs (const unsigned int  level,
     }
 
   //HEX DoFs
-  for (std::vector<unsigned int>::iterator i=mg_levels[level]->dof_object.dofs.begin();
+  for (std::vector<types::global_dof_index>::iterator i=mg_levels[level]->dof_object.dofs.begin();
        i!=mg_levels[level]->dof_object.dofs.end(); ++i)
     {
       if (*i != DoFHandler<3>::invalid_dof_index)
@@ -1574,13 +1574,13 @@ void DoFHandler<dim, spacedim>::MGVertexDoFs::init (const unsigned int cl, const
   const unsigned int n_levels = finest_level - coarsest_level + 1;
   const unsigned int n_indices = n_levels * dofs_per_vertex;
 
-  indices = new unsigned int[n_indices];
+  indices = new types::global_dof_index[n_indices];
   Assert (indices != 0, ExcNoMemory ());
 
   for (unsigned int i = 0; i < n_indices; ++i)
     indices[i] = DoFHandler<dim, spacedim>::invalid_dof_index;
 
-  indices_offset = new unsigned int[n_levels];
+  indices_offset = new types::global_dof_index[n_levels];
   Assert (indices != 0, ExcNoMemory ());
 
   for (unsigned int i = 0; i < n_levels; ++i)

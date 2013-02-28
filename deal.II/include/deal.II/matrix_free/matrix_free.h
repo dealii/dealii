@@ -556,14 +556,14 @@ public:
    * vector, not in global numbers. In addition, it only returns the indices
    * for degrees of freedom that are owned locally, not for ghosts.
    */
-  const std::vector<unsigned int> &
+  const std::vector<types::global_dof_index> &
   get_constrained_dofs (const unsigned int fe_component = 0) const;
 
   /**
    * Calls renumber_dofs function in dof info which renumbers the degrees
    * of freedom according to the ordering for parallelization.
    */
-  void renumber_dofs (std::vector<unsigned int> &renumbering,
+  void renumber_dofs (std::vector<types::global_dof_index> &renumbering,
                       const unsigned int vector_component = 0);
 
   //@}
@@ -970,7 +970,7 @@ MatrixFree<dim,Number>::get_vector_partitioner (const unsigned int comp) const
 
 template <int dim, typename Number>
 inline
-const std::vector<unsigned int> &
+const std::vector<types::global_dof_index> &
 MatrixFree<dim,Number>::get_constrained_dofs (const unsigned int comp) const
 {
   AssertIndexRange (comp, n_components());
@@ -1157,7 +1157,7 @@ MatrixFree<dim,Number>::create_cell_subrange_hp_by_index
 template <int dim, typename Number>
 inline
 void
-MatrixFree<dim,Number>::renumber_dofs (std::vector<unsigned int> &renumbering,
+MatrixFree<dim,Number>::renumber_dofs (std::vector<types::global_dof_index> &renumbering,
                                        const unsigned int vector_component)
 {
   AssertIndexRange(vector_component, dof_info.size());

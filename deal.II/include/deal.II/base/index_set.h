@@ -908,8 +908,8 @@ IndexSet::nth_index_in_set (const unsigned int n) const
 
 
 inline
-types::global_dof_index
-IndexSet::index_within_set (const unsigned int n) const
+unsigned int
+IndexSet::index_within_set (const types::global_dof_index n) const
 {
   // to make this call thread-safe, compress()
   // must not be called through this function

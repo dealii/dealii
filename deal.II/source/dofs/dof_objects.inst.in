@@ -54,14 +54,14 @@ for (deal_II_dimension, structdim : DIMENSIONS)
 		   const unsigned int       obj_index,
 		   const unsigned int       fe_index,
 		   const unsigned int       local_index,
-		   const unsigned int       global_index);
+		   const types::global_dof_index global_index);
 #endif
 
 
 #if (deal_II_dimension == 3) && (structdim < 3)
 
     template
-    unsigned int
+    types::global_dof_index
     DoFObjects<structdim>::
     get_dof_index (const dealii::DoFHandler<1,3> &dof_handler,
 		   const unsigned int       obj_index,

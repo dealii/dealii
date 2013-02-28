@@ -151,7 +151,7 @@ CompressedSparsityPattern::Line::flush_cache () const
               ExcInternalError());
       if (n_new_entries > entries.size())
         {
-          std::vector<unsigned int> new_entries;
+          std::vector<types::global_dof_index> new_entries;
           new_entries.reserve (n_new_entries);
           unsigned int cache_position = 0;
           unsigned int entry_position = 0;
@@ -265,7 +265,7 @@ CompressedSparsityPattern::Line::add_entries (ForwardIterator begin,
                   ExcInternalError());
           if (n_new_entries > entries.size())
             {
-              std::vector<unsigned int> new_entries;
+              std::vector<types::global_dof_index> new_entries;
               new_entries.reserve (n_new_entries);
               ForwardIterator my_it = begin;
               unsigned int entry_position = 0;

@@ -154,7 +154,7 @@ namespace internal
        * assigned the correct index after all the ghost indices have been
        * collected by the call to @p assign_ghosts.
        */
-      void read_dof_indices (const std::vector<unsigned int> &local_indices,
+      void read_dof_indices (const std::vector<types::global_dof_index> &local_indices,
                              const std::vector<unsigned int> &lexicographic_inv,
                              const ConstraintMatrix          &constraints,
                              const unsigned int               cell_number,
@@ -491,7 +491,7 @@ namespace internal
 
 
     inline
-    const unsigned int *
+    const types::global_dof_index *
     DoFInfo::begin_indices_plain (const unsigned int row) const
     {
       // if we have no constraints, should take the data from dof_indices
@@ -513,7 +513,7 @@ namespace internal
 
 
     inline
-    const unsigned int *
+    const types::global_dof_index *
     DoFInfo::end_indices_plain (const unsigned int row) const
     {
       return begin_indices_plain(row) +

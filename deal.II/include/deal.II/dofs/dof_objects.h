@@ -192,7 +192,7 @@ namespace internal
     inline
     unsigned int
     DoFObjects<dim>::n_active_fe_indices (const dealii::DoFHandler<dh_dim,spacedim> &,
-                                          const unsigned) const
+                                          const types::global_dof_index) const
     {
       return 1;
     }
