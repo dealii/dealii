@@ -224,64 +224,77 @@
  *****************************************/
 
 #cmakedefine DEAL_II_WITH_ARPACK
+#ifdef DEAL_II_WITH_ARPACK
+#  define DEAL_II_USE_ARPACK
+#endif
 
 /*************************************************
  * Configured in configure_functionparser.cmake: *
  *************************************************/
 
 #cmakedefine DEAL_II_WITH_FUNCTIONPARSER
+#ifdef DEAL_II_WITH_FUNCTIONPARSER
+#  define HAVE_FUNCTIONPARSER
+#endif
 
 /***************************************
  * Configured in configure_hdf5.cmake: *
  ***************************************/
 
 #cmakedefine DEAL_II_WITH_HDF5
+#ifdef DEAL_II_WITH_HDF5
+#  define DEAL_II_HAVE_HDF5
+#endif
 
 /*****************************************
  * Configured in configure_lapack.cmake: *
  *****************************************/
 
 #cmakedefine DEAL_II_WITH_LAPACK
+#ifdef DEAL_II_WITH_LAPACK
+#  define HAVE_LIBLAPACK
 
 /* Defined if the corresponding BLAS or LAPACK function is available */
-#cmakedefine HAVE_DAXPY_
-#cmakedefine HAVE_DGEEVX_
-#cmakedefine HAVE_DGEEV_
-#cmakedefine HAVE_DGELSD_
-#cmakedefine HAVE_DGEMM_
-#cmakedefine HAVE_DGEMV_
-#cmakedefine HAVE_DGEQRF_
-#cmakedefine HAVE_DGESDD_
-#cmakedefine HAVE_DGESVD_
-#cmakedefine HAVE_DGETRF_
-#cmakedefine HAVE_DGETRI_
-#cmakedefine HAVE_DGETRS_
-#cmakedefine HAVE_DORGQR_
-#cmakedefine HAVE_DORMQR_
-#cmakedefine HAVE_DSTEV_
-#cmakedefine HAVE_DSYEVX_
-#cmakedefine HAVE_DSYGV_
-#cmakedefine HAVE_DSYGVX_
-#cmakedefine HAVE_DTRTRS_
-#cmakedefine HAVE_SAXPY_
-#cmakedefine HAVE_SGEEVX_
-#cmakedefine HAVE_SGEEV_
-#cmakedefine HAVE_SGELSD_
-#cmakedefine HAVE_SGEMM_
-#cmakedefine HAVE_SGEMV_
-#cmakedefine HAVE_SGEQRF_
-#cmakedefine HAVE_SGESDD_
-#cmakedefine HAVE_SGESVD_
-#cmakedefine HAVE_SGETRF_
-#cmakedefine HAVE_SGETRI_
-#cmakedefine HAVE_SGETRS_
-#cmakedefine HAVE_SORGQR_
-#cmakedefine HAVE_SORMQR_
-#cmakedefine HAVE_SSTEV_
-#cmakedefine HAVE_SSYEVX_
-#cmakedefine HAVE_SSYGV_
-#cmakedefine HAVE_SSYGVX_
-#cmakedefine HAVE_STRTRS_
+#  cmakedefine HAVE_DAXPY_
+#  cmakedefine HAVE_DGEEVX_
+#  cmakedefine HAVE_DGEEV_
+#  cmakedefine HAVE_DGELSD_
+#  cmakedefine HAVE_DGEMM_
+#  cmakedefine HAVE_DGEMV_
+#  cmakedefine HAVE_DGEQRF_
+#  cmakedefine HAVE_DGESDD_
+#  cmakedefine HAVE_DGESVD_
+#  cmakedefine HAVE_DGETRF_
+#  cmakedefine HAVE_DGETRI_
+#  cmakedefine HAVE_DGETRS_
+#  cmakedefine HAVE_DORGQR_
+#  cmakedefine HAVE_DORMQR_
+#  cmakedefine HAVE_DSTEV_
+#  cmakedefine HAVE_DSYEVX_
+#  cmakedefine HAVE_DSYGV_
+#  cmakedefine HAVE_DSYGVX_
+#  cmakedefine HAVE_DTRTRS_
+#  cmakedefine HAVE_SAXPY_
+#  cmakedefine HAVE_SGEEVX_
+#  cmakedefine HAVE_SGEEV_
+#  cmakedefine HAVE_SGELSD_
+#  cmakedefine HAVE_SGEMM_
+#  cmakedefine HAVE_SGEMV_
+#  cmakedefine HAVE_SGEQRF_
+#  cmakedefine HAVE_SGESDD_
+#  cmakedefine HAVE_SGESVD_
+#  cmakedefine HAVE_SGETRF_
+#  cmakedefine HAVE_SGETRI_
+#  cmakedefine HAVE_SGETRS_
+#  cmakedefine HAVE_SORGQR_
+#  cmakedefine HAVE_SORMQR_
+#  cmakedefine HAVE_SSTEV_
+#  cmakedefine HAVE_SSYEVX_
+#  cmakedefine HAVE_SSYGV_
+#  cmakedefine HAVE_SSYGVX_
+#  cmakedefine HAVE_STRTRS_
+#endif
+
 
 
 /****************************************
@@ -289,6 +302,9 @@
  ****************************************/
 
 #cmakedefine DEAL_II_WITH_METIS
+#ifdef DEAL_II_WITH_METIS
+#  define DEAL_II_USE_METIS
+#endif
 
 
 /**************************************
@@ -296,6 +312,9 @@
  **************************************/
 
 #cmakedefine DEAL_II_WITH_MPI
+#ifdef DEAL_II_WITH_MPI
+#  define DEAL_II_COMPILER_SUPPORTS_MPI
+#endif
 
 
 /*****************************************
@@ -303,6 +322,9 @@
  *****************************************/
 
 #cmakedefine DEAL_II_WITH_MUMPS
+#ifdef DEAL_II_WITH_MUMPS
+#  define DEAL_II_USE_MUMPS
+#endif
 
 
 /*****************************************
@@ -310,6 +332,9 @@
  *****************************************/
 
 #cmakedefine DEAL_II_WITH_NETCDF
+#ifdef DEAL_II_WITH_NETCDF
+#  define HAVE_LIBNETCDF
+#endif
 
 
 /****************************************
@@ -317,6 +342,9 @@
  ****************************************/
 
 #cmakedefine DEAL_II_WITH_P4EST
+#ifdef DEAL_II_WITH_P4EST
+#  define DEAL_II_USE_P4EST
+#endif
 
 
 /****************************************
@@ -324,6 +352,9 @@
  ****************************************/
 
 #cmakedefine DEAL_II_WITH_PETSC
+#ifdef DEAL_II_WITH_PETSC
+#  define DEAL_II_USE_PETSC
+#endif
 
 
 /*
@@ -369,6 +400,9 @@
  ****************************************/
 
 #cmakedefine DEAL_II_WITH_SLEPC
+#ifdef DEAL_II_WITH_SLEPC
+#  define DEAL_II_USE_SLEPC
+#endif
 
 
 /********************************************
@@ -376,6 +410,9 @@
  ********************************************/
 
 #cmakedefine DEAL_II_WITH_THREADS
+#ifdef DEAL_II_WITH_THREADS
+#  define DEAL_II_USE_MT
+#endif
 
 /* Defined if multi-threading is to be achieved by using the POSIX functions
  */
@@ -404,6 +441,9 @@
  *******************************************/
 
 #cmakedefine DEAL_II_WITH_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
+#  define DEAL_II_USE_TRILINOS
+#endif
 
 
 /******************************************
@@ -411,6 +451,9 @@
  ******************************************/
 
 #cmakedefine DEAL_II_WITH_UMFPACK
+#ifdef DEAL_II_WITH_UMFPACK
+#  define HAVE_LIBUMFPACK
+#endif
 
 
 /***************************************
@@ -418,6 +461,9 @@
  ***************************************/
 
 #cmakedefine DEAL_II_WITH_ZLIB
+#ifdef DEAL_II_WITH_ZLIB
+#  define HAVE_LIBZ
+#endif
 
 
 #include <deal.II/base/numbers.h>
