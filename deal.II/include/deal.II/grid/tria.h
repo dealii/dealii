@@ -2023,9 +2023,11 @@ public:
    * @p true (which is the
    * default), then boundary
    * vertices are not moved.
+   *
+   * @deprecated Use GridTools::distort_random instead.
    */
   void distort_random (const double factor,
-                       const bool   keep_boundary=true);
+                       const bool   keep_boundary=true) DEAL_II_DEPRECATED;
 
 
   /**

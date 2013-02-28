@@ -263,6 +263,14 @@ namespace PETScWrappers
 
 
 
+  void
+  MatrixBase::compress ()
+  {
+    compress(::dealii::VectorOperation::unknown);
+  }
+
+
+
   unsigned int
   MatrixBase::m () const
   {

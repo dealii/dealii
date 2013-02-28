@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -14,9 +14,8 @@
 // right place.
 
 #include "../tests.h"
-#include <deal.II/numerics/mesh_worker.h>
-#include <deal.II/numerics/mesh_worker_assembler.h>
-#include <deal.II/numerics/mesh_worker_loop.h>
+#include <deal.II/meshworker/assembler.h>
+#include <deal.II/meshworker/loop.h>
 
 #include <deal.II/base/std_cxx1x/function.h>
 #include <deal.II/base/logstream.h>
@@ -142,7 +141,7 @@ test_simple(MGDoFHandler<dim>& mgdofs)
     assembler;
   assembler.initialize(matrix, v);
   
-  MeshWorker::integration_loop<dim, dim>
+  MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
     (dofs.begin_active(), dofs.end(),
      dof_info, info_box,
      std_cxx1x::bind (&Local<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),

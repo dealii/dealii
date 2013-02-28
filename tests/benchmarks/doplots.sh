@@ -2,6 +2,8 @@
 
 source testlist.sh
 
+echo "generating images..."
+
 for test in $TESTS ; do
     LASTREV=`tail -n 1 datatable.$test | cut -f 1 -d ' '`
     ./plot.sh $test $LASTREV >script
@@ -11,7 +13,7 @@ for test in $TESTS ; do
 done
 
 
-/baselineplot.sh > script
+./baselineplot.sh > script
 gnuplot script
 rm -rf script
 convert -density 150 baseline.eps baseline.png

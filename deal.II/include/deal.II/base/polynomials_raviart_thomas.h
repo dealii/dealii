@@ -56,7 +56,7 @@ public:
    * Raviart-Thomas-space, which is the degree
    * of the largest tensor product
    * polynomial space
-   * <i>Q<sub>k</sub></i> contained.
+   * <i>Q<sub>k</sub></i> contains.
    */
   PolynomialsRaviartThomas (const unsigned int k);
 
@@ -102,7 +102,7 @@ public:
   unsigned int degree () const;
 
   /**
-   * Return the name of the space ,
+   * Return the name of the space,
    * which is <tt>RaviartThomas</tt>.
    */
   std::string name () const;

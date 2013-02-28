@@ -415,7 +415,7 @@ namespace Step40
                                                   system_rhs);
         }
 
-    system_matrix.compress ();
+    system_matrix.compress (VectorOperation::add);
     system_rhs.compress (VectorOperation::add);
   }
 

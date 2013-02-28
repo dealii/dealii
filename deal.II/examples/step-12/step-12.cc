@@ -2,7 +2,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2010-2012 by the deal.II authors */
+/*    Copyright (C) 2010-2013 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -290,7 +290,7 @@ namespace Step12
     // appropriate operator() implementations here, or the result of std::bind
     // if the local integrators were, for example, non-static member
     // functions.
-    MeshWorker::integration_loop<dim, dim>
+    MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
     (dof_handler.begin_active(), dof_handler.end(),
      dof_info, info_box,
      &AdvectionProblem<dim>::integrate_cell_term,

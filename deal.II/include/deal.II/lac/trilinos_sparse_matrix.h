@@ -1375,8 +1375,12 @@ namespace TrilinosWrappers
      * See @ref GlossCompress "Compressing distributed objects"
      * for more information.
      */
-    void compress (::dealii::VectorOperation::values operation
-                   =::dealii::VectorOperation::unknown);
+    void compress (::dealii::VectorOperation::values operation);
+
+    /**
+     * @deprecated: use compress() with VectorOperation instead.
+     */
+    void compress () DEAL_II_DEPRECATED;
 
     /**
      * Set the element (<i>i,j</i>)
@@ -3048,11 +3052,20 @@ namespace TrilinosWrappers
 
 
   inline
+  void
+  SparseMatrix::compress ()
+  {
+    compress(::dealii::VectorOperation::unknown);
+  }
+
+
+
+  inline
   SparseMatrix &
   SparseMatrix::operator = (const double d)
   {
     Assert (d==0, ExcScalarAssignmentOnlyForZeroValue());
-    compress ();
+    compress (::dealii::VectorOperation::unknown); // TODO: why do we do this? Should we not check for is_compressed?
 
     const int ierr = matrix->PutScalar(d);
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));

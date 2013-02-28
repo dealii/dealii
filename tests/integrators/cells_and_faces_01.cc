@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010, 2011, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,9 +15,8 @@
 
 #include "../tests.h"
 #include "empty_info.h"
-#include <deal.II/numerics/mesh_worker.h>
-#include <deal.II/numerics/mesh_worker_assembler.h>
-#include <deal.II/numerics/mesh_worker_loop.h>
+#include <deal.II/meshworker/assembler.h>
+#include <deal.II/meshworker/loop.h>
 
 #include <deal.II/base/std_cxx1x/function.h>
 #include <deal.II/base/logstream.h>

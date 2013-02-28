@@ -208,7 +208,7 @@ class FE_DGNedelec : public FE_DGVector<PolynomialsNedelec<dim>, dim, spacedim>
 {
 public:
   /**
-   * Constructor for the N&eacute;d&eacute;lec
+   * Constructor for the discontinuous N&eacute;d&eacute;lec
    * element of degree @p p.
    */
   FE_DGNedelec (const unsigned int p);
@@ -239,7 +239,7 @@ class FE_DGRaviartThomas : public FE_DGVector<PolynomialsRaviartThomas<dim>, dim
 {
 public:
   /**
-   * Constructor for the N&eacute;d&eacute;lec
+   * Constructor for the Raviart-Thomas
    * element of degree @p p.
    */
   FE_DGRaviartThomas (const unsigned int p);
@@ -270,7 +270,7 @@ class FE_DGBDM : public FE_DGVector<PolynomialsBDM<dim>, dim, spacedim>
 {
 public:
   /**
-   * Constructor for the N&eacute;d&eacute;lec
+   * Constructor for the discontinuous BDM
    * element of degree @p p.
    */
   FE_DGBDM (const unsigned int p);

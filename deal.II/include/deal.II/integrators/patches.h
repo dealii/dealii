@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -27,7 +27,6 @@ namespace LocalIntegrators
   /**
    * @brief Integrators writing patches with values in quadrature points
    *
-   * @ingroup Integrators
    * @author Guido Kanschat
    * @date 2011
    */

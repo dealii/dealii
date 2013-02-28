@@ -10,7 +10,7 @@ the Laplace equation, though with a matrix-valued coefficient:
   -\nabla \cdot K({\mathbf x}) \nabla p &=& f \qquad {\textrm{in}\ } \Omega, \\
   p &=& g \qquad {\textrm{on}\ }\partial\Omega.
 @f}
-$K({\mathbf x})$ is assumed to be uniformly positive definite, i.e. there is
+$K({\mathbf x})$ is assumed to be uniformly positive definite, i.e., there is
 $\alpha>0$ such that the eigenvalues $\lambda_i({\mathbf x})$ of $K(x)$ satisfy
 $\lambda_i({\mathbf x})\ge \alpha$. The use of the symbol $p$ instead of the usual
 $u$ for the solution variable will become clear in the next section.
@@ -30,13 +30,14 @@ toplevel overview of this topic can be found in the @ref vector_valued module.
 
 <h3>Formulation, weak form, and discrete problem</h3>
 
-In the form above, the Laplace equation is considered a good model equation
+In the form above, the Laplace equation is generally considered a good model equation
 for fluid flow in porous media. In particular, if flow is so slow that all
 dynamic effects such as the acceleration terms in the Navier-Stokes equation
-become irrelevant, and if the flow pattern is stationary, then the Laplace
-equation models the pressure that drives the flow reasonable well. Because the
+become irrelevant, and if the flow pattern is stationary, then the
+Laplace
+equation models the pressure that drives the flow reasonable well. (Because the
 solution variable is a pressure, we here use the name $p$ instead of the
-name $u$ more commonly used for the solution of partial differential equations.
+name $u$ more commonly used for the solution of partial differential equations.)
 
 Typical applications of this view of the Laplace equation are then modeling
 groundwater flow, or the flow of hydrocarbons in oil reservoirs. In these
@@ -65,6 +66,12 @@ Laplace equation, called the mixed formulation:
   -{\textrm{div}}\ {\mathbf u} &=& -f \qquad {\textrm{in}\ }\Omega, \\
   p &=& g \qquad {\textrm{on}\ } \partial\Omega.
 @f}
+Here, we have multiplied the equation defining the velocity ${\mathbf
+u}$ by $K^{-1}$ because this makes the set of equations symmetric: one
+of the equations has the gradient, the second the negative divergence,
+and these two are of course adjoints of each other, resulting in a
+symmetric bilinear form and a consequently symmetric system matrix
+under the common assumption that $K$ is a symmetric tensor.
 
 The weak formulation of this problem is found by multiplying the two
 equations with test functions and integrating some terms by parts:

@@ -3,7 +3,12 @@
 <h3>Output of the program and graphical visualization</h3>
 
 
-If we run the program as is, we get this output:
+If we run the program as is, we get this output for the $8\times 8$
+mesh we use (for a total of 64 cells with 64 pressure degrees of
+freedom since we use piecewise constants, and 144 velocities because
+the Raviart-Thomas element defines one degree per freedom per face and
+there are 72 faces parallel to the $x$-axis and the same number
+parallel to the $y$-axis):
 @code
 examples/\step-20> make run
 ============================ Remaking Makefile.dep

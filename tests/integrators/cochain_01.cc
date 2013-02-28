@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2005, 2006, 2010 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2010, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,9 +37,9 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/fe/mapping_q1.h>
 
-#include <deal.II/numerics/mesh_worker_info.h>
-#include <deal.II/numerics/mesh_worker_assembler.h>
-#include <deal.II/numerics/mesh_worker_loop.h>
+#include <deal.II/meshworker/integration_info.h>
+#include <deal.II/meshworker/assembler.h>
+#include <deal.II/meshworker/loop.h>
 
 #include <deal.II/integrators/l2.h>
 #include <deal.II/integrators/divergence.h>
@@ -159,7 +159,7 @@ test_cochain(const Triangulation<dim>& tr, const FiniteElement<dim>& fe)
   assembler.initialize(&dof.block_info(), matrices);
   assembler.initialize(constraints);
   
-  MeshWorker::integration_loop<dim, dim>(
+  MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >(
     dof.begin_active(), dof.end(), dof_info, info_box,
     cell_matrix<dim>, 0, 0, assembler);
   
