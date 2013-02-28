@@ -52,16 +52,20 @@ cmake:
 TMPDIR=/tmp
 CMAKE=cmake
 
-random:= $(shell echo "$$RANDOM$$RANDOM")
-builddir:= "$(TMPDIR)"/deal-build.$(random)
-installdir:= "$(TMPDIR)"/deal-install.$(random)
+date:= $(shell date +%s)
+random:=$(shell echo "$$RANDOM")
+testdir:= "$(TMPDIR)"/deal-build-test.$(date)-$(random)
+builddir:= $(testdir)/build
+installdir:= $(testdir)/install
 
 .PHONY: build-test
 build-test:
 	@mkdir -p $(builddir)
 	@mkdir -p $(installdir)
-	@cd $(builddir) && "$(CMAKE)" -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(PWD) >$(builddir)/configuration.log 2>&1
-	@cd $(builddir) && make $(MAKEOPTS) install >$(builddir)/build.log 2>&1
+	@cd $(builddir) && "$(CMAKE)" -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(PWD) >$(testdir)/configure.log 2>&1
+	@cp $(builddir)/summary.log $(testdir)
 	@cd $(builddir) && make log >/dev/null 2>&1
+	@cp $(builddir)/cmake.log $(testdir)
+	@cd $(builddir) && make $(MAKEOPTS) install >$(testdir)/build.log 2>&1
 
 
