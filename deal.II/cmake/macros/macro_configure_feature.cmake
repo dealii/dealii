@@ -21,39 +21,37 @@
 #
 # This macro uses the following optional variables and macros:
 #
-# FEATURE_${feature}_DEPENDS (variable)
+# FEATURE_${feature}_DEPENDS    (a variable)
 #    a variable which contains an optional list of other features
 #    this feature depends on (and which have to be enbled for this feature
 #    to work.) The features must be given with the full option toggle:
 #    DEAL_II_WITH_[...]
 #
-# FEATURE_${feature}_HAVE_BUNDLED  (variable)
+# FEATURE_${feature}_HAVE_BUNDLED   (a variable)
 #    which should either be set to TRUE if all necessary libraries of the
 #    features comes bundled with deal.II and hence can be supported
 #    without external dependencies, or unset.
 #
-# FEATURE_${feature}_CONFIGURE_BUNDLED(var)  (macro)
+# FEATURE_${feature}_CONFIGURE_BUNDLED()   (a macro)
 #    which should setup all necessary configuration for the feature with
-#    bundled source dependencies. var set to TRUE indicates success,
-#    otherwise this script should issue a FATAL_ERROR.
+#    bundled source dependencies. If something goes wrong this macro must
+#    issue a FATAL_ERROR.
 #
-# FEATURE_${feature}_FIND_EXTERNAL(var)  (macro)
+# FEATURE_${feature}_FIND_EXTERNAL(var)   (a macro)
 #    which should set var to TRUE if all dependencies for the feature are
 #    fullfilled. In this case all necessary variables for
 #    FEATURE_${feature}_CONFIGURE_EXTERNAL must be set. Otherwise
 #    var should remain unset.
 #    If not defined, FIND_PACKAGE(${feature}) is called.
 #
-# FEATURE_${feature}_CONFIGURE_EXTERNAL(var)  (macro)
+# FEATURE_${feature}_CONFIGURE_EXTERNAL()   (macro)
 #    which should setup all necessary configuration for the feature with
 #    external dependencies.
 #
 # FEATURE_${feature}_ERROR_MESSAGE()  (macro)
 #    which should print a meaningfull error message (with FATAL_ERROR) for
-#    the case that no external library was found (and bundled is not
-#    allowed to be used.) If not defined, a suitable default error message
-#    will be printed.
-#
+#    the case that no usable library was found.
+#    If not defined, a suitable default error message will be printed.
 #
 
 
@@ -162,7 +160,6 @@ MACRO(CONFIGURE_FEATURE _feature)
   # configure_<feature>.cmake script...
   #
 
-
   #
   # Check for correct include order of the configure_*.cmake files:
   # If feature B depends on feature A, configure_A.cmake has to be
@@ -179,7 +176,6 @@ MACRO(CONFIGURE_FEATURE _feature)
     ENDIF()
   ENDFOREACH()
 
-
   #
   # Obey the user overrides:
   #
@@ -187,7 +183,6 @@ MACRO(CONFIGURE_FEATURE _feature)
       (NOT DEFINED DEAL_II_WITH_${_feature}) )
     SET_CACHED_OPTION(${_feature} OFF)
   ENDIF()
-
 
   #
   # Only try to configure ${_feature} if we have to, i.e.
