@@ -16,15 +16,6 @@
 # Configuration for the netcdf library:
 #
 
-
-MACRO(FEATURE_HDF5_CONFIGURE_EXTERNAL var)
-  INCLUDE_DIRECTORIES(${HDF5_INCLUDE_DIRS})
-  LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${HDF5_LIBRARIES})
-
-  SET(${var} TRUE)
-ENDMACRO()
-
-
 MACRO(FEATURE_HDF5_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find the hdf5 library!\n"
@@ -36,6 +27,5 @@ MACRO(FEATURE_HDF5_ERROR_MESSAGE)
     "or set the relevant variables by hand in ccmake.\n\n"
     )
 ENDMACRO()
-
 
 CONFIGURE_FEATURE(HDF5)

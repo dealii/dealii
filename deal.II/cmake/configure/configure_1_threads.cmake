@@ -23,65 +23,66 @@
 # Set up genereal threading:
 # The macro will be included in CONFIGURE_FEATURE_THREADS_EXTERNAL/BUNDLED.
 #
-MACRO(SETUP_THREADING var)
+MACRO(SETUP_THREADING)
   FIND_PACKAGE(Threads)
 
-  IF(Threads_FOUND)
-    MARK_AS_ADVANCED(
-      pthread_LIBRARY
+  IF(NOT Threads_FOUND)
+    # TODO:
+    MESSAGE(FATAL_ERROR
+      "\nInternal configuration error: No Threading support found\n\n"
       )
-    SET(${var} TRUE)
+  ENDIF()
 
-    #
-    # Change -lphtread to -pthread for better compatibility on non linux
-    # platforms:
-    #
-    IF("${CMAKE_THREAD_LIBS_INIT}" MATCHES "-lpthread")
-      CHECK_CXX_COMPILER_FLAG("-pthread"
-        DEAL_II_HAVE_FLAG_pthread
+  MARK_AS_ADVANCED(pthread_LIBRARY)
+
+  #
+  # Change -lphtread to -pthread for better compatibility on non linux
+  # platforms:
+  #
+  IF("${CMAKE_THREAD_LIBS_INIT}" MATCHES "-lpthread")
+    CHECK_CXX_COMPILER_FLAG("-pthread"
+      DEAL_II_HAVE_FLAG_pthread
+      )
+    IF(DEAL_II_HAVE_FLAG_pthread)
+      STRING(REPLACE "-lpthread" "-pthread" CMAKE_THREAD_LIBS_INIT
+        "${CMAKE_THREAD_LIBS_INIT}"
         )
-      IF(DEAL_II_HAVE_FLAG_pthread)
-        STRING(REPLACE "-lpthread" "-pthread" CMAKE_THREAD_LIBS_INIT
-          "${CMAKE_THREAD_LIBS_INIT}"
-          )
-      ENDIF()
     ENDIF()
+  ENDIF()
 
-    ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
+  ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
 
+  #
+  # Set up some posix thread specific configuration toggles:
+  #
+  IF(CMAKE_USE_PTHREADS_INIT)
+    SET(DEAL_II_USE_MT_POSIX TRUE)
 
     #
-    # Set up some posix thread specific configuration toggles:
+    # Check whether posix thread barriers are available:
     #
-    IF(CMAKE_USE_PTHREADS_INIT)
-      SET(DEAL_II_USE_MT_POSIX TRUE)
+    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
+    CHECK_CXX_SOURCE_COMPILES(
+    "
+    #include <pthread.h>
+    int main()
+    {
+      pthread_barrier_t pb;
+      pthread_barrier_init (&pb, 0, 1);
+      pthread_barrier_wait (&pb);
+      pthread_barrier_destroy (&pb);
+      return 0;
+    }
+    "
+    DEAL_II_HAVE_MT_POSIX_BARRIERS)
+    STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
 
-      #
-      # Check whether posix thread barriers are available:
-      #
-      ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
-      CHECK_CXX_SOURCE_COMPILES(
-      "
-      #include <pthread.h>
-      int main()
-      {
-        pthread_barrier_t pb;
-        pthread_barrier_init (&pb, 0, 1);
-        pthread_barrier_wait (&pb);
-        pthread_barrier_destroy (&pb);
-        return 0;
-      }
-      "
-      DEAL_II_HAVE_MT_POSIX_BARRIERS)
-      STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
-
-      IF(NOT DEAL_II_HAVE_MT_POSIX_BARRIERS)
-        SET(DEAL_II_USE_MT_POSIX_NO_BARRIERS TRUE)
-      ENDIF()
-
+    IF(NOT DEAL_II_HAVE_MT_POSIX_BARRIERS)
+      SET(DEAL_II_USE_MT_POSIX_NO_BARRIERS TRUE)
     ENDIF()
 
-  ENDIF(Threads_FOUND)
+  ENDIF()
+
 ENDMACRO()
 
 
@@ -98,7 +99,7 @@ MACRO(FEATURE_THREADS_FIND_EXTERNAL var)
 ENDMACRO()
 
 
-MACRO(FEATURE_THREADS_CONFIGURE_EXTERNAL var)
+MACRO(FEATURE_THREADS_CONFIGURE_EXTERNAL)
   INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
 
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
@@ -121,16 +122,15 @@ MACRO(FEATURE_THREADS_CONFIGURE_EXTERNAL var)
   ENDIF()
 
   # Setup threading and if successfull return TRUE:
-  SETUP_THREADING(${var})
+  SETUP_THREADING()
 ENDMACRO()
 
 
-MACRO(FEATURE_THREADS_CONFIGURE_BUNDLED var)
+MACRO(FEATURE_THREADS_CONFIGURE_BUNDLED)
   #
   # Setup threading (before configuring our build...)
-  # and if successfull return TRUE:
   #
-  SETUP_THREADING(${var})
+  SETUP_THREADING()
 
   #
   # We have to disable a bunch of warnings:
@@ -157,7 +157,6 @@ MACRO(FEATURE_THREADS_CONFIGURE_BUNDLED var)
   ENDIF()
 
   INCLUDE_DIRECTORIES(${TBB_FOLDER}/include)
-
 ENDMACRO()
 
 

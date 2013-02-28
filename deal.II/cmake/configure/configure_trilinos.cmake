@@ -157,7 +157,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
 ENDMACRO()
 
 
-MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL var)
+MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   INCLUDE_DIRECTORIES(${TRILINOS_INCLUDE_DIRS})
 
   # The user has to know the location of the trilinos headers as well:
@@ -182,7 +182,6 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL var)
     SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
   ENDIF()
 
-
   #
   #  used with -W -Wall (which includes -Wunused). Regrettable
   #  though it may be, these warnings pretty much drown everything
@@ -192,8 +191,6 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL var)
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-extra")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-overloaded-virtual")
-
-  SET(${var} TRUE)
 ENDMACRO()
 
 

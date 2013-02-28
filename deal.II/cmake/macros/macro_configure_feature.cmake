@@ -19,37 +19,36 @@
 #     CONFIGURE_FEATURE(feature)
 #
 #
-# This macro uses the following variables and macros:
+# This macro uses the following optional variables and macros:
 #
-# FEATURE_${feature}_DEPENDS (variable, optional)
+# FEATURE_${feature}_DEPENDS (variable)
 #    a variable which contains an optional list of other features
 #    this feature depends on (and which have to be enbled for this feature
 #    to work.) The features must be given with the full option toggle:
 #    DEAL_II_WITH_[...]
 #
-# FEATURE_${feature}_HAVE_BUNDLED  (variable, optional)
+# FEATURE_${feature}_HAVE_BUNDLED  (variable)
 #    which should either be set to TRUE if all necessary libraries of the
 #    features comes bundled with deal.II and hence can be supported
 #    without external dependencies, or unset.
 #
-# FEATURE_${feature}_CONFIGURE_BUNDLED(var)  (macro, optional)
+# FEATURE_${feature}_CONFIGURE_BUNDLED(var)  (macro)
 #    which should setup all necessary configuration for the feature with
 #    bundled source dependencies. var set to TRUE indicates success,
 #    otherwise this script should issue a FATAL_ERROR.
 #
-# FEATURE_${feature}_FIND_EXTERNAL(var)  (macro, optional)
+# FEATURE_${feature}_FIND_EXTERNAL(var)  (macro)
 #    which should set var to TRUE if all dependencies for the feature are
 #    fullfilled. In this case all necessary variables for
 #    FEATURE_${feature}_CONFIGURE_EXTERNAL must be set. Otherwise
 #    var should remain unset.
 #    If not defined, FIND_PACKAGE(${feature}) is called.
 #
-# FEATURE_${feature}_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
+# FEATURE_${feature}_CONFIGURE_EXTERNAL(var)  (macro)
 #    which should setup all necessary configuration for the feature with
-#    external dependencies. var set to TRUE indicates success,
-#    otherwise this script gives an error.
+#    external dependencies.
 #
-# FEATURE_${feature}_ERROR_MESSAGE()  (macro, optional)
+# FEATURE_${feature}_ERROR_MESSAGE()  (macro)
 #    which should print a meaningfull error message (with FATAL_ERROR) for
 #    the case that no external library was found (and bundled is not
 #    allowed to be used.) If not defined, a suitable default error message
@@ -120,6 +119,22 @@ MACRO(FEATURE_FIND_EXTERNAL _feature _var)
   FIND_PACKAGE(${_feature})
   IF(${_feature}_FOUND)
     SET(${_var} TRUE)
+  ENDIF()
+ENDMACRO()
+
+
+#
+# Default macro for basic external setup:
+#
+MACRO(FEATURE_CONFIGURE_EXTERNAL _feature)
+  IF(DEFINED ${_feature}_INCLUDE_DIRS)
+    INCLUDE_DIRECTORIES(${${_feature}_INCLUDE_DIRS})
+  ENDIF()
+  IF(DEFINED ${_feature}_LIBRARIES)
+    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${${_feature}_LIBRARIES})
+  ENDIF()
+  IF(DEFINED ${_feature}_LINKER_FLAGS)
+    ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${${_feature}_LINKER_FLAGS}")
   ENDIF()
 ENDMACRO()
 
@@ -199,17 +214,9 @@ MACRO(CONFIGURE_FEATURE _feature)
         # First case: DEAL_II_FORCE_BUNDLED_${_feature} is defined:
         #
         IF(FEATURE_${_feature}_HAVE_BUNDLED)
-          RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_BUNDLED(FEATURE_${_feature}_BUNDLED_CONFIGURED)")
-          IF(FEATURE_${_feature}_BUNDLED_CONFIGURED)
-            MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
-            SET_CACHED_OPTION(${_feature} ON)
-          ELSE()
-            # This should not happen. So give an error
-            MESSAGE(FATAL_ERROR
-              "\nInternal build system error: Failed to set up "
-              "DEAL_II_WITH_${_feature} with bundled packages.\n\n"
-              )
-          ENDIF()
+          RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
+          MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
+          SET_CACHED_OPTION(${_feature} ON)
         ELSE()
           MESSAGE(FATAL_ERROR "\n"
             "Internal build system error: DEAL_II_FORCE_BUNDLED_${_feature} "
@@ -229,35 +236,24 @@ MACRO(CONFIGURE_FEATURE _feature)
 
         IF(FEATURE_${_feature}_EXTERNAL_FOUND)
           MESSAGE(STATUS "All external dependencies for DEAL_II_WITH_${_feature} are fullfilled.")
-          RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_EXTERNAL(FEATURE_${_feature}_EXTERNAL_CONFIGURED)")
 
-          IF(FEATURE_${_feature}_EXTERNAL_CONFIGURED)
-            MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with external dependencies.")
-            SET_CACHED_OPTION(${_feature} ON)
+          IF(COMMAND FEATURE_${_feature}_CONFIGURE_EXTERNAL)
+            RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_EXTERNAL()")
           ELSE()
-            # This should not happen. So give an error
-            MESSAGE(FATAL_ERROR
-              "\nInternal build system error: Failed to set up "
-              "DEAL_II_WITH_${_feature} with external dependencies.\n\n"
-              )
+            FEATURE_CONFIGURE_EXTERNAL(${_feature})
           ENDIF()
+
+          MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with external dependencies.")
+          SET_CACHED_OPTION(${_feature} ON)
 
         ELSE(FEATURE_${_feature}_EXTERNAL_FOUND)
 
           MESSAGE(STATUS "DEAL_II_WITH_${_feature} has unmet external dependencies.")
 
           IF(FEATURE_${_feature}_HAVE_BUNDLED AND DEAL_II_ALLOW_BUNDLED)
-            RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_BUNDLED(FEATURE_${_feature}_BUNDLED_CONFIGURED)")
-            IF(FEATURE_${_feature}_BUNDLED_CONFIGURED)
-              MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
-              SET_CACHED_OPTION(${_feature} ON)
-            ELSE()
-              # This should not happen. So give an error
-              MESSAGE(FATAL_ERROR
-                "\nInternal build system error: Failed to set up "
-                "DEAL_II_WITH_${_feature} with bundled packages.\n\n"
-                )
-            ENDIF()
+            RUN_COMMAND("FEATURE_${_feature}_CONFIGURE_BUNDLED()")
+            MESSAGE(STATUS "DEAL_II_WITH_${_feature} successfully set up with bundled packages.")
+            SET_CACHED_OPTION(${_feature} ON)
           ELSE()
             IF(DEAL_II_WITH_${_feature})
               IF(COMMAND FEATURE_${_feature}_ERROR_MESSAGE)
@@ -271,6 +267,7 @@ MACRO(CONFIGURE_FEATURE _feature)
           ENDIF()
 
         ENDIF(FEATURE_${_feature}_EXTERNAL_FOUND)
+
       ENDIF()
     ENDIF()
   ELSE()
