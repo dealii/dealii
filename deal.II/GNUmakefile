@@ -25,7 +25,7 @@ indent:
 
 .PHONY: cmake
 cmake:
-	@cd bundled/cmake && make
+	cd bundled/cmake && make
 	@echo
 	@echo =======================================================
 	@echo
@@ -58,14 +58,14 @@ testdir:= "$(TMPDIR)"/deal-build-test.$(date)-$(random)
 builddir:= $(testdir)/build
 installdir:= $(testdir)/install
 
-.PHONY: build-test
+.PHONY: build_test
 build-test:
-	@mkdir -p $(builddir)
-	@mkdir -p $(installdir)
-	@cd $(builddir) && "$(CMAKE)" -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(PWD) >$(testdir)/configure.log 2>&1
-	@cp $(builddir)/summary.log $(testdir)
-	@cd $(builddir) && make log >/dev/null 2>&1
-	@cp $(builddir)/cmake.log $(testdir)
-	@cd $(builddir) && make $(MAKEOPTS) install >$(testdir)/build.log 2>&1
-
+	mkdir -p $(builddir)
+	mkdir -p $(installdir)
+	cd $(builddir) && "$(CMAKE)" -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(PWD) >$(testdir)/configure.log 2>&1
+	cp $(builddir)/summary.log $(testdir)
+	cd $(builddir) && make log >/dev/null 2>&1
+	cp $(builddir)/cmake.log $(testdir)
+	cd $(builddir) && make $(MAKEOPTS) install >$(testdir)/build.log 2>&1
+	cd $(installdir)/examples && make run_examples >$(testdir)/examples.log 2>&1
 

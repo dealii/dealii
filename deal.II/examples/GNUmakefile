@@ -9,16 +9,17 @@ else
   default:
 endif
 
+
 steps:= $(wildcard step-*)
 
-configure_examples:
-	@echo "============ Configure all examples"
-	@for f in  $(steps);\
-	do\
-	  cd $(PWD)/$$f ;\
-	  cmake .;\
-	  cd $(PWD);\
-	done
-
 .PHONY: configure_examples
+configure_examples: $(steps:%=%/Makefile)
 
+%/Makefile:
+	-cd $(@D) && cmake . > /dev/null 2>&1
+
+.PHONY: run_examples
+run_examples: $(steps:%=%/Output)
+
+%/Output: %/Makefile
+	cd $(@D) && if [ -f Makefile ]; then make run; fi > Output 2>&1

@@ -13,4 +13,5 @@ bin/cmake:
 clean:
 	rm -rf bin cmake-2.8.8 cmake-2.8.8.tar.gz doc man share
 
+.PHONY: all
 all: bin/cmake
