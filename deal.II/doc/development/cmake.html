@@ -1015,8 +1015,11 @@
     <h4> Writing feature tests </h4>
 
     <p>
+      TODO: This section is a bit outdated, update it!
+    </p>
+    <p>
       For a feature <code>&lt;feature&gt;</code> the following
-      the following toggles, variables and macros should be
+      the following toggles, variables and macros can be defined
       defined (Note: <code>&lt;FEATURE&gt;</code> means all caps,
       <code>&lt;feature&gt;</code> means all lowercase):
       <ul>
@@ -1026,48 +1029,46 @@
           <code>cmake/configure/configure_&lt;feature&gt;.cmake</code>
           defining how to configure <code>&lt;feature&gt;</code>:
 	  <pre>
-
-    FEATURE_&lt;FEATURE&gt;_DEPENDS (variable, optional)
+    FEATURE_${feature}_DEPENDS    (a variable)
       - a variable which contains an optional list of other features
         this feature depends on (and which have to be enbled for this feature
-        to work.) The features must be given with the full option toggle
+        to work.) The features must be given with the full option toggle:
         DEAL_II_WITH_[...]
 
-    FEATURE_&lt;FEATURE&gt;_FIND_EXTERNAL(var)  (macro, optional)
+    FEATURE_&lt;FEATURE&gt;_FIND_EXTERNAL(var)  (a macro)
       - which should set var to TRUE if all dependencies for the feature are
         fulfilled. In this case all necessary variables for
         FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL must be set. Otherwise
         var should remain unset.
         If not defined, FIND_PACKAGE(${feature}) is called.
 
-    FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL(var)  (macro, mandatory)
+    FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL()  (a macro)
       - which should setup all necessary configuration for the feature with
-        external dependencies. var set to TRUE indicates success,
-        otherwise this script should issue a FATAL_ERROR.
+        external dependencies. If something goes wrong this macro must
+        issue a FATAL_ERROR.
 
-    FEATURE_&lt;FEATURE&gt;_CONFIGURE_BUNDLED(var)  (macro, optional)
+    FEATURE_&lt;FEATURE&gt;_CONFIGURE_BUNDLED()  (a macro)
       - which should setup all necessary configuration for the feature with
-        bundled source dependencies. var set to TRUE indicates success,
-        otherwise this script should issue a FATAL_ERROR.
+        bundled source dependencies. If something goes wrong this macro must
+        issue a FATAL_ERROR.
 
     FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE()  (macro, optional)
       - which should print a meaningful error message (with FATAL_ERROR) for
         the case that no external library was found (and bundled is not
         allowed to be used.) If not defined, a suitable default error message
         will be printed.
-
 	  </pre>
 
 	<li>
           In <code>bundled/CMakeLists.txt</code>:
 	  <pre>
 
-    DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt; (bool, optional)
+    DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt; (a boolean)
       - If &lt;feature&gt; can be set up by bundled libraries, this
-        configuration option must be present to force the use of the bundled
+        configuration option must be present to force use of bundled
         dependencies
 
-    FEATURE_&lt;FEATURE&gt;_HAVE_BUNDLED  (variable, optional)
+    FEATURE_&lt;FEATURE&gt;_HAVE_BUNDLED  (a variable)
       - which should either be set to TRUE if all necessary libraries of the
         features comes bundled with deal.II and hence can be supported
         without external dependencies, or unset.
