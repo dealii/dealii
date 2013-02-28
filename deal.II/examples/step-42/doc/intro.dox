@@ -78,7 +78,8 @@ plastic deformations.
 The third equation is called equilibrium condition with a force of volume
 density $f$ which we will neglect in our example.
 The boundary of $\Omega$ separates as follows $\Gamma=\Gamma_D\bigcup\Gamma_C$ and $\Gamma_D\bigcap\Gamma_C=\emptyset$.
-At the boundary $\Gamma_D$ we have zero Dirichlet conditions. $\Gamma_C$ denotes the potential contact boundary.\\
+At the boundary $\Gamma_D$ we have zero Dirichlet conditions. $\Gamma_C$ denotes the potential contact boundary.
+
 The last two lines decribe the so-called Signorini contact conditions. If there is no contact the normal  stress
 @f{gather*} \sigma_n =  \sigma n\cdot n@f}
 is zero with the outward normal $n$. If there is contact ($u_n = g$) the tangential stress $\sigma_t = \sigma\cdot n - \sigma_n n$
@@ -116,7 +117,8 @@ tensor $C=A^{-1}$ we achieve the primal-mixed version of our problem:
 Find a pair $\lbrace\sigma,u\rbrace\in \Pi W\times V^+$ with
 @f{gather*}\left(\sigma,\tau - \sigma\right) - \left(C\varepsilon(u), \tau - \sigma\right) \geq 0,\quad \forall \tau\in \Pi W@f}
 @f{gather*}\left(\sigma,\varepsilon(\varphi) - \varepsilon(u)\right) \geq 0,\quad \forall \varphi\in V^+.@f}
-Therein $\varepsilon$ denotes the linearised deformation tensor with $\varepsilon(u) := \dfrac{1}{2}\left(\nabla u + \nabla u^T\right)$ for small deformations.\\
+Therein $\varepsilon$ denotes the linearised deformation tensor with $\varepsilon(u) := \dfrac{1}{2}\left(\nabla u + \nabla u^T\right)$ for small deformations.
+
 Most materials - especially metals - have the property that they show some hardening effects during the forming process.
 There are different constitutive laws to describe those material behaviors. The
 simplest one is called linear isotropic hardening described by the flow function
@@ -180,7 +182,8 @@ tr(\varepsilon(u))$ the volumetric part of the stress tensor.
 
 In the next step we test in a pointwise sense where the deviator part of the
 stress in a norm is bigger than the yield stress. If there are such points we
-project the deviator stress in those points back to the yield surface. Methods of this kind are called projections algorithm or radial-return-algorithm.\\
+project the deviator stress in those points back to the yield surface. Methods of this kind are called projections algorithm or radial-return-algorithm.
+
 Now we have a primal formulation of our elasto-plastic contact problem which only depends on the displacement $u$.
 It consists of a nonlinear variational inequality and has a unique solution as
 it satisfies the theorem of Lions and Stampaccia. A proof can be found in
@@ -195,7 +198,7 @@ method - inexact since we use an iterative solver for the linearised problems in
 <h3>Linearisation of the constitutive law for the Newton method</h3>
 
 For the Newton method we have to linearise the following semi-linearform
-@f{gather*}a(\psi;\varphi) := \left(P_{\Pi}(C\varepsilon(\varphi)),\varepsilon(\varphi)\right).@f}
+@f{gather*}a(\psi;\varphi) := \left(P_{\Pi}(C\varepsilon(\psi)),\varepsilon(\varphi)\right).@f}
 Because we have to find the solution $u$ in the convex set $V^+$, we have to
 apply an SQP-method (SQP: sequential quadratic programming). That means we have
 to solve a minimisation problem for a known $u^i$ in every SQP-step of the form
@@ -241,13 +244,14 @@ problem. Again we do so to gain a formulation that allows us to solve a linear
 system of equations finally.
 
 We introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset W'$,
-$W'$ dual space of the trace space $W$ of $V$ restricted to $\Gamma_C$,
+$W'$ dual space of the trace space $W:=\left[ H_0^{\frac{1}{2}}(\Gamma_C)
+\right]^{\textrm{dim}$ of $V$ restricted to $\Gamma_C$,
 @f{gather*}K:=\{\mu\in W':\mu_T = 0,\quad\langle\mu n,v\rangle_{\Gamma_C}\geq 0,\quad
-\forall v\in W, v \ge 0\text{ on }\Gamma_C \}@f}
+\forall v\in H_0^{\frac{1}{2}}(\Gamma_C), v \ge 0\text{ on }\Gamma_C \}@f}
 of Lagrange multipliers, where $\langle\cdot,\cdot\rangle$
 denotes the duality pairing, i.e. a boundary integral, between $W'$ and $W$.
 Intuitively, $K$ is the cone of all "non-positive functions", except that $ K\subset
-\left( \left[ H_0^{\frac{1}{2}} \right]^{\textrm{dim}} \right)' $ and so contains other
+\left( \left[ H_0^{\frac{1}{2}}(\Gamma_C) \right]^{\textrm{dim}} \right)' $ and so contains other
 objects besides regular functions as well. This yields:
 
 Find $u\in V$ and $\lambda\in K$ such that
