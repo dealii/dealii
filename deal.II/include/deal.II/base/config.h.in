@@ -223,7 +223,7 @@
  * Configured in configure_arpack.cmake: *
  *****************************************/
 
-#cmakedefine DEAL_II_USE_ARPACK
+#cmakedefine DEAL_II_WITH_ARPACK
 
 /*************************************************
  * Configured in configure_functionparser.cmake: *
