@@ -1,6 +1,6 @@
 <h1>Results</h1>
 
-Running the program (with a ball as obstacle) produces output like this:
+Running the program (with a ball as obstacle) on 12 cores produces output like this:
 @code
 Cycle 0:
    Number of active cells: 218
@@ -912,3 +912,30 @@ the residuals. After the last cycle there are 83 calls for the residual function
 12 calls as the Solving or Assembling what means that 12 damping steps were
 necessary summed up over the cycles.
 
+In every refinement step you can observe that the acitve set - the contact points -
+are iterated out at first. After that the Newton method has only to struggle with the
+plasticity. For the finer meshes there is quadratic convergence not until the
+last 4 or 5 newton iterations.
+
+<a name="extensions"></a>
+<h1>Possibilities for extensions</h1>
+
+Extend the program from a static to a quasi-static problem, perhaps by choosing a
+backward-euler-scheme for the time discretization (for theoretical results see Frohne: FEM-Simulation
+der Umformtechnik metallischer Oberflächen im Mikrokosmos, Ph.D. thesis,
+University of Siegen, Germany, 2011).
+
+Like mentioned in step-41 it would be an interesting advance to consider a contact
+problem with friction. In almost every mechanical process friction has a big influence.
+For the modelling we have to take into account tangential stresses at the contact
+surface. Also we have to observe that friction adds another nonlinearity to
+our problem.
+
+If we simulate a frictional contact the next step to consider heat development
+over the contact zone is not too far away. The heat that is caused by friction
+between two bodies rises up the temperature in the deformable body and entails an
+change of some material parameters.
+
+It might be of interest to implement more accurate, problem-adapted error
+estimators. To reduce the number of newton iterations a solution transfer of the
+coarse solution to the next adaptive refined mesh could be beneficial.
