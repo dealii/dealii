@@ -255,44 +255,44 @@
 #  define HAVE_LIBLAPACK
 
 /* Defined if the corresponding BLAS or LAPACK function is available */
-#  cmakedefine HAVE_DAXPY_
-#  cmakedefine HAVE_DGEEVX_
-#  cmakedefine HAVE_DGEEV_
-#  cmakedefine HAVE_DGELSD_
-#  cmakedefine HAVE_DGEMM_
-#  cmakedefine HAVE_DGEMV_
-#  cmakedefine HAVE_DGEQRF_
-#  cmakedefine HAVE_DGESDD_
-#  cmakedefine HAVE_DGESVD_
-#  cmakedefine HAVE_DGETRF_
-#  cmakedefine HAVE_DGETRI_
-#  cmakedefine HAVE_DGETRS_
-#  cmakedefine HAVE_DORGQR_
-#  cmakedefine HAVE_DORMQR_
-#  cmakedefine HAVE_DSTEV_
-#  cmakedefine HAVE_DSYEVX_
-#  cmakedefine HAVE_DSYGV_
-#  cmakedefine HAVE_DSYGVX_
-#  cmakedefine HAVE_DTRTRS_
-#  cmakedefine HAVE_SAXPY_
-#  cmakedefine HAVE_SGEEVX_
-#  cmakedefine HAVE_SGEEV_
-#  cmakedefine HAVE_SGELSD_
-#  cmakedefine HAVE_SGEMM_
-#  cmakedefine HAVE_SGEMV_
-#  cmakedefine HAVE_SGEQRF_
-#  cmakedefine HAVE_SGESDD_
-#  cmakedefine HAVE_SGESVD_
-#  cmakedefine HAVE_SGETRF_
-#  cmakedefine HAVE_SGETRI_
-#  cmakedefine HAVE_SGETRS_
-#  cmakedefine HAVE_SORGQR_
-#  cmakedefine HAVE_SORMQR_
-#  cmakedefine HAVE_SSTEV_
-#  cmakedefine HAVE_SSYEVX_
-#  cmakedefine HAVE_SSYGV_
-#  cmakedefine HAVE_SSYGVX_
-#  cmakedefine HAVE_STRTRS_
+#cmakedefine HAVE_DAXPY_
+#cmakedefine HAVE_DGEEVX_
+#cmakedefine HAVE_DGEEV_
+#cmakedefine HAVE_DGELSD_
+#cmakedefine HAVE_DGEMM_
+#cmakedefine HAVE_DGEMV_
+#cmakedefine HAVE_DGEQRF_
+#cmakedefine HAVE_DGESDD_
+#cmakedefine HAVE_DGESVD_
+#cmakedefine HAVE_DGETRF_
+#cmakedefine HAVE_DGETRI_
+#cmakedefine HAVE_DGETRS_
+#cmakedefine HAVE_DORGQR_
+#cmakedefine HAVE_DORMQR_
+#cmakedefine HAVE_DSTEV_
+#cmakedefine HAVE_DSYEVX_
+#cmakedefine HAVE_DSYGV_
+#cmakedefine HAVE_DSYGVX_
+#cmakedefine HAVE_DTRTRS_
+#cmakedefine HAVE_SAXPY_
+#cmakedefine HAVE_SGEEVX_
+#cmakedefine HAVE_SGEEV_
+#cmakedefine HAVE_SGELSD_
+#cmakedefine HAVE_SGEMM_
+#cmakedefine HAVE_SGEMV_
+#cmakedefine HAVE_SGEQRF_
+#cmakedefine HAVE_SGESDD_
+#cmakedefine HAVE_SGESVD_
+#cmakedefine HAVE_SGETRF_
+#cmakedefine HAVE_SGETRI_
+#cmakedefine HAVE_SGETRS_
+#cmakedefine HAVE_SORGQR_
+#cmakedefine HAVE_SORMQR_
+#cmakedefine HAVE_SSTEV_
+#cmakedefine HAVE_SSYEVX_
+#cmakedefine HAVE_SSYGV_
+#cmakedefine HAVE_SSYGVX_
+#cmakedefine HAVE_STRTRS_
 #endif
 
 
