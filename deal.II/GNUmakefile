@@ -13,6 +13,7 @@ style-h-files:= $(wildcard include/deal.II/*/*.h)
 style-cc-files:= $(wildcard source/*/*.cc)
 style-examples:= $(wildcard examples/*/*.cc)
 
+.PHONY: indent
 indent:
 	@echo "============ Indenting all files"
 	@for f in  $(style-h-files) $(style-cc-files) $(style-examples) ;\
@@ -21,6 +22,8 @@ indent:
 	  astyle --options=contrib/utilities/astyle.rc $$f ;\
 	done
 
+
+.PHONY: cmake
 cmake:
 	@cd bundled/cmake && make
 	@echo
@@ -35,5 +38,30 @@ cmake:
 	@echo =======================================================
 	@echo
 
-.PHONY: indent cmake
+
+#
+# Target for build tests
+#
+# Environment variables:
+# 	CMAKE
+# 	TMPDIR
+# 	CONFIGFILE
+# 	MAKEOPTS
+#
+
+TMPDIR=/tmp
+CMAKE=cmake
+
+random:= $(shell echo "$$RANDOM$$RANDOM")
+builddir:= "$(TMPDIR)"/deal-build.$(random)
+installdir:= "$(TMPDIR)"/deal-install.$(random)
+
+.PHONY: build-test
+build-test:
+	@mkdir -p $(builddir)
+	@mkdir -p $(installdir)
+	@cd $(builddir) && "$(CMAKE)" -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(PWD) >$(builddir)/configuration.log 2>&1
+	@cd $(builddir) && make $(MAKEOPTS) install >$(builddir)/build.log 2>&1
+	@cd $(builddir) && make log >/dev/null 2>&1
+
 
