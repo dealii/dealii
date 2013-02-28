@@ -91,24 +91,34 @@ ENDMACRO()
 #
 MACRO(FEATURE_ERROR_MESSAGE _feature)
   STRING(TOLOWER ${_feature} _feature_lowercase)
-  IF(FEATURE_${_feature}_HAVE_BUNDLED)
-    MESSAGE(FATAL_ERROR "\n"
-      "Could not find the ${_feature_lowercase} library!\n\n"
-      "Please ensure that the ${_feature_lowercase} library is installed on your computer.\n"
-      "If the library is not at a default location, either provide some hints\n"
-      "for the autodetection, or set the relevant variables by hand in ccmake.\n\n"
-      "Alternatively you may choose to compile the bundled library of\n"
-      "${_feature_lowercase} by setting DEAL_II_ALLOW_BUNDLED=on or\n"
-      "DEAL_II_FORCE_BUNDLED_${_feature}=on.\n\n"
+
+  IF(DEFINED ${_feature}_DIR)
+    SET(_hint_snippet "
+    $ ${_feature}_DIR=\"...\" cmake <...>
+    $ cmake -D${_feature}_DIR=\"...\" <...>
+or set the relevant variables by hand in ccmake."
       )
- ELSE()
-    MESSAGE(FATAL_ERROR "\n"
-      "Could not find the ${_feature_lowercase} library!\n\n"
-      "Please ensure that the ${_feature_lowercase} library is installed on your computer.\n"
-      "If the library is not at a default location, either provide some hints\n"
-      "for the autodetection, or set the relevant variables by hand in ccmake.\n\n"
+  ELSE()
+    SET(_hint_snippet
+      "or set the relevant variables by hand in ccmake."
       )
   ENDIF()
+
+  IF(FEATURE_${_feature}_HAVE_BUNDLED)
+    SET(_bundled_snippet
+      "\n\nAlternatively you may choose to compile the bundled library of
+${_feature_lowercase} by setting DEAL_II_ALLOW_BUNDLED=on or\nDEAL_II_FORCE_BUNDLED_${_feature}=on.\n"
+      )
+  ELSE()
+    SET(_bundled_snippet "\n")
+  ENDIF()
+
+  MESSAGE(FATAL_ERROR "\n"
+    "Could not find the ${_feature_lowercase} library!\n"
+    "Please ensure that the ${_feature_lowercase} library is installed on your computer.\n"
+    "If the library is not at a default location, either provide some hints\n"
+    "for autodetection,${_hint_snippet}${_bundled_snippet}"
+    )
 ENDMACRO()
 
 

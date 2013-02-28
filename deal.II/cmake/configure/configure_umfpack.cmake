@@ -22,7 +22,6 @@
 #
 SET(FEATURE_UMFPACK_DEPENDS DEAL_II_WITH_LAPACK)
 
-
 MACRO(FEATURE_UMFPACK_CONFIGURE_BUNDLED)
   INCLUDE_DIRECTORIES(
     ${UMFPACK_FOLDER}/UMFPACK/Include
@@ -30,10 +29,9 @@ MACRO(FEATURE_UMFPACK_CONFIGURE_BUNDLED)
     )
 ENDMACRO()
 
-
 MACRO(FEATURE_UMFPACK_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
-    "Could not find the umfpack and amd libraries!\n"
+    "Could not find umfpack and supporting libraries!\n"
     "Please ensure that the libraries are installed on your computer.\n"
     "If the libraries are not at a default location, either provide some hints\n"
     "for the autodetection:\n"
@@ -47,6 +45,5 @@ MACRO(FEATURE_UMFPACK_ERROR_MESSAGE)
     "(BLAS and LAPACK have to be installed for bundled UMFPACK to be available)\n\n"
     )
 ENDMACRO()
-
 
 CONFIGURE_FEATURE(UMFPACK)

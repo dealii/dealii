@@ -13,19 +13,7 @@
 #####
 
 #
-# Configuration for the netcdf library:
+# Configuration for the hdf5 library:
 #
-
-MACRO(FEATURE_HDF5_ERROR_MESSAGE)
-  MESSAGE(FATAL_ERROR "\n"
-    "Could not find the hdf5 library!\n"
-    "Please ensure that the hdf5 library is installed on your computer.\n"
-    "If the library is not at a default location, either provide some hints\n"
-    "for the autodetection:\n"
-    "    $ HDF5_DIR=\"...\" cmake <...>\n"
-    "    $ cmake -DHDF5_DIR=\"...\" <...>\n"
-    "or set the relevant variables by hand in ccmake.\n\n"
-    )
-ENDMACRO()
 
 CONFIGURE_FEATURE(HDF5)

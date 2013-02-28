@@ -16,7 +16,6 @@
 # Configuration for the netcdf library:
 #
 
-
 MACRO(FEATURE_METIS_FIND_EXTERNAL var)
   FIND_PACKAGE(METIS)
 
@@ -32,22 +31,11 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
       UNSET(METIS_INCLUDE_DIR CACHE)
       UNSET(METIS_DIR CACHE)
       UNSET(METIS_FOUND CACHE)
+      SET(METIS_DIR "" CACHE STRING
+        "An optional hint to a metis directory"
+        )
     ENDIF()
   ENDIF()
 ENDMACRO()
-
-
-MACRO(FEATURE_METIS_ERROR_MESSAGE)
-  MESSAGE(FATAL_ERROR "\n"
-    "Could not find the metis library!\n"
-    "Please ensure that the metis library version 5.0 or newer is installed on your computer.\n"
-    "If the library is not at a default location, either provide some hints\n"
-    "for the autodetection:\n"
-    "    $ METIS_DIR=\"...\" cmake <...>\n"
-    "    $ cmake -DMETIS_DIR=\"...\" <...>\n"
-    "or set the relevant variables by hand in ccmake.\n\n"
-    )
-ENDMACRO()
-
 
 CONFIGURE_FEATURE(METIS)
