@@ -40,14 +40,13 @@ MACRO(FEATURE_MPI_CONFIGURE_EXTERNAL)
   # The user has to know the location of the mpi headers as well:
   LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${MPI_CXX_INCLUDE_PATH})
 
-  # TODO:
-  SET(DEAL_II_USE_MPICXX ON CACHE BOOL
+  SET(DEAL_II_USE_MPICXX OFF CACHE BOOL # Disabled by default
     "Set the compiler to the detected mpi wrapper ${MPI_CXX_COMPILER}"
     )
-
   IF(DEAL_II_USE_MPICXX)
     SET(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
   ENDIF()
+
 ENDMACRO()
 
 
