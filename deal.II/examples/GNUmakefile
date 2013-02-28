@@ -15,9 +15,9 @@ configure_examples:
 	@echo "============ Configure all examples"
 	@for f in  $(steps);\
 	do\
-	  cd $$f ;\
+	  cd $(PWD)/$$f ;\
 	  cmake .;\
-	  cd ..;\
+	  cd $(PWD);\
 	done
 
 .PHONY: configure_examples
