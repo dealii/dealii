@@ -116,7 +116,7 @@ void test(std::ostream& /*out*/)
 
 int main(int argc, char *argv[])
 {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   MPI_Init (&argc,&argv);
 #else
   (void)argc;
@@ -132,7 +132,7 @@ int main(int argc, char *argv[])
   test<2>(logfile);
   deallog.pop();
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   MPI_Finalize();
 #endif
 }
