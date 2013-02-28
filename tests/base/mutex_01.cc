@@ -41,7 +41,7 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-#ifdef DEAL_II_USE_MT
+#ifdef DEAL_II_WITH_THREADS
 
   mutex.acquire ();
 

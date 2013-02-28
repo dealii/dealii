@@ -40,7 +40,7 @@
 template<int dim>
 void test()
 {
-  #ifdef DEAL_II_USE_MT
+  #ifdef DEAL_II_WITH_THREADS
 
   DeadlockKiller killer;
   #endif
