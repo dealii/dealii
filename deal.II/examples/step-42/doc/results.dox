@@ -937,5 +937,6 @@ between two bodies rises up the temperature in the deformable body and entails a
 change of some material parameters.
 
 It might be of interest to implement more accurate, problem-adapted error
-estimators. To reduce the number of newton iterations a solution transfer of the
-coarse solution to the next adaptive refined mesh could be beneficial.
+estimators for contact as well for the plasticity. To reduce the number of
+newton iterations a solution transfer of the coarse solution to the next
+adaptive refined mesh could be beneficial.
