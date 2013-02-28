@@ -21,5 +21,19 @@ indent:
 	  astyle --options=contrib/utilities/astyle.rc $$f ;\
 	done
 
-.PHONY: indent
+cmake:
+	@cd bundled/cmake && make
+	@echo
+	@echo =======================================================
+	@echo
+	@echo "CMake successfully bootstrapped in bundled/cmake"
+	@echo
+	@echo "Please add"
+	@echo "    export PATH=\"$(PWD)/bundled/cmake/bin:\$$PATH\""
+	@echo "to your ~/.bashrc file (or similar)."
+	@echo
+	@echo =======================================================
+	@echo
+
+.PHONY: indent cmake
 
