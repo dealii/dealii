@@ -340,14 +340,14 @@ namespace Step42
                      MPI_Comm _mpi_communicator,
                      ConditionalOStream _pcout);
 
-    void plast_linear_hardening (SymmetricTensor<4,dim> &stress_strain_tensor,
-                                 SymmetricTensor<2,dim> &strain_tensor,
-                                 unsigned int            &elast_points,
-                                 unsigned int            &plast_points,
-                                 double                  &yield);
-    void linearized_plast_linear_hardening (SymmetricTensor<4,dim> &stress_strain_tensor_linearized,
-                                            SymmetricTensor<4,dim> &stress_strain_tensor,
-                                            SymmetricTensor<2,dim> &strain_tensor);
+    void plast_linear_hardening (SymmetricTensor<4,dim> 	  &stress_strain_tensor,
+                                 const SymmetricTensor<2,dim> &strain_tensor,
+                                 unsigned int            	  &elast_points,
+                                 unsigned int            	  &plast_points,
+                                 double                  	  &yield);
+    void linearized_plast_linear_hardening (SymmetricTensor<4,dim> 		 &stress_strain_tensor_linearized,
+                                            SymmetricTensor<4,dim> 		 &stress_strain_tensor,
+                                            const SymmetricTensor<2,dim> &strain_tensor);
     inline SymmetricTensor<2,dim> get_strain (const FEValues<dim> &fe_values,
                                               const unsigned int  shape_func,
                                               const unsigned int  q_point) const;
@@ -396,11 +396,11 @@ namespace Step42
   }
 
   template <int dim>
-  void ConstitutiveLaw<dim>::plast_linear_hardening (SymmetricTensor<4,dim> &stress_strain_tensor,
-                                                     SymmetricTensor<2,dim> &strain_tensor,
-                                                     unsigned int            &elast_points,
-                                                     unsigned int            &plast_points,
-                                                     double                  &yield)
+  void ConstitutiveLaw<dim>::plast_linear_hardening (SymmetricTensor<4,dim> 	  &stress_strain_tensor,
+                                                     const SymmetricTensor<2,dim> &strain_tensor,
+                                                     unsigned int             	  &elast_points,
+                                                     unsigned int            	  &plast_points,
+                                                     double                 	  &yield)
   {
     if (dim == 3)
       {
@@ -429,9 +429,9 @@ namespace Step42
   }
 
   template <int dim>
-  void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,dim> &stress_strain_tensor_linearized,
-      SymmetricTensor<4,dim> &stress_strain_tensor,
-      SymmetricTensor<2,dim> &strain_tensor)
+  void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,dim> 		 &stress_strain_tensor_linearized,
+		  	  	  	  	  	  	  	  	  	  	  	  	  	  	SymmetricTensor<4,dim> 	 	 &stress_strain_tensor,
+		  	  	  	  	  	  	  	  	  	  	  	  	  	  	const SymmetricTensor<2,dim> &strain_tensor)
   {
     if (dim == 3)
       {
