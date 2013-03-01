@@ -126,6 +126,12 @@ foreach $filename (@ARGV)
 	    # check whether the file for the image is present
 	    $link = $1;
 
+	    # ignore online links
+	    if ($link =~ /^http/)
+	    {
+		next;
+	    }
+
 	    die "---Local image `$link' not found in file `$filename'\n This line is: $this_line.\n"
 		unless ((-r $link) && (-f $link));
 	}

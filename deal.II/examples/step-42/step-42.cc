@@ -55,6 +55,7 @@
 
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/error_estimator.h>
+#include <deal.II/distributed/solution_transfer.h>
 #include <deal.II/base/timer.h>
 #include <fstream>
 #include <iostream>
@@ -68,110 +69,15 @@ namespace Step42
 {
   using namespace dealii;
 
+  // @sect3{The <code>Input</code> class template}
 
-  // @sect3{The <code>PlasticityContactProblem</code> class template}
-
-  // This class has only the purpose
+  // This class has the the only purpose
   // to read in data from a picture file
   // that has to be stored as a pbm ascii
   // format. This data will be bilinear
   // interpolated and provides in this way
   // a function which describes an obstacle.
-
-  template <int dim> class Input;
-
-  // This class provides an interface
-  // for a constitutive law. In this
-  // example we are using an elastic
-  // plastic material with linear,
-  // isotropic hardening.
-
-  template <int dim> class ConstitutiveLaw;
-
-  // This class supplies all function
-  // and variables needed to describe
-  // the nonlinear contact problem. It is
-  // close to step-41 but with some additional
-  // features like: handling hanging nodes,
-  // a newton method, using Trilinos and p4est
-  // for parallel distributed computing.
-  // To deal with hanging nodes makes
-  // life a bit more complicated since
-  // we need an other ConstraintMatrix now.
-  // We create a newton method for the
-  // active set method for the contact
-  // situation and to handle the nonlinear
-  // operator for the constitutive law.
-
-  template <int dim>
-  class PlasticityContactProblem
-  {
-  public:
-    PlasticityContactProblem (int _n_refinements_global);
-    void run ();
-
-  private:
-    void make_grid ();
-    void setup_system();
-    void assemble_nl_system (TrilinosWrappers::MPI::Vector &u);
-    void residual_nl_system (TrilinosWrappers::MPI::Vector &u);
-    void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
-    void update_solution_and_constraints ();
-    void dirichlet_constraints ();
-    void solve ();
-    void solve_newton ();
-    void refine_grid ();
-    void move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const;
-    void output_results (const std::string &title) const;
-
-    int                  n_refinements_global;
-
-    MPI_Comm             mpi_communicator;
-
-    parallel::distributed::Triangulation<dim>   triangulation;
-
-    FESystem<dim>        fe;
-    DoFHandler<dim>      dof_handler;
-
-    IndexSet             locally_owned_dofs;
-    IndexSet             locally_relevant_dofs;
-
-    unsigned int         number_iterations;
-
-    ConstraintMatrix     constraints;
-    ConstraintMatrix     constraints_hanging_nodes;
-    ConstraintMatrix     constraints_dirichlet_hanging_nodes;
-
-    TrilinosWrappers::SparseMatrix system_matrix_newton;
-
-    TrilinosWrappers::MPI::Vector       solution;
-    TrilinosWrappers::MPI::Vector       old_solution;
-    TrilinosWrappers::MPI::Vector       system_rhs_newton;
-    TrilinosWrappers::MPI::Vector       resid_vector;
-    TrilinosWrappers::MPI::Vector       diag_mass_matrix_vector;
-    Vector<float>                       cell_constitution;
-    IndexSet                            active_set;
-
-    ConditionalOStream pcout;
-
-    TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
-    TrilinosWrappers::PreconditionAMG preconditioner_u;
-
-    std::unique_ptr<Input<dim> >               input_obstacle;
-    std::unique_ptr<ConstitutiveLaw<dim> >     plast_lin_hard;
-
-    double sigma_0;    // Yield stress
-    double gamma;      // Parameter for the linear isotropic hardening
-    double e_modul;    // E-Modul
-    double nu;         // Poisson ratio
-
-    TimerOutput          computing_timer;
-  };
-
-  // As explained above this class
-  // allocates the obstacle which
-  // will come into contact with our
-  // deformable body.
+  //
   // The data which we read in by the
   // function read_obstacle () from the file
   // "obstacle_file.pbm" will be stored
@@ -328,6 +234,14 @@ namespace Step42
 
     pcout << "Resolution of the scanned obstacle picture: " << nx << " x " << ny << std::endl;
   }
+
+  // @sect3{The <code>ConstitutiveLaw</code> class template}
+
+  // This class provides an interface
+  // for a constitutive law. In this
+  // example we are using an elastic
+  // plastic material with linear,
+  // isotropic hardening.
 
   template <int dim>
   class ConstitutiveLaw
@@ -586,6 +500,89 @@ namespace Step42
     }
   }
 
+  // @sect3{The <code>PlasticityContactProblem</code> class template}
+
+  // This class supplies all function
+  // and variables needed to describe
+  // the nonlinear contact problem. It is
+  // close to step-41 but with some additional
+  // features like: handling hanging nodes,
+  // a newton method, using Trilinos and p4est
+  // for parallel distributed computing.
+  // To deal with hanging nodes makes
+  // life a bit more complicated since
+  // we need an other ConstraintMatrix now.
+  // We create a newton method for the
+  // active set method for the contact
+  // situation and to handle the nonlinear
+  // operator for the constitutive law.
+
+  template <int dim>
+  class PlasticityContactProblem
+  {
+  public:
+    PlasticityContactProblem (int _n_refinements_global);
+    void run ();
+
+  private:
+    void make_grid ();
+    void setup_system();
+    void assemble_nl_system (TrilinosWrappers::MPI::Vector &u);
+    void residual_nl_system (TrilinosWrappers::MPI::Vector &u);
+    void assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix);
+    void update_solution_and_constraints ();
+    void dirichlet_constraints ();
+    void solve ();
+    void solve_newton ();
+    void refine_grid ();
+    void move_mesh (const TrilinosWrappers::MPI::Vector &_complete_displacement) const;
+    void output_results (const std::string &title) const;
+
+    unsigned int         n_refinements_global;
+    unsigned int         cycle;
+
+    MPI_Comm             mpi_communicator;
+
+    parallel::distributed::Triangulation<dim>   triangulation;
+
+    FESystem<dim>        fe;
+    DoFHandler<dim>      dof_handler;
+
+    std::unique_ptr<parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> > soltrans;
+
+    IndexSet             locally_owned_dofs;
+    IndexSet             locally_relevant_dofs;
+
+    unsigned int         number_iterations;
+
+    ConstraintMatrix     constraints;
+    ConstraintMatrix     constraints_hanging_nodes;
+    ConstraintMatrix     constraints_dirichlet_hanging_nodes;
+
+    TrilinosWrappers::SparseMatrix system_matrix_newton;
+
+    TrilinosWrappers::MPI::Vector       solution;
+    TrilinosWrappers::MPI::Vector       system_rhs_newton;
+    TrilinosWrappers::MPI::Vector       resid_vector;
+    TrilinosWrappers::MPI::Vector       diag_mass_matrix_vector;
+    Vector<float>                       cell_constitution;
+    IndexSet                            active_set;
+
+    ConditionalOStream pcout;
+
+    TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
+    TrilinosWrappers::PreconditionAMG preconditioner_u;
+
+    std::unique_ptr<Input<dim> >               input_obstacle;
+    std::unique_ptr<ConstitutiveLaw<dim> >     plast_lin_hard;
+
+    double sigma_0;    // Yield stress
+    double gamma;      // Parameter for the linear isotropic hardening
+    double e_modul;    // E-Modul
+    double nu;         // Poisson ratio
+
+    TimerOutput          computing_timer;
+  };
 
   // @sect3{Implementation of the <code>PlasticityContactProblem</code> class}
 
@@ -696,7 +693,6 @@ namespace Step42
     {
       solution.reinit (locally_relevant_dofs, mpi_communicator);
       system_rhs_newton.reinit (locally_owned_dofs, mpi_communicator);
-      old_solution.reinit (system_rhs_newton);
       resid_vector.reinit (system_rhs_newton);
       diag_mass_matrix_vector.reinit (system_rhs_newton);
       cell_constitution.reinit (triangulation.n_active_cells ());
@@ -1247,6 +1243,7 @@ namespace Step42
   {
     double                         resid=0;
     double                         resid_old=100000;
+    TrilinosWrappers::MPI::Vector  old_solution (system_rhs_newton);
     TrilinosWrappers::MPI::Vector  res (system_rhs_newton);
     TrilinosWrappers::MPI::Vector  tmp_vector (system_rhs_newton);
 
@@ -1270,9 +1267,9 @@ namespace Step42
     for (; j<=100; j++)
       {
         // Solve an elastic problem to obtain a better start solution
-        if (j == 1)
+        if (j == 1 && cycle == 0)
           plast_lin_hard->set_sigma_0 (1e+10);
-        else if (j == 2)
+        else if (j == 2 || cycle > 0)
           plast_lin_hard->set_sigma_0 (sigma_hlp);
 
         pcout<< " " <<std::endl;
@@ -1291,7 +1288,7 @@ namespace Step42
         pcout<< "      Solving system... " <<std::endl;
         solve ();
 
-        TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
+        TrilinosWrappers::MPI::Vector distributed_solution (system_rhs_newton);
         distributed_solution = solution;
 
         int damped = 0;
@@ -1321,7 +1318,7 @@ namespace Step42
               if (constraints.is_inhomogeneously_constrained (n))
                 res(n) = 0;
 
-	    res.compress(VectorOperation::insert);
+            res.compress(VectorOperation::insert);
 
             resid = res.l2_norm ();
 
@@ -1366,7 +1363,7 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::refine_grid ()
   {
-    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+	Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate (dof_handler,
                                         QGauss<dim-1>(3),
                                         typename FunctionMap<dim>::type(),
@@ -1376,8 +1373,11 @@ namespace Step42
     refine_and_coarsen_fixed_number (triangulation,
                                      estimated_error_per_cell,
                                      0.3, 0.03);
-    triangulation.execute_coarsening_and_refinement ();
 
+    triangulation.prepare_coarsening_and_refinement();
+    soltrans->prepare_for_coarsening_and_refinement(solution);
+
+    triangulation.execute_coarsening_and_refinement ();
   }
 
 
@@ -1483,7 +1483,7 @@ namespace Step42
     pcout << "Ostacle is available now." << std::endl;
 
     const unsigned int n_cycles = 6;
-    for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
+    for (cycle=0; cycle<n_cycles; ++cycle)
       {
         computing_timer.enter_section("Mesh refinement and setup system");
 
@@ -1495,10 +1495,20 @@ namespace Step42
             make_grid();
           }
         else
-          refine_grid ();
+          {
+        	soltrans.reset (new parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::Vector>(dof_handler));
+        	refine_grid ();
+          }
 
         setup_system ();
 
+        if (cycle > 0)
+          {
+            TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
+            distributed_solution = solution;
+        	soltrans->interpolate(distributed_solution);
+        	solution = distributed_solution;
+          }
 
         computing_timer.exit_section("Mesh refinement and setup system");
 
