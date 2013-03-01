@@ -97,6 +97,9 @@ build_test:
 	@echo "BEGIN BUILD INSTALL OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	cd $(builddir) && make $(MAKEOPTS) install >>$(logfile) 2>&1
 	@echo "END BUILD INSTALL OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
+	@echo "BEGIN BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
+	cd $(installdir)/examples && make $(MAKEOPTS) build_examples >>$(logfile) 2>&1
+	@echo "END BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	cd $(installdir)/examples && make $(MAKEOPTS) run_examples >>$(logfile) 2>&1
 	@echo "END RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)

@@ -9,17 +9,23 @@ else
   default:
 endif
 
-
 steps:= $(wildcard step-*)
-
-.PHONY: configure_examples
-configure_examples: $(steps:%=%/Makefile)
 
 %/Makefile:
 	-cd $(@D) && cmake . > configure.log 2>&1
 
+.PHONY: configure_examples
+configure_examples: $(steps:%=%/Makefile)
+
+%/%: %/Makefile
+	cd $(@D) && if [ -f Makefile ]; then (make > build.log 2>&1); fi
+
+.PHONY: build_examples
+build_examples: $(steps:%=%/%)
+
+%/OK: %/%
+	cd $(@D) && if [ -f Makefile ]; then (make run > run.log 2>&1); fi && touch OK
+
 .PHONY: run_examples
 run_examples: $(steps:%=%/OK)
 
-%/OK: %/Makefile
-	cd $(@D) && if [ -f Makefile ]; then (make run > run.log 2>&1); fi && touch OK
