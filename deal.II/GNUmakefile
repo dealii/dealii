@@ -59,7 +59,7 @@ builddir:= $(testdir)/build
 installdir:= $(testdir)/install
 
 .PHONY: build_test
-build-test:
+build_test:
 	mkdir -p $(builddir)
 	mkdir -p $(installdir)
 	cd $(builddir) && "$(CMAKE)" -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(PWD) >$(testdir)/configure.log 2>&1
