@@ -105,4 +105,4 @@ build_test:
 	@echo "END RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	rm -rf $(builddir)
 	rm -rf $(installdir)
-	rmdir --ignore-fail-on-non-empty -p $(testdir)
+	-rmdir --ignore-fail-on-non-empty -p $(testdir)
