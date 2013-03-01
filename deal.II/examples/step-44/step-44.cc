@@ -929,7 +929,7 @@ namespace Step44
                                     PerTaskData_UQPH &data);
 
     void
-    copy_local_to_global_UQPH(const PerTaskData_UQPH &data)
+    copy_local_to_global_UQPH(const PerTaskData_UQPH &/*data*/)
     {}
 
     // Solve for the displacement using a Newton-Raphson method. We break this
@@ -1765,7 +1765,7 @@ namespace Step44
   void
   Solid<dim>::update_qph_incremental_one_cell(const typename DoFHandler<dim>::active_cell_iterator &cell,
                                               ScratchData_UQPH &scratch,
-                                              PerTaskData_UQPH &data)
+                                              PerTaskData_UQPH &/*data*/)
   {
     PointHistory<dim> *lqph =
       reinterpret_cast<PointHistory<dim>*>(cell->user_pointer());
@@ -2134,7 +2134,6 @@ namespace Step44
     PointHistory<dim> *lqph =
       reinterpret_cast<PointHistory<dim>*>(cell->user_pointer());
 
-    static const SymmetricTensor<2, dim> I = StandardTensors<dim>::I;
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
       {
         const Tensor<2, dim> F_inv = lqph[q_point].get_F_inv();

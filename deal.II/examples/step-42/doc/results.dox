@@ -917,6 +917,31 @@ are iterated out at first. After that the Newton method has only to struggle wit
 plasticity. For the finer meshes there is quadratic convergence not until the
 last 4 or 5 newton iterations.
 
+<table align="center">
+  <tr>
+    <td valign="top">
+      0 &nbsp;
+    </td>
+    <td valign="top">
+      <img src="http://www.dealii.org/images/steps/developer/step-42-CellConstitutionBall2.png" alt="">
+    </td>
+    <td valign="top">
+      0 &nbsp;
+    </td>
+    <td valign="top">
+      <img src="http://www.dealii.org/images/steps/developer/step-42-CellConstitutionLi2.png" alt="">
+    </td>
+  </tr>
+</table>
+
+The picture shows the adaptive refinement and as well how much a cell is
+plastified druing the contact with the ball. In the middle - where the
+mesh is finest - you can see the hollow caused by the ball. The blue
+color means that this cell contains only elastic quadrature points in
+contrast to the red cells in which all quadrature points are plastified.
+Since we used trilinear ansatz functions each cell contains eight
+of these points which may or may not be elastic or plastic.  
+
 <a name="extensions"></a>
 <h1>Possibilities for extensions</h1>
 
