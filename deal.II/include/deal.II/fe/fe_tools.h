@@ -998,6 +998,9 @@ namespace FETools
    * elements on grids with hanging
    * nodes (locally refined grids)
    * are involved.
+   *
+   * For parallel computations with PETSc, supply @p z1 with ghost elements
+   * and @p z1_difference without ghost elements.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
   void interpolation_difference(const DoFHandler<dim,spacedim> &dof1,
