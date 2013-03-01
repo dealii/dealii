@@ -29,6 +29,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
 
   ADD_EXECUTABLE(report_features report_features.cc)
   TARGET_LINK_LIBRARIES(report_features ${DEAL_II_EXTERNAL_LIBRARIES})
+  ADD_CUSTOM_TARGET(run_report_features COMMAND report_features)
 
   INSTALL(TARGETS make_dependencies report_features expand_instantiations
     RUNTIME
