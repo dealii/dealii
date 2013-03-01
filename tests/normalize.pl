@@ -53,6 +53,3 @@ s/-0\.(0+)(?!\d)/0.\1/g;
 
 # remove deal.II debug output
 s/^DEAL.*::_.*\n//g;
-
-# Normalize version string to 7.3 pre:
-s/written by deal\.II .\..\.pre/written by deal.II 7.3.pre/;
