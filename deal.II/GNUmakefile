@@ -67,5 +67,5 @@ build_test:
 	cd $(builddir) && make log >/dev/null 2>&1
 	cp $(builddir)/cmake.log $(testdir)
 	cd $(builddir) && make $(MAKEOPTS) install >$(testdir)/build.log 2>&1
-	cd $(installdir)/examples && make run_examples >$(testdir)/examples.log 2>&1
+	cd $(installdir)/examples && make $(MAKEOPTS) run_examples >$(testdir)/examples.log 2>&1
 
