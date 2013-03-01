@@ -59,7 +59,6 @@ void test ()
 
 				   // change x, transfer, and check again
   x*=2.0;
-  x.compress();
   v=x;
   
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
