@@ -143,7 +143,7 @@ template <int dim, int spacedim> class MappingQ;
  * The node values above rely on integrals, which will be computed by
  * quadrature rules themselves. The generalized support points are a
  * set of points such that this quadrature can be performed with
- * sufficient accuracy. The points needed are thode of
+ * sufficient accuracy. The points needed are those of
  * QGauss<sub>k+1</sub> on each edge and QGauss<sub>k+2</sub> on each face and in
  * the interior of the cell (or none for N<sub>1</sub>).
  *

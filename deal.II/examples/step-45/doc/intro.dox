@@ -20,7 +20,7 @@ parts of the boundary. In the figure below we show this
 concept in two space-dimensions. There, all dashed faces with the same color should
 have the same boundary values:
 
-@image html step-45.periodic_cells.png
+<img src="http://www.dealii.org/images/steps/developer/step-45.periodic_cells.png" alt="">
 
 To keep things simple, in this tutorial we will consider an academic,
 simplified problem that allows us to focus on only that part that we are

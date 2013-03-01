@@ -6,11 +6,11 @@ like this:
 <TABLE WIDTH="60%" ALIGN="center">
   <tr>
     <td ALIGN="center">
-      @image html step-1.grid-1.png
+      <img src="http://www.dealii.org/images/steps/developer/step-1.grid-1.png" alt="">
     </td>
 
     <td ALIGN="center">
-      @image html step-1.grid-2.png
+      <img src="http://www.dealii.org/images/steps/developer/step-1.grid-2.png" alt="">
     </td>
   </tr>
 </table>
@@ -56,6 +56,10 @@ using meshes obtained from mesh generators, there is a good number of
 geometries for which deal.II can create meshes using the functions in the
 GridGenerator namespace. Take a look at what it provides and see how it could
 be used in a program like this.
+
+We also discuss a variety of other ways to create and manipulate meshes to
+step-49.
+
 
 <h4> Comments about programming and debugging </h4>
 

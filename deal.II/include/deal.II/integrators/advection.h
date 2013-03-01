@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -65,7 +65,6 @@ namespace LocalIntegrators
      * as many entries as quadrature points if the velocity is not constant.
      * @param factor is an optional multiplication factor for the result.
      *
-     * @ingroup Integrators
      * @author Guido Kanschat
      * @date 2012
      */

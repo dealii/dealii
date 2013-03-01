@@ -368,75 +368,48 @@ public:
    */
 
   /**
-   * Return the indices of the dofs of this
-   * object in the standard ordering: dofs
-   * on vertex 0, dofs on vertex 1, etc,
-   * dofs on line 0, dofs on line 1, etc,
-   * dofs on quad 0, etc.
+   * Return the indices of the dofs of this object in the standard
+   * ordering: dofs on vertex 0, dofs on vertex 1, etc, dofs on line
+   * 0, dofs on line 1, etc, dofs on quad 0, etc.
    *
-   * The vector has to have the
-   * right size before being passed
-   * to this function.
+   * The vector has to have the right size before being passed to this
+   * function.
    *
-   * This function is most often
-   * used on active objects (edges,
-   * faces, cells). It can be used
-   * on non-active objects as well
-   * (i.e. objects that have
-   * children), but only if the
-   * finite element under
-   * consideration has degrees of
-   * freedom exclusively on
-   * vertices. Otherwise, the
-   * function doesn't make much
-   * sense, since for example
-   * inactive edges do not have
-   * degrees of freedom associated
-   * with them at all.
+   * @note The behavior descibed below for non-active cells will
+   * be removed in a future release. It is not very intuitive and its
+   * use is limited to FE_Q elements of degree 1.
    *
-   * The last argument denotes the
-   * finite element index. For the
-   * standard ::DoFHandler class,
-   * this value must be equal to
-   * its default value since that
-   * class only supports the same
-   * finite element on all cells
-   * anyway.
+   * This function is most often used on active objects (edges, faces,
+   * cells). It can be used on non-active objects as well
+   * (i.e. objects that have children), but only if the finite element
+   * under consideration has degrees of freedom exclusively on
+   * vertices. Otherwise, the function doesn't make much sense, since
+   * for example inactive edges do not have degrees of freedom
+   * associated with them at all.
    *
-   * However, for hp objects
-   * (i.e. the hp::DoFHandler
-   * class), different finite
-   * element objects may be used on
-   * different cells. On faces
-   * between two cells, as well as
-   * vertices, there may therefore
-   * be two sets of degrees of
-   * freedom, one for each of the
-   * finite elements used on the
-   * adjacent cells. In order to
-   * specify which set of degrees
-   * of freedom to work on, the
-   * last argument is used to
-   * disambiguate. Finally, if this
-   * function is called for a cell
-   * object, there can only be a
-   * single set of degrees of
-   * freedom, and fe_index has to
-   * match the result of
+   * The last argument denotes the finite element index. For the
+   * standard ::DoFHandler class, this value must be equal to its
+   * default value since that class only supports the same finite
+   * element on all cells anyway.
+   *
+   * However, for hp objects (i.e. the hp::DoFHandler class),
+   * different finite element objects may be used on different
+   * cells. On faces between two cells, as well as vertices, there may
+   * therefore be two sets of degrees of freedom, one for each of the
+   * finite elements used on the adjacent cells. In order to specify
+   * which set of degrees of freedom to work on, the last argument is
+   * used to disambiguate. Finally, if this function is called for a
+   * cell object, there can only be a single set of degrees of
+   * freedom, and fe_index has to match the result of
    * active_fe_index().
    *
-   * For cells, there is only a
-   * single possible finite element
-   * index (namely the one for that
-   * cell, returned by
-   * <code>cell-@>active_fe_index</code>. Consequently,
-   * the derived DoFCellAccessor
-   * class has an overloaded
-   * version of this function that
-   * calls the present function
-   * with
-   * <code>cell-@>active_fe_index</code>
-   * as last argument.
+   * For cells, there is only a single possible finite element index
+   * (namely the one for that cell, returned by
+   * <code>cell-@>active_fe_index</code>. Consequently, the derived
+   * DoFCellAccessor class has an overloaded version of this function
+   * that calls the present function with
+   * <code>cell-@>active_fe_index</code> as last argument.
+   *
    */
   void get_dof_indices (std::vector<types::global_dof_index> &dof_indices,
                         const unsigned int fe_index = DH::default_fe_index) const;

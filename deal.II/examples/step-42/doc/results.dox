@@ -1,3 +1,967 @@
-<a name="Results"></a>
 <h1>Results</h1>
 
+Running the program (with a ball as obstacle) on 12 cores produces output like this:
+@code
+Cycle 0:
+   Number of active cells: 218
+   Total number of cells: 249
+   Number of degrees of freedom: 2187
+ 
+   Newton iteration 0
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+         Error: 173.076 -> 0.157131 in 8 FGMRES iterations.
+      Number of elastic quadrature points: 4096 and plastic quadrature points: 0
+      Residual of the non-contact part of the system: 0.157131
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 1
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+         Error: 57.3852 -> 0.0426777 in 9 FGMRES iterations.
+      Number of elastic quadrature points: 3944 and plastic quadrature points: 152
+      Residual of the non-contact part of the system: 24.9209
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 2
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+         Error: 24.9209 -> 0.0157852 in 8 FGMRES iterations.
+      Number of elastic quadrature points: 3960 and plastic quadrature points: 136
+      Residual of the non-contact part of the system: 1.63601
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 3
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+         Error: 1.63601 -> 0.00131281 in 8 FGMRES iterations.
+      Number of elastic quadrature points: 3960 and plastic quadrature points: 136
+      Residual of the non-contact part of the system: 0.00479668
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 4
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+         Error: 0.00479668 -> 2.27976e-06 in 9 FGMRES iterations.
+      Number of elastic quadrature points: 3960 and plastic quadrature points: 136
+      Residual of the non-contact part of the system: 2.29051e-06
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 5
+      Updating active set...
+         Size of active set: 1
+      Assembling system... 
+      Solving system... 
+         Error: 2.29051e-06 -> 1.31066e-09 in 9 FGMRES iterations.
+      Number of elastic quadrature points: 3960 and plastic quadrature points: 136
+      Residual of the non-contact part of the system: 1.31066e-09
+         with a damping parameter alpha = 1
+
+      Number of assembled systems = 6
+      Number of Solver-Iterations = 51
+      Writing graphical output...
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |     0.736s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assembling                      |         6 |    0.0779s |        11% |
+| Graphical output                |         1 |     0.219s |        30% |
+| Mesh refinement and setup system|         1 |    0.0274s |       3.7% |
+| Preconditioning                 |         6 |     0.147s |        20% |
+| Residual and lambda             |         6 |    0.0167s |       2.3% |
+| Solving                         |         6 |    0.0365s |         5% |
+| Solving and Preconditioning     |         6 |     0.197s |        27% |
+| Update solution and constraints |         6 |    0.0154s |       2.1% |
++---------------------------------+-----------+------------+------------+
+
+
+Cycle 1:
+   Number of active cells: 463
+   Total number of cells: 529
+   Number of degrees of freedom: 6294
+ 
+   Newton iteration 0
+      Updating active set...
+         Size of active set: 9
+      Assembling system... 
+      Solving system... 
+         Error: 254.373 -> 0.190863 in 9 FGMRES iterations.
+      Number of elastic quadrature points: 12384 and plastic quadrature points: 0
+      Residual of the non-contact part of the system: 0.190863
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 1
+      Updating active set...
+         Size of active set: 9
+      Assembling system... 
+      Solving system... 
+         Error: 43.8161 -> 0.0315499 in 12 FGMRES iterations.
+      Number of elastic quadrature points: 11092 and plastic quadrature points: 1292
+      Residual of the non-contact part of the system: 24.5462
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 2
+      Updating active set...
+         Size of active set: 9
+      Assembling system... 
+      Solving system... 
+         Error: 24.5462 -> 0.0222984 in 11 FGMRES iterations.
+      Number of elastic quadrature points: 11152 and plastic quadrature points: 1232
+      Residual of the non-contact part of the system: 5.47753
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 3
+      Updating active set...
+         Size of active set: 9
+      Assembling system... 
+      Solving system... 
+         Error: 5.47753 -> 0.00277991 in 11 FGMRES iterations.
+      Number of elastic quadrature points: 11160 and plastic quadrature points: 1224
+      Residual of the non-contact part of the system: 1.21575
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 4
+      Updating active set...
+         Size of active set: 9
+      Assembling system... 
+      Solving system... 
+         Error: 1.21575 -> 0.00104015 in 9 FGMRES iterations.
+      Number of elastic quadrature points: 11144 and plastic quadrature points: 1240
+      Residual of the non-contact part of the system: 0.0594461
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 5
+      Updating active set...
+         Size of active set: 9
+      Assembling system... 
+      Solving system... 
+         Error: 0.0594461 -> 2.73182e-05 in 10 FGMRES iterations.
+      Number of elastic quadrature points: 11144 and plastic quadrature points: 1240
+      Residual of the non-contact part of the system: 5.50309e-05
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 6
+      Updating active set...
+         Size of active set: 9
+      Assembling system... 
+      Solving system... 
+         Error: 5.50309e-05 -> 2.99676e-08 in 13 FGMRES iterations.
+      Number of elastic quadrature points: 11144 and plastic quadrature points: 1240
+      Residual of the non-contact part of the system: 2.99656e-08
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 7
+      Updating active set...
+         Size of active set: 9
+      Assembling system... 
+      Solving system... 
+         Error: 2.99656e-08 -> 1.70821e-11 in 14 FGMRES iterations.
+      Number of elastic quadrature points: 11144 and plastic quadrature points: 1240
+      Residual of the non-contact part of the system: 1.70843e-11
+         with a damping parameter alpha = 1
+
+      Number of assembled systems = 8
+      Number of Solver-Iterations = 89
+      Writing graphical output...
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      1.89s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assembling                      |        14 |     0.354s |        19% |
+| Graphical output                |         2 |     0.394s |        21% |
+| Mesh refinement and setup system|         2 |     0.109s |       5.8% |
+| Preconditioning                 |        14 |     0.302s |        16% |
+| Residual and lambda             |        14 |    0.0587s |       3.1% |
+| Solving                         |        14 |     0.142s |       7.6% |
+| Solving and Preconditioning     |        14 |      0.48s |        25% |
+| Update solution and constraints |        14 |    0.0452s |       2.4% |
++---------------------------------+-----------+------------+------------+
+
+
+Cycle 2:
+   Number of active cells: 1170
+   Total number of cells: 1337
+   Number of degrees of freedom: 18207
+ 
+   Newton iteration 0
+      Updating active set...
+         Size of active set: 37
+      Assembling system... 
+      Solving system... 
+         Error: 284.124 -> 0.219038 in 12 FGMRES iterations.
+      Number of elastic quadrature points: 38144 and plastic quadrature points: 0
+      Residual of the non-contact part of the system: 0.219038
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 1
+      Updating active set...
+         Size of active set: 25
+      Assembling system... 
+      Solving system... 
+         Error: 29.3138 -> 0.0233274 in 18 FGMRES iterations.
+      Number of elastic quadrature points: 26802 and plastic quadrature points: 11342
+      Residual of the non-contact part of the system: 18.6169
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 2
+      Updating active set...
+         Size of active set: 37
+      Assembling system... 
+      Solving system... 
+         Error: 40.4533 -> 0.0289656 in 17 FGMRES iterations.
+      Number of elastic quadrature points: 26314 and plastic quadrature points: 11830
+      Residual of the non-contact part of the system: 13.0957
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 3
+      Updating active set...
+         Size of active set: 37
+      Assembling system... 
+      Solving system... 
+         Error: 13.0957 -> 0.00985332 in 18 FGMRES iterations.
+      Number of elastic quadrature points: 27074 and plastic quadrature points: 11070
+      Residual of the non-contact part of the system: 13.4255
+         with a damping parameter alpha = 1
+      Number of elastic quadrature points: 30111 and plastic quadrature points: 8033
+      Residual of the non-contact part of the system: 4.53997
+         with a damping parameter alpha = 0.5
+ 
+   Newton iteration 4
+      Updating active set...
+         Size of active set: 37
+      Assembling system... 
+      Solving system... 
+         Error: 4.53997 -> 0.00288706 in 16 FGMRES iterations.
+      Number of elastic quadrature points: 29624 and plastic quadrature points: 8520
+      Residual of the non-contact part of the system: 0.376174
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 5
+      Updating active set...
+         Size of active set: 37
+      Assembling system... 
+      Solving system... 
+         Error: 0.376174 -> 0.000319472 in 15 FGMRES iterations.
+      Number of elastic quadrature points: 29500 and plastic quadrature points: 8644
+      Residual of the non-contact part of the system: 0.0174717
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 6
+      Updating active set...
+         Size of active set: 37
+      Assembling system... 
+      Solving system... 
+         Error: 0.0174717 -> 1.41647e-05 in 17 FGMRES iterations.
+      Number of elastic quadrature points: 29512 and plastic quadrature points: 8632
+      Residual of the non-contact part of the system: 6.13152e-05
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 7
+      Updating active set...
+         Size of active set: 37
+      Assembling system... 
+      Solving system... 
+         Error: 6.13152e-05 -> 5.43905e-08 in 20 FGMRES iterations.
+      Number of elastic quadrature points: 29512 and plastic quadrature points: 8632
+      Residual of the non-contact part of the system: 5.4391e-08
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 8
+      Updating active set...
+         Size of active set: 37
+      Assembling system... 
+      Solving system... 
+         Error: 5.4391e-08 -> 4.00879e-11 in 22 FGMRES iterations.
+      Number of elastic quadrature points: 29512 and plastic quadrature points: 8632
+      Residual of the non-contact part of the system: 4.0089e-11
+         with a damping parameter alpha = 1
+
+      Number of assembled systems = 9
+      Number of Solver-Iterations = 155
+      Writing graphical output...
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      4.76s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assembling                      |        23 |      1.24s |        26% |
+| Graphical output                |         3 |      0.61s |        13% |
+| Mesh refinement and setup system|         3 |     0.215s |       4.5% |
+| Preconditioning                 |        23 |     0.651s |        14% |
+| Residual and lambda             |        24 |      0.19s |         4% |
+| Solving                         |        23 |     0.513s |        11% |
+| Solving and Preconditioning     |        23 |      1.24s |        26% |
+| Update solution and constraints |        23 |     0.104s |       2.2% |
++---------------------------------+-----------+------------+------------+
+
+
+Cycle 3:
+   Number of active cells: 2955
+   Total number of cells: 3377
+   Number of degrees of freedom: 52497
+ 
+   Newton iteration 0
+      Updating active set...
+         Size of active set: 145
+      Assembling system... 
+      Solving system... 
+         Error: 296.309 -> 0.274641 in 16 FGMRES iterations.
+      Number of elastic quadrature points: 117216 and plastic quadrature points: 0
+      Residual of the non-contact part of the system: 0.274641
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 1
+      Updating active set...
+         Size of active set: 101
+      Assembling system... 
+      Solving system... 
+         Error: 16.3381 -> 0.0141064 in 28 FGMRES iterations.
+      Number of elastic quadrature points: 43467 and plastic quadrature points: 73749
+      Residual of the non-contact part of the system: 16.0978
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 2
+      Updating active set...
+         Size of active set: 169
+      Assembling system... 
+      Solving system... 
+         Error: 37.9212 -> 0.0359077 in 23 FGMRES iterations.
+      Number of elastic quadrature points: 49376 and plastic quadrature points: 67840
+      Residual of the non-contact part of the system: 13.2713
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 3
+      Updating active set...
+         Size of active set: 145
+      Assembling system... 
+      Solving system... 
+         Error: 13.2966 -> 0.0122436 in 31 FGMRES iterations.
+      Number of elastic quadrature points: 39170 and plastic quadrature points: 78046
+      Residual of the non-contact part of the system: 15.8407
+         with a damping parameter alpha = 1
+      Number of elastic quadrature points: 57541 and plastic quadrature points: 59675
+      Residual of the non-contact part of the system: 5.37003
+         with a damping parameter alpha = 0.5
+ 
+   Newton iteration 4
+      Updating active set...
+         Size of active set: 153
+      Assembling system... 
+      Solving system... 
+         Error: 5.37242 -> 0.00503175 in 21 FGMRES iterations.
+      Number of elastic quadrature points: 53138 and plastic quadrature points: 64078
+      Residual of the non-contact part of the system: 1.91646
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 5
+      Updating active set...
+         Size of active set: 145
+      Assembling system... 
+      Solving system... 
+         Error: 1.9277 -> 0.00180035 in 25 FGMRES iterations.
+      Number of elastic quadrature points: 52162 and plastic quadrature points: 65054
+      Residual of the non-contact part of the system: 1.12614
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 6
+      Updating active set...
+         Size of active set: 145
+      Assembling system... 
+      Solving system... 
+         Error: 1.12614 -> 0.000885797 in 19 FGMRES iterations.
+      Number of elastic quadrature points: 51667 and plastic quadrature points: 65549
+      Residual of the non-contact part of the system: 0.817432
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 7
+      Updating active set...
+         Size of active set: 145
+      Assembling system... 
+      Solving system... 
+         Error: 0.817432 -> 0.000802786 in 20 FGMRES iterations.
+      Number of elastic quadrature points: 51659 and plastic quadrature points: 65557
+      Residual of the non-contact part of the system: 0.557455
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 8
+      Updating active set...
+         Size of active set: 145
+      Assembling system... 
+      Solving system... 
+         Error: 0.557455 -> 0.000527895 in 18 FGMRES iterations.
+      Number of elastic quadrature points: 51572 and plastic quadrature points: 65644
+      Residual of the non-contact part of the system: 0.235355
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 9
+      Updating active set...
+         Size of active set: 145
+      Assembling system... 
+      Solving system... 
+         Error: 0.235355 -> 0.000197953 in 23 FGMRES iterations.
+      Number of elastic quadrature points: 51482 and plastic quadrature points: 65734
+      Residual of the non-contact part of the system: 0.0275413
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 10
+      Updating active set...
+         Size of active set: 145
+      Assembling system... 
+      Solving system... 
+         Error: 0.0275413 -> 2.37996e-05 in 25 FGMRES iterations.
+      Number of elastic quadrature points: 51464 and plastic quadrature points: 65752
+      Residual of the non-contact part of the system: 0.000526512
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 11
+      Updating active set...
+         Size of active set: 145
+      Assembling system... 
+      Solving system... 
+         Error: 0.000526512 -> 4.98197e-07 in 27 FGMRES iterations.
+      Number of elastic quadrature points: 51464 and plastic quadrature points: 65752
+      Residual of the non-contact part of the system: 5.35391e-07
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 12
+      Updating active set...
+         Size of active set: 145
+      Assembling system... 
+      Solving system... 
+         Error: 5.35391e-07 -> 5.141e-10 in 45 FGMRES iterations.
+      Number of elastic quadrature points: 51464 and plastic quadrature points: 65752
+      Residual of the non-contact part of the system: 5.14106e-10
+         with a damping parameter alpha = 1
+
+      Number of assembled systems = 13
+      Number of Solver-Iterations = 321
+      Writing graphical output...
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |      18.6s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assembling                      |        36 |      5.02s |        27% |
+| Graphical output                |         4 |      1.02s |       5.5% |
+| Mesh refinement and setup system|         4 |     0.453s |       2.4% |
+| Preconditioning                 |        36 |      1.94s |        10% |
+| Residual and lambda             |        38 |     0.682s |       3.7% |
+| Solving                         |        36 |      3.57s |        19% |
+| Solving and Preconditioning     |        36 |      5.68s |        30% |
+| Update solution and constraints |        36 |     0.254s |       1.4% |
++---------------------------------+-----------+------------+------------+
+
+
+Cycle 4:
+   Number of active cells: 7400
+   Total number of cells: 8457
+   Number of degrees of freedom: 154647
+ 
+   Newton iteration 0
+      Updating active set...
+         Size of active set: 609
+      Assembling system... 
+      Solving system... 
+         Error: 299.883 -> 0.198142 in 22 FGMRES iterations.
+      Number of elastic quadrature points: 362944 and plastic quadrature points: 0
+      Residual of the non-contact part of the system: 0.198142
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 1
+      Updating active set...
+         Size of active set: 437
+      Assembling system... 
+      Solving system... 
+         Error: 10.4425 -> 0.00864082 in 54 FGMRES iterations.
+      Number of elastic quadrature points: 50243 and plastic quadrature points: 312701
+      Residual of the non-contact part of the system: 13.0573
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 2
+      Updating active set...
+         Size of active set: 629
+      Assembling system... 
+      Solving system... 
+         Error: 25.4296 -> 0.0250775 in 32 FGMRES iterations.
+      Number of elastic quadrature points: 52693 and plastic quadrature points: 310251
+      Residual of the non-contact part of the system: 4.31469
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 3
+      Updating active set...
+         Size of active set: 609
+      Assembling system... 
+      Solving system... 
+         Error: 4.42111 -> 0.0042128 in 29 FGMRES iterations.
+      Number of elastic quadrature points: 53842 and plastic quadrature points: 309102
+      Residual of the non-contact part of the system: 3.2446
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 4
+      Updating active set...
+         Size of active set: 593
+      Assembling system... 
+      Solving system... 
+         Error: 3.2476 -> 0.00316464 in 29 FGMRES iterations.
+      Number of elastic quadrature points: 53576 and plastic quadrature points: 309368
+      Residual of the non-contact part of the system: 2.71394
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 5
+      Updating active set...
+         Size of active set: 579
+      Assembling system... 
+      Solving system... 
+         Error: 2.71408 -> 0.00247937 in 27 FGMRES iterations.
+      Number of elastic quadrature points: 53936 and plastic quadrature points: 309008
+      Residual of the non-contact part of the system: 2.42929
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 6
+      Updating active set...
+         Size of active set: 579
+      Assembling system... 
+      Solving system... 
+         Error: 2.42929 -> 0.00234882 in 29 FGMRES iterations.
+      Number of elastic quadrature points: 53201 and plastic quadrature points: 309743
+      Residual of the non-contact part of the system: 2.52783
+         with a damping parameter alpha = 1
+      Number of elastic quadrature points: 54507 and plastic quadrature points: 308437
+      Residual of the non-contact part of the system: 1.22978
+         with a damping parameter alpha = 0.5
+ 
+   Newton iteration 7
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 1.23087 -> 0.00117414 in 27 FGMRES iterations.
+      Number of elastic quadrature points: 53932 and plastic quadrature points: 309012
+      Residual of the non-contact part of the system: 0.913556
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 8
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 0.913556 -> 0.000846686 in 29 FGMRES iterations.
+      Number of elastic quadrature points: 53676 and plastic quadrature points: 309268
+      Residual of the non-contact part of the system: 0.608655
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 9
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 0.608915 -> 0.000590468 in 36 FGMRES iterations.
+      Number of elastic quadrature points: 53769 and plastic quadrature points: 309175
+      Residual of the non-contact part of the system: 0.572935
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 10
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 0.574492 -> 0.000516963 in 41 FGMRES iterations.
+      Number of elastic quadrature points: 53419 and plastic quadrature points: 309525
+      Residual of the non-contact part of the system: 0.575742
+         with a damping parameter alpha = 1
+      Number of elastic quadrature points: 53568 and plastic quadrature points: 309376
+      Residual of the non-contact part of the system: 0.351537
+         with a damping parameter alpha = 0.5
+ 
+   Newton iteration 11
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 0.351691 -> 0.000350487 in 32 FGMRES iterations.
+      Number of elastic quadrature points: 53596 and plastic quadrature points: 309348
+      Residual of the non-contact part of the system: 0.498347
+         with a damping parameter alpha = 1
+      Number of elastic quadrature points: 53574 and plastic quadrature points: 309370
+      Residual of the non-contact part of the system: 0.287064
+         with a damping parameter alpha = 0.5
+ 
+   Newton iteration 12
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 0.287174 -> 0.000275609 in 32 FGMRES iterations.
+      Number of elastic quadrature points: 53675 and plastic quadrature points: 309269
+      Residual of the non-contact part of the system: 0.248843
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 13
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 0.248843 -> 0.000232694 in 29 FGMRES iterations.
+      Number of elastic quadrature points: 53682 and plastic quadrature points: 309262
+      Residual of the non-contact part of the system: 0.341443
+         with a damping parameter alpha = 1
+      Number of elastic quadrature points: 53686 and plastic quadrature points: 309258
+      Residual of the non-contact part of the system: 0.232367
+         with a damping parameter alpha = 0.5
+ 
+   Newton iteration 14
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 0.232367 -> 0.000231641 in 35 FGMRES iterations.
+      Number of elastic quadrature points: 53691 and plastic quadrature points: 309253
+      Residual of the non-contact part of the system: 0.263644
+         with a damping parameter alpha = 1
+      Number of elastic quadrature points: 53694 and plastic quadrature points: 309250
+      Residual of the non-contact part of the system: 0.185686
+         with a damping parameter alpha = 0.5
+ 
+   Newton iteration 15
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 0.185686 -> 0.000171579 in 29 FGMRES iterations.
+      Number of elastic quadrature points: 53721 and plastic quadrature points: 309223
+      Residual of the non-contact part of the system: 0.273968
+         with a damping parameter alpha = 1
+      Number of elastic quadrature points: 53726 and plastic quadrature points: 309218
+      Residual of the non-contact part of the system: 0.189887
+         with a damping parameter alpha = 0.5
+      Number of elastic quadrature points: 53713 and plastic quadrature points: 309231
+      Residual of the non-contact part of the system: 0.0832966
+         with a damping parameter alpha = 0.25
+ 
+   Newton iteration 16
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 0.0832966 -> 8.32624e-05 in 38 FGMRES iterations.
+      Number of elastic quadrature points: 53749 and plastic quadrature points: 309195
+      Residual of the non-contact part of the system: 0.0306643
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 17
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 0.0306643 -> 3.01898e-05 in 38 FGMRES iterations.
+      Number of elastic quadrature points: 53766 and plastic quadrature points: 309178
+      Residual of the non-contact part of the system: 0.00261731
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 18
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 0.00261731 -> 2.33193e-06 in 51 FGMRES iterations.
+      Number of elastic quadrature points: 53768 and plastic quadrature points: 309176
+      Residual of the non-contact part of the system: 4.64159e-05
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 19
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 4.64159e-05 -> 4.62653e-08 in 62 FGMRES iterations.
+      Number of elastic quadrature points: 53768 and plastic quadrature points: 309176
+      Residual of the non-contact part of the system: 5.07264e-08
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 20
+      Updating active set...
+         Size of active set: 585
+      Assembling system... 
+      Solving system... 
+         Error: 5.07264e-08 -> 4.59618e-11 in 111 FGMRES iterations.
+      Number of elastic quadrature points: 53768 and plastic quadrature points: 309176
+      Residual of the non-contact part of the system: 4.59615e-11
+         with a damping parameter alpha = 1
+
+      Number of assembled systems = 21
+      Number of Solver-Iterations = 812
+      Writing graphical output...
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |       131s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assembling                      |        57 |      23.5s |        18% |
+| Graphical output                |         5 |      2.34s |       1.8% |
+| Mesh refinement and setup system|         5 |      1.07s |      0.82% |
+| Preconditioning                 |        57 |      8.46s |       6.5% |
+| Residual and lambda             |        66 |      3.61s |       2.8% |
+| Solving                         |        57 |        41s |        31% |
+| Solving and Preconditioning     |        57 |        50s |        38% |
+| Update solution and constraints |        57 |     0.736s |      0.56% |
++---------------------------------+-----------+------------+------------+
+
+
+Cycle 5:
+   Number of active cells: 19279
+   Total number of cells: 22033
+   Number of degrees of freedom: 461106
+ 
+   Newton iteration 0
+      Updating active set...
+         Size of active set: 2449
+      Assembling system... 
+      Solving system... 
+         Error: 300.845 -> 0.249318 in 28 FGMRES iterations.
+      Number of elastic quadrature points: 1122752 and plastic quadrature points: 0
+      Residual of the non-contact part of the system: 0.249318
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 1
+      Updating active set...
+         Size of active set: 1863
+      Assembling system... 
+      Solving system... 
+         Error: 6.17714 -> 0.0061549 in 82 FGMRES iterations.
+      Number of elastic quadrature points: 53510 and plastic quadrature points: 1069242
+      Residual of the non-contact part of the system: 10.188
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 2
+      Updating active set...
+         Size of active set: 2348
+      Assembling system... 
+      Solving system... 
+         Error: 15.5579 -> 0.0151548 in 41 FGMRES iterations.
+      Number of elastic quadrature points: 54822 and plastic quadrature points: 1067930
+      Residual of the non-contact part of the system: 1.5258
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 3
+      Updating active set...
+         Size of active set: 2485
+      Assembling system... 
+      Solving system... 
+         Error: 3.2747 -> 0.00308114 in 55 FGMRES iterations.
+      Number of elastic quadrature points: 61107 and plastic quadrature points: 1061645
+      Residual of the non-contact part of the system: 0.816662
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 4
+      Updating active set...
+         Size of active set: 2294
+      Assembling system... 
+      Solving system... 
+         Error: 0.846485 -> 0.000840713 in 105 FGMRES iterations.
+      Number of elastic quadrature points: 54660 and plastic quadrature points: 1068092
+      Residual of the non-contact part of the system: 0.651754
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 5
+      Updating active set...
+         Size of active set: 2375
+      Assembling system... 
+      Solving system... 
+         Error: 1.07345 -> 0.0010383 in 95 FGMRES iterations.
+      Number of elastic quadrature points: 59982 and plastic quadrature points: 1062770
+      Residual of the non-contact part of the system: 0.81415
+         with a damping parameter alpha = 1
+      Number of elastic quadrature points: 57363 and plastic quadrature points: 1065389
+      Residual of the non-contact part of the system: 0.432614
+         with a damping parameter alpha = 0.5
+ 
+   Newton iteration 6
+      Updating active set...
+         Size of active set: 2294
+      Assembling system... 
+      Solving system... 
+         Error: 0.600941 -> 0.000577431 in 51 FGMRES iterations.
+      Number of elastic quadrature points: 56754 and plastic quadrature points: 1065998
+      Residual of the non-contact part of the system: 0.434547
+         with a damping parameter alpha = 1
+      Number of elastic quadrature points: 57005 and plastic quadrature points: 1065747
+      Residual of the non-contact part of the system: 0.209227
+         with a damping parameter alpha = 0.5
+ 
+   Newton iteration 7
+      Updating active set...
+         Size of active set: 2327
+      Assembling system... 
+      Solving system... 
+         Error: 0.299306 -> 0.00029369 in 66 FGMRES iterations.
+      Number of elastic quadrature points: 56775 and plastic quadrature points: 1065977
+      Residual of the non-contact part of the system: 0.0890688
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 8
+      Updating active set...
+         Size of active set: 2317
+      Assembling system... 
+      Solving system... 
+         Error: 0.113493 -> 0.000112941 in 65 FGMRES iterations.
+      Number of elastic quadrature points: 56792 and plastic quadrature points: 1065960
+      Residual of the non-contact part of the system: 0.0846807
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 9
+      Updating active set...
+         Size of active set: 2311
+      Assembling system... 
+      Solving system... 
+         Error: 0.0847051 -> 8.37451e-05 in 38 FGMRES iterations.
+      Number of elastic quadrature points: 56797 and plastic quadrature points: 1065955
+      Residual of the non-contact part of the system: 0.0892047
+         with a damping parameter alpha = 1
+      Number of elastic quadrature points: 56793 and plastic quadrature points: 1065959
+      Residual of the non-contact part of the system: 0.0226437
+         with a damping parameter alpha = 0.5
+ 
+   Newton iteration 10
+      Updating active set...
+         Size of active set: 2313
+      Assembling system... 
+      Solving system... 
+         Error: 0.0240356 -> 2.37508e-05 in 72 FGMRES iterations.
+      Number of elastic quadrature points: 56816 and plastic quadrature points: 1065936
+      Residual of the non-contact part of the system: 0.00540846
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 11
+      Updating active set...
+         Size of active set: 2313
+      Assembling system... 
+      Solving system... 
+         Error: 0.00540846 -> 5.39193e-06 in 62 FGMRES iterations.
+      Number of elastic quadrature points: 56828 and plastic quadrature points: 1065924
+      Residual of the non-contact part of the system: 0.000268289
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 12
+      Updating active set...
+         Size of active set: 2313
+      Assembling system... 
+      Solving system... 
+         Error: 0.000268289 -> 2.64338e-07 in 83 FGMRES iterations.
+      Number of elastic quadrature points: 56828 and plastic quadrature points: 1065924
+      Residual of the non-contact part of the system: 8.91195e-07
+         with a damping parameter alpha = 1
+ 
+   Newton iteration 13
+      Updating active set...
+         Size of active set: 2313
+      Assembling system... 
+      Solving system... 
+         Error: 8.91195e-07 -> 8.85869e-10 in 255 FGMRES iterations.
+      Number of elastic quadrature points: 56828 and plastic quadrature points: 1065924
+      Residual of the non-contact part of the system: 8.86261e-10
+         with a damping parameter alpha = 1
+
+      Number of assembled systems = 14
+      Number of Solver-Iterations = 1098
+      Writing graphical output...
+
+
++---------------------------------------------+------------+------------+
+| Total wallclock time elapsed since start    |       465s |            |
+|                                             |            |            |
+| Section                         | no. calls |  wall time | % of total |
++---------------------------------+-----------+------------+------------+
+| Assembling                      |        71 |      61.6s |        13% |
+| Graphical output                |         6 |      10.5s |       2.2% |
+| Mesh refinement and setup system|         6 |      2.71s |      0.58% |
+| Preconditioning                 |        71 |      19.9s |       4.3% |
+| Residual and lambda             |        83 |      8.97s |       1.9% |
+| Solving                         |        71 |       170s |        36% |
+| Solving and Preconditioning     |        71 |       191s |        41% |
+| Update solution and constraints |        71 |      1.46s |      0.31% |
++---------------------------------+-----------+------------+------------+
+@endcode
+
+For each adaptive refinement cycle the iterations end if the active set and
+the residual for the non-linear problem don't change anymore. In the tables
+at the end of each cycle you find informations about computing time and the
+number of calls of different parts of the program like Assembling or calculating
+the residuals. After the last cycle there are 83 calls for the residual function.
+12 calls as the Solving or Assembling what means that 12 damping steps were
+necessary summed up over the cycles.
+
+In every refinement step you can observe that the acitve set - the contact points -
+are iterated out at first. After that the Newton method has only to struggle with the
+plasticity. For the finer meshes there is quadratic convergence not until the
+last 4 or 5 newton iterations.
+
+<table align="center">
+  <tr>
+    <td valign="top">
+      0 &nbsp;
+    </td>
+    <td valign="top">
+      <img src="http://www.dealii.org/images/steps/developer/step-42-CellConstitutionBall2.png" alt="">
+    </td>
+    <td valign="top">
+      0 &nbsp;
+    </td>
+    <td valign="top">
+      <img src="http://www.dealii.org/images/steps/developer/step-42-CellConstitutionLi2.png" alt="">
+    </td>
+  </tr>
+</table>
+
+The picture shows the adaptive refinement and as well how much a cell is
+plastified druing the contact with the ball. In the middle - where the
+mesh is finest - you can see the hollow caused by the ball. The blue
+color means that this cell contains only elastic quadrature points in
+contrast to the red cells in which all quadrature points are plastified.
+Since we used trilinear ansatz functions each cell contains eight
+of these points which may or may not be elastic or plastic.  
+
+<a name="extensions"></a>
+<h1>Possibilities for extensions</h1>
+
+Extend the program from a static to a quasi-static problem, perhaps by choosing a
+backward-euler-scheme for the time discretization (for theoretical results see Frohne: FEM-Simulation
+der Umformtechnik metallischer Oberflächen im Mikrokosmos, Ph.D. thesis,
+University of Siegen, Germany, 2011).
+
+Like mentioned in step-41 it would be an interesting advance to consider a contact
+problem with friction. In almost every mechanical process friction has a big influence.
+For the modelling we have to take into account tangential stresses at the contact
+surface. Also we have to observe that friction adds another nonlinearity to
+our problem.
+
+If we simulate a frictional contact the next step to consider heat development
+over the contact zone is not too far away. The heat that is caused by friction
+between two bodies rises up the temperature in the deformable body and entails an
+change of some material parameters.
+
+It might be of interest to implement more accurate, problem-adapted error
+estimators for contact as well for the plasticity. To reduce the number of
+newton iterations a solution transfer of the coarse solution to the next
+adaptive refined mesh could be beneficial.

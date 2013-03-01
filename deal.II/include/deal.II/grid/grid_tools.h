@@ -232,6 +232,22 @@ namespace GridTools
                Triangulation<2> &triangulation);
 
   /**
+   * This function transformes the @p Triangulation @p tria smoothly to a
+   * domain that is described by the boundary points in the map @p
+   * new_points. This map maps the point indices to the boundary points in the
+   * transformed domain.
+   *
+   * Note, that the @p Triangulation is changed in-place, therefore you don't
+   * need to keep two triangulations, but the given triangulation is changed
+   * (overwritten).
+   *
+   * In 1d, this function is not currently implemented.
+   */
+  template <int dim>
+  void laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
+                          Triangulation<dim> &tria);
+
+  /**
    * Scale the entire triangulation
    * by the given factor. To
    * preserve the orientation of
@@ -248,6 +264,29 @@ namespace GridTools
   template <int dim, int spacedim>
   void scale (const double        scaling_factor,
               Triangulation<dim, spacedim> &triangulation);
+
+  /**
+   * Distort the given triangulation by randomly
+   * moving around all the vertices
+   * of the grid.  The direction of
+   * movement of each vertex is random, while the
+   * length of the shift vector has
+   * a value of @p factor times
+   * the minimal length of the
+   * active edges adjacent to this
+   * vertex. Note that @p factor
+   * should obviously be well below
+   * <tt>0.5</tt>.
+   *
+   * If @p keep_boundary is set to
+   * @p true (which is the
+   * default), then boundary
+   * vertices are not moved.
+   */
+  template <int dim, int spacedim>
+  void distort_random (const double factor,
+                       Triangulation<dim, spacedim> &triangulation,
+                       const bool   keep_boundary=true);
 
   /**
    * Find and return the number of

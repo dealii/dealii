@@ -251,7 +251,7 @@ namespace internal
        * (we've closed a loop or
        * unoriented sides).
        *
-       * 6) Repeat 2), 3) ,4) and
+       * 6) Repeat 2), 3), 4) and
        * 5) on other unoriented
        * sides of (A)
        *

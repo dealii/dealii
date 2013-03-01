@@ -1141,7 +1141,7 @@ namespace Step18
         }
 
     // Now compress the vector and the system matrix:
-    system_matrix.compress();
+    system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
 
     

@@ -398,7 +398,7 @@ public:
    * An approximate eigenvalue is accepted
    * as converged when it is determined to
    * lie in an interval [a,b] of width less
-   * than or equal to abs_accuracy + eps * max( |a|,|b| ) ,
+   * than or equal to abs_accuracy + eps * max( |a|,|b| ),
    * where eps is the machine precision.
    * If abs_accuracy is less than
    * or equal to zero, then  eps*|t| will

@@ -18,6 +18,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/tria_boundary.h>
+#include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_tools.h>
 #include <deal.II/grid/intergrid_map.h>
 #include <deal.II/lac/sparsity_pattern.h>
@@ -601,6 +602,29 @@ namespace GridTools
     transform (ScalePoint<spacedim>(scaling_factor), triangulation);
   }
 
+
+  template <int dim>
+  void
+  laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
+                     Triangulation<dim> &triangulation)
+  {
+    //TODO: Move implementation of this function into the current
+    // namespace
+    GridGenerator::laplace_transformation(triangulation, new_points);
+  }
+
+
+
+  template <int dim, int spacedim>
+  void
+  distort_random (const double        factor,
+                  Triangulation<dim, spacedim> &triangulation,
+                  const bool          keep_boundary)
+  {
+    //TODO: Move implementation of this function into the current
+    // namespace
+    triangulation.distort_random (factor, keep_boundary);
+  }
 
 
   template <int dim, template <int, int> class Container, int spacedim>

@@ -14,7 +14,7 @@ solution is constant zero on the upper and the lower part of the boundary as
 required by the homogeneous Dirichlet boundary conditions. On the left and
 right parts the values coincide with each other, just as we wanted:
 
-@image html step-45.solution.png
+<img src="http://www.dealii.org/images/steps/developer/step-45.solution.png" alt="">
 
 Note also that the solution is clearly not left-right symmetric and so would
 not likely have been periodic had we prescribed, for example, homogeneous

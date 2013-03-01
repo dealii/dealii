@@ -1,7 +1,7 @@
 //--------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2012 by the deal.II authors
+//    Copyright (C) 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -230,10 +230,7 @@ test(Triangulation<dim>& tr)
 
 int main()
 {
-  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
-  deallog.depth_console(0);
+  initlog(__FILE__);
   deallog.threshold_double(1.e-10);
   
   Triangulation<2> tr2;

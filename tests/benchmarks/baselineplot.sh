@@ -15,7 +15,7 @@ set title 'benchmark baselines'
 EOF
 #echo "set terminal x11 persist"
 echo "set xrange [28000:*]"
-echo "set xrange [*,300]"
+echo "set yrange [*:300]"
 echo "plot \\"
 
 for test in $TESTS ; do

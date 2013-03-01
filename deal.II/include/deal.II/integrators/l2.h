@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,7 +45,6 @@ namespace LocalIntegrators
      * \int_F uv\,ds \quad \text{or} \quad \int_F \mathbf u\cdot \mathbf v\,ds
      * \f]
      *
-     * @ingroup Integrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
@@ -77,6 +76,9 @@ namespace LocalIntegrators
      * \f[
      * \int_Z fv\,dx \quad \text{or} \quad \int_F fv\,ds
      * \f]
+     *
+     * @author Guido Kanschat
+     * @date 2008, 2009, 2010
      */
     template <int dim>
     void L2 (
@@ -104,7 +106,6 @@ namespace LocalIntegrators
      * \int_F \mathbf f\cdot \mathbf v\,ds
      * \f]
      *
-     * @ingroup Integrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
@@ -141,7 +142,6 @@ namespace LocalIntegrators
      * Using appropriate weights, this term can be used to penalize
      * violation of conformity in <i>H<sup>1</sup></i>.
      *
-     * @ingroup Integrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */

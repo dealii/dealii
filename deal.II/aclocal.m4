@@ -89,6 +89,16 @@ AC_DEFUN(DEAL_II_DETERMINE_CXX_BRAND, dnl
     fi
   fi
 
+  dnl This got even more complicated when icc decided to advertise as
+  dnl "icc version XX (gcc version 4.2.2 compatibility)", in which 
+  dnl case the previous script would give a false positive.
+  if test "$GXX" = "yes" ; then
+    GXX_VERSION_STRING=`($CXX -v 2>&1) | grep "icc version"`
+    if test "x$GXX_VERSION_STRING" != "x" ; then
+      GXX=no
+    fi
+  fi
+
   dnl And because it is so convenient, the PathScale compiler also identifies
   dnl itself as GCC...
   if test "$GXX" = "yes" ; then
@@ -740,6 +750,15 @@ AC_DEFUN(DEAL_II_SET_CXX_FLAGS, dnl
           CXXFLAGSO="$CXXFLAGS -O2 -Wno-array-bounds -Wno-parentheses -Wno-delete-non-virtual-dtor -Wno-unneeded-internal-declaration -Wno-unused-function -Wno-unused-variable"
           CXXFLAGSPIC="-fPIC"
           LDFLAGSPIC="-fPIC"
+
+	  dnl On Apple OS X, it appears as if we also need to add -lstdc++
+	  dnl to the command line, for whatever reason
+          case "$target" in
+            *apple-darwin*)
+	      LDFLAGS="$LDFLAGS -lstdc++"
+	      ;;
+          esac
+
           ;;
 
       intel_icc*)

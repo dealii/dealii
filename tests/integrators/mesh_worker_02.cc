@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2003, 2004, 2007, 2008, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -13,9 +13,8 @@
 // Test consistency of assemblers MatrixSimple and MGMatrixSimple
 
 #include "../tests.h"
-#include <deal.II/numerics/mesh_worker.h>
-#include <deal.II/numerics/mesh_worker_assembler.h>
-#include <deal.II/numerics/mesh_worker_loop.h>
+#include <deal.II/meshworker/assembler.h>
+#include <deal.II/meshworker/loop.h>
 
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/compressed_sparsity_pattern.h>
@@ -147,7 +146,7 @@ assemble(const DoFHandler<dim>& dof_handler, SparseMatrix<double>& matrix)
   MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> > assembler;
   assembler.initialize(matrix);
   
-  MeshWorker::integration_loop<dim, dim>
+  MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
     (dof_handler.begin_active(),
      dof_handler.end(),
      dof_info,
@@ -229,8 +228,8 @@ test_simple(MGDoFHandler<dim>& mgdofs)
   mg_matrix_dg_up.resize(0, n_levels-1);
   mg_matrix_dg_down.resize(0, n_levels-1);
   
-  for (unsigned int level=mg_sparsity.get_minlevel();
-       level<=mg_sparsity.get_maxlevel();++level)
+  for (unsigned int level=mg_sparsity.min_level();
+       level<=mg_sparsity.max_level();++level)
     {
       CompressedSparsityPattern c_sparsity(mgdofs.n_dofs(level));
       CompressedSparsityPattern ci_sparsity;

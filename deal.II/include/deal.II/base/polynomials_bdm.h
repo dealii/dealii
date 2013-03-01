@@ -114,7 +114,7 @@ public:
   unsigned int degree () const;
 
   /**
-   * Return the name of the space ,
+   * Return the name of the space,
    * which is <tt>BDM</tt>.
    */
   std::string name () const;

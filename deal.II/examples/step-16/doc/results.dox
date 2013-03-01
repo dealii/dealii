@@ -6,7 +6,7 @@ other hand, since no tutorial program is a good one unless it has at
 least one colorful picture, here is, again, the solution:
 
 <p align="center">
-  @image html step-16.solution.png
+  <img src="http://www.dealii.org/images/steps/developer/step-16.solution.png" alt="">
 </p>
 
 When run, the output of this program is

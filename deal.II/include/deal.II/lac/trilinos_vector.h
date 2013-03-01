@@ -85,7 +85,7 @@ namespace TrilinosWrappers
      * all the other processes to join in on this. Since the other processes
      * don't call this function, you will either get a time-out on the first
      * process, or, worse, by the time the next a callto a Trilinos function
-     * generates an MPI message on the other processes , you will get a
+     * generates an MPI message on the other processes, you will get a
      * cryptic message that only a subset of processes attempted a
      * communication. These bugs can be very hard to figure out, unless you
      * are well-acquainted with the communication model of MPI, and know

@@ -262,7 +262,15 @@ namespace PETScWrappers
 
 
 
-  size_type 
+  void
+  MatrixBase::compress ()
+  {
+    compress(::dealii::VectorOperation::unknown);
+  }
+
+
+
+  size_type
   MatrixBase::m () const
   {
 #ifdef PETSC_USE_64BIT_INDICES

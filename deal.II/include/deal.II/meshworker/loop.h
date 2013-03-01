@@ -316,7 +316,7 @@ namespace MeshWorker
                                                         IntegrationInfo<dim, spacedim> &,
                                                         IntegrationInfo<dim, spacedim> &)> &face_worker,
                         ASSEMBLER &assembler,
-                        bool cells_first = true)
+                        bool cells_first)
   {
     loop<dim, spacedim>
     (begin, end,

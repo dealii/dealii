@@ -532,39 +532,37 @@
  * functions are collective, i.e. they need to be called by all
  * processors.
  *
- * There is one snag, however: both PETSc and Trilinos need to know
- * whether the operation that these <code>compress()</code> functions
- * invoke applies to adding elements or setting them. Usually, you
- * will have written or added elements to the vector or matrix before
- * (and after <code>compress()</code> was last called), and in this
- * case the wrapper object knows that the global communication
- * operation is either an add or a set operation since it keeps track
- * of this sort of thing. However, there are cases where this isn't
- * so: for example, if you are working on a coarse grid and there are
- * more processors than coarse grid cells; in that case, some
- * processors will not assemble anything, and when they come to the
- * point where they call <code>compress()</code> on the system matrix
- * and right hand side, these objects are still in their pristine
- * state. In a case like this the wrapper object doesn't know whether
- * it is supposed to do a global exchange for add or set operations,
- * and in the worst case you end up with a deadlock (because those
- * processors that did assembly operations want to communicate, while
- * those that didn't assemble anything do not want to communicate).
+ * There is one snag, however: both PETSc and Trilinos need to know whether
+ * the operation that these <code>compress()</code> functions invoke applies
+ * to adding elements or setting them.  In some cases, not all processors may
+ * be adding elements, for example if a processor does not own any cells when
+ * using a very coarse (initial) mesh.  For this reason, compress() takes an
+ * argument of type VectorOperation, which can be either ::add, or ::insert.
+ * This argument is required for vectors and matrices starting with the 7.3
+ * release.
  *
- * The way out of a situation like this is to use one of the two following
- * ways:
+ * In olde releases we also proposed fake add/set operations. Those were the
+ * cause of many bugs and deadlocks, so the usage of VectorOperation is now
+ * required.
  *
- * - You tell the object that you want to compress what operation is
- *   intended. This can be done using the VectorOperation argument in
- *   the various compress() functions.
- * - You do a fake addition or set operation on the object in question. For
- *   example, you can add a zero to an element of the matrix or vector,
- *   which has no effect other than telling the object that the next
- *   compress operation should be in <code>Add</code> mode.
+ * In short, you need to call compress() in the following cases (and only in
+ * those cases, though calling compress() in other cases just costs some
+ * performance):
  *
- * Some of the objects are also indifferent and can figure out what to
- * do without being told. The TrilinosWrappers::SparseMatrix can do that,
- * for example.
+ * 1. At the end of your assembly loop on matrices and vectors. This needs to
+ * be done if you write entries directly or if you use
+ * ConstraintMatrix::distribute_local_to_global. Use VectorOperation::add.
+ *
+ * 2. When you are done setting individual elements in a matrix/vector before
+ * any other operations are done (adding to elements, other operations like
+ * scaling, solving, reading, etc.). Use VectorOperation::insert.
+ *
+ * 3. Like in 2., but for adding values to individual elements. Use
+ * VectorOperation::add.
+ *
+ * All other operations like scaling or adding vectors, assignments, calls
+ * into deal.II (VectorTools, ConstraintMatrix, ...) or solvers do not require
+ * calls to compress().
  * </dd>
  *
  *
