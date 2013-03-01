@@ -11,6 +11,9 @@ SET(TARGET_SRC
   # You can specify additional files here!
   )
 
+# No sensible run target can be defined for this example step
+SET(TARGET_RUN ";")
+
 # Usually, you will not need to modify anything beyond this point...
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
