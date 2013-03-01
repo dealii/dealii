@@ -64,17 +64,14 @@ cmake:
 #
 TMPDIR=/tmp
 CMAKE=cmake
+SVN=svn info .
 date:= $(shell date +%s)
 random:=$(shell echo "$$RANDOM")
 testdir:= "$(TMPDIR)"/deal-build-test.$(date)-$(random)
 builddir:= $(testdir)/build
 installdir:= $(testdir)/install
 LOGDIR=$(testdir)
-ifeq "$(CONFIGFILE)" ""
-  logfile:=$(LOGDIR)/$(date).automatic.log
-else
-  logfile:=$(LOGDIR)/$(date).$(shell basename "$(CONFIGFILE)").log
-endif
+logfile:=$(LOGDIR)/$(date).$(firstword $(notdir $(CONFIGFILE)) automatic).log
 
 .PHONY: build_test
 build_test:
@@ -83,7 +80,7 @@ build_test:
 	mkdir -p $(LOGDIR)
 	@echo "AUTOMATED DEAL.II BUILD TEST" | tee $(logfile)
 	@echo "BEGIN HEADER `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	@svn info . | perl -ne 'print "dealii-feature: revision=$$_" if s/Last Changed Rev: //; print "dealii-feature: branch=$$1\n" if m/svn\.dealii\.org\/(.+)\/deal.II/;' | tee -a $(logfile)
+	@$(SVN) | perl -ne 'print "dealii-feature: revision=$$_" if s/Last Changed Rev: //; print "dealii-feature: branch=$$1\n" if m/svn\.dealii\.org\/(.+)\/deal.II/;' | tee -a $(logfile)
 	@echo "dealii-feature: user=$(USER)"
 	@echo "dealii-feature: host=`hostname`"
 	@echo "dealii-feature: configuration=`basename \"$(CONFIGFILE)\"`"
