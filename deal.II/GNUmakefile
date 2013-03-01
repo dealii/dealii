@@ -4,16 +4,38 @@
 ifneq ($(wildcard Makefile),)
   include Makefile
 else
-  default:
+  .PHONY: all
+  all:
+	@echo ""
+	@echo "###"
+	@echo "#"
+	@echo "#  Support GNUmakefile for deal.II"
+	@echo "#"
+	@echo "#  TODO: Helpfull message on how to use CMake"
+	@echo "#"
+	@echo "#  The following support targets exist:"
+	@echo "#   indent      -  run astyle on the source base"
+	@echo "#   cmake       -  bootstrap CMake in ./bundled/cmake"
+	@echo "#   build_test  -  run a build test. The following _optional_ environment"
+	@echo "#                  variables are considered:"
+	@echo "#                    LOGDIR     - path for log output"
+	@echo "#                    CONFIGFILE - optional path to a configuration file"
+	@echo "#"
+	@echo "#                    CMAKE      - the cmake executable, defaults to 'cmake'"
+	@echo "#                    MAKEOPTS   - options for gmake"
+	@echo "#                    TMPDIR"
+	@echo "#"
+	@echo "###"
+	@echo ""
 endif
+
 
 style-h-files:= $(wildcard include/deal.II/*/*.h)
 style-cc-files:= $(wildcard source/*/*.cc)
 style-examples:= $(wildcard examples/*/*.cc)
-
 .PHONY: indent
 indent:
-	@echo "============ Indenting all files"
+	@echo "Indenting all files"
 	@for f in  $(style-h-files) $(style-cc-files) $(style-examples) ;\
 	do\
 	  echo $$f ;\
@@ -24,23 +46,21 @@ indent:
 .PHONY: cmake
 cmake:
 	cd bundled/cmake && make
-	@echo
-	@echo =======================================================
-	@echo
-	@echo "CMake successfully bootstrapped in bundled/cmake"
-	@echo
-	@echo "Please add"
-	@echo "    export PATH=\"$(PWD)/bundled/cmake/bin:\$$PATH\""
-	@echo "to your ~/.bashrc file (or similar)."
-	@echo
-	@echo =======================================================
-	@echo
+	@echo ""
+	@echo "###"
+	@echo "#"
+	@echo "# CMake successfully bootstrapped in bundled/cmake"
+	@echo "#"
+	@echo "# Please add"
+	@echo "#     export PATH=\"$(PWD)/bundled/cmake/bin:\$$PATH\""
+	@echo "# to your ~/.bashrc file (or similar)."
+	@echo "#"
+	@echo "###"
+	@echo ""
 
 
 #
 # Target for build tests:
-#
-# Environment variables: CONFIGFILE CMAKE MAKEOPTS LOGDIR TMPDIR
 #
 TMPDIR=/tmp
 CMAKE=cmake
@@ -49,20 +69,18 @@ random:=$(shell echo "$$RANDOM")
 testdir:= "$(TMPDIR)"/deal-build-test.$(date)-$(random)
 builddir:= $(testdir)/build
 installdir:= $(testdir)/install
-
 LOGDIR=$(testdir)
 ifeq "$(CONFIGFILE)" ""
-  logfiledir:=$(LOGDIR)/$(date).automatic
+  logfile:=$(LOGDIR)/$(date).automatic.log
 else
-  logfiledir:=$(LOGDIR)/$(date).$(shell basename "$(CONFIGFILE)")
+  logfile:=$(LOGDIR)/$(date).$(shell basename "$(CONFIGFILE)").log
 endif
-logfile:=$(logfiledir)/build_test.log
 
 .PHONY: build_test
 build_test:
 	mkdir -p $(builddir)
 	mkdir -p $(installdir)
-	mkdir -p $(logfiledir)
+	mkdir -p $(LOGDIR)
 	@echo "AUTOMATED DEAL.II BUILD TEST" | tee $(logfile)
 	@echo "BEGIN HEADER `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@svn info . | perl -ne 'print "dealii-feature: revision=$$_\n" if s/Last Changed Rev: //; print "dealii-feature: branch=$$1\n" if m/svn\.dealii\.org\/(.+)\/deal.II/;' | tee -a $(logfile)
