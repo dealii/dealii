@@ -83,10 +83,10 @@ build_test:
 	mkdir -p $(LOGDIR)
 	@echo "AUTOMATED DEAL.II BUILD TEST" | tee $(logfile)
 	@echo "BEGIN HEADER `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	@svn info . | perl -ne 'print "dealii-feature: revision=$$_\n" if s/Last Changed Rev: //; print "dealii-feature: branch=$$1\n" if m/svn\.dealii\.org\/(.+)\/deal.II/;' | tee -a $(logfile)
+	@svn info . | perl -ne 'print "dealii-feature: revision=$$_" if s/Last Changed Rev: //; print "dealii-feature: branch=$$1\n" if m/svn\.dealii\.org\/(.+)\/deal.II/;' | tee -a $(logfile)
 	@echo "dealii-feature: user=$(USER)"
 	@echo "dealii-feature: host=`hostname`"
-	@echo "dealii-feature: configuration=`basename $(CONFIGFILE)`"
+	@echo "dealii-feature: configuration=`basename \"$(CONFIGFILE)\"`"
 	@echo END HEADER `date -u '+%Y-%m-%d %T'`\n | tee -a $(logfile)
 	@echo "BEGIN CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	cd $(builddir) && "$(CMAKE)" -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(PWD) >>$(logfile) 2>&1
@@ -95,8 +95,7 @@ build_test:
 	cd $(builddir) && "$(CMAKE)" --system-information >>$(logfile) 2>&1
 	@echo "END CMAKE SYSTEM INFORMATION `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN REPORT FEATURES `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	cd $(builddir) && make $(MAKEOPTS) report_features >>$(logfile) 2>&1
-	cd $(builddir) && make $(MAKEOPTS) run_report_features | tee -a $(logfile)
+	cd $(builddir) && make $(MAKEOPTS) run_report_features >>$(logfile) 2>&1
 	@echo "END REPORT FEATURES `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN BUILD INSTALL OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	cd $(builddir) && make $(MAKEOPTS) install >>$(logfile) 2>&1
