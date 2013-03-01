@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-// creation and size and ghost elements of LA::MPI::Vector
+// assignment of ghost vectors
 
 #include "../tests.h"
 #include <deal.II/lac/abstract_linear_algebra.h>
@@ -43,6 +43,10 @@ void test ()
 
   typename LA::MPI::Vector vb(MPI_COMM_WORLD, local_active);
   typename LA::MPI::Vector v(MPI_COMM_WORLD, local_active, local_relevant);
+  typename LA::MPI::Vector v2(MPI_COMM_WORLD, local_active, local_relevant);
+
+  vb = 1.0;
+  v2 = vb;
 
 				   // set local values
   vb(myid*2)=myid*2.0;
@@ -64,6 +68,14 @@ void test ()
       deallog << myid*2 << ":" << v(myid*2) << std::endl;
       deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
     }
+  
+				   //assignment from ghosted to ghosted
+  v2 = v;
+  Assert(v2(1) == 2.0, ExcInternalError());
+  Assert(v2(myid*2) == myid*4.0, ExcInternalError());
+  Assert(v2(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+
+
   
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
   Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
@@ -90,7 +102,7 @@ int main (int argc, char **argv)
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("vec_01").c_str());
+      std::ofstream logfile(output_file_for_mpi("vec_02").c_str());
       deallog.attach(logfile);
       deallog << std::setprecision(4);
       deallog.depth_console(0);

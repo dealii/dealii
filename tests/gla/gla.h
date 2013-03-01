@@ -54,7 +54,13 @@ class LA_Dummy
 	      {return 0;}
 	    
 	    
-	    const Vector & operator*=(const double factor)
+	    const Vector & operator=(const double number)
+	      {
+		return *this;
+	      }
+	    
+
+	      const Vector & operator*=(const double factor)
 	      {
 		return *this;
 	      }
