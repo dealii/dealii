@@ -16,10 +16,10 @@ steps:= $(wildcard step-*)
 configure_examples: $(steps:%=%/Makefile)
 
 %/Makefile:
-	-cd $(@D) && cmake . > /dev/null 2>&1
+	-cd $(@D) && cmake . > configure.log 2>&1
 
 .PHONY: run_examples
-run_examples: $(steps:%=%/Output)
+run_examples: $(steps:%=%/OK)
 
-%/Output: %/Makefile
-	cd $(@D) && if [ -f Makefile ]; then make run; fi > Output 2>&1
+%/OK: %/Makefile
+        cd $(@D) && if [ -f Makefile ]; then (make run > run.log 2>&1); fi && touch OK
