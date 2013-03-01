@@ -40,16 +40,6 @@
 #include <fstream>
 
 
-template <int dim>
-class LinearFunction : public Function<dim> 
-{
-  public:
-    double value (const Point<dim> &p,
-		  const unsigned int) const
-      {
-	return 1;
-      }
-};
 
 
 template<int dim>
