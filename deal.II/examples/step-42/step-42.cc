@@ -310,19 +310,11 @@ namespace Step42
   }
 
   template <int dim>
-<<<<<<< HEAD
-  void ConstitutiveLaw<dim>::plast_linear_hardening (SymmetricTensor<4,dim>  &stress_strain_tensor,
-                                                     SymmetricTensor<2,dim>  &strain_tensor,
-                                                     unsigned int            &elast_points,
-                                                     unsigned int            &plast_points,
-                                                     double                  &yield)
-=======
   void ConstitutiveLaw<dim>::plast_linear_hardening (SymmetricTensor<4,dim> 	  &stress_strain_tensor,
                                                      const SymmetricTensor<2,dim> &strain_tensor,
                                                      unsigned int             	  &elast_points,
                                                      unsigned int            	  &plast_points,
                                                      double                 	  &yield)
->>>>>>> mirror/trunk
   {
     if (dim == 3)
       {
@@ -351,15 +343,9 @@ namespace Step42
   }
 
   template <int dim>
-<<<<<<< HEAD
-  void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,dim>  &stress_strain_tensor_linearized,
-      SymmetricTensor<4,dim>  &stress_strain_tensor,
-      SymmetricTensor<2,dim>  &strain_tensor)
-=======
   void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,dim> 		 &stress_strain_tensor_linearized,
 		  	  	  	  	  	  	  	  	  	  	  	  	  	  	SymmetricTensor<4,dim> 	 	 &stress_strain_tensor,
 		  	  	  	  	  	  	  	  	  	  	  	  	  	  	const SymmetricTensor<2,dim> &strain_tensor)
->>>>>>> mirror/trunk
   {
     if (dim == 3)
       {
