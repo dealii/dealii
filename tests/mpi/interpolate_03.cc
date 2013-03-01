@@ -71,7 +71,6 @@ void test()
   VectorTools::interpolate (dofh,
 			    LinearFunction<dim>(),
 			    interpolated);
-  interpolated.compress();
 
   double norm = interpolated.l2_norm();
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
