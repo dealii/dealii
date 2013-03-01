@@ -22,4 +22,4 @@ configure_examples: $(steps:%=%/Makefile)
 run_examples: $(steps:%=%/OK)
 
 %/OK: %/Makefile
-        cd $(@D) && if [ -f Makefile ]; then (make run > run.log 2>&1); fi && touch OK
+	cd $(@D) && if [ -f Makefile ]; then (make run > run.log 2>&1); fi && touch OK
