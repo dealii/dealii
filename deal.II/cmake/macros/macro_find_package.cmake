@@ -21,7 +21,7 @@
 MACRO(FIND_PACKAGE _package_name)
   STRING(TOUPPER ${_package_name} _package_name_uppercase)
 
-  IF(NOT ${_package_name_uppercase}_FOUND)
+  IF(NOT DEFINED ${_package_name_uppercase}_FOUND)
     _FIND_PACKAGE (${_package_name} ${ARGN})
   ENDIF()
 ENDMACRO()
