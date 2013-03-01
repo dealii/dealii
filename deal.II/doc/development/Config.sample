@@ -84,6 +84,12 @@ SET(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS ON CACHE BOOL
   "Configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
   )
 
+#
+#SET(CMAKE_CXX_COMPILER "" CACHE STRING "CXX Compiler.")
+#
+#SET(CMAKE_C_COMPILER "" CACHE STRING "C Compiler.")
+#
+
 SET(CMAKE_CXX_FLAGS "" CACHE STRING
   "The user supplied cache variable will be appended _at the end_ of the auto generated CMAKE_CXX_FLAGS variable"
   )
