@@ -68,7 +68,7 @@ build_test:
 	@svn info . | perl -ne 'print "dealii-feature: revision=$$_\n" if s/Last Changed Rev: //; print "dealii-feature: branch=$$1\n" if m/svn\.dealii\.org\/(.+)\/deal.II/;' | tee -a $(logfile)
 	@echo "dealii-feature: user=$(USER)"
 	@echo "dealii-feature: host=`hostname`"
-	@echo "dealii-feature: configuration=`basename "$(CONFIGFILE)"`
+	@echo "dealii-feature: configuration=`basename $(CONFIGFILE)`"
 	@echo END HEADER `date -u '+%Y-%m-%d %T'`\n | tee -a $(logfile)
 	@echo "BEGIN CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	cd $(builddir) && "$(CMAKE)" -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(PWD) >>$(logfile) 2>&1
