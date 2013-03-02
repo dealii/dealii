@@ -3588,7 +3588,7 @@ namespace DoFTools
       local_selected_dofs[i] = component_mask[local_component_asssociation[i]];
 
     // then loop over all cells and do work
-    std::vector<unsigned int> indices(fe.dofs_per_cell);
+    std::vector<types::global_dof_index> indices(fe.dofs_per_cell);
     typename DH::level_cell_iterator c;
     for (c = dof.begin(level) ; c != dof.end(level) ; ++ c)
       {
@@ -4333,9 +4333,9 @@ namespace DoFTools
     void
     resolve_components (const FiniteElement<dim,spacedim> &fe,
                         const std::vector<unsigned char> &dofs_by_component,
-                        const std::vector<unsigned int> &target_component,
+                        const std::vector<types::global_dof_index> &target_component,
                         const bool                        only_once,
-                        std::vector<types::global_dof_index>        &dofs_per_component,
+                        std::vector<types::global_dof_index> &dofs_per_component,
                         unsigned int                     &component)
     {
       for (unsigned int b=0; b<fe.n_base_elements(); ++b)
@@ -4374,9 +4374,9 @@ namespace DoFTools
     void
     resolve_components (const hp::FECollection<dim,spacedim> &fe_collection,
                         const std::vector<unsigned char> &dofs_by_component,
-                        const std::vector<unsigned int> &target_component,
+                        const std::vector<types::global_dof_index> &target_component,
                         const bool                        only_once,
-                        std::vector<types::global_dof_index>        &dofs_per_component,
+                        std::vector<types::global_dof_index> &dofs_per_component,
                         unsigned int                     &component)
     {
       // assert that all elements in the collection have the same structure
@@ -4440,7 +4440,7 @@ namespace DoFTools
     const DH      &dof_handler,
     std::vector<types::global_dof_index> &dofs_per_component,
     bool only_once,
-    std::vector<unsigned int>  target_component)
+    std::vector<types::global_dof_index>  target_component)
   {
     const unsigned int n_components = dof_handler.get_fe().n_components();
 
@@ -4521,9 +4521,9 @@ namespace DoFTools
   void
   count_dofs_per_block (const DH &dof_handler,
                         std::vector<types::global_dof_index> &dofs_per_block,
-                        const std::vector<unsigned int> &target_block_)
+                        const std::vector<types::global_dof_index> &target_block_)
   {
-    std::vector<unsigned int>  target_block = target_block_;
+    std::vector<types::global_dof_index>  target_block = target_block_;
 
     const dealii::hp::FECollection<DH::dimension,DH::space_dimension>
     fe_collection (dof_handler.get_fe());
@@ -4597,7 +4597,7 @@ namespace DoFTools
   void
   count_dofs_per_component (const DoFHandler<dim,spacedim> &dof_handler,
                             std::vector<types::global_dof_index>      &dofs_per_component,
-                            std::vector<unsigned int>       target_component)
+                            std::vector<types::global_dof_index>       target_component)
   {
     count_dofs_per_component (dof_handler, dofs_per_component,
                               false, target_component);
@@ -5233,12 +5233,12 @@ namespace DoFTools
                                            weights, weight_mapping);
 
     // now compute the requested representation
-    const unsigned int n_global_parm_dofs
+    const types::global_dof_index n_global_parm_dofs
       = std::count_if (weight_mapping.begin(), weight_mapping.end(),
                        std::bind2nd (std::not_equal_to<int> (), -1));
 
     // first construct the inverse mapping of weight_mapping
-    std::vector<unsigned int> inverse_weight_mapping (n_global_parm_dofs,
+    std::vector<types::global_dof_index> inverse_weight_mapping (n_global_parm_dofs,
                                                       DoFHandler<dim,spacedim>::invalid_dof_index);
     for (unsigned int i=0; i<weight_mapping.size(); ++i)
       {
@@ -5666,7 +5666,7 @@ namespace DoFTools
   {
     typename DH::level_cell_iterator cell;
     typename DH::level_cell_iterator endc = dof_handler.end(level);
-    std::vector<unsigned int> indices;
+    std::vector<types::global_dof_index> indices;
 
     unsigned int i=0;
     for (cell=dof_handler.begin(level); cell != endc; ++i, ++cell)
@@ -5703,7 +5703,7 @@ namespace DoFTools
     typename DH::level_cell_iterator cell;
     typename DH::level_cell_iterator endc = dof_handler.end(level);
 
-    std::vector<unsigned int> indices;
+    std::vector<types::global_dof_index> indices;
     std::vector<bool> exclude;
 
     for (cell=dof_handler.begin(level); cell != endc; ++cell)
@@ -5750,7 +5750,7 @@ namespace DoFTools
     typename DH::level_cell_iterator pcell = dof_handler.begin(level-1);
     typename DH::level_cell_iterator endc = dof_handler.end(level-1);
 
-    std::vector<unsigned int> indices;
+    std::vector<types::global_dof_index> indices;
     std::vector<bool> exclude;
 
     for (unsigned int block = 0; pcell != endc; ++pcell)
@@ -5824,7 +5824,7 @@ namespace DoFTools
                                              numbers::invalid_unsigned_int);
 
     // Estimate for the number of dofs at this point
-    std::vector<unsigned int> vertex_dof_count(dof_handler.get_tria().n_vertices(), 0);
+    std::vector<types::global_dof_index> vertex_dof_count(dof_handler.get_tria().n_vertices(), 0);
 
     // Identify all vertices active on this level and remember some data
     // about them
@@ -5872,7 +5872,7 @@ namespace DoFTools
     // into the sparsity pattern.
     block_list.reinit(vertex_dof_count.size(), dof_handler.n_dofs(level), vertex_dof_count);
 
-    std::vector<unsigned int> indices;
+    std::vector<types::global_dof_index> indices;
     std::vector<bool> exclude;
 
     for (cell=dof_handler.begin(level); cell != endc; ++cell)

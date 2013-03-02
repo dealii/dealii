@@ -575,8 +575,9 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               dof_handler.levels[level]->dof_object.dof_offsets
-                = std::vector<unsigned int> (dof_handler.tria->n_raw_lines(level),
-                                             DoFHandler<dim,spacedim>::invalid_dof_index);
+                = std::vector<types::global_dof_index> (
+                    dof_handler.tria->n_raw_lines(level),
+                    DoFHandler<dim,spacedim>::invalid_dof_index);
 
               types::global_dof_index next_free_dof = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -691,8 +692,9 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               dof_handler.levels[level]->dof_object.dof_offsets
-                = std::vector<unsigned int> (dof_handler.tria->n_raw_quads(level),
-                                             DoFHandler<dim,spacedim>::invalid_dof_index);
+                = std::vector<types::global_dof_index> (
+                    dof_handler.tria->n_raw_quads(level),
+                    DoFHandler<dim,spacedim>::invalid_dof_index);
 
               types::global_dof_index next_free_dof = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -842,7 +844,7 @@ namespace internal
             // active ones will have a
             // non-invalid value later on
             dof_handler.faces->lines.dof_offsets
-              = std::vector<unsigned int> (dof_handler.tria->n_raw_lines(),
+              = std::vector<types::global_dof_index> (dof_handler.tria->n_raw_lines(),
                                            DoFHandler<dim,spacedim>::invalid_dof_index);
             dof_handler.faces->lines.dofs
               = std::vector<types::global_dof_index> (n_line_slots,
@@ -1055,7 +1057,7 @@ namespace internal
           for (unsigned int level=0; level<dof_handler.tria->n_levels(); ++level)
             {
               dof_handler.levels[level]->dof_object.dof_offsets
-                = std::vector<unsigned int> (dof_handler.tria->n_raw_hexs(level),
+                = std::vector<types::global_dof_index> (dof_handler.tria->n_raw_hexs(level),
                                              DoFHandler<dim,spacedim>::invalid_dof_index);
 
               types::global_dof_index next_free_dof = 0;
@@ -1210,7 +1212,7 @@ namespace internal
             if (true)
               {
                 dof_handler.faces->quads.dof_offsets
-                  = std::vector<unsigned int> (dof_handler.tria->n_raw_quads(),
+                  = std::vector<types::global_dof_index> (dof_handler.tria->n_raw_quads(),
                                                DoFHandler<dim,spacedim>::invalid_dof_index);
                 dof_handler.faces->quads.dofs
                   = std::vector<types::global_dof_index> (n_quad_slots,
@@ -1477,8 +1479,10 @@ namespace internal
         unsigned int
         max_couplings_between_dofs (const DoFHandler<1,spacedim> &dof_handler)
         {
-          return std::min(3*dof_handler.finite_elements->max_dofs_per_vertex() +
-                          2*dof_handler.finite_elements->max_dofs_per_line(), dof_handler.n_dofs());
+          return std::min(static_cast<types::global_dof_index> (3*
+                dof_handler.finite_elements->max_dofs_per_vertex() +
+                2*dof_handler.finite_elements->max_dofs_per_line()), 
+              dof_handler.n_dofs());
         }
 
 
@@ -1509,7 +1513,7 @@ namespace internal
           // nodes)
           // count lines -> 28 (don't forget to count
           // mother and children separately!)
-          unsigned int max_couplings;
+          types::global_dof_index max_couplings;
           switch (dof_handler.tria->max_adjacent_cells())
             {
             case 4:
@@ -1562,7 +1566,7 @@ namespace internal
           // can anyone give better estimate here?
           const unsigned int max_adjacent_cells = dof_handler.tria->max_adjacent_cells();
 
-          unsigned int max_couplings;
+          types::global_dof_index max_couplings;
           if (max_adjacent_cells <= 8)
             max_couplings=7*7*7*dof_handler.finite_elements->max_dofs_per_vertex() +
                           7*6*7*3*dof_handler.finite_elements->max_dofs_per_line() +
@@ -2673,8 +2677,8 @@ namespace hp
     Assert (number_cache.n_global_dofs < std::numeric_limits<unsigned int>::max (),
             ExcMessage ("Global number of degrees of freedom is too large."));
     number_cache.n_locally_owned_dofs_per_processor
-      = std::vector<unsigned int> (1,
-                                   (unsigned int) number_cache.n_global_dofs);
+      = std::vector<types::global_dof_index> (1,
+          (types::global_dof_index) number_cache.n_global_dofs);
 
     number_cache.locally_owned_dofs_per_processor
       = std::vector<IndexSet> (1,

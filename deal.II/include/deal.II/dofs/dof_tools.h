@@ -1919,7 +1919,7 @@ namespace DoFTools
                          const DH &dof_handler,
                          const unsigned int level,
                          const std::vector<bool> &selected_dofs = std::vector<bool>(),
-                         unsigned int offset = 0);
+                         types::global_dof_index offset = 0);
 
   /**
    * Create an incidence matrix that
@@ -2297,8 +2297,8 @@ namespace DoFTools
   void
   count_dofs_per_block (const DH &dof,
                         std::vector<types::global_dof_index> &dofs_per_block,
-                        const std::vector<types::global_dof_index>  &target_block
-                        = std::vector<types::global_dof_index>());
+                        const std::vector<unsigned int>  &target_block
+                        = std::vector<unsigned int>());
 
   /**
    * @deprecated See the previous
@@ -2697,7 +2697,7 @@ namespace DoFTools
   void
   map_dofs_to_support_points (const Mapping<dim,spacedim>       &mapping,
                               const DoFHandler<dim,spacedim>    &dof_handler,
-                              std::map<unsigned int, Point<spacedim> >     &support_points);
+                              std::map<types::global_dof_index, Point<spacedim> >     &support_points);
 
   /**
    * Same as the previous function but for the hp case.
@@ -2706,7 +2706,7 @@ namespace DoFTools
   void
   map_dofs_to_support_points (const dealii::hp::MappingCollection<dim,spacedim>   &mapping,
                               const hp::DoFHandler<dim,spacedim>    &dof_handler,
-                              std::map<unsigned int, Point<spacedim> > &support_points);
+                              std::map<types::global_dof_index, Point<spacedim> > &support_points);
 
 
   /**

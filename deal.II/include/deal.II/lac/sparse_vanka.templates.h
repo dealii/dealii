@@ -70,7 +70,8 @@ SparseVanka<number>::compute_inverses ()
                                                selected.end(),
                                                true);
 
-      const size_type n_inverses_per_thread = std::max(n_inverses / n_threads, 1U);
+      const size_type n_inverses_per_thread = std::max(n_inverses / n_threads, 
+          static_cast<size_type> (1U));
 
       // set up start and end index
       // for each of the
@@ -391,7 +392,8 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
                                            selected.end(),
                                            true);
 
-  const size_type n_inverses_per_block = std::max(n_inverses / n_blocks, 1U);
+  const size_type n_inverses_per_block = std::max(n_inverses / n_blocks, 
+      static_cast<size_type> (1U));
 
   // precompute the splitting points
   std::vector<std::pair<size_type, size_type> > intervals (n_blocks);

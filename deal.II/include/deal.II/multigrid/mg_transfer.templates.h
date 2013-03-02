@@ -69,7 +69,7 @@ namespace
   template <int dim, typename number, int spacedim>
   void
   reinit_vector (const dealii::DoFHandler<dim,spacedim> &mg_dof,
-                 std::vector<types::global_dof_index> target_component,
+                 std::vector<unsigned int> target_component,
                  MGLevelObject<BlockVector<number> > &v)
   {
     const unsigned int n_blocks = mg_dof.get_fe().n_blocks();

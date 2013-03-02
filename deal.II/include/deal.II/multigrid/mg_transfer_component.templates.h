@@ -99,7 +99,7 @@ MGTransferSelect<number>::copy_from_mg (
       //the block back to dst.
       const unsigned int n_blocks =
         *std::max_element(target_component.begin(), target_component.end()) + 1;
-      std::vector<unsigned int> dofs_per_block (n_blocks);
+      std::vector<types::global_dof_index> dofs_per_block (n_blocks);
       DoFTools::count_dofs_per_block (mg_dof_handler, dofs_per_block, target_component);
       BlockVector<number> tmp;
       tmp.reinit(n_blocks);

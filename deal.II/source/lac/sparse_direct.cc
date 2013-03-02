@@ -150,7 +150,7 @@ namespace HSL
 
     extern "C"
     void ma47id_ (double *,
-                  size_type *)
+                  unsigned int *)
     {
       AssertThrow (false,
                    ExcMessage("You can only use the HSL functions after putting "
@@ -167,7 +167,7 @@ namespace HSL
                   size_type *,
                   const size_type *,
                   size_type *,
-                  const size_type *,
+                  const unsigned int *,
                   double *,
                   int *)
     {
@@ -188,7 +188,7 @@ namespace HSL
                   const size_type *,
                   const size_type *,
                   const double *,
-                  const size_type *,
+                  const unsigned int *,
                   size_type *,
                   double *,
                   int *)
@@ -209,7 +209,7 @@ namespace HSL
                   double *,
                   double *,
                   size_type *,
-                  const size_type *)
+                  const unsigned int *)
     {
       AssertThrow (false,
                    ExcMessage("You can only use the HSL functions after putting "
@@ -1409,8 +1409,8 @@ SparseDirectMA47::fill_A (const SparseMatrix<double> &matrix)
 
 
 void
-SparseDirectMA47::call_ma47id (double    *CNTL,   // length 2
-                               size_type *ICNTL)  // length 7
+SparseDirectMA47::call_ma47id (double       *CNTL,   // length 2
+                               unsigned int *ICNTL)  // length 7
 {
   HSL::MA47::ma47id_ (CNTL, ICNTL);
 }

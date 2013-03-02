@@ -128,13 +128,13 @@ protected:
   /**
    * Start index of each block.
    */
-  std::vector<unsigned int> block_start;
+  std::vector<types::global_dof_index> block_start;
 
   /**
    * Start index of each block on
    * all levels.
    */
-  std::vector<std::vector<unsigned int> > mg_block_start;
+  std::vector<std::vector<types::global_dof_index> > mg_block_start;
 
   /**
    * Call build_matrices()

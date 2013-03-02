@@ -911,8 +911,8 @@ private:
   /**
    * Control values set by <tt>MA47ID</tt>.
    */
-  double    CNTL[2];
-  size_type ICNTL[7];
+  double       CNTL[2];
+  unsigned int ICNTL[7];
 
   /**
    * Info field filled by the MA47
@@ -971,8 +971,8 @@ private:
    * Call the <tt>ma47id</tt> function
    * with the given args.
    */
-  void call_ma47id (double    *CNTL,
-                    size_type *ICNTL);
+  void call_ma47id (double       *CNTL,
+                    unsigned int *ICNTL);
 
   /**
    * Call the <tt>ma47ad</tt> function
@@ -992,31 +992,31 @@ private:
    * Call the <tt>ma47bd</tt> function
    * with the given args.
    */
-  void call_ma47bd (const size_type *n_rows,
-                    const size_type *n_nonzero_elements,
-                    const size_type *column_numbers,
-                    double          *A,
-                    const size_type *LA,
-                    size_type       *IW,
-                    const size_type *LIW,
-                    const size_type *KEEP,
-                    const double    *CNTL,
-                    const size_type *ICNTL,
-                    size_type       *IW1,
-                    int             *INFO);
+  void call_ma47bd (const size_type    *n_rows,
+                    const size_type    *n_nonzero_elements,
+                    const size_type    *column_numbers,
+                    double             *A,
+                    const size_type    *LA,
+                    size_type          *IW,
+                    const size_type    *LIW,
+                    const size_type    *KEEP,
+                    const double       *CNTL,
+                    const unsigned int *ICNTL,
+                    size_type          *IW1,
+                    int                *INFO);
 
   /**
    * Call the <tt>ma47bd</tt> function
    * with the given args.
    */
-  void call_ma47cd (const size_type *n_rows,
-                    const double    *A,
-                    const size_type *LA,
-                    const size_type *IW,
-                    const size_type *LIW,
-                    double          *rhs_and_solution,
-                    size_type       *IW1,
-                    const size_type *ICNTL);
+  void call_ma47cd (const size_type    *n_rows,
+                    const double       *A,
+                    const size_type    *LA,
+                    const size_type    *IW,
+                    const size_type    *LIW,
+                    double             *rhs_and_solution,
+                    size_type          *IW1,
+                    const unsigned int *ICNTL);
 };
 
 

@@ -605,7 +605,7 @@ namespace GridTools
 
   template <int dim>
   void
-  laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
+  laplace_transform (const std::map<types::global_dof_index,Point<dim> > &new_points,
                      Triangulation<dim> &triangulation)
   {
     //TODO: Move implementation of this function into the current

@@ -2808,7 +2808,7 @@ GridGenerator::hyper_shell (Triangulation<3> &tria,
                             const Point<3> &p,
                             const double inner_radius,
                             const double outer_radius,
-                            const unsigned int n,
+                            const size_type n,
                             const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
@@ -3037,7 +3037,7 @@ GridGenerator::half_hyper_shell (Triangulation<3> &tria,
                                  const Point<3> &center,
                                  const double inner_radius,
                                  const double outer_radius,
-                                 const unsigned int n,
+                                 const size_type n,
                                  const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
@@ -3183,7 +3183,7 @@ void GridGenerator::quarter_hyper_shell (Triangulation<3> &tria,
                                          const Point<3> &center,
                                          const double inner_radius,
                                          const double outer_radius,
-                                         const unsigned int n,
+                                         const size_type n,
                                          const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
@@ -3370,7 +3370,7 @@ merge_triangulations (const Triangulation<dim, spacedim> &triangulation_1,
   // throw out duplicated vertices from the two meshes
   // and create the triangulation
   SubCellData subcell_data;
-  std::vector<size_type> considered_vertices;
+  std::vector<unsigned int> considered_vertices;
   GridTools::delete_duplicated_vertices (vertices, cells, subcell_data, considered_vertices);
   result.clear ();
   result.create_triangulation (vertices, cells, subcell_data);

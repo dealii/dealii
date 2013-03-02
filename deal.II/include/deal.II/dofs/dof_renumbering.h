@@ -920,7 +920,7 @@ namespace DoFRenumbering
    */
   template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
   unsigned int
-  compute_block_wise (std::vector<unsigned int> &new_dof_indices,
+  compute_block_wise (std::vector<types::global_dof_index> &new_dof_indices,
                       const ITERATOR &start,
                       const ENDITERATOR &end);
 

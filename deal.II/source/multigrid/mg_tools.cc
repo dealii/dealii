@@ -582,8 +582,8 @@ namespace MGTools
             ExcDimensionMismatch (sparsity.n_cols(), n_dofs));
 
     const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-    std::vector<unsigned int> dofs_on_this_cell(dofs_per_cell);
-    std::vector<unsigned int> dofs_on_other_cell(dofs_per_cell);
+    std::vector<types::global_dof_index> dofs_on_this_cell(dofs_per_cell);
+    std::vector<types::global_dof_index> dofs_on_other_cell(dofs_per_cell);
     typename DoFHandler<dim,spacedim>::cell_iterator cell = dof.begin(level),
                                                      endc = dof.end(level);
     for (; cell!=endc; ++cell)

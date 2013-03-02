@@ -1383,7 +1383,11 @@ void Vector<Number>::block_write (std::ostream &out) const
   const size_type sz = size();
   char buf[16];
 
-  std::sprintf(buf, "%d", sz);
+#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
+  std::sprintf(buf, "%llu", sz);
+#else
+  std::sprintf(buf, "%u", sz);
+#endif
   std::strcat(buf, "\n[");
 
   out.write(buf, std::strlen(buf));

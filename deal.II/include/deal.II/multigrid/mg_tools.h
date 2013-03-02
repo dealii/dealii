@@ -177,7 +177,7 @@ namespace MGTools
   void
   count_dofs_per_block (const DH     &dof_handler,
                         std::vector<std::vector<types::global_dof_index> > &dofs_per_block,
-                        std::vector<types::global_dof_index>  target_block = std::vector<types::global_dof_index>());
+                        std::vector<unsigned int>  target_block = std::vector<unsigned int>());
 
   /**
    * Count the dofs component-wise

@@ -622,7 +622,7 @@ public:
                                                 const double inner_radius = .25,
                                                 const double outer_radius = .5,
                                                 const double L = .5,
-                                                const unsigned int repetition = 1,
+                                                const size_type repetition = 1,
                                                 const bool colorize = false);
 
   /**

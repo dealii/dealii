@@ -395,7 +395,7 @@ namespace hp
      * Return the number of degrees of freedom
      * located on the boundary.
      */
-    unsigned int n_boundary_dofs () const;
+    types::global_dof_index n_boundary_dofs () const;
 
     /**
      * Return the number of degrees
