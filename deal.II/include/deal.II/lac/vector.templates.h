@@ -645,7 +645,7 @@ namespace internal
                 }
               n_chunks++;
             }
-          AssertDimension(X - X_original, vec_size);
+          AssertDimension(static_cast<unsigned int>(X - X_original), vec_size);
 
           // now sum the results from the chunks
           // recursively
