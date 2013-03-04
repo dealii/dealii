@@ -35,4 +35,4 @@ Makefile.depend: $(all-cc-files)
 	@$(CXX) $(flags) $^ -M > $@
 	@$(PERL) -pi~ -e 's/(^[^.]+)\.$(OBJEXT):/\1.$(OBJEXT) \1.g.$(OBJEXT):/;' $@
 
-include Makefile.depend
+-include Makefile.depend

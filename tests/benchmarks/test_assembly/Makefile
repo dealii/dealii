@@ -139,6 +139,6 @@ Makefile.dep: $(target).cc Makefile \
 
 # To make the dependencies known to `make', we finally have to include
 # them:
-include Makefile.dep
+-include Makefile.dep
 
 
