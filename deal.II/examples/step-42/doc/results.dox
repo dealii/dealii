@@ -919,17 +919,17 @@ last 4 or 5 newton iterations.
 
 <table align="center">
   <tr>
-    <td valign="top">
-      0 &nbsp;
+    <td>
+    @image html step-42-CellConstitutionColorbar.png
+    </td>
+    <td>
+    @image html step-42-CellConstitutionBall2.png
     </td>
     <td valign="top">
-      <img src="http://www.dealii.org/images/steps/developer/step-42-CellConstitutionBall2.png" alt="">
+      &nbsp;
     </td>
-    <td valign="top">
-      0 &nbsp;
-    </td>
-    <td valign="top">
-      <img src="http://www.dealii.org/images/steps/developer/step-42-CellConstitutionLi2.png" alt="">
+    <td>
+    @image html step-42-CellConstitutionLi2.png
     </td>
   </tr>
 </table>

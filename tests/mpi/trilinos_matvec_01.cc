@@ -83,7 +83,7 @@ void test ()
     }
   if ((n_procs == 1) || (my_id == 1))
     A.add(2,3, 2.0);
-  A.compress();
+  A.compress(VectorOperation::add);
 
   TrilinosWrappers::MPI::Vector x, y;
   x.reinit (col_partitioning, MPI_COMM_WORLD);

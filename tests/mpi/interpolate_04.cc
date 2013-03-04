@@ -12,10 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-// In Trilinos 10.12.1 interpolate() hangs with a small number of cells (smaller than the number of CPUs). This works fine in 10.4.2 and 10.8.5
-// As it turns out, this is because vector creation after interpolate()
-// reacts differently in 10.12.1 and causes a hang. The bug is
-// that interpolate() does not call compress()!
+// test FETools::interpolation_difference
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
@@ -36,21 +33,13 @@
 #include <deal.II/dofs/dof_accessor.h>
 
 #include <deal.II/fe/fe_q.h>
+#include <deal.II/fe/fe_tools.h>
 #include <deal.II/numerics/vector_tools.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
 
 #include <fstream>
 
 
-template <int dim>
-class LinearFunction : public Function<dim> 
-{
-  public:
-    double value (const Point<dim> &p,
-		  const unsigned int) const
-      {
-	return 1;
-      }
-};
 
 
 template<int dim>
@@ -63,16 +52,34 @@ void test()
 //tr.refine_global (2);
 
   const FE_Q<dim> fe(2);
-  DoFHandler<dim> dofh(tr);
-  dofh.distribute_dofs (fe);
-  
-  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-					     MPI_COMM_WORLD);
-  VectorTools::interpolate (dofh,
-			    LinearFunction<dim>(),
-			    interpolated);
+  DoFHandler<dim> dofh1(tr);
+  DoFHandler<dim> dofh2(tr);
+  dofh1.distribute_dofs (fe);
+  dofh2.distribute_dofs (fe);
 
-  double norm = interpolated.l2_norm();
+  ConstraintMatrix cm1;
+  cm1.close();
+  ConstraintMatrix cm2;
+  cm2.close();
+  
+  IndexSet  dof1_locally_owned_dofs = dofh1.locally_owned_dofs();
+  IndexSet  dof2_locally_owned_dofs = dofh2.locally_owned_dofs();
+  IndexSet  dof1_locally_relevant_dofs;
+  IndexSet  dof2_locally_relevant_dofs;
+  DoFTools::extract_locally_relevant_dofs (dofh2,
+					   dof2_locally_relevant_dofs);
+  DoFTools::extract_locally_relevant_dofs (dofh1,
+					   dof1_locally_relevant_dofs);
+  
+  PETScWrappers::MPI::Vector u1(MPI_COMM_WORLD, dof1_locally_owned_dofs, dof1_locally_relevant_dofs);
+
+  PETScWrappers::MPI::Vector out(MPI_COMM_WORLD, dof1_locally_owned_dofs);
+
+  FETools::interpolation_difference
+    (dofh1, cm1, u1, dofh2, cm2, out);
+
+  double norm = out.l2_norm();
+
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     deallog << "norm = " << norm
 	    << std::endl;
@@ -81,12 +88,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-#ifdef DEAL_II_WITH_MPI
-  MPI_Init (&argc,&argv);
-#else
-  (void)argc;
-  (void)argv;
-#endif
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -95,7 +97,7 @@ int main(int argc, char *argv[])
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("interpolate_03").c_str());
+      std::ofstream logfile(output_file_for_mpi("interpolate_04").c_str());
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
@@ -118,8 +120,4 @@ int main(int argc, char *argv[])
 //      test<3>();
       deallog.pop();
     }
-
-#ifdef DEAL_II_WITH_MPI
-  MPI_Finalize();
-#endif
 }

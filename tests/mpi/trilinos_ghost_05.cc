@@ -50,7 +50,7 @@ void test ()
   x(myid*2+1)=myid*2.0+1.0;
 
 				   // transfer to ghosted vector v and check
-  x.compress();
+  x.compress(VectorOperation::insert);
   v=x;
 
   Assert(v(myid*2) == myid*2.0, ExcInternalError());
@@ -59,7 +59,6 @@ void test ()
 
 				   // change x, transfer, and check again
   x*=2.0;
-  x.compress();
   v=x;
   
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
