@@ -426,9 +426,12 @@ namespace TrilinosWrappers
       Vector (const IndexSet &parallel_partitioning,
               const MPI_Comm &communicator = MPI_COMM_WORLD);
 
-      Vector (const MPI_Comm &communicator,
-              const IndexSet &local,
-              const IndexSet &ghost=IndexSet(0));
+      /**
+       * Creates a ghosted parallel vector.
+       */
+      Vector (const IndexSet &local,
+              const IndexSet &ghost,
+              const MPI_Comm &communicator = MPI_COMM_WORLD);
 
       /**
        * Copy constructor from the

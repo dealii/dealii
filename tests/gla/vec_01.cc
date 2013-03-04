@@ -41,8 +41,16 @@ void test ()
   IndexSet local_relevant(numproc*2);
   local_relevant.add_range(1,2);
 
-  typename LA::MPI::Vector vb(MPI_COMM_WORLD, local_active);
-  typename LA::MPI::Vector v(MPI_COMM_WORLD, local_active, local_relevant);
+  {
+				     //implicit communicator:
+    typename LA::MPI::Vector v1(local_active);
+    typename LA::MPI::Vector v2(local_active, local_relevant);
+    Assert(!v1.has_ghost_elements(), ExcInternalError());
+    Assert(v2.has_ghost_elements(), ExcInternalError());
+  }
+  
+  typename LA::MPI::Vector vb(local_active, MPI_COMM_WORLD);
+  typename LA::MPI::Vector v(local_active, local_relevant, MPI_COMM_WORLD);
 
 				   // set local values
   vb(myid*2)=myid*2.0;
@@ -59,7 +67,7 @@ void test ()
   Assert(v.has_ghost_elements(), ExcInternalError());
   
 				   // check local values
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (myid==0)
     {
       deallog << myid*2 << ":" << v(myid*2) << std::endl;
       deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
@@ -70,7 +78,7 @@ void test ()
   
 
 				   // check ghost values
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+  if (myid==0)
     deallog << "ghost: " << v(1) << std::endl;
   Assert(v(1) == 2.0, ExcInternalError());
 

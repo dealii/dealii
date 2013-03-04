@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-// assignment of ghost vectors
+// creation and size of LA::MPI::Vector
 
 #include "../tests.h"
 #include <deal.II/lac/abstract_linear_algebra.h>
@@ -41,50 +41,44 @@ void test ()
   IndexSet local_relevant(numproc*2);
   local_relevant.add_range(1,2);
 
-  typename LA::MPI::Vector vb(local_active);
-  typename LA::MPI::Vector v(local_active, local_relevant);
-  typename LA::MPI::Vector v2(local_active, local_relevant);
 
-  vb = 1.0;
-  v2 = vb;
-
-				   // set local values
-  vb(myid*2)=myid*2.0;
-  vb(myid*2+1)=myid*2.0+1.0;
-
-  vb.compress(VectorOperation::insert);
-  vb*=2.0;
-  v=vb;
-
-  Assert(vb.size() == numproc*2, ExcInternalError());
-  Assert(v.size() == numproc*2, ExcInternalError());
-
-  Assert(!vb.has_ghost_elements(), ExcInternalError());
-  Assert(v.has_ghost_elements(), ExcInternalError());
-  
-				   // check local values
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-    {
-      deallog << myid*2 << ":" << v(myid*2) << std::endl;
-      deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
-    }
-  
-				   //assignment from ghosted to ghosted
-  v2 = v;
-  Assert(v2(1) == 2.0, ExcInternalError());
-  Assert(v2(myid*2) == myid*4.0, ExcInternalError());
-  Assert(v2(myid*2+1) == myid*4.0+2.0, ExcInternalError());
-
+  IndexSet something(100);
+  something.add_range(myid,myid+1);
+  if (myid==numproc-1)
+    something.add_range(numproc,100);
 
   
-  Assert(v(myid*2) == myid*4.0, ExcInternalError());
-  Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
-  
+  {
+				     //implicit communicator:
+    typename LA::MPI::Vector v1(local_active);
+    Assert(!v1.has_ghost_elements(), ExcInternalError());
+    Assert(v1.size()==numproc*2, ExcInternalError());
 
-				   // check ghost values
-  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-    deallog << "ghost: " << v(1) << std::endl;
-  Assert(v(1) == 2.0, ExcInternalError());
+    v1.reinit(something);
+    Assert(!v1.has_ghost_elements(), ExcInternalError());
+    Assert(v1.size()==100, ExcInternalError());
+    
+    v1.reinit(local_active, local_relevant);
+    Assert(v1.has_ghost_elements(), ExcInternalError());
+    Assert(v1.size()==numproc*2, ExcInternalError());
+    
+    v1.reinit(something, MPI_COMM_WORLD);
+    Assert(!v1.has_ghost_elements(), ExcInternalError());
+    Assert(v1.size()==100, ExcInternalError());
+
+    typename LA::MPI::Vector v2(local_active, local_relevant);
+    Assert(v2.has_ghost_elements(), ExcInternalError());
+    Assert(v2.size()==numproc*2, ExcInternalError());
+
+    v2.reinit(local_active,MPI_COMM_WORLD);
+    Assert(!v2.has_ghost_elements(), ExcInternalError());
+    Assert(v2.size()==numproc*2, ExcInternalError());
+   
+    v2.reinit(local_active, local_relevant, MPI_COMM_WORLD);
+    Assert(v2.has_ghost_elements(), ExcInternalError());
+    Assert(v2.size()==numproc*2, ExcInternalError());
+    
+  }
 
 				   // done
   if (myid==0)
@@ -102,7 +96,7 @@ int main (int argc, char **argv)
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("vec_02").c_str());
+      std::ofstream logfile(output_file_for_mpi("vec_00").c_str());
       deallog.attach(logfile);
       deallog << std::setprecision(4);
       deallog.depth_console(0);

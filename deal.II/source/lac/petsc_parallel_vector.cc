@@ -79,6 +79,31 @@ namespace PETScWrappers
       Vector::create_vector(local.size(), local.n_elements(), ghost_set);
     }
 
+    Vector::Vector (const IndexSet   &local,
+                    const IndexSet &ghost,
+                    const MPI_Comm     &communicator)
+      :
+      communicator (communicator)
+    {
+      Assert(local.is_contiguous(), ExcNotImplemented());
+
+      IndexSet ghost_set = ghost;
+      ghost_set.subtract_set(local);
+
+      Vector::create_vector(local.size(), local.n_elements(), ghost_set);
+    }
+
+
+    Vector::Vector (const IndexSet   &local,
+          const MPI_Comm     &communicator)
+    :
+          communicator (communicator)
+    {
+      Assert(local.is_contiguous(), ExcNotImplemented());
+      Vector::create_vector(local.size(), local.n_elements());
+    }
+
+
     Vector::Vector (const MPI_Comm     &communicator,
                      const IndexSet   &local)
     :
@@ -150,6 +175,14 @@ namespace PETScWrappers
                     const IndexSet   &local,
                     const IndexSet &ghost)
     {
+      reinit(local, ghost, comm);
+    }
+
+    void
+    Vector::reinit (const IndexSet   &local,
+                    const IndexSet &ghost,
+                    const MPI_Comm     &comm)
+    {
       communicator = comm;
 
       Assert(local.is_contiguous(), ExcNotImplemented());
@@ -162,7 +195,14 @@ namespace PETScWrappers
 
     void
     Vector::reinit (const MPI_Comm     &comm,
-                 const IndexSet   &local)
+                    const IndexSet   &local)
+    {
+      reinit(local, comm);
+    }
+
+    void
+    Vector::reinit (const IndexSet &local,
+                    const MPI_Comm &comm)
     {
       communicator = comm;
 

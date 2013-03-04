@@ -106,9 +106,9 @@ namespace TrilinosWrappers
       reinit (v, false, true);
     }
 
-    Vector::Vector (const MPI_Comm &communicator,
-                    const IndexSet &local,
-                    const IndexSet &ghost)
+    Vector::Vector (const IndexSet &local,
+                    const IndexSet &ghost,
+                    const MPI_Comm &communicator)
       :
       VectorBase()
     {

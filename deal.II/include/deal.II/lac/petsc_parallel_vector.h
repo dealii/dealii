@@ -251,15 +251,47 @@ namespace PETScWrappers
        */
       explicit Vector (const MPI_Comm     &communicator,
                        const IndexSet   &local,
-                       const IndexSet &ghost);
+                       const IndexSet &ghost) DEAL_II_DEPRECATED;
+
+      /**
+       * Constructs a new parallel ghosted PETSc
+       * vector from an Indexset. Note that
+       * @p local must be contiguous and
+       * the global size of the vector is
+       * determined by local.size(). The
+       * global indices in @p ghost are
+       * supplied as ghost indices that can
+       * also be read locally.
+       *
+       * Note that the @p ghost IndexSet
+       * may be empty and that any indices
+       * already contained in @p local are
+       * ignored during construction. That
+       * way, the ghost parameter can equal
+       * the set of locally relevant
+       * degrees of freedom, see step-32.
+       *
+       * @note This operation always creates a ghosted
+       * vector.
+       */
+      explicit Vector (const IndexSet &local,
+                       const IndexSet &ghost,
+                       const MPI_Comm &communicator = MPI_COMM_WORLD);
 
       /**
        * Constructs a new parallel PETSc
        * vector from an Indexset. This creates a non
        * ghosted vector.
        */
-      explicit Vector (const MPI_Comm     &communicator,
-                       const IndexSet   &local);
+      explicit Vector (const MPI_Comm &communicator,
+                       const IndexSet &local) DEAL_II_DEPRECATED;
+      /**
+       * Constructs a new parallel PETSc
+       * vector from an Indexset. This creates a non
+       * ghosted vector.
+       */
+      explicit Vector (const IndexSet &local,
+                       const MPI_Comm &communicator = MPI_COMM_WORLD);
 
       /**
        * Copy the given vector. Resize the
@@ -391,7 +423,15 @@ namespace PETScWrappers
        */
       void reinit (const MPI_Comm     &communicator,
                    const IndexSet   &local,
-                   const IndexSet &ghost);
+                   const IndexSet &ghost) DEAL_II_DEPRECATED;
+      /**
+       * Reinit as a vector without ghost elements. See
+       * constructor with same signature
+       * for more detais.
+       */
+      void reinit (const IndexSet &local,
+                   const IndexSet &ghost,
+                   const MPI_Comm &communicator = MPI_COMM_WORLD);
 
       /**
        * Reinit as a vector without ghost elements. See
@@ -399,7 +439,14 @@ namespace PETScWrappers
        * for more detais.
        */
       void reinit (const MPI_Comm     &communicator,
-                   const IndexSet   &local);
+                   const IndexSet   &local) DEAL_II_DEPRECATED;
+      /**
+       * Reinit as a vector without ghost elements. See
+       * constructor with same signature
+       * for more detais.
+       */
+      void reinit (const IndexSet &local,
+                   const MPI_Comm &communicator = MPI_COMM_WORLD);
 
       /**
        * Return a reference to the MPI
