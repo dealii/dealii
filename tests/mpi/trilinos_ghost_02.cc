@@ -48,7 +48,7 @@ void test ()
   v(myid*2)=myid*2.0;
   v(myid*2+1)=myid*2.0+1.0;
 
-  v.compress();
+  v.compress(VectorOperation::insert);
 
 				  // assignment with transfer to ghost 
   v_tmp = v;

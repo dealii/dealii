@@ -58,4 +58,4 @@ Makefile.depend: $(shell echo *.cc)
 	@$(CXX) $(CXXFLAGS.g) $^ -M > $@
 	@$(PERL) -pi -e 's/(^[^.]+)\.o:/\1.o \1.g.o:/;' $@
 
-include Makefile.depend
+-include Makefile.depend

@@ -11,5 +11,5 @@ include $D/common/Make.global_options
 ULIMIT_LIMIT=1800
 
 include ../Makefile.rules
-include Makefile.depend
-include Makefile.tests
+-include Makefile.depend
+-include Makefile.tests

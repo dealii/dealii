@@ -3,7 +3,7 @@
 
 /*    $Id$    */
 /*                                                                */
-/*    Copyright (C) 2009-2012 by the deal.II authors */
+/*    Copyright (C) 2009-2013 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -30,8 +30,9 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_generator.h>
 
+#include <deal.II/multigrid/dof_accessor.h>
+
 #include <deal.II/multigrid/multigrid.h>
-#include <deal.II/multigrid/mg_dof_accessor.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
 #include <deal.II/multigrid/mg_coarse.h>

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -305,63 +305,44 @@ namespace MeshWorker
     Table<2, number> &quadrature_values();
 
     /**
-     * Access the <i>i</i>th value
-     * at quadrature point <i>k</i>
+     * Access the <i>i</i>th value at quadrature point <i>k</i>
      */
     number &quadrature_value(unsigned int k, unsigned int i);
 
     /**
-     * Read the <i>i</i>th value
-     * at quadrature point <i>k</i>
+     * Read the <i>i</i>th value at quadrature point <i>k</i>
      */
     number quadrature_value(unsigned int k, unsigned int i) const;
 
     /**
-     * Initialize the vector with
-     * scalar values.
+     * Initialize the vector with scalar values.
      *
-     * @note This function is
-     * usually only called by the
-     * assembler.
+     * @note This function is usually only called by the assembler.
      */
     void initialize_numbers(const unsigned int n);
+    
     /**
-     * Initialize the vector with
-     * vector values.
+     * Initialize the vector with vector values.
      *
-     * @note This function is
-     * usually only called by the
-     * assembler.
+     * @note This function is usually only called by the assembler.
      */
     void initialize_vectors(const unsigned int n);
+    
     /**
-     * Allocate @p n local
-     * matrices. Additionally,
-     * set their block row and
-     * column coordinates to
-     * zero. The matrices
-     * themselves are resized by
-     * reinit().
+     * Allocate @p n local matrices. Additionally, set their block row
+     * and column coordinates to zero. The matrices themselves are
+     * resized by reinit().
      *
-     * @note This function is
-     * usually only called by the
-     * assembler.
+     * @note This function is usually only called by the assembler.
      */
     void initialize_matrices(unsigned int n, bool both);
 
     /**
-     * Allocate a local matrix
-     * for each of the global
-     * ones in @p
-     * matrices. Additionally,
-     * set their block row and
-     * column coordinates. The
-     * matrices themselves are
-     * resized by reinit().
+     * Allocate a local matrix for each of the global ones in @p
+     * matrices. Additionally, set their block row and column
+     * coordinates. The matrices themselves are resized by reinit().
      *
-     * @note This function is
-     * usually only called by the
-     * assembler.
+     * @note This function is usually only called by the assembler.
      */
     template <class MATRIX>
     void initialize_matrices(const MatrixBlockVector<MATRIX> &matrices,
@@ -386,20 +367,15 @@ namespace MeshWorker
                              bool both);
 
     /**
-     * Initialize quadrature values
-     * to <tt>nv</tt> values in
+     * Initialize quadrature values to <tt>nv</tt> values in
      * <tt>np</tt> quadrature points.
      */
     void initialize_quadrature(unsigned int np, unsigned int nv);
 
     /**
-     * Reinitialize matrices for
-     * new cell. Does not resize
-     * any of the data vectors
-     * stored in this object, but
-     * resizes the vectors in #R
-     * and the matrices in #M1 and
-     * #M2 for hp and sets them to
+     * Reinitialize matrices for new cell. Does not resize any of the
+     * data vectors stored in this object, but resizes the vectors in
+     * #R and the matrices in #M1 and #M2 for hp and sets them to
      * zero.
      */
     void reinit(const BlockIndices &local_sizes);
@@ -414,55 +390,40 @@ namespace MeshWorker
 
   private:
     /**
-     * Initialize a single local
-     * matrix block. A helper
-     * function for initialize()
+     * Initialize a single local matrix block. A helper function for
+     * initialize()
      */
     void initialize_local(MatrixBlock<FullMatrix<number> > &M,
                           const unsigned int row,
                           const unsigned int col);
 
     /**
-     * The local numbers,
-     * computed on a cell or on a
-     * face.
+     * The local numbers, computed on a cell or on a face.
      */
     std::vector<number> J;
 
     /**
-     * The local vectors. This
-     * field is public, so that
-     * local integrators can
-     * write to it.
+     * The local vectors. This field is public, so that local
+     * integrators can write to it.
      */
     std::vector<BlockVector<number> > R;
 
     /**
-     * The local matrices
-     * coupling degrees of
-     * freedom in the cell
-     * itself or within the
-     * first cell on a face.
+     * The local matrices coupling degrees of freedom in the cell
+     * itself or within the first cell on a face.
      */
     std::vector<MatrixBlock<FullMatrix<number> > > M1;
 
     /**
-     * The local matrices
-     * coupling test functions on
-     * the cell with trial
-     * functions on the other
-     * cell.
+     * The local matrices coupling test functions on the cell with
+     * trial functions on the other cell.
      *
-     * Only used on interior
-     * faces.
+     * Only used on interior faces.
      */
     std::vector<MatrixBlock<FullMatrix<number> > > M2;
 
     /**
-     * @todo Shouldn't this be in
-     * IntegrationInfo? Guido
-     *
-     * Values in quadrature points.
+     * Values in quadrature points for writing into patch data.
      */
     Table<2, number> quadrature_data;
   };

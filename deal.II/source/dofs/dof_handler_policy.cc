@@ -1649,11 +1649,11 @@ namespace internal
         template <int spacedim>
         void
         communicate_mg_dof_indices_on_marked_cells
-        (const DoFHandler<1,spacedim> &dof_handler,
-         const std::map<unsigned int, std::set<dealii::types::subdomain_id> > &vertices_with_ghost_neighbors,
-         const std::vector<unsigned int> &coarse_cell_to_p4est_tree_permutation,
-         const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
-         const unsigned int level)
+        (const DoFHandler<1,spacedim> &,
+         const std::map<unsigned int, std::set<dealii::types::subdomain_id> > &,
+         const std::vector<unsigned int> &,
+         const std::vector<unsigned int> &,
+         const unsigned int)
         {
           Assert (false, ExcNotImplemented());
         }
@@ -1670,7 +1670,11 @@ namespace internal
          const unsigned int level)
         {
 #ifndef DEAL_II_USE_P4EST
+          (void)dof_handler;
           (void)vertices_with_ghost_neighbors;
+          (void)coarse_cell_to_p4est_tree_permutation;
+          (void)p4est_tree_to_coarse_cell_permutation;
+          (void)level;
           Assert (false, ExcNotImplemented());
 #else
 

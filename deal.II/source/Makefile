@@ -230,7 +230,7 @@ Makefile.dep: ../include/deal.II/lac/lapack_templates.h \
 	@echo "lac/Makefile.dep: $D/include/deal.II/lac/lapack_templates.h.in \
 				 $D/include/deal.II/lac/lapack_templates.h.in" \
 	 >> $@
-include Makefile.dep
+-include Makefile.dep
 
 
 # Rule to generate the dependency files, one for each source

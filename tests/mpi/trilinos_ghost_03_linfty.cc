@@ -48,7 +48,7 @@ void test ()
   v(myid*2)=myid*2;
   v(myid*2+1)=myid*2+1;
 
-  v.compress();
+  v.compress(VectorOperation::insert);
 
   v_tmp.reinit(v,false,true);
 

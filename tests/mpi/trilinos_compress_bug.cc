@@ -56,7 +56,7 @@ void test ()
     }
   }
   
-  test1.compress(Add);
+  test1.compress(VectorOperation::add);
 
   //TrilinosWrappers::MPI::Vector test(test1.vector_partitioner()); // works
   //TrilinosWrappers::MPI::Vector test(locally_owned); // works
@@ -70,7 +70,7 @@ void test ()
   if (myid==0)
     deallog << "before compress: " << test(locally_owned.nth_index_in_set(5)) << endl;
       
-   test.compress(Insert);
+  test.compress(VectorOperation::insert);
   
   if (myid==0)
     deallog << "after compress: " << test(locally_owned.nth_index_in_set(5)) << endl;

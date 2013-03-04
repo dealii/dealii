@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -215,6 +215,12 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
             }
           // Apply inverse diagonal
           this->inverse_vmult(block, x_cell, b_cell);
+#ifdef DEBUG
+	  for (unsigned int i=0;i<x_cell.size();++i)
+	    {
+	      Assert(numbers::is_finite(x_cell(i)), ExcNumberNotFinite());
+	    }
+#endif
           // Store in result vector
           row=additional_data->block_list.begin(block);
           for (size_type row_cell=0; row_cell<bs; ++row_cell, ++row)

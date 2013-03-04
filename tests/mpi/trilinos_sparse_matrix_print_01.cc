@@ -70,7 +70,7 @@ void test ()
   A.reinit (sp);
   if ((n_procs == 1) || (my_id == 1))
     A.add(2,3, 2.0);
-  A.compress();
+  A.compress(VectorOperation::add);
 
   if ((n_procs == 1) || (my_id == 1))
     A.print(deallog.get_file_stream());

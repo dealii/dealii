@@ -78,7 +78,7 @@ void test ()
   for (unsigned int i = 0; i<n_entries; ++i)
     if (row_partitioning.is_element(line[i]))
       A.add(line[i], local_index[i], local_value[i]);
-  A.compress();
+  A.compress(VectorOperation::add);
 
   if (my_id == 0)
     {
@@ -93,7 +93,6 @@ void test ()
 
   TrilinosWrappers::SparseMatrix AtA;
   A.Tmmult (AtA, A);
-  AtA.compress ();
 
 				   /* AtA should be
 

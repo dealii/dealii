@@ -205,5 +205,5 @@ Makefile.dep: $(shell echo $D/examples/*/*.cc $D/examples/*/doc/*.dox) Makefile
 	> $@
 
 ifneq ($(CLEAN),yes)
-include Makefile.dep
+-include Makefile.dep
 endif
