@@ -11,7 +11,7 @@ else
 	@echo "#"
 	@echo "#  Support GNUmakefile for deal.II"
 	@echo "#"
-	@echo "#  TODO: Helpfull message on how to use CMake"
+	@echo "#  TODO: Helpful message on how to use CMake"
 	@echo "#"
 	@echo "#  The following support targets exist:"
 	@echo "#   indent      -  run astyle on the source base"
