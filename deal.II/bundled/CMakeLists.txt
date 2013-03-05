@@ -95,10 +95,6 @@ SET(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
 OPTION(DEAL_II_FORCE_BUNDLED_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
   OFF)
-MARK_AS_ADVANCED(
-  atlas_LIBRARY
-  blas_LIBRARY
-  )
 
 IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
   ADD_SUBDIRECTORY(${UMFPACK_FOLDER}/UMFPACK/Source)
