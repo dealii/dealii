@@ -76,5 +76,5 @@ tests += threads_01 threads_02
 
 
 include ../Makefile.rules
-include Makefile.depend
-include Makefile.tests
+-include Makefile.depend
+-include Makefile.tests

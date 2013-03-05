@@ -19,6 +19,7 @@
 #include <deal.II/lac/householder.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
+#include <deal.II/lac/parallel_vector.h>
 #include <deal.II/lac/petsc_parallel_vector.h>
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_block_vector.h>
@@ -1671,10 +1672,13 @@ namespace FETools
             DoFTools::extract_locally_relevant_dofs (dof2,
                                                      dof2_locally_relevant_dofs);
 
+            PETScWrappers::MPI::Vector  u2_out (dynamic_cast<const PETScWrappers::MPI::Vector *> (&u1)->get_mpi_communicator(),
+                dof2_locally_owned_dofs);
+            interpolate(dof1, u1, dof2, constraints2, u2_out);
             PETScWrappers::MPI::Vector  u2 (dynamic_cast<const PETScWrappers::MPI::Vector *> (&u1)->get_mpi_communicator(),
                                             dof2_locally_owned_dofs,
                                             dof2_locally_relevant_dofs);
-            interpolate(dof1, u1, dof2, constraints2, u2);
+            u2 = u2_out;
             interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
           }
         else

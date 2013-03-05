@@ -80,8 +80,8 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  PetscInitialize(&argc,&argv,0,0);
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+ 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
       std::ofstream logfile(output_file_for_mpi("petsc_01").c_str());
@@ -93,6 +93,4 @@ int main(int argc, char *argv[])
     }
   else
     test();
-
-  PetscFinalize();
 }

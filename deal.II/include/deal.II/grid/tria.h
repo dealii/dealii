@@ -967,7 +967,7 @@ namespace internal
  *     void f() {
  *       Triangulation<dim> triangulation;
  *       // fill it somehow
- *       triangulation.signals.post_refinement (&f);
+ *       triangulation.signals.post_refinement.connect (&f);
  *       triangulation.refine_global (2);
  *   @endcode
  *   This code will produce output twice, once for each refinement cycle.

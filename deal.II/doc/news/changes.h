@@ -53,6 +53,9 @@ inconvenience this causes.
 
 <ol>
 
+<li> Fixed: FETools::interpolation_difference with PETSc.
+<br>
+(Timo Heister, 2013/03/01)
 
 </ol>
 

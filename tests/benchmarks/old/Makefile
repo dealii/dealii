@@ -81,4 +81,4 @@ Makefile.depend: $(shell echo *.cc)
 	@$(PERL) -pi -e 's#\.((g\.)?$(OBJEXT):)#/obj.\1#g;' $@
 
 
-include Makefile.depend
+-include Makefile.depend
