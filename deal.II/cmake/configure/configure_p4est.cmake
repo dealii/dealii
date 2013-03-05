@@ -30,6 +30,14 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
         "Could not find a sufficient p4est installation: "
         "P4est has to be configured with MPI support enabled.\n\n"
         )
+      UNSET(P4EST_DIR CACHE)
+      UNSET(P4EST_LIBRARY CACHE)
+      UNSET(P4EST_INCLUDE_DIR CACHE)
+      UNSET(SC_LIBRARY CACHE)
+      UNSET(SC_INCLUDE_DIR CACHE)
+      SET(P4EST_DIR "" CACHE STRING
+        "An optional hint to a p4est installation/directory"
+        )
     ELSE()
       SET(${var} TRUE)
     ENDIF()

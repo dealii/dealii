@@ -35,8 +35,13 @@ MACRO(FEATURE_SLEPC_FIND_EXTERNAL var)
         )
       UNSET(SLEPC_INCLUDE_DIR_ARCH CACHE)
       UNSET(SLEPC_INCLUDE_DIR_COMMON CACHE)
-      UNSET(SLEPC_INCLUDE_DIRS CACHE)
-      UNSET(SLEPC_LIBRARIES CACHE)
+      UNSET(SLEPC_LIBRARY CACHE)
+      SET(SLEPC_DIR "" CACHE STRING
+        "An optional hint to a SLEPc directory"
+        )
+      SET(SLEPC_ARCH "" CACHE STRING
+        "An optional hint to a SLEPc arch"
+        )
 
       SET(${var} FALSE)
     ENDIF()

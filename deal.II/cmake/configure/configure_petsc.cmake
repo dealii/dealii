@@ -59,8 +59,13 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     IF(NOT ${var})
       UNSET(PETSC_INCLUDE_DIR_ARCH CACHE)
       UNSET(PETSC_INCLUDE_DIR_COMMON CACHE)
-      UNSET(PETSC_INCLUDE_DIRS CACHE)
-      UNSET(PETSC_LIBRARIES CACHE)
+      UNSET(PETSC_LIBRARY CACHE)
+      SET(PETSC_DIR "" CACHE STRING
+        "An optional hint to a PETSc directory"
+        )
+      SET(PETSC_ARCH "" CACHE STRING
+        "An optional hint to a PETSc arch"
+        )
     ENDIF()
   ENDIF()
 ENDMACRO()
