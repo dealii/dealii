@@ -919,7 +919,7 @@ namespace DoFRenumbering
    * the renumbering vector.
    */
   template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
-  unsigned int
+  types::global_dof_index
   compute_block_wise (std::vector<types::global_dof_index> &new_dof_indices,
                       const ITERATOR &start,
                       const ENDITERATOR &end);

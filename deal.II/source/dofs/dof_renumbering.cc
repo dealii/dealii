@@ -1070,13 +1070,13 @@ namespace DoFRenumbering
     types::global_dof_index next_free_index = 0;
     for (unsigned int block=0; block<fe_collection.n_blocks(); ++block)
       {
-        const typename std::vector<unsigned int>::const_iterator
+        const typename std::vector<types::global_dof_index>::const_iterator
         begin_of_component = block_to_dof_map[block].begin(),
         end_of_component   = block_to_dof_map[block].end();
 
         next_free_index = shifts[block];
 
-        for (typename std::vector<unsigned int>::const_iterator
+        for (typename std::vector<types::global_dof_index>::const_iterator
              dof_index = begin_of_component;
              dof_index != end_of_component; ++dof_index)
           {

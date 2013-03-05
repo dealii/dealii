@@ -20,7 +20,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
       template
 	void compute_block_renumbering (
 	  const FiniteElement<deal_II_dimension,deal_II_space_dimension>& ,
-	  std::vector<unsigned int>&, std::vector<unsigned int>&, bool);
+	  std::vector<types::global_dof_index>&, std::vector<types::global_dof_index>&, bool);
 
       template
 	void compute_projection_matrices<deal_II_dimension, double, deal_II_space_dimension>

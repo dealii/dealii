@@ -1059,7 +1059,7 @@ namespace MGTools
   count_dofs_per_block (
     const DH     &dof_handler,
     std::vector<std::vector<types::global_dof_index> > &dofs_per_block,
-    std::vector<types::global_dof_index>  target_block)
+    std::vector<unsigned int>  target_block)
   {
     const FiniteElement<DH::dimension,DH::space_dimension> &fe = dof_handler.get_fe();
     const unsigned int n_blocks = fe.n_blocks();

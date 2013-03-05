@@ -4521,9 +4521,9 @@ namespace DoFTools
   void
   count_dofs_per_block (const DH &dof_handler,
                         std::vector<types::global_dof_index> &dofs_per_block,
-                        const std::vector<types::global_dof_index> &target_block_)
+                        const std::vector<unsigned int> &target_block_)
   {
-    std::vector<types::global_dof_index>  target_block = target_block_;
+    std::vector<unsigned int>  target_block = target_block_;
 
     const dealii::hp::FECollection<DH::dimension,DH::space_dimension>
     fe_collection (dof_handler.get_fe());

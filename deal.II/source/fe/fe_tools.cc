@@ -359,8 +359,8 @@ namespace FETools
   template<int dim, int spacedim>
   void compute_block_renumbering (
     const FiniteElement<dim,spacedim> &element,
-    std::vector<unsigned int> &renumbering,
-    std::vector<unsigned int> &block_data,
+    std::vector<types::global_dof_index> &renumbering,
+    std::vector<types::global_dof_index> &block_data,
     bool return_start_indices)
   {
     Assert(renumbering.size() == element.dofs_per_cell,
@@ -396,7 +396,7 @@ namespace FETools
 //TODO:[GK] This does not work for a single RT
     for (unsigned int i=0; i<element.dofs_per_cell; ++i)
       {
-        std::pair<unsigned int, unsigned int>
+        std::pair<types::global_dof_index, types::global_dof_index>
         indices = element.system_to_block_index(i);
         renumbering[i] = start_indices[indices.first]
                          +indices.second;
