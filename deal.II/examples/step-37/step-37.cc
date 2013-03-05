@@ -30,8 +30,6 @@
 #include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/grid/grid_generator.h>
 
-#include <deal.II/multigrid/dof_accessor.h>
-
 #include <deal.II/multigrid/multigrid.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
@@ -1001,8 +999,6 @@ namespace Step37
   void LaplaceProblem<dim>::solve ()
   {
     Timer time;
-    GrowingVectorMemory<>   vector_memory;
-
     MGTransferPrebuilt<Vector<double> > mg_transfer;
     mg_transfer.build_matrices(dof_handler);
     setup_time += time.wall_time();
@@ -1019,7 +1015,7 @@ namespace Step37
 
     typedef PreconditionChebyshev<LevelMatrixType,Vector<double> > SMOOTHER;
     MGSmootherPrecondition<LevelMatrixType, SMOOTHER, Vector<double> >
-    mg_smoother(vector_memory);
+      mg_smoother;
 
     // Then, we initialize the smoother with our level matrices and the
     // mandatory additional data for the Chebyshev smoother. We use quite a
