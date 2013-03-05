@@ -81,6 +81,15 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
   #
   SET(DEAL_II_MSVC TRUE)
 
+
+  #
+  # Disable shared libraries on native Windows targets for the moment.
+  #
+  MESSAGE(WARNING "\n"
+    "BUILD_SHARED_LIBS forced to OFF\n\n"
+    )
+  SET(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+
   #
   # Disable -ggdb and -g on Windows/MinGW targets for the moment until the
   # compilation issues with too big files are resolved
@@ -91,18 +100,5 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
   STRIP_FLAG(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-ggdb")
   STRIP_FLAG(DEAL_II_CXX_FLAGS_DEBUG "-g")
   STRIP_FLAG(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-g")
-ENDIF()
-
-
-#
-# Disable shared libraries on native Windows targets for the moment.
-#
-# - Matthias Maier, 2013
-#
-IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
-  MESSAGE(WARNING "\n"
-    "BUILD_SHARED_LIBS forced to OFF\n\n"
-    )
-  SET(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 ENDIF()
 
