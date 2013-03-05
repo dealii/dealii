@@ -618,7 +618,7 @@ namespace PETScWrappers
     template
     SparseMatrix::SparseMatrix (const MPI_Comm &,
                                 const SparsityPattern &,
-                                const std::vector<size_type &,
+                                const std::vector<size_type> &,
                                 const std::vector<size_type> &,
                                 const unsigned int,
                                 const bool);

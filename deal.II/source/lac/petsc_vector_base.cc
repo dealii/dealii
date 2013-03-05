@@ -263,7 +263,7 @@ namespace PETScWrappers
 
 
 
-  size_type 
+  VectorBase::size_type 
   VectorBase::size () const
   {
 #ifdef PETSC_USE_64BIT_INDICES
@@ -280,7 +280,7 @@ namespace PETScWrappers
 
 
 
-  size_type 
+  VectorBase::size_type 
   VectorBase::local_size () const
   {
 #ifdef PETSC_USE_64BIT_INDICES
@@ -297,7 +297,7 @@ namespace PETScWrappers
 
 
 
-  std::pair<size_type, size_type>
+  std::pair<VectorBase::size_type, VectorBase::size_type>
   VectorBase::local_range () const
   {
 #ifdef PETSC_USE_64BIT_INDICES

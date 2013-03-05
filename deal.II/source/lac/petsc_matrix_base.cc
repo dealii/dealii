@@ -270,7 +270,7 @@ namespace PETScWrappers
 
 
 
-  size_type
+  MatrixBase::size_type
   MatrixBase::m () const
   {
 #ifdef PETSC_USE_64BIT_INDICES
@@ -287,7 +287,7 @@ namespace PETScWrappers
 
 
 
-  size_type 
+  MatrixBase::size_type 
   MatrixBase::n () const
   {
 #ifdef PETSC_USE_64BIT_INDICES
@@ -304,7 +304,7 @@ namespace PETScWrappers
 
 
 
-  size_type 
+  MatrixBase::size_type 
   MatrixBase::local_size () const
   {
 #ifdef PETSC_USE_64BIT_INDICES
@@ -321,7 +321,7 @@ namespace PETScWrappers
 
 
 
-  std::pair<size_type, size_type>
+  std::pair<MatrixBase::size_type, MatrixBase::size_type>
   MatrixBase::local_range () const
   {
 #ifdef PETSC_USE_64BIT_INDICES
@@ -339,7 +339,7 @@ namespace PETScWrappers
 
 
 
-  size_type 
+  MatrixBase::size_type 
   MatrixBase::n_nonzero_elements () const
   {
     MatInfo mat_info;
@@ -352,7 +352,7 @@ namespace PETScWrappers
 
 
 
-  size_type 
+  MatrixBase::size_type 
   MatrixBase::
   row_length (const size_type row) const
   {
