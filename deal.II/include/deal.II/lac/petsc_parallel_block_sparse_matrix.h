@@ -63,11 +63,6 @@ namespace PETScWrappers
     {
     public:
       /**
-       * Declare type for container size.
-       */
-      typedef types::global_dof_index size_type;
-
-      /**
        * Typedef the base class for simpler
        * access to its own typedefs.
        */

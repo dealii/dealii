@@ -77,7 +77,13 @@ namespace PETScWrappers
      */
     class VectorReference
     {
-    private:
+    public:
+      /**
+       * Declare type for container size.
+       */
+      typedef types::global_dof_index size_type;
+
+      private:
       /**
        * Constructor. It is made private so
        * as to only allow the actual vector
@@ -86,12 +92,9 @@ namespace PETScWrappers
       VectorReference (const VectorBase &vector,
                        const size_type   index);
 
-    public:
-      /**
-       * Declare type for container size.
-       */
-      typedef types::global_dof_index size_type;
 
+      public:
+	
       /**
        * This looks like a copy operator,
        * but does something different than
