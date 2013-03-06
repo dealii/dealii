@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -216,13 +216,15 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   FIND_PACKAGE(Subversion QUIET)
   IF(SUBVERSION_FOUND AND EXISTS ${CMAKE_SOURCE_DIR}/.svn)
     SUBVERSION_WC_INFO(${CMAKE_SOURCE_DIR} _svn)
-    FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SVN.info "${_svn_WC_INFO}")
-    INSTALL(FILES
-      ${CMAKE_CURRENT_BINARY_DIR}/SVN.info
-      DESTINATION common
-      COMPONENT compat_files
-      )
+    FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/Version.svn "${_svn_WC_INFO}")
+  ELSE()
+    FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/Version.svn "")
   ENDIF()
 
-ENDIF()
+  INSTALL(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/Version.svn
+    DESTINATION common
+    COMPONENT compat_files
+    )
 
+ENDIF()
