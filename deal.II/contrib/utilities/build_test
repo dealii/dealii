@@ -3,19 +3,20 @@
 #
 # A build_test for deal.II
 #
-# Usage: Invoke this script in a source directory
+# Usage: Invoke this script either in a source directory or with $SOURCEDIR
+#        set
 #
 # The following environment variables may be set:
 #
-#   SOURCEDIR  - the source directory to use (if not invoked in a source
-#                directory)
-#   LOGDIR     - directory for the log file
-#   CONFIGFILE - A cmake configuration file for the build test
+#   SOURCEDIR    - the source directory to use (if not invoked in a source
+#                  directory)
+#   LOGDIR       - directory for the log file
+#   CONFIGFILE   - A cmake configuration file for the build test
 #
-#   CMAKE      - the cmake executable to use
-#   SVN        - svn info command to use
-#   TMPDIR     - defaults to "/tmp"
-#   CLEANUP    - defaults to "true"
+#   CMAKE        - the cmake executable to use
+#   SVN          - svn info command to use
+#   TMPDIR       - defaults to "/tmp"
+#   CLEAN_TMPDIR - defaults to "true"
 #
 
 SOURCEDIR=$(CURDIR)
@@ -29,9 +30,9 @@ builddir:= $(testdir)/build
 installdir:= $(testdir)/install
 LOGDIR=$(PWD)
 logfile:=$(LOGDIR)/$(date).$(firstword $(notdir $(CONFIGFILE)) automatic).log
-CLEANUP=true
+CLEAN_TMPDIR=true
 
-PIPEnTRAP:= >>$(logfile) 2>&1 || (if ${CLEANUP}; then rm -rf $(testdir); fi; false)
+PIPEnTRAP:= >>$(logfile) 2>&1 || (if ${CLEAN_TMPDIR}; then rm -rf $(testdir); fi; false)
 
 .PHONY: main
 main:
@@ -64,7 +65,7 @@ main:
 	@echo "BEGIN RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test run_examples $(PIPEnTRAP)
 	@echo "END RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	rm -rf $(testdir)
+	if ${CLEAN_TMPDIR}; then rm -rf $(testdir); fi
 
 
 #
@@ -73,10 +74,8 @@ main:
 
 steps:= $(wildcard step-*)
 
-%/Makefile:
+%/%:
 	-cd $(@D) && cmake . >/dev/null 2>&1
-
-%/%: %/Makefile
 	cd $(@D) && if [ -f Makefile ]; then make; fi
 
 %/OK: %/%
