@@ -1193,11 +1193,11 @@ namespace internal
 
       template <int dim, int spacedim>
       static
-      unsigned int
+      types::global_dof_index
       get_vertex_dof_index (const dealii::DoFHandler<dim,spacedim> &dof_handler,
-                            const unsigned int vertex_index,
+                            const types::global_dof_index vertex_index,
                             const unsigned int fe_index,
-                            const unsigned int local_index)
+                            const types::global_dof_index local_index)
       {
         Assert ((fe_index == dealii::DoFHandler<dim,spacedim>::default_fe_index),
                 ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
@@ -1217,11 +1217,11 @@ namespace internal
 
       template<int dim, int spacedim>
       static
-      unsigned int
+      types::global_dof_index
       get_vertex_dof_index (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
-                            const unsigned int vertex_index,
+                            const types::global_dof_index vertex_index,
                             const unsigned int fe_index,
-                            const unsigned int local_index)
+                            const types::global_dof_index local_index)
       {
         Assert ( (fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
                  ExcMessage ("You need to specify a FE index when working "
@@ -1246,13 +1246,13 @@ namespace internal
         // part. trigger an exception if
         // we can't find a set for this
         // particular fe_index
-        const unsigned int starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+        const types::global_dof_index starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
         const types::global_dof_index *pointer = &dof_handler.vertex_dofs[starting_offset];
         while (true)
           {
             Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
 
-            Assert((*pointer)<std::numeric_limits<unsigned int>::max(), ExcInternalError());
+            Assert((*pointer)<std::numeric_limits<types::global_dof_index>::max(), ExcInternalError());
             const unsigned int this_fe_index = static_cast<unsigned int>(*pointer);
 
             Assert (this_fe_index != numbers::invalid_unsigned_int,
@@ -2286,7 +2286,7 @@ DoFAccessor<0,DH<1,spacedim>, lda>::get_dof_indices (
   std::vector<types::global_dof_index> &dof_indices,
   const unsigned int fe_index) const
 {
-  for (unsigned int i=0; i<dof_indices.size(); ++i)
+  for (types::global_dof_index i=0; i<dof_indices.size(); ++i)
     dof_indices[i]
       = dealii::internal::DoFAccessor::Implementation::get_vertex_dof_index (
           *dof_handler,

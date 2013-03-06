@@ -2242,7 +2242,7 @@ make_sorted_row_list (const std::vector<size_type> &local_dof_indices,
                 Utilities::lower_bound(active_dofs.begin(),
                                        active_dofs.end()-i+1,
                                        new_index);
-              if (*it != new_index)
+              if (*it != new_index)               
                 active_dofs.insert(it, new_index);
             }
         }

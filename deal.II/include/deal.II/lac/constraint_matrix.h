@@ -1855,7 +1855,7 @@ ConstraintMatrix::add_line (const size_type line)
   if (line_index >= lines_cache.size())
     lines_cache.resize (std::max(2*static_cast<size_type>(lines_cache.size()),
                                  line_index+1),
-                        numbers::invalid_unsigned_int);
+                        numbers::invalid_size_type);
 
   // push a new line to the end of the
   // list
@@ -1936,7 +1936,7 @@ ConstraintMatrix::is_constrained (const size_type index) const
   const size_type line_index = calculate_line_index(index);
   return ((line_index < lines_cache.size())
           &&
-          (lines_cache[line_index] != numbers::invalid_unsigned_int));
+          (lines_cache[line_index] != numbers::invalid_size_type));
 }
 
 
