@@ -209,22 +209,4 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     DESTINATION common
     COMPONENT compat_files
     )
-
-  #
-  # Export some information about the current svn revision:
-  #
-  FIND_PACKAGE(Subversion QUIET)
-  IF(SUBVERSION_FOUND AND EXISTS ${CMAKE_SOURCE_DIR}/.svn)
-    SUBVERSION_WC_INFO(${CMAKE_SOURCE_DIR} _svn)
-    FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/Version.svn "${_svn_WC_INFO}")
-  ELSE()
-    FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/Version.svn "")
-  ENDIF()
-
-  INSTALL(FILES
-    ${CMAKE_CURRENT_BINARY_DIR}/Version.svn
-    DESTINATION common
-    COMPONENT compat_files
-    )
-
 ENDIF()
