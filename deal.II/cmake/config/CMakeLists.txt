@@ -210,9 +210,19 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     COMPONENT compat_files
     )
 
-  INSTALL(FILES
-    DESTINATION ${CMAKE_INSTALL_PREFIX}
-    COMPONENT compat_files
-    )
+  #
+  # Export some information about the current svn revision:
+  #
+  FIND_PACKAGE(Subversion REQUIRED)
+  IF(SUBVERSION_FOUND AND EXISTS ${CMAKE_SOURCE_DIR}/.svn)
+    SUBVERSION_WC_INFO(${CMAKE_SOURCE_DIR} _svn)
+    FILE(WRITE ${CMAKE_CURRENT_BINARY_DIR}/SVN.info "${_svn_WC_INFO}")
+    INSTALL(FILES
+      ${CMAKE_CURRENT_BINARY_DIR}/SVN.info
+      DESTINATION common
+      COMPONENT compat_files
+      )
+  ENDIF()
+
 ENDIF()
 
