@@ -31,17 +31,17 @@ LOGDIR=$(PWD)
 logfile:=$(LOGDIR)/$(date).$(firstword $(notdir $(CONFIGFILE)) automatic).log
 CLEANUP=true
 
-TEEnTRAP:= | tee -a $(logfile) || (if ${CLEANUP}; then rm -rf $(testdir); fi; false)
 PIPEnTRAP:= >>$(logfile) 2>&1 || (if ${CLEANUP}; then rm -rf $(testdir); fi; false)
 
 .PHONY: main
 main:
+	@if test ! -f $(SOURCEDIR)/CMakeLists.txt; then echo "ERROR: $(SOURCEDIR) doesn't seem to be a top-level source directory"; false; fi
 	mkdir -p $(LOGDIR)
 	mkdir -p $(builddir)
 	mkdir -p $(installdir)
 	@echo "AUTOMATED DEAL.II BUILD TEST" | tee $(logfile)
 	@echo "BEGIN HEADER `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	@$(SVN) | perl -ne 'print "dealii-feature: revision=$$_" if s/Last Changed Rev: //; print "dealii-feature: branch=$$1\n" if m/svn\.dealii\.org\/(.+)\/deal.II/;' $(TEEnTRAP)
+	@$(SVN) | perl -ne 'print "dealii-feature: revision=$$_" if s/Last Changed Rev: //; print "dealii-feature: branch=$$1\n" if m/svn\.dealii\.org\/(.+)\/deal.II/;' | tee -a $(logfile)
 	@echo "dealii-feature: user=$(USER)" | tee -a $(logfile)
 	@echo "dealii-feature: host=`hostname`" | tee -a $(logfile)
 	@echo "dealii-feature: configuration=`basename \"$(CONFIGFILE)\"`" | tee -a $(logfile)
@@ -59,7 +59,7 @@ main:
 	cd $(builddir) && make $(MAKEOPTS) install $(PIPEnTRAP)
 	@echo "END BUILD INSTALL OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test $(MAKEOPTS) build_examples $(PIPEnTRAP)
+	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test build_examples $(PIPEnTRAP)
 	@echo "END BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test run_examples $(PIPEnTRAP)
@@ -74,19 +74,16 @@ main:
 steps:= $(wildcard step-*)
 
 %/Makefile:
-	-cd $(@D) && cmake . > configure.log 2>&1
-
-.PHONY: configure_examples
-configure_examples: $(steps:%=%/Makefile)
+	-cd $(@D) && cmake . >/dev/null 2>&1
 
 %/%: %/Makefile
-	cd $(@D) && if [ -f Makefile ]; then (make > build.log 2>&1); fi
+	cd $(@D) && if [ -f Makefile ]; then make; fi
+
+%/OK: %/%
+	cd $(@D) && if [ -f Makefile ]; then make run; fi && touch OK
 
 .PHONY: build_examples
 build_examples: $(steps:%=%/%)
-
-%/OK: %/%
-	cd $(@D) && if [ -f Makefile ]; then (make run > run.log 2>&1); fi && touch OK
 
 .PHONY: run_examples
 run_examples: $(steps:%=%/OK)
