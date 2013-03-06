@@ -60,7 +60,7 @@ main:
 	cd $(builddir) && make $(MAKEOPTS) install $(PIPEnTRAP)
 	@echo "END BUILD INSTALL OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test build_examples $(PIPEnTRAP)
+	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test DEAL_II_DIR=$(installdir) build_examples $(PIPEnTRAP)
 	@echo "END BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test run_examples $(PIPEnTRAP)
