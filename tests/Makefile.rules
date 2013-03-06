@@ -172,9 +172,7 @@ default: run-tests
 ############################################################
 report:
 	@-$(MAKE) -k run-tests
-	@if test -f $D/common/Version.svn ; then \
-		echo "Revision: `cat $D/common/Version.svn`" ; \
-	 fi
+	@-svn info . | grep '^Revision'
 	@echo 'Date: ' `date -u +"%Y %j  %F  %U-%w"`
 	@echo 'Id: ' $(ID)
 	@for test in $(sort $(tests)) ; do \
