@@ -1,19 +1,24 @@
-style-h-files:= $(wildcard include/deal.II/*/*.h)
-style-cc-files:= $(wildcard source/*/*.cc)
-style-examples:= $(wildcard examples/*/*.cc)
-.PHONY: indent
-indent:
-	@echo "Indenting all files"
-	@for f in  $(style-h-files) $(style-cc-files) $(style-examples) ;\
-	do\
-	  echo $$f ;\
-	  astyle --options=contrib/utilities/astyle.rc $$f ;\
-	done
-
+#!/usr/bin/gmake -f
 
 #
-# Target for build tests:
+# A build_test for deal.II
 #
+# Usage: Invoke this script in a source directory
+#
+# The following environment variables may be set:
+#
+#   SOURCEDIR  - the source directory to use (if not invoked in a source
+#                directory)
+#   LOGDIR     - directory for the log file
+#   CONFIGFILE - A cmake configuration file for the build test
+#
+#   CMAKE      - the cmake executable to use
+#   SVN        - svn info command to use
+#   TMPDIR     - defaults to "/tmp"
+#   CLEANUP    - defaults to "true"
+#
+
+SOURCEDIR=$(CURDIR)
 TMPDIR=/tmp
 CMAKE=cmake
 SVN=svn info .
@@ -25,11 +30,12 @@ installdir:= $(testdir)/install
 LOGDIR=$(PWD)
 logfile:=$(LOGDIR)/$(date).$(firstword $(notdir $(CONFIGFILE)) automatic).log
 CLEANUP=true
+
 TEEnTRAP:= | tee -a $(logfile) || (if ${CLEANUP}; then rm -rf $(testdir); fi; false)
 PIPEnTRAP:= >>$(logfile) 2>&1 || (if ${CLEANUP}; then rm -rf $(testdir); fi; false)
 
-.PHONY: build_test
-build_test:
+.PHONY: main
+main:
 	mkdir -p $(LOGDIR)
 	mkdir -p $(builddir)
 	mkdir -p $(installdir)
@@ -53,9 +59,35 @@ build_test:
 	cd $(builddir) && make $(MAKEOPTS) install $(PIPEnTRAP)
 	@echo "END BUILD INSTALL OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	cd $(installdir)/examples && make $(MAKEOPTS) build_examples $(PIPEnTRAP)
+	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test $(MAKEOPTS) build_examples $(PIPEnTRAP)
 	@echo "END BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	cd $(installdir)/examples && make $(MAKEOPTS) run_examples $(PIPEnTRAP)
+	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test run_examples $(PIPEnTRAP)
 	@echo "END RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	rm -rf $(testdir)
+
+
+#
+# Recipes used for testing the example steps
+#
+
+steps:= $(wildcard step-*)
+
+%/Makefile:
+	-cd $(@D) && cmake . > configure.log 2>&1
+
+.PHONY: configure_examples
+configure_examples: $(steps:%=%/Makefile)
+
+%/%: %/Makefile
+	cd $(@D) && if [ -f Makefile ]; then (make > build.log 2>&1); fi
+
+.PHONY: build_examples
+build_examples: $(steps:%=%/%)
+
+%/OK: %/%
+	cd $(@D) && if [ -f Makefile ]; then (make run > run.log 2>&1); fi && touch OK
+
+.PHONY: run_examples
+run_examples: $(steps:%=%/OK)
+
