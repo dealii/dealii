@@ -70,39 +70,40 @@ random:=$(shell echo "$$RANDOM")
 testdir:= "$(TMPDIR)"/deal-build-test.$(date)-$(random)
 builddir:= $(testdir)/build
 installdir:= $(testdir)/install
-LOGDIR=$(testdir)
+LOGDIR=$(PWD)
 logfile:=$(LOGDIR)/$(date).$(firstword $(notdir $(CONFIGFILE)) automatic).log
+CLEANUP=true
+TEEnTRAP:= | tee -a $(logfile) || (if ${CLEANUP}; then rm -rf $(testdir); fi; false)
+PIPEnTRAP:= >>$(logfile) 2>&1 || (if ${CLEANUP}; then rm -rf $(testdir); fi; false)
 
 .PHONY: build_test
 build_test:
+	mkdir -p $(LOGDIR)
 	mkdir -p $(builddir)
 	mkdir -p $(installdir)
-	mkdir -p $(LOGDIR)
 	@echo "AUTOMATED DEAL.II BUILD TEST" | tee $(logfile)
 	@echo "BEGIN HEADER `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	@$(SVN) | perl -ne 'print "dealii-feature: revision=$$_" if s/Last Changed Rev: //; print "dealii-feature: branch=$$1\n" if m/svn\.dealii\.org\/(.+)\/deal.II/;' | tee -a $(logfile)
-	@echo "dealii-feature: user=$(USER)"
-	@echo "dealii-feature: host=`hostname`"
-	@echo "dealii-feature: configuration=`basename \"$(CONFIGFILE)\"`"
+	@$(SVN) | perl -ne 'print "dealii-feature: revision=$$_" if s/Last Changed Rev: //; print "dealii-feature: branch=$$1\n" if m/svn\.dealii\.org\/(.+)\/deal.II/;' $(TEEnTRAP)
+	@echo "dealii-feature: user=$(USER)" | tee -a $(logfile)
+	@echo "dealii-feature: host=`hostname`" | tee -a $(logfile)
+	@echo "dealii-feature: configuration=`basename \"$(CONFIGFILE)\"`" | tee -a $(logfile)
 	@echo END HEADER `date -u '+%Y-%m-%d %T'`\n | tee -a $(logfile)
 	@echo "BEGIN CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	cd $(builddir) && "$(CMAKE)" -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(PWD) >>$(logfile) 2>&1
+	cd $(builddir) && "$(CMAKE)" -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(PWD) $(PIPEnTRAP)
 	@echo "END CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN CMAKE SYSTEM INFORMATION `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	cd $(builddir) && "$(CMAKE)" --system-information >>$(logfile) 2>&1
+	cd $(builddir) && "$(CMAKE)" --system-information $(PIPEnTRAP)
 	@echo "END CMAKE SYSTEM INFORMATION `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN REPORT FEATURES `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	cd $(builddir) && make $(MAKEOPTS) run_report_features >>$(logfile) 2>&1
+	cd $(builddir) && make $(MAKEOPTS) run_report_features $(PIPEnTRAP)
 	@echo "END REPORT FEATURES `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN BUILD INSTALL OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	cd $(builddir) && make $(MAKEOPTS) install >>$(logfile) 2>&1
+	cd $(builddir) && make $(MAKEOPTS) install $(PIPEnTRAP)
 	@echo "END BUILD INSTALL OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	cd $(installdir)/examples && make $(MAKEOPTS) build_examples >>$(logfile) 2>&1
+	cd $(installdir)/examples && make $(MAKEOPTS) build_examples $(PIPEnTRAP)
 	@echo "END BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
 	@echo "BEGIN RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	cd $(installdir)/examples && make $(MAKEOPTS) run_examples >>$(logfile) 2>&1
+	cd $(installdir)/examples && make $(MAKEOPTS) run_examples $(PIPEnTRAP)
 	@echo "END RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(logfile)
-	rm -rf $(builddir)
-	rm -rf $(installdir)
-	-rmdir --ignore-fail-on-non-empty -p $(testdir)
+	rm -rf $(testdir)
