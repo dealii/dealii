@@ -13,6 +13,7 @@ nofail-dirs = a-framework       \
               deal.II           \
               integrators       \
               multigrid         \
+              grid              \
               bits              \
               hp                \
               matrix_free       \
