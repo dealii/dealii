@@ -25,7 +25,7 @@ PRIVATE void print_value
     Entry xi ;
     /* if Xz is null, then X is in "merged" format (compatible with Entry, */
     /* and ANSI C99 double _Complex type). */
-    PRINTF (("    "ID" :", INDEX (i))) ;
+    PRINTF (("    " ID " :", INDEX (i))) ;
     if (scalar)
     {
 	PRINT_SCALAR (Xx [i]) ;
@@ -56,7 +56,7 @@ GLOBAL Int UMF_report_vector
 
     if (user || prl >= 4)
     {
-	PRINTF (("dense vector, n = "ID". ", n)) ;
+	PRINTF (("dense vector, n = " ID ". ", n)) ;
     }
 
     if (user)

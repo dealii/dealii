@@ -62,7 +62,7 @@ GLOBAL Int UMFPACK_report_matrix
 	n_i = n_col ;
     }
 
-    PRINTF (("%s-form matrix, n_row "ID" n_col "ID", ", vector, n_row, n_col)) ;
+    PRINTF (("%s-form matrix, n_row " ID " n_col " ID ", ", vector, n_row, n_col)) ;
 
     if (n_row <= 0 || n_col <= 0)
     {
@@ -77,7 +77,7 @@ GLOBAL Int UMFPACK_report_matrix
     }
 
     nz = Ap [n] ;
-    PRINTF (("nz = "ID". ", nz)) ;
+    PRINTF (("nz = " ID ". ", nz)) ;
     if (nz < 0)
     {
 	PRINTF (("ERROR: number of entries < 0\n\n")) ;
@@ -86,7 +86,7 @@ GLOBAL Int UMFPACK_report_matrix
 
     if (Ap [0] != 0)
     {
-	PRINTF (("ERROR: Ap ["ID"] = "ID" must be "ID"\n\n",
+	PRINTF (("ERROR: Ap [" ID "] = " ID " must be " ID "\n\n",
 	    (Int) INDEX (0), INDEX (Ap [0]), (Int) INDEX (0))) ;
 	return (UMFPACK_ERROR_invalid_matrix) ;
     }
@@ -109,12 +109,12 @@ GLOBAL Int UMFPACK_report_matrix
     {
 	if (Ap [k] < 0)
 	{
-	    PRINTF (("ERROR: Ap ["ID"] < 0\n\n", INDEX (k))) ;
+	    PRINTF (("ERROR: Ap [" ID "] < 0\n\n", INDEX (k))) ;
 	    return (UMFPACK_ERROR_invalid_matrix) ;
 	}
 	if (Ap [k] > nz)
 	{
-	    PRINTF (("ERROR: Ap ["ID"] > size of Ai\n\n", INDEX (k))) ;
+	    PRINTF (("ERROR: Ap [" ID "] > size of Ai\n\n", INDEX (k))) ;
 	    return (UMFPACK_ERROR_invalid_matrix) ;
 	}
     }
@@ -124,7 +124,7 @@ GLOBAL Int UMFPACK_report_matrix
 	length = Ap [k+1] - Ap [k] ;
 	if (length < 0)
 	{
-	    PRINTF (("ERROR: # entries in %s "ID" is < 0\n\n",
+	    PRINTF (("ERROR: # entries in %s " ID " is < 0\n\n",
 		vector, INDEX (k))) ;
 	    return (UMFPACK_ERROR_invalid_matrix) ;
 	}
@@ -147,13 +147,13 @@ GLOBAL Int UMFPACK_report_matrix
 	p1 = Ap [k] ;
 	p2 = Ap [k+1] ;
 	length = p2 - p1 ;
-	PRINTF4 (("\n    %s "ID": start: "ID" end: "ID" entries: "ID"\n",
+	PRINTF4 (("\n    %s " ID ": start: " ID " end: " ID " entries: " ID "\n",
 	    vector, INDEX (k), p1, p2-1, length)) ;
 	ilast = EMPTY ;
 	for (p = p1 ; p < p2 ; p++)
 	{
 	    i = Ai [p] ;
-	    PRINTF4 (("\t%s "ID" ", index, INDEX (i))) ;
+	    PRINTF4 (("\t%s " ID " ", index, INDEX (i))) ;
 	    if (do_values && prl >= 4)
 	    {
 		PRINTF ((":")) ;
@@ -162,14 +162,14 @@ GLOBAL Int UMFPACK_report_matrix
 	    }
 	    if (i < 0 || i >= n_i)
 	    {
-		PRINTF ((" ERROR: %s index "ID" out of range in %s "ID"\n\n",
+		PRINTF ((" ERROR: %s index " ID " out of range in %s " ID "\n\n",
 		    index, INDEX (i), vector, INDEX (k))) ;
 		return (UMFPACK_ERROR_invalid_matrix) ;
 	    }
 	    if (i <= ilast)
 	    {
-		PRINTF ((" ERROR: %s index "ID" out of order (or duplicate) in "
-		    "%s "ID"\n\n", index, INDEX (i), vector, INDEX (k))) ;
+		PRINTF ((" ERROR: %s index " ID " out of order (or duplicate) in "
+		    "%s " ID "\n\n", index, INDEX (i), vector, INDEX (k))) ;
 		return (UMFPACK_ERROR_invalid_matrix) ;
 	    }
 	    PRINTF4 (("\n")) ;

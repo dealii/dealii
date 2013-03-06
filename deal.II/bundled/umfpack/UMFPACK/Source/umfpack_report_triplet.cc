@@ -42,7 +42,7 @@ GLOBAL Int UMFPACK_report_triplet
 	return (UMFPACK_OK) ;
     }
 
-    PRINTF (("triplet-form matrix, n_row = "ID", n_col = "ID" nz = "ID". ",
+    PRINTF (("triplet-form matrix, n_row = " ID ", n_col = " ID " nz = " ID ". ",
 	n_row, n_col, nz)) ;
 
     if (!Ti || !Tj)
@@ -72,7 +72,7 @@ GLOBAL Int UMFPACK_report_triplet
     {
 	i = Ti [k] ;
 	j = Tj [k] ;
-	PRINTF4 (("    "ID" : "ID" "ID" ", INDEX (k), INDEX (i), INDEX (j))) ;
+	PRINTF4 (("    " ID " : " ID " " ID " ", INDEX (k), INDEX (i), INDEX (j))) ;
 	if (do_values && prl >= 4)
 	{
 	    ASSIGN (t, Tx, Tz, k, split) ;

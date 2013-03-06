@@ -45,7 +45,7 @@ UMF_ltsolve			/* solve L.'x=b (array transpose) */
     DEBUG4 (("Ltsolve start:\n")) ;
     for (j = 0 ; j < Numeric->n_row ; j++)
     {
-	DEBUG4 (("Ltsolve start "ID": ", j)) ;
+	DEBUG4 (("Ltsolve start " ID ": ", j)) ;
 	EDEBUG4 (X [j]) ;
 	DEBUG4 (("\n")) ;
     }
@@ -89,7 +89,7 @@ UMF_ltsolve			/* solve L.'x=b (array transpose) */
 	    pos = Lpos [k] ;
 	    if (pos != EMPTY)
 	    {
-		DEBUG4 (("  k "ID" removing row "ID" at position "ID"\n",
+		DEBUG4 (("  k " ID " removing row " ID " at position " ID "\n",
 		k, Pattern [pos], pos)) ;
 		ASSERT (k != kstart) ;
 		ASSERT (deg > 0) ;
@@ -110,7 +110,7 @@ UMF_ltsolve			/* solve L.'x=b (array transpose) */
 	    for (j = 0 ; j < llen ; j++)
 	    {
 		row = *ip++ ;
-		DEBUG4 (("  row "ID"  k "ID"\n", row, k)) ;
+		DEBUG4 (("  row " ID "  k " ID "\n", row, k)) ;
 		ASSERT (row > k) ;
 		Pattern [deg++] = row ;
 	    }
@@ -142,7 +142,7 @@ UMF_ltsolve			/* solve L.'x=b (array transpose) */
 	    xk = X [k] ;
 	    for (j = 0 ; j < deg ; j++)
 	    {
-		DEBUG4 (("  row "ID"  k "ID" value", Pattern [j], k)) ;
+		DEBUG4 (("  row " ID "  k " ID " value", Pattern [j], k)) ;
 		EDEBUG4 (*xp) ;
 		DEBUG4 (("\n")) ;
 
@@ -169,7 +169,7 @@ UMF_ltsolve			/* solve L.'x=b (array transpose) */
 	    pos = Lpos [k] ;
 	    if (pos != EMPTY)
 	    {
-		DEBUG4 (("  k "ID" adding row "ID" at position "ID"\n",
+		DEBUG4 (("  k " ID " adding row " ID " at position " ID "\n",
 		k, k, pos)) ;
 		ASSERT (k != kstart) ;
 		ASSERT (pos >= 0 && pos <= deg) ;
@@ -185,7 +185,7 @@ UMF_ltsolve			/* solve L.'x=b (array transpose) */
 
     for (k = n1 - 1 ; k >= 0 ; k--)
     {
-	DEBUG4 (("Singleton k "ID"\n", k)) ;
+	DEBUG4 (("Singleton k " ID "\n", k)) ;
 	deg = Lilen [k] ;
 	if (deg > 0)
 	{
@@ -196,7 +196,7 @@ UMF_ltsolve			/* solve L.'x=b (array transpose) */
 	    Lval = (Entry *) (Numeric->Memory + lp) ;
 	    for (j = 0 ; j < deg ; j++)
 	    {
-		DEBUG4 (("  row "ID"  k "ID" value", Li [j], k)) ;
+		DEBUG4 (("  row " ID "  k " ID " value", Li [j], k)) ;
 		EDEBUG4 (Lval [j]) ;
 		DEBUG4 (("\n")) ;
 #ifdef CONJUGATE_SOLVE
@@ -214,7 +214,7 @@ UMF_ltsolve			/* solve L.'x=b (array transpose) */
 #ifndef NDEBUG
     for (j = 0 ; j < Numeric->n_row ; j++)
     {
-	DEBUG4 (("Ltsolve done "ID": ", j)) ;
+	DEBUG4 (("Ltsolve done " ID ": ", j)) ;
 	EDEBUG4 (X [j]) ;
 	DEBUG4 (("\n")) ;
     }

@@ -180,19 +180,19 @@ PRIVATE Int prune_singletons
     {
 	oldcol = Cperm1 [k] ;
 	newcol = k - n1 ;
-	DEBUG5 (("Prune singletons k "ID" oldcol "ID" newcol "ID": "ID"\n",
+	DEBUG5 (("Prune singletons k " ID " oldcol " ID " newcol " ID ": " ID "\n",
 	    k, oldcol, newcol, pp)) ;
 	Sp [newcol] = pp ;  /* load column pointers */
 	for (p = Ap [oldcol] ; p < Ap [oldcol+1] ; p++)
 	{
 	    row = Ai [p] ;
-	    DEBUG5 (("  "ID":  row "ID, pp, row)) ;
+	    DEBUG5 (("  " ID ":  row " ID, pp, row)) ;
 	    ASSERT (row >= 0 && row < n_row) ;
 	    newrow = InvRperm1 [row] - n1 ;
 	    ASSERT (newrow < n_row - n1) ;
 	    if (newrow >= 0)
 	    {
-		DEBUG5 (("  newrow "ID, newrow)) ;
+		DEBUG5 (("  newrow " ID, newrow)) ;
 		Si [pp++] = newrow ;
 		if (do_nzdiag)
 		{
@@ -261,7 +261,7 @@ PRIVATE void combine_ordering
 #endif
     for (k = 0 ; k < n1 ; k++)
     {
-	DEBUG1 ((ID" Initial singleton: "ID"\n", k, Cperm1 [k])) ;
+	DEBUG1 ((ID " Initial singleton: " ID "\n", k, Cperm1 [k])) ;
 	Cperm_init [k] = Cperm1 [k] ;
     }
     for (k = n1 ; k < n_col - nempty_col ; k++)
@@ -271,7 +271,7 @@ PRIVATE void combine_ordering
 	newcol = k - n1 ;	/* Qinv's name for this column */
 	knew = Qinv [newcol] ;	/* Qinv's ordering for this column */
 	knew += n1 ;		/* shift order, after singletons */
-	DEBUG1 ((" k "ID" oldcol "ID" newcol "ID" knew "ID"\n",
+	DEBUG1 ((" k " ID " oldcol " ID " newcol " ID " knew " ID "\n",
 	    k, oldcol, newcol, knew)) ;
 	ASSERT (knew >= 0 && knew < n_col - nempty_col) ;
 	ASSERT (Cperm_init [knew] == EMPTY) ;
@@ -375,7 +375,7 @@ GLOBAL Int UMFPACK_qsymbolic
     nb = MIN (nb, MAXNB) ;
     ASSERT (nb >= 0) ;
     if (nb % 2 == 1) nb++ ;	/* make sure nb is even */
-    DEBUG0 (("UMFPACK_qsymbolic: nb = "ID" aggressive = "ID"\n", nb,
+    DEBUG0 (("UMFPACK_qsymbolic: nb = " ID " aggressive = " ID "\n", nb,
 	aggressive)) ;
 
     tol = MAX (0.0, MIN (tol,  1.0)) ;
@@ -428,7 +428,7 @@ GLOBAL Int UMFPACK_qsymbolic
     }
 
     nz = Ap [n_col] ;
-    DEBUG0 (("n_row "ID" n_col "ID" nz "ID"\n", n_row, n_col, nz)) ;
+    DEBUG0 (("n_row " ID " n_col " ID " nz " ID "\n", n_row, n_col, nz)) ;
     Info [UMFPACK_NZ] = nz ;
     if (nz < 0)
     {
@@ -669,7 +669,7 @@ GLOBAL Int UMFPACK_qsymbolic
 	return (UMFPACK_ERROR_out_of_memory) ;
     }
 
-    DEBUG0 (("Symbolic UMF_malloc_count - init_count = "ID"\n",
+    DEBUG0 (("Symbolic UMF_malloc_count - init_count = " ID "\n",
 	UMF_malloc_count - init_count)) ;
     ASSERT (UMF_malloc_count == init_count + 17) ;
 
@@ -806,7 +806,7 @@ GLOBAL Int UMFPACK_qsymbolic
 	    ASSERT (Sdeg [k] >= 0 && Sdeg [k] < n2) ;
 	}
 	ASSERT (Sp [n2] - n2 <= nzaat && nzaat <= 2 * Sp [n2]) ;
-	DEBUG0 (("Explicit zeros: "ID" %g\n", nzdiag, amd_Info [AMD_NZDIAG])) ;
+	DEBUG0 (("Explicit zeros: " ID " %g\n", nzdiag, amd_Info [AMD_NZDIAG])) ;
 #endif
 
     }
@@ -929,7 +929,7 @@ GLOBAL Int UMFPACK_qsymbolic
 #endif
 		InvRperm1, n1, nempty, Sdeg, Rperm_2by2, &nweak, &unmatched,
 		Ri, Rp, SW->Rs, Blen, W, Ci, Wq) ;
-	DEBUGm3 (("2by2: nweak "ID" unmatched "ID"\n", nweak, unmatched)) ;
+	DEBUGm3 (("2by2: nweak " ID " unmatched " ID "\n", nweak, unmatched)) ;
 	Info [UMFPACK_2BY2_NWEAK] = nweak ;
 	Info [UMFPACK_2BY2_UNMATCHED] = unmatched ;
 
@@ -963,7 +963,7 @@ GLOBAL Int UMFPACK_qsymbolic
 	Info [UMFPACK_2BY2_NZ_PA_PLUS_PAT] = nz_papat ;
 	Info [UMFPACK_2BY2_NZDIAG] = nzd2 ;
 
-	DEBUG0 (("2by2: sym2 %g nzd2 "ID" n2 "ID"\n", sym2, nzd2, n2)) ;
+	DEBUG0 (("2by2: sym2 %g nzd2 " ID " n2 " ID "\n", sym2, nzd2, n2)) ;
 
 	/* ------------------------------------------------------------------ */
 	/* evaluate the 2-by-2 results */
@@ -1110,9 +1110,9 @@ GLOBAL Int UMFPACK_qsymbolic
 	DEBUG0 (("Force fixQ false\n")) ;
     }
 
-    DEBUG0 (("Strategy: ordering:   "ID"\n", Symbolic->ordering)) ;
-    DEBUG0 (("Strategy: fixQ:       "ID"\n", fixQ)) ;
-    DEBUG0 (("Strategy: prefer diag "ID"\n", prefer_diagonal)) ;
+    DEBUG0 (("Strategy: ordering:   " ID "\n", Symbolic->ordering)) ;
+    DEBUG0 (("Strategy: fixQ:       " ID "\n", fixQ)) ;
+    DEBUG0 (("Strategy: prefer diag " ID "\n", prefer_diagonal)) ;
 
     /* get statistics from amd_aat, if computed */
     Symbolic->strategy = strategy ;
@@ -1230,7 +1230,7 @@ GLOBAL Int UMFPACK_qsymbolic
 #ifndef NDEBUG
 	for (col = 0 ; col < n_col ; col++)
 	{
-	    DEBUG1 (("Cperm_init ["ID"] = "ID"\n", col, Cperm_init[col]));
+	    DEBUG1 (("Cperm_init [" ID "] = " ID "\n", col, Cperm_init[col]));
 	}
 	/* make sure colamd returned a valid permutation */
 	ASSERT (Cperm_init != (Int *) NULL) ;
@@ -1261,7 +1261,7 @@ GLOBAL Int UMFPACK_qsymbolic
     ASSERT (UMF_is_permutation (Cperm_init, Ci, n_col, n_col)) ;
     for (k = 0 ; k < n_col ; k++)
     {
-	DEBUG3 ((ID"\n", Cperm_init [k])) ;
+	DEBUG3 ((ID "\n", Cperm_init [k])) ;
     }
     /* ensure that empty columns have been placed last in A (:,Cperm_init) */
     for (newj = 0 ; newj < n_col ; newj++)
@@ -1377,7 +1377,7 @@ GLOBAL Int UMFPACK_qsymbolic
 	ASSERT (UMF_is_permutation (P, W, n_row - n1, n_row - n1)) ;
 	for (k = 0 ; k < n_row - n1 ; k++)
 	{
-	    DEBUG3 ((ID"\n", P [k])) ;
+	    DEBUG3 ((ID "\n", P [k])) ;
 	}
 #endif
 
@@ -1531,7 +1531,7 @@ GLOBAL Int UMFPACK_qsymbolic
 	SYM_WORK_USAGE (n_col, n_row, Clen) + Info [UMFPACK_SYMBOLIC_SIZE] ;
     Symbolic->peak_sym_usage = Info [UMFPACK_SYMBOLIC_PEAK_MEMORY] ;
 
-    DEBUG0 (("Number of fronts: "ID"\n", nfr)) ;
+    DEBUG0 (("Number of fronts: " ID "\n", nfr)) ;
 
     /* ---------------------------------------------------------------------- */
     /* allocate the second part of the Symbolic object (Front_*, Chain_*) */
@@ -1574,7 +1574,7 @@ GLOBAL Int UMFPACK_qsymbolic
 	error (&Symbolic, SW) ;
 	return (UMFPACK_ERROR_out_of_memory) ;
     }
-    DEBUG0 (("Symbolic UMF_malloc_count - init_count = "ID"\n",
+    DEBUG0 (("Symbolic UMF_malloc_count - init_count = " ID "\n",
 	UMF_malloc_count - init_count)) ;
     ASSERT (UMF_malloc_count == init_count + 21
 	+ (SW->Rperm_2by2 != (Int *) NULL)
@@ -1611,7 +1611,7 @@ GLOBAL Int UMFPACK_qsymbolic
 	    row = Rperm1 [k] ;
 	    InFront [row] = EMPTY ;
 	}
-	DEBUG1 (("Front (EMPTY), singleton nrows "ID" ncols "ID"\n", k, k)) ;
+	DEBUG1 (("Front (EMPTY), singleton nrows " ID " ncols " ID "\n", k, k)) ;
 	newj = n1 ;
 	for (i = 0 ; i < nfr ; i++)
 	{
@@ -1629,14 +1629,14 @@ GLOBAL Int UMFPACK_qsymbolic
 		    if (InFront [row] == nfr)
 		    {
 			/* this row belongs to front i */
-			DEBUG1 (("    Row "ID" in Front "ID"\n", row, i)) ;
+			DEBUG1 (("    Row " ID " in Front " ID "\n", row, i)) ;
 			InFront [row] = i ;
 			f1rows++ ;
 		    }
 		}
 	    }
 	    Front_1strow [i] = f1rows ;
-	    DEBUG1 (("    Front "ID" has 1strows: "ID" pivcols "ID"\n",
+	    DEBUG1 (("    Front " ID " has 1strows: " ID " pivcols " ID "\n",
 		i, f1rows, fpivcol)) ;
 	}
 
@@ -1694,15 +1694,15 @@ GLOBAL Int UMFPACK_qsymbolic
     {
 	if (InFront [row] == nfr)
 	{
-	    DEBUG1 (("    Row "ID" in Dummy Front "ID"\n", row, nfr)) ;
+	    DEBUG1 (("    Row " ID " in Dummy Front " ID "\n", row, nfr)) ;
 	}
 	else if (InFront [row] == EMPTY)
 	{
-	    DEBUG1 (("    singleton Row "ID"\n", row)) ;
+	    DEBUG1 (("    singleton Row " ID "\n", row)) ;
 	}
 	else
 	{
-	    DEBUG1 (("    Row "ID" in Front "ID"\n", row, nfr)) ;
+	    DEBUG1 (("    Row " ID " in Front " ID "\n", row, nfr)) ;
 	}
     }
 #endif
@@ -1715,7 +1715,7 @@ GLOBAL Int UMFPACK_qsymbolic
     for (i = 0 ; i < nfr ; i++)
     {
 	fpivcol = Fr_npivcol [i] ;
-	DEBUG1 (("Front "ID" k "ID" npivcol "ID" nrows "ID" ncols "ID"\n",
+	DEBUG1 (("Front " ID " k " ID " npivcol " ID " nrows " ID " ncols " ID "\n",
 	    i, k, fpivcol, Fr_nrows [i], Fr_ncols [i])) ;
 	k += fpivcol ;
 	/* copy Front info into Symbolic object from SW */
@@ -1724,7 +1724,7 @@ GLOBAL Int UMFPACK_qsymbolic
     }
 
     /* assign empty columns to dummy placehold front nfr */
-    DEBUG1 (("Dummy Cols in Front "ID" : "ID"\n", nfr, n_col-k)) ;
+    DEBUG1 (("Dummy Cols in Front " ID " : " ID "\n", nfr, n_col-k)) ;
     Front_npivcol [nfr] = n_col - k ;
     Front_parent [nfr] = EMPTY ;
 
@@ -1742,17 +1742,17 @@ GLOBAL Int UMFPACK_qsymbolic
     for (i = 0 ; i < nfr ; i++)
     {
 	f1rows = Front_1strow [i] ;
-	DEBUG1 (("Front "ID" : npivcol "ID" parent "ID,
+	DEBUG1 (("Front " ID " : npivcol " ID " parent " ID,
 	    i, Front_npivcol [i], Front_parent [i])) ;
-	DEBUG1 (("    1st rows in Front "ID" : "ID"\n", i, f1rows)) ;
+	DEBUG1 (("    1st rows in Front " ID " : " ID "\n", i, f1rows)) ;
 	Front_1strow [i] = k ;
 	k += f1rows ;
     }
 
     /* assign empty rows to dummy placehold front nfr */
-    DEBUG1 (("Rows in Front "ID" (dummy): "ID"\n", nfr, n_row-k)) ;
+    DEBUG1 (("Rows in Front " ID " (dummy): " ID "\n", nfr, n_row-k)) ;
     Front_1strow [nfr] = k ;
-    DEBUG1 (("nfr "ID" 1strow[nfr] "ID" nrow "ID"\n", nfr, k, n_row)) ;
+    DEBUG1 (("nfr " ID " 1strow[nfr] " ID " nrow " ID "\n", nfr, k, n_row)) ;
 
     /* Use Ci as temporary workspace for F1 */
     F1 = Ci ;				/* [ of size nfr+1 */
@@ -1778,7 +1778,7 @@ GLOBAL Int UMFPACK_qsymbolic
 #ifndef NDEBUG
     for (k = 0 ; k < n_row ; k++)
     {
-	DEBUG2 (("Rperm_init ["ID"] = "ID"\n", k, Rperm_init [k])) ;
+	DEBUG2 (("Rperm_init [" ID "] = " ID "\n", k, Rperm_init [k])) ;
     }
 #endif
 
@@ -1850,7 +1850,7 @@ GLOBAL Int UMFPACK_qsymbolic
 	for (newcol = 0 ; newcol < nn ; newcol++)
 	{
 	    oldcol = Cperm_init [newcol] ;
-	    DEBUG3 (("oldcol "ID" newcol "ID":\n", oldcol, newcol)) ;
+	    DEBUG3 (("oldcol " ID " newcol " ID ":\n", oldcol, newcol)) ;
 	    for (p = Ap [oldcol] ; p < Ap [oldcol+1] ; p++)
 	    {
 		Entry aij ;
@@ -1863,14 +1863,14 @@ GLOBAL Int UMFPACK_qsymbolic
 		}
 		if (oldrow == oldcol)
 		{
-		    DEBUG2 (("     old diagonal : oldcol "ID" oldrow "ID" ",
+		    DEBUG2 (("     old diagonal : oldcol " ID " oldrow " ID " ",
 			    oldcol, oldrow)) ;
 		    EDEBUG2 (aij) ;
 		    DEBUG2 (("\n")) ;
 		}
 		if (newrow == Diagonal_map [newcol])
 		{
-		    DEBUG2 (("     MAP diagonal : newcol "ID" MAProw "ID" ",
+		    DEBUG2 (("     MAP diagonal : newcol " ID " MAProw " ID " ",
 			    newcol, Diagonal_map [newrow])) ;
 		    EDEBUG2 (aij) ;
 		    DEBUG2 (("\n")) ;
@@ -1894,14 +1894,14 @@ GLOBAL Int UMFPACK_qsymbolic
     for (i = 0 ; i < nfr ; i++)
     {
 	/* start at i and walk up the tree */
-	DEBUG2 (("Walk up front tree from "ID"\n", i)) ;
+	DEBUG2 (("Walk up front tree from " ID "\n", i)) ;
 	j = i ;
 	while (j != EMPTY && Front_leftmostdesc [j] == EMPTY)
 	{
-	    DEBUG3 (("  Leftmost desc of "ID" is "ID"\n", j, i)) ;
+	    DEBUG3 (("  Leftmost desc of " ID " is " ID "\n", j, i)) ;
 	    Front_leftmostdesc [j] = i ;
 	    j = Front_parent [j] ;
-	    DEBUG3 (("  go to j = "ID"\n", j)) ;
+	    DEBUG3 (("  go to j = " ID "\n", j)) ;
 	}
     }
 
@@ -1931,21 +1931,21 @@ GLOBAL Int UMFPACK_qsymbolic
 	maxrows = MAX (maxrows, fallrows) ;
 	maxcols = MAX (maxcols, fallcols) ;
 
-	DEBUG1 (("Front: "ID", pivcol "ID", "ID"-by-"ID" parent "ID
-	    ", npiv "ID" Chain: maxrows "ID" maxcols "ID"\n", i, fpivcol,
+	DEBUG1 (("Front: " ID ", pivcol " ID ", " ID "-by-" ID " parent " ID
+	    ", npiv " ID " Chain: maxrows " ID " maxcols " ID "\n", i, fpivcol,
 	    fallrows, fallcols, parent, fpiv, maxrows, maxcols)) ;
 
 	if (parent != i+1)
 	{
 	    /* this is the end of a chain */
 	    double s ;
-	    DEBUG1 (("\nEnd of chain "ID"\n", nchains)) ;
+	    DEBUG1 (("\nEnd of chain " ID "\n", nchains)) ;
 
 	    /* make sure maxrows is an odd number */
 	    ASSERT (maxrows >= 0) ;
 	    if (maxrows % 2 == 0) maxrows++ ;
 
-	    DEBUG1 (("Chain maxrows "ID" maxcols "ID"\n", maxrows, maxcols)) ;
+	    DEBUG1 (("Chain maxrows " ID " maxcols " ID "\n", maxrows, maxcols)) ;
 
 	    Chain_maxrows [nchains] = maxrows ;
 	    Chain_maxcols [nchains] = maxcols ;
@@ -1972,7 +1972,7 @@ GLOBAL Int UMFPACK_qsymbolic
 
     /* for Info only: */
     dmaxfrsize = ceil (dmaxfrsize) ;
-    DEBUGm1 (("dmaxfrsize %30.20g Int_MAX "ID"\n", dmaxfrsize, Int_MAX)) ;
+    DEBUGm1 (("dmaxfrsize %30.20g Int_MAX " ID "\n", dmaxfrsize, Int_MAX)) ;
     ASSERT (Symbolic->nchains == nchains) ;
 
     /* For allocating objects in umfpack_numeric (does not include all possible
@@ -1982,7 +1982,7 @@ GLOBAL Int UMFPACK_qsymbolic
      * matrix.  maxnrows is always odd. */
     Symbolic->maxnrows = maxnrows ;
     Symbolic->maxncols = maxncols ;
-    DEBUGm3 (("maxnrows "ID" maxncols "ID"\n", maxnrows, maxncols)) ;
+    DEBUGm3 (("maxnrows " ID " maxncols " ID "\n", maxnrows, maxncols)) ;
 
     /* ---------------------------------------------------------------------- */
     /* find the initial element sizes */
@@ -2067,7 +2067,7 @@ GLOBAL Int UMFPACK_qsymbolic
     /* allocate the Rpi and Rpx workspace for UMF_kernel_init (incl. headers) */
     tail_usage  +=  UNITS (Int *, n_row+1) +  UNITS (Entry *, n_row+1) + 2 ;
     dtail_usage += DUNITS (Int *, n_row+1) + DUNITS (Entry *, n_row+1) + 2 ;
-    DEBUG1 (("Symbolic usage after Rpi/Rpx allocation: head "ID" tail "ID"\n",
+    DEBUG1 (("Symbolic usage after Rpi/Rpx allocation: head " ID " tail " ID "\n",
 	head_usage, tail_usage)) ;
 
     /* LU factors for singletons, at the head of memory */
@@ -2077,20 +2077,20 @@ GLOBAL Int UMFPACK_qsymbolic
 	unz = Rdeg [k] - 1 ;
 	dlnz += lnz ;
 	dunz += unz ;
-	DEBUG1 (("singleton k "ID" pivrow "ID" pivcol "ID" lnz "ID" unz "ID"\n",
+	DEBUG1 (("singleton k " ID " pivrow " ID " pivcol " ID " lnz " ID " unz " ID "\n",
 	    k, Rperm_init [k], Cperm_init [k], lnz, unz)) ;
 	head_usage  +=  UNITS (Int, lnz) +  UNITS (Entry, lnz)
 		    +   UNITS (Int, unz) +  UNITS (Entry, unz) ;
 	dhead_usage += DUNITS (Int, lnz) + DUNITS (Entry, lnz)
 		    +  DUNITS (Int, unz) + DUNITS (Entry, unz) ;
     }
-    DEBUG1 (("Symbolic init head usage: "ID" for LU singletons\n",head_usage)) ;
+    DEBUG1 (("Symbolic init head usage: " ID " for LU singletons\n",head_usage)) ;
 
     /* column elements: */
     for (k = n1 ; k < n_col - nempty_col; k++)
     {
 	esize = Esize ? Esize [k-n1] : Cdeg [k] ;
-	DEBUG2 (("   esize: "ID"\n", esize)) ;
+	DEBUG2 (("   esize: " ID "\n", esize)) ;
 	ASSERT (esize >= 0) ;
 	if (esize > 0)
 	{
@@ -2116,7 +2116,7 @@ GLOBAL Int UMFPACK_qsymbolic
 	Info [UMFPACK_NDENSE_ROW] = nrow_elements ;
     }
 
-    DEBUG1 (("Symbolic usage: "ID" = head "ID" + tail "ID" after els\n",
+    DEBUG1 (("Symbolic usage: " ID " = head " ID " + tail " ID " after els\n",
 	head_usage + tail_usage, head_usage, tail_usage)) ;
 
     /* compute the tuple lengths */
@@ -2163,7 +2163,7 @@ GLOBAL Int UMFPACK_qsymbolic
     }
 
     Symbolic->num_mem_init_usage = head_usage + tail_usage ;
-    DEBUG1 (("Symbolic usage: "ID" = head "ID" + tail "ID" final\n",
+    DEBUG1 (("Symbolic usage: " ID " = head " ID " + tail " ID " final\n",
 	Symbolic->num_mem_init_usage, head_usage, tail_usage)) ;
 
     ASSERT (UMF_is_permutation (Rperm_init, Ci, n_row, n_row)) ;
@@ -2308,7 +2308,7 @@ GLOBAL Int UMFPACK_qsymbolic
 #ifndef NDEBUG
     for (i = 0 ; i < nchains ; i++)
     {
-	DEBUG2 (("Chain "ID" start "ID" end "ID" maxrows "ID" maxcols "ID"\n",
+	DEBUG2 (("Chain " ID " start " ID " end " ID " maxrows " ID " maxcols " ID "\n",
 		i, Chain_start [i], Chain_start [i+1] - 1,
 		Chain_maxrows [i], Chain_maxcols [i])) ;
 	UMF_dump_chain (Chain_start [i], Fr_parent, Fr_npivcol, Fr_nrows,
@@ -2319,8 +2319,8 @@ GLOBAL Int UMFPACK_qsymbolic
     {
 	fpivcol = MAX (fpivcol, Front_npivcol [i]) ;
     }
-    DEBUG0 (("Max pivot cols in any front: "ID"\n", fpivcol)) ;
-    DEBUG1 (("Largest front: maxnrows "ID" maxncols "ID" dmaxfrsize %g\n",
+    DEBUG0 (("Max pivot cols in any front: " ID "\n", fpivcol)) ;
+    DEBUG1 (("Largest front: maxnrows " ID " maxncols " ID " dmaxfrsize %g\n",
 	maxnrows, maxncols, dmaxfrsize)) ;
 #endif
 
@@ -2345,7 +2345,7 @@ GLOBAL Int UMFPACK_qsymbolic
 
     free_work (SW) ;
 
-    DEBUG0 (("(3)Symbolic UMF_malloc_count - init_count = "ID"\n",
+    DEBUG0 (("(3)Symbolic UMF_malloc_count - init_count = " ID "\n",
 	UMF_malloc_count - init_count)) ;
     ASSERT (UMF_malloc_count == init_count + 12
 	+ (Symbolic->Esize != (Int *) NULL)

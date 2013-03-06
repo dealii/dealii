@@ -22,7 +22,7 @@ GLOBAL Int UMF_mem_alloc_head_block
 )
 {
     Int p, usage ;
-    DEBUG2 (("GET  BLOCK: from head, size "ID" ", nunits)) ;
+    DEBUG2 (("GET  BLOCK: from head, size " ID " ", nunits)) ;
 
     ASSERT (Numeric != (NumericType *) NULL) ;
     ASSERT (Numeric->Memory != (Unit *) NULL) ;
@@ -47,7 +47,7 @@ GLOBAL Int UMF_mem_alloc_head_block
     p = Numeric->ihead ;
     Numeric->ihead += nunits ;
 
-    DEBUG2 (("p: "ID"\n", p)) ;
+    DEBUG2 (("p: " ID "\n", p)) ;
     usage = Numeric->ihead + Numeric->tail_usage ;
     Numeric->max_usage = MAX (Numeric->max_usage, usage) ;
     return (p) ;

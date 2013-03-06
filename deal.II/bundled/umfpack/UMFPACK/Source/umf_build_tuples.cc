@@ -53,7 +53,7 @@ GLOBAL Int UMF_build_tuples
     nel = Work->nel ;
     n1 = Work->n1 ;
 
-    DEBUG3 (("BUILD_TUPLES: n_row "ID" n_col "ID" nel "ID"\n",
+    DEBUG3 (("BUILD_TUPLES: n_row " ID " n_col " ID " nel " ID "\n",
 	n_row, n_col, nel)) ;
 
     /* ---------------------------------------------------------------------- */
@@ -109,7 +109,7 @@ GLOBAL Int UMF_build_tuples
     /* for all elements, in order of creation */
     for (e = 1 ; e <= nel ; e++)
     {
-	DEBUG9 (("Adding tuples for element: "ID" at "ID"\n", e, E [e])) ;
+	DEBUG9 (("Adding tuples for element: " ID " at " ID "\n", e, E [e])) ;
 	ASSERT (E [e]) ;	/* no external fragmentation */
 	p = Numeric->Memory + E [e] ;
 	GET_ELEMENT_PATTERN (ep, p, Cols, Rows, ncols) ;

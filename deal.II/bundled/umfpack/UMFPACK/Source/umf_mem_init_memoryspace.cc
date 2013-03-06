@@ -24,7 +24,7 @@ GLOBAL void UMF_mem_init_memoryspace
     ASSERT (Numeric != (NumericType *) NULL) ;
     ASSERT (Numeric->Memory != (Unit *) NULL) ;
     ASSERT (Numeric->size >= 3) ;
-    DEBUG0 (("Init memory space, size "ID"\n", Numeric->size)) ;
+    DEBUG0 (("Init memory space, size " ID "\n", Numeric->size)) ;
 
     Numeric->ngarbage = 0 ;
     Numeric->nrealloc = 0 ;
@@ -40,7 +40,7 @@ GLOBAL void UMF_mem_init_memoryspace
     /* allocate the 2-unit tail marker block and initialize it */
     Numeric->itail -= 2 ;
     p = Numeric->Memory + Numeric->itail ;
-    DEBUG2 (("p "ID" tail "ID"\n", (Int) (p-Numeric->Memory), Numeric->itail)) ;
+    DEBUG2 (("p " ID " tail " ID "\n", (Int) (p-Numeric->Memory), Numeric->itail)) ;
     Numeric->tail_usage = 2 ;
     p->header.prevsize = 0 ;
     p->header.size = 1 ;

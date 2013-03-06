@@ -25,7 +25,7 @@ GLOBAL Int UMF_report_perm
 
     ASSERT (prl >= 3) ;
 
-    PRINTF4U (("permutation vector, n = "ID". ", n)) ;
+    PRINTF4U (("permutation vector, n = " ID ". ", n)) ;
 
     if (n <= 0)
     {
@@ -57,7 +57,7 @@ GLOBAL Int UMF_report_perm
     for (k = 0 ; k < n ; k++)
     {
 	i = P [k] ;
-	PRINTF4 (("    "ID" : "ID" ", INDEX (k), INDEX (i))) ;
+	PRINTF4 (("    " ID " : " ID " ", INDEX (k), INDEX (i))) ;
 	valid = (i >= 0 && i < n) ;
 	if (valid)
 	{

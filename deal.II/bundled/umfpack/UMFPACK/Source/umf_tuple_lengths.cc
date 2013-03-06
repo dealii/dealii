@@ -47,7 +47,7 @@ GLOBAL Int UMF_tuple_lengths	    /* return memory usage */
     n1 = Work->n1 ;
     nel = Work->nel ;
 
-    DEBUG3 (("TUPLE_LENGTHS: n_row "ID" n_col "ID" nel "ID"\n",
+    DEBUG3 (("TUPLE_LENGTHS: n_row " ID " n_col " ID " nel " ID "\n",
 	n_row, n_col, nel)) ;
     ASSERT (nel < Work->elen) ;
 
@@ -110,7 +110,7 @@ GLOBAL Int UMF_tuple_lengths	    /* return memory usage */
 	{
 	    usage  += 1 +  UNITS (Tuple, TUPLES (Col_tlen [col])) ;
 	    dusage += 1 + DUNITS (Tuple, TUPLES (Col_tlen [col])) ;
-	    DEBUG0 ((" col: "ID" tlen "ID" usage so far: "ID"\n",
+	    DEBUG0 ((" col: " ID " tlen " ID " usage so far: " ID "\n",
 		     col, Col_tlen [col], usage)) ;
 	}
     }
@@ -123,12 +123,12 @@ GLOBAL Int UMF_tuple_lengths	    /* return memory usage */
 	{
 	    usage  += 1 +  UNITS (Tuple, TUPLES (Row_tlen [row])) ;
 	    dusage += 1 + DUNITS (Tuple, TUPLES (Row_tlen [row])) ;
-	    DEBUG0 ((" row: "ID" tlen "ID" usage so far: "ID"\n",
+	    DEBUG0 ((" row: " ID " tlen " ID " usage so far: " ID "\n",
 		     row, Row_tlen [row], usage)) ;
 	}
     }
 
-    DEBUG0 (("UMF_build_tuples_usage "ID" %g\n", usage, dusage)) ;
+    DEBUG0 (("UMF_build_tuples_usage " ID " %g\n", usage, dusage)) ;
 
     *p_dusage = dusage ;
     return (usage) ;

@@ -63,7 +63,7 @@ GLOBAL void UMFPACK_report_control
     /* printing level */
     /* ---------------------------------------------------------------------- */
 
-    PRINTF (("\n    "ID": print level: "ID"\n",
+    PRINTF (("\n    " ID ": print level: " ID "\n",
 	(Int) INDEX (UMFPACK_PRL), prl)) ;
 
     /* ---------------------------------------------------------------------- */
@@ -73,11 +73,11 @@ GLOBAL void UMFPACK_report_control
     drow = GET_CONTROL (UMFPACK_DENSE_ROW, UMFPACK_DEFAULT_DENSE_ROW) ;
     dcol = GET_CONTROL (UMFPACK_DENSE_COL, UMFPACK_DEFAULT_DENSE_COL) ;
 
-    PRINTF (("    "ID": dense row parameter:    %g\n",
+    PRINTF (("    " ID ": dense row parameter:    %g\n",
 	(Int) INDEX (UMFPACK_DENSE_ROW), drow)) ;
     PRINTF (("        \"dense\" rows have    > max (16, (%g)*16*sqrt(n_col)"
 	" entries)\n", drow)) ;
-    PRINTF (("    "ID": dense column parameter: %g\n",
+    PRINTF (("    " ID ": dense column parameter: %g\n",
 	(Int) INDEX (UMFPACK_DENSE_COL), dcol)) ;
     PRINTF (("        \"dense\" columns have > max (16, (%g)*16*sqrt(n_row)"
 	" entries)\n", dcol)) ;
@@ -89,7 +89,7 @@ GLOBAL void UMFPACK_report_control
     relpt = GET_CONTROL (UMFPACK_PIVOT_TOLERANCE,
 	UMFPACK_DEFAULT_PIVOT_TOLERANCE) ;
     relpt = MAX (0.0, MIN (relpt, 1.0)) ;
-    PRINTF (("    "ID": pivot tolerance: %g\n",
+    PRINTF (("    " ID ": pivot tolerance: %g\n",
 	(Int) INDEX (UMFPACK_PIVOT_TOLERANCE), relpt)) ;
 
     /* ---------------------------------------------------------------------- */
@@ -98,7 +98,7 @@ GLOBAL void UMFPACK_report_control
 
     nb = GET_CONTROL (UMFPACK_BLOCK_SIZE, UMFPACK_DEFAULT_BLOCK_SIZE) ;
     nb = MAX (1, nb) ;
-    PRINTF (("    "ID": block size for dense matrix kernels: "ID"\n",
+    PRINTF (("    " ID ": block size for dense matrix kernels: " ID "\n",
 	(Int) INDEX (UMFPACK_BLOCK_SIZE), nb)) ;
 
     /* ---------------------------------------------------------------------- */
@@ -112,7 +112,7 @@ GLOBAL void UMFPACK_report_control
 	strategy = UMFPACK_STRATEGY_AUTO ;
     }
 
-    PRINTF (("    "ID": strategy: "ID,
+    PRINTF (("    " ID ": strategy: " ID,
 	(Int) INDEX (UMFPACK_STRATEGY), strategy)) ;
 
     if (strategy == UMFPACK_STRATEGY_SYMMETRIC)
@@ -148,14 +148,14 @@ GLOBAL void UMFPACK_report_control
     alloc_init = GET_CONTROL (UMFPACK_ALLOC_INIT, UMFPACK_DEFAULT_ALLOC_INIT) ;
     if (alloc_init >= 0)
     {
-	PRINTF (("    "ID": initial allocation ratio: %g\n",
+	PRINTF (("    " ID ": initial allocation ratio: %g\n",
 	(Int) INDEX (UMFPACK_ALLOC_INIT), alloc_init)) ;
     }
     else
     {
 	s = -alloc_init ;
 	s = MAX (1, s) ;
-	PRINTF (("    "ID": initial allocation (in Units): "ID"\n",
+	PRINTF (("    " ID ": initial allocation (in Units): " ID "\n",
 	(Int) INDEX (UMFPACK_ALLOC_INIT), s)) ;
     }
 
@@ -165,7 +165,7 @@ GLOBAL void UMFPACK_report_control
 
     irstep = GET_CONTROL (UMFPACK_IRSTEP, UMFPACK_DEFAULT_IRSTEP) ;
     irstep = MAX (0, irstep) ;
-    PRINTF (("    "ID": max iterative refinement steps: "ID"\n",
+    PRINTF (("    " ID ": max iterative refinement steps: " ID "\n",
 	(Int) INDEX (UMFPACK_IRSTEP), irstep)) ;
 
     /* ---------------------------------------------------------------------- */
@@ -174,7 +174,7 @@ GLOBAL void UMFPACK_report_control
 
     tol = GET_CONTROL (UMFPACK_2BY2_TOLERANCE, UMFPACK_DEFAULT_2BY2_TOLERANCE) ;
     tol = MAX (0.0, MIN (tol, 1.0)) ;
-    PRINTF (("    "ID": 2-by-2 pivot tolerance: %g\n",
+    PRINTF (("    " ID ": 2-by-2 pivot tolerance: %g\n",
 	(Int) INDEX (UMFPACK_2BY2_TOLERANCE), tol)) ;
 
     /* ---------------------------------------------------------------------- */
@@ -182,7 +182,7 @@ GLOBAL void UMFPACK_report_control
     /* ---------------------------------------------------------------------- */
 
     force_fixQ = GET_CONTROL (UMFPACK_FIXQ, UMFPACK_DEFAULT_FIXQ) ;
-    PRINTF (("    "ID": Q fixed during numerical factorization: %g ",
+    PRINTF (("    " ID ": Q fixed during numerical factorization: %g ",
 	(Int) INDEX (UMFPACK_FIXQ), force_fixQ)) ;
     if (force_fixQ > 0)
     {
@@ -202,7 +202,7 @@ GLOBAL void UMFPACK_report_control
     /* ---------------------------------------------------------------------- */
 
     amd_alpha = GET_CONTROL (UMFPACK_AMD_DENSE, UMFPACK_DEFAULT_AMD_DENSE) ;
-    PRINTF (("    "ID": AMD dense row/col parameter:    %g\n",
+    PRINTF (("    " ID ": AMD dense row/col parameter:    %g\n",
 	(Int) INDEX (UMFPACK_AMD_DENSE), amd_alpha)) ;
     if (amd_alpha < 0)
     {
@@ -222,7 +222,7 @@ GLOBAL void UMFPACK_report_control
     relpt2 = GET_CONTROL (UMFPACK_SYM_PIVOT_TOLERANCE,
 	UMFPACK_DEFAULT_SYM_PIVOT_TOLERANCE) ;
     relpt2 = MAX (0.0, MIN (relpt2, 1.0)) ;
-    PRINTF (("    "ID": diagonal pivot tolerance: %g\n"
+    PRINTF (("    " ID ": diagonal pivot tolerance: %g\n"
 	"        Only used if diagonal pivoting is attempted.\n",
 	(Int) INDEX (UMFPACK_SYM_PIVOT_TOLERANCE), relpt2)) ;
 
@@ -235,7 +235,7 @@ GLOBAL void UMFPACK_report_control
     {
 	scale = UMFPACK_DEFAULT_SCALE ;
     }
-    PRINTF (("    "ID": scaling: "ID, (Int) INDEX (UMFPACK_SCALE), scale)) ;
+    PRINTF (("    " ID ": scaling: " ID, (Int) INDEX (UMFPACK_SCALE), scale)) ;
     if (scale == UMFPACK_SCALE_NONE)
     {
 	PRINTF ((" (no)")) ;
@@ -259,14 +259,14 @@ GLOBAL void UMFPACK_report_control
     front_alloc_init = MIN (1.0, front_alloc_init) ;
     if (front_alloc_init >= 0)
     {
-	PRINTF (("    "ID": frontal matrix allocation ratio: %g\n",
+	PRINTF (("    " ID ": frontal matrix allocation ratio: %g\n",
 	(Int) INDEX (UMFPACK_FRONT_ALLOC_INIT), front_alloc_init)) ;
     }
     else
     {
 	s = -front_alloc_init ;
 	s = MAX (1, s) ;
-	PRINTF (("    "ID": initial frontal matrix size (# of Entry's): "ID"\n",
+	PRINTF (("    " ID ": initial frontal matrix size (# of Entry's): " ID "\n",
 	(Int) INDEX (UMFPACK_FRONT_ALLOC_INIT), s)) ;
     }
 
@@ -275,7 +275,7 @@ GLOBAL void UMFPACK_report_control
     /* ---------------------------------------------------------------------- */
 
     droptol = GET_CONTROL (UMFPACK_DROPTOL, UMFPACK_DEFAULT_DROPTOL) ;
-    PRINTF (("    "ID": drop tolerance: %g\n",
+    PRINTF (("    " ID ": drop tolerance: %g\n",
 	(Int) INDEX (UMFPACK_DROPTOL), droptol)) ;
 
     /* ---------------------------------------------------------------------- */
@@ -283,7 +283,7 @@ GLOBAL void UMFPACK_report_control
     /* ---------------------------------------------------------------------- */
 
     aggr = GET_CONTROL (UMFPACK_AGGRESSIVE, UMFPACK_DEFAULT_AGGRESSIVE) ;
-    PRINTF (("    "ID": AMD and COLAMD aggressive absorption: %g",
+    PRINTF (("    " ID ": AMD and COLAMD aggressive absorption: %g",
 	(Int) INDEX (UMFPACK_AGGRESSIVE), aggr)) ;
     if (aggr != 0.0)
     {
@@ -301,42 +301,42 @@ GLOBAL void UMFPACK_report_control
     PRINTF ((
 	"\n    The following options can only be changed at compile-time:\n")) ;
 
-    PRINTF (("    "ID": BLAS library used:  ",
+    PRINTF (("    " ID ": BLAS library used:  ",
 	(Int) INDEX (UMFPACK_COMPILED_WITH_BLAS))) ;
 
 #ifdef NBLAS
     PRINTF (("none.  UMFPACK will be slow.\n")) ;
 #else
-    PRINTF (("Fortran BLAS.  size of BLAS integer: "ID"\n",
+    PRINTF (("Fortran BLAS.  size of BLAS integer: " ID "\n",
 	(Int) (sizeof (BLAS_INT)))) ;
 #endif
 
 #ifdef MATLAB_MEX_FILE
-    PRINTF (("    "ID": compiled for MATLAB\n",
+    PRINTF (("    " ID ": compiled for MATLAB\n",
 	(Int) INDEX (UMFPACK_COMPILED_FOR_MATLAB))) ;
 #else
 #ifdef MATHWORKS
-    PRINTF (("    "ID": compiled for MATLAB\n",
+    PRINTF (("    " ID ": compiled for MATLAB\n",
 	(Int) INDEX (UMFPACK_COMPILED_FOR_MATLAB))) ;
 #else
-    PRINTF (("    "ID": compiled for ANSI C\n",
+    PRINTF (("    " ID ": compiled for ANSI C\n",
 	(Int) INDEX (UMFPACK_COMPILED_FOR_MATLAB))) ;
 #endif
 #endif
 
 #ifdef NO_TIMER
-    PRINTF (("    "ID": no CPU timer \n",
+    PRINTF (("    " ID ": no CPU timer \n",
 	(Int) INDEX (UMFPACK_COMPILED_WITH_GETRUSAGE))) ;
 #else
 #ifndef NPOSIX
-    PRINTF (("    "ID": CPU timer is POSIX times ( ) routine.\n",
+    PRINTF (("    " ID ": CPU timer is POSIX times ( ) routine.\n",
 	(Int) INDEX (UMFPACK_COMPILED_WITH_GETRUSAGE))) ;
 #else
 #ifdef GETRUSAGE
-    PRINTF (("    "ID": CPU timer is getrusage.\n",
+    PRINTF (("    " ID ": CPU timer is getrusage.\n",
 	(Int) INDEX (UMFPACK_COMPILED_WITH_GETRUSAGE))) ;
 #else
-    PRINTF (("    "ID": CPU timer is ANSI C clock (may wrap around).\n",
+    PRINTF (("    " ID ": CPU timer is ANSI C clock (may wrap around).\n",
 	(Int) INDEX (UMFPACK_COMPILED_WITH_GETRUSAGE))) ;
 #endif
 #endif
@@ -345,10 +345,10 @@ GLOBAL void UMFPACK_report_control
 #ifndef NDEBUG
     PRINTF ((
 "**** Debugging enabled (UMFPACK will be exceedingly slow!) *****************\n"
-"    "ID": compiled with debugging enabled. ",
+"    " ID ": compiled with debugging enabled. ",
 	(Int) INDEX (UMFPACK_COMPILED_IN_DEBUG_MODE))) ;
 #else
-    PRINTF (("    "ID": compiled for normal operation (debugging disabled)\n",
+    PRINTF (("    " ID ": compiled for normal operation (debugging disabled)\n",
 	(Int) INDEX (UMFPACK_COMPILED_IN_DEBUG_MODE))) ;
 #endif
 

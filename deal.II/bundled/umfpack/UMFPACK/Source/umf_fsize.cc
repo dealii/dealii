@@ -51,17 +51,17 @@ GLOBAL void UMF_fsize
 		/* :: frsize int overflow :: */
 		frsize = Int_MAX ;
 	    }
-	    DEBUG1 ((""ID" : npiv "ID" size "ID" parent "ID" ",
+	    DEBUG1 (("" ID " : npiv " ID " size " ID " parent " ID " ",
 		j, Npiv [j], frsize, parent)) ;
 	    Fsize [j] = MAX (Fsize [j], frsize) ;
-	    DEBUG1 (("Fsize [j = "ID"] = "ID"\n", j, Fsize [j])) ;
+	    DEBUG1 (("Fsize [j = " ID "] = " ID "\n", j, Fsize [j])) ;
 	    if (parent != EMPTY)
 	    {
 		/* find the maximum frontsize of self and children */
 		ASSERT (Npiv [parent] > 0) ;
 		ASSERT (parent > j) ;
 		Fsize [parent] = MAX (Fsize [parent], Fsize [j]) ;
-		DEBUG1 (("Fsize [parent = "ID"] = "ID"\n",
+		DEBUG1 (("Fsize [parent = " ID "] = " ID "\n",
 		    parent, Fsize [parent]));
 	    }
 	}

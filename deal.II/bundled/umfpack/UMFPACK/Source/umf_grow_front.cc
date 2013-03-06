@@ -43,7 +43,7 @@ GLOBAL Int UMF_grow_front
 
 #ifndef NDEBUG
     if (do_what != -1) UMF_debug++ ;
-    DEBUG0 (("\n\n====================GROW FRONT: do_what: "ID"\n", do_what)) ;
+    DEBUG0 (("\n\n====================GROW FRONT: do_what: " ID "\n", do_what)) ;
     if (do_what != -1) UMF_debug-- ;
     ASSERT (Work->do_grow) ;
     ASSERT (Work->fnpiv == 0) ;
@@ -62,11 +62,11 @@ GLOBAL Int UMF_grow_front
     fnrows_max = Work->fnrows_max + nb ;
     fncols_max = Work->fncols_max + nb ;
     ASSERT (fnrows_max >= 0 && (fnrows_max % 2) == 1) ;
-    DEBUG0 (("Max     size: "ID"-by-"ID" (incl. "ID" pivot block\n",
+    DEBUG0 (("Max     size: " ID "-by-" ID " (incl. " ID " pivot block\n",
 	fnrows_max, fncols_max, nb)) ;
 
     /* current dimensions of frontal matrix: fnr-by-fnc */
-    DEBUG0 (("Current : "ID"-by-"ID" (excl "ID" pivot blocks)\n",
+    DEBUG0 (("Current : " ID "-by-" ID " (excl " ID " pivot blocks)\n",
 		Work->fnr_curr, Work->fnc_curr, nb)) ;
     ASSERT (Work->fnr_curr >= 0) ;
     ASSERT ((Work->fnr_curr % 2 == 1) || Work->fnr_curr == 0) ;
@@ -89,11 +89,11 @@ GLOBAL Int UMF_grow_front
     ASSERT (fnr_min >= 0) ;
     ASSERT (fnr_min % 2 == 1) ;
 
-    DEBUG0 (("Min     : "ID"-by-"ID"\n", fnr_min, fnc_min)) ;
+    DEBUG0 (("Min     : " ID "-by-" ID "\n", fnr_min, fnc_min)) ;
 
     /* grow the front to fnr2-by-fnc2, but no bigger than the maximum,
      * and no smaller than the minumum. */
-    DEBUG0 (("Desired : ("ID"+"ID")-by-("ID"+"ID")\n", fnr2, nb, fnc2, nb)) ;
+    DEBUG0 (("Desired : (" ID "+" ID ")-by-(" ID "+" ID ")\n", fnr2, nb, fnc2, nb)) ;
     fnr2 += nb ;
     fnc2 += nb ;
     ASSERT (fnr2 >= 0) ;
@@ -102,7 +102,7 @@ GLOBAL Int UMF_grow_front
     fnc2 = MAX (fnc2, fnc_min) ;
     fnr2 = MIN (fnr2, fnrows_max) ;
     fnc2 = MIN (fnc2, fncols_max) ;
-    DEBUG0 (("Try     : "ID"-by-"ID"\n", fnr2, fnc2)) ;
+    DEBUG0 (("Try     : " ID "-by-" ID "\n", fnr2, fnc2)) ;
     ASSERT (fnr2 >= 0) ;
     ASSERT (fnr2 % 2 == 1) ;
 
@@ -163,7 +163,7 @@ GLOBAL Int UMF_grow_front
     }
 #endif
 
-    DEBUG0 (("Attempt size: "ID"-by-"ID"\n", fnr2, fnc2)) ;
+    DEBUG0 (("Attempt size: " ID "-by-" ID "\n", fnr2, fnc2)) ;
     eloc = UMF_mem_alloc_tail_block (Numeric, UNITS (Entry, newsize)) ;
 
     if (!eloc)
@@ -179,7 +179,7 @@ GLOBAL Int UMF_grow_front
 	    /* :: out of memory in umf_grow_front :: */
 	    return (FALSE) ;	/* out of memory */
 	}
-	DEBUG0 (("Attempt size: "ID"-by-"ID" again\n", fnr2, fnc2)) ;
+	DEBUG0 (("Attempt size: " ID "-by-" ID " again\n", fnr2, fnc2)) ;
 	eloc = UMF_mem_alloc_tail_block (Numeric, UNITS (Entry, newsize)) ;
     }
 
@@ -195,7 +195,7 @@ GLOBAL Int UMF_grow_front
 	ASSERT (fnr2 >= 0) ;
 	if (fnr2 % 2 == 0) fnr2++ ;
 	newsize = fnr2 * fnc2 ;
-	DEBUGm3 (("Attempt smaller size: "ID"-by-"ID" minsize "ID"-by-"ID"\n",
+	DEBUGm3 (("Attempt smaller size: " ID "-by-" ID " minsize " ID "-by-" ID "\n",
 	    fnr2, fnc2, fnr_min, fnc_min)) ;
 	eloc = UMF_mem_alloc_tail_block (Numeric, UNITS (Entry, newsize)) ;
     }
@@ -206,7 +206,7 @@ GLOBAL Int UMF_grow_front
 	fnr2 = fnr_min ;
 	fnc2 = fnc_min ;
 	newsize = minsize ;
-	DEBUG0 (("Attempt minsize: "ID"-by-"ID"\n", fnr2, fnc2)) ;
+	DEBUG0 (("Attempt minsize: " ID "-by-" ID "\n", fnr2, fnc2)) ;
 	eloc = UMF_mem_alloc_tail_block (Numeric, UNITS (Entry, newsize)) ;
     }
 
@@ -249,7 +249,7 @@ GLOBAL Int UMF_grow_front
 	for (j = 0 ; j < fncols ; j++)
 	{
 	    col = Fcols [j] ;
-	    DEBUG1 (("copy col "ID" \n",col)) ;
+	    DEBUG1 (("copy col " ID " \n",col)) ;
 	    ASSERT (col >= 0 && col < Work->n_col) ;
 	    for (i = 0 ; i < fnrows ; i++)
 	    {
@@ -257,7 +257,7 @@ GLOBAL Int UMF_grow_front
 	    }
 	    Fcnew += fnr2 ;
 	    Fcold += fnr_curr ;
-	    DEBUG1 (("new offset col "ID" "ID"\n",col, j * fnr2)) ;
+	    DEBUG1 (("new offset col " ID " " ID "\n",col, j * fnr2)) ;
 	    Fcpos [col] = j * fnr2 ;
 	}
     }
@@ -267,7 +267,7 @@ GLOBAL Int UMF_grow_front
 	for (j = 0 ; j < fncols ; j++)
 	{
 	    col = Fcols [j] ;
-	    DEBUG1 (("new offset col "ID" "ID"\n",col, j * fnr2)) ;
+	    DEBUG1 (("new offset col " ID " " ID "\n",col, j * fnr2)) ;
 	    Fcpos [col] = j * fnr2 ;
 	}
     }
@@ -287,7 +287,7 @@ GLOBAL Int UMF_grow_front
 
     ASSERT (Work->fnr_curr >= 0) ;
     ASSERT (Work->fnr_curr % 2 == 1) ;
-    DEBUG0 (("Newly grown front: "ID"+"ID" by "ID"+"ID"\n", Work->fnr_curr,
+    DEBUG0 (("Newly grown front: " ID "+" ID " by " ID "+" ID "\n", Work->fnr_curr,
 	nb, Work->fnc_curr, nb)) ;
     return (TRUE) ;
 }

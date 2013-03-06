@@ -28,7 +28,7 @@ GLOBAL void UMF_blas3_update
 #define blas_ok FALSE
 #endif
 
-    DEBUG5 (("In UMF_blas3_update "ID" "ID" "ID"\n",
+    DEBUG5 (("In UMF_blas3_update " ID " " ID " " ID "\n",
 	Work->fnpiv, Work->fnrows, Work->fncols)) ;
 
     k = Work->fnpiv ;
@@ -52,7 +52,7 @@ GLOBAL void UMF_blas3_update
 
 #ifndef NDEBUG
     DEBUG5 (("DO RANK-NB UPDATE of frontal:\n")) ;
-    DEBUG5 (("DGEMM : "ID" "ID" "ID"\n", k, m, n)) ;
+    DEBUG5 (("DGEMM : " ID " " ID " " ID "\n", k, m, n)) ;
     DEBUG7 (("C  block: ")) ; UMF_dump_dense (C,  d, m, n) ;
     DEBUG7 (("A  block: ")) ; UMF_dump_dense (L,  d, m, k) ;
     DEBUG7 (("B' block: ")) ; UMF_dump_dense (U, dc, n, k) ;
@@ -164,12 +164,12 @@ GLOBAL void UMF_blas3_update
 
 #ifndef NDEBUG
     DEBUG5 (("RANK-NB UPDATE of frontal done:\n")) ;
-    DEBUG5 (("DGEMM : "ID" "ID" "ID"\n", k, m, n)) ;
+    DEBUG5 (("DGEMM : " ID " " ID " " ID "\n", k, m, n)) ;
     DEBUG7 (("C  block: ")) ; UMF_dump_dense (C,  d, m, n) ;
     DEBUG7 (("A  block: ")) ; UMF_dump_dense (L,  d, m, k) ;
     DEBUG7 (("B' block: ")) ; UMF_dump_dense (U, dc, n, k) ;
     DEBUG7 (("LU block: ")) ; UMF_dump_dense (LU, nb, k, k) ;
 #endif
 
-    DEBUG2 (("blas3 "ID" "ID" "ID"\n", k, Work->fnrows, Work->fncols)) ;
+    DEBUG2 (("blas3 " ID " " ID " " ID "\n", k, Work->fnrows, Work->fncols)) ;
 }

@@ -77,7 +77,7 @@ GLOBAL Int UMF_init_front
 #ifndef NDEBUG
     DEBUG1 (("CURR after grow:\n")) ;
     UMF_dump_current_front (Numeric, Work, FALSE) ;
-    DEBUG1 (("fnrows new "ID" fncols new "ID"\n",
+    DEBUG1 (("fnrows new " ID " fncols new " ID "\n",
 	Work->fnrows_new, Work->fncols_new)) ;
 #endif
     ASSERT (Work->fnpiv == 0) ;
@@ -162,11 +162,11 @@ GLOBAL Int UMF_init_front
     Work->fnrows = fnrows ;
 
 #ifndef NDEBUG
-    DEBUG3 (("New Pivot col "ID" now in front, length "ID"\n",
+    DEBUG3 (("New Pivot col " ID " now in front, length " ID "\n",
 	Work->pivcol, fnrows)) ;
     for (i = 0 ; i < fnrows ; i++)
     {
-	DEBUG4 ((" "ID": row "ID"\n", i, Frows [i])) ;
+	DEBUG4 ((" " ID ": row " ID "\n", i, Frows [i])) ;
 	ASSERT (Frpos [Frows [i]] == i) ;
     }
 #endif
@@ -229,7 +229,7 @@ GLOBAL Int UMF_init_front
 	}
     }
 
-    DEBUGm1 (("rrdeg "ID" fncols "ID"\n", rrdeg, fncols)) ;
+    DEBUGm1 (("rrdeg " ID " fncols " ID "\n", rrdeg, fncols)) ;
     fncols = rrdeg ;
     Work->fncols = fncols ;
 
@@ -246,11 +246,11 @@ GLOBAL Int UMF_init_front
     zero_init_front (fncols, fnrows, Fcblock, fnr_curr) ;
 
 #ifndef NDEBUG
-    DEBUG3 (("New Pivot row "ID" now in front, length "ID" fnr_curr "ID"\n",
+    DEBUG3 (("New Pivot row " ID " now in front, length " ID " fnr_curr " ID "\n",
 		Work->pivrow, fncols, fnr_curr)) ;
     for (j = 0 ; j < fncols ; j++)
     {
-	DEBUG4 (("col "ID" position "ID"\n", j, Fcols [j])) ;
+	DEBUG4 (("col " ID " position " ID "\n", j, Fcols [j])) ;
 	ASSERT (Fcpos [Fcols [j]] == j * fnr_curr) ;
     }
 #endif

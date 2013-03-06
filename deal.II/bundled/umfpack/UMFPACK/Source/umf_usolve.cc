@@ -44,10 +44,10 @@ GLOBAL double UMF_usolve
     n1 = Numeric->n1 ;
 
 #ifndef NDEBUG
-    DEBUG4 (("Usolve start:  npiv = "ID" n = "ID"\n", npiv, n)) ;
+    DEBUG4 (("Usolve start:  npiv = " ID " n = " ID "\n", npiv, n)) ;
     for (j = 0 ; j < n ; j++)
     {
-	DEBUG4 (("Usolve start "ID": ", j)) ;
+	DEBUG4 (("Usolve start " ID ": ", j)) ;
 	EDEBUG4 (X [j]) ;
 	DEBUG4 (("\n")) ;
     }
@@ -78,8 +78,8 @@ GLOBAL double UMF_usolve
 	/* :: make last pivot row of U (singular matrices only) :: */
 	for (j = 0 ; j < deg ; j++)
 	{
-	    DEBUG1 (("Last row of U: j="ID"\n", j)) ;
-	    DEBUG1 (("Last row of U: Upattern[j]="ID"\n",
+	    DEBUG1 (("Last row of U: j=" ID "\n", j)) ;
+	    DEBUG1 (("Last row of U: Upattern[j]=" ID "\n",
 		Numeric->Upattern [j]) );
 	    Pattern [j] = Numeric->Upattern [j] ;
 	}
@@ -112,7 +112,7 @@ GLOBAL double UMF_usolve
 	xk = X [k] ;
 	for (j = 0 ; j < deg ; j++)
 	{
-	    DEBUG4 (("  k "ID" col "ID" value", k, Pattern [j])) ;
+	    DEBUG4 (("  k " ID " col " ID " value", k, Pattern [j])) ;
 	    EDEBUG4 (*xp) ;
 	    DEBUG4 (("\n")) ;
 	    /* xk -= X [Pattern [j]] * (*xp) ; */
@@ -144,12 +144,12 @@ GLOBAL double UMF_usolve
 	    /* next row is a new Uchain */
 	    deg = ulen ;
 	    ASSERT (IMPLIES (k == 0, deg == 0)) ;
-	    DEBUG4 (("end of chain for row of U "ID" deg "ID"\n", k-1, deg)) ;
+	    DEBUG4 (("end of chain for row of U " ID " deg " ID "\n", k-1, deg)) ;
 	    ip = (Int *) (Numeric->Memory + up) ;
 	    for (j = 0 ; j < deg ; j++)
 	    {
 		col = *ip++ ;
-		DEBUG4 (("  k "ID" col "ID"\n", k-1, col)) ;
+		DEBUG4 (("  k " ID " col " ID "\n", k-1, col)) ;
 		ASSERT (k <= col) ;
 		Pattern [j] = col ;
 	    }
@@ -157,13 +157,13 @@ GLOBAL double UMF_usolve
 	else
 	{
 	    deg -= ulen ;
-	    DEBUG4 (("middle of chain for row of U "ID" deg "ID"\n", k, deg)) ;
+	    DEBUG4 (("middle of chain for row of U " ID " deg " ID "\n", k, deg)) ;
 	    ASSERT (deg >= 0) ;
 	    pos = Upos [k] ;
 	    if (pos != EMPTY)
 	    {
 		/* add the pivot column */
-		DEBUG4 (("k "ID" add pivot entry at pos "ID"\n", k, pos)) ;
+		DEBUG4 (("k " ID " add pivot entry at pos " ID "\n", k, pos)) ;
 		ASSERT (pos >= 0 && pos <= deg) ;
 		Pattern [deg++] = Pattern [pos] ;
 		Pattern [pos] = k ;
@@ -179,7 +179,7 @@ GLOBAL double UMF_usolve
     {
 	deg = Uilen [k] ;
 	xk = X [k] ;
-	DEBUG4 (("Singleton k "ID"\n", k)) ;
+	DEBUG4 (("Singleton k " ID "\n", k)) ;
 	if (deg > 0)
 	{
 	    up = Uip [k] ;
@@ -188,7 +188,7 @@ GLOBAL double UMF_usolve
 	    Uval = (Entry *) (Numeric->Memory + up) ;
 	    for (j = 0 ; j < deg ; j++)
 	    {
-		DEBUG4 (("  k "ID" col "ID" value", k, Ui [j])) ;
+		DEBUG4 (("  k " ID " col " ID " value", k, Ui [j])) ;
 		EDEBUG4 (Uval [j]) ;
 		DEBUG4 (("\n")) ;
 		/* xk -= X [Ui [j]] * Uval [j] ; */
@@ -215,7 +215,7 @@ GLOBAL double UMF_usolve
 #ifndef NDEBUG
     for (j = 0 ; j < n ; j++)
     {
-	DEBUG4 (("Usolve done "ID": ", j)) ;
+	DEBUG4 (("Usolve done " ID ": ", j)) ;
 	EDEBUG4 (X [j]) ;
 	DEBUG4 (("\n")) ;
     }

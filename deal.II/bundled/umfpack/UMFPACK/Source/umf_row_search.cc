@@ -64,7 +64,7 @@ GLOBAL Int UMF_row_search
     for (i = 0 ; i < cdeg1 ; i++)
     {
 	row = Pattern [i] ;
-	DEBUG4 (("   row: "ID"\n", row)) ;
+	DEBUG4 (("   row: " ID "\n", row)) ;
 	ASSERT (row >= 0 && row < Numeric->n_row) ;
 	ASSERT (i == Pos [row]) ;
     }
@@ -81,7 +81,7 @@ GLOBAL Int UMF_row_search
 	    }
 	    else
 	    {
-		DEBUG4 (("   row: "ID" pos "ID"\n", row, Pos [row])) ;
+		DEBUG4 (("   row: " ID " pos " ID "\n", row, Pos [row])) ;
 	    }
 	}
 	ASSERT (cnt == Numeric->n_row) ;
@@ -190,7 +190,7 @@ GLOBAL Int UMF_row_search
 		if (SCALAR_IS_NONZERO (a) && a >= toler2)
 		{
 		    /* found it! */
-		    DEBUG3 (("Symmetric pivot: "ID" "ID"\n", pivcol, diag_row));
+		    DEBUG3 (("Symmetric pivot: " ID " " ID "\n", pivcol, diag_row));
 		    found = TRUE ;
 		    if (Frpos [diag_row] >= 0 && Frpos [diag_row] < fnrows)
 		    {
@@ -224,7 +224,7 @@ GLOBAL Int UMF_row_search
 			row = Pattern [i] ;
 			deg = Row_degree [row] ;
 #ifndef NDEBUG
-			DEBUG6 ((ID" candidate row "ID" deg "ID" absval %g\n",
+			DEBUG6 ((ID " candidate row " ID " deg " ID " absval %g\n",
 			    i, row, deg, a)) ;
 			UMF_dump_rowcol (0, Numeric, Work, row, TRUE) ;
 #endif
@@ -257,7 +257,7 @@ GLOBAL Int UMF_row_search
 			row = Pattern [i] ;
 			deg = Row_degree [row] ;
 #ifndef NDEBUG
-			DEBUG6 ((ID" candidate row "ID" deg "ID" absval %g\n",
+			DEBUG6 ((ID " candidate row " ID " deg " ID " absval %g\n",
 			    i, row, deg, a)) ;
 			UMF_dump_rowcol (0, Numeric, Work, row, TRUE) ;
 #endif
@@ -295,7 +295,7 @@ GLOBAL Int UMF_row_search
 			row = Pattern [i] ;
 			deg = Row_degree [row] ;
 #ifndef NDEBUG
-			DEBUG6 ((ID" candidate row "ID" deg "ID" absval %g\n",
+			DEBUG6 ((ID " candidate row " ID " deg " ID " absval %g\n",
 			    i, row, deg, a)) ;
 			UMF_dump_rowcol (0, Numeric, Work, row, TRUE) ;
 #endif
@@ -438,7 +438,7 @@ GLOBAL Int UMF_row_search
 
 	    */
 	    pivrow [IN] = Work->Frows [0] ;
-	    DEBUGm4 (("Got zero pivrow[OUT][IN] "ID" from current front\n",
+	    DEBUGm4 (("Got zero pivrow[OUT][IN] " ID " from current front\n",
 		pivrow [IN])) ;
 	}
 	else
@@ -462,7 +462,7 @@ GLOBAL Int UMF_row_search
 	    n_row = Numeric->n_row ;
 	    frontid = Work->frontid ;
 
-	    DEBUGm4 (("Note: pivcol: "ID" is empty front "ID"\n",
+	    DEBUGm4 (("Note: pivcol: " ID " is empty front " ID "\n",
 		pivcol, frontid)) ;
 #ifndef NDEBUG
 	    DEBUG1 (("Calling dump rowmerge\n")) ;
@@ -480,17 +480,17 @@ GLOBAL Int UMF_row_search
 	    fleftmost = Front_leftmostdesc [frontid] ;
 	    row1 = Front_new1strow [fleftmost] ;
 	    row2 = Front_1strow [frontid+1] - 1 ;
-	    DEBUG1 (("Leftmost: "ID" Rows ["ID" to "ID"] srch ["ID" to "ID"]\n",
+	    DEBUG1 (("Leftmost: " ID " Rows [" ID " to " ID "] srch [" ID " to " ID "]\n",
 		fleftmost, Front_1strow [frontid], row2, row1, row2)) ;
 
 	    /* look in the range row1 ... row2 */
 	    for (row = row1 ; row <= row2 ; row++)
 	    {
-		DEBUG3 (("   Row: "ID"\n", row)) ;
+		DEBUG3 (("   Row: " ID "\n", row)) ;
 		if (NON_PIVOTAL_ROW (row))
 		{
 		    /* found it */
-		    DEBUG3 (("   Row: "ID" found\n", row)) ;
+		    DEBUG3 (("   Row: " ID " found\n", row)) ;
 		    ASSERT (Frpos [row] == EMPTY) ;
 		    pivrow [OUT] = row ;
 		    DEBUGm4 (("got row merge pivrow %d\n", pivrow [OUT])) ;
@@ -504,17 +504,17 @@ GLOBAL Int UMF_row_search
 		/* not found, look in empty row set in "dummy" front */
 		row1 = Front_new1strow [nfr] ;
 		row2 = n_row-1 ;
-		DEBUG3 (("Empty: "ID" Rows ["ID" to "ID"] srch["ID" to "ID"]\n",
+		DEBUG3 (("Empty: " ID " Rows [" ID " to " ID "] srch[" ID " to " ID "]\n",
 		    nfr, Front_1strow [nfr], row2, row1, row2)) ;
 
 		/* look in the range row1 ... row2 */
 		for (row = row1 ; row <= row2 ; row++)
 		{
-		    DEBUG3 (("   Empty Row: "ID"\n", row)) ;
+		    DEBUG3 (("   Empty Row: " ID "\n", row)) ;
 		    if (NON_PIVOTAL_ROW (row))
 		    {
 			/* found it */
-			DEBUG3 (("   Empty Row: "ID" found\n", row)) ;
+			DEBUG3 (("   Empty Row: " ID " found\n", row)) ;
 			ASSERT (Frpos [row] == EMPTY) ;
 			pivrow [OUT] = row ;
 			DEBUGm4 (("got dummy row pivrow %d\n", pivrow [OUT])) ;
@@ -552,7 +552,7 @@ GLOBAL Int UMF_row_search
 #endif
 
 #ifndef NDEBUG
-    DEBUG4 (("pivrow [IN]: "ID"\n", pivrow [IN])) ;
+    DEBUG4 (("pivrow [IN]: " ID "\n", pivrow [IN])) ;
     UMF_dump_rowcol (0, Numeric, Work, pivrow [IN], TRUE) ;
 #endif
 
@@ -578,7 +578,7 @@ GLOBAL Int UMF_row_search
 
 #ifndef NDEBUG
 	    /* check Fcols */
-	    DEBUG5 (("ROW ASSEMBLE: rdeg "ID"\nREDUCE ROW "ID"\n",
+	    DEBUG5 (("ROW ASSEMBLE: rdeg " ID "\nREDUCE ROW " ID "\n",
 		fncols, pivrow [IN])) ;
 	    for (j = 0 ; j < fncols ; j++)
 	    {
@@ -672,13 +672,13 @@ GLOBAL Int UMF_row_search
 	    DEBUG4 (("Reduced IN row:\n")) ;
 	    for (j = 0 ; j < fncols ; j++)
 	    {
-		DEBUG6 ((" "ID" "ID" "ID"\n",
+		DEBUG6 ((" " ID " " ID " " ID "\n",
 		    j, Work->Fcols [j], Fcpos [Work->Fcols [j]])) ;
 		ASSERT (Fcpos [Work->Fcols [j]] >= 0) ;
 	    }
 	    for (j = fncols ; j < rdeg [IN] ; j++)
 	    {
-		DEBUG6 ((" "ID" "ID" "ID"\n", j, W_i [j], Wrp [W_i [j]]));
+		DEBUG6 ((" " ID " " ID " " ID "\n", j, W_i [j], Wrp [W_i [j]]));
 		ASSERT (W_i [j] >= 0 && W_i [j] < Work->n_col) ;
 		ASSERT (Wrp [W_i [j]] == Wrpflag) ;
 	    }
@@ -711,7 +711,7 @@ GLOBAL Int UMF_row_search
     /* ---------------------------------------------------------------------- */
 
 #ifndef NDEBUG
-    DEBUG4 (("pivrow [OUT]: "ID"\n", pivrow [OUT])) ;
+    DEBUG4 (("pivrow [OUT]: " ID "\n", pivrow [OUT])) ;
     UMF_dump_rowcol (0, Numeric, Work, pivrow [OUT], TRUE) ;
 #endif
 
@@ -802,7 +802,7 @@ GLOBAL Int UMF_row_search
 	    DEBUG4 (("Reduced row OUT:\n")) ;
 	    for (j = 0 ; j < rdeg [OUT] ; j++)
 	    {
-		DEBUG6 ((" "ID" "ID" "ID"\n", j, W_o [j], Wrp [W_o [j]])) ;
+		DEBUG6 ((" " ID " " ID " " ID "\n", j, W_o [j], Wrp [W_o [j]])) ;
 		ASSERT (W_o [j] >= 0 && W_o [j] < Work->n_col) ;
 		ASSERT (Wrp [W_o [j]] == Wrpflag) ;
 	    }

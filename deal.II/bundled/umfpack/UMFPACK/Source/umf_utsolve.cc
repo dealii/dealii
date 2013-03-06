@@ -50,10 +50,10 @@ UMF_utsolve			/* solve U.'x=b (array transpose) */
     n1 = Numeric->n1 ;
 
 #ifndef NDEBUG
-    DEBUG4 (("Utsolve start: npiv "ID" n "ID"\n", npiv, n)) ;
+    DEBUG4 (("Utsolve start: npiv " ID " n " ID "\n", npiv, n)) ;
     for (j = 0 ; j < n ; j++)
     {
-	DEBUG4 (("Utsolve start "ID": ", j)) ;
+	DEBUG4 (("Utsolve start " ID ": ", j)) ;
 	EDEBUG4 (X [j]) ;
 	DEBUG4 (("\n")) ;
     }
@@ -65,7 +65,7 @@ UMF_utsolve			/* solve U.'x=b (array transpose) */
 
     for (k = 0 ; k < n1 ; k++)
     {
-	DEBUG4 (("Singleton k "ID"\n", k)) ;
+	DEBUG4 (("Singleton k " ID "\n", k)) ;
 
 #ifndef NO_DIVIDE_BY_ZERO
 	/* Go ahead and divide by zero if D [k] is zero. */
@@ -100,7 +100,7 @@ UMF_utsolve			/* solve U.'x=b (array transpose) */
 	    Uval = (Entry *) (Numeric->Memory + up) ;
 	    for (j = 0 ; j < deg ; j++)
 	    {
-		DEBUG4 (("  k "ID" col "ID" value", k, Ui [j])) ;
+		DEBUG4 (("  k " ID " col " ID " value", k, Ui [j])) ;
 		EDEBUG4 (Uval [j]) ;
 		DEBUG4 (("\n")) ;
 #ifdef CONJUGATE_SOLVE
@@ -125,7 +125,7 @@ UMF_utsolve			/* solve U.'x=b (array transpose) */
 	/* find the end of this Uchain */
 	/* ------------------------------------------------------------------ */
 
-	DEBUG4 (("kstart "ID" kend "ID"\n", kstart, kend)) ;
+	DEBUG4 (("kstart " ID " kend " ID "\n", kstart, kend)) ;
 	/* for (kend = kstart ; kend < npiv && Uip [kend+1] > 0 ; kend++) ; */
 	kend = kstart ;
 	while (kend < npiv && Uip [kend+1] > 0)
@@ -138,7 +138,7 @@ UMF_utsolve			/* solve U.'x=b (array transpose) */
 	/* ------------------------------------------------------------------ */
 
 	k = kend+1 ;
-	DEBUG4 (("\nKend "ID" K "ID"\n", kend, k)) ;
+	DEBUG4 (("\nKend " ID " K " ID "\n", kend, k)) ;
 
 	/* ------------------------------------------------------------------ */
 	/* start with last row in Uchain of U in Pattern [0..deg-1] */
@@ -162,12 +162,12 @@ UMF_utsolve			/* solve U.'x=b (array transpose) */
 	    up = -Uip [k] ;
 	    ASSERT (up > 0) ;
 	    deg = Uilen [k] ;
-	    DEBUG4 (("end of chain for row of U "ID" deg "ID"\n", k-1, deg)) ;
+	    DEBUG4 (("end of chain for row of U " ID " deg " ID "\n", k-1, deg)) ;
 	    ip = (Int *) (Numeric->Memory + up) ;
 	    for (j = 0 ; j < deg ; j++)
 	    {
 		col = *ip++ ;
-		DEBUG4 (("  k "ID" col "ID"\n", k-1, col)) ;
+		DEBUG4 (("  k " ID " col " ID "\n", k-1, col)) ;
 		ASSERT (k <= col) ;
 		Pattern [j] = col ;
 	    }
@@ -192,14 +192,14 @@ UMF_utsolve			/* solve U.'x=b (array transpose) */
 		ASSERT (uhead >= deg) ;
 		Pattern [--uhead] = Pattern [--deg] ;
 	    }
-	    DEBUG4 (("middle of chain for row of U "ID" deg "ID"\n", k, deg)) ;
+	    DEBUG4 (("middle of chain for row of U " ID " deg " ID "\n", k, deg)) ;
 	    ASSERT (deg >= 0) ;
 
 	    pos = Upos [k] ;
 	    if (pos != EMPTY)
 	    {
 		/* add the pivot column */
-		DEBUG4 (("k "ID" add pivot entry at position "ID"\n", k, pos)) ;
+		DEBUG4 (("k " ID " add pivot entry at position " ID "\n", k, pos)) ;
 		ASSERT (pos >= 0 && pos <= deg) ;
 		Pattern [deg++] = Pattern [pos] ;
 		Pattern [pos] = k ;
@@ -225,7 +225,7 @@ UMF_utsolve			/* solve U.'x=b (array transpose) */
 	    if (pos != EMPTY)
 	    {
 		/* remove the pivot column */
-		DEBUG4 (("k "ID" add pivot entry at position "ID"\n", k, pos)) ;
+		DEBUG4 (("k " ID " add pivot entry at position " ID "\n", k, pos)) ;
 		ASSERT (k > kstart) ;
 		ASSERT (pos >= 0 && pos < deg) ;
 		ASSERT (Pattern [pos] == k) ;
@@ -242,7 +242,7 @@ UMF_utsolve			/* solve U.'x=b (array transpose) */
 		    ASSERT (deg <= uhead && uhead < n) ;
 		    Pattern [deg++] = Pattern [uhead++] ;
 		}
-		DEBUG4 (("middle of chain, row of U "ID" deg "ID"\n", k, deg)) ;
+		DEBUG4 (("middle of chain, row of U " ID " deg " ID "\n", k, deg)) ;
 		ASSERT (deg >= 0) ;
 	    }
 
@@ -287,7 +287,7 @@ UMF_utsolve			/* solve U.'x=b (array transpose) */
 		}
 		for (j = 0 ; j < deg ; j++)
 		{
-		    DEBUG4 (("  k "ID" col "ID" value", k, Pattern [j])) ;
+		    DEBUG4 (("  k " ID " col " ID " value", k, Pattern [j])) ;
 		    EDEBUG4 (*xp) ;
 		    DEBUG4 (("\n")) ;
 #ifdef CONJUGATE_SOLVE
@@ -320,7 +320,7 @@ UMF_utsolve			/* solve U.'x=b (array transpose) */
 #ifndef NDEBUG
     for (j = 0 ; j < n ; j++)
     {
-	DEBUG4 (("Utsolve done "ID": ", j)) ;
+	DEBUG4 (("Utsolve done " ID ": ", j)) ;
 	EDEBUG4 (X [j]) ;
 	DEBUG4 (("\n")) ;
     }

@@ -95,12 +95,12 @@ GLOBAL Int UMF_store_lu
     nb = Work->nb ;
 
 #ifndef NDEBUG
-    DEBUG1 (("\nSTORE LU: fnrows "ID
-	" fncols "ID"\n", fnrows, fncols)) ;
+    DEBUG1 (("\nSTORE LU: fnrows " ID
+	" fncols " ID "\n", fnrows, fncols)) ;
 
     DEBUG2 (("\nFrontal matrix, including all space:\n"
-		"fnr_curr "ID" fnc_curr "ID" nb    "ID"\n"
-		"fnrows   "ID" fncols   "ID" fnpiv "ID"\n",
+		"fnr_curr " ID " fnc_curr " ID " nb    " ID "\n"
+		"fnrows   " ID " fncols   " ID " fnpiv " ID "\n",
 		fnr_curr, fnc_curr, nb, fnrows, fncols, fnpiv)) ;
 
     DEBUG2 (("\nJust the active part:\n")) ;
@@ -145,14 +145,14 @@ GLOBAL Int UMF_store_lu
 
 	DEBUGm4 ((
 	"\n -------------------------------------------------------------"
-	"Store LU: step " ID"\n", k))  ;
+	"Store LU: step " ID "\n", k))  ;
 	ASSERT (k < MIN (Work->n_row, Work->n_col)) ;
-	DEBUG2 (("Store column of L, k = "ID", llen "ID"\n", k, llen)) ;
+	DEBUG2 (("Store column of L, k = " ID ", llen " ID "\n", k, llen)) ;
 	for (i = 0 ; i < llen ; i++)
 	{
 	    row = Lpattern [i] ;
 	    ASSERT (row >= 0 && row < Work->n_row) ;
-	    DEBUG2 (("    Lpattern["ID"] "ID" Lpos "ID, i, row, Lpos [row])) ;
+	    DEBUG2 (("    Lpattern[" ID "] " ID " Lpos " ID, i, row, Lpos [row])) ;
 	    if (row == pivrow) DEBUG2 ((" <- pivot row")) ;
 	    DEBUG2 (("\n")) ;
 	    ASSERT (i == Lpos [row]) ;
@@ -165,7 +165,7 @@ GLOBAL Int UMF_store_lu
 
 	/* remove pivot row index from current column of L */
 	/* if a new Lchain starts, then all entries are removed later */
-	DEBUG2 (("Removing pivrow from Lpattern, k = "ID"\n", k)) ;
+	DEBUG2 (("Removing pivrow from Lpattern, k = " ID "\n", k)) ;
 	ASSERT (!NON_PIVOTAL_ROW (pivrow)) ;
 	pivrow_position = Lpos [pivrow] ;
 	if (pivrow_position != EMPTY)
@@ -196,7 +196,7 @@ GLOBAL Int UMF_store_lu
 	D [k] = pivot_value ;
 	zero_pivot = IS_ZERO (pivot_value) ;
 
-	DEBUG4 (("Pivot D["ID"]=", k)) ;
+	DEBUG4 (("Pivot D[" ID "]=", k)) ;
 	EDEBUG4 (pivot_value) ;
 	DEBUG4 (("\n")) ;
 
@@ -277,7 +277,7 @@ GLOBAL Int UMF_store_lu
 	if (newLchain)
 	{
 	    /* start a new chain for column k of L */
-	    DEBUG2 (("Start new Lchain, k = "ID"\n", k)) ;
+	    DEBUG2 (("Start new Lchain, k = " ID "\n", k)) ;
 
 	    pivrow_position = EMPTY ;
 
@@ -295,7 +295,7 @@ GLOBAL Int UMF_store_lu
 	else
 	{
 	    /* continue the prior Lchain */
-	    DEBUG2 (("Continue  Lchain, k = "ID"\n", k)) ;
+	    DEBUG2 (("Continue  Lchain, k = " ID "\n", k)) ;
 	    lnzi = lnz2i ;
 	    lnzx = lnz2x ;
 	}
@@ -537,14 +537,14 @@ GLOBAL Int UMF_store_lu
 #endif
 
 	}
-	DEBUG4 (("llen "ID" lnzx "ID"\n", llen, lnzx)) ;
+	DEBUG4 (("llen " ID " lnzx " ID "\n", llen, lnzx)) ;
 	ASSERT (llen == lnzx) ;
 	ASSERT (lnz <= llen) ;
-	DEBUG4 (("lnz "ID" \n", lnz)) ;
+	DEBUG4 (("lnz " ID " \n", lnz)) ;
 
 #ifdef DROP
 
-	    DEBUG4 (("all_lnz "ID" \n", all_lnz)) ;
+	    DEBUG4 (("all_lnz " ID " \n", all_lnz)) ;
 	    ASSERT (lnz <= all_lnz) ;
 	    Numeric->lnz += lnz ;
 	    Numeric->all_lnz += all_lnz ;
@@ -596,11 +596,11 @@ GLOBAL Int UMF_store_lu
 	ASSERT (pivrow >= 0 && pivrow < Work->n_row) ;
 	ASSERT (pivcol >= 0 && pivcol < Work->n_col) ;
 
-	DEBUG2 (("Store row of U, k = "ID", ulen "ID"\n", k, ulen)) ;
+	DEBUG2 (("Store row of U, k = " ID ", ulen " ID "\n", k, ulen)) ;
 	for (i = 0 ; i < ulen ; i++)
 	{
 	    col = Upattern [i] ;
-	    DEBUG2 (("    Upattern["ID"] "ID, i, col)) ;
+	    DEBUG2 (("    Upattern[" ID "] " ID, i, col)) ;
 	    if (col == pivcol) DEBUG2 ((" <- pivot col")) ;
 	    DEBUG2 (("\n")) ;
 	    ASSERT (col >= 0 && col < Work->n_col) ;
@@ -627,7 +627,7 @@ GLOBAL Int UMF_store_lu
 	unz = 0 ;
 	unz2i = 0 ;
 	unz2x = ulen ;
-	DEBUG2 (("unz2x is "ID", lnzx "ID"\n", unz2x, lnzx)) ;
+	DEBUG2 (("unz2x is " ID ", lnzx " ID "\n", unz2x, lnzx)) ;
 
 	/* if row k does not end a Uchain, pivcol not included in ulen */
 	ASSERT (!NON_PIVOTAL_COL (pivcol)) ;
@@ -635,7 +635,7 @@ GLOBAL Int UMF_store_lu
 	if (pivcol_position != EMPTY)
 	{
 	    unz2x-- ;
-	    DEBUG2 (("(exclude pivcol) unz2x is now "ID"\n", unz2x)) ;
+	    DEBUG2 (("(exclude pivcol) unz2x is now " ID "\n", unz2x)) ;
 	}
 
 	ASSERT (unz2x >= 0) ;
@@ -794,14 +794,14 @@ GLOBAL Int UMF_store_lu
 	{
 	    /* starting a new Uchain - flag this by negating Uip [k] */
 	    uip = -uip ;
-	    DEBUG2 (("Start new Uchain, k = "ID"\n", k)) ;
+	    DEBUG2 (("Start new Uchain, k = " ID "\n", k)) ;
 
 	    pivcol_position = EMPTY ;
 
 	    /* end the prior Uchain */
 	    /* save the current Upattern, and then */
 	    /* clear it and start a new Upattern */
-	    DEBUG2 (("Ending prior chain, k-1 = "ID"\n", k-1)) ;
+	    DEBUG2 (("Ending prior chain, k-1 = " ID "\n", k-1)) ;
 	    uilen = ulen ;
 	    Ui = (Int *) (Numeric->Memory + p) ;
 	    Numeric->isize += ulen ;
@@ -820,12 +820,12 @@ GLOBAL Int UMF_store_lu
 	else
 	{
 	    /* continue the prior Uchain */
-	    DEBUG2 (("Continue  Uchain, k = "ID"\n", k)) ;
+	    DEBUG2 (("Continue  Uchain, k = " ID "\n", k)) ;
 	    ASSERT (k > 0) ;
 
 	    /* remove pivot col index from current row of U */
 	    /* if a new Uchain starts, then all entries are removed later */
-	    DEBUG2 (("Removing pivcol from Upattern, k = "ID"\n", k)) ;
+	    DEBUG2 (("Removing pivcol from Upattern, k = " ID "\n", k)) ;
 
 	    if (pivcol_position != EMPTY)
 	    {
@@ -1010,11 +1010,11 @@ GLOBAL Int UMF_store_lu
 
 	ASSERT (ulen == unzx) ;
 	ASSERT (unz <= ulen) ;
-	DEBUG4 (("unz "ID" \n", unz)) ;
+	DEBUG4 (("unz " ID " \n", unz)) ;
 
 #ifdef DROP
 
-	    DEBUG4 (("all_unz "ID" \n", all_unz)) ;
+	    DEBUG4 (("all_unz " ID " \n", all_unz)) ;
 	    ASSERT (unz <= all_unz) ;
 	    Numeric->unz += unz ;
 	    Numeric->all_unz += all_unz ;
@@ -1033,7 +1033,7 @@ GLOBAL Int UMF_store_lu
 
 	Numeric->nUentries += unzx ;
 	Work->ulen = ulen ;
-	DEBUG1 (("Work->ulen = "ID" at end of pivot step, k: "ID"\n", ulen, k));
+	DEBUG1 (("Work->ulen = " ID " at end of pivot step, k: " ID "\n", ulen, k));
 
 	/* ------------------------------------------------------------------ */
 	/* the pivot row is the k-th row of U */

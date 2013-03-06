@@ -39,7 +39,7 @@ GLOBAL double UMF_lsolve
     DEBUG4 (("Lsolve start:\n")) ;
     for (j = 0 ; j < Numeric->n_row ; j++)
     {
-	DEBUG4 (("Lsolve start "ID": ", j)) ;
+	DEBUG4 (("Lsolve start " ID ": ", j)) ;
 	EDEBUG4 (X [j]) ;
 	DEBUG4 (("\n")) ;
     }
@@ -51,7 +51,7 @@ GLOBAL double UMF_lsolve
 
     for (k = 0 ; k < n1 ; k++)
     {
-	DEBUG4 (("Singleton k "ID"\n", k)) ;
+	DEBUG4 (("Singleton k " ID "\n", k)) ;
 	xk = X [k] ;
 	deg = Lilen [k] ;
 	if (deg > 0 && IS_NONZERO (xk))
@@ -62,7 +62,7 @@ GLOBAL double UMF_lsolve
 	    Lval = (Entry *) (Numeric->Memory + lp) ;
 	    for (j = 0 ; j < deg ; j++)
 	    {
-		DEBUG4 (("  row "ID"  k "ID" value", Li [j], k)) ;
+		DEBUG4 (("  row " ID "  k " ID " value", Li [j], k)) ;
 		EDEBUG4 (Lval [j]) ;
 		DEBUG4 (("\n")) ;
 		/* X [Li [j]] -= xk * Lval [j] ; */
@@ -97,7 +97,7 @@ GLOBAL double UMF_lsolve
 	pos = Lpos [k] ;
 	if (pos != EMPTY)
 	{
-	    DEBUG4 (("  k "ID" removing row "ID" at position "ID"\n",
+	    DEBUG4 (("  k " ID " removing row " ID " at position " ID "\n",
 	    k, Pattern [pos], pos)) ;
 	    ASSERT (!newLchain) ;
 	    ASSERT (deg > 0) ;
@@ -112,7 +112,7 @@ GLOBAL double UMF_lsolve
 	for (j = 0 ; j < llen ; j++)
 	{
 	    row = *ip++ ;
-	    DEBUG4 (("  row "ID"  k "ID"\n", row, k)) ;
+	    DEBUG4 (("  row " ID "  k " ID "\n", row, k)) ;
 	    ASSERT (row > k) ;
 	    Pattern [deg++] = row ;
 	}
@@ -127,7 +127,7 @@ GLOBAL double UMF_lsolve
 	    xp = (Entry *) (Numeric->Memory + lp + UNITS (Int, llen)) ;
 	    for (j = 0 ; j < deg ; j++)
 	    {
-		DEBUG4 (("  row "ID"  k "ID" value", Pattern [j], k)) ;
+		DEBUG4 (("  row " ID "  k " ID " value", Pattern [j], k)) ;
 		EDEBUG4 (*xp) ;
 		DEBUG4 (("\n")) ;
 		/* X [Pattern [j]] -= xk * (*xp) ; */
@@ -140,7 +140,7 @@ GLOBAL double UMF_lsolve
 #ifndef NDEBUG
     for (j = 0 ; j < Numeric->n_row ; j++)
     {
-	DEBUG4 (("Lsolve done "ID": ", j)) ;
+	DEBUG4 (("Lsolve done " ID ": ", j)) ;
 	EDEBUG4 (X [j]) ;
 	DEBUG4 (("\n")) ;
     }

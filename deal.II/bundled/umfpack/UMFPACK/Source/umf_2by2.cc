@@ -116,7 +116,7 @@ PRIVATE Int two_by_two	    /* returns # unmatched weak diagonals */
 	if (Next [newcol] == IS_WEAK)
 	{
 	    /* add this column to the list of weak nodes */
-	    DEBUGm1 (("    newcol "ID" has a weak diagonal deg "ID"\n",
+	    DEBUGm1 (("    newcol " ID " has a weak diagonal deg " ID "\n",
 		newcol, deg)) ;
 	    deg = Degree [newcol] ;
 	    ASSERT (deg >= 0 && deg < n2) ;
@@ -181,10 +181,10 @@ PRIVATE Int two_by_two	    /* returns # unmatched weak diagonals */
     for (deg = mindeg ; deg <= maxdeg ; deg++)
     {
 	/* find the next weak diagonal of lowest degree */
-	DEBUGm2 (("---------------------------------- Deg: "ID"\n", deg)) ;
+	DEBUGm2 (("---------------------------------- Deg: " ID "\n", deg)) ;
 	for (k = Head [deg] ; k != EMPTY ; k = Next [k])
 	{
-	    DEBUGm2 (("k: "ID"\n", k)) ;
+	    DEBUGm2 (("k: " ID "\n", k)) ;
 	    if (P [k] == EMPTY)
 	    {
 		/* C (k,k) is a weak diagonal entry.  Find an index j != k such
@@ -195,16 +195,16 @@ PRIVATE Int two_by_two	    /* returns # unmatched weak diagonals */
 		 *
 		 * Note that row k of R and column k of C are both sorted. */
 
-		DEBUGm4 (("===== Weak diagonal k = "ID"\n", k)) ;
+		DEBUGm4 (("===== Weak diagonal k = " ID "\n", k)) ;
 		DEBUG1 (("Column k of C:\n")) ;
 		for (p = Cp [k] ; p < Cp [k+1] ; p++)
 		{
-		    DEBUG1 (("    "ID": deg "ID"\n", Ci [p], Degree [Ci [p]]));
+		    DEBUG1 (("    " ID ": deg " ID "\n", Ci [p], Degree [Ci [p]]));
 		}
 		DEBUG1 (("Row k of R (strong entries only):\n")) ;
 		for (p = Rp [k] ; p < Rp [k+1] ; p++)
 		{
-		    DEBUG1 (("    "ID": deg "ID"\n", Ri [p], Degree [Ri [p]]));
+		    DEBUG1 (("    " ID ": deg " ID "\n", Ri [p], Degree [Ri [p]]));
 		}
 
 		/* no (C (k,j), C (j,k)) pair exists yet */
@@ -268,7 +268,7 @@ PRIVATE Int two_by_two	    /* returns # unmatched weak diagonals */
 			jdeg = Degree [j] ;
 			jdiff = SCALAR_ABS (k-j) ;
 
-			DEBUG1 (("Try candidate j "ID" deg "ID" diff "ID
+			DEBUG1 (("Try candidate j " ID " deg " ID " diff " ID
 				    "\n", j, jdeg, jdiff)) ;
 
 			if (j_best == EMPTY)
@@ -317,8 +317,8 @@ PRIVATE Int two_by_two	    /* returns # unmatched weak diagonals */
 		    {
 			/* j is best match for k */
 			/* found a strong pair, A (j,k) and A (k,j) */
-			DEBUG1 ((" --- Found pair k: "ID" j: " ID
-			    " jdeg: "ID" jdiff: "ID"\n",
+			DEBUG1 ((" --- Found pair k: " ID " j: " ID
+			    " jdeg: " ID " jdiff: " ID "\n",
 			    k, j, jdeg, jdiff)) ;
 			ASSERT (jdiff != EMPTY) ;
 			ASSERT (jdeg != EMPTY) ;
@@ -336,7 +336,7 @@ PRIVATE Int two_by_two	    /* returns # unmatched weak diagonals */
 		if (j_best != EMPTY)
 		{
 		    j = j_best ;
-		    DEBUGm4 ((" --- best pair j: "ID" for k: "ID"\n", j, k)) ;
+		    DEBUGm4 ((" --- best pair j: " ID " for k: " ID "\n", j, k)) ;
 		    P [k] = j ;
 		    P [j] = k ;
 		}
@@ -461,7 +461,7 @@ GLOBAL void UMF_2by2
 	do_max = FALSE ;
     }
     do_scale = do_max || do_sum ;
-    DEBUGm3 (("do_values "ID" do_sum "ID" do_max "ID" do_scale "ID"\n",
+    DEBUGm3 (("do_values " ID " do_sum " ID " do_max " ID " do_scale " ID "\n",
 	do_values, do_sum, do_max, do_scale)) ;
 
     /* ---------------------------------------------------------------------- */
@@ -574,7 +574,7 @@ GLOBAL void UMF_2by2
 	oldcol = Cperm1 [k] ;
 	newcol = k - n1 ;
 	Next [newcol] = EMPTY ;
-	DEBUGm1 (("Column "ID" newcol "ID" oldcol "ID"\n", k, newcol, oldcol)) ;
+	DEBUGm1 (("Column " ID " newcol " ID " oldcol " ID "\n", k, newcol, oldcol)) ;
 
 	Cp [newcol] = pp ;
 
@@ -691,7 +691,7 @@ GLOBAL void UMF_2by2
 	    }
 
 	    ctol = tol * cmax ;
-	    DEBUGm1 (("    cmax col "ID" %g  ctol %g\n", oldcol, cmax, ctol)) ;
+	    DEBUGm1 (("    cmax col " ID " %g  ctol %g\n", oldcol, cmax, ctol)) ;
 	}
 	else
 	{
@@ -755,7 +755,7 @@ GLOBAL void UMF_2by2
 		    weak = WEAK (value, ctol) ;
 		    if (!weak)
 		    {
-			DEBUG0 (("    strong: row "ID": %g\n", oldrow, value)) ;
+			DEBUG0 (("    strong: row " ID ": %g\n", oldrow, value)) ;
 			Ci [pp++] = newrow ;
 			Ri [newrow]++ ;
 		    }
@@ -776,7 +776,7 @@ GLOBAL void UMF_2by2
 		    weak = WEAK (value, ctol) ;
 		    if (!weak)
 		    {
-			DEBUG0 (("    strong: row "ID": %g\n", oldrow, value)) ;
+			DEBUG0 (("    strong: row " ID ": %g\n", oldrow, value)) ;
 			Ci [pp++] = newrow ;
 			Ri [newrow]++ ;
 		    }
@@ -797,7 +797,7 @@ GLOBAL void UMF_2by2
 		    weak = WEAK (value, ctol) ;
 		    if (!weak)
 		    {
-			DEBUG0 (("    strong: row "ID": %g\n", oldrow, value)) ;
+			DEBUG0 (("    strong: row " ID ": %g\n", oldrow, value)) ;
 			Ci [pp++] = newrow ;
 			Ri [newrow]++ ;
 		    }
@@ -849,10 +849,10 @@ GLOBAL void UMF_2by2
     *p_unmatched = unmatched ;
 
 #ifndef NDEBUG
-    DEBUGm4 (("UMF_2by2: weak "ID"  unmatched "ID"\n", nweak, unmatched)) ;
+    DEBUGm4 (("UMF_2by2: weak " ID "  unmatched " ID "\n", nweak, unmatched)) ;
     for (row = 0 ; row < n ; row++)
     {
-	DEBUGm2 (("P ["ID"] = "ID"\n", row, P [row])) ;
+	DEBUGm2 (("P [" ID "] = " ID "\n", row, P [row])) ;
     }
     DEBUGm2 (("\n =============================UMF_2by2: done\n\n")) ;
 #endif

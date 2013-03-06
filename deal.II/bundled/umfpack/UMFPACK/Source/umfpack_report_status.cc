@@ -112,7 +112,7 @@ GLOBAL void UMFPACK_report_status
 	    break ;
 
 	default:
-	    PRINTF (("ERROR: Unrecognized error code: "ID"\n", status)) ;
+	    PRINTF (("ERROR: Unrecognized error code: " ID "\n", status)) ;
 
     }
     PRINTF  (("\n")) ;

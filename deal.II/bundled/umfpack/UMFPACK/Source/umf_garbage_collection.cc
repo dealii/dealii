@@ -106,9 +106,9 @@ GLOBAL void UMF_garbage_collection
     {
 	if (NON_PIVOTAL_ROW (row) && Row_tuples [row])
 	{
-	    DEBUG2 (("row "ID" tuples "ID"\n", row, Row_tuples [row])) ;
+	    DEBUG2 (("row " ID " tuples " ID "\n", row, Row_tuples [row])) ;
 	    p = Numeric->Memory + Row_tuples [row] - 1 ;
-	    DEBUG2 (("Freeing tuple list row "ID", p-S "ID", size "ID"\n",
+	    DEBUG2 (("Freeing tuple list row " ID ", p-S " ID ", size " ID "\n",
 		row, (Int) (p-Numeric->Memory), p->header.size)) ;
 	    ASSERT (p->header.size > 0) ;
 	    ASSERT (p >= Numeric->Memory + Numeric->itail) ;
@@ -122,9 +122,9 @@ GLOBAL void UMF_garbage_collection
     {
 	if (NON_PIVOTAL_COL (col) && Col_tuples [col])
 	{
-	    DEBUG2 (("col "ID" tuples "ID"\n", col, Col_tuples [col])) ;
+	    DEBUG2 (("col " ID " tuples " ID "\n", col, Col_tuples [col])) ;
 	    p = Numeric->Memory + Col_tuples [col] - 1 ;
-	    DEBUG2 (("Freeing tuple list col "ID", p-S "ID", size "ID"\n",
+	    DEBUG2 (("Freeing tuple list col " ID ", p-S " ID ", size " ID "\n",
 		col, (Int) (p-Numeric->Memory), p->header.size)) ;
 	    ASSERT (p->header.size > 0) ;
 	    ASSERT (p >= Numeric->Memory + Numeric->itail) ;
@@ -144,7 +144,7 @@ GLOBAL void UMF_garbage_collection
 #ifndef NDEBUG
     nmark = 0 ;
     UMF_dump_current_front (Numeric, Work, FALSE) ;
-    DEBUGm1 (("E [0] "ID"  \n", E [0])) ;
+    DEBUGm1 (("E [0] " ID "  \n", E [0])) ;
     ASSERT (IMPLIES (E [0],
 		Work->Flublock == (Entry *) (Numeric->Memory + E [0]))) ;
     ASSERT (IMPLIES (Work->Flublock,
@@ -169,7 +169,7 @@ GLOBAL void UMF_garbage_collection
 #ifndef NDEBUG
 	    nmark++ ;
 #endif
-	    DEBUG7 ((ID":: Mark e "ID" at psrc-S "ID", new e "ID"\n",
+	    DEBUG7 ((ID ":: Mark e " ID " at psrc-S " ID ", new e " ID "\n",
 		nmark, e, (Int) (psrc-Numeric->Memory), e2)) ;
 	    E [e] = 0 ;
 	    if (e == Work->prior_element)
@@ -218,7 +218,7 @@ GLOBAL void UMF_garbage_collection
 	/* a free block will have a negative size, so skip it */
 	/* otherwise, if size >= 0, it holds the element name, not the size */
 
-	DEBUG8 (("psrc-S: "ID" prevsize: "ID" size: "ID,
+	DEBUG8 (("psrc-S: " ID " prevsize: " ID " size: " ID,
 	    (Int) (psrc-Numeric->Memory), prevsize, size)) ;
 
 	if (e == 0)
@@ -254,10 +254,10 @@ GLOBAL void UMF_garbage_collection
 	    pnext = pdest ;
 
 #ifndef NDEBUG
-	    DEBUGm2 (("move front: dr "ID" dc "ID" r "ID" drnew "ID" c "ID
-		" dcnew " ID" k "ID"\n", dr, dc, r, drnew, c, dcnew, k)) ;
+	    DEBUGm2 (("move front: dr " ID " dc " ID " r " ID " drnew " ID " c " ID
+		" dcnew " ID " k " ID "\n", dr, dc, r, drnew, c, dcnew, k)) ;
 	    DEBUG7 (("\n")) ;
-	    DEBUG7 ((ID":: Move current frontal matrix from: psrc-S: "ID" \n",
+	    DEBUG7 ((ID ":: Move current frontal matrix from: psrc-S: " ID " \n",
 		nmark, (Int) (psrc-Numeric->Memory))) ;
 	    nmark-- ;
 	    ASSERT (E [e] == 0) ;
@@ -352,14 +352,14 @@ GLOBAL void UMF_garbage_collection
 		    {
 			if (Fcpos [j] != EMPTY) cnt++ ;
 		    }
-		    DEBUGm2 (("Recompute Fcpos cnt "ID" c "ID"\n", cnt, c)) ;
+		    DEBUGm2 (("Recompute Fcpos cnt " ID " c " ID "\n", cnt, c)) ;
 		    ASSERT (cnt == c) ;
 		}
 #endif
 	    }
 
 #ifndef NDEBUG
-	    DEBUGm2 (("Compacted front, drnew "ID" dcnew "ID"\n", drnew, dcnew)) ;
+	    DEBUGm2 (("Compacted front, drnew " ID " dcnew " ID "\n", drnew, dcnew)) ;
 	    DEBUG7 (("C  block: ")) ;
 	    UMF_dump_dense (F1 + nb*nb + drnew*nb + nb*dcnew, drnew, r, c) ;
 	    DEBUG7 (("L  block: ")) ;
@@ -494,7 +494,7 @@ GLOBAL void UMF_garbage_collection
 
 #ifndef NDEBUG
 	    DEBUG7 (("\n")) ;
-	    DEBUG7 ((ID":: Move element "ID": from: "ID" \n",
+	    DEBUG7 ((ID ":: Move element " ID ": from: " ID " \n",
 		nmark, e, (Int) (psrc-Numeric->Memory))) ;
 	    nmark-- ;
 	    ASSERT (e <= nel) ;
@@ -513,12 +513,12 @@ GLOBAL void UMF_garbage_collection
 	    rdeg = epsrc->rdeg ;
 
 #ifndef NDEBUG
-	    DEBUG7 ((" nrows "ID" nrowsleft "ID"\n", nrows, nrowsleft)) ;
-	    DEBUG7 ((" ncols "ID" ncolsleft "ID"\n", ncols, ncolsleft)) ;
+	    DEBUG7 ((" nrows " ID " nrowsleft " ID "\n", nrows, nrowsleft)) ;
+	    DEBUG7 ((" ncols " ID " ncolsleft " ID "\n", ncols, ncolsleft)) ;
 	    DEBUG8 ((" Rows:")) ;
-	    for (i = 0 ; i < nrows ; i++) DEBUG8 ((" "ID, Rows [i])) ;
+	    for (i = 0 ; i < nrows ; i++) DEBUG8 ((" " ID, Rows [i])) ;
 	    DEBUG8 (("\n Cols:")) ;
-	    for (j = 0 ; j < ncols ; j++) DEBUG8 ((" "ID, Cols [j])) ;
+	    for (j = 0 ; j < ncols ; j++) DEBUG8 ((" " ID, Cols [j])) ;
 	    DEBUG8 (("\n")) ;
 #endif
 
@@ -531,7 +531,7 @@ GLOBAL void UMF_garbage_collection
 		  + UNITS (Int, nrowsleft + ncolsleft)
 		  + UNITS (Entry, csize) ;
 
-	    DEBUG7 (("Old size "ID" New size "ID"\n", size, size2)) ;
+	    DEBUG7 (("Old size " ID " New size " ID "\n", size, size2)) ;
 
 	    pnext = pdest ;
 	    pnext->header.prevsize = size2 ;
@@ -661,7 +661,7 @@ GLOBAL void UMF_garbage_collection
 	    DEBUG8 ((" free\n")) ;
 	}
 #endif
-	DEBUG7 (("psrc "ID"  tail "ID"\n",
+	DEBUG7 (("psrc " ID "  tail " ID "\n",
 	(Int) (psrc-Numeric->Memory), Numeric->itail)) ;
     }
 

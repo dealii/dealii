@@ -90,7 +90,7 @@ GLOBAL Int UMF_get_memory
     /* determine the desired new size of memory */
     /* ---------------------------------------------------------------------- */
 
-    DEBUG0 (("UMF_get_memory: needunits: "ID"\n", needunits)) ;
+    DEBUG0 (("UMF_get_memory: needunits: " ID "\n", needunits)) ;
 
     minsize = Numeric->size + needunits ;
     nsize += (double) Numeric->size ;
@@ -115,14 +115,14 @@ GLOBAL Int UMF_get_memory
     newsize = MAX (newsize, Numeric->size) ;
 
     DEBUG0 ((
-    "REALLOC MEMORY: needunits "ID" old size: "ID" new size: "ID" Units \n",
+    "REALLOC MEMORY: needunits " ID " old size: " ID " new size: " ID " Units \n",
 	needunits, Numeric->size, newsize)) ;
 
     /* Forget where the biggest free block is (we no longer need it) */
     /* since garbage collection will occur shortly. */
     Numeric->ibig = EMPTY ;
 
-    DEBUG0 (("Before realloc E [0] "ID"\n", Work->E [0])) ;
+    DEBUG0 (("Before realloc E [0] " ID "\n", Work->E [0])) ;
 
     /* ---------------------------------------------------------------------- */
     /* reallocate the memory, if possible, and make it bigger */
@@ -170,7 +170,7 @@ GLOBAL Int UMF_get_memory
 	Work->Flblock  = Work->Flublock + nb * nb ;
 	Work->Fublock  = Work->Flblock  + dr * nb ;
 	Work->Fcblock  = Work->Fublock  + nb * dc ;
-	DEBUG0 (("after realloc E [0] "ID"\n", Work->E [0])) ;
+	DEBUG0 (("after realloc E [0] " ID "\n", Work->E [0])) ;
     }
     ASSERT (IMPLIES (!(Work->E [0]), Work->Flublock == (Entry *) NULL)) ;
 

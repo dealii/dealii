@@ -90,10 +90,10 @@ GLOBAL Int UMF_kernel
 	Int i ;
 	f1 = Chain_start [chain] ;
 	f2 = Chain_start [chain+1] - 1 ;
-	DEBUG1 (("\nCHain: "ID" start "ID" end "ID"\n", chain, f1, f2)) ;
+	DEBUG1 (("\nCHain: " ID " start " ID " end " ID "\n", chain, f1, f2)) ;
 	for (i = f1 ; i <= f2 ; i++)
 	{
-	    DEBUG1 (("Front "ID", npivcol "ID"\n", i, Front_npivcol [i])) ;
+	    DEBUG1 (("Front " ID ", npivcol " ID "\n", i, Front_npivcol [i])) ;
 	}
     }
 #endif
@@ -129,7 +129,7 @@ GLOBAL Int UMF_kernel
 	    Work->hi = Work->nextcand + Work->ncand - 1 ;
 	    jmax = MIN (MAX_CANDIDATES, Work->ncand) ;
 	    DEBUGm1 ((">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> Starting front "
-		ID", npivcol: "ID"\n", Work->frontid, Work->ncand)) ;
+		ID ", npivcol: " ID "\n", Work->frontid, Work->ncand)) ;
 	    if (fixQ)
 	    {
 		/* do not modify the column order */
@@ -138,7 +138,7 @@ GLOBAL Int UMF_kernel
 	    DEBUGm1 (("Initial candidates: ")) ;
 	    for (j = 0 ; j < jmax ; j++)
 	    {
-		DEBUGm1 ((" "ID, Work->nextcand)) ;
+		DEBUGm1 ((" " ID, Work->nextcand)) ;
 		ASSERT (Work->nextcand <= Work->hi) ;
 		Work->Candidates [j] = Work->nextcand++ ;
 	    }

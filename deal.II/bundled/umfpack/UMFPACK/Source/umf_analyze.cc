@@ -83,7 +83,7 @@ GLOBAL Int UMF_analyze
 	Wflag, npivcol, fallrows, fallcols, fpiv, frows, fcols, *Front_size ;
 
     nfr = 0 ;
-    DEBUG0 (("UMF_analyze: anzmax "ID" anrow "ID" ancol "ID"\n",
+    DEBUG0 (("UMF_analyze: anzmax " ID " anrow " ID " ancol " ID "\n",
 	Ap [n_row], n_row, n_col)) ;
 
     /* ====================================================================== */
@@ -126,7 +126,7 @@ GLOBAL Int UMF_analyze
 
     for (j = 0 ; j < n_col ; j = jnext)
     {
-	DEBUG1 (("\n\n============Front "ID" starting. nfr = "ID"\n", j, nfr)) ;
+	DEBUG1 (("\n\n============Front " ID " starting. nfr = " ID "\n", j, nfr)) ;
 
 	/* ================================================================== */
 	/* === garbage collection =========================================== */
@@ -137,14 +137,14 @@ GLOBAL Int UMF_analyze
 	    /* we might run out ... compact the rows of U */
 
 #ifndef NDEBUG
-	    DEBUG0 (("UMF_analyze COMPACTION, j="ID" pfirst="ID"\n",
+	    DEBUG0 (("UMF_analyze COMPACTION, j=" ID " pfirst=" ID "\n",
 		j, pfirst)) ;
 	    for (row = 0 ; row < j ; row++)
 	    {
 		if (Up [row] != EMPTY)
 		{
 		    /* this is a live row of U */
-		    DEBUG1 (("Live row: "ID" cols: ", row)) ;
+		    DEBUG1 (("Live row: " ID " cols: ", row)) ;
 		    p = Up [row] ;
 		    ASSERT (Front_ncols [row] > Front_npivcol [row]) ;
 		    p2 = p + (Front_ncols [row] - Front_npivcol [row]) ;
@@ -167,7 +167,7 @@ GLOBAL Int UMF_analyze
 		if (Up [row] != EMPTY)
 		{
 		    /* this is a live row of U */
-		    DEBUG1 (("Live row: "ID" cols: ", row)) ;
+		    DEBUG1 (("Live row: " ID " cols: ", row)) ;
 		    ASSERT (row < n_col) ;
 		    p = Up [row] ;
 		    ASSERT (Front_ncols [row] > Front_npivcol [row]) ;
@@ -186,13 +186,13 @@ GLOBAL Int UMF_analyze
 	    }
 
 #ifndef NDEBUG
-	    DEBUG1 (("\nAFTER COMPACTION, j="ID" pfirst="ID"\n", j, pfirst)) ;
+	    DEBUG1 (("\nAFTER COMPACTION, j=" ID " pfirst=" ID "\n", j, pfirst)) ;
 	    for (row = 0 ; row < j ; row++)
 	    {
 		if (Up [row] != EMPTY)
 		{
 		    /* this is a live row of U */
-		    DEBUG1 (("Live row: "ID" cols: ", row)) ;
+		    DEBUG1 (("Live row: " ID " cols: ", row)) ;
 		    p = Up [row] ;
 		    ASSERT (Front_ncols [row] > Front_npivcol [row]) ;
 		    p2 = p + (Front_ncols [row] - Front_npivcol [row]) ;
@@ -223,7 +223,7 @@ GLOBAL Int UMF_analyze
 	if (jlast != EMPTY && Link [j] == jlast)
 	{
 	    /* yes - create row j by appending to jlast */
-	    DEBUG1 (("GOT:last front is child of this one: j "ID" jlast "ID"\n",
+	    DEBUG1 (("GOT:last front is child of this one: j " ID " jlast " ID "\n",
 		j, jlast)) ;
 	    ASSERT (jlast >= 0 && jlast < j) ;
 
@@ -235,13 +235,13 @@ GLOBAL Int UMF_analyze
 	    for (p = Up [j] ; p < pdest ; )
 	    {
 		j3 = Ai [p] ;
-		DEBUG1 (("Initial row of U: col "ID" ", j3)) ;
+		DEBUG1 (("Initial row of U: col " ID " ", j3)) ;
 		ASSERT (j3 >= 0 && j3 < n_col) ;
-		DEBUG1 (("W: "ID" \n", W [j3])) ;
+		DEBUG1 (("W: " ID " \n", W [j3])) ;
 		ASSERT (W [j3] == Wflag) ;
 		if (j == j3)
 		{
-		    DEBUG1 (("Found column j at p = "ID"\n", p)) ;
+		    DEBUG1 (("Found column j at p = " ID "\n", p)) ;
 		    Ai [p] = Ai [--pdest] ;
 		}
 		else
@@ -259,7 +259,7 @@ GLOBAL Int UMF_analyze
 
 	    ASSERT (Front_nrows [jlast] > Front_npivcol [jlast]) ;
 	    thickness = (Front_nrows [jlast] - Front_npivcol [jlast]) ;
-	    DEBUG1 (("initial thickness: "ID"\n", thickness)) ;
+	    DEBUG1 (("initial thickness: " ID "\n", thickness)) ;
 
 	}
 	else
@@ -282,8 +282,8 @@ GLOBAL Int UMF_analyze
 	ASSERT (pdest <= pfirst) ;
 	W [j] = Wflag ;
 
-	DEBUG1 (("\nComputing row "ID" of A'*A\n", j)) ;
-	DEBUG2 (("	col: "ID" (diagonal)\n", j)) ;
+	DEBUG1 (("\nComputing row " ID " of A'*A\n", j)) ;
+	DEBUG2 (("	col: " ID " (diagonal)\n", j)) ;
 
 	/* ------------------------------------------------------------------ */
 	/* find the rows the contribute to this column j */
@@ -326,10 +326,10 @@ GLOBAL Int UMF_analyze
 	    ASSERT (p < p2) ;
 
 	    /* merge row k of A into W */
-	    DEBUG2 (("	---- A row "ID" ", k)) ;
+	    DEBUG2 (("	---- A row " ID " ", k)) ;
 	    ASSERT (k >= 0 && k < n_row) ;
 	    ASSERT (Ai [p] == j) ;
-	    DEBUG2 (("  p "ID" p2 "ID"\n        cols:", p, p2)) ;
+	    DEBUG2 (("  p " ID " p2 " ID "\n        cols:", p, p2)) ;
 	    ASSERT (p  >= pfirst && p  < Ap [n_row]) ;
 	    ASSERT (p2 >  pfirst && p2 <= Ap [n_row]) ;
 	    for ( ; p < p2 ; p++)
@@ -337,7 +337,7 @@ GLOBAL Int UMF_analyze
 		/* add to pattern if seen for the first time */
 		col = Ai [p] ;
 		ASSERT (col >= j && col < n_col) ;
-		DEBUG3 ((" "ID, col)) ;
+		DEBUG3 ((" " ID, col)) ;
 		if (W [col] != Wflag)
 		{
 		    Ai [pdest++] = col ;
@@ -355,10 +355,10 @@ GLOBAL Int UMF_analyze
 	}
 
 #ifndef NDEBUG
-	DEBUG3 (("\nRow "ID" of A'A:\n", j)) ;
+	DEBUG3 (("\nRow " ID " of A'A:\n", j)) ;
 	for (p = Up [j] ; p < pdest ; p++)
 	{
-	    DEBUG3 ((" "ID, Ai [p])) ;
+	    DEBUG3 ((" " ID, Ai [p])) ;
 	}
 	DEBUG3 (("\n")) ;
 #endif
@@ -380,13 +380,13 @@ GLOBAL Int UMF_analyze
 	for (k = Link [j] ; k != EMPTY ; k = Link [k])
 	{
 	    /* merge row k of U into W */
-	    DEBUG2 (("	---- U row "ID, k)) ;
+	    DEBUG2 (("	---- U row " ID, k)) ;
 	    ASSERT (k >= 0 && k < n_col) ;
 	    ASSERT (Up [k] != EMPTY) ;
 	    p = Up [k] ;
 	    ASSERT (Front_ncols [k] > Front_npivcol [k]) ;
 	    p2 = p + (Front_ncols [k] - Front_npivcol [k]) ;
-	    DEBUG2 (("  p "ID" p2 "ID"\n        cols:", p, p2)) ;
+	    DEBUG2 (("  p " ID " p2 " ID "\n        cols:", p, p2)) ;
 	    ASSERT (p <= pfirst) ;
 	    ASSERT (p2 <= pfirst) ;
 	    for ( ; p < p2 ; p++)
@@ -394,7 +394,7 @@ GLOBAL Int UMF_analyze
 		/* add to pattern if seen for the first time */
 		col = Ai [p] ;
 		ASSERT (col >= j && col < n_col) ;
-		DEBUG3 ((" "ID, col)) ;
+		DEBUG3 ((" " ID, col)) ;
 		if (W [col] != Wflag)
 		{
 		    Ai [pdest++] = col ;
@@ -418,13 +418,13 @@ GLOBAL Int UMF_analyze
 	}
 
 #ifndef NDEBUG
-	DEBUG3 (("\nRow "ID" of U prior to supercolumn detection:\n", j));
+	DEBUG3 (("\nRow " ID " of U prior to supercolumn detection:\n", j));
 	for (p = Up [j] ; p < pdest ; p++)
 	{
-	    DEBUG3 ((" "ID, Ai [p])) ;
+	    DEBUG3 ((" " ID, Ai [p])) ;
 	}
 	DEBUG3 (("\n")) ;
-	DEBUG1 (("thickness, prior to supercol detect: "ID"\n", thickness)) ;
+	DEBUG1 (("thickness, prior to supercol detect: " ID "\n", thickness)) ;
 #endif
 
 	/* ================================================================== */
@@ -448,15 +448,15 @@ GLOBAL Int UMF_analyze
 	}
 
 	/* the loop above terminated with j2 at the first non-supernode */
-	DEBUG1 (("jnext = "ID"\n", jnext)) ;
+	DEBUG1 (("jnext = " ID "\n", jnext)) ;
 	ASSERT (j2 <= jnext) ;
 	jnext = j2 ;
 	j2-- ;
-	DEBUG1 (("j2 = "ID"\n", j2)) ;
+	DEBUG1 (("j2 = " ID "\n", j2)) ;
 	ASSERT (j2 < n_col) ;
 
 	npivots = j2-j+1 ;
-	DEBUG1 (("Number of pivot columns: "ID"\n", npivots)) ;
+	DEBUG1 (("Number of pivot columns: " ID "\n", npivots)) ;
 
 	/* rows j:j2 have the same nonzero pattern, except for columns j:j2-1 */
 
@@ -465,7 +465,7 @@ GLOBAL Int UMF_analyze
 	    /* supernode detected, prune the pattern of new row j */
 	    ASSERT (parent == j+1) ;
 	    ASSERT (j2 < n_col) ;
-	    DEBUG1 (("Supernode detected, j "ID" to j2 "ID"\n", j, j2)) ;
+	    DEBUG1 (("Supernode detected, j " ID " to j2 " ID "\n", j, j2)) ;
 
 	    parent = n_col ;
 	    p2 = pdest ;
@@ -487,7 +487,7 @@ GLOBAL Int UMF_analyze
 	    }
 	}
 
-	DEBUG1 (("Parent ["ID"] = "ID"\n", j, parent)) ;
+	DEBUG1 (("Parent [" ID "] = " ID "\n", j, parent)) ;
 	ASSERT (parent > j2) ;
 
 	if (parent == n_col)
@@ -497,11 +497,11 @@ GLOBAL Int UMF_analyze
 	}
 
 #ifndef NDEBUG
-	DEBUG3 (("\nFinal row "ID" of U after supercolumn detection:\n", j)) ;
+	DEBUG3 (("\nFinal row " ID " of U after supercolumn detection:\n", j)) ;
 	for (p = Up [j] ; p < pdest ; p++)
 	{
 	    ASSERT (Ai [p] >= 0 && Ai [p] < n_col) ;
-	    DEBUG3 ((" "ID" ("ID")", Ai [p], W [Ai [p]])) ;
+	    DEBUG3 ((" " ID " (" ID ")", Ai [p], W [Ai [p]])) ;
 	    ASSERT (W [Ai [p]] == Wflag) ;
 	}
 	DEBUG3 (("\n")) ;
@@ -542,8 +542,8 @@ GLOBAL Int UMF_analyze
 
 	/* Front_parent [j] is the first column of the parent frontal matrix */
 
-	DEBUG1 (("\n\n==== Front "ID", nfr "ID" pivot columns "ID":"ID
-	    " all front: "ID"-by-"ID" Parent: "ID"\n", j, nfr, j,j+npivots-1,
+	DEBUG1 (("\n\n==== Front " ID ", nfr " ID " pivot columns " ID ":" ID
+	    " all front: " ID "-by-" ID " Parent: " ID "\n", j, nfr, j,j+npivots-1,
 	    Front_nrows [j], Front_ncols [j], Front_parent [j])) ;
 	nfr++ ;
 
@@ -583,7 +583,7 @@ GLOBAL Int UMF_analyze
 	    if (Front_npivcol [j] > 0)
 	    {
 		Front_order [j] = k++ ;
-		DEBUG1 (("Front order of j: "ID" is:"ID"\n", j,
+		DEBUG1 (("Front order of j: " ID " is:" ID "\n", j,
 		    Front_order [j])) ;
 	    }
 	    else
@@ -634,7 +634,7 @@ GLOBAL Int UMF_analyze
 	    k = Front_order [i] ;
 	    if (k != EMPTY)
 	    {
-		DEBUG1 (("Front "ID" new order: "ID"\n", i, k)) ;
+		DEBUG1 (("Front " ID " new order: " ID "\n", i, k)) ;
 		ASSERT (k >= 0 && k < nfr) ;
 		ASSERT (Winv [k] == EMPTY) ;
 		Winv [k] = i ;
@@ -646,15 +646,15 @@ GLOBAL Int UMF_analyze
 	for (k = 0 ; k < nfr ; k++)
 	{
 	    i = Winv [k] ;
-	    DEBUG1 (("Old Front "ID" New Front "ID" npivots "ID" nrows "ID
-		" ncols "ID"\n",
+	    DEBUG1 (("Old Front " ID " New Front " ID " npivots " ID " nrows " ID
+		" ncols " ID "\n",
 		i, k, Front_npivcol [i], Front_nrows [i], Front_ncols [i])) ;
 	    ASSERT (i >= 0 && i < n_col) ;
 	    ASSERT (Front_npivcol [i] > 0) ;
 	    for (npiv = 0 ; npiv < Front_npivcol [i] ; npiv++)
 	    {
 		Up [kk] = i + npiv ;
-		DEBUG1 (("    Cperm ["ID"] = "ID"\n", kk, Up [kk])) ;
+		DEBUG1 (("    Cperm [" ID "] = " ID "\n", kk, Up [kk])) ;
 		kk++ ;
 	    }
 	}
@@ -693,8 +693,8 @@ GLOBAL Int UMF_analyze
     DEBUG1 (("\nFinal frontal matrices:\n")) ;
     for (i = 0 ; i < nfr ; i++)
     {
-	DEBUG1 (("Final front "ID": npiv "ID" nrows "ID" ncols "ID" parent "
-	    ID"\n", i, Front_npivcol [i], Front_nrows [i],
+	DEBUG1 (("Final front " ID ": npiv " ID " nrows " ID " ncols " ID " parent "
+	    ID "\n", i, Front_npivcol [i], Front_nrows [i],
 	    Front_ncols [i], Front_parent [i])) ;
     }
 #endif

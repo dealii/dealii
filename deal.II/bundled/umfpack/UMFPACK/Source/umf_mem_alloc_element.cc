@@ -54,7 +54,7 @@ GLOBAL Int UMF_mem_alloc_element
 
     ep = (Element *) p ;
 
-    DEBUG2 (("alloc_element done ("ID" x "ID"): p: "ID" i "ID"\n",
+    DEBUG2 (("alloc_element done (" ID " x " ID "): p: " ID " i " ID "\n",
 	nrows, ncols, (Int) (p-Numeric->Memory), i)) ;
 
     /* Element data structure, in order: */
@@ -72,8 +72,8 @@ GLOBAL Int UMF_mem_alloc_element
     ep->rdeg = 0 ;
     ep->next = EMPTY ;
 
-    DEBUG2 (("new block size: "ID" ", GET_BLOCK_SIZE (Numeric->Memory + i))) ;
-    DEBUG2 (("Element size needed "ID"\n", GET_ELEMENT_SIZE (nrows, ncols))) ;
+    DEBUG2 (("new block size: " ID " ", GET_BLOCK_SIZE (Numeric->Memory + i))) ;
+    DEBUG2 (("Element size needed " ID "\n", GET_ELEMENT_SIZE (nrows, ncols))) ;
 
     *epout = ep ;
 

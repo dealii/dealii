@@ -38,15 +38,15 @@ GLOBAL Int UMF_is_permutation
     for (k = 0 ; k < r ; k++)
     {
 	i = P [k] ;
-	DEBUG5 (("k "ID" i "ID"\n", k, i)) ;
+	DEBUG5 (("k " ID " i " ID "\n", k, i)) ;
 	if (i < 0 || i >= n)
 	{
-	    DEBUG0 (("i out of range "ID" "ID"\n", i, n)) ;
+	    DEBUG0 (("i out of range " ID " " ID "\n", i, n)) ;
 	    return (FALSE) ;
 	}
 	if (W [i])
 	{
-	    DEBUG0 (("i duplicate "ID"\n", i)) ;
+	    DEBUG0 (("i duplicate " ID "\n", i)) ;
 	    return (FALSE) ;
 	}
 	W [i] = TRUE ;

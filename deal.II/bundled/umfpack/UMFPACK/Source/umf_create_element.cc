@@ -261,7 +261,7 @@ GLOBAL Int UMF_create_element
 
     e = ++(Work->nel) ;	/* get the name of this new frontal matrix */
     Work->prior_element = e ;
-    DEBUG8 (("wrapup e "ID" nel "ID"\n", e, Work->nel)) ;
+    DEBUG8 (("wrapup e " ID " nel " ID "\n", e, Work->nel)) ;
 
     ASSERT (e > 0 && e < Work->elen) ;
     ASSERT (E [e] == 0) ;
@@ -294,7 +294,7 @@ GLOBAL Int UMF_create_element
 	Cols [i] = Fcols [i] ;
     }
     Fcol = Work->Fcblock ;
-    DEBUG0 (("copy front "ID" by "ID"\n", fnrows, fncols)) ;
+    DEBUG0 (("copy front " ID " by " ID "\n", fnrows, fncols)) ;
     fnr_curr = Work->fnr_curr ;
     ASSERT (fnr_curr >= 0 && fnr_curr % 2 == 1) ;
     for (j = 0 ; j < fncols ; j++)
@@ -359,7 +359,7 @@ GLOBAL Int UMF_create_element
 	    ASSERT (col >= 0 && col < n_col) ;
 	    ASSERT (NON_PIVOTAL_COL (col)) ;
 	    t1 = Col_tuples [col] ;
-	    DEBUG1 (("Placing on col:"ID" , tuples at "ID"\n",
+	    DEBUG1 (("Placing on col:" ID " , tuples at " ID "\n",
 		col, Col_tuples [col])) ;
 
 	    size = 0 ;
@@ -375,7 +375,7 @@ GLOBAL Int UMF_create_element
 	    }
 
 	    needunits = UNITS (Tuple, len + 1) ;
-	    DEBUG1 (("len: "ID" size: "ID" needunits: "ID"\n",
+	    DEBUG1 (("len: " ID " size: " ID " needunits: " ID "\n",
 		len, size, needunits));
 
 	    if (needunits > size && t1)
@@ -407,7 +407,7 @@ GLOBAL Int UMF_create_element
 	    if (needunits > size)
 	    {
 		/* no room exists - reallocate elsewhere */
-		DEBUG1 (("REALLOCATE Col: "ID", size "ID" to "ID"\n",
+		DEBUG1 (("REALLOCATE Col: " ID ", size " ID " to " ID "\n",
 		    col, size, 2*needunits)) ;
 
 #ifndef NDEBUG
@@ -460,7 +460,7 @@ GLOBAL Int UMF_create_element
 	    ASSERT (row >= 0 && row < n_row) ;
 	    ASSERT (NON_PIVOTAL_ROW (row)) ;
 	    t1 = Row_tuples [row] ;
-	    DEBUG1 (("Placing on row:"ID" , tuples at "ID"\n",
+	    DEBUG1 (("Placing on row:" ID " , tuples at " ID "\n",
 		row, Row_tuples [row])) ;
 
 	    size = 0 ;
@@ -475,7 +475,7 @@ GLOBAL Int UMF_create_element
 	    }
 
 	    needunits = UNITS (Tuple, len + 1) ;
-	    DEBUG1 (("len: "ID" size: "ID" needunits: "ID"\n",
+	    DEBUG1 (("len: " ID " size: " ID " needunits: " ID "\n",
 		len, size, needunits)) ;
 
 	    if (needunits > size && t1)
@@ -510,7 +510,7 @@ GLOBAL Int UMF_create_element
 	    if (needunits > size)
 	    {
 		/* no room exists - reallocate elsewhere */
-		DEBUG1 (("REALLOCATE Row: "ID", size "ID" to "ID"\n",
+		DEBUG1 (("REALLOCATE Row: " ID ", size " ID " to " ID "\n",
 		    row, size, 2*needunits)) ;
 
 #ifndef NDEBUG
@@ -558,10 +558,10 @@ GLOBAL Int UMF_create_element
     /* ---------------------------------------------------------------------- */
 
 #ifndef NDEBUG
-    DEBUG1 (("Done extending\nFINAL: element row pattern: len="ID"\n", fncols));
-    for (j = 0 ; j < fncols ; j++) DEBUG1 ((""ID"\n", Fcols [j])) ;
-    DEBUG1 (("FINAL: element col pattern:  len="ID"\n", fnrows)) ;
-    for (j = 0 ; j < fnrows ; j++) DEBUG1 ((""ID"\n", Frows [j])) ;
+    DEBUG1 (("Done extending\nFINAL: element row pattern: len=" ID "\n", fncols));
+    for (j = 0 ; j < fncols ; j++) DEBUG1 (("" ID "\n", Fcols [j])) ;
+    DEBUG1 (("FINAL: element col pattern:  len=" ID "\n", fnrows)) ;
+    for (j = 0 ; j < fnrows ; j++) DEBUG1 (("" ID "\n", Frows [j])) ;
     for (j = 0 ; j < fncols ; j++)
     {
 	col = Fcols [j] ;
@@ -578,11 +578,11 @@ GLOBAL Int UMF_create_element
     {
 	UMF_dump_memory (Numeric) ;
     }
-    DEBUG1 (("New element, after filling with stuff: "ID"\n", e)) ;
+    DEBUG1 (("New element, after filling with stuff: " ID "\n", e)) ;
     UMF_dump_element (Numeric, Work, e, TRUE) ;
     if (nn < 1000)
     {
-	DEBUG4 (("Matrix dump, after New element: "ID"\n", e)) ;
+	DEBUG4 (("Matrix dump, after New element: " ID "\n", e)) ;
 	UMF_dump_matrix (Numeric, Work, TRUE) ;
     }
     DEBUG3 (("FRONTAL WRAPUP DONE\n")) ;

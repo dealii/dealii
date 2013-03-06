@@ -96,7 +96,7 @@ GLOBAL Int UMF_triplet_nomap_nox
 	}
 	W [i]++ ;
 #ifndef NDEBUG
-	DEBUG1 ((ID " triplet: "ID" "ID" ", k, i, j)) ;
+	DEBUG1 ((ID " triplet: " ID " " ID " ", k, i, j)) ;
 #ifdef DO_VALUES
 	{
 	    Entry tt ;
@@ -162,7 +162,7 @@ GLOBAL Int UMF_triplet_nomap_nox
     {
 	/* make sure that kth triplet is mapped correctly */
 	p = Map [k] ;
-	DEBUG1 (("First row map: Map ["ID"] = "ID"\n", k, p)) ;
+	DEBUG1 (("First row map: Map [" ID "] = " ID "\n", k, p)) ;
 	i = Ti [k] ;
 	j = Tj [k] ;
 	ASSERT (j == Rj [p]) ;
@@ -296,7 +296,7 @@ GLOBAL Int UMF_triplet_nomap_nox
     {
 	/* make sure that kth triplet is mapped correctly */
 	p = Map [k] ;
-	DEBUG1 (("Second row map: Map ["ID"] = "ID"\n", k, p)) ;
+	DEBUG1 (("Second row map: Map [" ID "] = " ID "\n", k, p)) ;
 	i = Ti [k] ;
 	j = Tj [k] ;
 	ASSERT (j == Rj [p]) ;
@@ -413,11 +413,11 @@ GLOBAL Int UMF_triplet_nomap_nox
     {
 	/* make sure that kth triplet is mapped correctly */
 	p = Map [k] ;
-	DEBUG1 (("Col map: Map ["ID"] = "ID"\t", k, p)) ;
+	DEBUG1 (("Col map: Map [" ID "] = " ID "\t", k, p)) ;
 	i = Ti [k] ;
 	j = Tj [k] ;
 	ASSERT (i == Ai [p]) ;
-	DEBUG1 (("   i "ID" j "ID" Ap[j] "ID" p "ID" Ap[j+1] "ID"\n",
+	DEBUG1 (("   i " ID " j " ID " Ap[j] " ID " p " ID " Ap[j+1] " ID "\n",
 		i, j, Ap [j], p, Ap [j+1])) ;
 	ASSERT (Ap [j] <= p && p < Ap [j+1]) ;
     }

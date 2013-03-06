@@ -140,7 +140,7 @@ GLOBAL void UMFPACK_report_info
 #ifdef NBLAS
     PRINTF (("none.  UMFPACK will be slow.\n")) ;
 #else
-    PRINTF (("Fortran BLAS.  size of BLAS integer: "ID"\n",
+    PRINTF (("Fortran BLAS.  size of BLAS integer: " ID "\n",
 	(Int) (sizeof (BLAS_INT)))) ;
 #endif
 
@@ -178,20 +178,20 @@ GLOBAL void UMFPACK_report_info
     n_col = (Int) Info [UMFPACK_NCOL] ;
     n_inner = MIN (n_row, n_col) ;
 
-    PRINT_INFO ("    number of rows in matrix A:       "ID"\n", n_row) ;
-    PRINT_INFO ("    number of columns in matrix A:    "ID"\n", n_col) ;
-    PRINT_INFO ("    entries in matrix A:              "ID"\n",
+    PRINT_INFO ("    number of rows in matrix A:       " ID "\n", n_row) ;
+    PRINT_INFO ("    number of columns in matrix A:    " ID "\n", n_col) ;
+    PRINT_INFO ("    entries in matrix A:              " ID "\n",
 	(Int) Info [UMFPACK_NZ]) ;
-    PRINT_INFO ("    memory usage reported in:         "ID"-byte Units\n",
+    PRINT_INFO ("    memory usage reported in:         " ID "-byte Units\n",
 	(Int) Info [UMFPACK_SIZE_OF_UNIT]) ;
 
-    PRINT_INFO ("    size of int:                      "ID" bytes\n",
+    PRINT_INFO ("    size of int:                      " ID " bytes\n",
 	(Int) Info [UMFPACK_SIZE_OF_INT]) ;
-    PRINT_INFO ("    size of UF_long:                  "ID" bytes\n",
+    PRINT_INFO ("    size of UF_long:                  " ID " bytes\n",
 	(Int) Info [UMFPACK_SIZE_OF_LONG]) ;
-    PRINT_INFO ("    size of pointer:                  "ID" bytes\n",
+    PRINT_INFO ("    size of pointer:                  " ID " bytes\n",
 	(Int) Info [UMFPACK_SIZE_OF_POINTER]) ;
-    PRINT_INFO ("    size of numerical entry:          "ID" bytes\n",
+    PRINT_INFO ("    size of numerical entry:          " ID " bytes\n",
 	(Int) Info [UMFPACK_SIZE_OF_ENTRY]) ;
 
     /* ---------------------------------------------------------------------- */

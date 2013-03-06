@@ -110,7 +110,7 @@ GLOBAL Int UMF_extend_front
 
 #ifndef NDEBUG
     DEBUG2 (("EXTEND FRONT\n")) ;
-    DEBUG2 (("Work->fnpiv "ID"\n", fnpiv)) ;
+    DEBUG2 (("Work->fnpiv " ID "\n", fnpiv)) ;
     ASSERT (Work->Flblock  == Work->Flublock + Work->nb*Work->nb) ;
     ASSERT (Work->Fublock  == Work->Flblock  + Work->fnr_curr*Work->nb) ;
     ASSERT (Work->Fcblock  == Work->Fublock  + Work->nb*Work->fnc_curr) ;
@@ -172,13 +172,13 @@ GLOBAL Int UMF_extend_front
     fncols_extended = fncols ;
 
 #ifndef NDEBUG
-    DEBUG2 (("Pivot col, before extension: "ID"\n", fnrows)) ;
+    DEBUG2 (("Pivot col, before extension: " ID "\n", fnrows)) ;
     for (i = 0 ; i < fnrows ; i++)
     {
-	DEBUG2 ((" "ID": row "ID"\n", i, Frows [i])) ;
+	DEBUG2 ((" " ID ": row " ID "\n", i, Frows [i])) ;
 	ASSERT (Frpos [Frows [i]] == i) ;
     }
-    DEBUG2 (("Extending pivot column: pivcol_in_front: "ID"\n",
+    DEBUG2 (("Extending pivot column: pivcol_in_front: " ID "\n",
 	Work->pivcol_in_front)) ;
 #endif
 
@@ -198,7 +198,7 @@ GLOBAL Int UMF_extend_front
 	    Fl [i] = Wy [i] ;
 #ifndef NDEBUG
 	    row = Frows [i] ;
-	    DEBUG2 ((" "ID": row "ID" ", i, row)) ;
+	    DEBUG2 ((" " ID ": row " ID " ", i, row)) ;
 	    EDEBUG2 (Fl [i]) ;
 	    if (row == Work->pivrow) DEBUG2 ((" <- pivrow")) ;
 	    DEBUG2 (("\n")) ;
@@ -230,7 +230,7 @@ GLOBAL Int UMF_extend_front
 	{
 	    row = Wm [i] ;
 #ifndef NDEBUG
-	    DEBUG2 ((" "ID": row "ID" (ext) ", fnrows_extended, row)) ;
+	    DEBUG2 ((" " ID ": row " ID " (ext) ", fnrows_extended, row)) ;
 	    EDEBUG2 (Wx [i]) ;
 	    if (row == Work->pivrow) DEBUG2 ((" <- pivrow")) ;
 	    DEBUG2 (("\n")) ;
@@ -254,10 +254,10 @@ GLOBAL Int UMF_extend_front
     /* ---------------------------------------------------------------------- */
 
 #ifndef NDEBUG
-    DEBUG6 (("Pivot row, before extension: "ID"\n", fncols)) ;
+    DEBUG6 (("Pivot row, before extension: " ID "\n", fncols)) ;
     for (j = 0 ; j < fncols ; j++)
     {
-	DEBUG7 ((" "ID": col "ID"\n", j, Fcols [j])) ;
+	DEBUG7 ((" " ID ": col " ID "\n", j, Fcols [j])) ;
 	ASSERT (Fcpos [Fcols [j]] == j * fnr_curr) ;
     }
     DEBUG6 (("Extending pivot row:\n")) ;
@@ -272,7 +272,7 @@ GLOBAL Int UMF_extend_front
 	    {
 #ifndef NDEBUG
 		col = Fcols [j] ;
-		DEBUG2 ((" "ID": col "ID" (ext)\n", j, col)) ;
+		DEBUG2 ((" " ID ": col " ID " (ext)\n", j, col)) ;
 		ASSERT (col != Work->pivcol) ;
 		ASSERT (col >= 0 && col < Work->n_col) ;
 		ASSERT (Fcpos [col] < 0) ;
@@ -291,7 +291,7 @@ GLOBAL Int UMF_extend_front
 		for (j = fncols ; j < rrdeg ; j++)
 		{
 		    col = Wrow [j] ;
-		    DEBUG2 ((" "ID": col "ID" (ext)\n", j, col)) ;
+		    DEBUG2 ((" " ID ": col " ID " (ext)\n", j, col)) ;
 		    ASSERT (Fcpos [col] < 0) ;
 		    /* Fcols [j] = col ;  not needed */
 		    Fcpos [col] = j * fnr_curr ;
@@ -302,7 +302,7 @@ GLOBAL Int UMF_extend_front
 		for (j = fncols ; j < rrdeg ; j++)
 		{
 		    col = Wrow [j] ;
-		    DEBUG2 ((" "ID": col "ID" (ext)\n", j, col)) ;
+		    DEBUG2 ((" " ID ": col " ID " (ext)\n", j, col)) ;
 		    ASSERT (Fcpos [col] < 0) ;
 		    Fcols [j] = col ;
 		    Fcpos [col] = j * fnr_curr ;
@@ -321,7 +321,7 @@ GLOBAL Int UMF_extend_front
 	    ASSERT (col >= 0 && col < Work->n_col) ;
 	    if (Fcpos [col] < 0)
 	    {
-		DEBUG2 ((" col:: "ID" (ext)\n", col)) ;
+		DEBUG2 ((" col:: " ID " (ext)\n", col)) ;
 		Fcols [fncols_extended] = col ;
 		Fcpos [col] = fncols_extended * fnr_curr ;
 		fncols_extended++ ;
@@ -337,33 +337,33 @@ GLOBAL Int UMF_extend_front
     ASSERT (fncols_extended <= fnc_curr) ;
     ASSERT (fnrows_extended <= fnr_curr) ;
 
-    DEBUG6 (("Pivot col, after ext: "ID" "ID"\n", fnrows,fnrows_extended)) ;
+    DEBUG6 (("Pivot col, after ext: " ID " " ID "\n", fnrows,fnrows_extended)) ;
     for (i = 0 ; i < fnrows_extended ; i++)
     {
 	row = Frows [i] ;
-	DEBUG7 ((" "ID": row "ID" pos "ID" old: %d", i, row, Frpos [row],
+	DEBUG7 ((" " ID ": row " ID " pos " ID " old: %d", i, row, Frpos [row],
 	    i < fnrows)) ;
 	if (row == Work->pivrow ) DEBUG7 (("  <-- pivrow")) ;
 	DEBUG7 (("\n")) ;
 	ASSERT (Frpos [Frows [i]] == i) ;
     }
 
-    DEBUG6 (("Pivot row position: "ID"\n", Frpos [Work->pivrow])) ;
+    DEBUG6 (("Pivot row position: " ID "\n", Frpos [Work->pivrow])) ;
     ASSERT (Frpos [Work->pivrow] >= 0) ;
     ASSERT (Frpos [Work->pivrow] < fnrows_extended) ;
 
-    DEBUG6 (("Pivot row, after ext: "ID" "ID"\n", fncols,fncols_extended)) ;
+    DEBUG6 (("Pivot row, after ext: " ID " " ID "\n", fncols,fncols_extended)) ;
     for (j = 0 ; j < fncols_extended ; j++)
     {
 	col = Fcols [j] ;
-	DEBUG7 ((" "ID": col "ID" pos "ID" old: %d", j, col, Fcpos [col],
+	DEBUG7 ((" " ID ": col " ID " pos " ID " old: %d", j, col, Fcpos [col],
 	    j < fncols)) ;
 	if (col == Work->pivcol ) DEBUG7 (("  <-- pivcol")) ;
 	DEBUG7 (("\n")) ;
 	ASSERT (Fcpos [Fcols [j]] == j * fnr_curr) ;
     }
 
-    DEBUG6 (("Pivot col position: "ID"\n", Fcpos [Work->pivcol])) ;
+    DEBUG6 (("Pivot col position: " ID "\n", Fcpos [Work->pivcol])) ;
     ASSERT (Fcpos [Work->pivcol] >= 0) ;
     ASSERT (Fcpos [Work->pivcol] < fncols_extended * fnr_curr) ;
 

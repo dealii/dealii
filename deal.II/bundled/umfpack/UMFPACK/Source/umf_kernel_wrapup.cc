@@ -56,7 +56,7 @@ GLOBAL void UMF_kernel_wrapup
 
     ASSERT (n_row == Numeric->n_row) ;
     ASSERT (n_col == Symbolic->n_col) ;
-    DEBUG0 (("Wrap-up: npiv "ID" ulen "ID"\n", npiv, Numeric->ulen)) ;
+    DEBUG0 (("Wrap-up: npiv " ID " ulen " ID "\n", npiv, Numeric->ulen)) ;
     ASSERT (npiv <= n_inner) ;
 
     /* this will be nonzero only if matrix is singular or rectangular */
@@ -135,13 +135,13 @@ GLOBAL void UMF_kernel_wrapup
     {
 	/* finalize the row permutation */
 	k = npiv ;
-	DEBUGm3 (("Singular pivot rows "ID" to "ID"\n", k, n_row-1)) ;
+	DEBUGm3 (("Singular pivot rows " ID " to " ID "\n", k, n_row-1)) ;
 	for (row = 0 ; row < n_row ; row++)
 	{
 	    if (NON_PIVOTAL_ROW (row))
 	    {
 		Rperm [row] = ONES_COMPLEMENT (k) ;
-		DEBUGm3 (("Singular row "ID" is k: "ID" pivot row\n", row, k)) ;
+		DEBUGm3 (("Singular row " ID " is k: " ID " pivot row\n", row, k)) ;
 		ASSERT (!NON_PIVOTAL_ROW (row)) ;
 		Lpos [row] = EMPTY ;
 		Uip [row] = EMPTY ;
@@ -156,13 +156,13 @@ GLOBAL void UMF_kernel_wrapup
     {
 	/* finalize the col permutation */
 	k = npiv ;
-	DEBUGm3 (("Singular pivot cols "ID" to "ID"\n", k, n_col-1)) ;
+	DEBUGm3 (("Singular pivot cols " ID " to " ID "\n", k, n_col-1)) ;
 	for (col = 0 ; col < n_col ; col++)
 	{
 	    if (NON_PIVOTAL_COL (col))
 	    {
 		Cperm [col] = ONES_COMPLEMENT (k) ;
-		DEBUGm3 (("Singular col "ID" is k: "ID" pivot row\n", col, k)) ;
+		DEBUGm3 (("Singular col " ID " is k: " ID " pivot row\n", col, k)) ;
 		ASSERT (!NON_PIVOTAL_COL (col)) ;
 		Upos [col] = EMPTY ;
 		Lip [col] = EMPTY ;
@@ -176,7 +176,7 @@ GLOBAL void UMF_kernel_wrapup
     if (npiv < n_inner)
     {
 	/* finalize the diagonal of U */
-	DEBUGm3 (("Diag of U is zero, "ID" to "ID"\n", npiv, n_inner-1)) ;
+	DEBUGm3 (("Diag of U is zero, " ID " to " ID "\n", npiv, n_inner-1)) ;
 	for (k = npiv ; k < n_inner ; k++)
 	{
 	    CLEAR (D [k]) ;
@@ -191,7 +191,7 @@ GLOBAL void UMF_kernel_wrapup
 	Work->Upattern = (Int *) NULL ;
     }
 
-    DEBUG2 (("Nnzpiv: "ID"  npiv "ID"\n", Numeric->nnzpiv, npiv)) ;
+    DEBUG2 (("Nnzpiv: " ID "  npiv " ID "\n", Numeric->nnzpiv, npiv)) ;
     ASSERT (Numeric->nnzpiv <= npiv) ;
     if (Numeric->nnzpiv < n_inner && !SCALAR_IS_NAN (Numeric->min_udiag))
     {
@@ -344,7 +344,7 @@ GLOBAL void UMF_kernel_wrapup
     {
 	/* this is a singleton row of U */
 	ulen = Uilen [k] ;
-	DEBUG4 (("K "ID" New U.  ulen "ID" Singleton 1\n", k, ulen)) ;
+	DEBUG4 (("K " ID " New U.  ulen " ID " Singleton 1\n", k, ulen)) ;
 	if (ulen > 0)
 	{
 	    up = Uip [k] ;
@@ -352,7 +352,7 @@ GLOBAL void UMF_kernel_wrapup
 	    for (i = 0 ; i < ulen ; i++)
 	    {
 		col = *ip ;
-		DEBUG4 ((" old col "ID" new col "ID"\n", col, Fcpos [col]));
+		DEBUG4 ((" old col " ID " new col " ID "\n", col, Fcpos [col]));
 		ASSERT (col >= 0 && col < n_col) ;
 		*ip++ = Fcpos [col] ;
 	    }
@@ -366,7 +366,7 @@ GLOBAL void UMF_kernel_wrapup
 	{
 	    /* this is the start of a new Uchain (with a pattern) */
 	    ulen = Uilen [k] ;
-	    DEBUG4 (("K "ID" New U.  ulen "ID" End_Uchain 1\n", k, ulen)) ;
+	    DEBUG4 (("K " ID " New U.  ulen " ID " End_Uchain 1\n", k, ulen)) ;
 	    if (ulen > 0)
 	    {
 		up = -up ;
@@ -374,7 +374,7 @@ GLOBAL void UMF_kernel_wrapup
 		for (i = 0 ; i < ulen ; i++)
 		{
 		    col = *ip ;
-		    DEBUG4 ((" old col "ID" new col "ID"\n", col, Fcpos [col]));
+		    DEBUG4 ((" old col " ID " new col " ID "\n", col, Fcpos [col]));
 		    ASSERT (col >= 0 && col < n_col) ;
 		    *ip++ = Fcpos [col] ;
 		}
@@ -386,11 +386,11 @@ GLOBAL void UMF_kernel_wrapup
     if (ulen > 0)
     {
 	/* convert last pivot row of U to the new pivot order */
-	DEBUG4 (("K "ID" (last)\n", k)) ;
+	DEBUG4 (("K " ID " (last)\n", k)) ;
 	for (i = 0 ; i < ulen ; i++)
 	{
 	    col = Numeric->Upattern [i] ;
-	    DEBUG4 (("    old col "ID" new col "ID"\n", col, Fcpos [col])) ;
+	    DEBUG4 (("    old col " ID " new col " ID "\n", col, Fcpos [col])) ;
 	    Numeric->Upattern [i] = Fcpos [col] ;
 	}
     }
@@ -404,7 +404,7 @@ GLOBAL void UMF_kernel_wrapup
     for (k = 0 ; k < n1 ; k++)
     {
 	llen = Lilen [k] ;
-	DEBUG4 (("K "ID" New L.  llen "ID" Singleton col\n", k, llen)) ;
+	DEBUG4 (("K " ID " New L.  llen " ID " Singleton col\n", k, llen)) ;
 	if (llen > 0)
 	{
 	    lp = Lip [k] ;
@@ -412,7 +412,7 @@ GLOBAL void UMF_kernel_wrapup
 	    for (i = 0 ; i < llen ; i++)
 	    {
 		row = *ip ;
-		DEBUG4 (("    old row "ID" new row "ID"\n", row, Frpos [row])) ;
+		DEBUG4 (("    old row " ID " new row " ID "\n", row, Frpos [row])) ;
 		ASSERT (row >= 0 && row < n_row) ;
 		*ip++ = Frpos [row] ;
 	    }
@@ -422,7 +422,7 @@ GLOBAL void UMF_kernel_wrapup
     for (k = n1 ; k < npiv ; k++)
     {
 	llen = Lilen [k] ;
-	DEBUG4 (("K "ID" New L.  llen "ID" \n", k, llen)) ;
+	DEBUG4 (("K " ID " New L.  llen " ID " \n", k, llen)) ;
 	if (llen > 0)
 	{
 	    lp = Lip [k] ;
@@ -435,7 +435,7 @@ GLOBAL void UMF_kernel_wrapup
 	    for (i = 0 ; i < llen ; i++)
 	    {
 		row = *ip ;
-		DEBUG4 (("    old row "ID" new row "ID"\n", row, Frpos [row])) ;
+		DEBUG4 (("    old row " ID " new row " ID "\n", row, Frpos [row])) ;
 		ASSERT (row >= 0 && row < n_row) ;
 		*ip++ = Frpos [row] ;
 	    }

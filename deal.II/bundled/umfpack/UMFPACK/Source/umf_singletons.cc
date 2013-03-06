@@ -58,14 +58,14 @@ PRIVATE void dump_singletons
 )
 {
     Int i, next, cnt ;
-    DEBUG6 (("%s Singleton list: head "ID" tail "ID"\n", name, head, tail)) ;
+    DEBUG6 (("%s Singleton list: head " ID " tail " ID "\n", name, head, tail)) ;
     i = head ;
     ASSERT (head >= EMPTY && head < n) ;
     ASSERT (tail >= EMPTY && tail < n) ;
     cnt = 0 ;
     while (i != EMPTY)
     {
-	DEBUG7 ((" "ID": "ID" deg: "ID"\n", cnt, i, Deg [i])) ;
+	DEBUG7 ((" " ID ": " ID " deg: " ID "\n", cnt, i, Deg [i])) ;
 	ASSERT (i >= 0 && i < n) ;
 	next = Next [i] ;
 	if (i == tail) ASSERT (next == EMPTY) ;
@@ -94,16 +94,16 @@ PRIVATE void dump_mat
 	p1 = Xp [x] ;
 	p2 = Xp [x+1] ;
 	xdeg = Xdeg [x] ;
-	DEBUG6 (("Dump %s "ID" p1 "ID" p2 "ID" deg "ID"\n",
+	DEBUG6 (("Dump %s " ID " p1 " ID " p2 " ID " deg " ID "\n",
 	    xname, x, p1, p2, xdeg)) ;
 	do_xdeg = (xdeg >= 0) ;
 	for (p = p1 ; p < p2 ; p++)
 	{
 	    y = Xi [p] ;
-	    DEBUG7 (("    %s "ID" deg: ", yname, y)) ;
+	    DEBUG7 (("    %s " ID " deg: ", yname, y)) ;
 	    ASSERT (y >= 0 && y < ny) ;
 	    ydeg = Ydeg [y] ;
-	    DEBUG7 ((ID"\n", ydeg)) ;
+	    DEBUG7 ((ID "\n", ydeg)) ;
 	    if (do_xdeg && ydeg >= 0)
 	    {
 		xdeg-- ;
@@ -191,7 +191,7 @@ PRIVATE int order_singletons	/* return new number of singletons */
     {
 	/* remove the singleton at the head of the queue */
 	xpivot = head ;
-	DEBUG1 (("------ Order %s singleton: "ID"\n", xname, xpivot)) ;
+	DEBUG1 (("------ Order %s singleton: " ID "\n", xname, xpivot)) ;
 	head = Next [xpivot] ;
 	if (head == EMPTY) tail = EMPTY ;
 
@@ -216,7 +216,7 @@ PRIVATE int order_singletons	/* return new number of singletons */
 	for (p = Xp [xpivot] ; p < p2 ; p++)
 	{
 	    y = Xi [p] ;
-	    DEBUG1 (("%s: "ID"\n", yname, y)) ;
+	    DEBUG1 (("%s: " ID "\n", yname, y)) ;
 	    if (Ydeg [y] >= 0)
 	    {
 		/* this is a live index in this xpivot vector */
@@ -231,7 +231,7 @@ PRIVATE int order_singletons	/* return new number of singletons */
 	for (p = Xp [xpivot] ; p < p2 ; p++)
 	{
 	    y = Xi [p] ;
-	    DEBUG1 (("%s: "ID"\n", yname, y)) ;
+	    DEBUG1 (("%s: " ID "\n", yname, y)) ;
 	    if (Ydeg [y] >= 0)
 	    {
 		/* this is a live index in this xpivot vector */
@@ -240,19 +240,19 @@ PRIVATE int order_singletons	/* return new number of singletons */
 	    }
 	}
 
-	DEBUG1 (("Pivot %s: "ID"\n", yname, ypivot)) ;
+	DEBUG1 (("Pivot %s: " ID "\n", yname, ypivot)) ;
 	ASSERT (ypivot != EMPTY) ;
-	DEBUG1 (("deg "ID"\n", Ydeg [ypivot])) ;
+	DEBUG1 (("deg " ID "\n", Ydeg [ypivot])) ;
 	ASSERT (Ydeg [ypivot] >= 0) ;
 
 	/* decrement the degrees after removing this singleton */
-	DEBUG1 (("p1 "ID"\n", Yp [ypivot])) ;
-	DEBUG1 (("p2 "ID"\n", Yp [ypivot+1])) ;
+	DEBUG1 (("p1 " ID "\n", Yp [ypivot])) ;
+	DEBUG1 (("p2 " ID "\n", Yp [ypivot+1])) ;
 	p2 = Yp [ypivot+1] ;
 	for (p = Yp [ypivot] ; p < p2 ; p++)
 	{
 	    x = Yi [p] ;
-	    DEBUG1 (("    %s: "ID" deg: "ID"\n", xname, x, Xdeg [x])) ;
+	    DEBUG1 (("    %s: " ID " deg: " ID "\n", xname, x, Xdeg [x])) ;
 	    if (Xdeg [x] < 0) continue ;
 	    ASSERT (Xdeg [x] > 0) ;
 	    if (x == xpivot) continue ;
@@ -272,7 +272,7 @@ PRIVATE int order_singletons	/* return new number of singletons */
 		    Next [tail] = x ;
 		}
 		tail = x ;
-		DEBUG1 ((" New %s singleton:  "ID"\n", xname, x)) ;
+		DEBUG1 ((" New %s singleton:  " ID "\n", xname, x)) ;
 #ifndef NDEBUG
 		if (k % 100 == 0)
 		{
@@ -301,10 +301,10 @@ PRIVATE int order_singletons	/* return new number of singletons */
     }
 
 #ifndef NDEBUG
-    DEBUGm4 (("%s singletons: k = "ID"\n", xname, k)) ;
+    DEBUGm4 (("%s singletons: k = " ID "\n", xname, k)) ;
     for (i = k1 ; i < k ; i++)
     {
-	DEBUG1 (("  %s: "ID" %s: "ID"\n", xname, Xperm [i], yname, Yperm [i])) ;
+	DEBUG1 (("  %s: " ID " %s: " ID "\n", xname, Xperm [i], yname, Yperm [i])) ;
     }
     ASSERT (k > 0) ;
 #endif
@@ -362,7 +362,7 @@ PRIVATE Int find_any_singletons	    /* returns # of singletons found */
 	    if (head == EMPTY) tail = col ;
 	    Next [col] = head ;
 	    head = col ;
-	    DEBUG1 (("Column singleton: "ID"\n", col)) ;
+	    DEBUG1 (("Column singleton: " ID "\n", col)) ;
 	}
     }
 
@@ -404,7 +404,7 @@ PRIVATE Int find_any_singletons	    /* returns # of singletons found */
 	    if (head == EMPTY) tail = row ;
 	    Next [row] = head ;
 	    head = row ;
-	    DEBUG1 (("Row singleton: "ID"\n", row)) ;
+	    DEBUG1 (("Row singleton: " ID "\n", row)) ;
 	}
     }
 
@@ -434,7 +434,7 @@ PRIVATE Int find_any_singletons	    /* returns # of singletons found */
 	n1r = n1 - n1c ;
     }
 
-    DEBUG0 (("n1 "ID"\n", n1)) ;
+    DEBUG0 (("n1 " ID "\n", n1)) ;
     *p_n1r = n1r ;
     *p_n1c = n1c ;
     return (n1) ;
@@ -480,7 +480,7 @@ PRIVATE Int find_user_singletons	/* returns # singletons found */
     /* find singletons in the user column permutation, Quser */
     pivcol = Quser [0] ;
     found = (Cdeg [pivcol] == 1) ;
-    DEBUG0 (("Is first col: "ID" a col singleton?: "ID"\n", pivcol, found)) ;
+    DEBUG0 (("Is first col: " ID " a col singleton?: " ID "\n", pivcol, found)) ;
     if (!found)
     {
 	/* the first column is not a column singleton, check for a row
@@ -489,7 +489,7 @@ PRIVATE Int find_user_singletons	/* returns # singletons found */
 	{
 	    if (Rdeg [Ai [p]] == 1)
 	    {
-		DEBUG0 (("Row singleton in first col: "ID" row: "ID"\n",
+		DEBUG0 (("Row singleton in first col: " ID " row: " ID "\n",
 		    pivcol, Ai [p])) ;
 		found = TRUE ;
 		break ;
@@ -526,7 +526,7 @@ PRIVATE Int find_user_singletons	/* returns # singletons found */
 	    /* pivcol is a column singleton */
 	    /* -------------------------------------------------------------- */
 
-	    DEBUG0 (("Found a col singleton: k "ID" pivcol "ID"\n", k, pivcol));
+	    DEBUG0 (("Found a col singleton: k " ID " pivcol " ID "\n", k, pivcol));
 
 	    /* find the pivrow to match with this pivcol */
 #ifndef NDEBUG
@@ -537,7 +537,7 @@ PRIVATE Int find_user_singletons	/* returns # singletons found */
 		for (p = Ap [pivcol] ; p < p2 ; p++)
 		{
 		    row = Ai [p] ;
-		    DEBUG1 (("row: "ID"\n", row)) ;
+		    DEBUG1 (("row: " ID "\n", row)) ;
 		    if (Rdeg [row] >= 0)
 		    {
 			/* this is a live index in this column vector */
@@ -552,7 +552,7 @@ PRIVATE Int find_user_singletons	/* returns # singletons found */
 	    for (p = Ap [pivcol] ; p < p2 ; p++)
 	    {
 		row = Ai [p] ;
-		DEBUG1 (("row: "ID"\n", row)) ;
+		DEBUG1 (("row: " ID "\n", row)) ;
 		if (Rdeg [row] >= 0)
 		{
 		    /* this is a live index in this pivcol vector */
@@ -561,19 +561,19 @@ PRIVATE Int find_user_singletons	/* returns # singletons found */
 		}
 	    }
 
-	    DEBUG1 (("Pivot row: "ID"\n", pivrow)) ;
+	    DEBUG1 (("Pivot row: " ID "\n", pivrow)) ;
 	    ASSERT (pivrow != EMPTY) ;
-	    DEBUG1 (("deg "ID"\n", Rdeg [pivrow])) ;
+	    DEBUG1 (("deg " ID "\n", Rdeg [pivrow])) ;
 	    ASSERT (Rdeg [pivrow] >= 0) ;
 
 	    /* decrement the degrees after removing this col singleton */
-	    DEBUG1 (("p1 "ID"\n", Rp [pivrow])) ;
-	    DEBUG1 (("p2 "ID"\n", Rp [pivrow+1])) ;
+	    DEBUG1 (("p1 " ID "\n", Rp [pivrow])) ;
+	    DEBUG1 (("p2 " ID "\n", Rp [pivrow+1])) ;
 	    p2 = Rp [pivrow+1] ;
 	    for (p = Rp [pivrow] ; p < p2 ; p++)
 	    {
 		col = Ri [p] ;
-		DEBUG1 (("    col: "ID" deg: "ID"\n", col, Cdeg [col])) ;
+		DEBUG1 (("    col: " ID " deg: " ID "\n", col, Cdeg [col])) ;
 		if (Cdeg [col] < 0) continue ;
 		ASSERT (Cdeg [col] > 0) ;
 		Cdeg [col]-- ;
@@ -599,7 +599,7 @@ PRIVATE Int find_user_singletons	/* returns # singletons found */
 		pivrow = Ai [p] ;
 		if (Rdeg [pivrow] == 1)
 		{
-		    DEBUG0 (("Row singleton in pivcol: "ID" row: "ID"\n",
+		    DEBUG0 (("Row singleton in pivcol: " ID " row: " ID "\n",
 			pivcol, pivrow)) ;
 		    found = TRUE ;
 		    break ;
@@ -620,7 +620,7 @@ PRIVATE Int find_user_singletons	/* returns # singletons found */
 		for (p = Rp [pivrow] ; p < p2 ; p++)
 		{
 		    col = Ri [p] ;
-		    DEBUG1 (("col: "ID" cdeg::: "ID"\n", col, Cdeg [col])) ;
+		    DEBUG1 (("col: " ID " cdeg::: " ID "\n", col, Cdeg [col])) ;
 		    if (Cdeg [col] >= 0)
 		    {
 			/* this is a live index in this column vector */
@@ -632,18 +632,18 @@ PRIVATE Int find_user_singletons	/* returns # singletons found */
 	    }
 #endif
 
-	    DEBUG1 (("Pivot row: "ID"\n", pivrow)) ;
-	    DEBUG1 (("pivcol deg "ID"\n", Cdeg [pivcol])) ;
+	    DEBUG1 (("Pivot row: " ID "\n", pivrow)) ;
+	    DEBUG1 (("pivcol deg " ID "\n", Cdeg [pivcol])) ;
 	    ASSERT (Cdeg [pivcol] > 1) ;
 
 	    /* decrement the degrees after removing this row singleton */
-	    DEBUG1 (("p1 "ID"\n", Ap [pivcol])) ;
-	    DEBUG1 (("p2 "ID"\n", Ap [pivcol+1])) ;
+	    DEBUG1 (("p1 " ID "\n", Ap [pivcol])) ;
+	    DEBUG1 (("p2 " ID "\n", Ap [pivcol+1])) ;
 	    p2 = Ap [pivcol+1] ;
 	    for (p = Ap [pivcol] ; p < p2 ; p++)
 	    {
 		row = Ai [p] ;
-		DEBUG1 (("    row: "ID" deg: "ID"\n", row, Rdeg [row])) ;
+		DEBUG1 (("    row: " ID " deg: " ID "\n", row, Rdeg [row])) ;
 		if (Rdeg [row] < 0) continue ;
 		ASSERT (Rdeg [row] > 0) ;
 		Rdeg [row]-- ;
@@ -668,7 +668,7 @@ PRIVATE Int find_user_singletons	/* returns # singletons found */
 
     }
 
-    DEBUGm4 (("User singletons found: "ID"\n", n1)) ;
+    DEBUGm4 (("User singletons found: " ID "\n", n1)) ;
     ASSERT (n1 > 0) ;
 
     *p_n1r = n1r ;
@@ -700,17 +700,17 @@ PRIVATE Int finish_permutation
     nempty = 0 ;
     s = n1 ;
     max_deg = 0 ;
-    DEBUG0 (("n1 "ID" nempty "ID"\n", n1, nempty)) ;
+    DEBUG0 (("n1 " ID " nempty " ID "\n", n1, nempty)) ;
     for (k = 0 ; k < nx ; k++)
     {
 	x = (Xuser != (Int *) NULL) ? Xuser [k] : k ;
-	DEBUG0 (("finish perm k "ID" x "ID" nx "ID"\n", k, x, nx)) ;
+	DEBUG0 (("finish perm k " ID " x " ID " nx " ID "\n", k, x, nx)) ;
 	deg = Xdeg [x] ;
 	if (deg == 0)
 	{
 	    /* this row/col is empty in the pruned submatrix */
 	    ASSERT (s < nx - nempty) ;
-	    DEBUG0 (("empty k "ID"\n", k)) ;
+	    DEBUG0 (("empty k " ID "\n", k)) ;
 	    nempty++ ;
 	    Xperm [nx - nempty] = x ;
 	}
@@ -902,9 +902,9 @@ GLOBAL Int UMF_singletons
     {
 	is_sym = FALSE ;
     }
-    DEBUGm4 (("Submatrix square and symmetrically permuted? "ID"\n", is_sym)) ;
-    DEBUGm4 (("singletons "ID" row "ID" col "ID"\n", n1, n1r, n1c)) ;
-    DEBUGm4 (("Empty cols "ID" rows "ID"\n", nempty_col, nempty_row)) ;
+    DEBUGm4 (("Submatrix square and symmetrically permuted? " ID "\n", is_sym)) ;
+    DEBUGm4 (("singletons " ID " row " ID " col " ID "\n", n1, n1r, n1c)) ;
+    DEBUGm4 (("Empty cols " ID " rows " ID "\n", nempty_col, nempty_row)) ;
     *p_n1 = n1 ;
     *p_n1r = n1r ;
     *p_n1c = n1c ;

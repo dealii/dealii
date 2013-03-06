@@ -36,7 +36,7 @@ GLOBAL Int UMF_mem_alloc_tail_block
 	UMF_allocfail = FALSE ;	/* don't fail the next time */
 	return (0) ;
     }
-    DEBUG2 (("UMF_mem_alloc_tail_block, size: "ID" + 1 = "ID":  ",
+    DEBUG2 (("UMF_mem_alloc_tail_block, size: " ID " + 1 = " ID ":  ",
 	nunits, nunits+1)) ;
 #endif
 
@@ -73,8 +73,8 @@ GLOBAL Int UMF_mem_alloc_tail_block
 	    /* internal fragmentation would be too small */
 	    /* allocate the entire free block */
 	    p->header.size = -p->header.size ;
-	    DEBUG2 (("GET  BLOCK: p: "ID" size: "ID", all of big: "ID" size: "
-		ID"\n", (Int) (p-Numeric->Memory), nunits, Numeric->ibig,
+	    DEBUG2 (("GET  BLOCK: p: " ID " size: " ID ", all of big: " ID " size: "
+		ID "\n", (Int) (p-Numeric->Memory), nunits, Numeric->ibig,
 		p->header.size)) ;
 	    /* no more biggest block */
 	    Numeric->ibig = EMPTY ;
@@ -91,8 +91,8 @@ GLOBAL Int UMF_mem_alloc_tail_block
 	    pbig->header.size = -bigsize ;
 	    pbig->header.prevsize = nunits ;
 	    pnext->header.prevsize = bigsize ;
-	    DEBUG2 (("GET  BLOCK: p: "ID" size: "ID", some of big: "ID" left: "
-		ID"\n", (Int) (p-Numeric->Memory), nunits, Numeric->ibig,
+	    DEBUG2 (("GET  BLOCK: p: " ID " size: " ID ", some of big: " ID " left: "
+		ID "\n", (Int) (p-Numeric->Memory), nunits, Numeric->ibig,
 		bigsize)) ;
 	}
 
@@ -113,7 +113,7 @@ GLOBAL Int UMF_mem_alloc_tail_block
 	p->header.size = nunits ;
 	p->header.prevsize = 0 ;
 	pnext->header.prevsize = nunits ;
-	DEBUG2 (("p: "ID" size: "ID", new tail "ID"\n",
+	DEBUG2 (("p: " ID " size: " ID ", new tail " ID "\n",
 	    (Int) (p-Numeric->Memory), nunits, Numeric->itail)) ;
     }
 

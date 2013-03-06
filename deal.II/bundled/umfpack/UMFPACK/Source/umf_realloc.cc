@@ -53,7 +53,7 @@ GLOBAL void *UMF_realloc
     }
     size *= size_of_object ;
 
-    DEBUG0 (("UMF_realloc: "ID" n_objects "ID"  size_of_object "ID"\n",
+    DEBUG0 (("UMF_realloc: " ID " n_objects " ID "  size_of_object " ID "\n",
 	(Int) p, n_objects, (Int) size_of_object)) ;
 
     /* see AMD/Source/amd_global.c for the memory allocator selection */
@@ -68,7 +68,7 @@ GLOBAL void *UMF_realloc
     }
 #endif
 
-    DEBUG0 (("UMF_realloc: "ID" new malloc count "ID"\n",
+    DEBUG0 (("UMF_realloc: " ID " new malloc count " ID "\n",
 	(Int) p2, UMF_malloc_count)) ;
 
     return (p2) ;

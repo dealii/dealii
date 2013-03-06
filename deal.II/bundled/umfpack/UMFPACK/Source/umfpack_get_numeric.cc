@@ -379,7 +379,7 @@ PRIVATE void get_L
     /* singletons */
     for (k = 0 ; k < n1 ; k++)
     {
-	DEBUG4 (("Singleton k "ID"\n", k)) ;
+	DEBUG4 (("Singleton k " ID "\n", k)) ;
 	deg = Lilen [k] ;
 	if (deg > 0)
 	{
@@ -391,7 +391,7 @@ PRIVATE void get_L
 	    {
 		row = Li [j] ;
 		value = Lval [j] ;
-		DEBUG4 (("  row "ID"  k "ID" value", row, k)) ;
+		DEBUG4 (("  row " ID "  k " ID " value", row, k)) ;
 		EDEBUG4 (value) ;
 		DEBUG4 (("\n")) ;
 		if (IS_NONZERO (value))
@@ -423,7 +423,7 @@ PRIVATE void get_L
 	pos = Lpos [k] ;
 	if (pos != EMPTY)
 	{
-	    DEBUG4 (("  k "ID" removing row "ID" at position "ID"\n",
+	    DEBUG4 (("  k " ID " removing row " ID " at position " ID "\n",
 	    k, Pattern [pos], pos)) ;
 	    ASSERT (!newLchain) ;
 	    ASSERT (deg > 0) ;
@@ -438,7 +438,7 @@ PRIVATE void get_L
 	for (j = 0 ; j < llen ; j++)
 	{
 	    row = *ip++ ;
-	    DEBUG4 (("  row "ID"  k "ID"\n", row, k)) ;
+	    DEBUG4 (("  row " ID "  k " ID "\n", row, k)) ;
 	    ASSERT (row > k && row < n_row) ;
 	    Pattern [deg++] = row ;
 	}
@@ -447,7 +447,7 @@ PRIVATE void get_L
 
 	for (j = 0 ; j < deg ; j++)
 	{
-	    DEBUG4 (("  row "ID"  k "ID" value", Pattern [j], k)) ;
+	    DEBUG4 (("  row " ID "  k " ID " value", Pattern [j], k)) ;
 	    row = Pattern [j] ;
 	    value = *xp++ ;
 	    EDEBUG4 (value) ;
@@ -477,7 +477,7 @@ PRIVATE void get_L
     /* add entries from the rows of L (singletons) */
     for (k = 0 ; k < n1 ; k++)
     {
-	DEBUG4 (("Singleton k "ID"\n", k)) ;
+	DEBUG4 (("Singleton k " ID "\n", k)) ;
 	deg = Lilen [k] ;
 	if (deg > 0)
 	{
@@ -489,7 +489,7 @@ PRIVATE void get_L
 	    {
 		row = Li [j] ;
 		value = Lval [j] ;
-		DEBUG4 (("  row "ID"  k "ID" value", row, k)) ;
+		DEBUG4 (("  row " ID "  k " ID " value", row, k)) ;
 		EDEBUG4 (value) ;
 		DEBUG4 (("\n")) ;
 		if (IS_NONZERO (value))
@@ -537,7 +537,7 @@ PRIVATE void get_L
 	pos = Lpos [k] ;
 	if (pos != EMPTY)
 	{
-	    DEBUG4 (("  k "ID" removing row "ID" at position "ID"\n",
+	    DEBUG4 (("  k " ID " removing row " ID " at position " ID "\n",
 	    k, Pattern [pos], pos)) ;
 	    ASSERT (!newLchain) ;
 	    ASSERT (deg > 0) ;
@@ -552,7 +552,7 @@ PRIVATE void get_L
 	for (j = 0 ; j < llen ; j++)
 	{
 	    row = *ip++ ;
-	    DEBUG4 (("  row "ID"  k "ID"\n", row, k)) ;
+	    DEBUG4 (("  row " ID "  k " ID "\n", row, k)) ;
 	    ASSERT (row > k) ;
 	    Pattern [deg++] = row ;
 	}
@@ -561,7 +561,7 @@ PRIVATE void get_L
 
 	for (j = 0 ; j < deg ; j++)
 	{
-	    DEBUG4 (("  row "ID"  k "ID" value", Pattern [j], k)) ;
+	    DEBUG4 (("  row " ID "  k " ID " value", Pattern [j], k)) ;
 	    row = Pattern [j] ;
 	    value = *xp++ ;
 	    EDEBUG4 (value) ;
@@ -733,15 +733,15 @@ PRIVATE void get_U
     for (col = 0 ; col < npiv ; col++)
     {
 	/* include the diagonal entry in the column counts */
-	DEBUG4 (("D ["ID"] = ", col)) ;
+	DEBUG4 (("D [" ID "] = ", col)) ;
 	EDEBUG4 (D [col]) ;
 	Wi [col] = IS_NONZERO (D [col]) ;
-	DEBUG4 ((" is nonzero: "ID"\n", Wi [col])) ;
+	DEBUG4 ((" is nonzero: " ID "\n", Wi [col])) ;
 #ifndef NDEBUG
 	nnzpiv += IS_NONZERO (D [col]) ;
 #endif
     }
-    DEBUG4 (("nnzpiv "ID" "ID"\n", nnzpiv, Numeric->nnzpiv)) ;
+    DEBUG4 (("nnzpiv " ID " " ID "\n", nnzpiv, Numeric->nnzpiv)) ;
     ASSERT (nnzpiv == Numeric->nnzpiv) ;
     for (col = npiv ; col < n_col ; col++)
     {
@@ -753,11 +753,11 @@ PRIVATE void get_U
     if (deg > 0)
     {
 	/* make last pivot row of U (singular matrices only) */
-	DEBUG0 (("Last pivot row of U: ulen "ID"\n", deg)) ;
+	DEBUG0 (("Last pivot row of U: ulen " ID "\n", deg)) ;
 	for (j = 0 ; j < deg ; j++)
 	{
 	    Pattern [j] = Numeric->Upattern [j] ;
-	    DEBUG0 (("    column "ID"\n", Pattern [j])) ;
+	    DEBUG0 (("    column " ID "\n", Pattern [j])) ;
 	}
     }
 
@@ -784,7 +784,7 @@ PRIVATE void get_U
 
 	for (j = 0 ; j < deg ; j++)
 	{
-	    DEBUG4 (("  k "ID" col "ID" value\n", k, Pattern [j])) ;
+	    DEBUG4 (("  k " ID " col " ID " value\n", k, Pattern [j])) ;
 	    col = Pattern [j] ;
 	    ASSERT (col >= 0 && col < n_col) ;
 	    value = *xp++ ;
@@ -806,12 +806,12 @@ PRIVATE void get_U
 	{
 	    /* next row is a new Uchain */
 	    deg = ulen ;
-	    DEBUG4 (("end of chain for row of U "ID" deg "ID"\n", k-1, deg)) ;
+	    DEBUG4 (("end of chain for row of U " ID " deg " ID "\n", k-1, deg)) ;
 	    ip = (Int *) (Numeric->Memory + up) ;
 	    for (j = 0 ; j < deg ; j++)
 	    {
 		col = *ip++ ;
-		DEBUG4 (("  k "ID" col "ID"\n", k-1, col)) ;
+		DEBUG4 (("  k " ID " col " ID "\n", k-1, col)) ;
 		ASSERT (k <= col) ;
 		Pattern [j] = col ;
 	    }
@@ -819,13 +819,13 @@ PRIVATE void get_U
 	else
 	{
 	    deg -= ulen ;
-	    DEBUG4 (("middle of chain for row of U "ID" deg "ID"\n", k-1, deg));
+	    DEBUG4 (("middle of chain for row of U " ID " deg " ID "\n", k-1, deg));
 	    ASSERT (deg >= 0) ;
 	    pos = Upos [k] ;
 	    if (pos != EMPTY)
 	    {
 		/* add the pivot column */
-		DEBUG4 (("k "ID" add pivot entry at position "ID"\n", k, pos)) ;
+		DEBUG4 (("k " ID " add pivot entry at position " ID "\n", k, pos)) ;
 		ASSERT (pos >= 0 && pos <= deg) ;
 		Pattern [deg++] = Pattern [pos] ;
 		Pattern [pos] = k ;
@@ -837,7 +837,7 @@ PRIVATE void get_U
     for (k = n1 - 1 ; k >= 0 ; k--)
     {
 	deg = Uilen [k] ;
-	DEBUG4 (("Singleton k "ID"\n", k)) ;
+	DEBUG4 (("Singleton k " ID "\n", k)) ;
 	if (deg > 0)
 	{
 	    up = Uip [k] ;
@@ -848,7 +848,7 @@ PRIVATE void get_U
 	    {
 		col = Usi [j] ;
 		value = Uval [j] ;
-		DEBUG4 (("  k "ID" col "ID" value", k, col)) ;
+		DEBUG4 (("  k " ID " col " ID " value", k, col)) ;
 		EDEBUG4 (value) ;
 		DEBUG4 (("\n")) ;
 		if (IS_NONZERO (value))
@@ -871,7 +871,7 @@ PRIVATE void get_U
 	unz2 += Wi [col] ;
     }
     Up [n_col] = unz2 ;
-    DEBUG1 (("Numeric->unz "ID"  npiv "ID" nnzpiv "ID" unz2 "ID"\n",
+    DEBUG1 (("Numeric->unz " ID "  npiv " ID " nnzpiv " ID " unz2 " ID "\n",
 	Numeric->unz, npiv, Numeric->nnzpiv, unz2)) ;
     ASSERT (Numeric->unz + Numeric->nnzpiv == unz2) ;
 
@@ -941,7 +941,7 @@ PRIVATE void get_U
 	xp += deg ;
 	for (j = deg-1 ; j >= 0 ; j--)
 	{
-	    DEBUG4 (("  k "ID" col "ID" value", k, Pattern [j])) ;
+	    DEBUG4 (("  k " ID " col " ID " value", k, Pattern [j])) ;
 	    col = Pattern [j] ;
 	    ASSERT (col >= 0 && col < n_col) ;
 	    value = *(--xp) ;
@@ -977,12 +977,12 @@ PRIVATE void get_U
 	{
 	    /* next row is a new Uchain */
 	    deg = ulen ;
-	    DEBUG4 (("end of chain for row of U "ID" deg "ID"\n", k-1, deg)) ;
+	    DEBUG4 (("end of chain for row of U " ID " deg " ID "\n", k-1, deg)) ;
 	    ip = (Int *) (Numeric->Memory + up) ;
 	    for (j = 0 ; j < deg ; j++)
 	    {
 		col = *ip++ ;
-		DEBUG4 (("  k "ID" col "ID"\n", k-1, col)) ;
+		DEBUG4 (("  k " ID " col " ID "\n", k-1, col)) ;
 		ASSERT (k <= col) ;
 		Pattern [j] = col ;
 	    }
@@ -990,13 +990,13 @@ PRIVATE void get_U
 	else
 	{
 	    deg -= ulen ;
-	    DEBUG4 (("middle of chain for row of U "ID" deg "ID"\n", k-1, deg));
+	    DEBUG4 (("middle of chain for row of U " ID " deg " ID "\n", k-1, deg));
 	    ASSERT (deg >= 0) ;
 	    pos = Upos [k] ;
 	    if (pos != EMPTY)
 	    {
 		/* add the pivot column */
-		DEBUG4 (("k "ID" add pivot entry at position "ID"\n", k, pos)) ;
+		DEBUG4 (("k " ID " add pivot entry at position " ID "\n", k, pos)) ;
 		ASSERT (pos >= 0 && pos <= deg) ;
 		Pattern [deg++] = Pattern [pos] ;
 		Pattern [pos] = k ;
@@ -1008,7 +1008,7 @@ PRIVATE void get_U
     for (k = n1 - 1 ; k >= 0 ; k--)
     {
 	deg = Uilen [k] ;
-	DEBUG4 (("Singleton k "ID"\n", k)) ;
+	DEBUG4 (("Singleton k " ID "\n", k)) ;
 	if (deg > 0)
 	{
 	    up = Uip [k] ;
@@ -1019,7 +1019,7 @@ PRIVATE void get_U
 	    {
 		col = Usi [j] ;
 		value = Uval [j] ;
-		DEBUG4 (("  k "ID" col "ID" value", k, col)) ;
+		DEBUG4 (("  k " ID " col " ID " value", k, col)) ;
 		EDEBUG4 (value) ;
 		DEBUG4 (("\n")) ;
 		if (IS_NONZERO (value))

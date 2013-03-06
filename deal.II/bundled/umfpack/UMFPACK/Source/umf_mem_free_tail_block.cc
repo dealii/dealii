@@ -34,7 +34,7 @@ GLOBAL void UMF_mem_free_tail_block
     p = Numeric->Memory + i ;
 
     p-- ;	/* get the corresponding header */
-    DEBUG2 (("free block: p: "ID, (Int) (p-Numeric->Memory))) ;
+    DEBUG2 (("free block: p: " ID, (Int) (p-Numeric->Memory))) ;
     ASSERT (p >= Numeric->Memory + Numeric->itail) ;
     ASSERT (p < Numeric->Memory + Numeric->size) ;
     ASSERT (p->header.size > 0) ;		/* block not already free */
@@ -47,7 +47,7 @@ GLOBAL void UMF_mem_free_tail_block
     /* ---------------------------------------------------------------------- */
 
     pnext = p + 1 + p->header.size ;
-    DEBUG2 (("size: "ID" next: "ID" ", p->header.size,
+    DEBUG2 (("size: " ID " next: " ID " ", p->header.size,
 	(Int) (pnext-Numeric->Memory))) ;
     ASSERT (pnext < Numeric->Memory + Numeric->size) ;
     ASSERT (pnext->header.prevsize == p->header.size) ;
@@ -76,7 +76,7 @@ GLOBAL void UMF_mem_free_tail_block
     {
 	ASSERT (p->header.prevsize > 0) ;
 	pprev = p - 1 - p->header.prevsize ;
-	DEBUG2 ((" prev: "ID" ", (Int) (pprev-Numeric->Memory))) ;
+	DEBUG2 ((" prev: " ID " ", (Int) (pprev-Numeric->Memory))) ;
 	ASSERT (pprev >= Numeric->Memory + Numeric->itail) ;
 	sprev = pprev->header.size ;
 	if (sprev < 0)
@@ -108,7 +108,7 @@ GLOBAL void UMF_mem_free_tail_block
 	/* top block in list is freed */
 	Numeric->itail = pnext - Numeric->Memory ;
 	pnext->header.prevsize = 0 ;
-	DEBUG2 ((" NEW TAIL : "ID" ", Numeric->itail)) ;
+	DEBUG2 ((" NEW TAIL : " ID " ", Numeric->itail)) ;
 	ASSERT (pnext->header.size > 0) ;
 	if (Numeric->ibig != EMPTY && Numeric->ibig <= Numeric->itail)
 	{
@@ -136,7 +136,7 @@ GLOBAL void UMF_mem_free_tail_block
 	p->header.size = -(p->header.size) ;
     }
 
-    DEBUG2 (("new p: "ID" freesize: "ID"\n", (Int) (p-Numeric->Memory),
+    DEBUG2 (("new p: " ID " freesize: " ID "\n", (Int) (p-Numeric->Memory),
 	-(p->header.size))) ;
 
 }

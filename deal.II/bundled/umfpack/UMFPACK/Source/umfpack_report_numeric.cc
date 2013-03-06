@@ -77,7 +77,7 @@ GLOBAL Int UMFPACK_report_numeric
     n_inner = MIN (n_row, n_col) ;
     npiv = Numeric->npiv ;
 
-    DEBUG1 (("n_row "ID" n_col "ID" nn "ID" n_inner "ID" npiv "ID"\n",
+    DEBUG1 (("n_row " ID " n_col " ID " nn " ID " n_inner " ID " npiv " ID "\n",
 	n_row, n_col, nn, n_inner, npiv)) ;
 
     /* size of Numeric object, except Numeric->Memory and Numeric->Upattern */
@@ -91,20 +91,20 @@ GLOBAL Int UMFPACK_report_numeric
 	+ ((Numeric->scale != UMFPACK_SCALE_NONE) ?
 		UNITS (Entry, n_row) : 0) ; /* Rs */
 
-    DEBUG1 (("num fixed size: "ID"\n", num_fixed_size)) ;
-    DEBUG1 (("Numeric->size "ID"\n", Numeric->size)) ;
-    DEBUG1 (("ulen units "ID"\n", UNITS (Int, Numeric->ulen))) ;
+    DEBUG1 (("num fixed size: " ID "\n", num_fixed_size)) ;
+    DEBUG1 (("Numeric->size " ID "\n", Numeric->size)) ;
+    DEBUG1 (("ulen units " ID "\n", UNITS (Int, Numeric->ulen))) ;
 
     /* size of Numeric->Memory is Numeric->size */
     /* size of Numeric->Upattern is Numeric->ulen */
     numeric_size = num_fixed_size + Numeric->size
 	+ UNITS (Int, Numeric->ulen) ;
 
-    DEBUG1 (("numeric total size "ID"\n", numeric_size)) ;
+    DEBUG1 (("numeric total size " ID "\n", numeric_size)) ;
 
     if (prl >= 4)
     {
-	PRINTF (("\n    n_row: "ID"  n_col: "ID"\n", n_row, n_col)) ;
+	PRINTF (("\n    n_row: " ID "  n_col: " ID "\n", n_row, n_col)) ;
 
 	PRINTF (("    relative pivot tolerance used:              %g\n",
 	    Numeric->relpt)) ;
@@ -138,35 +138,35 @@ GLOBAL Int UMFPACK_report_numeric
 	    Numeric->alloc_init)) ;
 	PRINTF (("    frontal matrix allocation parameter used:   %g\n",
 	    Numeric->front_alloc_init)) ;
-	PRINTF (("    final total size of Numeric object (Units): "ID"\n",
+	PRINTF (("    final total size of Numeric object (Units): " ID "\n",
 	    numeric_size)) ;
 	PRINTF (("    final total size of Numeric object (MBytes): %.1f\n",
 	    MBYTES (numeric_size))) ;
-	PRINTF (("    peak size of variable-size part (Units):    "ID"\n",
+	PRINTF (("    peak size of variable-size part (Units):    " ID "\n",
 	    Numeric->max_usage)) ;
 	PRINTF (("    peak size of variable-size part (MBytes):   %.1f\n",
 	    MBYTES (Numeric->max_usage))) ;
-	PRINTF (("    largest actual frontal matrix size:         "ID"\n",
+	PRINTF (("    largest actual frontal matrix size:         " ID "\n",
 	    Numeric->maxfrsize)) ;
-	PRINTF (("    memory defragmentations:                    "ID"\n",
+	PRINTF (("    memory defragmentations:                    " ID "\n",
 	    Numeric->ngarbage)) ;
-	PRINTF (("    memory reallocations:                       "ID"\n",
+	PRINTF (("    memory reallocations:                       " ID "\n",
 	    Numeric->nrealloc)) ;
-	PRINTF (("    costly memory reallocations:                "ID"\n",
+	PRINTF (("    costly memory reallocations:                " ID "\n",
 	    Numeric->ncostly)) ;
-	PRINTF (("    entries in compressed pattern (L and U):    "ID"\n",
+	PRINTF (("    entries in compressed pattern (L and U):    " ID "\n",
 	    Numeric->isize)) ;
-	PRINTF (("    number of nonzeros in L (excl diag):        "ID"\n",
+	PRINTF (("    number of nonzeros in L (excl diag):        " ID "\n",
 	    Numeric->lnz)) ;
-	PRINTF (("    number of entries stored in L (excl diag):  "ID"\n",
+	PRINTF (("    number of entries stored in L (excl diag):  " ID "\n",
 	    Numeric->nLentries)) ;
-	PRINTF (("    number of nonzeros in U (excl diag):        "ID"\n",
+	PRINTF (("    number of nonzeros in U (excl diag):        " ID "\n",
 	    Numeric->unz)) ;
-	PRINTF (("    number of entries stored in U (excl diag):  "ID"\n",
+	PRINTF (("    number of entries stored in U (excl diag):  " ID "\n",
 	    Numeric->nUentries)) ;
 	PRINTF (("    factorization floating-point operations:    %g\n",
 	    Numeric->flops)) ;
-	PRINTF (("    number of nonzeros on diagonal of U:        "ID"\n",
+	PRINTF (("    number of nonzeros on diagonal of U:        " ID "\n",
 	    Numeric->nnzpiv)) ;
 	PRINTF (("    min abs. value on diagonal of U:            %.5e\n",
 	    Numeric->min_udiag)) ;
@@ -309,12 +309,12 @@ PRIVATE Int report_L
 	    PRINTF (("    ...\n")) ;
 	    prl-- ;
 	}
-	PRINTF4 (("\n    column "ID":", INDEX (k))) ;
-	PRINTF4 (("  length "ID".\n", deg)) ;
+	PRINTF4 (("\n    column " ID ":", INDEX (k))) ;
+	PRINTF4 (("  length " ID ".\n", deg)) ;
 	for (j = 0 ; j < deg ; j++)
 	{
 	    row = Li [j] ;
-	    PRINTF4 (("\trow "ID" : ", INDEX (row))) ;
+	    PRINTF4 (("\trow " ID " : ", INDEX (row))) ;
 	    if (prl >= 4) PRINT_ENTRY (Lval [j]) ;
 	    if (row <= k || row >= n_row)
 	    {
@@ -360,7 +360,7 @@ PRIVATE Int report_L
 	    prl-- ;
 	}
 
-	PRINTF4 (("\n    column "ID":", INDEX (k))) ;
+	PRINTF4 (("\n    column " ID ":", INDEX (k))) ;
 
 	/* ------------------------------------------------------------------ */
 	/* make column of L in Pattern [0..deg-1] */
@@ -370,7 +370,7 @@ PRIVATE Int report_L
 	pos = Lpos [k] ;
 	if (pos != EMPTY)
 	{
-	    PRINTF4 (("  remove row "ID" at position "ID".",
+	    PRINTF4 (("  remove row " ID " at position " ID ".",
 		INDEX (Pattern [pos]), INDEX (pos))) ;
 	    valid = (!newLchain) && (deg > 0) && (pos < deg) && (pos >= 0)
 		&& (Pattern [pos] == k) ;
@@ -396,7 +396,7 @@ PRIVATE Int report_L
 	}
 	if (llen > 0)
 	{
-	    PRINTF4 (("  add "ID" entries.", llen)) ;
+	    PRINTF4 (("  add " ID " entries.", llen)) ;
 	    ip = (Int *) (Numeric->Memory + lp) ;
 	    for (j = 0 ; j < llen ; j++)
 	    {
@@ -408,7 +408,7 @@ PRIVATE Int report_L
 	/* print column k of L */
 	/* ------------------------------------------------------------------ */
 
-	PRINTF4 (("  length "ID".", deg)) ;
+	PRINTF4 (("  length " ID ".", deg)) ;
 	if (newLchain)
 	{
 	    PRINTF4 (("  Start of Lchain.")) ;
@@ -418,7 +418,7 @@ PRIVATE Int report_L
 	for (j = 0 ; j < deg ; j++)
 	{
 	    row = Pattern [j] ;
-	    PRINTF4 (("\trow "ID" : ", INDEX (row))) ;
+	    PRINTF4 (("\trow " ID " : ", INDEX (row))) ;
 	    if (prl >= 4) PRINT_ENTRY (*xp) ;
 	    if (row <= k || row >= n_row)
 	    {
@@ -491,7 +491,7 @@ PRIVATE Int report_U
 	}
     }
 
-    PRINTF4 (("\n    row "ID":  length "ID".  End of Uchain.\n", INDEX (npiv-1),
+    PRINTF4 (("\n    row " ID ":  length " ID ".  End of Uchain.\n", INDEX (npiv-1),
 	deg)) ;
 
     for (k = npiv-1 ; k >= n1 ; k--)
@@ -531,7 +531,7 @@ PRIVATE Int report_U
 	for (j = 0 ; j < deg ; j++)
 	{
 	    col = Pattern [j] ;
-	    PRINTF4 (("\tcol "ID" :", INDEX (col))) ;
+	    PRINTF4 (("\tcol " ID " :", INDEX (col))) ;
 	    if (prl >= 4) PRINT_ENTRY (*xp) ;
 	    if (col <= k || col >= n_col)
 	    {
@@ -563,7 +563,7 @@ PRIVATE Int report_U
 
 	if (k > 0)
 	{
-	    PRINTF4 (("\n    row "ID":  ", INDEX (k-1))) ;
+	    PRINTF4 (("\n    row " ID ":  ", INDEX (k-1))) ;
 	}
 
 	if (newUchain)
@@ -572,7 +572,7 @@ PRIVATE Int report_U
 	    if (k > 0)
 	    {
 		deg = ulen ;
-		PRINTF4 (("length "ID".  End of Uchain.\n", deg)) ;
+		PRINTF4 (("length " ID ".  End of Uchain.\n", deg)) ;
 		if (up + (Int) UNITS (Int, ulen) > Numeric->size)
 		{
 		    return (FALSE) ;
@@ -588,7 +588,7 @@ PRIVATE Int report_U
 	{
 	    if (ulen > 0)
 	    {
-		PRINTF4 (("remove "ID" entries.  ", ulen)) ;
+		PRINTF4 (("remove " ID " entries.  ", ulen)) ;
 	    }
 	    deg -= ulen ;
 	    if (deg < 0)
@@ -599,7 +599,7 @@ PRIVATE Int report_U
 	    if (pos != EMPTY)
 	    {
 		/* add the pivot column */
-		PRINTF4 (("add column "ID" at position "ID".  ",
+		PRINTF4 (("add column " ID " at position " ID ".  ",
 		    INDEX (k), INDEX (pos))) ;
 		if (pos < 0 || pos > deg)
 		{
@@ -608,7 +608,7 @@ PRIVATE Int report_U
 		Pattern [deg++] = Pattern [pos] ;
 		Pattern [pos] = k ;
 	    }
-	    PRINTF4 (("length "ID".\n", deg)) ;
+	    PRINTF4 (("length " ID ".\n", deg)) ;
 	}
     }
 
@@ -636,12 +636,12 @@ PRIVATE Int report_U
 	    PRINTF (("    ...\n")) ;
 	    prl-- ;
 	}
-	PRINTF4 (("\n    row "ID":", INDEX (k))) ;
-	PRINTF4 (("  length "ID".\n", deg)) ;
+	PRINTF4 (("\n    row " ID ":", INDEX (k))) ;
+	PRINTF4 (("  length " ID ".\n", deg)) ;
 	for (j = 0 ; j < deg ; j++)
 	{
 	    col = Ui [j] ;
-	    PRINTF4 (("\tcol "ID" : ", INDEX (col))) ;
+	    PRINTF4 (("\tcol " ID " : ", INDEX (col))) ;
 	    if (prl >= 4) PRINT_ENTRY (Uval [j]) ;
 	    if (col <= k || col >= n_col)
 	    {

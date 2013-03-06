@@ -55,7 +55,7 @@ PRIVATE void row_assemble
     Fcblock = Work->Fcblock ;
 
 #ifndef NDEBUG
-    DEBUG6 (("SCAN2-row: "ID"\n", row)) ;
+    DEBUG6 (("SCAN2-row: " ID "\n", row)) ;
     UMF_dump_rowcol (0, Numeric, Work, row, FALSE) ;
 #endif
 
@@ -94,7 +94,7 @@ PRIVATE void row_assemble
 	    p += UNITS (Int, ncols + nrows) ;
 	    S = ((Entry *) p) + f ;
 
-	    DEBUG6 (("Old LSON: "ID"\n", e)) ;
+	    DEBUG6 (("Old LSON: " ID "\n", e)) ;
 #ifndef NDEBUG
 	    UMF_dump_element (Numeric, Work, e, FALSE) ;
 #endif
@@ -102,7 +102,7 @@ PRIVATE void row_assemble
 	    ncolsleft = ep->ncolsleft ;
 
 	    Frow = Fcblock + Frpos [row] ;
-	    DEBUG6 (("LSON found (in scan2-row): "ID"\n", e)) ;
+	    DEBUG6 (("LSON found (in scan2-row): " ID "\n", e)) ;
 
 	    Row_degree [row] -= ncolsleft ;
 
@@ -160,7 +160,7 @@ PRIVATE void row_assemble
     Row_tlen [row] = tp2 - tp1 ;
 
 #ifndef NDEBUG
-    DEBUG7 (("row assembled in scan2-row: "ID"\n", row)) ;
+    DEBUG7 (("row assembled in scan2-row: " ID "\n", row)) ;
     UMF_dump_rowcol (0, Numeric, Work, row, FALSE) ;
     DEBUG7 (("Current frontal matrix: (scan 1b)\n")) ;
     UMF_dump_current_front (Numeric, Work, TRUE) ;
@@ -206,7 +206,7 @@ PRIVATE void col_assemble
     cdeg0 = Work->cdeg0 ;
     Fcblock = Work->Fcblock ;
 
-    DEBUG6 (("SCAN2-col: "ID"\n", col)) ;
+    DEBUG6 (("SCAN2-col: " ID "\n", col)) ;
 #ifndef NDEBUG
     UMF_dump_rowcol (1, Numeric, Work, col, FALSE) ;
 #endif
@@ -245,7 +245,7 @@ PRIVATE void col_assemble
 	    p += UNITS (Int, ncols + nrows) ;
 	    S = ((Entry *) p) + f * nrows ;
 
-	    DEBUG6 (("Old USON: "ID"\n", e)) ;
+	    DEBUG6 (("Old USON: " ID "\n", e)) ;
 #ifndef NDEBUG
 	    UMF_dump_element (Numeric, Work, e, FALSE) ;
 #endif
@@ -253,7 +253,7 @@ PRIVATE void col_assemble
 	    nrowsleft = ep->nrowsleft ;
 
 	    Fcol = Fcblock + Fcpos [col] ;
-	    DEBUG6 (("USON found (in scan2-col): "ID"\n", e)) ;
+	    DEBUG6 (("USON found (in scan2-col): " ID "\n", e)) ;
 #ifndef FIXQ
 	    Col_degree [col] -= nrowsleft ;
 #endif
@@ -303,7 +303,7 @@ PRIVATE void col_assemble
     Col_tlen [col] = tp2 - tp1 ;
 
 #ifndef NDEBUG
-    DEBUG7 (("Column assembled in scan2-col: "ID"\n", col)) ;
+    DEBUG7 (("Column assembled in scan2-col: " ID "\n", col)) ;
     UMF_dump_rowcol (1, Numeric, Work, col, FALSE) ;
     DEBUG7 (("Current frontal matrix: after scan2-col\n")) ;
     UMF_dump_current_front (Numeric, Work, TRUE) ;
@@ -389,23 +389,23 @@ GLOBAL void UMF_assemble_fixq
 #ifndef NDEBUG
     DEBUG6 (("============================================\n")) ;
     DEBUG6 (("Degree update, assembly.\n")) ;
-    DEBUG6 (("pivot row pattern:  fncols="ID"\n", fncols)) ;
+    DEBUG6 (("pivot row pattern:  fncols=" ID "\n", fncols)) ;
     for (j = 0 ; j < fncols ; j++)
     {
 	col = Work->Fcols [j] ;
-	DEBUG6 ((ID" ", col)) ;
+	DEBUG6 ((ID " ", col)) ;
 	ASSERT (Fcpos [col] == j * Work->fnr_curr) ;
 	ASSERT (NON_PIVOTAL_COL (col)) ;
     }
     ASSERT (Fcpos [Work->pivcol] >= 0) ;
-    DEBUG6 (("pivcol: "ID" pos "ID" fnr_curr "ID" fncols "ID"\n",
+    DEBUG6 (("pivcol: " ID " pos " ID " fnr_curr " ID " fncols " ID "\n",
 	Work->pivcol, Fcpos [Work->pivcol], Work->fnr_curr, fncols)) ;
     ASSERT (Fcpos [Work->pivcol] <  fncols * Work->fnr_curr) ;
-    DEBUG6 (("\npivot col pattern:  fnrows="ID"\n", fnrows)) ;
+    DEBUG6 (("\npivot col pattern:  fnrows=" ID "\n", fnrows)) ;
     for (i = 0 ; i < fnrows ; i++)
     {
 	row = Work->Frows [i] ;
-	DEBUG6 ((ID" ", row)) ;
+	DEBUG6 ((ID " ", row)) ;
 	ASSERT (Frpos [row] == i) ;
 	ASSERT (NON_PIVOTAL_ROW (row)) ;
     }
@@ -437,7 +437,7 @@ GLOBAL void UMF_assemble_fixq
     /* assemble from prior elements into the current frontal matrix */
     /* ---------------------------------------------------------------------- */
 
-    DEBUG2 (("New assemble start [prior_element:"ID"\n", Work->prior_element)) ;
+    DEBUG2 (("New assemble start [prior_element:" ID "\n", Work->prior_element)) ;
 
     /* Currently no rows or columns are marked.  No elements are scanned, */
     /* that is, (ep->next == EMPTY) is true for all elements */
@@ -463,7 +463,7 @@ GLOBAL void UMF_assemble_fixq
 		ep->next = son_list ;
 		son_list = e ;
 #ifndef NDEBUG
-		DEBUG2 (("e "ID" is Prior son "ID" "ID"\n",
+		DEBUG2 (("e " ID " is Prior son " ID " " ID "\n",
 		    e, prior_Uson, prior_Lson)) ;
 		UMF_dump_element (Numeric, Work, e, FALSE) ;
 #endif
@@ -485,7 +485,7 @@ GLOBAL void UMF_assemble_fixq
 	if (row < 0) row = FLIP (row) ;
 	ASSERT (row >= 0 && row < n_row) ;
 
-	DEBUG6 (("SCAN1-row: "ID"\n", row)) ;
+	DEBUG6 (("SCAN1-row: " ID "\n", row)) ;
 #ifndef NDEBUG
 	UMF_dump_rowcol (0, Numeric, Work, row, FALSE) ;
 #endif
@@ -514,12 +514,12 @@ GLOBAL void UMF_assemble_fixq
 	    {
 		/* first time seen in scan1-row */
 		ep->cdeg = ep->nrowsleft + cdeg0 ;
-		DEBUG6 (("e "ID" First seen: cdeg: "ID" ", e, ep->cdeg-cdeg0)) ;
+		DEBUG6 (("e " ID " First seen: cdeg: " ID " ", e, ep->cdeg-cdeg0)) ;
 		ASSERT (ep->ncolsleft > 0 && ep->nrowsleft > 0) ;
 	    }
 
 	    ep->cdeg-- ;	/* decrement external column degree */
-	    DEBUG6 (("e "ID" New ext col deg: "ID"\n", e, ep->cdeg - cdeg0)) ;
+	    DEBUG6 (("e " ID " New ext col deg: " ID "\n", e, ep->cdeg - cdeg0)) ;
 
 	    /* this element is not yet in the new son list */
 	    if (ep->cdeg == cdeg0 && ep->next == EMPTY)
@@ -547,7 +547,7 @@ GLOBAL void UMF_assemble_fixq
 	if (col < 0) col = FLIP (col) ;
 	ASSERT (col >= 0 && col < n_col) ;
 
-	DEBUG6 (("SCAN 1-col: "ID"\n", col)) ;
+	DEBUG6 (("SCAN 1-col: " ID "\n", col)) ;
 #ifndef NDEBUG
 	UMF_dump_rowcol (1, Numeric, Work, col, FALSE) ;
 #endif
@@ -576,12 +576,12 @@ GLOBAL void UMF_assemble_fixq
 	    {
 		/* first time seen in scan1-col */
 		ep->rdeg = ep->ncolsleft + rdeg0 ;
-		DEBUG6 (("e "ID" First seen: rdeg: "ID" ", e, ep->rdeg-rdeg0)) ;
+		DEBUG6 (("e " ID " First seen: rdeg: " ID " ", e, ep->rdeg-rdeg0)) ;
 		ASSERT (ep->ncolsleft > 0 && ep->nrowsleft > 0) ;
 	    }
 
 	    ep->rdeg-- ;	/* decrement external row degree */
-	    DEBUG6 (("e "ID" New ext row degree: "ID"\n", e, ep->rdeg-rdeg0)) ;
+	    DEBUG6 (("e " ID " New ext row degree: " ID "\n", e, ep->rdeg-rdeg0)) ;
 
 	    if (ep->rdeg == rdeg0 && ep->next == EMPTY)
 	    {
@@ -606,7 +606,7 @@ GLOBAL void UMF_assemble_fixq
     {
 	ASSERT (e > 0 && e <= Work->nel && E [e]) ;
 	p = Memory + E [e] ;
-	DEBUG2 (("New son: "ID"\n", e)) ;
+	DEBUG2 (("New son: " ID "\n", e)) ;
 #ifndef NDEBUG
 	UMF_dump_element (Numeric, Work, e, FALSE) ;
 #endif
@@ -620,7 +620,7 @@ GLOBAL void UMF_assemble_fixq
 	extcdeg = (ep->cdeg < cdeg0) ? nrowsleft : (ep->cdeg - cdeg0) ;
 	ncols_to_assemble = ncolsleft - extrdeg ;
 	nrows_to_assemble = nrowsleft - extcdeg ;
-	DEBUG2 (("extrdeg "ID" extcdeg "ID"\n", extrdeg, extcdeg)) ;
+	DEBUG2 (("extrdeg " ID " extcdeg " ID "\n", extrdeg, extcdeg)) ;
 
 	if (extrdeg == 0 && extcdeg == 0)
 	{
@@ -629,7 +629,7 @@ GLOBAL void UMF_assemble_fixq
 	    /* this is an LUson - assemble an entire contribution block */
 	    /* -------------------------------------------------------------- */
 
-	    DEBUG6 (("LUson found: "ID"\n", e)) ;
+	    DEBUG6 (("LUson found: " ID "\n", e)) ;
 
 	    if (nrows == nrowsleft)
 	    {
@@ -784,10 +784,10 @@ GLOBAL void UMF_assemble_fixq
 	    /* this is a Uson - assemble all possible columns */
 	    /* -------------------------------------------------------------- */
 
-	    DEBUG6 (("New USON: "ID"\n", e)) ;
+	    DEBUG6 (("New USON: " ID "\n", e)) ;
 	    ASSERT (extrdeg > 0) ;
 
-	    DEBUG6 (("New uson "ID" cols to do "ID"\n", e, ncols_to_assemble)) ;
+	    DEBUG6 (("New uson " ID " cols to do " ID "\n", e, ncols_to_assemble)) ;
 
 	    if (ncols_to_assemble > 0)
 	    {
@@ -907,10 +907,10 @@ GLOBAL void UMF_assemble_fixq
 	    /* this is an Lson - assemble all possible rows */
 	    /* -------------------------------------------------------------- */
 
-	    DEBUG6 (("New LSON: "ID"\n", e)) ;
+	    DEBUG6 (("New LSON: " ID "\n", e)) ;
 	    ASSERT (extrdeg == 0 && extcdeg > 0) ;
 
-	    DEBUG6 (("New lson "ID" rows to do "ID"\n", e, nrows_to_assemble)) ;
+	    DEBUG6 (("New lson " ID " rows to do " ID "\n", e, nrows_to_assemble)) ;
 
 	    if (nrows_to_assemble > 0)
 	    {
@@ -1102,7 +1102,7 @@ GLOBAL void UMF_assemble_fixq
 	row = Work->Frows [i2] ;
 	ASSERT (row >= 0 && row < n_row) ;
 
-	DEBUG6 (("DEBUG SCAN 1: "ID"\n", row)) ;
+	DEBUG6 (("DEBUG SCAN 1: " ID "\n", row)) ;
 	UMF_dump_rowcol (0, Numeric, Work, row, TRUE) ;
 
 	ASSERT (NON_PIVOTAL_ROW (row)) ;
@@ -1126,7 +1126,7 @@ GLOBAL void UMF_assemble_fixq
 	    extrdeg = (ep->rdeg < rdeg0) ? ep->ncolsleft : (ep->rdeg - rdeg0) ;
 	    extcdeg = (ep->cdeg < cdeg0) ? ep->nrowsleft : (ep->cdeg - cdeg0) ;
 	    DEBUG6 ((
-		"e "ID" After assembly ext row deg: "ID" ext col degree "ID"\n",
+		"e " ID " After assembly ext row deg: " ID " ext col degree " ID "\n",
 		e, extrdeg, extcdeg)) ;
 
 	    if (Work->any_skip)
@@ -1160,7 +1160,7 @@ GLOBAL void UMF_assemble_fixq
 	col = Work->Fcols [j2] ;
 	ASSERT (col >= 0 && col < n_col) ;
 
-	DEBUG6 (("DEBUG SCAN 2: "ID"\n", col)) ;
+	DEBUG6 (("DEBUG SCAN 2: " ID "\n", col)) ;
 #ifndef FIXQ
 	UMF_dump_rowcol (1, Numeric, Work, col, TRUE) ;
 #else
@@ -1187,7 +1187,7 @@ GLOBAL void UMF_assemble_fixq
 	    ASSERT (col == Cols [f]) ;
 	    extrdeg = (ep->rdeg < rdeg0) ? ep->ncolsleft : (ep->rdeg - rdeg0) ;
 	    extcdeg = (ep->cdeg < cdeg0) ? ep->nrowsleft : (ep->cdeg - cdeg0) ;
-	    DEBUG6 (("e "ID" After assembly ext col deg: "ID"\n", e, extcdeg)) ;
+	    DEBUG6 (("e " ID " After assembly ext col deg: " ID "\n", e, extcdeg)) ;
 
 	    if (Work->any_skip)
 	    {

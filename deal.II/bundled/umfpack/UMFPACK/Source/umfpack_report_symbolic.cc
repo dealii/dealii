@@ -74,9 +74,9 @@ GLOBAL Int UMFPACK_report_symbolic
     {
 
 	PRINTF (("\n    matrix to be factorized:\n")) ;
-	PRINTF (("\tn_row: "ID" n_col: "ID"\n", n_row, n_col)) ;
-	PRINTF (("\tnumber of entries: "ID"\n", nz)) ;
-	PRINTF (("    block size used for dense matrix kernels:   "ID"\n",
+	PRINTF (("\tn_row: " ID " n_col: " ID "\n", n_row, n_col)) ;
+	PRINTF (("\tnumber of entries: " ID "\n", nz)) ;
+	PRINTF (("    block size used for dense matrix kernels:   " ID "\n",
 	Symbolic->nb)) ;
 
 	PRINTF (("    strategy used:                              ")) ;
@@ -145,10 +145,10 @@ GLOBAL Int UMFPACK_report_symbolic
 	    Symbolic->peak_sym_usage,
 	    MBYTES (Symbolic->peak_sym_usage))) ;
 	PRINTF (("    frontal matrices / supercolumns:\n")) ;
-	PRINTF (("\tnumber of frontal chains: "ID"\n", nchains)) ;
-	PRINTF (("\tnumber of frontal matrices: "ID"\n", nfr)) ;
-	PRINTF (("\tlargest frontal matrix row dimension: "ID"\n", maxnrows)) ;
-	PRINTF (("\tlargest frontal matrix column dimension: "ID"\n",maxncols));
+	PRINTF (("\tnumber of frontal chains: " ID "\n", nchains)) ;
+	PRINTF (("\tnumber of frontal matrices: " ID "\n", nfr)) ;
+	PRINTF (("\tlargest frontal matrix row dimension: " ID "\n", maxnrows)) ;
+	PRINTF (("\tlargest frontal matrix column dimension: " ID "\n",maxncols));
     }
 
     k = 0 ;
@@ -158,21 +158,21 @@ GLOBAL Int UMFPACK_report_symbolic
     {
 	frontid1 = Chain_start [chain] ;
 	frontid2 = Chain_start [chain+1] - 1 ;
-	PRINTF4 (("\n    Frontal chain: "ID".  Frontal matrices "ID" to "ID"\n",
+	PRINTF4 (("\n    Frontal chain: " ID ".  Frontal matrices " ID " to " ID "\n",
 	    INDEX (chain), INDEX (frontid1), INDEX (frontid2))) ;
-	PRINTF4 (("\tLargest frontal matrix in Frontal chain: "ID"-by-"ID"\n",
+	PRINTF4 (("\tLargest frontal matrix in Frontal chain: " ID "-by-" ID "\n",
 	    Chain_maxrows [chain], Chain_maxcols [chain])) ;
 	for (frontid = frontid1 ; frontid <= frontid2 ; frontid++)
 	{
 	    kk = Front_npivcol [frontid] ;
-	    PRINTF4 (("\tFront: "ID"  pivot cols: "ID" (pivot columns "ID" to "
-		ID")\n", INDEX (frontid), kk, INDEX (k), INDEX (k+kk-1))) ;
-	    PRINTF4 (("\t    pivot row candidates: "ID" to "ID"\n",
+	    PRINTF4 (("\tFront: " ID "  pivot cols: " ID " (pivot columns " ID " to "
+		ID ")\n", INDEX (frontid), kk, INDEX (k), INDEX (k+kk-1))) ;
+	    PRINTF4 (("\t    pivot row candidates: " ID " to " ID "\n",
 		INDEX (Front_1strow [Front_leftmostdesc [frontid]]),
 		INDEX (Front_1strow [frontid+1]-1))) ;
-	    PRINTF4 (("\t    leftmost descendant: "ID"\n",
+	    PRINTF4 (("\t    leftmost descendant: " ID "\n",
 		INDEX (Front_leftmostdesc [frontid]))) ;
-	    PRINTF4 (("\t    1st new candidate row : "ID"\n",
+	    PRINTF4 (("\t    1st new candidate row : " ID "\n",
 		INDEX (Front_1strow [frontid]))) ;
 	    PRINTF4 (("\t    parent:")) ;
 	    if (Front_parent [frontid] == EMPTY)
@@ -181,7 +181,7 @@ GLOBAL Int UMFPACK_report_symbolic
 	    }
 	    else
 	    {
-		PRINTF4 ((" "ID"\n", INDEX (Front_parent [frontid]))) ;
+		PRINTF4 ((" " ID "\n", INDEX (Front_parent [frontid]))) ;
 	    }
 	    done = (frontid == 20 && frontid < nfr-1 && prl == 4) ;
 	    if (done)
@@ -193,7 +193,7 @@ GLOBAL Int UMFPACK_report_symbolic
 	}
 	if (Front_npivcol [nfr] != 0)
 	{
-	    PRINTF4 (("\tFront: "ID" placeholder for "ID" empty columns\n",
+	    PRINTF4 (("\tFront: " ID " placeholder for " ID " empty columns\n",
 		INDEX (nfr), Front_npivcol [nfr])) ;
 	}
 	if (done)

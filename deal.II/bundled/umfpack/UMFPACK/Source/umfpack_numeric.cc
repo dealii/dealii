@@ -251,7 +251,7 @@ GLOBAL Int UMFPACK_numeric
 	error (&Numeric, Work) ;
 	return (UMFPACK_ERROR_out_of_memory) ;
     }
-    DEBUG0 (("malloc: init_count "ID" UMF_malloc_count "ID"\n",
+    DEBUG0 (("malloc: init_count " ID " UMF_malloc_count " ID "\n",
 	init_count, UMF_malloc_count)) ;
     ASSERT (UMF_malloc_count == init_count
 	+ (16 + 2*Symbolic->prefer_diagonal)
@@ -307,7 +307,7 @@ GLOBAL Int UMFPACK_numeric
 	Info [UMFPACK_NOFF_DIAG] = Work->noff_diagonal ;
     }
 
-    DEBUG0 (("malloc: init_count "ID" UMF_malloc_count "ID"\n",
+    DEBUG0 (("malloc: init_count " ID " UMF_malloc_count " ID "\n",
 	init_count, UMF_malloc_count)) ;
 
     npiv = Numeric->npiv ;	/* = n_inner for nonsingular matrices */
@@ -324,14 +324,14 @@ GLOBAL Int UMFPACK_numeric
      * which is transfered to Numeric->Upattern if ulen > 0.
      */
 
-    DEBUG0 (("malloc: init_count "ID" UMF_malloc_count "ID"\n",
+    DEBUG0 (("malloc: init_count " ID " UMF_malloc_count " ID "\n",
 	init_count, UMF_malloc_count)) ;
 
     free_work (Work) ;
 
-    DEBUG0 (("malloc: init_count "ID" UMF_malloc_count "ID"\n",
+    DEBUG0 (("malloc: init_count " ID " UMF_malloc_count " ID "\n",
 	init_count, UMF_malloc_count)) ;
-    DEBUG0 (("Numeric->ulen: "ID" scale: "ID"\n", ulen, scale)) ;
+    DEBUG0 (("Numeric->ulen: " ID " scale: " ID "\n", ulen, scale)) ;
     ASSERT (UMF_malloc_count == init_count + (ulen > 0) +
 	(11 + (scale != UMFPACK_SCALE_NONE))) ;
 
@@ -393,7 +393,7 @@ GLOBAL Int UMFPACK_numeric
      * from size n_col+1 to size ulen + 1.  If ulen is zero, the object does
      * not exist. */
 
-    DEBUG4 (("ulen: "ID" Upattern "ID"\n", ulen, (Int) Numeric->Upattern)) ;
+    DEBUG4 (("ulen: " ID " Upattern " ID "\n", ulen, (Int) Numeric->Upattern)) ;
     ASSERT (IMPLIES (ulen == 0, Numeric->Upattern == (Int *) NULL)) ;
     if (ulen > 0 && ulen < n_col)
     {
@@ -494,7 +494,7 @@ GLOBAL Int UMFPACK_numeric
     {
 	/* there are zeros and/or NaN's on the diagonal of U */
 	DEBUG0 (("Warning, matrix is singular in umfpack_numeric\n")) ;
-	DEBUG0 (("nnzpiv "ID" n_inner "ID" rcond %g\n", Numeric->nnzpiv,
+	DEBUG0 (("nnzpiv " ID " n_inner " ID " rcond %g\n", Numeric->nnzpiv,
 	    n_inner, Numeric->rcond)) ;
 	status = UMFPACK_WARNING_singular_matrix ;
 	Info [UMFPACK_STATUS] = status ;
@@ -626,7 +626,7 @@ PRIVATE Int numeric_alloc
 
     Numeric->size = (Int) nsize ;
 
-    DEBUG0 (("Num init %g usage_est %g numsize "ID" minusage "ID"\n",
+    DEBUG0 (("Num init %g usage_est %g numsize " ID " minusage " ID "\n",
 	alloc_init, Symbolic->num_mem_usage_est, Numeric->size, min_usage)) ;
 
     /* allocates 1 object: */
@@ -637,7 +637,7 @@ PRIVATE Int numeric_alloc
 	Numeric->Memory = (Unit *) UMF_malloc (Numeric->size, sizeof (Unit)) ;
 	if (Numeric->Memory)
 	{
-	    DEBUG0 (("Successful Numeric->size: "ID"\n", Numeric->size)) ;
+	    DEBUG0 (("Successful Numeric->size: " ID "\n", Numeric->size)) ;
 	    return (TRUE) ;
 	}
 	/* too much, reduce the request (but not below the minimum) */
@@ -679,7 +679,7 @@ PRIVATE Int work_alloc
     maxncols = MIN (n_col, maxncols) ;
     maxnrc = MAX (maxnrows, maxncols) ;
 
-    DEBUG0 (("work alloc:  maxnrows+nb "ID" maxncols+nb "ID"\n",
+    DEBUG0 (("work alloc:  maxnrows+nb " ID " maxncols+nb " ID "\n",
 	maxnrows, maxncols)) ;
 
     /* 15 allocations, freed in free_work: */

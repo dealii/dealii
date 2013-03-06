@@ -31,7 +31,7 @@ GLOBAL Int UMF_start_front    /* returns TRUE if successful, FALSE otherwise */
     fnrows_max = Symbolic->Chain_maxrows [chain] ;
     fncols_max = Symbolic->Chain_maxcols [chain] ;
 
-    DEBUGm2 (("Start Front for chain "ID".  fnrows_max "ID" fncols_max "ID"\n",
+    DEBUGm2 (("Start Front for chain " ID ".  fnrows_max " ID " fncols_max " ID "\n",
 	chain, fnrows_max, fncols_max)) ;
 
     Work->fnrows_max = fnrows_max ;
@@ -62,11 +62,11 @@ GLOBAL Int UMF_start_front    /* returns TRUE if successful, FALSE otherwise */
 	tp = (Tuple *) Memory + tpi ;
 	tpend = tp + Col_tlen [col] ;
 	cdeg = 0 ;
-	DEBUGm3 (("\n=============== start front: col "ID" tlen "ID"\n",
+	DEBUGm3 (("\n=============== start front: col " ID " tlen " ID "\n",
 		col, Col_tlen [col])) ;
 	for ( ; tp < tpend ; tp++)
 	{
-	    DEBUG1 (("Tuple ("ID","ID")\n", tp->e, tp->f)) ;
+	    DEBUG1 (("Tuple (" ID "," ID ")\n", tp->e, tp->f)) ;
 	    e = tp->e ;
 	    if (!E [e]) continue ;
 	    f = tp->f ;
@@ -75,11 +75,11 @@ GLOBAL Int UMF_start_front    /* returns TRUE if successful, FALSE otherwise */
 	    p += UNITS (Element, 1) ;
 	    Cols = (Int *) p ;
 	    if (Cols [f] == EMPTY) continue ;
-	    DEBUG1 (("  nrowsleft "ID"\n", ep->nrowsleft)) ;
+	    DEBUG1 (("  nrowsleft " ID "\n", ep->nrowsleft)) ;
 	    cdeg += ep->nrowsleft ;
 	}
 #ifndef NDEBUG
-	DEBUGm3 (("start front cdeg: "ID" col "ID"\n", cdeg, col)) ;
+	DEBUGm3 (("start front cdeg: " ID " col " ID "\n", cdeg, col)) ;
 	UMF_dump_rowcol (1, Numeric, Work, col, FALSE) ;
 #endif
 
@@ -108,7 +108,7 @@ GLOBAL Int UMF_start_front    /* returns TRUE if successful, FALSE otherwise */
 	cdeg = 0 ;
     }
 
-    DEBUGm2 (("fnrows max "ID" fncols_max "ID"\n", fnrows_max, fncols_max)) ;
+    DEBUGm2 (("fnrows max " ID " fncols_max " ID "\n", fnrows_max, fncols_max)) ;
 
     /* the current frontal matrix is empty */
     ASSERT (Work->fnrows == 0 && Work->fncols == 0 && Work->fnpiv == 0) ;
@@ -204,8 +204,8 @@ GLOBAL Int UMF_start_front    /* returns TRUE if successful, FALSE otherwise */
     Work->fncols_new = 0 ;
 
     /* desired size is fnr2-by-fnc2 (includes L and U blocks): */
-    DEBUGm2 (("    fsize "ID"  fcurr_size "ID"\n", fsize, fcurr_size)) ;
-    DEBUGm2 (("    maxfrsize "ID"  fnr_curr "ID" fnc_curr "ID"\n", maxfrsize,
+    DEBUGm2 (("    fsize " ID "  fcurr_size " ID "\n", fsize, fcurr_size)) ;
+    DEBUGm2 (("    maxfrsize " ID "  fnr_curr " ID " fnc_curr " ID "\n", maxfrsize,
 	Work->fnr_curr, Work->fnc_curr)) ;
 
     if (fsize >= maxfrsize && !overflow)
@@ -214,7 +214,7 @@ GLOBAL Int UMF_start_front    /* returns TRUE if successful, FALSE otherwise */
 	fnr2 = fnrows_max + nb ;
 	fnc2 = fncols_max + nb ;
 	fsize = maxfrsize ;
-	DEBUGm1 (("   sufficient for ("ID"+"ID")-by-("ID"+"ID")\n",
+	DEBUGm1 (("   sufficient for (" ID "+" ID ")-by-(" ID "+" ID ")\n",
 	    fnrows_max, nb, fncols_max, nb)) ;
     }
     else
@@ -242,7 +242,7 @@ GLOBAL Int UMF_start_front    /* returns TRUE if successful, FALSE otherwise */
 		fnc2 = fsize / fnr2 ;
 	    }
 	}
-	DEBUGm1 (("   smaller "ID"-by-"ID"\n", fnr2, fnc2)) ;
+	DEBUGm1 (("   smaller " ID "-by-" ID "\n", fnr2, fnc2)) ;
     }
     fnr2 = MIN (fnr2, fnrows_max + nb) ;
     fnc2 = MIN (fnc2, fncols_max + nb) ;

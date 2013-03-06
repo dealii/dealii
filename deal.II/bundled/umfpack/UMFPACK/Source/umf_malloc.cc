@@ -75,7 +75,7 @@ GLOBAL void *UMF_malloc
     /* see AMD/Source/amd_global.c for the memory allocator selection */
     p = amd_malloc (size) ;
 
-    DEBUG0 ((ID"\n", (Int) p)) ;
+    DEBUG0 ((ID "\n", (Int) p)) ;
 
 #if defined (UMF_MALLOC_COUNT) || !defined (NDEBUG)
     if (p)
@@ -83,7 +83,7 @@ GLOBAL void *UMF_malloc
 	/* One more object has been malloc'ed.  Keep track of the count. */
 	/* (purely for sanity checks). */
 	UMF_malloc_count++ ;
-	DEBUG0 (("  successful, new malloc count: "ID"\n", UMF_malloc_count)) ;
+	DEBUG0 (("  successful, new malloc count: " ID "\n", UMF_malloc_count)) ;
     }
 #endif
 

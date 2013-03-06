@@ -105,10 +105,10 @@ GLOBAL void UMF_scale_column
 #ifndef NDEBUG
     ASSERT (fnrows == Work->fnrows_new + 1) ;
     ASSERT (fncols == Work->fncols_new + 1) ;
-    DEBUG1 (("SCALE COL: fnrows "ID" fncols "ID"\n", fnrows, fncols)) ;
+    DEBUG1 (("SCALE COL: fnrows " ID " fncols " ID "\n", fnrows, fncols)) ;
     DEBUG2 (("\nFrontal matrix, including all space:\n"
-		"fnr_curr "ID" fnc_curr "ID" nb    "ID"\n"
-		"fnrows   "ID" fncols   "ID" fnpiv "ID"\n",
+		"fnr_curr " ID " fnc_curr " ID " nb    " ID "\n"
+		"fnrows   " ID " fncols   " ID " fnpiv " ID "\n",
 		fnr_curr, fnc_curr, nb, fnrows, fncols, fnpiv)) ;
     DEBUG2 (("\nJust the active part:\n")) ;
     DEBUG7 (("C  block: ")) ;
@@ -143,7 +143,7 @@ GLOBAL void UMF_scale_column
 	Int fs = fspos / fnr_curr ;
 
 	DEBUG6 (("Shift pivot column in front\n")) ;
-	DEBUG6 (("fspos: "ID" flpos: "ID"\n", fspos, fncols * fnr_curr)) ;
+	DEBUG6 (("fspos: " ID " flpos: " ID "\n", fspos, fncols * fnr_curr)) ;
 
 	/* ------------------------------------------------------------------ */
 	/* move Fe => Fs */
@@ -190,8 +190,8 @@ GLOBAL void UMF_scale_column
 
 #ifndef NDEBUG
     DEBUG2 (("\nFrontal matrix after col swap, including all space:\n"
-		"fnr_curr "ID" fnc_curr "ID" nb    "ID"\n"
-		"fnrows   "ID" fncols   "ID" fnpiv "ID"\n",
+		"fnr_curr " ID " fnc_curr " ID " nb    " ID "\n"
+		"fnrows   " ID " fncols   " ID " fnpiv " ID "\n",
 		fnr_curr, fnc_curr, nb,
 		fnrows, fncols, fnpiv)) ;
     DEBUG2 (("\nJust the active part:\n")) ;
@@ -215,7 +215,7 @@ GLOBAL void UMF_scale_column
     fnrows = --(Work->fnrows) ;
 
     DEBUG6 (("Swap/shift pivot row in front:\n")) ;
-    DEBUG6 (("fspos: "ID" flpos: "ID"\n", fspos, fnrows)) ;
+    DEBUG6 (("fspos: " ID " flpos: " ID "\n", fspos, fnrows)) ;
 
     if (fspos == fnrows)
     {
@@ -337,8 +337,8 @@ GLOBAL void UMF_scale_column
 
 #ifndef NDEBUG
     DEBUG2 (("\nFrontal matrix after row swap, including all space:\n"
-		"fnr_curr "ID" fnc_curr "ID" nb    "ID"\n"
-		"fnrows   "ID" fncols   "ID" fnpiv "ID"\n",
+		"fnr_curr " ID " fnc_curr " ID " nb    " ID "\n"
+		"fnrows   " ID " fncols   " ID " fnpiv " ID "\n",
 		Work->fnr_curr, Work->fnc_curr, Work->nb,
 		Work->fnrows, Work->fncols, Work->fnpiv)) ;
     DEBUG2 (("\nJust the active part:\n")) ;
@@ -393,7 +393,7 @@ GLOBAL void UMF_scale_column
     Row_tuples [pivrow] = 0 ;
     Col_tuples [pivcol] = 0 ;
 
-    DEBUG5 (("number of pivots prior to this one: "ID"\n", k)) ;
+    DEBUG5 (("number of pivots prior to this one: " ID "\n", k)) ;
     ASSERT (NON_PIVOTAL_ROW (pivrow)) ;
     ASSERT (NON_PIVOTAL_COL (pivcol)) ;
 

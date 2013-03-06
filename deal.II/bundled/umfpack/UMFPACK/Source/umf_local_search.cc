@@ -38,13 +38,13 @@ PRIVATE void remove_candidate (Int jj, WorkType *Work, SymbolicType *Symbolic)
 
 #ifndef NDEBUG
     Int j ;
-    DEBUGm2 (("pivot column Candidates before remove: nCand "ID" ncand "ID
-	" lo "ID" hi "ID" jj "ID"\n", Work->nCandidates, Work->ncand,
+    DEBUGm2 (("pivot column Candidates before remove: nCand " ID " ncand " ID
+	" lo " ID " hi " ID " jj " ID "\n", Work->nCandidates, Work->ncand,
 	Work->lo, Work->hi, jj)) ;
     for (j = 0 ; j < Work->nCandidates ; j++)
     {
 	Int col = Work->Candidates [j] ;
-	DEBUGm2 ((ID" ", col));
+	DEBUGm2 ((ID " ", col));
 	ASSERT (col >= 0 && col < Work->n_col) ;
 	/* ASSERT (NON_PIVOTAL_COL (col)) ; */
 	ASSERT (col >= Work->lo && col <= Work->hi) ;
@@ -85,13 +85,13 @@ PRIVATE void remove_candidate (Int jj, WorkType *Work, SymbolicType *Symbolic)
     Work->ncand-- ;
 
 #ifndef NDEBUG
-    DEBUGm2 (("pivot column Candidates after remove: nCand "ID" ncand "ID
-	" lo "ID" hi "ID" jj "ID"\n", Work->nCandidates, Work->ncand, Work->lo,
+    DEBUGm2 (("pivot column Candidates after remove: nCand " ID " ncand " ID
+	" lo " ID " hi " ID " jj " ID "\n", Work->nCandidates, Work->ncand, Work->lo,
 	Work->hi, jj)) ;
     for (j = 0 ; j < Work->nCandidates ; j++)
     {
 	Int col = Work->Candidates [j] ;
-	DEBUGm2 ((ID" ", col));
+	DEBUGm2 ((ID " ", col));
 	ASSERT (col >= 0 && col < Work->n_col) ;
 	/* ASSERT (NON_PIVOTAL_COL (col)) ; */
 	ASSERT (col >= Work->lo && col <= Work->hi) ;
@@ -208,12 +208,12 @@ GLOBAL Int UMF_local_search
 	}
     }
 
-    DEBUGm2 ((ID" pivot column Candidates: lo "ID" hi "ID"\n",
+    DEBUGm2 ((ID " pivot column Candidates: lo " ID " hi " ID "\n",
 	Work->nCandidates, Work->lo, Work->hi)) ;
     for (j = 0 ; j < Work->nCandidates ; j++)
     {
 	col = Work->Candidates [j] ;
-	DEBUGm2 ((ID" ", col));
+	DEBUGm2 ((ID " ", col));
 	ASSERT (col >= 0 && col < n_col) ;
 	ASSERT (NON_PIVOTAL_COL (col)) ;
 	ASSERT (col >= Work->lo && col <= Work->hi) ;
@@ -222,8 +222,8 @@ GLOBAL Int UMF_local_search
     DEBUGm2 (("\n")) ;
     /* there are no 0-by-c or r-by-0 fronts, where c and r are > 0 */
     /* a front is either 0-by-0, or r-by-c */
-    DEBUG2 (("\n\n::: "ID" : Npiv: "ID" + fnpiv "ID" = "ID". "
-	"size "ID"-by-"ID"\n", Work->frontid,
+    DEBUG2 (("\n\n::: " ID " : Npiv: " ID " + fnpiv " ID " = " ID ". "
+	"size " ID "-by-" ID "\n", Work->frontid,
 	Work->npiv, Work->fnpiv, Work->npiv + Work->fnpiv, fnrows, fncols)) ;
     ASSERT ((fnrows == 0 && fncols == 0) ||(fnrows != 0 && fncols != 0)) ;
 #endif
@@ -274,12 +274,12 @@ GLOBAL Int UMF_local_search
 
 #ifndef NDEBUG
 	/* check Frpos */
-	DEBUG4 (("Check Frpos : fnrows "ID" col "ID" maxcdeg "ID"\n",
+	DEBUG4 (("Check Frpos : fnrows " ID " col " ID " maxcdeg " ID "\n",
 		fnrows, pivcol [IN], max_cdeg)) ;
 	for (i = 0 ; i < fnrows ; i++)
 	{
 	    row = Frows [i] ;
-	    DEBUG4 (("  row: "ID"\n", row)) ;
+	    DEBUG4 (("  row: " ID "\n", row)) ;
 	    ASSERT (row >= 0 && row < n_row) ;
 	    ASSERT (Frpos [row] == i) ;
 	}
@@ -295,7 +295,7 @@ GLOBAL Int UMF_local_search
 		}
 		else
 		{
-		    DEBUG4 (("  row: "ID" pos "ID"\n", row, Frpos [row])) ;
+		    DEBUG4 (("  row: " ID " pos " ID "\n", row, Frpos [row])) ;
 		}
 	    }
 	    ASSERT (cnt == n_row) ;
@@ -315,24 +315,24 @@ GLOBAL Int UMF_local_search
     /* look in the candidate set for the best column */
     /* ------------------------------------------------------------------ */
 
-    DEBUG2 (("Max candidates %d, Work->ncand "ID" jmax "ID"\n",
+    DEBUG2 (("Max candidates %d, Work->ncand " ID " jmax " ID "\n",
 	MAX_CANDIDATES, Work->ncand, Work->nCandidates)) ;
     col = Work->Candidates [0] ;
     ASSERT (Work->nCandidates > 0) ;
-    DEBUG3 (("Pivot column candidate: "ID" j = "ID"\n", col, j)) ;
+    DEBUG3 (("Pivot column candidate: " ID " j = " ID "\n", col, j)) ;
     ASSERT (col >= 0 && col < n_col) ;
 
     /* there is no Col_degree if fixQ is true */
     deg = Symbolic->fixQ ? EMPTY : Col_degree [col] ;
 
 #ifndef NDEBUG
-    DEBUG3 (("Pivot column candidate: "ID" cost: "ID"  Fcpos[col] "ID"\n",
+    DEBUG3 (("Pivot column candidate: " ID " cost: " ID "  Fcpos[col] " ID "\n",
 	col, deg, Fcpos [col])) ;
     UMF_dump_rowcol (1, Numeric, Work, col, !Symbolic->fixQ) ;
     if (Symbolic->fixQ)
     {
-	DEBUG1 (("FIXQ: Candidates "ID" pivcol "ID" npiv "ID" fnpiv "ID
-	    " ndiscard "ID "\n", Work->nCandidates, col, Work->npiv,
+	DEBUG1 (("FIXQ: Candidates " ID " pivcol " ID " npiv " ID " fnpiv " ID
+	    " ndiscard " ID "\n", Work->nCandidates, col, Work->npiv,
 	    Work->fnpiv, Work->ndiscard)) ;
 	ASSERT (Work->nCandidates == 1) ;
 	ASSERT (col == Work->npiv + Work->fnpiv + Work->ndiscard) ;
@@ -359,12 +359,12 @@ GLOBAL Int UMF_local_search
     {
 	col = Work->Candidates [j] ;
 
-	DEBUG3 (("Pivot col candidate: "ID" j = "ID"\n", col, j)) ;
+	DEBUG3 (("Pivot col candidate: " ID " j = " ID "\n", col, j)) ;
 	ASSERT (col >= 0 && col < n_col) ;
 	ASSERT (!Symbolic->fixQ) ;
 	deg = Col_degree [col] ;
 #ifndef NDEBUG
-	DEBUG3 (("Pivot col candidate: "ID" cost: "ID" Fcpos[col] "ID"\n",
+	DEBUG3 (("Pivot col candidate: " ID " cost: " ID " Fcpos[col] " ID "\n",
 		col, deg, Fcpos [col])) ;
 	UMF_dump_rowcol (1, Numeric, Work, col, !Symbolic->fixQ) ;
 #endif
@@ -395,7 +395,7 @@ GLOBAL Int UMF_local_search
 	}
     }
 
-    DEBUG2 (("Pivcol in "ID" out "ID"\n", pivcol [IN], pivcol [OUT])) ;
+    DEBUG2 (("Pivcol in " ID " out " ID "\n", pivcol [IN], pivcol [OUT])) ;
     ASSERT ((pivcol [IN] >= 0 && pivcol [IN] < n_col)
 	|| (pivcol [OUT] >= 0 && pivcol [OUT] < n_col)) ;
 
@@ -408,12 +408,12 @@ GLOBAL Int UMF_local_search
 
 #ifndef NDEBUG
     /* check Frpos */
-    DEBUG4 (("Prior to col update: fnrows "ID" col "ID" maxcdeg "ID"\n",
+    DEBUG4 (("Prior to col update: fnrows " ID " col " ID " maxcdeg " ID "\n",
 	    fnrows, pivcol [IN], max_cdeg)) ;
     for (i = 0 ; i < fnrows ; i++)
     {
 	row = Frows [i] ;
-	DEBUG4 (("  row: "ID"\n", row)) ;
+	DEBUG4 (("  row: " ID "\n", row)) ;
 	ASSERT (row >= 0 && row < n_row) ;
 	ASSERT (Frpos [row] == i) ;
     }
@@ -429,7 +429,7 @@ GLOBAL Int UMF_local_search
 	    }
 	    else
 	    {
-		DEBUG4 (("  row: "ID" pos "ID"\n", row, Frpos [row])) ;
+		DEBUG4 (("  row: " ID " pos " ID "\n", row, Frpos [row])) ;
 	    }
 	}
 	ASSERT (cnt == n_row) ;
@@ -440,7 +440,7 @@ GLOBAL Int UMF_local_search
     {
 
 #ifndef NDEBUG
-	DEBUG2 (("col[IN] column "ID" in front at position = "ID"\n",
+	DEBUG2 (("col[IN] column " ID " in front at position = " ID "\n",
 		pivcol [IN], Fcpos [pivcol [IN]])) ;
 	UMF_dump_rowcol (1, Numeric, Work, pivcol [IN], !Symbolic->fixQ) ;
 #endif
@@ -536,11 +536,11 @@ GLOBAL Int UMF_local_search
 	/* ------------------------------------------------------------------ */
 
 #ifndef NDEBUG
-	DEBUG2 (("Wy after update: fnrows="ID"\n", fnrows)) ;
-	DEBUG4 ((" fnpiv="ID" \n", fnpiv)) ;
+	DEBUG2 (("Wy after update: fnrows=" ID "\n", fnrows)) ;
+	DEBUG4 ((" fnpiv=" ID " \n", fnpiv)) ;
 	for (i = 0 ; i < fnrows ; i++)
 	{
-	    DEBUG4 ((ID" "ID" "ID, i, Frows [i], Frpos [Frows [i]])) ;
+	    DEBUG4 ((ID " " ID " " ID, i, Frows [i], Frpos [Frows [i]])) ;
 	    EDEBUG4 (Wy [i]) ;
 	    DEBUG4 (("\n")) ;
 	}
@@ -554,12 +554,12 @@ GLOBAL Int UMF_local_search
 
 #ifndef NDEBUG
 	/* check Frpos */
-	DEBUG4 (("After col update: fnrows "ID" col "ID" maxcdeg "ID"\n",
+	DEBUG4 (("After col update: fnrows " ID " col " ID " maxcdeg " ID "\n",
 		fnrows, pivcol [IN], max_cdeg)) ;
 	for (i = 0 ; i < fnrows ; i++)
 	{
 	    row = Frows [i] ;
-	    DEBUG4 (("  row: "ID"\n", row)) ;
+	    DEBUG4 (("  row: " ID "\n", row)) ;
 	    ASSERT (row >= 0 && row < n_row) ;
 	    ASSERT (Frpos [row] == i) ;
 	}
@@ -575,7 +575,7 @@ GLOBAL Int UMF_local_search
 		}
 		else
 		{
-		    DEBUG4 (("  row: "ID" pos "ID"\n", row, Frpos [row])) ;
+		    DEBUG4 (("  row: " ID " pos " ID "\n", row, Frpos [row])) ;
 		}
 	    }
 	    ASSERT (cnt == n_row) ;
@@ -584,7 +584,7 @@ GLOBAL Int UMF_local_search
 
 #ifndef NDEBUG
 	/* check Frpos */
-	DEBUG4 (("COL ASSEMBLE: cdeg "ID"\nREDUCE COL in "ID" max_cdeg "ID"\n",
+	DEBUG4 (("COL ASSEMBLE: cdeg " ID "\nREDUCE COL in " ID " max_cdeg " ID "\n",
 		cdeg_in, pivcol [IN], max_cdeg)) ;
 	for (i = 0 ; i < cdeg_in ; i++)
 	{
@@ -672,7 +672,7 @@ GLOBAL Int UMF_local_search
 
 #ifndef NDEBUG
 	/* check Frpos again */
-	DEBUG4 (("COL DONE: cdeg "ID"\nREDUCE COL in "ID" max_cdeg "ID"\n",
+	DEBUG4 (("COL DONE: cdeg " ID "\nREDUCE COL in " ID " max_cdeg " ID "\n",
 		cdeg_in, pivcol [IN], max_cdeg)) ;
 	for (i = 0 ; i < cdeg_in ; i++)
 	{
@@ -692,11 +692,11 @@ GLOBAL Int UMF_local_search
 #endif
 
 #ifndef NDEBUG
-	DEBUG4 (("Reduced column: cdeg in  "ID" fnrows_max "ID"\n",
+	DEBUG4 (("Reduced column: cdeg in  " ID " fnrows_max " ID "\n",
 	    cdeg_in, Work->fnrows_max)) ;
 	for (i = 0 ; i < cdeg_in ; i++)
 	{
-	    DEBUG4 ((" "ID" "ID" "ID, i, Frows [i], Frpos [Frows [i]])) ;
+	    DEBUG4 ((" " ID " " ID " " ID, i, Frows [i], Frpos [Frows [i]])) ;
 	    EDEBUG4 (Wy [i]) ;
 	    DEBUG4 (("\n")) ;
 	    ASSERT (i == Frpos [Frows [i]]) ;
@@ -786,19 +786,19 @@ GLOBAL Int UMF_local_search
 	    do_extend = TRUE ;
 
 	    DEBUG2 (("Evaluating option IN-IN:\n")) ;
-	    DEBUG2 (("Work->fnzeros "ID" fnpiv "ID" nr_in "ID" nc "ID"\n",
+	    DEBUG2 (("Work->fnzeros " ID " fnpiv " ID " nr_in " ID " nc " ID "\n",
 		Work->fnzeros, fnpiv, nr_in, nc)) ;
-	    DEBUG2 (("fncols "ID" fnrows "ID"\n", fncols, fnrows)) ;
+	    DEBUG2 (("fncols " ID " fnrows " ID "\n", fncols, fnrows)) ;
 
 	    /* determine if BLAS-3 update should be applied before extending. */
 	    /* update if too many zero entries accumulate in the LU block */
 	    fnzeros = Work->fnzeros + fnpiv * (nr_in + nc) ;
 
-	    DEBUG2 (("fnzeros "ID"\n", fnzeros)) ;
+	    DEBUG2 (("fnzeros " ID "\n", fnzeros)) ;
 
 	    new_LUsize = (fnpiv+1) * (fnrows + nr_in + fncols + nc) ;
 
-	    DEBUG2 (("new_LUsize "ID"\n", new_LUsize)) ;
+	    DEBUG2 (("new_LUsize " ID "\n", new_LUsize)) ;
 
 	    /* There are fnpiv pivots currently in the front.  This one
 	     * will be the (fnpiv+1)st pivot, if it is extended. */
@@ -807,9 +807,9 @@ GLOBAL Int UMF_local_search
 	    do_update = fnpiv > 0 &&
 		(((double) fnzeros) / ((double) new_LUsize)) > RELAX2 ;
 
-	    DEBUG2 (("do_update "ID"\n", do_update))
+	    DEBUG2 (("do_update " ID "\n", do_update))
 
-	    DEBUG2 (("option IN  IN : nr "ID" nc "ID" cost "ID"(0) relax "ID
+	    DEBUG2 (("option IN  IN : nr " ID " nc " ID " cost " ID "(0) relax " ID
 		"\n", nr_in, nc, thiscost, do_extend)) ;
 
 	    /* this is the best option seen so far */
@@ -848,7 +848,7 @@ GLOBAL Int UMF_local_search
 	    for (i = 0 ; i < rdeg [IN][OUT] ; i++)
 	    {
 		col = Wio [i] ;
-		DEBUG4 (("counting col "ID" Fcpos[] = "ID"\n", col,
+		DEBUG4 (("counting col " ID " Fcpos[] = " ID "\n", col,
 		    Fcpos [col])) ;
 		ASSERT (col >= 0 && col < n_col && NON_PIVOTAL_COL (col)) ;
 		if (Fcpos [col] < 0) nc++ ;
@@ -906,24 +906,24 @@ GLOBAL Int UMF_local_search
 		thiscost += extra_zeros ;
 
 		DEBUG2 (("Evaluating option IN-OUT:\n")) ;
-		DEBUG2 (("Work->fnzeros "ID" fnpiv "ID" nr_in "ID" nc "ID"\n",
+		DEBUG2 (("Work->fnzeros " ID " fnpiv " ID " nr_in " ID " nc " ID "\n",
 		    Work->fnzeros, fnpiv, nr_in, nc)) ;
-		DEBUG2 (("fncols "ID" fnrows "ID"\n", fncols, fnrows)) ;
+		DEBUG2 (("fncols " ID " fnrows " ID "\n", fncols, fnrows)) ;
 
 		/* determine if BLAS-3 update to be applied before extending. */
 		/* update if too many zero entries accumulate in the LU block */
 		fnzeros = Work->fnzeros + fnpiv * (nr_in + nc) ;
 
-		DEBUG2 (("fnzeros "ID"\n", fnzeros)) ;
+		DEBUG2 (("fnzeros " ID "\n", fnzeros)) ;
 
 		new_LUsize = (fnpiv+1) * (fnrows + nr_in + fncols + nc) ;
 
-		DEBUG2 (("new_LUsize "ID"\n", new_LUsize)) ;
+		DEBUG2 (("new_LUsize " ID "\n", new_LUsize)) ;
 
 		/* RELAX3 parameter uses a double relop, ignore NaN case: */
 		do_update = fnpiv > 0 &&
 		    (((double) fnzeros) / ((double) new_LUsize)) > RELAX3 ;
-		DEBUG2 (("do_update "ID"\n", do_update))
+		DEBUG2 (("do_update " ID "\n", do_update))
 
 	    }
 	    else
@@ -931,7 +931,7 @@ GLOBAL Int UMF_local_search
 		/* the current front would not be extended */
 		do_update = fnpiv > 0 ;
 		fnzeros = 0 ;
-		DEBUG2 (("IN-OUT do_update forced true: "ID"\n", do_update)) ;
+		DEBUG2 (("IN-OUT do_update forced true: " ID "\n", do_update)) ;
 
 		/* The new front would be just big enough to hold the new
 		 * pivot row and column. */
@@ -940,7 +940,7 @@ GLOBAL Int UMF_local_search
 
 	    }
 
-	    DEBUG2 (("option IN  OUT: nr "ID" nc "ID" cost "ID"("ID") relax "ID
+	    DEBUG2 (("option IN  OUT: nr " ID " nc " ID " cost " ID "(" ID ") relax " ID
 		"\n", nr_in, nc, thiscost, extra_zeros, do_extend)) ;
 
 	    if (bestcost == EMPTY || thiscost < bestcost)
@@ -969,10 +969,10 @@ GLOBAL Int UMF_local_search
     {
 
 #ifndef NDEBUG
-	DEBUG2 (("out_col column "ID" NOT in front at position = "ID"\n",
+	DEBUG2 (("out_col column " ID " NOT in front at position = " ID "\n",
 		pivcol [OUT], Fcpos [pivcol [OUT]])) ;
 	UMF_dump_rowcol (1, Numeric, Work, pivcol [OUT], !Symbolic->fixQ) ;
-	DEBUG2 (("fncols "ID" fncols_max "ID"\n", fncols, Work->fncols_max)) ;
+	DEBUG2 (("fncols " ID " fncols_max " ID "\n", fncols, Work->fncols_max)) ;
 	ASSERT (fncols < Work->fncols_max) ;
 #endif
 
@@ -992,7 +992,7 @@ GLOBAL Int UMF_local_search
 
 #ifndef NDEBUG
 	/* check Wp */
-	DEBUG4 (("COL ASSEMBLE: cdeg 0\nREDUCE COL out "ID"\n", pivcol [OUT])) ;
+	DEBUG4 (("COL ASSEMBLE: cdeg 0\nREDUCE COL out " ID "\n", pivcol [OUT])) ;
 	if (UMF_debug > 0 || MAX (n_row, n_col) < 1000)
 	{
 	    for (i = 0 ; i < MAX (n_row, n_col) ; i++)
@@ -1000,7 +1000,7 @@ GLOBAL Int UMF_local_search
 		ASSERT (Wp [i] < 0) ;
 	    }
 	}
-	DEBUG4 (("max_cdeg: "ID"\n", max_cdeg)) ;
+	DEBUG4 (("max_cdeg: " ID "\n", max_cdeg)) ;
 #endif
 
 	ASSERT (pivcol [OUT] >= 0 && pivcol [OUT] < n_col) ;
@@ -1068,10 +1068,10 @@ GLOBAL Int UMF_local_search
 	/* ------------------------------------------------------------------ */
 
 #ifndef NDEBUG
-	DEBUG4 (("Reduced column: cdeg out "ID"\n", cdeg_out)) ;
+	DEBUG4 (("Reduced column: cdeg out " ID "\n", cdeg_out)) ;
 	for (i = 0 ; i < cdeg_out ; i++)
 	{
-	    DEBUG4 ((" "ID" "ID" "ID, i, Wm [i], Wp [Wm [i]])) ;
+	    DEBUG4 ((" " ID " " ID " " ID, i, Wm [i], Wp [Wm [i]])) ;
 	    EDEBUG4 (Wx [i]) ;
 	    DEBUG4 (("\n")) ;
 	    ASSERT (i == Wp [Wm [i]]) ;
@@ -1120,7 +1120,7 @@ GLOBAL Int UMF_local_search
 	     * the current front is empty, pivcol [IN] must also be EMPTY.
 	     */
 
-	    DEBUGm4 (("Note: pivcol [OUT]: "ID" discard\n", pivcol [OUT])) ;
+	    DEBUGm4 (("Note: pivcol [OUT]: " ID " discard\n", pivcol [OUT])) ;
 	    ASSERT ((Work->fnrows == 0 && Work->fncols == 0)) ;
 	    ASSERT (pivcol [IN] == EMPTY) ;
 
@@ -1130,7 +1130,7 @@ GLOBAL Int UMF_local_search
 	    Work->ndiscard++ ;
 
 	    /* delete all of the tuples, and all contributions to this column */
-	    DEBUG1 (("Prune tuples of dead outcol: "ID"\n", pivcol [OUT])) ;
+	    DEBUG1 (("Prune tuples of dead outcol: " ID "\n", pivcol [OUT])) ;
 	    Col_tlen [pivcol [OUT]] = 0 ;
 	    UMF_mem_free_tail_block (Numeric, Col_tuples [pivcol [OUT]]) ;
 	    Col_tuples [pivcol [OUT]] = 0 ;
@@ -1146,7 +1146,7 @@ GLOBAL Int UMF_local_search
 	    /* the "in" row is the same as the "in" row for the "in" column */
 	    Woi = Fcols ;
 	    rdeg [OUT][IN] = rdeg [IN][IN] ;
-	    DEBUG4 (("Freebie in, row "ID"\n", pivrow [IN][IN])) ;
+	    DEBUG4 (("Freebie in, row " ID "\n", pivrow [IN][IN])) ;
 	}
 
 	if (freebie [OUT])
@@ -1154,7 +1154,7 @@ GLOBAL Int UMF_local_search
 	    /* the "out" row is the same as the "out" row for the "in" column */
 	    Woo = Wio ;
 	    rdeg [OUT][OUT] = rdeg [IN][OUT] ;
-	    DEBUG4 (("Freebie out, row "ID"\n", pivrow [IN][OUT])) ;
+	    DEBUG4 (("Freebie out, row " ID "\n", pivrow [IN][OUT])) ;
 	}
 
 	/* ------------------------------------------------------------------ */
@@ -1254,31 +1254,31 @@ GLOBAL Int UMF_local_search
 		thiscost += extra_zeros ;
 
 		DEBUG2 (("Evaluating option OUT-IN:\n")) ;
-		DEBUG2 ((" Work->fnzeros "ID" fnpiv "ID" nr_out "ID" nc "ID"\n",
+		DEBUG2 ((" Work->fnzeros " ID " fnpiv " ID " nr_out " ID " nc " ID "\n",
 		Work->fnzeros, fnpiv, nr_out, nc)) ;
-		DEBUG2 (("fncols "ID" fnrows "ID"\n", fncols, fnrows)) ;
+		DEBUG2 (("fncols " ID " fnrows " ID "\n", fncols, fnrows)) ;
 
 		/* determine if BLAS-3 update to be applied before extending. */
 		/* update if too many zero entries accumulate in the LU block */
 		fnzeros = Work->fnzeros + fnpiv * (nr_out + nc) ;
 
-		DEBUG2 (("fnzeros "ID"\n", fnzeros)) ;
+		DEBUG2 (("fnzeros " ID "\n", fnzeros)) ;
 
 		new_LUsize = (fnpiv+1) * (fnrows + nr_out + fncols + nc) ;
 
-		DEBUG2 (("new_LUsize "ID"\n", new_LUsize)) ;
+		DEBUG2 (("new_LUsize " ID "\n", new_LUsize)) ;
 
 		/* RELAX3 parameter uses a double relop, ignore NaN case: */
 		do_update = fnpiv > 0 &&
 		    (((double) fnzeros) / ((double) new_LUsize)) > RELAX3 ;
-		DEBUG2 (("do_update "ID"\n", do_update))
+		DEBUG2 (("do_update " ID "\n", do_update))
 	    }
 	    else
 	    {
 		/* the current front would not be extended */
 		do_update = fnpiv > 0 ;
 		fnzeros = 0 ;
-		DEBUG2 (("OUT-IN do_update forced true: "ID"\n", do_update)) ;
+		DEBUG2 (("OUT-IN do_update forced true: " ID "\n", do_update)) ;
 
 		/* The new front would be just big enough to hold the new
 		 * pivot row and column. */
@@ -1286,7 +1286,7 @@ GLOBAL Int UMF_local_search
 		fncols_new [OUT][IN] = rdeg [OUT][IN] - 1 ;
 	    }
 
-	    DEBUG2 (("option OUT IN : nr "ID" nc "ID" cost "ID"("ID") relax "ID
+	    DEBUG2 (("option OUT IN : nr " ID " nc " ID " cost " ID "(" ID ") relax " ID
 		"\n", nr_out, nc, thiscost, extra_zeros, do_extend)) ;
 
 	    if (bestcost == EMPTY || thiscost < bestcost)
@@ -1440,31 +1440,31 @@ GLOBAL Int UMF_local_search
 		thiscost += extra_zeros ;
 
 		DEBUG2 (("Evaluating option OUT-OUT:\n")) ;
-		DEBUG2 (("Work->fnzeros "ID" fnpiv "ID" nr_out "ID" nc "ID"\n",
+		DEBUG2 (("Work->fnzeros " ID " fnpiv " ID " nr_out " ID " nc " ID "\n",
 		    Work->fnzeros, fnpiv, nr_out, nc)) ;
-		DEBUG2 (("fncols "ID" fnrows "ID"\n", fncols, fnrows)) ;
+		DEBUG2 (("fncols " ID " fnrows " ID "\n", fncols, fnrows)) ;
 
 		/* determine if BLAS-3 update to be applied before extending. */
 		/* update if too many zero entries accumulate in the LU block */
 		fnzeros = Work->fnzeros + fnpiv * (nr_out + nc) ;
 
-		DEBUG2 (("fnzeros "ID"\n", fnzeros)) ;
+		DEBUG2 (("fnzeros " ID "\n", fnzeros)) ;
 
 		new_LUsize = (fnpiv+1) * (fnrows + nr_out + fncols + nc) ;
 
-		DEBUG2 (("new_LUsize "ID"\n", new_LUsize)) ;
+		DEBUG2 (("new_LUsize " ID "\n", new_LUsize)) ;
 
 		/* RELAX3 parameter uses a double relop, ignore NaN case: */
 		do_update = fnpiv > 0 &&
 		    (((double) fnzeros) / ((double) new_LUsize)) > RELAX3 ;
-		DEBUG2 (("do_update "ID"\n", do_update))
+		DEBUG2 (("do_update " ID "\n", do_update))
 	    }
 	    else
 	    {
 		/* the current front would not be extended */
 		do_update = fnpiv > 0 ;
 		fnzeros = 0 ;
-		DEBUG2 (("OUT-OUT do_update forced true: "ID"\n", do_update)) ;
+		DEBUG2 (("OUT-OUT do_update forced true: " ID "\n", do_update)) ;
 
 		/* The new front would be just big enough to hold the new
 		 * pivot row and column. */
@@ -1472,7 +1472,7 @@ GLOBAL Int UMF_local_search
 		fncols_new [OUT][OUT] = rdeg [OUT][OUT] - 1 ;
 	    }
 
-	    DEBUG2 (("option OUT OUT: nr "ID" nc "ID" cost "ID"\n",
+	    DEBUG2 (("option OUT OUT: nr " ID " nc " ID " cost " ID "\n",
 		rdeg [OUT][OUT], cdeg_out, thiscost)) ;
 
 	    if (bestcost == EMPTY || thiscost < bestcost)
@@ -1490,7 +1490,7 @@ GLOBAL Int UMF_local_search
     /* At this point, a structural pivot has been found. */
     /* It may be numerically zero, however. */
     ASSERT (Work->pivot_case != EMPTY) ;
-    DEBUG2 (("local search, best option "ID", best cost "ID"\n",
+    DEBUG2 (("local search, best option " ID ", best cost " ID "\n",
 	Work->pivot_case, bestcost)) ;
 
     /* ====================================================================== */
@@ -1598,9 +1598,9 @@ GLOBAL Int UMF_local_search
     /* ---------------------------------------------------------------------- */
 
     DEBUG1 (("Check frontal growth:\n")) ;
-    DEBUG1 (("fnrows_new "ID" + 1 = "ID",  fnr_curr "ID"\n",
+    DEBUG1 (("fnrows_new " ID " + 1 = " ID ",  fnr_curr " ID "\n",
 	    Work->fnrows_new, Work->fnrows_new + 1, fnr_curr)) ;
-    DEBUG1 (("fncols_new "ID" + 1 = "ID",  fnc_curr "ID"\n",
+    DEBUG1 (("fncols_new " ID " + 1 = " ID ",  fnc_curr " ID "\n",
 	    Work->fncols_new, Work->fncols_new + 1, fnc_curr)) ;
 
     Work->do_grow = (Work->fnrows_new + 1 > fnr_curr
@@ -1660,11 +1660,11 @@ GLOBAL Int UMF_local_search
 
 
 #ifndef NDEBUG
-    DEBUG2 (("\n\nSEARCH DONE: Pivot col "ID" in: ("ID") pivot row "ID" in: ("ID
-	") extend: "ID"\n\n", Work->pivcol, Work->pivcol_in_front,
+    DEBUG2 (("\n\nSEARCH DONE: Pivot col " ID " in: (" ID ") pivot row " ID " in: (" ID
+	") extend: " ID "\n\n", Work->pivcol, Work->pivcol_in_front,
 	Work->pivrow, Work->pivrow_in_front, Work->do_extend)) ;
     UMF_dump_rowcol (1, Numeric, Work, Work->pivcol, !Symbolic->fixQ) ;
-    DEBUG2 (("Pivot col "ID": fnrows "ID" ccdeg "ID"\n", Work->pivcol, fnrows,
+    DEBUG2 (("Pivot col " ID ": fnrows " ID " ccdeg " ID "\n", Work->pivcol, fnrows,
 	Work->ccdeg)) ;
     if (Work->pivcol_in_front)	/* case c1 */
     {
@@ -1673,7 +1673,7 @@ GLOBAL Int UMF_local_search
 	for (i = 0 ; i < fnrows ; i++)
 	{
 	    row = Frows [i] ;
-	    DEBUG3 ((ID":   row:: "ID" in front ", i, row)) ;
+	    DEBUG3 ((ID ":   row:: " ID " in front ", i, row)) ;
 	    ASSERT (row >= 0 && row < n_row && NON_PIVOTAL_ROW (row)) ;
 	    ASSERT (Frpos [row] == i) ;
 	    EDEBUG3 (Wy [i]) ;
@@ -1689,7 +1689,7 @@ GLOBAL Int UMF_local_search
 	for (i = fnrows ; i < fnrows + Work->ccdeg ; i++)
 	{
 	    row = Frows [i] ;
-	    DEBUG3 ((ID":   row:: "ID" (new)", i, row)) ;
+	    DEBUG3 ((ID ":   row:: " ID " (new)", i, row)) ;
 	    ASSERT (row >= 0 && row < n_row && NON_PIVOTAL_ROW (row)) ;
 	    ASSERT (Frpos [row] == i) ;
 	    EDEBUG3 (Wy [i]) ;
@@ -1711,7 +1711,7 @@ GLOBAL Int UMF_local_search
 	    for (i = 0 ; i < fnrows ; i++)
 	    {
 		row = Frows [i] ;
-		DEBUG3 ((ID":   row:: "ID" in front ", i, row)) ;
+		DEBUG3 ((ID ":   row:: " ID " in front ", i, row)) ;
 		ASSERT (row >= 0 && row < n_row && NON_PIVOTAL_ROW (row)) ;
 		ASSERT (Frpos [row] == i) ;
 		if (row == Work->pivrow)
@@ -1728,7 +1728,7 @@ GLOBAL Int UMF_local_search
 	    {
 		row = Wm [i] ;
 		ASSERT (row >= 0 && row < n_row && NON_PIVOTAL_ROW (row)) ;
-		DEBUG3 ((ID":   row:: "ID" ", i, row)) ;
+		DEBUG3 ((ID ":   row:: " ID " ", i, row)) ;
 		EDEBUG3 (Wx [i]) ;
 		if (Frpos [row] < 0)
 		{
@@ -1754,7 +1754,7 @@ GLOBAL Int UMF_local_search
 	    {
 		row = Wm [i] ;
 		ASSERT (row >= 0 && row < n_row && NON_PIVOTAL_ROW (row)) ;
-		DEBUG3 ((ID":   row:: "ID" ", i, row)) ;
+		DEBUG3 ((ID ":   row:: " ID " ", i, row)) ;
 		EDEBUG3 (Wx [i]) ;
 		DEBUG3 ((" (new) ")) ;
 		if (row == Work->pivrow)
@@ -1814,14 +1814,14 @@ GLOBAL Int UMF_local_search
 
 #ifndef NDEBUG
     UMF_dump_rowcol (0, Numeric, Work, Work->pivrow, TRUE) ;
-    DEBUG2 (("Pivot row "ID":\n", Work->pivrow)) ;
+    DEBUG2 (("Pivot row " ID ":\n", Work->pivrow)) ;
     if (Work->pivrow_in_front)
     {
 	Int found = FALSE ;
 	for (i = 0 ; i < fncols ; i++)
 	{
 	    col = Fcols [i] ;
-	    DEBUG3 (("   col:: "ID" in front\n", col)) ;
+	    DEBUG3 (("   col:: " ID " in front\n", col)) ;
 	    ASSERT (col >= 0 && col < n_col && NON_PIVOTAL_COL (col)) ;
 	    ASSERT (Fcpos [col] == i * fnr_curr) ;
 	    if (col == Work->pivcol) found = TRUE ;
@@ -1835,7 +1835,7 @@ GLOBAL Int UMF_local_search
 	    ASSERT (col >= 0 && col < n_col && NON_PIVOTAL_COL (col)) ;
 	    ASSERT (Fcpos [col] < 0) ;
 	    if (col == Work->pivcol) found = TRUE ;
-	    else DEBUG3 (("   col:: "ID" (new)\n", col)) ;
+	    else DEBUG3 (("   col:: " ID " (new)\n", col)) ;
 	}
 	ASSERT (found == !Work->pivcol_in_front) ;
     }
@@ -1847,7 +1847,7 @@ GLOBAL Int UMF_local_search
 	    for (i = 0 ; i < fncols ; i++)
 	    {
 		col = Fcols [i] ;
-		DEBUG3 (("   col:: "ID" in front\n", col)) ;
+		DEBUG3 (("   col:: " ID " in front\n", col)) ;
 		ASSERT (col >= 0 && col < n_col && NON_PIVOTAL_COL (col)) ;
 		ASSERT (Fcpos [col] == i * fnr_curr) ;
 		if (col == Work->pivcol) found = TRUE ;
@@ -1860,7 +1860,7 @@ GLOBAL Int UMF_local_search
 		ASSERT (col >= 0 && col < n_col && NON_PIVOTAL_COL (col)) ;
 		if (Fcpos [col] >= 0) continue ;
 		if (col == Work->pivcol) found = TRUE ;
-		else DEBUG3 (("   col:: "ID" (new, extend)\n", col)) ;
+		else DEBUG3 (("   col:: " ID " (new, extend)\n", col)) ;
 	    }
 	    ASSERT (found == !Work->pivcol_in_front) ;
 	}
@@ -1872,7 +1872,7 @@ GLOBAL Int UMF_local_search
 		col = Work->Wrow [i] ;
 		ASSERT (col >= 0 && col < n_col && NON_PIVOTAL_COL (col)) ;
 		if (col == Work->pivcol) found = TRUE ;
-		else DEBUG3 (("   col:: "ID" (all new)\n", col)) ;
+		else DEBUG3 (("   col:: " ID " (all new)\n", col)) ;
 	    }
 	    ASSERT (found) ;
 	}
@@ -1896,11 +1896,11 @@ GLOBAL Int UMF_local_search
 
     /* ---------------------------------------------------------------------- */
 
-    DEBUG2 (("LOCAL SEARCH DONE: pivot column "ID" pivot row: "ID"\n",
+    DEBUG2 (("LOCAL SEARCH DONE: pivot column " ID " pivot row: " ID "\n",
 	Work->pivcol, Work->pivrow)) ;
-    DEBUG2 (("do_extend: "ID"\n", Work->do_extend)) ;
-    DEBUG2 (("do_update: "ID"\n", Work->do_update)) ;
-    DEBUG2 (("do_grow:   "ID"\n", Work->do_grow)) ;
+    DEBUG2 (("do_extend: " ID "\n", Work->do_extend)) ;
+    DEBUG2 (("do_update: " ID "\n", Work->do_update)) ;
+    DEBUG2 (("do_grow:   " ID "\n", Work->do_grow)) ;
 
     /* ---------------------------------------------------------------------- */
     /* keep track of the diagonal */

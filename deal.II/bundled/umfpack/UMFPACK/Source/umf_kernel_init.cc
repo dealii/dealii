@@ -57,7 +57,7 @@ PRIVATE Int packsp	/* returns new value of pnew */
     len = *p_len ;
     Bi = (Int   *) (Memory + p) ; p += UNITS (Int,   len) ;
     Bx = (Entry *) (Memory + p) ; p += UNITS (Entry, len) ;
-    DEBUGm4 (("  p "ID" len "ID" pnew "ID"\n", p, len, pnew)) ;
+    DEBUGm4 (("  p " ID " len " ID " pnew " ID "\n", p, len, pnew)) ;
 
     /* the vector resides in Bi [0..len-1] and Bx [0..len-1] */
 
@@ -67,7 +67,7 @@ PRIVATE Int packsp	/* returns new value of pnew */
     {
 	i = Bi [p] ;
 	x = Bx [p] ;
-	DEBUGm4 (("    old vector: i "ID" value: ", i)) ;
+	DEBUGm4 (("    old vector: i " ID " value: ", i)) ;
 	EDEBUGk (-4, x) ;
 	DEBUGm4 (("\n")) ;
 	ASSERT (i >= 0) ;
@@ -93,7 +93,7 @@ PRIVATE Int packsp	/* returns new value of pnew */
 #ifndef NDEBUG
     for (p = 0 ; p < len_new ; p++)
     {
-	DEBUGm4 (("    new vector: i "ID" value: ", Bi [p])) ;
+	DEBUGm4 (("    new vector: i " ID " value: ", Bi [p])) ;
 	EDEBUGk (-4, Bx [p]) ;
 	DEBUGm4 (("\n")) ;
 	ASSERT (Bi [p] >= 0) ;
@@ -105,7 +105,7 @@ PRIVATE Int packsp	/* returns new value of pnew */
     *p_len = len_new ;
     Bi2 = (Int   *) (Memory + pnew) ; pnew += UNITS (Int,   len_new) ;
     Bx2 = (Entry *) (Memory + pnew) ; pnew += UNITS (Entry, len_new) ;
-    DEBUGm4 (("  pnew "ID" len_new "ID"\n", pnew, len_new)) ;
+    DEBUGm4 (("  pnew " ID " len_new " ID "\n", pnew, len_new)) ;
 
     /* shift the vector upwards, into its new space */
     for (p = 0 ; p < len_new ; p++)
@@ -120,7 +120,7 @@ PRIVATE Int packsp	/* returns new value of pnew */
 #ifndef NDEBUG
     for (p = 0 ; p < len_new ; p++)
     {
-	DEBUGm4 (("    packed vec: i "ID" value: ", Bi2 [p])) ;
+	DEBUGm4 (("    packed vec: i " ID " value: ", Bi2 [p])) ;
 	EDEBUGk (-4, Bx2 [p]) ;
 	DEBUGm4 (("\n")) ;
 	ASSERT (Bi2 [p] >= 0) ;
@@ -194,7 +194,7 @@ GLOBAL Int UMF_kernel_init
     Rdeg = Symbolic->Rdeg ;
     n1 = Symbolic->n1 ;
     dense_row_threshold = Symbolic->dense_row_threshold ;
-    DEBUG0 (("Singletons: "ID"\n", n1)) ;
+    DEBUG0 (("Singletons: " ID "\n", n1)) ;
     Work->nforced = 0 ;
     Work->ndiscard = 0 ;
     Work->noff_diagonal = 0 ;
@@ -215,7 +215,7 @@ GLOBAL Int UMF_kernel_init
     /* ---------------------------------------------------------------------- */
 
     UMF_mem_init_memoryspace (Numeric) ;
-    DEBUG1 (("Kernel init head usage, before allocs: "ID"\n", Numeric->ihead)) ;
+    DEBUG1 (("Kernel init head usage, before allocs: " ID "\n", Numeric->ihead)) ;
 
     /* ---------------------------------------------------------------------- */
     /* initialize the Work and Numeric objects */
@@ -402,7 +402,7 @@ GLOBAL Int UMF_kernel_init
 			Rs [row] += value ;
 		    }
 		}
-		DEBUG4 (("i "ID" j "ID" value %g,  Rs[i]: %g\n",
+		DEBUG4 (("i " ID " j " ID " value %g,  Rs[i]: %g\n",
 		    row, col, value, Rs[row])) ;
 		ilast = row ;
 	    }
@@ -424,7 +424,7 @@ GLOBAL Int UMF_kernel_init
 	    DEBUG2 (("sum %30.20e ", Rs [row])) ;
 	    rsmin = MIN (rsmin, Rs [row]) ;
 	    rsmax = MAX (rsmax, Rs [row]) ;
-	    DEBUG2 (("Rs["ID"] = %30.20e\n", row, Rs [row])) ;
+	    DEBUG2 (("Rs[" ID "] = %30.20e\n", row, Rs [row])) ;
 	}
 #ifndef NRECIPROCAL
 	/* multiply by the reciprocal if Rs is not too small */
@@ -523,15 +523,15 @@ GLOBAL Int UMF_kernel_init
 	lnz = Cdeg [k] - 1 ;
 	unz = Rdeg [k] - 1 ;
 
-	DEBUG1 (("Singleton k "ID" pivrow "ID" pivcol "ID" cdeg "ID" rdeg "
-	    ID"\n", k, Rperm_init [k], Cperm_init [k], Cdeg [k], Rdeg [k])) ;
+	DEBUG1 (("Singleton k " ID " pivrow " ID " pivcol " ID " cdeg " ID " rdeg "
+	    ID "\n", k, Rperm_init [k], Cperm_init [k], Cdeg [k], Rdeg [k])) ;
 	ASSERT (unz >= 0 && lnz >= 0 && (lnz == 0 || unz == 0)) ;
-	DEBUG1 (("   lnz "ID" unz "ID"\n", lnz, unz)) ;
+	DEBUG1 (("   lnz " ID " unz " ID "\n", lnz, unz)) ;
 
 	size = UNITS (Int, lnz) + UNITS (Entry, lnz)
 	     + UNITS (Int, unz) + UNITS (Entry, unz) ;
 	p = UMF_mem_alloc_head_block (Numeric, size) ;
-	DEBUG1 (("Kernel init head usage: "ID"\n", Numeric->ihead)) ;
+	DEBUG1 (("Kernel init head usage: " ID "\n", Numeric->ihead)) ;
 	if (!p)
 	{
 	    /* :: pattern change (out of memory for singletons) :: */
@@ -603,17 +603,17 @@ GLOBAL Int UMF_kernel_init
 		return (FALSE) ;	/* pattern has changed */
 	    }
 	    Cols [0] = k ;
-	    DEBUG0 (("Got column element e "ID" esize "ID"\n", e, esize)) ;
+	    DEBUG0 (("Got column element e " ID " esize " ID "\n", e, esize)) ;
 	}
 	else
 	{
 	    /* all rows in this column are dense, or empty */
 	    E [e] = 0 ;
 	    empty_elements = TRUE  ;
-	    DEBUG0 (("column element e is empty "ID"\n", e)) ;
+	    DEBUG0 (("column element e is empty " ID "\n", e)) ;
 	}
     }
-    DEBUG0 (("e "ID" n_col "ID" nempty_col "ID" n1 "ID"\n", e, n_col,
+    DEBUG0 (("e " ID " n_col " ID " nempty_col " ID " n1 " ID "\n", e, n_col,
 		nempty_col, n1)) ;
     ASSERT (e == n_col - nempty_col - n1) ;
 
@@ -642,7 +642,7 @@ GLOBAL Int UMF_kernel_init
 		Rpi [k] = Cols ;
 		Rpx [k] = C ;
 		Wp [k] = rdeg ;
-		DEBUG0 (("Got row element e "ID" rdeg "ID"\n", e, rdeg)) ;
+		DEBUG0 (("Got row element e " ID " rdeg " ID "\n", e, rdeg)) ;
 	    }
 	}
     }
@@ -698,7 +698,7 @@ GLOBAL Int UMF_kernel_init
 	    else if (newrow < k)
 	    {
 		/* this entry goes in a row of U */
-		DEBUG1 (("Singleton row of U: k "ID" newrow "ID"\n",
+		DEBUG1 (("Singleton row of U: k " ID " newrow " ID "\n",
 		    k, newrow)) ;
 		if (--(Wp [newrow]) < 0)
 		{
@@ -712,7 +712,7 @@ GLOBAL Int UMF_kernel_init
 	    else
 	    {
 		/* this entry goes in a column of L */
-		DEBUG1 (("Singleton col of L: k "ID" newrow "ID"\n",
+		DEBUG1 (("Singleton col of L: k " ID " newrow " ID "\n",
 		    k, newrow)) ;
 		if (llen >= lilen)
 		{
@@ -816,7 +816,7 @@ GLOBAL Int UMF_kernel_init
 	    if (newrow < n1 || rdeg > dense_row_threshold)
 	    {
 		/* this entry goes in a row of U or into a dense row */
-		DEBUG1 (("Singleton/dense row of U: k "ID" newrow "ID"\n",
+		DEBUG1 (("Singleton/dense row of U: k " ID " newrow " ID "\n",
 		    k, newrow)) ;
 		if (--(Wp [newrow]) < 0)
 		{
@@ -829,7 +829,7 @@ GLOBAL Int UMF_kernel_init
 	    else
 	    {
 		/* this entry goes in an initial element */
-		DEBUG1 (("In element k "ID" e "ID" newrow "ID"\n",
+		DEBUG1 (("In element k " ID " e " ID " newrow " ID "\n",
 		    k, e, newrow)) ;
 		if (clen >= esize)
 		{
@@ -844,8 +844,8 @@ GLOBAL Int UMF_kernel_init
 #ifndef NDEBUG
 		if (Diagonal_map && (newrow == Diagonal_map [k]))
 		{
-		    DEBUG0 (("Diagonal: old: row "ID" col "ID" : "
-			"new: row "ID" col "ID" : ",
+		    DEBUG0 (("Diagonal: old: row " ID " col " ID " : "
+			"new: row " ID " col " ID " : ",
 			oldrow, oldcol, newrow, k)) ;
 		    EDEBUGk (0, x) ;
 		}
@@ -878,10 +878,10 @@ GLOBAL Int UMF_kernel_init
 	ASSERT (pnew == 1) ;
 	for (k = 0 ; k < n1 ; k++)
 	{
-	    DEBUGm4 (("\nPrune singleton L col "ID"\n", k)) ;
+	    DEBUGm4 (("\nPrune singleton L col " ID "\n", k)) ;
 	    pnew = packsp (pnew, &Lip [k], &Lilen [k], drop, droptol, Memory) ;
 	    Numeric->lnz += Lilen [k] ;
-	    DEBUGm4 (("\nPrune singleton U row "ID"\n", k)) ;
+	    DEBUGm4 (("\nPrune singleton U row " ID "\n", k)) ;
 	    pnew = packsp (pnew, &Uip [k], &Uilen [k], drop, droptol, Memory) ;
 	    Numeric->unz += Uilen [k] ;
 	}
@@ -905,7 +905,7 @@ GLOBAL Int UMF_kernel_init
 
     for (k = n1 ; k < n_row ; k++)
     {
-	DEBUG1 (("Initial row degree k "ID" oldrow "ID" Rdeg "ID"\n",
+	DEBUG1 (("Initial row degree k " ID " oldrow " ID " Rdeg " ID "\n",
 	    k, Rperm_init [k], Rdeg [k])) ;
 	rdeg = Rdeg [k] ;
 	Row_degree [k] = rdeg ;
@@ -941,7 +941,7 @@ GLOBAL Int UMF_kernel_init
 		ASSIGN (aij, Ax, Az, p, split) ;
 		if (newrow == Diagonal_map [newcol])
 		{
-		    DEBUG0 (("old row "ID" col "ID" new row "ID" col "ID,
+		    DEBUG0 (("old row " ID " col " ID " new row " ID " col " ID,
 			oldrow, oldcol, newrow, newcol)) ;
 		    EDEBUGk (0, aij) ;
 		    DEBUG0 ((" scaled ")) ;
@@ -989,7 +989,7 @@ GLOBAL Int UMF_kernel_init
     }
 
 #ifndef NDEBUG
-    DEBUG0 (("Number of initial elements: "ID"\n", Work->nel)) ;
+    DEBUG0 (("Number of initial elements: " ID "\n", Work->nel)) ;
     for (e = 0 ; e <= Work->nel ; e++) UMF_dump_element (Numeric, Work,e,TRUE) ;
 #endif
 
@@ -1010,7 +1010,7 @@ GLOBAL Int UMF_kernel_init
 	Wp [i] = EMPTY ;
     }
 
-    DEBUG1 (("Kernel init head usage: "ID"\n", Numeric->ihead)) ;
+    DEBUG1 (("Kernel init head usage: " ID "\n", Numeric->ihead)) ;
 
     /* ---------------------------------------------------------------------- */
     /* build the tuple lists */

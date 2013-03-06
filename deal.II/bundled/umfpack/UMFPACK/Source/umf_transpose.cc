@@ -72,7 +72,7 @@ GLOBAL Int UMF_transpose
     Int nz ;
     ASSERT (n_col >= 0) ;
     nz = (Ap != (Int *) NULL) ? Ap [n_col] : 0 ;
-    DEBUG2 (("UMF_transpose: "ID"-by-"ID" nz "ID"\n", n_row, n_col, nz)) ;
+    DEBUG2 (("UMF_transpose: " ID "-by-" ID " nz " ID "\n", n_row, n_col, nz)) ;
 #endif
 
     if (check)
@@ -384,7 +384,7 @@ GLOBAL Int UMF_transpose
 	{
 	    i = k ;
 	}
-	DEBUG3 ((ID":  W[i] "ID" Rp[k+1] "ID"\n", i, W [i], Rp [k+1])) ;
+	DEBUG3 ((ID ":  W[i] " ID " Rp[k+1] " ID "\n", i, W [i], Rp [k+1])) ;
 	ASSERT (W [i] == Rp [k+1]) ;
     }
     DEBUG2 (("UMF_transpose, output matrix:\n")) ;

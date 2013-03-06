@@ -25,7 +25,7 @@ GLOBAL void *UMF_free
     void *p
 )
 {
-    DEBUG0 (("UMF_free: "ID"\n", (Int) p)) ;
+    DEBUG0 (("UMF_free: " ID "\n", (Int) p)) ;
     if (p)
     {
 
@@ -36,7 +36,7 @@ GLOBAL void *UMF_free
 	/* One more object has been free'd.  Keep track of the count. */
 	/* (purely for sanity checks). */
 	UMF_malloc_count-- ;
-	DEBUG0 (("     new malloc count: "ID"\n", UMF_malloc_count)) ;
+	DEBUG0 (("     new malloc count: " ID "\n", UMF_malloc_count)) ;
 #endif
 
     }
