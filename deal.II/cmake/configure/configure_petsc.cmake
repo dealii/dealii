@@ -52,7 +52,7 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     IF( (PETSC_WITH_MPIUNI AND DEAL_II_WITH_MPI)
          OR
          (NOT PETSC_WITH_MPIUNI AND NOT DEAL_II_WITH_MPI))
-      MESSAGE(STATUS "Could not find a sufficient modern PETSc installation: "
+      MESSAGE(STATUS "Could not find a sufficient PETSc installation: "
         "PETSc has to be configured with the same MPI configuration as deal.II."
         )
       SET(PETSC_ADDITIONAL_ERROR_STRING
