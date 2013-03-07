@@ -645,7 +645,7 @@ namespace MeshWorker
     inline void
     MatrixSimple<MATRIX>::initialize_info(DOFINFO &info, bool face) const
     {
-      const unsigned int n = dof_info.indices_by_block.size();
+      const unsigned int n = info.indices_by_block.size();
 
       if (n == 0)
         info.initialize_matrices(1, face);
