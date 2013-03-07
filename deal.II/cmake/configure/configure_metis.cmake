@@ -24,9 +24,13 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
       SET(${var} TRUE)
     ELSE()
       MESSAGE(WARNING "\n"
-        "Could not find a sufficient modern metis installation: "
-        "Version 5.x required!\n\n"
         )
+      SET(METIS_ADDITIONAL_WARNING_STRING
+        "Could not find a sufficient modern metis installation: "
+        "Version 5.x required!\n"
+        )
+      MESSAGE(WARNING "\n" ${METIS_ADDITIONAL_WARNING_STRING} "\n")
+
       UNSET(METIS_LIBRARY CACHE)
       UNSET(METIS_INCLUDE_DIR CACHE)
       UNSET(METIS_DIR CACHE)

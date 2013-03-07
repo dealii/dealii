@@ -113,7 +113,8 @@ ${_feature_lowercase} by setting DEAL_II_ALLOW_BUNDLED=on or\nDEAL_II_FORCE_BUND
 
   MESSAGE(FATAL_ERROR "\n"
     "Could not find the ${_feature_lowercase} library!\n"
-    "Please ensure that the ${_feature_lowercase} library is installed on your computer.\n"
+    ${${_feature}_ADDITIONAL_WARNING_STRING}
+    "Please ensure that a suitable ${_feature_lowercase} library is installed on your computer.\n"
     "If the library is not at a default location, either provide some hints\n"
     "for autodetection,${_hint_snippet}${_bundled_snippet}"
     )

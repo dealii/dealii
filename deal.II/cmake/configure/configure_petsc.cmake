@@ -31,10 +31,11 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     # We support petsc from version 3.x.x onwards
     #
     IF(PETSC_VERSION_MAJOR LESS 3)
-      MESSAGE(WARNING "\n"
+      SET(PETSC_ADDITIONAL_WARNING_STRING
         "Could not find a sufficient modern petsc installation: "
-        "Version >=3.0.0 required!\n\n"
+        "Version >=3.0.0 required!\n"
         )
+      MESSAGE(WARNING "\n" ${PETSC_ADDITIONAL_WARNING_STRING} "\n")
       SET(${var} FALSE)
     ENDIF()
 
@@ -49,10 +50,14 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     IF( (PETSC_WITH_MPIUNI AND DEAL_II_WITH_MPI)
          OR
          (NOT PETSC_WITH_MPIUNI AND NOT DEAL_II_WITH_MPI))
-      MESSAGE(WARNING "\n"
-        "Could not find a sufficient petsc installation: "
-        "Petsc has to be configured with the same MPI configuration as deal.II.\n\n"
+      SET(PETSC_ADDITIONAL_WARNING_STRING
+        ${PETSC_ADDITIONAL_WARNING_STRING}
+        "Could not find a sufficient PETSc installation:\n"
+        "PETSc has to be configured with the same MPI configuration as deal.II, but found:\n"
+        "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
+        "  PETSC_WITH_MPI   = (NOT ${PETSC_WITH_MPIUNI})\n"
         )
+      MESSAGE(WARNING "\n" ${PETSC_ADDITIONAL_WARNING_STRING} "\n")
       SET(${var} FALSE)
     ENDIF()
 
@@ -97,7 +102,8 @@ ENDMACRO()
 MACRO(FEATURE_PETSC_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find the petsc library!\n"
-    "Please ensure that the petsc library version 3.0.0 or newer is installed on your computer.\n"
+    ${PETSC_ADDITIONAL_WARNING_STRING}
+    "\nPlease ensure that the petsc library version 3.0.0 or newer is installed on your computer.\n"
     "Furthermore PETSc has to be configured with the same mpi options as deal.II.\n"
     "If the library is not at a default location, either provide some hints\n"
     "for the autodetection:\n"

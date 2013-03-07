@@ -48,7 +48,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDFOREACH()
 
     IF(NOT ${var})
-      SET(TRILINOS_ADDITIONAL_INFORMATION
+      SET(TRILINOS_ADDITIONAL_WARNING_STRING
         "The Trilinos installation found at\n"
         "  ${TRILINOS_DIR}\n"
         "is missing one or more modules necessary for the deal.II Trilinos interfaces:\n"
@@ -56,7 +56,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         "Please re-install Trilinos with the missing Trilinos subpackages
         enabled.\n\n"
         )
-      MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_INFORMATION} "\n")
+      MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_WARNING_STRING} "\n")
     ENDIF()
 
     #
@@ -75,15 +75,15 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         TRILINOS_VERSION_MINOR EQUAL 8 AND
         TRILINOS_VERSION_SUBMINOR LESS 2))
 
-      SET(TRILINOS_ADDITIONAL_INFORMATION
-        ${TRILINOS_ADDITIONAL_INFORMATION}
+      SET(TRILINOS_ADDITIONAL_WARNING_STRING
+        ${TRILINOS_ADDITIONAL_WARNING_STRING}
         "The Trilinos installation found at\n"
         "  ${TRILINOS_DIR}\n"
         "with version ${TRILINOS_VERSION_MAJOR}.${TRILINOS_VERSION_MINOR}.${TRILINOS_VERSION_SUBMINOR} has bugs that make\n"
         "it incompatible with deal.II. Please use versions before 10.6 or after\n"
         "10.8.1.\n\n"
         )
-      MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_INFORMATION} "\n")
+      MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_WARNING_STRING} "\n")
       SET(${var} FALSE)
     ENDIF()
 
@@ -94,15 +94,15 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     IF( (TRILINOS_WITH_MPI AND NOT DEAL_II_WITH_MPI)
          OR
          (NOT TRILINOS_WITH_MPI AND DEAL_II_WITH_MPI))
-      SET(TRILINOS_ADDITIONAL_INFORMATION
-        ${TRILINOS_ADDITIONAL_INFORMATION}
+      SET(TRILINOS_ADDITIONAL_WARNING_STRING
+        ${TRILINOS_ADDITIONAL_WARNING_STRING}
         "The Trilinos installation found at\n"
         "  ${TRILINOS_DIR}\n"
         "has to be configured with the same MPI configuration as deal.II, but found:\n"
         "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
         "  TRILINOS_WITH_MPI = ${TRILINOS_WITH_MPI}\n"
         )
-      MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_INFORMATION} "\n")
+      MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_WARNING_STRING} "\n")
       SET(${var} FALSE)
     ENDIF()
 
@@ -138,14 +138,14 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         LIST(APPEND DEAL_II_DEFINITIONS "HAS_C99_TR1_CMATH")
         LIST(APPEND DEAL_II_USER_DEFINITIONS "HAS_C99_TR1_CMATH")
       ELSE()
-        SET(TRILINOS_ADDITIONAL_INFORMATION
-          ${TRILINOS_ADDITIONAL_INFORMATION}
+        SET(TRILINOS_ADDITIONAL_WARNING_STRING
+          ${TRILINOS_ADDITIONAL_WARNING_STRING}
           "The Trilinos installation found at\n"
           "  ${TRILINOS_DIR}\n"
           "is not compatible with the C++ standard selected for\n"
           "this compiler. See the deal.II FAQ page for a solution.\n\n"
           )
-        MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_INFORMATION} "\n")
+        MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_WARNING_STRING} "\n")
         SET(${var} FALSE)
       ENDIF()
     ENDIF()
@@ -203,7 +203,7 @@ ENDMACRO()
 MACRO(FEATURE_TRILINOS_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find a suitable set of trilinos libraries!\n"
-    ${TRILINOS_ADDITIONAL_INFORMATION}
+    ${TRILINOS_ADDITIONAL_WARNING_STRING}
     "Please ensure that a suitable set of trilinos libraries are installed on your computer.\n"
     "If the libraries are not at a default location, either provide some hints\n"
     "for the autodetection:\n"
