@@ -47,6 +47,7 @@ INSTALL(FILES
 # Strip -Wno-deprecated from CMAKE_CXX_FLAGS so that deprecation warnings
 # are actually shown for user code:
 #
+STRIP_FLAG(CMAKE_CXX_FLAGS "-Wno-deprecated")
 STRIP_FLAG(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations")
 
 #
