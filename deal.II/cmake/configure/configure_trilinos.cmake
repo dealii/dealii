@@ -207,7 +207,7 @@ MACRO(FEATURE_TRILINOS_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find a suitable set of trilinos libraries!\n"
     ${TRILINOS_ADDITIONAL_INFORMATION}
-    "Please ensure that all necessary libraries are installed on your computer.\n"
+    "Please ensure that a suitable set of trilinos libraries are installed on your computer.\n"
     "If the libraries are not at a default location, either provide some hints\n"
     "for the autodetection:\n"
     "    $ TRILINOS_DIR=\"...\" cmake <...>\n"
