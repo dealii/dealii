@@ -58,7 +58,7 @@ Makefile.dep: $(HEADERS:%=$D/%)
 		echo `echo test-$$i | $(PERL) -pi -e 's/\.h/.cc/g; s/\//-/g;'` : $D/$$i ; \
 	 done > Makefile.dep
 
-include Makefile.dep
+-include Makefile.dep
 
 
 # here's what's to be done

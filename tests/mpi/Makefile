@@ -35,7 +35,7 @@ tests   = $(shell echo $(addsuffix /ncpu_*, $(basename $(tests_x_1))))
 
 OVERRIDE_OUTPUT_RULE = yes
 include ../Makefile.rules
-include Makefile.depend
+-include Makefile.depend
 
 
 Makefile.mpi.tests: Makefile $(shell echo *.cc) $(shell echo */*/cmp/generic)
@@ -50,7 +50,7 @@ Makefile.mpi.tests: Makefile $(shell echo *.cc) $(shell echo */*/cmp/generic)
 	 done) \
 		> $@
 
-include Makefile.mpi.tests
+-include Makefile.mpi.tests
 
 # override the rule from ../Makefile.rules by running things with
 # mpirun -np X

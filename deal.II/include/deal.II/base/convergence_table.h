@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -37,16 +37,16 @@ DEAL_II_NAMESPACE_OPEN
  * calling e.g.  <tt>add_value("n cells", n_cells)</tt>. The table data is
  * also added by calling add_value().  Before the output of the table the
  * functions evaluate_convergence_rates() and evaluate_all_convergence_rates()
- * may be called (even multiply).
+ * may be called.
  *
  * There are two possibilities of how to evaluate the convergence rates of multiple
  * columns in the same RateMode.
  * <ol>
  * <li> call evaluate_convergence_rates() for all wanted columns
  * <li> call omit_column_from_convergence_rate_evaluation() for all
- * NOT wanted columns and then
- * evaluate_all_convergence_rates() to evaluate the convergence rates of all columns
- * that are not signed to be omitted.
+ *      columns for which this evaluation is not desired and then
+ *      evaluate_all_convergence_rates() to evaluate the convergence rates of all columns
+ *      that have not been flagged for omission.
  * </ol>
  *
  * A detailed discussion of this class can also be found in the step-7 and

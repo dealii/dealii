@@ -57,7 +57,7 @@ Makefile.dep: $D/contrib/mesh_conversion/convert_mesh $(MESH_INPUTS)
 		echo `echo $$i | $(PERL) -pi -e 's/\.inp/.OK/g; s/\//-/g;'` : $D/$$i ; \
 	 done > Makefile.dep
 
-include Makefile.dep
+-include Makefile.dep
 
 
 # here's what's to be done

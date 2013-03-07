@@ -6,5 +6,5 @@
 include ../Makefile.paths
 include $D/common/Make.global_options
 include ../Makefile.rules
-include Makefile.depend
-include Makefile.tests
+-include Makefile.depend
+-include Makefile.tests
