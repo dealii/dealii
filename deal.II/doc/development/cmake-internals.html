@@ -1,0 +1,288 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>The deal.II Readme</title>
+    <link href="../screen.css" rel="StyleSheet">
+    <meta name="author" content="the deal.II authors <authors @ dealii.org>">
+    <meta name="copyright" content="Copyright (C) 2012 by the deal.II authors">
+    <meta name="date" content="$Date$">
+    <meta name="svn_id" content="$Id$">
+    <meta name="keywords" content="deal.II">
+  </head>
+
+  <body>
+
+
+    <h1>Details on the <acronym>deal.II</acronym> CMake build system</h1>
+
+    <p>
+      This page provides details about <acronym>deal.II</acronym> CMake build system.
+    </p>
+
+    <p>
+    <table class="tutorial" width="50%">
+      <tr><th colspan="2"><b><small>Table of contents</small></b></th></tr>
+      <tr><td valign="top">
+	  <ul>
+	    <li><a href="#dev">Developing the deal.II CMake system</a>
+	      <ul>
+		<li><a href="#devplatform">Writing platform checks</a>
+		<li><a href="#devfeature">Writing feature tests</a>
+	      </ul>
+	  </ul>
+	</td>
+      </tr>
+    </table>
+    </p>
+
+    <a name="dev"></a>
+    <h3> Developing the <acronym>deal.II</acronym> CMake system </h3>
+
+    <p>
+      To keep things clean, only the following variables should be
+      appended in the platform checks and feature configuration (beside
+      setting a lot of <code>DEAL_II_*</code> definitions...):
+      <ul>
+	<li>
+          The general (internal) logic for variables applies:
+	  <ul>
+            <li>A variable name without <code>_DEBUG</code> or
+              <code>_RELEASE</code>: Used for all targets
+            <li> <code>&lt;...&gt;_DEBUG</code>: <i>additionally</i> used for debug targets
+            <li> <code>&lt;...&gt;_RELEASE</code>: <i>additionally</i> used for release targets
+	  </ul>
+
+	<li>
+	  For internal use, for setting necessary linker flags for the deal.II library:
+	  <ul>
+            <li> <code>CMAKE_SHARED_LINKER_FLAGS</code>
+            <li> <code>DEAL_II_SHARED_LINKER_FLAGS_DEBUG</code>
+            <li> <code>DEAL_II_SHARED_LINKER_FLAGS_RELEASE</code>
+	  </ul>
+
+	<li>
+	  For internal use, for setting necessary compiler flags, e.g.
+          <code>-std=c++11</code> (if available):
+	  <ul>
+            <li> <code>CMAKE_CXX_FLAGS</code>
+            <li> <code>DEAL_II_CXX_FLAGS_DEBUG</code>
+            <li> <code>DEAL_II_CXX_FLAGS_RELEASE</code>
+	  </ul>
+
+	<li>
+	  For internal use, for setting necessary include dirs for the compilation of the
+          <acronym>deal.II</acronym> library:
+	  <ul>
+	    <li> <code>INCLUDE_DIRECTORIES(...)</code>
+	  </ul>
+
+	<li>
+	  For internal use, for setting necessary preprocessor definitions
+	  (<code>-D&lt;...&gt;</code>) for the compilation of the
+	  deal.II library:
+	  <ul>
+            <li> <code>DEAL_II_DEFINITIONS</code>
+            <li> <code>DEAL_II_DEFINITIONS_DEBUG</code>
+            <li> <code>DEAL_II_DEFINITIONS_RELEASE</code>
+	  </ul>
+
+	<li>
+	  For internal and external use, used to keep track of external
+	  libraries, the <acronym>deal.II</acronym> library and user
+	  programs have to be linked against:
+	  <ul>
+            <li> <code>DEAL_II_EXTERNAL_LIBRARIES</code>
+            <li> <code>DEAL_II_EXTERNAL_LIBRARIES_DEBUG</code>
+            <li> <code>DEAL_II_EXTERNAL_LIBRARIES_RELEASE</code>
+	  </ul>
+
+	<li>
+	  For external use, used to keep track of external preprocessor
+	  definitions, necessary for the compilation of user programs:
+	  <ul>
+            <li> <code>DEAL_II_USER_DEFINITIONS</code>
+            <li> <code>DEAL_II_USER_DEFINITIONS_DEBUG</code>
+            <li> <code>DEAL_II_USER_DEFINITIONS_RELEASE</code>
+	  </ul>
+
+	<li>
+          Used to keep track of external include dirs, necessary for the
+          compilation of user programs:
+	  <ul>
+            <li> <code>DEAL_II_USER_INCLUDE_DIRS</code>
+	  </ul>
+      </ul>
+    </p>
+
+
+    <a name="devplatform"></a>
+    <h4>  Writing platform checks </h4>
+
+    <p>
+      Platform checks reside under <code>cmake/checks</code>. We currently have
+      <pre>
+
+	cmake/check/check_for_compiler_bugs.cmake
+	cmake/check/check_for_compiler_features.cmake
+	cmake/check/check_for_cxx_features.cmake
+      </pre>
+    </p>
+    <p>
+      <b>Some Notes:</b>
+      <ul>
+	<li> There are a number of readily available platform check macros:
+	  <pre>
+
+    CHECK_CXX_SOURCE_COMPILES(source variable)
+      - Checks whether it is possible to compile _and_ link the code snipet
+        &lt;source&gt;. If succesful, variable is set to 1.
+
+    CHECK_CXX_SOURCE_RUNS(source variable)
+      - variable is set to 1 if &lt;source&gt; coulde be succesfully compiled and
+        linked and the resulting program ran and exited without error.
+
+    CHECK_CXX_COMPILER_BUG(source variable)
+      - Inverts the logic of CHECK_CXX_SOURCE_COMPILES(), i.e. variable is
+        set to 1 if it was not possible to compile and link &lt;source&gt;.
+
+    CHECK_INCLUDE_FILE_CXX(header variable)
+      - Check whether it is possible to compile and link a dummy program
+        including &lt;header&gt;.
+
+    CHECK_FUNCTION_EXISTS(function variable)
+      - Check for the existence of a function prototype with name
+        &lt;function&gt;. (Don't forget to specify the link libraries, see
+        below.)
+
+    CHECK_CXX_COMPILER_FLAG(flag variable)
+      - Sets the variable to 1 if the compiler understands the flag.
+	  </pre>
+
+	<li> Necessary compiler flags can easily set in the string variable
+	  <code>CMAKE_REQUIRED_FLAGS</code>. There are two small macros
+	  that do this job nicely:
+	  <pre>
+
+    PUSH_TEST_FLAG("-Werror")
+    CHECK_CXX_SOURCE_COMPILES(...)
+    POP_TEST_FLAG()
+	  </pre>
+
+	<li> Libraries necessary for linkage can be set in the list variable
+	  <code>CMAKE_REQUIRED_LIBRARIES</code>. It is best two hard set
+	  this variable to a specific value and later on cleaning it,
+	  instead of appending/removing:
+	  <pre>
+
+    SET(CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;
+    CHECK_CXX_SOURCE_COMPILES(...)
+    SET(CMAKE_REQUIRED_LIBRARIES)
+	  </pre>
+      </ul>
+    </p>
+
+    <p>
+      <b>General notes:</b>
+      <ul>
+	<li> A platform check should have a prominent comment explaining what
+	  it does and why it is there, as well as a stating the author and the
+	  year.
+
+        <li> Definition toggles in
+          <code>include/deal.II/base/config.h.in</code> should have a
+          prominent comment explaining it and should be grouped by file
+          exporting the definition
+      </ul>
+    </p>
+
+
+    <a name="devfeature"></a>
+    <h4> Writing feature tests </h4>
+
+    <p>
+      TODO: This section is a bit outdated, update it!
+    </p>
+    <p>
+      For a feature <code>&lt;feature&gt;</code> the following
+      the following toggles, variables and macros can be defined
+      defined (Note: <code>&lt;FEATURE&gt;</code> means all caps,
+      <code>&lt;feature&gt;</code> means all lowercase):
+      <ul>
+
+	<li>
+          A file
+          <code>cmake/configure/configure_&lt;feature&gt;.cmake</code>
+          defining how to configure <code>&lt;feature&gt;</code>:
+	  <pre>
+    FEATURE_${feature}_DEPENDS    (a variable)
+      - a variable which contains an optional list of other features
+        this feature depends on (and which have to be enbled for this feature
+        to work.) The features must be given with the full option toggle:
+        DEAL_II_WITH_[...]
+
+    FEATURE_&lt;FEATURE&gt;_FIND_EXTERNAL(var)  (a macro)
+      - which should set var to TRUE if all dependencies for the feature are
+        fulfilled. In this case all necessary variables for
+        FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL must be set. Otherwise
+        var should remain unset.
+        If not defined, FIND_PACKAGE(${feature}) is called.
+
+    FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL()  (a macro)
+      - which should setup all necessary configuration for the feature with
+        external dependencies. If something goes wrong this macro must
+        issue a FATAL_ERROR.
+
+    FEATURE_&lt;FEATURE&gt;_CONFIGURE_BUNDLED()  (a macro)
+      - which should setup all necessary configuration for the feature with
+        bundled source dependencies. If something goes wrong this macro must
+        issue a FATAL_ERROR.
+
+    FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE()  (macro, optional)
+      - which should print a meaningful error message (with FATAL_ERROR) for
+        the case that no external library was found (and bundled is not
+        allowed to be used.) If not defined, a suitable default error message
+        will be printed.
+	  </pre>
+
+	<li>
+          In <code>bundled/CMakeLists.txt</code>:
+	  <pre>
+
+    DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt; (a boolean)
+      - If &lt;feature&gt; can be set up by bundled libraries, this
+        configuration option must be present to force use of bundled
+        dependencies
+
+    FEATURE_&lt;FEATURE&gt;_HAVE_BUNDLED  (a variable)
+      - which should either be set to TRUE if all necessary libraries of the
+        features comes bundled with deal.II and hence can be supported
+        without external dependencies, or unset.
+	  </pre>
+
+    Setup of compilation and installation if
+    <code>FEATURE_&lt;FEATURE&gt;_BUNDLED_CONFIGURED</code> is set.
+      </ul>
+    </p>
+
+    <a name="advanced"></a>
+    <h3>Advanced setup</h3>
+
+    A sample configuration file for preloading the CMake cache with
+    <pre>
+
+    $ cmake -C Config.sample <...>
+    </pre>
+    can be found <a href="Config.sample" target="_top">here</a>.
+    This sample configuration covers all options mentioned in this
+    documentation as well as some advanced aspects in feature
+    configuration.
+
+    <hr>
+
+    <address>
+      <a href="mail.html" target="body">The deal.II Group</a>
+      $Date$
+    </address>
+  </body>
+</html>

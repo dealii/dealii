@@ -33,14 +33,15 @@
 	    system</a>
 	    <li><a href="#compiling">Compiling only certain
 	    parts</a>
-	    <li><a href="#tuning">Fine tuning the configuration system</a>
+	    <li><a href="#configure">Configuration options</a>
 	      <ul>
-		<li><a href="#tuningfeature">Feature configuration</a>
-		<li><a href="#tuningautoconf">Autoconfiguration</a>
-		<li><a href="#tuningext">External library locations</a>
-		<li><a href="#tuningcomp">Component selection</a>
-		<li><a href="#tuningbuild">Build configuration</a>
-		<li><a href="#tuninginstall">Installation</a>
+		<li><a href="#configurefeature">Feature configuration</a>
+		<li><a href="#configureautoconf">Autoconfiguration</a>
+		<li><a href="#configureext">External library locations</a>
+		<li><a href="#configureoverride">Manual override</a>
+		<li><a href="#configurecomp">Component selection</a>
+		<li><a href="#configurebuild">Build configuration</a>
+		<li><a href="#configureinstall">Installation</a>
 	      </ul>
 	    <li><a href="#ext">How to use deal.II in your CMake project</a>
 	      <ul>
@@ -48,12 +49,7 @@
 		<li><a href="#extcmake">deal.IIConfig.cmake</a>
 		<li><a href="#extsetup">Setting up necessary configuration variables</a>
 	      </ul>
-	    <li><a href="#dev">Developing the deal.II CMake system</a>
-	      <ul>
-		<li><a href="#devplatform">Writing platform checks</a>
-		<li><a href="#devfeature">Writing feature tests</a>
-	      </ul>
-	    <li><a href="#advanced">Advanced setup</a>
+	    <li><a href="#advanced">Initial cache file and advanced options</a>
 	  </ul>
 	</td>
       </tr>
@@ -193,24 +189,24 @@
       library. Rather, <code>make install</code> will still want to have both
       libraries up to date and will therefore invoke <code>make all</code>
       automatically. To restrict builds in such a way that only one library
-      will be installed, see <a href="#tuningbuild">this section</a>.
+      will be installed, see <a href="#configurebuild">this section</a>.
     </p>
 
 
-    <a name="tuning"></a>
-    <h3>Fine tuning the configuration system</h3>
+    <a name="configure"></a>
+    <h3>Configuration options</h3>
 
     <p>
       The various configuration options of the
       <acronym>deal.II</acronym> library are organized in three
-      categories: <a href="#tuningfeature">feature</a>,
-      <a href="#tuningcomp">component</a>, and <a
-      href="#tuningbuild">build</a>/<a href="#tuninginstall">install</a>
+      categories: <a href="#configurefeature">feature</a>,
+      <a href="#configurecomp">component</a>, and <a
+      href="#configurebuild">build</a>/<a href="#configureinstall">install</a>
       configuration.
     </p>
 
 
-    <a name="tuningfeature"></a>
+    <a name="configurefeature"></a>
     <h4>Feature configuration</h4>
 
     <p>
@@ -250,10 +246,8 @@
         <li> <code>DEAL_II_WITH_BOOST</code> is always <code>ON</code>
           since BOOST is a mandatory build time dependency.
 
-        <li> <code>DEAL_II_WITH_THREADS</code> decides whether to use
-          threads and if set to <code>ON</code> also decides whether
-          we interface to the Threading Building Blocks (TBB) library
-          which we need in that case.
+        <li> <code>DEAL_II_WITH_THREADS</code> enables threading support
+          with the help of the Threading Building Blocks (TBB) library.
       </ul>
     </p>
 
@@ -303,7 +297,7 @@
 
 
 
-    <a name="tuningautoconf"></a>
+    <a name="configureautoconf"></a>
     <h4> Autoconfiguration </h4>
 
     <p>
@@ -338,7 +332,7 @@
     </p>
 
 
-    <a name="tuningext"></a>
+    <a name="configureext"></a>
     <h4> External library locations </h4>
 
     <p>
@@ -393,7 +387,7 @@
 
 	<li>
 	  <p>
-	    The system default locations for libraries and includes.
+	    The default system locations for libraries and includes.
 	  </p>
       </ol>
     </p>
@@ -401,10 +395,8 @@
     <p>
       Alternatively, cached variables set by the
       <code>Find&lt;Module&gt;</code> mechanism may be set,
-      hinted or overwritten directly.  These variables are usually
-      called <code>&lt;library&gt;_INCLUDE_DIR(|S)</code> and
-      <code>&lt;library&gt;_(LIBRARY|LIBRARIES)</code> (highly dependend
-      of the actual library).  You can get a list via
+      hinted or overwritten directly (variable names are highly
+      dependend on the actual library). You can get a list via
       <pre>
 
     make edit_cache
@@ -414,8 +406,27 @@
       <code>-NOTFOUND</code> and may be set by hand.
     </p>
 
+    <a name="configureoverride"></a>
+    <h4> Manual override </h4>
+      It is possible to override the CMake find mechanism for external
+      libraries manually. This is e.g. useful if a non standard lapack/blas
+      installation should be used (and cannot be found by the
+      <code>FindLapack.cmake</code> module shipped with CMake)
+      In this case you can by hand
+      <pre>
 
-    <a name="tuningcomp"></a>
+    cmake -DLAPACK_FOUND=true \
+          -DLAPACK_LIBRARIES="library;and;complete;link;interface" \
+          -DLAPACK_LINKER_FLAGS="" &lt;...&gt;
+      </pre>
+      You can set these values on the command line, with ccmake or by
+      providing an initial cache file, see
+      <a href="#advanced">advanced setup section</a>.
+      Possible manual overrides are explained in detail in the
+      in the <a href="Config.sample" target="_top">Config.sample file</a>.
+
+
+    <a name="configurecomp"></a>
     <h4> Component selection </h4>
 
     <p>
@@ -474,36 +485,32 @@
     </p>
 
 
-    <a name="tuningbuild"></a>
+    <a name="configurebuild"></a>
     <h4> Build configuration </h4>
 
     <p>
-      As explained in <a href="#compiling">this section above</a>, one can
-      limit <code>make</code> to building only a subset of the usual
-      libraries. However, this does not restrict the set of things that need
-      to be built so that <code>make install</code> can install them. Rather,
-      the <code>cmake</code> variable
-      <code>CMAKE_BUILD_TYPE</code> controls the type of build.
-      We support the <code>Debug</code>, <code>Release</code>
-      and <code>DebugRelease</code> build targets. Default is the
-      <code>DebugRelease</code> target.
+      The <code>cmake</code> variable <code>CMAKE_BUILD_TYPE</code>
+      controls the type of build.  We support <code>Debug</code>,
+      <code>Release</code> and <code>DebugRelease</code> mode. Default
+      is <code>DebugRelease</code>.
       <ul>
         <li>
           Passing <code>cmake</code> the
           flag <code>-DCMAKE_BUILD_TYPE=Debug</code> will produce makefiles
-          that require only compiling and installing the debug library
-          <code>libdeal_II.g.so</code>
+          that compile and install only the debug library
+          <code>libdeal_II.g.so</code>.
         <li>
           Passing <code>cmake</code> the
           flag <code>-DCMAKE_BUILD_TYPE=Release</code> result in only
-          compiling and installing <code>libdeal_II.so</code>.
+          compiling and installing the optimized library <code>libdeal_II.so</code>.
         <li>
           Passing <code>cmake</code> the
           flag <code>-DCMAKE_BUILD_TYPE=DebugRelease</code> will build and
           install both libraries.
       </ul>
-      For more information on what these targets represent, see the general
-      discussion <a href="../readme.html#configuration">here</a>.
+
+      For more information, see the general discussion <a
+        href="../readme.html#configuration">here</a>.
     </p>
 
     <p>
@@ -519,7 +526,7 @@
 	  may still pull in necessary compiler flags.
 
 	<li>
-	  Overwrite the default configuration by setting the following
+	  Override the default configuration by setting the following
 	  cached variables:
 	  <pre>
 
@@ -530,7 +537,7 @@
 
 	  The content of the cached variables will be preserved
 	  and added <i>to the end</i> of the default compiler flags,
-	  hence providing the possibility for overwriting a flag. E.g.:
+	  hence providing the possibility for overriding a flag. E.g.:
 	  <code>-Wsign-compare</code>, set by the build system, can be
 	  overwritten by specifying:
 	  <pre>
@@ -561,7 +568,7 @@
     </p>
 
 
-    <a name="tuninginstall"></a>
+    <a name="configureinstall"></a>
     <h4> Installation </h4>
 
     <p>
@@ -850,237 +857,8 @@
     </p>
 
 
-    <a name="dev"></a>
-    <h3> Developing the <acronym>deal.II</acronym> CMake system </h3>
-
-    <p>
-      To keep things clean, only the following variables should be
-      appended in the platform checks and feature configuration (beside
-      setting a lot of <code>DEAL_II_*</code> definitions...):
-      <ul>
-	<li>
-          The general (internal) logic for variables applies:
-	  <ul>
-            <li>A variable name without <code>_DEBUG</code> or
-              <code>_RELEASE</code>: Used for all targets
-            <li> <code>&lt;...&gt;_DEBUG</code>: <i>additionally</i> used for debug targets
-            <li> <code>&lt;...&gt;_RELEASE</code>: <i>additionally</i> used for release targets
-	  </ul>
-
-	<li>
-	  For internal use, for setting necessary linker flags for the deal.II library:
-	  <ul>
-            <li> <code>CMAKE_SHARED_LINKER_FLAGS</code>
-            <li> <code>DEAL_II_SHARED_LINKER_FLAGS_DEBUG</code>
-            <li> <code>DEAL_II_SHARED_LINKER_FLAGS_RELEASE</code>
-	  </ul>
-
-	<li>
-	  For internal use, for setting necessary compiler flags, e.g.
-          <code>-std=c++11</code> (if available):
-	  <ul>
-            <li> <code>CMAKE_CXX_FLAGS</code>
-            <li> <code>DEAL_II_CXX_FLAGS_DEBUG</code>
-            <li> <code>DEAL_II_CXX_FLAGS_RELEASE</code>
-	  </ul>
-
-	<li>
-	  For internal use, for setting necessary include dirs for the compilation of the
-          <acronym>deal.II</acronym> library:
-	  <ul>
-	    <li> <code>INCLUDE_DIRECTORIES(...)</code>
-	  </ul>
-
-	<li>
-	  For internal use, for setting necessary preprocessor definitions
-	  (<code>-D&lt;...&gt;</code>) for the compilation of the
-	  deal.II library:
-	  <ul>
-            <li> <code>DEAL_II_DEFINITIONS</code>
-            <li> <code>DEAL_II_DEFINITIONS_DEBUG</code>
-            <li> <code>DEAL_II_DEFINITIONS_RELEASE</code>
-	  </ul>
-
-	<li>
-	  For internal and external use, used to keep track of external
-	  libraries, the <acronym>deal.II</acronym> library and user
-	  programs have to be linked against:
-	  <ul>
-            <li> <code>DEAL_II_EXTERNAL_LIBRARIES</code>
-            <li> <code>DEAL_II_EXTERNAL_LIBRARIES_DEBUG</code>
-            <li> <code>DEAL_II_EXTERNAL_LIBRARIES_RELEASE</code>
-	  </ul>
-
-	<li>
-	  For external use, used to keep track of external preprocessor
-	  definitions, necessary for the compilation of user programs:
-	  <ul>
-            <li> <code>DEAL_II_USER_DEFINITIONS</code>
-            <li> <code>DEAL_II_USER_DEFINITIONS_DEBUG</code>
-            <li> <code>DEAL_II_USER_DEFINITIONS_RELEASE</code>
-	  </ul>
-
-	<li>
-          Used to keep track of external include dirs, necessary for the
-          compilation of user programs:
-	  <ul>
-            <li> <code>DEAL_II_USER_INCLUDE_DIRS</code>
-	  </ul>
-      </ul>
-    </p>
-
-
-    <a name="devplatform"></a>
-    <h4>  Writing platform checks </h4>
-
-    <p>
-      Platform checks reside under <code>cmake/checks</code>. We currently have
-      <pre>
-
-	cmake/check/check_for_compiler_bugs.cmake
-	cmake/check/check_for_compiler_features.cmake
-	cmake/check/check_for_cxx_features.cmake
-      </pre>
-    </p>
-    <p>
-      <b>Some Notes:</b>
-      <ul>
-	<li> There are a number of readily available platform check macros:
-	  <pre>
-
-    CHECK_CXX_SOURCE_COMPILES(source variable)
-      - Checks whether it is possible to compile _and_ link the code snipet
-        &lt;source&gt;. If succesful, variable is set to 1.
-
-    CHECK_CXX_SOURCE_RUNS(source variable)
-      - variable is set to 1 if &lt;source&gt; coulde be succesfully compiled and
-        linked and the resulting program ran and exited without error.
-
-    CHECK_CXX_COMPILER_BUG(source variable)
-      - Inverts the logic of CHECK_CXX_SOURCE_COMPILES(), i.e. variable is
-        set to 1 if it was not possible to compile and link &lt;source&gt;.
-
-    CHECK_INCLUDE_FILE_CXX(header variable)
-      - Check whether it is possible to compile and link a dummy program
-        including &lt;header&gt;.
-
-    CHECK_FUNCTION_EXISTS(function variable)
-      - Check for the existence of a function prototype with name
-        &lt;function&gt;. (Don't forget to specify the link libraries, see
-        below.)
-
-    CHECK_CXX_COMPILER_FLAG(flag variable)
-      - Sets the variable to 1 if the compiler understands the flag.
-	  </pre>
-
-	<li> Necessary compiler flags can easily set in the string variable
-	  <code>CMAKE_REQUIRED_FLAGS</code>. There are two small macros
-	  that do this job nicely:
-	  <pre>
-
-    PUSH_TEST_FLAG("-Werror")
-    CHECK_CXX_SOURCE_COMPILES(...)
-    POP_TEST_FLAG()
-	  </pre>
-
-	<li> Libraries necessary for linkage can be set in the list variable
-	  <code>CMAKE_REQUIRED_LIBRARIES</code>. It is best two hard set
-	  this variable to a specific value and later on cleaning it,
-	  instead of appending/removing:
-	  <pre>
-
-    SET(CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;
-    CHECK_CXX_SOURCE_COMPILES(...)
-    SET(CMAKE_REQUIRED_LIBRARIES)
-	  </pre>
-      </ul>
-    </p>
-
-    <p>
-      <b>General notes:</b>
-      <ul>
-	<li> A platform check should have a prominent comment explaining what
-	  it does and why it is there, as well as a stating the author and the
-	  year.
-
-        <li> Definition toggles in
-          <code>include/deal.II/base/config.h.in</code> should have a
-          prominent comment explaining it and should be grouped by file
-          exporting the definition
-      </ul>
-    </p>
-
-
-    <a name="devfeature"></a>
-    <h4> Writing feature tests </h4>
-
-    <p>
-      TODO: This section is a bit outdated, update it!
-    </p>
-    <p>
-      For a feature <code>&lt;feature&gt;</code> the following
-      the following toggles, variables and macros can be defined
-      defined (Note: <code>&lt;FEATURE&gt;</code> means all caps,
-      <code>&lt;feature&gt;</code> means all lowercase):
-      <ul>
-
-	<li>
-          A file
-          <code>cmake/configure/configure_&lt;feature&gt;.cmake</code>
-          defining how to configure <code>&lt;feature&gt;</code>:
-	  <pre>
-    FEATURE_${feature}_DEPENDS    (a variable)
-      - a variable which contains an optional list of other features
-        this feature depends on (and which have to be enbled for this feature
-        to work.) The features must be given with the full option toggle:
-        DEAL_II_WITH_[...]
-
-    FEATURE_&lt;FEATURE&gt;_FIND_EXTERNAL(var)  (a macro)
-      - which should set var to TRUE if all dependencies for the feature are
-        fulfilled. In this case all necessary variables for
-        FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL must be set. Otherwise
-        var should remain unset.
-        If not defined, FIND_PACKAGE(${feature}) is called.
-
-    FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL()  (a macro)
-      - which should setup all necessary configuration for the feature with
-        external dependencies. If something goes wrong this macro must
-        issue a FATAL_ERROR.
-
-    FEATURE_&lt;FEATURE&gt;_CONFIGURE_BUNDLED()  (a macro)
-      - which should setup all necessary configuration for the feature with
-        bundled source dependencies. If something goes wrong this macro must
-        issue a FATAL_ERROR.
-
-    FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE()  (macro, optional)
-      - which should print a meaningful error message (with FATAL_ERROR) for
-        the case that no external library was found (and bundled is not
-        allowed to be used.) If not defined, a suitable default error message
-        will be printed.
-	  </pre>
-
-	<li>
-          In <code>bundled/CMakeLists.txt</code>:
-	  <pre>
-
-    DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt; (a boolean)
-      - If &lt;feature&gt; can be set up by bundled libraries, this
-        configuration option must be present to force use of bundled
-        dependencies
-
-    FEATURE_&lt;FEATURE&gt;_HAVE_BUNDLED  (a variable)
-      - which should either be set to TRUE if all necessary libraries of the
-        features comes bundled with deal.II and hence can be supported
-        without external dependencies, or unset.
-	  </pre>
-
-    Setup of compilation and installation if
-    <code>FEATURE_&lt;FEATURE&gt;_BUNDLED_CONFIGURED</code> is set.
-      </ul>
-    </p>
-
     <a name="advanced"></a>
-    <h3>Advanced setup</h3>
+    <h3>Initial cache file and advanced options</h3>
 
     A sample configuration file for preloading the CMake cache with
     <pre>
