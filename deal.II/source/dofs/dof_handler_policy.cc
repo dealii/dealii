@@ -839,14 +839,19 @@ namespace internal
         static
         void
         renumber_mg_dofs (const std::vector<unsigned int> &new_numbers,
-                          const IndexSet &indices,
+                          const IndexSet                  &indices,
                           DoFHandler<3,spacedim>          &dof_handler,
-                          const unsigned int level,
-                          const bool check_validity)
+                          const unsigned int               level,
+                          const bool                       check_validity)
         {
-          //TODO
-          AssertThrow(false, ExcNotImplemented());
+          // TODO 
+	  (void) new_numbers;
+	  (void) indices;
+	  (void) dof_handler;
+	  (void) level;
+	  (void) check_validity;
 
+          AssertThrow(false, ExcNotImplemented());
         }
 
 
