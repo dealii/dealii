@@ -181,7 +181,7 @@ void GridGenerator::hyper_cube (Triangulation<dim,spacedim> &tria,
 
 void
 GridGenerator::moebius (
-  Triangulation<3> &tria,
+  Triangulation<3>  &tria,
   const unsigned int   n_cells,
   const unsigned int   n_rotations,
   const double         R,
@@ -234,7 +234,7 @@ GridGenerator::moebius (
 
 
 void
-GridGenerator::torus (Triangulation<2,3> &tria,
+GridGenerator::torus (Triangulation<2,3>  &tria,
                       const double         R,
                       const double         r)
 {

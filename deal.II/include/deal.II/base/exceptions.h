@@ -114,7 +114,7 @@ protected:
   /**
    * Name of the file this exception happen in.
    */
-  const char *file;
+  const char  *file;
 
   /**
    * Line number in this file.
@@ -124,17 +124,17 @@ protected:
   /**
    * Name of the function, pretty printed.
    */
-  const char *function;
+  const char  *function;
 
   /**
    * The violated condition, as a string.
    */
-  const char *cond;
+  const char  *cond;
 
   /**
    * Name of the exception and call sequence.
    */
-  const char *exc;
+  const char  *exc;
 
   /**
    * A backtrace to the position where the problem happened, if the
@@ -905,7 +905,7 @@ namespace StandardExceptions
 /**
  * Assert support for the LAPACK library
  */
-#ifdef HAVE_LIBLAPACK
+#ifdef DEAL_II_WITH_LAPACK
 #  define AssertLAPACK {}
 #else
 #  define AssertLAPACK Assert(false, ExcNeedsLAPACK())
@@ -914,7 +914,7 @@ namespace StandardExceptions
 /**
  * Assert support for the UMFPACK library
  */
-#ifdef HAVE_LIBUMFPACK
+#ifdef DEAL_II_WITH_UMFPACK
 #  define AssertUMFPACK {}
 #else
 #  define AssertUMFPACK Assert(false, ExcNeedsUMFPACK())

@@ -559,7 +559,7 @@ namespace Step35
       {}
     };
 
-    void assemble_one_cell_of_gradient (const IteratorPair &SI,
+    void assemble_one_cell_of_gradient (const IteratorPair  &SI,
                                         InitGradScratchData &scratch,
                                         InitGradPerTaskData &data);
 
@@ -879,7 +879,7 @@ namespace Step35
   template <int dim>
   void
   NavierStokesProjection<dim>::
-  assemble_one_cell_of_gradient (const IteratorPair &SI,
+  assemble_one_cell_of_gradient (const IteratorPair  &SI,
                                  InitGradScratchData &scratch,
                                  InitGradPerTaskData &data)
   {

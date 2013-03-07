@@ -36,10 +36,8 @@ DEAL_II_NAMESPACE_OPEN
 #endif
 
 // include UMFPACK file.
-#ifdef HAVE_LIBUMFPACK
-extern "C" {
+#ifdef DEAL_II_WITH_UMFPACK
 #  include <umfpack.h>
-}
 #endif
 
 // if the HSL functions are not there, define them empty and throw an
@@ -490,7 +488,11 @@ SparseDirectMA27::initialize (const SparsityPattern &sp)
           // copy of the program, and
           // run the detached solver
           // slave instead
-          const char *const program_name = DEAL_II_PATH"/lib/bin/detached_ma27";
+          /*
+           * TODO: Does this invocation work with just the name of the
+           * executable? Maier, 2012
+           */
+          const char *const program_name = "detached_ma27";
           const char *const child_argv[] = { program_name, NULL };
           execv(program_name, const_cast<char *const *>(child_argv));
 
@@ -1489,7 +1491,7 @@ initialize (const SparsityPattern &)
 {}
 
 
-#ifdef HAVE_LIBUMFPACK
+#ifdef DEAL_II_WITH_UMFPACK
 
 SparseDirectUMFPACK::SparseDirectUMFPACK ()
   :
@@ -1902,7 +1904,7 @@ SparseDirectUMFPACK::Tvmult_add (
   Assert(false, ExcNotImplemented());
 }
 
-#ifdef DEAL_II_USE_MUMPS
+#ifdef DEAL_II_WITH_MUMPS
 SparseDirectMUMPS::SparseDirectMUMPS ()
   :
   initialize_called (false)
@@ -2078,7 +2080,7 @@ void SparseDirectMUMPS::vmult (Vector<double>       &dst,
   copy_solution (dst);
 }
 
-#endif // DEAL_II_USE_MUMPS
+#endif // DEAL_II_WITH_MUMPS
 
 // explicit instantiations for SparseMatrixMA27
 template
@@ -2092,7 +2094,7 @@ void SparseDirectMA27::solve (const SparseMatrix<double> &matrix,
                               Vector<double>             &rhs_and_solution);
 
 template
-void SparseDirectMA27::solve (const SparseMatrix<float> &matrix,
+void SparseDirectMA27::solve (const SparseMatrix<float>  &matrix,
                               Vector<double>             &rhs_and_solution);
 
 
@@ -2115,7 +2117,7 @@ InstantiateUMFPACK(BlockSparseMatrix<double>)
 InstantiateUMFPACK(BlockSparseMatrix<float>)
 
 // explicit instantiations for SparseDirectMUMPS
-#ifdef DEAL_II_USE_MUMPS
+#ifdef DEAL_II_WITH_MUMPS
 #define InstantiateMUMPS(MATRIX) \
   template \
   void SparseDirectMUMPS::initialize (const MATRIX &, const Vector<double> &);

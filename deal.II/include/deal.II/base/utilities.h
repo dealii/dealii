@@ -21,10 +21,10 @@
 #include <functional>
 #include <string>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 #  include <Epetra_Comm.h>
 #  include <Epetra_Map.h>
-#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  else
 #    include <Epetra_SerialComm.h>
@@ -287,7 +287,7 @@ namespace Utilities
   Iterator
   lower_bound (Iterator  first,
                Iterator  last,
-               const T &val);
+               const T  &val);
 
 
   /**
@@ -485,7 +485,7 @@ namespace Utilities
   }
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * This namespace provides some of the basic structures used in the
    * initialization of the Trilinos objects (e.g., matrices, vectors, and
@@ -660,7 +660,7 @@ namespace Utilities
      * the duplicate_communicator() function.
      */
     Epetra_Map
-    duplicate_map (const Epetra_BlockMap &map,
+    duplicate_map (const Epetra_BlockMap  &map,
                    const Epetra_Comm &comm);
   }
 
@@ -705,7 +705,7 @@ namespace Utilities
   Iterator
   lower_bound (Iterator  first,
                Iterator  last,
-               const T &val)
+               const T  &val)
   {
     return Utilities::lower_bound (first, last, val,
                                    std::less<T>());

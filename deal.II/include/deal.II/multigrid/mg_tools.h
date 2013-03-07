@@ -233,7 +233,7 @@ namespace MGTools
   void
   make_boundary_list (const DoFHandler<dim,spacedim>      &mg_dof,
                       const typename FunctionMap<dim>::type &function_map,
-                      std::vector<std::set<unsigned int> > &boundary_indices,
+                      std::vector<std::set<unsigned int> >  &boundary_indices,
                       const ComponentMask                   &component_mask = ComponentMask());
 
   /**
@@ -287,8 +287,8 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<std::vector<bool> > &interface_dofs,
-                                std::vector<std::vector<bool> > &boundary_interface_dofs);
+                                std::vector<std::vector<bool> >  &interface_dofs,
+                                std::vector<std::vector<bool> >  &boundary_interface_dofs);
 
   /**
    * Does the same as the function above,
@@ -297,12 +297,12 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                                std::vector<std::vector<bool> > &interface_dofs);
+                                std::vector<std::vector<bool> >  &interface_dofs);
 
   template <int dim, int spacedim>
   void
   extract_non_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                              std::vector<std::set<unsigned int> > &non_interface_dofs);
+                              std::vector<std::set<unsigned int> >  &non_interface_dofs);
 }
 
 /* @} */

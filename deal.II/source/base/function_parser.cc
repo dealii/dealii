@@ -15,8 +15,13 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/vector.h>
 
-#ifndef DEAL_II_DISABLE_PARSER
-#  include <functionparser/fparser.h>
+#ifdef DEAL_II_WITH_FUNCTIONPARSER
+#include <fparser.hh>
+namespace fparser
+{
+  class FunctionParser: public ::FunctionParser
+{};
+}
 #else
 
 namespace fparser
@@ -50,7 +55,7 @@ FunctionParser<dim>::~FunctionParser()
 }
 
 
-#ifndef DEAL_II_DISABLE_PARSER
+#ifdef DEAL_II_WITH_FUNCTIONPARSER
 template <int dim>
 void FunctionParser<dim>::initialize (const std::string                   &variables,
                                       const std::vector<std::string>      &expressions,
@@ -128,7 +133,6 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
       // problems with the number of
       // variables...
     }
-
   // Now we define how many variables
   // we expect to read in.  We
   // distinguish between two cases:
@@ -147,10 +151,14 @@ void FunctionParser<dim>::initialize (const std::string   &variables,
   else
     n_vars = dim;
 
-  // Let's check if the number of
-  // variables is correct...
-  AssertThrow (n_vars == fp[0].NVars(),
-               ExcDimensionMismatch(n_vars,fp[0].NVars()));
+  /*
+                                     // Let's check if the number of
+                                     // variables is correct...
+    AssertThrow (n_vars == fp[0].NVars(),
+  !                              ~~~~~~~
+  !                              not available anymore in fparser-4.5, maier 2012
+                 ExcDimensionMismatch(n_vars,fp[0].NVars()));
+  */
 
   // Now set the initialization bit.
   initialized = true;
@@ -197,7 +205,7 @@ void FunctionParser<dim>::initialize (const std::string &variables,
 
 
 template <int dim>
-double FunctionParser<dim>::value (const Point<dim> &p,
+double FunctionParser<dim>::value (const Point<dim>  &p,
                                    const unsigned int component) const
 {
   Assert (initialized==true, ExcNotInitialized());

@@ -1291,7 +1291,7 @@ namespace DoFTools
   template <class DH, typename Number>
   void
   distribute_cell_to_dof_vector (const DH              &dof_handler,
-                                 const Vector<Number> &cell_data,
+                                 const Vector<Number>  &cell_data,
                                  Vector<double>        &dof_data,
                                  const unsigned int     component = 0);
 
@@ -1624,7 +1624,7 @@ namespace DoFTools
   void
   extract_subdomain_dofs (const DH           &dof_handler,
                           const types::subdomain_id subdomain_id,
-                          std::vector<bool> &selected_dofs);
+                          std::vector<bool>  &selected_dofs);
 
 
   /**
@@ -2297,7 +2297,7 @@ namespace DoFTools
   void
   count_dofs_per_block (const DH &dof,
                         std::vector<unsigned int> &dofs_per_block,
-                        const std::vector<unsigned int> &target_block
+                        const std::vector<unsigned int>  &target_block
                         = std::vector<unsigned int>());
 
   /**
@@ -2600,7 +2600,7 @@ namespace DoFTools
   template <class DH>
   void
   map_dof_to_boundary_indices (const DH                   &dof_handler,
-                               std::vector<unsigned int> &mapping);
+                               std::vector<unsigned int>  &mapping);
 
   /**
    * Same as the previous function,

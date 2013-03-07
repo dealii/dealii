@@ -26,7 +26,7 @@ for (deal_II_dimension : DIMENSIONS)
     template class SolutionTransfer<deal_II_dimension,::dealii::parallel::distributed::BlockVector<float>, DoFHandler<deal_II_dimension> >;
 
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
     template class SolutionTransfer<deal_II_dimension, PETScWrappers::Vector, DoFHandler<deal_II_dimension> >;
 
     template class SolutionTransfer<deal_II_dimension, PETScWrappers::BlockVector, DoFHandler<deal_II_dimension> >;
@@ -36,7 +36,7 @@ for (deal_II_dimension : DIMENSIONS)
     template class SolutionTransfer<deal_II_dimension, PETScWrappers::MPI::BlockVector, DoFHandler<deal_II_dimension> >;
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
     template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::Vector, DoFHandler<deal_II_dimension> >;
 
     template class SolutionTransfer<deal_II_dimension, TrilinosWrappers::BlockVector, DoFHandler<deal_II_dimension> >;

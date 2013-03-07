@@ -141,7 +141,7 @@ namespace Step21
 
   template <int dim>
   double
-  PressureRightHandSide<dim>::value (const Point<dim>  & /*p*/,
+  PressureRightHandSide<dim>::value (const Point<dim>  &/*p*/,
                                      const unsigned int /*component*/) const
   {
     return 0;
@@ -165,7 +165,7 @@ namespace Step21
 
   template <int dim>
   double
-  PressureBoundaryValues<dim>::value (const Point<dim> &p,
+  PressureBoundaryValues<dim>::value (const Point<dim>  &p,
                                       const unsigned int /*component*/) const
   {
     return 1-p[0];
@@ -234,7 +234,7 @@ namespace Step21
 
   template <int dim>
   double
-  InitialValues<dim>::value (const Point<dim> &p,
+  InitialValues<dim>::value (const Point<dim>  &p,
                              const unsigned int component) const
   {
     return ZeroFunction<dim>(dim+2).value (p, component);

@@ -87,7 +87,7 @@ namespace Step43
 
   template <int dim>
   double
-  PressureRightHandSide<dim>::value (const Point<dim>  & /*p*/,
+  PressureRightHandSide<dim>::value (const Point<dim>  &/*p*/,
                                      const unsigned int /*component*/) const
   {
     return 0;
@@ -107,7 +107,7 @@ namespace Step43
 
   template <int dim>
   double
-  PressureBoundaryValues<dim>::value (const Point<dim> &p,
+  PressureBoundaryValues<dim>::value (const Point<dim>  &p,
                                       const unsigned int /*component*/) const
   {
     return 1-p[0];
@@ -154,7 +154,7 @@ namespace Step43
 
   template <int dim>
   double
-  SaturationInitialValues<dim>::value (const Point<dim>  & /*p*/,
+  SaturationInitialValues<dim>::value (const Point<dim>  &/*p*/,
                                        const unsigned int /*component*/) const
   {
     return 0.2;
@@ -428,7 +428,7 @@ namespace Step43
 
     template <class PreconditionerA, class PreconditionerMp>
     BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
-    BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix &S,
+    BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix  &S,
                              const InverseMatrix<TrilinosWrappers::SparseMatrix,
                              PreconditionerMp>      &Mpinv,
                              const PreconditionerA                      &Apreconditioner)
@@ -517,8 +517,8 @@ namespace Step43
     void                     project_back_saturation ();
     double                   compute_viscosity (const std::vector<double>          &old_saturation,
                                                 const std::vector<double>          &old_old_saturation,
-                                                const std::vector<Tensor<1,dim> > &old_saturation_grads,
-                                                const std::vector<Tensor<1,dim> > &old_old_saturation_grads,
+                                                const std::vector<Tensor<1,dim> >  &old_saturation_grads,
+                                                const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
                                                 const std::vector<Vector<double> > &present_darcy_values,
                                                 const double                        global_max_u_F_prime,
                                                 const double                        global_S_variation,
@@ -2092,8 +2092,8 @@ namespace Step43
   TwoPhaseFlowProblem<dim>::
   compute_viscosity (const std::vector<double>          &old_saturation,
                      const std::vector<double>          &old_old_saturation,
-                     const std::vector<Tensor<1,dim> > &old_saturation_grads,
-                     const std::vector<Tensor<1,dim> > &old_old_saturation_grads,
+                     const std::vector<Tensor<1,dim> >  &old_saturation_grads,
+                     const std::vector<Tensor<1,dim> >  &old_old_saturation_grads,
                      const std::vector<Vector<double> > &present_darcy_values,
                      const double                        global_max_u_F_prime,
                      const double                        global_S_variation,

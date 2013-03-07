@@ -71,7 +71,7 @@ namespace Step14
       void set_refinement_cycle (const unsigned int refinement_cycle);
 
       virtual void operator () (const DoFHandler<dim> &dof_handler,
-                                const Vector<double> &solution) const = 0;
+                                const Vector<double>  &solution) const = 0;
     protected:
       unsigned int refinement_cycle;
     };
@@ -99,7 +99,7 @@ namespace Step14
       PointValueEvaluation (const Point<dim>   &evaluation_point);
 
       virtual void operator () (const DoFHandler<dim> &dof_handler,
-                                const Vector<double> &solution) const;
+                                const Vector<double>  &solution) const;
 
       DeclException1 (ExcEvaluationPointNotFound,
                       Point<dim>,
@@ -123,7 +123,7 @@ namespace Step14
     void
     PointValueEvaluation<dim>::
     operator () (const DoFHandler<dim> &dof_handler,
-                 const Vector<double> &solution) const
+                 const Vector<double>  &solution) const
     {
       double point_value = 1e20;
 
@@ -173,7 +173,7 @@ namespace Step14
       PointXDerivativeEvaluation (const Point<dim>   &evaluation_point);
 
       virtual void operator () (const DoFHandler<dim> &dof_handler,
-                                const Vector<double> &solution) const;
+                                const Vector<double>  &solution) const;
 
       DeclException1 (ExcEvaluationPointNotFound,
                       Point<dim>,
@@ -198,7 +198,7 @@ namespace Step14
     void
     PointXDerivativeEvaluation<dim>::
     operator () (const DoFHandler<dim> &dof_handler,
-                 const Vector<double> &solution) const
+                 const Vector<double>  &solution) const
     {
       // This time initialize the return value with something useful, since we
       // will have to add up a number of contributions and take the mean value
@@ -314,7 +314,7 @@ namespace Step14
       GridOutput (const std::string &output_name_base);
 
       virtual void operator () (const DoFHandler<dim> &dof_handler,
-                                const Vector<double> &solution) const;
+                                const Vector<double>  &solution) const;
     private:
       const std::string output_name_base;
     };
@@ -331,7 +331,7 @@ namespace Step14
     template <int dim>
     void
     GridOutput<dim>::operator () (const DoFHandler<dim> &dof_handler,
-                                  const Vector<double>  & /*solution*/) const
+                                  const Vector<double>  &/*solution*/) const
     {
       std::ostringstream filename;
       filename << output_name_base << "-"

@@ -69,7 +69,7 @@ public:
    * @note The triangulation needs to be void upon calling this function.
    */
   template <int dim, int spacedim>
-  static void hyper_cube (Triangulation<dim,spacedim> &tria,
+  static void hyper_cube (Triangulation<dim,spacedim>  &tria,
                           const double        left = 0.,
                           const double        right= 1.);
 
@@ -87,7 +87,7 @@ public:
    * @note The triangulation needs to be void upon calling this function.
    */
   template <int dim>
-  static void subdivided_hyper_cube (Triangulation<dim> &tria,
+  static void subdivided_hyper_cube (Triangulation<dim>  &tria,
                                      const unsigned int  repetitions,
                                      const double        left = 0.,
                                      const double        right= 1.);
@@ -210,7 +210,6 @@ public:
   parallelogram(Triangulation<dim> &tria,
                 const Point<dim> (&corners)[dim],
                 const bool           colorize=false);
-
 
   /**
    * @deprecated Use the other function of same name.
@@ -583,7 +582,7 @@ public:
    * torus.
    */
 
-  static void torus (Triangulation<2,3> &tria,
+  static void torus (Triangulation<2,3>  &tria,
                      const double         R,
                      const double         r);
 
@@ -630,7 +629,7 @@ public:
    * @param R           The radius of the circle, which forms the middle line of the torus containing the loop of cells. Must be greater than @p r.
    * @param r           The radius of the cylinder bend together as loop.
    */
-  static void moebius (Triangulation<3,3> &tria,
+  static void moebius (Triangulation<3,3>  &tria,
                        const unsigned int   n_cells,
                        const unsigned int   n_rotations,
                        const double         R,

@@ -30,7 +30,7 @@ namespace Functions
 
   template <int dim>
   void
-  ParsedFunction<dim>::declare_parameters(ParameterHandler &prm,
+  ParsedFunction<dim>::declare_parameters(ParameterHandler  &prm,
                                           const unsigned int n_components)
   {
     Assert(n_components > 0, ExcZero());

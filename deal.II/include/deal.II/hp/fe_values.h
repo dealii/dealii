@@ -274,7 +274,7 @@ namespace hp
      * function.
      */
     FEValues (const dealii::hp::MappingCollection<dim,spacedim> &mapping_collection,
-              const dealii::hp::FECollection<dim,spacedim> &fe_collection,
+              const dealii::hp::FECollection<dim,spacedim>  &fe_collection,
               const dealii::hp::QCollection<dim>       &q_collection,
               const UpdateFlags             update_flags);
 
@@ -501,7 +501,7 @@ namespace hp
      * function.
      */
     FEFaceValues (const hp::MappingCollection<dim,spacedim> &mapping_collection,
-                  const hp::FECollection<dim,spacedim> &fe_collection,
+                  const hp::FECollection<dim,spacedim>  &fe_collection,
                   const hp::QCollection<dim-1>     &q_collection,
                   const UpdateFlags             update_flags);
 
@@ -528,7 +528,7 @@ namespace hp
      * <tt>DoFHandler::get_fe()</tt>
      * function.
      */
-    FEFaceValues (const hp::FECollection<dim,spacedim> &fe_collection,
+    FEFaceValues (const hp::FECollection<dim,spacedim>  &fe_collection,
                   const hp::QCollection<dim-1> &q_collection,
                   const UpdateFlags             update_flags);
 
@@ -711,7 +711,7 @@ namespace hp
      * function.
      */
     FESubfaceValues (const hp::MappingCollection<dim,spacedim> &mapping_collection,
-                     const hp::FECollection<dim,spacedim> &fe_collection,
+                     const hp::FECollection<dim,spacedim>  &fe_collection,
                      const hp::QCollection<dim-1>     &q_collection,
                      const UpdateFlags             update_flags);
 

@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/lac/full_matrix.h>
@@ -433,7 +433,7 @@ namespace PETScWrappers
      */
     void set (const unsigned int               row,
               const std::vector<unsigned int> &col_indices,
-              const std::vector<PetscScalar> &values,
+              const std::vector<PetscScalar>  &values,
               const bool                       elide_zero_values = false);
 
     /**
@@ -465,7 +465,7 @@ namespace PETScWrappers
     void set (const unsigned int  row,
               const unsigned int  n_cols,
               const unsigned int *col_indices,
-              const PetscScalar *values,
+              const PetscScalar  *values,
               const bool          elide_zero_values = false);
 
     /**
@@ -569,7 +569,7 @@ namespace PETScWrappers
      */
     void add (const unsigned int               row,
               const std::vector<unsigned int> &col_indices,
-              const std::vector<PetscScalar> &values,
+              const std::vector<PetscScalar>  &values,
               const bool                       elide_zero_values = true);
 
     /**
@@ -602,7 +602,7 @@ namespace PETScWrappers
     void add (const unsigned int  row,
               const unsigned int  n_cols,
               const unsigned int *col_indices,
-              const PetscScalar *values,
+              const PetscScalar  *values,
               const bool          elide_zero_values = true,
               const bool          col_indices_are_sorted = false);
 
@@ -1525,7 +1525,7 @@ namespace PETScWrappers
   void
   MatrixBase::set (const unsigned int               row,
                    const std::vector<unsigned int> &col_indices,
-                   const std::vector<PetscScalar> &values,
+                   const std::vector<PetscScalar>  &values,
                    const bool                       elide_zero_values)
   {
     Assert (col_indices.size() == values.size(),
@@ -1542,7 +1542,7 @@ namespace PETScWrappers
   MatrixBase::set (const unsigned int  row,
                    const unsigned int  n_cols,
                    const unsigned int *col_indices,
-                   const PetscScalar *values,
+                   const PetscScalar  *values,
                    const bool          elide_zero_values)
   {
     prepare_action(LastAction::insert);
@@ -1674,7 +1674,7 @@ namespace PETScWrappers
   void
   MatrixBase::add (const unsigned int               row,
                    const std::vector<unsigned int> &col_indices,
-                   const std::vector<PetscScalar> &values,
+                   const std::vector<PetscScalar>  &values,
                    const bool                       elide_zero_values)
   {
     Assert (col_indices.size() == values.size(),
@@ -1691,7 +1691,7 @@ namespace PETScWrappers
   MatrixBase::add (const unsigned int  row,
                    const unsigned int  n_cols,
                    const unsigned int *col_indices,
-                   const PetscScalar *values,
+                   const PetscScalar  *values,
                    const bool          elide_zero_values,
                    const bool          /*col_indices_are_sorted*/)
   {
@@ -1870,7 +1870,7 @@ namespace PETScWrappers
 DEAL_II_NAMESPACE_CLOSE
 
 
-#endif // DEAL_II_USE_PETSC
+#endif // DEAL_II_WITH_PETSC
 
 
 /*----------------------------   petsc_matrix_base.h     ---------------------------*/

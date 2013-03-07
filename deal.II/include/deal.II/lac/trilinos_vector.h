@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/std_cxx1x/shared_ptr.h>
 #  include <deal.II/base/subscriptor.h>
@@ -538,7 +538,7 @@ namespace TrilinosWrappers
         {
           vector.reset (new Epetra_FEVector(Epetra_Map
                                             (static_cast<int>(v.size()), 0,
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
                                              Epetra_MpiComm(MPI_COMM_SELF)
 #else
                                              Epetra_SerialComm()
@@ -835,7 +835,7 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS
 
 /*----------------------------   trilinos_vector.h     ---------------------------*/
 

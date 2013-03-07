@@ -33,7 +33,7 @@
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/mapping_info.h>
 
-#if DEAL_II_USE_MT==1
+#ifdef DEAL_II_WITH_THREADS
 #include <tbb/task.h>
 #include <tbb/task_scheduler_init.h>
 #include <tbb/parallel_for.h>
@@ -1566,7 +1566,7 @@ template <int dim, typename Number>
 template <typename DH, typename Quad>
 void MatrixFree<dim,Number>::
 reinit(const Mapping<dim>                         &mapping,
-       const std::vector<const DH *> &dof_handler,
+       const std::vector<const DH *>  &dof_handler,
        const std::vector<const ConstraintMatrix *> &constraint,
        const std::vector<Quad>              &quad,
        const MatrixFree<dim,Number>::AdditionalData additional_data)
@@ -1653,7 +1653,7 @@ namespace internal
 
   template<typename Number>
   inline
-  void update_ghost_values_start (const parallel::distributed::Vector<Number> &src,
+  void update_ghost_values_start (const parallel::distributed::Vector<Number>  &src,
                                   const unsigned int                  channel = 0)
   {
     src.update_ghost_values_start(channel);
@@ -1663,7 +1663,7 @@ namespace internal
 
   template <typename VectorStruct>
   inline
-  void update_ghost_values_start (const std::vector<VectorStruct> &src)
+  void update_ghost_values_start (const std::vector<VectorStruct>  &src)
   {
     for (unsigned int comp=0; comp<src.size(); comp++)
       update_ghost_values_start(src[comp], comp);
@@ -1673,7 +1673,7 @@ namespace internal
 
   template <typename VectorStruct>
   inline
-  void update_ghost_values_start (const std::vector<VectorStruct *> &src)
+  void update_ghost_values_start (const std::vector<VectorStruct *>  &src)
   {
     for (unsigned int comp=0; comp<src.size(); comp++)
       update_ghost_values_start(*src[comp], comp);
@@ -1690,7 +1690,7 @@ namespace internal
 
   template <typename Number>
   inline
-  void update_ghost_values_finish (const parallel::distributed::Vector<Number> &src)
+  void update_ghost_values_finish (const parallel::distributed::Vector<Number>  &src)
   {
     src.update_ghost_values_finish();
   }
@@ -1699,7 +1699,7 @@ namespace internal
 
   template <typename VectorStruct>
   inline
-  void update_ghost_values_finish (const std::vector<VectorStruct> &src)
+  void update_ghost_values_finish (const std::vector<VectorStruct>  &src)
   {
     for (unsigned int comp=0; comp<src.size(); comp++)
       update_ghost_values_finish(src[comp]);
@@ -1709,7 +1709,7 @@ namespace internal
 
   template <typename VectorStruct>
   inline
-  void update_ghost_values_finish (const std::vector<VectorStruct *> &src)
+  void update_ghost_values_finish (const std::vector<VectorStruct *>  &src)
   {
     for (unsigned int comp=0; comp<src.size(); comp++)
       update_ghost_values_finish(*src[comp]);
@@ -1792,7 +1792,7 @@ namespace internal
   }
 
 
-#if DEAL_II_USE_MT==1
+#ifdef DEAL_II_WITH_THREADS
 
   // This defines the TBB data structures that are needed to schedule the
   // partition-partition variant
@@ -1921,7 +1921,7 @@ namespace internal
       tbb::empty_task *dummy;
 
     private:
-      const Worker &function;
+      const Worker  &function;
       const unsigned int partition;
       const internal::MatrixFreeFunctions::TaskInfo &task_info;
     };
@@ -2007,7 +2007,7 @@ namespace internal
   class MPIComDistribute : public tbb::task
   {
   public:
-    MPIComDistribute (const VectorStruct &src_in)
+    MPIComDistribute (const VectorStruct  &src_in)
       :
       src(src_in)
     {};
@@ -2043,7 +2043,7 @@ namespace internal
     VectorStruct &dst;
   };
 
-#endif // #if DEAL_II_USE_MT==1
+#endif // DEAL_II_WITH_THREADS
 
 } // end of namespace internal
 
@@ -2060,9 +2060,9 @@ MatrixFree<dim, Number>::cell_loop
                                  const std::pair<unsigned int,
                                  unsigned int> &)> &cell_operation,
  OutVector       &dst,
- const InVector &src) const
+ const InVector  &src) const
 {
-#if DEAL_II_USE_MT==1
+#ifdef DEAL_II_WITH_THREADS
 
   // Use multithreading if so requested and if there is enough work to do in
   // parallel (the code might hang if there are less than two chunks!)

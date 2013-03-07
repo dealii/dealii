@@ -169,7 +169,7 @@ namespace Step37
 
 
   template <int dim>
-  double Coefficient<dim>::value (const Point<dim> &p,
+  double Coefficient<dim>::value (const Point<dim>  &p,
                                   const unsigned int component) const
   {
     return value<double>(p,component);
@@ -272,7 +272,7 @@ namespace Step37
     void clear();
 
     void reinit (const DoFHandler<dim>  &dof_handler,
-                 const ConstraintMatrix &constraints,
+                 const ConstraintMatrix  &constraints,
                  const unsigned int      level = numbers::invalid_unsigned_int);
 
     unsigned int m () const;
@@ -397,7 +397,7 @@ namespace Step37
   template <int dim, int fe_degree, typename number>
   void
   LaplaceOperator<dim,fe_degree,number>::reinit (const DoFHandler<dim>  &dof_handler,
-                                                 const ConstraintMatrix &constraints,
+                                                 const ConstraintMatrix  &constraints,
                                                  const unsigned int      level)
   {
     typename MatrixFree<dim,number>::AdditionalData additional_data;

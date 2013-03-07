@@ -92,7 +92,7 @@ SparseMatrix<number>::SparseMatrix (const SparsityPattern &c)
 
 template <typename number>
 SparseMatrix<number>::SparseMatrix (const SparsityPattern &c,
-                                    const IdentityMatrix &id)
+                                    const IdentityMatrix  &id)
   :
   cols(0, "SparseMatrix"),
   val(0),
@@ -172,7 +172,7 @@ SparseMatrix<number>::operator = (const double d)
 
 template <typename number>
 SparseMatrix<number> &
-SparseMatrix<number>::operator= (const IdentityMatrix &id)
+SparseMatrix<number>::operator= (const IdentityMatrix  &id)
 {
   Assert (cols->n_rows() == id.m(),
           ExcDimensionMismatch (cols->n_rows(), id.m()));
@@ -388,7 +388,7 @@ namespace internal
     void vmult_on_subrange (const unsigned int  begin_row,
                             const unsigned int  end_row,
                             const number       *values,
-                            const std::size_t *rowstart,
+                            const std::size_t  *rowstart,
                             const unsigned int *colnums,
                             const InVector     &src,
                             OutVector          &dst,
@@ -773,7 +773,7 @@ namespace internal
     number matrix_norm_sqr_on_subrange (const unsigned int  begin_row,
                                         const unsigned int  end_row,
                                         const number       *values,
-                                        const std::size_t *rowstart,
+                                        const std::size_t  *rowstart,
                                         const unsigned int *colnums,
                                         const InVector     &v)
     {
@@ -836,7 +836,7 @@ namespace internal
     number matrix_scalar_product_on_subrange (const unsigned int  begin_row,
                                               const unsigned int  end_row,
                                               const number       *values,
-                                              const std::size_t *rowstart,
+                                              const std::size_t  *rowstart,
                                               const unsigned int *colnums,
                                               const InVector     &u,
                                               const InVector     &v)
@@ -1220,7 +1220,7 @@ namespace internal
     number residual_sqr_on_subrange (const unsigned int  begin_row,
                                      const unsigned int  end_row,
                                      const number       *values,
-                                     const std::size_t *rowstart,
+                                     const std::size_t  *rowstart,
                                      const unsigned int *colnums,
                                      const InVector     &u,
                                      const InVector     &b,
@@ -1288,7 +1288,7 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
   const unsigned int n = src.size();
   somenumber              *dst_ptr = dst.begin();
   const somenumber        *src_ptr = src.begin();
-  const std::size_t *rowstart_ptr = &cols->rowstart[0];
+  const std::size_t  *rowstart_ptr = &cols->rowstart[0];
 
   // optimize the following loop for
   // the case that the relaxation

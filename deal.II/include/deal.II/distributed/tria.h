@@ -25,11 +25,11 @@
 #include <list>
 #include <utility>
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
 #  include <mpi.h>
 #endif
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
 #include <p4est_connectivity.h>
 #include <p4est.h>
 #include <p4est_ghost.h>
@@ -44,7 +44,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int, int> class Triangulation;
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
 
 namespace internal
 {
@@ -894,7 +894,7 @@ namespace parallel
 }
 
 
-#else // DEAL_II_USE_P4EST
+#else // DEAL_II_WITH_P4EST
 
 namespace parallel
 {
@@ -950,7 +950,7 @@ namespace parallel
        * communicator used by this
        * triangulation.
        */
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       MPI_Comm get_communicator () const;
 #endif
     };

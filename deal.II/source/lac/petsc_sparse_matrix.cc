@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/petsc_sparse_matrix.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/sparsity_pattern.h>
@@ -353,9 +353,26 @@ namespace PETScWrappers
   template void
   SparseMatrix::do_reinit (const CompressedSimpleSparsityPattern &,
                            const bool);
+
+  PetscScalar
+  SparseMatrix::matrix_norm_square (const VectorBase &v) const
+  {
+    Vector tmp (v.size());
+    vmult (tmp, v);
+    return tmp*v;
+  }
+
+  PetscScalar
+  SparseMatrix::matrix_scalar_product (const VectorBase &u,
+                                       const VectorBase &v) const
+  {
+    Vector tmp (v.size());
+    vmult (tmp, v);
+    return u*tmp;
+  }
 }
 
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_PETSC
+#endif // DEAL_II_WITH_PETSC

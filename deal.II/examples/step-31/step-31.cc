@@ -164,7 +164,7 @@ namespace Step31
 
     template <int dim>
     double
-    TemperatureRightHandSide<dim>::value (const Point<dim> &p,
+    TemperatureRightHandSide<dim>::value (const Point<dim>  &p,
                                           const unsigned int component) const
     {
       Assert (component == 0,
@@ -384,7 +384,7 @@ namespace Step31
 
     template <class PreconditionerA, class PreconditionerMp>
     BlockSchurPreconditioner<PreconditionerA, PreconditionerMp>::
-    BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix &S,
+    BlockSchurPreconditioner(const TrilinosWrappers::BlockSparseMatrix  &S,
                              const InverseMatrix<TrilinosWrappers::SparseMatrix,
                              PreconditionerMp>      &Mpinv,
                              const PreconditionerA                      &Apreconditioner)
@@ -472,12 +472,12 @@ namespace Step31
     double
     compute_viscosity(const std::vector<double>          &old_temperature,
                       const std::vector<double>          &old_old_temperature,
-                      const std::vector<Tensor<1,dim> > &old_temperature_grads,
-                      const std::vector<Tensor<1,dim> > &old_old_temperature_grads,
+                      const std::vector<Tensor<1,dim> >  &old_temperature_grads,
+                      const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
                       const std::vector<double>          &old_temperature_laplacians,
                       const std::vector<double>          &old_old_temperature_laplacians,
-                      const std::vector<Tensor<1,dim> > &old_velocity_values,
-                      const std::vector<Tensor<1,dim> > &old_old_velocity_values,
+                      const std::vector<Tensor<1,dim> >  &old_velocity_values,
+                      const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
                       const std::vector<double>          &gamma_values,
                       const double                        global_u_infty,
                       const double                        global_T_variation,
@@ -768,12 +768,12 @@ namespace Step31
   BoussinesqFlowProblem<dim>::
   compute_viscosity (const std::vector<double>          &old_temperature,
                      const std::vector<double>          &old_old_temperature,
-                     const std::vector<Tensor<1,dim> > &old_temperature_grads,
-                     const std::vector<Tensor<1,dim> > &old_old_temperature_grads,
+                     const std::vector<Tensor<1,dim> >  &old_temperature_grads,
+                     const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
                      const std::vector<double>          &old_temperature_laplacians,
                      const std::vector<double>          &old_old_temperature_laplacians,
-                     const std::vector<Tensor<1,dim> > &old_velocity_values,
-                     const std::vector<Tensor<1,dim> > &old_old_velocity_values,
+                     const std::vector<Tensor<1,dim> >  &old_velocity_values,
+                     const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
                      const std::vector<double>          &gamma_values,
                      const double                        global_u_infty,
                      const double                        global_T_variation,

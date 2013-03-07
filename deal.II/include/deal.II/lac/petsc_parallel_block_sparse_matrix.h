@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/base/table.h>
 #  include <deal.II/lac/block_matrix_base.h>
@@ -228,7 +228,7 @@ namespace PETScWrappers
        * applicable if the matrix has
        * only one block row.
        */
-      void Tvmult (BlockVector &dst,
+      void Tvmult (BlockVector  &dst,
                    const Vector &src) const;
 
       /**
@@ -313,7 +313,7 @@ namespace PETScWrappers
 
     inline
     void
-    BlockSparseMatrix::vmult (BlockVector &dst,
+    BlockSparseMatrix::vmult (BlockVector  &dst,
                               const Vector &src) const
     {
       BaseClass::vmult_block_nonblock (dst, src);
@@ -352,7 +352,7 @@ namespace PETScWrappers
 
     inline
     void
-    BlockSparseMatrix::Tvmult (BlockVector &dst,
+    BlockSparseMatrix::Tvmult (BlockVector  &dst,
                                const Vector &src) const
     {
       BaseClass::Tvmult_block_nonblock (dst, src);
@@ -386,6 +386,6 @@ namespace PETScWrappers
 DEAL_II_NAMESPACE_CLOSE
 
 
-#endif    // DEAL_II_USE_PETSC
+#endif    // DEAL_II_WITH_PETSC
 
 #endif    // __deal2__petsc_parallel_block_sparse_matrix_h

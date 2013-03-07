@@ -67,7 +67,7 @@ all: $(TESTS)
 # create a report, where we get exactly one line per test.
 report:
 	@-$(MAKE) -k
-	@-svn info $D | grep '^Revision'
+	@-svn info . | grep '^Revision'
 	@echo 'Date: ' `date -u +"%Y %j  %F  %U-%w"`
 	@echo 'Id: ' $(ID)
 	@for test in $(TESTS) ; do \

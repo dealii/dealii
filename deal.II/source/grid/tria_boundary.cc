@@ -920,7 +920,7 @@ template <>
 Point<3>
 StraightBoundary<1,3>::
 project_to_surface (const Triangulation<1, 3>::quad_iterator &,
-                    const Point<3> &y) const
+                    const Point<3>  &y) const
 {
   return y;
 }
@@ -930,7 +930,7 @@ template <int dim, int spacedim>
 Point<spacedim>
 StraightBoundary<dim, spacedim>::
 project_to_surface (const typename Triangulation<dim, spacedim>::quad_iterator &quad,
-                    const Point<spacedim> &y) const
+                    const Point<spacedim>  &y) const
 {
   if (spacedim <= 2)
     return y;

@@ -318,7 +318,7 @@ public:
    */
   template <typename block_number,
            typename nonblock_number>
-  void Tvmult (BlockVector<block_number> &dst,
+  void Tvmult (BlockVector<block_number>  &dst,
                const Vector<nonblock_number> &src) const;
 
   /**

@@ -38,7 +38,7 @@ for (deal_II_dimension : DIMENSIONS; V1,V2 : DEAL_II_VEC_TEMPLATES; S1, S2 : REA
 
 for(deal_II_dimension : DIMENSIONS)
   {    
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
     template void
       MGTransferPrebuilt<TrilinosWrappers::MPI::Vector>::copy_to_mg (

@@ -109,7 +109,7 @@ public:
    * can be initialized by
    * <tt>DoFAccessor::set_dof_values()</tt>.
    */
-  MappingQ1Eulerian (const VECTOR &euler_transform_vectors,
+  MappingQ1Eulerian (const VECTOR  &euler_transform_vectors,
                      const DoFHandler<dim,spacedim> &shiftmap_dof_handler);
 
   /**

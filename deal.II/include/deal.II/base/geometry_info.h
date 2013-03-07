@@ -2736,7 +2736,7 @@ GeometryInfo<3>::cell_to_child_coordinates (const Point<3>         &p,
 template <int dim>
 inline
 Point<dim>
-GeometryInfo<dim>::cell_to_child_coordinates (const Point<dim> &         /*p*/,
+GeometryInfo<dim>::cell_to_child_coordinates (const Point<dim>         &/*p*/,
                                               const unsigned int        /*child_index*/,
                                               const RefinementCase<dim> /*refine_case*/)
 
@@ -2880,7 +2880,7 @@ GeometryInfo<2>::child_to_cell_coordinates (const Point<2>         &p,
 template <int dim>
 inline
 Point<dim>
-GeometryInfo<dim>::child_to_cell_coordinates (const Point<dim> &         /*p*/,
+GeometryInfo<dim>::child_to_cell_coordinates (const Point<dim>         &/*p*/,
                                               const unsigned int        /*child_index*/,
                                               const RefinementCase<dim> /*refine_case*/)
 {

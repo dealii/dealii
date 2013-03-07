@@ -921,7 +921,7 @@ namespace internal
       template <int dim, int spacedim>
       NumberCache
       Sequential<dim,spacedim>::
-      renumber_dofs (const std::vector<unsigned int> &new_numbers,
+      renumber_dofs (const std::vector<unsigned int>  &new_numbers,
                      dealii::DoFHandler<dim,spacedim> &dof_handler) const
       {
         Implementation::renumber_dofs (new_numbers, IndexSet(0),
@@ -957,7 +957,7 @@ namespace internal
 
       /* --------------------- class ParallelDistributed ---------------- */
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
 
       namespace
       {
@@ -1444,7 +1444,7 @@ namespace internal
          const std::vector<unsigned int> &coarse_cell_to_p4est_tree_permutation,
          const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation)
         {
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
           (void)vertices_with_ghost_neighbors;
           Assert (false, ExcNotImplemented());
 #else
@@ -1668,7 +1668,7 @@ namespace internal
          const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
          const unsigned int level)
         {
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
           (void)dof_handler;
           (void)vertices_with_ghost_neighbors;
           (void)coarse_cell_to_p4est_tree_permutation;
@@ -1881,7 +1881,7 @@ namespace internal
 
       }
 
-#endif // DEAL_II_USE_P4EST
+#endif // DEAL_II_WITH_P4EST
 
 
 
@@ -1892,7 +1892,7 @@ namespace internal
       {
         NumberCache number_cache;
 
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
         (void)dof_handler;
         Assert (false, ExcNotImplemented());
 #else
@@ -2113,7 +2113,7 @@ namespace internal
               }
         }
 #endif // DEBUG
-#endif // DEAL_II_USE_P4EST
+#endif // DEAL_II_WITH_P4EST
 
         return number_cache;
       }
@@ -2125,7 +2125,7 @@ namespace internal
       distribute_mg_dofs (DoFHandler<dim,spacedim> &dof_handler,
                           std::vector<NumberCache> &number_caches) const
       {
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
         (void)dof_handler;
         (void)number_caches;
         Assert (false, ExcNotImplemented());
@@ -2361,7 +2361,7 @@ namespace internal
 
           }
 
-#endif // DEAL_II_USE_P4EST
+#endif // DEAL_II_WITH_P4EST
       }
 
 
@@ -2376,7 +2376,7 @@ namespace internal
 
         NumberCache number_cache;
 
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
         Assert (false, ExcNotImplemented());
 #else
 

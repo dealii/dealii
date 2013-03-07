@@ -15,7 +15,7 @@
 \begin{titlepage}
 \vspace*{7cm}
 \begin{center}
-{\Large deal.II Reference Manual for Version @PACKAGE_VERSION@}\\
+{\Large deal.II Reference Manual for Version @DEAL_II_PACKAGE_VERSION@}\\
 \vspace*{1cm}
 {\large Wolfgang Bangerth, Timo Heister, Guido Kanschat}\\
 \vspace*{0.5cm}

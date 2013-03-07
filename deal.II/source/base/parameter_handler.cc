@@ -32,15 +32,6 @@
 #include <limits>
 
 
-#ifdef DEAL_II_MSVC
-// on Windows systems with MS Visual C/C++, there is a
-// #define for 'max' that collides with std::max. So, if
-// we find that this is indeed the case, #undef it
-#  if defined(max)
-#    undef max
-#  endif
-#endif
-
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -436,7 +427,7 @@ namespace Patterns
   const char *List::description_init = "[List";
 
 
-  List::List (const PatternBase &p,
+  List::List (const PatternBase  &p,
               const unsigned int  min_elements,
               const unsigned int  max_elements)
     :
@@ -571,8 +562,8 @@ namespace Patterns
   const char *Map::description_init = "[Map";
 
 
-  Map::Map (const PatternBase &p_key,
-            const PatternBase &p_value,
+  Map::Map (const PatternBase  &p_key,
+            const PatternBase  &p_value,
             const unsigned int  min_elements,
             const unsigned int  max_elements)
     :

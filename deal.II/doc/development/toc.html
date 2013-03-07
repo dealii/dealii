@@ -17,12 +17,13 @@
     <h1>Information on development with <acronym>deal.II</acronym></h1>
 
     <p>
-    Apart from the online API references and the tutorial, which is
-    covered elsewhere, this page gathers some information that might
-    be of interest if you want to develop programs based on
-    <acronym>deal.II</acronym> yourself, or if you want to contribute
+    Apart from the online API references (the "manual") and the tutorial,
+    which are covered elsewhere, this page gathers some information on
+    developing programs based on
+    <acronym>deal.II</acronym>, as well as on how to contribute
     to the development of <acronym>deal.II</acronym> itself. In the
-    latter case, we encourage you to get anonymous subversion access as
+    latter case, we encourage you to use the current development version
+    instead of a pre-packaged version of <acronym>deal.II</acronym>, as
     described on our <a
     href="http://www.dealii.org/download/">download page</a>.
     </p>
@@ -33,18 +34,24 @@
 
     <ul>
     <li> <p> Documentation of the <a href="svn.html">SVN Archive</a> and
-	information on <a href="http://www.dealii.org/websvn/log.php?repname=deal.II+Repository&path=%2F&isdir=1&" target="_top">Recent changes to the library</a>: If you want to stay
-         informed about what is going on with the library itself, you may want
-         to take a look at this page. You can browse the repository and
-         subscribe to an rss feed too.</p>
+	information on <a href="http://www.dealii.org/websvn/log.php?repname=deal.II+Repository&path=%2F&isdir=1&" target="_top">recent changes to the library</a>.
 
-    <li> <p><a href="makefiles.html" target="body">Makefiles</a>:
-         The library has a file which exports several make variables
-	 to Makefiles which include it. This information may be used
-         to make writing Makefiles more portable and simple. The
-	 exported variables are explained in this page and we show two
-	 generic Makefiles, one for small and one for larger projects.
+    <li> <p>
+         <a href="cmake.html">deal.II CMake documentation</a>:
+         This page provides extensive information about usage
+         of the <acronym>deal.II</acronym> CMake build system.
+
+    <li> <p><a href="cmakelists.html" target="body">Example CMakeLists.txt</a>:
+         An overview of how to write the <code>CMakeLists.txt</code> input
+         files that control <code>cmake</code> if you want to use it for your
+         own project and want it to compile and link against
+         the <acronym>deal.II</acronym> library.
          </p>
+
+    <li> <p>
+         <a href="cmake-internals.html">deal.II CMake internals</a>:
+         This page provides details about <acronym>deal.II</acronym> CMake
+         build system.
 
     <li> <p><a href="writing-documentation.html" target="body">Writing
          documentation</a>: To document the library and our
@@ -55,15 +62,18 @@
          enable automatic documentation generation.
 	 </p>
 
-    <li> <p><a href="../porting.html" target="body">Porting
+    <li> <p><a href="porting.html" target="body">Porting
          <acronym>deal.II</acronym> to a new system</a>:
-         <acronym>deal.II</acronym> uses the mechanism provided by
-         GNU&nbsp;autoconf. Therefore, porting to a reasonably
-         standardized UNIX system should not be too difficult. Other
-         systems, such as proprietary ones, might or might not work (it is
-	 possible, for example, to use Microsoft Windows);
-         see the <a href="../readme.html" target="body">ReadMe</a>
-         file for more information on supported systems and porting.
+
+         <acronym>deal.II</acronym> uses CMake as build system
+         and is fairly ISO (1998) C++ Standard compliant.
+         So, porting to a reasonably <a
+         href="http://www.opengroup.org/austin/">POSIX</a> compliant
+         system with a reasonably ISO C++ compliant compiler shouldn't be
+         much work. Other (mostly proprietary) systems might require more
+         work. See the <a href="../readme.html" target="body">ReadMe</a>
+         file for more information on already supported systems. This
+         resource gives some hints for porting to unknown platforms.
 	 </p>
 
     <li> <p><a href="https://code.google.com/p/dealii/issues/list" target="_top">Bugs</a>:

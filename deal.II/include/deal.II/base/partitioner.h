@@ -470,7 +470,7 @@ namespace Utilities
 
 
     inline
-    const IndexSet &Partitioner::ghost_indices() const
+    const IndexSet  &Partitioner::ghost_indices() const
     {
       return ghost_indices_data;
     }

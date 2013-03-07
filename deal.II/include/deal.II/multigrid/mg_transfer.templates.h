@@ -101,7 +101,7 @@ namespace
       }
   }
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * Adjust vectors on all levels to
    * correct size.  Here, we just
@@ -121,7 +121,7 @@ namespace
        (&mg_dof.get_tria()));
     AssertThrow(tria!=NULL, ExcMessage("multigrid with Trilinos vectors only works with distributed Triangulation!"));
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
     for (unsigned int level=v.min_level();
          level<=v.max_level(); ++level)
       {

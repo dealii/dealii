@@ -218,7 +218,7 @@ public:
    * want to change the pointer
    * variable which we are given.
    */
-  void swap (T  *&tt);
+  void swap (T *&tt);
 
   /**
    * Return an estimate of the
@@ -444,7 +444,7 @@ void SmartPointer<T,P>::swap (SmartPointer<T,Q> &tt)
 
 template <typename T, typename P>
 inline
-void SmartPointer<T,P>::swap (T  *&tt)
+void SmartPointer<T,P>::swap (T *&tt)
 {
   if (t != 0)
     t->unsubscribe (id);
@@ -491,7 +491,7 @@ void swap (SmartPointer<T,P> &t1, SmartPointer<T,Q> &t2)
  */
 template <typename T, typename P>
 inline
-void swap (SmartPointer<T,P> &t1, T  *&t2)
+void swap (SmartPointer<T,P> &t1, T *&t2)
 {
   t1.swap (t2);
 }
@@ -507,7 +507,7 @@ void swap (SmartPointer<T,P> &t1, T  *&t2)
  */
 template <typename T, typename P>
 inline
-void swap (T  *&t1, SmartPointer<T,P> &t2)
+void swap (T *&t1, SmartPointer<T,P> &t2)
 {
   t2.swap (t1);
 }

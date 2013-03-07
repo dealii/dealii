@@ -1,0 +1,148 @@
+#####
+##
+## Copyright (C) 2012, 2013 by the deal.II authors
+##
+## This file is part of the deal.II library.
+##
+## <TODO: Full License information>
+## This file is dual licensed under QPL 1.0 and LGPL 2.1 or any later
+## version of the LGPL license.
+##
+## Author: Matthias Maier <matthias.maier@iwr.uni-heidelberg.de>
+##
+#####
+
+##                                                                       ##
+#             The cmake build system for the deal.II project              #
+#                                                                         #
+#     See doc/readme.html and doc/development/cmake.html for further      #
+#     details on how to use the cmake build system of deal.II.            #
+##                                                                       ##
+
+
+###########################################################################
+#                                                                         #
+#                             Configuration:                              #
+#                                                                         #
+###########################################################################
+
+SET(VERSION "8.0.pre")
+
+#
+# General configuration for cmake:
+#
+CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
+MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
+
+SET(CMAKE_INCLUDE_CURRENT_DIR TRUE)
+
+LIST(APPEND CMAKE_MODULE_PATH
+  ${CMAKE_SOURCE_DIR}/cmake/
+  ${CMAKE_SOURCE_DIR}/cmake/modules/
+  )
+
+#
+# Load all macros:
+#
+INCLUDE(setup_external_macros)
+FILE(GLOB _macro_files "cmake/macros/*.cmake")
+FOREACH(_file ${_macro_files})
+  INCLUDE(${_file})
+ENDFOREACH()
+
+#
+# Check whether the doc and bundled folders are available:
+#
+IF(EXISTS ${CMAKE_SOURCE_DIR}/bundled/CMakeLists.txt)
+  SET(DEAL_II_HAVE_BUNDLED_DIRECTORY TRUE)
+ENDIF()
+
+IF(EXISTS ${CMAKE_SOURCE_DIR}/doc/CMakeLists.txt)
+  SET(DEAL_II_HAVE_DOC_DIRECTORY TRUE)
+ENDIF()
+
+#
+# We have to initialize some cached variables before PROJECT is called, so
+# do it at this point:
+#
+INCLUDE(setup_cached_variables)
+
+#
+# Now, set the project and set up the rest:
+#
+PROJECT(deal.II)
+INCLUDE(setup_deal_ii)
+INCLUDE(setup_compiler_flags)
+
+#
+# Include information about bundled libraries:
+#
+IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
+  INCLUDE(bundled/CMakeLists.txt)
+ENDIF()
+
+#
+# Run all system checks:
+#
+FILE(GLOB _check_files "cmake/checks/*.cmake")
+LIST(SORT _check_files)
+FOREACH(_file ${_check_files})
+  MESSAGE(STATUS "")
+  MESSAGE(STATUS "Include ${_file}")
+  INCLUDE(${_file})
+ENDFOREACH()
+
+#
+# Feature configuration:
+#
+FILE(GLOB _configure_files "cmake/configure/configure_*.cmake")
+LIST(SORT _configure_files) # make sure to include in alphabetical order
+FOREACH(_file ${_configure_files})
+  MESSAGE(STATUS "")
+  MESSAGE(STATUS "Include ${_file}")
+  INCLUDE(${_file})
+ENDFOREACH()
+
+#
+# Finalize the configuration:
+#
+INCLUDE(setup_finalize)
+
+
+###########################################################################
+#                                                                         #
+#                      Compilation and installation:                      #
+#                                                                         #
+###########################################################################
+
+IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
+  ADD_SUBDIRECTORY(bundled)
+ENDIF()
+
+ADD_SUBDIRECTORY(cmake/scripts)
+
+ADD_SUBDIRECTORY(include)
+
+IF(DEAL_II_HAVE_DOC_DIRECTORY)
+  ADD_SUBDIRECTORY(doc)
+ENDIF()
+
+ADD_SUBDIRECTORY(source)
+
+ADD_SUBDIRECTORY(cmake/config) # has to be included after source
+
+ADD_SUBDIRECTORY(contrib) # has to be included after source
+
+ADD_SUBDIRECTORY(examples)
+
+#
+# Define some custom targets for convenience
+#
+INCLUDE(setup_custom_targets)
+
+#
+# And finally, print the configuration:
+#
+FILE(READ ${CMAKE_BINARY_DIR}/summary.log DEAL_II_LOG_SUMMARY)
+MESSAGE("${DEAL_II_LOG_SUMMARY}")
+

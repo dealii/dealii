@@ -123,7 +123,7 @@ public:
   static void project_to_subface (const SubQuadrature       &quadrature,
                                   const unsigned int         face_no,
                                   const unsigned int         subface_no,
-                                  std::vector<Point<dim> > &q_points,
+                                  std::vector<Point<dim> >  &q_points,
                                   const RefinementCase<dim-1> &ref_case=RefinementCase<dim-1>::isotropic_refinement);
 
   /**
@@ -226,7 +226,7 @@ public:
    */
   static
   Quadrature<dim>
-  project_to_child (const Quadrature<dim> &quadrature,
+  project_to_child (const Quadrature<dim>  &quadrature,
                     const unsigned int      child_no);
 
   /**
@@ -249,7 +249,7 @@ public:
    */
   static
   Quadrature<dim>
-  project_to_all_children (const Quadrature<dim> &quadrature);
+  project_to_all_children (const Quadrature<dim>  &quadrature);
 
   /**
    * Project the onedimensional

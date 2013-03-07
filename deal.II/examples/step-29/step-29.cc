@@ -102,7 +102,7 @@ namespace Step29
 
   template <int dim>
   inline
-  void DirichletBoundaryValues<dim>::vector_value (const Point<dim> & /*p*/,
+  void DirichletBoundaryValues<dim>::vector_value (const Point<dim> &/*p*/,
                                                    Vector<double>   &values) const
   {
     Assert (values.size() == 2, ExcDimensionMismatch (values.size(), 2));
@@ -405,7 +405,7 @@ namespace Step29
   // system, which consists of two copies of the scalar Q1 field, one for $v$
   // and one for $w$:
   template <int dim>
-  UltrasoundProblem<dim>::UltrasoundProblem (ParameterHandler &param)
+  UltrasoundProblem<dim>::UltrasoundProblem (ParameterHandler  &param)
     :
     prm(param),
     dof_handler(triangulation),

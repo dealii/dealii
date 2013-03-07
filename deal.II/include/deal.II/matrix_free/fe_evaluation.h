@@ -2280,7 +2280,7 @@ template<typename VectorType>
 inline
 void
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
-::distribute_local_to_global (std::vector<VectorType> &dst,
+::distribute_local_to_global (std::vector<VectorType>  &dst,
                               const unsigned int        first_index) const
 {
   AssertIndexRange (first_index, dst.size());
@@ -2307,7 +2307,7 @@ template<typename VectorType>
 inline
 void
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
-::distribute_local_to_global (std::vector<VectorType *> &dst,
+::distribute_local_to_global (std::vector<VectorType *>  &dst,
                               const unsigned int         first_index) const
 {
   AssertIndexRange (first_index, dst.size());
@@ -2358,7 +2358,7 @@ template<typename VectorType>
 inline
 void
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
-::set_dof_values (std::vector<VectorType> &dst,
+::set_dof_values (std::vector<VectorType>  &dst,
                   const unsigned int        first_index) const
 {
   AssertIndexRange (first_index, dst.size());
@@ -2386,7 +2386,7 @@ template<typename VectorType>
 inline
 void
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
-::set_dof_values (std::vector<VectorType *> &dst,
+::set_dof_values (std::vector<VectorType *>  &dst,
                   const unsigned int         first_index) const
 {
   AssertIndexRange (first_index, dst.size());

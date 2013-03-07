@@ -1375,7 +1375,7 @@ public:
   template <typename ForwardIteratorVec, typename ForwardIteratorInd,
            class VectorType>
   void
-  get_dof_values (const VectorType &global_vector,
+  get_dof_values (const VectorType  &global_vector,
                   ForwardIteratorInd local_indices_begin,
                   ForwardIteratorVec local_vector_begin,
                   ForwardIteratorVec local_vector_end) const;
@@ -1767,7 +1767,7 @@ private:
    */
   void
   make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
-                        internals::GlobalRowsFromLocal &global_rows) const;
+                        internals::GlobalRowsFromLocal  &global_rows) const;
 
   /**
    * Internal helper function for
@@ -2081,7 +2081,7 @@ ConstraintMatrix::distribute_local_to_global (
 template <typename ForwardIteratorVec, typename ForwardIteratorInd,
          class VectorType>
 inline
-void ConstraintMatrix::get_dof_values (const VectorType &global_vector,
+void ConstraintMatrix::get_dof_values (const VectorType  &global_vector,
                                        ForwardIteratorInd local_indices_begin,
                                        ForwardIteratorVec local_vector_begin,
                                        ForwardIteratorVec local_vector_end) const

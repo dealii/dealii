@@ -325,7 +325,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   MPI_Init (&argc,&argv);
 #else
   (void)argc;
@@ -351,7 +351,7 @@ int main(int argc, char *argv[])
   else
     test<2>();
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   MPI_Finalize();
 #endif
 }

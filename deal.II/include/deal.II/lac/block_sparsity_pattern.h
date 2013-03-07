@@ -33,7 +33,7 @@ class BlockSparsityPattern;
 class BlockCompressedSparsityPattern;
 class BlockCompressedSimpleSparsityPattern;
 class BlockCompressedSetSparsityPattern;
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   class BlockSparsityPattern;
@@ -976,7 +976,7 @@ public:
 
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 
 /**

@@ -40,23 +40,23 @@
     </p>
 
     <p>
-      After this, you need to configure and build deal.II using a line
-      like
+      After this, you need to configure <acronym>deal.II</acronym>
+      using a line like
       <code>
 	<pre>
-	  ./configure --with-p4est=/path/to/installation --enable-mpi
-	  make all
+
+    cmake -DP4EST_DIR=/path/to/installation -DDEAL_II_WITH_P4EST=ON -DDEAL_II_WITH_MPI=ON <...>
 	</pre>
       </code>
-      Obviously, you can also add additional flags
-      to <code>./configure</code> as described in the
-      general <a href="../readme.html">ReadMe file</a>.
+      Obviously, you can also add additional flags to
+      <code>cmake</code> as described in the general <a
+      href="../readme.html">ReadMe file</a>.
     </p>
 
     <hr>
-
     <address>
       <a href="mail.html">The deal.II Group</a>
+	$Date$
     </address>
   </body>
 </html>

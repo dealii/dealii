@@ -174,7 +174,7 @@ namespace Step23
 
 
   template <int dim>
-  double InitialValuesU<dim>::value (const Point<dim>  & /*p*/,
+  double InitialValuesU<dim>::value (const Point<dim>  &/*p*/,
                                      const unsigned int component) const
   {
     Assert (component == 0, ExcInternalError());
@@ -184,7 +184,7 @@ namespace Step23
 
 
   template <int dim>
-  double InitialValuesV<dim>::value (const Point<dim>  & /*p*/,
+  double InitialValuesV<dim>::value (const Point<dim>  &/*p*/,
                                      const unsigned int component) const
   {
     Assert (component == 0, ExcInternalError());
@@ -208,7 +208,7 @@ namespace Step23
 
 
   template <int dim>
-  double RightHandSide<dim>::value (const Point<dim>  & /*p*/,
+  double RightHandSide<dim>::value (const Point<dim>  &/*p*/,
                                     const unsigned int component) const
   {
     Assert (component == 0, ExcInternalError());

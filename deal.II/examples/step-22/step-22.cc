@@ -178,7 +178,7 @@ namespace Step22
 
   template <int dim>
   double
-  BoundaryValues<dim>::value (const Point<dim> &p,
+  BoundaryValues<dim>::value (const Point<dim>  &p,
                               const unsigned int component) const
   {
     Assert (component < this->n_components,
@@ -220,7 +220,7 @@ namespace Step22
 
   template <int dim>
   double
-  RightHandSide<dim>::value (const Point<dim>  & /*p*/,
+  RightHandSide<dim>::value (const Point<dim>  &/*p*/,
                              const unsigned int /*component*/) const
   {
     return 0;

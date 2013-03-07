@@ -423,7 +423,7 @@ namespace Step9
   public:
     template <int dim>
     static void estimate (const DoFHandler<dim> &dof,
-                          const Vector<double> &solution,
+                          const Vector<double>  &solution,
                           Vector<float>         &error_per_cell);
 
     DeclException2 (ExcInvalidVectorLength,
@@ -437,7 +437,7 @@ namespace Step9
 
     template <int dim>
     static void estimate_interval (const DoFHandler<dim> &dof,
-                                   const Vector<double> &solution,
+                                   const Vector<double>  &solution,
                                    const IndexInterval   &index_interval,
                                    Vector<float>         &error_per_cell);
   };
@@ -976,7 +976,7 @@ namespace Step9
   template <int dim>
   void
   GradientEstimation::estimate (const DoFHandler<dim> &dof_handler,
-                                const Vector<double> &solution,
+                                const Vector<double>  &solution,
                                 Vector<float>         &error_per_cell)
   {
     // Before starting with the work, we check that the vector into which the
@@ -1054,7 +1054,7 @@ namespace Step9
   template <int dim>
   void
   GradientEstimation::estimate_interval (const DoFHandler<dim> &dof_handler,
-                                         const Vector<double> &solution,
+                                         const Vector<double>  &solution,
                                          const IndexInterval   &index_interval,
                                          Vector<float>         &error_per_cell)
   {

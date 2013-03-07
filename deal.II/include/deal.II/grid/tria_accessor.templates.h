@@ -2883,7 +2883,7 @@ inline
 bool
 CellAccessor<dim,spacedim>::is_locally_owned () const
 {
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
   return true;
 #else
   const types::subdomain_id subdomain = this->subdomain_id();
@@ -2906,7 +2906,7 @@ inline
 bool
 CellAccessor<dim,spacedim>::is_ghost () const
 {
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
   return false;
 #else
   const types::subdomain_id subdomain = this->subdomain_id();
@@ -2930,7 +2930,7 @@ inline
 bool
 CellAccessor<dim,spacedim>::is_artificial () const
 {
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
   return false;
 #else
   return (this->subdomain_id() == numbers::artificial_subdomain_id);

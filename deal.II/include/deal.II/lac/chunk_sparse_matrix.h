@@ -172,7 +172,7 @@ public:
    * diagonal.
    */
   ChunkSparseMatrix (const ChunkSparsityPattern &sparsity,
-                     const IdentityMatrix &id);
+                     const IdentityMatrix  &id);
 
   /**
    * Destructor. Free all memory, but do not
@@ -215,7 +215,7 @@ public:
    * diagonal.
    */
   ChunkSparseMatrix<number> &
-  operator= (const IdentityMatrix &id);
+  operator= (const IdentityMatrix  &id);
 
   /**
    * This operator assigns a scalar to

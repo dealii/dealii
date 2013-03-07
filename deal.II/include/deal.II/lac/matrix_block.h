@@ -793,7 +793,7 @@ inline
 void
 MatrixBlock<MATRIX>::add (const unsigned int   b_row,
                           const unsigned int   n_cols,
-                          const unsigned int *col_indices,
+                          const unsigned int  *col_indices,
                           const number        *values,
                           const bool,
                           const bool)

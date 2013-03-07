@@ -1,0 +1,17 @@
+#!/bin/bash
+
+if test ! -d source -o ! -d include -o ! -d examples ; then
+  echo "*** This script must be run from the top-level directory of deal.II."
+  exit
+fi
+
+if test ! -f contrib/utilities/astyle.rc ; then
+  echo "*** No style file contrib/utilities/astyle.rc found."
+  exit
+fi
+
+echo "--- Indenting all deal.II header and source files"
+astyle --options=contrib/utilities/astyle.rc \
+       include/deal.II/*/*.h \
+       source/*/*.cc \
+       examples/*/*.cc

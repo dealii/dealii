@@ -1442,7 +1442,7 @@ namespace internal
       void
       create_triangulation (const std::vector<Point<spacedim> > &v,
                             const std::vector<CellData<1> >     &cells,
-                            const SubCellData &                   /*subcelldata*/,
+                            const SubCellData                   &/*subcelldata*/,
                             Triangulation<1,spacedim>           &triangulation)
       {
         AssertThrow (v.size() > 0, ExcMessage ("No vertices given"));

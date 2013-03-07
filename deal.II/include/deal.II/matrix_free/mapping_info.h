@@ -70,7 +70,7 @@ namespace internal
                        const std::vector<std::pair<unsigned int,unsigned int> > &cells,
                        const std::vector<unsigned int>         &active_fe_index,
                        const Mapping<dim>                      &mapping,
-                       const std::vector<dealii::hp::QCollection<1> > &quad,
+                       const std::vector<dealii::hp::QCollection<1> >  &quad,
                        const UpdateFlags                        update_flags);
 
       /**
@@ -79,7 +79,7 @@ namespace internal
        */
       UpdateFlags
       compute_update_flags (const UpdateFlags                        update_flags,
-                            const std::vector<dealii::hp::QCollection<1> > &quad) const;
+                            const std::vector<dealii::hp::QCollection<1> >  &quad) const;
 
       /**
        * Returns the type of a given cell as detected during initialization.

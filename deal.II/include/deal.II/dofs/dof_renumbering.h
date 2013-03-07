@@ -891,7 +891,7 @@ namespace DoFRenumbering
    */
   template <int dim>
   void
-  block_wise (MGDoFHandler<dim> &dof_handler,
+  block_wise (MGDoFHandler<dim>  &dof_handler,
               const unsigned int  level);
 
 

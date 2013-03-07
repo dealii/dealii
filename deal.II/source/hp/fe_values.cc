@@ -232,7 +232,7 @@ namespace hp
 
   template <int dim, int spacedim>
   FEFaceValues<dim,spacedim>::FEFaceValues (const hp::MappingCollection<dim,spacedim> &mapping,
-                                            const hp::FECollection<dim,spacedim> &fe_collection,
+                                            const hp::FECollection<dim,spacedim>  &fe_collection,
                                             const hp::QCollection<dim-1> &q_collection,
                                             const UpdateFlags         update_flags)
     :
@@ -244,7 +244,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  FEFaceValues<dim,spacedim>::FEFaceValues (const hp::FECollection<dim,spacedim> &fe_collection,
+  FEFaceValues<dim,spacedim>::FEFaceValues (const hp::FECollection<dim,spacedim>  &fe_collection,
                                             const hp::QCollection<dim-1> &q_collection,
                                             const UpdateFlags         update_flags)
     :
@@ -351,7 +351,7 @@ namespace hp
 
   template <int dim, int spacedim>
   FESubfaceValues<dim,spacedim>::FESubfaceValues (const hp::MappingCollection<dim,spacedim> &mapping,
-                                                  const hp::FECollection<dim,spacedim> &fe_collection,
+                                                  const hp::FECollection<dim,spacedim>  &fe_collection,
                                                   const hp::QCollection<dim-1> &q_collection,
                                                   const UpdateFlags         update_flags)
     :
@@ -363,7 +363,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  FESubfaceValues<dim,spacedim>::FESubfaceValues (const hp::FECollection<dim,spacedim> &fe_collection,
+  FESubfaceValues<dim,spacedim>::FESubfaceValues (const hp::FECollection<dim,spacedim>  &fe_collection,
                                                   const hp::QCollection<dim-1> &q_collection,
                                                   const UpdateFlags         update_flags)
     :

@@ -461,7 +461,7 @@ private:
    * to <tt>std::cerr</tt>, but can be set to another
    * stream through the constructor.
    */
-  std::ostream *std_out;
+  std::ostream  *std_out;
 
   /**
    * Pointer to a stream, where a copy of
@@ -471,7 +471,7 @@ private:
    * You can set and reset this stream
    * by the <tt>attach</tt> function.
    */
-  std::ostream *file;
+  std::ostream  *file;
 
   /**
    * Value denoting the number of

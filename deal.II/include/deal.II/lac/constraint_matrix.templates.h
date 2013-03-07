@@ -1669,8 +1669,8 @@ namespace internals
                       const unsigned int        column_start,
                       const unsigned int        column_end,
                       const FullMatrix<double> &local_matrix,
-                      unsigned int         *&col_ptr,
-                      number             *&val_ptr)
+                      unsigned int *&col_ptr,
+                      number *&val_ptr)
   {
     if (column_end == column_start)
       return;
@@ -2114,7 +2114,7 @@ add_this_index:
 void
 ConstraintMatrix::
 make_sorted_row_list (const std::vector<unsigned int> &local_dof_indices,
-                      internals::GlobalRowsFromLocal &global_rows) const
+                      internals::GlobalRowsFromLocal  &global_rows) const
 {
   const unsigned int n_local_dofs = local_dof_indices.size();
   AssertDimension (n_local_dofs, global_rows.size());

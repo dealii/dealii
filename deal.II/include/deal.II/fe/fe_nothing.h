@@ -339,7 +339,7 @@ public:
   void
   get_subface_interpolation_matrix (const FiniteElement<dim> &source_fe,
                                     const unsigned int index,
-                                    FullMatrix<double> &interpolation_matrix) const;
+                                    FullMatrix<double>  &interpolation_matrix) const;
 
 
 };
