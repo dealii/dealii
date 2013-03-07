@@ -838,19 +838,13 @@ namespace internal
         template <int spacedim>
         static
         void
-        renumber_mg_dofs (const std::vector<unsigned int> &new_numbers,
-                          const IndexSet                  &indices,
-                          DoFHandler<3,spacedim>          &dof_handler,
-                          const unsigned int               level,
-                          const bool                       check_validity)
+        renumber_mg_dofs (const std::vector<unsigned int> &,
+                          const IndexSet                  &,
+                          DoFHandler<3,spacedim>          &,
+                          const unsigned int               ,
+                          const bool                       )
         {
-          // TODO 
-	  (void) new_numbers;
-	  (void) indices;
-	  (void) dof_handler;
-	  (void) level;
-	  (void) check_validity;
-
+          // TODO
           AssertThrow(false, ExcNotImplemented());
         }
 
