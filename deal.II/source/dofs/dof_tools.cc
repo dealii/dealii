@@ -2383,7 +2383,7 @@ namespace DoFTools
                         subface->get_dof_indices (slave_dofs, subface_fe_index);
 
                         for (unsigned int i=0; i<slave_dofs.size(); ++i)
-                          Assert (slave_dofs[i] != numbers::invalid_unsigned_int,
+                          Assert (slave_dofs[i] != numbers::invalid_dof_index,
                                   ExcInternalError());
 
                         // Now create the element constraint for this

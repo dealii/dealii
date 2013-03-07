@@ -185,7 +185,7 @@ namespace internal
                                     dofs_per_cell[0] : dofs_per_cell[cell_active_fe_index[cell_number]];
       for (unsigned int i=0; i<dofs_this_cell; i++)
         {
-	  types::global_dof_index current_dof =
+	        types::global_dof_index current_dof =
             local_indices[lexicographic_inv[i]];
           const std::vector<std::pair<types::global_dof_index,double> >
           *entries_ptr =
@@ -299,7 +299,7 @@ no_constraint:
             {
               for (unsigned int i=0; i<dofs_this_cell; ++i)
                 {
-		  types::global_dof_index current_dof =
+		              types::global_dof_index current_dof =
                     local_indices[lexicographic_inv[i]];
                   if (n_mpi_procs > 1 &&
                       (current_dof < first_owned ||

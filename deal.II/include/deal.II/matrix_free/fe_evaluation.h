@@ -1807,7 +1807,7 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
   // loop over all local dofs. ind_local holds local number on cell, index
   // iterates over the elements of index_local_to_global and dof_indices
   // points to the global indices stored in index_local_to_global
-  const unsigned int *dof_indices = dof_info.begin_indices(cell);
+  const types::global_dof_index *dof_indices = dof_info.begin_indices(cell);
   const std::pair<unsigned short,unsigned short> *indicators =
     dof_info.begin_indicators(cell);
   const std::pair<unsigned short,unsigned short> *indicators_end =

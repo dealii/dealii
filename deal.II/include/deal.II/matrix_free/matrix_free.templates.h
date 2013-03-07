@@ -412,7 +412,7 @@ void MatrixFree<dim,Number>::initialize_indices
   AssertDimension (n_fe, constraint.size());
 
   std::vector<types::global_dof_index> local_dof_indices;
-  std::vector<std::vector<unsigned int> > ghost_dofs(n_fe);
+  std::vector<std::vector<types::global_dof_index> > ghost_dofs(n_fe);
   std::vector<std::vector<std::vector<unsigned int> > > lexicographic_inv(n_fe);
 
   internal::MatrixFreeFunctions::ConstraintValues<double> constraint_values;
@@ -519,10 +519,10 @@ void MatrixFree<dim,Number>::initialize_indices
 
       // cache the constrained indices for use in matrix-vector products
       {
-        const unsigned int
+        const types::global_dof_index
         start_index = dof_info[no].vector_partitioner->local_range().first,
         end_index   = dof_info[no].vector_partitioner->local_range().second;
-        for (unsigned int i=start_index; i<end_index; ++i)
+        for (types::global_dof_index i=start_index; i<end_index; ++i)
           if (constraint[no]->is_constrained(i)==true)
             dof_info[no].constrained_dofs.push_back(i-start_index);
       }

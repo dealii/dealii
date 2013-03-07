@@ -1294,7 +1294,7 @@ namespace internal
         const unsigned int starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
         const types::global_dof_index *pointer = &dof_handler.vertex_dofs[starting_offset];
 
-        Assert (*pointer != numbers::invalid_unsigned_int,
+        Assert (*pointer != numbers::invalid_size_type,
                 ExcInternalError());
 
         unsigned int counter = 0;
@@ -1302,7 +1302,7 @@ namespace internal
           {
             Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
 
-            Assert((*pointer)<std::numeric_limits<unsigned int>::max(), ExcInternalError());
+            Assert((*pointer)<std::numeric_limits<types::global_dof_index>::max(), ExcInternalError());
             const unsigned int this_fe_index = static_cast<unsigned int>(*pointer);
 
             if (this_fe_index == numbers::invalid_unsigned_int)
