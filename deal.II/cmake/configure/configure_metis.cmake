@@ -33,7 +33,6 @@ MACRO(FEATURE_METIS_FIND_EXTERNAL var)
 
       UNSET(METIS_LIBRARY CACHE)
       UNSET(METIS_INCLUDE_DIR CACHE)
-      UNSET(METIS_DIR CACHE)
       SET(METIS_DIR "" CACHE STRING
         "An optional hint to a metis directory"
         )
