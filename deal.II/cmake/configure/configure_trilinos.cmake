@@ -48,12 +48,15 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDFOREACH()
 
     IF(NOT ${var})
-      MESSAGE(WARNING "\n"
-        "The Trilinos installation is missing one or more modules necessary for\n"
-        "the deal.II Trilinos interfaces:\n"
-        "${_modules_missing}\n\n"
-        "Please re-install Trilinos with the missing Trilinos subpackages enabled.\n\n"
+      SET(TRILINOS_ADDITIONAL_INFORMATION
+        "The Trilinos installation found at\n"
+        "  ${TRILINOS_DIR}\n"
+        "is missing one or more modules necessary for the deal.II Trilinos interfaces:\n"
+        "  ${_modules_missing}\n\n"
+        "Please re-install Trilinos with the missing Trilinos subpackages
+        enabled.\n\n"
         )
+      MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_INFORMATION} "\n")
     ENDIF()
 
     #
@@ -62,27 +65,25 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     #   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5062
     #   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5319
     #
-    IF(TRILINOS_VERSION_MAJOR EQUAL 10 AND TRILINOS_VERSION_MINOR EQUAL 6)
-      MESSAGE(WARNING "\n"
-        "Trilinos versions ${TRILINOS_VERSION_MAJOR}.${TRILINOS_VERSION_MINOR}.x have bugs that make\n"
-        "it incompatible with deal.II. Please use versions before 10.6 or after\n"
-        "10.8.1.\n\n"
-        )
-      SET(${var} FALSE)
-    ENDIF()
-
-    #
     # The same is unfortunately true for 10.8.[01]:
     #   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5370
     #
-    IF( TRILINOS_VERSION_MAJOR EQUAL 10 AND
+    IF((TRILINOS_VERSION_MAJOR EQUAL 10 AND
+        TRILINOS_VERSION_MINOR EQUAL 6)
+       OR
+       (TRILINOS_VERSION_MAJOR EQUAL 10 AND
         TRILINOS_VERSION_MINOR EQUAL 8 AND
-        TRILINOS_VERSION_SUBMINOR LESS 2 )
-      MESSAGE(WARNING "\n"
-        "Trilinos versions 10.8.0 and 10.8.1 have bugs that make\n"
+        TRILINOS_VERSION_SUBMINOR LESS 2))
+
+      SET(TRILINOS_ADDITIONAL_INFORMATION
+        ${TRILINOS_ADDITIONAL_INFORMATION}
+        "The Trilinos installation found at\n"
+        "  ${TRILINOS_DIR}\n"
+        "with version ${TRILINOS_VERSION_MAJOR}.${TRILINOS_VERSION_MINOR}.${TRILINOS_VERSION_SUBMINOR} has bugs that make\n"
         "it incompatible with deal.II. Please use versions before 10.6 or after\n"
         "10.8.1.\n\n"
         )
+      MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_INFORMATION} "\n")
       SET(${var} FALSE)
     ENDIF()
 
@@ -93,9 +94,15 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     IF( (TRILINOS_WITH_MPI AND NOT DEAL_II_WITH_MPI)
          OR
          (NOT TRILINOS_WITH_MPI AND DEAL_II_WITH_MPI))
-      MESSAGE(WARNING "\n"
-        "Trilinos has to be configured with the same MPI configuration as deal.II.\n\n"
+      SET(TRILINOS_ADDITIONAL_INFORMATION
+        ${TRILINOS_ADDITIONAL_INFORMATION}
+        "The Trilinos installation found at\n"
+        "  ${TRILINOS_DIR}\n"
+        "has to be configured with the same MPI configuration as deal.II, but found:"
+        "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
+        "  TRILINOS_WITH_MPI = ${TRILINOS_WITH_MPI}\n"
         )
+      MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_INFORMATION} "\n")
       SET(${var} FALSE)
     ENDIF()
 
@@ -131,10 +138,14 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         LIST(APPEND DEAL_II_DEFINITIONS "HAS_C99_TR1_CMATH")
         LIST(APPEND DEAL_II_USER_DEFINITIONS "HAS_C99_TR1_CMATH")
       ELSE()
-        MESSAGE(WARNING "\n"
-          "Your Trilinos installation is not compatible with the C++ standard selected for\n"
+        SET(TRILINOS_ADDITIONAL_INFORMATION
+          ${TRILINOS_ADDITIONAL_INFORMATION}
+          "The Trilinos installation found at\n"
+          "  ${TRILINOS_DIR}\n"
+          "is not compatible with the C++ standard selected for\n"
           "this compiler. See the deal.II FAQ page for a solution.\n\n"
           )
+        MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_INFORMATION} "\n")
         SET(${var} FALSE)
       ENDIF()
     ENDIF()
@@ -195,9 +206,8 @@ ENDMACRO()
 MACRO(FEATURE_TRILINOS_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find a suitable set of trilinos libraries!\n"
+    ${TRILINOS_ADDITIONAL_INFORMATION}
     "Please ensure that all necessary libraries are installed on your computer.\n"
-    "Some Trilinos versions have bugs that make it incompatible with deal.II.\n"
-    "(There will be a warning above if this is the case)\n"
     "If the libraries are not at a default location, either provide some hints\n"
     "for the autodetection:\n"
     "    $ TRILINOS_DIR=\"...\" cmake <...>\n"
