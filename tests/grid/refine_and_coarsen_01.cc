@@ -48,7 +48,7 @@ void check ()
   
   GridRefinement::refine_and_coarsen_fixed_fraction (tria,
 						     estimated_error_per_cell,
-						     0.1, 0);
+						     0.25, 0);
   tria.execute_coarsening_and_refinement ();
 
   deallog << "n_active_cells: " << tria.n_active_cells() << std::endl;
