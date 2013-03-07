@@ -98,7 +98,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         ${TRILINOS_ADDITIONAL_INFORMATION}
         "The Trilinos installation found at\n"
         "  ${TRILINOS_DIR}\n"
-        "has to be configured with the same MPI configuration as deal.II, but found:"
+        "has to be configured with the same MPI configuration as deal.II, but found:\n"
         "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
         "  TRILINOS_WITH_MPI = ${TRILINOS_WITH_MPI}\n"
         )
