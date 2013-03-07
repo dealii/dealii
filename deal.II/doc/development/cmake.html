@@ -29,7 +29,11 @@
       <tr><th colspan="2"><b><small>Table of contents</small></b></th></tr>
       <tr><td valign="top">
 	  <ul>
-	    <li><a href="#operatingconf">Operating cmake</a>
+	    <li><a href="#operating">Operating cmake</a>
+              <ul>
+                <li><a href="#operatingmanip">Manipulating the cache</a>
+                <li><a href="#operatingccmake"><code>ccmake</code> and special build targets </a>
+              </ul>
 	    <li><a href="#configure">Configuration options</a>
 	      <ul>
 		<li><a href="#configurefeature">Feature configuration</a>
@@ -54,7 +58,7 @@
     </table>
     </p>
 
-    <a name="operatingconf"></a>
+    <a name="operating"></a>
     <h3>Operating cmake</h3>
 
     <p>
@@ -82,10 +86,10 @@
     cmake -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
     cmake ../deal.II
       </pre>
-      has no effect: In particular, the second time around it
-      uses the <code>CMAKE_INSTALL_PREFIX</code> value previously
-      passed, along with all other arguments one may have had on
-      the first invocation. This is different from the way the
+      has no effect: In particular, the <code>CMAKE_INSTALL_PREFIX</code>
+      specified on the first invocation of <code>cmake</code> is
+      cached and therefore still valid after the second invocation
+      of <code>cmake</code> This is different from the way the
       <code>autoconf/configure</code> mechanism worked.
     </p>
 
@@ -128,6 +132,48 @@
       <code>TRILINOS_DIR</code>.
     </p>
 
+    <a name="operatingmanip"></a>
+    <h4> Manipulating the cache </h4>
+
+      A cached variable can be set on the command line via
+      <pre>
+
+    cmake -D&lt;VARIABLE&gt;=&lt;VALUE&gt; .
+      </pre>
+
+      Cached variables can be removed from the cache via
+      <pre>
+
+    cmake -U&lt;VARIABLE&gt; .
+      </pre>
+      It is possible to use <code>-U</code> together with a globbing
+      expression. E.g. to remove the current feature configuration and
+      rerun the autodetection on can invoke
+      <pre>
+
+    cmake -U"DEAL_II_WITH_*" .
+      </pre>
+
+    <a name="operatingccmake"></a>
+    <h4> <code>ccmake</code> and special build targets </h4>
+
+      A very convenient way to alter the configuration is to use the graphical
+      cli interface <code>ccmake</code>. It can be invoked via
+      <pre>
+
+    ccmake .
+      </pre>
+      or by
+      <pre>
+
+    make edit_cache
+      </pre>
+
+      A reconfiguration (without editing the cache) can be run via
+      <pre>
+
+    make rebuild_cache
+      </pre>
 
     <a name="configure"></a>
     <h3>Configuration options</h3>
@@ -345,10 +391,10 @@
     <a name="configureoverride"></a>
     <h4> Manual override </h4>
       It is possible to override the CMake find mechanism for external
-      libraries manually. This is e.g. useful if a non standard lapack/blas
-      installation should be used (and cannot be found by the
-      <code>FindLapack.cmake</code> module shipped with CMake)
-      In this case you can by hand
+      libraries manually. This is useful if a non standard library (e.g.
+      lapack/blas) should be used but cannot be found by the
+      <code>FIND_PACKAGE(...)</code> mechanism of cmake.
+      In this case you can set by hand:
       <pre>
 
     cmake -DLAPACK_FOUND=true \
