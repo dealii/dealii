@@ -20,8 +20,8 @@
 #
 
 MACRO(STRIP_FLAG _variable _flag)
-  SET(${_variable} "${${_variable}} ")
-  STRING(REPLACE "${_flag} " "" "${_variable}" ${${_variable}})
+  SET(${_variable} " ${${_variable}} ")
+  STRING(REPLACE " ${_flag} " " " "${_variable}" ${${_variable}})
   STRING(STRIP "${${_variable}}" ${_variable})
 ENDMACRO()
 
