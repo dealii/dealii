@@ -25,13 +25,15 @@ MACRO(FEATURE_HDF5_FIND_EXTERNAL var)
          (NOT HDF5_WITH_MPI AND NOT DEAL_II_WITH_MPI))
       SET(${var} TRUE)
     ELSE()
-      SET(HDF5_ADDITIONAL_WARNING_STRING
+      MESSAGE(STATUS "Insufficient hdf5 installation found: "
+        "hdf5 has to be configured with the same MPI configuration as deal.II."
+        )
+      SET(HDF5_ADDITIONAL_ERROR_STRING
         "Insufficient hdf5 installation found!\n"
         "hdf5 has to be configured with the same MPI configuration as deal.II, but found:\n"
         "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
         "  HDF5_WITH_MPI    = ${HDF5_WITH_MPI}\n"
         )
-      MESSAGE(WARNING "\n" ${HDF5_ADDITIONAL_WARNING_STRING} "\n")
     ENDIF()
   ENDIF()
 ENDMACRO()

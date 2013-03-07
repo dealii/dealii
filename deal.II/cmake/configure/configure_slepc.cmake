@@ -29,11 +29,13 @@ MACRO(FEATURE_SLEPC_FIND_EXTERNAL var)
       SET(${var} TRUE)
     ELSE()
 
-      SET(SLEPC_ADDITIONAL_WARNING_STRING
+      MESSAGE(STATUS "Could not find a sufficient SLEPc installation: "
+        "The SLEPc library must have the same version as the PETSc library."
+        )
+      SET(SLEPC_ADDITIONAL_ERROR_STRING
         "Could not find a sufficient SLEPc installation: "
         "The SLEPc library must have the same version as the PETSc library.\n"
         )
-      MESSAGE(WARNING "\n" ${SLEPC_ADDITIONAL_WARNING_STRING} "\n")
 
       UNSET(SLEPC_INCLUDE_DIR_ARCH CACHE)
       UNSET(SLEPC_INCLUDE_DIR_COMMON CACHE)
@@ -63,7 +65,7 @@ ENDMACRO()
 MACRO(FEATURE_SLEPC_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find the SLEPc library!\n"
-    ${SLEPC_ADDITIONAL_WARNING_STRING}
+    ${SLEPC_ADDITIONAL_ERROR_STRING}
     "Please ensure that the SLEPc library version 3.0.0 or newer is installed on your computer\n"
     "and the version is the same as the one of the installed PETSc library.\n"
     "If the library is not at a default location, either provide some hints\n"

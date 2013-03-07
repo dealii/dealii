@@ -26,11 +26,13 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
     # Check whether p4est supports mpi:
     #
     IF(NOT P4EST_WITH_MPI)
-      SET(HDF5_ADDITIONAL_WARNING_STRING
-        "Insufficient p4est installation found!\n"
-        "p4est has to be configured with enabled MPI.\n"
+      MESSAGE(STATUS "Insufficient p4est installation found: "
+        "p4est has to be configured with MPI enabled."
         )
-      MESSAGE(WARNING "\n" ${P4EST_ADDITIONAL_WARNING_STRING} "\n")
+      SET(HDF5_ADDITIONAL_ERROR_STRING
+        "Insufficient p4est installation found!\n"
+        "p4est has to be configured with MPI enabled.\n"
+        )
 
       UNSET(P4EST_LIBRARY CACHE)
       UNSET(P4EST_INCLUDE_DIR CACHE)
