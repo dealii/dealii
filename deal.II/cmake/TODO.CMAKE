@@ -1,3 +1,8 @@
+Major:
+
+* Mumps may have a transitive link interface to Scotch. Fix this
+
+
 Some last bits and thoughts:
 
 * A TECPLOT feature has to be written
