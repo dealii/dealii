@@ -232,7 +232,7 @@
 #
 # MPI:
 #
-# SET(DEAL_II_WITH_MPI ON CACHE BOOL ""
+# SET(DEAL_II_WITH_MPI ON CACHE BOOL
 #   "Build deal.II with support for mpi"
 #   )
 #
