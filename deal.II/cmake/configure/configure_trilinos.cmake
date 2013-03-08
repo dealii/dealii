@@ -36,7 +36,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     FOREACH(_module
       amesos epetra ifpack aztecoo sacado teuchos
       )
-      LIST_CONTAINS(_module_found ${_module} ${Trilinos_LIBRARIES})
+      ITEM_MATCHES(_module_found ${_module}$ ${Trilinos_LIBRARIES})
       IF(_module_found)
         MESSAGE(STATUS "Found ${_module}")
       ELSE()
