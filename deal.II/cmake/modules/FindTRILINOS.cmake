@@ -42,6 +42,8 @@ FIND_PACKAGE(TRILINOS
     lib${LIB_SUFFIX}/cmake/Trilinos
     lib64/cmake/Trilinos
     lib/cmake/Trilinos
+    include/Trilinos
+    include/trilinos
   NO_SYSTEM_ENVIRONMENT_PATH
   )
 
