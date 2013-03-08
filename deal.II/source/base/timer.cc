@@ -44,7 +44,7 @@ Timer::Timer()
   :
   cumulative_time (0.),
   cumulative_wall_time (0.)
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   , mpi_communicator (MPI_COMM_SELF)
   , sync_wall_time (false)
 #endif
@@ -56,7 +56,7 @@ Timer::Timer()
 
 // in case we use an MPI compiler, use
 // the communicator given from input
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
 Timer::Timer(MPI_Comm mpi_communicator,
              bool sync_wall_time_)
   :
@@ -105,7 +105,7 @@ void Timer::start ()
 {
   running    = true;
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   if (sync_wall_time)
     MPI_Barrier(mpi_communicator);
 #endif
@@ -131,7 +131,7 @@ void Timer::start ()
   start_time = windows::cpu_clock();
   start_time_children = start_time;
 #else
-#  error unsupported platform. Porting not finished.
+#  error Unsupported platform. Porting not finished.
 #endif
 }
 
@@ -167,7 +167,8 @@ double Timer::stop ()
 #else
 #  error Unsupported platform. Porting not finished.
 #endif
-#ifdef DEAL_II_COMPILER_USE_MPI
+
+#ifdef DEAL_II_WITH_MPI
       if (sync_wall_time && Utilities::System::job_supports_mpi())
         {
           this->mpi_data
@@ -215,7 +216,7 @@ double Timer::operator() () const
       const double running_time = windows::cpu_clock() - start_time + cumulative_time;
       return running_time;
 #else
-#  error unsupported platform. Porting not finished.
+#  error Unsupported platform. Porting not finished.
 #endif
     }
   else
@@ -270,7 +271,7 @@ TimerOutput::TimerOutput (std::ostream &stream,
   output_type (output_type),
   out_stream (stream, true),
   output_is_enabled (true)
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   , mpi_communicator (MPI_COMM_SELF)
 #endif
 {}
@@ -285,13 +286,13 @@ TimerOutput::TimerOutput (ConditionalOStream &stream,
   output_type (output_type),
   out_stream (stream),
   output_is_enabled (true)
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   , mpi_communicator (MPI_COMM_SELF)
 #endif
 {}
 
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
 
 TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
                           std::ostream &stream,

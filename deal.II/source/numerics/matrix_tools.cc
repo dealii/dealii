@@ -35,7 +35,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #  include <deal.II/lac/petsc_sparse_matrix.h>
 #  include <deal.II/lac/petsc_parallel_vector.h>
@@ -43,7 +43,7 @@
 #  include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/trilinos_block_sparse_matrix.h>
@@ -2351,7 +2351,7 @@ namespace MatrixTools
 
 
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
   namespace internal
   {
@@ -2561,7 +2561,7 @@ namespace MatrixTools
 
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
   namespace internal
   {

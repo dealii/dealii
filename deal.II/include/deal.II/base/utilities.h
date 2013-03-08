@@ -21,10 +21,10 @@
 #include <functional>
 #include <string>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 #  include <Epetra_Comm.h>
 #  include <Epetra_Map.h>
-#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  else
 #    include <Epetra_SerialComm.h>
@@ -485,7 +485,7 @@ namespace Utilities
   }
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * This namespace provides some of the basic structures used in the
    * initialization of the Trilinos objects (e.g., matrices, vectors, and

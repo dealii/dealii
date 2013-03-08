@@ -15,7 +15,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/lac/trilinos_vector_base.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <cmath>
 #  include <Epetra_Import.h>
@@ -58,7 +58,7 @@ namespace TrilinosWrappers
     last_action (Zero),
     compressed  (true),
     has_ghosts  (false),
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     vector(new Epetra_FEVector(
              Epetra_Map(0,0,Epetra_MpiComm(MPI_COMM_SELF))))
 #else
@@ -91,7 +91,7 @@ namespace TrilinosWrappers
     // When we clear the vector,
     // reset the pointer and generate
     // an empty vector.
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     Epetra_Map map (0, 0, Epetra_MpiComm(MPI_COMM_SELF));
 #else
     Epetra_Map map (0, 0, Epetra_SerialComm());
@@ -285,7 +285,7 @@ namespace TrilinosWrappers
         ++ptr;
       }
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     // in parallel, check that the vector
     // is zero on _all_ processors.
     const Epetra_MpiComm *mpi_comm
@@ -303,7 +303,7 @@ namespace TrilinosWrappers
   bool
   VectorBase::is_non_negative () const
   {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     // if this vector is a parallel one, then
     // we need to communicate to determine
     // the answer to the current
@@ -440,4 +440,4 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS

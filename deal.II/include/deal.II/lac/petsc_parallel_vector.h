@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/lac/exceptions.h>
@@ -664,7 +664,7 @@ namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_PETSC
+#endif // DEAL_II_WITH_PETSC
 
 /*----------------------------   petsc_parallel_vector.h     ---------------------------*/
 

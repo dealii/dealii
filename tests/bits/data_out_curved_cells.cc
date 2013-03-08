@@ -256,7 +256,7 @@ int main ()
 				   // to me, appears to deadlock at
 				   // times. make sure we kill it
 				   // after some time
-#if DEAL_II_USE_MT == 1
+#ifdef DEAL_II_WITH_THREADS
   DeadlockKiller killer;
 #endif
 

@@ -1,0 +1,4 @@
+for (S : REAL_SCALARS)
+  {
+    template class BlockSparseMatrix<S>;
+  }

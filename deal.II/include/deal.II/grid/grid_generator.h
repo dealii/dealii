@@ -211,7 +211,6 @@ public:
                 const Point<dim> (&corners)[dim],
                 const bool           colorize=false);
 
-
   /**
    * @deprecated Use the other function of same name.
    */

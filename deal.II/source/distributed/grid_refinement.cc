@@ -21,7 +21,7 @@
 #include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/trilinos_block_vector.h>
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
 
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_accessor.h>

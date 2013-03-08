@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/lac/block_sparse_matrix.h>
 #  include <deal.II/lac/block_sparsity_pattern.h>
@@ -232,7 +232,7 @@ namespace TrilinosWrappers
 
     // produce a dummy local map and pass it
     // off to the other function
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     Epetra_MpiComm    trilinos_communicator (MPI_COMM_SELF);
 #else
     Epetra_SerialComm trilinos_communicator;

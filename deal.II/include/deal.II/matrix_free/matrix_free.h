@@ -33,7 +33,7 @@
 #include <deal.II/matrix_free/dof_info.h>
 #include <deal.II/matrix_free/mapping_info.h>
 
-#if DEAL_II_USE_MT==1
+#ifdef DEAL_II_WITH_THREADS
 #include <tbb/task.h>
 #include <tbb/task_scheduler_init.h>
 #include <tbb/parallel_for.h>
@@ -1792,7 +1792,7 @@ namespace internal
   }
 
 
-#if DEAL_II_USE_MT==1
+#ifdef DEAL_II_WITH_THREADS
 
   // This defines the TBB data structures that are needed to schedule the
   // partition-partition variant
@@ -2043,7 +2043,7 @@ namespace internal
     VectorStruct &dst;
   };
 
-#endif // #if DEAL_II_USE_MT==1
+#endif // DEAL_II_WITH_THREADS
 
 } // end of namespace internal
 
@@ -2062,7 +2062,7 @@ MatrixFree<dim, Number>::cell_loop
  OutVector       &dst,
  const InVector  &src) const
 {
-#if DEAL_II_USE_MT==1
+#ifdef DEAL_II_WITH_THREADS
 
   // Use multithreading if so requested and if there is enough work to do in
   // parallel (the code might hang if there are less than two chunks!)

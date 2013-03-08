@@ -402,8 +402,9 @@ std::pair<unsigned int,unsigned int>
 BlockIndices::global_to_local (const unsigned int i) const
 {
   Assert (i<total_size(), ExcIndexRange(i, 0, total_size()));
+  Assert (n_blocks > 0, ExcLowerRange(i, 1));
 
-  int block = n_blocks-1;
+  unsigned int block = n_blocks-1;
   while (i < start_indices[block])
     --block;
 

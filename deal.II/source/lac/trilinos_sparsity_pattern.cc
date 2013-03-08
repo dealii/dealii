@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/utilities.h>
 #  include <deal.II/lac/sparsity_pattern.h>
@@ -742,4 +742,4 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS

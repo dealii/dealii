@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/utilities.h>
 #  include <deal.II/lac/sparse_matrix.h>
@@ -1504,4 +1504,4 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS

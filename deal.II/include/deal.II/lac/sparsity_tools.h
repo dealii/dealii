@@ -18,7 +18,7 @@
 
 #include <vector>
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
 #include <mpi.h>
 #include <deal.II/base/index_set.h>
 #endif
@@ -195,7 +195,7 @@ namespace SparsityTools
                          const std::vector<unsigned int> &starting_indices = std::vector<unsigned int>());
 
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   /**
    * Communciate rows in a compressed
    * sparsity pattern over MPI.

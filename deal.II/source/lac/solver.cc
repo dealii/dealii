@@ -34,7 +34,7 @@ template class Solver<Vector<float> >;
 template class Solver<BlockVector<float> >;
 template class Solver<parallel::distributed::Vector<float> >;
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 template class Solver<PETScWrappers::Vector>;
 template class Solver<PETScWrappers::BlockVector>;
 #endif

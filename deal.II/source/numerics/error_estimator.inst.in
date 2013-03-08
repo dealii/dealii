@@ -178,7 +178,7 @@ INSTANTIATE(parallel::distributed::Vector<float>,hp::DoFHandler)
 INSTANTIATE(parallel::distributed::BlockVector<double>,hp::DoFHandler)
 INSTANTIATE(parallel::distributed::BlockVector<float>,hp::DoFHandler)
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 INSTANTIATE(PETScWrappers::Vector,DoFHandler)
 INSTANTIATE(PETScWrappers::BlockVector,DoFHandler)
 
@@ -190,7 +190,7 @@ INSTANTIATE(PETScWrappers::MPI::BlockVector,DoFHandler)
 
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 INSTANTIATE(TrilinosWrappers::Vector,DoFHandler)
 INSTANTIATE(TrilinosWrappers::BlockVector,DoFHandler)
 

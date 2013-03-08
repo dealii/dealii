@@ -28,7 +28,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   class Vector;
@@ -39,7 +39,7 @@ namespace PETScWrappers
 }
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -190,7 +190,7 @@ public:
   Vector (const Vector<OtherNumber> &v);
 #endif
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
   /**
    * Another copy constructor: copy the
    * values from a sequential PETSc wrapper
@@ -219,7 +219,7 @@ public:
   Vector (const PETScWrappers::MPI::Vector &v);
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * Another copy constructor: copy
    * the values from a Trilinos
@@ -427,7 +427,7 @@ public:
    */
   Vector<Number> &operator= (const BlockVector<Number> &v);
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
   /**
    * Another copy operator: copy the
    * values from a sequential PETSc
@@ -462,7 +462,7 @@ public:
 #endif
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * Another copy operator: copy
    * the values from a (sequential

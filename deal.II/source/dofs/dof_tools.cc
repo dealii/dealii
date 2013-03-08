@@ -3008,7 +3008,7 @@ namespace DoFTools
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
-#if defined(DEBUG) && defined(DEAL_II_USE_P4EST)
+#if defined(DEBUG) && defined(DEAL_II_WITH_P4EST)
     // Check whether we run on a non parallel mesh or on a
     // parallel::distributed::Triangulation in serial
     {
@@ -3102,7 +3102,7 @@ namespace DoFTools
     Assert(dim == space_dim,
            ExcNotImplemented());
 
-#if defined(DEBUG) && defined(DEAL_II_USE_P4EST)
+#if defined(DEBUG) && defined(DEAL_II_WITH_P4EST)
     // Check whether we run on a non parallel mesh or on a
     // parallel::distributed::Triangulation in serial
     {
@@ -4499,7 +4499,7 @@ namespace DoFTools
             ExcInternalError());
 
     // reduce information from all CPUs
-#if defined(DEAL_II_USE_P4EST) && defined(DEAL_II_COMPILER_SUPPORTS_MPI)
+#if defined(DEAL_II_WITH_P4EST) && defined(DEAL_II_WITH_MPI)
     const unsigned int dim = DH::dimension;
     const unsigned int spacedim = DH::space_dimension;
 
@@ -4574,8 +4574,8 @@ namespace DoFTools
           += std::count(dofs_by_block.begin(), dofs_by_block.end(),
                         block);
 
-#ifdef DEAL_II_USE_P4EST
-#if DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_P4EST
+#ifdef DEAL_II_WITH_MPI
         // if we are working on a parallel mesh, we now need to collect
         // this information from all processors
         if (const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> *tria

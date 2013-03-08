@@ -94,7 +94,7 @@ namespace GridTools
     // processor without being true on
     // all. however, we can ask for the global
     // number of active cells and use that
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
     if (const parallel::distributed::Triangulation<dim,spacedim> *p_tria
         = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&tria))
       Assert (p_tria->n_global_active_cells() == tria.n_cells(0),
@@ -185,7 +185,7 @@ namespace GridTools
 
     double global_volume = 0;
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     if (const parallel::distributed::Triangulation<dim,spacedim> *p_tria
         = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&triangulation))
       global_volume = Utilities::MPI::sum (local_volume, p_tria->get_communicator());

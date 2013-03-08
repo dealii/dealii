@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #include <deal.II/base/utilities.h>
 #  include <deal.II/base/std_cxx1x/shared_ptr.h>
@@ -29,7 +29,7 @@
 
 #  define TrilinosScalar double
 #  include "Epetra_ConfigDefs.h"
-#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI // only if MPI is installed
+#  ifdef DEAL_II_WITH_MPI // only if MPI is installed
 #    include "mpi.h"
 #    include "Epetra_MpiComm.h"
 #  else
@@ -1274,7 +1274,7 @@ namespace TrilinosWrappers
       }
 
 #ifdef DEBUG
-#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#  ifdef DEAL_II_WITH_MPI
     // check that every process has decided
     // to use the same mode. This will
     // otherwise result in undefined
@@ -2001,7 +2001,7 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS
 
 /*----------------------------   trilinos_vector_base.h     ---------------------------*/
 

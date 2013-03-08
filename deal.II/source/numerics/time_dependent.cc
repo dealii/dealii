@@ -205,7 +205,8 @@ void TimeDependent::start_sweep (const unsigned int s)
 
 void TimeDependent::end_sweep (const unsigned int n_threads)
 {
-  if (DEAL_II_USE_MT && (n_threads > 1))
+#ifdef DEAL_II_WITH_THREADS
+  if (n_threads > 1)
     {
       const unsigned int stride = timesteps.size() / n_threads;
       Threads::ThreadGroup<> threads;
@@ -219,8 +220,13 @@ void TimeDependent::end_sweep (const unsigned int n_threads)
       threads.join_all();
     }
   else
-    // now do the work
-    end_sweep (0, timesteps.size());
+    {
+      // now do the work
+      end_sweep (0, timesteps.size());
+    }
+#else
+  end_sweep (0, timesteps.size());
+#endif
 }
 
 

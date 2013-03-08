@@ -2175,7 +2175,7 @@ namespace Functions
   {
     Assert(dim==2, ExcNotImplemented());
     const double r = p.distance(center);
-#ifdef HAVE_JN_
+#ifdef HAVE_JN
     return jn(order, r*wave_number);
 #else
     Assert(false, ExcMessage("Bessel function jn was not found by configure"));
@@ -2195,7 +2195,7 @@ namespace Functions
     AssertDimension(points.size(), values.size());
     for (unsigned int k=0; k<points.size(); ++k)
       {
-#ifdef HAVE_JN_
+#ifdef HAVE_JN
         const double r = points[k].distance(center);
         values[k] = jn(order, r*wave_number);
 #else
@@ -2221,7 +2221,7 @@ namespace Functions
     Tensor<1,dim> result;
     result[0] = wave_number * co * dJn;
     result[1] = wave_number * si * dJn;
-#ifdef HAVE_JN_
+#ifdef HAVE_JN
     return result;
 #else
     Assert(false, ExcMessage("Bessel function jn was not found by configure"));
@@ -2247,7 +2247,7 @@ namespace Functions
         const double co = (r==0.) ? 0. : (p(0)-center(0))/r;
         const double si = (r==0.) ? 0. : (p(1)-center(1))/r;
 
-#ifdef HAVE_JN_
+#ifdef HAVE_JN
         const double dJn = (order==0)
                            ? (-jn(1, r*wave_number))
                            : (.5*(jn(order-1, wave_number*r) -jn(order+1, wave_number*r)));

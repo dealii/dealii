@@ -147,7 +147,7 @@ namespace Utilities
       // find out the end index for each processor
       // and communicate it (this implies the start
       // index for the next processor)
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       if (n_procs < 2)
         {
           Assert (ghost_indices_data.n_elements() == 0, ExcInternalError());

@@ -22,7 +22,7 @@
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_tools.h>
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
 #  include <p4est_bits.h>
 #  include <p4est_extended.h>
 #  include <p4est_vtk.h>
@@ -45,7 +45,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
 
 namespace internal
 {
@@ -3424,7 +3424,7 @@ namespace parallel
 }
 
 
-#else // DEAL_II_USE_P4EST
+#else // DEAL_II_WITH_P4EST
 
 namespace parallel
 {
@@ -3454,7 +3454,7 @@ namespace parallel
     }
 
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     template <int dim, int spacedim>
     MPI_Comm
     Triangulation<dim,spacedim>::get_communicator () const
@@ -3466,7 +3466,7 @@ namespace parallel
   }
 }
 
-#endif // DEAL_II_USE_P4EST
+#endif // DEAL_II_WITH_P4EST
 
 
 

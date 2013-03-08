@@ -14,7 +14,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/petsc_solver.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/lac/petsc_matrix_base.h>
 #  include <deal.II/lac/petsc_vector_base.h>
@@ -901,4 +901,4 @@ namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_PETSC
+#endif // DEAL_II_WITH_PETSC

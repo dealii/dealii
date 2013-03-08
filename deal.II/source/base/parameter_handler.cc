@@ -32,15 +32,6 @@
 #include <limits>
 
 
-#ifdef DEAL_II_MSVC
-// on Windows systems with MS Visual C/C++, there is a
-// #define for 'max' that collides with std::max. So, if
-// we find that this is indeed the case, #undef it
-#  if defined(max)
-#    undef max
-#  endif
-#endif
-
 DEAL_II_NAMESPACE_OPEN
 
 

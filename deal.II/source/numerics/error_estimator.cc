@@ -1172,7 +1172,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
           const types::subdomain_id         subdomain_id_,
           const types::material_id                  material_id)
 {
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>*>
       (&dof_handler.get_tria())
       != 0)
@@ -1523,7 +1523,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           const types::subdomain_id          subdomain_id_,
           const types::material_id                   material_id)
 {
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
       (&dof_handler.get_tria())
       != 0)
