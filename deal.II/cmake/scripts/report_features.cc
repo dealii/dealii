@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -11,6 +11,10 @@
 //
 //----------------------------------------------------------------------
 
+/*
+ * TODO: Implement a report line for Arpack, Boost and P4est
+ * - 2013, maier
+ */
 #include <deal.II/base/config.h>
 
 #include <iostream>
@@ -51,11 +55,8 @@ extern "C" {
 
 int main()
 {
-#ifdef HAVE_LIBBLAS
-  std::cout << "dealii-feature: BLAS=yes" << std::endl;
-#endif
-
 #ifdef DEAL_II_WITH_LAPACK
+  std::cout << "dealii-feature: BLAS=yes" << std::endl;
   std::cout << "dealii-feature: LAPACK=yes" << std::endl;
 #endif
 
@@ -77,6 +78,12 @@ int main()
 	    << MPI_VERSION << '.'
 	    << MPI_SUBVERSION << std::endl;
 #  endif
+#endif
+
+#ifdef DEAL_II_WITH_THREADS
+  std::cout << "dealii-feature: multithreading=yes" << std::endl;
+#else
+  std::cout << "dealii-feature: multithreading=no" << std::endl;
 #endif
 
 #ifdef DEAL_II_WITH_TRILINOS
