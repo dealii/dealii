@@ -32,3 +32,4 @@ Some last bits and thoughts:
 
 
 * document that we no longer need the two-lib installation of p4est
+* adjust doc/development/testsuite.html
