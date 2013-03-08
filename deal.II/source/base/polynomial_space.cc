@@ -125,7 +125,7 @@ PolynomialSpace<dim>::set_numbering(
 template <int dim>
 double
 PolynomialSpace<dim>::compute_value (const unsigned int i,
-                                     const Point<dim> &p) const
+                                     const Point<dim>  &p) const
 {
   unsigned int ix[dim];
   compute_index(i,ix);
@@ -143,7 +143,7 @@ PolynomialSpace<dim>::compute_value (const unsigned int i,
 template <int dim>
 Tensor<1,dim>
 PolynomialSpace<dim>::compute_grad (const unsigned int i,
-                                    const Point<dim> &p) const
+                                    const Point<dim>  &p) const
 {
   unsigned int ix[dim];
   compute_index(i,ix);
@@ -169,7 +169,7 @@ PolynomialSpace<dim>::compute_grad (const unsigned int i,
 template <int dim>
 Tensor<2,dim>
 PolynomialSpace<dim>::compute_grad_grad (const unsigned int i,
-                                         const Point<dim> &p) const
+                                         const Point<dim>  &p) const
 {
   unsigned int ix[dim];
   compute_index(i,ix);

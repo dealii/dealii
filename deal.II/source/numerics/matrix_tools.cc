@@ -35,7 +35,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #  include <deal.II/lac/petsc_sparse_matrix.h>
 #  include <deal.II/lac/petsc_parallel_vector.h>
@@ -43,7 +43,7 @@
 #  include <deal.II/lac/petsc_parallel_block_sparse_matrix.h>
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/trilinos_block_sparse_matrix.h>
@@ -1122,11 +1122,11 @@ namespace MatrixCreator
 
   template <int dim, int spacedim>
   void
-  create_boundary_mass_matrix (const Mapping<dim, spacedim> &mapping,
+  create_boundary_mass_matrix (const Mapping<dim, spacedim>  &mapping,
                                const DoFHandler<dim,spacedim> &dof,
                                const Quadrature<dim-1>  &q,
-                               SparseMatrix<double> &matrix,
-                               const typename FunctionMap<spacedim>::type &boundary_functions,
+                               SparseMatrix<double>  &matrix,
+                               const typename FunctionMap<spacedim>::type  &boundary_functions,
                                Vector<double>            &rhs_vector,
                                std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                const Function<spacedim> *const coefficient,
@@ -1942,7 +1942,7 @@ namespace MatrixTools
   template <typename number>
   void
   apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
-                         SparseMatrix<number> &matrix,
+                         SparseMatrix<number>  &matrix,
                          Vector<number>   &solution,
                          Vector<number>   &right_hand_side,
                          const bool        eliminate_columns)
@@ -2096,7 +2096,7 @@ namespace MatrixTools
   template <typename number>
   void
   apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
-                         BlockSparseMatrix<number> &matrix,
+                         BlockSparseMatrix<number>  &matrix,
                          BlockVector<number>   &solution,
                          BlockVector<number>   &right_hand_side,
                          const bool             eliminate_columns)
@@ -2351,7 +2351,7 @@ namespace MatrixTools
 
 
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
   namespace internal
   {
@@ -2561,7 +2561,7 @@ namespace MatrixTools
 
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
   namespace internal
   {
@@ -2928,14 +2928,14 @@ namespace MatrixTools
   template
   void
   apply_boundary_values<double> (const std::map<types::global_dof_index,double> &boundary_values,
-                                 SparseMatrix<double> &matrix,
+                                 SparseMatrix<double>  &matrix,
                                  Vector<double>   &solution,
                                  Vector<double>   &right_hand_side,
                                  const bool        eliminate_columns);
   template
   void
   apply_boundary_values<float> (const std::map<types::global_dof_index,double> &boundary_values,
-                                SparseMatrix<float> &matrix,
+                                SparseMatrix<float>  &matrix,
                                 Vector<float>   &solution,
                                 Vector<float>   &right_hand_side,
                                 const bool        eliminate_columns);
@@ -2943,14 +2943,14 @@ namespace MatrixTools
   template
   void
   apply_boundary_values<double> (const std::map<types::global_dof_index,double> &boundary_values,
-                                 BlockSparseMatrix<double> &matrix,
+                                 BlockSparseMatrix<double>  &matrix,
                                  BlockVector<double>   &solution,
                                  BlockVector<double>   &right_hand_side,
                                  const bool        eliminate_columns);
   template
   void
   apply_boundary_values<float> (const std::map<types::global_dof_index,double> &boundary_values,
-                                BlockSparseMatrix<float> &matrix,
+                                BlockSparseMatrix<float>  &matrix,
                                 BlockVector<float>   &solution,
                                 BlockVector<float>   &right_hand_side,
                                 const bool        eliminate_columns);

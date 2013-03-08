@@ -48,11 +48,11 @@
 // we use uint32_t and uint8_t below, which are declared here:
 #include <stdint.h>
 
-#ifdef HAVE_LIBZ
+#ifdef DEAL_II_WITH_ZLIB
 #  include <zlib.h>
 #endif
 
-#ifdef DEAL_II_HAVE_HDF5
+#ifdef DEAL_II_WITH_HDF5
 #include <hdf5.h>
 #endif
 
@@ -218,7 +218,7 @@ namespace
 
 
 
-#ifdef HAVE_LIBZ
+#ifdef DEAL_II_WITH_ZLIB
   /**
    * Do a zlib compression followed
    * by a base64 encoding of the
@@ -1435,7 +1435,7 @@ namespace
   VtuStream::write_point (const unsigned int,
                           const Point<dim> &p)
   {
-#if !defined(HAVE_LIBZ)
+#if !defined(DEAL_II_WITH_ZLIB)
     // write out coordinates
     stream << p;
     // fill with zeroes
@@ -1457,7 +1457,7 @@ namespace
   void
   VtuStream::flush_points ()
   {
-#ifdef HAVE_LIBZ
+#ifdef DEAL_II_WITH_ZLIB
     // compress the data we have in
     // memory and write them to the
     // stream. then release the data
@@ -1476,7 +1476,7 @@ namespace
     unsigned int d2,
     unsigned int d3)
   {
-#if !defined(HAVE_LIBZ)
+#if !defined(DEAL_II_WITH_ZLIB)
     stream << start << '\t'
            << start+d1;
     if (dim>=2)
@@ -1515,7 +1515,7 @@ namespace
   void
   VtuStream::flush_cells ()
   {
-#ifdef HAVE_LIBZ
+#ifdef DEAL_II_WITH_ZLIB
     // compress the data we have in
     // memory and write them to the
     // stream. then release the data
@@ -1529,7 +1529,7 @@ namespace
   std::ostream &
   VtuStream::operator<< (const std::vector<T> &data)
   {
-#ifdef HAVE_LIBZ
+#ifdef DEAL_II_WITH_ZLIB
     // compress the data we have in
     // memory and write them to the
     // stream. then release the data
@@ -1819,12 +1819,12 @@ DataOutBase::GnuplotFlags::GnuplotFlags ()
 
 
 
-void DataOutBase::GnuplotFlags::declare_parameters (ParameterHandler & /*prm*/)
+void DataOutBase::GnuplotFlags::declare_parameters (ParameterHandler &/*prm*/)
 {}
 
 
 
-void DataOutBase::GnuplotFlags::parse_parameters (const ParameterHandler & /*prm*/) const
+void DataOutBase::GnuplotFlags::parse_parameters (const ParameterHandler &/*prm*/) const
 {}
 
 
@@ -2128,12 +2128,12 @@ DataOutBase::GmvFlags::GmvFlags ()
 
 
 
-void DataOutBase::GmvFlags::declare_parameters (ParameterHandler & /*prm*/)
+void DataOutBase::GmvFlags::declare_parameters (ParameterHandler &/*prm*/)
 {}
 
 
 
-void DataOutBase::GmvFlags::parse_parameters (const ParameterHandler & /*prm*/) const
+void DataOutBase::GmvFlags::parse_parameters (const ParameterHandler &/*prm*/) const
 {}
 
 
@@ -2157,12 +2157,12 @@ TecplotFlags (const char *tecplot_binary_file_name,
 
 
 
-void DataOutBase::TecplotFlags::declare_parameters (ParameterHandler & /*prm*/)
+void DataOutBase::TecplotFlags::declare_parameters (ParameterHandler &/*prm*/)
 {}
 
 
 
-void DataOutBase::TecplotFlags::parse_parameters (const ParameterHandler & /*prm*/) const
+void DataOutBase::TecplotFlags::parse_parameters (const ParameterHandler &/*prm*/) const
 {}
 
 
@@ -2181,12 +2181,12 @@ DataOutBase::VtkFlags::VtkFlags ()
 
 
 
-void DataOutBase::VtkFlags::declare_parameters (ParameterHandler & /*prm*/)
+void DataOutBase::VtkFlags::declare_parameters (ParameterHandler &/*prm*/)
 {}
 
 
 
-void DataOutBase::VtkFlags::parse_parameters (const ParameterHandler & /*prm*/) const
+void DataOutBase::VtkFlags::parse_parameters (const ParameterHandler &/*prm*/) const
 {}
 
 
@@ -2208,12 +2208,12 @@ DataOutBase::Deal_II_IntermediateFlags::Deal_II_IntermediateFlags ()
 
 
 
-void DataOutBase::Deal_II_IntermediateFlags::declare_parameters (ParameterHandler & /*prm*/)
+void DataOutBase::Deal_II_IntermediateFlags::declare_parameters (ParameterHandler &/*prm*/)
 {}
 
 
 
-void DataOutBase::Deal_II_IntermediateFlags::parse_parameters (const ParameterHandler & /*prm*/) const
+void DataOutBase::Deal_II_IntermediateFlags::parse_parameters (const ParameterHandler &/*prm*/) const
 {}
 
 
@@ -2481,7 +2481,7 @@ void DataOutBase::write_ucd (const std::vector<Patch<dim,spacedim> > &patches,
 {
   AssertThrow (out, ExcIO());
 
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   // verify that there are indeed
   // patches to be written out. most
   // of the times, people just forget
@@ -2580,7 +2580,7 @@ void DataOutBase::write_dx (const std::vector<Patch<dim,spacedim> > &patches,
 {
   AssertThrow (out, ExcIO());
 
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   // verify that there are indeed
   // patches to be written out. most
   // of the times, people just forget
@@ -2873,12 +2873,12 @@ template <int dim, int spacedim>
 void DataOutBase::write_gnuplot (const std::vector<Patch<dim,spacedim> > &patches,
                                  const std::vector<std::string>          &data_names,
                                  const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &,
-                                 const GnuplotFlags &                      /*flags*/,
+                                 const GnuplotFlags                      &/*flags*/,
                                  std::ostream                            &out)
 {
   AssertThrow (out, ExcIO());
 
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   // verify that there are indeed
   // patches to be written out. most
   // of the times, people just forget
@@ -3113,7 +3113,7 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 {
   AssertThrow (out, ExcIO());
 
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   // verify that there are indeed
   // patches to be written out. most
   // of the times, people just forget
@@ -3473,14 +3473,14 @@ void DataOutBase::write_povray (const std::vector<Patch<dim,spacedim> > &patches
 
 template <int dim, int spacedim>
 void DataOutBase::write_eps (const std::vector<Patch<dim,spacedim> > &patches,
-                             const std::vector<std::string> &          /*data_names*/,
+                             const std::vector<std::string>          &/*data_names*/,
                              const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &,
                              const EpsFlags                          &flags,
                              std::ostream                            &out)
 {
   Assert (out, ExcIO());
 
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   // verify that there are indeed
   // patches to be written out. most
   // of the times, people just forget
@@ -3862,7 +3862,7 @@ void DataOutBase::write_gmv (const std::vector<Patch<dim,spacedim> > &patches,
   Assert(dim<=3, ExcNotImplemented());
   AssertThrow (out, ExcIO());
 
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   // verify that there are indeed
   // patches to be written out. most
   // of the times, people just forget
@@ -4016,7 +4016,7 @@ void DataOutBase::write_tecplot (const std::vector<Patch<dim,spacedim> > &patche
 {
   AssertThrow (out, ExcIO());
 
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   // verify that there are indeed
   // patches to be written out. most
   // of the times, people just forget
@@ -4303,7 +4303,7 @@ void DataOutBase::write_tecplot_binary (const std::vector<Patch<dim,spacedim> > 
 
   AssertThrow (out, ExcIO());
 
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   // verify that there are indeed
   // patches to be written out. most
   // of the times, people just forget
@@ -4610,7 +4610,7 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
 {
   AssertThrow (out, ExcIO());
 
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   // verify that there are indeed
   // patches to be written out. most
   // of the times, people just forget
@@ -4867,7 +4867,7 @@ void DataOutBase::write_vtu_header (std::ostream &out)
       << "\n-->\n";
 
   out << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\"";
-#ifdef HAVE_LIBZ
+#ifdef DEAL_II_WITH_ZLIB
   out << " compressor=\"vtkZLibDataCompressor\"";
 #endif
 #ifdef DEAL_II_WORDS_BIGENDIAN
@@ -4917,7 +4917,7 @@ void DataOutBase::write_vtu_main (const std::vector<Patch<dim,spacedim> > &patch
 {
   AssertThrow (out, ExcIO());
 
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   // verify that there are indeed
   // patches to be written out. most
   // of the times, people just forget
@@ -5008,7 +5008,7 @@ void DataOutBase::write_vtu_main (const std::vector<Patch<dim,spacedim> > &patch
                                 patches[0].data.n_rows()));
 
 
-#ifdef HAVE_LIBZ
+#ifdef DEAL_II_WITH_ZLIB
   const char *ascii_or_binary = "binary";
 #else
   const char *ascii_or_binary = "ascii";
@@ -5097,7 +5097,7 @@ void DataOutBase::write_vtu_main (const std::vector<Patch<dim,spacedim> > &patch
     // uint8_t might be a typedef to unsigned
     // char which is then not printed as
     // ascii integers
-#ifdef HAVE_LIBZ
+#ifdef DEAL_II_WITH_ZLIB
     std::vector<uint8_t> cell_types (n_cells,
                                      static_cast<uint8_t>(vtk_cell_type[dim]));
 #else
@@ -5253,7 +5253,7 @@ DataOutBase::
 write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
                             const std::vector<std::string>          &data_names,
                             const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
-                            const Deal_II_IntermediateFlags &         /*flags*/,
+                            const Deal_II_IntermediateFlags         &/*flags*/,
                             std::ostream                            &out)
 {
   AssertThrow (out, ExcIO());
@@ -5267,7 +5267,7 @@ write_deal_II_intermediate (const std::vector<Patch<dim,spacedim> > &patches,
 
   // then write a header
   out << "[deal.II intermediate format graphics data]" << '\n'
-      << "[written by " << DEAL_II_PACKAGE_STRING << "]" << '\n'
+      << "[written by " << DEAL_II_PACKAGE_NAME << " " << DEAL_II_PACKAGE_VERSION << "]" << '\n'
       << "[Version: " << Deal_II_IntermediateFlags::format_version << "]" << '\n';
 
   out << data_names.size() << '\n';
@@ -5473,7 +5473,7 @@ void DataOutInterface<dim,spacedim>::write_vtu (std::ostream &out) const
 template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::write_vtu_in_parallel (const char *filename, MPI_Comm comm) const
 {
-#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifndef DEAL_II_WITH_MPI
   //without MPI fall back to the normal way to write a vtu file:
   (void)comm;
 
@@ -5535,7 +5535,7 @@ template <int dim, int spacedim>
 void
 DataOutInterface<dim,spacedim>::
 write_pvd_record (std::ostream &out,
-                  const std::vector<std::pair<double,std::string> > &times_and_names) const
+                  const std::vector<std::pair<double,std::string> >  &times_and_names) const
 {
   AssertThrow (out, ExcIO());
 
@@ -5718,7 +5718,7 @@ XDMFEntry DataOutBase::create_xdmf_entry (const std::vector<Patch<dim,spacedim> 
   const unsigned int n_data_sets = data_names.size();
   int             myrank;
 
-#ifndef DEAL_II_HAVE_HDF5
+#ifndef DEAL_II_WITH_HDF5
   // throw an exception, but first make
   // sure the compiler does not warn about
   // the now unused function arguments
@@ -5735,7 +5735,7 @@ XDMFEntry DataOutBase::create_xdmf_entry (const std::vector<Patch<dim,spacedim> 
   compute_sizes<dim,spacedim>(patches, local_node_cell_count[0], local_node_cell_count[1]);
 
   // And compute the global total
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   MPI_Comm_rank(comm, &myrank);
   MPI_Allreduce(local_node_cell_count, global_node_cell_count, 2, MPI_UNSIGNED, MPI_SUM, comm);
 #else
@@ -5826,7 +5826,7 @@ void DataOutBase::write_xdmf_file (const std::vector<Patch<dim,spacedim> > &,
 {
   int             myrank;
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   MPI_Comm_rank(comm, &myrank);
 #else
   (void)comm;
@@ -5909,7 +5909,7 @@ template <int dim, int spacedim>
 void DataOutInterface<dim,spacedim>::
 write_hdf5_parallel (const char *filename, MPI_Comm comm) const
 {
-#ifndef DEAL_II_HAVE_HDF5
+#ifndef DEAL_II_WITH_HDF5
   AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
 #endif
   DataOutBase::write_hdf5_parallel(get_patches(), get_dataset_names(),
@@ -5924,7 +5924,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
                                        const char *filename,
                                        MPI_Comm comm)
 {
-#ifndef DEAL_II_HAVE_HDF5
+#ifndef DEAL_II_WITH_HDF5
   // throw an exception, but first make
   // sure the compiler does not warn about
   // the now unused function arguments
@@ -5946,7 +5946,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 
   // If HDF5 is not parallel and we're using multiple processes, abort
 #ifndef H5_HAVE_PARALLEL
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   int world_size;
   MPI_Comm_size(comm, &world_size);
   AssertThrow (world_size <= 1,
@@ -5964,7 +5964,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   plist_id = H5Pcreate(H5P_FILE_ACCESS);
   AssertThrow(plist_id != -1, ExcIO());
   // If MPI is enabled *and* HDF5 is parallel, we can do parallel output
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
 #ifdef H5_HAVE_PARALLEL
   // Set the access to use the specified MPI_Comm object
   status = H5Pset_fapl_mpio(plist_id, comm, MPI_INFO_NULL);
@@ -5980,7 +5980,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 
   // Compute the global total number of nodes/cells
   // And determine the offset of the data for this process
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   MPI_Allreduce(local_node_cell_count, global_node_cell_count, 2, MPI_UNSIGNED, MPI_SUM, comm);
   MPI_Scan(local_node_cell_count, global_node_cell_offsets, 2, MPI_UNSIGNED, MPI_SUM, comm);
   global_node_cell_offsets[0] -= local_node_cell_count[0];
@@ -6056,7 +6056,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   // Create the property list for a collective write
   plist_id = H5Pcreate(H5P_DATASET_XFER);
   AssertThrow(plist_id >= 0, ExcIO());
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
 #ifdef H5_HAVE_PARALLEL
   status = H5Pset_dxpl_mpio(plist_id, H5FD_MPIO_COLLECTIVE);
   AssertThrow(status >= 0, ExcIO());
@@ -6569,7 +6569,7 @@ DataOutReader<dim,spacedim>::read (std::istream &in)
     getline (in, header);
 
     std::ostringstream s;
-    s << "[written by " << DEAL_II_PACKAGE_STRING << "]";
+    s << "[written by " << DEAL_II_PACKAGE_NAME << " " << DEAL_II_PACKAGE_VERSION << "]";
 
     Assert (header == s.str(), ExcUnexpectedInput(s.str(),header));
   }

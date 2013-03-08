@@ -168,7 +168,7 @@ namespace FETools
    */
   template<int dim, int spacedim>
   void compute_block_renumbering (
-    const FiniteElement<dim,spacedim> &fe,
+    const FiniteElement<dim,spacedim>  &fe,
     std::vector<types::global_dof_index> &renumbering,
     std::vector<types::global_dof_index> &block_data,
     bool return_start_indices = true);
@@ -580,9 +580,9 @@ namespace FETools
            template <int, int> class DH1,
            template <int, int> class DH2,
            class InVector, class OutVector>
-  void interpolate (const DH1<dim,spacedim> &dof1,
+  void interpolate (const DH1<dim,spacedim>  &dof1,
                     const InVector           &u1,
-                    const DH2<dim,spacedim> &dof2,
+                    const DH2<dim,spacedim>  &dof2,
                     const ConstraintMatrix   &constraints,
                     OutVector                &u2);
 
@@ -631,10 +631,10 @@ namespace FETools
    * corresponding to @p dof2, this function is simply an identity mapping.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void back_interpolate (const DoFHandler<dim,spacedim> &dof1,
+  void back_interpolate (const DoFHandler<dim,spacedim>  &dof1,
                          const ConstraintMatrix &constraints1,
                          const InVector         &u1,
-                         const DoFHandler<dim,spacedim> &dof2,
+                         const DoFHandler<dim,spacedim>  &dof2,
                          const ConstraintMatrix &constraints2,
                          OutVector              &u1_interpolated);
 
@@ -666,10 +666,10 @@ namespace FETools
    * and @p z1_difference without ghost elements.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void interpolation_difference(const DoFHandler<dim,spacedim> &dof1,
+  void interpolation_difference(const DoFHandler<dim,spacedim>  &dof1,
                                 const ConstraintMatrix &constraints1,
                                 const InVector         &z1,
-                                const DoFHandler<dim,spacedim> &dof2,
+                                const DoFHandler<dim,spacedim>  &dof2,
                                 const ConstraintMatrix &constraints2,
                                 OutVector              &z1_difference);
 
@@ -725,9 +725,9 @@ namespace FETools
    * Otherwise, the same holds as for the other @p extrapolate function.
    */
   template <int dim, class InVector, class OutVector, int spacedim>
-  void extrapolate (const DoFHandler<dim,spacedim> &dof1,
+  void extrapolate (const DoFHandler<dim,spacedim>  &dof1,
                     const InVector         &z1,
-                    const DoFHandler<dim,spacedim> &dof2,
+                    const DoFHandler<dim,spacedim>  &dof2,
                     const ConstraintMatrix &constraints,
                     OutVector              &z2);
   //@}

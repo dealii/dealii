@@ -234,7 +234,7 @@ ChunkSparseMatrix<number>::ChunkSparseMatrix (const ChunkSparsityPattern &c)
 
 template <typename number>
 ChunkSparseMatrix<number>::ChunkSparseMatrix (const ChunkSparsityPattern &c,
-                                              const IdentityMatrix &id)
+                                              const IdentityMatrix  &id)
   :
   cols(0, "ChunkSparseMatrix"),
   val(0),
@@ -287,7 +287,7 @@ ChunkSparseMatrix<number>::operator = (const double d)
 
 template <typename number>
 ChunkSparseMatrix<number> &
-ChunkSparseMatrix<number>::operator= (const IdentityMatrix &id)
+ChunkSparseMatrix<number>::operator= (const IdentityMatrix  &id)
 {
   Assert (cols->n_rows() == id.m(),
           ExcDimensionMismatch (cols->n_rows(), id.m()));

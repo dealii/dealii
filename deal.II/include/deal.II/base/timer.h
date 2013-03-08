@@ -17,7 +17,7 @@
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
 #  include <mpi.h>
 #endif
 
@@ -76,7 +76,7 @@ public:
    */
   Timer ();
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   /**
    * Constructor that takes an MPI
    * communicator as input. A timer
@@ -233,7 +233,7 @@ private:
    */
   MPI_Comm            mpi_communicator;
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   /**
    * Store whether the wall time is
    * synchronized between machines.
@@ -351,7 +351,7 @@ public:
                const enum OutputFrequency output_frequency,
                const enum OutputType      output_type);
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   /**
    * Constructor that takes an MPI
    * communicator as input. A timer
@@ -533,7 +533,7 @@ void Timer::restart ()
 
 
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
 
 inline
 const Utilities::System::MinMaxAvg &

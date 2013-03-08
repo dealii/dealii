@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/lac/petsc_parallel_vector.h>
 #  include <deal.II/lac/block_indices.h>
@@ -108,7 +108,7 @@ namespace PETScWrappers
        * to those of the given argument and
        * copy the elements.
        */
-      BlockVector (const BlockVector &V);
+      BlockVector (const BlockVector  &V);
 
       /**
        * Constructor. Set the number of
@@ -539,6 +539,6 @@ namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif  // DEAL_II_USE_PETSC
+#endif  // DEAL_II_WITH_PETSC
 
 #endif

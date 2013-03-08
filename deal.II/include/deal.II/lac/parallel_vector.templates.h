@@ -28,7 +28,7 @@ namespace parallel
     void
     Vector<Number>::clear_mpi_requests ()
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       for (size_type j=0; j<compress_requests.size(); j++)
         MPI_Request_free(&compress_requests[j]);
       compress_requests.clear();
@@ -202,7 +202,7 @@ namespace parallel
     void
     Vector<Number>::compress_start (const unsigned int counter)
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       const Utilities::MPI::Partitioner &part = *partitioner;
 
       // nothing to do when we neither have import
@@ -283,7 +283,7 @@ namespace parallel
     void
     Vector<Number>::compress_finish (const bool add_ghost_data)
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       const Utilities::MPI::Partitioner &part = *partitioner;
 
       // nothing to do when we neither have import
@@ -348,7 +348,7 @@ namespace parallel
     void
     Vector<Number>::update_ghost_values_start (const unsigned int counter) const
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       const Utilities::MPI::Partitioner &part = *partitioner;
 
       // nothing to do when we neither have import
@@ -441,7 +441,7 @@ namespace parallel
     void
     Vector<Number>::update_ghost_values_finish () const
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       // wait for both sends and receives to
       // complete, even though only receives are
       // really necessary. this gives (much) better
@@ -469,7 +469,7 @@ namespace parallel
     void
     Vector<Number>::swap (Vector<Number> &v)
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       // introduce a Barrier over all MPI processes
       // to make sure that the compress request are
       // no longer used before changing the owner
@@ -541,7 +541,7 @@ namespace parallel
       // information in order, use as many barriers
       // as there are processors and start writing
       // when it's our turn
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       for (unsigned int i=0; i<partitioner->this_mpi_process(); i++)
         MPI_Barrier (partitioner->get_communicator());
 #endif
@@ -570,7 +570,7 @@ namespace parallel
               << std::endl;
       out << std::endl << std::flush;
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       MPI_Barrier (partitioner->get_communicator());
 
       for (size_type i=partitioner->this_mpi_process()+1;

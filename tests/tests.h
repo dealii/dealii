@@ -125,7 +125,7 @@ set_grain_sizes;
 //
 // the actual sleep time isn't all that important. the point is that
 // we need to kill deadlocked threads at one point, whenever that is
-#if DEAL_II_USE_MT == 1
+#ifdef DEAL_II_WITH_THREADS
 
 struct DeadlockKiller
 {
@@ -180,7 +180,7 @@ DEAL_II_NAMESPACE_CLOSE
 // the number of MPI processes
 std::string output_file_for_mpi (const std::string &directory)
 {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   return (directory + "/ncpu_" +
 	  Utilities::int_to_string (Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) +
 	  "/output");

@@ -116,7 +116,7 @@ namespace Step13
       void set_refinement_cycle (const unsigned int refinement_cycle);
 
       virtual void operator () (const DoFHandler<dim> &dof_handler,
-                                const Vector<double> &solution) const = 0;
+                                const Vector<double>  &solution) const = 0;
     protected:
       unsigned int refinement_cycle;
     };
@@ -172,7 +172,7 @@ namespace Step13
                             TableHandler       &results_table);
 
       virtual void operator () (const DoFHandler<dim> &dof_handler,
-                                const Vector<double> &solution) const;
+                                const Vector<double>  &solution) const;
 
       DeclException1 (ExcEvaluationPointNotFound,
                       Point<dim>,
@@ -203,7 +203,7 @@ namespace Step13
     void
     PointValueEvaluation<dim>::
     operator () (const DoFHandler<dim> &dof_handler,
-                 const Vector<double> &solution) const
+                 const Vector<double>  &solution) const
     {
       // First allocate a variable that will hold the point value. Initialize
       // it with a value that is clearly bogus, so that if we fail to set it
@@ -366,7 +366,7 @@ namespace Step13
                       const typename DataOut<dim>::OutputFormat  output_format);
 
       virtual void operator () (const DoFHandler<dim> &dof_handler,
-                                const Vector<double> &solution) const;
+                                const Vector<double>  &solution) const;
     private:
       const std::string                         output_name_base;
       const typename DataOut<dim>::OutputFormat output_format;
@@ -402,7 +402,7 @@ namespace Step13
     template <int dim>
     void
     SolutionOutput<dim>::operator () (const DoFHandler<dim> &dof_handler,
-                                      const Vector<double> &solution) const
+                                      const Vector<double>  &solution) const
     {
       DataOut<dim> data_out;
       data_out.attach_dof_handler (dof_handler);

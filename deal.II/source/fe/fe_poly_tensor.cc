@@ -83,7 +83,7 @@ namespace
 
 
   void
-  get_face_sign_change (const Triangulation<3>::cell_iterator & /*cell*/,
+  get_face_sign_change (const Triangulation<3>::cell_iterator &/*cell*/,
                         const unsigned int                     /*dofs_per_face*/,
                         std::vector<double>                   &face_sign)
   {

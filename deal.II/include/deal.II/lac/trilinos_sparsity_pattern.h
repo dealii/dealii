@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/base/index_set.h>
@@ -29,7 +29,7 @@
 
 #  include <Epetra_FECrsGraph.h>
 #  include <Epetra_Map.h>
-#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #    include "mpi.h"
 #  else
@@ -1858,7 +1858,7 @@ namespace TrilinosWrappers
 DEAL_II_NAMESPACE_CLOSE
 
 
-#endif // DEAL_II_USE_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS
 
 
 /*--------------------   trilinos_sparsity_pattern.h     --------------------*/

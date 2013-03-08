@@ -602,7 +602,7 @@ MappingQ1<dim,spacedim>::compute_fill (const typename Triangulation<dim,spacedim
                                        const unsigned int  n_q_points,
                                        const DataSetDescriptor  data_set,
                                        const CellSimilarity::Similarity cell_similarity,
-                                       InternalData &data,
+                                       InternalData  &data,
                                        std::vector<Point<spacedim> > &quadrature_points) const
 {
   const UpdateFlags update_flags(data.current_update_flags());
@@ -1115,7 +1115,7 @@ fill_fe_subface_values (const typename Triangulation<dim,spacedim>::cell_iterato
                         typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                         std::vector<Point<spacedim> >     &quadrature_points,
                         std::vector<double>          &JxW_values,
-                        std::vector<Tensor<1,spacedim> > &boundary_forms,
+                        std::vector<Tensor<1,spacedim> >  &boundary_forms,
                         std::vector<Point<spacedim> >     &normal_vectors) const
 {
   // ensure that the following cast
@@ -1149,7 +1149,7 @@ void
 MappingQ1<dim,spacedim>::transform (
   const VectorSlice<const std::vector<Tensor<1, dim> > >  input,
   VectorSlice<std::vector<Tensor<1, spacedim> > >         output,
-  const typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
+  const typename Mapping<dim,spacedim>::InternalDataBase  &mapping_data,
   const MappingType                                       mapping_type) const
 {
   transform_fields(input, output, mapping_data, mapping_type);
@@ -1834,10 +1834,10 @@ transform_real_to_unit_cell_internal (const Triangulation<1,2>::cell_iterator &c
 template<>
 Point<1>
 MappingQ1<1,3>::
-transform_real_to_unit_cell_internal (const Triangulation<1,3>::cell_iterator & /*cell*/,
-                                      const Point<3> & /*p*/,
-                                      const Point<1> & /*initial_p_unit*/,
-                                      InternalData &   /*mdata*/) const
+transform_real_to_unit_cell_internal (const Triangulation<1,3>::cell_iterator &/*cell*/,
+                                      const Point<3> &/*p*/,
+                                      const Point<1> &/*initial_p_unit*/,
+                                      InternalData   &/*mdata*/) const
 {
   Assert(false, ExcNotImplemented());
   return Point<1>();

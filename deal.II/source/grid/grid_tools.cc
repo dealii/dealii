@@ -94,7 +94,7 @@ namespace GridTools
     // processor without being true on
     // all. however, we can ask for the global
     // number of active cells and use that
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
     if (const parallel::distributed::Triangulation<dim,spacedim> *p_tria
         = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&tria))
       Assert (p_tria->n_global_active_cells() == tria.n_cells(0),
@@ -185,7 +185,7 @@ namespace GridTools
 
     double global_volume = 0;
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     if (const parallel::distributed::Triangulation<dim,spacedim> *p_tria
         = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>(&triangulation))
       global_volume = Utilities::MPI::sum (local_volume, p_tria->get_communicator());
@@ -856,7 +856,7 @@ next_cell:
 
   template <int dim, template<int, int> class Container, int spacedim>
   typename Container<dim,spacedim>::active_cell_iterator
-  find_active_cell_around_point (const Container<dim,spacedim> &container,
+  find_active_cell_around_point (const Container<dim,spacedim>  &container,
                                  const Point<spacedim> &p)
   {
     return find_active_cell_around_point(StaticMappingQ1<dim,spacedim>::mapping,
@@ -1256,7 +1256,7 @@ next_cell:
 
   template <int dim, int spacedim>
   void
-  get_subdomain_association (const Triangulation<dim, spacedim> &triangulation,
+  get_subdomain_association (const Triangulation<dim, spacedim>  &triangulation,
                              std::vector<types::subdomain_id> &subdomain)
   {
     Assert (subdomain.size() == triangulation.n_active_cells(),
@@ -2034,7 +2034,7 @@ next_cell:
   typename Triangulation<dim,spacedim>::DistortedCellList
 
   fix_up_distorted_child_cells (const typename Triangulation<dim,spacedim>::DistortedCellList &distorted_cells,
-                                Triangulation<dim,spacedim> & /*triangulation*/)
+                                Triangulation<dim,spacedim> &/*triangulation*/)
   {
     typename Triangulation<dim,spacedim>::DistortedCellList unfixable_subset;
 

@@ -719,7 +719,7 @@ namespace DoFRenumbering
         = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
            (&start->get_dof_handler().get_tria())))
       {
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
         std::vector<types::global_dof_index> local_dof_count(n_buckets);
 
         for (unsigned int c=0; c<n_buckets; ++c)
@@ -1016,7 +1016,7 @@ namespace DoFRenumbering
         = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
            (&start->get_dof_handler().get_tria())))
       {
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
         std::vector<types::global_dof_index> local_dof_count(n_buckets);
 
         for (unsigned int c=0; c<n_buckets; ++c)
@@ -1166,7 +1166,7 @@ namespace DoFRenumbering
 
     if (tria)
       {
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
         //this is a distributed Triangulation. We need to traverse the coarse
         //cells in the order p4est does
         for (unsigned int c = 0; c < tria->n_cells (0); ++c)

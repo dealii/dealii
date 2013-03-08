@@ -19,11 +19,11 @@
 #include <vector>
 #include <algorithm>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 #  include <Epetra_Map.h>
 #endif
 
-#if defined(DEAL_II_COMPILER_SUPPORTS_MPI) || defined(DEAL_II_USE_PETSC)
+#if defined(DEAL_II_WITH_MPI) || defined(DEAL_II_WITH_PETSC)
 #include <mpi.h>
 #else
 typedef int MPI_Comm;
@@ -328,7 +328,7 @@ public:
    */
   void block_read(std::istream &in);
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * Given an MPI communicator,
    * create a Trilinos map object

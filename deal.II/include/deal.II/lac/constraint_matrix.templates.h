@@ -2118,7 +2118,7 @@ add_this_index:
 void
 ConstraintMatrix::
 make_sorted_row_list (const std::vector<size_type> &local_dof_indices,
-                      internals::GlobalRowsFromLocal &global_rows) const
+                      internals::GlobalRowsFromLocal  &global_rows) const
 {
   const size_type n_local_dofs = local_dof_indices.size();
   AssertDimension (n_local_dofs, global_rows.size());

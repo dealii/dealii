@@ -17,33 +17,35 @@
     <h1>Installation instructions and further information
       on <acronym>deal.II</acronym> </h1>
 
-    <p>
-      This document contains the following sections:
-    </p>
-    <ul>
-      <li> <a href="#prerequisites">System requirements</a>
-	<ul>
-	  <li> <a href="#supported">Supported platforms</a>
-	  <li> <a href="#additional-software">Additional software requirements</a>
-	</ul>
-      <li> <a href="#installation">Installation</a>
-	<ul>
-	  <li>  <a href="#unpacking">Unpacking</a>
-	  <li>  <a href="#configuration">Configuring</a>
-	  <li>  <a href="#building">Building the library</a>
-	  <li> <a href="#configuration-options">Configuration options</a>
-            <ul>
-	      <li> <a href="#choose-compiler">Changing the compiler or
-		  compiler flags</a>
-	      <li> <a href="#optional">Selecting optional behavior</a>
-	      <li> <a href="#optional-software">Optional interfaces to
-		  other software packages</a>
-	    </ul>
-	</ul>
-      <li> <a href="#problems">Problems, questions, mailing lists</a>
-      <li> <a href="#license">License</a>
-    </ul>
-
+    <table class="tutorial" width="60%">
+      <tr><th colspan="2"><b><small>Table of contents</small></b></th></tr>
+      <tr><td valign="top">
+	  <ul>
+	    <li> <a href="#prerequisites">System requirements</a>
+	      <ul>
+		<li> <a href="#supported">Supported platforms</a>
+		<li> <a href="#additional-software">Additional software requirements</a>
+	      </ul>
+	    <li> <a href="#installation">Installation</a>
+	      <ul>
+		<li>  <a href="#unpacking">Unpacking</a>
+		<li>  <a href="#configuration">Configuring and building the library</a>
+		<li>  <a href="#documentation">Configuring and building the documentation</a>
+		<li>  <a href="#configuration-options">Configuration options</a>
+		  <ul>
+		    <li> <a href="#optional">Selecting optional behavior</a>
+		    <li> <a href="#optional-software">Optional interfaces to
+			other software packages</a>
+		    <li> <a href="#conf-details">More information on configuring
+			and building the library</a>
+		  </ul>
+	      </ul>
+	    <li> <a href="#problems">Problems, questions, mailing lists</a>
+	    <li> <a href="#license">License</a>
+	  </ul>
+	</td>
+      </tr>
+    </table>
 
 
     <a name="prerequisites"></a>
@@ -56,18 +58,19 @@
       <acronym>deal.II</acronym> is mostly developed on Linux using the
       <a href="http://gcc.gnu.org">GCC</a> compiler. However, it is not
       platform specific and we strive to keep the source code C++
-      standard compliant.
+      Standard compliant.
     </p>
 
     <p>
-      We expect that <acronym>deal.II</acronym> should work on the following
+      <acronym>deal.II</acronym> supports at least the following
       platforms:
       <ul>
-	<li>Linux: using the GCC compiler versions 4.0 or later; using the
-	  clang compiler version 3.1 or later.
+	<li>GNU/Linux: using the GCC compiler version 4.0 or later; using the
+	  Clang compiler version 3.0 or later; using the ICC compiler
+          version 12 or later
 	<li>Mac OS X: using the GCC compiler version 4.0 or later (Please see
           the <a href="https://code.google.com/p/dealii/w/list"
-		 target="_top">deal.II Wiki</a> for installation issues);
+		 target="_top">deal.II Wiki</a> for installation issues)
 	<li><a href="http://www.cygwin.com"
                target="_top">Cygwin/Windows</a> with recent GCC
           versions. For <a href="https://code.google.com/p/dealii/wiki/Windows"
@@ -77,62 +80,53 @@
 		 target="_top">deal.II Wiki</a>!
       </ul>
       Most other combinations of POSIX-style operating systems and C++
-      standards compliant compilers should also work. If they don't, please
-      report it as a bug.
+      Standard compliant compilers should also work. <i>If they don't,
+      please report it as a bug.</i>
     </p>
 
     <p>
-      There are many C++ compilers out there. Our experience is that,
-      unfortunately, most of them do not fully support the C++ 1998 standard
-      upon which we build, and they eventually fail on a project as large as
-      deal.II. Your best bet is to stick with the ones listed above. The only
-      platform where this is not trivial is Microsoft Windows where the widely
-      used Microsoft Visual C++ compiler simply has too many bugs supporting
-      advanced C++ code.
+      Please note that the Microsoft Visual C++ compiler, that is widely
+      used on Microsoft Windows, is not supported. If you need a native
+      Windows target, use the MinGW compiler instead.
     </p>
 
 
     <a name="additional-software"></a>
     <h3>Additional software requirements</h3>
 
-    In order to compile and use the <acronym>deal.II</acronym>
-    libraries you need to have the following programs installed:
+    <p>
+      In order to compile and use <acronym>deal.II</acronym>
+      you need to have the following programs installed:
+    </p>
     <ul>
       <li> <p>
-          Perl: Any Perl 5.x version should work.
+          <a href="http://www.cmake.org/" target="_top">CMake</a> version 2.8.8 or later
 	</p>
 
       <li> <p>
-          Make: We use <a href="http://www.gnu.org"
-			  target="_top">GNU make</a>, version 3.78 or later. Other make
-          programs (i.e. non-GNU) will usually fail
-          to work and are not supported.
+          <a href="http://www.gnu.org/software/make/" target="_top">GNU make</a>, version
+          3.78 or later (or any other generator supported by CMake)
+	</p>
+
+      <li> <p>
+          For generating the documentation:
+          <a href="http://www.perl.org/" target="_top">Perl 5.x</a>,
+	  <a href="http://www.doxygen.org/" target="_top">doxygen</a>
+          and <code>dot</code>, which is part of the
+	  <a href="http://www.graphviz.org" target="_top">GraphViz</a>
+          package
 	</p>
 
       <li> <p>
           For debugging programs, we have found that the
-	  <a href="http://www.gnu.org" target="_top">GNU
-	    debugger gdb</a> is a valuable tool. Other options
-	  are <a href="http://www.gnu.org/software/ddd/" target="_top">DDD</a>
-	  and <a href="http://www.kdbg.org/" target="_top">kdbg</a>, both of
-	  which have graphical user interfaces. Most integrated development
-	  environments like <a href="http://www.kdevelop.org/"
-			       target="_top">kdevelop</a> or
-	  <a href="http://eclipse.org/" target="_top">Eclipse</a> have built
-	  in debuggers as well.
-	</p>
-
-      <li> <p>
-          In case you want to generate the documentation locally on your
-	  machine from the header <acronym>deal.II</acronym> files, you need a
-	  copy of <a href="http://www.doxygen.org/" target="_top">doxygen</a>
-	  on your machine. If not, you can still work with the library and
-	  use the documentation provided on our homepage for reference. Note
-          that in order to generate inheritance graphs for classes, doxygen
-          can use the <code>dot</code> program, which is part of the <a
-									href="http://www.graphviz.org" target="_top">GraphViz</a>
-          package. If this program is not available, then doxygen attempts to
-          generate text-mode graphs; these are much less nice, though.
+	  <a href="http://www.gnu.org/software/gdb/" target="_top">GNU
+	    debugger GDB</a> is an invaluable tool. GDB is a text-based tool
+	    not always easy to use; <a href="http://www.kdbg.org/"
+	    target="_top">kdbg</a>, is one of many graphical user interfaces
+	    for it. Most integrated development environments
+	    like <a href="http://www.kdevelop.org/" target="_top">kdevelop</a>
+	    or <a href="http://eclipse.org/" target="_top">Eclipse</a> have built
+	    in debuggers as well.
 	</p>
 
       <li> <p>
@@ -146,27 +140,29 @@
 	  <a href="http://www.avs.com" target="_top">AVS Explorer</a>,
 	  <a href="http://www.opendx.org" target="_top">Open DX</a>,
 	  <a href="http://www.povray.org" target="_top">Povray</a>,
-          and directly to Encapsulated Postscript. GNUPLOT and a
-          postscript viewer (for EPS) should be available almost
-          everywhere. In the last few years, most new visualization
-          programs have moved to support VTK/VTU format. There are a
-          number of excellent programs that can read VTK and VTU, such as <a
-									     href="http://www.llnl.gov/visit/" target="_top">Visit</a>,
-	  <a href="http://www.paraview.org/HTML/Index.html"
-             target="_top">ParaView</a>, as well as others.
-	  Povray is freely available for almost all
-          platforms. AVS is a commercial program available for most
-          Unix flavors. Tecplot is a commercial program available for
-          Windows and most Unix platforms.
+          and directly to Encapsulated Postscript.
+        </p>
+        <p>
+          <code>gnuplot</code>
+          and a postscript viewer (for <code>eps</code>) should be
+          available almost everywhere. In the last few years, most
+          new visualization programs have moved to support
+          <code>vtk</code>/<code>vtu</code> format. There are a number
+          of excellent programs that can read <code>vtk</code> and
+          <code>vtu</code>, such as
+          <a href="http://www.llnl.gov/visit/" target="_top">Visit</a>,
+          <a href="http://www.paraview.org/HTML/Index.html" target="_top">ParaView</a>,
+	  as well as others. Povray is freely available for almost all
+	  platforms. AVS is a commercial program available for most Unix
+	  flavors. Tecplot is a commercial program available for Windows
+	  and most Unix platforms.
 	</p>
-
 	<p>
-	  In case you didn't find your favorite graphics format above, adding a new
-	  writer to <acronym>deal.II</acronym> is not too difficult as only a
-	  simple
-	  intermediate format needs to be
-	  converted into output (without references to cells,
-	  nodes, types of finite elements, and the like).
+	  In case you didn't find your favorite graphics format above,
+	  adding a new writer to <acronym>deal.II</acronym> is not too
+	  difficult, as only a simple intermediate format needs to be
+	  converted into output (without references to cells, nodes,
+	  types of finite elements, and the like).
 	</p>
     </ul>
 
@@ -178,100 +174,103 @@
 
     <a name="unpacking"></a>
     <h3>Unpacking</h3>
-    The whole library usually comes as a .tar.gz file, that is a
-    tarred file archive which is compressed with gzip. After downloading this
-    tar file, please unpack it at the position where you want to install the
-    deal.II library using either
-    <pre>
-
-      gunzip deal.II-X.Y.Z.tar.gz
-      tar xf deal.II-X.Y.Z.tar
-    </pre>
-    or, if you have GNU tar with
-    <pre>
-
-      tar xzf deal.II-X.Y.Z.tar.gz
-    </pre>
-    Unpacking will create a subdirectory <tt>deal.II</tt> with
-    the whole library wherever you do it. Since deal.II does not have
-    a <tt>make install</tt> which would copy the libraries to a final position,
-    this subdirectory is where the built library will reside.
-
-    <a name="configuration"></a>
-    <h3>Configuration</h3>
 
     <p>
-      Unpacking will create a subdirectory <tt>deal.II</tt>. First run
+      The whole library usually comes as a <code>tar.gz</code> file,
+      which is a file archive compressed with gzip. After downloading it,
+      unpack it using either
       <pre>
 
-	cd deal.II
-	./configure
+	gunzip deal.II-X.Y.Z.tar.gz
+	tar xf deal.II-X.Y.Z.tar
       </pre>
-      to set some paths and find out your system parameters. <tt>configure</tt>
-      supports several flags which are discussed
-      further down <a href="#configuration-options">below</a>.
+      or, if you have GNU tar with
+      <pre>
+
+	tar -xvf deal.II-X.Y.Z.tar.gz
+      </pre>
+      <b>Note:</b> You will want to hang on to the source files
+      of <acronym>deal.II</acronym> after installation as it makes developing
+      much simpler. Consequently, you should do the steps above in a permanent
+      directory, not on <code>/tmp</code> as one often does when installing
+      software.
+    </p>
+
+    <a name="configuration"></a>
+    <h3>Configuring and building the library</h3>
+
+    <p>
+      <acronym>deal.II</acronym> uses the
+      <a href="http://www.cmake.org/" target="_top">CMake</a>
+      integrated configuration and build system. Unpacking will create a
+      subdirectory <tt>deal.II/</tt> in the current directory. Then do the
+      following steps:
+      <pre>
+
+	mkdir build
+	cd build
+	cmake -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
+	make
+	make install
+      </pre>
+      These steps compile, link and install the deal.II library. The
+      whole process should take between a few minutes and an hour, depending
+      on your machine.
     </p>
 
     <p>
-      <code>./configure</code> creates the
-      file <code>deal.II/common/Make.global_options</code>,
-      which remembers paths and configuration options. Please note that it is not
-      possible to move the library directory after configuration. Neither will
-      the library compile, nor will your application programs be able to use it.
-      You can
-      use <code>deal.II/common/Make.global_options</code> in the
-      <a href="development/index.html" target="_top">Makefiles
-	of your own projects</a> to set relevant paths and parameters correctly.
-    </p>
+      <b>Note:</b>
+      <ul>
+	<li> <code>/path/install/dir</code> is the directory which deal.II
+	  should be installed into. This can be a directory in your home
+	  directory (e.g., <code>~/bin/deal.II</code>) or a directory
+	  such as <code>/usr/local</code> if you have root privileges.
 
-    <a name="building"></a>
-    <h3>Building the library</h3>
-    After configuring, type <tt>make</tt>, to obtain the following help (this
-    output may change slightly over time, just try it):
+	<li> If your machine has multiple processors, use <code>make
+	  -jN</code> in the last two steps, where <code>N</code> is the
+	  number of simultaneous build processes you want <code>make</code>
+	  to use at any given time. Allowing <code>make</code> to use
+	  more simultaneous build processes (assuming you have that many
+	  processor cores) will greatly lower the build time.
 
-    <pre>
-      ========================================================================
-      =              Global Makefile for the deal.II libraries               =
-      ========================================================================
-      =                                                                      =
-      = The following targets exist:                                         =
-      =    all        : debug and optimized libraries                        =
-      =    debug      : the debug version of the deal.II library             =
-      =    optimized  : the optimized version of the deal.II library         =
-      =                                                                      =
-      =    contrib    : additional libraries in contrib, if there are any    =
-      =                                                                      =
-      =    online-doc : generate the documentation in HTML format            =
-      =    TODO       : create a "TODO" file from the source files           =
-      =    TAGS       : create a TAGS file from include and source files     =
-      =                                                                      =
-      =    clean      : removes all object files in subdirs                  =
-      =    distclean  : removes all object files, libraries, etc in subdirs  =
-      ========================================================================
-    </pre>
+	<li> If you do not intend to modify the <acronym>deal.II</acronym>
+	  sources and recompile things, then you can remove
+	  the <code>build/</code> directory after the last step.
 
-    <p>
-      To execute one of the commands, type for example <code>make
-	all</code>. Building all libraries takes somewhere between 4 minutes
-      and several hours, depending on the number of processors your machine
-      has, and requires about 2 GB of free disk space. If you have a
-      multi-processor machine, you can call <code>make -j16 all</code>
-      to let <code>make</code> call multiple instances of the compiler
-      (in this case sixteen). This speeds up compilation by about
-      the factor given after <code>-j</code>, at least if you have as many
-      processors.
+	<li> In principle, after installing <acronym>deal.II</acronym>, you
+	  can remove the source directory as well (i.e., the directory into
+	  which <code>tar</code> unpacked the file you downloaded) since
+	  projects using deal.II should only need files that have been
+	  installed. However, you will find it convenient to keep the source
+	  files around anyway, for one reason: When
+	  debugging you often end up with assertions for which you'd like to
+          see the place in the library's source files that triggered it.
+
+	<li> The <acronym>deal.II</acronym> <code>CMake</code> system can accept a
+	  significant number of configuration parameters. See the
+	  discussion <a href="#configuration-options">below</a>.
+
+	<li> If you are changing part of the <acronym>deal.II</acronym>
+	code itself, you can re-compile the library using only the
+	last two commands above in the previously created build
+	directory. It is also possible to change the configuration used
+	in this directory by calling <code>cmake</code> a second time,
+	possibly with different arguments.
+	However, this sometimes leads to surprising results and you may
+	not get exactly what you were hoping for. For more information,
+	see <a href="development/cmake.html">here</a>.
+
+      </ul>
     </p>
 
     <p>
-      The <acronym>deal.II</acronym> libraries come in two versions
-      corresponding to their respective targets:
+      The commands above build and install the <acronym>deal.II</acronym>
+      libraries in two variants:
       <ul>
 	<li>
-	  <p><code>lib/libdeal_II.g</code>: This is the
-	    debug version of the library. It is compiled with compiler flags so
-	    that the library contains information that can be used by debuggers. (The
-	    infix <code>.g</code> was historically chosen because gcc uses the
-	    flag <code>-g</code> to request debugging information).
+	  <p><i>Debug mode</i>: This version of the
+	    library is compiled with compiler flags so
+	    that the library contains information that can be used by debuggers.
 	  </p>
 
 	  <p>
@@ -281,35 +280,19 @@
 	    invaluable means to finding programming bugs since they will
 	    almost always abort your program if something goes wrong. In our
 	    experience, more than ninety per cent of all errors are invalid
-	    parameters (such as vectors having the wrong size, etc) and they
-	    are usually found almost instantaneously displaying the file
+	    parameters (such as vectors having the wrong size, etc.) and they
+	    are usually found almost instantaneously, displaying the file
 	    name and line number of where the problem occurred.
 	  </p>
 
-	<li> <p><code>lib/libdeal_II</code>: This is the
-	    optimized version of the library. You will want to link with it
-	    once you know that your program is working as expected. This
-	    version of the library does not contain the safety checks any more
+	<li> <i>Optimized mode</i>: You will want to link with this version of
+	    the library once you know that your program is working as
+	    expected. It does not contain the safety checks any more
 	    and is compiled with aggressive compiler optimizations. The
 	    resulting executables are smaller and will run between 2 and 10
 	    times faster than the debug executables.
 	  </p>
       </ul>
-      Each library file will have a suffix that depends on the system.
-      If static libraries were requested during
-      configuration, then the suffix is <code>.a</code>. For shared
-      libraries, it is <code>.so</code> (for most Unix-like and Linux
-      systems), <code>.dylib</code> (for Mac OS X), or <code>.dll</code>
-      (for Cygwin/Windows).
-    </p>
-
-    <p>
-      Apart from the libraries, you can generate the full set of
-      documentation files, by typing <code>make online-doc</code>; this takes
-      some minutes but you will
-      have (almost) all the documentation locally on your computer. You
-      will then be able to access it through <a
-						href="documentation.html" target="body">this page</a>.
     </p>
 
     <p>
@@ -319,134 +302,96 @@
       <a href="doxygen/tutorial/index.html" target="_top">tutorial</a>.
     </p>
 
+    <a name="documentation"></a>
+    <h3>Configuring and building the documentation</h3>
+
+    <p>
+      All the documentation about the version that you downloaded and that can
+      be found at the <a href="http://www.dealii.org/" target="_top">
+      http://www.dealii.org/</a> domain  can also be generated locally. To do
+      so, invoke <code>cmake</code> in the build instructions above as follows:
+      <pre>
+
+	cmake -DDEAL_II_COMPONENT_DOCUMENTATION=ON -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
+      </pre>
+      For this to succeed, you will need <a href="http://www.perl.org/"
+      target="_top">Perl 5.x</a>,
+      <a href="http://www.doxygen.org/" target="_top">doxygen</a>
+      and <code>dot</code> (which is part of
+      the <a href="http://www.graphviz.org" target="_top">GraphViz</a>
+      package) to be installed.
+    </p>
+
+    <p>
+      Upon calling <code>make</code> and <code>make install</code>, this will
+      install both this readme, other installation instructions, as well as the
+      <a href="doxygen/deal.II/index.html" target="_top">manual that documents
+      all functions and classes</a> as well as
+      the <a href="doxygen/tutorial/index.html" target="_top"> tutorial
+      of well-documented example programs</a> (the "steps").
+    </p>
+
+    <p>
+      <b>Note:</b> Generating this documentation can take a <i>really long
+      time</i> &mdash; running doxygen through our hundreds of thousands of
+      lines of code can take 15-20 minutes even on a fast machine during which
+      you will not get any output from <code>make</code>.
+    </p>
+
 
     <a name="configuration-options"></a>
     <h3>Configuration options</h3>
 
-    <a name="choose-compiler"></a>
-    <h4>Changing the compiler or compiler flags</h4>
-
-    To instruct <code>configure</code> to use a particular compiler, there are two
-    options: first, you can prepend your search path by the directory
-    of the desired compiler. Alternatively, if your full compiler paths are
-    <tt>mycc</tt> and <tt>myc++</tt> (for example) for your C and C++ compilers,
-    respectively, type into your <tt>csh</tt>:
-    <pre>
-      setenv CC  mycc
-      setenv CXX myc++
-      ./configure
-    </pre>
-    or into your <tt>bash</tt>
-    <pre>
-      export CC=mycc
-      export CXX=myc++
-      ./configure
-    </pre>
-
     <p>
-      The paths to these compilers are stored in the
-      <code>common/Make.global_options</code> files, so the compilers
-      are always used when compiling the library even if the environment
-      variables are not set later on any more (for example if you are working
-      within another window, or have unset the variables for other
-      purposes).
+      <acronym>deal.II</acronym> has a large number of optional interfaces to
+      other libraries. <b>By default, <code>cmake</code> will automatically
+      enable support  for all external libraries it can find in default
+      paths.</b>
+      However, this behavior can be changed using command line switches to
+      the initial call to <code>cmake</code>. A detailed description
+      can be found <a href="development/cmake.html">here</a>.
     </p>
 
     <p>
-      If all you want to do is pass different compiler flags to the
-      compiler, set the standard environment variables <code>CXXFLAGS,
-	CFLAGS, LDFLAGS</code> before calling
-      <code>./configure</code>. For example, to produce
-      <code>gprof</code> output, do:
-      <pre>
-	setenv CXXFLAGS -pg
-	setenv LDFLAGS -pg
-	./configure &lt;configure-options&gt;
-      </pre>
-      The flags so set are used for both optimized and debug mode. If you want to
-      set flags for only one of these two cases, you should
-      set <code>CXXFLAGSO</code> or <code>CXXFLAGSG</code>, respectively.
+      In the following, let us summarize the most common configuration
+      options.
     </p>
-
 
     <a name="optional">
       <h4>Selecting optional behavior</h4></a>
 
-    You can give several flags to ./configure:
     <ul>
       <li>
 	<p>
-	  <code>--enable-shared</code>: Compile the files of deal.II into
-	  shared libraries, rather than statically linked
-	  libraries. Enabling this option saves disk space, link time and
-	  start-up time, so this is the default. Some systems
-	  might not support shared libraries, in which case you should
-	  call ./configure with the parameter
-	  <code>--disable-shared</code>.
+	  <i>Threading</i>: By default, deal.II supports parallelism between
+	  multiple cores on the same machine using threads and a
+	  task-based model built on the
+          <a href="http://threadingbuildingblocks.org/"
+	  target="_top">Threading Building Blocks</a>. You can switch
+	  threading off by passing the <code>-DDEAL_II_WITH_THREADS=OFF</code>
+	  argument to <code>cmake</code>.
 	</p>
 
       <li>
 	<p>
-	  <code>--enable-threads</code>: This flag indicates that those
-	  parts of the library that support this compute in parallel,
-	  using multiple threads, making programs significantly faster on
-	  machines with multiple cores or processors. The default is to
-	  use multiple threads since most machines today have several
-	  processor cores. If this is not desired,
-	  use <code>--disable-threads</code>.
+	  <i>MPI</i>: To enable parallel computations beyond a single node
+	  using the <a href="http://mpi-forum.org/" target="_top">Message
+	  Passing Interface (MPI)</a>, pass the
+	  <code>-DDEAL_II_WITH_MPI=ON</code> argument
+	  to <code>cmake</code>. If <code>cmake</code> found MPI but you
+	  specifically do not want to use it, then
+	  pass <code>-DDEAL_II_WITH_MPI=OFF</code>.
+	</p>
 
-	  <li>
-	    <p>
-	      <code>--enable-mpi</code>: If given this
-	      flag, <code>./configure</code> chooses <code>mpiCC</code>
-	      and <code>mpicc</code> as the C++ and C compilers, respectively,
-	      unless the <code>$CXX</code> and <code>$CC</code> environment
-	      variables have specifically been set to something else. If these
-	      compilers exist and indeed support MPI, then this also switches
-	      on support for MPI in the library.
-	    </p>
-
-	  <li>
-	    <p>
-	      <code>--with-cpu=...</code>: Enable specific optimization
-	      flags for a particular processor. Programs compiled with these options
-	      might not execute on another system, but may be faster on the
-	      particular CPU selected.
-	    </p>
-
-	    <p>
-	      For a complete list of supported values of this switch, you may
-	      take a look at the file <code>aclocal.m4</code> in the top-level
-	      directory. However, the most commonly used value
-	      is <code>--with-cpu=native</code>, indicating that the compiler
-	      should determine the CPU we are running on by itself and
-	      optimize for it.
-	    </p>
-
-	  <li>
-	    <p>
-	      <code>--with-doxygen=...</code>: Select the specified executable
-	      of <code>doxygen</code> over the one automatically found by
-	      <code>./configure</code>. May also be used if no
-	      <code>doxygen</code> can be found automatically.
-	    </p>
+      <li>
+        <p>
+          If you wish to install projects residing under
+          <code>contrib/</code> such as ParameterGUI,
+          specify <code>-DDEAL_II_COMPONENT_CONTRIB=ON</code>.
+          Beware of the fact that parameterGUI needs
+          development packages for Qt.
+	</p>
     </ul>
-
-    <p>
-      <code>./configure</code> stores the paths to some
-      programs, such as the compilers or the Perl interpreter. The
-      compiler which will be used when compiling the library (or your
-      own application) is therefore selected at the time of
-      configuration and independent of the setting of your $PATH
-      environment value at the time when you run <code>make</code>. If
-      you want to change the compiler used, you will therefore have
-      to re-run ./configure.
-    </p>
-
-    <p>
-      It is in general a good idea to run <code>make clean</code>
-      before re-configuring.
-    </p>
 
 
 
@@ -454,271 +399,328 @@
     <a name="optional-software"></a>
     <h4>Optional interfaces to other software packages</h4>
 
-    <p> <acronym>deal.II</acronym> comes with built-in support for a
-      number of external software packages. These packages are
-      sometimes detected automatically, sometimes they must be enabled explicitly
-      during configuration by adding the option <tt>--with-package</tt>.
-      Supported software packages are (the following list contains
-      trademarks belonging to their owners):
+    <p>
+      When configuring interfacing to external libraries, the
+      <code>cmake</code> script by default tries to find all of these
+      libraries in a number of standard locations on your file system.
+      For <i>optional</i> interfaces, it gives up if the library is not
+      found and <acronym>deal.II</acronym> will be built without support
+      for them.
+      However, there is one interface that we <i>need</i> to have: <a
+      href="http://www.boost.org/" target="_top">BOOST</a>. If it is not
+      found externally <code>cmake</code> will resort to the bundled boost
+      version that is part of the <acronym>deal.II</acronym> tar file.
+    </p>
+
+    <p>
+      The following paragraphs describe how the interfaces to the
+      various packages, <acronym>deal.II</acronym> interacts with,
+      can be configured.
+    </p>
+
+    <p>
+    <b>Notes:</b>
+      <ul>
+        <li>
+          <b>The majority of libraries mentioned below should be readily
+          packaged by most Linux distributions. Usually you need to
+          install a <i>development</i> version of a library package,
+          e.g. ending in <code>-dev</code> or <code>-devel</code>.
+          After that <code>cmake</code> will automatically find the
+          library and use it.</b>
+        <li>
+          Configuring the interface to a self compiled package,
+          say <code>foo</code> can usually be done by specifying
+          <code>-DFOO_DIR=/path/to/foo</code>.  Alternatively, you can
+          set <code>FOO_DIR</code> as an environment variable in your
+          <code>.bashrc</code> or <code>.cshrc</code> file so that
+          you do not have to enter this argument again the next time
+          you invoke <code>cmake</code> in a fresh build directory.
+          Any value passed on the command line wins over a value that
+          may be found in an environment variable.
+        <li>
+          To explicitly enable or disable support for
+          a library <code>foo</code> use the argument
+          <code>-DDEAL_II_WITH_FOO=ON</code> resp.
+          <code>-DDEAL_II_WITH_FOO=OFF</code> for <code>cmake</code>.
+    </ul>
     </p>
 
     <dl>
-      <dt>TECPLOT</dt>
-      <dd>Autodetected if one of the variables <tt>$TECHOME</tt>,
-	<tt>$TEC80HOME</tt> or <tt>$TEC90HOME</tt> points to a valid installation
-	of the tecio library. If enabled, allows data output in TECPLOT format.
-      </dd>
-
-      <a name="umfpack"></a>
-      <dt>UMFPACK</dt>
-      <dd>Enabled by <tt>--with-umfpack</tt>. If no argument is given,
-	use the version of UMFPACK that comes bundled with <acronym>deal.II</acronym>. If you
-	want a different version of UMFPACK, provide the path to that
-	version as an argument. Enabling UMFPACK adds the
-	class <tt>SparseDirectUMFPACK</tt> to the library. The default is to not
-	use UMFPACK.
-
-	<p>
-	  If you want to use an external installation of UMFPACK, but UMFPACK was
-	  installed as
-	  part of <code>/usr</code> or <code>/opt</code>, instead of local
-	  directories in a home directory for example, you can use configure
-	  switches <code>--with-umfpack-include, --with-umfpack-libs</code>.
-	</p>
-
-	<p>
-	  Note that UMFPACK has its own license; if
-	  you want to use it with deal.II, please read it and make sure that you
-	  agree with it. You can find the license of UMFPACK <a
-								href="http://www.cise.ufl.edu/research/sparse/umfpack/">here</a>. We
-	  include UMFPACK in the deal.II distributions courtesy of its author,
-	  <a href="http://www.cise.ufl.edu/~davis/">Timothy A. Davis</a>.
-      </dd>
-
-      <a name="petsc"></a>
-      <dt>Petsc</dt>
+      <a name="ARPACK"></a>
+      <dt><a href="http://www.caam.rice.edu/software/ARPACK/" target="_top">ARPACK</a></dt>
       <dd>
 	<p>
-	  <acronym>deal.II</acronym> can interface to
-	  the <a href="http://www.mcs.anl.gov/petsc/"
-		 target="_top">PETSc</a> library. The simplest way to do so is to
-	  set the <code>PETSC_DIR</code> and <code>PETSC_ARCH</code>
-	  environment variables. More information and configuration
-	  options can be found by issuing <code>./configure --help</code>
-	  at the command line, or, <a href="readme-petsc-trilinos.html"
-				      target="body">here</a>.
-	</p>
+	  <a href="http://www.caam.rice.edu/software/ARPACK/"
+	     target="_top">ARPACK</a> is a library for computing large
+          scale eigenvalue problems.
+          <a href="http://www.caam.rice.edu/software/ARPACK/" target="_top">ARPACK</a>
+          should be readily packaged by most Linux distributions.
+          (Don't forget to install a develpment version of the library).
+          To use a self compiled version, specify
+          <code>-DARPACK_DIR=/path/to/arpack</code> on the command line.
 
-	<p>
-	  (<acronym>deal.II</acronym>) version 7.2 (and higher) support
-	  PETSc 3.x.x only; earlier releases are no longer supported.
-	</p>
-      </dd>
-
-      <a name="slepc"></a>
-      <dt>Slepc</dt>
-      <dd>
-	<p>
-	  <acronym>deal.II</acronym> can also interface to
-	  the <a href="http://www.grycap.upv.es/slepc/"
-		 target="_top">SLEPc</a> library. The way to do it is to set
-	  the <code>SLEPC_DIR</code> environment variable by
-	  passing <code>--with-slepc=/path/to/slepc</code>
-	  to <acronym>deal.II</acronym>'s <code>./configure</code> script.
-	  The use of SLEPc is optional, however, for the interface with
-	  SLEPc to work at all, <acronym>deal.II</acronym>'s interface to
-	  PETSc must also be configured correctly (see the notes above on
-	  how to do this).
-	</p>
-      </dd>
-
-      <a name="trilinos"></a>
-      <dt>Trilinos</dt>
-      <dd>
-	<p>
-	  <acronym>deal.II</acronym> can also interface
-	  to <a href="http://trilinos.sandia.gov" target="_top">Trilinos</a>. The
-	  simplest way to use these interfaces is to
-	  pass <code>--with-trilinos=/path/to/trilinos</code>
-	  to <acronym>deal.II</acronym>'s <code>./configure</code> script.  Note
-	  that not all versions of Trilinos are compatible
-	  with <acronym>deal.II</acronym>.  More details about compatibility and
-	  configuration can be found <a href="readme-petsc-trilinos.html"
-					target="body">here</a>.
-	</p>
-      </dd>
-
-      <a name="metis"></a>
-      <dt>Metis</dt>
-      <dd>
-	<p>
-	  In order to generate partitionings of triangulations, we have
-	  functions that
-	  call <a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview"
-		  target="_top">METIS</a> library. METIS is a library that
-	  provides various methods to partition graphs, which we use to
-	  define which cell belongs to which part of a
-	  triangulation. The main point in using METIS is to generate
-	  partitions so that the interfaces between cell blocks are as
-	  small as possible. This data can, in turn, be used to
-	  distribute degrees of freedom onto different processors when
-	  using PETSc and/or SLEPc in parallel mode.
-	</p>
-
-	<p>
-	  As with PETSc and SLEPc, the use of METIS is optional.  If you
-	  wish to use it, you can do so by having a METIS installation
-	  around at the time of calling
-	  <code>./configure</code> by either setting
-	  the <code>METIS_DIR</code> environment variable denoting the
-	  path to the METIS library, or using the
-	  <code>--with-metis</code> flag.
-	</p>
-
-	<p>
-	  (<acronym>deal.II</acronym>) version 7.2 (and higher) support
-	  METIS 5.x.x only; earlier releases are no longer
-	  supported.  <br>METIS is not needed when
-	  using <code>p4est</code> to parallelize programs, see below.
-	</p>
-      </dd>
-
-      <a name="p4est"></a>
-      <dt>p4est</dt>
-      <dd>
-	<p>
-	  p4est is a library that <acronym>deal.II</acronym> uses to
-	  distribute very large meshes across multiple processors (think
-	  meshes with a billion cells on 10,000 processors). Using and
-	  installing p4est is discussed <a href="external-libs/p4est.html"
-					   target="body">here</a>.
-	  To configure <acronym>deal.II</acronym> with p4est, you will
-	  need to use the <code>--with-path=/path/to/path</code>
-	  switch to the <code>./configure</code> script.
+	  For a detailed description on how to compile ARPACK and linking with deal.II, see
+	  <a href="external-libs/arpack.html" target="body">this page</a>.
 	</p>
       </dd>
 
       <a name="blas"></a>
-      <dt>BLAS, LAPACK</dt>
-
-      <dd> <p>If <code>--with-blas=blasname</code> and/or
-	  <code>--with-lapack=lapackname</code> is given, provide wrappers
-	  around some of the BLAS and LAPACK functions, and link with the
-	  respective libraries. It will make sure that we link with the
-	  required FORTRAN libraries. If no argument is given to
-	  <code>--with-blas</code>, then a BLAS library
-	  <code>libblas.a</code> or <code>libblas.so</code> is searched for
-	  in the default locations of your system, and similarly for LAPACK.</p>
-
-	<p>If your BLAS or LAPACK libraries are not in the standard search
-	  path of your linker, you have to tell the linker where to find them.
-	  The path is not given as an argument to
-	  <code>--with-blas</code>. Rather, you set the variable
-	  <code>LDFLAGS</code> accordingly or make sure that the path is in
-	  your <code>LD_LIBRARY_PATH</code> or similar. For details, please
-	  look up the documentation of your linker. An example configuration
-	  for Linux is:</p>
-	<pre>
-	  ./configure --with-blas=myblas LDFLAGS=-L/my/lib/
-	</pre>
-	<p> This example will search for a library
-	  <code>libmyblas.a</code> or <code>libmyblas.so</code> in the
-	  directory <code>/my/lib</code> and elsewhere in the system library
-	  paths.</p>
-
-	<p>Some versions of BLAS and LAPACK need additional libraries
-	  to be linked with. Such an example is the
-	  <a href="http://math-atlas.sourceforge.net/">automatically tuned
-	    linear algebra software (ATLAS)</a>. The BLAS version of this
-	  package also needs declarations from <code>libatlas.a</code>,
-	  so it must be included. Using the standard library names of
-	  atlas, the include for BLAS reads
-	  <pre>
-	    ./configure --with-blas='f77blas -latlas'
-	  </pre>
-	  assuming that the library files <code>libf77blas.a</code> and
-	  <code>libatlas.a</code> or the respective shared libraries
-	  <code>*.so</code> are in libraries included in
-	  <code>LD_LIBRARY_PATH</code>. LAPACK generated by ATLAS is
-	  included in a similar fashion.</p>
-      </dd>
-
-      <a name="netcdf"></a>
-      <dt>NetCDF</dt>
-      <dd>Autodetected if the <tt>NETCDF_DIR</tt> environment variable
-	points to a valid installation of the <a
-						 href="http://www.unidata.ucar.edu/software/netcdf/">NetCDF</a>
-	library. Can also be enabled by
-	<tt>--with-netcdf=/path/to/netcdf</tt> which overrides the path in
-	<tt>$NETCDF_DIR</tt>. If enabled, <acronym>deal.II</acronym> allows grid
-	input in NetCDF format (GridIn::read_netcdf). If NetCDF was installed as
-	part of <code>/usr</code> or <code>/opt</code>, instead of local
-	directories in a home directory for example, you can use configure
-	switches <code>--with-netcdf-include, --with-netcdf-libs</code>.
-      </dd>
-
-      <a name="hsl"></a>
-      <dt>Harwell Subroutine Library (HSL)</dt>
+      <dt>
+	<a href="http://www.netlib.org/blas/" target="_top">BLAS</a>,
+	<a href="http://www.netlib.org/lapack/" target="_top">LAPACK</a>
+      </dt>
       <dd>
-	It is possible to use some subroutines from the
-	<a href="http://www.cse.clrc.ac.uk/Activity/HSL"
-	   target="_top">Harwell Subroutine Library (HSL)</a> to make use
-	of some sparse direct solvers. For a description of how to
-	include these functions, see
-	<a href="external-libs/hsl.html" target="body">this page</a>.
-      </dd>
-
-      <a name="mumps"></a>
-      <dt>MUltifrontal Massively Parallel sparse direct Solver (MUMPS)</dt>
-      <dd>
-	It is possible to make use some subroutines that make use of the
-	<a href="http://mumps.enseeiht.fr"
-	   target="_top">MUltifrontal Massively Parallel sparse direct Solver
-	  (MUMPS)</a>. For a detailed description of how to compile MUMPS (and
-	some dependencies) and linking with deal.II, see
-	<a href="external-libs/mumps.html" target="body">this page</a>.
+	<p>
+	  <a href="http://www.netlib.org/blas/" target="_top">BLAS</a>
+	  (the <i>Basic Linear Algebra Subroutines</i>) and
+	  <a href="http://www.netlib.org/lapack/" target="_top">LAPACK</a>
+	  (<i>Linear Algebra Package</i>) are two packages that support
+	  low-level linear algebra operations on vectors and dense
+          matrices.
+          Both libraries should be packaged by almost all Linux
+          distributions and found automatically whenever available.
+          (You might have to install develpment versions of the libraries
+          for <acronym>deal.II</acronym> being able to use them).
+          For details on how to set up <acronym>deal.II</acronym> with a
+          non standard BLAS/LAPACK implementation, see the
+	  <a href="development/cmake.html#advanced">advanced
+            setup</a> section in the CMake ReadME.
+	</p>
       </dd>
 
       <a name="functionparser"></a>
-      <dt>FunctionParser</dt>
+      <dt><a href="http://warp.povusers.org/FunctionParser/">FunctionParser</a></dt>
       <dd>
-	There is a wrapper for the
-	<a href="http://warp.povusers.org/FunctionParser/">FunctionParser</a>
-	library, which  has its own license; if you want to use it with deal.II,
-	please read it and make sure that you agree with it.
-	You can find the license of FunctionParser
-	<a href="http://warp.povusers.org/FunctionParser/">here</a>. We
-	include FunctionParser in the deal.II distributions courtesy of its author,
-	<a href="http://www.students.tut.fi/~warp/">Juha Nieminen</a>.
-      </dd>
-
-      <a name="ARPACK"></a>
-      <dt>ARPACK</dt>
-      <dd>
-	There is a wrapper for the eigenvalue solver
-	<a href="http://www.caam.rice.edu/software/ARPACK/">ARPACK</a>
-	library, which has its own license; if you want to use it with deal.II,
-	please read it and make sure that you agree with it.
-	You can find the license of ARPACK
-	<a href="http://www.caam.rice.edu/software/ARPACK/RiceBSD.txt">here</a>.
-	For a detailed description of how to compile ARPACK and linking with deal.II, see
-	<a href="external-libs/arpack.html" target="body">this page</a>.
+	<p>
+	  <a href="http://warp.povusers.org/FunctionParser/">FunctionParser</a>
+	  is a library that allows to enter functions in text form and have them
+	  interpreted at run time. This is particularly useful in input
+	  parameter files. <code>cmake</code> will usually find the version of
+	  this library that comes bundled with <acronym>deal.II</acronym>.
+	  The function parser library has its own license; if you want to use
+	  it with deal.II, please read it and make sure that you agree with it.
+	  You can find it
+	  <a href="http://warp.povusers.org/FunctionParser/">here</a>. We
+	  include FunctionParser in the deal.II distributions courtesy of its author,
+	  <a href="http://iki.fi/warp/">Juha Nieminen</a>.
+	</p>
       </dd>
 
       <a name="HDF5"></a>
-      <dt>HDF5</dt>
+      <dt><a href="http://www.hdfgroup.org/HDF5/">HDF5</a></dt>
       <dd>
-	This adds HDF5/XDMF graphical output capabilities to deal.II. You need to
-	install the <a href="http://www.hdfgroup.org/HDF5/">HDF5 library</a>
-	separately. Configure with <code>--with-hdf5=</code> and point it to
-	the h5pcc or h5cc script inside your hdf5 installation.
-
-	For a detailed description of how to compile HDF5 and linking with
-	deal.II, see <a href="external-libs/hdf5.html" target="body">this
-	  page</a>.
+	<p>
+	  The <a href="http://www.hdfgroup.org/HDF5/">HDF5 library</a>
+	  provides graphical output capabilities in <code>HDF5/XDMF</code>
+	  format.
+	  <a href="http://www.hdfgroup.org/HDF5/">HDF5</a> should be
+	  readily packaged by most Linux distributions.  (Don't forget
+          to install a develpment version of the library).
+	  To use a self compiled version, specify
+	  <code>-DHDF5_DIR=/path/to/hdf5</code> on the command line.
+	</p>
       </dd>
 
+      <a name="metis"></a>
+      <dt><a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview"
+	     target="_top">METIS</a></dt>
+      <dd>
+	<p>
+	  <a href="http://glaros.dtc.umn.edu/gkhome/metis/metis/overview"
+		  target="_top">METIS</a> is a library that
+	  provides various methods to partition
+	  graphs. <acronym>deal.II</acronym> uses it in programs like the
+	  step-17 tutorial to partition a mesh for parallel computing.
+	  To use a self compiled version, specify
+	  <code>-DMETIS_DIR=/path/to/metis</code> on the command line.
+	  <acronym>deal.II</acronym> supports METIS 5 and later.
+	</p>
+
+	<p>
+	  <b>Note:</b> A more modern way to support parallel computations is
+	  shown in the step-40 tutorial program and is based on
+	  the <code>p4est</code> library instead of METIS. See below on
+	  installing <code>p4est</code>.
+	</p>
+      </dd>
+
+      <a name="mumps"></a>
+      <dt><a href="http://mumps.enseeiht.fr" target="_top">MUMPS</a></dt>
+      <dd>
+	<p>
+	  <a href="http://mumps.enseeiht.fr" target="_top">MUMPS</a>
+	  (MUltifrontal Massively Parallel sparse direct Solver)
+	  is a sparse direct solver that can factorize matrices within or
+	  across nodes of a cluster.
+	  <a href="http://mumps.enseeiht.fr" target="_top">MUMPS</a>
+          should be readily packaged by most Linux distributions.
+          (Don't forget to install a develpment version of the library).
+          To use a self compiled version, provide the
+	  <code>-DMUMPS_DIR=/path/to/mumps</code> argument to <code>cmake</code>.
+	  For a detailed description on how to compile MUMPS (and
+	  some dependencies) and linking with deal.II, see
+	  <a href="external-libs/mumps.html" target="body">this page</a>.
+	</p>
+      </dd>
+
+      <a name="netcdf"></a>
+      <dt><a href="http://www.unidata.ucar.edu/software/netcdf/" target="_top">NetCDF</a></dt>
+      <dd>
+	<p>
+	  <a href="http://www.unidata.ucar.edu/software/netcdf/"
+	  target="_top">NetCDF</a> is a library that provides services for
+	  reading and writing mesh data (and many other
+	  things). <acronym>deal.II</acronym> can use it to read meshes via
+          one of the functions of the <code>GridIn</code> class.
+	  <a href="http://www.unidata.ucar.edu/software/netcdf/"
+          target="_top">NetCDF</a> should be readily packaged by most
+          Linux distributions. (Don't forget to install a develpment
+	  version of the library). To use a self compiled version, pass
+	  <code>-DNETCDF_DIR=/path/to/netcdf</code> to <code>cmake</code>.
+      </dd>
+
+      <a name="p4est"></a>
+      <dt><a href="http://www.p4est.org/" target="_top">p4est</a></dt>
+      <dd>
+	<p>
+	  <a href="http://www.p4est.org/" target="_top">p4est</a>
+	  is a library that <acronym>deal.II</acronym> uses to
+	  distribute very large meshes across multiple processors (think
+	  meshes with a billion cells on 10,000 processors). Using and
+	  installing p4est is discussed <a href="external-libs/p4est.html"
+					   target="body">here</a>.
+	  To use a self compiled version, pass the argument
+	  <code>-DP4EST_DIR=/path/to/p4est</code> to the
+	  <code>cmake</code> command.
+	</p>
+      </dd>
+
+      <a name="petsc"></a>
+      <dt><a href="http://www.mcs.anl.gov/petsc/"
+		 target="_top">PETSc</a></dt>
+      <dd>
+	<p>
+	  <a href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a> is a
+	  library that supports parallel linear algebra and many other things.
+
+	  <a href="http://www.mcs.anl.gov/petsc/" target="_top">PETSc</a>
+	  is already packaged by some Linux distributions and should be
+	  found automatically if present. (Don't forget to install a
+	  develpment version of the library).  To use a self compiled
+	  version of PETSc, add <code>-DPETSC_DIR=/path/to/petsc
+	  -DPETSC_ARCH=architecture</code> to the argument list for
+	  <code>cmake</code>. The values for these arguments must be
+	  the same as those specified when building PETSc.
+	</p>
+
+	<p>
+	  To disable the PETSc interfaces in cases where <code>cmake</code>
+	  automatically finds it, use <code>-DDEAL_II_WITH_PETSC=OFF</code>
+	  More information on configuring and building PETSC can be
+          found <a href="external-libs/petsc.html" target="body">here</a>.
+	</p>
+      </dd>
+
+      <a name="slepc"></a>
+      <dt><a href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a></dt>
+      <dd>
+	<p>
+	  <a href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a> is
+	  a library for eigenvalue computations that builds on PETSc. Its
+	  configuration works just like that for PETSc, except that the
+          variable to set is <code>SLEPC_DIR</code> and
+          <code>SLEPC_ARCH</code>.
+          If <code>SLEPC_ARCH</code> is left empty, <code>cmake</code> will
+          use the same architecture as specified in <code>PETSC_ARCH</code>.
+	  For the interface with SLEPc to work, <acronym>deal.II</acronym>'s
+	  PETSc interface must also be configured correctly (see above).
+	</p>
+      </dd>
+
+      <a name="tbb"></a>
+      <dt><a href="http://www.threadingbuildingblocks.org/"
+	     target="_top">Threading Building Blocks (TBB)</a></dt>
+      <dd>
+	<p>
+	  The <a href="http://www.threadingbuildingblocks.org/"
+	     target="_top">Threading Building Blocks (TBB)</a>
+	  is a library that provides advanced services for using multiple
+	  processor cores on a single machine and is used
+	  in <acronym>deal.II</acronym> to parallelize many operations. If not
+	  found in a system-wide location, <code>cmake</code> will
+	  resort to the version bundled as part of
+	  the <acronym>deal.II</acronym> download. It is always enabled unless
+	  threads are explicitly disabled, see <a href="#optional">above</a>.
+	</p>
+      </dd>
+
+      <a name="trilinos"></a>
+      <dt><a href="http://trilinos.sandia.gov" target="_top">Trilinos</a></dt>
+      <dd>
+	<p>
+	  <a href="http://trilinos.sandia.gov" target="_top">Trilinos</a> is a
+	  library for parallel linear algebra and all sorts of other things as
+	  well.
+
+	  To interface with a self compiled version of <a
+	  href="http://trilinos.sandia.gov" target="_top">Trilinos</a>
+	  add <code>-DTRILINOS_DIR=/path/to/trilinos</code> to the
+	  argument list for <code>cmake</code>.  Alternatively, you can
+	  also set an environment variable <code>TRILINOS_DIR</code>
+	  and <code>cmake</code> will pick up this path.
+	</p>
+
+	<p>
+	  To disable the Trilinos interfaces in cases where
+	  <code>cmake</code> automatically finds it, use
+	  <code>-DDEAL_II_WITH_TRILINOS=OFF</code> More details about
+	  compatibility and configuration can be found
+          <a href="external-libs/trilinos.html" target="body">here</a>.
+	</p>
+      </dd>
+
+      <a name="umfpack"></a>
+      <dt><a href="http://www.cise.ufl.edu/research/sparse/umfpack/"
+	     target="_top">UMFPACK</a></dt>
+      <dd>
+	<p>
+	  <a href="http://www.cise.ufl.edu/research/sparse/umfpack/"
+	     target="_top">UMFPACK</a> is a sparse direct solver that we often
+	  use in prototype codes where the goal is to simply get a linear
+          system solved robustly.
+	  The interface will be enabled by default, either using a version
+	  installed on your system of using a version that comes bundled
+	  with <acronym>deal.II</acronym>.
+	  It can be disabled explicitly by using the
+	  <code>-DDEAL_II_WITH_UMFPACK=OFF</code> argument.
+	  To use a self compiled version, pass the argument
+	  <code>-DUMFPACK_DIR=/path/to/umfpack</code> to the
+	  <code>cmake</code> command.
+	</p>
+
+	<p>
+	  UMFPACK has its own license. To use it with deal.II, please
+	  read it and make sure that you agree with it. You can find
+	  the license of UMFPACK
+          <a href="http://www.cise.ufl.edu/research/sparse/umfpack/">here</a>.
+	  We include UMFPACK in the deal.II distributions courtesy of
+	  its author, <a href="http://www.cise.ufl.edu/~davis/">Timothy
+	  A. Davis</a>.
+	</p>
+      </dd>
     </dl>
+
+
+    <a name="conf-details"></a>
+    <h4>More information on configuring and building the library</h4>
+
+    <p>
+      The <acronym>deal.II</acronym> <code>cmake</code> system allows far
+      greater control over what exactly is configured or built than just the
+      outline above. If you want to learn more about this, take a look
+      <a href="development/cmake.html">here</a>.
+    </p>
 
 
     <a name="problems"></a>
@@ -736,18 +738,11 @@
     </p>
 
     <p>
-      For specific problems, send email to either
-      <tt>Wolfgang.Bangerth</tt>, <tt>Timo.Heister</tt>,
-      <tt>Guido.Kanschat</tt>, or simply <tt>authors</tt> at
-      <tt>dealii.org</tt>.
-    </p>
-
-    <p>
       We are interested in any feedback, whether positive or negative,
       in order to determine the directions of future work on the
       library. We are also very much interested in incorporating any
       work and bug fixes by third parties into the library. Of course,
-      you will be credited for this on our home page.
+      you will be credited for this on the <a href="authors.html">authors page</a>.
     </p>
 
     <p>
@@ -793,14 +788,19 @@
       </ul>
 
     <p>
-      <acronym>deal.II</acronym> can interface with a number of <a
-								   href="#external-libs">other packages</a> that you have to install
+      <acronym>deal.II</acronym> can interface with a number of
+      <a href="#optional-software">other packages</a> that you have to install
       yourself. They are, of course, covered by their own licenses. In addition,
-      deal.II comes with copies of <a
-				      href="http://www.cise.ufl.edu/research/sparse/umfpack/">UMFPACK</a> and
-      <a href="http://warp.povusers.org/FunctionParser/">FunctionParser</a>,
-      courtesy of their authors. UMFPACK and FunctionParser are covered by their
-      own licenses; please refer to their webpages to read them.
+      deal.II comes bundled with copies of
+      <a href="http://www.cise.ufl.edu/research/sparse/umfpack/"
+	 target="_top">UMFPACK</a>,
+      <a href="http://threadingbuildingblocks.org/"
+	 target="_top">Threading Building Blocks</a>,
+      <a href="http://www.boost.org/" target="_top">BOOST</a>
+      and
+      <a href="http://warp.povusers.org/FunctionParser/" target="_top">FunctionParser</a>,
+      courtesy of their authors. These are also covered by their
+      own licenses; please refer to their webpages for more information.
 
       <hr>
 

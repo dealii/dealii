@@ -577,7 +577,7 @@ public:
    * not provide for nonzero entries on the entire diagonal.
    */
   SparseMatrix (const SparsityPattern &sparsity,
-                const IdentityMatrix &id);
+                const IdentityMatrix  &id);
 
   /**
    * Destructor. Free all memory, but do not release the memory of the
@@ -603,7 +603,7 @@ public:
    * provide for nonzero entries on the entire diagonal.
    */
   SparseMatrix<number> &
-  operator= (const IdentityMatrix &id);
+  operator= (const IdentityMatrix  &id);
 
   /**
    * This operator assigns a scalar to a matrix. Since this does usually not

@@ -23,7 +23,7 @@
 #include <deal.II/lac/sparse_matrix_ez.h>
 #include <deal.II/lac/block_sparse_matrix.h>
 
-#ifdef DEAL_II_USE_MUMPS
+#ifdef DEAL_II_WITH_MUMPS
 #  include <deal.II/base/utilities.h>
 #  include <dmumps_c.h>
 #endif
@@ -1310,9 +1310,9 @@ class SparseDirectMUMPS
 {
 private:
 
-#ifdef DEAL_II_USE_MUMPS
+#ifdef DEAL_II_WITH_MUMPS
   DMUMPS_STRUC_C id;
-#endif // DEAL_II_USE_MUMPS
+#endif // DEAL_II_WITH_MUMPS
 
   double   *a;
   double   *rhs;

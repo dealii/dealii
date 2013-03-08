@@ -28,7 +28,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   class Vector;
@@ -39,7 +39,7 @@ namespace PETScWrappers
 }
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   namespace MPI
@@ -190,7 +190,7 @@ public:
   Vector (const Vector<OtherNumber> &v);
 #endif
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
   /**
    * Another copy constructor: copy the
    * values from a sequential PETSc wrapper
@@ -219,7 +219,7 @@ public:
   Vector (const PETScWrappers::MPI::Vector &v);
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * Another copy constructor: copy
    * the values from a Trilinos
@@ -427,7 +427,7 @@ public:
    */
   Vector<Number> &operator= (const BlockVector<Number> &v);
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
   /**
    * Another copy operator: copy the
    * values from a sequential PETSc
@@ -462,7 +462,7 @@ public:
 #endif
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * Another copy operator: copy
    * the values from a (sequential
@@ -708,7 +708,7 @@ public:
    */
   template <typename OtherNumber>
   void add (const std::vector<size_type>   &indices,
-            const std::vector<OtherNumber> &values);
+            const std::vector<OtherNumber>  &values);
 
   /**
    * This is a second collective
@@ -733,7 +733,7 @@ public:
   template <typename OtherNumber>
   void add (const size_type    n_elements,
             const size_type   *indices,
-            const OtherNumber *values);
+            const OtherNumber  *values);
 
   /**
    * Addition of @p s to all
@@ -1304,7 +1304,7 @@ template <typename OtherNumber>
 inline
 void
 Vector<Number>::add (const std::vector<size_type> &indices,
-                     const std::vector<OtherNumber> &values)
+                     const std::vector<OtherNumber>  &values)
 {
   Assert (indices.size() == values.size(),
           ExcDimensionMismatch(indices.size(), values.size()));
@@ -1333,7 +1333,7 @@ inline
 void
 Vector<Number>::add (const size_type  n_indices,
                      const size_type *indices,
-                     const OtherNumber *values)
+                     const OtherNumber  *values)
 {
   for (size_type i=0; i<n_indices; ++i)
     {

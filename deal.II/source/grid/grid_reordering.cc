@@ -225,7 +225,7 @@ namespace internal
                   const unsigned int s1,
                   const unsigned int s2,
                   const unsigned int s3,
-                  const CellData<2> &cd)
+                  const CellData<2>  &cd)
       :
       original_cell_data (cd)
     {

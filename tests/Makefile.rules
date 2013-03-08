@@ -1,7 +1,7 @@
 ######################################################################
 # Makefile.rules,v 1.11 2001/04/24 13:18:09 wolf Exp
 #
-# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, the deal.II authors
+# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, the deal.II authors
 #
 # Common make rules for test files. To be included by the Makefiles
 # in the subdirectories.
@@ -26,7 +26,7 @@ MAIL=mail
 #this lets you overwrite the diff tool for comparisons.
 #recommended environment setting:
 #export DEALII_DIFF="numdiff -a 1e-6 -q"
-DEALII_DIFF?=diff 
+DEALII_DIFF?=diff
 
 PLATFORM = $(TARGET)+$(GXX-VERSION:intel_%=%)
 PLATFORM-HIERARCHY = $(shell $(PERL) ../hierarchy.pl $(PLATFORM))
@@ -172,7 +172,7 @@ default: run-tests
 ############################################################
 report:
 	@-$(MAKE) -k run-tests
-	@-svn info $D | grep '^Revision'
+	@-svn info . | grep '^Revision'
 	@echo 'Date: ' `date -u +"%Y %j  %F  %U-%w"`
 	@echo 'Id: ' $(ID)
 	@for test in $(sort $(tests)) ; do \
@@ -318,4 +318,3 @@ Makefile.tests: Makefile $(shell echo *.cc)
 
 
 .PHONY: report show-tests clean distclean summary %/ref
-

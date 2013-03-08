@@ -163,7 +163,7 @@ namespace Step46
 
   template <int dim>
   double
-  StokesBoundaryValues<dim>::value (const Point<dim> &p,
+  StokesBoundaryValues<dim>::value (const Point<dim>  &p,
                                     const unsigned int component) const
   {
     Assert (component < this->n_components,
@@ -212,7 +212,7 @@ namespace Step46
 
   template <int dim>
   double
-  RightHandSide<dim>::value (const Point<dim>  & /*p*/,
+  RightHandSide<dim>::value (const Point<dim>  &/*p*/,
                              const unsigned int /*component*/) const
   {
     return 0;

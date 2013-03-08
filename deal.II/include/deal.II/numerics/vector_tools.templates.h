@@ -480,7 +480,7 @@ namespace VectorTools
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
                                  const Vector            &u1,
                                  const DH<dim, spacedim> &dof2,
-                                 const ConstraintMatrix &constraints,
+                                 const ConstraintMatrix  &constraints,
                                  Vector                  &u2)
   {
     Assert(GridTools::have_same_coarse_mesh(dof1, dof2),
@@ -5671,7 +5671,7 @@ namespace VectorTools
             }
         }
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
     // if this was a distributed
     // DoFHandler, we need to do the
     // reduction over the entire domain

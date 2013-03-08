@@ -1164,7 +1164,7 @@ protected:
    */
   template <class BlockVectorType,
            class VectorType>
-  void Tvmult_block_nonblock (BlockVectorType &dst,
+  void Tvmult_block_nonblock (BlockVectorType  &dst,
                               const VectorType &src) const;
 
   /**
@@ -1318,7 +1318,7 @@ namespace BlockMatrixIterators
   template <class BlockMatrix>
   inline
   Accessor<BlockMatrix, true>::Accessor (
-    const BlockMatrix *matrix,
+    const BlockMatrix  *matrix,
     const size_type    row,
     const size_type    col)
     :
@@ -1527,7 +1527,7 @@ namespace BlockMatrixIterators
   template <class BlockMatrix>
   inline
   Accessor<BlockMatrix, false>::Accessor (
-    BlockMatrix *matrix,
+    BlockMatrix  *matrix,
     const size_type row,
     const size_type col)
     :
@@ -2492,7 +2492,7 @@ template <class BlockVectorType,
          class VectorType>
 void
 BlockMatrixBase<MatrixType>::
-vmult_block_nonblock (BlockVectorType &dst,
+vmult_block_nonblock (BlockVectorType  &dst,
                       const VectorType &src) const
 {
   Assert (dst.n_blocks() == n_block_rows(),
@@ -2577,7 +2577,7 @@ template <class BlockVectorType,
          class VectorType>
 void
 BlockMatrixBase<MatrixType>::
-Tvmult_block_nonblock (BlockVectorType &dst,
+Tvmult_block_nonblock (BlockVectorType  &dst,
                        const VectorType &src) const
 {
   Assert (dst.n_blocks() == n_block_cols(),

@@ -148,7 +148,7 @@ private:
    * Reference to the stream we
    * want to write to.
    */
-  std::ostream &output_stream;
+  std::ostream  &output_stream;
 
   /**
    * Stores the actual condition

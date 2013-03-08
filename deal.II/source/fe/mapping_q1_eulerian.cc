@@ -25,7 +25,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template <int dim, class EulerVectorType, int spacedim>
 MappingQ1Eulerian<dim, EulerVectorType, spacedim>::
-MappingQ1Eulerian (const EulerVectorType &euler_transform_vectors,
+MappingQ1Eulerian (const EulerVectorType  &euler_transform_vectors,
                    const DoFHandler<dim,spacedim> &shiftmap_dof_handler)
   :
   euler_transform_vectors(&euler_transform_vectors),

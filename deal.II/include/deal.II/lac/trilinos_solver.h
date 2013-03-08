@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/std_cxx1x/shared_ptr.h>
 #  include <deal.II/lac/exceptions.h>
@@ -120,7 +120,7 @@ namespace TrilinosWrappers
      * solver control object and
      * creates the solver.
      */
-    SolverBase (SolverControl &cn);
+    SolverBase (SolverControl  &cn);
 
     /**
      * Second constructor. This
@@ -555,7 +555,7 @@ namespace TrilinosWrappers
      * solver control object and
      * creates the solver.
      */
-    SolverDirect (SolverControl &cn,
+    SolverDirect (SolverControl  &cn,
                   const AdditionalData &data = AdditionalData());
 
     /**
@@ -658,7 +658,7 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS
 
 /*----------------------------   trilinos_solver.h     ---------------------------*/
 

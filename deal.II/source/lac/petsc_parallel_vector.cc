@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/petsc_parallel_vector.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/lac/petsc_vector.h>
 #  include <cmath>
@@ -53,7 +53,7 @@ namespace PETScWrappers
 
 
     Vector::Vector (const MPI_Comm   &communicator,
-                    const VectorBase &v,
+                    const VectorBase  &v,
                     const size_type   local_size)
       :
       communicator (communicator)
@@ -373,4 +373,4 @@ namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_PETSC
+#endif // DEAL_II_WITH_PETSC

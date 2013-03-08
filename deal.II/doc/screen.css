@@ -88,10 +88,11 @@ h1 {
 }
 
 h2 {
-	font-size: 144%;
+	font-size: 150%;
 }
 
-h3 { font-size: 120%;
+h3 { font-size: 140%;
+     padding-top: 1.5em;
      padding-bottom: 0.17em;
      border-bottom: 1px dashed #aaaaaa; }
 h4 { font-size: 110%; 
@@ -201,6 +202,10 @@ code.class { color: #009000; }
 code.member { color: #006000; }
 code.function { color: #006000; }
 code.global { color: #005030; }
+
+code {
+    white-space: nowrap;
+}
 
 td.build {
 	text-align: center;

@@ -2,7 +2,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2006-2012 by the deal.II authors */
+/*    Copyright (C) 2006-2013 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -141,7 +141,7 @@ namespace Step21
 
   template <int dim>
   double
-  PressureRightHandSide<dim>::value (const Point<dim>  & /*p*/,
+  PressureRightHandSide<dim>::value (const Point<dim>  &/*p*/,
                                      const unsigned int /*component*/) const
   {
     return 0;
@@ -165,7 +165,7 @@ namespace Step21
 
   template <int dim>
   double
-  PressureBoundaryValues<dim>::value (const Point<dim> &p,
+  PressureBoundaryValues<dim>::value (const Point<dim>  &p,
                                       const unsigned int /*component*/) const
   {
     return 1-p[0];
@@ -234,7 +234,7 @@ namespace Step21
 
   template <int dim>
   double
-  InitialValues<dim>::value (const Point<dim> &p,
+  InitialValues<dim>::value (const Point<dim>  &p,
                              const unsigned int component) const
   {
     return ZeroFunction<dim>(dim+2).value (p, component);
@@ -441,7 +441,9 @@ namespace Step21
 
   // The linear solvers we use are also completely analogous to the ones used
   // in step-20. The following classes are therefore copied verbatim from
-  // there. There is a single change: if the size of a linear system is small,
+  // there. Note that the classes here are not only copied from
+  // step-20, but also duplicate classes in deal.II. In a future version of this example, they should be
+  // replaced by an efficient method, though. There is a single change: if the size of a linear system is small,
   // i.e. when the mesh is very coarse, then it is sometimes not sufficient to
   // set a maximum of <code>src.size()</code> CG iterations before the solver
   // in the <code>vmult()</code> function converges. (This is, of course, a
@@ -1209,6 +1211,11 @@ namespace Step21
   // the present time step in the middle of solving the linear system
   // corresponding to each time step. We can therefore output the present end
   // time of a time step only at the end of the time step.
+  //
+  // The function as it is here does actually not compute the results
+  // found on the web page. The reason is, that even on a decent
+  // computer it runs more than a day. If you want to reproduce these
+  // results, set the final time at the end of the do loop to 250.
   template <int dim>
   void TwoPhaseFlowProblem<dim>::run ()
   {
@@ -1246,7 +1253,7 @@ namespace Step21
                   << std::endl
                   << std::endl;
       }
-    while (time <= 250);
+    while (time <= 1.);
   }
 }
 

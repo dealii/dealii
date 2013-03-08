@@ -65,7 +65,7 @@ template <class InputVector, int spacedim>
 inline
 typename DerivativeApproximation::Gradient<dim>::ProjectedDerivative
 DerivativeApproximation::Gradient<dim>::
-get_projected_derivative (const FEValues<dim,spacedim> &fe_values,
+get_projected_derivative (const FEValues<dim,spacedim>  &fe_values,
                           const InputVector    &solution,
                           const unsigned int    component)
 {
@@ -114,7 +114,7 @@ template <class InputVector, int spacedim>
 inline
 typename DerivativeApproximation::SecondDerivative<dim>::ProjectedDerivative
 DerivativeApproximation::SecondDerivative<dim>::
-get_projected_derivative (const FEValues<dim,spacedim> &fe_values,
+get_projected_derivative (const FEValues<dim,spacedim>  &fe_values,
                           const InputVector    &solution,
                           const unsigned int    component)
 {
@@ -396,7 +396,7 @@ template <class InputVector, int spacedim>
 inline
 typename DerivativeApproximation::ThirdDerivative<dim>::ProjectedDerivative
 DerivativeApproximation::ThirdDerivative<dim>::
-get_projected_derivative (const FEValues<dim,spacedim> &fe_values,
+get_projected_derivative (const FEValues<dim,spacedim>  &fe_values,
                           const InputVector    &solution,
                           const unsigned int    component)
 {
@@ -703,7 +703,7 @@ approximate_cell (const Mapping<dim,spacedim>                   &mapping,
                   const DH<dim,spacedim>                        &dof_handler,
                   const InputVector                             &solution,
                   const unsigned int                             component,
-                  const typename DH<dim,spacedim>::active_cell_iterator &cell,
+                  const typename DH<dim,spacedim>::active_cell_iterator  &cell,
                   typename DerivativeDescription::Derivative    &derivative)
 {
   QMidpoint<dim> midpoint_rule;

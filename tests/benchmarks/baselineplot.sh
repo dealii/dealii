@@ -10,7 +10,7 @@ set key left top
 set output "baseline.eps"
 #set log y
 set xlabel 'revision'
-set ylabel 'percentage speedup to baseline'
+set ylabel 'percentage slowdown to baseline'
 set title 'benchmark baselines'
 EOF
 #echo "set terminal x11 persist"

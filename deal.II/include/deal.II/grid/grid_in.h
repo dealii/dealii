@@ -581,9 +581,9 @@ private:
    */
   static void parse_tecplot_header(std::string   &header,
                                    std::vector<unsigned int> &tecplot2deal,
-                                   unsigned int &n_vars,
-                                   unsigned int &n_vertices,
-                                   unsigned int &n_cells,
+                                   unsigned int  &n_vars,
+                                   unsigned int  &n_vertices,
+                                   unsigned int  &n_cells,
                                    std::vector<unsigned int> &IJK,
                                    bool          &structured,
                                    bool          &blocked);

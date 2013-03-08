@@ -8,7 +8,7 @@ echo "HEAD: $HEADREVISION"
 
 while [ $PREVREVISION -lt $HEADREVISION ] ; do
 
-  NEXTREVISION=`expr $PREVREVISION "+" 10`
+  NEXTREVISION=`expr $PREVREVISION "+" 25`
   echo "Updating from $PREVREVISION to $NEXTREVISION"
   cd deal.II
   svn up -r$NEXTREVISION || exit 1

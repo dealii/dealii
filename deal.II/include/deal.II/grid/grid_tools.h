@@ -362,7 +362,7 @@ namespace GridTools
    */
   template <int dim, template <int,int> class Container, int spacedim>
   typename Container<dim,spacedim>::active_cell_iterator
-  find_active_cell_around_point (const Container<dim,spacedim> &container,
+  find_active_cell_around_point (const Container<dim,spacedim>  &container,
                                  const Point<spacedim> &p);
 
   /**
@@ -618,7 +618,7 @@ namespace GridTools
    */
   template <int dim, int spacedim>
   void
-  get_subdomain_association (const Triangulation<dim, spacedim> &triangulation,
+  get_subdomain_association (const Triangulation<dim, spacedim>  &triangulation,
                              std::vector<types::subdomain_id> &subdomain);
 
   /**

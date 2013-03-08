@@ -70,7 +70,7 @@ BlockVector<Number>::BlockVector (const BlockVector<OtherNumber> &v)
 #endif
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 template <typename Number>
 BlockVector<Number>::BlockVector (const TrilinosWrappers::BlockVector &v)
@@ -143,7 +143,7 @@ BlockVector<Number>::~BlockVector ()
 {}
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 template <typename Number>
 inline
 BlockVector<Number> &

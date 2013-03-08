@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/lac/exceptions.h>
@@ -89,7 +89,7 @@ namespace PETScWrappers
        * as to only allow the actual vector
        * class to create it.
        */
-      VectorReference (const VectorBase &vector,
+      VectorReference (const VectorBase  &vector,
                        const size_type   index);
 
 
@@ -450,7 +450,7 @@ namespace PETScWrappers
      * second.
      */
     void set (const std::vector<size_type>   &indices,
-              const std::vector<PetscScalar> &values);
+              const std::vector<PetscScalar>  &values);
 
     /**
      * A collective add operation: This
@@ -459,7 +459,7 @@ namespace PETScWrappers
      * components specified by @p indices.
      */
     void add (const std::vector<size_type> &indices,
-              const std::vector<PetscScalar> &values);
+              const std::vector<PetscScalar>  &values);
 
     /**
      * This is a second collective
@@ -482,7 +482,7 @@ namespace PETScWrappers
      */
     void add (const size_type    n_elements,
               const size_type   *indices,
-              const PetscScalar *values);
+              const PetscScalar  *values);
 
     /**
      * Return the scalar product of two
@@ -890,7 +890,7 @@ namespace PETScWrappers
      */
     void do_set_add_operation (const size_type    n_elements,
                                const size_type   *indices,
-                               const PetscScalar *values,
+                               const PetscScalar  *values,
                                const bool         add_values);
 
 
@@ -918,7 +918,7 @@ namespace PETScWrappers
   namespace internal
   {
     inline
-    VectorReference::VectorReference (const VectorBase &vector,
+    VectorReference::VectorReference (const VectorBase  &vector,
                                       const size_type   index)
       :
       vector (vector),
@@ -1226,7 +1226,7 @@ namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_PETSC
+#endif // DEAL_II_WITH_PETSC
 
 /*----------------------------   petsc_vector_base.h     ---------------------------*/
 

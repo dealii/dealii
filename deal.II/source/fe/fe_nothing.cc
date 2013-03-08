@@ -168,7 +168,7 @@ compare_for_face_domination (const FiniteElement<dim> &) const
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_Nothing<dim> ::
-hp_vertex_dof_identities (const FiniteElement<dim> & /*fe_other*/) const
+hp_vertex_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
 {
   // the FE_Nothing has no
   // degrees of freedom, so there
@@ -181,7 +181,7 @@ hp_vertex_dof_identities (const FiniteElement<dim> & /*fe_other*/) const
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_Nothing<dim> ::
-hp_line_dof_identities (const FiniteElement<dim> & /*fe_other*/) const
+hp_line_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
 {
   // the FE_Nothing has no
   // degrees of freedom, so there
@@ -194,7 +194,7 @@ hp_line_dof_identities (const FiniteElement<dim> & /*fe_other*/) const
 template <int dim>
 std::vector<std::pair<unsigned int, unsigned int> >
 FE_Nothing<dim> ::
-hp_quad_dof_identities (const FiniteElement<dim> & /*fe_other*/) const
+hp_quad_dof_identities (const FiniteElement<dim> &/*fe_other*/) const
 {
   // the FE_Nothing has no
   // degrees of freedom, so there
@@ -216,7 +216,7 @@ hp_constraints_are_implemented () const
 template <int dim>
 void
 FE_Nothing<dim>::
-get_face_interpolation_matrix (const FiniteElement<dim> & /*source_fe*/,
+get_face_interpolation_matrix (const FiniteElement<dim> &/*source_fe*/,
                                FullMatrix<double>       &interpolation_matrix) const
 {
   // since this element has no face dofs, the
@@ -236,7 +236,7 @@ void
 FE_Nothing<dim>::
 get_subface_interpolation_matrix (const FiniteElement<dim> & /*source_fe*/,
                                   const unsigned int /*index*/,
-                                  FullMatrix<double> &interpolation_matrix) const
+                                  FullMatrix<double>  &interpolation_matrix) const
 {
   // since this element has no face dofs, the
   // interpolation matrix is necessarily empty

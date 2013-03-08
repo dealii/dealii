@@ -574,7 +574,7 @@ namespace VectorTools
   interpolate_to_different_mesh (const DH<dim, spacedim> &dof1,
                                  const VECTOR            &u1,
                                  const DH<dim, spacedim> &dof2,
-                                 const ConstraintMatrix &constraints,
+                                 const ConstraintMatrix  &constraints,
                                  VECTOR                  &u2);
 
 

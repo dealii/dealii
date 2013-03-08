@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/trilinos_solver.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/conditional_ostream.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
@@ -37,7 +37,7 @@ namespace TrilinosWrappers
 
 
 
-  SolverBase::SolverBase (SolverControl &cn)
+  SolverBase::SolverBase (SolverControl  &cn)
     :
     solver_name    (gmres),
     solver_control (cn)
@@ -384,7 +384,7 @@ namespace TrilinosWrappers
 
 
 
-  SolverDirect::SolverDirect (SolverControl &cn,
+  SolverDirect::SolverDirect (SolverControl  &cn,
                               const AdditionalData &data)
     :
     solver_control (cn),
@@ -529,4 +529,4 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_PETSC
+#endif // DEAL_II_WITH_PETSC

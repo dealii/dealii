@@ -380,7 +380,7 @@ private:
      */
     template <class InputVector, int spacedim>
     static ProjectedDerivative
-    get_projected_derivative (const FEValues<dim,spacedim> &fe_values,
+    get_projected_derivative (const FEValues<dim,spacedim>  &fe_values,
                               const InputVector    &solution,
                               const unsigned int    component);
 
@@ -461,7 +461,7 @@ private:
      */
     template <class InputVector, int spacedim>
     static ProjectedDerivative
-    get_projected_derivative (const FEValues<dim,spacedim> &fe_values,
+    get_projected_derivative (const FEValues<dim,spacedim>  &fe_values,
                               const InputVector    &solution,
                               const unsigned int    component);
 
@@ -539,7 +539,7 @@ private:
      */
     template <class InputVector, int spacedim>
     static ProjectedDerivative
-    get_projected_derivative (const FEValues<dim,spacedim> &fe_values,
+    get_projected_derivative (const FEValues<dim,spacedim>  &fe_values,
                               const InputVector    &solution,
                               const unsigned int    component);
 
@@ -690,7 +690,7 @@ private:
                     const DH<dim,spacedim>                                 &dof,
                     const InputVector                             &solution,
                     const unsigned int                             component,
-                    const typename DH<dim,spacedim>::active_cell_iterator &cell,
+                    const typename DH<dim,spacedim>::active_cell_iterator  &cell,
                     typename DerivativeDescription::Derivative    &derivative);
 };
 

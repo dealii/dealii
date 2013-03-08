@@ -838,15 +838,14 @@ namespace internal
         template <int spacedim>
         static
         void
-        renumber_mg_dofs (const std::vector<unsigned int> &new_numbers,
-                          const IndexSet &indices,
-                          DoFHandler<3,spacedim>          &dof_handler,
-                          const unsigned int level,
-                          const bool check_validity)
+        renumber_mg_dofs (const std::vector<unsigned int> &,
+                          const IndexSet                  &,
+                          DoFHandler<3,spacedim>          &,
+                          const unsigned int               ,
+                          const bool                       )
         {
-          //TODO
+          // TODO
           AssertThrow(false, ExcNotImplemented());
-
         }
 
 
@@ -958,7 +957,7 @@ namespace internal
 
       /* --------------------- class ParallelDistributed ---------------- */
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
 
       namespace
       {
@@ -1445,7 +1444,7 @@ namespace internal
          const std::vector<unsigned int> &coarse_cell_to_p4est_tree_permutation,
          const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation)
         {
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
           (void)vertices_with_ghost_neighbors;
           Assert (false, ExcNotImplemented());
 #else
@@ -1669,7 +1668,7 @@ namespace internal
          const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
          const unsigned int level)
         {
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
           (void)dof_handler;
           (void)vertices_with_ghost_neighbors;
           (void)coarse_cell_to_p4est_tree_permutation;
@@ -1882,7 +1881,7 @@ namespace internal
 
       }
 
-#endif // DEAL_II_USE_P4EST
+#endif // DEAL_II_WITH_P4EST
 
 
 
@@ -1893,7 +1892,7 @@ namespace internal
       {
         NumberCache number_cache;
 
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
         (void)dof_handler;
         Assert (false, ExcNotImplemented());
 #else
@@ -2114,7 +2113,7 @@ namespace internal
               }
         }
 #endif // DEBUG
-#endif // DEAL_II_USE_P4EST
+#endif // DEAL_II_WITH_P4EST
 
         return number_cache;
       }
@@ -2126,7 +2125,7 @@ namespace internal
       distribute_mg_dofs (DoFHandler<dim,spacedim> &dof_handler,
                           std::vector<NumberCache> &number_caches) const
       {
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
         (void)dof_handler;
         (void)number_caches;
         Assert (false, ExcNotImplemented());
@@ -2362,7 +2361,7 @@ namespace internal
 
           }
 
-#endif // DEAL_II_USE_P4EST
+#endif // DEAL_II_WITH_P4EST
       }
 
 
@@ -2377,7 +2376,7 @@ namespace internal
 
         NumberCache number_cache;
 
-#ifndef DEAL_II_USE_P4EST
+#ifndef DEAL_II_WITH_P4EST
         Assert (false, ExcNotImplemented());
 #else
 

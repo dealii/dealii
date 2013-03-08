@@ -2442,7 +2442,7 @@ public:
    * @author Marco Engelhard, 2012
    */
   void write_pvd_record (std::ostream &out,
-                         const std::vector<std::pair<double,std::string> > &times_and_names) const;
+                         const std::vector<std::pair<double,std::string> >  &times_and_names) const;
 
   /**
    * This function is the exact

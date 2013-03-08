@@ -18,7 +18,7 @@
 
 #include <algorithm>
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/compressed_sparsity_pattern.h>
 #include <deal.II/lac/compressed_set_sparsity_pattern.h>
@@ -26,7 +26,7 @@
 #include <deal.II/lac/block_sparsity_pattern.h>
 #endif
 
-#ifdef DEAL_II_USE_METIS
+#ifdef DEAL_II_WITH_METIS
 extern "C"
 {
 #include <metis.h>
@@ -62,7 +62,7 @@ namespace SparsityTools
 
     // Make sure that METIS is actually
     // installed and detected
-#ifndef DEAL_II_USE_METIS
+#ifndef DEAL_II_WITH_METIS
     AssertThrow (false, ExcMETISNotInstalled());
 #else
 
@@ -374,7 +374,7 @@ namespace SparsityTools
             ExcInternalError());
   }
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   template <class CSP_t>
   void distribute_sparsity_pattern(CSP_t &csp,
                                    const std::vector<size_type> &rows_per_cpu,
@@ -511,7 +511,7 @@ namespace SparsityTools
       const MPI_Comm & mpi_comm,\
       const IndexSet & myrange)
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
 SPARSITY_FUNCTIONS(CompressedSparsityPattern);
 SPARSITY_FUNCTIONS(CompressedSimpleSparsityPattern);
 SPARSITY_FUNCTIONS(BlockCompressedSimpleSparsityPattern);

@@ -591,7 +591,7 @@ namespace Step18
   template <int dim>
   inline
   void
-  BodyForce<dim>::vector_value (const Point<dim> & /*p*/,
+  BodyForce<dim>::vector_value (const Point<dim> &/*p*/,
                                 Vector<double>   &values) const
   {
     Assert (values.size() == dim,
@@ -689,7 +689,7 @@ namespace Step18
   template <int dim>
   void
   IncrementalBoundaryValues<dim>::
-  vector_value (const Point<dim> & /*p*/,
+  vector_value (const Point<dim> &/*p*/,
                 Vector<double>   &values) const
   {
     Assert (values.size() == dim,

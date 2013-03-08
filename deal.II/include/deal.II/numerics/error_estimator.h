@@ -603,7 +603,7 @@ public:
    * general case.
    */
   template <typename InputVector, class DH>
-  static void estimate (const Mapping<1,spacedim> &mapping,
+  static void estimate (const Mapping<1,spacedim>  &mapping,
                         const DH   &dof,
                         const Quadrature<0> &quadrature,
                         const typename FunctionMap<spacedim>::type &neumann_bc,

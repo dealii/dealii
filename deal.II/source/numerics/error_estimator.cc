@@ -1140,14 +1140,14 @@ estimate (const DH   &dof_handler,
 template <int spacedim>
 template <typename InputVector, class DH>
 void KellyErrorEstimator<1,spacedim>::
-estimate (const Mapping<1,spacedim> &                    /*mapping*/,
-          const DH &                            /*dof_handler*/,
+estimate (const Mapping<1,spacedim>                    &/*mapping*/,
+          const DH                            &/*dof_handler*/,
           const hp::QCollection<0> &,
-          const typename FunctionMap<spacedim>::type &          /*neumann_bc*/,
-          const std::vector<const InputVector *> & /*solutions*/,
-          std::vector<Vector<float>*> &            /*errors*/,
-          const ComponentMask &                /*component_mask_*/,
-          const Function<spacedim> *                   /*coefficient*/,
+          const typename FunctionMap<spacedim>::type          &/*neumann_bc*/,
+          const std::vector<const InputVector *> &/*solutions*/,
+          std::vector<Vector<float>*>            &/*errors*/,
+          const ComponentMask                &/*component_mask_*/,
+          const Function<spacedim>                   */*coefficient*/,
           const unsigned int,
           const types::subdomain_id          /*subdomain_id*/,
           const types::material_id                   /*material_id*/)
@@ -1172,7 +1172,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
           const types::subdomain_id         subdomain_id_,
           const types::material_id                  material_id)
 {
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<1,spacedim>*>
       (&dof_handler.get_tria())
       != 0)
@@ -1523,7 +1523,7 @@ estimate (const Mapping<dim, spacedim>                  &mapping,
           const types::subdomain_id          subdomain_id_,
           const types::material_id                   material_id)
 {
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
   if (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
       (&dof_handler.get_tria())
       != 0)

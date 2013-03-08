@@ -13,7 +13,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_P4EST
+#ifdef DEAL_II_WITH_P4EST
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>

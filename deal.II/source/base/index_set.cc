@@ -16,8 +16,8 @@
 #include <deal.II/base/index_set.h>
 #include <list>
 
-#ifdef DEAL_II_USE_TRILINOS
-#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  endif
 #  include <Epetra_SerialComm.h>
@@ -374,7 +374,7 @@ void IndexSet::fill_index_vector(std::vector<types::global_dof_index> &indices) 
 
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 Epetra_Map
 IndexSet::make_trilinos_map (const MPI_Comm &communicator,
@@ -386,7 +386,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
     return Epetra_Map (static_cast<int>(size()),
                        static_cast<int>(n_elements()),
                        0,
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
                        Epetra_MpiComm(communicator));
 #else
                        Epetra_SerialComm());
@@ -404,7 +404,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
                           :
                           0),
                          0,
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
                          Epetra_MpiComm(communicator));
 #else
                          Epetra_SerialComm());

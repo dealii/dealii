@@ -154,7 +154,7 @@ namespace Step32
 
     template <int dim>
     double
-    TemperatureInitialValues<dim>::value (const Point<dim> &p,
+    TemperatureInitialValues<dim>::value (const Point<dim>  &p,
                                           const unsigned int) const
     {
       const double r = p.norm();
@@ -224,8 +224,8 @@ namespace Step32
     class BlockSchurPreconditioner : public Subscriptor
     {
     public:
-      BlockSchurPreconditioner (const TrilinosWrappers::BlockSparseMatrix &S,
-                                const TrilinosWrappers::BlockSparseMatrix &Spre,
+      BlockSchurPreconditioner (const TrilinosWrappers::BlockSparseMatrix  &S,
+                                const TrilinosWrappers::BlockSparseMatrix  &Spre,
                                 const PreconditionerMp                     &Mppreconditioner,
                                 const PreconditionerA                      &Apreconditioner,
                                 const bool                                  do_solve_A)
@@ -275,7 +275,7 @@ namespace Step32
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_matrix;
       const SmartPointer<const TrilinosWrappers::BlockSparseMatrix> stokes_preconditioner_matrix;
       const PreconditionerMp &mp_preconditioner;
-      const PreconditionerA &a_preconditioner;
+      const PreconditionerA  &a_preconditioner;
       const bool do_solve_A;
     };
   }
@@ -775,14 +775,14 @@ namespace Step32
     double
     compute_viscosity(const std::vector<double>          &old_temperature,
                       const std::vector<double>          &old_old_temperature,
-                      const std::vector<Tensor<1,dim> > &old_temperature_grads,
-                      const std::vector<Tensor<1,dim> > &old_old_temperature_grads,
+                      const std::vector<Tensor<1,dim> >  &old_temperature_grads,
+                      const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
                       const std::vector<double>          &old_temperature_laplacians,
                       const std::vector<double>          &old_old_temperature_laplacians,
-                      const std::vector<Tensor<1,dim> > &old_velocity_values,
-                      const std::vector<Tensor<1,dim> > &old_old_velocity_values,
-                      const std::vector<SymmetricTensor<2,dim> > &old_strain_rates,
-                      const std::vector<SymmetricTensor<2,dim> > &old_old_strain_rates,
+                      const std::vector<Tensor<1,dim> >  &old_velocity_values,
+                      const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
+                      const std::vector<SymmetricTensor<2,dim> >  &old_strain_rates,
+                      const std::vector<SymmetricTensor<2,dim> >  &old_old_strain_rates,
                       const double                        global_u_infty,
                       const double                        global_T_variation,
                       const double                        average_temperature,
@@ -951,7 +951,7 @@ namespace Step32
 
     void
     local_assemble_stokes_system (const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                  Assembly::Scratch::StokesSystem<dim> &scratch,
+                                  Assembly::Scratch::StokesSystem<dim>  &scratch,
                                   Assembly::CopyData::StokesSystem<dim> &data);
 
     void
@@ -960,7 +960,7 @@ namespace Step32
 
     void
     local_assemble_temperature_matrix (const typename DoFHandler<dim>::active_cell_iterator &cell,
-                                       Assembly::Scratch::TemperatureMatrix<dim> &scratch,
+                                       Assembly::Scratch::TemperatureMatrix<dim>  &scratch,
                                        Assembly::CopyData::TemperatureMatrix<dim> &data);
 
     void
@@ -1552,14 +1552,14 @@ namespace Step32
   BoussinesqFlowProblem<dim>::
   compute_viscosity (const std::vector<double>          &old_temperature,
                      const std::vector<double>          &old_old_temperature,
-                     const std::vector<Tensor<1,dim> > &old_temperature_grads,
-                     const std::vector<Tensor<1,dim> > &old_old_temperature_grads,
+                     const std::vector<Tensor<1,dim> >  &old_temperature_grads,
+                     const std::vector<Tensor<1,dim> >  &old_old_temperature_grads,
                      const std::vector<double>          &old_temperature_laplacians,
                      const std::vector<double>          &old_old_temperature_laplacians,
-                     const std::vector<Tensor<1,dim> > &old_velocity_values,
-                     const std::vector<Tensor<1,dim> > &old_old_velocity_values,
-                     const std::vector<SymmetricTensor<2,dim> > &old_strain_rates,
-                     const std::vector<SymmetricTensor<2,dim> > &old_old_strain_rates,
+                     const std::vector<Tensor<1,dim> >  &old_velocity_values,
+                     const std::vector<Tensor<1,dim> >  &old_old_velocity_values,
+                     const std::vector<SymmetricTensor<2,dim> >  &old_strain_rates,
+                     const std::vector<SymmetricTensor<2,dim> >  &old_old_strain_rates,
                      const double                        global_u_infty,
                      const double                        global_T_variation,
                      const double                        average_temperature,
@@ -3179,9 +3179,9 @@ namespace Step32
   BoussinesqFlowProblem<dim>::Postprocessor::
   compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
                                      const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                     const std::vector<std::vector<Tensor<2,dim> > > & /*dduh*/,
-                                     const std::vector<Point<dim> >                  & /*normals*/,
-                                     const std::vector<Point<dim> >                  & /*evaluation_points*/,
+                                     const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
+                                     const std::vector<Point<dim> >                  &/*normals*/,
+                                     const std::vector<Point<dim> >                  &/*evaluation_points*/,
                                      std::vector<Vector<double> >                    &computed_quantities) const
   {
     const unsigned int n_quadrature_points = uh.size();

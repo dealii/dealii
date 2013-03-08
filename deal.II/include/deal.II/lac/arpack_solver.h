@@ -16,7 +16,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_ARPACK
+#ifdef DEAL_II_WITH_ARPACK
 
 DEAL_II_NAMESPACE_OPEN
 

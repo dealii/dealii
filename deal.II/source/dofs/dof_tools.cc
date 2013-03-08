@@ -116,7 +116,7 @@ namespace DoFTools
   make_sparsity_pattern (const DH                &dof,
                          const Table<2,Coupling> &couplings,
                          SparsityPattern         &sparsity,
-                         const ConstraintMatrix &constraints,
+                         const ConstraintMatrix  &constraints,
                          const bool               keep_constrained_dofs,
                          const types::subdomain_id subdomain_id)
   {
@@ -1780,8 +1780,8 @@ namespace DoFTools
 
 
     void
-    make_hp_hanging_node_constraints (const dealii::hp::DoFHandler<1> & /*dof_handler*/,
-                                      ConstraintMatrix &        /*constraints*/)
+    make_hp_hanging_node_constraints (const dealii::hp::DoFHandler<1> &/*dof_handler*/,
+                                      ConstraintMatrix        &/*constraints*/)
     {
       // we may have to compute constraints for vertices. gotta think about
       // that a bit more
@@ -1792,8 +1792,8 @@ namespace DoFTools
 
 
     void
-    make_oldstyle_hanging_node_constraints (const dealii::hp::DoFHandler<1> & /*dof_handler*/,
-                                            ConstraintMatrix &        /*constraints*/,
+    make_oldstyle_hanging_node_constraints (const dealii::hp::DoFHandler<1> &/*dof_handler*/,
+                                            ConstraintMatrix        &/*constraints*/,
                                             dealii::internal::int2type<1>)
     {
       // we may have to compute constraints for vertices. gotta think about
@@ -3008,7 +3008,7 @@ namespace DoFTools
     Assert (0<=direction && direction<space_dim,
             ExcIndexRange (direction, 0, space_dim));
 
-#if defined(DEBUG) && defined(DEAL_II_USE_P4EST)
+#if defined(DEBUG) && defined(DEAL_II_WITH_P4EST)
     // Check whether we run on a non parallel mesh or on a
     // parallel::distributed::Triangulation in serial
     {
@@ -3102,7 +3102,7 @@ namespace DoFTools
     Assert(dim == space_dim,
            ExcNotImplemented());
 
-#if defined(DEBUG) && defined(DEAL_II_USE_P4EST)
+#if defined(DEBUG) && defined(DEAL_II_WITH_P4EST)
     // Check whether we run on a non parallel mesh or on a
     // parallel::distributed::Triangulation in serial
     {
@@ -3167,7 +3167,7 @@ namespace DoFTools
     //   in the component_mask that corresponds to this shape function
     template <int dim, int spacedim>
     std::vector<unsigned char>
-    get_local_component_association (const FiniteElement<dim,spacedim> &fe,
+    get_local_component_association (const FiniteElement<dim,spacedim>  &fe,
                                      const ComponentMask        &component_mask)
     {
       std::vector<unsigned char> local_component_association (fe.dofs_per_cell,
@@ -4499,7 +4499,7 @@ namespace DoFTools
             ExcInternalError());
 
     // reduce information from all CPUs
-#if defined(DEAL_II_USE_P4EST) && defined(DEAL_II_COMPILER_SUPPORTS_MPI)
+#if defined(DEAL_II_WITH_P4EST) && defined(DEAL_II_WITH_MPI)
     const unsigned int dim = DH::dimension;
     const unsigned int spacedim = DH::space_dimension;
 
@@ -4521,7 +4521,7 @@ namespace DoFTools
   void
   count_dofs_per_block (const DH &dof_handler,
                         std::vector<types::global_dof_index> &dofs_per_block,
-                        const std::vector<unsigned int> &target_block_)
+                        const std::vector<unsigned int>  &target_block_)
   {
     std::vector<unsigned int>  target_block = target_block_;
 
@@ -4574,8 +4574,8 @@ namespace DoFTools
           += std::count(dofs_by_block.begin(), dofs_by_block.end(),
                         block);
 
-#ifdef DEAL_II_USE_P4EST
-#if DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_P4EST
+#ifdef DEAL_II_WITH_MPI
         // if we are working on a parallel mesh, we now need to collect
         // this information from all processors
         if (const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension> *tria
@@ -5419,8 +5419,8 @@ namespace DoFTools
       template <class DH>
       void
       map_dofs_to_support_points(const hp::MappingCollection<DH::dimension, DH::space_dimension> &mapping,
-                                 const DH &dof_handler,
-                                 std::vector<Point<DH::space_dimension> > &support_points)
+                                 const DH  &dof_handler,
+                                 std::vector<Point<DH::space_dimension> >  &support_points)
       {
         // get the data in the form of the map as above
         std::map<types::global_dof_index,Point<DH::space_dimension> >  x_support_points;

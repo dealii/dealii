@@ -63,6 +63,9 @@ namespace MeshWorker
       void initialize(const ConstraintMatrix &constraints);
 
       /**
+       * @deprecated This function is of no effect. Only the block info
+       * structure in DoFInfo is being used.
+       *
        * Store information on the local block structure. If the
        * assembler is inititialized with this function,
        * initialize_info() will generate one local matrix for each
@@ -72,14 +75,9 @@ namespace MeshWorker
        * In spite of using local block structure, all blocks will be
        * enteres into the same global matrix, disregarding any global
        * block structure.
-       *
-       * @note The argument of this function will be copied into the
-       * member object #local_indices. Thus, every subsequent change
-       * in the block structure must be initialzied or will not be
-       * used by the assembler.
        */
 
-      void initialize_local_blocks(const BlockIndices &local_indices);
+      void initialize_local_blocks(const BlockIndices &);
 
       /**
        * Initialize the local data in the DoFInfo object used later
@@ -108,12 +106,6 @@ namespace MeshWorker
       void assemble(const DOFINFO &info1,
                     const DOFINFO &info2);
     private:
-      /**
-       * The object containing the local block structure. Set by
-       * initialize_local_blocks() and used by assembling functions.
-       */
-      BlockIndices local_indices;
-
       /**
        * The global residal vectors filled by assemble().
        */
@@ -144,11 +136,9 @@ namespace MeshWorker
      * by default, the obvious choice of taking a single local matrix with
      * dimensions equal to the number of degrees of freedom of the
      * cell. Alternatively, a local block structure can be initialized
-     * with initialize_local_blocks(). After this, the local data will be
+     * in DoFInfo. After this, the local data will be
      * arranged as an array of n by n FullMatrix blocks, which are
-     * ordered lexicographically in DoFInfo. Note that
-     * initialize_local_blocks() has to be called before initialize_info()
-     * to take the desired effect.
+     * ordered lexicographically in DoFInfo.
      *
      * @ingroup MeshWorker
      * @author Guido Kanschat, 2009
@@ -177,6 +167,9 @@ namespace MeshWorker
       void initialize(const ConstraintMatrix &constraints);
 
       /**
+       * @deprecated This function is of no effect. Only the block info
+       * structure in DoFInfo is being used.
+       *
        * Store information on the local block structure. If the
        * assembler is inititialized with this function,
        * initialize_info() will generate one local matrix for each
@@ -186,25 +179,16 @@ namespace MeshWorker
        * In spite of using local block structure, all blocks will be
        * enteres into the same global matrix, disregarding any global
        * block structure.
-       *
-       * @note The argument of this function will be copied into the
-       * member object #local_indices. Thus, every subsequent change
-       * in the block structure must be initialzied or will not be
-       * used by the assembler.
        */
 
-      void initialize_local_blocks(const BlockIndices &local_indices);
+      void initialize_local_blocks(const BlockIndices &);
 
       /**
-       * Initialize the local data
-       * in the DoFInfo object used
-       * later for assembling.
+       * Initialize the local data in the DoFInfo object used later
+       * for assembling.
        *
-       * The info object refers to
-       * a cell if
-       * <code>!face</code>, or
-       * else to an interior or
-       * boundary face.
+       * The info object refers to a cell if <code>!face</code>, or
+       * else to an interior or boundary face.
        */
       template <class DOFINFO>
       void initialize_info(DOFINFO &info, bool face) const;
@@ -241,12 +225,6 @@ namespace MeshWorker
        * containing constraints.
        */
       SmartPointer<const ConstraintMatrix,MatrixSimple<MATRIX> > constraints;
-
-      /**
-       * The object containing the local block structure. Set by
-       * initialize_local_blocks() and used by assembling functions.
-       */
-      BlockIndices local_indices;
 
       /**
        * The smallest positive number that will be entered into the
@@ -294,6 +272,9 @@ namespace MeshWorker
       void initialize(const MGConstrainedDoFs &mg_constrained_dofs);
 
       /**
+       * @deprecated This function is of no effect. Only the block info
+       * structure in DoFInfo is being used.
+       *
        * Store information on the local block structure. If the
        * assembler is inititialized with this function,
        * initialize_info() will generate one local matrix for each
@@ -303,13 +284,8 @@ namespace MeshWorker
        * In spite of using local block structure, all blocks will be
        * enteres into the same global matrix, disregarding any global
        * block structure.
-       *
-       * @note The argument of this function will be copied into the
-       * member object #local_indices. Thus, every subsequent change
-       * in the block structure must be initialzied or will not be
-       * used by the assembler.
        */
-      void initialize_local_blocks(const BlockIndices &local_indices);
+      void initialize_local_blocks(const BlockIndices &);
 
       /**
        * Initialize the matrices #flux_up and #flux_down used for
@@ -439,12 +415,6 @@ namespace MeshWorker
       SmartPointer<const MGConstrainedDoFs,MGMatrixSimple<MATRIX> > mg_constrained_dofs;
 
       /**
-       * The object containing the local block structure. Set by
-       * initialize_local_blocks() and used by assembling functions.
-       */
-      BlockIndices local_indices;
-
-      /**
        * The smallest positive number that will be entered into the
        * global matrix. All smaller absolute values will be treated as
        * zero and will not be assembled.
@@ -538,10 +508,8 @@ namespace MeshWorker
 
     template <class MATRIX>
     inline void
-    ResidualSimple<MATRIX>::initialize_local_blocks(const BlockIndices &b)
-    {
-      local_indices = b;
-    }
+    ResidualSimple<MATRIX>::initialize_local_blocks(const BlockIndices &)
+    {}
     
     
     template <class VECTOR>
@@ -567,7 +535,7 @@ namespace MeshWorker
             }
           else
             {
-	      if (local_indices.size() == 0)
+	      if (info.indices_by_block.size() == 0)
 		constraints->distribute_local_to_global(info.vector(k).block(0), info.indices, (*residuals(k)));
 	      else
 		for (unsigned int i=0;i != info.vector(k).n_blocks();++i)
@@ -593,14 +561,14 @@ namespace MeshWorker
             }
           else
             {
-	      if (local_indices.size() == 0)
+	      if (info1.indices_by_block.size() == 0 && info2.indices_by_block.size() == 0)
 		{
 		  constraints->distribute_local_to_global
 		    (info1.vector(k).block(0), info1.indices, (*residuals(k)));
 		  constraints->distribute_local_to_global
 		    (info2.vector(k).block(0), info2.indices, (*residuals(k)));
 		}
-	      else
+	      else if (info1.indices_by_block.size() != 0 && info2.indices_by_block.size() != 0)
 		{
 		  for (unsigned int i=0;i<info1.vector(k).n_blocks();++i)
 		    {
@@ -609,6 +577,10 @@ namespace MeshWorker
 		      constraints->distribute_local_to_global
 			(info2.vector(k).block(i), info2.indices_by_block[i], (*residuals(k)));
 		    }
+		}
+	      else
+		{
+		  Assert(false, ExcNotImplemented());
 		}
             }
         }
@@ -643,10 +615,8 @@ namespace MeshWorker
 
     template <class MATRIX>
     inline void
-    MatrixSimple<MATRIX>::initialize_local_blocks(const BlockIndices &b)
-    {
-      local_indices = b;
-    }
+    MatrixSimple<MATRIX>::initialize_local_blocks(const BlockIndices &)
+    {}
 
 
     template <class MATRIX >
@@ -654,7 +624,7 @@ namespace MeshWorker
     inline void
     MatrixSimple<MATRIX>::initialize_info(DOFINFO &info, bool face) const
     {
-      const unsigned int n = local_indices.size();
+      const unsigned int n = info.indices_by_block.size();
 
       if (n == 0)
         info.initialize_matrices(1, face);
@@ -706,7 +676,7 @@ namespace MeshWorker
     {
       Assert(!info.level_cell, ExcMessage("Cell may not access level dofs"));
 
-      if (local_indices.size() == 0)
+      if (info.indices_by_block.size() == 0)
         assemble(info.matrix(0,false).matrix, info.indices, info.indices);
       else
         {
@@ -728,14 +698,14 @@ namespace MeshWorker
       Assert(!info1.level_cell, ExcMessage("Cell may not access level dofs"));
       Assert(!info2.level_cell, ExcMessage("Cell may not access level dofs"));
 
-      if (local_indices.size() == 0)
+      if (info1.indices_by_block.size() == 0 && info2.indices_by_block.size() == 0)
         {
           assemble(info1.matrix(0,false).matrix, info1.indices, info1.indices);
           assemble(info1.matrix(0,true).matrix, info1.indices, info2.indices);
           assemble(info2.matrix(0,false).matrix, info2.indices, info2.indices);
           assemble(info2.matrix(0,true).matrix, info2.indices, info1.indices);
         }
-      else
+      else if (info1.indices_by_block.size() != 0 && info2.indices_by_block.size() != 0)
         for (unsigned int k=0; k<info1.n_matrices(); ++k)
           {
             const unsigned int row = info1.matrix(k,false).row;
@@ -750,6 +720,10 @@ namespace MeshWorker
             assemble(info2.matrix(k,true).matrix,
                      info2.indices_by_block[row], info1.indices_by_block[column]);
           }
+      else
+	{
+	  Assert(false, ExcNotImplemented());
+	}
     }
 
 
@@ -779,10 +753,8 @@ namespace MeshWorker
 
     template <class MATRIX>
     inline void
-    MGMatrixSimple<MATRIX>::initialize_local_blocks(const BlockIndices &b)
-    {
-      local_indices = b;
-    }
+    MGMatrixSimple<MATRIX>::initialize_local_blocks(const BlockIndices &)
+    {}
 
 
     template <class MATRIX>
@@ -810,7 +782,7 @@ namespace MeshWorker
     inline void
     MGMatrixSimple<MATRIX>::initialize_info(DOFINFO &info, bool face) const
     {
-      const unsigned int n = local_indices.size();
+      const unsigned int n = info.indices_by_block.size();
 
       if (n == 0)
         info.initialize_matrices(1, face);
@@ -1072,7 +1044,7 @@ namespace MeshWorker
       Assert(info.level_cell, ExcMessage("Cell must access level dofs"));
       const unsigned int level = info.cell->level();
 
-      if (local_indices.size() == 0)
+      if (info.indices_by_block.size() == 0)
         {
           assemble((*matrix)[level], info.matrix(0,false).matrix,
                    info.indices, info.indices, level);
@@ -1115,7 +1087,7 @@ namespace MeshWorker
       const unsigned int level1 = info1.cell->level();
       const unsigned int level2 = info2.cell->level();
 
-      if (local_indices.size() == 0)
+      if (info1.indices_by_block.size() == 0)
         {
           if (level1 == level2)
             {

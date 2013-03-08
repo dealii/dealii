@@ -208,7 +208,7 @@ template<class SOLVER, class VECTOR>
 template<class MATRIX, class PRECOND>
 MGCoarseGridLACIteration<SOLVER, VECTOR>
 ::MGCoarseGridLACIteration(SOLVER &s,
-                           const MATRIX &m,
+                           const MATRIX  &m,
                            const PRECOND &p)
   :
   solver(&s, typeid(*this).name())
@@ -231,7 +231,7 @@ template<class MATRIX, class PRECOND>
 void
 MGCoarseGridLACIteration<SOLVER, VECTOR>
 ::initialize(SOLVER &s,
-             const MATRIX &m,
+             const MATRIX  &m,
              const PRECOND &p)
 {
   solver = &s;

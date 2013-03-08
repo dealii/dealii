@@ -462,7 +462,7 @@ namespace Step33
     void
     compute_refinement_indicators (const DoFHandler<dim> &dof_handler,
                                    const Mapping<dim>    &mapping,
-                                   const Vector<double> &solution,
+                                   const Vector<double>  &solution,
                                    Vector<double>        &refinement_indicators)
     {
       const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
@@ -587,9 +587,9 @@ namespace Step33
   EulerEquations<dim>::Postprocessor::
   compute_derived_quantities_vector (const std::vector<Vector<double> >              &uh,
                                      const std::vector<std::vector<Tensor<1,dim> > > &duh,
-                                     const std::vector<std::vector<Tensor<2,dim> > > & /*dduh*/,
-                                     const std::vector<Point<dim> >                  & /*normals*/,
-                                     const std::vector<Point<dim> >                  & /*evaluation_points*/,
+                                     const std::vector<std::vector<Tensor<2,dim> > > &/*dduh*/,
+                                     const std::vector<Point<dim> >                  &/*normals*/,
+                                     const std::vector<Point<dim> >                  &/*evaluation_points*/,
                                      std::vector<Vector<double> >                    &computed_quantities) const
   {
     // At the beginning of the function, let us make sure that all variables

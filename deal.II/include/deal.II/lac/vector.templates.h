@@ -20,12 +20,12 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/block_vector.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 #  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/petsc_parallel_vector.h>
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 #  include <deal.II/lac/trilinos_vector.h>
 #endif
 
@@ -152,7 +152,7 @@ Vector<Number>::Vector (const Vector<OtherNumber> &v)
 
 #endif
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 
 template <typename Number>
@@ -205,7 +205,7 @@ Vector<Number>::Vector (const PETScWrappers::MPI::Vector &v)
 
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 template <typename Number>
 Vector<Number>::Vector (const TrilinosWrappers::MPI::Vector &v)
@@ -501,7 +501,7 @@ namespace internal
     struct InnerProd
     {
       Number
-      operator() (const Number  *&X, const Number2  *&Y, const Number &) const
+      operator() (const Number *&X, const Number2 *&Y, const Number &) const
       {
         return *X++ * Number(numbers::NumberTraits<Number2>::conjugate(*Y++));
       }
@@ -661,7 +661,7 @@ namespace internal
             }
           result = outer_results[0];
         }
-#if DEAL_II_USE_MT == 1
+#ifdef DEAL_II_WITH_THREADS
       else if (vec_size > 4 * internal::Vector::minimum_parallel_grain_size)
         {
           // split the vector into smaller pieces to be
@@ -1200,7 +1200,7 @@ Vector<Number>::operator = (const BlockVector<Number> &v)
 
 
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 template <typename Number>
 Vector<Number> &
@@ -1245,7 +1245,7 @@ Vector<Number>::operator = (const PETScWrappers::MPI::Vector &v)
 #endif
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 template <typename Number>
 Vector<Number> &

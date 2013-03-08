@@ -116,7 +116,7 @@ namespace FE_Q_Helper
     template <int dim>
     inline
     std::vector<Polynomials::Polynomial<double> >
-    generate_poly_space1d (const std::vector<Point<dim> > &unit_support_points,
+    generate_poly_space1d (const std::vector<Point<dim> >  &unit_support_points,
                            const std::vector<unsigned int> &index_map_inverse,
                            const unsigned int               dofs1d)
     {
@@ -767,8 +767,8 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
 template <>
 void
 FE_Q<1>::
-get_face_interpolation_matrix (const FiniteElement<1,1> & /*x_source_fe*/,
-                               FullMatrix<double> &     /*interpolation_matrix*/) const
+get_face_interpolation_matrix (const FiniteElement<1,1> &/*x_source_fe*/,
+                               FullMatrix<double>     &/*interpolation_matrix*/) const
 {
   Assert (false, ExcImpossibleInDim(1));
 }
@@ -778,9 +778,9 @@ get_face_interpolation_matrix (const FiniteElement<1,1> & /*x_source_fe*/,
 template <>
 void
 FE_Q<1>::
-get_subface_interpolation_matrix (const FiniteElement<1,1> & /*x_source_fe*/,
+get_subface_interpolation_matrix (const FiniteElement<1,1> &/*x_source_fe*/,
                                   const unsigned int      /*subface*/,
-                                  FullMatrix<double> &     /*interpolation_matrix*/) const
+                                  FullMatrix<double>     &/*interpolation_matrix*/) const
 {
   Assert (false, ExcImpossibleInDim(1));
 }
@@ -789,8 +789,8 @@ get_subface_interpolation_matrix (const FiniteElement<1,1> & /*x_source_fe*/,
 template <>
 void
 FE_Q<1,2>::
-get_face_interpolation_matrix (const FiniteElement<1,2> & /*x_source_fe*/,
-                               FullMatrix<double> &     /*interpolation_matrix*/) const
+get_face_interpolation_matrix (const FiniteElement<1,2> &/*x_source_fe*/,
+                               FullMatrix<double>     &/*interpolation_matrix*/) const
 {
   typedef FiniteElement<1,2> FEL;
   Assert (false,
@@ -802,9 +802,9 @@ get_face_interpolation_matrix (const FiniteElement<1,2> & /*x_source_fe*/,
 template <>
 void
 FE_Q<1,2>::
-get_subface_interpolation_matrix (const FiniteElement<1,2> & /*x_source_fe*/,
+get_subface_interpolation_matrix (const FiniteElement<1,2> &/*x_source_fe*/,
                                   const unsigned int      /*subface*/,
-                                  FullMatrix<double> &     /*interpolation_matrix*/) const
+                                  FullMatrix<double>     &/*interpolation_matrix*/) const
 {
   typedef FiniteElement<1,2> FEL;
   Assert (false,
@@ -816,8 +816,8 @@ get_subface_interpolation_matrix (const FiniteElement<1,2> & /*x_source_fe*/,
 template <>
 void
 FE_Q<1,3>::
-get_face_interpolation_matrix (const FiniteElement<1,3> & /*x_source_fe*/,
-                               FullMatrix<double> &     /*interpolation_matrix*/) const
+get_face_interpolation_matrix (const FiniteElement<1,3> &/*x_source_fe*/,
+                               FullMatrix<double>     &/*interpolation_matrix*/) const
 {
   typedef FiniteElement<1,3> FEL;
   Assert (false,
@@ -829,9 +829,9 @@ get_face_interpolation_matrix (const FiniteElement<1,3> & /*x_source_fe*/,
 template <>
 void
 FE_Q<1,3>::
-get_subface_interpolation_matrix (const FiniteElement<1,3> & /*x_source_fe*/,
+get_subface_interpolation_matrix (const FiniteElement<1,3> &/*x_source_fe*/,
                                   const unsigned int      /*subface*/,
-                                  FullMatrix<double> &     /*interpolation_matrix*/) const
+                                  FullMatrix<double>     &/*interpolation_matrix*/) const
 {
   typedef FiniteElement<1,3> FEL;
   Assert (false,
@@ -1335,7 +1335,7 @@ void FE_Q<1>::initialize_unit_face_support_points ()
 }
 
 template <>
-void FE_Q<1>::initialize_unit_face_support_points (const Quadrature<1> & /*points*/)
+void FE_Q<1>::initialize_unit_face_support_points (const Quadrature<1> &/*points*/)
 {
   // no faces in 1d, so nothing to do
 }
@@ -1347,7 +1347,7 @@ void FE_Q<1,2>::initialize_unit_face_support_points ()
 }
 
 template <>
-void FE_Q<1,2>::initialize_unit_face_support_points (const Quadrature<1> & /*points*/)
+void FE_Q<1,2>::initialize_unit_face_support_points (const Quadrature<1> &/*points*/)
 {
   // no faces in 1d, so nothing to do
 }
@@ -1359,7 +1359,7 @@ void FE_Q<1,3>::initialize_unit_face_support_points ()
 }
 
 template <>
-void FE_Q<1,3>::initialize_unit_face_support_points (const Quadrature<1> & /*points*/)
+void FE_Q<1,3>::initialize_unit_face_support_points (const Quadrature<1> &/*points*/)
 {
   // no faces in 1d, so nothing to do
 }

@@ -1844,7 +1844,7 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
 
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 // this is a specialization for a
 // parallel (non-block) Trilinos
@@ -1902,7 +1902,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
                             individual_indices.end());
   }
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   const Epetra_MpiComm *mpi_comm
     = dynamic_cast<const Epetra_MpiComm *>(&vec.trilinos_vector().Comm());
 
@@ -1986,7 +1986,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
                               individual_indices.end());
     }
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
   const Epetra_MpiComm *mpi_comm
     = dynamic_cast<const Epetra_MpiComm *>(&vec.block(0).trilinos_vector().Comm());
 
@@ -2035,7 +2035,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
 
 #endif
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 // this is a specialization for a
 // parallel (non-block) PETSc
@@ -2112,7 +2112,7 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
 
 template<>
 void
-ConstraintMatrix::distribute (PETScWrappers::MPI::BlockVector & /*vec*/) const
+ConstraintMatrix::distribute (PETScWrappers::MPI::BlockVector &/*vec*/) const
 {
   Assert (sorted==true, ExcMatrixIsClosed());
   AssertThrow (false, ExcNotImplemented());
@@ -2288,12 +2288,12 @@ ConstraintMatrix::memory_consumption () const
 // can't do that - we have to rewrite those functions by hand if we want to
 // use them. The key is to use local ranges etc., which still needs to be
 // implemented.
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 VECTOR_FUNCTIONS(PETScWrappers::MPI::Vector);
 VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockVector);
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::Vector);
 PARALLEL_VECTOR_FUNCTIONS(TrilinosWrappers::MPI::BlockVector);
 #endif
@@ -2357,7 +2357,7 @@ MATRIX_VECTOR_FUNCTIONS(ChunkSparseMatrix<float>, Vector<float>);
 // BLOCK_MATRIX_FUNCTIONS(BlockSparseMatrixEZ<double>);
 // BLOCK_MATRIX_VECTOR_FUNCTIONS(BlockSparseMatrixEZ<float>,  Vector<float>);
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix);
 BLOCK_MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix);
 MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);
@@ -2368,7 +2368,7 @@ MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::SparseMatrix, PETScWrappers::MPI::Ve
 BLOCK_MATRIX_VECTOR_FUNCTIONS(PETScWrappers::MPI::BlockSparseMatrix ,PETScWrappers::MPI::BlockVector);
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix);
 BLOCK_MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix);
 MATRIX_VECTOR_FUNCTIONS(TrilinosWrappers::SparseMatrix, TrilinosWrappers::Vector);
@@ -2414,7 +2414,7 @@ BLOCK_SPARSITY_FUNCTIONS(BlockCompressedSparsityPattern);
 BLOCK_SPARSITY_FUNCTIONS(BlockCompressedSetSparsityPattern);
 BLOCK_SPARSITY_FUNCTIONS(BlockCompressedSimpleSparsityPattern);
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 SPARSITY_FUNCTIONS(TrilinosWrappers::SparsityPattern);
 BLOCK_SPARSITY_FUNCTIONS(TrilinosWrappers::BlockSparsityPattern);
 #endif
@@ -2434,12 +2434,12 @@ ONLY_MATRIX_FUNCTIONS(MatrixBlock<SparseMatrix<double> >);
 ONLY_MATRIX_FUNCTIONS(BlockSparseMatrix<float>);
 ONLY_MATRIX_FUNCTIONS(BlockSparseMatrix<double>);
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 ONLY_MATRIX_FUNCTIONS(TrilinosWrappers::SparseMatrix);
 ONLY_MATRIX_FUNCTIONS(TrilinosWrappers::BlockSparseMatrix);
 #endif
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 ONLY_MATRIX_FUNCTIONS(PETScWrappers::SparseMatrix);
 ONLY_MATRIX_FUNCTIONS(PETScWrappers::BlockSparseMatrix);
 ONLY_MATRIX_FUNCTIONS(PETScWrappers::MPI::SparseMatrix);

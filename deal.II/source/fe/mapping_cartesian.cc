@@ -467,7 +467,7 @@ MappingCartesian<dim, spacedim>::fill_fe_face_values (
   typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   std::vector<Point<dim> >     &quadrature_points,
   std::vector<double>          &JxW_values,
-  std::vector<Tensor<1,dim> > &boundary_forms,
+  std::vector<Tensor<1,dim> >  &boundary_forms,
   std::vector<Point<spacedim> >     &normal_vectors) const
 {
   // convert data object to internal
@@ -522,7 +522,7 @@ MappingCartesian<dim, spacedim>::fill_fe_subface_values (
   typename Mapping<dim, spacedim>::InternalDataBase &mapping_data,
   std::vector<Point<dim> >     &quadrature_points,
   std::vector<double>          &JxW_values,
-  std::vector<Tensor<1,dim> > &boundary_forms,
+  std::vector<Tensor<1,dim> >  &boundary_forms,
   std::vector<Point<spacedim> >     &normal_vectors) const
 {
   // convert data object to internal

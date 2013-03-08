@@ -605,9 +605,32 @@ namespace
    * which the determinant of the
    * Jacobian is zero or
    * negative. This is the function
+   * for the case dim!=spacedim,
+   * where we can not determine
+   * whether a cell is twisted as it
+   * may, for example, discretize a
+   * manifold with a twist.
+   */
+  template <class TRIANGULATION>
+  inline
+  typename TRIANGULATION::DistortedCellList
+  collect_distorted_coarse_cells (const TRIANGULATION &)
+  {
+    return typename TRIANGULATION::DistortedCellList();
+  }
+
+
+
+  /**
+   * Collect all coarse mesh cells
+   * with at least one vertex at
+   * which the determinant of the
+   * Jacobian is zero or
+   * negative. This is the function
    * for the case dim==spacedim.
    */
   template <int dim>
+  inline
   typename Triangulation<dim,dim>::DistortedCellList
   collect_distorted_coarse_cells (const Triangulation<dim,dim> &triangulation)
   {
@@ -634,27 +657,6 @@ namespace
 
     return distorted_cells;
   }
-
-
-  /**
-   * Collect all coarse mesh cells
-   * with at least one vertex at
-   * which the determinant of the
-   * Jacobian is zero or
-   * negative. This is the function
-   * for the case dim!=spacedim,
-   * where we can not determine
-   * whether a cell is twisted as it
-   * may, for example, discretize a
-   * manifold with a twist.
-   */
-  template <int dim, int spacedim>
-  typename Triangulation<dim,spacedim>::DistortedCellList
-  collect_distorted_coarse_cells (const Triangulation<dim,spacedim> &)
-  {
-    return typename Triangulation<dim,spacedim>::DistortedCellList();
-  }
-
 
 
   /**
@@ -1440,7 +1442,7 @@ namespace internal
       void
       create_triangulation (const std::vector<Point<spacedim> > &v,
                             const std::vector<CellData<1> >     &cells,
-                            const SubCellData &                   /*subcelldata*/,
+                            const SubCellData                   &/*subcelldata*/,
                             Triangulation<1,spacedim>           &triangulation)
       {
         AssertThrow (v.size() > 0, ExcMessage ("No vertices given"));

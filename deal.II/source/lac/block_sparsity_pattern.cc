@@ -336,7 +336,7 @@ template class BlockSparsityPatternBase<SparsityPattern>;
 template class BlockSparsityPatternBase<CompressedSparsityPattern>;
 template class BlockSparsityPatternBase<CompressedSimpleSparsityPattern>;
 template class BlockSparsityPatternBase<CompressedSetSparsityPattern>;
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 template class BlockSparsityPatternBase<TrilinosWrappers::SparsityPattern>;
 #endif
 
@@ -669,7 +669,7 @@ BlockCompressedSimpleSparsityPattern::reinit (
 }
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
 

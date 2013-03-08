@@ -310,7 +310,7 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
 
 template <int dim, int spacedim>
 FESystem<dim,spacedim>::FESystem (
-  const std::vector<const FiniteElement<dim,spacedim>*> &fes,
+  const std::vector<const FiniteElement<dim,spacedim>*>  &fes,
   const std::vector<unsigned int>                  &multiplicities)
   :
   FiniteElement<dim,spacedim> (multiply_dof_numbers(fes, multiplicities),
@@ -392,7 +392,7 @@ FESystem<dim,spacedim>::shape_value (const unsigned int i,
 template <int dim, int spacedim>
 double
 FESystem<dim,spacedim>::shape_value_component (const unsigned int i,
-                                               const Point<dim> &p,
+                                               const Point<dim>  &p,
                                                const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
@@ -444,7 +444,7 @@ FESystem<dim,spacedim>::shape_grad (const unsigned int i,
 template <int dim, int spacedim>
 Tensor<1,dim>
 FESystem<dim,spacedim>::shape_grad_component (const unsigned int i,
-                                              const Point<dim> &p,
+                                              const Point<dim>  &p,
                                               const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));
@@ -496,7 +496,7 @@ FESystem<dim,spacedim>::shape_grad_grad (const unsigned int i,
 template <int dim, int spacedim>
 Tensor<2,dim>
 FESystem<dim,spacedim>::shape_grad_grad_component (const unsigned int i,
-                                                   const Point<dim> &p,
+                                                   const Point<dim>  &p,
                                                    const unsigned int component) const
 {
   Assert (i<this->dofs_per_cell, ExcIndexRange(i, 0, this->dofs_per_cell));

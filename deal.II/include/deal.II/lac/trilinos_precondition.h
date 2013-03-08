@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/subscriptor.h>
 #  include <deal.II/base/std_cxx1x/shared_ptr.h>
@@ -23,7 +23,7 @@
 #  include <deal.II/lac/trilinos_vector_base.h>
 #  include <deal.II/lac/parallel_vector.h>
 
-#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #  else
 #    include <Epetra_SerialComm.h>
@@ -191,7 +191,7 @@ namespace TrilinosWrappers
      * needs to be copied from
      * deal.II format.
      */
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     Epetra_MpiComm     communicator;
 #else
     Epetra_SerialComm  communicator;
@@ -1646,7 +1646,7 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS
 
 /*----------------------------   trilinos_precondition.h     ---------------------------*/
 

@@ -332,7 +332,7 @@ void Histogram::evaluate<float> (const Vector<float>   &values,
 
 // explicit instantiations for double
 template
-void Histogram::evaluate<double> (const std::vector<Vector<double> > &values,
+void Histogram::evaluate<double> (const std::vector<Vector<double> >  &values,
                                   const std::vector<double>                    &y_values,
                                   const unsigned int                            n_intervals,
                                   const IntervalSpacing                         interval_spacing);

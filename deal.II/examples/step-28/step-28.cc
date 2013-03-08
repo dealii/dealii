@@ -1225,7 +1225,7 @@ namespace Step28
     // describing the material parameters for the number of energy groups
     // requested in the input file, and (iii) the finite element to be used by
     // all energy groups:
-    const Parameters &parameters;
+    const Parameters  &parameters;
     const MaterialData material_data;
     FE_Q<dim>          fe;
 

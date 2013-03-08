@@ -154,7 +154,7 @@ namespace Step20
   // course. Given our discussion in the introduction of how the solution
   // should look like, the following computations should be straightforward:
   template <int dim>
-  double RightHandSide<dim>::value (const Point<dim>  & /*p*/,
+  double RightHandSide<dim>::value (const Point<dim>  &/*p*/,
                                     const unsigned int /*component*/) const
   {
     return 0;
@@ -163,7 +163,7 @@ namespace Step20
 
 
   template <int dim>
-  double PressureBoundaryValues<dim>::value (const Point<dim> &p,
+  double PressureBoundaryValues<dim>::value (const Point<dim>  &p,
                                              const unsigned int /*component*/) const
   {
     const double alpha = 0.3;

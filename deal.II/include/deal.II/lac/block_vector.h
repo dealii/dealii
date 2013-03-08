@@ -24,7 +24,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   class Vector;
@@ -139,7 +139,7 @@ public:
 #endif
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * A copy constructor taking a
    * (parallel) Trilinos block
@@ -241,7 +241,7 @@ public:
   BlockVector &
   operator= (const Vector<Number> &V);
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * A copy constructor from a
    * Trilinos block vector to a

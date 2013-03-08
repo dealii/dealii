@@ -571,7 +571,7 @@ namespace Patterns
      * and maximal allowable
      * lengths of the list.
      */
-    List (const PatternBase &base_pattern,
+    List (const PatternBase  &base_pattern,
           const unsigned int  min_elements = 0,
           const unsigned int  max_elements = max_int_value);
 
@@ -705,8 +705,8 @@ namespace Patterns
      * and maximal allowable
      * lengths of the list.
      */
-    Map (const PatternBase &key_pattern,
-         const PatternBase &value_pattern,
+    Map (const PatternBase  &key_pattern,
+         const PatternBase  &value_pattern,
          const unsigned int  min_elements = 0,
          const unsigned int  max_elements = max_int_value);
 

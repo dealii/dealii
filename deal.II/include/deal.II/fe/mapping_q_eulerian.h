@@ -113,8 +113,8 @@ public:
    */
 
   MappingQEulerian (const unsigned int     degree,
-                    const VECTOR &euler_vector,
-                    const DoFHandler<dim,spacedim> &euler_dof_handler);
+                    const VECTOR  &euler_vector,
+                    const DoFHandler<dim,spacedim>  &euler_dof_handler);
 
   /**
    * Return a pointer to a copy of the

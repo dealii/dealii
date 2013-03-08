@@ -1291,7 +1291,7 @@ namespace DoFTools
   template <class DH, typename Number>
   void
   distribute_cell_to_dof_vector (const DH              &dof_handler,
-                                 const Vector<Number> &cell_data,
+                                 const Vector<Number>  &cell_data,
                                  Vector<double>        &dof_data,
                                  const unsigned int     component = 0);
 
@@ -1624,7 +1624,7 @@ namespace DoFTools
   void
   extract_subdomain_dofs (const DH           &dof_handler,
                           const types::subdomain_id subdomain_id,
-                          std::vector<bool> &selected_dofs);
+                          std::vector<bool>  &selected_dofs);
 
 
   /**

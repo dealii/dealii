@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/trilinos_vector.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_block_vector.h>
@@ -400,7 +400,7 @@ namespace TrilinosWrappers
     last_action = Zero;
     Epetra_LocalMap map (static_cast<TrilinosWrapper::types::int_type>(partitioning.size()),
                          0,
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
                          Epetra_MpiComm(communicator));
 #else
                          Epetra_SerialComm());
@@ -492,7 +492,7 @@ namespace TrilinosWrappers
       {
         Epetra_LocalMap map (static_cast<TrilinosWrapper::types::int_type>(partitioning.size()),
                              0,
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
                              Epetra_MpiComm(communicator));
 #else
                              Epetra_SerialComm());
@@ -619,4 +619,4 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS

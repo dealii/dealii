@@ -34,8 +34,8 @@
 #endif
 
 
-#ifdef DEAL_II_USE_TRILINOS
-#  ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_TRILINOS
+#  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #    include <deal.II/lac/vector_memory.h>
 #    include <deal.II/lac/trilinos_vector.h>
@@ -605,9 +605,13 @@ namespace Utilities
 
     std::string get_hostname ()
     {
+#if defined(HAVE_UNISTD_H) && defined(HAVE_GETHOSTNAME)
       const unsigned int N=1024;
       char hostname[N];
       gethostname (&(hostname[0]), N-1);
+#else
+      std::string hostname("unknown");
+#endif
       return hostname;
     }
 
@@ -629,7 +633,7 @@ namespace Utilities
 
     bool job_supports_mpi ()
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
 
@@ -671,14 +675,14 @@ namespace Utilities
   }
 
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
   namespace Trilinos
   {
     const Epetra_Comm &
     comm_world()
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       static Teuchos::RCP<Epetra_MpiComm>
       communicator = Teuchos::rcp (new Epetra_MpiComm (MPI_COMM_WORLD), true);
 #else
@@ -694,7 +698,7 @@ namespace Utilities
     const Epetra_Comm &
     comm_self()
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       static Teuchos::RCP<Epetra_MpiComm>
       communicator = Teuchos::rcp (new Epetra_MpiComm (MPI_COMM_SELF), true);
 #else
@@ -710,7 +714,7 @@ namespace Utilities
     Epetra_Comm *
     duplicate_communicator (const Epetra_Comm &communicator)
     {
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
 
       // see if the communicator is in fact a
       // parallel MPI communicator; if so,
@@ -743,7 +747,7 @@ namespace Utilities
       // communicator if this whole
       // thing was created as an MPI
       // communicator
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       Epetra_MpiComm
       *mpi_comm = dynamic_cast<Epetra_MpiComm *>(&communicator);
       if (mpi_comm != 0)

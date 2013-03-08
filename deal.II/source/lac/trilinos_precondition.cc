@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/trilinos_precondition.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/lac/vector.h>
 #  include <deal.II/lac/sparse_matrix.h>
@@ -34,7 +34,7 @@ namespace TrilinosWrappers
 {
 
   PreconditionBase::PreconditionBase()
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     :
     communicator (MPI_COMM_SELF)
 #endif
@@ -46,7 +46,7 @@ namespace TrilinosWrappers
     :
     Subscriptor (),
     preconditioner (base.preconditioner),
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     communicator (base.communicator),
 #endif
     vector_distributor (new Epetra_Map(*base.vector_distributor))
@@ -62,7 +62,7 @@ namespace TrilinosWrappers
   void PreconditionBase::clear ()
   {
     preconditioner.reset();
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
     communicator = MPI_COMM_SELF;
 #endif
     vector_distributor.reset();
@@ -722,4 +722,4 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS

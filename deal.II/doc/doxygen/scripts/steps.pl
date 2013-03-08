@@ -1,0 +1,100 @@
+######################################################################
+# $Id$
+######################################################################
+#
+# Copyright (c) the deal.II authors 2009
+#
+######################################################################
+
+use strict;
+
+# List of additional node attributes to highlight purpose and state of the example
+my %style = (
+ "basic"          => ',height=.8,width=.8,shape="octagon",fillcolor="green"',
+ "techniques"     => ',height=.35,width=.35,fillcolor="orange"',
+ "fluids"         => ',height=.25,width=.25,fillcolor="yellow"',
+ "solids"         => ',height=.25,width=.25,fillcolor="lightblue"',
+ "time dependent" => ',height=.25,width=.25,fillcolor="blue"',
+ "unfinished"     => ',height=.25,width=.25,style="dashed"'
+    );
+
+
+# Print a preamble setting common attributes
+
+print << 'EOT'
+digraph StepsMap
+{
+  overlap=false;
+  edge [fontname="FreeSans",
+        fontsize="10",
+        labelfontname="FreeSans",
+        labelfontsize="10",
+        color="black",
+        style="solid"];
+  node [fontname="FreeSans",
+        fontsize="10",
+        shape="rectangle",
+        height=0.2,
+        width=0.4,
+        color="black",
+        fillcolor="white",
+        style="filled"];
+EOT
+    ;
+
+# print all nodes
+
+my $step;
+foreach $step (@ARGV)
+{
+    my $number = $step;
+    $number =~ s/^.*-//;
+
+    # read first line of tooltip file
+    open TF, "$step/doc/tooltip"
+	or die "Can't open tooltip file $step/doc/tooltip";
+    my $tooltip = <TF>;
+    close TF;
+    chop $tooltip;
+
+    printf "Step$number [label=\"$number\", URL=\"../deal.II/step_$number.html\", tooltip=\"$tooltip\"";
+
+
+    # read first line of 'kind' file
+    open KF, "$step/doc/kind"
+	or die "Can't open kind file $step/doc/kind";
+    my $kind = <KF>;
+    close KF;
+    chop $kind;
+
+    die "Unknown kind '$kind' in file $step/doc/kind" if (! defined $style{$kind});
+    print "$style{$kind}";
+
+    print "];\n";
+}
+
+# Print all edges
+# Keep sorted by second node on edge!
+
+my $step;
+foreach $step (@ARGV)
+{
+    my $number = $step;
+    $number =~ s/^.*-//;
+
+    # read first line of dependency file
+    open BF, "$step/doc/builds-on"
+	or die "Can't open builds-on file $step/doc/builds-on";
+    my $buildson = <BF>;
+    close BF;
+    chop $buildson;
+
+    my $source;
+    foreach $source (split ' ', $buildson) {
+	$source =~ s/step-/Step/g;
+	print "$source -> Step$number\n";
+    }
+}
+
+print "}\n";
+

@@ -46,7 +46,7 @@ namespace hp
 }
 
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 namespace PETScWrappers
 {
   class SparseMatrix;
@@ -61,7 +61,7 @@ namespace PETScWrappers
 }
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
 {
   class SparseMatrix;
@@ -806,7 +806,7 @@ namespace MatrixTools
   template <typename number>
   void
   apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
-                         SparseMatrix<number> &matrix,
+                         SparseMatrix<number>  &matrix,
                          Vector<number>        &solution,
                          Vector<number>        &right_hand_side,
                          const bool             eliminate_columns = true);
@@ -828,7 +828,7 @@ namespace MatrixTools
                          BlockVector<number>                 &right_hand_side,
                          const bool           eliminate_columns = true);
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
   /**
    * Apply dirichlet boundary conditions to
    * the system matrix and vectors as
@@ -868,9 +868,9 @@ namespace MatrixTools
    */
   void
   apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
-                         PETScWrappers::SparseMatrix &matrix,
-                         PETScWrappers::Vector &solution,
-                         PETScWrappers::Vector &right_hand_side,
+                         PETScWrappers::SparseMatrix  &matrix,
+                         PETScWrappers::Vector  &solution,
+                         PETScWrappers::Vector  &right_hand_side,
                          const bool             eliminate_columns = true);
 
   /**
@@ -879,9 +879,9 @@ namespace MatrixTools
    */
   void
   apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
-                         PETScWrappers::MPI::SparseMatrix &matrix,
-                         PETScWrappers::MPI::Vector &solution,
-                         PETScWrappers::MPI::Vector &right_hand_side,
+                         PETScWrappers::MPI::SparseMatrix  &matrix,
+                         PETScWrappers::MPI::Vector  &solution,
+                         PETScWrappers::MPI::Vector  &right_hand_side,
                          const bool             eliminate_columns = true);
 
   /**
@@ -911,9 +911,9 @@ namespace MatrixTools
    */
   void
   apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
-                         PETScWrappers::MPI::SparseMatrix &matrix,
+                         PETScWrappers::MPI::SparseMatrix  &matrix,
                          PETScWrappers::Vector       &solution,
-                         PETScWrappers::MPI::Vector &right_hand_side,
+                         PETScWrappers::MPI::Vector  &right_hand_side,
                          const bool             eliminate_columns = true);
 
   /**
@@ -928,7 +928,7 @@ namespace MatrixTools
 
 #endif
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   /**
    * Apply dirichlet boundary
    * conditions to the system matrix
@@ -969,7 +969,7 @@ namespace MatrixTools
    */
   void
   apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
-                         TrilinosWrappers::SparseMatrix &matrix,
+                         TrilinosWrappers::SparseMatrix  &matrix,
                          TrilinosWrappers::Vector        &solution,
                          TrilinosWrappers::Vector        &right_hand_side,
                          const bool             eliminate_columns = true);
@@ -981,7 +981,7 @@ namespace MatrixTools
    */
   void
   apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
-                         TrilinosWrappers::BlockSparseMatrix &matrix,
+                         TrilinosWrappers::BlockSparseMatrix  &matrix,
                          TrilinosWrappers::BlockVector        &solution,
                          TrilinosWrappers::BlockVector        &right_hand_side,
                          const bool                eliminate_columns = true);
@@ -1024,7 +1024,7 @@ namespace MatrixTools
    */
   void
   apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
-                         TrilinosWrappers::SparseMatrix &matrix,
+                         TrilinosWrappers::SparseMatrix  &matrix,
                          TrilinosWrappers::MPI::Vector   &solution,
                          TrilinosWrappers::MPI::Vector   &right_hand_side,
                          const bool             eliminate_columns = true);
@@ -1036,7 +1036,7 @@ namespace MatrixTools
    */
   void
   apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
-                         TrilinosWrappers::BlockSparseMatrix &matrix,
+                         TrilinosWrappers::BlockSparseMatrix  &matrix,
                          TrilinosWrappers::MPI::BlockVector   &solution,
                          TrilinosWrappers::MPI::BlockVector   &right_hand_side,
                          const bool                eliminate_columns = true);

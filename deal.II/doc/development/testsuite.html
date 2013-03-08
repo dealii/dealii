@@ -150,24 +150,15 @@
     <h3>Running it</h3>
 
     <p>
-    To run the testsuite, go into your deal.II directory and do this:
+    To run the testsuite, go to the directory where you want to test deal.II
+    and do this:
     <pre>
-       cd /path/to/deal.II
        svn checkout https://svn.dealii.org/trunk/tests
-    </pre>
-    This should generate a <code>tests/</code> directory parallel to
-    the <code>base/</code>, <code>lac/</code>, etc directories. Then
-    do this:
-    <pre>
        cd tests
-       ./configure
+       DEAL_II_DIR=/a/b/c ./configure
     </pre>
-    This assumes that you have previously configured your deal.II
-    installation and sets up a few things, in particular it determines
-    which system you are on and which compiler you are using, in order
-    to make sure that the stored correct output for your system and
-    compiler is used to compare against the output of the tests when
-    you run them.
+    where <code>/a/b/c</code> is the installation directory you have told
+    CMake to install deal.II into previously.
     </p>
 
     <p>
@@ -271,7 +262,7 @@
     tests nightly through a cron-job with this command, to have
     regular test runs.
     </p>
-    
+
     <p>
     To get a quick overview you can run
     <pre>
@@ -281,13 +272,13 @@
     at the end:
     <pre>
                 Compiling Linking Running   Check      OK     all
-         a-framework	1	1	1	1	1	5	
-                base	0	0	0	2	185	187	
-                 lac	0	0	0	0	117	117	
-                  fe	0	0	0	4	114	118	
-             deal.II	0	0	0	2	291	293	
-         integrators	0	0	0	0	15	15	
-           multigrid	0	0	0	0	35	35	      
+         a-framework	1	1	1	1	1	5
+                base	0	0	0	2	185	187
+                 lac	0	0	0	0	117	117
+                  fe	0	0	0	4	114	118
+             deal.II	0	0	0	2	291	293
+         integrators	0	0	0	0	15	15
+           multigrid	0	0	0	0	35	35
 		 ...
     </pre>
     </p>
@@ -602,4 +593,3 @@ testname/cmp/generic
 
   </body>
 </html>
-

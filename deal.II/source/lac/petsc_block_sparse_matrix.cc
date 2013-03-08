@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/petsc_block_sparse_matrix.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 DEAL_II_NAMESPACE_OPEN
 

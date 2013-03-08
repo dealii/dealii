@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/utilities.h>
 #  include <deal.II/lac/sparse_matrix.h>
@@ -111,7 +111,7 @@ namespace TrilinosWrappers
 
 
 
-  SparseMatrix::SparseMatrix (const Epetra_Map &input_map,
+  SparseMatrix::SparseMatrix (const Epetra_Map  &input_map,
                               const size_type n_max_entries_per_row)
     :
     column_space_map (new Epetra_Map (input_map)),
@@ -137,8 +137,8 @@ namespace TrilinosWrappers
 
 
 
-  SparseMatrix::SparseMatrix (const Epetra_Map &input_row_map,
-                              const Epetra_Map &input_col_map,
+  SparseMatrix::SparseMatrix (const Epetra_Map  &input_row_map,
+                              const Epetra_Map  &input_col_map,
                               const size_type n_max_entries_per_row)
     :
     column_space_map (new Epetra_Map (input_col_map)),
@@ -353,7 +353,7 @@ namespace TrilinosWrappers
   template <typename SparsityType>
   void
   SparseMatrix::reinit (const Epetra_Map    &input_map,
-                        const SparsityType &sparsity_pattern,
+                        const SparsityType  &sparsity_pattern,
                         const bool           exchange_data)
   {
     reinit (input_map, input_map, sparsity_pattern, exchange_data);
@@ -394,7 +394,7 @@ namespace TrilinosWrappers
   void
   SparseMatrix::reinit (const Epetra_Map    &input_row_map,
                         const Epetra_Map    &input_col_map,
-                        const SparsityType &sparsity_pattern,
+                        const SparsityType  &sparsity_pattern,
                         const bool           exchange_data)
   {
     // release memory before reallocation
@@ -1514,4 +1514,4 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_TRILINOS
+#endif // DEAL_II_WITH_TRILINOS

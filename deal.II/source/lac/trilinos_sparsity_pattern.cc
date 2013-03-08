@@ -14,7 +14,7 @@
 
 #include <deal.II/lac/trilinos_sparsity_pattern.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/utilities.h>
 #  include <deal.II/lac/sparsity_pattern.h>
@@ -92,7 +92,7 @@ namespace TrilinosWrappers
   }
 
 
-  SparsityPattern::SparsityPattern (const Epetra_Map &input_map,
+  SparsityPattern::SparsityPattern (const Epetra_Map  &input_map,
                                     const size_type n_entries_per_row)
   {
     reinit (input_map, input_map, n_entries_per_row);
@@ -108,8 +108,8 @@ namespace TrilinosWrappers
 
 
 
-  SparsityPattern::SparsityPattern (const Epetra_Map &input_row_map,
-                                    const Epetra_Map &input_col_map,
+  SparsityPattern::SparsityPattern (const Epetra_Map  &input_row_map,
+                                    const Epetra_Map  &input_col_map,
                                     const size_type n_entries_per_row)
   {
     reinit (input_row_map, input_col_map, n_entries_per_row);
@@ -751,4 +751,4 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_TRILINOS                     
+#endif // DEAL_II_WITH_TRILINOS

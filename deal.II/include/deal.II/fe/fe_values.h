@@ -39,7 +39,7 @@
 // dummy include in order to have the
 // definition of PetscScalar available
 // without including other PETSc stuff
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 #  include <petsc.h>
 #endif
 

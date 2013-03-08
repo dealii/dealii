@@ -254,7 +254,7 @@ namespace parallel
        * in_vector, and copies all the data.
        */
       Vector<Number> &
-      operator = (const Vector<Number> &in_vector);
+      operator = (const Vector<Number>  &in_vector);
 
       /**
        * Assigns the vector to the parallel
@@ -657,7 +657,7 @@ namespace parallel
        */
       template <typename OtherNumber>
       void add (const std::vector<size_type>   &indices,
-                const std::vector<OtherNumber> &values);
+                const std::vector<OtherNumber>  &values);
 
       /**
        * This is a second collective
@@ -682,7 +682,7 @@ namespace parallel
       template <typename OtherNumber>
       void add (const size_type    n_elements,
                 const size_type   *indices,
-                const OtherNumber *values);
+                const OtherNumber  *values);
 
       /**
        * Addition of @p s to all
@@ -919,7 +919,7 @@ namespace parallel
        */
       VectorView<Number> vector_view;
 
-#ifdef DEAL_II_COMPILER_SUPPORTS_MPI
+#ifdef DEAL_II_WITH_MPI
       /**
        * A vector that collects all requests from @p
        * compress() operations. This class uses
@@ -1593,7 +1593,7 @@ namespace parallel
     inline
     void
     Vector<Number>::add (const std::vector<size_type> &indices,
-                         const std::vector<OtherNumber> &values)
+                         const std::vector<OtherNumber>  &values)
     {
       AssertDimension (indices.size(), values.size());
       add (indices.size(), &indices[0], &values[0]);
@@ -1620,7 +1620,7 @@ namespace parallel
     void
     Vector<Number>::add (const size_type    n_indices,
                          const size_type   *indices,
-                         const OtherNumber *values)
+                         const OtherNumber  *values)
     {
       for (size_type i=0; i<n_indices; ++i)
         {

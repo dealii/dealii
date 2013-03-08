@@ -45,7 +45,7 @@ namespace internal
     typedef ::dealii::SparseMatrix<typename VECTOR::value_type> Matrix;
   };
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
   template <>
   struct MatrixSelector<dealii::TrilinosWrappers::MPI::Vector>
   {

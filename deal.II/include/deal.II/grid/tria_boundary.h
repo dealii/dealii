@@ -691,7 +691,7 @@ template <>
 Point<3>
 StraightBoundary<1,3>::
 project_to_surface (const Triangulation<1, 3>::quad_iterator &quad,
-                    const Point<3> &y) const;
+                    const Point<3>  &y) const;
 
 
 #endif // DOXYGEN

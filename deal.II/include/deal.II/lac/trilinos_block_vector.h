@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_TRILINOS
+#ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/lac/trilinos_vector.h>
 #  include <deal.II/lac/trilinos_parallel_block_vector.h>
@@ -134,7 +134,7 @@ namespace TrilinosWrappers
      * of the given input vector and copy
      * the elements.
      */
-    BlockVector (const BlockVector &V);
+    BlockVector (const BlockVector  &V);
 
     /**
      * Creates a block vector
@@ -586,6 +586,6 @@ namespace TrilinosWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif  // DEAL_II_USE_TRILINOS
+#endif  // DEAL_II_WITH_TRILINOS
 
 #endif

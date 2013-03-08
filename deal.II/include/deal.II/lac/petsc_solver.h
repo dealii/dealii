@@ -15,7 +15,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_USE_PETSC
+#ifdef DEAL_II_WITH_PETSC
 
 #  include <deal.II/lac/exceptions.h>
 #  include <deal.II/lac/solver_control.h>
@@ -111,7 +111,7 @@ namespace PETScWrappers
      * see the documentation of the
      * SolverBase class.
      */
-    SolverBase (SolverControl &cn,
+    SolverBase (SolverControl  &cn,
                 const MPI_Comm &mpi_communicator);
 
     /**
@@ -1269,7 +1269,7 @@ namespace PETScWrappers
 
 DEAL_II_NAMESPACE_CLOSE
 
-#endif // DEAL_II_USE_PETSC
+#endif // DEAL_II_WITH_PETSC
 
 /*----------------------------   petsc_solver.h     ---------------------------*/
 

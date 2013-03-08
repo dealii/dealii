@@ -1,0 +1,919 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>The deal.II Readme</title>
+    <link href="../screen.css" rel="StyleSheet">
+    <meta name="author" content="the deal.II authors <authors @ dealii.org>">
+    <meta name="copyright" content="Copyright (C) 2012 by the deal.II authors">
+    <meta name="date" content="$Date$">
+    <meta name="svn_id" content="$Id$">
+    <meta name="keywords" content="deal.II">
+  </head>
+
+  <body>
+
+
+    <h1>Details on the <acronym>deal.II</acronym> configuration and build system</h1>
+
+    <p>
+      The <acronym>deal.II</acronym> <a href="../readme.html"
+      target="body">README</a> file gives an overview over the basics
+      of configuring and building the <acronym>deal.II</acronym>
+      library. This page provides more details about using the
+      <acronym>deal.II</acronym> CMake build system.
+    </p>
+
+    <p>
+    <table class="tutorial" width="50%">
+      <tr><th colspan="2"><b><small>Table of contents</small></b></th></tr>
+      <tr><td valign="top">
+	  <ul>
+	    <li><a href="#operating">Operating cmake</a>
+              <ul>
+                <li><a href="#operatingmanip">Manipulating the cache</a>
+                <li><a href="#operatingccmake"><code>ccmake</code> and special build targets </a>
+              </ul>
+	    <li><a href="#configure">Configuration options</a>
+	      <ul>
+		<li><a href="#configurefeature">Feature configuration</a>
+		<li><a href="#configureautoconf">Autoconfiguration</a>
+		<li><a href="#configureext">External library locations</a>
+		<li><a href="#configureoverride">Manual override</a>
+		<li><a href="#configurecomp">Component selection</a>
+		<li><a href="#configurebuild">Build configuration</a>
+		<li><a href="#configureinstall">Installation</a>
+	      </ul>
+	    <li><a href="#ext">How to use deal.II in your CMake project</a>
+	      <ul>
+		<li><a href="#extfinding">Finding the deal.II library</a>
+		<li><a href="#extcmake">deal.IIConfig.cmake</a>
+		<li><a href="#extsetup">Setting up necessary configuration variables</a>
+	      </ul>
+	    <li><a href="#advanced">Initial cache file and advanced options</a>
+	    <li><a href="#compiling">Compiling only certain parts</a>
+	  </ul>
+	</td>
+      </tr>
+    </table>
+    </p>
+
+    <a name="operating"></a>
+    <h3>Operating cmake</h3>
+
+    <p>
+      When configuring <acronym>deal.II</acronym> by
+      running <code>cmake</code>, the <code>cmake</code> program
+      creates a cache in the current (build) directory that contains
+      the values of all (cached) variables that had previously been passed
+      as command line arguments, been found through running tests,
+      or had otherwise been set.
+    </p>
+
+    <p>
+      On a subsequent call to <code>cmake</code>, e.g. to change the
+      configuration or due to a callback from the build system because some
+      configuration file (the <code>CMakeLists.txt</code> and
+      <code>cmake/&lt;..&gt;.cmake</code> files) has changed,
+      <code>cmake</code> will only run whatever tests are
+      necessary; <i>values for variables that are already in the cache
+      are not re-evaluated</i>. This means that calling <code>cmake</code>
+      a second time without any arguments at all in a situation like this
+      <pre>
+
+    mkdir build
+    cd build
+    cmake -DCMAKE_INSTALL_PREFIX=/path/install/dir ../deal.II
+    cmake ../deal.II
+      </pre>
+      has no effect: In particular, the <code>CMAKE_INSTALL_PREFIX</code>
+      specified on the first invocation of <code>cmake</code> is
+      cached and therefore still valid after the second invocation
+      of <code>cmake</code> This is different from the way the
+      <code>autoconf/configure</code> mechanism worked.
+    </p>
+
+    <p>
+      The cache has an important reason: one can modify all sort of
+      configuration parameters and thereby interact with the configuration
+      system in rather powerful (and, possibly, destructive) ways. For
+      example, the following commands
+      <pre>
+
+    mkdir build
+    cd build
+    cmake  ../deal.II
+    ccmake
+      </pre>
+      first configure a bare-bone setup and then call
+      the <code>ccmake</code> program -- an interactive editor for the
+      cached variables. Similarly,
+      <pre>
+
+    mkdir build
+    cd build
+    cmake  ../deal.II
+    cmake -D&lt;OPTION&gt;=&lt;VALUE&gt; [...] ../deal.II
+      </pre>
+      sets a variable the second time around without destroying all
+      the configuration that has happened the first time around. Likewise,
+      <pre>
+
+    mkdir build
+    cd build
+    cmake  ../deal.II
+    cmake -DDEAL_II_WITH_METIS=OFF .
+    cmake -DDEAL_II_WITH_TRILINOS=ON -DTRILINOS_DIR=/path/to/trilinos .
+      </pre>
+      switches off support for the METIS library that may have been
+      automatically detected during the first invocation of
+      <code>cmake</code> and enables support for Trilinos by enablind
+      <code>DEAL_II_WITH_TRILINOS</code> and setting
+      <code>TRILINOS_DIR</code>.
+    </p>
+
+    <a name="operatingmanip"></a>
+    <h4> Manipulating the cache </h4>
+
+      A cached variable can be set on the command line via
+      <pre>
+
+    cmake -D&lt;VARIABLE&gt;=&lt;VALUE&gt; .
+      </pre>
+
+      Cached variables can be removed from the cache via
+      <pre>
+
+    cmake -U&lt;VARIABLE&gt; .
+      </pre>
+      It is possible to use <code>-U</code> together with a globbing
+      expression. E.g. to remove the current feature configuration and
+      rerun the autodetection on can invoke
+      <pre>
+
+    cmake -U"DEAL_II_WITH_*" .
+      </pre>
+
+    <a name="operatingccmake"></a>
+    <h4> <code>ccmake</code> and special build targets </h4>
+
+      A very convenient way to alter the configuration is to use the graphical
+      cli interface <code>ccmake</code>. It can be invoked via
+      <pre>
+
+    ccmake .
+      </pre>
+      or by
+      <pre>
+
+    make edit_cache
+      </pre>
+
+      A reconfiguration (without editing the cache) can be run via
+      <pre>
+
+    make rebuild_cache
+      </pre>
+
+    <a name="configure"></a>
+    <h3>Configuration options</h3>
+
+    <p>
+      The various configuration options of the
+      <acronym>deal.II</acronym> library are organized in three
+      categories: <a href="#configurefeature">feature</a>,
+      <a href="#configurecomp">component</a>, and <a
+      href="#configurebuild">build</a>/<a href="#configureinstall">install</a>
+      configuration.
+    </p>
+
+
+    <a name="configurefeature"></a>
+    <h4>Feature configuration</h4>
+
+    <p>
+      <acronym>deal.II</acronym> provides (optional) interfaces to quite
+      a number of external libraries. All of these are represented by
+      <code>cmake</code> variables that are set to <code>ON</code> if
+      an external package is found or to <code>OFF</code> otherwise. By
+      explicitly setting it to off either on the command line or using
+      <code>ccmake</code>, you can prevent <acronym>deal.II</acronym>
+      from using this external package, even if it is found.
+    </p>
+
+    <p>
+      Specifically, the following variables exist (the list may grow
+      over time, but names are standardized):
+      <pre>
+
+    DEAL_II_WITH_ARPACK
+    DEAL_II_WITH_BOOST
+    DEAL_II_WITH_FUNCTIONPARSER
+    DEAL_II_WITH_LAPACK
+    DEAL_II_WITH_METIS
+    DEAL_II_WITH_MUMPS
+    DEAL_II_WITH_MPI
+    DEAL_II_WITH_NETCDF
+    DEAL_II_WITH_P4EST
+    DEAL_II_WITH_PETSC
+    DEAL_II_WITH_SLEPC
+    DEAL_II_WITH_THREADS
+    DEAL_II_WITH_TRILINOS
+    DEAL_II_WITH_UMFPACK
+    DEAL_II_WITH_ZLIB
+      </pre>
+      They all have standard meaning with the exception of
+      two:
+      <ul>
+        <li> <code>DEAL_II_WITH_BOOST</code> is always <code>ON</code>
+          since BOOST is a mandatory build time dependency.
+
+        <li> <code>DEAL_II_WITH_THREADS</code> enables threading support
+          with the help of the Threading Building Blocks (TBB) library.
+      </ul>
+    </p>
+
+    <p>
+      If enabled, each of the features above will usually add one ore
+      more dependencies to external or 'bundled' (i.e. bundled with
+      <acronym>deal.II</acronym> and residing under <code>bundled/</code>)
+      libraries.
+    </p>
+
+    <p>
+      There are some options to determine the behavior of the dependency
+      resolution.
+      <ul>
+        <li>
+          <p>
+            <code>DEAL_II_ALLOW_BUNDLED</code>:
+          </p>
+          <p>
+            If set to <code>ON</code> external libraries still have
+            precedence. But if there is no external library the bundled
+            library will be used.
+            If set to <code>OFF</code> bundled libraries will not be
+            used and the dependency resolution will fail if there is no
+            external library.
+          </p>
+        <li>
+          <p>
+            <code>DEAL_II_FORCE_BUNDLED_(BOOST|FUNCTIONPARSER|THREADS|UMFPACK)</code>:
+          </p>
+          <p>
+            Forces the use of the bundled library regardless whether
+            <code>DEAL_II_ALLOW_BUNDLED</code> is set to <code>OFF</code>
+            or an external library is found.
+          </p>
+        <li>
+          Thus, to ensure that no bundled library is used at all
+          <code>DEAL_II_ALLOW_BUNDLED</code>, as well as every
+          <code>DEAL_II_FORCE_BUNDLED_&lt;library&gt;</code>
+          have to be set to <code>OFF</code>.  Conversely,
+          <code>DEAL_II_FORCE_BUNDLED_&lt;library&gt;=ON</code>
+          will not automatically enable the corresponding
+          <code>DEAL_II_WITH_&lt;feature&gt;</code> toggle. This has to be
+          set separately.
+      </ul>
+    </p>
+
+
+
+    <a name="configureautoconf"></a>
+    <h4> Autoconfiguration </h4>
+
+    <p>
+      As long as <code>DEAL_II_WITH_&lt;FEATURE&gt;</code> is
+      not explicitly set to <code>ON</code> or <code>OFF</code>
+      in the cache it will be automatically configured. If a toggle
+      <code>DEAL_II_WITH_&lt;FEATURE&gt;</code> is defined it won't
+      be altered.
+      This means that the very first configuration run will set
+      all available features to <code>ON</code> and the rest
+      to <code>OFF</code>. In all subsequent configuration steps
+      <code>DEAL_II_WITH_&lt;FEATURE&gt;</code> has to be changed by hand,
+      see the previous section.
+    </p>
+
+    <p>
+      This behavior can be controlled via several variables:
+      <ul>
+	<li>
+          <code>DEAL_II_ALLOW_AUTODETECTION=OFF</code>: This will
+          disable any autoconfiguration by setting undefined
+          <code>DEAL_II_WITH_&lt;FEATURE&gt;</code> toggles to
+          <code>OFF</code>.
+
+	<li>
+          <code>DEAL_II_FORCE_AUTODETECTION=ON</code>: This will
+          force the reconfiguration of every feature by undefining
+          <code>DEAL_II_WITH_&lt;FEATURE&gt;</code> prior to
+          configuration, effectively overwriting <i>any</i> supplied or
+          cached value.
+      </ul>
+    </p>
+
+
+    <a name="configureext"></a>
+    <h4> External library locations </h4>
+
+    <p>
+      External libraries will be searched depending on hints in the following
+      order:
+      <ol>
+	<li>
+	  <p>
+            Paths specified via <code>CMAKE_PREFIX_PATH</code> take
+            precedence, e.g. with
+	    <pre>
+
+    cmake -DCMAKE_PREFIX_PATH=~/workspace/local ../deal.II
+	    </pre>
+	    libraries from <code>~/workspace/local</code> will be
+	    preferred for dependency resolution.
+	  </p>
+
+	<li>
+	  <p>
+	    Hints given by <code>&lt;library&gt;_DIR</code> via command
+            line or environment for <i>some</i> libraries:
+            <pre>
+
+    cmake -DP4EST_DIR=~/workspace/p4est-install/ ../deal.II
+	    </pre>
+	    or
+	    <pre>
+
+    export P4EST_DIR=~/workspace/p4est-install/
+    cmake ../deal.II
+	    </pre>
+            where <code>-D&lt;library&gt;_DIR</code> takes precedence
+            over environment.
+	  </p>
+
+	  <p>
+	    Currently, the following variables will be considered:
+	    <pre>
+
+    ARPACK_DIR,
+    HDF5_DIR,
+    METIS_DIR,
+    MUMPS_DIR (and SCALAPACK_DIR, BLACS_DIR),
+    P4EST_DIR (and SC_DIR),
+    PETSC_DIR and PETSC_ARCH (forming ${PETSC_DIR}/${PETSC_ARCH}),
+    SLEPC_DIR and SLEPC_ARCH (forming ${SLEPC_DIR}/${SLEPC_ARCH}),
+    TRILINOS_DIR,
+    UMFPACK_DIR and SUITESPARSE_DIR (AMD_DIR, CHOLMOD_DIR, COLAMD_DIR, SUITESPARSECONFIG_DIR)
+	    </pre>
+	  </p>
+
+	<li>
+	  <p>
+	    The default system locations for libraries and includes.
+	  </p>
+      </ol>
+    </p>
+
+    <p>
+      Alternatively, cached variables set by the
+      <code>Find&lt;Module&gt;</code> mechanism may be set,
+      hinted or overwritten directly (variable names are highly
+      dependend on the actual library). You can get a list via
+      <pre>
+
+    make edit_cache
+      </pre>
+      and entering advanced configuration mode by pressing [t].
+      Variables that could not be determined are suffixed with
+      <code>-NOTFOUND</code> and may be set by hand.
+    </p>
+
+    <a name="configureoverride"></a>
+    <h4> Manual override </h4>
+      It is possible to override the CMake find mechanism for external
+      libraries manually. This is useful if a non standard library (e.g.
+      lapack/blas) should be used but cannot be found by the
+      <code>FIND_PACKAGE(...)</code> mechanism of cmake.
+      In this case you can set by hand:
+      <pre>
+
+    cmake -DLAPACK_FOUND=true \
+          -DLAPACK_LIBRARIES="library;and;complete;link;interface" \
+          -DLAPACK_LINKER_FLAGS="" &lt;...&gt;
+      </pre>
+      You can set these values on the command line, with ccmake or by
+      providing an initial cache file, see
+      <a href="#advanced">advanced setup section</a>.
+      Possible manual overrides are explained in detail in the
+      in the <a href="Config.sample" target="_top">Config.sample file</a>.
+
+
+    <a name="configurecomp"></a>
+    <h4> Component selection </h4>
+
+    <p>
+      The following options control which components of
+      <acronym>deal.II</acronym> will be configured, built and installed:
+
+      <ul>
+	<li>
+          <p>
+            <code>DEAL_II_COMPONENT_CONTRIB</code> (default
+            <code>OFF</code>):
+          </p>
+          <p>
+            Enable configuration and installation of programs
+            in <code>contrib/</code>. This adds a component
+            <code>contrib</code> to the build system.
+            Beware of the fact that <code>contrib</code> needs
+            development packages for Qt.
+          </p>
+
+	<li>
+          <p>
+            <code>DEAL_II_COMPONENT_COMPAT_FILES</code>
+            (default <code>ON</code>):
+          </p>
+          <p>
+            Enable legacy directory structure and the installation of
+            compatibility files and tools for the old build system. This
+            adds a component <code>compat_files</code> to the build
+            system.
+          </p>
+
+	<li>
+          <p>
+            <code>DEAL_II_COMPONENT_DOCUMENTATION</code>
+            (default <code>OFF</code>):
+          </p>
+          <p>
+            Enable configuration, build and installation of the
+            documentation including all of the tutorial programs and the
+            doxygen-generated manual.  This adds a
+            component <code>documentation</code> to the build system.
+          </p>
+
+	<li>
+          <p>
+            <code>DEAL_II_COMPONENT_EXAMPLES</code>
+            (default <code>ON</code>):
+          </p>
+          <p>
+            Enable configuration and installation of the example steps (but
+            not generate the documentation for the tutorial steps).
+            This adds a component <code>examples</code> to the build system.
+          </p>
+      </ul>
+    </p>
+
+
+    <a name="configurebuild"></a>
+    <h4> Build configuration </h4>
+
+    <p>
+      The <code>cmake</code> variable <code>CMAKE_BUILD_TYPE</code>
+      controls the type of build.  We support <code>Debug</code>,
+      <code>Release</code> and <code>DebugRelease</code> mode. Default
+      is <code>DebugRelease</code>.
+      <ul>
+        <li>
+          Passing <code>cmake</code> the
+          flag <code>-DCMAKE_BUILD_TYPE=Debug</code> will produce makefiles
+          that compile and install only the debug library
+          <code>libdeal_II.g.so</code>.
+        <li>
+          Passing <code>cmake</code> the
+          flag <code>-DCMAKE_BUILD_TYPE=Release</code> result in only
+          compiling and installing the optimized library <code>libdeal_II.so</code>.
+        <li>
+          Passing <code>cmake</code> the
+          flag <code>-DCMAKE_BUILD_TYPE=DebugRelease</code> will build and
+          install both libraries.
+      </ul>
+
+      For more information, see the general discussion <a
+        href="../readme.html#configuration">here</a>.
+    </p>
+
+    <p>
+      deal.II will configure sensible default <code>CFLAGS</code> and
+      <code>CXXFLAGS</code> depending on platform, compiler and build
+      target. There are two options to override this behaviour:
+
+      <ol>
+	<li>
+	  Disable the configuration completely by setting
+	  <code>DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS</code> to
+	  <code>OFF</code>.  Beware of the fact that certain features
+	  may still pull in necessary compiler flags.
+
+	<li>
+	  Override the default configuration by setting the following
+	  cached variables:
+	  <pre>
+
+    CMAKE_CXX_FLAGS           - used during all builds
+    DEAL_II_CXX_FLAGS_DEBUG   - additional flags for the debug library
+    DEAL_II_CXX_FLAGS_RELEASE - additional flags for the release library
+	  </pre>
+
+	  The content of the cached variables will be preserved
+	  and added <i>to the end</i> of the default compiler flags,
+	  hence providing the possibility for overriding a flag. E.g.:
+	  <code>-Wsign-compare</code>, set by the build system, can be
+	  overwritten by specifying:
+	  <pre>
+
+    cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" &lt;...&gt;
+	  </pre>
+      </ol>
+    </p>
+
+    <p>
+      The build can be further controlled by the following variables:
+      <ul>
+        <li>
+          <code>DEAL_II_ALLOW_PLATFORM_INTROSPECTION</code>: If set
+          (default), <acronym>deal.II</acronym> will do platform
+          introspection for the given CPU.
+
+	<li>
+          <code>BUILD_SHARED_LIBS</code>: If set (default),
+          <acronym>deal.II</acronym> will be linked as a shared library
+
+	<li>
+	  <code>CMAKE_INSTALL_RPATH_USE_LINK_PATH</code>: If set
+	  (default), the <acronym>deal.II</acronym> library will be
+	  installed with rpaths  set for all libraries outside of the
+	  system search paths
+      </ul>
+    </p>
+
+
+    <a name="configureinstall"></a>
+    <h4> Installation </h4>
+
+    <p>
+      <code>CMAKE_INSTALL_PREFIX</code> determines the location,
+      where the <acronym>deal.II</acronym> library will be
+      installed to.  Please note that depending on whether
+      <code>DEAL_II_COMPONENT_COMPAT_FILES</code> is set, there will be
+      different directory structures:
+      <ul>
+	<li>
+          With <code>DEAL_II_COMPONENT_COMPAT_FILES=ON</code>:
+	  <pre>
+
+    ${CMAKE_INSTALL_PREFIX}/
+        bin
+        cmake/macros
+        common
+        common/scripts
+        doc
+        examples
+        include
+        lib
+        lib/cmake/deal.II
+	  </pre>
+
+	<li>
+        With <code>DEAL_II_COMPONENT_COMPAT_FILES=OFF</code>:
+	  <pre>
+
+    ${CMAKE_INSTALL_PREFIX}/
+        bin
+        include
+        lib${LIB_SUFFIX}
+        lib${LIB_SUFFIX}/cmake/deal.II
+        share/deal.II/
+        share/deal.II/cmake/macros
+        share/doc/deal.II/examples
+        share/doc/deal.II/html
+	  </pre>
+      </ul>
+    </p>
+
+    <p>
+      The individual target directories can be overwritten by setting the
+      following variables:
+      <pre>
+
+    DEAL_II_CMAKE_MACROS_RELDIR
+    DEAL_II_DOCUMENTATION_RELDIR
+    DEAL_II_EXAMPLES_RELDIR
+    DEAL_II_EXECUTABLE_RELDIR
+    DEAL_II_INCLUDE_RELDIR
+    DEAL_II_LIBRARY_RELDIR
+    DEAL_II_PROJECT_CONFIG_RELDIR
+      </pre>
+    </p>
+
+
+    <a name="ext"></a>
+    <h3> How to use deal.II in your CMake project </h3>
+
+    <p>
+      Using <acronym>deal.II</acronym> in your own project is particularly
+      simple if your project also uses <code>cmake</code>. The following
+      subsections describe this process.
+    </p>
+
+
+    <a name="extfinding"></a>
+    <h4> Finding the deal.II library </h4>
+
+    <p>
+    Finding the <acronym>deal.II</acronym> library should be no more than
+      <pre>
+
+    FIND_PACKAGE(deal.II REQUIRED)
+      </pre>
+      in your CMakeLists.txt file.  You may have to hint for the location
+      of the <code>deal.IIConfig.cmake</code> file.  Either by directly
+      specifying <code>deal.II_DIR</code> to point to the path were the
+      <code>deal.IIConfig.cmake</code> file is located:
+      <pre>
+
+    cmake -Ddeal.II_DIR=/path/to/the/config/file &lt;...&gt;
+      </pre>
+      or by specifying a search path via <code>CMAKE_PREFIX_PATH</code>,
+      e.g.
+      <pre>
+
+    cmake -DCMAKE_PREFIX_PATH=~/workspace/local
+      </pre>
+      In this case <code>deal.IIConfig.cmake</code> will be searched
+      for in
+      <pre>
+
+    ~/workspace/local/
+    ~/workspace/local/lib/cmake/deal.II/
+      </pre>
+    </p>
+
+
+    <a name="extcmake"></a>
+    <h4>  deal.IIConfig.cmake </h4>
+
+    <p>
+      Importing the deal.IIConfig.cmake file via <code>FIND_PACKAGE</code>
+      will set a bunch of variables and macros; all of the form
+      <code>DEAL_II_*</code>. There is the usual duplet:
+      <pre>
+
+    DEAL_II_INCLUDE_DIRS
+    DEAL_II_LIBRARIES
+      </pre>
+      (with <code>debug</code> and <code>optimized</code> keywords. For
+      compatibility there is also <code>DEAL_II_LIBRARIES_DEBUG</code>
+      and <code>DEAL_II_LIBRARIES_RELEASE</code> only specifying the
+      respective set of libraries.)
+    </p>
+
+    <p>
+      Interesting additional variables might be:
+      <pre>
+
+    DEAL_II_USER_DEFINITIONS
+    DEAL_II_USER_DEFINITIONS_DEBUG
+    DEAL_II_USER_DEFINITIONS_RELEASE
+    DEAL_II_LINKER_FLAGS
+    DEAL_II_LINKER_FLAGS_DEBUG
+    DEAL_II_LINKER_FLAGS_RELEASE
+    DEAL_II_CXX_FLAGS
+    DEAL_II_CXX_FLAGS_DEBUG
+    DEAL_II_CXX_FLAGS_RELEASE
+
+    DEAL_II_TARGET_CONFIG
+    DEAL_II_TARGET
+    DEAL_II_TARGET_DEBUG
+    DEAL_II_TARGET_RELEASE
+      </pre>
+    </p>
+
+
+
+    <a name="extsetup"></a>
+    <h4> Setting up necessary configuration variables </h4>
+
+    <p>
+    For actually using <acronym>deal.II</acronym> in your CMake
+    project some configuration steps are necessary.  These can be
+    either set via <a href="#extsetupmacro">macros</a> or by <a
+    href="#extsetuphand">hand</a>:
+      <ol>
+        <a name="extsetupmacro"></a><li> <b>Configuration with the help of
+          two convencience macros:</b>
+        <p>
+          <code>deal.IIConfig.cmake</code> includes some convenience macros
+          to automatically setup all necessary configuration. A fully
+          functional, minimal example for the step-1 tutorial program is:
+	  <pre>
+
+    FIND_PACKAGE(deal.II REQUIRED)
+
+    DEAL_II_INITIALIZE_CACHED_VARIABLES()
+
+    PROJECT(step-1)
+
+    ADD_EXECUTABLE(step-1 step-1.cc)
+    DEAL_II_SETUP_TARGET(step-1)
+	  </pre>
+        </p>
+
+
+        <a name="extsetuphand"></a><li> <b>Configuration by hand:</b>
+	  <ul>
+	    <li> Set up all include directories for header files:
+	      <pre>
+
+    INCLUDE_DIRECTORIES(${DEAL_II_INCLUDE_DIRS})
+	      </pre>
+
+	    <li>
+	      deal.II usually ships with an optimized Release and a Debug version
+              of the library. So it is a good idea to set up
+              <code>CMAKE_BUILD_TYPE</code> accordingly:
+	      <pre>
+
+    SET(CMAKE_BUILD_TYPE "Debug" CACHE
+      "Choose the type of build, options are: Debug, Release"
+      )
+	      </pre>
+
+	      A cached variable ensures that we can later switch the build type
+	      by editing the cache:
+	      <pre>
+
+    make edit_cache
+	      </pre>
+
+	    <li> Often, it is a good idea to use the same compiler and linker
+	      flags as the deal.II library.
+	      <pre>
+
+    SET(CMAKE_CXX_FLAGS ${DEAL_II_CXX_FLAGS})
+    SET(CMAKE_CXX_FLAGS_RELEASE ${DEAL_II_CXX_FLAGS_RELEASE})
+    SET(CMAKE_CXX_FLAGS_DEBUG ${DEAL_II_CXX_FLAGS_DEBUG})
+	      </pre>
+	      (Optionally you can set up the variables with the
+	      <code>CACHE</code> to be able to edit them via ccmake or
+	      make edit_cache.)
+
+	    <li>
+	      <i>After</i> this, specify your project name:
+	      <pre>
+
+    PROJECT(myProject)
+	      </pre>
+	      This ensures that the compiler detection and platform setup
+	      that is issued by calling <code>PROJECT(...)</code> will run
+	      after we have set up our cached variables. This way it is
+	      our choice of variables that will be set and not the default
+	      values determined by the <code>PROJECT(...)</code> call.
+
+	    <li>
+	      After defining your targets, e.g.
+	      <pre>
+
+    ADD_EXECUTABLE(step-1 step-1.cc)
+	      </pre>
+	      you have to specify to link against deal.II and all external
+	      libraries:
+	      <pre>
+
+    TARGET_LINK_LIBRARIES(step-1 ${DEAL_II_LIBRARIES})
+	      </pre>
+
+	    <li> as well as using some preprocessor definitions:
+	      <pre>
+
+    SET_TARGET_PROPERTIES(step-1 PROPERTIES
+      COMPILE_DEFINITIONS
+      "${DEAL_II_USER_DEFINITIONS}"
+      COMPILE_DEFINITIONS_DEBUG
+      "${DEAL_II_USER_DEFINITIONS_DEBUG}"
+      COMPILE_DEFINITIONS_RELEASE
+      "${DEAL_II_USER_DEFINITIONS_RELEASE}"
+      )
+	      </pre>
+
+	    <li> Optionally, you can set the link flags to the one used by the
+	      deal.II library:
+	      <pre>
+
+    SET_TARGET_PROPERTIES(step-1 PROPERTIES
+      LINK_FLAGS
+      "${DEAL_II_LINKER_FLAGS}"
+      LINK_FLAGS_DEBUG
+      "${DEAL_II_LINKER_FLAGS_DEBUG}"
+      LINK_FLAGS_RELEASE
+      "${DEAL_II_LINKER_FLAGS_RELEASE}"
+      )
+	      </pre>
+	      And this it is.
+
+	  </ul>
+
+          <li>
+            <b>Advanced setup:</b>
+
+            <p>
+              For an advanced setup in a big CMake project
+              <code><a href="#extcmake">deal.IIConfig.cmake</a></code>
+              provides information about the <acronym>deal.II</acronym>
+              installation with traditional variables, see
+              <a href="#extcmake">here</a>, as well as <i>external CMake
+              targets</i> with link interface for direct inclusion:
+              <pre>
+
+    INCLUDE(${DEAL_II_TARGET_CONFIG})
+
+    ADD_EXECUTABLE(step-1
+      step-1.cc
+      ${DEAL_II_TARGET}
+      )
+              </pre>
+            </p>
+      </ol>
+    </p>
+
+
+    <a name="advanced"></a>
+    <h3>Initial cache file and advanced options</h3>
+
+    A sample configuration file for preloading the CMake cache with
+    <pre>
+
+    $ cmake -C Config.sample <...>
+    </pre>
+    can be found <a href="Config.sample" target="_top">here</a>.
+    This sample configuration covers all options mentioned in this
+    documentation as well as some advanced aspects in feature
+    configuration.
+
+
+    <a name="compiling"></a>
+    <h3> Compiling only certain parts </h3>
+    <p>
+
+    <p>
+      While developing the library itself, it is often desirable
+      to only compile certain parts. The build system generated by
+      <code>cmake</code> allows to build specific, selected targets.
+      A common scenario is that you only want to build debug or optimized
+      libraries. This can be achieved using the following commands in
+      the build directory:
+      <pre>
+
+    make  deal_II.g        # only debug library
+    make  deal_II          # only release (optimized) library
+    make  all              # both
+
+    make  obj_grid.release # all objects in ./source/grid in release configuration
+      </pre>
+    </p>
+
+    <p>
+      For a complete list of possible targets that allow even
+      finer-grained control, do
+      <pre>
+
+    make  help
+      </pre>
+    </p>
+
+    <p>
+      It is frequently useful to be able to see what a particular
+      command does. In that case, use the following:
+      <pre>
+
+    make  deal_II.g VERBOSE=ON
+      </pre>
+      This will show, for every command executed, the exact command
+      line with which it was invoked, including compiler arguments,
+      etc. Every command <code>cmake</code> executes starts with
+      a <code>cd</code> command to change the current directory
+      appropriately so that the command line can be copied and executed
+      from anywhere within the build directory.
+    </p>
+
+    <p>
+      <b>Note:</b> Just because you can call <code>make deal_II.g</code> to
+      only compile the debug version does not mean that a
+      subsequent <code>make install</code> will only install the debug
+      library. Rather, <code>make install</code> will still want to have both
+      libraries up to date and will therefore invoke <code>make all</code>
+      automatically. To restrict builds in such a way that only one library
+      will be installed, see <a href="#configurebuild">this section</a>.
+    </p>
+
+
+    <hr>
+
+    <address>
+      <a href="mail.html" target="body">The deal.II Group</a>
+      $Date$
+    </address>
+  </body>
+</html>

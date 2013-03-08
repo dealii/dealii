@@ -100,9 +100,8 @@ namespace MeshWorker
     std::vector<types::global_dof_index> indices;
 
     /**
-     * The DoF indices on the
-     * current cell, organized by
-     * local blocks
+     * The DoF indices on the current cell, organized by local blocks.
+     * The size of this vector is zero, unless local blocks are used.
      */
     std::vector<std::vector<types::global_dof_index> > indices_by_block;
 
@@ -129,9 +128,7 @@ namespace MeshWorker
     void reinit(const DHCellIterator &c);
 
     /**
-     * Set the current face and
-     * fill @p indices if the #cell
-     * changed.
+     * Set the current face and fill @p indices if the #cell changed.
      */
     template <class DHCellIterator, class DHFaceIterator>
     void reinit(const DHCellIterator &c,
@@ -139,9 +136,8 @@ namespace MeshWorker
                 const unsigned int face_no);
 
     /**
-     * Set the current subface
-     * and fill @p indices if the
-     * #cell changed.
+     * Set the current subface and fill @p indices if the #cell
+     * changed.
      */
     template <class DHCellIterator, class DHFaceIterator>
     void reinit(const DHCellIterator &c,
@@ -150,19 +146,16 @@ namespace MeshWorker
                 const unsigned int subface_no);
 
     /**
-     * Switch to a new face of the
-     * same cell. Does not change
-     * @p indices and does not reset
-     * data in LocalResults.
+     * Switch to a new face of the same cell. Does not change @p
+     * indices and does not reset data in LocalResults.
      */
     template <class DHFaceIterator>
     void set_face (const DHFaceIterator &f,
                    const unsigned int face_no);
+    
     /**
-     * Switch to a new subface of the
-     * same cell. Does not change
-     * @p indices and does not reset
-     * data in LocalResults.
+     * Switch to a new subface of the same cell. Does not change @p
+     * indices and does not reset data in LocalResults.
      */
     template <class DHFaceIterator>
     void set_subface (const DHFaceIterator &f,
@@ -178,13 +171,9 @@ namespace MeshWorker
     bool level_cell;
   private:
     /**
-     * Standard constructor, not
-     * setting any block
-     * indices. Use of this
-     * constructor is not
-     * recommended, but it is
-     * needed for the arrays in
-     * DoFInfoBox.
+     * Standard constructor, not setting any block indices. Use of
+     * this constructor is not recommended, but it is needed for the
+     * arrays in DoFInfoBox.
      */
     DoFInfo ();
 
@@ -193,9 +182,6 @@ namespace MeshWorker
     /// Fill index vector with active indices
     template <class DHCellIterator>
     void get_indices(const DHCellIterator &c);
-
-    /// Fill index vector with level indices
-    //void get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator& c);
 
     /// Auxiliary vector
     std::vector<types::global_dof_index> indices_org;

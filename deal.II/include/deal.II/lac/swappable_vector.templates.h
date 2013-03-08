@@ -145,10 +145,11 @@ void SwappableVector<number>::reload ()
 template <typename number>
 void SwappableVector<number>::alert ()
 {
+#ifndef DEAL_II_WITH_THREADS
   // note: this function does nothing
   // in non-MT mode
-  if (!DEAL_II_USE_MT)
-    return;
+  return;
+#else
 
   // synchronise with possible other
   // invocations of this function and
@@ -170,6 +171,7 @@ void SwappableVector<number>::alert ()
     Threads::new_thread (&SwappableVector<number>::reload_vector, *this, true);
   // note that reload_vector also
   // releases the lock
+#endif
 }
 
 
@@ -184,16 +186,16 @@ void SwappableVector<number>::reload_vector (const bool set_flag)
   this->block_read (tmp_in);
   tmp_in.close ();
 
+#ifdef DEAL_II_WITH_THREADS
   // release the lock that was
   // acquired by the calling
   // functions
-  if (DEAL_II_USE_MT)
-    {
-      // set the flag if so required
-      if (set_flag)
-        data_is_preloaded = true;
-      lock.release ();
-    };
+
+  // set the flag if so required
+  if (set_flag)
+    data_is_preloaded = true;
+  lock.release ();
+#endif
 }
 
 

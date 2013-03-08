@@ -1,0 +1,96 @@
+BOOL            := { true; false }
+REAL_SCALARS    := { double; float; long double }
+COMPLEX_SCALARS := { std::complex<double>;
+                     std::complex<float>;
+                     std::complex<long double> }
+
+DERIVATIVE_TENSORS := { double;
+			Tensor<1,deal_II_dimension>;
+			Tensor<2,deal_II_dimension> }
+
+DEAL_II_VEC_TEMPLATES := { Vector; BlockVector }
+
+SERIAL_VECTORS := { Vector<double>;
+                    Vector<float> ;
+		    Vector<long double>;
+
+	            BlockVector<double>;
+                    BlockVector<float>;
+                    BlockVector<long double>;
+
+		    parallel::distributed::Vector<double>;
+		    parallel::distributed::Vector<float> ;
+		    parallel::distributed::Vector<long double>;
+
+                    parallel::distributed::BlockVector<double>;
+                    parallel::distributed::BlockVector<float> ;
+                    parallel::distributed::BlockVector<long double>;
+
+		    @DEAL_II_EXPAND_TRILINOS_VECTOR@;
+		    @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
+		    @DEAL_II_EXPAND_PETSC_VECTOR@;
+		    @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
+
+		    @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
+		    @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
+		    @DEAL_II_EXPAND_PETSC_BLOCKVECTOR@;
+		    @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@;
+                  }
+
+EXTERNAL_SEQUENTIAL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_VECTOR@;
+                                 @DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR@;
+                                 @DEAL_II_EXPAND_PETSC_VECTOR@;
+                                 @DEAL_II_EXPAND_PETSC_BLOCKVECTOR@
+                               }
+
+EXTERNAL_PARALLEL_VECTORS := { @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
+                               @DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR@;
+                               @DEAL_II_EXPAND_PETSC_MPI_VECTOR@;
+                               @DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR@
+                             }
+
+VECTORS_WITH_MATRIX := { Vector<double>;
+                    Vector<float> ;
+		    Vector<long double>;
+
+	            BlockVector<double>;
+                    BlockVector<float>;
+                    BlockVector<long double>;
+
+		    @DEAL_II_EXPAND_TRILINOS_VECTOR@;
+		    @DEAL_II_EXPAND_TRILINOS_MPI_VECTOR@;
+                  }
+
+DOFHANDLERS := { DoFHandler<deal_II_dimension>;
+                 hp::DoFHandler<deal_II_dimension> }
+
+DOFHANDLER_TEMPLATES := { DoFHandler;
+                          hp::DoFHandler }
+
+TRIANGULATION_AND_DOFHANDLER_TEMPLATES := { Triangulation;
+					    DoFHandler;
+					    hp::DoFHandler }
+
+TRIANGULATION_AND_DOFHANDLERS := { Triangulation<deal_II_dimension, deal_II_space_dimension>;
+                                   DoFHandler<deal_II_dimension, deal_II_space_dimension>;
+                                   hp::DoFHandler<deal_II_dimension, deal_II_space_dimension> }
+
+
+FEVALUES_BASES := { FEValuesBase<deal_II_dimension>;
+	            FEFaceValuesBase<deal_II_dimension> }
+
+SPARSITY_PATTERNS := { SparsityPattern;
+                       CompressedSparsityPattern;
+                       CompressedSetSparsityPattern;
+                       CompressedSimpleSparsityPattern;
+                       @DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN@;
+
+                       BlockSparsityPattern;
+                       BlockCompressedSparsityPattern;
+                       BlockCompressedSetSparsityPattern;
+                       BlockCompressedSimpleSparsityPattern;
+                       @DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN@; }
+
+DIMENSIONS := { 1; 2; 3 }
+
+SPACE_DIMENSIONS := { 1; 2; 3 }

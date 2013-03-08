@@ -537,7 +537,7 @@ public:
    * matrix structure.  It must be compressed. The matrix structure is not
    * compressed after this function finishes.
    */
-  SparsityPattern (const SparsityPattern &original,
+  SparsityPattern (const SparsityPattern  &original,
                    const size_type        max_per_row,
                    const size_type        extra_off_diagonals);
 

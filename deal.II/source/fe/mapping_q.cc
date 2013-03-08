@@ -367,7 +367,7 @@ MappingQ<dim,spacedim>::fill_fe_face_values (
   typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
   std::vector<Point<spacedim> >     &quadrature_points,
   std::vector<double>          &JxW_values,
-  std::vector<Tensor<1,spacedim> > &exterior_forms,
+  std::vector<Tensor<1,spacedim> >  &exterior_forms,
   std::vector<Point<spacedim> >     &normal_vectors) const
 {
   // convert data object to internal
@@ -429,7 +429,7 @@ MappingQ<dim,spacedim>::fill_fe_subface_values (const typename Triangulation<dim
                                                 typename Mapping<dim,spacedim>::InternalDataBase &mapping_data,
                                                 std::vector<Point<spacedim> >     &quadrature_points,
                                                 std::vector<double>          &JxW_values,
-                                                std::vector<Tensor<1,spacedim> > &exterior_forms,
+                                                std::vector<Tensor<1,spacedim> >  &exterior_forms,
                                                 std::vector<Point<spacedim> >     &normal_vectors) const
 {
   // convert data object to internal
