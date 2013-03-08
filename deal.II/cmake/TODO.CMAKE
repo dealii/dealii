@@ -30,3 +30,5 @@ Some last bits and thoughts:
         * broken because DEAL_II_PATH is not available any more in config.h
 
 
+
+* document that we no longer need the two-lib installation of p4est
