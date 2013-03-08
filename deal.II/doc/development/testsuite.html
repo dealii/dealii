@@ -162,6 +162,16 @@
     </p>
 
     <p>
+    Not all tests will succeed on your machine, because you might not have
+    configured with all the required packages (for example PETSc or Trilinos)
+    or, because your machine has slightly different floating point outputs.
+    To improve the number of tests that work correctly, install the tool
+    numdiff and export the environment variable
+    <code>export DEALII_DIFF="numdiff -a 1e-6 -q"</code> 
+    before running the testsuite.
+    </p>
+
+    <p>
     Once you have done this, you may simply type
     <code>make</code>. This runs all the tests there are, but stops at
     the first one that fails to either execute properly or for which
