@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("refinement_listener_01").c_str());
+      std::ofstream logfile(output_file_for_mpi("refinement_listener_02").c_str());
       deallog.attach(logfile);
       deallog.depth_console(0);
       deallog.threshold_double(1.e-10);
