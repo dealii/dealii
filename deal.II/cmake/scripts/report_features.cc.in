@@ -109,7 +109,7 @@ std::cout << "dealii-feature: BOOST="
 #endif
 
 #ifdef DEAL_II_WITH_P4EST
-  std::cout << "dealii-feature: P4EST=yes" << std::endl;
+  std::cout << "dealii-feature: P4est=yes" << std::endl;
 #endif
 
 #ifdef DEAL_II_WITH_PETSC
@@ -130,10 +130,6 @@ std::cout << "dealii-feature: BOOST="
 
 #ifdef DEAL_II_WITH_NETCDF
   std::cout << "dealii-feature: NetCDF=yes" << std::endl;
-#endif
-
-#ifdef DEAL_II_WITH_P4EST
-  std::cout << "dealii-feature: P4est=yes" << std::endl;
 #endif
 
 #ifdef DEAL_II_WITH_TECPLOT
