@@ -12,7 +12,8 @@
 #                  directory)
 #   CONFIGFILE   - A cmake configuration file for the build test
 #   LOGDIR       - directory for the log file
-#   LOGFILE      - the logfile to use, default to $LOGDIR/$CONFIGFILE.<epoc>.log
+#   LOGFILE      - the logfile to use, defaults to
+#                      $LOGDIR/$CONFIGFILE.<unix time>.log
 #
 #   CMAKE        - the cmake executable to use
 #   SVN          - svn info command to use
