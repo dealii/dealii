@@ -16,27 +16,19 @@ SET(TARGET_SRC
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
 FIND_PACKAGE(deal.II 8.0 QUIET
-  HINTS
-    ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ ../../../ ../../../../../ $ENV{DEAL_II_DIR}
-  #
-  # If the deal.II library cannot be found (because it is not installed at a
-  # default location or your project resides at an uncommon place), you
-  # can specify additional hints for search paths here, e.g.
-  # "$ENV{HOME}/workspace/deal.II"
+  HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
+IF(NOT ${deal.II_FOUND})
+  MESSAGE(FATAL_ERROR "\n"
+    "*** Could not locate deal.II. ***\n\n"
+    "You may want to either pass a flag -DDEAL_II_DIR=/path/to/deal.II to cmake\n"
+    "or set an environment variable \"DEAL_II_DIR\" that contains this path."
+    )
+ENDIF()
 
 #
 # Are all dependencies fullfilled?
 #
-IF (NOT ${deal.II_FOUND})
-   MESSAGE(FATAL_ERROR
-           "\n\n"
-	   " *** Could not locate deal.II. *** "
-	   "\n\n"
-           " *** You may want to either pass the -DDEAL_II_DIR=/path/to/deal.II flag to cmake \n"
-           " *** or set an environment variable \"DEAL_II_DIR\" that contains this path.")
-ENDIF ()
-
 IF(NOT DEAL_II_WITH_PETSC OR NOT DEAL_II_WITH_P4EST OR DEAL_II_WITH_THREADS)
   MESSAGE(FATAL_ERROR "
 Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
