@@ -68,9 +68,11 @@ ENDMACRO()
 MACRO(FEATURE_MPI_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find any suitable mpi library!\n"
-    "Please ensure that an mpi library is installed on your computer.\n"
-    "If the library is not at a default location, either provide some hints\n"
-    "for the autodetection, or set the relevant variables by hand in ccmake.\n"
+    "Please ensure that an mpi library is installed on your computer\n"
+    "and set CMAKE_CXX_COMPILER and CMAKE_C_COMPILER to the appropriate mpi\n"
+    "wrappers:\n"
+    "    $ CC=\".../mpicc\" CXX=\".../mpicxx\" cmake <...>\n"
+    "    $ cmake -DCMAKE_C_COMPILER=\".../mpicc\" -DCMAKE_CXX_COMPIER=\".../mpicxx\" <...>\n"
     )
 ENDMACRO()
 
