@@ -11,13 +11,11 @@
 //
 //----------------------------------------------------------------------
 
-/*
- * TODO: Implement a report line for Arpack, Boost and P4est
- * - 2013, maier
- */
 #include <deal.II/base/config.h>
 
 #include <iostream>
+
+#include <boost/version.hpp>
 
 #ifdef DEAL_II_WITH_UMFPACK
 extern "C" {
@@ -55,16 +53,42 @@ extern "C" {
 
 int main()
 {
+  std::cout << "dealii-feature: target="
+            << "@CMAKE_SYSTEM_NAME@" << std::endl;
+  std::cout << "dealii-feature: compiler="
+            << "@CMAKE_CXX_COMPILER_ID@@CMAKE_CXX_COMPILER_VERSION@"
+            << std::endl;
+  if(${_shared_libs})
+    std::cout << "dealii-feature: shared_libs=yes" << std::endl;
+  else
+    std::cout << "dealii-feature: shared_libs=yes" << std::endl;
+
+#ifdef DEAL_II_WITH_ARPACK
+  std::cout << "dealii-feature: ARPACK=yes" << std::endl;
+#endif
+
+std::cout << "dealii-feature: BOOST="
+          << BOOST_VERSION / 100000 << "."
+          << BOOST_VERSION / 100 % 1000
+          << std::endl;
+
+#ifdef DEAL_II_WITH_FUNCTIONPARSER
+  std::cout << "dealii-feature: parser=yes" << std::endl;
+#else
+  std::cout << "dealii-feature: parser=no" << std::endl;
+#endif
+
+#ifdef DEAL_II_WITH_HDF5
+   std::cout << "dealii-feature: HDF5=yes" << std::endl;
+#endif
+
 #ifdef DEAL_II_WITH_LAPACK
   std::cout << "dealii-feature: BLAS=yes" << std::endl;
   std::cout << "dealii-feature: LAPACK=yes" << std::endl;
 #endif
 
-#ifdef DEAL_II_WITH_UMFPACK
-  std::cout << "dealii-feature: UMFPACK="
-	    << UMFPACK_MAIN_VERSION << '.'
-	    << UMFPACK_SUB_VERSION << '.'
-	    << UMFPACK_SUBSUB_VERSION << std::endl;
+#ifdef DEAL_II_WITH_METIS
+  std::cout << "dealii-feature: METIS=yes" << std::endl;
 #endif
 
 #if defined(DEAL_II_WITH_MPI)
@@ -78,6 +102,42 @@ int main()
 	    << MPI_VERSION << '.'
 	    << MPI_SUBVERSION << std::endl;
 #  endif
+#endif
+
+#ifdef DEAL_II_WITH_MUMPS
+  std::cout << "dealii-feature: MUMPS=yes" << std::endl;
+#endif
+
+#ifdef DEAL_II_WITH_P4EST
+  std::cout << "dealii-feature: P4EST=yes" << std::endl;
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+  std::cout << "dealii-feature: PETSc="
+	    << PETSC_VERSION_MAJOR << '.'
+	    << PETSC_VERSION_MINOR << '.'
+	    << PETSC_VERSION_SUBMINOR << "-p"
+	    << PETSC_VERSION_PATCH << std::endl;
+#endif
+
+#ifdef DEAL_II_WITH_SLEPC
+  std::cout << "dealii-feature: SLEPc="
+	    << SLEPC_VERSION_MAJOR << '.'
+	    << SLEPC_VERSION_MINOR << '.'
+	    << SLEPC_VERSION_SUBMINOR << "-p"
+	    << SLEPC_VERSION_PATCH << std::endl;
+#endif
+
+#ifdef DEAL_II_WITH_NETCDF
+  std::cout << "dealii-feature: NetCDF=yes" << std::endl;
+#endif
+
+#ifdef DEAL_II_WITH_P4EST
+  std::cout << "dealii-feature: P4est=yes" << std::endl;
+#endif
+
+#ifdef DEAL_II_WITH_TECPLOT
+   std::cout << "dealii-feature: Tecplot=yes" << std::endl;
 #endif
 
 #ifdef DEAL_II_WITH_THREADS
@@ -99,61 +159,15 @@ int main()
 #  endif
 #endif
 
-#ifdef DEAL_II_WITH_MUMPS
-  std::cout << "dealii-feature: MUMPS=yes" << std::endl;
-#endif
-
-#ifdef DEAL_II_WITH_PETSC
-  std::cout << "dealii-feature: PETSc="
-	    << PETSC_VERSION_MAJOR << '.'
-	    << PETSC_VERSION_MINOR << '.'
-	    << PETSC_VERSION_SUBMINOR << "-p"
-	    << PETSC_VERSION_PATCH << std::endl;
-#endif
-
-#ifdef DEAL_II_WITH_SLEPC
-  std::cout << "dealii-feature: SLEPc="
-	    << SLEPC_VERSION_MAJOR << '.'
-	    << SLEPC_VERSION_MINOR << '.'
-	    << SLEPC_VERSION_SUBMINOR << "-p"
-	    << SLEPC_VERSION_PATCH << std::endl;
-#endif
-
-#if defined(HAVE_HSL_MA27) || defined(HAVE_HSL_MA47)
-  std::cout << "dealii-feature: HSL=";
-#ifdef HAVE_HSL_MA27
-  std::cout << "MA27";
-#endif
-#ifdef HAVE_HSL_MA47
-  std::cout << "MA47";
-#endif
-  std::cout << std::endl;
-#endif
-
-#ifdef DEAL_II_WITH_P4EST
-  std::cout << "dealii-feature: P4est=yes" << std::endl;
-#endif
-
-#ifdef DEAL_II_WITH_HDF5
-   std::cout << "dealii-feature: HDF5=yes" << std::endl;
-#endif
-
-#ifdef DEAL_II_HAVE_TECPLOT
-   std::cout << "dealii-feature: Tecplot=yes" << std::endl;
-#endif
-   
-#ifdef DEAL_II_WITH_NETCDF
-  std::cout << "dealii-feature: NetCDF=yes" << std::endl;
+#ifdef DEAL_II_WITH_UMFPACK
+  std::cout << "dealii-feature: UMFPACK="
+	    << UMFPACK_MAIN_VERSION << '.'
+	    << UMFPACK_SUB_VERSION << '.'
+	    << UMFPACK_SUBSUB_VERSION << std::endl;
 #endif
 
 #ifdef DEAL_II_WITH_ZLIB
   std::cout << "dealii-feature: LibZ=yes" << std::endl;
 #endif
 
-#ifdef DEAL_II_WITH_FUNCTIONPARSER
-  std::cout << "dealii-feature: parser=yes" << std::endl;
-#else
-  std::cout << "dealii-feature: parser=no" << std::endl;
-#endif
-  
 }
