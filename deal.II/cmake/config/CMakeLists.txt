@@ -55,10 +55,15 @@ STRIP_FLAG(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations")
 #
 
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
-  IF(_build MATCHES DEBUG)
-    SET(_keyword "debug")
+
+  IF(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
+    SET(_keyword "general")
   ELSE()
-    SET(_keyword "optimized")
+    IF(_build MATCHES DEBUG)
+      SET(_keyword "debug")
+    ELSE()
+      SET(_keyword "optimized")
+    ENDIF()
   ENDIF()
 
   SET(CONFIG_LIBRARIES_${_build}
@@ -66,18 +71,14 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     ${DEAL_II_EXTERNAL_LIBRARIES}
     ${DEAL_II_EXTERNAL_LIBRARIES_${_build}}
     )
-
-  IF(NOT "${CONFIG_LIBRARIES_${_build}}" STREQUAL "")
-    LIST(APPEND CONFIG_LIBRARIES
-      ${_keyword}
-      ${CONFIG_LIBRARIES_${_build}}
-      )
-  ENDIF()
+  LIST(APPEND CONFIG_LIBRARIES
+    ${_keyword}
+    ${CONFIG_LIBRARIES_${_build}}
+    )
 
   SET(CONFIG_TARGET_${_build}
     ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
     )
-
   LIST(APPEND CONFIG_TARGET
     ${_keyword}
     ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
