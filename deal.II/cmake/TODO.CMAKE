@@ -2,6 +2,7 @@ Major:
 
 * Mumps may have a transitive link interface to Scotch. Fix this
 
+* Get rid of the last bits of unguarded platform introspection
 
 Some last bits and thoughts:
 
