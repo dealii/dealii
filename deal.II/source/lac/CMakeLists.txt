@@ -81,12 +81,14 @@ SET(inst_in_files
   chunk_sparse_matrix.inst.in
   constraint_matrix.inst.in
   full_matrix.inst.in
+  lapack_full_matrix.inst.in
   operator.inst.in
   parallel_vector.inst.in
   precondition_block.inst.in
   relaxation_block.inst.in
   sparse_matrix_ez.inst.in
   sparse_matrix.inst.in
+  trilinos_sparse_matrix.inst.in
   trilinos_vector_base.inst.in
   vector.inst.in
   vector_memory.inst.in
