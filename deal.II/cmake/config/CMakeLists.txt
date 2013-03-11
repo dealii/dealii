@@ -139,10 +139,6 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
   # Transform some cmake lists into a string that the old Makefile
   # mechanism actually understands:
-  #
-  # TODO: Come up with an idea how to get the link line directly from
-  # CMake...
-  #
 
   TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_CXX}"
     ${DEAL_II_USER_INCLUDE_DIRS}
@@ -156,6 +152,16 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
       ${DEAL_II_USER_DEFINITIONS_${build}}
       )
 
+    TO_STRING(MAKEFILE_TARGETS_${build}
+        ${MAKEFILE_LIBRARY_${build}}
+        ${DEAL_II_EXTERNAL_LIBRARIES}
+        ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
+        )
+
+    #
+    # TODO: Come up with an idea how to get the link line directly from
+    # CMake...
+    #
     FOREACH(_lib
         ${MAKEFILE_LIBRARY_${build}}
         ${DEAL_II_EXTERNAL_LIBRARIES}
@@ -212,3 +218,4 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     COMPONENT compat_files
     )
 ENDIF()
+
