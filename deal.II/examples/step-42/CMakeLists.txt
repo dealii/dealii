@@ -54,8 +54,8 @@ PROJECT(${TARGET})
 # Workaround: Enable -std=c++0x for Clang as std::unique_ptr is not
 # standardized in C++03
 #
-IF(CMAKE_CXX_COMPILER_ID matches Clang)
-  SET(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS})
+IF(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+  SET(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
 ENDIF()
 
 DEAL_II_INVOKE_AUTOPILOT()
