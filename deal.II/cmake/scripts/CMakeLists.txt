@@ -20,6 +20,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   # executables:
   #
   INCLUDE_DIRECTORIES(
+    BEFORE # Ensure deal.II include directories come first
     ${CMAKE_BINARY_DIR}/include/
     ${CMAKE_SOURCE_DIR}/include/
     )
