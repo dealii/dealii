@@ -16,7 +16,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_CAN_USE_CXX1X
+#ifdef DEAL_II_CAN_USE_CXX11
 
 #  include <tuple>
 DEAL_II_NAMESPACE_OPEN
