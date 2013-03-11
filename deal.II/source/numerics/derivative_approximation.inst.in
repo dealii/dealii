@@ -11,140 +11,114 @@
 //
 //---------------------------------------------------------------------------
 
+for (deal_II_dimension : DIMENSIONS ; VEC : SERIAL_VECTORS ; DH : DOFHANDLER_TEMPLATES)
+{
+template
+void
+DerivativeApproximation::
+approximate_gradient<deal_II_dimension>
+(const Mapping<deal_II_dimension> &mapping,
+ const DH<deal_II_dimension> &dof_handler,
+ const VEC             &solution,
+ Vector<float>         &derivative_norm,
+ const unsigned int     component);
+
+template
+void
+DerivativeApproximation::
+approximate_gradient<deal_II_dimension>
+(const DH<deal_II_dimension> &dof_handler,
+ const VEC             &solution,
+ Vector<float>         &derivative_norm,
+ const unsigned int     component);
+
+template
+void
+DerivativeApproximation::
+approximate_second_derivative<deal_II_dimension>
+(const Mapping<deal_II_dimension> &mapping,
+ const DH<deal_II_dimension> &dof_handler,
+ const VEC             &solution,
+ Vector<float>         &derivative_norm,
+ const unsigned int     component);
+
+template
+void
+DerivativeApproximation::
+approximate_second_derivative<deal_II_dimension>
+(const DH<deal_II_dimension> &dof_handler,
+ const VEC             &solution,
+ Vector<float>         &derivative_norm,
+ const unsigned int     component);
+
+template
+void
+DerivativeApproximation::
+approximate_derivative_tensor<deal_II_dimension>
+(const Mapping<deal_II_dimension> & 	mapping,
+ const DH<deal_II_dimension> &dof_handler,
+ const VEC &solution,
+ const DH<deal_II_dimension>::active_cell_iterator &cell,
+ Tensor<1,deal_II_dimension> &derivative,
+ const unsigned int     component);
+
+template
+void
+DerivativeApproximation::
+approximate_derivative_tensor<deal_II_dimension>
+(const Mapping<deal_II_dimension> & 	mapping,
+ const DH<deal_II_dimension> &dof_handler,
+ const VEC &solution,
+ const DH<deal_II_dimension>::active_cell_iterator &cell,
+ Tensor<2,deal_II_dimension> &derivative,
+ const unsigned int     component);
+
+template
+void
+DerivativeApproximation::
+approximate_derivative_tensor<deal_II_dimension>
+(const Mapping<deal_II_dimension> & 	mapping,
+ const DH<deal_II_dimension> &dof_handler,
+ const VEC &solution,
+ const DH<deal_II_dimension>::active_cell_iterator &cell,
+ Tensor<3,deal_II_dimension> &derivative,
+ const unsigned int     component);
+
+template
+void
+DerivativeApproximation::
+approximate_derivative_tensor<deal_II_dimension>
+(const DH<deal_II_dimension> &dof_handler,
+ const VEC &solution,
+ const DH<deal_II_dimension>::active_cell_iterator &cell,
+ Tensor<1,deal_II_dimension> &derivative,
+ const unsigned int     component);
+
+template
+void
+DerivativeApproximation::
+approximate_derivative_tensor<deal_II_dimension>
+(const DH<deal_II_dimension> &dof_handler,
+ const VEC &solution,
+ const DH<deal_II_dimension>::active_cell_iterator &cell,
+ Tensor<2,deal_II_dimension> &derivative,
+ const unsigned int     component);
+
+template
+void
+DerivativeApproximation::
+approximate_derivative_tensor<deal_II_dimension>
+(const DH<deal_II_dimension> &dof_handler,
+ const VEC &solution,
+ const DH<deal_II_dimension>::active_cell_iterator &cell,
+ Tensor<3,deal_II_dimension> &derivative,
+ const unsigned int     component);
+
+}
+
+
 for (deal_II_dimension : DIMENSIONS)
 {
-#define INSTANTIATE(InputVector,DH)                      \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_gradient<deal_II_dimension>                  \
-(const Mapping<deal_II_dimension> &mapping,              \
- const DH<deal_II_dimension> &dof_handler,               \
- const InputVector  &solution,                           \
- Vector<float>         &derivative_norm,                 \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_gradient<deal_II_dimension>                  \
-(const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- Vector<float>         &derivative_norm,                 \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_second_derivative<deal_II_dimension>         \
-(const Mapping<deal_II_dimension> &mapping,              \
- const DH<deal_II_dimension> &dof_handler,               \
- const InputVector  &solution,                           \
- Vector<float>         &derivative_norm,                 \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_second_derivative<deal_II_dimension>         \
-(const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- Vector<float>         &derivative_norm,                 \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_derivative_tensor<deal_II_dimension>         \
-(const Mapping<deal_II_dimension> & 	mapping,	 \
- const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- const DH<deal_II_dimension>::active_cell_iterator &cell,\
- Tensor<1,deal_II_dimension> &derivative,                \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_derivative_tensor<deal_II_dimension>         \
-(const Mapping<deal_II_dimension> & 	mapping,	 \
- const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- const DH<deal_II_dimension>::active_cell_iterator &cell,\
- Tensor<2,deal_II_dimension> &derivative,                \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_derivative_tensor<deal_II_dimension>         \
-(const Mapping<deal_II_dimension> & 	mapping,	 \
- const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- const DH<deal_II_dimension>::active_cell_iterator &cell,\
- Tensor<3,deal_II_dimension> &derivative,                \
- const unsigned int     component);			 \
-							 \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_derivative_tensor<deal_II_dimension>         \
-(const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- const DH<deal_II_dimension>::active_cell_iterator &cell,\
- Tensor<1,deal_II_dimension> &derivative,                \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_derivative_tensor<deal_II_dimension>         \
-(const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- const DH<deal_II_dimension>::active_cell_iterator &cell,\
- Tensor<2,deal_II_dimension> &derivative,                \
- const unsigned int     component);                      \
-                                                         \
-template                                                 \
-void                                                     \
-DerivativeApproximation::                                \
-approximate_derivative_tensor<deal_II_dimension>         \
-(const DH<deal_II_dimension> &dof_handler,               \
- const InputVector     &solution,                        \
- const DH<deal_II_dimension>::active_cell_iterator &cell,\
- Tensor<3,deal_II_dimension> &derivative,                \
- const unsigned int     component)
-
-
-INSTANTIATE(Vector<double>, DoFHandler);
-INSTANTIATE(Vector<float>, DoFHandler);
-INSTANTIATE(BlockVector<double>, DoFHandler);
-INSTANTIATE(BlockVector<float>, DoFHandler);
-
-INSTANTIATE(Vector<double>, hp::DoFHandler);
-INSTANTIATE(Vector<float>, hp::DoFHandler);
-INSTANTIATE(BlockVector<double>, hp::DoFHandler);
-INSTANTIATE(BlockVector<float>, hp::DoFHandler);
-
-#ifdef DEAL_II_WITH_PETSC
-INSTANTIATE(PETScWrappers::Vector, DoFHandler);
-INSTANTIATE(PETScWrappers::BlockVector, DoFHandler);
-
-INSTANTIATE(PETScWrappers::Vector, hp::DoFHandler);
-INSTANTIATE(PETScWrappers::BlockVector, hp::DoFHandler);
-#endif
-
-#ifdef DEAL_II_WITH_TRILINOS
-INSTANTIATE(TrilinosWrappers::Vector, DoFHandler);
-INSTANTIATE(TrilinosWrappers::BlockVector, DoFHandler);
-INSTANTIATE(TrilinosWrappers::MPI::Vector, DoFHandler);
-INSTANTIATE(TrilinosWrappers::MPI::BlockVector, DoFHandler);
-
-//TODO: test hp before instantiating
-#endif
-
-#undef INSTANTIATE
-
 template
 double
 DerivativeApproximation::
