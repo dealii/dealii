@@ -168,6 +168,14 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     UNSET(TRILINOS_SUPPORTS_CPP11 CACHE)
     UNSET(TRILINOS_HAS_C99_TR1_WORKAROUND CACHE)
 
+    #
+    # TODO: Resolve this cache invalidation issue and then put these checks
+    # back into FEATURE_TRILINO_CONFIGURE_EXTERNAL where they belong to.
+    #
+    ENABLE_IF_SUPPORTED(TRILINOS_DISABLE_WARNING_FLAGS "-Wno-unused")
+    ENABLE_IF_SUPPORTED(TRILINOS_DISABLE_WARNING_FLAGS "-Wno-extra")
+    ENABLE_IF_SUPPORTED(TRILINOS_DISABLE_WARNING_FLAGS "-Wno-overloaded-virtual")
+
   ENDIF(TRILINOS_FOUND)
 ENDMACRO()
 
@@ -195,14 +203,10 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
 
   #
-  #  used with -W -Wall (which includes -Wunused). Regrettable
-  #  though it may be, these warnings pretty much drown everything
-  #  else and we better disable some of the warnings to enable us
-  #  to see through the clutter.
+  # Disable a bunch of warnings caused by Trilinos headers:
   #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-extra")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-overloaded-virtual")
+  ADD_FLAGS(CMAKE_CXX_FLAGS "${TRILINOS_DISABLE_WARNING_FLAGS}")
+
 ENDMACRO()
 
 
