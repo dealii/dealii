@@ -60,8 +60,8 @@ EXEEXT     =
 
 
 # set paths to all the libraries we need:
-lib-deal2.o     = ${DEAL_II_LIBRARIES_RELEASE}
-lib-deal2.g     = ${DEAL_II_LIBRARIES_DEBUG}
+lib-deal2.o     = ${MAKEFILE_TARGETS_RELEASE}
+lib-deal2.g     = ${MAKEFILE_TARGETS_DEBUG}
 
 
 # include paths as command line flags. while compilers allow a space between

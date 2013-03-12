@@ -12,29 +12,15 @@
 ##
 #####
 
-FIND_PACKAGE(Perl REQUIRED)
-FIND_PACKAGE(Doxygen REQUIRED)
-
-IF(NOT DOXYGEN_FOUND OR NOT DOXYGEN_DOT_FOUND)
-  # Just to be sure that we actually have dot...
-  MESSAGE(FATAL_ERROR
-    "Could not find doxygen and dot which is required for building the documentation"
-    )
-ENDIF()
-
-
 #
 # Prepare the example steps for doxygen:
 #
-
 ADD_SUBDIRECTORY(tutorial)
 ADD_SUBDIRECTORY(images)
-
 
 #
 # Prepare auxiliary files for doxygen:
 #
-
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/options.dox.in
   ${CMAKE_CURRENT_BINARY_DIR}/options.dox
@@ -60,7 +46,6 @@ CONFIGURE_FILE(
 #
 # Finalize the doxygen configuration:
 #
-
 file(GLOB doxygen_input
   ${CMAKE_CURRENT_SOURCE_DIR}/headers/*.h
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/*.h
@@ -92,7 +77,6 @@ FILE(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
 #
 # And, finally, call doxygen:
 #
-
 ADD_CUSTOM_COMMAND(
   OUTPUT
     ${CMAKE_CURRENT_BINARY_DIR}/doxygen.log

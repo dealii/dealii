@@ -17,6 +17,7 @@
 #
 
 INCLUDE_DIRECTORIES(
+  BEFORE # Ensure deal.II include directories come first
   ${CMAKE_BINARY_DIR}/include/
   ${CMAKE_SOURCE_DIR}/include/
   )

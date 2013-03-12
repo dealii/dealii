@@ -21,6 +21,8 @@
 #
 
 MACRO(ADD_FLAGS _variable _flags)
-  SET(${_variable} "${${_variable}} ${_flags}")
+  IF(NOT "${_flags}" STREQUAL "")
+    SET(${_variable} "${${_variable}} ${_flags}")
+  ENDIF()
 ENDMACRO()
 

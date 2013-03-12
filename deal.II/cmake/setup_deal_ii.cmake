@@ -16,7 +16,11 @@
 # Set up deal.II specific definitions
 #
 # This file defines a long list of uncached variables, used throughout the
-# configuration to determine paths, locations and names:
+# configuration to determine paths, locations and names.
+#
+# Definitions marked with *) can be overriden by defining them to cache
+# prior to the call of this file. This is done with the help of the
+# SET_IF_EMPTY macro.
 #
 # General information about deal.II:
 #

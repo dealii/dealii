@@ -13,7 +13,7 @@
 
 
 // check that refine_and_coarsen_fixed_fraction behaves correctly
-// if all the indicators are the same.
+// if all the indicators are the same. This was fixed in 28858.
 
 #include "../tests.h"
 

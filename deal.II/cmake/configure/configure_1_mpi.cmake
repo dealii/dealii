@@ -16,15 +16,38 @@
 # Configuration for mpi support:
 #
 
+SET(DEAL_II_ALLOW_GENERIC_MPI ON CACHE BOOL
+  "Allow the usage of an external mpi library even if the current compiler is not an mpi wrapper"
+  )
+
+
 MACRO(FEATURE_MPI_FIND_EXTERNAL var)
-  FIND_PACKAGE(MPI QUIET)
+  #
+  # If CMAKE_CXX_COMPILER is already an MPI wrapper, use it to determine
+  # the mpi implementation:
+  #
+  SET(MPI_C_COMPILER ${CMAKE_C_COMPILER})
+  SET(MPI_CXX_COMPILER ${CMAKE_CXX_COMPILER})
+  FIND_PACKAGE(MPI)
+
+  IF(NOT MPI_CXX_FOUND)
+    #
+    # CMAKE_CXX_COMPILER is apparently not an mpi wrapper.
+    # If we're allowed to do so, search for a generic mpi implementation
+    # and use it.
+    #
+    IF(DEAL_II_ALLOW_GENERIC_MPI)
+      SET(MPI_FOUND)
+      UNSET(MPI_C_COMPILER CACHE)
+      UNSET(MPI_CXX_COMPILER CACHE)
+      FIND_PACKAGE(MPI)
+    ENDIF()
+  ENDIF()
 
   IF(MPI_CXX_FOUND)
     # Hide some variables:
-    MARK_AS_ADVANCED(
-      MPI_EXTRA_LIBRARY
-      MPI_LIBRARY
-      )
+    MARK_AS_ADVANCED(MPI_EXTRA_LIBRARY MPI_LIBRARY)
+
     SET(${var} TRUE)
   ENDIF()
 ENDMACRO()
@@ -39,23 +62,17 @@ MACRO(FEATURE_MPI_CONFIGURE_EXTERNAL)
 
   # The user has to know the location of the mpi headers as well:
   LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${MPI_CXX_INCLUDE_PATH})
-
-  SET(DEAL_II_USE_MPICXX OFF CACHE BOOL # Disabled by default
-    "Set the compiler to the detected mpi wrapper ${MPI_CXX_COMPILER}"
-    )
-  IF(DEAL_II_USE_MPICXX)
-    SET(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
-  ENDIF()
-
 ENDMACRO()
 
 
 MACRO(FEATURE_MPI_ERROR_MESSAGE)
   MESSAGE(FATAL_ERROR "\n"
     "Could not find any suitable mpi library!\n"
-    "Please ensure that an mpi library is installed on your computer.\n"
-    "If the library is not at a default location, either provide some hints\n"
-    "for the autodetection, or set the relevant variables by hand in ccmake.\n"
+    "Please ensure that an mpi library is installed on your computer\n"
+    "and set CMAKE_CXX_COMPILER and CMAKE_C_COMPILER to the appropriate mpi\n"
+    "wrappers:\n"
+    "    $ CC=\".../mpicc\" CXX=\".../mpicxx\" cmake <...>\n"
+    "    $ cmake -DCMAKE_C_COMPILER=\".../mpicc\" -DCMAKE_CXX_COMPIER=\".../mpicxx\" <...>\n"
     )
 ENDMACRO()
 

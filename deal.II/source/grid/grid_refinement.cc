@@ -209,7 +209,8 @@ namespace
 template <int dim, class Vector, int spacedim>
 void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
                              const Vector       &criteria,
-                             const double        threshold)
+                             const double        threshold,
+                             const unsigned int max_to_mark)
 {
   Assert (criteria.size() == tria.n_active_cells(),
           ExcDimensionMismatch(criteria.size(), tria.n_active_cells()));
@@ -239,9 +240,15 @@ void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
           new_threshold=criteria(index);
     }
 
+  unsigned int marked=0;
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
     if (std::fabs(criteria(index)) >= new_threshold)
+    {
+      if (max_to_mark!=numbers::invalid_unsigned_int && marked>=max_to_mark)
+        break;
+      marked++;
       cell->set_refine_flag();
+    }
 }
 
 
@@ -493,7 +500,7 @@ GridRefinement::refine_and_coarsen_fixed_fraction (Triangulation<dim,spacedim> &
 
   // actually flag cells
   if (top_threshold < max_element(criteria))
-    refine (tria, criteria, top_threshold);
+    refine (tria, criteria, top_threshold, pp - tmp.begin());
 
   if (bottom_threshold > min_element(criteria))
     coarsen (tria, criteria, bottom_threshold);

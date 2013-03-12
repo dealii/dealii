@@ -213,7 +213,7 @@ namespace GridRefinement
 
   /**
    * Flag all mesh cells for which the value in @p criteria exceeds @p
-   * threshold for refinement.
+   * threshold for refinement, but only flag up to @p max_to_mark cells.
    *
    * The vector @p criteria contains a nonnegative value for each active
    * cell, ordered in the canonical order of of
@@ -229,7 +229,8 @@ namespace GridRefinement
   template <int dim, class Vector, int spacedim>
   void refine (Triangulation<dim,spacedim> &tria,
                const Vector                &criteria,
-               const double                threshold);
+               const double                threshold,
+               const unsigned int max_to_mark = numbers::invalid_unsigned_int);
 
   /**
    * Flag all mesh cells for which the value in @p criteria

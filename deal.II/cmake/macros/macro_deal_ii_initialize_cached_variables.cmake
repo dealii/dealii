@@ -35,6 +35,9 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
       )
   ENDIF()
 
+  #
+  # Set build type according to available libraries
+  #
   IF(DEAL_II_BUILD_TYPE MATCHES "Debug")
     SET(CMAKE_BUILD_TYPE "Debug" CACHE STRING
       "Choose the type of build, options are: Debug, Release"
@@ -42,6 +45,25 @@ MACRO(DEAL_II_INITIALIZE_CACHED_VARIABLES)
   ELSE()
     SET(CMAKE_BUILD_TYPE "Release" CACHE STRING
       "Choose the type of build, options are: Debug, Release"
+      )
+  ENDIF()
+
+  #
+  # Bail out if build type is unknown...
+  #
+  IF( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
+      NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Debug" )
+    MESSAGE(FATAL_ERROR
+      "\nCMAKE_BUILD_TYPE does neither match Release nor Debug!\n\n"
+      )
+  ENDIF()
+  #
+  # ... or unsupported
+  #
+  IF(NOT DEAL_II_BUILD_TYPE MATCHES "${CMAKE_BUILD_TYPE}")
+    MESSAGE(FATAL_ERROR "\n"
+      "CMAKE_BUILD_TYPE \"${CMAKE_BUILD_TYPE}\" unsupported by current installation!\n"
+      "deal.II was build with \"${DEAL_II_BUILD_TYPE}\" only build type.\n\n"
       )
   ENDIF()
 

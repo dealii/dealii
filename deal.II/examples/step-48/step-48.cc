@@ -20,13 +20,9 @@
 #include <deal.II/lac/vector.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/tria_boundary_lib.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/lac/constraint_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
-#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/fe/fe_q.h>
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/vector_tools.h>
@@ -133,7 +129,7 @@ namespace Step48
         fe_eval.distribute_local_to_global (inv_mass_matrix);
       }
 
-    inv_mass_matrix.compress();
+    inv_mass_matrix.compress(VectorOperation::add);
     for (unsigned int k=0; k<inv_mass_matrix.local_size(); ++k)
       if (inv_mass_matrix.local_element(k)>1e-15)
         inv_mass_matrix.local_element(k) = 1./inv_mass_matrix.local_element(k);
@@ -322,7 +318,7 @@ namespace Step48
   SineGordonProblem<dim>::SineGordonProblem ()
     :
     pcout (std::cout,
-           Utilities::System::get_this_mpi_process(MPI_COMM_WORLD)==0),
+           Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)==0),
 #ifdef DEAL_II_WITH_P4EST
     triangulation (MPI_COMM_WORLD),
 #endif

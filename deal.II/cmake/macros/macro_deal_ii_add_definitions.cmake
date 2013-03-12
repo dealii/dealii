@@ -23,9 +23,8 @@ MACRO(DEAL_II_ADD_DEFINITIONS _name)
   FOREACH(_build ${DEAL_II_BUILD_TYPES})
     STRING(TOLOWER ${_build} _build_lowercase)
 
-    GET_TARGET_PROPERTY(_definitions ${_name}.${_build_lowercase} COMPILE_DEFINITIONS)
-    SET_TARGET_PROPERTIES(${_name}.${_build_lowercase} PROPERTIES
-      COMPILE_DEFINITIONS "${ARGN};${_macro_definitions}"
+    SET_PROPERTY(TARGET ${_name}.${_build_lowercase}
+      APPEND PROPERTY COMPILE_DEFINITIONS "${ARGN}"
       )
   ENDFOREACH()
 

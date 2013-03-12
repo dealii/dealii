@@ -3849,10 +3849,10 @@ namespace internal
     Assert (fe_eval.dof_values_initialized == true,
             internal::ExcAccessToUninitializedField());
 
-    const unsigned int temp_size = fe_eval.dofs_per_cell > fe_eval.n_q_points ?
-                                   fe_eval.dofs_per_cell : fe_eval.n_q_points;
-    const unsigned int n_components = fe_eval.n_components;
-    const unsigned int dim = fe_eval.dimension;
+    const unsigned int temp_size = FEEval::dofs_per_cell > FEEval::n_q_points ?
+                                   FEEval::dofs_per_cell : FEEval::n_q_points;
+    const unsigned int n_components = FEEval::n_components;
+    const unsigned int dim = FEEval::dimension;
 
     for (unsigned int c=0; c<n_components; c++)
       {
@@ -4038,10 +4038,10 @@ namespace internal
       Assert (fe_eval.gradients_quad_submitted == true,
               ExcAccessToUninitializedField());
 
-    const unsigned int temp_size = fe_eval.dofs_per_cell > fe_eval.n_q_points ?
-                                   fe_eval.dofs_per_cell : fe_eval.n_q_points;
-    const unsigned int n_components = fe_eval.n_components;
-    const unsigned int dim = fe_eval.dimension;
+    const unsigned int temp_size = FEEval::dofs_per_cell > FEEval::n_q_points ?
+                                   FEEval::dofs_per_cell : FEEval::n_q_points;
+    const unsigned int n_components = FEEval::n_components;
+    const unsigned int dim = FEEval::dimension;
 
 
     for (unsigned int c=0; c<n_components; c++)
