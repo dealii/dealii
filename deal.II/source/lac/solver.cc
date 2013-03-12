@@ -17,26 +17,14 @@
 #include <deal.II/lac/block_vector.h>
 #include <deal.II/lac/petsc_vector.h>
 #include <deal.II/lac/petsc_block_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
+#include <deal.II/lac/trilinos_block_vector.h>
 
 #include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/parallel_block_vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-
-// a few instantiations of static members. Hope that we catch all that
-// are required
-
-template class Solver<Vector<double> >;
-template class Solver<BlockVector<double> >;
-template class Solver<parallel::distributed::Vector<double> >;
-
-template class Solver<Vector<float> >;
-template class Solver<BlockVector<float> >;
-template class Solver<parallel::distributed::Vector<float> >;
-
-#ifdef DEAL_II_WITH_PETSC
-template class Solver<PETScWrappers::Vector>;
-template class Solver<PETScWrappers::BlockVector>;
-#endif
+#include "solver.inst"
 
 DEAL_II_NAMESPACE_CLOSE

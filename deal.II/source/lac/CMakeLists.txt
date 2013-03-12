@@ -86,6 +86,7 @@ SET(inst_in_files
   parallel_vector.inst.in
   precondition_block.inst.in
   relaxation_block.inst.in
+  solver.inst.in
   sparse_matrix_ez.inst.in
   sparse_matrix.inst.in
   trilinos_sparse_matrix.inst.in
