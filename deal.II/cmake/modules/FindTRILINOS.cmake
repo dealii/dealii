@@ -33,17 +33,18 @@ SET_IF_EMPTY(TRILINOS_DIR "$ENV{TRILINOS_DIR}")
 #
 # Include the trilinos package configuration:
 #
-FIND_PACKAGE(TRILINOS
-  QUIET CONFIG
+FIND_PACKAGE(TRILINOS_CONFIG
+  CONFIG
   NAMES Trilinos TRILINOS
   HINTS
+    ${TRILINOS_DIR}/lib/cmake/Trilinos
     ${TRILINOS_DIR}
   PATH_SUFFIXES
-    lib${LIB_SUFFIX}/cmake/Trilinos
     lib64/cmake/Trilinos
     lib/cmake/Trilinos
-    include/Trilinos
+    lib${LIB_SUFFIX}/cmake/Trilinos
     include/trilinos
+    include/Trilinos
   NO_SYSTEM_ENVIRONMENT_PATH
   )
 
@@ -77,7 +78,7 @@ ENDFOREACH()
 
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(TRILINOS DEFAULT_MSG
   TRILINOS_LIBRARIES # cosmetic: Gives nice output
-  TRILINOS_FOUND
+  TRILINOS_CONFIG_FOUND
   )
 
 
