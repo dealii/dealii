@@ -127,11 +127,8 @@ IF(TRILINOS_FOUND)
 
 ELSE()
 
-  IF(TRILINOS_DIR MATCHES "-NOTFOUND")
-    SET(TRILINOS_DIR "" CACHE STRING
-      "A hint to a Trilinos installation"
-      FORCE
-      )
-  ENDIF()
+  SET(TRILINOS_DIR "" CACHE STRING
+    "An optional hint to a Trilinos installation"
+    )
 ENDIF()
 
