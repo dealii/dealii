@@ -378,8 +378,8 @@ namespace TrilinosWrappers
       }
 
       void copy_row (const dealii::SparsityPattern &csp,
-                     const size_int                 row,
-                     std::vector<TrilinosWrapper::types::int_type>         &row_indices)
+                     const size_type                row,
+                     std::vector<TrilinosWrapper::types::int_type> &row_indices)
       {
         dealii::SparsityPattern::iterator col_num = csp.begin (row);
         for (size_type col=0; col_num != csp.end (row); ++col_num, ++col)
@@ -937,7 +937,7 @@ namespace TrilinosWrappers
 
 
 
-  size_type
+  SparseMatrix::size_type
   SparseMatrix::row_length (const size_type row) const
   {
     Assert (row < m(), ExcInternalError());
@@ -964,6 +964,8 @@ namespace TrilinosWrappers
 
   namespace internals
   {
+    typedef types::global_dof_index size_type;
+
     void perform_mmult (const SparseMatrix &inputleft,
                         const SparseMatrix &inputright,
                         SparseMatrix       &result,
@@ -1059,7 +1061,7 @@ namespace TrilinosWrappers
               inputleft.trilinos_sparsity_pattern().ExtractMyRowView(i, num_entries,
                                                                      indices);
               Assert (num_entries >= 0, ExcInternalError());
-              const sizretype GID = inputleft.row_partitioner().GID(i);
+              const size_type GID = inputleft.row_partitioner().GID(i);
               for (TrilinosWrapper::types::int_type j=0; j<num_entries; ++j)
                 sparsity_transposed.add (inputleft.col_partitioner().GID(indices[j]),
                                          GID);
@@ -1390,7 +1392,7 @@ namespace TrilinosWrappers
 
 
 
-  size_type
+  SparseMatrix::size_type
   SparseMatrix::memory_consumption () const
   {
     size_type static_memory = sizeof(this) + sizeof (*matrix)

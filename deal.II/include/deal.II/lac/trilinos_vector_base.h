@@ -66,6 +66,11 @@ namespace TrilinosWrappers
   namespace internal
   {
     /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
+    /**
      * This class implements a
      * wrapper for accessing the
      * Trilinos vector in the same
@@ -94,10 +99,6 @@ namespace TrilinosWrappers
                        const size_type  index);
 
     public:
-      /**
-       * Declare type for container size.
-       */
-      typedef types::global_dof_index size_type;
 
       /**
        * This looks like a copy
@@ -1072,8 +1073,8 @@ namespace TrilinosWrappers
   namespace internal
   {
     inline
-    VectorReference::VectorReference (VectorBase   &vector,
-                                      const size_t  index)
+    VectorReference::VectorReference (VectorBase      &vector,
+                                      const size_type  index)
       :
       vector (vector),
       index (index)
@@ -1381,7 +1382,7 @@ namespace TrilinosWrappers
     for (size_type i=0; i<n_elements; ++i)
       {
         const size_type row = indices[i];
-        const TrilinosWrapper::types::int_type local_row = vector->Map().LID(static_cast<TrilinosWrapper::Types::int_type>(row));
+        const TrilinosWrapper::types::int_type local_row = vector->Map().LID(static_cast<TrilinosWrapper::types::int_type>(row));
         if (local_row == -1)
           {
             const int ierr = vector->ReplaceGlobalValues (1,
@@ -1449,7 +1450,7 @@ namespace TrilinosWrappers
     for (size_type i=0; i<n_elements; ++i)
       {
         const size_type row = indices[i];
-        const TrilinosWrapper::types::int_type local_row = vector->Map().LID(static_cast<TrilinosWrapper::Types::int_type>(row));
+        const TrilinosWrapper::types::int_type local_row = vector->Map().LID(static_cast<TrilinosWrapper::types::int_type>(row));
         if (local_row == -1)
           {
             const int ierr = vector->SumIntoGlobalValues (1,
@@ -1466,7 +1467,7 @@ namespace TrilinosWrappers
 
 
   inline
-  size_type
+  VectorBase::size_type
   VectorBase::size () const
   {
     return (size_type) (vector->Map().MaxAllGID() + 1 -
@@ -1476,7 +1477,7 @@ namespace TrilinosWrappers
 
 
   inline
-  size_type
+  VectorBase::size_type
   VectorBase::local_size () const
   {
     return (size_type) vector->Map().NumMyElements();
@@ -1485,7 +1486,7 @@ namespace TrilinosWrappers
 
 
   inline
-  std::pair<size_type, size_type>
+  std::pair<VectorBase::size_type, VectorBase::size_type>
   VectorBase::local_range () const
   {
     TrilinosWrapper::types::int_type begin, end;

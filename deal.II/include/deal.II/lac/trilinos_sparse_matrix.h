@@ -512,6 +512,11 @@ namespace TrilinosWrappers
   {
   public:
     /**
+     * Declare the type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
+    /**
      * A structure that describes
      * some of the traits of this
      * class in terms of its run-time
@@ -2651,7 +2656,7 @@ namespace TrilinosWrappers
 
 
     inline
-    size_type
+    AccessorBase::size_type
     AccessorBase::row() const
     {
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
@@ -2660,7 +2665,7 @@ namespace TrilinosWrappers
 
 
     inline
-    size_type
+    AccessorBase::size_type
     AccessorBase::column() const
     {
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
@@ -2669,7 +2674,7 @@ namespace TrilinosWrappers
 
 
     inline
-    size_type
+    AccessorBase::size_type
     AccessorBase::index() const
     {
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
@@ -3179,7 +3184,7 @@ namespace TrilinosWrappers
 
     TrilinosWrapper::types::int_type *col_index_ptr;
     TrilinosScalar const *col_value_ptr;
-    TrilinosWrapper::types::int_typeint_type n_columns;
+    TrilinosWrapper::types::int_type n_columns;
 
     // If we don't elide zeros, the pointers
     // are already available...
@@ -3516,7 +3521,7 @@ namespace TrilinosWrappers
   // called frequently and do only involve
   // a call to some Trilinos function.
   inline
-  size_type
+  SparseMatrix::size_type
   SparseMatrix::m () const
   {
     return matrix -> NumGlobalRows();
@@ -3525,7 +3530,7 @@ namespace TrilinosWrappers
 
 
   inline
-  size_type
+  SparseMatrix::size_type
   SparseMatrix::n () const
   {
     return matrix -> NumGlobalCols();
@@ -3534,7 +3539,7 @@ namespace TrilinosWrappers
 
 
   inline
-  size_type
+  SparseMatrix::size_type
   SparseMatrix::local_size () const
   {
     return matrix -> NumMyRows();
@@ -3543,7 +3548,7 @@ namespace TrilinosWrappers
 
 
   inline
-  std::pair<size_type, size_type>
+  std::pair<SparseMatrix::size_type, SparseMatrix::size_type>
   SparseMatrix::local_range () const
   {
     size_type begin, end;
@@ -3556,7 +3561,7 @@ namespace TrilinosWrappers
 
 
   inline
-  size_type
+  SparseMatrix::size_type
   SparseMatrix::n_nonzero_elements () const
   {
     return matrix->NumGlobalNonzeros();

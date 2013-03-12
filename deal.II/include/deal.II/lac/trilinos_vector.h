@@ -520,7 +520,7 @@ namespace TrilinosWrappers
       // Need to copy out values, since the
       // deal.II might not use doubles, so
       // that a direct access is not possible.
-      for (Trilinos::Wrapper::Types::int_type i=0; i<size; ++i)
+      for (TrilinosWrapper::types::int_type i=0; i<size; ++i)
         (*vector)[0][i] = v(parallel_partitioner.GID(i));
     }
 

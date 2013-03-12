@@ -260,7 +260,7 @@ namespace TrilinosWrappers
 
 
 
-  size_type
+  BlockSparseMatrix::size_type
   BlockSparseMatrix::n_nonzero_elements () const
   {
     size_type n_nonzero = 0;

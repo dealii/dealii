@@ -183,6 +183,10 @@ namespace TrilinosWrappers
     class Iterator
     {
     public:
+      /**
+       * Declare type for container size.
+       */
+      typedef types::global_dof_index size_type;
 
       /**
        * Constructor. Create an
@@ -240,7 +244,7 @@ namespace TrilinosWrappers
        * Exception
        */
       DeclException2 (ExcInvalidIndexWithinRow,
-                      size_type, syze_type,
+                      size_type, size_type,
                       << "Attempt to access element " << arg2
                       << " of row " << arg1
                       << " which doesn't have that many elements.");
@@ -281,6 +285,11 @@ namespace TrilinosWrappers
   class SparsityPattern : public Subscriptor
   {
   public:
+
+    /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
 
     /**
      * Declare a typedef for the
@@ -572,7 +581,7 @@ namespace TrilinosWrappers
      */
     SparsityPattern (const Epetra_Map             &row_parallel_partitioning,
                      const Epetra_Map             &col_parallel_partitioning,
-                     const std::vector<size_tyoe> &n_entries_per_row);
+                     const std::vector<size_type> &n_entries_per_row);
 
     /**
      * Reinitialization function for
@@ -623,7 +632,7 @@ namespace TrilinosWrappers
      */
     void
     reinit (const Epetra_Map             &parallel_partitioning,
-            const std::vector<size_tyep> &n_entries_per_row);
+            const std::vector<size_type> &n_entries_per_row);
 
     /**
      * This reinit function is similar to
@@ -1399,7 +1408,7 @@ namespace TrilinosWrappers
 
 
     inline
-    size_type
+    Accessor::size_type
     Accessor::row() const
     {
       Assert (a_row < sparsity_pattern->n_rows(), ExcBeyondEndOfSparsityPattern());
@@ -1409,7 +1418,7 @@ namespace TrilinosWrappers
 
 
     inline
-    size_type
+    Accessor::size_type
     Accessor::column() const
     {
       Assert (a_row < sparsity_pattern->n_rows(), ExcBeyondEndOfSparsityPattern());
@@ -1419,7 +1428,7 @@ namespace TrilinosWrappers
 
 
     inline
-    size_type
+    Accessor::size_type
     Accessor::index() const
     {
       Assert (a_row < sparsity_pattern->n_rows(), ExcBeyondEndOfSparsityPattern());
@@ -1809,7 +1818,7 @@ namespace TrilinosWrappers
   SparsityPattern::reinit (const IndexSet     &row_parallel_partitioning,
                            const IndexSet     &col_parallel_partitioning,
                            const MPI_Comm     &communicator,
-                           const std::vector<TrilinosWrapper::types::int_type> &n_entries_per_row)
+                           const std::vector<size_type> &n_entries_per_row)
   {
     Epetra_Map row_map =
       row_parallel_partitioning.make_trilinos_map (communicator, false);

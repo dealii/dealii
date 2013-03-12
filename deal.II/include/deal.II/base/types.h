@@ -145,6 +145,7 @@ namespace TrilinosWrapper
 {
   namespace types
   {
+#define DEAL_II_EPETRA_NO_64BIT_GLOBAL_INDICES
 #ifdef DEAL_II_EPETRA_NO_64BIT_GLOBAL_INDICES
     /**
      * Declare type of integer used in the Epetra package of Trilinos.

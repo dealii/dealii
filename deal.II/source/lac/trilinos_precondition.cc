@@ -695,7 +695,7 @@ namespace TrilinosWrappers
 
 
 
-  size_type
+  PreconditionAMG::size_type
   PreconditionAMG::memory_consumption() const
   {
     unsigned int memory = sizeof(this);

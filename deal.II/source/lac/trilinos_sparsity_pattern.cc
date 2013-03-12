@@ -240,7 +240,7 @@ namespace TrilinosWrappers
   void
   SparsityPattern::reinit (const Epetra_Map   &input_row_map,
                            const Epetra_Map   &input_col_map,
-                           const std::vector<TrilinosWrapper::types::int_type> &n_entries_per_row)
+                           const std::vector<size_type> &n_entries_per_row)
   {
     // release memory before reallocation
     graph.reset ();
@@ -277,6 +277,7 @@ namespace TrilinosWrappers
   {
     namespace
     {
+      typedef types::global_dof_index size_type;
     // distinguish between compressed sparsity types that define row_begin()
     // and SparsityPattern that uses begin() as iterator type
       template <typename Sparsity>
@@ -324,7 +325,7 @@ namespace TrilinosWrappers
 
     const size_type first_row = input_row_map.MinMyGID(),
                        last_row = input_row_map.MaxMyGID()+1;
-    std::vector<TrilinosWrapper::type::int_type> n_entries_per_row(last_row - first_row);
+    std::vector<TrilinosWrapper::types::int_type> n_entries_per_row(last_row - first_row);
 
     for (size_type row=first_row; row<last_row; ++row)
       n_entries_per_row[row-first_row] = sp.row_length(row);
@@ -518,7 +519,7 @@ namespace TrilinosWrappers
 
 
 
-  size_type
+  SparsityPattern::size_type
   SparsityPattern::bandwidth () const
   {
     size_type local_b=0;
@@ -530,7 +531,7 @@ namespace TrilinosWrappers
         graph->ExtractMyRowView(i, num_entries, indices);
         for (size_type j=0; j<(size_type)num_entries; ++j)
           {
-            if (static_cast<size_type>(std::abs(static_cast<int_int>(i-indices[j]))) > local_b)
+            if (static_cast<size_type>(std::abs(static_cast<size_type>(i-indices[j]))) > local_b)
               local_b = std::abs(static_cast<size_type>(i-indices[j]));
           }
       }
@@ -540,7 +541,7 @@ namespace TrilinosWrappers
 
 
 
-  size_type
+  SparsityPattern::size_type
   SparsityPattern::n_rows () const
   {
     const TrilinosWrapper::types::int_type n_rows = graph -> NumGlobalRows();
@@ -549,7 +550,7 @@ namespace TrilinosWrappers
 
 
 
-  size_type
+  SparsityPattern::size_type
   SparsityPattern::n_cols () const
   {
     TrilinosWrapper::types::int_type n_cols;
@@ -563,7 +564,7 @@ namespace TrilinosWrappers
 
 
 
-  size_type
+  SparsityPattern::size_type
   SparsityPattern::local_size () const
   {
     TrilinosWrapper::types::int_type n_rows = graph -> NumMyRows();
@@ -573,7 +574,7 @@ namespace TrilinosWrappers
 
 
 
-  std::pair<size_type, size_type>
+  std::pair<SparsityPattern::size_type, SparsityPattern::size_type>
   SparsityPattern::local_range () const
   {
     size_type begin, end;
@@ -585,7 +586,7 @@ namespace TrilinosWrappers
 
 
 
-  size_type
+  SparsityPattern::size_type
   SparsityPattern::n_nonzero_elements () const
   {
     TrilinosWrapper::types::int_type nnz = graph->NumGlobalEntries();
@@ -595,7 +596,7 @@ namespace TrilinosWrappers
 
 
 
-  size_type
+  SparsityPattern::size_type
   SparsityPattern::max_entries_per_row () const
   {
     TrilinosWrapper::types::int_type nnz = graph->MaxNumIndices();
@@ -605,7 +606,7 @@ namespace TrilinosWrappers
 
 
 
-  size_type
+  SparsityPattern::size_type
   SparsityPattern::row_length (const size_type row) const
   {
     Assert (row < n_rows(), ExcInternalError());
@@ -669,7 +670,7 @@ namespace TrilinosWrappers
     Assert (graph->Filled() == true, ExcInternalError());
     for (size_type row=0; row<local_size(); ++row)
       {
-        signed TrilinosWrapper::types::int_type *indices;
+        TrilinosWrapper::types::int_type *indices;
         TrilinosWrapper::types::int_type num_entries;
         graph->ExtractMyRowView (row, num_entries, indices);
 
@@ -680,7 +681,7 @@ namespace TrilinosWrappers
           // x-y, that is we have to exchange
           // the order of output
           out << indices[graph->GRID(static_cast<TrilinosWrapper::types::int_type>(j))]
-            << " " << -static_cast<signed TrilinosWrapper::types::int_type>(row)
+            << " " << -static_cast<TrilinosWrapper::types::int_type>(row)
             << std::endl;
       }
 

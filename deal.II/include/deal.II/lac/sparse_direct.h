@@ -1072,6 +1072,11 @@ class SparseDirectUMFPACK : public Subscriptor
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Dummy class needed for the
    * usual initalization interface
    * of preconditioners.
