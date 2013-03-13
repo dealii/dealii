@@ -245,7 +245,7 @@ system of equations finally.
 
 We introduce a Lagrange multiplier $\lambda$ and the convex cone $K\subset W'$,
 $W'$ dual space of the trace space $W:=\left[ H_0^{\frac{1}{2}}(\Gamma_C)
-\right]^{\textrm{dim}$ of $V$ restricted to $\Gamma_C$,
+\right]^{\textrm{dim}}$ of $V$ restricted to $\Gamma_C$,
 @f{gather*}K:=\{\mu\in W':\mu_T = 0,\quad\langle\mu n,v\rangle_{\Gamma_C}\geq 0,\quad
 \forall v\in H_0^{\frac{1}{2}}(\Gamma_C), v \ge 0\text{ on }\Gamma_C \}@f}
 of Lagrange multipliers, where $\langle\cdot,\cdot\rangle$
@@ -321,7 +321,7 @@ method for the contact. It sums up the results of the sections before and works 
  @f{gather*}\mathcal{F}_{k+1}:=\lbrace p\in\mathcal{S}:\Lambda^k_p +
  c\left(\left[B^TU^k\right]_p - G_p\right) \leq 0\rbrace.@f}
  Projection $U^k$ so that it holds the second equation in (2)
- @f{gather*}\hat U^K := P_{\mathcal{A}_{k+1}}(U^k).@f} 
+ @f{gather*}\hat U^K := P_{\mathcal{A}_{k+1}}(U^k).@f}
  <li> If $\mathcal{A}_{k+1} = \mathcal{A}_k$ and $\vert
  F\left(U^{k}\right) \vert < \delta$ then stop, else set $k=k+1$ and go to
  step (1).
@@ -372,7 +372,7 @@ Compared to step-41, step (1) is added but it should be clear
 from the sections above that we only linearize the problem. In step (2) we have
 to solve a linear system of equations again. And now the solution has to fulfill two stopping
 criteria. $\mathcal{A}_{k+1} = \mathcal{A}_k$ makes sure that the contact zones
-are iterated out and the second ensures an accurate enough residual which means 
+are iterated out and the second ensures an accurate enough residual which means
 that the plastic zones are also iterated out.
 
 A similar method can also be found in Brunssen, Schmid, Sch&auml;fer,
