@@ -436,6 +436,26 @@
 #
 
 
+#
+# ZLIB:
+#
+# SET(DEAL_II_WITH_ZLIB ON CACHE BOOL
+#   "Build deal.II with support for zlib"
+#   )
+#
+# Automatic detection:
+#
+# Specify a hint with CMAKE_PREFIX_PATH or by setting
+# SET(ZLIB_ROOT "/.../..." CACHE PATH "")
+#
+# Manual setup:
+#
+# SET(ZLIB_FOUND TRUE CACHE BOOL "")
+# SET(ZLIB_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+# SET(ZLIB_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
+#
+
+
 
 ###########################################################################
 #                                                                         #

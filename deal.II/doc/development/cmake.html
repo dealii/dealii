@@ -495,6 +495,26 @@
         href="../readme.html#configuration">here</a>.
     </p>
 
+    </p>
+      Compilers can be switched either by command line or by setting
+      <code>CMAKE_(C|CXX)_COMPILER</code>:
+      <pre>
+
+     CC=mpicc CXX=mpicxx cmake &lt;...&gt;
+
+     cmake -DCMAKE_C_COMPILER="mpicc" -DCMAKE_CXX_COMPILER="mpicxx" &lt;...&gt;
+      </pre>
+      Please note that
+      <ul>
+        <li>
+          The compiler <i>must</i> be specified at the very first
+          invokation of <code>cmake</code>.
+        <li>
+          The specified C and CXX compilers must be the same compiler
+          brand and the same compiler version.
+      </ul>
+    </p>
+
     <p>
       deal.II will configure sensible default <code>CFLAGS</code> and
       <code>CXXFLAGS</code> depending on platform, compiler and build
@@ -534,7 +554,7 @@
       <ul>
         <li>
           <code>DEAL_II_ALLOW_PLATFORM_INTROSPECTION</code>: If set
-          (default), <acronym>deal.II</acronym> will do platform
+          (default), <acronym>deal.II</acronym> will perform platform
           introspection for the given CPU.
 
 	<li>
