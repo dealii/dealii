@@ -242,8 +242,13 @@
 #
 # Automatic detection:
 #
-# Set CMAKE_C_COMPILER and CMAKE_CXX_COMPILER to the appropriate MPI
-# wrapper.
+# The best way to force a specific MPI implementation to be used is to set
+# set CMAKE_C_COMPILER and CMAKE_CXX_COMPILER to the appropriate MPI wrapper.
+# Alternatively, specify the mpi wrappers that will be queried for the mpi
+# link interface:
+#
+# SET(MPI_C_COMPILER "mpicc" CACHE STRING "")
+# SET(MPI_CXX_COMPILER "mpicxx" CACHE STRING "")
 #
 # Manual setup:
 #
