@@ -25,9 +25,10 @@
 # General information about deal.II:
 #
 #     DEAL_II_PACKAGE_NAME            *)
-#     DEAL_II_PACKAGE_VERSION         **)
+#     DEAL_II_PACKAGE_VERSION         *)
 #     DEAL_II_VERSION_MAJOR
 #     DEAL_II_VERSION_MINOR
+#     DEAL_II_VERSION
 #
 # Information about paths, install locations and names:
 #
@@ -53,7 +54,6 @@
 #     DEAL_II_WITH_DOC_DIRECTORY
 #
 # *)  Can be overwritten by the command line via -D<...>
-# **) Will be set with to the value of ${VERSION}
 #
 
 ###########################################################################
@@ -64,14 +64,15 @@
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
 
-SET(DEAL_II_PACKAGE_VERSION ${VERSION})
+SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "8.0.pre") # TODO: Get this value from somewhere else
 
 STRING(REGEX REPLACE
-  "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${VERSION}"
+  "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${DEAL_II_PACKAGE_VERSION}"
   )
 STRING(REGEX REPLACE
-  "^[0-9]+\\.([0-9]+).*" "\\1" DEAL_II_VERSION_MINOR "${VERSION}"
+  "^[0-9]+\\.([0-9]+).*" "\\1" DEAL_II_VERSION_MINOR "${DEAL_II_PACKAGE_VERSION}"
   )
+SET(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR})
 
 
 ###########################################################################
