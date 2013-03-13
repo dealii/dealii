@@ -81,7 +81,6 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
   #
   SET(DEAL_II_MSVC TRUE)
 
-
   #
   # Disable shared libraries on native Windows targets for the moment.
   #

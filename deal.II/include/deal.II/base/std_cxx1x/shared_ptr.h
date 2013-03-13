@@ -30,6 +30,7 @@ DEAL_II_NAMESPACE_CLOSE
 #else
 
 #include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx1x
 {
