@@ -5,7 +5,7 @@
     <title>The deal.II Readme</title>
     <link href="../screen.css" rel="StyleSheet">
     <meta name="author" content="the deal.II authors <authors @ dealii.org>">
-    <meta name="copyright" content="Copyright (C) 2012 by the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2012, 2013 by the deal.II authors">
     <meta name="date" content="$Date$">
     <meta name="svn_id" content="$Id$">
     <meta name="keywords" content="deal.II">
@@ -42,6 +42,7 @@
 		<li><a href="#configureoverride">Manual override</a>
 		<li><a href="#configurecomp">Component selection</a>
 		<li><a href="#configurebuild">Build configuration</a>
+		<li><a href="#compiler">Selecting a compiler</a>
 		<li><a href="#configureinstall">Installation</a>
 	      </ul>
 	    <li><a href="#ext">How to use deal.II in your CMake project</a>
@@ -390,12 +391,15 @@
 
     <a name="configureoverride"></a>
     <h4> Manual override </h4>
+    <p><b>Warning:</b>Do not do this unless absolutely necessary!</p>
+    <p>
       It is possible to override the CMake find mechanism for external
       libraries manually. This is useful if a non standard library (e.g.
       lapack/blas) should be used but cannot be found by the
       <code>FIND_PACKAGE(...)</code> mechanism of cmake.
       In this case you can set by hand:
-      <pre>
+    </p>
+    <pre>
 
     cmake -DLAPACK_FOUND=true \
           -DLAPACK_LIBRARIES="library;and;complete;link;interface" \
@@ -494,6 +498,9 @@
       For more information, see the general discussion <a
         href="../readme.html#configuration">here</a>.
     </p>
+
+    <a name="compiler"></a>
+    <h4> Selecting a compiler </h4>
 
     </p>
       Compilers can be switched either by command line or by setting
