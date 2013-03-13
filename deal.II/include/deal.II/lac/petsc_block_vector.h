@@ -123,7 +123,7 @@ namespace PETScWrappers
      * initialize each block with
      * <tt>n[i]</tt> zero elements.
      */
-    BlockVector (const std::vector<unsigned int> &n);
+    BlockVector (const std::vector<size_type> &n);
 
     /**
      * Constructor. Set the number of
@@ -144,9 +144,9 @@ namespace PETScWrappers
      * different blocks.
      */
     template <typename InputIterator>
-    BlockVector (const std::vector<unsigned int> &n,
-                 const InputIterator              first,
-                 const InputIterator              end);
+    BlockVector (const std::vector<size_type> &n,
+                 const InputIterator           first,
+                 const InputIterator           end);
 
     /**
      * Destructor. Clears memory

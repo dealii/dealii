@@ -2377,7 +2377,7 @@ namespace MatrixTools
         if (boundary_values.size() == 0)
           return;
 
-        const std::pair<unsigned int, unsigned int> local_range
+        const std::pair<types::global_dof_index, types::global_dof_index> local_range
           = matrix.local_range();
         Assert (local_range == right_hand_side.local_range(),
                 ExcInternalError());
@@ -2398,7 +2398,7 @@ namespace MatrixTools
 
         // figure out which rows of the matrix we
         // have to eliminate on this processor
-        std::vector<unsigned int> constrained_rows;
+        std::vector<types::global_dof_index> constrained_rows;
         for (std::map<types::global_dof_index,double>::const_iterator
              dof  = boundary_values.begin();
              dof != boundary_values.end();
@@ -2505,7 +2505,7 @@ namespace MatrixTools
     // into blocks for the boundary values.
     // To this end, generate a vector of
     // maps with the respective indices.
-    std::vector<std::map<unsigned int,double> > block_boundary_values(n_blocks);
+    std::vector<std::map<dealii::types::global_dof_index,double> > block_boundary_values(n_blocks);
     {
       int offset = 0, block=0;
       for (std::map<types::global_dof_index,double>::const_iterator
@@ -2542,7 +2542,7 @@ namespace MatrixTools
         const std::pair<types::global_dof_index, types::global_dof_index> local_range
           = matrix.block(block_m,0).local_range();
 
-        std::vector<unsigned int> constrained_rows;
+        std::vector<types::global_dof_index> constrained_rows;
         for (std::map<types::global_dof_index,double>::const_iterator
              dof  = block_boundary_values[block_m].begin();
              dof != block_boundary_values[block_m].end();
@@ -2614,7 +2614,7 @@ namespace MatrixTools
 
         // figure out which rows of the matrix we
         // have to eliminate on this processor
-        std::vector<unsigned int> constrained_rows;
+        std::vector<types::global_dof_index> constrained_rows;
         for (std::map<types::global_dof_index,double>::const_iterator
              dof  = boundary_values.begin();
              dof != boundary_values.end();
@@ -2724,7 +2724,7 @@ namespace MatrixTools
             const std::pair<types::global_dof_index, types::global_dof_index> local_range
               = matrix.block(block_m,0).local_range();
 
-            std::vector<unsigned int> constrained_rows;
+            std::vector<types::global_dof_index> constrained_rows;
             for (std::map<types::global_dof_index,double>::const_iterator
                  dof  = block_boundary_values[block_m].begin();
                  dof != block_boundary_values[block_m].end();

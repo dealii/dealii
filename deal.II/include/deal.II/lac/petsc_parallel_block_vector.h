@@ -348,10 +348,10 @@ namespace PETScWrappers
 
 
     inline
-    BlockVector::BlockVector (const size_type  n_blocks,
-                              const MPI_Comm  &communicator,
-                              const size_type  block_size,
-                              const size_type  local_size)
+    BlockVector::BlockVector (const unsigned int  n_blocks,
+                              const MPI_Comm     &communicator,
+                              const size_type     block_size,
+                              const size_type     local_size)
     {
       reinit (n_blocks, communicator, block_size, local_size);
     }
@@ -414,10 +414,10 @@ namespace PETScWrappers
 
     inline
     void
-    BlockVector::reinit (const size_type  n_blocks,
-                         const MPI_Comm  &communicator,
-                         const size_type  block_size,
-                         const size_type  local_size,
+    BlockVector::reinit (const unsigned int  n_blocks,
+                         const MPI_Comm     &communicator,
+                         const size_type     block_size,
+                         const size_type     local_size,
                          const bool fast)
     {
       reinit(std::vector<size_type>(n_blocks, block_size),
@@ -463,7 +463,7 @@ namespace PETScWrappers
     BlockVector::reinit (const std::vector<IndexSet> &parallel_partitioning,
                  const MPI_Comm              &communicator)
     {
-      std::vector<unsigned int> sizes(parallel_partitioning.size());
+      std::vector<size_type> sizes(parallel_partitioning.size());
       for (unsigned int i=0; i<parallel_partitioning.size(); ++i)
         sizes[i] = parallel_partitioning[i].size();
 

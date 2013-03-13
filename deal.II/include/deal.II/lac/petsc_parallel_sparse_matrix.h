@@ -277,7 +277,7 @@ namespace PETScWrappers
                     const SparsityType           &sparsity_pattern,
                     const std::vector<size_type> &local_rows_per_process,
                     const std::vector<size_type> &local_columns_per_process,
-                    const size_type               this_process,
+                    const unsigned int            this_process,
                     const bool                    preset_nonzero_locations = true);
 
       /**

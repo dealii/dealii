@@ -4507,7 +4507,7 @@ namespace DoFTools
         = (dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim>*>
            (&dof_handler.get_tria())))
       {
-        std::vector<unsigned int> local_dof_count = dofs_per_component;
+        std::vector<types::global_dof_index> local_dof_count = dofs_per_component;
 
         MPI_Allreduce ( &local_dof_count[0], &dofs_per_component[0], n_target_components,
                         MPI_UNSIGNED, MPI_SUM, tria->get_communicator());
@@ -4582,7 +4582,7 @@ namespace DoFTools
             = (dynamic_cast<const parallel::distributed::Triangulation<DH::dimension,DH::space_dimension>*>
                (&dof_handler.get_tria())))
           {
-            std::vector<unsigned int> local_dof_count = dofs_per_block;
+            std::vector<types::global_dof_index> local_dof_count = dofs_per_block;
             MPI_Allreduce ( &local_dof_count[0], &dofs_per_block[0], n_target_blocks,
                             MPI_UNSIGNED, MPI_SUM, tria->get_communicator());
           }

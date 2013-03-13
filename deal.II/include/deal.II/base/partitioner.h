@@ -204,7 +204,7 @@ namespace Utilities
        * the individual processor on the ghost
        * elements present (second entry).
        */
-      const std::vector<std::pair<unsigned int,unsigned int> > &
+      const std::vector<std::pair<unsigned int, types::global_dof_index> > &
       ghost_targets() const;
 
       /**
@@ -215,7 +215,7 @@ namespace Utilities
        * but tailored to be iterated over, and some
        * indices may be duplicates.
        */
-      const std::vector<std::pair<unsigned int, unsigned int> > &
+      const std::vector<std::pair<unsigned int, types::global_dof_index> > &
       import_indices() const;
 
       /**
@@ -233,7 +233,7 @@ namespace Utilities
        * indices that are ghosts on other
        * processors.
        */
-      const std::vector<std::pair<unsigned int,unsigned int> > &
+      const std::vector<std::pair<unsigned int, types::global_dof_index> > &
       import_targets() const;
 
       /**
@@ -325,7 +325,7 @@ namespace Utilities
        * ghost indices belong to and how many those
        * indices are
        */
-      std::vector<std::pair<unsigned int,unsigned int> > ghost_targets_data;
+      std::vector<std::pair<unsigned int, types::global_dof_index> > ghost_targets_data;
 
       /**
        * The set of (local) indices that we are
@@ -335,7 +335,7 @@ namespace Utilities
        * but tailored to be iterated over, and some
        * indices may be duplicates.
        */
-      std::vector<std::pair<unsigned int, unsigned int> > import_indices_data;
+      std::vector<std::pair<unsigned int, types::global_dof_index> > import_indices_data;
 
       /**
        * Caches the number of ghost indices. It
@@ -349,7 +349,7 @@ namespace Utilities
        * The set of processors and length of data
        * field which send us their ghost data
        */
-      std::vector<std::pair<unsigned int,unsigned int> > import_targets_data;
+      std::vector<std::pair<unsigned int,types::global_dof_index> > import_targets_data;
 
       /**
        * The ID of the current processor in the MPI
@@ -487,7 +487,7 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<unsigned int,unsigned int> > &
+    const std::vector<std::pair<unsigned int, types::global_dof_index> > &
     Partitioner::ghost_targets() const
     {
       return ghost_targets_data;
@@ -495,7 +495,7 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<unsigned int, unsigned int> > &
+    const std::vector<std::pair<unsigned int, types::global_dof_index> > &
     Partitioner::import_indices() const
     {
       return import_indices_data;
@@ -513,7 +513,7 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<unsigned int,unsigned int> > &
+    const std::vector<std::pair<unsigned int,types::global_dof_index> > &
     Partitioner::import_targets() const
     {
       return import_targets_data;

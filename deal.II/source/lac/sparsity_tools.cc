@@ -507,7 +507,7 @@ namespace SparsityTools
 
 #define SPARSITY_FUNCTIONS(SparsityType) \
   template void SparsityTools::distribute_sparsity_pattern<SparsityType> (SparsityType & csp, \
-      const std::vector<unsigned int> & rows_per_cpu,\
+      const std::vector<size_type> & rows_per_cpu,\
       const MPI_Comm & mpi_comm,\
       const IndexSet & myrange)
 
