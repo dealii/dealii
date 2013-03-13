@@ -11,200 +11,136 @@
 //
 //---------------------------------------------------------------------------
 
-for (deal_II_dimension : DIMENSIONS)
+for (deal_II_dimension : DIMENSIONS ; deal_II_space_dimension : SPACE_DIMENSIONS)
 {
-#if deal_II_dimension != 1
-template class KellyErrorEstimator<deal_II_dimension, deal_II_dimension>;
+#if deal_II_dimension != 1 && deal_II_dimension <= deal_II_space_dimension
+template class KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>;
 #endif
+}
 
+for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimension : SPACE_DIMENSIONS; DH : DOFHANDLER_TEMPLATES )
+{
+#if deal_II_dimension <= deal_II_space_dimension
 
-#if deal_II_dimension == 2
-template class KellyErrorEstimator<deal_II_dimension, deal_II_dimension+1>;
-#endif
+template
+void
+KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+estimate<VEC,DH<deal_II_dimension,deal_II_space_dimension> > (const Mapping<deal_II_dimension, deal_II_space_dimension>      &,
+          const DH<deal_II_dimension,deal_II_space_dimension>   &,
+          const Quadrature<deal_II_dimension-1> &,
+          const FunctionMap<deal_II_space_dimension>::type &,
+          const VEC       &,
+          Vector<float>           &,
+          const ComponentMask &,
+          const Function<deal_II_space_dimension>     *,
+          const unsigned int       ,
+          const unsigned int       ,
+          const types::material_id);
 
-// instantiate the externally visible functions. define a list of functions
-// for vectors, where the vector/matrix can be replaced using a preprocessor
-// variable VectorType/MatrixType
-#define INSTANTIATE_1(InputVector,DH,Q) \
-template    \
-void    \
-KellyErrorEstimator<deal_II_dimension, deal_II_dimension>::    \
-estimate<InputVector,DH<deal_II_dimension> > (const Mapping<deal_II_dimension, deal_II_dimension>      &,    \
-          const DH<deal_II_dimension>   &,    \
-          const Q<deal_II_dimension-1> &,    \
-          const FunctionMap<deal_II_dimension>::type &,    \
-          const InputVector       &,    \
-          Vector<float>           &,    \
-          const ComponentMask &,    \
-          const Function<deal_II_dimension>     *,    \
-          const unsigned int       , \
-          const unsigned int       , \
-          const types::material_id);    \
-    \
-template    \
-void    \
-KellyErrorEstimator<deal_II_dimension, deal_II_dimension>::    \
-estimate<InputVector,DH<deal_II_dimension> > (const DH<deal_II_dimension>   &,    \
-          const Q<deal_II_dimension-1> &,    \
-          const FunctionMap<deal_II_dimension>::type &,    \
-          const InputVector       &,    \
-          Vector<float>           &,    \
-          const ComponentMask &,    \
-          const Function<deal_II_dimension>     *,    \
-          const unsigned int       , \
-          const unsigned int       , \
-          const types::material_id);    \
-        \
-template    \
-void    \
-KellyErrorEstimator<deal_II_dimension, deal_II_dimension>::    \
-estimate<InputVector,DH<deal_II_dimension> > (const Mapping<deal_II_dimension, deal_II_dimension>          &,    \
-          const DH<deal_II_dimension>       &,    \
-          const Q<deal_II_dimension-1>     &,    \
-          const FunctionMap<deal_II_dimension>::type &,    \
-          const std::vector<const InputVector *> &,    \
-          std::vector<Vector<float>*> &,    \
-          const ComponentMask     &,    \
-          const Function<deal_II_dimension>         *,    \
-          const unsigned int           , \
-          const unsigned int           , \
-          const types::material_id);    \
-    \
-template    \
-void    \
-KellyErrorEstimator<deal_II_dimension, deal_II_dimension>::    \
-estimate<InputVector,DH<deal_II_dimension> > (const DH<deal_II_dimension>       &,    \
-          const Q<deal_II_dimension-1>     &,    \
-          const FunctionMap<deal_II_dimension>::type &,    \
-          const std::vector<const InputVector *> &,    \
-          std::vector<Vector<float>*> &,    \
-          const ComponentMask     &,    \
-          const Function<deal_II_dimension>         *,    \
-          const unsigned int           , \
-          const unsigned int           , \
-          const types::material_id);\
+template
+void
+KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+estimate<VEC,DH<deal_II_dimension,deal_II_space_dimension> > (
+          const DH<deal_II_dimension,deal_II_space_dimension>   &,
+          const Quadrature<deal_II_dimension-1> &,
+          const FunctionMap<deal_II_space_dimension>::type &,
+          const VEC       &,
+          Vector<float>           &,
+          const ComponentMask &,
+          const Function<deal_II_space_dimension>     *,
+          const unsigned int       ,
+          const unsigned int       ,
+          const types::material_id);
 
-#if deal_II_dimension == 2 || deal_II_dimension == 1
+template
+void
+KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+estimate<VEC,DH<deal_II_dimension,deal_II_space_dimension> > (const Mapping<deal_II_dimension, deal_II_space_dimension>      &,
+          const DH<deal_II_dimension,deal_II_space_dimension>   &,
+          const Quadrature<deal_II_dimension-1> &,
+          const FunctionMap<deal_II_space_dimension>::type &,
+          const std::vector<const VEC *>       &,
+          std::vector<Vector<float> *>         &,
+          const ComponentMask &,
+          const Function<deal_II_space_dimension>     *,
+          const unsigned int       ,
+          const unsigned int       ,
+          const types::material_id);
 
-#define INSTANTIATE_CODIM(InputVector,DH,Q)     \
-template    \
-void    \
-KellyErrorEstimator<deal_II_dimension, deal_II_dimension+1>::    \
-estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const Mapping<deal_II_dimension, deal_II_dimension+1>      &,    \
-          const DH<deal_II_dimension,deal_II_dimension+1>   &,    \
-          const Q<deal_II_dimension-1> &,    \
-          const FunctionMap<deal_II_dimension+1>::type &,    \
-          const InputVector       &,    \
-          Vector<float>           &,    \
-          const ComponentMask &,    \
-          const Function<deal_II_dimension+1>     *,    \
-          const unsigned int       , \
-          const unsigned int       , \
-          const types::material_id);    \
-    \
-template    \
-void    \
-KellyErrorEstimator<deal_II_dimension, deal_II_dimension+1>::    \
-estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const DH<deal_II_dimension,deal_II_dimension+1>   &,    \
-          const Q<deal_II_dimension-1> &,    \
-          const FunctionMap<deal_II_dimension+1>::type &,    \
-          const InputVector       &,    \
-          Vector<float>           &,    \
-          const ComponentMask &,    \
-          const Function<deal_II_dimension+1>     *,    \
-          const unsigned int       , \
-          const unsigned int       , \
-          const types::material_id);    \
-        \
-template    \
-void    \
-KellyErrorEstimator<deal_II_dimension, deal_II_dimension+1>::    \
-estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const Mapping<deal_II_dimension, deal_II_dimension+1>          &,    \
-          const DH<deal_II_dimension,deal_II_dimension+1>       &,    \
-          const Q<deal_II_dimension-1>     &,    \
-          const FunctionMap<deal_II_dimension+1>::type &,    \
-          const std::vector<const InputVector *> &,    \
-          std::vector<Vector<float>*> &,    \
-          const ComponentMask     &,    \
-          const Function<deal_II_dimension+1>         *,    \
-          const unsigned int           , \
-          const unsigned int           , \
-          const types::material_id);    \
-    \
-template    \
-void    \
-KellyErrorEstimator<deal_II_dimension, deal_II_dimension+1>::    \
-estimate<InputVector,DH<deal_II_dimension,deal_II_dimension+1> > (const DH<deal_II_dimension,deal_II_dimension+1>       &,    \
-          const Q<deal_II_dimension-1>     &,    \
-          const FunctionMap<deal_II_dimension+1>::type &,    \
-          const std::vector<const InputVector *> &,    \
-          std::vector<Vector<float>*> &,    \
-          const ComponentMask     &,    \
-          const Function<deal_II_dimension+1>         *,    \
-          const unsigned int           , \
-          const unsigned int           , \
-          const types::material_id);\
+template
+void
+KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+estimate<VEC,DH<deal_II_dimension,deal_II_space_dimension> > (
+          const DH<deal_II_dimension,deal_II_space_dimension>   &,
+          const Quadrature<deal_II_dimension-1> &,
+          const FunctionMap<deal_II_space_dimension>::type &,
+          const std::vector<const VEC *>       &,
+          std::vector<Vector<float> *>         &,
+          const ComponentMask &,
+          const Function<deal_II_space_dimension>     *,
+          const unsigned int       ,
+          const unsigned int       ,
+          const types::material_id);
 
-#else
-#define INSTANTIATE_CODIM(InputVector,DH,Q)
-#endif
+template
+void
+KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+estimate<VEC,DH<deal_II_dimension,deal_II_space_dimension> > (const Mapping<deal_II_dimension, deal_II_space_dimension>      &,
+          const DH<deal_II_dimension,deal_II_space_dimension>   &,
+          const hp::QCollection<deal_II_dimension-1> &,
+          const FunctionMap<deal_II_space_dimension>::type &,
+          const VEC       &,
+          Vector<float>           &,
+          const ComponentMask &,
+          const Function<deal_II_space_dimension>     *,
+          const unsigned int       ,
+          const unsigned int       ,
+          const types::material_id);
 
+template
+void
+KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+estimate<VEC,DH<deal_II_dimension,deal_II_space_dimension> > (
+          const DH<deal_II_dimension,deal_II_space_dimension>   &,
+          const hp::QCollection<deal_II_dimension-1> &,
+          const FunctionMap<deal_II_space_dimension>::type &,
+          const VEC       &,
+          Vector<float>           &,
+          const ComponentMask &,
+          const Function<deal_II_space_dimension>     *,
+          const unsigned int       ,
+          const unsigned int       ,
+          const types::material_id);
 
-#define INSTANTIATE(InputVector,DH) \
-     INSTANTIATE_1(InputVector,DH,Quadrature) \
-     INSTANTIATE_1(InputVector,DH,hp::QCollection) \
-     INSTANTIATE_CODIM(InputVector, DH, Quadrature) \
-     INSTANTIATE_CODIM(InputVector, DH, hp::QCollection)
+template
+void
+KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+estimate<VEC,DH<deal_II_dimension,deal_II_space_dimension> > (const Mapping<deal_II_dimension, deal_II_space_dimension>      &,
+          const DH<deal_II_dimension,deal_II_space_dimension>   &,
+          const hp::QCollection<deal_II_dimension-1> &,
+          const FunctionMap<deal_II_space_dimension>::type &,
+          const std::vector<const VEC *>       &,
+          std::vector<Vector<float> *>         &,
+          const ComponentMask &,
+          const Function<deal_II_space_dimension>     *,
+          const unsigned int       ,
+          const unsigned int       ,
+          const types::material_id);
 
-
-
-INSTANTIATE(Vector<double>,DoFHandler)
-INSTANTIATE(Vector<float>,DoFHandler)
-INSTANTIATE(BlockVector<double>,DoFHandler)
-INSTANTIATE(BlockVector<float>,DoFHandler)
-
-INSTANTIATE(Vector<double>,hp::DoFHandler)
-INSTANTIATE(Vector<float>,hp::DoFHandler)
-INSTANTIATE(BlockVector<double>,hp::DoFHandler)
-INSTANTIATE(BlockVector<float>,hp::DoFHandler)
-
-INSTANTIATE(parallel::distributed::Vector<double>,DoFHandler)
-INSTANTIATE(parallel::distributed::Vector<float>,DoFHandler)
-INSTANTIATE(parallel::distributed::BlockVector<double>,DoFHandler)
-INSTANTIATE(parallel::distributed::BlockVector<float>,DoFHandler)
-
-INSTANTIATE(parallel::distributed::Vector<double>,hp::DoFHandler)
-INSTANTIATE(parallel::distributed::Vector<float>,hp::DoFHandler)
-INSTANTIATE(parallel::distributed::BlockVector<double>,hp::DoFHandler)
-INSTANTIATE(parallel::distributed::BlockVector<float>,hp::DoFHandler)
-
-#ifdef DEAL_II_WITH_PETSC
-INSTANTIATE(PETScWrappers::Vector,DoFHandler)
-INSTANTIATE(PETScWrappers::BlockVector,DoFHandler)
-
-INSTANTIATE(PETScWrappers::Vector,hp::DoFHandler)
-INSTANTIATE(PETScWrappers::BlockVector,hp::DoFHandler)
-
-INSTANTIATE(PETScWrappers::MPI::Vector,DoFHandler)
-INSTANTIATE(PETScWrappers::MPI::BlockVector,DoFHandler)
+template
+void
+KellyErrorEstimator<deal_II_dimension, deal_II_space_dimension>::
+estimate<VEC,DH<deal_II_dimension,deal_II_space_dimension> > (
+          const DH<deal_II_dimension,deal_II_space_dimension>   &,
+          const hp::QCollection<deal_II_dimension-1> &,
+          const FunctionMap<deal_II_space_dimension>::type &,
+          const std::vector<const VEC *>       &,
+          std::vector<Vector<float> *>         &,
+          const ComponentMask &,
+          const Function<deal_II_space_dimension>     *,
+          const unsigned int       ,
+          const unsigned int       ,
+          const types::material_id);
 
 #endif
-
-#ifdef DEAL_II_WITH_TRILINOS
-INSTANTIATE(TrilinosWrappers::Vector,DoFHandler)
-INSTANTIATE(TrilinosWrappers::BlockVector,DoFHandler)
-
-INSTANTIATE(TrilinosWrappers::Vector,hp::DoFHandler)
-INSTANTIATE(TrilinosWrappers::BlockVector,hp::DoFHandler)
-
-INSTANTIATE(TrilinosWrappers::MPI::Vector,DoFHandler)
-INSTANTIATE(TrilinosWrappers::MPI::BlockVector,DoFHandler)
-
-INSTANTIATE(TrilinosWrappers::MPI::Vector,hp::DoFHandler)
-INSTANTIATE(TrilinosWrappers::MPI::BlockVector,hp::DoFHandler)
-#endif
-
-#undef INSTANTIATE
-#undef INSTANTIATE_1
-#undef INSTANTIATE_CODIM
 }

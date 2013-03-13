@@ -24,9 +24,8 @@ inconvenience this causes.
 </p>
 
 <ol>
-
 <!--
-<li> 
+<li>
 <br>
 (NAME, 2013/02/16)
 -->
@@ -41,7 +40,22 @@ inconvenience this causes.
 
 
 <ol>
-
+  <li> New: deal.II now uses <a href="http://www.cmake.org/">CMake</a>
+  as its configuration and build tool. Please read through the
+  readme and other installation files for information about how the
+  installation process has changed.
+  <br>
+  Because this touches the configuration of every external package we
+  interact with, there are a number of other changes as a result:
+  <ul>
+    <li>The minimum supported version for Trilinos is now 10.8.x.
+    <li>We no longer link with different versions of the p4est library
+        in debug and optimized mode. Rather, we now link with the same
+	library in both modes. The p4est installation instructions have
+	been updated. <blink>TODO TODO TODO</blink>
+  </ul>
+  <br>
+  (Matthias Maier, 2013/03/07)
 
 </ol>
 

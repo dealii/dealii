@@ -1388,12 +1388,17 @@ namespace TrilinosWrappers
             sizeof(int)*local_size() +
             static_memory);
   }
+}
 
 
 
+// explicit instantiations
+#include "trilinos_sparse_matrix.inst"
 
-  // explicit instantiations
-  //
+
+// TODO: put these instantiations into generic file
+namespace TrilinosWrappers
+{
   template void
   SparseMatrix::reinit (const dealii::SparsityPattern &);
   template void
@@ -1441,64 +1446,6 @@ namespace TrilinosWrappers
                         const Epetra_Map &,
                         const CompressedSetSparsityPattern &,
                         const bool);
-
-  template void
-  SparseMatrix::reinit (const dealii::SparseMatrix<float> &,
-                        const double,
-                        const bool,
-                        const dealii::SparsityPattern *);
-  template void
-  SparseMatrix::reinit (const dealii::SparseMatrix<double> &,
-                        const double,
-                        const bool,
-                        const dealii::SparsityPattern *);
-  template void
-  SparseMatrix::reinit (const dealii::SparseMatrix<long double> &,
-                        const double,
-                        const bool,
-                        const dealii::SparsityPattern *);
-
-  template void
-  SparseMatrix::reinit (const Epetra_Map &,
-                        const dealii::SparseMatrix<float> &,
-                        const double,
-                        const bool,
-                        const dealii::SparsityPattern *);
-  template void
-  SparseMatrix::reinit (const Epetra_Map &,
-                        const dealii::SparseMatrix<double> &,
-                        const double,
-                        const bool,
-                        const dealii::SparsityPattern *);
-  template void
-  SparseMatrix::reinit (const Epetra_Map &,
-                        const dealii::SparseMatrix<long double> &,
-                        const double,
-                        const bool,
-                        const dealii::SparsityPattern *);
-
-  template void
-  SparseMatrix::reinit (const Epetra_Map &,
-                        const Epetra_Map &,
-                        const dealii::SparseMatrix<float> &,
-                        const double,
-                        const bool,
-                        const dealii::SparsityPattern *);
-  template void
-  SparseMatrix::reinit (const Epetra_Map &,
-                        const Epetra_Map &,
-                        const dealii::SparseMatrix<double> &,
-                        const double,
-                        const bool,
-                        const dealii::SparsityPattern *);
-  template void
-  SparseMatrix::reinit (const Epetra_Map &,
-                        const Epetra_Map &,
-                        const dealii::SparseMatrix<long double> &,
-                        const double,
-                        const bool,
-                        const dealii::SparsityPattern *);
-
 
 }
 

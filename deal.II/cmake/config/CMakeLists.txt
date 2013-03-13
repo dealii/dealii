@@ -55,10 +55,15 @@ STRIP_FLAG(CMAKE_CXX_FLAGS "-Wno-deprecated-declarations")
 #
 
 FOREACH(_build ${DEAL_II_BUILD_TYPES})
-  IF(_build MATCHES DEBUG)
-    SET(_keyword "debug")
+
+  IF(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
+    SET(_keyword "general")
   ELSE()
-    SET(_keyword "optimized")
+    IF(_build MATCHES DEBUG)
+      SET(_keyword "debug")
+    ELSE()
+      SET(_keyword "optimized")
+    ENDIF()
   ENDIF()
 
   SET(CONFIG_LIBRARIES_${_build}
@@ -66,18 +71,14 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     ${DEAL_II_EXTERNAL_LIBRARIES}
     ${DEAL_II_EXTERNAL_LIBRARIES_${_build}}
     )
-
-  IF(NOT "${CONFIG_LIBRARIES_${_build}}" STREQUAL "")
-    LIST(APPEND CONFIG_LIBRARIES
-      ${_keyword}
-      ${CONFIG_LIBRARIES_${_build}}
-      )
-  ENDIF()
+  LIST(APPEND CONFIG_LIBRARIES
+    ${_keyword}
+    ${CONFIG_LIBRARIES_${_build}}
+    )
 
   SET(CONFIG_TARGET_${_build}
     ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
     )
-
   LIST(APPEND CONFIG_TARGET
     ${_keyword}
     ${DEAL_II_BASE_NAME}${DEAL_II_${_build}_SUFFIX}
@@ -138,10 +139,6 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
   # Transform some cmake lists into a string that the old Makefile
   # mechanism actually understands:
-  #
-  # TODO: Come up with an idea how to get the link line directly from
-  # CMake...
-  #
 
   TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_CXX}"
     ${DEAL_II_USER_INCLUDE_DIRS}
@@ -155,6 +152,16 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
       ${DEAL_II_USER_DEFINITIONS_${build}}
       )
 
+    TO_STRING(MAKEFILE_TARGETS_${build}
+        ${MAKEFILE_LIBRARY_${build}}
+        ${DEAL_II_EXTERNAL_LIBRARIES}
+        ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
+        )
+
+    #
+    # TODO: Come up with an idea how to get the link line directly from
+    # CMake...
+    #
     FOREACH(_lib
         ${MAKEFILE_LIBRARY_${build}}
         ${DEAL_II_EXTERNAL_LIBRARIES}
@@ -211,3 +218,4 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     COMPONENT compat_files
     )
 ENDIF()
+

@@ -38,6 +38,22 @@
 
     <dl>
       <dt>
+          <strong>2013/03/07: Build system switched to CMake</strong>
+      </dt>
+      <dd>
+          After having used Autoconf as the configuration and build system
+	  since the beginning of deal.II in 1997, we have now switch to
+	  <a href="http://www.cmake.org/">CMake</a>. This implementation,
+	  contributed by Matthias Maier of Heidelberg University, has taken
+	  more than half a year, consists of more than 10,000 lines, and
+	  touches every aspect of the installation process. It provides a more
+	  modern interface to and more reliable way of interacting with other
+	  packages. Furthermore, it no longer relies on shell scripts and
+	  therefore integrates more easily with integrated development
+	  environments as well as Microsoft Windows without Cygwin.
+      </dd>
+
+      <dt>
           <strong style="color:red">2013/02/27: Version 7.3 released</strong>
       </dt>
       <dd>

@@ -33,11 +33,10 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       "Check whether the found trilinos package contains all required modules:"
       )
 
-
     FOREACH(_module
       amesos epetra ifpack aztecoo sacado teuchos
       )
-      LIST_CONTAINS(_module_found ${_module} ${Trilinos_LIBRARIES})
+      ITEM_MATCHES(_module_found ${_module}$ ${Trilinos_LIBRARIES})
       IF(_module_found)
         MESSAGE(STATUS "Found ${_module}")
       ELSE()
@@ -48,6 +47,9 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     ENDFOREACH()
 
     IF(NOT ${var})
+      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+        "Missing ${_modules_missing}"
+        )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         "The Trilinos installation found at\n"
         "  ${TRILINOS_DIR}\n"
@@ -56,7 +58,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         "Please re-install Trilinos with the missing Trilinos subpackages
         enabled.\n\n"
         )
-      MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_ERROR_STRING} "\n")
     ENDIF()
 
     #
@@ -75,6 +76,10 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         TRILINOS_VERSION_MINOR EQUAL 8 AND
         TRILINOS_VERSION_SUBMINOR LESS 2))
 
+      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+        "Version ${TRILINOS_VERSION_MAJOR}.${TRILINOS_VERSION_MINOR}.${TRILINOS_VERSION_SUBMINOR} has bugs that make "
+        "it incompatible with deal.II. Please use versions before 10.6 or after 10.8.1"
+        )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation found at\n"
@@ -83,7 +88,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         "it incompatible with deal.II. Please use versions before 10.6 or after\n"
         "10.8.1.\n\n"
         )
-      MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_ERROR_STRING} "\n")
       SET(${var} FALSE)
     ENDIF()
 
@@ -94,6 +98,9 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     IF( (TRILINOS_WITH_MPI AND NOT DEAL_II_WITH_MPI)
          OR
          (NOT TRILINOS_WITH_MPI AND DEAL_II_WITH_MPI))
+      MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+        "Trilinos has to be configured with the same MPI configuration as deal.II."
+        )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
         "The Trilinos installation found at\n"
@@ -102,7 +109,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
         "  TRILINOS_WITH_MPI = ${TRILINOS_WITH_MPI}\n"
         )
-      MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_ERROR_STRING} "\n")
       SET(${var} FALSE)
     ENDIF()
 
@@ -138,6 +144,10 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         LIST(APPEND DEAL_II_DEFINITIONS "HAS_C99_TR1_CMATH")
         LIST(APPEND DEAL_II_USER_DEFINITIONS "HAS_C99_TR1_CMATH")
       ELSE()
+        MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+          "The installation is not compatible with the C++ standard selected for "
+          "this compiler."
+          )
         SET(TRILINOS_ADDITIONAL_ERROR_STRING
           ${TRILINOS_ADDITIONAL_ERROR_STRING}
           "The Trilinos installation found at\n"
@@ -145,7 +155,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
           "is not compatible with the C++ standard selected for\n"
           "this compiler. See the deal.II FAQ page for a solution.\n\n"
           )
-        MESSAGE(WARNING "\n" ${TRILINOS_ADDITIONAL_ERROR_STRING} "\n")
         SET(${var} FALSE)
       ENDIF()
     ENDIF()
@@ -158,6 +167,14 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     #
     UNSET(TRILINOS_SUPPORTS_CPP11 CACHE)
     UNSET(TRILINOS_HAS_C99_TR1_WORKAROUND CACHE)
+
+    #
+    # TODO: Resolve this cache invalidation issue and then put these checks
+    # back into FEATURE_TRILINO_CONFIGURE_EXTERNAL where they belong to.
+    #
+    ENABLE_IF_SUPPORTED(TRILINOS_DISABLE_WARNING_FLAGS "-Wno-unused")
+    ENABLE_IF_SUPPORTED(TRILINOS_DISABLE_WARNING_FLAGS "-Wno-extra")
+    ENABLE_IF_SUPPORTED(TRILINOS_DISABLE_WARNING_FLAGS "-Wno-overloaded-virtual")
 
   ENDIF(TRILINOS_FOUND)
 ENDMACRO()
@@ -182,21 +199,14 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   SET(DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR "TrilinosWrappers::BlockVector")
   SET(DEAL_II_EXPAND_TRILINOS_SPARSITY_PATTERN "TrilinosWrappers::SparsityPattern")
   SET(DEAL_II_EXPAND_TRILINOS_BLOCK_SPARSITY_PATTERN "TrilinosWrappers::BlockSparsityPattern")
-
-  IF(DEAL_II_WITH_MPI)
-    SET(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
-    SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
-  ENDIF()
+  SET(DEAL_II_EXPAND_TRILINOS_MPI_BLOCKVECTOR "TrilinosWrappers::MPI::BlockVector")
+  SET(DEAL_II_EXPAND_TRILINOS_MPI_VECTOR "TrilinosWrappers::MPI::Vector")
 
   #
-  #  used with -W -Wall (which includes -Wunused). Regrettable
-  #  though it may be, these warnings pretty much drown everything
-  #  else and we better disable some of the warnings to enable us
-  #  to see through the clutter.
+  # Disable a bunch of warnings caused by Trilinos headers:
   #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-extra")
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-overloaded-virtual")
+  ADD_FLAGS(CMAKE_CXX_FLAGS "${TRILINOS_DISABLE_WARNING_FLAGS}")
+
 ENDMACRO()
 
 

@@ -1,3 +1,9 @@
+Major:
+
+* Mumps may have a transitive link interface to Scotch. Fix this
+
+* Get rid of the last bits of unguarded platform introspection
+
 Some last bits and thoughts:
 
 * A TECPLOT feature has to be written
@@ -24,4 +30,9 @@ Some last bits and thoughts:
 
         * broken because DEAL_II_PATH is not available any more in config.h
 
+* document that we no longer need the two-lib installation of p4est
+
+* adjust doc/development/testsuite.html
+
+* update https://code.google.com/p/dealii/wiki/Windows
 

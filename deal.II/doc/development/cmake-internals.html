@@ -25,24 +25,308 @@
       <tr><th colspan="2"><b><small>Table of contents</small></b></th></tr>
       <tr><td valign="top">
 	  <ul>
-	    <li><a href="#dev">Developing the deal.II CMake system</a>
-	      <ul>
-		<li><a href="#devplatform">Writing platform checks</a>
-		<li><a href="#devfeature">Writing feature tests</a>
-	      </ul>
+	    <li><a href="#codingstyle">Coding convention</a>
+	    <li><a href="#setup"><code>./CMakeLists.txt</code> and
+              <code>./cmake/setup_*.cmake</code></a>
+	    <li><a href="#checks"><code>./cmake/checks/check_*.cmake</code></a>
+	    <li><a href="#config.h.in"><code>./include/deal.II/base/config.h.in</code></a>
+	    <li><a href="#variables">Global variables controlling the build process</a>
 	  </ul>
 	</td>
       </tr>
     </table>
     </p>
 
-    <a name="dev"></a>
-    <h3> Developing the <acronym>deal.II</acronym> CMake system </h3>
+    <a name="codingstyle"></a>
+    <h3> Coding convention </h3>
+      Coding conventions are always a matter of choice. Nevertheless, the
+      following rules should be considered:
+      <ul>
+        <li>
+          Statements and keywords are written in all caps.
+        <li>
+          Indenting is done by two spaces; the usual indenting rules apply.
+        <li>
+          The <code>ELSE()</code>, <code>ENDIF()</code>,
+          <code>ENDFOREACH()</code>, etc. statements shall not repeat the
+          corresponding condition in <code>IF()</code>,
+          <code>FOREACH()</code>, etc.
+        <li>
+          To emphasize a comment it may be enclosed by a leading and
+          trailing empty comment line.
+      </ul>
+      An example:
+      <pre>
+
+    FOREACH(_build ${DEAL_II_BUILD_TYPES})
+      #
+      # Set an appropriate keyword depending on target and build type:
+      #
+      IF(NOT "${CMAKE_BUILD_TYPE}" STREQUAL "DebugRelease")
+        SET(_keyword "general")
+      ELSE()
+        IF(_build MATCHES DEBUG)
+          SET(_keyword "debug")
+        ELSE()
+          SET(_keyword "optimized")
+        ENDIF()
+      ENDIF()
+    ENDFOREACH()
+      </pre>
+      <ul>
+        <li>
+          Line break is at 78 characters and should be obeyed whenever
+          reasonable.
+        <li>
+          Long statements should be broken into several lines at reasonable
+          places. Additional lines for a statement are indented by 2
+          spaces.
+        <li>
+          Multiline statements must end with the closing bracket at a
+          single line:
+      </ul>
+      <pre>
+
+    LIST(APPEND CONFIG_LIBRARIES
+      ${_keyword}
+      ${CONFIG_LIBRARIES_${_build}}
+      )
+
+    SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+      PROPERTIES
+      VERSION ${VERSION}
+      SOVERSION ${VERSION}
+      LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_${build}}"
+      COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
+      COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${build}}"
+      )
+      </pre>
+      CMake operates almost always with variables in global state. To guard
+      against accidential overwrite of variables the following naming
+      conventions must be followed at all times:
+      <ul>
+        <li>
+          Global (configuration) variables are written in all caps. When
+          introducing a new one, ensure that the name isn't already used
+          somewhere else. Unrelated global variables must never be
+          overwritten.
+        <li>
+          Global variables can be prefixed by <code>DEAL_II_</code>.
+          (Global variables defined by CMake are usually prefixed by
+          <code>CMAKE_</code>.)
+        <li>
+          Local variables should always be named in all lowercase with a
+          leading "_". Local variables cannot be assumed to remain valid.
+          The may get overwritten at any time.
+      </ul>
+
+
+    <a name="setup"></a>
+    <h3> <code>./CMakeLists.txt</code> and <code>./cmake/setup_*.cmake</code> </h3>
 
     <p>
-      To keep things clean, only the following variables should be
-      appended in the platform checks and feature configuration (beside
-      setting a lot of <code>DEAL_II_*</code> definitions...):
+      The very first configuration steps after some initial setup in
+      <code>./CMakeLists.txt</code> takes place in some
+      <code>./cmake/setup_*.cmake</code> files:
+      <ul>
+        <li> <code>setup_cached_variables.cmake</code>:
+          This sets up all cached variables prior to the call to
+          <code>PROJECT(deal.II)</code>. For details see the comment at the
+          top. Furthermore, some bookkeeping for compiler and linker flags
+          takes place, see <a href="cmake.html#configurebuild">the section
+          about compile flags</a>.
+        <li> <code>setup_deal_ii.cmake</code>:
+          This file is included immediately after the call to
+          <code>PROJECT(deal.II)</code> and will set up all <i>magic
+          numbers</i> such as names, definitions, relative and absolute
+          paths used in the build system. Most of the definitions are
+          guarded with the help of the <code>SET_IF_EMPTY</code> macro so
+          that it is possible to override the values from the command line.
+        <li> <code>setup_compiler_flags.cmake</code>
+          sets up a suitable set of default compile flag for a known
+          compiler by including the appropriate
+          <code>setup_compiler_flags_*.cmake</code> file. When adding new
+          flags or compiler support, please respect the following note
+          <pre>
+
+    #
+    # (./cmake/setup_compiler_flags.cmake)
+    #
+    # ####################
+    # #     FAT NOTE:    #
+    # ####################
+    #
+    # All configuration in setup_compiler_flags.cmake and
+    # setup_compiler_flags_<compiler>.cmake shall ONLY modify:
+    #
+    #   CMAKE_CXX_FLAGS
+    #   DEAL_II_CXX_FLAGS_DEBUG
+    #   DEAL_II_CXX_FLAGS_RELEASE
+    #   CMAKE_SHARED_LINKER_FLAGS
+    #   DEAL_II_SHARED_LINKER_FLAGS_DEBUG
+    #   DEAL_II_SHARED_LINKER_FLAGS_RELEASE
+    #
+    # All modifications shall be guarded with the ENABLE_IF_SUPPORTED
+    # or ENABLE_IF_LINKS macro, e.g.
+    #
+    #   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
+    #   ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
+    #
+    # Compiler flags for platform dependent optimization (such as
+    # -march=native) must always be guarded with
+    # DEAL_II_ALLOW_PLATFORM_INTROSPECTION:
+    #
+    #   IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+    #     ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-march=native")
+    #   ENDIF()
+    #
+    # Checks for compiler features (such as C++11 support) and compiler
+    # specific bugs that
+    #   - usually set up further configuration (such as preprocessor
+    #     definitions)
+    #   - disable a specific flag for a specific compiler version.
+    #
+    # belong the corresponding file:
+    #
+    #   ./cmake/checks/check_01_compiler_features.cmake
+    #   ./cmake/checks/check_01_cpu_features.cmake
+    #   ./cmake/checks/check_01_cxx_features.cmake
+    #   ./cmake/checks/check_01_system_features.cmake
+    #   ./cmake/checks/check_02_compiler_bugs.cmake
+    #
+          </pre>
+      </ul>
+    </p>
+
+
+    <a name="checks"></a>
+    <h3> <code>./cmake/checks/check_*.cmake</code> </h3>
+
+    <p>
+      The next step in the configuration process is to include all
+      checks residing under <code>./cmake/checks</code>. Currently
+      there are:
+      <pre>
+
+    ./cmake/checks/check_01_compiler_features.cmake
+      - Search for support for compiler dependent features such as stack
+        trace support, demangler support, etc.
+
+    ./cmake/checks/check_01_cpu_features.cmake
+      - Platform introspection for CPU features goes here and must be
+        guarded with DEAL_II_ALLOW_PLATFORM_INTROSPECTION
+
+    ./cmake/checks/check_01_cxx_features.cmake
+      - Check for supported C++ language features such as sufficient C++11
+        support
+
+    ./cmake/checks/check_01_system_features.cmake
+      - Checks for specific platform (Linux/Darwin/CYGWIN/Windows..)
+        features and support
+
+    ./cmake/checks/check_02_compiler_bugs.cmake
+      - Check for compiler bugs
+      </pre>
+      <ul>
+        <li>
+          A check usually consists of a call to one of the macros below
+          that will set up a global variable. Please stick to the naming
+          convention <code>HAVE_&lt;..&gt;</code>, resp.
+          <code>DEAL_II_(HAVE|USE)_&lt;..&gt;</code>. <b>It is forbidden to
+          use a variable name starting with
+          <code>DEAL_II_WITH_&lt;..&gt;</code> because this prefix is
+          exclusively reserved for the feature mechanism described
+          below.</b> For some tests it might be necessary to manipulate <a
+          href="#variables">global variables</a>.
+        <li>
+          A platform check should have a prominent comment explaining what
+	  it does and why it is there, and should state author and year.
+        <li>
+          There are a number of readily available platform check macros:
+	 <pre>
+
+    CHECK_CXX_SOURCE_COMPILES(source variable)
+      - Checks whether it is possible to compile _and_ link the code snipet
+        &lt;source&gt;. If succesful, variable is set to 1.
+
+    CHECK_CXX_SOURCE_RUNS(source variable)
+      - variable is set to 1 if &lt;source&gt; coulde be succesfully compiled and
+        linked and the resulting program ran and exited without error.
+        Avoid this macro outside of a DEAL_II_ALLOW_PLATFORM_INTROSPECTION
+        guard. A sensible fallback should be provided if the check cannot
+        be run (e.g. when cross compiling).
+
+    CHECK_CXX_COMPILER_BUG(source variable)
+      - Inverts the logic of CHECK_CXX_SOURCE_COMPILES(), i.e. variable is
+        set to 1 if it was not possible to compile and link &lt;source&gt;.
+
+    CHECK_INCLUDE_FILE_CXX(header variable)
+      - Check whether it is possible to compile and link a dummy program
+        including &lt;header&gt;.
+
+    CHECK_FUNCTION_EXISTS(function variable)
+      - Check for the existence of a function prototype with name
+        &lt;function&gt;. (Don't forget to specify the link libraries, see
+        below.) Use CHECK_CXX_SYMBOL_EXISTS to search for C++ function
+        definitions instead, if possible.
+
+    CHECK_CXX_SYMBOL_EXISTS(symbol header_file variable)
+      - Check for the existence of a symbol definition in the header_file
+        as well as for the presence in the current link interface
+        (Don't forget to specify the link libraries, see below.)
+
+    CHECK_CXX_COMPILER_FLAG(flag variable)
+      - Sets the variable to 1 if the compiler understands the flag.
+	  </pre>
+
+	<li> Necessary compiler flags can easily set in the string variable
+	  <code>CMAKE_REQUIRED_FLAGS</code>. There are two small macros
+	  that do this job nicely:
+	  <pre>
+
+    PUSH_TEST_FLAG("-Werror")
+    CHECK_CXX_SOURCE_COMPILES(...)
+    POP_TEST_FLAG()
+	  </pre>
+
+	<li> Libraries necessary for linkage can be set in the list variable
+	  <code>CMAKE_REQUIRED_LIBRARIES</code>. It is best two hard set
+	  this variable to a specific value and later on cleaning it,
+	  instead of appending/removing:
+	  <pre>
+
+    SET(CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;
+    CHECK_CXX_SOURCE_COMPILES(...)
+    SET(CMAKE_REQUIRED_LIBRARIES)
+	  </pre>
+      </ul>
+    </p>
+
+
+
+    <a name="config.h.in"></a>
+    <h3> <code>./include/deal.II/base/config.h.in<</code> </h3>
+      <ul>
+
+        <li> Definition toggles in
+          <code>include/deal.II/base/config.h.in</code> should have a
+          prominent comment explaining it and should be grouped by file
+          exporting the definition
+      </ul>
+
+
+
+    <a name="variables"></a>
+    <h3> Global variables controlling the build process </h3>
+
+    <p>
+      The following list describes all global variables controlling the
+      build process and the visibility associated with it (internal use for
+      compiling deal.Ii, externally used variables will get exported in
+      deal.IIConfig.cmake). Lists should be manipulated with
+      <code>LIST(APPEND ...)</code>, flags with <code>ADD_FLAGS(...)</code>
+      (or if it is necessary to guard them with
+      <code>ENABLE_IF_SUPPORTED(...)</code>.)
       <ul>
 	<li>
           The general (internal) logic for variables applies:
@@ -119,84 +403,6 @@
     <a name="devplatform"></a>
     <h4>  Writing platform checks </h4>
 
-    <p>
-      Platform checks reside under <code>cmake/checks</code>. We currently have
-      <pre>
-
-	cmake/check/check_for_compiler_bugs.cmake
-	cmake/check/check_for_compiler_features.cmake
-	cmake/check/check_for_cxx_features.cmake
-      </pre>
-    </p>
-    <p>
-      <b>Some Notes:</b>
-      <ul>
-	<li> There are a number of readily available platform check macros:
-	  <pre>
-
-    CHECK_CXX_SOURCE_COMPILES(source variable)
-      - Checks whether it is possible to compile _and_ link the code snipet
-        &lt;source&gt;. If succesful, variable is set to 1.
-
-    CHECK_CXX_SOURCE_RUNS(source variable)
-      - variable is set to 1 if &lt;source&gt; coulde be succesfully compiled and
-        linked and the resulting program ran and exited without error.
-
-    CHECK_CXX_COMPILER_BUG(source variable)
-      - Inverts the logic of CHECK_CXX_SOURCE_COMPILES(), i.e. variable is
-        set to 1 if it was not possible to compile and link &lt;source&gt;.
-
-    CHECK_INCLUDE_FILE_CXX(header variable)
-      - Check whether it is possible to compile and link a dummy program
-        including &lt;header&gt;.
-
-    CHECK_FUNCTION_EXISTS(function variable)
-      - Check for the existence of a function prototype with name
-        &lt;function&gt;. (Don't forget to specify the link libraries, see
-        below.)
-
-    CHECK_CXX_COMPILER_FLAG(flag variable)
-      - Sets the variable to 1 if the compiler understands the flag.
-	  </pre>
-
-	<li> Necessary compiler flags can easily set in the string variable
-	  <code>CMAKE_REQUIRED_FLAGS</code>. There are two small macros
-	  that do this job nicely:
-	  <pre>
-
-    PUSH_TEST_FLAG("-Werror")
-    CHECK_CXX_SOURCE_COMPILES(...)
-    POP_TEST_FLAG()
-	  </pre>
-
-	<li> Libraries necessary for linkage can be set in the list variable
-	  <code>CMAKE_REQUIRED_LIBRARIES</code>. It is best two hard set
-	  this variable to a specific value and later on cleaning it,
-	  instead of appending/removing:
-	  <pre>
-
-    SET(CMAKE_REQUIRED_LIBRARIES &lt;a list of libraries&gt;
-    CHECK_CXX_SOURCE_COMPILES(...)
-    SET(CMAKE_REQUIRED_LIBRARIES)
-	  </pre>
-      </ul>
-    </p>
-
-    <p>
-      <b>General notes:</b>
-      <ul>
-	<li> A platform check should have a prominent comment explaining what
-	  it does and why it is there, as well as a stating the author and the
-	  year.
-
-        <li> Definition toggles in
-          <code>include/deal.II/base/config.h.in</code> should have a
-          prominent comment explaining it and should be grouped by file
-          exporting the definition
-      </ul>
-    </p>
-
-
     <a name="devfeature"></a>
     <h4> Writing feature tests </h4>
 
@@ -264,19 +470,6 @@
     <code>FEATURE_&lt;FEATURE&gt;_BUNDLED_CONFIGURED</code> is set.
       </ul>
     </p>
-
-    <a name="advanced"></a>
-    <h3>Advanced setup</h3>
-
-    A sample configuration file for preloading the CMake cache with
-    <pre>
-
-    $ cmake -C Config.sample <...>
-    </pre>
-    can be found <a href="Config.sample" target="_top">here</a>.
-    This sample configuration covers all options mentioned in this
-    documentation as well as some advanced aspects in feature
-    configuration.
 
     <hr>
 

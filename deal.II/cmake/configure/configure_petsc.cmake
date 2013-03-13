@@ -52,7 +52,7 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     IF( (PETSC_WITH_MPIUNI AND DEAL_II_WITH_MPI)
          OR
          (NOT PETSC_WITH_MPIUNI AND NOT DEAL_II_WITH_MPI))
-      MESSAGE(STATUS "Could not find a sufficient modern PETSc installation: "
+      MESSAGE(STATUS "Could not find a sufficient PETSc installation: "
         "PETSc has to be configured with the same MPI configuration as deal.II."
         )
       SET(PETSC_ADDITIONAL_ERROR_STRING
@@ -95,11 +95,8 @@ MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL)
 
   SET(DEAL_II_EXPAND_PETSC_VECTOR "PETScWrappers::Vector")
   SET(DEAL_II_EXPAND_PETSC_BLOCKVECTOR "PETScWrappers::BlockVector")
-
-  IF(DEAL_II_WITH_MPI)
-    SET(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
-    SET(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
-  ENDIF()
+  SET(DEAL_II_EXPAND_PETSC_MPI_VECTOR "PETScWrappers::MPI::Vector")
+  SET(DEAL_II_EXPAND_PETSC_MPI_BLOCKVECTOR "PETScWrappers::MPI::BlockVector")
 ENDMACRO()
 
 

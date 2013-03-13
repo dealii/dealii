@@ -891,27 +891,7 @@ PreconditionLU<number>::Tvmult(BlockVector<number> &dst,
 
 
 
-template class LAPACKFullMatrix<double>;
-template LAPACKFullMatrix<double> &
-LAPACKFullMatrix<double>::operator = (const FullMatrix<double> &M);
-template LAPACKFullMatrix<double> &
-LAPACKFullMatrix<double>::operator = (const FullMatrix<float> &M);
+#include "lapack_full_matrix.inst"
 
-template class LAPACKFullMatrix<float>;
-template LAPACKFullMatrix<float> &
-LAPACKFullMatrix<float>::operator = (const FullMatrix<double> &M);
-template LAPACKFullMatrix<float> &
-LAPACKFullMatrix<float>::operator = (const FullMatrix<float> &M);
-
-template class LAPACKFullMatrix<long double>;
-template LAPACKFullMatrix<long double> &
-LAPACKFullMatrix<long double>::operator = (const FullMatrix<long double> &M);
-template LAPACKFullMatrix<long double> &
-LAPACKFullMatrix<long double>::operator = (const FullMatrix<double> &M);
-template LAPACKFullMatrix<long double> &
-LAPACKFullMatrix<long double>::operator = (const FullMatrix<float> &M);
-
-template class PreconditionLU<double>;
-template class PreconditionLU<float>;
 
 DEAL_II_NAMESPACE_CLOSE

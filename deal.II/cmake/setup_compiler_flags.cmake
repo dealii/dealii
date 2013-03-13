@@ -32,18 +32,33 @@
 #   DEAL_II_SHARED_LINKER_FLAGS_DEBUG
 #   DEAL_II_SHARED_LINKER_FLAGS_RELEASE
 #
+# All modifications shall be guarded with the ENABLE_IF_SUPPORTED
+# or ENABLE_IF_LINKS macro, e.g.
+#
+#   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
+#   ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
+#
+# Compiler flags for platform dependent optimization (such as
+# -march=native) must always be guarded with
+# DEAL_II_ALLOW_PLATFORM_INTROSPECTION:
+#
+#   IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+#     ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-march=native")
+#   ENDIF()
 #
 # Checks for compiler features (such as C++11 support) and compiler
 # specific bugs that
-#   - usually set up further configuration (such as definitions)
+#   - usually set up further configuration (such as preprocessor
+#     definitions)
 #   - disable a specific flag for a specific compiler version.
 #
-# belong to
+# belong the corresponding file:
 #
-#   ./check/check_for_compiler_features.cmake
-#   ./check/check_for_compiler_bugs.cmake
-#   ./check/check_for_compiler_bugs_*.cmake
-#   ./check/check_for_cxx_features.cmake
+#   ./cmake/checks/check_01_compiler_features.cmake
+#   ./cmake/checks/check_01_cpu_features.cmake
+#   ./cmake/checks/check_01_cxx_features.cmake
+#   ./cmake/checks/check_01_system_features.cmake
+#   ./cmake/checks/check_02_compiler_bugs.cmake
 #
 
 

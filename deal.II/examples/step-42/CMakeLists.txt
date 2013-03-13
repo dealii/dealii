@@ -22,27 +22,19 @@ SET(CLEAN_UP_FILES *.vtu *.pvtu *.visit)
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 
 FIND_PACKAGE(deal.II 8.0 QUIET
-  HINTS
-    ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ ../../../ ../../../../../ $ENV{DEAL_II_DIR}
-  #
-  # If the deal.II library cannot be found (because it is not installed at a
-  # default location or your project resides at an uncommon place), you
-  # can specify additional hints for search paths here, e.g.
-  # "$ENV{HOME}/workspace/deal.II"
+  HINTS ${deal.II_DIR} ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
   )
+IF(NOT ${deal.II_FOUND})
+  MESSAGE(FATAL_ERROR "\n"
+    "*** Could not locate deal.II. ***\n\n"
+    "You may want to either pass a flag -DDEAL_II_DIR=/path/to/deal.II to cmake\n"
+    "or set an environment variable \"DEAL_II_DIR\" that contains this path."
+    )
+ENDIF()
 
 #
 # Are all dependencies fullfilled?
 #
-IF (NOT ${deal.II_FOUND})
-   MESSAGE(FATAL_ERROR
-           "\n\n"
-	   " *** Could not locate deal.II. *** "
-	   "\n\n"
-           " *** You may want to either pass the -DDEAL_II_DIR=/path/to/deal.II flag to cmake \n"
-           " *** or set an environment variable \"DEAL_II_DIR\" that contains this path.")
-ENDIF ()
-
 IF( NOT DEAL_II_WITH_MPI OR
     NOT DEAL_II_WITH_P4EST OR
     NOT DEAL_II_WITH_TRILINOS )
@@ -57,4 +49,13 @@ ENDIF()
 
 DEAL_II_INITIALIZE_CACHED_VARIABLES()
 PROJECT(${TARGET})
+
+#
+# Workaround: Enable -std=c++0x for Clang as std::unique_ptr is not
+# standardized in C++03
+#
+IF(CMAKE_CXX_COMPILER_ID MATCHES Clang)
+  SET(CMAKE_CXX_FLAGS "-std=c++0x ${CMAKE_CXX_FLAGS}")
+ENDIF()
+
 DEAL_II_INVOKE_AUTOPILOT()

@@ -232,15 +232,31 @@
 #
 # MPI:
 #
-# SET(DEAL_II_WITH_MPI ON CACHE BOOL ""
+# SET(DEAL_II_WITH_MPI ON CACHE BOOL
 #   "Build deal.II with support for mpi"
 #   )
 #
-# SET(DEAL_II_USE_MPICXX ON CACHE BOOL
-#   "Set the compiler to the detected mpi wrapper"
+# SET(DEAL_II_ALLOW_GENERIC_MPI ON CACHE BOOL
+#   "Allow the usage of an external mpi library even if the current compiler is not an mpi wrapper"
 #   )
 #
-# TODO
+# Automatic detection:
+#
+# The best way to force a specific MPI implementation to be used is to set
+# set CMAKE_C_COMPILER and CMAKE_CXX_COMPILER to the appropriate MPI wrapper.
+# Alternatively, specify the mpi wrappers that will be queried for the mpi
+# link interface:
+#
+# SET(MPI_C_COMPILER "mpicc" CACHE STRING "")
+# SET(MPI_CXX_COMPILER "mpicxx" CACHE STRING "")
+#
+# Manual setup:
+#
+# SET(MPI_FOUND TRUE CACHE BOOL "")
+# SET(MPI_CXX_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+# SET(MPI_CXX_INCLUDE_PATH "include directory for mpi" CACHE STRING "")
+# SET(MPI_CXX_FLAGS "..." CACHE STRING "")
+# SET(MPI_CXX_LINK_FLAGS "..." CACHE STRING "")
 #
 
 
@@ -259,10 +275,10 @@
 #
 # Manual setup:
 #
-# SET(METIS_FOUND TRUE CACHE BOOL "")
-# SET(METIS_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(METIS_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(METIS_LINKER_FLAGS "..." CACHE STRING "")
+# SET(MUMPS_FOUND TRUE CACHE BOOL "")
+# SET(MUMPS_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+# SET(MUMPS_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
+# SET(MUMPS_LINKER_FLAGS "..." CACHE STRING "")
 #
 
 
@@ -422,6 +438,26 @@
 # SET(UMFPACK_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
 # SET(UMFPACK_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
 # SET(UMFPACK_LINKER_FLAGS "..." CACHE STRING "")
+#
+
+
+#
+# ZLIB:
+#
+# SET(DEAL_II_WITH_ZLIB ON CACHE BOOL
+#   "Build deal.II with support for zlib"
+#   )
+#
+# Automatic detection:
+#
+# Specify a hint with CMAKE_PREFIX_PATH or by setting
+# SET(ZLIB_ROOT "/.../..." CACHE PATH "")
+#
+# Manual setup:
+#
+# SET(ZLIB_FOUND TRUE CACHE BOOL "")
+# SET(ZLIB_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+# SET(ZLIB_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
 #
 
 

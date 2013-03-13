@@ -1,0 +1,25 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2013 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+for (S : REAL_SCALARS)
+  {
+    template class LAPACKFullMatrix<S>;
+    template class PreconditionLU<S>;
+  }
+
+for (S1, S2 : REAL_SCALARS)
+  {
+    template LAPACKFullMatrix<S1> &
+    LAPACKFullMatrix<S1>::operator = (const FullMatrix<S2> &M);
+  }

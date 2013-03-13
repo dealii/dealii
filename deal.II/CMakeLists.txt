@@ -115,6 +115,9 @@ INCLUDE(setup_finalize)
 #                                                                         #
 ###########################################################################
 
+MESSAGE(STATUS "")
+MESSAGE(STATUS "Configuring done. Include CMakeLists.txt now.")
+
 IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
   ADD_SUBDIRECTORY(bundled)
 ENDIF()
@@ -145,4 +148,3 @@ INCLUDE(setup_custom_targets)
 #
 FILE(READ ${CMAKE_BINARY_DIR}/summary.log DEAL_II_LOG_SUMMARY)
 MESSAGE("${DEAL_II_LOG_SUMMARY}")
-

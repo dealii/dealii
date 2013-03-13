@@ -27,9 +27,10 @@
 #   DEAL_II_HAVE_AVX                     *)
 #   DEAL_II_COMPILER_VECTORIZATION_LEVEL
 #
-# Note: It is possible to disable the platform introspection tests (e.g.
-# for cross compiling or for packaging) by defining the variables (*) in
-# the cache prior to configure
+# *)
+# It is is possible to manually set the above values to their corresponding
+# values, when platform introspection is disabled with
+# DEAL_II_ALLOW_PLATFORM_INTROSPECTION=OFF,
 #
 
 
