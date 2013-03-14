@@ -363,7 +363,13 @@ namespace Utilities
       {
         return MPI_UNSIGNED_LONG;
       }
+      
 
+      inline MPI_Datatype mpi_type_id (const unsigned long long int *)
+      {
+	return MPI_UNSIGNED_LONG;
+      }
+      
 
       inline MPI_Datatype mpi_type_id (const unsigned long long int *)
       {
