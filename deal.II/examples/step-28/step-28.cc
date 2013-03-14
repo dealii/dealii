@@ -492,7 +492,7 @@ namespace Step28
 
     Vector<double>                system_rhs;
 
-    std::map<unsigned int,double> boundary_values;
+    std::map<types::global_dof_index,double> boundary_values;
     ConstraintMatrix              hanging_node_constraints;
 
 
@@ -667,7 +667,7 @@ namespace Step28
     FullMatrix<double> cell_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>     cell_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -743,7 +743,7 @@ namespace Step28
     std::vector<double>       extraneous_source_values (n_q_points);
     std::vector<double>       solution_old_values (n_q_points);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -941,7 +941,7 @@ namespace Step28
             prolongation_matrix.Tvmult_add (cell_rhs, tmp);
           }
 
-        std::vector<unsigned int> local_dof_indices (fe.dofs_per_cell);
+        std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
         cell_g->get_dof_indices (local_dof_indices);
 
         for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -1580,7 +1580,7 @@ namespace Step28
   template <int dim>
   void NeutronDiffusionProblem<dim>::refine_grid ()
   {
-    std::vector<unsigned int> n_cells (parameters.n_groups);
+    std::vector<types::global_dof_index> n_cells (parameters.n_groups);
     for (unsigned int group=0; group<parameters.n_groups; ++group)
       n_cells[group] = energy_groups[group]->n_active_cells();
 

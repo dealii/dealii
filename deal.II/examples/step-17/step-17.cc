@@ -298,7 +298,7 @@ namespace Step17
 
     // While we're at it, let us also count how many degrees of freedom there
     // exist on the present process:
-    const unsigned int n_local_dofs
+    const types::global_dof_index n_local_dofs
       = DoFTools::count_dofs_with_subdomain_association (dof_handler,
                                                          this_mpi_process);
 
@@ -390,7 +390,7 @@ namespace Step17
     FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       cell_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     std::vector<double>     lambda_values (n_q_points);
     std::vector<double>     mu_values (n_q_points);
@@ -517,7 +517,7 @@ namespace Step17
     //
     // However, we still have to apply boundary values, in the same way as we
     // always do:
-    std::map<unsigned int,double> boundary_values;
+    std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
                                               ZeroFunction<dim>(dim),

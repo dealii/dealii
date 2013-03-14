@@ -479,7 +479,7 @@ namespace Utilities
 
 
   std::vector<unsigned long long int>
-  invert_permutation (const std::vector<unsigned long int> &permutation)
+  invert_permutation (const std::vector<unsigned long long int> &permutation)
   {
     const unsigned long long int n = permutation.size();
 
