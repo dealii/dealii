@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -66,11 +66,16 @@ ENDIF()
 #
 # Threading Building Blocks library
 #
-SET(FEATURE_THREADS_HAVE_BUNDLED TRUE)
-OPTION(DEAL_II_FORCE_BUNDLED_THREADS
-  "Always use the bundled tbb library instead of an external one."
-  OFF)
-SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb30_104oss")
+IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
+  #
+  # Cygwin is currently unsupported by tbb
+  #
+  SET(FEATURE_THREADS_HAVE_BUNDLED TRUE)
+  OPTION(DEAL_II_FORCE_BUNDLED_THREADS
+    "Always use the bundled tbb library instead of an external one."
+    OFF)
+  SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb30_104oss")
+ENDIF()
 
 IF(FEATURE_THREADS_BUNDLED_CONFIGURED)
   INSTALL(DIRECTORY ${TBB_FOLDER}/include/tbb
