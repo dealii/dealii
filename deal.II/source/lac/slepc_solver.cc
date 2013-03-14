@@ -167,11 +167,7 @@ namespace SLEPcWrappers
 
     // get number of converged eigenstates
     ierr = EPSGetConverged (solver_data->eps,
-#ifdef PETSC_USE_64BIT_INDICES
                             reinterpret_cast<PetscInt *>(n_converged)
-#else
-                            reinterpret_cast<int *>(n_converged)
-#endif
                            );
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
