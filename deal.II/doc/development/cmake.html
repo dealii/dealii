@@ -499,6 +499,28 @@
         href="../readme.html#configuration">here</a>.
     </p>
 
+
+    <p>
+      The build can be further controlled by the following variables:
+      <ul>
+        <li>
+          <code>DEAL_II_ALLOW_PLATFORM_INTROSPECTION</code>: If set
+          (default), <acronym>deal.II</acronym> will perform platform
+          introspection for the given CPU.
+
+	<li>
+          <code>BUILD_SHARED_LIBS</code>: If set (default),
+          <acronym>deal.II</acronym> will be linked as a shared library
+
+	<li>
+	  <code>CMAKE_INSTALL_RPATH_USE_LINK_PATH</code>: If set
+	  (default), the <acronym>deal.II</acronym> library will be
+	  installed with rpaths  set for all libraries outside of the
+	  system search paths
+      </ul>
+    </p>
+
+
     <a name="compiler"></a>
     <h4> Selecting a compiler </h4>
 
@@ -554,26 +576,6 @@
     cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" &lt;...&gt;
 	  </pre>
       </ol>
-    </p>
-
-    <p>
-      The build can be further controlled by the following variables:
-      <ul>
-        <li>
-          <code>DEAL_II_ALLOW_PLATFORM_INTROSPECTION</code>: If set
-          (default), <acronym>deal.II</acronym> will perform platform
-          introspection for the given CPU.
-
-	<li>
-          <code>BUILD_SHARED_LIBS</code>: If set (default),
-          <acronym>deal.II</acronym> will be linked as a shared library
-
-	<li>
-	  <code>CMAKE_INSTALL_RPATH_USE_LINK_PATH</code>: If set
-	  (default), the <acronym>deal.II</acronym> library will be
-	  installed with rpaths  set for all libraries outside of the
-	  system search paths
-      </ul>
     </p>
 
 
