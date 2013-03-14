@@ -225,11 +225,7 @@ namespace PETScWrappers
     int
 #endif
     convergence_test (KSP                 ksp,
-#ifdef PETSC_USE_64BIT_INDICES
                       const PetscInt      iteration,
-#else
-                      const int           iteration,
-#endif
                       const PetscReal     residual_norm,
                       KSPConvergedReason *reason,
                       void               *solver_control);
@@ -1226,11 +1222,7 @@ namespace PETScWrappers
     int
 #endif
     convergence_test (KSP                ksp,
-#ifdef PETSC_USE_64BIT_INDICES
                       const PetscInt     iteration,
-#else
-                      const int          iteration,
-#endif
                       const PetscReal    residual_norm,
                       KSPConvergedReason *reason,
                       void               *solver_control);
