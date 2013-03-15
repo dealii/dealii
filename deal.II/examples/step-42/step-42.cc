@@ -881,7 +881,7 @@ namespace Step42
 
     Vector<double>       cell_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     const FEValuesExtractors::Vector displacement (0);
 
@@ -992,7 +992,7 @@ namespace Step42
     for (unsigned i=0; i<dim; i++)
     	ones[i] = 1.0;
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     const FEValuesExtractors::Vector displacement (0);
 
