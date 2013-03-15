@@ -117,3 +117,13 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
   STRIP_FLAG(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-g")
 ENDIF()
 
+IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
+  #
+  # Workaround for a miscompilation and linkage issue with shared libraries
+  # under Cygwin. Replacing -O0 with -O1 helps.
+  #
+  # - Matthias Maier, 2013
+  #
+  REPLACE_FLAG(DEAL_II_CXX_FLAGS_DEBUG "-O0" "-O1")
+
+ENDIF()
