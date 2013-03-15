@@ -151,10 +151,10 @@ IF(UMFPACK_FOUND)
     SUITESPARSE_DIR
   )
 ELSE()
-  SET(UMFPACK_DIR "" CACHE STRING
+  SET(UMFPACK_DIR "" CACHE PATH
     "An optional hint to an UMFPACK directory"
     )
-  SET(SUITESPARSE_DIR "" CACHE STRING
+  SET(SUITESPARSE_DIR "" CACHE PATH
     "An optional hint to a SUITESPARSE directory"
     )
 ENDIF()

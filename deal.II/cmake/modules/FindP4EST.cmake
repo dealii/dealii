@@ -117,7 +117,7 @@ IF(P4EST_FOUND)
     SC_INCLUDE_DIR
   )
 ELSE()
-  SET(P4EST_DIR "" CACHE STRING
+  SET(P4EST_DIR "" CACHE PATH
     "An optional hint to a p4est installation/directory"
     )
 ENDIF()

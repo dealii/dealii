@@ -364,6 +364,21 @@
           "global" variables prefixed by <code>FEATURE_</code> may be
           altered. Do not set <code>DEAL_II_*</code> or <code>CMAKE_*</code>
           variables directly!
+        <li>
+          A hint with <code>FEATURE_DIR</code> can be set up for
+          convenience. It is best to start the <code>Find</code> module by
+          <pre>
+
+    SET_IF_EMPTY(FEATURE_DIR "$ENV{FEATURE_DIR}")
+          </pre>
+          and use <code>FEATURE_DIR</code> as a hint. If the external
+          library could be found, hide it via
+          <code>MARK_AS_ADVANCED</code>, if the external library could not
+          be found, set a cache value:
+          <pre>
+
+    SET(FEATURE_DIR "" CACHE PATH "An optional hint to a FEATURE directory")
+          </pre>
       </ul>
 
 
