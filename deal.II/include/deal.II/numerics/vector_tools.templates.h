@@ -2345,7 +2345,7 @@ namespace VectorTools
       VectorDoFTuple ()
       {
         for (unsigned int i=0; i<dim; ++i)
-          dof_indices[i] = numbers::invalid_unsigned_int;
+          dof_indices[i] = numbers::invalid_dof_index;
       }
 
 

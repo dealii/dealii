@@ -435,7 +435,7 @@ namespace DoFRenumbering
                       const bool                       reversed_numbering,
                       const std::vector<types::global_dof_index> &starting_indices)
   {
-    Assert(dof_handler.n_dofs(level) != numbers::invalid_unsigned_int,
+    Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
            ExcNotInitialized());
 //TODO: we should be doing the same here as in the other compute_CMK function to preserve some memory
 
@@ -497,7 +497,7 @@ namespace DoFRenumbering
     dof_handler.renumber_dofs (renumbering);
 
     // for (unsigned int level=0;level<dof_handler.get_tria().n_levels();++level)
-    //   if (dof_handler.n_dofs(level) != numbers::invalid_unsigned_int)
+    //   if (dof_handler.n_dofs(level) != numbers::invalid_dof_index)
     //  component_wise(dof_handler, level, component_order_arg);
   }
 
@@ -550,7 +550,7 @@ namespace DoFRenumbering
                   const unsigned int level,
                   const std::vector<unsigned int> &component_order_arg)
   {
-    Assert(dof_handler.n_dofs(level) != numbers::invalid_unsigned_int,
+    Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
            ExcNotInitialized());
 
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(level),
@@ -731,8 +731,6 @@ namespace DoFRenumbering
         all_dof_counts(fe_collection.n_components() *
                        Utilities::MPI::n_mpi_processes (tria->get_communicator()));
 
-	Assert (sizeof(types::global_dof_index) == sizeof(unsigned int),
-		ExcNotImplemented());
         MPI_Allgather ( &local_dof_count[0], n_buckets, MPI_UNSIGNED, &all_dof_counts[0],
                         n_buckets, MPI_UNSIGNED, tria->get_communicator());
 
@@ -869,7 +867,7 @@ namespace DoFRenumbering
   void
   block_wise (DoFHandler<dim> &dof_handler, const unsigned int level)
   {
-    Assert(dof_handler.n_dofs(level) != numbers::invalid_unsigned_int,
+    Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
            ExcNotInitialized());
 
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(level),
@@ -1213,7 +1211,7 @@ namespace DoFRenumbering
 
     // make sure that all local DoFs got new numbers assigned
     Assert (std::find (renumbering.begin(), renumbering.end(),
-                       numbers::invalid_unsigned_int)
+                       numbers::invalid_dof_index)
             == renumbering.end(),
             ExcInternalError());
 
@@ -1242,7 +1240,7 @@ namespace DoFRenumbering
                            const std::vector<bool> &selected_dofs,
                            const unsigned int       level)
   {
-    Assert(dof_handler.n_dofs(level) != numbers::invalid_unsigned_int,
+    Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
            ExcNotInitialized());
 
     std::vector<types::global_dof_index> renumbering(dof_handler.n_dofs(level),
@@ -1299,7 +1297,7 @@ namespace DoFRenumbering
                                    const std::vector<bool>   &selected_dofs,
                                    const unsigned int         level)
   {
-    Assert(dof_handler.n_dofs(level) != numbers::invalid_unsigned_int,
+    Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
            ExcNotInitialized());
 
     const unsigned int n_dofs = dof_handler.n_dofs(level);
@@ -1422,7 +1420,7 @@ namespace DoFRenumbering
     const unsigned int level,
     const typename std::vector<typename DH::level_cell_iterator> &cells)
   {
-    Assert(dof.n_dofs(level) != numbers::invalid_unsigned_int,
+    Assert(dof.n_dofs(level) != numbers::invalid_dof_index,
            ExcNotInitialized());
 
     std::vector<types::global_dof_index> renumbering(dof.n_dofs(level));
@@ -1885,13 +1883,13 @@ namespace DoFRenumbering
     // same subdomain, then they will be in
     // this order also after reordering
     std::fill (new_dof_indices.begin(), new_dof_indices.end(),
-               numbers::invalid_unsigned_int);
+               numbers::invalid_dof_index);
     types::global_dof_index next_free_index = 0;
     for (types::subdomain_id subdomain=0; subdomain<n_subdomains; ++subdomain)
       for (types::global_dof_index i=0; i<n_dofs; ++i)
         if (subdomain_association[i] == subdomain)
           {
-            Assert (new_dof_indices[i] == numbers::invalid_unsigned_int,
+            Assert (new_dof_indices[i] == numbers::invalid_dof_index,
                     ExcInternalError());
             new_dof_indices[i] = next_free_index;
             ++next_free_index;
@@ -1900,7 +1898,7 @@ namespace DoFRenumbering
     // we should have numbered all dofs
     Assert (next_free_index == n_dofs, ExcInternalError());
     Assert (std::find (new_dof_indices.begin(), new_dof_indices.end(),
-                       numbers::invalid_unsigned_int)
+                       numbers::invalid_dof_index)
             == new_dof_indices.end(),
             ExcInternalError());
   }

@@ -292,22 +292,22 @@ namespace Utilities
         // space and compress contiguous indices in
         // form of ranges
         {
-          unsigned int last_index = numbers::invalid_unsigned_int-1;
-          std::vector<std::pair<unsigned int,types::global_dof_index> > compressed_import_indices;
+          types::global_dof_index last_index = numbers::invalid_dof_index-1;
+          std::vector<std::pair<types::global_dof_index,types::global_dof_index> > compressed_import_indices;
           for (unsigned int i=0; i<n_import_indices_data; i++)
             {
               Assert (expanded_import_indices[i] >= local_range_data.first &&
                       expanded_import_indices[i] < local_range_data.second,
                       ExcIndexRange(expanded_import_indices[i], local_range_data.first,
                                     local_range_data.second));
-              unsigned int new_index = (expanded_import_indices[i] -
+              types::global_dof_index new_index = (expanded_import_indices[i] -
                                         local_range_data.first);
               if (new_index == last_index+1)
                 compressed_import_indices.back().second++;
               else
                 {
                   compressed_import_indices.push_back
-                  (std::pair<unsigned int,types::global_dof_index>(new_index,new_index+1));
+                  (std::pair<types::global_dof_index,types::global_dof_index>(new_index,new_index+1));
                 }
               last_index = new_index;
             }

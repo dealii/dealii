@@ -277,7 +277,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       level_end  = mg_dof.end_active(level);
 
       temp_copy_indices.resize (0);
-      temp_copy_indices.resize (mg_dof.n_dofs(level), numbers::invalid_unsigned_int);
+      temp_copy_indices.resize (mg_dof.n_dofs(level), numbers::invalid_dof_index);
 
       // Compute coarse level right hand side
       // by restricting from fine level.
@@ -311,11 +311,11 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       const types::global_dof_index n_active_dofs =
         std::count_if (temp_copy_indices.begin(), temp_copy_indices.end(),
                        std::bind2nd(std::not_equal_to<types::global_dof_index>(),
-                                    numbers::invalid_unsigned_int));
+                                    numbers::invalid_dof_index));
       copy_indices[level].resize (n_active_dofs);
       types::global_dof_index counter = 0;
       for (types::global_dof_index i=0; i<temp_copy_indices.size(); ++i)
-        if (temp_copy_indices[i] != numbers::invalid_unsigned_int)
+        if (temp_copy_indices[i] != numbers::invalid_dof_index)
           copy_indices[level][counter++] =
             std::pair<types::global_dof_index, unsigned int> (temp_copy_indices[i], i);
       Assert (counter == n_active_dofs, ExcInternalError());

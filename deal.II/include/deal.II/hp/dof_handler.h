@@ -849,7 +849,7 @@ namespace hp
      * actual data format used to
      * the present class.
      */
-    std::vector<unsigned int>      vertex_dofs_offsets;
+    std::vector<types::global_dof_index>      vertex_dofs_offsets;
 
     std::vector<MGVertexDoFs> mg_vertex_dofs;
 
@@ -915,7 +915,7 @@ namespace hp
   types::global_dof_index
   DoFHandler<dim,spacedim>::n_dofs (const unsigned int) const
   {
-    return numbers::invalid_unsigned_int;
+    return numbers::invalid_dof_index;
   }
 
 

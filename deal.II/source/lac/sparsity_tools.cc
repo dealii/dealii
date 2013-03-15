@@ -139,7 +139,7 @@ namespace SparsityTools
   {
     /**
      * Given a connectivity graph and a list of indices (where
-     * invalid_unsigned_int indicates that a node has not been numbered yet),
+     * invalid_size_type indicates that a node has not been numbered yet),
      * pick a valid starting index among the as-yet unnumbered one.
      */
     size_type 
@@ -147,11 +147,11 @@ namespace SparsityTools
                                     const std::vector<size_type> &new_indices)
     {
       {
-        size_type starting_point   = numbers::invalid_unsigned_int;
+        size_type starting_point   = numbers::invalid_size_type;
         size_type min_coordination = sparsity.n_rows();
         for (size_type row=0; row<sparsity.n_rows(); ++row)
           // look over all as-yet unnumbered indices
-          if (new_indices[row] == numbers::invalid_unsigned_int)
+          if (new_indices[row] == numbers::invalid_size_type)
             {
               SparsityPattern::iterator j = sparsity.begin(row);
 
@@ -176,16 +176,16 @@ namespace SparsityTools
         //
         // if that should be the case, we can chose an arbitrary dof as
         // starting point, e.g. the first unnumbered one
-        if (starting_point == numbers::invalid_unsigned_int)
+        if (starting_point == numbers::invalid_size_type)
           {
             for (size_type i=0; i<new_indices.size(); ++i)
-              if (new_indices[i] == numbers::invalid_unsigned_int)
+              if (new_indices[i] == numbers::invalid_size_type)
                 {
                   starting_point = i;
                   break;
                 }
 
-            Assert (starting_point != numbers::invalid_unsigned_int,
+            Assert (starting_point != numbers::invalid_size_type,
                     ExcInternalError());
           }
 
@@ -216,17 +216,17 @@ namespace SparsityTools
 
     // initialize the new_indices array with invalid values
     std::fill (new_indices.begin(), new_indices.end(),
-               numbers::invalid_unsigned_int);
+               numbers::invalid_size_type);
 
     // delete disallowed elements
     for (size_type i=0; i<last_round_dofs.size(); ++i)
-      if ((last_round_dofs[i]==numbers::invalid_unsigned_int) ||
+      if ((last_round_dofs[i]==numbers::invalid_size_type) ||
           (last_round_dofs[i]>=sparsity.n_rows()))
-        last_round_dofs[i] = numbers::invalid_unsigned_int;
+        last_round_dofs[i] = numbers::invalid_size_type;
 
     std::remove_if (last_round_dofs.begin(), last_round_dofs.end(),
                     std::bind2nd(std::equal_to<size_type>(),
-                                 numbers::invalid_unsigned_int));
+                                 numbers::invalid_size_type));
 
     // now if no valid points remain: find dof with lowest coordination number
     if (last_round_dofs.empty())
@@ -271,7 +271,7 @@ namespace SparsityTools
         // eliminate dofs which are
         // already numbered
         for (int s=next_round_dofs.size()-1; s>=0; --s)
-          if (new_indices[next_round_dofs[s]] != numbers::invalid_unsigned_int)
+          if (new_indices[next_round_dofs[s]] != numbers::invalid_size_type)
             next_round_dofs.erase (next_round_dofs.begin() + s);
 
         // check whether there are
@@ -288,7 +288,7 @@ namespace SparsityTools
         if (next_round_dofs.empty())
           {
             if (std::find (new_indices.begin(), new_indices.end(),
-                           numbers::invalid_unsigned_int)
+                           numbers::invalid_size_type)
                 ==
                 new_indices.end())
               // no unnumbered
@@ -366,7 +366,7 @@ namespace SparsityTools
     // front-marching-algorithm (which
     // Cuthill-McKee actually is) has
     // reached all points.
-    Assert ((std::find (new_indices.begin(), new_indices.end(), numbers::invalid_unsigned_int)
+    Assert ((std::find (new_indices.begin(), new_indices.end(), numbers::invalid_size_type)
              ==
              new_indices.end())
             &&

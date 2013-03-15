@@ -613,7 +613,7 @@ public:
    * If no level degrees of
    * freedom have been assigned
    * to this level, returns
-   * numbers::invalid_unsigned_int. Else
+   * numbers::invalid_dof_index. Else
    * returns the number of
    * degrees of freedom on this level.
    */

@@ -1610,11 +1610,11 @@ private:
    * contains the position of the
    * ConstraintLine of a constrained degree
    * of freedom, or
-   * numbers::invalid_unsigned_int if the
+   * numbers::invalid_size_type if the
    * degree of freedom is not
    * constrained. The
-   * numbers::invalid_unsigned_int
-  * return value returns thus whether
+   * numbers::invalid_size_type
+   * return value returns thus whether
    * there is a constraint line for a given
    * degree of freedom index. Note that
    * this class has no notion of how many
@@ -1841,7 +1841,7 @@ ConstraintMatrix::add_line (const size_type line)
   // several terabytes of memory to
   // resize the various arrays below
   // :-)
-  Assert (line != numbers::invalid_unsigned_int,
+  Assert (line != numbers::invalid_size_type,
           ExcInternalError());
   const size_type line_index = calculate_line_index (line);
 
@@ -1885,7 +1885,7 @@ ConstraintMatrix::add_entry (const size_type line,
   // in any case: exit the function if an
   // entry for this column already exists,
   // since we don't want to enter it twice
-  Assert (lines_cache[calculate_line_index(line)] != numbers::invalid_unsigned_int,
+  Assert (lines_cache[calculate_line_index(line)] != numbers::invalid_size_type,
           ExcInternalError());
   ConstraintLine *line_ptr = &lines[lines_cache[calculate_line_index(line)]];
   Assert (line_ptr->line == line, ExcInternalError());
@@ -1911,7 +1911,7 @@ ConstraintMatrix::set_inhomogeneity (const size_type line,
 {
   const size_type line_index = calculate_line_index(line);
   Assert( line_index < lines_cache.size() &&
-          lines_cache[line_index] != numbers::invalid_unsigned_int,
+          lines_cache[line_index] != numbers::invalid_size_type,
           ExcMessage("call add_line() before calling set_inhomogeneity()"));
   Assert(lines_cache[line_index] < lines.size(), ExcInternalError());
   ConstraintLine *line_ptr = &lines[lines_cache[line_index]];
@@ -1950,7 +1950,7 @@ ConstraintMatrix::is_inhomogeneously_constrained (const size_type index) const
   // that means computing the line index twice
   const size_type line_index = calculate_line_index(index);
   if (line_index >= lines_cache.size() ||
-      lines_cache[line_index] == numbers::invalid_unsigned_int)
+      lines_cache[line_index] == numbers::invalid_size_type)
     return false;
   else
     {
@@ -1970,7 +1970,7 @@ ConstraintMatrix::get_constraint_entries (const size_type line) const
   // that means computing the line index twice
   const size_type line_index = calculate_line_index(line);
   if (line_index >= lines_cache.size() ||
-      lines_cache[line_index] == numbers::invalid_unsigned_int)
+      lines_cache[line_index] == numbers::invalid_size_type)
     return 0;
   else
     return &lines[lines_cache[line_index]].entries;
@@ -1987,7 +1987,7 @@ ConstraintMatrix::get_inhomogeneity (const size_type line) const
   // that means computing the line index twice
   const size_type line_index = calculate_line_index(line);
   if (line_index >= lines_cache.size() ||
-      lines_cache[line_index] == numbers::invalid_unsigned_int)
+      lines_cache[line_index] == numbers::invalid_size_type)
     return 0;
   else
     return lines[lines_cache[line_index]].inhomogeneity;

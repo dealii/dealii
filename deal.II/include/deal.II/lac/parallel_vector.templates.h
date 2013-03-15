@@ -309,7 +309,7 @@ namespace parallel
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
 
           Number *read_position = import_data;
-          std::vector<std::pair<unsigned int, size_type> >::const_iterator
+          std::vector<std::pair<size_type, size_type> >::const_iterator
           my_imports = part.import_indices().begin();
 
           // If add_ghost_data is set, add the imported
@@ -414,7 +414,7 @@ namespace parallel
         {
           Assert (import_data != 0, ExcInternalError());
           Number *write_position = import_data;
-          std::vector<std::pair<unsigned int, size_type> >::const_iterator
+          std::vector<std::pair<size_type, size_type> >::const_iterator
           my_imports = part.import_indices().begin();
           for ( ; my_imports!=part.import_indices().end(); ++my_imports)
             for (size_type j=my_imports->first; j<my_imports->second; j++)

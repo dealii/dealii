@@ -941,7 +941,7 @@ SparsityPattern::row_position (const size_type i, const size_type j) const
       // entry exists
       if (colnums[k] == j) return k-rowstart[i];
     }
-  return numbers::invalid_unsigned_int;
+  return numbers::invalid_size_type;
 }
 
 

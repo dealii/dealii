@@ -215,7 +215,7 @@ namespace Utilities
        * but tailored to be iterated over, and some
        * indices may be duplicates.
        */
-      const std::vector<std::pair<unsigned int, types::global_dof_index> > &
+      const std::vector<std::pair<types::global_dof_index, types::global_dof_index> > &
       import_indices() const;
 
       /**
@@ -335,7 +335,7 @@ namespace Utilities
        * but tailored to be iterated over, and some
        * indices may be duplicates.
        */
-      std::vector<std::pair<unsigned int, types::global_dof_index> > import_indices_data;
+      std::vector<std::pair<types::global_dof_index, types::global_dof_index> > import_indices_data;
 
       /**
        * Caches the number of ghost indices. It
@@ -495,7 +495,7 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<unsigned int, types::global_dof_index> > &
+    const std::vector<std::pair<types::global_dof_index, types::global_dof_index> > &
     Partitioner::import_indices() const
     {
       return import_indices_data;

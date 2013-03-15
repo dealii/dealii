@@ -129,7 +129,7 @@ RelaxationBlock<MATRIX,inverse_type>::invert_diagblocks ()
                 {
                   const size_type column = entry->column();
                   const size_type col_cell = additional_data->block_list.row_position(block, column);
-                  if (col_cell != numbers::invalid_unsigned_int)
+                  if (col_cell != numbers::invalid_size_type)
                     M_cell(row_cell, col_cell) = entry->value();
                 }
             }

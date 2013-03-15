@@ -263,7 +263,7 @@ namespace internal
           // already fill the
           // vertex_dofs_offsets field
           dof_handler.vertex_dofs_offsets.resize (dof_handler.tria->n_vertices(),
-                                                  numbers::invalid_unsigned_int);
+                                                  numbers::invalid_dof_index);
 
           unsigned int vertex_slots_needed = 0;
           for (unsigned int v=0; v<dof_handler.tria->n_vertices(); ++v)
@@ -286,7 +286,7 @@ namespace internal
           for (unsigned int v=0; v<dof_handler.tria->n_vertices(); ++v)
             if (dof_handler.tria->vertex_used(v) == true)
               {
-                unsigned int pointer = dof_handler.vertex_dofs_offsets[v];
+                types::global_dof_index pointer = dof_handler.vertex_dofs_offsets[v];
                 for (unsigned int fe=0; fe<dof_handler.finite_elements->size(); ++fe)
                   if (vertex_fe_association[fe][v] == true)
                     {
@@ -301,7 +301,7 @@ namespace internal
                     }
                 // finally place the end
                 // marker
-                dof_handler.vertex_dofs[pointer] = numbers::invalid_unsigned_int;
+                dof_handler.vertex_dofs[pointer] = numbers::invalid_dof_index;
               }
         }
 
@@ -1421,7 +1421,7 @@ namespace internal
               // line_dofs_offsets field
               dof_handler.faces->lines.dof_offsets
               .resize (dof_handler.tria->n_raw_lines(),
-                       numbers::invalid_unsigned_int);
+                       numbers::invalid_dof_index);
 
               unsigned int line_slots_needed = 0;
               for (unsigned int line=0; line<dof_handler.tria->n_raw_lines(); ++line)
@@ -1459,7 +1459,7 @@ namespace internal
                         }
                     // finally place the end
                     // marker
-                    dof_handler.faces->lines.dofs[pointer] = numbers::invalid_unsigned_int;
+                    dof_handler.faces->lines.dofs[pointer] = numbers::invalid_dof_index;
                   }
             }
 
@@ -2110,7 +2110,7 @@ namespace hp
                                               identities[i].second);
 
                     Assert ((new_dof_indices[higher_dof_index] ==
-                             numbers::invalid_unsigned_int)
+                             numbers::invalid_dof_index)
                             ||
                             (new_dof_indices[higher_dof_index] ==
                              lower_dof_index),
@@ -2281,10 +2281,10 @@ namespace hp
                                   // slave to
                                   // master
                                   if (new_dof_indices[master_dof_index] !=
-                                      numbers::invalid_unsigned_int)
+                                      numbers::invalid_dof_index)
                                     {
                                       Assert (new_dof_indices[new_dof_indices[master_dof_index]] ==
-                                              numbers::invalid_unsigned_int,
+                                              numbers::invalid_dof_index,
                                               ExcInternalError());
 
                                       new_dof_indices[slave_dof_index]
@@ -2293,7 +2293,7 @@ namespace hp
                                   else
                                     {
                                       Assert ((new_dof_indices[master_dof_index] ==
-                                               numbers::invalid_unsigned_int)
+                                               numbers::invalid_dof_index)
                                               ||
                                               (new_dof_indices[slave_dof_index] ==
                                                master_dof_index),
@@ -2359,7 +2359,7 @@ namespace hp
                             = line->dof_index (identities[i].second, other_fe_index);
 
                           Assert ((new_dof_indices[master_dof_index] ==
-                                   numbers::invalid_unsigned_int)
+                                   numbers::invalid_dof_index)
                                   ||
                                   (new_dof_indices[slave_dof_index] ==
                                    master_dof_index),
@@ -2497,7 +2497,7 @@ namespace hp
                         = quad->dof_index (identities[i].second, other_fe_index);
 
                       Assert ((new_dof_indices[master_dof_index] ==
-                               numbers::invalid_unsigned_int)
+                               numbers::invalid_dof_index)
                               ||
                               (new_dof_indices[slave_dof_index] ==
                                master_dof_index),
@@ -2621,7 +2621,7 @@ namespace hp
     // lower-dimensional objects
     // where elements come together
     std::vector<types::global_dof_index>
-    constrained_indices (number_cache.n_global_dofs, numbers::invalid_unsigned_int);
+    constrained_indices (number_cache.n_global_dofs, numbers::invalid_dof_index);
     compute_vertex_dof_identities (constrained_indices);
     compute_line_dof_identities (constrained_indices);
     compute_quad_dof_identities (constrained_indices);
@@ -2630,10 +2630,10 @@ namespace hp
     // new numbers to those which are
     // not constrained
     std::vector<types::global_dof_index>
-    new_dof_indices (number_cache.n_global_dofs, numbers::invalid_unsigned_int);
+    new_dof_indices (number_cache.n_global_dofs, numbers::invalid_dof_index);
     types::global_dof_index next_free_dof = 0;
     for (types::global_dof_index i=0; i<number_cache.n_global_dofs; ++i)
-      if (constrained_indices[i] == numbers::invalid_unsigned_int)
+      if (constrained_indices[i] == numbers::invalid_dof_index)
         {
           new_dof_indices[i] = next_free_dof;
           ++next_free_dof;
@@ -2643,10 +2643,10 @@ namespace hp
     // are constrained and record the
     // new dof number for those:
     for (types::global_dof_index i=0; i<number_cache.n_global_dofs; ++i)
-      if (constrained_indices[i] != numbers::invalid_unsigned_int)
+      if (constrained_indices[i] != numbers::invalid_dof_index)
         {
           Assert (new_dof_indices[constrained_indices[i]] !=
-                  numbers::invalid_unsigned_int,
+                  numbers::invalid_dof_index,
                   ExcInternalError());
 
           new_dof_indices[i] = new_dof_indices[constrained_indices[i]];
@@ -2654,7 +2654,7 @@ namespace hp
 
     for (types::global_dof_index i=0; i<number_cache.n_global_dofs; ++i)
       {
-        Assert (new_dof_indices[i] != numbers::invalid_unsigned_int,
+        Assert (new_dof_indices[i] != numbers::invalid_dof_index,
                 ExcInternalError());
         Assert (new_dof_indices[i] < next_free_dof,
                 ExcInternalError());
@@ -3324,7 +3324,7 @@ namespace hp
                                            const unsigned int) const
   {
     Assert (false, ExcNotImplemented());
-    return numbers::invalid_unsigned_int;
+    return numbers::invalid_dof_index;
   }
 
 
@@ -3356,7 +3356,7 @@ namespace hp
     }
 
     {
-      std::vector<unsigned int> tmp;
+      std::vector<types::global_dof_index> tmp;
       std::swap (vertex_dofs_offsets, tmp);
     }
   }

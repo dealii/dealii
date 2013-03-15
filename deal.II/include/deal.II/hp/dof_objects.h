@@ -272,7 +272,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert (dof_offsets[obj_index] != numbers::invalid_unsigned_int,
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -308,7 +308,7 @@ namespace internal
           const types::global_dof_index *pointer        = &dofs[starting_offset];
           while (true)
             {
-              Assert (*pointer != numbers::invalid_unsigned_int,
+              Assert (*pointer != numbers::invalid_dof_index,
                       ExcInternalError());
               if (*pointer == fe_index)
                 return *(pointer + 1 + local_index);
@@ -354,7 +354,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert (dof_offsets[obj_index] != numbers::invalid_unsigned_int,
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -390,7 +390,7 @@ namespace internal
           types::global_dof_index      *pointer         = &dofs[starting_offset];
           while (true)
             {
-              Assert (*pointer != numbers::invalid_unsigned_int,
+              Assert (*pointer != numbers::invalid_dof_index,
                       ExcInternalError());
               if (*pointer == fe_index)
                 {
@@ -426,7 +426,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      if (dof_offsets[obj_index] == numbers::invalid_unsigned_int)
+      if (dof_offsets[obj_index] == numbers::invalid_dof_index)
         return 0;
 
       // if we are on a cell, then the
@@ -454,7 +454,7 @@ namespace internal
           unsigned int counter = 0;
           while (true)
             {
-              if (*pointer == numbers::invalid_unsigned_int)
+              if (*pointer == numbers::invalid_dof_index)
                 // end of list reached
                 return counter;
               else
@@ -491,7 +491,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert (dof_offsets[obj_index] != numbers::invalid_unsigned_int,
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -529,7 +529,7 @@ namespace internal
           unsigned int counter = 0;
           while (true)
             {
-              Assert (*pointer != numbers::invalid_unsigned_int,
+              Assert (*pointer != numbers::invalid_dof_index,
                       ExcInternalError());
 
               const unsigned int fe_index = *pointer;
@@ -575,7 +575,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert (dof_offsets[obj_index] != numbers::invalid_unsigned_int,
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -610,7 +610,7 @@ namespace internal
           const types::global_dof_index  *pointer = &dofs[starting_offset];
           while (true)
             {
-              if (*pointer == numbers::invalid_unsigned_int)
+              if (*pointer == numbers::invalid_dof_index)
                 // end of list reached
                 return false;
               else if (*pointer == fe_index)

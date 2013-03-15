@@ -497,7 +497,7 @@ namespace internal
       // if we have no constraints, should take the data from dof_indices
       if (row_length_indicators(row) == 0)
         {
-          Assert (row_starts_plain_indices[row] == numbers::invalid_unsigned_int,
+          Assert (row_starts_plain_indices[row] == numbers::invalid_dof_index,
                   ExcInternalError());
           return begin_indices(row);
         }

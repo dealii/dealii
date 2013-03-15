@@ -84,7 +84,7 @@ public:
    * This can be achieved by calling
    * clear(), for example.
    */
-  void set_size (const unsigned int size);
+  void set_size (const types::global_dof_index size);
 
   /**
    * Return the size of the index
@@ -96,7 +96,7 @@ public:
    * set. The latter information is
    * returned by n_elements().
    */
-  unsigned int size () const;
+  types::global_dof_index size () const;
 
   /**
    * Add the half-open range
@@ -534,7 +534,7 @@ private:
    * set have to have a smaller
    * number than this value.
    */
-  unsigned int index_space_size;
+  types::global_dof_index index_space_size;
 
   /**
    * This integer caches the index of the
@@ -566,8 +566,8 @@ private:
 inline
 IndexSet::Range::Range ()
   :
-  begin(numbers::invalid_unsigned_int),
-  end(numbers::invalid_unsigned_int)
+  begin(numbers::invalid_dof_index),
+  end(numbers::invalid_dof_index)
 {}
 
 
@@ -612,7 +612,7 @@ IndexSet::clear ()
 
 inline
 void
-IndexSet::set_size (const unsigned int sz)
+IndexSet::set_size (const types::global_dof_index sz)
 {
   Assert (ranges.empty(),
           ExcMessage ("This function can only be called if the current "
@@ -624,7 +624,7 @@ IndexSet::set_size (const unsigned int sz)
 
 
 inline
-unsigned int
+types::global_dof_index
 IndexSet::size () const
 {
   return index_space_size;
@@ -901,7 +901,7 @@ IndexSet::nth_index_in_set (const unsigned int n) const
   else
     {
       Assert (false, ExcInternalError());
-      return numbers::invalid_unsigned_int;
+      return numbers::invalid_dof_index;
     }
 }
 

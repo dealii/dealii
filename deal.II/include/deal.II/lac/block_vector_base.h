@@ -1677,7 +1677,7 @@ namespace internal
           current_block       = parent.n_blocks();
           index_within_block  = 0;
           next_break_backward = global_index;
-          next_break_forward  = numbers::invalid_unsigned_int;
+          next_break_forward  = numbers::invalid_size_type;
         };
     }
 
@@ -1709,7 +1709,7 @@ namespace internal
             // then move the next
             // boundary arbitrarily far
             // away
-            next_break_forward = numbers::invalid_unsigned_int;
+            next_break_forward = numbers::invalid_size_type;
         };
 
       ++global_index;
@@ -1743,7 +1743,7 @@ namespace internal
         // get into unspecified terrain
         {
           --current_block;
-          index_within_block = numbers::invalid_unsigned_int;
+          index_within_block = numbers::invalid_size_type;
           next_break_forward = 0;
           next_break_backward = 0;
         };

@@ -79,7 +79,7 @@ void SparseILU<number>::decompose (const SparseMatrix<somenumber> &matrix,
   const size_type N = this->m();
   size_type jrow = 0;
 
-  std::vector<size_type> iw (N, numbers::invalid_unsigned_int);
+  std::vector<size_type> iw (N, numbers::invalid_size_type);
 
   for (size_type k=0; k<N; ++k)
     {
@@ -118,7 +118,7 @@ label_150:
         for (; jj<ia[jrow+1]; ++jj)
           {
             const size_type jw = iw[ja[jj]];
-            if (jw != numbers::invalid_unsigned_int)
+            if (jw != numbers::invalid_size_type)
               luval[jw] -= t1 * luval[jj];
           }
 
@@ -143,7 +143,7 @@ label_200:
       luval[ia[k]] = 1./luval[ia[k]];
 
       for (size_type j=j1; j<=j2; ++j)
-        iw[ja[j]] = numbers::invalid_unsigned_int;
+        iw[ja[j]] = numbers::invalid_size_type;
     }
 }
 

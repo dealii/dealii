@@ -1062,10 +1062,10 @@ namespace MatrixCreator
               Threads::Mutex::ScopedLock lock (mutex);
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
-                  if (dof_is_on_face[i] && dof_to_boundary_mapping[dofs[i]] != numbers::invalid_unsigned_int)
+                  if (dof_is_on_face[i] && dof_to_boundary_mapping[dofs[i]] != numbers::invalid_dof_index)
                     {
                       for (unsigned int j=0; j<dofs_per_cell; ++j)
-                        if (dof_is_on_face[j] && dof_to_boundary_mapping[dofs[j]] != numbers::invalid_unsigned_int)
+                        if (dof_is_on_face[j] && dof_to_boundary_mapping[dofs[j]] != numbers::invalid_dof_index)
                           {
                             Assert(numbers::is_finite(cell_matrix(i,j)), ExcNumberNotFinite());
                             matrix.add(dof_to_boundary_mapping[dofs[i]],

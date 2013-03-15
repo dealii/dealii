@@ -1144,7 +1144,7 @@ namespace internal
         Assert (fe_index < dof_handler.finite_elements->size(),
                 ExcInternalError());
         Assert (dof_handler.vertex_dofs_offsets[vertex_index] !=
-                numbers::invalid_unsigned_int,
+                numbers::invalid_dof_index,
                 ExcMessage ("This vertex is unused and has no DoFs associated with it"));
 
         // hop along the list of index
@@ -1154,7 +1154,7 @@ namespace internal
         // part. trigger an exception if
         // we can't find a set for this
         // particular fe_index
-        const unsigned int starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+        const types::global_dof_index starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
         types::global_dof_index *pointer = &dof_handler.vertex_dofs[starting_offset];
         while (true)
           {
@@ -1236,7 +1236,7 @@ namespace internal
                 ExcIndexRange (vertex_index, 0,
                                dof_handler.vertex_dofs_offsets.size()));
         Assert (dof_handler.vertex_dofs_offsets[vertex_index] !=
-                numbers::invalid_unsigned_int,
+                numbers::invalid_dof_index,
                 ExcMessage ("This vertex is unused and has no DoFs associated with it"));
 
         // hop along the list of index
@@ -1285,16 +1285,16 @@ namespace internal
                             "this DoFHandler"));
 
         // if this vertex is unused, return 0
-        if (dof_handler.vertex_dofs_offsets[vertex_index] == numbers::invalid_unsigned_int)
+        if (dof_handler.vertex_dofs_offsets[vertex_index] == numbers::invalid_dof_index)
           return 0;
 
         // hop along the list of index
         // sets and count the number of
         // hops
-        const unsigned int starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+        const types::global_dof_index starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
         const types::global_dof_index *pointer = &dof_handler.vertex_dofs[starting_offset];
 
-        Assert (*pointer != numbers::invalid_size_type,
+        Assert (*pointer != numbers::invalid_dof_index,
                 ExcInternalError());
 
         unsigned int counter = 0;
@@ -1338,16 +1338,16 @@ namespace internal
         // make sure we don't ask on
         // unused vertices
         Assert (dof_handler.vertex_dofs_offsets[vertex_index] !=
-                numbers::invalid_unsigned_int,
+                numbers::invalid_dof_index,
                 ExcInternalError());
 
         // hop along the list of index
         // sets and count the number of
         // hops
-        const unsigned int starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+        const types::global_dof_index starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
         const types::global_dof_index *pointer = &dof_handler.vertex_dofs[starting_offset];
 
-        Assert (*pointer != numbers::invalid_unsigned_int,
+        Assert (*pointer != numbers::invalid_dof_index,
                 ExcInternalError());
 
         unsigned int counter = 0;
@@ -1399,23 +1399,23 @@ namespace internal
         // make sure we don't ask on
         // unused vertices
         Assert (dof_handler.vertex_dofs_offsets[vertex_index] !=
-                numbers::invalid_unsigned_int,
+                numbers::invalid_dof_index,
                 ExcInternalError());
 
         // hop along the list of index
         // sets and see whether we find
         // the given index
-        const unsigned int starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
+        const types::global_dof_index starting_offset = dof_handler.vertex_dofs_offsets[vertex_index];
         const types::global_dof_index *pointer = &dof_handler.vertex_dofs[starting_offset];
 
-        Assert (*pointer != numbers::invalid_unsigned_int,
+        Assert (*pointer != numbers::invalid_dof_index,
                 ExcInternalError());
 
         while (true)
           {
             Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
 
-            Assert((*pointer)<std::numeric_limits<unsigned int>::max(), ExcInternalError());
+            Assert((*pointer)<std::numeric_limits<types::global_dof_index>::max(), ExcInternalError());
             const unsigned int this_fe_index = static_cast<unsigned int>(*pointer);
 
             Assert (this_fe_index < dof_handler.finite_elements->size(),
@@ -1815,7 +1815,7 @@ namespace internal
                              const unsigned int fe_index)
     {
       const DH &handler = accessor.get_dof_handler();
-      Assert(handler.n_dofs(level) != numbers::invalid_unsigned_int,
+      Assert(handler.n_dofs(level) != numbers::invalid_dof_index,
              ExcNotInitialized());
 
       const FiniteElement<DH::dimension, DH::space_dimension> &fe
@@ -1841,7 +1841,7 @@ namespace internal
                              const unsigned int fe_index)
     {
       const DH &handler = accessor.get_dof_handler();
-      Assert(handler.n_dofs(level) != numbers::invalid_unsigned_int,
+      Assert(handler.n_dofs(level) != numbers::invalid_dof_index,
              ExcNotInitialized());
 
       const FiniteElement<DH::dimension, DH::space_dimension> &fe = handler.get_fe ()[fe_index];
@@ -1870,7 +1870,7 @@ namespace internal
                              const unsigned int fe_index)
     {
       const DH &handler = accessor.get_dof_handler();
-      Assert(handler.n_dofs(level) != numbers::invalid_unsigned_int,
+      Assert(handler.n_dofs(level) != numbers::invalid_dof_index,
              ExcNotInitialized());
 
       const FiniteElement<DH::dimension, DH::space_dimension> &fe = handler.get_fe ()[fe_index];

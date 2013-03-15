@@ -1688,10 +1688,10 @@ namespace DoFTools
         // check for a couple conditions that happened in parallel
         // distributed mode
         for (unsigned int row=0; row!=n_slave_dofs; ++row)
-          Assert (slave_dofs[row] != numbers::invalid_unsigned_int,
+          Assert (slave_dofs[row] != numbers::invalid_dof_index,
                   ExcInternalError());
         for (unsigned int col=0; col!=n_master_dofs; ++col)
-          Assert (master_dofs[col] != numbers::invalid_unsigned_int,
+          Assert (master_dofs[col] != numbers::invalid_dof_index,
                   ExcInternalError());
 
 
