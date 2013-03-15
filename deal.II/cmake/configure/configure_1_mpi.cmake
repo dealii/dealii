@@ -16,7 +16,7 @@
 # Configuration for mpi support:
 #
 
-SET(DEAL_II_ALLOW_GENERIC_MPI ON CACHE BOOL
+SET(DEAL_II_ALLOW_GENERIC_MPI OFF CACHE BOOL
   "Allow the usage of an external mpi library even if the current compiler is not an mpi wrapper"
   )
 
