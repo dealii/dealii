@@ -16,14 +16,22 @@
 # Configuration for mpi support:
 #
 
-
 MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   #
-  # If CMAKE_CXX_COMPILER is already an MPI wrapper, use it to determine
-  # the mpi implementation:
+  # Obey a manual user override: If MPI_CXX_FOUND is set to true in the
+  # cache, we skip the FIND_PACKAGE calls:
   #
-  SET_IF_EMPTY(MPI_C_COMPILER ${CMAKE_C_COMPILER})
+  IF(MPI_CXX_FOUND)
+    SET(MPI_FOUND TRUE)
+  ENDIF()
+
+  #
+  # If CMAKE_CXX_COMPILER is already an MPI wrapper, use it to determine
+  # the mpi implementation. If MPI_CXX_COMPILER is defined use the value
+  # directly.
+  #
   SET_IF_EMPTY(MPI_CXX_COMPILER ${CMAKE_CXX_COMPILER})
+  SET_IF_EMPTY(MPI_C_COMPILER ${CMAKE_C_COMPILER}) # for good measure
   FIND_PACKAGE(MPI)
 
   IF(NOT MPI_CXX_FOUND)
@@ -33,9 +41,13 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
     # is set.
     #
     IF(DEAL_II_WITH_MPI)
-      SET(MPI_FOUND)
-      UNSET(MPI_C_COMPILER CACHE)
+      MESSAGE(STATUS
+        "MPI not found but DEAL_II_WITH_MPI is set to TRUE."
+        " Try again with more aggressive search paths:"
+        )
+      SET(MPI_FOUND) # clear this value so that FIND_PACKAGE runs again.
       UNSET(MPI_CXX_COMPILER CACHE)
+      UNSET(MPI_C_COMPILER CACHE)
       FIND_PACKAGE(MPI)
     ENDIF()
   ENDIF()
