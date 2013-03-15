@@ -236,14 +236,16 @@
 #   "Build deal.II with support for mpi"
 #   )
 #
-# SET(DEAL_II_ALLOW_GENERIC_MPI ON CACHE BOOL
-#   "Allow the usage of an external mpi library even if the current compiler is not an mpi wrapper"
-#   )
-#
 # Automatic detection:
+#
+# If DEAL_II_WITH_MPI is undefined, autodetection of MPI is very
+# conservative. Only the current compiler and the variables MPI_C_COMPILER
+# and MPI_CXX_COMPILER are used to find MPI. DEAL_II_WITH_MPI=ON will
+# trigger a more sophisticated search for MPI.
 #
 # The best way to force a specific MPI implementation to be used is to set
 # set CMAKE_C_COMPILER and CMAKE_CXX_COMPILER to the appropriate MPI wrapper.
+#
 # Alternatively, specify the mpi wrappers that will be queried for the mpi
 # link interface:
 #

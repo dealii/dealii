@@ -16,10 +16,6 @@
 # Configuration for mpi support:
 #
 
-SET(DEAL_II_ALLOW_GENERIC_MPI OFF CACHE BOOL
-  "Allow the usage of an external mpi library even if the current compiler is not an mpi wrapper"
-  )
-
 
 MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   #
@@ -33,10 +29,10 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   IF(NOT MPI_CXX_FOUND)
     #
     # CMAKE_CXX_COMPILER is apparently not an mpi wrapper.
-    # If we're allowed to do so, search for a generic mpi implementation
-    # and use it.
+    # So, let's be a bit more aggressive in finding MPI if DEAL_II_WITH_MPI
+    # is set.
     #
-    IF(DEAL_II_ALLOW_GENERIC_MPI)
+    IF(DEAL_II_WITH_MPI)
       SET(MPI_FOUND)
       UNSET(MPI_C_COMPILER CACHE)
       UNSET(MPI_CXX_COMPILER CACHE)
