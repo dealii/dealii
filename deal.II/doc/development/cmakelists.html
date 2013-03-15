@@ -70,7 +70,7 @@
     <p>
       The easiest way to write a <code>CMakeLists.txt</code> file is to use
       an "autopilot" style macro. Here is an example for the step-1
-      tutorial program (<a href="CMakeLists.txt.example"
+      tutorial program (<a href="CMakeLists.txt.sample"
       target="_top">plain text</a> version) that can be used for simple
       projects:
       <pre>
@@ -117,7 +117,7 @@
     #
     FIND_PACKAGE(deal.II 8.0 REQUIRED
       HINTS
-        ${DEAL_II_DIR} ../ ../../ ../../../ ../../../../../ $ENV{DEAL_II_DIR}
+        ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
       #
       # If the deal.II library cannot be found (because it is not installed at a
       # default location or your project resides at an uncommon place), you
@@ -199,7 +199,7 @@
     #
     FIND_PACKAGE(deal.II 8.0 REQUIRED
       HINTS
-        ${DEAL_II_DIR} ../ ../../ ../../../ ../../../../../ $ENV{DEAL_II_DIR}
+        ${DEAL_II_DIR} ../ ../../ $ENV{DEAL_II_DIR}
       #
       # If the deal.II library cannot be found (because it is not installed at a
       # default location or your project resides at an uncommon place), you
@@ -244,11 +244,7 @@
       COMMENT "Run ${TARGET} with ${CMAKE_BUILD_TYPE} configuration"
       )
       </pre>
-
-    Further details can be found in the <a href="cmake.html#ext"
-      target="body">deal.II CMake ReadME</a>.
    </p>
-
 
 
     <a name="ext"></a>
