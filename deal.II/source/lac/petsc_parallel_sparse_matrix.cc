@@ -387,7 +387,7 @@ namespace PETScWrappers
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
 #else //PETSC_VERSION>=2.3.3
-      // new version to create the matrix. We
+      // create the matrix. We
       // do not set row length but set the
       // correct SparsityPattern later.
       int ierr;
@@ -422,34 +422,10 @@ namespace PETScWrappers
       // class.
       if (preset_nonzero_locations == true)
         {
-          // starting with petsc 2.2.1, there is
-          // a function
-          // MatMPIAIJSetPreallocationCSR that
+          // MatMPIAIJSetPreallocationCSR
           // can be used to allocate the sparsity
           // pattern of a matrix if it is already
-          // available. if we don't have this, we
-          // have to somehow clumsily work around
-          // the whole thing:
-#if DEAL_II_PETSC_VERSION_LT(2,2,1)
-          std::vector<PetscInt>
-
-          row_entries;
-          std::vector<PetscScalar> row_values;
-          for (unsigned int i=0; i<sparsity_pattern.n_rows(); ++i)
-            {
-              row_entries.resize (sparsity_pattern.row_length(i));
-              row_values.resize (sparsity_pattern.row_length(i), 0.0);
-              for (unsigned int j=0; j<sparsity_pattern.row_length(i); ++j)
-                row_entries[j] = sparsity_pattern.column_number (i,j);
-
-              const int int_row = i;
-              MatSetValues (matrix, 1, &int_row,
-                            sparsity_pattern.row_length(i), &row_entries[0],
-                            &row_values[0], INSERT_VALUES);
-            }
-
-          compress ();
-#else
+          // available:
 
           // first set up the column number
           // array for the rows to be stored
@@ -541,7 +517,6 @@ namespace PETScWrappers
 #endif // version <=2.3.3
           compress ();
 
-#endif
 
           // Tell PETSc that we are not
           // planning on adding new entries
