@@ -1,5 +1,5 @@
 /***************************************************************************\
-|* Function Parser for C++ v4.5                                            *|
+|* Function Parser for C++ v4.5.1                                          *|
 |*-------------------------------------------------------------------------*|
 |* Copyright: Juha Nieminen, Joel Yliluoma                                 *|
 |*                                                                         *|
@@ -456,7 +456,7 @@ namespace
         return std::strtod(str, endptr);
     }
 
-#if defined(FP_USE_STRTOLD) || __cplusplus > 201100
+#if defined(FP_USE_STRTOLD) || defined(FP_SUPPORT_CPLUSPLUS11_MATH_FUNCS)
     template<>
     inline long double fp_parseLiteral<long double>(const char* str,
                                                     char** endptr)
@@ -916,39 +916,16 @@ void FunctionParserBase<Value_t>::ForceDeepCopy()
 //=========================================================================
 // Epsilon
 //=========================================================================
-template<> double FunctionParserBase<double>::sEpsilon = 1E-12;
-template<> float FunctionParserBase<float>::sEpsilon = 1E-5F;
-template<> long double FunctionParserBase<long double>::sEpsilon = 1E-14L;
-template<> long FunctionParserBase<long>::sEpsilon = 0;
-
-template<> std::complex<double>
-FunctionParserBase<std::complex<double> >::sEpsilon = 1E-12;
-
-template<> std::complex<float>
-FunctionParserBase<std::complex<float> >::sEpsilon = 1E-5F;
-
-template<> std::complex<long double>
-FunctionParserBase<std::complex<long double> >::sEpsilon = 1E-14L;
-
-#ifdef FP_SUPPORT_MPFR_FLOAT_TYPE
-template<> MpfrFloat
-FunctionParserBase<MpfrFloat>::sEpsilon(MpfrFloat::someEpsilon());
-#endif
-
-#ifdef FP_SUPPORT_GMP_INT_TYPE
-template<> GmpInt FunctionParserBase<GmpInt>::sEpsilon = 0;
-#endif
-
 template<typename Value_t>
 Value_t FunctionParserBase<Value_t>::epsilon()
 {
-    return sEpsilon;
+    return Epsilon<Value_t>::value;
 }
 
 template<typename Value_t>
 void FunctionParserBase<Value_t>::setEpsilon(Value_t value)
 {
-    sEpsilon = value;
+    Epsilon<Value_t>::value = value;
 }
 
 
@@ -3782,4 +3759,42 @@ void FunctionParserBase<Value_t>::Optimize()
 }
 #endif
 
-FUNCTIONPARSER_INSTANTIATE_TYPES
+
+#define FUNCTIONPARSER_INSTANTIATE_CLASS(type) \
+    template class FunctionParserBase< type >;
+
+#ifndef FP_DISABLE_DOUBLE_TYPE
+FUNCTIONPARSER_INSTANTIATE_CLASS(double)
+#endif
+
+#ifdef FP_SUPPORT_FLOAT_TYPE
+FUNCTIONPARSER_INSTANTIATE_CLASS(float)
+#endif
+
+#ifdef FP_SUPPORT_LONG_DOUBLE_TYPE
+FUNCTIONPARSER_INSTANTIATE_CLASS(long double)
+#endif
+
+#ifdef FP_SUPPORT_LONG_INT_TYPE
+FUNCTIONPARSER_INSTANTIATE_CLASS(long)
+#endif
+
+#ifdef FP_SUPPORT_MPFR_FLOAT_TYPE
+FUNCTIONPARSER_INSTANTIATE_CLASS(MpfrFloat)
+#endif
+
+#ifdef FP_SUPPORT_GMP_INT_TYPE
+FUNCTIONPARSER_INSTANTIATE_CLASS(GmpInt)
+#endif
+
+#ifdef FP_SUPPORT_COMPLEX_DOUBLE_TYPE
+FUNCTIONPARSER_INSTANTIATE_CLASS(std::complex<double>)
+#endif
+
+#ifdef FP_SUPPORT_COMPLEX_FLOAT_TYPE
+FUNCTIONPARSER_INSTANTIATE_CLASS(std::complex<float>)
+#endif
+
+#ifdef FP_SUPPORT_COMPLEX_LONG_DOUBLE_TYPE
+FUNCTIONPARSER_INSTANTIATE_CLASS(std::complex<long double>)
+#endif

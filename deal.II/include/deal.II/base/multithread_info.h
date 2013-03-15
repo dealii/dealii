@@ -33,6 +33,10 @@ DEAL_II_NAMESPACE_OPEN
  * threads used for task-based parallel methods is selected automatically
  * by the Threading Building
  * Blocks library. See @ref threads for more information on this.
+ * To set n_default_threads add the following at the start of your main():
+ * <code>
+ * multithread_info.n_default_threads=1;
+ * </code> 
  *
  * @ingroup threads
  * @author Thomas Richter, Wolfgang Bangerth, 2000

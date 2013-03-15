@@ -77,7 +77,7 @@ IF(NETCDF_FOUND)
     NETCDF_DIR
   )
 ELSE()
-  SET(NETCDF_DIR "" CACHE STRING
+  SET(NETCDF_DIR "" CACHE PATH
     "An optional hint to a NETCDF installation"
     )
 ENDIF()

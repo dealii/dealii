@@ -68,11 +68,7 @@ namespace PETScWrappers
           // an index set
           if (vector.ghosted)
             {
-#ifdef PETSC_USE_64BIT_INDICES
               PetscInt begin, end;
-#else
-              int begin, end;
-#endif
               ierr = VecGetOwnershipRange (vector.vector, &begin, &end);
               AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -119,12 +115,7 @@ namespace PETScWrappers
           // first verify that the requested
           // element is actually locally
           // available
-
-#ifdef PETSC_USE_64BIT_INDICES
           PetscInt begin, end;
-#else
-          int begin, end;
-#endif
 
           ierr = VecGetOwnershipRange (vector.vector, &begin, &end);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -266,12 +257,7 @@ namespace PETScWrappers
   VectorBase::size_type 
   VectorBase::size () const
   {
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscInt
-#else
-    int
-#endif
-    sz;
+    PetscInt sz;
     const int ierr = VecGetSize (vector, &sz);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -283,12 +269,7 @@ namespace PETScWrappers
   VectorBase::size_type 
   VectorBase::local_size () const
   {
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscInt
-#else
-    int
-#endif
-    sz;
+    PetscInt sz;
     const int ierr = VecGetLocalSize (vector, &sz);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -300,12 +281,7 @@ namespace PETScWrappers
   std::pair<VectorBase::size_type, VectorBase::size_type>
   VectorBase::local_range () const
   {
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscInt
-#else
-    int
-#endif
-    begin, end;
+    PetscInt begin, end;
     const int ierr = VecGetOwnershipRange (static_cast<const Vec &>(vector),
                                            &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));

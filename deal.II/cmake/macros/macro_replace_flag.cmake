@@ -13,18 +13,23 @@
 #####
 
 #
-# Remove all occurences of "${flag}" in the string variable.
+# Replace all occurences of "${flag}" with "${replacement}" in the string
+# variable.
 #
 # Usage:
-#     STRIP_FLAG(variable flag)
+#     STRIP_FLAG(variable flag replacement)
 #
 
-MACRO(STRIP_FLAG _variable _flag)
+MACRO(REPLACE_FLAG _variable _flag _replacement)
+  STRING(STRIP "${_replacement}" _replacement_stripped)
   STRING(REPLACE " " "  " ${_variable} "${${_variable}}")
   SET(${_variable} " ${${_variable}} ")
   STRING(REPLACE " " "  " _flag2 "${_flag}")
-  STRING(REPLACE " ${_flag2} " " " ${_variable} "${${_variable}}")
+  IF(NOT "${_replacement_stripped}" STREQUAL "")
+    STRING(REPLACE " ${_flag2} " " ${_replacement_stripped} " ${_variable} "${${_variable}}")
+  ELSE()
+    STRING(REPLACE " ${_flag2} " " " ${_variable} "${${_variable}}")
+  ENDIF()
   STRING(REPLACE "  " " " ${_variable} "${${_variable}}")
   STRING(STRIP "${${_variable}}" ${_variable})
 ENDMACRO()
-

@@ -26,21 +26,21 @@ int main()
 
 				   // Open with full debugging
   PathSearch cc("CC", 3);
-  cc.add_path(DEAL_II_PATH "/source/lac/");
-  cc.add_path(DEAL_II_PATH "/include/deal.II/lac/", PathSearch::front);
+  cc.add_path("../");
+  cc.add_path("../scripts/", PathSearch::front);
   cc.add_suffix(".c");
   cc.add_suffix(".cc");
 
-  deallog << cc.find("block_vector.cc") << std::endl;
-  deallog << cc.find("block_vector") << std::endl;
+  deallog << cc.find("path_search.cc") << std::endl;
+  deallog << cc.find("path_search") << std::endl;
   cc.add_suffix(".h", PathSearch::after_none);
-  deallog << cc.find("block_vector") << std::endl;
+  deallog << cc.find("tests") << std::endl;
   cc.show(deallog);
   
   PathSearch mesh("MESH", 3);
+  mesh.add_path("../bits/");
   mesh.show(deallog);
-  std::ifstream in(mesh.find("backstep").c_str());
-  deallog << mesh.find("backstep") << std::endl;
+  std::ifstream in(mesh.find("grid_in_msh_01.2d").c_str());
   std::string line;
   for (unsigned int i=0;i<4;++i)
     {

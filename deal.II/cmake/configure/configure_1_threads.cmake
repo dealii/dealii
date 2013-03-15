@@ -55,7 +55,14 @@ MACRO(SETUP_THREADING)
   #
   # Set up some posix thread specific configuration toggles:
   #
-  IF(CMAKE_USE_PTHREADS_INIT)
+  IF(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+
+    IF(NOT CMAKE_USE_PTHREADS_INIT)
+      MESSAGE(FATAL_ERROR
+        "\nInternal configuration error: Not on Windows but posix thread support unavailable\n\n"
+        )
+    ENDIF()
+
     SET(DEAL_II_USE_MT_POSIX TRUE)
 
     #
@@ -76,11 +83,17 @@ MACRO(SETUP_THREADING)
     "
     DEAL_II_HAVE_MT_POSIX_BARRIERS)
     STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
-
     IF(NOT DEAL_II_HAVE_MT_POSIX_BARRIERS)
       SET(DEAL_II_USE_MT_POSIX_NO_BARRIERS TRUE)
     ENDIF()
 
+  ELSE()
+
+    #
+    # Poor Windows:
+    #
+    SET(DEAL_II_USE_MT_POSIX FALSE)
+    SET(DEAL_II_USE_MT_POSIX_NO_BARRIERS TRUE)
   ENDIF()
 
 ENDMACRO()

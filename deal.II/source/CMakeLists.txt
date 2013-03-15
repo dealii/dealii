@@ -57,13 +57,13 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
 
   SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     PROPERTIES
-    VERSION ${VERSION}
+    VERSION "${DEAL_II_PACKAGE_VERSION}"
     #
     # Sonaming: Well... we just use the version number.
     # No point to wrack one's brain over the question whether a new version of
     # a C++ library is still ABI backwards compatible :-]
     #
-    SOVERSION ${VERSION}
+    SOVERSION "${DEAL_II_PACKAGE_VERSION}"
     LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_${build}}"
     COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
     COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${build}}"

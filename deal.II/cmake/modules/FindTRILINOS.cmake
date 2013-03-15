@@ -34,7 +34,7 @@ SET_IF_EMPTY(TRILINOS_DIR "$ENV{TRILINOS_DIR}")
 # Include the trilinos package configuration:
 #
 FIND_PACKAGE(TRILINOS_CONFIG
-  CONFIG
+  CONFIG QUIET
   NAMES Trilinos TRILINOS
   HINTS
     ${TRILINOS_DIR}/lib/cmake/Trilinos
@@ -127,7 +127,7 @@ IF(TRILINOS_FOUND)
 
 ELSE()
 
-  SET(TRILINOS_DIR "" CACHE STRING
+  SET(TRILINOS_DIR "" CACHE PATH
     "An optional hint to a Trilinos installation"
     )
 ENDIF()

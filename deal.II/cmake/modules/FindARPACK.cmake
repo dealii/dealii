@@ -62,7 +62,7 @@ IF(ARPACK_FOUND)
     ARPACK_DIR
   )
 ELSE()
-  SET(ARPACK_DIR "" CACHE STRING
+  SET(ARPACK_DIR "" CACHE PATH
     "An optional hint to an ARPACK installation"
     )
 ENDIF()

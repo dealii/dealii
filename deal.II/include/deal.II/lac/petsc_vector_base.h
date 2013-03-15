@@ -968,11 +968,7 @@ namespace PETScWrappers
 
       Assert (!vector.has_ghost_elements(), ExcGhostsPresent());
 
-#ifdef PETSC_USE_64BIT_INDICES
       const PetscInt petsc_i = index;
-#else
-      const signed int petsc_i = index;
-#endif
 
       const int ierr
         = VecSetValues (vector, 1, &petsc_i, &value, INSERT_VALUES);
@@ -1010,11 +1006,7 @@ namespace PETScWrappers
         return *this;
 
       // use the PETSc function to add something
-#ifdef PETSC_USE_64BIT_INDICES
       const PetscInt petsc_i = index;
-#else
-      const signed int petsc_i = index;
-#endif
       const int ierr
         = VecSetValues (vector, 1, &petsc_i, &value, ADD_VALUES);
       AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -1051,11 +1043,7 @@ namespace PETScWrappers
 
       // use the PETSc function to
       // add something
-#ifdef PETSC_USE_64BIT_INDICES
       const PetscInt petsc_i = index;
-#else
-      const signed int petsc_i = index;
-#endif
       const PetscScalar subtractand = -value;
       const int ierr
         = VecSetValues (vector, 1, &petsc_i, &subtractand, ADD_VALUES);
@@ -1090,12 +1078,7 @@ namespace PETScWrappers
       if (value == 1.)
         return *this;
 
-#ifdef PETSC_USE_64BIT_INDICES
       const PetscInt petsc_i = index;
-#else
-      const signed int petsc_i = index;
-#endif
-
       const PetscScalar new_value
         = static_cast<PetscScalar>(*this) * value;
 
@@ -1132,12 +1115,7 @@ namespace PETScWrappers
       if (value == 1.)
         return *this;
 
-#ifdef PETSC_USE_64BIT_INDICES
       const PetscInt petsc_i = index;
-#else
-      const signed int petsc_i = index;
-#endif
-
       const PetscScalar new_value
         = static_cast<PetscScalar>(*this) / value;
 
@@ -1155,12 +1133,7 @@ namespace PETScWrappers
   bool
   VectorBase::in_local_range (const size_type index) const
   {
-#ifdef PETSC_USE_64BIT_INDICES
     PetscInt begin, end;
-#else
-    int begin, end;
-#endif
-
     const int ierr = VecGetOwnershipRange (static_cast<const Vec &>(vector),
                                            &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));

@@ -16,30 +16,38 @@
 # Configuration for mpi support:
 #
 
-SET(DEAL_II_ALLOW_GENERIC_MPI ON CACHE BOOL
-  "Allow the usage of an external mpi library even if the current compiler is not an mpi wrapper"
-  )
-
-
 MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   #
-  # If CMAKE_CXX_COMPILER is already an MPI wrapper, use it to determine
-  # the mpi implementation:
+  # Obey a manual user override: If MPI_CXX_FOUND is set to true in the
+  # cache, we skip the FIND_PACKAGE calls:
   #
-  SET(MPI_C_COMPILER ${CMAKE_C_COMPILER})
-  SET(MPI_CXX_COMPILER ${CMAKE_CXX_COMPILER})
+  IF(MPI_CXX_FOUND)
+    SET(MPI_FOUND TRUE)
+  ENDIF()
+
+  #
+  # If CMAKE_CXX_COMPILER is already an MPI wrapper, use it to determine
+  # the mpi implementation. If MPI_CXX_COMPILER is defined use the value
+  # directly.
+  #
+  SET_IF_EMPTY(MPI_CXX_COMPILER ${CMAKE_CXX_COMPILER})
+  SET_IF_EMPTY(MPI_C_COMPILER ${CMAKE_C_COMPILER}) # for good measure
   FIND_PACKAGE(MPI)
 
   IF(NOT MPI_CXX_FOUND)
     #
     # CMAKE_CXX_COMPILER is apparently not an mpi wrapper.
-    # If we're allowed to do so, search for a generic mpi implementation
-    # and use it.
+    # So, let's be a bit more aggressive in finding MPI if DEAL_II_WITH_MPI
+    # is set.
     #
-    IF(DEAL_II_ALLOW_GENERIC_MPI)
-      SET(MPI_FOUND)
-      UNSET(MPI_C_COMPILER CACHE)
+    IF(DEAL_II_WITH_MPI)
+      MESSAGE(STATUS
+        "MPI not found but DEAL_II_WITH_MPI is set to TRUE."
+        " Try again with more aggressive search paths:"
+        )
+      SET(MPI_FOUND) # clear this value so that FIND_PACKAGE runs again.
       UNSET(MPI_CXX_COMPILER CACHE)
+      UNSET(MPI_C_COMPILER CACHE)
       FIND_PACKAGE(MPI)
     ENDIF()
   ENDIF()

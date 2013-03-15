@@ -1,5 +1,5 @@
 /***************************************************************************\
-|* Function Parser for C++ v4.5                                            *|
+|* Function Parser for C++ v4.5.1                                          *|
 |*-------------------------------------------------------------------------*|
 |* Copyright: Juha Nieminen                                                *|
 |*                                                                         *|
@@ -47,6 +47,12 @@
    resulting binary smaller.)
  */
 //#define FP_DISABLE_DOUBLE_TYPE
+
+/* Uncomment this line or define it in your compiler settings to make the
+   parser use C++11 math functions. (Note that these may not be supported
+   by all compilers.)
+*/
+//#define FP_SUPPORT_CPLUSPLUS11_MATH_FUNCS
 
 /*
  Whether to use shortcut evaluation for the & and | operators:

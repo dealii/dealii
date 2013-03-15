@@ -93,10 +93,10 @@ IF(SCALAPACK_FOUND)
     BLACSF77INIT_LIBRARY
     )
 ELSE()
-  SET(SCALAPACK_DIR "" CACHE STRING
+  SET(SCALAPACK_DIR "" CACHE PATH
     "An optional hint to a SCALAPACK directory"
     )
-  SET(BLACS_DIR "" CACHE STRING
+  SET(BLACS_DIR "" CACHE PATH
     "An optional hint to a BLACS directory"
     )
 ENDIF()
