@@ -389,21 +389,34 @@
     <p>
       It is possible to override the CMake find mechanism for external
       libraries manually. This is useful if a non standard library (e.g.
-      lapack/blas) should be used but cannot be found by the
-      <code>FIND_PACKAGE(...)</code> mechanism of cmake.
+      BLAS or LAPACK) should be used but cannot be found by the
+      <code>FIND_PACKAGE(...)</code> mechanism of cmake in the default
+      directories.
       In this case you can set by hand:
-    </p>
-    <pre>
+      <pre>
 
     cmake -DLAPACK_FOUND=true \
-          -DLAPACK_LIBRARIES="library;and;complete;link;interface" \
-          -DLAPACK_LINKER_FLAGS="" &lt;...&gt;
+          -DLAPACK_LIBRARIES="library;and;complete;link;interface"
       </pre>
-      You can set these values on the command line, with ccmake or by
-      providing an initial cache file, see
+      The first of the two defines ensures that <code>cmake</code> doesn't
+      just take the second as hints but errors out if LAPACK can't
+      be used with the given library (if you are sure that the path works, you
+      can then omit the first command). An example of use is to select BLAS
+      and LAPACK as follows:
+      <pre>
+
+    cmake -DBLAS_FOUND=true \
+          -DBLAS_LIBRARIES=/apps/GotoBLAS/lib64/libgoto.so \
+          -DLAPACK_FOUND=true \
+          -DLAPACK_LIBRARIES=/apps/lapack-3.2.1/lib64/liblapack.so
+      </pre>
+
+      You can set these values on the command line, with <code>ccmake</code>
+      or by providing an initial cache file, see
       <a href="#advanced">advanced setup section</a>.
       Possible manual overrides are explained in detail in the
       in the <a href="Config.sample" target="_top">Config.sample file</a>.
+    </p>
 
 
     <a name="configurecomp"></a>
