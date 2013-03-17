@@ -5,7 +5,7 @@
     <title>The deal.II Readme on interfacing to PETSc</title>
     <link href="../screen.css" rel="StyleSheet">
     <meta name="author" content="the deal.II authors <authors @ dealii.org>">
-    <meta name="copyright" content="Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors">
     <meta name="date" content="$Date$">
     <meta name="svn_id" content="$Id$">
     <meta name="keywords" content="deal.II">
@@ -47,7 +47,9 @@
       PETSc usually requires you to set the
       environment variables <code>PETSC_DIR</code> and <code>PETSC_ARCH</code>
       to a path to PETSc and denoting the architecture for which PETSc is
-      compiled. If these environment variables are set, then
+      compiled (a string you can choose however you like, it is simply
+      intended to identify one of possibly several different PETSc
+      installations). If these environment variables are set, then
       <acronym>deal.II</acronym> will pick them up during
       configuration, and store them. It will then also recognize that
       PETSc shall be used, and enable the wrapper classes.
@@ -127,6 +129,20 @@
 
 	export PETSC_DIR=/path/to/petsc-x-y-z
       </pre>
+    </p>
+
+    <p>
+      By default, PETSc is compiled in "debug mode". You can switch this to
+      "optimized mode" by adding the command line parameter
+      <pre>
+
+	--with-debugging=0
+      </pre>
+      to the call of <code>./config/configure.py</code> above. In some cases,
+      this has made linear solvers run up to 30% faster. As with choosing
+      between <acronym>deal.II</acronym>'s debug and optimized modes, you
+      should only use optimized PETSc builds once you have tested that your
+      program runs well in debug mode.
     </p>
 
     <hr>
