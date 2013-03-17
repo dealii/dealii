@@ -24,11 +24,13 @@ inconvenience this causes.
 </p>
 
 <ol>
-<!--
-<li>
+
+<li> Changed: The TimeDependent::end_sweep function with an argument indicating
+the number of threads has been removed. Use the corresponding function without
+an argument. Since the argument had a default value, few users will have used
+this function.
 <br>
-(NAME, 2013/02/16)
--->
+(Wolfgang Bangerth, 2013/03/17)
 
 </ol>
 
