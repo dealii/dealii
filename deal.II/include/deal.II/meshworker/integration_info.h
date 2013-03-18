@@ -220,7 +220,7 @@ namespace MeshWorker
      * Reinitialize internal data
      * structures for use on a cell.
      */
-    template <typename number=double>
+    template <typename number>
     void reinit(const DoFInfo<dim, spacedim, number> &i);
 
     /**
