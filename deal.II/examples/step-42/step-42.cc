@@ -460,9 +460,9 @@ namespace Step42
     class Obstacle : public Function<dim>
     {
     public:
-      Obstacle (std::unique_ptr<Input<dim> > const &_input) :
+      Obstacle (std_cxx1x::shared_ptr<Input<dim> > const &_input) :
         Function<dim>(dim),
-        input_obstacle_copy(std::move (_input)) {};
+        input_obstacle_copy(_input) {};
 
       virtual double value (const Point<dim>   &p,
                             const unsigned int  component = 0) const;
@@ -471,7 +471,7 @@ namespace Step42
                                  Vector<double>   &values) const;
 
     private:
-      std::unique_ptr<Input<dim> >  const &input_obstacle_copy;
+      std_cxx1x::shared_ptr<Input<dim> >  const &input_obstacle_copy;
     };
 
     template <int dim>
@@ -549,7 +549,7 @@ namespace Step42
     FESystem<dim>        fe;
     DoFHandler<dim>      dof_handler;
 
-    std::unique_ptr<parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> > soltrans;
+    std_cxx1x::shared_ptr<parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> > soltrans;
 
     IndexSet             locally_owned_dofs;
     IndexSet             locally_relevant_dofs;
@@ -574,8 +574,8 @@ namespace Step42
     TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
     TrilinosWrappers::PreconditionAMG preconditioner_u;
 
-    std::unique_ptr<Input<dim> >               input_obstacle;
-    std::unique_ptr<ConstitutiveLaw<dim> >     plast_lin_hard;
+    std_cxx1x::shared_ptr<Input<dim> >               input_obstacle;
+    std_cxx1x::shared_ptr<ConstitutiveLaw<dim> >     plast_lin_hard;
 
     double sigma_0;    // Yield stress
     double gamma;      // Parameter for the linear isotropic hardening
