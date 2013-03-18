@@ -80,9 +80,9 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
-    template <int dim>
+    template <int dim, typename number=double>
     void L2 (
-      Vector<double> &result,
+      Vector<number> &result,
       const FEValuesBase<dim> &fe,
       const std::vector<double> &input,
       const double factor = 1.)
@@ -109,9 +109,9 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
-    template <int dim>
+    template <int dim, typename number=double>
     void L2 (
-      Vector<double> &result,
+      Vector<number> &result,
       const FEValuesBase<dim> &fe,
       const VectorSlice<const std::vector<std::vector<double> > > &input,
       const double factor = 1.)

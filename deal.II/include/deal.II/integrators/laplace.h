@@ -486,10 +486,10 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2010
      */
-    template <int dim>
+    template <int dim, int spacedim=dim, typename number>
     double compute_penalty(
-      const MeshWorker::DoFInfo<dim> &dinfo1,
-      const MeshWorker::DoFInfo<dim> &dinfo2,
+      const MeshWorker::DoFInfo<dim,spacedim,number> &dinfo1,
+      const MeshWorker::DoFInfo<dim,spacedim,number> &dinfo2,
       unsigned int deg1,
       unsigned int deg2)
     {

@@ -121,9 +121,9 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2011
      */
-    template <int dim>
+    template <int dim, typename number=double>
     void cell_residual(
-      Vector<double> &result,
+      Vector<number> &result,
       const FEValuesBase<dim> &fetest,
       const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &input,
       const double factor = 1.)
@@ -201,9 +201,9 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2011
      */
-    template <int dim>
+    template <int dim, typename number=double>
     void gradient_residual(
-      Vector<double> &result,
+      Vector<number> &result,
       const FEValuesBase<dim> &fetest,
       const std::vector<Tensor<1,dim> > &input,
       const double factor = 1.)
@@ -273,10 +273,10 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2011
      */
-    template<int dim>
+    template<int dim, typename number=double>
     void
     u_dot_n_residual (
-      Vector<double> &result,
+      Vector<number> &result,
       const FEValuesBase<dim> &fe,
       const FEValuesBase<dim> &fetest,
       const VectorSlice<const std::vector<std::vector<double> > > &data,

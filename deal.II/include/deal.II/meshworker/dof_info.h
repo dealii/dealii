@@ -117,8 +117,7 @@ namespace MeshWorker
      * pointer empty, but setting
      * the #aux_local_indices.
      */
-    template <class DH>
-    DoFInfo (const DH &dof_handler);
+    DoFInfo (const DoFHandler<dim, spacedim>& dof_handler);
 
     /**
      * Set the current cell and
@@ -281,8 +280,7 @@ namespace MeshWorker
 //----------------------------------------------------------------------//
 
   template <int dim, int spacedim, typename number>
-  template <class DH>
-  DoFInfo<dim,spacedim,number>::DoFInfo(const DH &dof_handler)
+  DoFInfo<dim,spacedim,number>::DoFInfo(const DoFHandler<dim,spacedim> &dof_handler)
   {
     std::vector<unsigned int> aux(1);
     aux[0] = dof_handler.get_fe().dofs_per_cell;

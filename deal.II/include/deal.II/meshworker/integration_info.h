@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -220,7 +220,8 @@ namespace MeshWorker
      * Reinitialize internal data
      * structures for use on a cell.
      */
-    void reinit(const DoFInfo<dim, spacedim> &i);
+    template <typename number=double>
+    void reinit(const DoFInfo<dim, spacedim, number> &i);
 
     /**
      * Use the finite element
@@ -887,8 +888,9 @@ namespace MeshWorker
 
 
   template <int dim, int spacedim>
+  template <typename number>
   inline void
-  IntegrationInfo<dim,spacedim>::reinit(const DoFInfo<dim, spacedim> &info)
+  IntegrationInfo<dim,spacedim>::reinit(const DoFInfo<dim, spacedim, number> &info)
   {
     for (unsigned int i=0; i<fevalv.size(); ++i)
       {
@@ -920,8 +922,9 @@ namespace MeshWorker
 
 
   template <>
+  template <typename number>
   inline void
-  IntegrationInfo<1,1>::reinit(const DoFInfo<1,1> &info)
+  IntegrationInfo<1,1>::reinit(const DoFInfo<1,1,number> &info)
   {
     const int dim = 1;
     const int spacedim = 1;
@@ -954,8 +957,9 @@ namespace MeshWorker
 
 
   template <>
+  template <typename number>
   inline void
-  IntegrationInfo<1,2>::reinit(const DoFInfo<1,2> &info)
+  IntegrationInfo<1,2>::reinit(const DoFInfo<1,2,number> &info)
   {
     const int dim = 1;
     const int spacedim = 2;
