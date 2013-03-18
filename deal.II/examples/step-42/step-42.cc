@@ -690,7 +690,7 @@ namespace Step42
       dirichlet_constraints ();
     }
 
-    // Initialzation for matrices and vectors
+    // Initialization for matrices and vectors
     {
       solution.reinit (locally_relevant_dofs, mpi_communicator);
       system_rhs_newton.reinit (locally_owned_dofs, mpi_communicator);
@@ -1182,7 +1182,7 @@ namespace Step42
   // meaningless value. These values have to
   // to set to zero.
 
-  // The rest of the funtion is smiliar to
+  // The rest of the function is similar to
   // step-41 except that we use a FGMRES-solver
   // instead of CG. For a very small hardening
   // value gamma the linear system becomes
@@ -1335,7 +1335,7 @@ namespace Step42
 
             // The previous iteration of step 0 is the solution of an elastic problem.
             // So a linear combination of a plastic and an elastic solution makes no sense
-            // since the elastic solution is not in the konvex set of the plastic solution.
+            // since the elastic solution is not in the convex set of the plastic solution.
             if (j == 2)
               break;
           }
