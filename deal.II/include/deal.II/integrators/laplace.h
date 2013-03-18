@@ -486,7 +486,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2010
      */
-    template <int dim, int spacedim=dim, typename number>
+    template <int dim, int spacedim, typename number>
     double compute_penalty(
       const MeshWorker::DoFInfo<dim,spacedim,number> &dinfo1,
       const MeshWorker::DoFInfo<dim,spacedim,number> &dinfo2,

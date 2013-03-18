@@ -121,7 +121,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2011
      */
-    template <int dim, typename number=double>
+    template <int dim, typename number>
     void cell_residual(
       Vector<number> &result,
       const FEValuesBase<dim> &fetest,
@@ -201,7 +201,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2011
      */
-    template <int dim, typename number=double>
+    template <int dim, typename number>
     void gradient_residual(
       Vector<number> &result,
       const FEValuesBase<dim> &fetest,

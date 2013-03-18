@@ -75,7 +75,7 @@ namespace LocalIntegrators
      * - \int_Z \varepsilon(u): \varepsilon(v) \,dx
      * \f]
      */
-    template <int dim, typename number=double>
+    template <int dim, typename number>
     inline void
     cell_residual  (
       Vector<number> &result,
@@ -167,7 +167,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2013
      */
-    template <int dim, typename number=double>
+    template <int dim, typename number>
     void nitsche_residual (
       Vector<number> &result,
       const FEValuesBase<dim> &fe,
@@ -292,7 +292,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2013
      */
-    template<int dim, typename number=double>
+    template<int dim, typename number>
     void
     ip_residual(
       Vector<number> &result1,

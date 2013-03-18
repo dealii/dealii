@@ -80,7 +80,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
-    template <int dim, typename number=double>
+    template <int dim, typename number>
     void L2 (
       Vector<number> &result,
       const FEValuesBase<dim> &fe,
@@ -109,7 +109,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2008, 2009, 2010
      */
-    template <int dim, typename number=double>
+    template <int dim, typename number>
     void L2 (
       Vector<number> &result,
       const FEValuesBase<dim> &fe,
