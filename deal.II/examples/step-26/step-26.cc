@@ -98,9 +98,6 @@ namespace Step26
     Assert (component == 0, ExcInternalError());
     Assert (dim == 2, ExcNotImplemented());
 
-    return std::sin(p[0]*numbers::PI) * std::sin(p[1]*numbers::PI);
-
-
     const double time = this->get_time();
     const double point_within_period = (time/period - std::floor(time/period));
 
@@ -154,8 +151,7 @@ namespace Step26
   template<int dim>
   void HeatEquation<dim>::setup_system()
   {
-    //    GridGenerator::hyper_L (triangulation);
-    GridGenerator::hyper_cube (triangulation, 0, 1);
+    GridGenerator::hyper_L (triangulation);
     triangulation.refine_global (5);
 
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
@@ -267,7 +263,7 @@ namespace Step26
                                                    boundary_values_u_function, boundary_values);
 
           matrix_u.copy_from(mass_matrix);
-          matrix_u.add(theta * time_step, laplace_matrix); // I omit here a time_step*theta
+          matrix_u.add(theta * time_step, laplace_matrix);
           MatrixTools::apply_boundary_values(boundary_values, matrix_u,
                                              solution_u, system_rhs);
         }
