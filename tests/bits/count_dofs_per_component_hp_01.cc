@@ -53,8 +53,8 @@ void test ()
   dof_handler.distribute_dofs(fe_system);
 
   //count dofs per component and show them on the screen
-  std::vector<unsigned int> dofs_per_component(3,0);
-  std::vector<unsigned int> dofs_per_component_hp(3,0);
+  std::vector<types::global_dof_index> dofs_per_component(3,0);
+  std::vector<types::global_dof_index> dofs_per_component_hp(3,0);
   DoFTools::count_dofs_per_component(dof_handler, dofs_per_component);
   DoFTools::count_dofs_per_component(hp_dof_handler, dofs_per_component_hp);
 

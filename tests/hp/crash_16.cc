@@ -70,8 +70,8 @@ void test ()
 				   // loop over all lines and make sure that
 				   // all the DoF indices on these lines are
 				   // identical
-  std::vector<unsigned int> indices_1;
-  std::vector<unsigned int> indices_2;
+  std::vector<types::global_dof_index> indices_1;
+  std::vector<types::global_dof_index> indices_2;
 
   std::set<unsigned int> line_already_treated;
 

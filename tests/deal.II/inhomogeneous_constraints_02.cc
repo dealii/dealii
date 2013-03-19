@@ -76,7 +76,7 @@ void test(bool use_inhomogeneity_for_rhs)
   SparseMatrix<double> mat(sp);
   Vector<double> rhs(5);
 
-  std::vector<unsigned int> local_dofs;
+  std::vector<types::global_dof_index> local_dofs;
   for (unsigned int i=0;i<5;++i)
     local_dofs.push_back(i);
 

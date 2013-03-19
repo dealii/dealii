@@ -100,7 +100,7 @@ void test ()
 					      exact_solution,
 					      boundary_values);
 
-  for (std::map<unsigned int,double>::iterator i=boundary_values.begin();
+  for (std::map<types::global_dof_index,double>::iterator i=boundary_values.begin();
        i != boundary_values.end(); ++i)
     deallog << i->first << ' ' << i->second << std::endl;
 }

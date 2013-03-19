@@ -51,7 +51,7 @@ void test()
   triangulation.refine_global (2);
   dof_handler.distribute_dofs (fe);
 
-  std::vector<unsigned int> dofs_per_component (fe.n_components());
+  std::vector<types::global_dof_index> dofs_per_component (fe.n_components());
   DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
 
   Assert (std::accumulate (dofs_per_component.begin(), dofs_per_component.end(), 0U)

@@ -62,8 +62,8 @@ setup_constraints(const DoFHandler<dim>& dof_handler)
 	}      
     }
   
-  std::vector<unsigned int> cell_indices(fe.dofs_per_cell);
-  std::vector<unsigned int> neighbor_indices(fe.dofs_per_cell);
+  std::vector<types::global_dof_index> cell_indices(fe.dofs_per_cell);
+  std::vector<types::global_dof_index> neighbor_indices(fe.dofs_per_cell);
   
   for (typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active();
        cell != dof_handler.end();++cell)
@@ -90,7 +90,7 @@ setup_constraints(const DoFHandler<dim>& dof_handler)
 	      
 	      const unsigned int d = GeometryInfo<dim>::unit_normal_direction[other_face];
 	      
-	      std::vector<std::pair<unsigned int, double> > rhs;
+	      std::vector<std::pair<types::global_dof_index, double> > rhs;
 	      const unsigned int constrained = fe.face_to_cell_index(
 		(fvertex == 0) ? 2 : fe.dofs_per_face-1, face);
 	      double constrained_weight = 0.;

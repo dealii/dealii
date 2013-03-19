@@ -305,7 +305,7 @@ namespace Step37
   {
     data.cell_loop (&LaplaceOperator::local_apply, this, dst, src);
 
-    const std::vector<unsigned int> &
+    const std::vector<types::global_dof_index> &
     constrained_dofs = data.get_constrained_dofs();
     for (unsigned int i=0; i<constrained_dofs.size(); ++i)
       dst(constrained_dofs[i]) += src(constrained_dofs[i]);
@@ -431,7 +431,7 @@ namespace Step37
     typename FunctionMap<dim>::type dirichlet_boundary;
     ZeroFunction<dim>               homogeneous_dirichlet_bc (1);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-    std::vector<std::set<unsigned int> > boundary_indices(triangulation.n_levels());
+    std::vector<std::set<types::global_dof_index> > boundary_indices(triangulation.n_levels());
     MGTools::make_boundary_list (mg_dof_handler,
                                  dirichlet_boundary,
                                  boundary_indices);

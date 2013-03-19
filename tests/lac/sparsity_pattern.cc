@@ -94,9 +94,9 @@ main ()
 				   // now check for equivalence of sp3 and sp4
   for (unsigned int row=0; row<sp3.n_rows(); ++row)
     {
-      const unsigned int
+      const types::global_dof_index
         *sp3_p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
-      const unsigned int
+      const types::global_dof_index
         *sp4_p=sp4.get_column_numbers()+sp4.get_rowstart_indices()[row];
       for (; sp3_p != (sp3.get_column_numbers() +
                        sp3.get_rowstart_indices()[row+1]);

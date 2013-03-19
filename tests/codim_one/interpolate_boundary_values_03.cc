@@ -55,7 +55,7 @@ void test() {
 				   // separately
   for (unsigned int boundary_id=0; boundary_id<2; ++boundary_id)
     {
-      std::map<unsigned int, double> bv;
+      std::map<types::global_dof_index, double> bv;
       VectorTools::interpolate_boundary_values (dof_handler,
 						boundary_id,
 						Functions::SquareFunction<spacedim>(),

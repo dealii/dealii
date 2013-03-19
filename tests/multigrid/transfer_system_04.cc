@@ -109,7 +109,7 @@ void check (const FiniteElement<dim>& fe)
 			  0, 0,
 			  block_component, block_component);
 
-  std::vector<std::vector<unsigned int> > dofs_per_block(tr.n_levels(), std::vector<unsigned int>(2));
+  std::vector<std::vector<types::global_dof_index> > dofs_per_block(tr.n_levels(), std::vector<types::global_dof_index>(2));
   MGTools::count_dofs_per_block(mg_dof_handler, dofs_per_block, block_component);
   FullMatrix<double> prolong_0_1 (dofs_per_block[1][0],
                                   dofs_per_block[0][0]);

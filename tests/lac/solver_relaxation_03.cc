@@ -77,8 +77,8 @@ int main()
       testproblem.five_point(A, true);
 
 				       // The permutation vectors;
-      std::vector<unsigned int> perm(dim);
-      std::vector<unsigned int> iperm(dim);
+      std::vector<types::global_dof_index> perm(dim);
+      std::vector<types::global_dof_index> iperm(dim);
       
       for (unsigned int blocksize = 4; blocksize < 32; blocksize <<= 1)
 	{

@@ -53,7 +53,7 @@ check ()
   DoFHandler<dim> dof(tr);
   dof.distribute_dofs(element);
 
-  std::vector<unsigned int> count (element.n_components());
+  std::vector<types::global_dof_index> count (element.n_components());
   DoFTools::count_dofs_per_component (dof, count, false);
 
   for (unsigned int d=0; d<count.size(); ++d)

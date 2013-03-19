@@ -106,8 +106,8 @@ int main()
       PreconditionSSOR<> prec_ssor;
       prec_ssor.initialize(A, 1.2);
 
-      std::vector<unsigned int> permutation(dim);
-      std::vector<unsigned int> inverse_permutation(dim);
+      std::vector<types::global_dof_index> permutation(dim);
+      std::vector<types::global_dof_index> inverse_permutation(dim);
 
 				       // Create a permutation: Blocks
 				       // backwards and every second

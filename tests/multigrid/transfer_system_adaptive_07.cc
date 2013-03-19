@@ -154,8 +154,8 @@ void check (const FiniteElement<dim>& fe)
   transfer.build_matrices(mg_dof_handler, mg_dof_handler, 
       0, 0, block_selected, block_selected);
 
-  std::vector<std::vector<unsigned int> > 
-    dofs_per_block(tr.n_levels(), std::vector<unsigned int>(2));
+  std::vector<std::vector<types::global_dof_index> > 
+    dofs_per_block(tr.n_levels(), std::vector<types::global_dof_index>(2));
   MGTools::count_dofs_per_block(mg_dof_handler, 
       dofs_per_block, block_selected);
 

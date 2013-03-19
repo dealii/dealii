@@ -493,8 +493,8 @@ void matrix_position ()
     Assert (sparsity_pattern(sparsity_pattern.matrix_position(i).first,
 			     sparsity_pattern.matrix_position(i).second) == i,
 	    ExcInternalError());
-  for (unsigned int row=0; row<sparsity_pattern.n_rows(); ++row)
-    for (unsigned int col=0; col<sparsity_pattern.n_cols(); ++col)
+  for (types::global_dof_index row=0; row<sparsity_pattern.n_rows(); ++row)
+    for (types::global_dof_index col=0; col<sparsity_pattern.n_cols(); ++col)
       if (sparsity_pattern(row,col) != SparsityPattern::invalid_entry)
 	Assert (sparsity_pattern.matrix_position(sparsity_pattern(row,col)) ==
 		std::make_pair(row,col),

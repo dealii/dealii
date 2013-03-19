@@ -450,7 +450,7 @@ namespace Step22
 
     constraints.close ();
 
-    std::vector<unsigned int> dofs_per_block (2);
+    std::vector<types::global_dof_index> dofs_per_block (2);
     DoFTools::count_dofs_per_block (dof_handler, dofs_per_block,
                                     block_component);
     const unsigned int n_u = dofs_per_block[0],

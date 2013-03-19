@@ -75,11 +75,11 @@ void test ()
   typename FunctionMap<dim>::type dirichlet_boundary;
   ZeroFunction<dim>               homogeneous_dirichlet_bc (1);
   dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-  std::vector<std::set<unsigned int> > boundary_indices(nlevels);
+  std::vector<std::set<types::global_dof_index> > boundary_indices(nlevels);
   MGTools::make_boundary_list (dof, dirichlet_boundary, boundary_indices);
   for (unsigned int level=0;level<nlevels;++level)
     {
-      std::set<unsigned int>::iterator bc_it = boundary_indices[level].begin();
+      std::set<types::global_dof_index>::iterator bc_it = boundary_indices[level].begin();
       for ( ; bc_it != boundary_indices[level].end(); ++bc_it)
         mg_constraints[level].add_line(*bc_it);
       mg_constraints[level].close();

@@ -149,7 +149,7 @@ void check (const FiniteElement<dim>& fe)
     DoFRenumbering::component_wise (mg_dof_handler, 
         level, block_selected);
 
-  std::vector<std::set<unsigned int> > boundary_indices(tr.n_levels());
+  std::vector<std::set<types::global_dof_index> > boundary_indices(tr.n_levels());
   typename FunctionMap<dim>::type      dirichlet_boundary;
   ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
   dirichlet_boundary[3] =             &dirichlet_bc;
@@ -161,8 +161,8 @@ void check (const FiniteElement<dim>& fe)
   transfer.build_matrices(mg_dof_handler, mg_dof_handler, 
       0, 0, block_selected, block_selected, boundary_indices);
 
-  std::vector<std::vector<unsigned int> > 
-    dofs_per_block(tr.n_levels(), std::vector<unsigned int>(2));
+  std::vector<std::vector<types::global_dof_index> > 
+    dofs_per_block(tr.n_levels(), std::vector<types::global_dof_index>(2));
   MGTools::count_dofs_per_block(mg_dof_handler, 
       dofs_per_block, block_selected);
 

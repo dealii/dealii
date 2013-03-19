@@ -59,7 +59,7 @@ reinit_vector_by_blocks (
     {
       std::vector<std::vector<types::global_dof_index> >
 	new_dofs(mg_dof.get_tria().n_levels(),
-		 std::vector<unsigned int>(selected.size()));
+		 std::vector<types::global_dof_index>(selected.size()));
       std::swap(ndofs, new_dofs);
       MGTools::count_dofs_per_block (mg_dof, ndofs);
     }

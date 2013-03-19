@@ -64,7 +64,7 @@ void test ()
                                             Functions::SquareFunction<dim>(),
                                             boundary_values);
   deallog << boundary_values.size() << std::endl;
-  for (std::map<unsigned int,double>::const_iterator
+  for (std::map<types::global_dof_index,double>::const_iterator
 	 p = boundary_values.begin();
        p != boundary_values.end(); ++p)
     deallog << p->first << ' ' << p->second << std::endl;

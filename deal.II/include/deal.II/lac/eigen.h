@@ -145,6 +145,11 @@ class EigenInverse : private Solver<VECTOR>
 {
 public:
   /**
+   * Declare type of container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Standardized data struct to
    * pipe additional data to the
    * solver.

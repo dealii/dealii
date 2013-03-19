@@ -41,7 +41,7 @@ print_dofs (const DoFHandler<dim> &dof, stream & out)
   out << std::setprecision (2);
   out << std::fixed;
   const FiniteElement<dim>& fe = dof.get_fe();
-  std::vector<unsigned int> v (fe.dofs_per_cell);
+  std::vector<types::global_dof_index> v (fe.dofs_per_cell);
   std_cxx1x::shared_ptr<FEValues<dim> > fevalues;
 
   if (fe.has_support_points())
