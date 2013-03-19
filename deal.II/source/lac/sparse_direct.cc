@@ -1847,7 +1847,7 @@ void SparseDirectUMFPACK::factorize (const Matrix &)
 void
 SparseDirectUMFPACK::solve (Vector<double> &) const
 {
-  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but you called ./configure without the necessary --with-umfpack switch."));
+  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
 }
 
 
@@ -1856,7 +1856,7 @@ void
 SparseDirectUMFPACK::solve (const Matrix &,
                             Vector<double> &)
 {
-  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but you called ./configure without the necessary --with-umfpack switch."));
+  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
 }
 
 

@@ -1,0 +1,4 @@
+
+DEAL::ExcIndexRange (tensor.first_tensor_component, 0, fe_values_views_cache.symmetric_second_order_tensors.size())
+DEAL::ExcIndexRange (tensor.first_tensor_component, 0, fe_values_views_cache.symmetric_second_order_tensors.size())
+DEAL::ExcIndexRange (tensor.first_tensor_component, 0, fe_values_views_cache.symmetric_second_order_tensors.size())

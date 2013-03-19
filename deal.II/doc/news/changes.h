@@ -24,11 +24,13 @@ inconvenience this causes.
 </p>
 
 <ol>
-<!--
-<li>
+
+<li> Changed: The TimeDependent::end_sweep function with an argument indicating
+the number of threads has been removed. Use the corresponding function without
+an argument. Since the argument had a default value, few users will have used
+this function.
 <br>
-(NAME, 2013/02/16)
--->
+(Wolfgang Bangerth, 2013/03/17)
 
 </ol>
 
@@ -67,7 +69,17 @@ inconvenience this causes.
 
 <ol>
 
-<li> Fixed: FETools::interpolation_difference with PETSc.
+<li> Changed: FEValuesExtractors::Scalar, FEValuesExtractors::Vector and
+FEValuesExtractors::SymmetricTensor could not be default constructed, and
+consequently one could not easily put them into arrays (where they would
+be default constructed when changing the size, and later assigned useful
+values). These classes can now be default constructed to invalid
+values, but can of course not be used in any useful way.
+<br>
+(Wolfgang Bangerth, 2013/03/15)
+
+<li> Fixed: FETools::interpolation_difference did not work with PETSc.
+This is now fixed.
 <br>
 (Timo Heister, 2013/03/01)
 

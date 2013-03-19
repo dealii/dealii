@@ -460,9 +460,9 @@ namespace Step42
     class Obstacle : public Function<dim>
     {
     public:
-      Obstacle (std::unique_ptr<Input<dim> > const &_input) :
+      Obstacle (std_cxx1x::shared_ptr<Input<dim> > const &_input) :
         Function<dim>(dim),
-        input_obstacle_copy(std::move (_input)) {};
+        input_obstacle_copy(_input) {};
 
       virtual double value (const Point<dim>   &p,
                             const unsigned int  component = 0) const;
@@ -471,7 +471,7 @@ namespace Step42
                                  Vector<double>   &values) const;
 
     private:
-      std::unique_ptr<Input<dim> >  const &input_obstacle_copy;
+      std_cxx1x::shared_ptr<Input<dim> >  const &input_obstacle_copy;
     };
 
     template <int dim>
@@ -549,7 +549,7 @@ namespace Step42
     FESystem<dim>        fe;
     DoFHandler<dim>      dof_handler;
 
-    std::unique_ptr<parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> > soltrans;
+    std_cxx1x::shared_ptr<parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> > soltrans;
 
     IndexSet             locally_owned_dofs;
     IndexSet             locally_relevant_dofs;
@@ -574,8 +574,8 @@ namespace Step42
     TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
     TrilinosWrappers::PreconditionAMG preconditioner_u;
 
-    std::unique_ptr<Input<dim> >               input_obstacle;
-    std::unique_ptr<ConstitutiveLaw<dim> >     plast_lin_hard;
+    std_cxx1x::shared_ptr<Input<dim> >               input_obstacle;
+    std_cxx1x::shared_ptr<ConstitutiveLaw<dim> >     plast_lin_hard;
 
     double sigma_0;    // Yield stress
     double gamma;      // Parameter for the linear isotropic hardening
@@ -690,7 +690,7 @@ namespace Step42
       dirichlet_constraints ();
     }
 
-    // Initialzation for matrices and vectors
+    // Initialization for matrices and vectors
     {
       solution.reinit (locally_relevant_dofs, mpi_communicator);
       system_rhs_newton.reinit (locally_owned_dofs, mpi_communicator);
@@ -1182,7 +1182,7 @@ namespace Step42
   // meaningless value. These values have to
   // to set to zero.
 
-  // The rest of the funtion is smiliar to
+  // The rest of the function is similar to
   // step-41 except that we use a FGMRES-solver
   // instead of CG. For a very small hardening
   // value gamma the linear system becomes
@@ -1335,7 +1335,7 @@ namespace Step42
 
             // The previous iteration of step 0 is the solution of an elastic problem.
             // So a linear combination of a plastic and an elastic solution makes no sense
-            // since the elastic solution is not in the konvex set of the plastic solution.
+            // since the elastic solution is not in the convex set of the plastic solution.
             if (j == 2)
               break;
           }
@@ -1540,10 +1540,6 @@ int main (int argc, char *argv[])
 
   deallog.depth_console (0);
 
-  clock_t     start, end;
-
-  start = clock();
-
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
   {
     int _n_refinements_global = 3;
@@ -1556,9 +1552,6 @@ int main (int argc, char *argv[])
     PlasticityContactProblem<3> laplace_problem_3d (_n_refinements_global);
     laplace_problem_3d.run ();
   }
-
-  end = clock();
-  cout<< "%%%%%% Rechenzeit overall = " << (double)(end-start)/CLOCKS_PER_SEC <<std::endl;
 
   return 0;
 }
