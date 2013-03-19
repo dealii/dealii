@@ -1540,10 +1540,6 @@ int main (int argc, char *argv[])
 
   deallog.depth_console (0);
 
-  clock_t     start, end;
-
-  start = clock();
-
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
   {
     int _n_refinements_global = 3;
@@ -1556,9 +1552,6 @@ int main (int argc, char *argv[])
     PlasticityContactProblem<3> laplace_problem_3d (_n_refinements_global);
     laplace_problem_3d.run ();
   }
-
-  end = clock();
-  cout<< "%%%%%% Rechenzeit overall = " << (double)(end-start)/CLOCKS_PER_SEC <<std::endl;
 
   return 0;
 }
