@@ -273,7 +273,7 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2011
      */
-    template<int dim, typename number=double>
+    template<int dim, typename number>
     void
     u_dot_n_residual (
       Vector<number> &result,
@@ -457,7 +457,7 @@ namespace LocalIntegrators
                 }
         }
     }
-    
+
     /**
      * The <i>L</i><sup>2</sup>-norm of the divergence over the
      * quadrature set determined by the FEValuesBase object.
