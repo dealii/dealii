@@ -98,7 +98,8 @@ namespace Step26
     Assert (component == 0, ExcInternalError());
     Assert (dim == 2, ExcNotImplemented());
 
-    return std::cos(p[0]*numbers::PI/2) * std::cos(p[1]*numbers::PI/2);
+    return std::sin(p[0]*numbers::PI) * std::sin(p[1]*numbers::PI);
+
 
     const double time = this->get_time();
     const double point_within_period = (time/period - std::floor(time/period));
@@ -146,7 +147,7 @@ namespace Step26
 
   template<int dim>
   HeatEquation<dim>::HeatEquation() :
-    fe(1), dof_handler(triangulation), time_step(1. / 1000), theta(0.5)
+    fe(1), dof_handler(triangulation), time_step(1. / 500), theta(0.5)
   {
   }
 
@@ -154,8 +155,8 @@ namespace Step26
   void HeatEquation<dim>::setup_system()
   {
     //    GridGenerator::hyper_L (triangulation);
-    GridGenerator::hyper_cube (triangulation, -1, 1);
-    triangulation.refine_global (7);
+    GridGenerator::hyper_cube (triangulation, 0, 1);
+    triangulation.refine_global (5);
 
     std::cout << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl;
@@ -211,6 +212,8 @@ namespace Step26
                                  + Utilities::int_to_string(timestep_number, 3) + ".vtk";
     std::ofstream output(filename.c_str());
     data_out.write_vtk(output);
+
+    std::cout << "    max= " << time << ' ' << solution_u.linfty_norm() << std::endl;
   }
 
   template<int dim>
@@ -238,20 +241,20 @@ namespace Step26
         mass_matrix.vmult(system_rhs, old_solution_u);
 
         laplace_matrix.vmult(tmp, old_solution_u);
-        system_rhs.add(-(1 - theta) * time_step, tmp); //I omit here a time_step
+        system_rhs.add(-(1 - theta) * time_step, tmp);
 
         RightHandSide<dim> rhs_function;
         rhs_function.set_time(time);
         VectorTools::create_right_hand_side(dof_handler, QGauss<dim>(2),
                                             rhs_function, tmp);
         forcing_terms = tmp;
-        forcing_terms *= theta; // I omit here a time_step
+        forcing_terms *= theta;
 
         rhs_function.set_time(time - time_step);
         VectorTools::create_right_hand_side(dof_handler, QGauss<dim>(2),
                                             rhs_function, tmp);
 
-        forcing_terms.add((1 - theta) * time_step, tmp);
+        forcing_terms.add(1 - theta, tmp);
 
         system_rhs.add(time_step, forcing_terms);
 
