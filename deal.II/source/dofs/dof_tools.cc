@@ -4333,7 +4333,7 @@ namespace DoFTools
     void
     resolve_components (const FiniteElement<dim,spacedim> &fe,
                         const std::vector<unsigned char> &dofs_by_component,
-                        const std::vector<types::global_dof_index> &target_component,
+                        const std::vector<unsigned int>  &target_component,
                         const bool                        only_once,
                         std::vector<types::global_dof_index> &dofs_per_component,
                         unsigned int                     &component)
@@ -4374,7 +4374,7 @@ namespace DoFTools
     void
     resolve_components (const hp::FECollection<dim,spacedim> &fe_collection,
                         const std::vector<unsigned char> &dofs_by_component,
-                        const std::vector<types::global_dof_index> &target_component,
+                        const std::vector<unsigned int>  &target_component,
                         const bool                        only_once,
                         std::vector<types::global_dof_index> &dofs_per_component,
                         unsigned int                     &component)
@@ -4440,7 +4440,7 @@ namespace DoFTools
     const DH      &dof_handler,
     std::vector<types::global_dof_index> &dofs_per_component,
     bool only_once,
-    std::vector<types::global_dof_index>  target_component)
+    std::vector<unsigned int>  target_component)
   {
     const unsigned int n_components = dof_handler.get_fe().n_components();
 
@@ -4597,7 +4597,7 @@ namespace DoFTools
   void
   count_dofs_per_component (const DoFHandler<dim,spacedim> &dof_handler,
                             std::vector<types::global_dof_index>      &dofs_per_component,
-                            std::vector<types::global_dof_index>       target_component)
+                            std::vector<unsigned int>       target_component)
   {
     count_dofs_per_component (dof_handler, dofs_per_component,
                               false, target_component);

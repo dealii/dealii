@@ -32,21 +32,21 @@ int main()
   deallog.threshold_double(1.e-10);
 
   BlockSparsityPattern sparsity;
-  std::vector<unsigned int> row_blocks(4);
+  std::vector<types::global_dof_index> row_blocks(4);
   row_blocks[0] = 4;
   row_blocks[1] = 5;
   row_blocks[2] = 1;
   row_blocks[3] = 4;
-  std::vector<unsigned int> col_blocks(3);
+  std::vector<types::global_dof_index> col_blocks(3);
   col_blocks[0] = 2;
   col_blocks[1] = 3;
   col_blocks[2] = 2;
   BlockIndices rows(row_blocks);
   BlockIndices cols(col_blocks);
 
-  std::vector<std::vector<unsigned int> >
+  std::vector<std::vector<types::global_dof_index> >
     row_length(cols.size(),
-	       std::vector<unsigned int>(rows.total_size()));
+	       std::vector<types::global_dof_index>(rows.total_size()));
   for (unsigned int jb=0;jb<row_length.size();++jb)
       for (unsigned int i=0;i<row_length[jb].size();++i)
 	{

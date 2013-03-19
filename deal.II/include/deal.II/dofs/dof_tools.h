@@ -2259,8 +2259,8 @@ namespace DoFTools
   count_dofs_per_component (const DH      &dof_handler,
                             std::vector<types::global_dof_index> &dofs_per_component,
                             const bool vector_valued_once = false,
-                            std::vector<types::global_dof_index>  target_component
-                            = std::vector<types::global_dof_index>());
+                            std::vector<unsigned int>  target_component
+                            = std::vector<unsigned int>());
 
   /**
    * Count the degrees of freedom
@@ -2312,7 +2312,7 @@ namespace DoFTools
   void
   count_dofs_per_component (const DoFHandler<dim,spacedim>     &dof_handler,
                             std::vector<types::global_dof_index> &dofs_per_component,
-                            std::vector<types::global_dof_index>  target_component) DEAL_II_DEPRECATED;
+                            std::vector<unsigned int>  target_component) DEAL_II_DEPRECATED;
 
   /**
    * This function can be used when

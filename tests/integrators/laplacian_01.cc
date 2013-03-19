@@ -37,7 +37,7 @@ void test_cell(const FEValuesBase<dim>& fev)
   std::vector<std::vector<Tensor<1,dim> > >
     ugrad(d,std::vector<Tensor<1,dim> >(fev.n_quadrature_points));
   
-  std::vector<unsigned int> indices(n);
+  std::vector<types::global_dof_index> indices(n);
   for (unsigned int i=0;i<n;++i)
     indices[i] = i;
   
@@ -80,7 +80,7 @@ void test_boundary(const FEValuesBase<dim>& fev)
   std::vector<std::vector<Tensor<1,dim> > >
     ugrad   (d,std::vector<Tensor<1,dim> >(fev.n_quadrature_points));
   
-  std::vector<unsigned int> indices(n);
+  std::vector<types::global_dof_index> indices(n);
   for (unsigned int i=0;i<n;++i)
     indices[i] = i;
   
@@ -139,7 +139,7 @@ void test_face(const FEValuesBase<dim>& fev1,
     u1grad(d,std::vector<Tensor<1,dim> >(fev1.n_quadrature_points)),
     u2grad(d,std::vector<Tensor<1,dim> >(fev2.n_quadrature_points));
   
-  std::vector<unsigned int> indices1(n1), indices2(n2);
+  std::vector<types::global_dof_index> indices1(n1), indices2(n2);
   for (unsigned int i=0;i<n1;++i) indices1[i] = i;
   for (unsigned int i=0;i<n2;++i) indices2[i] = i;
   

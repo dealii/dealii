@@ -799,13 +799,13 @@ template
 void
 DoFTools::count_dofs_per_component<DoFHandler<deal_II_dimension> > (
   const DoFHandler<deal_II_dimension>&,
-  std::vector<types::global_dof_index>&, bool, std::vector<types::global_dof_index>);
+  std::vector<types::global_dof_index>&, bool, std::vector<unsigned int>);
 
 template
 void
 DoFTools::count_dofs_per_component<hp::DoFHandler<deal_II_dimension> > (
   const hp::DoFHandler<deal_II_dimension>&,
-  std::vector<types::global_dof_index>&, bool, std::vector<types::global_dof_index>);
+  std::vector<types::global_dof_index>&, bool, std::vector<unsigned int>);
 
 
 #if deal_II_dimension < 3
@@ -813,13 +813,13 @@ template
 void
 DoFTools::count_dofs_per_component<DoFHandler<deal_II_dimension, deal_II_dimension+1> > (
   const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
-  std::vector<types::global_dof_index>&, bool, std::vector<types::global_dof_index>);
+  std::vector<types::global_dof_index>&, bool, std::vector<unsigned int>);
 
 template
 void
 DoFTools::count_dofs_per_component<hp::DoFHandler<deal_II_dimension, deal_II_dimension+1> > (
   const hp::DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
-  std::vector<types::global_dof_index>&, bool, std::vector<types::global_dof_index>);
+  std::vector<types::global_dof_index>&, bool, std::vector<unsigned int>);
 
 template
 void
@@ -845,13 +845,13 @@ template
 void
 DoFTools::count_dofs_per_component<DoFHandler<1,3> > (
   const DoFHandler<1,3>&,
-  std::vector<types::global_dof_index>&, bool, std::vector<types::global_dof_index>);
+  std::vector<types::global_dof_index>&, bool, std::vector<unsigned int>);
 
 template
 void
 DoFTools::count_dofs_per_component<hp::DoFHandler<1,3> > (
   const hp::DoFHandler<1,3>&,
-  std::vector<types::global_dof_index>&, bool, std::vector<types::global_dof_index>);
+  std::vector<types::global_dof_index>&, bool, std::vector<unsigned int>);
 
 template
 void
@@ -897,7 +897,7 @@ template
 void
 DoFTools::count_dofs_per_component<deal_II_dimension> (
   const DoFHandler<deal_II_dimension>&,
-  std::vector<types::global_dof_index>&, std::vector<types::global_dof_index>);
+  std::vector<types::global_dof_index>&, std::vector<unsigned int>);
 
 template
 void

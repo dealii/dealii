@@ -26,13 +26,13 @@ void test ()
 {
   deallog.push("BlockIndices");
   
-  std::vector<unsigned int> ivector(4);
+  std::vector<types::global_dof_index> ivector(4);
   ivector[0] = 3;
   ivector[1] = 0;
   ivector[2] = 1;
   ivector[3] = 2;
 
-  const std::vector<unsigned int> vector_indices(ivector);
+  const std::vector<types::global_dof_index> vector_indices(ivector);
   
   BlockIndices i1(ivector);
   BlockIndices i2 = i1;

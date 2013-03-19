@@ -373,7 +373,7 @@ namespace LaplaceSolver
     assemble_rhs (linear_system.rhs);
     linear_system.hanging_node_constraints.condense (linear_system.rhs);
 
-    std::map<unsigned int,double> boundary_value_map;
+    std::map<types::global_dof_index,double> boundary_value_map;
     VectorTools::interpolate_boundary_values (dof_handler,
 					      0,
 					      *boundary_values,

@@ -157,7 +157,7 @@ void test ()
   assemble_laplace(Bb, bb, dof_handler, fe);
   assemble_laplace(B, b, dof_handler, fe);
   
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
                                             ZeroFunction<dim>(size.size()),

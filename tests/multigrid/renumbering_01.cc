@@ -54,7 +54,7 @@ void check()
     cell = mgdof.begin(),
     endc = mgdof.end();
   std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
-  std::vector<unsigned int> mg_dof_indices (fe.dofs_per_cell);
+  std::vector<types::global_dof_index> mg_dof_indices (fe.dofs_per_cell);
   for (; cell!=endc; ++cell)
     {
       if (!cell->has_children())

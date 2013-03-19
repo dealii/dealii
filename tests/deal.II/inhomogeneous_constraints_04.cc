@@ -114,7 +114,7 @@ void test(bool use_constraint_matrix)
 	  rhs (local_dofs2[i]) += local_vec (i);
 	}
 
-      std::map<unsigned int, double>     boundary_values;
+      std::map<types::global_dof_index,double> boundary_values;
       boundary_values.insert (std::pair<unsigned int,double>(1, -5.0));
       boundary_values.insert (std::pair<unsigned int,double>(3, 2.0));
       boundary_values.insert (std::pair<unsigned int,double>(4, 0.0));

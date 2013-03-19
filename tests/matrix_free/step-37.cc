@@ -463,7 +463,7 @@ namespace Step37
     const unsigned int   dofs_per_cell = fe.dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     const Coefficient<dim> coefficient;
     std::vector<double>    coefficient_values (n_q_points);
 
@@ -499,7 +499,7 @@ namespace Step37
     const unsigned int   dofs_per_cell = fe.dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     const Coefficient<dim>    coefficient;
     std::vector<double>       coefficient_values (n_q_points);
     FullMatrix<double>        local_matrix (dofs_per_cell, dofs_per_cell);

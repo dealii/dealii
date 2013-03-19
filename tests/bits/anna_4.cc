@@ -156,7 +156,7 @@ void FindBug<dim>::dirichlet_conditions ()
                                    // correctly implemented by now
 
 
-  std::map<unsigned int,double> dirichlet_dofs;
+  std::map<types::global_dof_index,double> dirichlet_dofs;
 
                                    // we declare a vector of bools,
                                    // which tells the

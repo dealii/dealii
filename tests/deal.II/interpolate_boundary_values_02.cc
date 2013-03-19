@@ -54,7 +54,7 @@ void test ()
 
   dof_handler.distribute_dofs (fe);
 
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             10,
                                             Functions::SquareFunction<dim>(),

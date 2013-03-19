@@ -164,7 +164,7 @@ void test ()
       {
 	deallog << cell << ' ' << cell->active_fe_index() << std::endl
 		<< "   ";
-	std::vector<unsigned int> local_dof_indices (cell->get_fe().dofs_per_cell);
+	std::vector<types::global_dof_index> local_dof_indices (cell->get_fe().dofs_per_cell);
 	cell->get_dof_indices (local_dof_indices);
 
 	for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)

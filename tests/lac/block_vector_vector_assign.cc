@@ -39,7 +39,7 @@ bool operator == (const Vector1 &v1,
 
 void test ()
 {
-  std::vector<unsigned int> ivector(4);
+  std::vector<types::global_dof_index> ivector(4);
   ivector[0] = 2;
   ivector[1] = 4;
   ivector[2] = 3;

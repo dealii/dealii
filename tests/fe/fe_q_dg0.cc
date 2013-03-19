@@ -433,7 +433,7 @@ namespace Step22
       typename DoFHandler<dim>::active_cell_iterator
       cell = dof_handler.begin_active(),
       endc = dof_handler.end();
-      std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+      std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
       cell->get_dof_indices(local_dof_indices);
       unsigned int first_disc_dof=local_dof_indices[dofs_per_cell-1];
@@ -518,7 +518,7 @@ namespace Step22
     FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       local_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     const RightHandSide<dim>          right_hand_side;
     std::vector<Vector<double> >      rhs_values (n_q_points,
@@ -889,7 +889,7 @@ namespace Step22
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     for (; cell!=endc; ++cell)
       {
         fe_v.reinit(cell);

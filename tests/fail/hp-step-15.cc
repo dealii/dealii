@@ -267,7 +267,7 @@ void MinimizationProblem<dim>::assemble_step ()
   hanging_node_constraints.condense (matrix);
   hanging_node_constraints.condense (residual);
 
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<dim>(),

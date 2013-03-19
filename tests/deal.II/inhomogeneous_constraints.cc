@@ -199,7 +199,7 @@ void LaplaceProblem<dim>::setup_system ()
 				   // function.
   {
     test_all_constraints.merge (hanging_nodes_only);
-    std::map<unsigned int,double> boundary_values;
+    std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
 					      0,
 					      BoundaryValues<dim>(),
@@ -337,7 +337,7 @@ void LaplaceProblem<dim>::assemble_reference ()
     }
 
   hanging_nodes_only.condense (reference_matrix, reference_rhs);
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    BoundaryValues<dim>(),

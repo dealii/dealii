@@ -134,7 +134,7 @@ void AdvectionProblem<dim>::setup_system ()
 				   // take the right hand side function as
 				   // boundary function
   {
-    std::map<unsigned int,double> boundary_values;
+    std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
 					      0,
 					      RightHandSide<dim>(),
@@ -276,7 +276,7 @@ void AdvectionProblem<dim>::assemble_reference ()
 
 				   // use some other rhs vector as dummy for
 				   // application of Dirichlet conditions
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    RightHandSide<dim>(),

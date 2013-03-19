@@ -84,7 +84,7 @@ void test()
       triangulation.execute_coarsening_and_refinement ();
       dof_handler.distribute_dofs (fe);
 
-      std::vector<unsigned int> dofs_per_block (fe.n_components());
+      std::vector<types::global_dof_index> dofs_per_block (fe.n_components());
       DoFTools::count_dofs_per_block (dof_handler, dofs_per_block);
 
       Assert (std::accumulate (dofs_per_block.begin(), dofs_per_block.end(), 0U)

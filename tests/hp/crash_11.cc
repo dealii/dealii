@@ -111,7 +111,7 @@ int main ()
 	  for (unsigned int i=0; i<4; ++i)
 	    {
 	      deallog << "DoF indices for fe_index=" << i << ": ";
-	      std::vector<unsigned int> line_dofs (fe[i].dofs_per_line + 2*fe[i].dofs_per_vertex);
+	      std::vector<types::global_dof_index> line_dofs (fe[i].dofs_per_line + 2*fe[i].dofs_per_vertex);
 	      cell->line(l)->get_dof_indices (line_dofs, i);
 	      for (unsigned int j=0; j<fe[i].dofs_per_line + 2*fe[i].dofs_per_vertex; ++j)
 		deallog << line_dofs[j] << ' ';

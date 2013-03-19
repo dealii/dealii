@@ -120,7 +120,7 @@ int main ()
       deallog << "    active_fe_index=" << cell->active_fe_index() << std::endl;
 
       deallog << "    dofs=";
-      std::vector<unsigned int> local_dofs (fe[cell->active_fe_index()].dofs_per_cell);
+      std::vector<types::global_dof_index> local_dofs (fe[cell->active_fe_index()].dofs_per_cell);
       cell->get_dof_indices (local_dofs);
       for (unsigned int i=0; i<fe[cell->active_fe_index()].dofs_per_cell; ++i)
 	deallog << local_dofs[i] << ' ';

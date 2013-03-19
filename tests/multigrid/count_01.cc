@@ -35,7 +35,7 @@
 
 using namespace std;
 
-void log_vector (const std::vector<std::vector<unsigned int> >& count)
+void log_vector (const std::vector<std::vector<types::global_dof_index> >& count)
 {
   for (unsigned int l=0;l<count.size();++l)
     {
@@ -61,7 +61,7 @@ void check_fe(FiniteElement<dim>& fe)
   MGDoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
   
-  std::vector<std::vector<unsigned int> > count(tr.n_levels());
+  std::vector<std::vector<types::global_dof_index> > count(tr.n_levels());
   MGTools::count_dofs_per_component(mgdof, count, false);
   log_vector(count);
   MGTools::count_dofs_per_component(mgdof, count, true);

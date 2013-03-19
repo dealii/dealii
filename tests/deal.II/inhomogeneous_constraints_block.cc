@@ -130,7 +130,7 @@ void AdvectionProblem<dim>::setup_system ()
 				   // add boundary conditions as
 				   // inhomogeneous constraints here.
   {
-    std::map<unsigned int,double> boundary_values;
+    std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
 					      0,
 					      ConstantFunction<dim>(1.,2),
@@ -312,7 +312,7 @@ void AdvectionProblem<dim>::assemble_reference ()
 
 				   // use some other rhs vector as dummy for
 				   // application of Dirichlet conditions
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ConstantFunction<dim>(1.,2),

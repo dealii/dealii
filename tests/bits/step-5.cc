@@ -225,7 +225,7 @@ void LaplaceProblem<dim>::assemble_system ()
 	}
     }
 
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<dim>(),

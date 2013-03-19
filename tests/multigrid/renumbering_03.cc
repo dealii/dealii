@@ -56,8 +56,8 @@ void check()
   mg_dof_handler.distribute_dofs(fe);
   for (unsigned int level=0; level<tria.n_levels(); ++level)
     {
-      const unsigned int n_dofs=mg_dof_handler.n_dofs(level);
-      vector<unsigned int> new_numbers(n_dofs);
+      const types::global_dof_index n_dofs=mg_dof_handler.n_dofs(level);
+      vector<types::global_dof_index> new_numbers(n_dofs);
       for (unsigned int i=0; i<n_dofs; ++i)
 	new_numbers[i]=n_dofs-1-i;
 
