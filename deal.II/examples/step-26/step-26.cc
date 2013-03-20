@@ -247,15 +247,15 @@ namespace Step26
         VectorTools::create_right_hand_side(dof_handler, QGauss<dim>(2),
                                             rhs_function, tmp);
         forcing_terms = tmp;
-        forcing_terms *= theta;
+        forcing_terms *= time_step * theta;
 
         rhs_function.set_time(time - time_step);
         VectorTools::create_right_hand_side(dof_handler, QGauss<dim>(2),
                                             rhs_function, tmp);
 
-        forcing_terms.add(1 - theta, tmp);
+        forcing_terms.add(time_step * (1 - theta), tmp);
 
-        system_rhs.add(time_step, forcing_terms);
+        system_rhs += forcing_terms;
 
         {
           BoundaryValuesU<dim> boundary_values_u_function;
