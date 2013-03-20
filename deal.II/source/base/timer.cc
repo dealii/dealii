@@ -609,5 +609,13 @@ TimerOutput::enable_output ()
   output_is_enabled = true;
 }
 
+void
+TimerOutput::reset ()
+{
+  Threads::Mutex::ScopedLock lock (mutex);
+  sections.clear();
+  active_sections.clear();
+}
+
 
 DEAL_II_NAMESPACE_CLOSE

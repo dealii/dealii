@@ -452,6 +452,11 @@ public:
    */
   void enable_output ();
 
+  /**
+   * Resets the recorded timing information.
+   */
+  void reset ();
+
 private:
   /**
    * A timer object for the overall
