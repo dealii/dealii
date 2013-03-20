@@ -231,9 +231,11 @@ namespace Step26
     Vector<double> tmp(solution.size());
     Vector<double> forcing_terms(solution.size());
 
-    for (timestep_number = 1, time = time_step; time <= 0.5;
-         time += time_step, ++timestep_number)
+    while (time <= 0.5)
       {
+	time += time_step;
+	++timestep_number;
+
         std::cout << "Time step " << timestep_number << " at t=" << time
                   << std::endl;
 
