@@ -607,7 +607,7 @@ namespace Step42
     nu (0.3),
     computing_timer (MPI_COMM_WORLD,
                      pcout,
-                     TimerOutput::summary,
+                     TimerOutput::never,
                      TimerOutput::wall_times)
   {
     // double _E, double _nu, double _sigma_0, double _gamma
@@ -1533,6 +1533,7 @@ namespace Step42
         computing_timer.exit_section("Graphical output");
 
         computing_timer.print_summary();
+        computing_timer.reset();
       }
   }
 }
