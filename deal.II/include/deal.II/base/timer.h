@@ -323,9 +323,9 @@ public:
   /**
    * Sets whether to generate output every
    * time we exit a section, just in the
-   * end, or both.
+   * end, both, or never.
    */
-  enum OutputFrequency {every_call, summary, every_call_and_summary}
+  enum OutputFrequency {every_call, summary, every_call_and_summary, never}
   output_frequency;
 
   /**

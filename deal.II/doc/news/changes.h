@@ -69,7 +69,9 @@ this function.
 
 <ol>
 
-<li> Added TimerOutput::reset to remove the collected information so far.
+<li> Added TimerOutput::reset to remove the collected information so far and
+added a new frequency TimerOutput::never to only output information if
+triggered by print_summary().
 <br>
 (Timo Heister, 2013/03/20)
 

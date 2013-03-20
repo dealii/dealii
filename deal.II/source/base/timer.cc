@@ -328,7 +328,8 @@ TimerOutput::~TimerOutput()
   while (active_sections.size() > 0)
     leave_subsection();
 
-  if (output_frequency != every_call && output_is_enabled == true)
+  if ( (output_frequency == summary || output_frequency == every_call_and_summary)
+      && output_is_enabled == true)
     print_summary();
 }
 
