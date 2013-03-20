@@ -69,6 +69,10 @@ this function.
 
 <ol>
 
+<li> Added TimerOutput::reset to remove the collected information so far.
+<br>
+(Timo Heister, 2013/03/20)
+
 <li> Changed: FEValuesExtractors::Scalar, FEValuesExtractors::Vector and
 FEValuesExtractors::SymmetricTensor could not be default constructed, and
 consequently one could not easily put them into arrays (where they would
