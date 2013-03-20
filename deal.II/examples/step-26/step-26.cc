@@ -41,6 +41,8 @@ namespace Step26
 {
   using namespace dealii;
 
+
+
   template<int dim>
   class HeatEquation
   {
@@ -50,38 +52,41 @@ namespace Step26
 
   private:
     void setup_system();
-    void solve_u();
+    void solve_time_step();
     void output_results() const;
 
-    Triangulation<dim> triangulation;
-    FE_Q<dim> fe;
-    DoFHandler<dim> dof_handler;
+    Triangulation<dim>   triangulation;
+    FE_Q<dim>            fe;
+    DoFHandler<dim>      dof_handler;
 
-    ConstraintMatrix constraints;
+    ConstraintMatrix     constraints;
 
-    SparsityPattern sparsity_pattern;
+    SparsityPattern      sparsity_pattern;
     SparseMatrix<double> mass_matrix;
     SparseMatrix<double> laplace_matrix;
     SparseMatrix<double> system_matrix;
 
-    Vector<double> solution;
-    Vector<double> old_solution;
-    Vector<double> system_rhs;
+    Vector<double>       solution;
+    Vector<double>       old_solution;
+    Vector<double>       system_rhs;
 
-    double time, time_step;
-    unsigned int timestep_number;
-    const double theta;
+    double               time;
+    double               time_step;
+    unsigned int         timestep_number;
+
+    const double         theta;
   };
 
-  //-------------------------------------
+
 
   template<int dim>
   class RightHandSide: public Function<dim>
   {
   public:
-    RightHandSide() :
-    Function<dim>(),
-    period (0.2)
+    RightHandSide()
+      :
+      Function<dim>(),
+      period (0.2)
     {}
 
     virtual double value(const Point<dim> &p,
@@ -90,6 +95,8 @@ namespace Step26
   private:
     const double period;
   };
+
+
 
   template<int dim>
   double RightHandSide<dim>::value(const Point<dim> &p,
@@ -103,50 +110,59 @@ namespace Step26
 
     if ((point_within_period >= 0.0) && (point_within_period <= 0.2))
       {
-	if ((p[0] > 0.5) && (p[1] > -0.5))
-	  return 1;
-	else
-	  return 0;
+        if ((p[0] > 0.5) && (p[1] > -0.5))
+          return 1;
+        else
+          return 0;
       }
     else if ((point_within_period >= 0.5) && (point_within_period <= 0.7))
       {
-	if ((p[0] > -0.5) && (p[1] > 0.5))
-	  return 1;
-	else
-	  return 0;
+        if ((p[0] > -0.5) && (p[1] > 0.5))
+          return 1;
+        else
+          return 0;
       }
     else
       return 0;
   }
 
+
+
   template<int dim>
   class BoundaryValues: public Function<dim>
   {
   public:
-    BoundaryValues() :
+    BoundaryValues()
+      :
       Function<dim>()
     {
     }
-    virtual ~BoundaryValues()
-    {
-    }
+
     virtual double value(const Point<dim> &p,
                          const unsigned int component = 0) const;
   };
 
   template<int dim>
   double BoundaryValues<dim>::value(const Point<dim> &/*p*/,
-                                     const unsigned int component) const
+                                    const unsigned int component) const
   {
     Assert(component == 0, ExcInternalError());
-    return 0; // Zero-Dirichlet Boundary
+    return 0;
   }
 
+
+
   template<int dim>
-  HeatEquation<dim>::HeatEquation() :
-    fe(1), dof_handler(triangulation), time_step(1. / 500), theta(0.5)
+  HeatEquation<dim>::HeatEquation()
+    :
+    fe(1),
+    dof_handler(triangulation),
+    time_step(1. / 500),
+    theta(0.5)
   {
   }
+
+
 
   template<int dim>
   void HeatEquation<dim>::setup_system()
@@ -162,17 +178,22 @@ namespace Step26
     std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
               << std::endl << std::endl;
 
-    sparsity_pattern.reinit(dof_handler.n_dofs(), dof_handler.n_dofs(),
+    sparsity_pattern.reinit(dof_handler.n_dofs(),
+                            dof_handler.n_dofs(),
                             dof_handler.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern(dof_handler, sparsity_pattern);
+    DoFTools::make_sparsity_pattern(dof_handler,
+                                    sparsity_pattern);
     sparsity_pattern.compress();
 
     mass_matrix.reinit(sparsity_pattern);
     laplace_matrix.reinit(sparsity_pattern);
     system_matrix.reinit(sparsity_pattern);
 
-    MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
-    MatrixCreator::create_laplace_matrix(dof_handler, QGauss<dim>(3),
+    MatrixCreator::create_mass_matrix(dof_handler,
+                                      QGauss<dim>(fe.degree+1),
+                                      mass_matrix);
+    MatrixCreator::create_laplace_matrix(dof_handler,
+                                         QGauss<dim>(fe.degree+1),
                                          laplace_matrix);
 
     solution.reinit(dof_handler.n_dofs());
@@ -182,8 +203,10 @@ namespace Step26
     constraints.close();
   }
 
+
+
   template<int dim>
-  void HeatEquation<dim>::solve_u()
+  void HeatEquation<dim>::solve_time_step()
   {
     SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
     SolverCG<> cg(solver_control);
@@ -193,9 +216,11 @@ namespace Step26
 
     cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
-    std::cout << "   u-equation: " << solver_control.last_step()
+    std::cout << "     " << solver_control.last_step()
               << " CG iterations." << std::endl;
   }
+
+
 
   template<int dim>
   void HeatEquation<dim>::output_results() const
@@ -208,33 +233,34 @@ namespace Step26
     data_out.build_patches();
 
     const std::string filename = "solution-"
-                                 + Utilities::int_to_string(timestep_number, 3) + ".vtk";
+                                 + Utilities::int_to_string(timestep_number, 3) +
+                                 ".vtk";
     std::ofstream output(filename.c_str());
     data_out.write_vtk(output);
-
-    std::cout << "    max= " << time << ' ' << solution.linfty_norm() << std::endl;
   }
+
+
 
   template<int dim>
   void HeatEquation<dim>::run()
   {
     setup_system();
 
-    VectorTools::interpolate(dof_handler, ZeroFunction<dim>(), solution);
+    VectorTools::interpolate(dof_handler,
+                             ZeroFunction<dim>(),
+                             old_solution);
+    solution = old_solution;
 
     timestep_number = 0;
     output_results();
-
-    VectorTools::interpolate(dof_handler, ZeroFunction<dim>(),
-                             old_solution);
 
     Vector<double> tmp(solution.size());
     Vector<double> forcing_terms(solution.size());
 
     while (time <= 0.5)
       {
-	time += time_step;
-	++timestep_number;
+        time += time_step;
+        ++timestep_number;
 
         std::cout << "Time step " << timestep_number << " at t=" << time
                   << std::endl;
@@ -246,14 +272,18 @@ namespace Step26
 
         RightHandSide<dim> rhs_function;
         rhs_function.set_time(time);
-        VectorTools::create_right_hand_side(dof_handler, QGauss<dim>(2),
-                                            rhs_function, tmp);
+        VectorTools::create_right_hand_side(dof_handler,
+                                            QGauss<dim>(fe.degree+1),
+                                            rhs_function,
+                                            tmp);
         forcing_terms = tmp;
         forcing_terms *= time_step * theta;
 
         rhs_function.set_time(time - time_step);
-        VectorTools::create_right_hand_side(dof_handler, QGauss<dim>(2),
-                                            rhs_function, tmp);
+        VectorTools::create_right_hand_side(dof_handler,
+                                            QGauss<dim>(fe.degree+1),
+                                            rhs_function,
+                                            tmp);
 
         forcing_terms.add(time_step * (1 - theta), tmp);
 
@@ -265,18 +295,19 @@ namespace Step26
 
           std::map<unsigned int, double> boundary_values;
           VectorTools::interpolate_boundary_values(dof_handler,
-						   0,
+                                                   0,
                                                    boundary_values_function,
-						   boundary_values);
+                                                   boundary_values);
 
           system_matrix.copy_from(mass_matrix);
           system_matrix.add(theta * time_step, laplace_matrix);
           MatrixTools::apply_boundary_values(boundary_values,
-					     system_matrix,
+                                             system_matrix,
                                              solution,
-					     system_rhs);
+                                             system_rhs);
         }
-        solve_u();
+
+        solve_time_step();
 
         output_results();
 
