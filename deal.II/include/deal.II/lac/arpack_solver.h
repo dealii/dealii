@@ -20,41 +20,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-/**
- * Interface for using ARPACK. ARPACK is a collection of Fortran77
- * subroutines designed to solve large scale eigenvalue problems.
- * Here we interface to the routines dnaupd and dneupd of ARPACK.
- * The package is designed to compute a few eigenvalues and
- * corresponding eigenvectors of a general n by n matrix A. It is
- * most appropriate for large sparse matrices A.
- *
- * In this class we make use of the method applied to the
- * generalized eigenspectrum problem $(A-\lambda B)x=0$, for
- * $x\neq0$; where $A$ is a system matrix, $B$ is a mass matrix,
- * and $\lambda, x$ are a set of eigenvalues and eigenvectors
- * respectively.
- *
- * The ArpackSolver can be used in application codes in the
- * following way:
- @code
-  SolverControl solver_control (1000, 1e-9);
-  ArpackSolver (solver_control);
-  system.solve (A, B, lambda, x, size_of_spectrum);
- @endcode
- * for the generalized eigenvalue problem $Ax=B\lambda x$, where
- * the variable <code>const unsigned int size_of_spectrum</code>
- * tells ARPACK the number of eigenvector/eigenvalue pairs to
- * solve for.
- *
- * Through the AdditionalData the user can specify some of the
- * parameters to be set.
- *
- * For further information on how the ARPACK routines dnaupd and
- * dneupd work and also how to set the parameters appropriately
- * please take a look into the ARPACK manual.
- *
- * @author Bärbel Janssen, Agnieszka Miedlar, 2010.
- */
 
 extern "C" void dnaupd_(int *ido, char *bmat, const unsigned int *n, char *which,
                         const unsigned int *nev, const double *tol, double *resid, int *ncv,
@@ -70,9 +35,43 @@ extern "C" void dneupd_(int *rvec, char *howmany, int *select, double *d,
                         double *workd, double *workl, int *lworkl, int *info);
 
 /**
- * Class to interface with the ARPACK routines.
+ * Interface for using ARPACK. ARPACK is a collection of Fortran77 subroutines
+ * designed to solve large scale eigenvalue problems.  Here we interface to
+ * the routines <code>dneupd</code> and <code>dnaupd</code> of ARPACK.  The
+ * package is designed to compute a few eigenvalues and corresponding
+ * eigenvectors of a general n by n matrix A. It is most appropriate for large
+ * sparse matrices A.
+ *
+ * In this class we make use of the method applied to the
+ * generalized eigenspectrum problem $(A-\lambda B)x=0$, for
+ * $x\neq0$; where $A$ is a system matrix, $B$ is a mass matrix,
+ * and $\lambda, x$ are a set of eigenvalues and eigenvectors
+ * respectively.
+ *
+ * The ArpackSolver can be used in application codes in the
+ * following way:
+ @code
+  SolverControl solver_control (1000, 1e-9);
+  ArpackSolver (solver_control);
+  system.solve (A, B, P, lambda, x, size_of_spectrum);
+ @endcode
+ * for the generalized eigenvalue problem $Ax=B\lambda x$, where
+ * the variable <code>size_of_spectrum</code>
+ * tells ARPACK the number of eigenvector/eigenvalue pairs to
+ * solve for. Here, <code>lambda</code> is a vector that will contain
+ * the eigenvalues computed, <code>x</code> a vector that will
+ * contain the eigenvectors computed, and <code>P</code> is
+ * a preconditioner for the matrix <code>A</code>.
+ *
+ * Through the AdditionalData the user can specify some of the
+ * parameters to be set.
+ *
+ * For further information on how the ARPACK routines <code>dneupd</code> and
+ * <code>dnaupd</code> work and also how to set the parameters appropriately
+ * please take a look into the ARPACK manual.
+ *
+ * @author Baerbel Janssen, Agnieszka Miedlar, 2010.
  */
-
 class ArpackSolver : public Subscriptor
 {
 public:
@@ -123,7 +122,8 @@ public:
   /**
    * Solve the generalized eigensprectrum
    * problem $A x=\lambda B x$ by calling
-   * dneupd and dnaupd of ARPACK.
+   * the <code>dneupd</code> and <code>dnaupd</code>
+   * functions of ARPACK.
    */
   template <typename VECTOR, typename MATRIX1,
            typename MATRIX2, typename INVERSE>
