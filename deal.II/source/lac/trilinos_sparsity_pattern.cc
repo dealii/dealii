@@ -531,8 +531,8 @@ namespace TrilinosWrappers
         graph->ExtractMyRowView(i, num_entries, indices);
         for (size_type j=0; j<(size_type)num_entries; ++j)
           {
-            if (static_cast<size_type>(std::abs(static_cast<size_type>(i-indices[j]))) > local_b)
-              local_b = std::abs(static_cast<size_type>(i-indices[j]));
+            if (static_cast<size_type>(std::abs(static_cast<TrilinosWrapper::types::int_type>(i-indices[j]))) > local_b)
+              local_b = std::abs(static_cast<TrilinosWrapper::types::int_type>(i-indices[j]));
           }
       }
     graph->Comm().MaxAll((TrilinosWrapper::types::int_type *)&local_b, &global_b, 1);
