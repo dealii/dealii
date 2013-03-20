@@ -62,10 +62,10 @@ namespace Step26
     SparsityPattern sparsity_pattern;
     SparseMatrix<double> mass_matrix;
     SparseMatrix<double> laplace_matrix;
-    SparseMatrix<double> matrix_u;
+    SparseMatrix<double> system_matrix;
 
-    Vector<double> solution_u;
-    Vector<double> old_solution_u;
+    Vector<double> solution;
+    Vector<double> old_solution;
     Vector<double> system_rhs;
 
     double time, time_step;
@@ -169,14 +169,14 @@ namespace Step26
 
     mass_matrix.reinit(sparsity_pattern);
     laplace_matrix.reinit(sparsity_pattern);
-    matrix_u.reinit(sparsity_pattern);
+    system_matrix.reinit(sparsity_pattern);
 
     MatrixCreator::create_mass_matrix(dof_handler, QGauss<dim>(3), mass_matrix);
     MatrixCreator::create_laplace_matrix(dof_handler, QGauss<dim>(3),
                                          laplace_matrix);
 
-    solution_u.reinit(dof_handler.n_dofs());
-    old_solution_u.reinit(dof_handler.n_dofs());
+    solution.reinit(dof_handler.n_dofs());
+    old_solution.reinit(dof_handler.n_dofs());
     system_rhs.reinit(dof_handler.n_dofs());
 
     constraints.close();
@@ -189,9 +189,9 @@ namespace Step26
     SolverCG<> cg(solver_control);
 
     PreconditionSSOR<> preconditioner;
-    preconditioner.initialize(matrix_u, 1.0);
+    preconditioner.initialize(system_matrix, 1.0);
 
-    cg.solve(matrix_u, solution_u, system_rhs, preconditioner);
+    cg.solve(system_matrix, solution, system_rhs, preconditioner);
 
     std::cout << "   u-equation: " << solver_control.last_step()
               << " CG iterations." << std::endl;
@@ -203,7 +203,7 @@ namespace Step26
     DataOut<dim> data_out;
 
     data_out.attach_dof_handler(dof_handler);
-    data_out.add_data_vector(solution_u, "U");
+    data_out.add_data_vector(solution, "U");
 
     data_out.build_patches();
 
@@ -212,7 +212,7 @@ namespace Step26
     std::ofstream output(filename.c_str());
     data_out.write_vtk(output);
 
-    std::cout << "    max= " << time << ' ' << solution_u.linfty_norm() << std::endl;
+    std::cout << "    max= " << time << ' ' << solution.linfty_norm() << std::endl;
   }
 
   template<int dim>
@@ -220,16 +220,16 @@ namespace Step26
   {
     setup_system();
 
-    VectorTools::interpolate(dof_handler, ZeroFunction<dim>(), solution_u);
+    VectorTools::interpolate(dof_handler, ZeroFunction<dim>(), solution);
 
     timestep_number = 0;
     output_results();
 
     VectorTools::interpolate(dof_handler, ZeroFunction<dim>(),
-                             old_solution_u);
+                             old_solution);
 
-    Vector<double> tmp(solution_u.size());
-    Vector<double> forcing_terms(solution_u.size());
+    Vector<double> tmp(solution.size());
+    Vector<double> forcing_terms(solution.size());
 
     for (timestep_number = 1, time = time_step; time <= 0.5;
          time += time_step, ++timestep_number)
@@ -237,9 +237,9 @@ namespace Step26
         std::cout << "Time step " << timestep_number << " at t=" << time
                   << std::endl;
 
-        mass_matrix.vmult(system_rhs, old_solution_u);
+        mass_matrix.vmult(system_rhs, old_solution);
 
-        laplace_matrix.vmult(tmp, old_solution_u);
+        laplace_matrix.vmult(tmp, old_solution);
         system_rhs.add(-(1 - theta) * time_step, tmp);
 
         RightHandSide<dim> rhs_function;
@@ -265,16 +265,16 @@ namespace Step26
           VectorTools::interpolate_boundary_values(dof_handler, 0,
                                                    boundary_values_u_function, boundary_values);
 
-          matrix_u.copy_from(mass_matrix);
-          matrix_u.add(theta * time_step, laplace_matrix);
-          MatrixTools::apply_boundary_values(boundary_values, matrix_u,
-                                             solution_u, system_rhs);
+          system_matrix.copy_from(mass_matrix);
+          system_matrix.add(theta * time_step, laplace_matrix);
+          MatrixTools::apply_boundary_values(boundary_values, system_matrix,
+                                             solution, system_rhs);
         }
         solve_u();
 
         output_results();
 
-        old_solution_u = solution_u;
+        old_solution = solution;
       }
   }
 }
