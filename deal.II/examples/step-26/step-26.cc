@@ -120,14 +120,14 @@ namespace Step26
   }
 
   template<int dim>
-  class BoundaryValuesU: public Function<dim>
+  class BoundaryValues: public Function<dim>
   {
   public:
-    BoundaryValuesU() :
+    BoundaryValues() :
       Function<dim>()
     {
     }
-    virtual ~BoundaryValuesU()
+    virtual ~BoundaryValues()
     {
     }
     virtual double value(const Point<dim> &p,
@@ -135,7 +135,7 @@ namespace Step26
   };
 
   template<int dim>
-  double BoundaryValuesU<dim>::value(const Point<dim> &/*p*/,
+  double BoundaryValues<dim>::value(const Point<dim> &/*p*/,
                                      const unsigned int component) const
   {
     Assert(component == 0, ExcInternalError());
@@ -258,17 +258,21 @@ namespace Step26
         system_rhs += forcing_terms;
 
         {
-          BoundaryValuesU<dim> boundary_values_u_function;
-          boundary_values_u_function.set_time(time);
+          BoundaryValues<dim> boundary_values_function;
+          boundary_values_function.set_time(time);
 
           std::map<unsigned int, double> boundary_values;
-          VectorTools::interpolate_boundary_values(dof_handler, 0,
-                                                   boundary_values_u_function, boundary_values);
+          VectorTools::interpolate_boundary_values(dof_handler,
+						   0,
+                                                   boundary_values_function,
+						   boundary_values);
 
           system_matrix.copy_from(mass_matrix);
           system_matrix.add(theta * time_step, laplace_matrix);
-          MatrixTools::apply_boundary_values(boundary_values, system_matrix,
-                                             solution, system_rhs);
+          MatrixTools::apply_boundary_values(boundary_values,
+					     system_matrix,
+                                             solution,
+					     system_rhs);
         }
         solve_u();
 
