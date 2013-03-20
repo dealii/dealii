@@ -32,11 +32,11 @@ void test ()
       A(i,j) = i+j;
 
 				   // pick every other row and column
-  std::vector<unsigned int> rows (A.m());
+  std::vector<types::global_dof_index> rows (A.m());
   for (unsigned int i=0; i<rows.size(); ++i)
     rows[i] = 2*i;
 
-  std::vector<unsigned int> cols (A.n());
+  std::vector<types::global_dof_index> cols (A.n());
   for (unsigned int i=0; i<cols.size(); ++i)
     cols[i] = 2*i;
 

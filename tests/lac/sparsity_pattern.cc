@@ -83,7 +83,7 @@ main ()
   for (unsigned int row=0; row<sp3.n_rows(); ++row)
     {
       sparsity.push_back (std::set<unsigned int,std::greater<unsigned int> >());
-      for (const unsigned int *p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
+      for (const types::global_dof_index *p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
 	   p != sp3.get_column_numbers()+sp3.get_rowstart_indices()[row+1]; ++p)
 	sparsity.back().insert (*p);
     };
@@ -156,9 +156,9 @@ main ()
   
   for (unsigned int row=0; row<sp3.n_rows(); ++row)
     {
-      const unsigned int
+      const types::global_dof_index
         *sp3_p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
-      const unsigned int
+      const types::global_dof_index
         *sp5_p=sp5.get_column_numbers()+sp5.get_rowstart_indices()[row];
       for (; sp3_p != (sp3.get_column_numbers() +
                        sp3.get_rowstart_indices()[row+1]);

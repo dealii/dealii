@@ -160,7 +160,7 @@ public:
    * local_index obviously needs to be less
    * than n_elements().
    */
-  types::global_dof_index nth_index_in_set (const unsigned int local_index) const;
+  types::global_dof_index nth_index_in_set (const types::global_dof_index local_index) const;
 
   /**
    * Return the how-manyth element of this
@@ -172,7 +172,7 @@ public:
    * a member of this index set, i.e. if
    * is_element(global_index) is false.
    */
-  unsigned int index_within_set (const types::global_dof_index global_index) const;
+  types::global_dof_index index_within_set (const types::global_dof_index global_index) const;
 
   /**
    * Each index set can be
@@ -551,7 +551,7 @@ private:
    * owned range), whereas there are only a
    * few other elements (ghosts).
    */
-  mutable unsigned int largest_range;
+  mutable types::global_dof_index largest_range;
 
   /**
    * Actually perform the compress()
@@ -835,7 +835,7 @@ IndexSet::n_elements () const
   // non-overlapping ranges
   compress ();
 
-  unsigned int v = 0;
+  types::global_dof_index v = 0;
   if (!ranges.empty())
     {
       Range &r = ranges.back();
@@ -843,7 +843,7 @@ IndexSet::n_elements () const
     }
 
 #ifdef DEBUG
-  unsigned int s = 0;
+  types::global_dof_index s = 0;
   for (std::vector<Range>::iterator range = ranges.begin();
        range != ranges.end();
        ++range)
@@ -858,7 +858,7 @@ IndexSet::n_elements () const
 
 inline
 types::global_dof_index
-IndexSet::nth_index_in_set (const unsigned int n) const
+IndexSet::nth_index_in_set (const types::global_dof_index n) const
 {
   // to make this call thread-safe, compress()
   // must not be called through this function
@@ -908,7 +908,7 @@ IndexSet::nth_index_in_set (const unsigned int n) const
 
 
 inline
-unsigned int
+types::global_dof_index
 IndexSet::index_within_set (const types::global_dof_index n) const
 {
   // to make this call thread-safe, compress()

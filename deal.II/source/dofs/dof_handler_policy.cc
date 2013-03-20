@@ -221,7 +221,7 @@ namespace internal
         template <int dim, int spacedim>
         static
         types::global_dof_index
-        distribute_dofs (const types::global_dof_index        offset,
+        distribute_dofs (const types::global_dof_index offset,
                          const types::subdomain_id subdomain_id,
                          DoFHandler<dim,spacedim> &dof_handler)
         {
@@ -909,7 +909,7 @@ namespace internal
 
         for (unsigned int level = 0; level < dof_handler.get_tria().n_levels(); ++level)
           {
-            unsigned int next_free_dof = Implementation::distribute_dofs_on_level(0, numbers::invalid_subdomain_id, dof_handler, level);
+            types::global_dof_index next_free_dof = Implementation::distribute_dofs_on_level(0, numbers::invalid_subdomain_id, dof_handler, level);
 
             number_caches[level].n_global_dofs = next_free_dof;
             number_caches[level].n_locally_owned_dofs = next_free_dof;

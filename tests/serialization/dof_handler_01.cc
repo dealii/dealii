@@ -86,8 +86,8 @@ namespace dealii
 					 // compare dofs on this cell and then on the faces
 	if (c1->has_children() == false)
 	  {
-	    std::vector<types::local_dof_index> local_dofs_1 (c1->get_fe().dofs_per_cell);
-	    std::vector<types::local_dof_index> local_dofs_2 (c2->get_fe().dofs_per_cell);
+	    std::vector<types::global_dof_index> local_dofs_1 (c1->get_fe().dofs_per_cell);
+	    std::vector<types::global_dof_index> local_dofs_2 (c2->get_fe().dofs_per_cell);
 
 	    c1->get_dof_indices (local_dofs_1);
 	    c2->get_dof_indices (local_dofs_2);
