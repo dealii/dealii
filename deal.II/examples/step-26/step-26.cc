@@ -188,7 +188,10 @@ namespace Step26
     SolverControl solver_control(1000, 1e-8 * system_rhs.l2_norm());
     SolverCG<> cg(solver_control);
 
-    cg.solve(matrix_u, solution_u, system_rhs, PreconditionIdentity());
+    PreconditionSSOR<> preconditioner;
+    preconditioner.initialize(matrix_u, 1.0);
+
+    cg.solve(matrix_u, solution_u, system_rhs, preconditioner);
 
     std::cout << "   u-equation: " << solver_control.last_step()
               << " CG iterations." << std::endl;
