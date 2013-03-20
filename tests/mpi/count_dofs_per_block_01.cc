@@ -51,7 +51,7 @@ void test()
   DoFHandler<dim> dof_handler (triangulation);
   dof_handler.distribute_dofs (fe);
 
-  std::vector<types::global_dof_inex> dofs_per_block (fe.n_blocks());
+  std::vector<types::global_dof_index> dofs_per_block (fe.n_blocks());
   DoFTools::count_dofs_per_block (dof_handler, dofs_per_block);
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)

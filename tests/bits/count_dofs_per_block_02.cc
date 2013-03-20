@@ -40,7 +40,7 @@ std::string output_file_name = "count_dofs_per_block_02/output";
 
 
 
-void print (const std::vector<unsigned int> &v)
+void print (const std::vector<types::global_dof_index> &v)
 {  
   deallog << v.size();
   for (unsigned int i=0; i<v.size(); ++i)

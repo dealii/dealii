@@ -83,7 +83,8 @@ output_vector (const VECTOR &v)
 
                                    // write out at most 20 equispaced
                                    // elements of the vector
-  for (unsigned int i=0; i<v.size(); i+=std::max(1U,v.size()/20))
+  for (unsigned int i=0; i<v.size(); i+=std::max(static_cast<std::size_t>(1),
+        v.size()/20))
     deallog << v(i) << ' ';
   deallog << std::endl;
 }

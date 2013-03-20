@@ -33,7 +33,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   if (dof_handler.get_fe().dofs_per_face == 0)
     return;
   
-  std::vector<unsigned int> map (dof_handler.n_dofs());
+  std::vector<types::global_dof_index> map (dof_handler.n_dofs());
   DoFTools::map_dof_to_boundary_indices (dof_handler, map);
   
   const unsigned int n_blocks = std::min (dof_handler.get_fe().n_components(),

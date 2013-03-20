@@ -89,8 +89,8 @@ int main()
 	  PreconditionBlock<SparseMatrix<double>,double>::AdditionalData prec_data(blocksize, 0.8);
 	  
 					   // The permutation vectors;
-	  std::vector<unsigned int> bperm(n_blocks);
-	  std::vector<unsigned int> ibperm(n_blocks);
+	  std::vector<types::global_dof_index> bperm(n_blocks);
+	  std::vector<types::global_dof_index> ibperm(n_blocks);
 	  
 	  relax_data.block_list.reinit(n_blocks, dim, blocksize);
 	  for (unsigned int block=0;block<n_blocks;++block)

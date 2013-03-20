@@ -34,21 +34,21 @@ check_this (const DoFHandler<dim> &dof_handler)
   if (dof_handler.get_fe().dofs_per_face == 0)
     return;
   
-  std::vector<unsigned int> map (dof_handler.n_dofs());
+  std::vector<types::global_dof_index> map (dof_handler.n_dofs());
   std::set<types::boundary_id> set;
   set.insert (0);
   DoFTools::map_dof_to_boundary_indices (dof_handler, set, map);
 
   typename FunctionMap<dim>::type boundary_ids;
   boundary_ids[0] = 0;
-  const unsigned int n_boundary_dofs = dof_handler.n_boundary_dofs(boundary_ids);
+  const types::global_dof_index n_boundary_dofs = dof_handler.n_boundary_dofs(boundary_ids);
   const unsigned int n_blocks = std::min (dof_handler.get_fe().n_components(),
                                           n_boundary_dofs);
   BlockCompressedSparsityPattern sp (n_blocks,
                                      n_blocks);
                                    // split dofs almost arbitrarily to
                                    // blocks
-  std::vector<unsigned int> dofs_per_block(n_blocks);
+  std::vector<types::global_dof_index> dofs_per_block(n_blocks);
   for (unsigned int i=0; i<n_blocks-1; ++i)
     dofs_per_block[i] = n_boundary_dofs/n_blocks;
   dofs_per_block.back() = (n_boundary_dofs -

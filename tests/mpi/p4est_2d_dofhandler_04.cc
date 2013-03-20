@@ -104,7 +104,7 @@ void test()
 	 if (!cell->is_artificial())
 	 {
 	   cell->get_dof_indices (local_dof_indices);
-	   for (std::vector<unsigned int>::iterator it=local_dof_indices.begin(); it!= local_dof_indices.end(); ++it)
+	   for (std::vector<types::global_dof_index>::iterator it=local_dof_indices.begin(); it!= local_dof_indices.end(); ++it)
 	     {
 	       unsigned int invalid_dofindex = DoFHandler<dim,dim>::invalid_dof_index;
 	       Assert(*it!=invalid_dofindex, ExcInternalError());

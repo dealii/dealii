@@ -139,7 +139,7 @@ void AdvectionProblem<dim>::setup_system ()
 					      0,
 					      RightHandSide<dim>(),
 					      boundary_values);
-    std::map<unsigned int,double>::const_iterator boundary_value =
+    std::map<types::global_dof_index,double>::const_iterator boundary_value =
       boundary_values.begin();
     for ( ; boundary_value !=boundary_values.end(); ++boundary_value)
       {

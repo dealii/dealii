@@ -45,7 +45,7 @@
 
   
 void
-solve_filtered (std::map<unsigned int,double> &bv,
+solve_filtered (std::map<types::global_dof_index,double> &bv,
 		SparseMatrix<double>          &A,
 		Vector<double>                &u,
 		Vector<double>                &f)

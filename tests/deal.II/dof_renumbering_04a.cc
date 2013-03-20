@@ -66,7 +66,7 @@ check ()
   DoFHandler<dim> dof(tr);
   
   dof.distribute_dofs(fe);
-  std::vector<unsigned int> new_dofs (dof.n_dofs());
+  std::vector<types::global_dof_index> new_dofs (dof.n_dofs());
   DoFRenumbering::boost::compute_Cuthill_McKee(new_dofs, dof);
 
   for (unsigned int i=0; i<new_dofs.size(); ++i)

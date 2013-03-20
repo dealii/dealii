@@ -36,7 +36,7 @@ void test ()
   SparseMatrix<double> m(sp);
 
 				// prepare structure with indices and values
-  std::vector<unsigned int> indices (m.n());
+  std::vector<types::global_dof_index> indices (m.n());
   for (unsigned int j=0; j<m.n(); ++j)
     indices[j] = j;
   std::vector<double> values (m.n());

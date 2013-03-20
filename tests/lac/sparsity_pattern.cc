@@ -121,8 +121,8 @@ main ()
 	Assert (sp(sp.matrix_position(i).first,
 		    sp.matrix_position(i).second) == i,
 		ExcInternalError());
-      for (unsigned int row=0; row<sp.n_rows(); ++row)
-	for (unsigned int col=0; col<sp.n_cols(); ++col)
+      for (types::global_dof_index row=0; row<sp.n_rows(); ++row)
+	for (types::global_dof_index col=0; col<sp.n_cols(); ++col)
 	  if (sp(row,col) != SparsityPattern::invalid_entry)
 	    Assert (sp.matrix_position(sp(row,col)) ==
 		    std::make_pair(row,col),

@@ -96,7 +96,7 @@ void test ()
                                    // and for A applying constraints
                                    // right away and for B applying
                                    // constraints later on
-  std::vector<unsigned int> local_dofs (fe.dofs_per_cell);
+  std::vector<types::global_dof_index> local_dofs (fe.dofs_per_cell);
   FullMatrix<double> local_matrix (fe.dofs_per_cell, fe.dofs_per_cell);
   Vector<double> local_vector (fe.dofs_per_cell);
   for (typename DoFHandler<dim>::active_cell_iterator

@@ -43,7 +43,7 @@ void test()
   csp.add(1,0);
   
   PETScWrappers::MPI::SparseMatrix mat;
-  std::vector< unsigned int > local_rows(numprocs,2);
+  std::vector<types::global_dof_index> local_rows(numprocs,2);
   
   mat.reinit(MPI_COMM_WORLD, csp, local_rows, local_rows, myid);
   

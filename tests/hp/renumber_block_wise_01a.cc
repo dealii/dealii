@@ -39,7 +39,7 @@
 
 
 template <int dim>
-std::vector<unsigned int>
+std::vector<types::global_dof_index>
 get_dofs (const hp::DoFHandler<dim> &dof)
 {
   std::vector<types::global_dof_index> local;

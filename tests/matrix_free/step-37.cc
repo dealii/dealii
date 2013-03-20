@@ -333,7 +333,7 @@ namespace Step37
 
     diagonal_values = diagonal;
 
-    const std::vector<unsigned int> &
+    const std::vector<types::global_dof_index> &
     constrained_dofs = data.get_constrained_dofs();
     for (unsigned int i=0; i<constrained_dofs.size(); ++i)
       diagonal_values(constrained_dofs[i]) = 1.0;
@@ -437,7 +437,7 @@ namespace Step37
                                  boundary_indices);
     for (unsigned int level=0; level<nlevels; ++level)
       {
-        std::set<unsigned int>::iterator bc_it = boundary_indices[level].begin();
+        std::set<types::global_dof_index>::iterator bc_it = boundary_indices[level].begin();
         for ( ; bc_it != boundary_indices[level].end(); ++bc_it)
           mg_constraints[level].add_line(*bc_it);
 

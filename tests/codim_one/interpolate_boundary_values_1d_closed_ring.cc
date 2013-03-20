@@ -70,7 +70,7 @@ void test() {
 						  bv);
 	deallog << bv.size() << " boundary degrees of freedom" << std::endl;
 
-	for (std::map<unsigned int, double>::const_iterator i = bv.begin();
+	for (std::map<types::global_dof_index, double>::const_iterator i = bv.begin();
 	     i != bv.end(); ++i)
 	  deallog << i->first << ' ' << i->second << std::endl;
 

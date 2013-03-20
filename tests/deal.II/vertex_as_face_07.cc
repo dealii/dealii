@@ -35,7 +35,7 @@ void print_dofs (const typename hp::DoFHandler<1,spacedim>::face_iterator &i,
 		 const unsigned int fe_index,
 		 const unsigned int n)
 {
-  std::vector<unsigned int> dof_indices (n);
+  std::vector<types::global_dof_index> dof_indices (n);
   i->get_dof_indices (dof_indices, fe_index);
   for (unsigned int i=0; i<n; ++i)
     deallog << dof_indices[i] << ' ';
@@ -48,7 +48,7 @@ template <int spacedim>
 void print_dofs (const typename hp::DoFHandler<1,spacedim>::cell_iterator &i,
 		 const unsigned int n)
 {
-  std::vector<unsigned int> dof_indices (n);
+  std::vector<types::global_dof_index> dof_indices (n);
   i->get_dof_indices (dof_indices);
   for (unsigned int i=0; i<n; ++i)
     deallog << dof_indices[i] << ' ';
