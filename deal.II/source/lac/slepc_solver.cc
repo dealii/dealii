@@ -171,7 +171,7 @@ namespace SLEPcWrappers
                            );
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    int n_iterations     = 0;
+    PetscInt n_iterations = 0;
     double residual_norm = 1e300;
 
     // @todo Investigate elaborating on some of this to act on the
