@@ -5935,6 +5935,22 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   (void)comm;
   AssertThrow(false, ExcMessage ("HDF5 support is disabled."));
 #else
+#ifndef DEAL_II_COMPILER_SUPPORTS_MPI
+  // verify that there are indeed
+  // patches to be written out. most
+  // of the times, people just forget 
+  // to call build_patches when there
+  // are no patches, so a warning is
+  // in order. that said, the
+  // assertion is disabled if we
+  // support MPI since then it can
+  // happen that on the coarsest
+  // mesh, a processor simply has no
+  // cells it actually owns, and in
+  // that case it is legit if there
+  // are no patches
+  Assert (patches.size() > 0, ExcNoPatches());
+#else
   hid_t           h5_file_id, plist_id;
   hid_t           node_dataspace, node_dataset, node_file_dataspace, node_memory_dataspace;
   hid_t           cell_dataspace, cell_dataset, cell_file_dataspace, cell_memory_dataspace;
@@ -5943,6 +5959,11 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   unsigned int    local_node_cell_count[2], global_node_cell_count[2], global_node_cell_offsets[2];
   hsize_t         count[2], offset[2], node_ds_dim[2], cell_ds_dim[2];
   const unsigned int n_data_sets = data_names.size();
+  bool            empty_proc = false;
+  Table<2,double> data_vectors;
+  Threads::Task<> reorder_task;
+
+  if (patches.size() == 0) empty_proc = true;
 
   // If HDF5 is not parallel and we're using multiple processes, abort
 #ifndef H5_HAVE_PARALLEL
@@ -5954,11 +5975,15 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 #endif
 #endif
 
-  compute_sizes<dim,spacedim>(patches, local_node_cell_count[0], local_node_cell_count[1]);
+  if (empty_proc) {
+    local_node_cell_count[0] = local_node_cell_count[1] = 0;
+  } else {
+    compute_sizes<dim,spacedim>(patches, local_node_cell_count[0], local_node_cell_count[1]);
 
-  Table<2,double> data_vectors (n_data_sets, local_node_cell_count[0]);
-  void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &, Table<2,double> &) = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
-  Threads::Task<> reorder_task = Threads::new_task (fun_ptr, patches, data_vectors);
+    data_vectors = Table<2,double> (n_data_sets, local_node_cell_count[0]);
+    void (*fun_ptr) (const std::vector<Patch<dim,spacedim> > &, Table<2,double> &) = &DataOutBase::template write_gmv_reorder_data_vectors<dim,spacedim>;
+    reorder_task = Threads::new_task (fun_ptr, patches, data_vectors);
+  }
 
   // Create file access properties
   plist_id = H5Pcreate(H5P_FILE_ACCESS);
@@ -6071,7 +6096,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   status = H5Dwrite(cell_dataset, H5T_NATIVE_UINT, cell_memory_dataspace, cell_file_dataspace, plist_id, hdf5_data.cell_data());
   AssertThrow(status >= 0, ExcIO());
 
-  reorder_task.join ();
+  if (!empty_proc) reorder_task.join ();
 
   // when writing, first write out
   // all vector data, then handle the
@@ -6155,7 +6180,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
 
       // Write point data to the memory array
       r = 0;
-      for (i=0; i<local_node_cell_count[0]; ++i)
+      for (i=0; !empty_proc && i<local_node_cell_count[0]; ++i)
         {
           // Get the offset to the vector
           q = data_set;
@@ -6211,6 +6236,7 @@ void DataOutBase::write_hdf5_parallel (const std::vector<Patch<dim,spacedim> > &
   // Close the file
   status = H5Fclose(h5_file_id);
   AssertThrow(status >= 0, ExcIO());
+#endif
 #endif
 }
 
