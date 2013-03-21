@@ -340,6 +340,30 @@ namespace GridOutFlags
     boundary_thickness = param.get_integer("Boundary width");
   }
 
+  Svg::Svg(const unsigned int line_thickness,
+           const unsigned int boundary_line_thickness,
+           const unsigned int margin_in_percent,
+           const Background background,
+           const Coloring coloring,
+           const bool label_level_number,
+           const bool label_cell_index,
+           const bool label_material_id,
+           const bool label_subdomain_id,
+	   const bool draw_colorbar,
+           const bool draw_legend) :
+    line_thickness(line_thickness),
+    boundary_line_thickness(boundary_line_thickness),
+    margin_in_percent(margin_in_percent),
+    background(background),
+    coloring(coloring),
+    label_level_number(label_level_number),
+    label_cell_index(label_cell_index),
+    label_material_id(label_material_id),
+    label_subdomain_id(label_subdomain_id),
+    draw_colorbar(draw_colorbar),
+    draw_legend(draw_legend)
+  {}
+
 
 }  // end namespace GridOutFlags
 
@@ -406,6 +430,12 @@ void GridOut::set_flags (const GridOutFlags::XFig &flags)
 
 
 
+void GridOut::set_flags (const GridOutFlags::Svg &flags)
+{
+  svg_flags = flags;
+}
+
+
 std::string
 GridOut::default_suffix (const OutputFormat output_format)
 {
@@ -425,6 +455,8 @@ GridOut::default_suffix (const OutputFormat output_format)
       return ".fig";
     case msh:
       return ".msh";
+    case svg:
+      return ".svg";
     default:
       Assert (false, ExcNotImplemented());
       return "";
@@ -465,6 +497,9 @@ GridOut::parse_output_format (const std::string &format_name)
   if (format_name == "msh")
     return msh;
 
+  if (format_name == "svg")
+    return svg;
+
   AssertThrow (false, ExcInvalidState ());
   // return something weird
   return OutputFormat(-1);
@@ -474,7 +509,7 @@ GridOut::parse_output_format (const std::string &format_name)
 
 std::string GridOut::get_output_format_names ()
 {
-  return "none|dx|gnuplot|eps|ucd|xfig|msh";
+  return "none|dx|gnuplot|eps|ucd|xfig|msh|svg";
 }
 
 
@@ -1174,7 +1209,7 @@ void GridOut::write_xfig (
         {
 //TODO[GK]: Simplify after deprecation period is over
         case GridOutFlags::XFig::material_id:
-	  out << static_cast<unsigned int>(cell->material_id()) + 32;
+          out << static_cast<unsigned int>(cell->material_id()) + 32;
           break;
         case GridOutFlags::XFig::level_number:
           out << cell->level() + 8;
@@ -1274,7 +1309,599 @@ void GridOut::write_xfig (
 }
 
 
+template <int dim, int spacedim>
+void GridOut::write_svg(const Triangulation<dim,spacedim> &tria, std::ostream &out) const
+{
+  Assert(false, ExcNotImplemented());
+}
 
+
+void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
+{
+
+  const int dim = 2;
+
+//------------------ determine the bounding box of the given triangulation,
+//------------------ the materials being used, the levels being used,
+//------------------ the subdomains being used (, and the level subdomains being used)
+  unsigned int  n_materials      = 0;
+  unsigned int  n_levels         = 0;
+  unsigned int  n_subdomains     = 0;
+  //unsigned int n_level_subdomains    = 0;         // TODO [CW]: CellAccessor<dim, spacedim> does not
+  // seem to possess this attribute ...
+
+  const unsigned int  height     = 4000;            // TODO [CW]: consider other options ...
+
+  unsigned int  cell_label_font_size     = round((height/100.) * 2.25);   // initial font size for cell labels
+  unsigned int  font_size                = round((height/100.) * 2.);   // font size for date, time, legend, and colorbar
+
+  // get date and time
+  time_t time_stamp;
+  tm *now;
+  time_stamp = time(0);
+  now = localtime(&time_stamp);
+
+  Triangulation<2,2>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
+
+  double x_min = cell->vertex(0)[0];
+  double x_max = cell->vertex(0)[0];
+  double y_min = cell->vertex(0)[1];
+  double y_max = cell->vertex(0)[1];
+
+  unsigned int min_level = cell->level();
+  unsigned int max_level = cell->level();
+
+  // array for the materials being used
+  unsigned int materials[256];
+  for (unsigned int material_index = 0; material_index < 256; material_index++) materials[material_index] = 0;
+
+  // array for the levels being used
+  unsigned int levels[256];
+  for (unsigned int level_index = 0; level_index < 256; level_index++) levels[level_index] = 0;
+
+  // array for the subdomains being used
+  unsigned int subdomains[256];
+  for (unsigned int subdomain_index = 0; subdomain_index < 256; subdomain_index++) subdomains[subdomain_index] = 0;
+
+  /*
+  // array for the level subdomains being used
+  int level_subdomains[256];
+  for(int level_subdomain_index = 0; level_subdomain_index < 256; level_subdomain_index++) level_subdomains[level_subdomain_index] = 0;
+  */
+
+  // determine the bounding box of the triangulation and check the cells for material and subdomain
+  for (; cell != endc; ++cell)
+    {
+      for (unsigned int vertex_index = 0; vertex_index < GeometryInfo<dim>::vertices_per_cell; vertex_index++)
+        {
+          if (cell->vertex(vertex_index)[0] < x_min) x_min = cell->vertex(vertex_index)[0];
+          if (cell->vertex(vertex_index)[0] > x_max) x_max = cell->vertex(vertex_index)[0];
+          if (cell->vertex(vertex_index)[1] < y_min) y_min = cell->vertex(vertex_index)[1];
+          if (cell->vertex(vertex_index)[1] > y_max) y_max = cell->vertex(vertex_index)[1];
+        }
+
+      if ((unsigned int)cell->level() < min_level)      min_level = cell->level();
+      if ((unsigned int)cell->level() > max_level)      max_level = cell->level();
+
+      if ((unsigned int)cell->material_id())            materials[(unsigned int)cell->material_id()] = 1;
+      else if ((unsigned int)cell->material_id() == 0)  materials[0] = 1;
+
+      if ((int)cell->level())                           levels[(unsigned int)cell->level()] = 1;
+      else if ((unsigned int)cell->level() == 0)        levels[0] = 1;
+
+      if ((unsigned int)cell->subdomain_id())           subdomains[(unsigned int)cell->subdomain_id()] = 1;
+      else if ((unsigned int)cell->subdomain_id() == 0) subdomains[0] = 1;
+
+      //  if((unsigned int)(cell->level_subdomain_id()))           level_subdomains[(unsigned int)cell->level_subdomain_id()] = 1;
+      //  else if((unsigned int)(cell->level_subdomain_id()) == 0) level_subdomains[0] = 1;
+    }
+
+  const double x_dimension = x_max - x_min;
+  const double y_dimension = y_max - y_min;
+
+  // count the materials being used
+  for (unsigned int material_index = 0; material_index < 256; material_index++)
+    {
+      if (materials[material_index]) n_materials++;
+    }
+
+  // count the levels being used
+  for (unsigned int level_index = 0; level_index < 256; level_index++)
+    {
+      if (levels[level_index]) n_levels++;
+    }
+
+  // count the subdomains being used
+  for (unsigned int subdomain_index = 0; subdomain_index < 256; subdomain_index++)
+    {
+      if (subdomains[subdomain_index]) n_subdomains++;
+    }
+
+  /*
+  // count the level subdomains being used
+  for(int level_subdomain_index = 0; level_subdomain_index < 256; level_subdomain_index++)
+  {
+    if(level_subdomains[level_subdomain_index]) n_level_subdomains++;
+  }
+  */
+
+//------------------ create the svg file with internal style sheet
+  const unsigned int width  = round(height * (x_dimension/y_dimension));
+  unsigned int additional_width = 0;
+
+  if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id)) // || svg_flags.label_level_subdomain_id ))
+    {
+      additional_width  = round(height * .4); // additional width for legend
+    }
+  else if (svg_flags.draw_colorbar && svg_flags.coloring)
+    {
+      additional_width  = round(height * .175); // additional width for colorbar // TODO [CW]: not enough / automatic adjustment ...
+    }
+
+  out << "<!-- deal.ii GridOut " << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year + 1900
+      << ' ' << now->tm_hour << ':';
+
+  if (now->tm_min < 10) out << '0';
+
+  out << now->tm_min << " -->"
+      << '\n' << '\n';
+
+  // basic svg header and inclusion of the corresponding style sheet
+  out << "<svg width=\"" << width + additional_width << "\" height=\"" << height << "\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">"
+      << '\n' << '\n';
+
+  if (svg_flags.background == 2)
+    {
+      out << " <linearGradient id=\"background_gradient\" gradientUnits=\"userSpaceOnUse\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"" << height << "\">" << '\n'
+          << "  <stop offset=\"0\" style=\"stop-color:white\"/>" << '\n'
+          << "  <stop offset=\"1\" style=\"stop-color:lightsteelblue\"/>" << '\n'
+          << " </linearGradient>"
+          << '\n';
+    }
+
+  out << '\n';
+
+  out << "<style type=\"text/css\"><![CDATA["
+      << '\n';
+
+  if (svg_flags.background == 0)      out << " rect.background{fill:none}" << '\n';
+  else if (svg_flags.background == 1) out << " rect.background{fill:white}" << '\n';
+  else                                out << " rect.background{fill:url(#background_gradient)}" << '\n';
+
+  // basic svg graphic element styles
+  out << " rect{fill:none; stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}' << '\n'
+      << " text{font-family:Helvetica; text-anchor:middle; fill:rgb(25,25,25)}" << '\n'
+      << " line{stroke:rgb(25,25,25); stroke-width:" << svg_flags.boundary_line_thickness << '}' << '\n'
+      << " path{fill:none; stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}' << '\n';
+
+  out << '\n';
+
+  for (unsigned int level_index = min_level; level_index <= max_level; level_index++)
+    {
+      int font_size = cell_label_font_size * pow(.5, level_index - min_level);
+
+      out << " text.l" << level_index << "{font-family:Helvetica; text-anchor:middle;"
+          << "fill:rgb(25,25,25); font-size:" << font_size << '}'
+          << '\n';
+    }
+
+  out << '\n';
+
+  if (svg_flags.coloring)
+    {
+      unsigned int labeling_index = 0;
+      unsigned int n = 0;
+
+      switch (svg_flags.coloring)
+        {
+        case 1:
+          n = n_materials;
+          break;
+        case 2:
+          n = n_levels;
+          break;
+        case 3:
+          n = n_subdomains;
+          break;
+//    case 4:  n = n_level_subdomains; break;
+        default:
+          break;
+        }
+
+      for (unsigned int index = 0; index < n; index++)
+        {
+          double h;
+
+          if (n != 1)  h = .6 - (index / (n-1.)) * .6;
+          else    h = .6;
+
+          unsigned int  r = 0;
+          unsigned int  g = 0;
+          unsigned int  b = 0;
+
+          unsigned int  i = floor(h * 6);
+
+          double f = h * 6 - i;
+          double q = 1 - f;
+          double t = f;
+
+          switch (i % 6)
+            {
+            case 0:
+              r = 255,             g = round(255*t);                        break;
+            case 1:
+              r = round(255*q),    g = 255;                                 break;
+            case 2:
+                                   g = 255,            b = round(255*t);    break;
+            case 3:
+                                   g = round(255*q),   b = 255;             break;
+            case 4:
+              r = round(255*t),                        b = 255;             break;
+            case 5:
+              r = 255,                                 b = round(255*q);    break;
+            default: break;
+            }
+
+          switch (svg_flags.coloring)
+            {
+            case 1:
+              while (!materials[labeling_index])   labeling_index++;
+              break;
+            case 2:
+              while (!levels[labeling_index])      labeling_index++;
+              break;
+            case 3:
+              while (!subdomains[labeling_index])  labeling_index++;
+              break;
+              //  case 4: while(!level_subdomains[labeling_index]) labeling_index++; break;
+            default:
+              break;
+            }
+
+          out << " path.p" << labeling_index
+              << "{fill:rgb(" << r << ',' << g << ',' << b << "); "
+              << "stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}'
+              << '\n';
+
+          out << " rect.r" << labeling_index
+              << "{fill:rgb(" << r << ',' << g << ',' << b << "); "
+              << "stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}'
+              << '\n';
+
+          labeling_index++;
+        }
+    }
+
+  out << " ]]></style>"
+      << '\n' << '\n';
+
+  out << " <rect class=\"background\" width=\"" << width + additional_width << "\" height=\"" << height << "\"/>"
+      << '\n';
+
+  if (svg_flags.background == 2)
+    {
+      unsigned int x_offset = 0;
+
+      if (svg_flags.margin_in_percent) x_offset = round((height/100.) * (svg_flags.margin_in_percent/2.));
+      else                            x_offset = round(height * .025);
+
+      out << " <text x=\"" << x_offset << "\" y=\"" << round(height * .045) << '\"'
+          << " style=\"font-weight:100; fill:lightsteelblue; text-anchor:start; font-family:Courier; font-size:" << round(height * .035) << "\">"
+          << "deal.II" << "</text>"
+          << '\n';
+
+      out << " <text x=\"" << x_offset + round(height * .045 * 3.75) << "\" y=\"" << round(height * .045) << '\"'
+          << " style=\"fill:lightsteelblue; text-anchor:start; font-size:" << round(font_size * .75) << "\">"
+          << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year + 1900
+          << " - " << now->tm_hour << ':';
+
+      if (now->tm_min < 10) out << '0';
+
+      out << now->tm_min
+          << "</text>"
+          << '\n' << '\n';
+    }
+
+//------------------ draw the cells
+  out << "  <!-- cells -->"
+      << '\n';
+
+  cell = tria.begin_active();
+  endc = tria.end();
+
+  for (; cell != endc; ++cell)
+    {
+      // draw the current cell
+      out << "  <path";
+
+      if (svg_flags.coloring)
+        {
+          out << " class=\"p";
+
+          switch (svg_flags.coloring)
+            {
+            case 1:
+              out << (unsigned int)cell->material_id();
+              break;
+            case 2:
+              out << (unsigned int)cell->level();
+              break;
+            case 3:
+              out << (unsigned int)cell->subdomain_id();
+              break;
+              // case 4: out << (unsigned int)cell->level_subdomain_id(); break;
+            default:
+              break;
+            }
+
+          out << '\"';
+        }
+
+      out << " d=\""
+          <<  "M " << round(((cell->vertex(0)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << ' '   << round(((cell->vertex(0)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << " L " << round(((cell->vertex(1)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << ' '   << round(((cell->vertex(1)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << " L " << round(((cell->vertex(3)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << ' '   << round(((cell->vertex(3)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << " L " << round(((cell->vertex(2)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << ' '   << round(((cell->vertex(2)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << " L " << round(((cell->vertex(0)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << ' '   << round(((cell->vertex(0)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << "\"/>"
+          << '\n';
+
+      // label the current cell
+      if (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
+        {
+          out << "  <text class=\"l" << cell->level()
+              << "\" x=\""           << round(((cell->center()[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+              << "\" y=\""           << round(((cell->center()[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+              << "\">";
+
+          if (svg_flags.label_level_number)
+            {
+              out << cell->level();
+            }
+
+          if (svg_flags.label_cell_index)
+            {
+              if (svg_flags.label_level_number) out << ',';
+              out << cell->index();
+            }
+
+          if (svg_flags.label_material_id)
+            {
+              if (svg_flags.label_level_number || svg_flags.label_cell_index) out << ',';
+              out << (int)cell->material_id();
+            }
+
+          if (svg_flags.label_subdomain_id)
+            {
+              if (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id) out << ',';
+              out << cell->subdomain_id();
+            }
+          /*
+                if(svg_flags.label_level_subdomain_id)
+                {
+                  if(svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id) out << ',';
+                  out << cell->level_subdomain_id();
+                }
+          */
+          out << "</text>"
+              << '\n';
+        }
+
+//------------------ draw the boundary
+      if (svg_flags.boundary_line_thickness)
+        {
+          for (unsigned int faceIndex = 0; faceIndex < GeometryInfo<dim>::faces_per_cell; faceIndex++)
+            {
+              if (cell->at_boundary(faceIndex))
+                {
+                  out << "  <line x1=\"" << round(((cell->face(faceIndex)->vertex(0)[0] - x_min)/x_dimension) * (width - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+                      << "\" y1=\""      << round(((cell->face(faceIndex)->vertex(0)[1] - y_min)/y_dimension) * (height - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+                      << "\" x2=\""      << round(((cell->face(faceIndex)->vertex(1)[0] - x_min)/x_dimension) * (width - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+                      << "\" y2=\""      << round(((cell->face(faceIndex)->vertex(1)[1] - y_min)/y_dimension) * (height - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+                      << "\"/>"
+                      << '\n';
+                }
+            }
+        }
+    }
+
+//------------------ draw the legend
+  if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id)) // || svg_flags.label_level_subdomain_id ))
+    {
+      out << '\n';
+
+      out << " <!-- legend -->"
+          << '\n';
+
+      unsigned int additional_width = 0;
+      if (!svg_flags.margin_in_percent) additional_width = round((height/100.) * 2.5);
+
+      out << " <rect x=\"" << width + additional_width << "\" y=\"" << round((height/100.) * svg_flags.margin_in_percent)
+          << "\" width=\"" << round((height/100.) * (40. - svg_flags.margin_in_percent)) << "\" height=\"" << round(height*.2) << "\"/>"
+          << '\n';
+
+      unsigned int line_offset = 0;
+
+      out << " <text x=\"" << width + additional_width + round((height/100.) * 1.25)
+          << "\" y=\""     << round((height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size)
+          << "\" style=\"text-anchor:start; font-weight:bold; font-size:" << font_size
+          << "\">"
+          << "cell label"
+          << "</text>"
+          << '\n';
+
+      if (svg_flags.label_level_number)
+        {
+          out << "  <text x=\"" << width + additional_width + round((height/100.) * 2.)
+              << "\" y=\""      << round((height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size)
+              << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
+              << "\">"
+              << "level_number";
+
+          if (svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
+            out << ',';
+
+          out << "</text>"
+              << '\n';
+        }
+
+      if (svg_flags.label_cell_index)
+        {
+          out << "  <text x=\"" << width + additional_width + round((height/100.) * 2.)
+              << "\" y=\""      << round((height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
+              << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
+              << "\">"
+              << "cell_index";
+
+          if (svg_flags.label_material_id || svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
+            out << ',';
+
+          out << "</text>"
+              << '\n';
+        }
+
+      if (svg_flags.label_material_id)
+        {
+          out << "  <text x=\"" << width + additional_width + round((height/100.) * 2.)
+              << "\" y=\""      << round((height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
+              << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
+              << "\">"
+              << "material_id";
+
+          if (svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
+            out << ',';
+
+          out << "</text>"
+              << '\n';
+        }
+
+      if (svg_flags.label_subdomain_id)
+        {
+          out << "  <text x= \""  << width + additional_width + round((height/100.) * 2.)
+              << "\" y=\""    << round((height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
+              << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
+              << "\">"
+              << "subdomain_id";
+
+          // if(svg_flags.label_level_subdomain_id)
+          // out << ',';
+
+          out << "</text>"
+              << '\n';
+        }
+      /*
+          if(svg_flags.label_level_subdomain_id)
+          {
+            out << "  <text x= \"" << width + additional_width + round((height/100.) * 2.)
+                << "\" y=\""       << round((height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
+                << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
+                << "\">"
+                << "level_subdomain_id"
+                << "</text>" << '\n';
+          }
+      */
+    }
+
+//------------------ draw the colorbar
+  if (svg_flags.draw_colorbar && svg_flags.coloring)
+    {
+      out << '\n';
+
+      out << " <!-- colorbar -->"
+          << '\n';
+
+      unsigned int additional_width = 0;
+      if (!svg_flags.margin_in_percent) additional_width = round((height/100.) * 2.5);
+
+      unsigned int n = 0;
+
+      out << " <text x=\"" << width + additional_width
+          << "\" y=\""     << round((height/100.) * (svg_flags.margin_in_percent+27.5) - (font_size/1.25))
+          << "\" style=\"text-anchor:start; font-weight:bold; font-size:" << font_size << "\">";
+
+      switch (svg_flags.coloring)
+        {
+        case 1:
+          out << "material_id",        n = n_materials;
+          break;
+        case 2:
+          out << "level_number",       n = n_levels;
+          break;
+        case 3:
+          out << "subdomain_id",       n = n_subdomains;
+          break;
+          // case 4: out << "level_subdomain_id", n = n_level_subdomains; break;
+        default:
+          break;
+        }
+
+      out << "</text>"
+          << '\n';
+
+      unsigned int element_height = floor(((height/100.) * (72.5 - 2.*svg_flags.margin_in_percent)) / n);
+      unsigned int element_width  = round((height/100.) * 2.5);
+
+      int labeling_index = 0;
+
+      for (unsigned int index = 0; index < n; index++)
+        {
+          switch (svg_flags.coloring)
+            {
+            case 1:
+              while (!materials[labeling_index])        labeling_index++;
+              break;
+            case 2:
+              while (!levels[labeling_index])           labeling_index++;
+              break;
+            case 3:
+              while (!subdomains[labeling_index])       labeling_index++;
+              break;
+              // case 4: while(!level_subdomains[labeling_index]) labeling_index++; break;
+            default:
+              break;
+            }
+
+          out << "  <rect class=\"r" << labeling_index
+              << "\" x=\""           << width + additional_width
+              << "\" y=\""           << round((height/100.) * (svg_flags.margin_in_percent + 27.5)) + (n-index-1) * element_height
+              << "\" width=\""       << element_width
+              << "\" height=\""      << element_height
+              << "\"/>"
+              << '\n';
+
+          unsigned int additional_width = 0;
+          if (!svg_flags.margin_in_percent) additional_width = round((height/100.) * 2.5);
+
+          out << "  <text x=\"" << width + additional_width + 1.5 * element_width
+              << "\" y=\""      << round((height/100.) * (svg_flags.margin_in_percent + 27.5)) + (n-index-1 + .5) * element_height + round(font_size * .35) << "\""
+              << " style=\"text-anchor:start; font-size:" << round(font_size);
+
+          if (index == 0 || index == n-1) out << "; font-weight:bold";
+
+          out << "\">" << labeling_index;
+
+          if (index == n-1) out << " max";
+          if (index == 0)   out << " min";
+
+          out << "</text>"
+              << '\n';
+
+          labeling_index++;
+        }
+    }
+
+//------------------ finalize the svg file
+  out << '\n';
+  out << "</svg>";
+
+  out.flush();
+
+}
 
 
 unsigned int GridOut::n_boundary_faces (const Triangulation<1> &) const
@@ -2611,6 +3238,10 @@ void GridOut::write (const Triangulation<dim, spacedim> &tria,
 
     case msh:
       write_msh (tria, out);
+      return;
+
+    case svg:
+      write_svg (tria, out);
       return;
     }
 

@@ -737,6 +737,93 @@ namespace GridOutFlags
     void parse_parameters (ParameterHandler &param);
   };
 
+
+  /**
+   * Flags controlling SVG output.
+   */
+  struct Svg
+  {
+    /// Thickness of the lines between cells
+    unsigned int line_thickness;
+    /// Thickness of lines at the boundary
+    unsigned int boundary_line_thickness;
+
+    /// Margin around the plotted area
+    unsigned int margin_in_percent;
+
+    /**
+     * Background style.
+     */
+    enum Background {
+	/// Use transparent value of SVG
+        transparent,
+	/// Use white background
+        white,
+	/// Use a gradient from white (top) to steelblue (bottom), and add date and time plus a "deal.II" logo.
+        dealii };
+
+    Background background;
+
+    /**
+     * Cell coloring.
+     */
+    enum Coloring { 
+        /// No cell coloring
+        none, 
+        /// Convert the material id into the cell color
+        material_id, 
+        /// Convert the level number into the cell color
+        level_number, 
+        /// Convert the subdomain id into the cell color
+        subdomain_id }; 
+ 
+    Coloring coloring;
+
+    /**
+     * Cell labeling (fixed order).
+     * 
+     * The following booleans determine which property of the cell
+     * shall be displayed as text in the middle of each cell.
+     */
+    bool label_level_number;    /// default: true
+    bool label_cell_index;      /// default: true
+    bool label_material_id;     /// default: false
+    bool label_subdomain_id;    /// default: false
+    //bool label_level_subdomain_id;  // TODO [CW]: not yet implemented ...
+
+    /// Draw a colorbar next to the plotted grid with respect to the chosen coloring of the cells
+    bool draw_colorbar;
+    /// Draw a legend next to the plotted grid, explaining the label of the cells
+    bool draw_legend;
+
+    /**
+     * Constructor.
+     */
+    Svg (const unsigned int line_thickness = 3,
+         const unsigned int boundary_line_thickness = 7,
+         const unsigned int margin_in_percent = 7,
+         const Background background = dealii,
+         const Coloring coloring = material_id,
+         const bool label_level_number = true,
+         const bool label_cell_index = true,
+         const bool label_material_id = false,
+         const bool label_subdomain_id = false,
+	 const bool draw_colorbar = true,
+         const bool draw_legend = true);
+
+    /**
+     * Declare parameters in
+     * ParameterHandler.
+     */
+//    static void declare_parameters (ParameterHandler &param);
+
+    /**
+     * Parse parameters of
+     * ParameterHandler.
+     */
+//    void parse_parameters (ParameterHandler &param);
+  };
+
 }
 
 
@@ -840,7 +927,10 @@ public:
     /// write() calls write_xfig()
     xfig,
     /// write() calls write_msh()
-    msh
+    msh,
+    /// write() calls write_svg()
+    svg
+    /// write() calls write_svg()
   };
 
   /**
@@ -1111,6 +1201,43 @@ public:
                    const Mapping<dim>        *mapping=0) const;
 
   /**
+   * Write the triangulation in the
+   * SVG format.
+   * 
+   * SVG (Scalable Vector Graphics) is 
+   * an XML-based vector image format 
+   * recommended by the World Wide Web 
+   * Consortium (W3C). This function
+   * conforms to the latest 
+   * specification SVG 1.1, released 
+   * on August 16, 2011.
+   * 
+   * The cells of the triangulation
+   * are written as polygons with 
+   * additional lines at the boundary
+   * of the triangulation. A coloring 
+   * of the cells is further possible 
+   * in order to visualize a 
+   * certain property of the cells 
+   * such as their level or material 
+   * id. A colorbar can be drawn to
+   * encode the chosen coloring. 
+   * Moreover, a cell label can be
+   * added, showing level index, etc.
+   *
+   * @note Only implemented for the 
+   * two-dimensional grids in two
+   * space dimensions.
+   * 
+   */
+  template <int dim, int spacedim>
+  void write_svg (const Triangulation<dim,spacedim> &tria,
+                  std::ostream            &out) const;
+
+  void write_svg (const Triangulation<2,2> &tria,
+                  std::ostream            &out) const;
+
+  /**
    * Write grid to @p out according
    * to the given data format. This
    * function simply calls the
@@ -1175,6 +1302,11 @@ public:
    * three-dimensional triangulation
    */
   void set_flags (const GridOutFlags::XFig &flags);
+
+  /**
+   * Set flags for SVG output
+   */
+  void set_flags (const GridOutFlags::Svg &flags);
 
   /**
    * Provide a function which tells us which
@@ -1318,6 +1450,11 @@ private:
    * Flags used for XFig output.
    */
   GridOutFlags::XFig xfig_flags;
+
+  /**
+   * Flags used for Svg output.
+   */
+  GridOutFlags::Svg svg_flags;
 
   /**
    * Write the grid information about
