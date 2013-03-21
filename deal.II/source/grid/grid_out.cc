@@ -1478,7 +1478,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
   for (unsigned int level_index = min_level; level_index <= max_level; level_index++)
     {
-      int font_size = cell_label_font_size * pow(.5, level_index - min_level);
+      int font_size = cell_label_font_size * std::pow(.5, 1.*(level_index - min_level));
 
       out << " text.l" << level_index << "{font-family:Helvetica; text-anchor:middle;"
           << "fill:rgb(25,25,25); font-size:" << font_size << '}'
