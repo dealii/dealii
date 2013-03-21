@@ -976,7 +976,7 @@ namespace Step42
     unsigned int sum_elast_points = Utilities::MPI::sum(elast_points, mpi_communicator);
     unsigned int sum_plast_points = Utilities::MPI::sum(plast_points, mpi_communicator);
     pcout << "      Number of elastic quadrature points: " << sum_elast_points
-          << " and plastic quadrature points: " << sum_plast_points <<std::endl;
+          << " and plastic quadrature points: " << sum_plast_points << std::endl;
   }
 
   template <int dim>
@@ -1278,20 +1278,20 @@ namespace Step42
         else if (j == 2 || cycle > 0)
           plast_lin_hard->set_sigma_0 (sigma_hlp);
 
-        pcout<< " " <<std::endl;
-        pcout<< "   Newton iteration " << j <<std::endl;
-        pcout<< "      Updating active set..." <<std::endl;
+        pcout << " " <<std::endl;
+        pcout << "   Newton iteration " << j << std::endl;
+        pcout << "      Updating active set..." << std::endl;
 
         update_solution_and_constraints ();
 
-        pcout<< "      Assembling system... " <<std::endl;
+        pcout << "      Assembling system... " << std::endl;
         system_matrix_newton = 0;
         system_rhs_newton = 0;
         assemble_nl_system (solution);  //compute Newton-Matrix
 
         number_assemble_system += 1;
 
-        pcout<< "      Solving system... " <<std::endl;
+        pcout << "      Solving system... " << std::endl;
         solve ();
 
         TrilinosWrappers::MPI::Vector distributed_solution (system_rhs_newton);
@@ -1493,7 +1493,7 @@ namespace Step42
       {
         computing_timer.enter_section("Setup");
 
-        pcout << "" <<std::endl;
+        pcout << std::endl;
         pcout << "Cycle " << cycle << ':' << std::endl;
 
         if (cycle == 0)
@@ -1522,7 +1522,7 @@ namespace Step42
 
         solve_newton ();
 
-        pcout<< "      Writing graphical output..." <<std::endl;
+        pcout << "      Writing graphical output..." << std::endl;
         computing_timer.enter_section("Graphical output");
 
         std::ostringstream filename_solution;
@@ -1551,10 +1551,8 @@ int main (int argc, char *argv[])
   {
     int _n_refinements_global = 3;
 
-    if (argc == 3)
-      {
+    if (argc == 2)
         _n_refinements_global = atoi(argv[1]);
-      }
 
     PlasticityContactProblem<3> laplace_problem_3d (_n_refinements_global);
     laplace_problem_3d.run ();
