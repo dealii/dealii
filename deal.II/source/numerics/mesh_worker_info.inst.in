@@ -1,8 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
-//    Version: $Name$
 //
-//    Copyright (C) 2010, 2012 by the deal.II authors
+//    Copyright (C) 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -31,6 +30,13 @@ namespace MeshWorker
 
   template void IntegrationInfo<deal_II_dimension>::fill_local_data(
     const DoFInfo<deal_II_dimension, deal_II_dimension, double>&, bool);
+
+  template class DoFInfo<deal_II_dimension,deal_II_dimension,long double>;
+  template class DoFInfoBox<deal_II_dimension,
+                            DoFInfo<deal_II_dimension,deal_II_dimension,long double> >;
+
+  template void IntegrationInfo<deal_II_dimension>::fill_local_data(
+    const DoFInfo<deal_II_dimension, deal_II_dimension, long double>&, bool);
 
 //   template void IntegrationInfo<deal_II_dimension>
 //   ::initialize<FEValues<deal_II_dimension> >(
