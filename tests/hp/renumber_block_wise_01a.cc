@@ -65,7 +65,7 @@ check_renumbering(hp::DoFHandler<dim>& dof)
 				   // do component-wise and save the
 				   // results
   DoFRenumbering::component_wise (dof);
-  const std::vector<unsigned int> vc = get_dofs (dof);
+  const std::vector<types::global_dof_index> vc = get_dofs (dof);
 
   deallog << "OK" << std::endl;
 }

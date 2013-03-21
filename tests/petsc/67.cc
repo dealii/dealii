@@ -77,8 +77,8 @@ void test (PETScWrappers::MatrixBase &m)
       const double s = m.el(N/3,i);
       norm_sqr -= s*s;
     }
-  const unsigned int rows[2] = { N/3, N/2 };
-  m.clear_rows (std::vector<unsigned int>(&rows[0], &rows[2]));
+  const types::global_dof_index rows[2] = { N/3, N/2 };
+  m.clear_rows (std::vector<types::global_dof_index>(&rows[0], &rows[2]));
   
   deallog << m.frobenius_norm() << ' ' << std::sqrt (norm_sqr)
           << std::endl;

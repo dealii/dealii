@@ -42,8 +42,9 @@ check_this (const DoFHandler<dim> &dof_handler)
   typename FunctionMap<dim>::type boundary_ids;
   boundary_ids[0] = 0;
   const types::global_dof_index n_boundary_dofs = dof_handler.n_boundary_dofs(boundary_ids);
-  const unsigned int n_blocks = std::min (dof_handler.get_fe().n_components(),
-                                          n_boundary_dofs);
+  const unsigned int n_blocks = std::min (
+      static_cast<types::global_dof_index>(dof_handler.get_fe().n_components()),
+      n_boundary_dofs);
   BlockCompressedSparsityPattern sp (n_blocks,
                                      n_blocks);
                                    // split dofs almost arbitrarily to

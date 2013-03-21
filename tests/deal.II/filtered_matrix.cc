@@ -67,7 +67,7 @@ solve_filtered (std::map<types::global_dof_index,double> &bv,
   
   solver.solve (A1, u, f1, fprec);
 
-  for (std::map<unsigned int,double>::const_iterator i=bv.begin();
+  for (std::map<types::global_dof_index,double>::const_iterator i=bv.begin();
        i!=bv.end(); ++i)
     Assert (std::fabs(u(i->first) - i->second) < 1e-8,
 	    ExcInternalError());

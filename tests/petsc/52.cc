@@ -62,7 +62,8 @@ int main (int argc,char **argv)
     {
       PetscInitialize(&argc,&argv,0,0);
       {
-        std::vector<unsigned int> row_lengths (5, 3U);
+        std::vector<types::global_dof_index> row_lengths (5,
+            static_cast<types::global_dof_index>(3));
         row_lengths.back() = 2;
         PETScWrappers::SparseMatrix m (5,5,row_lengths);
         test (m);

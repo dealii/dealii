@@ -55,7 +55,7 @@ check_this (const DoFHandler<dim> &dof_handler)
 
                                    // output every second element
   unsigned int j=0;
-  for (typename std::map<Point<dim>, unsigned int, Comp>::const_iterator
+  for (typename std::map<Point<dim>, types::global_dof_index, Comp>::const_iterator
          i=map.begin(); i!=map.end(); ++i,++j)
     if (j%2 == 0)
       deallog << i->first << " " << i->second << std::endl;

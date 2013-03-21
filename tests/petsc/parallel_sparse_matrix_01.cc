@@ -57,8 +57,8 @@ void test ()
                                    // process has 10 rows, the second one 20,
                                    // the third one 30, and so on
   unsigned int N = 0;
-  std::vector<unsigned int> local_rows_per_process (get_n_mpi_processes());
-  std::vector<unsigned int> start_row (get_n_mpi_processes());
+  std::vector<types::global_dof_index> local_rows_per_process (get_n_mpi_processes());
+  std::vector<types::global_dof_index> start_row (get_n_mpi_processes());
   for (unsigned int i=0; i<get_n_mpi_processes(); ++i)
     {
       N += (i+1)*10;

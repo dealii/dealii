@@ -204,7 +204,7 @@ void LaplaceProblem<dim>::setup_system ()
 					      0,
 					      BoundaryValues<dim>(),
 					      boundary_values);
-    std::map<unsigned int,double>::const_iterator boundary_value = boundary_values.begin();
+    std::map<types::global_dof_index,double>::const_iterator boundary_value = boundary_values.begin();
     for ( ; boundary_value !=boundary_values.end(); ++boundary_value)
       {
 	if (!test_all_constraints.is_constrained(boundary_value->first))
