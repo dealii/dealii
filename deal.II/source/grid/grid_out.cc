@@ -1331,9 +1331,10 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   // seem to possess this attribute ...
 
   const unsigned int  height     = 4000;            // TODO [CW]: consider other options ...
-
-  unsigned int  cell_label_font_size     = round((height/100.) * 2.25);   // initial font size for cell labels
-  unsigned int  font_size                = round((height/100.) * 2.);   // font size for date, time, legend, and colorbar
+// the following
+  
+  unsigned int  cell_label_font_size     = static_cast<int>(0.5+ (height/100.) * 2.25);   // initial font size for cell labels
+  unsigned int  font_size                = static_cast<int>(0.5+ (height/100.) * 2.);   // font size for date, time, legend, and colorbar
 
   // get date and time
   time_t time_stamp;
@@ -1379,13 +1380,13 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           if (cell->vertex(vertex_index)[1] < y_min) y_min = cell->vertex(vertex_index)[1];
           if (cell->vertex(vertex_index)[1] > y_max) y_max = cell->vertex(vertex_index)[1];
         }
-
+      
       if ((unsigned int)cell->level() < min_level)      min_level = cell->level();
       if ((unsigned int)cell->level() > max_level)      max_level = cell->level();
-
+      
       if ((unsigned int)cell->material_id())            materials[(unsigned int)cell->material_id()] = 1;
       else if ((unsigned int)cell->material_id() == 0)  materials[0] = 1;
-
+      
       if ((int)cell->level())                           levels[(unsigned int)cell->level()] = 1;
       else if ((unsigned int)cell->level() == 0)        levels[0] = 1;
 
@@ -1398,25 +1399,25 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
   const double x_dimension = x_max - x_min;
   const double y_dimension = y_max - y_min;
-
+  
   // count the materials being used
   for (unsigned int material_index = 0; material_index < 256; material_index++)
     {
       if (materials[material_index]) n_materials++;
     }
-
+  
   // count the levels being used
   for (unsigned int level_index = 0; level_index < 256; level_index++)
     {
       if (levels[level_index]) n_levels++;
     }
-
+  
   // count the subdomains being used
   for (unsigned int subdomain_index = 0; subdomain_index < 256; subdomain_index++)
     {
       if (subdomains[subdomain_index]) n_subdomains++;
     }
-
+  
   /*
   // count the level subdomains being used
   for(int level_subdomain_index = 0; level_subdomain_index < 256; level_subdomain_index++)
@@ -1426,30 +1427,35 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   */
 
 //------------------ create the svg file with internal style sheet
-  const unsigned int width  = round(height * (x_dimension/y_dimension));
+  const unsigned int width  = static_cast<int>(0.5+ height * (x_dimension/y_dimension));
   unsigned int additional_width = 0;
 
-  if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id)) // || svg_flags.label_level_subdomain_id ))
+  if (svg_flags.draw_legend &&
+      (svg_flags.label_level_number ||
+       svg_flags.label_cell_index ||
+       svg_flags.label_material_id ||
+       svg_flags.label_subdomain_id)) // || svg_flags.label_level_subdomain_id ))
     {
-      additional_width  = round(height * .4); // additional width for legend
+      additional_width  = static_cast<int>(0.5+ height * .4); // additional width for legend
     }
   else if (svg_flags.draw_colorbar && svg_flags.coloring)
     {
-      additional_width  = round(height * .175); // additional width for colorbar // TODO [CW]: not enough / automatic adjustment ...
+      additional_width  = static_cast<int>(0.5+ height * .175); // additional width for colorbar // TODO [CW]: not enough / automatic adjustment ...
     }
 
   out << "<!-- deal.ii GridOut " << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year + 1900
       << ' ' << now->tm_hour << ':';
-
+  
   if (now->tm_min < 10) out << '0';
-
+  
   out << now->tm_min << " -->"
       << '\n' << '\n';
-
+  
   // basic svg header and inclusion of the corresponding style sheet
-  out << "<svg width=\"" << width + additional_width << "\" height=\"" << height << "\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">"
+  out << "<svg width=\"" << width + additional_width << "\" height=\"" << height
+      << "\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">"
       << '\n' << '\n';
-
+  
   if (svg_flags.background == 2)
     {
       out << " <linearGradient id=\"background_gradient\" gradientUnits=\"userSpaceOnUse\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"" << height << "\">" << '\n'
@@ -1458,28 +1464,28 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           << " </linearGradient>"
           << '\n';
     }
-
+  
   out << '\n';
-
+  
   out << "<style type=\"text/css\"><![CDATA["
       << '\n';
-
+  
   if (svg_flags.background == 0)      out << " rect.background{fill:none}" << '\n';
   else if (svg_flags.background == 1) out << " rect.background{fill:white}" << '\n';
   else                                out << " rect.background{fill:url(#background_gradient)}" << '\n';
-
+  
   // basic svg graphic element styles
   out << " rect{fill:none; stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}' << '\n'
       << " text{font-family:Helvetica; text-anchor:middle; fill:rgb(25,25,25)}" << '\n'
       << " line{stroke:rgb(25,25,25); stroke-width:" << svg_flags.boundary_line_thickness << '}' << '\n'
       << " path{fill:none; stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}' << '\n';
-
+  
   out << '\n';
-
+  
   for (unsigned int level_index = min_level; level_index <= max_level; level_index++)
     {
       int font_size = cell_label_font_size * std::pow(.5, 1.*(level_index - min_level));
-
+      
       out << " text.l" << level_index << "{font-family:Helvetica; text-anchor:middle;"
           << "fill:rgb(25,25,25); font-size:" << font_size << '}'
           << '\n';
@@ -1528,18 +1534,31 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           switch (i % 6)
             {
             case 0:
-              r = 255,             g = round(255*t);                        break;
+		  r = 255;
+		  g = static_cast<int>(0.5+ 255*t);
+		  break;
             case 1:
-              r = round(255*q),    g = 255;                                 break;
+		  r = static_cast<int>(0.5+ 255*q);
+		  g = 255;
+		  break;
             case 2:
-                                   g = 255,            b = round(255*t);    break;
+		  g = 255;
+		  b = static_cast<int>(0.5+ 255*t);
+		  break;
             case 3:
-                                   g = round(255*q),   b = 255;             break;
+		  g = static_cast<int>(0.5+ 255*q);
+		  b = 255;
+		  break;
             case 4:
-              r = round(255*t),                        b = 255;             break;
+		  r = static_cast<int>(0.5+ 255*t);
+		  b = 255;
+		  break;
             case 5:
-              r = 255,                                 b = round(255*q);    break;
-            default: break;
+		  r = 255;
+		  b = static_cast<int>(0.5+ 255*q);
+		  break;
+            default:
+		  break;
             }
 
           switch (svg_flags.coloring)
@@ -1575,28 +1594,32 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   out << " ]]></style>"
       << '\n' << '\n';
 
-  out << " <rect class=\"background\" width=\"" << width + additional_width << "\" height=\"" << height << "\"/>"
+  out << " <rect class=\"background\" width=\"" << width + additional_width
+      << "\" height=\"" << height << "\"/>"
       << '\n';
-
+  
   if (svg_flags.background == 2)
     {
       unsigned int x_offset = 0;
+      
+      if (svg_flags.margin_in_percent)
+	x_offset = static_cast<int>(0.5+ (height/100.) * (svg_flags.margin_in_percent/2.));
+      else
+	x_offset = static_cast<int>(0.5+ height * .025);
 
-      if (svg_flags.margin_in_percent) x_offset = round((height/100.) * (svg_flags.margin_in_percent/2.));
-      else                            x_offset = round(height * .025);
-
-      out << " <text x=\"" << x_offset << "\" y=\"" << round(height * .045) << '\"'
-          << " style=\"font-weight:100; fill:lightsteelblue; text-anchor:start; font-family:Courier; font-size:" << round(height * .035) << "\">"
+      out << " <text x=\"" << x_offset << "\" y=\"" << static_cast<int>(0.5+ height * .045) << '\"'
+          << " style=\"font-weight:100; fill:lightsteelblue; text-anchor:start; font-family:Courier; font-size:"
+	  << static_cast<int>(0.5+ height * .035) << "\">"
           << "deal.II" << "</text>"
           << '\n';
-
-      out << " <text x=\"" << x_offset + round(height * .045 * 3.75) << "\" y=\"" << round(height * .045) << '\"'
-          << " style=\"fill:lightsteelblue; text-anchor:start; font-size:" << round(font_size * .75) << "\">"
+      
+      out << " <text x=\"" << x_offset + static_cast<int>(0.5+ height * .045 * 3.75) << "\" y=\"" << static_cast<int>(0.5+ height * .045) << '\"'
+          << " style=\"fill:lightsteelblue; text-anchor:start; font-size:" << static_cast<int>(0.5+ font_size * .75) << "\">"
           << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year + 1900
           << " - " << now->tm_hour << ':';
-
+      
       if (now->tm_min < 10) out << '0';
-
+      
       out << now->tm_min
           << "</text>"
           << '\n' << '\n';
@@ -1638,25 +1661,28 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
         }
 
       out << " d=\""
-          <<  "M " << round(((cell->vertex(0)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << ' '   << round(((cell->vertex(0)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << " L " << round(((cell->vertex(1)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << ' '   << round(((cell->vertex(1)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << " L " << round(((cell->vertex(3)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << ' '   << round(((cell->vertex(3)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << " L " << round(((cell->vertex(2)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << ' '   << round(((cell->vertex(2)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << " L " << round(((cell->vertex(0)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << ' '   << round(((cell->vertex(0)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          <<  "M " << static_cast<int>(0.5+ ((cell->vertex(0)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << ' '   << static_cast<int>(0.5+ ((cell->vertex(0)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << " L " << static_cast<int>(0.5+ ((cell->vertex(1)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << ' '   << static_cast<int>(0.5+ ((cell->vertex(1)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << " L " << static_cast<int>(0.5+ ((cell->vertex(3)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << ' '   << static_cast<int>(0.5+ ((cell->vertex(3)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << " L " << static_cast<int>(0.5+ ((cell->vertex(2)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << ' '   << static_cast<int>(0.5+ ((cell->vertex(2)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << " L " << static_cast<int>(0.5+ ((cell->vertex(0)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+          << ' '   << static_cast<int>(0.5+ ((cell->vertex(0)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
           << "\"/>"
           << '\n';
 
       // label the current cell
-      if (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
+      if (svg_flags.label_level_number ||
+	  svg_flags.label_cell_index ||
+	  svg_flags.label_material_id ||
+	  svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
         {
           out << "  <text class=\"l" << cell->level()
-              << "\" x=\""           << round(((cell->center()[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-              << "\" y=\""           << round(((cell->center()[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+              << "\" x=\"" << static_cast<int>(0.5+ ((cell->center()[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+              << "\" y=\"" << static_cast<int>(0.5+ ((cell->center()[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
               << "\">";
 
           if (svg_flags.label_level_number)
@@ -1672,13 +1698,16 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
           if (svg_flags.label_material_id)
             {
-              if (svg_flags.label_level_number || svg_flags.label_cell_index) out << ',';
+              if (svg_flags.label_level_number
+		  || svg_flags.label_cell_index) out << ',';
               out << (int)cell->material_id();
             }
 
           if (svg_flags.label_subdomain_id)
             {
-              if (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id) out << ',';
+              if (svg_flags.label_level_number
+		  || svg_flags.label_cell_index
+		  || svg_flags.label_material_id) out << ',';
               out << cell->subdomain_id();
             }
           /*
@@ -1699,10 +1728,10 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
             {
               if (cell->at_boundary(faceIndex))
                 {
-                  out << "  <line x1=\"" << round(((cell->face(faceIndex)->vertex(0)[0] - x_min)/x_dimension) * (width - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-                      << "\" y1=\""      << round(((cell->face(faceIndex)->vertex(0)[1] - y_min)/y_dimension) * (height - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-                      << "\" x2=\""      << round(((cell->face(faceIndex)->vertex(1)[0] - x_min)/x_dimension) * (width - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-                      << "\" y2=\""      << round(((cell->face(faceIndex)->vertex(1)[1] - y_min)/y_dimension) * (height - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+                  out << "  <line x1=\"" << static_cast<int>(0.5+ ((cell->face(faceIndex)->vertex(0)[0] - x_min)/x_dimension) * (width - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+                      << "\" y1=\""      << static_cast<int>(0.5+ ((cell->face(faceIndex)->vertex(0)[1] - y_min)/y_dimension) * (height - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+                      << "\" x2=\""      << static_cast<int>(0.5+ ((cell->face(faceIndex)->vertex(1)[0] - x_min)/x_dimension) * (width - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
+                      << "\" y2=\""      << static_cast<int>(0.5+ ((cell->face(faceIndex)->vertex(1)[1] - y_min)/y_dimension) * (height - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
                       << "\"/>"
                       << '\n';
                 }
@@ -1711,7 +1740,11 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
     }
 
 //------------------ draw the legend
-  if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id)) // || svg_flags.label_level_subdomain_id ))
+  if (svg_flags.draw_legend &&
+      (svg_flags.label_level_number ||
+       svg_flags.label_cell_index ||
+       svg_flags.label_material_id ||
+       svg_flags.label_subdomain_id)) // || svg_flags.label_level_subdomain_id ))
     {
       out << '\n';
 
@@ -1719,16 +1752,18 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           << '\n';
 
       unsigned int additional_width = 0;
-      if (!svg_flags.margin_in_percent) additional_width = round((height/100.) * 2.5);
+      if (!svg_flags.margin_in_percent) additional_width = static_cast<int>(0.5+ (height/100.) * 2.5);
 
-      out << " <rect x=\"" << width + additional_width << "\" y=\"" << round((height/100.) * svg_flags.margin_in_percent)
-          << "\" width=\"" << round((height/100.) * (40. - svg_flags.margin_in_percent)) << "\" height=\"" << round(height*.2) << "\"/>"
+      out << " <rect x=\"" << width + additional_width << "\" y=\""
+	  << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent)
+          << "\" width=\"" << static_cast<int>(0.5+ (height/100.) * (40. - svg_flags.margin_in_percent))
+	  << "\" height=\"" << static_cast<int>(0.5+ height*.2) << "\"/>"
           << '\n';
 
       unsigned int line_offset = 0;
 
-      out << " <text x=\"" << width + additional_width + round((height/100.) * 1.25)
-          << "\" y=\""     << round((height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size)
+      out << " <text x=\"" << width + additional_width + static_cast<int>(0.5+ (height/100.) * 1.25)
+          << "\" y=\""     << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size)
           << "\" style=\"text-anchor:start; font-weight:bold; font-size:" << font_size
           << "\">"
           << "cell label"
@@ -1737,8 +1772,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
       if (svg_flags.label_level_number)
         {
-          out << "  <text x=\"" << width + additional_width + round((height/100.) * 2.)
-              << "\" y=\""      << round((height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size)
+          out << "  <text x=\"" << width + additional_width + static_cast<int>(0.5+ (height/100.) * 2.)
+              << "\" y=\""      << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size)
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
               << "\">"
               << "level_number";
@@ -1752,8 +1787,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
       if (svg_flags.label_cell_index)
         {
-          out << "  <text x=\"" << width + additional_width + round((height/100.) * 2.)
-              << "\" y=\""      << round((height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
+          out << "  <text x=\"" << width + additional_width + static_cast<int>(0.5+ (height/100.) * 2.)
+              << "\" y=\""      << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
               << "\">"
               << "cell_index";
@@ -1767,8 +1802,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
       if (svg_flags.label_material_id)
         {
-          out << "  <text x=\"" << width + additional_width + round((height/100.) * 2.)
-              << "\" y=\""      << round((height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
+          out << "  <text x=\"" << width + additional_width + static_cast<int>(0.5+ (height/100.) * 2.)
+              << "\" y=\""      << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
               << "\">"
               << "material_id";
@@ -1782,8 +1817,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
       if (svg_flags.label_subdomain_id)
         {
-          out << "  <text x= \""  << width + additional_width + round((height/100.) * 2.)
-              << "\" y=\""    << round((height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
+          out << "  <text x= \""  << width + additional_width + static_cast<int>(0.5+ (height/100.) * 2.)
+              << "\" y=\""    << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
               << "\">"
               << "subdomain_id";
@@ -1797,8 +1832,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
       /*
           if(svg_flags.label_level_subdomain_id)
           {
-            out << "  <text x= \"" << width + additional_width + round((height/100.) * 2.)
-                << "\" y=\""       << round((height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
+            out << "  <text x= \"" << width + additional_width + static_cast<int>(0.5+ (height/100.) * 2.)
+                << "\" y=\""       << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
                 << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
                 << "\">"
                 << "level_subdomain_id"
@@ -1816,12 +1851,12 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           << '\n';
 
       unsigned int additional_width = 0;
-      if (!svg_flags.margin_in_percent) additional_width = round((height/100.) * 2.5);
+      if (!svg_flags.margin_in_percent) additional_width = static_cast<int>(0.5+ (height/100.) * 2.5);
 
       unsigned int n = 0;
 
       out << " <text x=\"" << width + additional_width
-          << "\" y=\""     << round((height/100.) * (svg_flags.margin_in_percent+27.5) - (font_size/1.25))
+          << "\" y=\""     << static_cast<int>(0.5+ (height/100.) * (svg_flags.margin_in_percent+27.5) - (font_size/1.25))
           << "\" style=\"text-anchor:start; font-weight:bold; font-size:" << font_size << "\">";
 
       switch (svg_flags.coloring)
@@ -1844,7 +1879,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           << '\n';
 
       unsigned int element_height = floor(((height/100.) * (72.5 - 2.*svg_flags.margin_in_percent)) / n);
-      unsigned int element_width  = round((height/100.) * 2.5);
+      unsigned int element_width  = static_cast<int>(0.5+ (height/100.) * 2.5);
 
       int labeling_index = 0;
 
@@ -1868,18 +1903,18 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
           out << "  <rect class=\"r" << labeling_index
               << "\" x=\""           << width + additional_width
-              << "\" y=\""           << round((height/100.) * (svg_flags.margin_in_percent + 27.5)) + (n-index-1) * element_height
+              << "\" y=\""           << static_cast<int>(0.5+ (height/100.) * (svg_flags.margin_in_percent + 27.5)) + (n-index-1) * element_height
               << "\" width=\""       << element_width
               << "\" height=\""      << element_height
               << "\"/>"
               << '\n';
 
           unsigned int additional_width = 0;
-          if (!svg_flags.margin_in_percent) additional_width = round((height/100.) * 2.5);
+          if (!svg_flags.margin_in_percent) additional_width = static_cast<int>(0.5+ (height/100.) * 2.5);
 
           out << "  <text x=\"" << width + additional_width + 1.5 * element_width
-              << "\" y=\""      << round((height/100.) * (svg_flags.margin_in_percent + 27.5)) + (n-index-1 + .5) * element_height + round(font_size * .35) << "\""
-              << " style=\"text-anchor:start; font-size:" << round(font_size);
+              << "\" y=\""      << static_cast<int>(0.5+ (height/100.) * (svg_flags.margin_in_percent + 27.5)) + (n-index-1 + .5) * element_height + static_cast<int>(0.5+ font_size * .35) << "\""
+              << " style=\"text-anchor:start; font-size:" << static_cast<int>(0.5+ font_size);
 
           if (index == 0 || index == n-1) out << "; font-weight:bold";
 
