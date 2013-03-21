@@ -717,6 +717,15 @@ namespace Step42
 
       system_matrix_newton.reinit (sp);
 
+      // create a SP that only contains the diagonal
+      sp.reinit(locally_owned_dofs, mpi_communicator);
+      for (unsigned int idx=0; idx < locally_owned_dofs.n_elements();++idx)
+        {
+          unsigned int gidx = locally_owned_dofs.nth_index_in_set(idx);
+          sp.add(gidx, gidx);
+        }
+      sp.compress();
+
       TrilinosWrappers::SparseMatrix mass_matrix;
       mass_matrix.reinit (sp);
       assemble_mass_matrix_diagonal (mass_matrix);
