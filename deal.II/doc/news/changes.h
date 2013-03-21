@@ -69,6 +69,15 @@ this function.
 
 <ol>
 
+<li> Added/fixed: IterativeInverse::vmult() can now handle vectors
+using a different number type than the matrix type. As usual, the
+number types must be compatible. Addtitionally, the initial guess is
+always set to zero, since starting with the incoming vector makes no
+sense.
+<br>
+(Guido Kanschat, 2013/03/21)
+</li>
+
 <li> Added GridOut::write_svg to allow for the output of two-dimensional 
 triangulations in two space dimensions in the SVG format (Scalable Vector 
 Graphics, an XML-based vector image format recommended by the World 
@@ -82,6 +91,7 @@ added a new frequency TimerOutput::never to only output information if
 triggered by print_summary().
 <br>
 (Timo Heister, 2013/03/20)
+</li>
 
 <li> Changed: FEValuesExtractors::Scalar, FEValuesExtractors::Vector and
 FEValuesExtractors::SymmetricTensor could not be default constructed, and
@@ -91,11 +101,13 @@ values). These classes can now be default constructed to invalid
 values, but can of course not be used in any useful way.
 <br>
 (Wolfgang Bangerth, 2013/03/15)
+</li>
 
 <li> Fixed: FETools::interpolation_difference did not work with PETSc.
 This is now fixed.
 <br>
 (Timo Heister, 2013/03/01)
+</li>
 
 </ol>
 
