@@ -848,11 +848,11 @@ namespace PETScWrappers
 
   }
 
-  int SparseDirectMUMPS::convergence_test (KSP            /*ksp*/,
-                                           const PetscInt       iteration,
-                                           const PetscReal      residual_norm,
-                                           KSPConvergedReason   *reason,
-                                           void                 *solver_control_x)
+  PetscErrorCode SparseDirectMUMPS::convergence_test (KSP               /*ksp*/,
+						      const PetscInt      iteration,
+						      const PetscReal     residual_norm,
+						      KSPConvergedReason *reason,
+						      void               *solver_control_x)
   {
     SolverControl &solver_control = *reinterpret_cast<SolverControl *>(solver_control_x);
 

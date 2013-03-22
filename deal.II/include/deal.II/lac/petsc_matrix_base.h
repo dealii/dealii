@@ -1691,6 +1691,7 @@ namespace PETScWrappers
 
     const PetscInt petsc_i = row;
     PetscInt *col_index_ptr;
+
     PetscScalar const *col_value_ptr;
     int n_columns;
 
