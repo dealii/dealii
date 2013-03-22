@@ -1481,7 +1481,7 @@ namespace internal
         {
           return std::min(static_cast<types::global_dof_index> (3*
                 dof_handler.finite_elements->max_dofs_per_vertex() +
-                2*dof_handler.finite_elements->max_dofs_per_line()), 
+                2*dof_handler.finite_elements->max_dofs_per_line()),
               dof_handler.n_dofs());
         }
 
@@ -1592,7 +1592,7 @@ namespace hp
   const unsigned int DoFHandler<dim,spacedim>::dimension;
 
   template<int dim, int spacedim>
-  const unsigned int DoFHandler<dim,spacedim>::invalid_dof_index;
+  const types::global_dof_index DoFHandler<dim,spacedim>::invalid_dof_index;
 
   template<int dim, int spacedim>
   const unsigned int DoFHandler<dim,spacedim>::default_fe_index;
