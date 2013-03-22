@@ -64,25 +64,25 @@ void test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs (fe);
 
-//  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
-//					     MPI_COMM_WORLD);
-//  VectorTools::interpolate (dofh,
-//			    LinearFunction<dim>(),
-//			    interpolated);
-//  
-//  IndexSet relevant_set;
-//  DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
-//  TrilinosWrappers::MPI::Vector x_rel(relevant_set, MPI_COMM_WORLD);
-//  x_rel = interpolated;
-//
-//  const double mean
-//    = VectorTools::compute_mean_value (dofh, QGauss<dim>(2), x_rel, 0);
-//
-//  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
-//    deallog << "mean=" << mean
-//	    << std::endl;
-//  
-//  Assert (std::fabs(mean - 2) < 1e-3, ExcInternalError());
+  TrilinosWrappers::MPI::Vector interpolated(dofh.locally_owned_dofs(),
+					     MPI_COMM_WORLD);
+  VectorTools::interpolate (dofh,
+			    LinearFunction<dim>(),
+			    interpolated);
+  
+  IndexSet relevant_set;
+  DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
+  TrilinosWrappers::MPI::Vector x_rel(relevant_set, MPI_COMM_WORLD);
+  x_rel = interpolated;
+
+  const double mean
+    = VectorTools::compute_mean_value (dofh, QGauss<dim>(2), x_rel, 0);
+
+  if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
+    deallog << "mean=" << mean
+	    << std::endl;
+  
+  Assert (std::fabs(mean - 2) < 1e-3, ExcInternalError());
 }
 
 

@@ -72,7 +72,7 @@ IndexSet::do_compress () const
 
   // now compute indices within set and the
   // range with most elements
-  unsigned int next_index = 0, largest_range_size = 0;
+  types::global_dof_index next_index = 0, largest_range_size = 0;
   for (std::vector<Range>::iterator
        i = ranges.begin();
        i != ranges.end();
