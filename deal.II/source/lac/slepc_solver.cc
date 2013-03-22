@@ -50,6 +50,7 @@ namespace SLEPcWrappers
     solver_control (cn),
     mpi_communicator (mpi_communicator),
     set_which (EPS_LARGEST_MAGNITUDE),
+    set_problem (EPS_NHEP),
     opA (NULL),
     opB (NULL),
     initial_vector (NULL),
@@ -92,6 +93,12 @@ namespace SLEPcWrappers
   SolverBase::set_which_eigenpairs (const EPSWhich eps_which)
   {
     set_which = eps_which;
+  }
+
+  void
+  SolverBase::set_problem_type (const EPSProblemType eps_problem)
+  {
+    set_problem = eps_problem;
   }
 
   void
