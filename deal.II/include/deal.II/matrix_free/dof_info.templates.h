@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2011, 2012 by the deal.II authors
+//    Copyright (C) 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -280,7 +280,7 @@ no_constraint:
               constraint_iterator.first++;
             }
         }
-      row_starts[cell_number+1] = std_cxx1x::tuple<size_dof, 
+      row_starts[cell_number+1] = std_cxx1x::tuple<size_dof,
 						   size_constraint,
 						   unsigned int>
                                   (dof_indices.size(), constraint_indicator.size(), 0);
@@ -349,7 +349,7 @@ no_constraint:
               ghost_origin[i].second = i;
             }
           std::sort (ghost_origin.begin(), ghost_origin.end());
-	  
+
 	  types::global_dof_index last_contiguous_start = ghost_origin[0].first;
           ghost_numbering[ghost_origin[0].second] = 0;
           for (size_dof i=1; i<n_ghosts; i++)
@@ -1694,7 +1694,7 @@ not_connect:
      CompressedSimpleSparsityPattern &connectivity) const
     {
       AssertDimension (row_starts.size()-1, size_info.n_active_cells);
-      const types::global_dof_index n_rows = 
+      const types::global_dof_index n_rows =
                                   (vector_partitioner->local_range().second-
                                    vector_partitioner->local_range().first)
                                   + vector_partitioner->ghost_indices().n_elements();
@@ -1874,8 +1874,8 @@ not_connect:
                        vector_partitioner->size());
       const unsigned int local_size = vector_partitioner->local_size();
       renumbering.resize (0);
-      renumbering.resize (local_size, numbers::invalid_unsigned_int);
-      
+      renumbering.resize (local_size, numbers::invalid_dof_index);
+
       types::global_dof_index counter = 0;
       std::vector<types::global_dof_index>::iterator dof_ind = dof_indices.begin(),
                                           end_ind = dof_indices.end();
@@ -1883,7 +1883,7 @@ not_connect:
         {
           if (*dof_ind < local_size)
             {
-              if (renumbering[*dof_ind] == numbers::invalid_unsigned_int)
+              if (renumbering[*dof_ind] == numbers::invalid_dof_index)
                 renumbering[*dof_ind] = counter++;
               *dof_ind = renumbering[*dof_ind];
             }
@@ -1891,7 +1891,7 @@ not_connect:
 
       AssertIndexRange (counter, local_size+1);
       for (size_dof i=0; i<renumbering.size(); ++i)
-        if (renumbering[i] == numbers::invalid_unsigned_int)
+        if (renumbering[i] == numbers::invalid_dof_index)
           renumbering[i] = counter++;
 
       // adjust the constrained DoFs
