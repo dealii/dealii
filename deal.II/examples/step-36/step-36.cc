@@ -281,8 +281,8 @@ namespace Step36
     // At the end of the function, we tell PETSc that the matrices have now
     // been fully assembled and that the sparse matrix representation can now
     // be compressed as no more entries will be added:
-    stiffness_matrix.compress ();
-    mass_matrix.compress ();
+    stiffness_matrix.compress (VectorOperation::add);
+    mass_matrix.compress (VectorOperation::add);
   }
 
 
