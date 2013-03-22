@@ -1162,9 +1162,9 @@ namespace internal
 
             // a fe index is always small
             Assert((*pointer)<std::numeric_limits<unsigned int>::max(), ExcInternalError());
-            const unsigned int this_fe_index = static_cast<unsigned int>(*pointer);
+            const types::global_dof_index this_fe_index = *pointer;
 
-            Assert (this_fe_index != numbers::invalid_unsigned_int,
+            Assert (this_fe_index != numbers::invalid_dof_index,
                     ExcInternalError());
             Assert (this_fe_index < dof_handler.finite_elements->size(),
                     ExcInternalError());
@@ -1253,9 +1253,9 @@ namespace internal
             Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
 
             Assert((*pointer)<std::numeric_limits<types::global_dof_index>::max(), ExcInternalError());
-            const unsigned int this_fe_index = static_cast<unsigned int>(*pointer);
+            const types::global_dof_index this_fe_index = *pointer;
 
-            Assert (this_fe_index != numbers::invalid_unsigned_int,
+            Assert (this_fe_index != numbers::invalid_dof_index,
                     ExcInternalError());
             Assert (this_fe_index < dof_handler.finite_elements->size(),
                     ExcInternalError());
@@ -1302,10 +1302,9 @@ namespace internal
           {
             Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
 
-            Assert((*pointer)<std::numeric_limits<types::global_dof_index>::max(), ExcInternalError());
-            const unsigned int this_fe_index = static_cast<unsigned int>(*pointer);
+            const types::global_dof_index this_fe_index = *pointer;
 
-            if (this_fe_index == numbers::invalid_unsigned_int)
+            if (this_fe_index == numbers::invalid_dof_index)
               return counter;
             else
               {
@@ -1356,7 +1355,7 @@ namespace internal
             Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
 
             Assert((*pointer)<std::numeric_limits<unsigned int>::max(), ExcInternalError());
-            const unsigned int this_fe_index = static_cast<unsigned int>(*pointer);
+            const types::global_dof_index this_fe_index = *pointer;
 
             Assert (this_fe_index < dof_handler.finite_elements->size(),
                     ExcInternalError());
@@ -1364,7 +1363,7 @@ namespace internal
             if (counter == n)
               return this_fe_index;
 
-            Assert (this_fe_index != numbers::invalid_unsigned_int,
+            Assert (this_fe_index != numbers::invalid_dof_index,
                     ExcInternalError());
 
             pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
@@ -1416,12 +1415,12 @@ namespace internal
             Assert (pointer <= &dof_handler.vertex_dofs.back(), ExcInternalError());
 
             Assert((*pointer)<std::numeric_limits<types::global_dof_index>::max(), ExcInternalError());
-            const unsigned int this_fe_index = static_cast<unsigned int>(*pointer);
+            const types::global_dof_index this_fe_index = *pointer;
 
             Assert (this_fe_index < dof_handler.finite_elements->size(),
                     ExcInternalError());
 
-            if (this_fe_index == numbers::invalid_unsigned_int)
+            if (this_fe_index == numbers::invalid_dof_index)
               return false;
             else if (this_fe_index == fe_index)
               return true;
