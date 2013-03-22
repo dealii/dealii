@@ -136,7 +136,7 @@ namespace hp
      * certain value, but rather take
      * its symbolic name.
      */
-    static const unsigned int invalid_dof_index = numbers::invalid_unsigned_int;
+    static const types::global_dof_index invalid_dof_index = numbers::invalid_dof_index;
 
     /**
      * The default index of the
@@ -1012,5 +1012,3 @@ namespace hp
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-
-
