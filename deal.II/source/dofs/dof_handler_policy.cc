@@ -1964,9 +1964,9 @@ namespace internal
         number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
 
         MPI_Allgather ( &number_cache.n_locally_owned_dofs,
-                        1, MPI_UNSIGNED,
+                        1, DEAL_II_DOF_INDEX_MPI_TYPE,
                         &number_cache.n_locally_owned_dofs_per_processor[0],
-                        1, MPI_UNSIGNED,
+                        1, DEAL_II_DOF_INDEX_MPI_TYPE,
                         tr->get_communicator());
 
         const dealii::types::global_dof_index
@@ -2210,9 +2210,9 @@ namespace internal
             number_cache.n_locally_owned_dofs_per_processor.resize(n_cpus);
 
             MPI_Allgather ( &number_cache.n_locally_owned_dofs,
-                            1, MPI_UNSIGNED,
+                            1, DEAL_II_DOF_INDEX_MPI_TYPE,
                             &number_cache.n_locally_owned_dofs_per_processor[0],
-                            1, MPI_UNSIGNED,
+                            1, DEAL_II_DOF_INDEX_MPI_TYPE,
                             tr->get_communicator());
 
             const unsigned int
