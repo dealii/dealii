@@ -617,7 +617,7 @@ no_constraint:
       if (store_plain_indices == true)
         {
           new_rowstart_plain.resize (size_info.n_macro_cells + 1,
-                                     numbers::invalid_unsigned_int);
+                                     numbers::invalid_dof_index);
           new_plain_indices.reserve (plain_dof_indices.size());
         }
 

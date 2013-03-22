@@ -204,7 +204,7 @@ private:
   /**
    * Optional signature of the @p u-vector.
    */
-  std::vector<unsigned int> signature;
+  std::vector<types::global_dof_index> signature;
 
   /**
    * Switch for debugging information.
@@ -222,7 +222,7 @@ SchurMatrix<MA_inverse, MB, MDt, MC>
               const MDt &Dt,
               const MC &C,
               VectorMemory<BlockVector<double> > &mem,
-              const std::vector<unsigned int> &signature)
+              const std::vector<types::global_dof_index> &signature)
   : Ainv(&Ainv), B(&B), Dt(&Dt), C(&C),
     mem(mem),
     signature(signature),
