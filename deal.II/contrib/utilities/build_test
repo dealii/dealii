@@ -72,9 +72,9 @@ main:
 	@echo "BEGIN BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
 	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test DEAL_II_DIR=$(installdir) build_examples $(PIPEnTRAP)
 	@echo "END BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
-	#@echo "BEGIN RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
-	#cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test run_examples $(PIPEnTRAP)
-	#@echo "END RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
+	@echo "BEGIN RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
+	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test run_examples $(PIPEnTRAP)
+	@echo "END RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
 	@echo "BUILD TEST SUCCESSFUL `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
 	if ${CLEAN_TMPDIR}; then rm -rf $(testdir); fi
 
@@ -85,16 +85,19 @@ main:
 
 steps:= $(wildcard step-*)
 
+runsteps:= step-1 step-2 step-3
+
+
 %/%:
 	-cd $(@D) && cmake . >/dev/null 2>&1
 	cd $(@D) && if [ -f Makefile ]; then make; fi
 
 %/OK: %/%
-	cd $(@D) && if [ -f Makefile ]; then make run; fi && touch OK
+	cd $(@D) && make run && touch OK
 
 .PHONY: build_examples
 build_examples: $(steps:%=%/%)
 
 .PHONY: run_examples
-run_examples: $(steps:%=%/OK)
+run_examples: $(runsteps:%=%/OK)
 
