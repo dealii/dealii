@@ -402,14 +402,13 @@
       just take the second as hints but errors out if LAPACK can't
       be used with the given library (if you are sure that the path works, you
       can then omit the first command). An example of use is to select BLAS
-      and LAPACK as follows (here, these libraries have been compiled with the
-      gfortran compiler and need its support library):
+      and LAPACK as follows:
       <pre>
 
     cmake -DBLAS_FOUND=true \
-          -DBLAS_LIBRARIES="-L/apps/GotoBLAS/lib64 -lgoto -lgfortran" \
+          -DBLAS_LIBRARIES=/apps/GotoBLAS/lib64/libgoto.so \
           -DLAPACK_FOUND=true \
-          -DLAPACK_LIBRARIES="-L/apps/lapack-3.2.1/lib64 -llapack -L/apps/GotoBLAS/lib64 -lgoto -lgfortran"
+          -DLAPACK_LIBRARIES=/apps/lapack-3.2.1/lib64/liblapack.so
       </pre>
 
       You can set these values on the command line, with <code>ccmake</code>
