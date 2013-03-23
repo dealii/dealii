@@ -409,7 +409,17 @@
 #   "Always use the bundled tbb library instead of an external one."
 #   )
 #
-# TODO
+# Automatic setup:
+#
+# Specify a hint with CMAKE_PREFIX_PATH or by setting
+# SET(TBB_DIR "/.../..." CACHE PATH "")
+#
+# Manual setup:
+#
+# SET(TBB_FOUND TRUE CACHE BOOL "")
+# SET(TBB_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+# SET(TBB_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
+# SET(TBB_WITH_DEBUGLIB TRUE CACHE BOOL "")
 #
 
 
