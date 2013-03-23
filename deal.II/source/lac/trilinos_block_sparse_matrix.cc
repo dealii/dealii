@@ -148,7 +148,7 @@ namespace TrilinosWrappers
     std::vector<Epetra_Map> parallel_partitioning;
     for (size_type i=0; i<block_sparsity_pattern.n_block_rows(); ++i)
       parallel_partitioning.push_back
-      (Epetra_Map(static_cast<TrilinosWrapper::types::int_type>(block_sparsity_pattern.block(i,0).n_rows()),
+      (Epetra_Map(static_cast<TrilinosWrappers::types::int_type>(block_sparsity_pattern.block(i,0).n_rows()),
                   0,
                   Utilities::Trilinos::comm_self()));
 
@@ -240,7 +240,7 @@ namespace TrilinosWrappers
 
     std::vector<Epetra_Map> parallel_partitioning;
     for (size_type i=0; i<dealii_block_sparse_matrix.n_block_rows(); ++i)
-      parallel_partitioning.push_back (Epetra_Map(static_cast<TrilinosWrapper::types::int_type>(dealii_block_sparse_matrix.block(i,0).m()),
+      parallel_partitioning.push_back (Epetra_Map(static_cast<TrilinosWrappers::types::int_type>(dealii_block_sparse_matrix.block(i,0).m()),
                                                   0,
                                                   trilinos_communicator));
 

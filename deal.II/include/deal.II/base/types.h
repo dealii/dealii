@@ -141,7 +141,7 @@ namespace types
 
 }
 
-namespace TrilinosWrapper
+namespace TrilinosWrappers
 {
   namespace types
   {
@@ -188,9 +188,9 @@ namespace numbers
    * Representation of the
    * largest number that
    * can be put into a
-   * size_type. This value 
-   * is used throughout 
-   * the library as a 
+   * size_type. This value
+   * is used throughout
+   * the library as a
    * marker for an
    * invalid size_type
    * value, such as

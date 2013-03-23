@@ -231,10 +231,10 @@ namespace TrilinosWrappers
       size_type n_elements = 0, added_elements = 0, block_offset = 0;
       for (size_type block=0; block<v.n_blocks(); ++block)
         n_elements += v.block(block).local_size();
-      std::vector<TrilinosWrapper::types::int_type> global_ids (n_elements, -1);
+      std::vector<TrilinosWrappers::types::int_type> global_ids (n_elements, -1);
       for (size_type block=0; block<v.n_blocks(); ++block)
         {
-          TrilinosWrapper::types::int_type *glob_elements = 
+          TrilinosWrappers::types::int_type *glob_elements = 
             v.block(block).vector_partitioner().MyGlobalElements();
           for (size_type i=0; i<v.block(block).local_size(); ++i)
             global_ids[added_elements++] = glob_elements[i] + block_offset;
@@ -377,7 +377,7 @@ namespace TrilinosWrappers
   Vector::Vector (const size_type n)
   {
     last_action = Zero;
-    Epetra_LocalMap map ((TrilinosWrapper::types::int_type)n, 0, Utilities::Trilinos::comm_self());
+    Epetra_LocalMap map ((TrilinosWrappers::types::int_type)n, 0, Utilities::Trilinos::comm_self());
     vector.reset (new Epetra_FEVector (map));
   }
 
@@ -398,7 +398,7 @@ namespace TrilinosWrappers
                   const MPI_Comm &communicator)
   {
     last_action = Zero;
-    Epetra_LocalMap map (static_cast<TrilinosWrapper::types::int_type>(partitioning.size()),
+    Epetra_LocalMap map (static_cast<TrilinosWrappers::types::int_type>(partitioning.size()),
                          0,
 #ifdef DEAL_II_WITH_MPI
                          Epetra_MpiComm(communicator));
@@ -437,7 +437,7 @@ namespace TrilinosWrappers
   {
     if (size() != n)
       {
-        Epetra_LocalMap map ((TrilinosWrapper::types::int_type)n, 0,
+        Epetra_LocalMap map ((TrilinosWrappers::types::int_type)n, 0,
                              Utilities::Trilinos::comm_self());
         vector.reset (new Epetra_FEVector (map));
       }
@@ -488,9 +488,9 @@ namespace TrilinosWrappers
                   const bool      fast)
   {
     if (vector->Map().NumGlobalElements() !=
-        static_cast<TrilinosWrapper::types::int_type>(partitioning.size()))
+        static_cast<TrilinosWrappers::types::int_type>(partitioning.size()))
       {
-        Epetra_LocalMap map (static_cast<TrilinosWrapper::types::int_type>(partitioning.size()),
+        Epetra_LocalMap map (static_cast<TrilinosWrappers::types::int_type>(partitioning.size()),
                              0,
 #ifdef DEAL_II_WITH_MPI
                              Epetra_MpiComm(communicator));

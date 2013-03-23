@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -73,7 +73,7 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      typedef types::global_dof_index size_type;
+      typedef dealii::types::global_dof_index size_type;
 
       /**
        * Constructor.
@@ -186,7 +186,7 @@ namespace TrilinosWrappers
       /**
        * Declare type for container size.
        */
-      typedef types::global_dof_index size_type;
+      typedef dealii::types::global_dof_index size_type;
 
       /**
        * Constructor. Create an
@@ -289,7 +289,7 @@ namespace TrilinosWrappers
     /**
      * Declare type for container size.
      */
-    typedef types::global_dof_index size_type;
+    typedef dealii::types::global_dof_index size_type;
 
     /**
      * Declare a typedef for the
@@ -1593,7 +1593,7 @@ namespace TrilinosWrappers
   bool
   SparsityPattern::in_local_range (const size_type index) const
   {
-    TrilinosWrapper::types::int_type begin, end;
+    TrilinosWrappers::types::int_type begin, end;
     begin = graph->RowMap().MinMyGID();
     end = graph->RowMap().MaxMyGID()+1;
 
@@ -1642,14 +1642,14 @@ namespace TrilinosWrappers
     if (begin == end)
       return;
 
-    TrilinosWrapper::types::int_type *col_index_ptr = 
-      (TrilinosWrapper::types::int_type *)(&*begin);
-    const TrilinosWrapper::types::int_type n_cols = 
-      static_cast<TrilinosWrapper::types::int_type>(end - begin);
+    TrilinosWrappers::types::int_type *col_index_ptr =
+      (TrilinosWrappers::types::int_type *)(&*begin);
+    const TrilinosWrappers::types::int_type n_cols =
+      static_cast<TrilinosWrappers::types::int_type>(end - begin);
     compressed = false;
 
-    const int ierr = graph->InsertGlobalIndices (1, 
-                                                 (TrilinosWrapper::types::int_type *)&row,
+    const int ierr = graph->InsertGlobalIndices (1,
+                                                 (TrilinosWrappers::types::int_type *)&row,
                                                  n_cols, col_index_ptr);
 
     AssertThrow (ierr >= 0, ExcTrilinosError(ierr));

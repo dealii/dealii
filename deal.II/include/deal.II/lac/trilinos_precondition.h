@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -74,8 +74,8 @@ namespace TrilinosWrappers
   public:
     /**
      * Declare the type for container size.
-     */ 
-    typedef types::global_dof_index size_type;
+     */
+    typedef dealii::types::global_dof_index size_type;
 
     /**
      * Standardized data struct to
@@ -1563,9 +1563,9 @@ namespace TrilinosWrappers
   void PreconditionBase::vmult (dealii::Vector<double>       &dst,
                                 const dealii::Vector<double> &src) const
   {
-    AssertDimension (static_cast<TrilinosWrapper::types::int_type>(dst.size()),
+    AssertDimension (static_cast<TrilinosWrappers::types::int_type>(dst.size()),
                      preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension (static_cast<TrilinosWrapper::types::int_type>(src.size()),
+    AssertDimension (static_cast<TrilinosWrappers::types::int_type>(src.size()),
                      preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst (View, preconditioner->OperatorDomainMap(),
                             dst.begin());
@@ -1581,9 +1581,9 @@ namespace TrilinosWrappers
   void PreconditionBase::Tvmult (dealii::Vector<double>       &dst,
                                  const dealii::Vector<double> &src) const
   {
-    AssertDimension (static_cast<TrilinosWrapper::types::int_type>(dst.size()),
+    AssertDimension (static_cast<TrilinosWrappers::types::int_type>(dst.size()),
                      preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension (static_cast<TrilinosWrapper::types::int_type>(src.size()),
+    AssertDimension (static_cast<TrilinosWrappers::types::int_type>(src.size()),
                      preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst (View, preconditioner->OperatorDomainMap(),
                             dst.begin());
@@ -1603,9 +1603,9 @@ namespace TrilinosWrappers
   PreconditionBase::vmult (parallel::distributed::Vector<double>       &dst,
                            const parallel::distributed::Vector<double> &src) const
   {
-    AssertDimension (static_cast<TrilinosWrapper::types::int_type>(dst.local_size()),
+    AssertDimension (static_cast<TrilinosWrappers::types::int_type>(dst.local_size()),
                      preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension (static_cast<TrilinosWrapper::types::int_type>(src.local_size()),
+    AssertDimension (static_cast<TrilinosWrappers::types::int_type>(src.local_size()),
                      preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst (View, preconditioner->OperatorDomainMap(),
                             dst.begin());
@@ -1621,9 +1621,9 @@ namespace TrilinosWrappers
   PreconditionBase::Tvmult (parallel::distributed::Vector<double>       &dst,
                             const parallel::distributed::Vector<double> &src) const
   {
-    AssertDimension (static_cast<TrilinosWrapper::types::int_type>(dst.local_size()),
+    AssertDimension (static_cast<TrilinosWrappers::types::int_type>(dst.local_size()),
                      preconditioner->OperatorDomainMap().NumMyElements());
-    AssertDimension (static_cast<TrilinosWrapper::types::int_type>(src.local_size()),
+    AssertDimension (static_cast<TrilinosWrappers::types::int_type>(src.local_size()),
                      preconditioner->OperatorRangeMap().NumMyElements());
     Epetra_Vector tril_dst (View, preconditioner->OperatorDomainMap(),
                             dst.begin());

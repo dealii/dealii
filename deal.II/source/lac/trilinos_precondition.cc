@@ -602,7 +602,7 @@ namespace TrilinosWrappers
         for (size_type d=0; d<constant_modes_dimension; ++d)
           for (size_type row=0; row<my_size; ++row)
             {
-              TrilinosWrapper::types::int_type global_row_id = 
+              TrilinosWrappers::types::int_type global_row_id = 
                 constant_modes_are_global ? domain_map.GID(row) : row;
               distributed_constant_modes[d][row] =
                 additional_data.constant_modes[d][global_row_id];
@@ -663,7 +663,7 @@ namespace TrilinosWrappers
     // equidistributed map; avoid
     // storing the nonzero
     // elements.
-    vector_distributor.reset (new Epetra_Map(static_cast<TrilinosWrapper::types::int_type>(n_rows), 
+    vector_distributor.reset (new Epetra_Map(static_cast<TrilinosWrappers::types::int_type>(n_rows), 
           0, communicator));
 
     if (trilinos_matrix.get() == 0)
