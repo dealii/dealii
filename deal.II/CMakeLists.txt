@@ -114,26 +114,22 @@ INCLUDE(setup_finalize)
 ###########################################################################
 
 MESSAGE(STATUS "")
-MESSAGE(STATUS "Configuring done. Include CMakeLists.txt now.")
+MESSAGE(STATUS "Configuring done. Proceed to target definitions now.")
+
+ADD_SUBDIRECTORY(cmake/scripts)
+ADD_SUBDIRECTORY(include)
+
+IF(DEAL_II_HAVE_DOC_DIRECTORY)
+  ADD_SUBDIRECTORY(doc) # has to be included after include
+ENDIF()
 
 IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
   ADD_SUBDIRECTORY(bundled)
 ENDIF()
-
-ADD_SUBDIRECTORY(cmake/scripts)
-
-ADD_SUBDIRECTORY(include)
-
-IF(DEAL_II_HAVE_DOC_DIRECTORY)
-  ADD_SUBDIRECTORY(doc)
-ENDIF()
-
-ADD_SUBDIRECTORY(source)
+ADD_SUBDIRECTORY(source) # has to be included after bundled
 
 ADD_SUBDIRECTORY(cmake/config) # has to be included after source
-
 ADD_SUBDIRECTORY(contrib) # has to be included after source
-
 ADD_SUBDIRECTORY(examples)
 
 #

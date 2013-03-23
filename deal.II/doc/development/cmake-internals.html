@@ -593,16 +593,68 @@
     <h3><code>./source/CMakeLists.txt</code></h3>
 
     <p>
-      TODO
+      All parts of the library are organized into logical object libraries
+      with their respective sources lying under
+      <code>./source/&lt;foo&gt;</code>, or
+      <code>./bundled/&lt;foo&gt;/&lt;...&gt;</code>. The actual setup of
+      an object library happens within that subdirectories with the help of
+      two macros:
+      <pre>
+
+    #
+    # A list of source files forming the object target:
+    #
+    SET(src
+      ...
+      dof_tools.cc
+      )
+
+    #
+    # A list of instantiations that must be expanded:
+    #
+    SET(inst_in_files
+      ...
+      dof_tools.inst.in
+      )
+
+    #
+    # The following macro will set up an obj_dofs.debug and
+    # obj_dofs.release target  with appropriate compile flags and
+    # definitions for a simultaneous build of debug and release library.
+    # Furthermore, the object name will be stored in
+    #   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_(debug/release)
+    # so that it is available in global scope.
+    #
+    DEAL_II_ADD_LIBRARY(obj_dofs OBJECT ${src})
+
+    #
+    # This macro will set up an obj_dofs.inst target for expanding all
+    # files listed in ${inst_in_files}. Appropriate target dependencies
+    # will be added to obj_dofs.debug and obj_dofs.release.
+    #
+    EXPAND_INSTANTIATIONS(obj_dofs "${inst_in_files}")
+      </pre>
+    </p>
+
+    <p>
+      Later, all object targets are collected in
+      <code>./source/CMakeLists.txt</code> to define the actual debug and
+      releases libraries. For further details, see
+      <code>./source/CMakelists.txt</code> and
+      <code>./cmake/macros/macro_deal_ii_add_library.cmake</code>.
     </p>
 
     <a name="projectconfig"></a>
     <h3><code>./cmake/config/CMakeLists.txt</code></h3>
 
     <p>
-      TODO
+      The final bits of configuration happens in
+      <code>./cmake/config/CMakeLists.txt</code> where the templates for
+      the project configuration <code>deal.IIConfig.cmake</code> and the
+      compatibility file <code>Make.global_options</code> get expanded.
+      Furthermore, the configuration for the template expansion mechanism
+      resides under <code>./cmake/config/template_arguments.in</code>.
     </p>
-
 
     <hr>
 
