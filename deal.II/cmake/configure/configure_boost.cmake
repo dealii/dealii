@@ -38,14 +38,17 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
   #
   # We require at least version 1.44
   #
-  FIND_PACKAGE(Boost 1.44 COMPONENTS serialization system thread)
+  IF(DEAL_II_WITH_THREADS)
+    FIND_PACKAGE(Boost 1.44 COMPONENTS serialization system thread)
+  ELSE()
+    FIND_PACKAGE(Boost 1.44 COMPONENTS serialization system)
+  ENDIF()
 
-  IF(Boost_THREAD_FOUND AND
-     Boost_SERIALIZATION_FOUND AND
-     Boost_SYSTEM_FOUND)
+  IF( Boost_SERIALIZATION_FOUND AND
+      Boost_SYSTEM_FOUND AND
+      (NOT DEAL_II_WITH_THREADS OR Boost_THREAD_FOUND)
+    )
     SET(${var} TRUE)
-
-    # Get rid of this annoying unimportant variable:
     MARK_AS_ADVANCED(Boost_DIR)
   ENDIF()
 ENDMACRO()
@@ -53,6 +56,12 @@ ENDMACRO()
 
 MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL)
   INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
+
+  #
+  # Remove "pthread" from Boost_LIBRARIES. Threading, if necessary, is
+  # already set up via configure_1_threads.cmake.
+  #
+  LIST(REMOVE_ITEM Boost_LIBRARIES "pthread")
 
   #
   # Transform  Boost_LIBRARIES into a list of debug and release libraries
