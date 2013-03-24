@@ -47,13 +47,11 @@ CONFIGURE_FILE(
 # Finalize the doxygen configuration:
 #
 file(GLOB doxygen_input
-  ${CMAKE_CURRENT_SOURCE_DIR}/headers/*.h
-  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/*.h
-  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/main.cpp
-  ${CMAKE_SOURCE_DIR}/doc/news/*.h
-  ${CMAKE_SOURCE_DIR}/include/deal.II/**/*.h
-
-  ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
+  ${CMAKE_CURRENT_SOURCE_DIR}/headers
+  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui
+  ${CMAKE_SOURCE_DIR}/doc/news
+  ${CMAKE_SOURCE_DIR}/include/deal.II/*/
+  ${CMAKE_BINARY_DIR}/include/deal.II/*/
   ${CMAKE_CURRENT_BINARY_DIR}/tutorial
   )
 TO_STRING(doxygen_input_string ${doxygen_input})
@@ -62,7 +60,6 @@ file(GLOB doxygen_image_path
   ${CMAKE_CURRENT_SOURCE_DIR}/images
   ${CMAKE_SOURCE_DIR}/examples/*/doc
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/images
-
   ${CMAKE_CURRENT_BINARY_DIR}/images
   )
 TO_STRING(doxygen_image_path_string ${doxygen_image_path})
