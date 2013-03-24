@@ -386,31 +386,42 @@
 
     <a name="configureoverride"></a>
     <h4> Manual override </h4>
-    <p><b>Warning:</b>Do not do this unless absolutely necessary!</p>
+    <p><b>Warning:</b> Do not do this unless absolutely necessary!</p>
     <p>
       It is possible to override the CMake find mechanism for external
       libraries manually. This is useful if a non standard library (e.g.
       BLAS or LAPACK) should be used but cannot be found by the
-      <code>FIND_PACKAGE(...)</code> mechanism of cmake in the default
-      directories.
+      <code>FIND_PACKAGE(...)</code> mechanism.
+
       In this case you can set by hand:
       <pre>
 
-    cmake -DLAPACK_FOUND=true \
-          -DLAPACK_LIBRARIES="library;and;complete;link;interface"
+    cmake -D&lt;lib&gt;_FOUND=true \
+          -D&lt;lib&gt;_LIBRARIES="library;and;complete;link;interface" \
+        ( -D&lt;lib&gt;_INCLUDE_DIRS="semicolon;separated;list;of;include;dirs" \
+          -D&lt;lib&gt;_LINK_FLAGS="..." \
+          -D&lt;lib&gt;_&lt;...depending on library...&gt; )
       </pre>
-      The first of the two defines ensures that <code>cmake</code> doesn't
-      just take the second as hints but errors out if LAPACK can't
-      be used with the given library (if you are sure that the path works, you
-      can then omit the first command). An example of use is to select BLAS
-      and LAPACK as follows (here, these libraries have been compiled with the
-      gfortran compiler and need its support library):
+
+      The first define ensures that <code>cmake</code> does not
+      call the corresponding <code>Find&lt;lib&gt;.cmake</code> module.
+      Therefore, all information that would be otherwise exported by the
+      module must be specified by hand. (See the
+      <a href="Config.sample" target="_top">Config.sample file</a> for a
+      detailed list of valid variables per feature.)
+    </p>
+    <p>
+      An example of use is to select BLAS and LAPACK manually as follows
+      (here, these libraries have been compiled with the gfortran compiler
+      and need its support library):
       <pre>
 
     cmake -DBLAS_FOUND=true \
-          -DBLAS_LIBRARIES="-L/apps/GotoBLAS/lib64 -lgoto -lgfortran" \
+          -DBLAS_LIBRARIES="/apps/GotoBLAS/lib64/libgoto.so" \
+          -DBLAS_LINKER_FLAGS="-lgfortran" \
           -DLAPACK_FOUND=true \
-          -DLAPACK_LIBRARIES="-L/apps/lapack-3.2.1/lib64 -llapack -L/apps/GotoBLAS/lib64 -lgoto -lgfortran"
+          -DLAPACK_LIBRARIES="/apps/lapack-3.2.1/liblapack.so;/apps/GotoBLAS/lib64/libgoto.so" \
+          -DLAPACK_LINKER_FLAGS="-lgfortran"
       </pre>
 
       You can set these values on the command line, with <code>ccmake</code>
