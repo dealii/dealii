@@ -4444,7 +4444,8 @@ namespace DoFTools
   {
     const unsigned int n_components = dof_handler.get_fe().n_components();
 
-    std::fill (dofs_per_component.begin(), dofs_per_component.end(), 0U);
+    std::fill (dofs_per_component.begin(), dofs_per_component.end(),
+	       types::global_dof_index(0));
 
     // If the empty vector was given as default argument, set up this
     // vector as identity.
@@ -4494,7 +4495,8 @@ namespace DoFTools
     Assert ((internal::all_elements_are_primitive(dof_handler.get_fe()) == false)
             ||
             (std::accumulate (dofs_per_component.begin(),
-                              dofs_per_component.end(), 0U)
+                              dofs_per_component.end(),
+			      types::global_dof_index(0))
              == dof_handler.n_locally_owned_dofs()),
             ExcInternalError());
 
@@ -4510,7 +4512,8 @@ namespace DoFTools
         std::vector<types::global_dof_index> local_dof_count = dofs_per_component;
 
         MPI_Allreduce ( &local_dof_count[0], &dofs_per_component[0], n_target_components,
-                        MPI_UNSIGNED, MPI_SUM, tria->get_communicator());
+                        DEAL_II_DOF_INDEX_MPI_TYPE,
+			MPI_SUM, tria->get_communicator());
       }
 #endif
   }
@@ -4532,7 +4535,8 @@ namespace DoFTools
     for (unsigned int this_fe=0; this_fe<fe_collection.size(); ++this_fe)
       {
         const FiniteElement<DH::dimension,DH::space_dimension> &fe = fe_collection[this_fe];
-        std::fill (dofs_per_block.begin(), dofs_per_block.end(), 0U);
+        std::fill (dofs_per_block.begin(), dofs_per_block.end(),
+		   types::global_dof_index(0));
 
         // If the empty vector was given as default argument, set up this
         // vector as identity.
@@ -4583,8 +4587,10 @@ namespace DoFTools
                (&dof_handler.get_tria())))
           {
             std::vector<types::global_dof_index> local_dof_count = dofs_per_block;
-            MPI_Allreduce ( &local_dof_count[0], &dofs_per_block[0], n_target_blocks,
-                            MPI_UNSIGNED, MPI_SUM, tria->get_communicator());
+            MPI_Allreduce ( &local_dof_count[0], &dofs_per_block[0],
+			    n_target_blocks,
+                            DEAL_II_DOF_INDEX_MPI_TYPE,
+			    MPI_SUM, tria->get_communicator());
           }
 #endif
 #endif
