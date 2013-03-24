@@ -128,7 +128,10 @@ IF(UMFPACK_FOUND)
     )
 
   #
-  # Add rt to the link interface as well:
+  # Add rt to the link interface as well (for whatever reason,
+  # libsuitesparse.so depends on clock_gettime but the shared
+  # lib does not record its dependence on librt.so as evidenced
+  # by ldd :-( ):
   #
   FIND_LIBRARY(rt_lib NAMES rt)
   MARK_AS_ADVANCED(rt_lib)
@@ -167,4 +170,3 @@ ELSE()
     "An optional hint to a SUITESPARSE directory"
     )
 ENDIF()
-
