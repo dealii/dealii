@@ -18,8 +18,11 @@
 
 INCLUDE_DIRECTORIES(
   BEFORE # Ensure deal.II include directories come first
-  ${CMAKE_BINARY_DIR}/include/
+  #
+  # Reverse order due to BEFORE:
+  #
   ${CMAKE_SOURCE_DIR}/include/
+  ${CMAKE_BINARY_DIR}/include/
   )
 
 #
