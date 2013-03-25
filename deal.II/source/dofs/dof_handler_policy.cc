@@ -1316,7 +1316,7 @@ namespace internal
           const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell,
           const typename DoFHandler<dim,spacedim>::level_cell_iterator &dealii_cell,
           const typename dealii::internal::p4est::types<dim>::quadrant &quadrant,
-          unsigned int *dofs,
+          dealii::types::global_dof_index* dofs,
           unsigned int level)
         {
           if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
@@ -1570,8 +1570,11 @@ namespace internal
               typename dealii::internal::p4est::types<dim>::quadrant *quadrant
                 =reinterpret_cast<typename dealii::internal::p4est::types<dim>::quadrant *>(ptr);
               ptr+=cells*sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
-              dealii::types::global_dof_index *dofs=reinterpret_cast<dealii::types::global_dof_index *>(ptr);
+              dealii::types::global_dof_index *dofs
+		= reinterpret_cast<dealii::types::global_dof_index*>(ptr);
 
+	      // the dofs pointer contains for each cell the number of dofs
+	      // on that cell (dofs[0]) followed by the dof indices itself.
               for (unsigned int c=0; c<cells; ++c, dofs+=1+dofs[0])
                 {
                   typename DoFHandler<dim,spacedim>::level_cell_iterator
@@ -1809,8 +1812,11 @@ namespace internal
               typename dealii::internal::p4est::types<dim>::quadrant *quadrant
                 =reinterpret_cast<typename dealii::internal::p4est::types<dim>::quadrant *>(ptr);
               ptr+=cells*sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
-              unsigned int *dofs=reinterpret_cast<unsigned int *>(ptr);
+              dealii::types::global_dof_index *dofs
+		= reinterpret_cast<dealii::types::global_dof_index*>(ptr);
 
+	      // the dofs pointer contains for each cell the number of dofs
+	      // on that cell (dofs[0]) followed by the dof indices itself.
               for (unsigned int c=0; c<cells; ++c, dofs+=1+dofs[0])
                 {
                   typename DoFHandler<dim,spacedim>::level_cell_iterator
