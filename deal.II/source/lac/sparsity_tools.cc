@@ -142,7 +142,7 @@ namespace SparsityTools
      * invalid_size_type indicates that a node has not been numbered yet),
      * pick a valid starting index among the as-yet unnumbered one.
      */
-    size_type 
+    size_type
     find_unnumbered_starting_index (const SparsityPattern     &sparsity,
                                     const std::vector<size_type> &new_indices)
     {
@@ -452,16 +452,19 @@ namespace SparsityTools
       for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
         MPI_Isend(&(it->second[0]),
                   it->second.size(),
-                  MPI_INT,
+                  MPI_UNSIGNED_LONG_LONG,
                   it->first,
                   124,
                   mpi_comm,
                   &requests[idx]);
     }
 
+//TODO: In the following, we read individual bytes and then reinterpret them
+//    as size_type objects. this is error prone. use properly typed reads that
+//    match the write above
     {
       //receive
-      std::vector<unsigned int> recv_buf;
+      std::vector<size_type> recv_buf;
       for (unsigned int index=0; index<num_receive; ++index)
         {
           MPI_Status status;
@@ -472,17 +475,17 @@ namespace SparsityTools
           MPI_Get_count(&status, MPI_BYTE, &len);
           Assert( len%sizeof(unsigned int)==0, ExcInternalError());
 
-          recv_buf.resize(len/sizeof(unsigned int));
+          recv_buf.resize(len/sizeof(size_type));
 
           MPI_Recv(&recv_buf[0], len, MPI_BYTE, status.MPI_SOURCE,
                    status.MPI_TAG, mpi_comm, &status);
 
-          std::vector<unsigned int>::const_iterator ptr = recv_buf.begin();
-          std::vector<unsigned int>::const_iterator end = recv_buf.end();
+          std::vector<size_type>::const_iterator ptr = recv_buf.begin();
+          std::vector<size_type>::const_iterator end = recv_buf.end();
           while (ptr+1<end)
             {
-              unsigned int num=*(ptr++);
-              unsigned int row=*(ptr++);
+              size_type num=*(ptr++);
+              size_type row=*(ptr++);
               for (unsigned int c=0; c<num; ++c)
                 {
                   csp.add(row, *ptr);
@@ -490,7 +493,6 @@ namespace SparsityTools
                 }
             }
           Assert(ptr==end, ExcInternalError());
-
         }
     }
 
