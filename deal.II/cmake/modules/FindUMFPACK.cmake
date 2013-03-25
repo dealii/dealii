@@ -105,7 +105,6 @@ FIND_UMFPACK_LIBRARY(CHOLMOD cholmod)
 FIND_UMFPACK_LIBRARY(COLAMD colamd)
 FIND_UMFPACK_LIBRARY(SuiteSparse_config suitesparseconfig)
 
-
 SET(_output ${UMFPACK_LIBRARY} ${CHOLMOD_LIBRARY} ${COLAMD_LIBRARY} ${AMD_LIBRARY} ${SuiteSparse_config_LIBRARY})
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(UMFPACK DEFAULT_MSG
   _output # Cosmetic: Gives nice output
@@ -127,6 +126,19 @@ IF(UMFPACK_FOUND)
     ${SuiteSparse_config_LIBRARY}
     ${LAPACK_LIBRARIES}
     )
+
+  #
+  # Add rt to the link interface as well (for whatever reason,
+  # libsuitesparse.so depends on clock_gettime but the shared
+  # lib does not record its dependence on librt.so as evidenced
+  # by ldd :-( ):
+  #
+  FIND_LIBRARY(rt_lib NAMES rt)
+  MARK_AS_ADVANCED(rt_lib)
+  IF(NOT rt_lib MATCHES "-NOTFOUND")
+    LIST(APPEND UMFPACK_LIBRARIES ${rt_lib})
+  ENDIF()
+
   SET(UMFPACK_INCLUDE_DIRS
     ${UMFPACK_INCLUDE_DIR}
     ${AMD_INCLUDE_DIR}
@@ -151,11 +163,10 @@ IF(UMFPACK_FOUND)
     SUITESPARSE_DIR
   )
 ELSE()
-  SET(UMFPACK_DIR "" CACHE STRING
+  SET(UMFPACK_DIR "" CACHE PATH
     "An optional hint to an UMFPACK directory"
     )
-  SET(SUITESPARSE_DIR "" CACHE STRING
+  SET(SUITESPARSE_DIR "" CACHE PATH
     "An optional hint to a SUITESPARSE directory"
     )
 ENDIF()
-

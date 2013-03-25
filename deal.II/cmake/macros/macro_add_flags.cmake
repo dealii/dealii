@@ -21,6 +21,10 @@
 #
 
 MACRO(ADD_FLAGS _variable _flags)
-  SET(${_variable} "${${_variable}} ${_flags}")
+  STRING(STRIP "${_flags}" _flags_stripped)
+  IF(NOT "${_flags_stripped}" STREQUAL "")
+    SET(${_variable} "${${_variable}} ${_flags}")
+    STRING(STRIP "${${_variable}}" ${_variable})
+  ENDIF()
 ENDMACRO()
 

@@ -309,13 +309,7 @@ namespace PETScWrappers
 
 #if DEBUG
       // test ghost allocation in debug mode
-
-#ifdef PETSC_USE_64BIT_INDICES
-      PetscInt
-#else
-      int
-#endif
-      begin, end;
+      PetscInt begin, end;
 
       ierr = VecGetOwnershipRange (vector, &begin, &end);
 

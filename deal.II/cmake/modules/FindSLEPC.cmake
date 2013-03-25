@@ -126,7 +126,7 @@ IF(SLEPC_FOUND)
     SLEPC_LIBRARY
   )
 ELSE()
-  SET(SLEPC_DIR "" CACHE STRING
+  SET(SLEPC_DIR "" CACHE PATH
     "An optional hint to a SLEPC directory"
     )
   SET(SLEPC_ARCH "" CACHE STRING

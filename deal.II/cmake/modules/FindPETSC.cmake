@@ -166,7 +166,7 @@ IF(PETSC_FOUND)
     PETSC_LIBRARY
   )
 ELSE()
-  SET(PETSC_DIR "" CACHE STRING
+  SET(PETSC_DIR "" CACHE PATH
     "An optional hint to a PETSc directory"
     )
   SET(PETSC_ARCH "" CACHE STRING

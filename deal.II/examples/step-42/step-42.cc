@@ -459,9 +459,9 @@ namespace Step42
     class Obstacle : public Function<dim>
     {
     public:
-      Obstacle (std::unique_ptr<Input<dim> > const &_input) :
+      Obstacle (std_cxx1x::shared_ptr<Input<dim> > const &_input) :
         Function<dim>(dim),
-        input_obstacle_copy(std::move (_input)) {};
+        input_obstacle_copy(_input) {};
 
       virtual double value (const Point<dim>   &p,
                             const unsigned int  component = 0) const;
@@ -470,7 +470,7 @@ namespace Step42
                                  Vector<double>   &values) const;
 
     private:
-      std::unique_ptr<Input<dim> >  const &input_obstacle_copy;
+      std_cxx1x::shared_ptr<Input<dim> >  const &input_obstacle_copy;
     };
 
     template <int dim>
@@ -548,7 +548,7 @@ namespace Step42
     FESystem<dim>        fe;
     DoFHandler<dim>      dof_handler;
 
-    std::unique_ptr<parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> > soltrans;
+    std_cxx1x::shared_ptr<parallel::distributed::SolutionTransfer<dim, TrilinosWrappers::MPI::Vector> > soltrans;
 
     IndexSet             locally_owned_dofs;
     IndexSet             locally_relevant_dofs;
@@ -573,8 +573,8 @@ namespace Step42
     TrilinosWrappers::PreconditionAMG::AdditionalData additional_data;
     TrilinosWrappers::PreconditionAMG preconditioner_u;
 
-    std::unique_ptr<Input<dim> >               input_obstacle;
-    std::unique_ptr<ConstitutiveLaw<dim> >     plast_lin_hard;
+    std_cxx1x::shared_ptr<Input<dim> >               input_obstacle;
+    std_cxx1x::shared_ptr<ConstitutiveLaw<dim> >     plast_lin_hard;
 
     double sigma_0;    // Yield stress
     double gamma;      // Parameter for the linear isotropic hardening
@@ -604,8 +604,9 @@ namespace Step42
     gamma (0.01),
     e_modul (2.0e+5),
     nu (0.3),
-    computing_timer (pcout,
-                     TimerOutput::summary,
+    computing_timer (MPI_COMM_WORLD,
+                     pcout,
+                     TimerOutput::never,
                      TimerOutput::wall_times)
   {
     // double _E, double _nu, double _sigma_0, double _gamma
@@ -660,12 +661,14 @@ namespace Step42
   {
     // setup dofs
     {
+      computing_timer.enter_section("Setup: distribute DoFs");
       dof_handler.distribute_dofs (fe);
 
       locally_owned_dofs = dof_handler.locally_owned_dofs ();
       locally_relevant_dofs.clear();
       DoFTools::extract_locally_relevant_dofs (dof_handler,
                                                locally_relevant_dofs);
+      computing_timer.exit_section("Setup: distribute DoFs");
     }
 
     // setup hanging nodes and dirichlet constraints
@@ -689,7 +692,7 @@ namespace Step42
       dirichlet_constraints ();
     }
 
-    // Initialzation for matrices and vectors
+    // Initialization for matrices and vectors
     {
       solution.reinit (locally_relevant_dofs, mpi_communicator);
       system_rhs_newton.reinit (locally_owned_dofs, mpi_communicator);
@@ -702,6 +705,7 @@ namespace Step42
 
     // setup sparsity pattern
     {
+      computing_timer.enter_section("Setup: matrix");
       TrilinosWrappers::SparsityPattern sp (locally_owned_dofs,
                                             mpi_communicator);
 
@@ -711,6 +715,15 @@ namespace Step42
       sp.compress();
 
       system_matrix_newton.reinit (sp);
+
+      // create a SP that only contains the diagonal
+      sp.reinit(locally_owned_dofs, mpi_communicator);
+      for (unsigned int idx=0; idx < locally_owned_dofs.n_elements();++idx)
+        {
+          unsigned int gidx = locally_owned_dofs.nth_index_in_set(idx);
+          sp.add(gidx, gidx);
+        }
+      sp.compress();
 
       TrilinosWrappers::SparseMatrix mass_matrix;
       mass_matrix.reinit (sp);
@@ -723,6 +736,7 @@ namespace Step42
       number_iterations = 0;
 
       diag_mass_matrix_vector.compress (VectorOperation::insert);
+      computing_timer.exit_section("Setup: matrix");
     }
   }
 
@@ -970,7 +984,7 @@ namespace Step42
     unsigned int sum_elast_points = Utilities::MPI::sum(elast_points, mpi_communicator);
     unsigned int sum_plast_points = Utilities::MPI::sum(plast_points, mpi_communicator);
     pcout << "      Number of elastic quadrature points: " << sum_elast_points
-          << " and plastic quadrature points: " << sum_plast_points <<std::endl;
+          << " and plastic quadrature points: " << sum_plast_points << std::endl;
   }
 
   template <int dim>
@@ -1181,7 +1195,7 @@ namespace Step42
   // meaningless value. These values have to
   // to set to zero.
 
-  // The rest of the funtion is smiliar to
+  // The rest of the function is similar to
   // step-41 except that we use a FGMRES-solver
   // instead of CG. For a very small hardening
   // value gamma the linear system becomes
@@ -1189,7 +1203,7 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::solve ()
   {
-    computing_timer.enter_section ("Solving and Preconditioning");
+    computing_timer.enter_section ("Solve");
 
     TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
     distributed_solution = solution;
@@ -1199,13 +1213,13 @@ namespace Step42
     distributed_solution.compress(VectorOperation::insert);
     system_rhs_newton.compress(VectorOperation::insert);
 
-    computing_timer.enter_section("Preconditioning");
+    computing_timer.enter_section("Solve: setup preconditioner");
 
     preconditioner_u.initialize (system_matrix_newton, additional_data);
 
-    computing_timer.exit_section("Preconditioning");
+    computing_timer.exit_section("Solve: setup preconditioner");
 
-    computing_timer.enter_section("Solving");
+    computing_timer.enter_section("Solve: iterate");
 
     PrimitiveVectorMemory<TrilinosWrappers::MPI::Vector> mem;
     TrilinosWrappers::MPI::Vector    tmp (system_rhs_newton);
@@ -1225,7 +1239,7 @@ namespace Step42
           << " FGMRES iterations."
           << std::endl;
 
-    computing_timer.exit_section("Solving");
+    computing_timer.exit_section("Solve: iterate");
 
     number_iterations += solver_control.last_step();
 
@@ -1233,7 +1247,7 @@ namespace Step42
 
     solution = distributed_solution;
 
-    computing_timer.exit_section("Solving and Preconditioning");
+    computing_timer.exit_section("Solve");
   }
 
 
@@ -1272,20 +1286,20 @@ namespace Step42
         else if (j == 2 || cycle > 0)
           plast_lin_hard->set_sigma_0 (sigma_hlp);
 
-        pcout<< " " <<std::endl;
-        pcout<< "   Newton iteration " << j <<std::endl;
-        pcout<< "      Updating active set..." <<std::endl;
+        pcout << " " <<std::endl;
+        pcout << "   Newton iteration " << j << std::endl;
+        pcout << "      Updating active set..." << std::endl;
 
         update_solution_and_constraints ();
 
-        pcout<< "      Assembling system... " <<std::endl;
+        pcout << "      Assembling system... " << std::endl;
         system_matrix_newton = 0;
         system_rhs_newton = 0;
         assemble_nl_system (solution);  //compute Newton-Matrix
 
         number_assemble_system += 1;
 
-        pcout<< "      Solving system... " <<std::endl;
+        pcout << "      Solving system... " << std::endl;
         solve ();
 
         TrilinosWrappers::MPI::Vector distributed_solution (system_rhs_newton);
@@ -1334,7 +1348,7 @@ namespace Step42
 
             // The previous iteration of step 0 is the solution of an elastic problem.
             // So a linear combination of a plastic and an elastic solution makes no sense
-            // since the elastic solution is not in the konvex set of the plastic solution.
+            // since the elastic solution is not in the convex set of the plastic solution.
             if (j == 2)
               break;
           }
@@ -1485,9 +1499,9 @@ namespace Step42
     const unsigned int n_cycles = 6;
     for (cycle=0; cycle<n_cycles; ++cycle)
       {
-        computing_timer.enter_section("Mesh refinement and setup system");
+        computing_timer.enter_section("Setup");
 
-        pcout << "" <<std::endl;
+        pcout << std::endl;
         pcout << "Cycle " << cycle << ':' << std::endl;
 
         if (cycle == 0)
@@ -1496,8 +1510,10 @@ namespace Step42
           }
         else
           {
+                computing_timer.enter_section("Setup: refine mesh");
         	soltrans.reset (new parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::Vector>(dof_handler));
         	refine_grid ();
+        	computing_timer.exit_section("Setup: refine mesh");
           }
 
         setup_system ();
@@ -1510,11 +1526,11 @@ namespace Step42
         	solution = distributed_solution;
           }
 
-        computing_timer.exit_section("Mesh refinement and setup system");
+        computing_timer.exit_section("Setup");
 
         solve_newton ();
 
-        pcout<< "      Writing graphical output..." <<std::endl;
+        pcout << "      Writing graphical output..." << std::endl;
         computing_timer.enter_section("Graphical output");
 
         std::ostringstream filename_solution;
@@ -1525,7 +1541,7 @@ namespace Step42
         computing_timer.exit_section("Graphical output");
 
         computing_timer.print_summary();
-        computing_timer.disable_output();
+        computing_timer.reset();
       }
   }
 }
@@ -1539,25 +1555,16 @@ int main (int argc, char *argv[])
 
   deallog.depth_console (0);
 
-  clock_t     start, end;
-
-  start = clock();
-
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
   {
     int _n_refinements_global = 3;
 
-    if (argc == 3)
-      {
+    if (argc == 2)
         _n_refinements_global = atoi(argv[1]);
-      }
 
     PlasticityContactProblem<3> laplace_problem_3d (_n_refinements_global);
     laplace_problem_3d.run ();
   }
-
-  end = clock();
-  cout<< "%%%%%% Rechenzeit overall = " << (double)(end-start)/CLOCKS_PER_SEC <<std::endl;
 
   return 0;
 }

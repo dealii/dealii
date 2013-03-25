@@ -50,6 +50,7 @@ namespace SLEPcWrappers
     solver_control (cn),
     mpi_communicator (mpi_communicator),
     set_which (EPS_LARGEST_MAGNITUDE),
+    set_problem (EPS_NHEP),
     opA (NULL),
     opB (NULL),
     initial_vector (NULL),
@@ -95,7 +96,14 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::solve (const unsigned int n_eigenvectors, unsigned int *n_converged)
+  SolverBase::set_problem_type (const EPSProblemType eps_problem)
+  {
+    set_problem = eps_problem;
+  }
+
+  void
+  SolverBase::solve (const unsigned int  n_eigenvectors, 
+		     unsigned int       *n_converged)
   {
     int ierr;
 
@@ -167,11 +175,7 @@ namespace SLEPcWrappers
 
     // get number of converged eigenstates
     ierr = EPSGetConverged (solver_data->eps,
-#ifdef PETSC_USE_64BIT_INDICES
                             reinterpret_cast<PetscInt *>(n_converged)
-#else
-                            reinterpret_cast<int *>(n_converged)
-#endif
                            );
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 

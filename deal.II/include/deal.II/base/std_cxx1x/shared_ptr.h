@@ -16,7 +16,7 @@
 
 #include <deal.II/base/config.h>
 
-#ifdef DEAL_II_CAN_USE_CXX1X
+#ifdef DEAL_II_CAN_USE_CXX11
 
 #  include <memory>
 DEAL_II_NAMESPACE_OPEN
@@ -30,6 +30,7 @@ DEAL_II_NAMESPACE_CLOSE
 #else
 
 #include <boost/shared_ptr.hpp>
+#include <boost/enable_shared_from_this.hpp>
 DEAL_II_NAMESPACE_OPEN
 namespace std_cxx1x
 {

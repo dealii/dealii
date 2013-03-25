@@ -21,13 +21,17 @@
 #
 
 MACRO(ENABLE_IF_SUPPORTED _variable _flag)
-  STRING(REGEX REPLACE "^-" "" _flag_name "${_flag}")
-  CHECK_CXX_COMPILER_FLAG(
-    "${_flag}"
-    DEAL_II_HAVE_FLAG_${_flag_name}
-    )
-  IF(DEAL_II_HAVE_FLAG_${_flag_name})
-    SET(${_variable} "${${_variable}} ${_flag}")
+  STRING(STRIP "${_flag}" _flag_stripped)
+  IF(NOT "${_flag_stripped}" STREQUAL "")
+    STRING(REGEX REPLACE "^-" "" _flag_name "${_flag_stripped}")
+    CHECK_CXX_COMPILER_FLAG(
+      "${_flag_stripped}"
+      DEAL_II_HAVE_FLAG_${_flag_name}
+      )
+    IF(DEAL_II_HAVE_FLAG_${_flag_name})
+      SET(${_variable} "${${_variable}} ${_flag_stripped}")
+      STRING(STRIP "${${_variable}}" ${_variable})
+    ENDIF()
   ENDIF()
 ENDMACRO()
 

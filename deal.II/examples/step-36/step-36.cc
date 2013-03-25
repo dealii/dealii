@@ -2,7 +2,7 @@
 /*         Wolfgang Bangerth, Texas A&M University                */
 /*    $Id$*/
 /*                                                                */
-/*    Copyright (C) 2009, 2011-2012 by the deal.II authors */
+/*    Copyright (C) 2009, 2011-2013 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -281,8 +281,8 @@ namespace Step36
     // At the end of the function, we tell PETSc that the matrices have now
     // been fully assembled and that the sparse matrix representation can now
     // be compressed as no more entries will be added:
-    stiffness_matrix.compress ();
-    mass_matrix.compress ();
+    stiffness_matrix.compress (VectorOperation::add);
+    mass_matrix.compress (VectorOperation::add);
   }
 
 
@@ -298,7 +298,6 @@ namespace Step36
   template <int dim>
   unsigned int EigenvalueProblem<dim>::solve ()
   {
-
     // We start here, as we normally do, by assigning convergence control we
     // want:
     SolverControl solver_control (dof_handler.n_dofs(), 1e-9);

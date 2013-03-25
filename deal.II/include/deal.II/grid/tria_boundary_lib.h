@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -46,13 +46,9 @@ class CylinderBoundary : public StraightBoundary<dim,spacedim>
 {
 public:
   /**
-   * Constructor. Per default
-   * circular tube along the x-axis
-   * (<tt>axis=0</tt>). Choose
-   * <tt>axis=1</tt> or
-   * <tt>axis=2</tt> for a tube
-   * along the y- or z-axis,
-   * respectively.
+   * Constructor. Using default values for the constructor arguments yields a
+   * circular tube along the x-axis (<tt>axis=0</tt>). Choose <tt>axis=1</tt>
+   * or <tt>axis=2</tt> for a tube along the y- or z-axis, respectively.
    */
   CylinderBoundary (const double radius = 1.0,
                     const unsigned int axis = 0);
@@ -69,9 +65,9 @@ public:
    * the given point may be any
    * point on the axis.
    */
-  CylinderBoundary (const double       radius,
-                    const Point<spacedim>   direction,
-                    const Point<spacedim>   point_on_axis);
+  CylinderBoundary (const double           radius,
+                    const Point<spacedim> &direction,
+                    const Point<spacedim> &point_on_axis);
 
   /**
    * Refer to the general documentation of

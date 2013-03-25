@@ -103,7 +103,7 @@ IF(MUMPS_FOUND)
     PORT_LIBRARY
   )
 ELSE()
-  SET(MUMPS_DIR "" CACHE STRING
+  SET(MUMPS_DIR "" CACHE PATH
     "An optional hint to a mumps directory"
     )
 ENDIF()

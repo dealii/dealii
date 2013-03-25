@@ -16,14 +16,19 @@
 # Set up deal.II specific definitions
 #
 # This file defines a long list of uncached variables, used throughout the
-# configuration to determine paths, locations and names:
+# configuration to determine paths, locations and names.
+#
+# Definitions marked with *) can be overriden by defining them to cache
+# prior to the call of this file. This is done with the help of the
+# SET_IF_EMPTY macro.
 #
 # General information about deal.II:
 #
 #     DEAL_II_PACKAGE_NAME            *)
-#     DEAL_II_PACKAGE_VERSION         **)
+#     DEAL_II_PACKAGE_VERSION         *)
 #     DEAL_II_VERSION_MAJOR
 #     DEAL_II_VERSION_MINOR
+#     DEAL_II_VERSION
 #
 # Information about paths, install locations and names:
 #
@@ -49,7 +54,6 @@
 #     DEAL_II_WITH_DOC_DIRECTORY
 #
 # *)  Can be overwritten by the command line via -D<...>
-# **) Will be set with to the value of ${VERSION}
 #
 
 ###########################################################################
@@ -60,14 +64,15 @@
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
 
-SET(DEAL_II_PACKAGE_VERSION ${VERSION})
+SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "8.0.pre") # TODO: Get this value from somewhere else
 
 STRING(REGEX REPLACE
-  "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${VERSION}"
+  "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${DEAL_II_PACKAGE_VERSION}"
   )
 STRING(REGEX REPLACE
-  "^[0-9]+\\.([0-9]+).*" "\\1" DEAL_II_VERSION_MINOR "${VERSION}"
+  "^[0-9]+\\.([0-9]+).*" "\\1" DEAL_II_VERSION_MINOR "${DEAL_II_PACKAGE_VERSION}"
   )
+SET(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR})
 
 
 ###########################################################################
@@ -78,7 +83,8 @@ STRING(REGEX REPLACE
 
 SET(DEAL_II_PROJECT_CONFIG_NAME "${DEAL_II_PACKAGE_NAME}")
 
-SET_IF_EMPTY(DEAL_II_BASE_NAME "deal_II")
+STRING(REPLACE "." "_" _base_name "${DEAL_II_PACKAGE_NAME}")
+SET_IF_EMPTY(DEAL_II_BASE_NAME "${_base_name}")
 SET_IF_EMPTY(DEAL_II_DEBUG_SUFFIX ".g")
 SET_IF_EMPTY(DEAL_II_RELEASE_SUFFIX "")
 
@@ -102,7 +108,7 @@ ELSE()
   #
   SET_IF_EMPTY(DEAL_II_CMAKE_MACROS_RELDIR "share/${DEAL_II_PACKAGE_NAME}/cmake/Macros")
   SET_IF_EMPTY(DEAL_II_DOCUMENTATION_RELDIR "share/doc/${DEAL_II_PACKAGE_NAME}/html")
-  SET_IF_EMPTY(DEAL_II_EXAMPLES_RELDIR "share/${DEAL_II_PACKAGE_NAME}/examples")
+  SET_IF_EMPTY(DEAL_II_EXAMPLES_RELDIR "share/doc/${DEAL_II_PACKAGE_NAME}/examples")
   SET_IF_EMPTY(DEAL_II_EXECUTABLE_RELDIR "bin")
   SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include")
   SET_IF_EMPTY(DEAL_II_LIBRARY_RELDIR "lib${LIB_SUFFIX}")

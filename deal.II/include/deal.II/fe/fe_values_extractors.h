@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -56,6 +56,17 @@ namespace FEValuesExtractors
      * vector.
      */
     unsigned int component;
+
+    /**
+     * Default constructor. Initialize the
+     * object with an invalid component. This leads to
+     * an object that can not be used, but it allows
+     * objects of this kind to be put into arrays that
+     * require a default constructor upon resizing the
+     * array, and then later assigning a suitable
+     * object to each element of the array.
+     */
+    Scalar ();
 
     /**
      * Constructor. Take the selected
@@ -116,6 +127,17 @@ namespace FEValuesExtractors
     unsigned int first_vector_component;
 
     /**
+     * Default constructor. Initialize the
+     * object with an invalid component. This leads to
+     * an object that can not be used, but it allows
+     * objects of this kind to be put into arrays that
+     * require a default constructor upon resizing the
+     * array, and then later assigning a suitable
+     * object to each element of the array.
+     */
+    Vector ();
+
+    /**
      * Constructor. Take the first
      * component of the selected vector
      * inside the FEValues object as
@@ -160,6 +182,17 @@ namespace FEValuesExtractors
     unsigned int first_tensor_component;
 
     /**
+     * Default constructor. Initialize the
+     * object with an invalid component. This leads to
+     * an object that can not be used, but it allows
+     * objects of this kind to be put into arrays that
+     * require a default constructor upon resizing the
+     * array, and then later assigning a suitable
+     * object to each element of the array.
+     */
+    SymmetricTensor ();
+
+    /**
      * Constructor. Take the first
      * component of the selected tensor
      * inside the FEValues object as
@@ -175,6 +208,14 @@ namespace FEValuesExtractors
 namespace FEValuesExtractors
 {
   inline
+  Scalar::Scalar ()
+    :
+    component (numbers::invalid_unsigned_int)
+  {}
+
+
+
+  inline
   Scalar::Scalar (const unsigned int component)
     :
     component (component)
@@ -183,10 +224,26 @@ namespace FEValuesExtractors
 
 
   inline
+  Vector::Vector ()
+    :
+    first_vector_component (numbers::invalid_unsigned_int)
+  {}
+
+
+  inline
   Vector::Vector (const unsigned int first_vector_component)
     :
     first_vector_component (first_vector_component)
   {}
+
+
+  template <int rank>
+  inline
+  SymmetricTensor<rank>::SymmetricTensor ()
+    :
+    first_tensor_component(numbers::invalid_unsigned_int)
+  {}
+
 
   template <int rank>
   inline

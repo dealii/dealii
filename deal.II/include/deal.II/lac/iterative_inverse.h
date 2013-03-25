@@ -77,7 +77,7 @@ public:
   /**
    * Initialization
    * function. Provide a matrix and
-   * preconditioner for th solve in
+   * preconditioner for the solve in
    * vmult().
    */
   template <class MATRIX, class PRECONDITION>
@@ -93,6 +93,14 @@ public:
    * Solve for right hand side <tt>src</tt>.
    */
   void vmult (VECTOR &dst, const VECTOR &src) const;
+
+  /**
+   * Solve for right hand side <tt>src</tt>, but allow for the fact
+   * that the vectors given to this function have different type from
+   * the vectors used by the inner solver.
+   */
+  template <class VECTOR2>
+  void vmult (VECTOR2 &dst, const VECTOR2 &src) const;
 
   /**
    * The solver, which allows
@@ -144,7 +152,25 @@ IterativeInverse<VECTOR>::vmult (VECTOR &dst, const VECTOR &src) const
 {
   Assert(matrix.get() != 0, ExcNotInitialized());
   Assert(preconditioner.get() != 0, ExcNotInitialized());
+  dst = 0.;
   solver.solve(*matrix, dst, src, *preconditioner);
+}
+
+
+template <class VECTOR>
+template <class VECTOR2>
+inline void
+IterativeInverse<VECTOR>::vmult (VECTOR2 &dst, const VECTOR2 &src) const
+{
+  Assert(matrix.get() != 0, ExcNotInitialized());
+  Assert(preconditioner.get() != 0, ExcNotInitialized());
+  GrowingVectorMemory<VECTOR> mem;
+  typename VectorMemory<VECTOR>::Pointer sol(mem);
+  typename VectorMemory<VECTOR>::Pointer rhs(mem);
+  sol->reinit(dst);
+  *rhs = src;
+  solver.solve(*matrix, *sol, *rhs, *preconditioner);
+  dst = *sol;
 }
 
 

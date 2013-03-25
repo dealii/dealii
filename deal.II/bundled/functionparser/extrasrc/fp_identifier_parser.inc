@@ -151,7 +151,7 @@ to be modified by hand.
 #define lB lA 1]){lH
 #define lA :lN uptr[
 #define l9 'a' lB
-#define l8 default: l0
+#define l8 default:l0
 #define l7 lG l0 5;}lH
 #define l6 <<16)|
 #define l5 ==uptr[
@@ -171,25 +171,25 @@ l6
 3
 lA
 0]){lH
-l9 'b' :if('s' l5
+l9'b':if('s' l5
 2])l0(cAbs
 l6
-lM'r' :if('g' l5
+lM'r':if('g' l5
 2])l0(cArg
 l6
 l4
-lE 'c' lB 'o' lA
+lE'c' lB'o' lA
 2]){lH's':l0(cCos
 l6
 lJ
-lH 't':l0(cCot
+lH't':l0(cCot
 l6
 lJ
-lE 's' :if('c' l5
-2]) l0 (cCsc
+lE's':if('c' l5
+2])l0(cCsc
 l6
 l4
-lE 'e' :if('x' l5
+lE'e':if('x' l5
 1]&&'p' l5
 2])l0(cExp
 l6
@@ -201,10 +201,10 @@ lM'l':if('o' l5
 1]&&'g' l5
 2])l0(cLog
 l6
-lM 'm' lB 'a' :if('x' l5
+lM'm' lB'a':if('x' l5
 2])l0(cMax
 l6
-lM 'i' : if(lK
+lM'i':if(lK
 2])l0(cMin
 l6
 l4
@@ -212,11 +212,11 @@ lE'p':if('o' l5
 1]&&'w' l5
 2])l0(cPow
 l6
-lM 's' lB 'e':if('c' l5
+lM's' lB'e':if('c' l5
 2])l0(cSec
 l6
-lM 'i' :if(lK
-2]) l0 (cSin
+lM'i':if(lK
+2])l0(cSin
 l6
 l4
 lE't':if('a' l5
@@ -228,9 +228,9 @@ lE
 4
 lA
 0]){lH
-l9 'c' : if('o' l5
-2] && 's' l5
-3]) l0 (cAcos
+l9'c':if('o' l5
+2]&&'s' l5
+3])l0(cAcos
 l6
 lO's':lL
 2]&&lK
@@ -243,16 +243,16 @@ l6
 l3
 l8
 4;}
-lH 'c' lB 'b' :if('r' l5
+lH'c' lB'b':if('r' l5
 2]&&'t' l5
 3])l0(cCbrt
 l6
-lO 'e' :lL
-2] && 'l' l5
+lO'e':lL
+2]&&'l' l5
 3])l0(cCeil
 l6
-lO 'o' lA
-2]){ lH 'n' : if('j' l5
+lO'o' lA
+2]){lH'n':if('j' l5
 3])l0(cConj
 l6
 lO's':if('h' l5
@@ -263,27 +263,27 @@ l8
 4;}
 l8
 4;}
-lH 'e' :{ lI 'x' , 'p' , '2'}
+lH'e':{lI'x','p','2'}
 ;if(lC
 cExp2
 l6
 l3}
-lH'i':{lI 'm','a','g'}
+lH'i':{lI'm','a','g'}
 ;if(lC
 cImag
 l6
 l3}
-lH 'l':{lI 'o','g','2'}
+lH'l':{lI'o','g','2'}
 ;if(lC
 cLog2
 l6
 l3}
-lH 'r':{ lI 'e','a','l'}
+lH'r':{lI'e','a','l'}
 ;if(lC
 cReal
 l6
 l3}
-lH 's' lB 'i' :if(lK
+lH's' lB'i':if(lK
 2]&&'h' l5
 3])l0(cSinh
 l6

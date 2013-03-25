@@ -55,7 +55,14 @@ MACRO(SETUP_THREADING)
   #
   # Set up some posix thread specific configuration toggles:
   #
-  IF(CMAKE_USE_PTHREADS_INIT)
+  IF(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+
+    IF(NOT CMAKE_USE_PTHREADS_INIT)
+      MESSAGE(FATAL_ERROR
+        "\nInternal configuration error: Not on Windows but posix thread support unavailable\n\n"
+        )
+    ENDIF()
+
     SET(DEAL_II_USE_MT_POSIX TRUE)
 
     #
@@ -76,11 +83,17 @@ MACRO(SETUP_THREADING)
     "
     DEAL_II_HAVE_MT_POSIX_BARRIERS)
     STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
-
     IF(NOT DEAL_II_HAVE_MT_POSIX_BARRIERS)
       SET(DEAL_II_USE_MT_POSIX_NO_BARRIERS TRUE)
     ENDIF()
 
+  ELSE()
+
+    #
+    # Poor Windows:
+    #
+    SET(DEAL_II_USE_MT_POSIX FALSE)
+    SET(DEAL_II_USE_MT_POSIX_NO_BARRIERS TRUE)
   ENDIF()
 
 ENDMACRO()
@@ -102,26 +115,22 @@ ENDMACRO()
 MACRO(FEATURE_THREADS_CONFIGURE_EXTERNAL)
   INCLUDE_DIRECTORIES(${TBB_INCLUDE_DIR})
 
-  IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-    IF(TBB_DEBUG_FOUND)
-      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG ${TBB_DEBUG_LIBRARY})
+  SPLIT_DEBUG_RELEASE(_tbb_debug _tbb_release ${TBB_LIBRARIES})
+
+  IF(CMAKE_BUILD_TYPE MATCHES "Debug")
+    IF(TBB_WITH_DEBUG_LIB)
       LIST(APPEND DEAL_II_DEFINITIONS_DEBUG
         "TBB_USE_DEBUG=1" "TBB_DO_ASSERT=1"
         )
-    ELSE()
-      MESSAGE(STATUS
-        "No debug tbb library was found. "
-        "The regular tbb lib will be used for the debug target instead."
-        )
-      LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG ${TBB_LIBRARY})
     ENDIF()
+
+    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG ${_tbb_debug})
   ENDIF()
 
-  IF (CMAKE_BUILD_TYPE MATCHES "Release")
-    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_RELEASE ${TBB_LIBRARY})
+  IF(CMAKE_BUILD_TYPE MATCHES "Release")
+    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_RELEASE ${_tbb_release})
   ENDIF()
 
-  # Setup threading and if successfull return TRUE:
   SETUP_THREADING()
 ENDMACRO()
 

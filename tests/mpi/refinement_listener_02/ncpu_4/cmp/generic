@@ -1,0 +1,7 @@
+
+DEAL:0::refine_global(1) results in a total of 2
+DEAL:0::refine_global(3) results in a total of 18
+DEAL:0::local refinement results in a total of 10
+DEAL:0::local refinement results in a total of 12
+DEAL:0::local refinement results in a total of 14
+DEAL:0::local refinement results in a total of 16

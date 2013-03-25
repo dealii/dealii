@@ -82,7 +82,7 @@ IF(HDF5_FOUND)
     HDF5_INCLUDE_DIR
     )
 ELSE()
-  SET(HDF5_DIR "" CACHE STRING
+  SET(HDF5_DIR "" CACHE PATH
     "An optional hint to an hdf5 directory"
     )
 ENDIF()

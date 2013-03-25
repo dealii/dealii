@@ -26,15 +26,11 @@
 #                                                                         #
 ###########################################################################
 
-SET(VERSION "8.0.pre")
-
 #
 # General configuration for cmake:
 #
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.8)
 MESSAGE(STATUS "This is CMake ${CMAKE_VERSION}")
-
-SET(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 
 LIST(APPEND CMAKE_MODULE_PATH
   ${CMAKE_SOURCE_DIR}/cmake/
@@ -115,24 +111,23 @@ INCLUDE(setup_finalize)
 #                                                                         #
 ###########################################################################
 
-IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
-  ADD_SUBDIRECTORY(bundled)
-ENDIF()
+MESSAGE(STATUS "")
+MESSAGE(STATUS "Configuring done. Proceed to target definitions now.")
 
 ADD_SUBDIRECTORY(cmake/scripts)
-
 ADD_SUBDIRECTORY(include)
 
 IF(DEAL_II_HAVE_DOC_DIRECTORY)
-  ADD_SUBDIRECTORY(doc)
+  ADD_SUBDIRECTORY(doc) # has to be included after include
 ENDIF()
 
-ADD_SUBDIRECTORY(source)
+IF(DEAL_II_HAVE_BUNDLED_DIRECTORY)
+  ADD_SUBDIRECTORY(bundled)
+ENDIF()
+ADD_SUBDIRECTORY(source) # has to be included after bundled
 
 ADD_SUBDIRECTORY(cmake/config) # has to be included after source
-
 ADD_SUBDIRECTORY(contrib) # has to be included after source
-
 ADD_SUBDIRECTORY(examples)
 
 #
@@ -145,4 +140,3 @@ INCLUDE(setup_custom_targets)
 #
 FILE(READ ${CMAKE_BINARY_DIR}/summary.log DEAL_II_LOG_SUMMARY)
 MESSAGE("${DEAL_II_LOG_SUMMARY}")
-

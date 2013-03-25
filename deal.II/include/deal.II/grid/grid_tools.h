@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -166,17 +166,17 @@ namespace GridTools
   /**
    * Transform the vertices of the given
    * triangulation by applying the
-   * predicate to all its vertices. Since
+   * function object provided as first argument to all its vertices. Since
    * the internal consistency of a
    * triangulation can only be guaranteed
    * if the transformation is applied to
-   * the vertices of only one level of a
+   * the vertices of only one level of
    * hierarchically refined cells, this
    * function may only be used if all cells
    * of the triangulation are on the same
    * refinement level.
    *
-   * The predicate given as
+   * The transformation given as
    * argument is used to transform
    * each vertex. Its respective
    * type has to offer a
@@ -187,14 +187,14 @@ namespace GridTools
    * pointer to the function. In
    * either case, argument and
    * return value have to be of
-   * type <tt>Point<dim></tt>.
+   * type <tt>Point<spacedim></tt>.
    *
    * This function is used in the
    * "Possibilities for extensions" section
-   * of step-38.
+   * of step-38. It is also used in step-49.
    */
-  template <int dim, typename Predicate, int spacedim>
-  void transform (const Predicate    &predicate,
+  template <int dim, typename Transformation, int spacedim>
+  void transform (const Transformation        &transformation,
                   Triangulation<dim,spacedim> &triangulation);
 
   /**

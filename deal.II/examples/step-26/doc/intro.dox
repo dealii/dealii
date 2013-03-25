@@ -1,2 +1,115 @@
 <a name="Intro"></a>
 <h1>Introduction</h1>
+
+
+<h4> Verifying whether the code is correct </h4>
+
+There are a number of things one can typically get wrong when implementing a
+finite element code. In particular, for time dependent problems, the following
+are common sources of bugs:
+- The time integration, for example by getting the coefficients in front of
+  the terms involving the current and previous time steps wrong (e.g., mixing
+  up a factor $\theta$ for $1-\theta$).
+- Handling the right hand side, for example forgetting a factor of $k_n$ or
+  $\theta$.
+- Mishandling the boundary values, again for example forgetting a factor of
+  $k_n$ or $\theta$, or forgetting to apply nonzero boundary values not only
+  to the right hand side but also to the system matrix.
+
+A less common problem is getting the initial conditions wrong because one can
+typically see that it is wrong by just outputting the first time step. In any
+case, in order to verify the correctness of the code, it is helpful to have a
+testing protocol that allows us to verify each of these components
+separately. This means:
+- Testing the code with nonzero initial conditions but zero right hand side
+  and boundary values and verifying that the time evolution is correct.
+- Then testing with zero initial conditions and boundary values but nonzero
+  right hand side and again ensuring correctness.
+- Finally, testing with zero initial conditions and right hand side but
+  nonzero boundary values.
+
+This sounds complicated, but fortunately, for linear partial differential
+equations without coefficients (or constant coefficients) like the one here,
+there is a fairly standard protocol that rests on the following observation:
+if you choose as your domain a square $[0,1]^2$ (or, with slight
+modifications, a rectangle), then the exact solution can be written as
+@f{align*}
+  u(x,y,t) = a(t) \sin(n_x \pi x) \sin(n_y \pi y)
+@f}
+(with integer constants $n_x,n_y$)
+if only the initial condition, right hand side and boundary values are all
+of the form $\sin(n_x \pi x) \sin(n_y \pi y)$ as well. This is due to the fact
+that the function $\sin(n_x \pi x) \sin(n_y \pi y)$ is an eigenfunction of the
+Laplace operator and allows us to compute things like the time factor $a(t)$
+analytically and, consequently, compare with what we get numerically.
+
+As an example, let us consider the situation where we have
+$u_0(x,y)=\sin(n_x \pi x) \sin(n_x \pi y)$ and
+$f(x,y,t)=0$. With the claim (ansatz) of the form for
+$u(x,y,t)$ above, we get that
+@f{align*}
+  \left(\frac{\partial}{\partial t} -\Delta\right)
+  u(x,y,t)
+  &=
+  \left(\frac{\partial}{\partial t} -\Delta\right)
+  a(t) \sin(n_x \pi x) \sin(n_y \pi y)
+  \\
+  &=
+  \left(a'(t) + (n_x^2+n_y^2)\pi^2 a(t) \right) \sin(n_x \pi x) \sin(n_y \pi y).
+@f}
+For this to be equal to $f(x,y,t)=0$, we need that
+@f{align*}
+  a'(t) + (n_x^2+n_y^2)\pi^2 a(t) = 0
+@f}
+and due to the initial conditions, $a(0)=1$. This differential equation can be
+integrated to yield
+@f{align*}
+  a(t) = - e^{-(n_x^2+n_y^2)\pi^2 t}.
+@f}
+In other words, if the initial condition is a product of sines, then the
+solution has exactly the same shape of a product of sines that decays to zero
+with a known time dependence. This is something that is easy to test if you
+have a sufficiently fine mesh and sufficiently small time step.
+
+What is typically going to happen if you get the time integration scheme wrong
+(e.g., by having the wrong factors of $\theta$ or $k$ in front of the various
+terms) is that you don't get the right temporal behavior of the
+solution. Double check the various factors until you get the right
+behavior. You may also want to verify that the temporal decay rate (as
+determined, for example, by plotting the value of the solution at a fixed
+point) does not double or halve each time you double or halve the time step or
+mesh size. You know that it's not the handling of the
+boundary conditions or right hand side because these were both zero.
+
+If you have so verified that the time integrator is correct, take the
+situation where the right hand side is nonzero but the initial conditions are
+zero: $u_0(x,y)=0$ and
+$f(x,y,t)=\sin(n_x \pi x) \sin(n_x \pi y)$. Again,
+@f{align*}
+  \left(\frac{\partial}{\partial t} -\Delta\right)
+  u(x,y,t)
+  &=
+  \left(\frac{\partial}{\partial t} -\Delta\right)
+  a(t) \sin(n_x \pi x) \sin(n_y \pi y)
+  \\
+  &=
+  \left(a'(t) + (n_x^2+n_y^2)\pi^2 a(t) \right) \sin(n_x \pi x) \sin(n_y \pi y),
+@f}
+and for this to be equal to $f(x,y,t)$, we need that
+@f{align*}
+  a'(t) + (n_x^2+n_y^2)\pi^2 a(t) = 1
+@f}
+and due to the initial conditions, $a(0)=0$. Integrating this equation in time
+yields
+@f{align*}
+  a(t) = \frac{1}{(n_x^2+n_y^2)\pi^2} \left[ 1 - e^{-(n_x^2+n_y^2)\pi^2 t} \right].
+@f}
+
+Again, if you have the wrong factors of $\theta$ or $k$ in front of the right
+hand side terms you will either not get the right temporal behavior of the
+solution, or it will converge to a maximum value other than
+$\frac{1}{(n_x^2+n_y^2)\pi^2}$.
+
+Once we have verified that the time integration and right hand side handling
+are correct using this scheme, we can go on to verifying that we have the
+boundary values correct, using a very similar approach.

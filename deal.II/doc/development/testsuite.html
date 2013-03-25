@@ -150,24 +150,28 @@
     <h3>Running it</h3>
 
     <p>
-    To run the testsuite, go into your deal.II directory and do this:
+    To run the testsuite, go to the directory where you want to test deal.II
+    and do this:
     <pre>
-       cd /path/to/deal.II
        svn checkout https://svn.dealii.org/trunk/tests
-    </pre>
-    This should generate a <code>tests/</code> directory parallel to
-    the <code>base/</code>, <code>lac/</code>, etc directories. Then
-    do this:
-    <pre>
        cd tests
-       ./configure
+       DEAL_II_DIR=/a/b/c ./configure
     </pre>
-    This assumes that you have previously configured your deal.II
-    installation and sets up a few things, in particular it determines
-    which system you are on and which compiler you are using, in order
-    to make sure that the stored correct output for your system and
-    compiler is used to compare against the output of the tests when
-    you run them.
+    where <code>/a/b/c</code> is the installation directory you have told
+    CMake to install deal.II into previously.
+    </p>
+
+    <p>
+    Not all tests succeed on every machine even if all computations are
+    correct, because you might not have configured with all the required
+    packages (for example PETSc or Trilinos), or because your machine
+    generates slightly different floating point outputs.  To increase the
+    number of tests that work correctly, install the
+    <a href="http://www.nongnu.org/numdiff/">numdiff</a> toold that compares
+    stored and newly created output files based on floating point
+    tolerances. To use it, simply export the environment variable
+    <code>export DEAL_II_DIFF="numdiff -a 1e-6 -q"</code>
+    before running the testsuite.
     </p>
 
     <p>
@@ -192,13 +196,13 @@
       =====linking======= quadrature_test.exe
       ...
     </pre>
-    You should be aware that because of the number of tests we have,
-    running the entire testsuite can easily take an hour, even on a
-    fast system. (On the other hand, only a large testsuite can offer
-    comprehensive coverage of a software as big as deal.II.) This time
-    can be reduced, however, on multicore machines if you use the command
+    Be aware that because of the number of tests we have, running the entire
+    testsuite takes approximately 10 hours (as of early 2013), even on a fast
+    system. (On the other hand, of couse only a large testsuite can offer
+    comprehensive coverage of a software as big as deal.II.) This time can be
+    reduced, however, on multicore machines if you use the command
     <code>make -jN</code> where <code>N</code> is an integer equal to or
-    slight larger than the number of processor cores you have, as this
+    slightly larger than the number of processor cores you have, as this
     instructs <code>make</code> to run several tests at the same time.
     </p>
 
@@ -271,7 +275,7 @@
     tests nightly through a cron-job with this command, to have
     regular test runs.
     </p>
-    
+
     <p>
     To get a quick overview you can run
     <pre>
@@ -281,13 +285,13 @@
     at the end:
     <pre>
                 Compiling Linking Running   Check      OK     all
-         a-framework	1	1	1	1	1	5	
-                base	0	0	0	2	185	187	
-                 lac	0	0	0	0	117	117	
-                  fe	0	0	0	4	114	118	
-             deal.II	0	0	0	2	291	293	
-         integrators	0	0	0	0	15	15	
-           multigrid	0	0	0	0	35	35	      
+         a-framework	1	1	1	1	1	5
+                base	0	0	0	2	185	187
+                 lac	0	0	0	0	117	117
+                  fe	0	0	0	4	114	118
+             deal.II	0	0	0	2	291	293
+         integrators	0	0	0	0	15	15
+           multigrid	0	0	0	0	35	35
 		 ...
     </pre>
     </p>
@@ -602,4 +606,3 @@ testname/cmp/generic
 
   </body>
 </html>
-

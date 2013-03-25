@@ -13,20 +13,13 @@
 #####
 
 IF(DEAL_II_COMPONENT_EXAMPLES)
-  #
-  # Add a rule on how to install the examples:
-  #
-
-  file(GLOB _steps ${CMAKE_CURRENT_SOURCE_DIR}/step-*)
-
-  FOREACH(_step ${_steps})
-    INSTALL(DIRECTORY ${_step}
-      DESTINATION ${DEAL_II_EXAMPLES_RELDIR}
-      COMPONENT examples
-      PATTERN ".svn" EXCLUDE
-      PATTERN "doc" EXCLUDE
-      PATTERN "TODO" EXCLUDE
-      )
-  ENDFOREACH()
-
+  INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
+    DESTINATION ${DEAL_II_EXAMPLES_RELDIR}
+    COMPONENT examples
+    PATTERN "${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt" EXCLUDE
+    PATTERN "doc" EXCLUDE
+    PATTERN "doxygen" EXCLUDE
+    PATTERN ".svn" EXCLUDE
+    PATTERN "TODO" EXCLUDE
+    )
 ENDIF()

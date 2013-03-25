@@ -16,16 +16,15 @@
 # A small macro to test whether a given list contains an element.
 #
 # Usage:
-#     LIST_CONTAINS(var value list)
+#     ITEM_MATCHES(var regex list)
 #
-# var is set to true if list contains value as an element compared via
-# STREQUAL.
+# var is set to true if list contains an item that matches regex.
 #
 
-MACRO(LIST_CONTAINS _var _value)
+MACRO(ITEM_MATCHES _var _regex)
   SET(${_var})
-  FOREACH (_value2 ${ARGN})
-    IF("${_value}" STREQUAL "${_value2}")
+  FOREACH (_item ${ARGN})
+    IF("${_item}" MATCHES ${_regex})
       SET(${_var} TRUE)
       BREAK()
     ENDIF()

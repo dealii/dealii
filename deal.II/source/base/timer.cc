@@ -328,7 +328,8 @@ TimerOutput::~TimerOutput()
   while (active_sections.size() > 0)
     leave_subsection();
 
-  if (output_frequency != every_call && output_is_enabled == true)
+  if ( (output_frequency == summary || output_frequency == every_call_and_summary)
+      && output_is_enabled == true)
     print_summary();
 }
 
@@ -405,7 +406,8 @@ TimerOutput::leave_subsection (const std::string &section_name)
 
   // in case we have to print out
   // something, do that here...
-  if (output_frequency != summary && output_is_enabled == true)
+  if ((output_frequency == every_call || output_frequency == every_call_and_summary)
+      && output_is_enabled == true)
     {
       std::string output_time;
       std::ostringstream cpu;
@@ -607,6 +609,14 @@ void
 TimerOutput::enable_output ()
 {
   output_is_enabled = true;
+}
+
+void
+TimerOutput::reset ()
+{
+  Threads::Mutex::ScopedLock lock (mutex);
+  sections.clear();
+  active_sections.clear();
 }
 
 

@@ -160,11 +160,7 @@ namespace PETScWrappers
 
   int
   SolverBase::convergence_test (KSP                 /*ksp*/,
-#ifdef PETSC_USE_64BIT_INDICES
                                 const PetscInt      iteration,
-#else
-                                const int           iteration,
-#endif
                                 const PetscReal     residual_norm,
                                 KSPConvergedReason *reason,
                                 void               *solver_control_x)
@@ -852,15 +848,11 @@ namespace PETScWrappers
 
   }
 
-  int SparseDirectMUMPS::convergence_test (KSP            /*ksp*/,
-#ifdef PETSC_USE_64BIT_INDICES
-                                           const PetscInt       iteration,
-#else
-                                           const int            iteration,
-#endif
-                                           const PetscReal      residual_norm,
-                                           KSPConvergedReason   *reason,
-                                           void                 *solver_control_x)
+  PetscErrorCode SparseDirectMUMPS::convergence_test (KSP               /*ksp*/,
+						      const PetscInt      iteration,
+						      const PetscReal     residual_norm,
+						      KSPConvergedReason *reason,
+						      void               *solver_control_x)
   {
     SolverControl &solver_control = *reinterpret_cast<SolverControl *>(solver_control_x);
 

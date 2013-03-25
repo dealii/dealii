@@ -92,8 +92,6 @@ ENDIF()
 
 IF(NOT DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   FILE(APPEND ${_log} "#\n#  WARNING: DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS is set to OFF\n")
-ELSEIF(NOT DEAL_II_KNOWN_COMPILER)
-  FILE(APPEND ${_log} "#\n#  WARNING: Unknown compiler! Please set compiler flags by hand.\n")
 ENDIF()
 
 FILE(APPEND ${_log}
@@ -113,32 +111,62 @@ FILE(APPEND ${_log}
   "DEAL_II_ALLOW_AUTODETECTION = ${DEAL_II_ALLOW_AUTODETECTION}):\n"
   )
 
-GET_CMAKE_PROPERTY(_res VARIABLES)
-FOREACH(_var ${_res})
+#
+# Cache for quicker access:
+#
+GET_CMAKE_PROPERTY(_variables VARIABLES)
+FOREACH(_var ${_variables})
   IF(_var MATCHES "DEAL_II_WITH")
-    IF(${${_var}})
-      # FEATURE is enabled
-      STRING(REGEX REPLACE "^DEAL_II_WITH_" "" _feature ${_var})
-      IF(FEATURE_${_feature}_EXTERNAL_CONFIGURED)
-        FILE(APPEND ${_log} "#        ${_var} set up with external dependencies\n")
-      ELSEIF(FEATURE_${_feature}_BUNDLED_CONFIGURED)
-        IF(DEAL_II_FORCE_BUNDLED_${_feature})
-          FILE(APPEND ${_log} "#        ${_var} set up with bundled packages (forced)\n")
-        ELSE()
-          FILE(APPEND ${_log} "#        ${_var} set up with bundled packages\n")
+    LIST(APPEND _features "${_var}")
+  ELSEIF(_var MATCHES "DEAL_II_COMPONENT")
+    LIST(APPEND _components "${_var}")
+  ELSEIF(_var MATCHES "(COMPILER|COMPILE_FLAGS|LINK_FLAGS|LIBRARIES|INCLUDE_PATH|INCLUDE_DIRS|LINKER_FLAGS)")
+    LIST(APPEND _features_config ${_var})
+  ENDIF()
+ENDFOREACH()
+
+FOREACH(_var ${_features})
+  IF(${${_var}})
+    # FEATURE is enabled
+    STRING(REGEX REPLACE "^DEAL_II_WITH_" "" _feature ${_var})
+    IF(FEATURE_${_feature}_EXTERNAL_CONFIGURED)
+      FILE(APPEND ${_log} "#        ${_var} set up with external dependencies\n")
+
+      #
+      # Print the feature configuration:
+      #
+      FOREACH(_var2 ${_features_config})
+        IF( # MPI:
+            _var2 MATCHES "^${_feature}_CXX_(COMPILER|COMPILE_FLAGS|LINK_FLAGS|LIBRARIES|INCLUDE_PATH)$" OR
+            # Boost:
+            ( _feature MATCHES "BOOST" AND _var2 MATCHES "^Boost(_LIBRARIES|_INCLUDE_DIRS)$" ) OR
+            # TBB:
+            ( _feature MATCHES "THREADS" AND _var2 MATCHES "^TBB(_LIBRARIES|_INCLUDE_DIRS)$" ) OR
+            # Generic:
+            ( (NOT _var2 MATCHES "^(MPI|Boost)") AND
+              _var2 MATCHES "^${_feature}_(INCLUDE_DIRS|LIBRARIES|LINKER_FLAGS)$" )
+          )
+          FILE(APPEND ${_log} "#            ${_var2} = ${${_var2}}\n")
         ENDIF()
+      ENDFOREACH()
+
+    ELSEIF(FEATURE_${_feature}_BUNDLED_CONFIGURED)
+      IF(DEAL_II_FORCE_BUNDLED_${_feature})
+        FILE(APPEND ${_log} "#        ${_var} set up with bundled packages (forced)\n")
+      ELSE()
+        FILE(APPEND ${_log} "#        ${_var} set up with bundled packages\n")
       ENDIF()
-    ELSE()
-      # FEATURE is disabled
-      FILE(APPEND ${_log} "#      ( ${_var} = ${${_var}} )\n")
     ENDIF()
+  ELSE()
+    # FEATURE is disabled
+    FILE(APPEND ${_log} "#      ( ${_var} = ${${_var}} )\n")
   ENDIF()
 ENDFOREACH()
 
 FILE(APPEND ${_log}
   "#\n#  Component configuration:\n"
   )
-FOREACH(_var ${_res})
+FOREACH(_var ${_components})
   IF(_var MATCHES "DEAL_II_COMPONENT")
     IF(${${_var}})
       FILE(APPEND ${_log} "#        ${_var}\n")

@@ -2,10 +2,10 @@
 	  "http://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>
-    <title>The deal.II Readme</title>
+    <title>deal.II CMake documentation</title>
     <link href="../screen.css" rel="StyleSheet">
     <meta name="author" content="the deal.II authors <authors @ dealii.org>">
-    <meta name="copyright" content="Copyright (C) 2012 by the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2012, 2013 by the deal.II authors">
     <meta name="date" content="$Date$">
     <meta name="svn_id" content="$Id$">
     <meta name="keywords" content="deal.II">
@@ -42,13 +42,8 @@
 		<li><a href="#configureoverride">Manual override</a>
 		<li><a href="#configurecomp">Component selection</a>
 		<li><a href="#configurebuild">Build configuration</a>
+		<li><a href="#compiler">Selecting a compiler</a>
 		<li><a href="#configureinstall">Installation</a>
-	      </ul>
-	    <li><a href="#ext">How to use deal.II in your CMake project</a>
-	      <ul>
-		<li><a href="#extfinding">Finding the deal.II library</a>
-		<li><a href="#extcmake">deal.IIConfig.cmake</a>
-		<li><a href="#extsetup">Setting up necessary configuration variables</a>
 	      </ul>
 	    <li><a href="#advanced">Initial cache file and advanced options</a>
 	    <li><a href="#compiling">Compiling only certain parts</a>
@@ -148,7 +143,7 @@
       </pre>
       It is possible to use <code>-U</code> together with a globbing
       expression. E.g. to remove the current feature configuration and
-      rerun the autodetection on can invoke
+      rerun the autodetection one can invoke
       <pre>
 
     cmake -U"DEAL_II_WITH_*" .
@@ -362,6 +357,7 @@
     P4EST_DIR (and SC_DIR),
     PETSC_DIR and PETSC_ARCH (forming ${PETSC_DIR}/${PETSC_ARCH}),
     SLEPC_DIR and SLEPC_ARCH (forming ${SLEPC_DIR}/${SLEPC_ARCH}),
+    TBB_DIR,
     TRILINOS_DIR,
     UMFPACK_DIR and SUITESPARSE_DIR (AMD_DIR, CHOLMOD_DIR, COLAMD_DIR, SUITESPARSECONFIG_DIR)
 	    </pre>
@@ -390,22 +386,50 @@
 
     <a name="configureoverride"></a>
     <h4> Manual override </h4>
+    <p><b>Warning:</b> Do not do this unless absolutely necessary!</p>
+    <p>
       It is possible to override the CMake find mechanism for external
       libraries manually. This is useful if a non standard library (e.g.
-      lapack/blas) should be used but cannot be found by the
-      <code>FIND_PACKAGE(...)</code> mechanism of cmake.
+      BLAS or LAPACK) should be used but cannot be found by the
+      <code>FIND_PACKAGE(...)</code> mechanism.
+
       In this case you can set by hand:
       <pre>
 
-    cmake -DLAPACK_FOUND=true \
-          -DLAPACK_LIBRARIES="library;and;complete;link;interface" \
-          -DLAPACK_LINKER_FLAGS="" &lt;...&gt;
+    cmake -D&lt;lib&gt;_FOUND=true \
+          -D&lt;lib&gt;_LIBRARIES="library;and;complete;link;interface" \
+        ( -D&lt;lib&gt;_INCLUDE_DIRS="semicolon;separated;list;of;include;dirs" \
+          -D&lt;lib&gt;_LINKER_FLAGS="..." \
+          -D&lt;lib&gt;_&lt;...depending on library...&gt; )
       </pre>
-      You can set these values on the command line, with ccmake or by
-      providing an initial cache file, see
+
+      The first define ensures that <code>cmake</code> does not
+      call the corresponding <code>Find&lt;lib&gt;.cmake</code> module.
+      Therefore, all information that would be otherwise exported by the
+      module must be specified by hand. (See the
+      <a href="Config.sample" target="_top">Config.sample file</a> for a
+      detailed list of valid variables per feature.)
+    </p>
+    <p>
+      An example of use is to select BLAS and LAPACK manually as follows
+      (here, these libraries have been compiled with the gfortran compiler
+      and need its support library):
+      <pre>
+
+    cmake -DBLAS_FOUND=true \
+          -DBLAS_LIBRARIES="/apps/GotoBLAS/lib64/libgoto.so" \
+          -DBLAS_LINKER_FLAGS="-lgfortran" \
+          -DLAPACK_FOUND=true \
+          -DLAPACK_LIBRARIES="/apps/lapack-3.2.1/liblapack.so;/apps/GotoBLAS/lib64/libgoto.so" \
+          -DLAPACK_LINKER_FLAGS="-lgfortran"
+      </pre>
+
+      You can set these values on the command line, with <code>ccmake</code>
+      or by providing an initial cache file, see
       <a href="#advanced">advanced setup section</a>.
       Possible manual overrides are explained in detail in the
       in the <a href="Config.sample" target="_top">Config.sample file</a>.
+    </p>
 
 
     <a name="configurecomp"></a>
@@ -495,6 +519,51 @@
         href="../readme.html#configuration">here</a>.
     </p>
 
+
+    <p>
+      The build can be further controlled by the following variables:
+      <ul>
+        <li>
+          <code>DEAL_II_ALLOW_PLATFORM_INTROSPECTION</code>: If set
+          (default), <acronym>deal.II</acronym> will perform platform
+          introspection for the given CPU.
+
+	<li>
+          <code>BUILD_SHARED_LIBS</code>: If set (default),
+          <acronym>deal.II</acronym> will be linked as a shared library
+
+	<li>
+	  <code>CMAKE_INSTALL_RPATH_USE_LINK_PATH</code>: If set
+	  (default), the <acronym>deal.II</acronym> library will be
+	  installed with rpaths  set for all libraries outside of the
+	  system search paths
+      </ul>
+    </p>
+
+
+    <a name="compiler"></a>
+    <h4> Selecting a compiler </h4>
+
+    </p>
+      Compilers can be switched either by command line or by setting
+      <code>CMAKE_(C|CXX)_COMPILER</code>:
+      <pre>
+
+     CC=mpicc CXX=mpicxx cmake &lt;...&gt;
+
+     cmake -DCMAKE_C_COMPILER="mpicc" -DCMAKE_CXX_COMPILER="mpicxx" &lt;...&gt;
+      </pre>
+      Please note that
+      <ul>
+        <li>
+          The compiler <i>must</i> be specified at the very first
+          invokation of <code>cmake</code>.
+        <li>
+          The specified C and CXX compilers must be the same compiler
+          brand and the same compiler version.
+      </ul>
+    </p>
+
     <p>
       deal.II will configure sensible default <code>CFLAGS</code> and
       <code>CXXFLAGS</code> depending on platform, compiler and build
@@ -527,26 +596,6 @@
     cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" &lt;...&gt;
 	  </pre>
       </ol>
-    </p>
-
-    <p>
-      The build can be further controlled by the following variables:
-      <ul>
-        <li>
-          <code>DEAL_II_ALLOW_PLATFORM_INTROSPECTION</code>: If set
-          (default), <acronym>deal.II</acronym> will do platform
-          introspection for the given CPU.
-
-	<li>
-          <code>BUILD_SHARED_LIBS</code>: If set (default),
-          <acronym>deal.II</acronym> will be linked as a shared library
-
-	<li>
-	  <code>CMAKE_INSTALL_RPATH_USE_LINK_PATH</code>: If set
-	  (default), the <acronym>deal.II</acronym> library will be
-	  installed with rpaths  set for all libraries outside of the
-	  system search paths
-      </ul>
     </p>
 
 
@@ -606,236 +655,6 @@
     DEAL_II_LIBRARY_RELDIR
     DEAL_II_PROJECT_CONFIG_RELDIR
       </pre>
-    </p>
-
-
-    <a name="ext"></a>
-    <h3> How to use deal.II in your CMake project </h3>
-
-    <p>
-      Using <acronym>deal.II</acronym> in your own project is particularly
-      simple if your project also uses <code>cmake</code>. The following
-      subsections describe this process.
-    </p>
-
-
-    <a name="extfinding"></a>
-    <h4> Finding the deal.II library </h4>
-
-    <p>
-    Finding the <acronym>deal.II</acronym> library should be no more than
-      <pre>
-
-    FIND_PACKAGE(deal.II REQUIRED)
-      </pre>
-      in your CMakeLists.txt file.  You may have to hint for the location
-      of the <code>deal.IIConfig.cmake</code> file.  Either by directly
-      specifying <code>deal.II_DIR</code> to point to the path were the
-      <code>deal.IIConfig.cmake</code> file is located:
-      <pre>
-
-    cmake -Ddeal.II_DIR=/path/to/the/config/file &lt;...&gt;
-      </pre>
-      or by specifying a search path via <code>CMAKE_PREFIX_PATH</code>,
-      e.g.
-      <pre>
-
-    cmake -DCMAKE_PREFIX_PATH=~/workspace/local
-      </pre>
-      In this case <code>deal.IIConfig.cmake</code> will be searched
-      for in
-      <pre>
-
-    ~/workspace/local/
-    ~/workspace/local/lib/cmake/deal.II/
-      </pre>
-    </p>
-
-
-    <a name="extcmake"></a>
-    <h4>  deal.IIConfig.cmake </h4>
-
-    <p>
-      Importing the deal.IIConfig.cmake file via <code>FIND_PACKAGE</code>
-      will set a bunch of variables and macros; all of the form
-      <code>DEAL_II_*</code>. There is the usual duplet:
-      <pre>
-
-    DEAL_II_INCLUDE_DIRS
-    DEAL_II_LIBRARIES
-      </pre>
-      (with <code>debug</code> and <code>optimized</code> keywords. For
-      compatibility there is also <code>DEAL_II_LIBRARIES_DEBUG</code>
-      and <code>DEAL_II_LIBRARIES_RELEASE</code> only specifying the
-      respective set of libraries.)
-    </p>
-
-    <p>
-      Interesting additional variables might be:
-      <pre>
-
-    DEAL_II_USER_DEFINITIONS
-    DEAL_II_USER_DEFINITIONS_DEBUG
-    DEAL_II_USER_DEFINITIONS_RELEASE
-    DEAL_II_LINKER_FLAGS
-    DEAL_II_LINKER_FLAGS_DEBUG
-    DEAL_II_LINKER_FLAGS_RELEASE
-    DEAL_II_CXX_FLAGS
-    DEAL_II_CXX_FLAGS_DEBUG
-    DEAL_II_CXX_FLAGS_RELEASE
-
-    DEAL_II_TARGET_CONFIG
-    DEAL_II_TARGET
-    DEAL_II_TARGET_DEBUG
-    DEAL_II_TARGET_RELEASE
-      </pre>
-    </p>
-
-
-
-    <a name="extsetup"></a>
-    <h4> Setting up necessary configuration variables </h4>
-
-    <p>
-    For actually using <acronym>deal.II</acronym> in your CMake
-    project some configuration steps are necessary.  These can be
-    either set via <a href="#extsetupmacro">macros</a> or by <a
-    href="#extsetuphand">hand</a>:
-      <ol>
-        <a name="extsetupmacro"></a><li> <b>Configuration with the help of
-          two convencience macros:</b>
-        <p>
-          <code>deal.IIConfig.cmake</code> includes some convenience macros
-          to automatically setup all necessary configuration. A fully
-          functional, minimal example for the step-1 tutorial program is:
-	  <pre>
-
-    FIND_PACKAGE(deal.II REQUIRED)
-
-    DEAL_II_INITIALIZE_CACHED_VARIABLES()
-
-    PROJECT(step-1)
-
-    ADD_EXECUTABLE(step-1 step-1.cc)
-    DEAL_II_SETUP_TARGET(step-1)
-	  </pre>
-        </p>
-
-
-        <a name="extsetuphand"></a><li> <b>Configuration by hand:</b>
-	  <ul>
-	    <li> Set up all include directories for header files:
-	      <pre>
-
-    INCLUDE_DIRECTORIES(${DEAL_II_INCLUDE_DIRS})
-	      </pre>
-
-	    <li>
-	      deal.II usually ships with an optimized Release and a Debug version
-              of the library. So it is a good idea to set up
-              <code>CMAKE_BUILD_TYPE</code> accordingly:
-	      <pre>
-
-    SET(CMAKE_BUILD_TYPE "Debug" CACHE
-      "Choose the type of build, options are: Debug, Release"
-      )
-	      </pre>
-
-	      A cached variable ensures that we can later switch the build type
-	      by editing the cache:
-	      <pre>
-
-    make edit_cache
-	      </pre>
-
-	    <li> Often, it is a good idea to use the same compiler and linker
-	      flags as the deal.II library.
-	      <pre>
-
-    SET(CMAKE_CXX_FLAGS ${DEAL_II_CXX_FLAGS})
-    SET(CMAKE_CXX_FLAGS_RELEASE ${DEAL_II_CXX_FLAGS_RELEASE})
-    SET(CMAKE_CXX_FLAGS_DEBUG ${DEAL_II_CXX_FLAGS_DEBUG})
-	      </pre>
-	      (Optionally you can set up the variables with the
-	      <code>CACHE</code> to be able to edit them via ccmake or
-	      make edit_cache.)
-
-	    <li>
-	      <i>After</i> this, specify your project name:
-	      <pre>
-
-    PROJECT(myProject)
-	      </pre>
-	      This ensures that the compiler detection and platform setup
-	      that is issued by calling <code>PROJECT(...)</code> will run
-	      after we have set up our cached variables. This way it is
-	      our choice of variables that will be set and not the default
-	      values determined by the <code>PROJECT(...)</code> call.
-
-	    <li>
-	      After defining your targets, e.g.
-	      <pre>
-
-    ADD_EXECUTABLE(step-1 step-1.cc)
-	      </pre>
-	      you have to specify to link against deal.II and all external
-	      libraries:
-	      <pre>
-
-    TARGET_LINK_LIBRARIES(step-1 ${DEAL_II_LIBRARIES})
-	      </pre>
-
-	    <li> as well as using some preprocessor definitions:
-	      <pre>
-
-    SET_TARGET_PROPERTIES(step-1 PROPERTIES
-      COMPILE_DEFINITIONS
-      "${DEAL_II_USER_DEFINITIONS}"
-      COMPILE_DEFINITIONS_DEBUG
-      "${DEAL_II_USER_DEFINITIONS_DEBUG}"
-      COMPILE_DEFINITIONS_RELEASE
-      "${DEAL_II_USER_DEFINITIONS_RELEASE}"
-      )
-	      </pre>
-
-	    <li> Optionally, you can set the link flags to the one used by the
-	      deal.II library:
-	      <pre>
-
-    SET_TARGET_PROPERTIES(step-1 PROPERTIES
-      LINK_FLAGS
-      "${DEAL_II_LINKER_FLAGS}"
-      LINK_FLAGS_DEBUG
-      "${DEAL_II_LINKER_FLAGS_DEBUG}"
-      LINK_FLAGS_RELEASE
-      "${DEAL_II_LINKER_FLAGS_RELEASE}"
-      )
-	      </pre>
-	      And this it is.
-
-	  </ul>
-
-          <li>
-            <b>Advanced setup:</b>
-
-            <p>
-              For an advanced setup in a big CMake project
-              <code><a href="#extcmake">deal.IIConfig.cmake</a></code>
-              provides information about the <acronym>deal.II</acronym>
-              installation with traditional variables, see
-              <a href="#extcmake">here</a>, as well as <i>external CMake
-              targets</i> with link interface for direct inclusion:
-              <pre>
-
-    INCLUDE(${DEAL_II_TARGET_CONFIG})
-
-    ADD_EXECUTABLE(step-1
-      step-1.cc
-      ${DEAL_II_TARGET}
-      )
-              </pre>
-            </p>
-      </ol>
     </p>
 
 

@@ -1,0 +1,4 @@
+
+DEAL::ExcIndexRange (scalar.component, 0, fe_values_views_cache.scalars.size())
+DEAL::ExcIndexRange (scalar.component, 0, fe_values_views_cache.scalars.size())
+DEAL::ExcIndexRange (scalar.component, 0, fe_values_views_cache.scalars.size())

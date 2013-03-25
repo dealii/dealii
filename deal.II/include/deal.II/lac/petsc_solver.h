@@ -219,20 +219,11 @@ namespace PETScWrappers
      * convergence has been reached.
      */
     static
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscErrorCode
-#else
-    int
-#endif
-    convergence_test (KSP                 ksp,
-#ifdef PETSC_USE_64BIT_INDICES
-                      const PetscInt      iteration,
-#else
-                      const int           iteration,
-#endif
-                      const PetscReal     residual_norm,
-                      KSPConvergedReason *reason,
-                      void               *solver_control);
+      PetscErrorCode convergence_test (KSP                 ksp,
+				       const PetscInt      iteration,
+				       const PetscReal     residual_norm,
+				       KSPConvergedReason *reason,
+				       void               *solver_control);
 
     /**
      * A structure that contains the PETSc
@@ -1220,20 +1211,12 @@ namespace PETScWrappers
      * to see if convergence has been reached.
      */
     static
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscErrorCode
-#else
-    int
-#endif
-    convergence_test (KSP                ksp,
-#ifdef PETSC_USE_64BIT_INDICES
-                      const PetscInt     iteration,
-#else
-                      const int          iteration,
-#endif
-                      const PetscReal    residual_norm,
-                      KSPConvergedReason *reason,
-                      void               *solver_control);
+      PetscErrorCode convergence_test (KSP                ksp,
+				       const PetscInt     iteration,
+				       const PetscReal    residual_norm,
+				       KSPConvergedReason *reason,
+				       void               *solver_control);
+
     /**
      * A structure that contains the
      * PETSc solver and preconditioner

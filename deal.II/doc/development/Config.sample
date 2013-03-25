@@ -151,7 +151,19 @@
 #
 # Boost is a mandatory build time dependency.
 #
-# TODO
+# Automatic detection:
+#
+# SET(Boost_DIR "..." CACHE PATH
+#   "The preferred installation prefix for searching for boost"
+#   )
+#
+# Have a look at the very long configuration list in FindBoost.cmake.
+#
+# Manual setup:
+#
+# SET(Boost_FOUND TRUE CACHE BOOL "")
+# SET(Boost_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
+# SET(Boost_LIBRARIES "libraries;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
 #
 
 
@@ -191,17 +203,33 @@
 
 
 #
-# Lapack:
+# BLAS and LAPACK:
 #
 # SET(DEAL_II_WITH_LAPACK ON CACHE BOOL
 #   "Build deal.II with support for lapack"
 #   )
 #
+#
 # Automatic detection:
 #
-# Specify a hint with CMAKE_PREFIX_PATH.
+# You can set the BLAS/LAPACK vendor that should be found with
+#
+# SET(BLA_VENDOR "Goto" CACHE STRING "")
+#   Valid vendors: Goto, ATLAS, PhiPACK, CXML, DXML, SunPerf, SCSL, SGIMATH,
+#   IBMESSL, Intel10_32, Intel10_64lp, Intel10_64lp_seq, ACML, ACML_MP,
+#   ACML_GPU, Apple, NAS, Generic
+#
+# BLA_VENDOR will also be recognized by FindLAPACK.cmake.
+#
+# If your BLAS/LAPACK installation resides at a non system location, specify
+# a hint with CMAKE_PREFIX_PATH.
+#
 #
 # Manual setup:
+#
+# SET(BLAS_FOUND TRUE CACHE BOOL "")
+# SET(BLAS_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+# SET(BLAS_LINKER_FLAGS "..." CACHE STRING "")
 #
 # SET(LAPACK_FOUND TRUE CACHE BOOL "")
 # SET(LAPACK_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
@@ -232,15 +260,41 @@
 #
 # MPI:
 #
-# SET(DEAL_II_WITH_MPI ON CACHE BOOL ""
+# SET(DEAL_II_WITH_MPI ON CACHE BOOL
 #   "Build deal.II with support for mpi"
 #   )
 #
-# SET(DEAL_II_USE_MPICXX ON CACHE BOOL
-#   "Set the compiler to the detected mpi wrapper"
-#   )
 #
-# TODO
+# Automatic detection:
+#
+# If DEAL_II_WITH_MPI is undefined, autodetection of MPI is very
+# conservative. Only the current compiler and the variable MPI_CXX_COMPILER
+# is used to find MPI. (MPI_CXX_COMPILER takes precedence.)
+#
+# DEAL_II_WITH_MPI=ON will trigger a more sophisticated search for MPI.
+#
+# The best way to force a specific MPI implementation to be used is to set
+# CMAKE_C_COMPILER and CMAKE_CXX_COMPILER to the appropriate MPI wrapper
+# (See above).
+#
+# Alternatively, specify the mpi wrapper that will be queried for the mpi
+# link interface:
+#
+# SET(MPI_CXX_COMPILER "mpicxx" CACHE STRING "")
+#
+#
+# Manual setup:
+#
+# SET(MPI_CXX_FOUND TRUE CACHE BOOL "")
+#
+# and set the current compiler to an MPI wrapper. Alternatively, you can
+# specify the complete link interface as well as compile and link flags
+# via:
+#
+# SET(MPI_CXX_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+# SET(MPI_CXX_INCLUDE_PATH "include directory for mpi" CACHE STRING "")
+# SET(MPI_CXX_COMPILE_FLAGS "..." CACHE STRING "")
+# SET(MPI_CXX_LINK_FLAGS "..." CACHE STRING "")
 #
 
 
@@ -259,10 +313,10 @@
 #
 # Manual setup:
 #
-# SET(METIS_FOUND TRUE CACHE BOOL "")
-# SET(METIS_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
-# SET(METIS_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
-# SET(METIS_LINKER_FLAGS "..." CACHE STRING "")
+# SET(MUMPS_FOUND TRUE CACHE BOOL "")
+# SET(MUMPS_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+# SET(MUMPS_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
+# SET(MUMPS_LINKER_FLAGS "..." CACHE STRING "")
 #
 
 
@@ -371,7 +425,17 @@
 #   "Always use the bundled tbb library instead of an external one."
 #   )
 #
-# TODO
+# Automatic setup:
+#
+# Specify a hint with CMAKE_PREFIX_PATH or by setting
+# SET(TBB_DIR "/.../..." CACHE PATH "")
+#
+# Manual setup:
+#
+# SET(TBB_FOUND TRUE CACHE BOOL "")
+# SET(TBB_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+# SET(TBB_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
+# SET(TBB_WITH_DEBUGLIB TRUE CACHE BOOL "")
 #
 
 
@@ -422,6 +486,26 @@
 # SET(UMFPACK_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
 # SET(UMFPACK_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
 # SET(UMFPACK_LINKER_FLAGS "..." CACHE STRING "")
+#
+
+
+#
+# ZLIB:
+#
+# SET(DEAL_II_WITH_ZLIB ON CACHE BOOL
+#   "Build deal.II with support for zlib"
+#   )
+#
+# Automatic detection:
+#
+# Specify a hint with CMAKE_PREFIX_PATH or by setting
+# SET(ZLIB_ROOT "/.../..." CACHE PATH "")
+#
+# Manual setup:
+#
+# SET(ZLIB_FOUND TRUE CACHE BOOL "")
+# SET(ZLIB_LIBRARIES "library;and;semicolon;separated;list;of;link;interface" CACHE STRING "")
+# SET(ZLIB_INCLUDE_DIRS "semicolon;separated;list;of;include;dirs" CACHE STRING "")
 #
 
 

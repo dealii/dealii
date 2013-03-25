@@ -103,16 +103,6 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 ENDIF()
 
 
-IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  #
-  # Use -Wno-long-long on Apple Darwin to avoid some unnecessary
-  # warnings. However, newer gccs on that platform do not have
-  # this flag any more, so check whether we can indeed do this
-  #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-double")
-ENDIF()
-
-
 #############################
 #                           #
 #    For Release target:    #

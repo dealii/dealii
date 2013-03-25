@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -100,9 +100,8 @@ namespace MeshWorker
     std::vector<unsigned int> indices;
 
     /**
-     * The DoF indices on the
-     * current cell, organized by
-     * local blocks
+     * The DoF indices on the current cell, organized by local blocks.
+     * The size of this vector is zero, unless local blocks are used.
      */
     std::vector<std::vector<unsigned int> > indices_by_block;
 
@@ -118,8 +117,7 @@ namespace MeshWorker
      * pointer empty, but setting
      * the #aux_local_indices.
      */
-    template <class DH>
-    DoFInfo (const DH &dof_handler);
+    DoFInfo (const DoFHandler<dim, spacedim>& dof_handler);
 
     /**
      * Set the current cell and
@@ -129,9 +127,7 @@ namespace MeshWorker
     void reinit(const DHCellIterator &c);
 
     /**
-     * Set the current face and
-     * fill @p indices if the #cell
-     * changed.
+     * Set the current face and fill @p indices if the #cell changed.
      */
     template <class DHCellIterator, class DHFaceIterator>
     void reinit(const DHCellIterator &c,
@@ -139,9 +135,8 @@ namespace MeshWorker
                 const unsigned int n);
 
     /**
-     * Set the current subface
-     * and fill @p indices if the
-     * #cell changed.
+     * Set the current subface and fill @p indices if the #cell
+     * changed.
      */
     template <class DHCellIterator, class DHFaceIterator>
     void reinit(const DHCellIterator &c,
@@ -150,19 +145,16 @@ namespace MeshWorker
                 const unsigned int s);
 
     /**
-     * Switch to a new face of the
-     * same cell. Does not change
-     * @p indices and does not reset
-     * data in LocalResults.
+     * Switch to a new face of the same cell. Does not change @p
+     * indices and does not reset data in LocalResults.
      */
     template <class DHFaceIterator>
     void set_face (const DHFaceIterator &f,
                    const unsigned int n);
+    
     /**
-     * Switch to a new subface of the
-     * same cell. Does not change
-     * @p indices and does not reset
-     * data in LocalResults.
+     * Switch to a new subface of the same cell. Does not change @p
+     * indices and does not reset data in LocalResults.
      */
     template <class DHFaceIterator>
     void set_subface (const DHFaceIterator &f,
@@ -178,13 +170,9 @@ namespace MeshWorker
     bool level_cell;
   private:
     /**
-     * Standard constructor, not
-     * setting any block
-     * indices. Use of this
-     * constructor is not
-     * recommended, but it is
-     * needed for the arrays in
-     * DoFInfoBox.
+     * Standard constructor, not setting any block indices. Use of
+     * this constructor is not recommended, but it is needed for the
+     * arrays in DoFInfoBox.
      */
     DoFInfo ();
 
@@ -193,9 +181,6 @@ namespace MeshWorker
     /// Fill index vector with active indices
     template <class DHCellIterator>
     void get_indices(const DHCellIterator &c);
-
-    /// Fill index vector with level indices
-    //void get_indices(const typename MGDoFHandler<dim, spacedim>::cell_iterator& c);
 
     /// Auxiliary vector
     std::vector<unsigned int> indices_org;
@@ -295,8 +280,7 @@ namespace MeshWorker
 //----------------------------------------------------------------------//
 
   template <int dim, int spacedim, typename number>
-  template <class DH>
-  DoFInfo<dim,spacedim,number>::DoFInfo(const DH &dof_handler)
+  DoFInfo<dim,spacedim,number>::DoFInfo(const DoFHandler<dim,spacedim> &dof_handler)
   {
     std::vector<unsigned int> aux(1);
     aux[0] = dof_handler.get_fe().dofs_per_cell;

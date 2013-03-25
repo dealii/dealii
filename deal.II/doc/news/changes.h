@@ -25,11 +25,12 @@ inconvenience this causes.
 
 <ol>
 
-<!--
-<li> 
+<li> Changed: The TimeDependent::end_sweep function with an argument indicating
+the number of threads has been removed. Use the corresponding function without
+an argument. Since the argument had a default value, few users will have used
+this function.
 <br>
-(NAME, 2013/02/16)
--->
+(Wolfgang Bangerth, 2013/03/17)
 
 </ol>
 
@@ -41,7 +42,22 @@ inconvenience this causes.
 
 
 <ol>
-
+  <li> New: deal.II now uses <a href="http://www.cmake.org/">CMake</a>
+  as its configuration and build tool. Please read through the
+  readme and other installation files for information about how the
+  installation process has changed.
+  <br>
+  Because this touches the configuration of every external package we
+  interact with, there are a number of other changes as a result:
+  <ul>
+    <li>The minimum supported version for Trilinos is now 10.8.x.
+    <li>We no longer link with different versions of the p4est library
+        in debug and optimized mode. Rather, we now link with the same
+	library in both modes. The p4est installation instructions have
+	been updated. <blink>TODO TODO TODO</blink>
+  </ul>
+  <br>
+  (Matthias Maier, 2013/03/07)
 
 </ol>
 
@@ -53,9 +69,45 @@ inconvenience this causes.
 
 <ol>
 
-<li> Fixed: FETools::interpolation_difference with PETSc.
+<li> Added/fixed: IterativeInverse::vmult() can now handle vectors
+using a different number type than the matrix type. As usual, the
+number types must be compatible. Addtitionally, the initial guess is
+always set to zero, since starting with the incoming vector makes no
+sense.
+<br>
+(Guido Kanschat, 2013/03/21)
+</li>
+
+<li> Added GridOut::write_svg to allow for the output of two-dimensional 
+triangulations in two space dimensions in the SVG format (Scalable Vector 
+Graphics, an XML-based vector image format recommended by the World 
+Wide Web Consortium W3C). This function also provides cell coloring 
+and cell labeling for the visualization of basic cell properties.
+<br>
+(Christian Wülker, 2013/03/21)
+
+<li> Added TimerOutput::reset to remove the collected information so far and
+added a new frequency TimerOutput::never to only output information if
+triggered by print_summary().
+<br>
+(Timo Heister, 2013/03/20)
+</li>
+
+<li> Changed: FEValuesExtractors::Scalar, FEValuesExtractors::Vector and
+FEValuesExtractors::SymmetricTensor could not be default constructed, and
+consequently one could not easily put them into arrays (where they would
+be default constructed when changing the size, and later assigned useful
+values). These classes can now be default constructed to invalid
+values, but can of course not be used in any useful way.
+<br>
+(Wolfgang Bangerth, 2013/03/15)
+</li>
+
+<li> Fixed: FETools::interpolation_difference did not work with PETSc.
+This is now fixed.
 <br>
 (Timo Heister, 2013/03/01)
+</li>
 
 </ol>
 

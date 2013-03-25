@@ -12,11 +12,32 @@
 ##
 #####
 
+
+#
+# Required packages for the document generation:
+#
+FIND_PACKAGE(Perl)
+FIND_PACKAGE(Doxygen)
+
+
 #
 # Set up all necessary bits for the documentation
 #
-
 IF(DEAL_II_COMPONENT_DOCUMENTATION)
+
+  #
+  # Do we have all necessary dependencies?
+  #
+  IF(NOT PERL_FOUND)
+    MESSAGE(FATAL_ERROR
+      "Could not find a perl installation which is required for building the documentation"
+      )
+  ENDIF()
+  IF(NOT DOXYGEN_FOUND OR NOT DOXYGEN_DOT_FOUND)
+    MESSAGE(FATAL_ERROR
+      "Could not find doxygen and dot which is required for building the documentation"
+      )
+  ENDIF()
 
   #
   # Generate the source documentation via doxygen:

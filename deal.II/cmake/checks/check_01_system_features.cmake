@@ -71,6 +71,22 @@ ENDIF()
 
 ###########################################################################
 #                                                                         #
+#                         Mac OSX specific setup:                         #
+#                                                                         #
+###########################################################################
+
+IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
+  #
+  # Use -Wno-long-double on Apple Darwin to avoid some unnecessary
+  # warnings. However, newer gccs on that platform do not have
+  # this flag any more, so check whether we can indeed do this
+  #
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-double")
+ENDIF()
+
+
+###########################################################################
+#                                                                         #
 #                    Windows and CYGWIN specific setup:                   #
 #                                                                         #
 ###########################################################################
@@ -80,7 +96,6 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
   # Export DEAL_II_MSVC if we are on a Windows platform:
   #
   SET(DEAL_II_MSVC TRUE)
-
 
   #
   # Disable shared libraries on native Windows targets for the moment.
@@ -102,3 +117,13 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Windows")
   STRIP_FLAG(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-g")
 ENDIF()
 
+IF(CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
+  #
+  # Workaround for a miscompilation and linkage issue with shared libraries
+  # under Cygwin. Replacing -O0 with -O1 helps.
+  #
+  # - Matthias Maier, 2013
+  #
+  REPLACE_FLAG(DEAL_II_CXX_FLAGS_DEBUG "-O0" "-O1")
+
+ENDIF()
