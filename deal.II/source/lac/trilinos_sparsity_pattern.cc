@@ -654,7 +654,7 @@ namespace TrilinosWrappers
           {
             graph->ExtractMyRowView (i, num_entries, indices);
             for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-              out << "(" << i << "," << indices[graph->GRID(j)] << ") "
+              out << "(" << i << "," << indices[graph->GRID64(j)] << ") "
                   << std::endl;
           }
       }
@@ -680,7 +680,7 @@ namespace TrilinosWrappers
           // j horizontal, gnuplot output is
           // x-y, that is we have to exchange
           // the order of output
-          out << indices[graph->GRID(static_cast<TrilinosWrappers::types::int_type>(j))]
+          out << indices[graph->GRID64(static_cast<TrilinosWrappers::types::int_type>(j))]
             << " " << -static_cast<TrilinosWrappers::types::int_type>(row)
             << std::endl;
       }

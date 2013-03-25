@@ -1377,7 +1377,7 @@ namespace TrilinosWrappers
           {
             matrix->ExtractMyRowView (i, num_entries, values, indices);
             for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-              out << "(" << matrix->GRID(i) << "," << matrix->GCID(indices[j]) << ") "
+              out << "(" << matrix->GRID64(i) << "," << matrix->GCID64(indices[j]) << ") "
                   << values[j] << std::endl;
           }
       }

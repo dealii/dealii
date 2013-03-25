@@ -1470,8 +1470,8 @@ namespace TrilinosWrappers
   VectorBase::size_type
   VectorBase::size () const
   {
-    return (size_type) (vector->Map().MaxAllGID() + 1 -
-                           vector->Map().MinAllGID());
+    return (size_type) (vector->Map().MaxAllGID64() + 1 -
+                           vector->Map().MinAllGID64());
   }
 
 

@@ -515,13 +515,13 @@ namespace TrilinosWrappers
 
       has_ghosts = vector->Map().UniqueGIDs()==false;
 
-      const TrilinosWrappers::types::int_type size = parallel_partitioner.NumMyElements();
+      const int size = parallel_partitioner.NumMyElements();
 
       // Need to copy out values, since the
       // deal.II might not use doubles, so
       // that a direct access is not possible.
-      for (TrilinosWrappers::types::int_type i=0; i<size; ++i)
-        (*vector)[0][i] = v(parallel_partitioner.GID(i));
+      for (int i=0; i<size; ++i)
+        (*vector)[0][i] = v(parallel_partitioner.GID64(i));
     }
 
 
@@ -542,7 +542,7 @@ namespace TrilinosWrappers
       if (size() != v.size())
         {
           vector.reset (new Epetra_FEVector(Epetra_Map
-                                            (static_cast<int>(v.size()), 0,
+                                            (static_cast<TrilinosWrappers::types::int_type>(v.size()), 0,
 #ifdef DEAL_II_WITH_MPI
                                              Epetra_MpiComm(MPI_COMM_SELF)
 #else

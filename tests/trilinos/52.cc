@@ -64,10 +64,10 @@ int main (int argc,char **argv)
   try
     {
       {
-        std::vector<types::global_dof_index> row_lengths (5,
-            static_cast<types::global_dof_index>(3));
+        std::vector<unsigned int> row_lengths (5,3U);
         row_lengths.back() = 2;
-        TrilinosWrappers::SparseMatrix m (5U,5U,row_lengths);
+        TrilinosWrappers::SparseMatrix m (static_cast<types::global_dof_index>(5U),
+            static_cast<types::global_dof_index>(5U),row_lengths);
         test (m);
       }
     }
