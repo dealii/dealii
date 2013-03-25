@@ -145,17 +145,16 @@ namespace TrilinosWrappers
 {
   namespace types
   {
-#define DEAL_II_EPETRA_NO_64BIT_GLOBAL_INDICES
-#ifdef DEAL_II_EPETRA_NO_64BIT_GLOBAL_INDICES
-    /**
-     * Declare type of integer used in the Epetra package of Trilinos.
-     */
-    typedef int int_type;
-#else
+#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
     /**
      * Declare type of integer used in the Epetra package of Trilinos.
      */
     typedef long long int_type;
+#else
+    /**
+     * Declare type of integer used in the Epetra package of Trilinos.
+     */
+    typedef int int_type;
 #endif
   }
 }

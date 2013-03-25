@@ -578,7 +578,7 @@ namespace TrilinosWrappers
      */
     SparseMatrix (const size_type  m,
                   const size_type  n,
-                  const size_type  n_max_entries_per_row);
+                  const unsigned int  n_max_entries_per_row);
 
     /**
      * Generate a matrix that is completely
@@ -590,9 +590,9 @@ namespace TrilinosWrappers
      * specifies the number of entries in
      * each row.
      */
-    SparseMatrix (const size_type               m,
-                  const size_type               n,
-                  const std::vector<size_type> &n_entries_per_row);
+    SparseMatrix (const size_type                  m,
+                  const size_type                  n,
+                  const std::vector<unsigned int> &n_entries_per_row);
 
     /**
      * Generate a matrix from a Trilinos
@@ -761,8 +761,8 @@ namespace TrilinosWrappers
      * SparseMatrix::reinit call
      * considerably faster.
      */
-    SparseMatrix (const Epetra_Map             &parallel_partitioning,
-                  const std::vector<size_type> &n_entries_per_row);
+    SparseMatrix (const Epetra_Map                &parallel_partitioning,
+                  const std::vector<unsigned int> &n_entries_per_row);
 
     /**
      * This constructor is similar to the
@@ -828,7 +828,7 @@ namespace TrilinosWrappers
      */
     SparseMatrix (const Epetra_Map                &row_parallel_partitioning,
                   const Epetra_Map                &col_parallel_partitioning,
-                  const std::vector<size_type> &n_entries_per_row);
+                  const std::vector<unsigned int> &n_entries_per_row);
 
     /**
      * This function is initializes the
@@ -991,9 +991,9 @@ namespace TrilinosWrappers
      * memory prior to use (in the
      * compress() step).
      */
-    SparseMatrix (const IndexSet  &parallel_partitioning,
-                  const MPI_Comm  &communicator = MPI_COMM_WORLD,
-                  const size_type  n_max_entries_per_row = 0);
+    SparseMatrix (const IndexSet    &parallel_partitioning,
+                  const MPI_Comm    &communicator = MPI_COMM_WORLD,
+                  const unsigned int n_max_entries_per_row = 0);
 
     /**
      * Same as before, but now set the
@@ -1009,9 +1009,9 @@ namespace TrilinosWrappers
      * SparseMatrix::reinit call
      * considerably faster.
      */
-    SparseMatrix (const IndexSet               &parallel_partitioning,
-                  const MPI_Comm               &communicator,
-                  const std::vector<size_type> &n_entries_per_row);
+    SparseMatrix (const IndexSet                  &parallel_partitioning,
+                  const MPI_Comm                  &communicator,
+                  const std::vector<unsigned int> &n_entries_per_row);
 
     /**
      * This constructor is similar to the
@@ -1074,10 +1074,10 @@ namespace TrilinosWrappers
      * each row of the newly generated
      * matrix.
      */
-    SparseMatrix (const IndexSet               &row_parallel_partitioning,
-                  const IndexSet               &col_parallel_partitioning,
-                  const MPI_Comm               &communicator,
-                  const std::vector<size_type> &n_entries_per_row);
+    SparseMatrix (const IndexSet                  &row_parallel_partitioning,
+                  const IndexSet                  &col_parallel_partitioning,
+                  const MPI_Comm                  &communicator,
+                  const std::vector<unsigned int> &n_entries_per_row);
 
     /**
      * This function is initializes the
@@ -1249,7 +1249,7 @@ namespace TrilinosWrappers
      * exactly are stored locally,
      * use local_range().
      */
-    size_type local_size () const;
+    unsigned int local_size () const;
 
     /**
      * Return a pair of indices
@@ -3501,7 +3501,7 @@ namespace TrilinosWrappers
           std::cout << col_index_ptr[i] << " ";
         std::cout << std::endl << std::endl;
         std::cout << "Matrix row has the following indices:" << std::endl;
-        TrilinosWrappers::types::int_type n_indices, *indices;
+        int n_indices, *indices;
         trilinos_sparsity_pattern().ExtractMyRowView(row_partitioner().LID(static_cast<TrilinosWrappers::types::int_type>(row)),
                                                      n_indices,
                                                      indices);
@@ -3524,7 +3524,7 @@ namespace TrilinosWrappers
   SparseMatrix::size_type
   SparseMatrix::m () const
   {
-    return matrix -> NumGlobalRows();
+    return matrix -> NumGlobalRows64();
   }
 
 
@@ -3533,13 +3533,13 @@ namespace TrilinosWrappers
   SparseMatrix::size_type
   SparseMatrix::n () const
   {
-    return matrix -> NumGlobalCols();
+    return matrix -> NumGlobalCols64();
   }
 
 
 
   inline
-  SparseMatrix::size_type
+  unsigned int
   SparseMatrix::local_size () const
   {
     return matrix -> NumMyRows();
@@ -3564,7 +3564,7 @@ namespace TrilinosWrappers
   SparseMatrix::size_type
   SparseMatrix::n_nonzero_elements () const
   {
-    return matrix->NumGlobalNonzeros();
+    return matrix->NumGlobalNonzeros64();
   }
 
 

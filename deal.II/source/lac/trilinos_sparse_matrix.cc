@@ -54,7 +54,7 @@ namespace TrilinosWrappers
 
       // get a representation of the present
       // row
-      TrilinosWrappers::types::int_type ncols;
+      int ncols;
       TrilinosWrappers::types::int_type colnums = matrix->n();
       if (value_cache.get() == 0)
         {
@@ -124,12 +124,12 @@ namespace TrilinosWrappers
 
 
   SparseMatrix::SparseMatrix (const Epetra_Map                &input_map,
-                              const std::vector<size_type> &n_entries_per_row)
+                              const std::vector<unsigned int> &n_entries_per_row)
     :
     column_space_map (new Epetra_Map (input_map)),
     matrix (new Epetra_FECrsMatrix
             (Copy, *column_space_map,
-             (TrilinosWrappers::types::int_type *)const_cast<size_type *>(&(n_entries_per_row[0])),
+             (int *)const_cast<unsigned int *>(&(n_entries_per_row[0])),
              false)),
     last_action (Zero),
     compressed (false)
@@ -152,11 +152,11 @@ namespace TrilinosWrappers
 
   SparseMatrix::SparseMatrix (const Epetra_Map                &input_row_map,
                               const Epetra_Map                &input_col_map,
-                              const std::vector<size_type> &n_entries_per_row)
+                              const std::vector<unsigned int> &n_entries_per_row)
     :
     column_space_map (new Epetra_Map (input_col_map)),
     matrix (new Epetra_FECrsMatrix(Copy, input_row_map,
-                                   (TrilinosWrappers::types::int_type *)const_cast<size_type *>(&(n_entries_per_row[0])),
+                                   (int *)const_cast<unsigned int *>(&(n_entries_per_row[0])),
                                    false)),
     last_action (Zero),
     compressed (false)
@@ -166,7 +166,7 @@ namespace TrilinosWrappers
 
   SparseMatrix::SparseMatrix (const size_type m,
                               const size_type n,
-                              const size_type n_max_entries_per_row)
+                              const unsigned int n_max_entries_per_row)
     :
     column_space_map (new Epetra_Map (static_cast<TrilinosWrappers::types::int_type>(n), 0,
                                       Utilities::Trilinos::comm_self())),
@@ -191,9 +191,9 @@ namespace TrilinosWrappers
 
 
 
-  SparseMatrix::SparseMatrix (const size_type               m,
-                              const size_type               n,
-                              const std::vector<size_type> &n_entries_per_row)
+  SparseMatrix::SparseMatrix (const size_type                  m,
+                              const size_type                  n,
+                              const std::vector<unsigned int> &n_entries_per_row)
     :
     column_space_map (new Epetra_Map (static_cast<TrilinosWrappers::types::int_type>(n), 0,
                                       Utilities::Trilinos::comm_self())),
@@ -201,7 +201,7 @@ namespace TrilinosWrappers
                                    Epetra_Map (static_cast<TrilinosWrappers::types::int_type>(m), 0,
                                                Utilities::Trilinos::comm_self()),
                                    *column_space_map,
-                                   (TrilinosWrappers::types::int_type *)const_cast<size_type *>(&(n_entries_per_row[0])),
+                                   (int *)const_cast<unsigned int *>(&(n_entries_per_row[0])),
                                    false)),
     last_action (Zero),
     compressed (false)
@@ -211,7 +211,7 @@ namespace TrilinosWrappers
 
   SparseMatrix::SparseMatrix (const IndexSet     &parallel_partitioning,
                               const MPI_Comm     &communicator,
-                              const size_type     n_max_entries_per_row)
+                              const unsigned int  n_max_entries_per_row)
     :
     column_space_map (new Epetra_Map(parallel_partitioning.
                                      make_trilinos_map(communicator, false))),
@@ -225,15 +225,15 @@ namespace TrilinosWrappers
 
 
 
-  SparseMatrix::SparseMatrix (const IndexSet     &parallel_partitioning,
-                              const MPI_Comm     &communicator,
-                              const std::vector<size_type> &n_entries_per_row)
+  SparseMatrix::SparseMatrix (const IndexSet                  &parallel_partitioning,
+                              const MPI_Comm                  &communicator,
+                              const std::vector<unsigned int> &n_entries_per_row)
     :
     column_space_map (new Epetra_Map(parallel_partitioning.
                                      make_trilinos_map(communicator, false))),
     matrix (new Epetra_FECrsMatrix(Copy,
                                    *column_space_map,
-                                   (TrilinosWrappers::types::int_type *)const_cast<size_type *>(&(n_entries_per_row[0])),
+                                   (int *)const_cast<unsigned int *>(&(n_entries_per_row[0])),
                                    false)),
     last_action (Zero),
     compressed (false)
@@ -259,17 +259,17 @@ namespace TrilinosWrappers
 
 
 
-  SparseMatrix::SparseMatrix (const IndexSet     &row_parallel_partitioning,
-                              const IndexSet     &col_parallel_partitioning,
-                              const MPI_Comm     &communicator,
-                              const std::vector<size_type> &n_entries_per_row)
+  SparseMatrix::SparseMatrix (const IndexSet                  &row_parallel_partitioning,
+                              const IndexSet                  &col_parallel_partitioning,
+                              const MPI_Comm                  &communicator,
+                              const std::vector<unsigned int> &n_entries_per_row)
     :
     column_space_map (new Epetra_Map(col_parallel_partitioning.
                                      make_trilinos_map(communicator, false))),
     matrix (new Epetra_FECrsMatrix(Copy,
                                    row_parallel_partitioning.
                                    make_trilinos_map(communicator, false),
-                                   (TrilinosWrappers::types::int_type *)const_cast<size_type *>(&(n_entries_per_row[0])),
+                                   (int *)const_cast<unsigned int *>(&(n_entries_per_row[0])),
                                    false)),
     last_action (Zero),
     compressed (false)
@@ -428,7 +428,7 @@ namespace TrilinosWrappers
 
     const size_type first_row = input_row_map.MinMyGID(),
                        last_row = input_row_map.MaxMyGID()+1;
-    std::vector<TrilinosWrappers::types::int_type> n_entries_per_row(last_row-first_row);
+    std::vector<int> n_entries_per_row(last_row-first_row);
 
     for (size_type row=first_row; row<last_row; ++row)
       n_entries_per_row[row-first_row] = sparsity_pattern.row_length(row);
@@ -479,8 +479,7 @@ namespace TrilinosWrappers
     graph->OptimizeStorage();
 
     // check whether we got the number of columns right.
-    AssertDimension (sparsity_pattern.n_cols(),
-                     static_cast<size_type>(graph->NumGlobalCols()));
+    AssertDimension (sparsity_pattern.n_cols(),static_cast<size_type>(graph->NumGlobalCols64()));
 
     // And now finally generate the matrix.
     matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
@@ -720,23 +719,21 @@ namespace TrilinosWrappers
 
     // Only do this on the rows owned
     // locally on this processor.
-    TrilinosWrappers::types::int_type local_row =
+    int local_row =
       matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(row));
     if (local_row >= 0)
       {
         TrilinosScalar *values;
-        TrilinosWrappers::types::int_type *col_indices;
-        TrilinosWrappers::types::int_type num_entries;
+        int *col_indices;
+        int num_entries;
         const int ierr = matrix->ExtractMyRowView(local_row, num_entries,
                                                   values, col_indices);
 
         Assert (ierr == 0,
                 ExcTrilinosError(ierr));
 
-        TrilinosWrappers::types::int_type *diag_find = std::find(col_indices,
-            col_indices+num_entries,local_row);
-        TrilinosWrappers::types::int_type diag_index =
-          (TrilinosWrappers::types::int_type)(diag_find - col_indices);
+        int *diag_find = std::find(col_indices,col_indices+num_entries,local_row);
+        int diag_index = (int)(diag_find - col_indices);
 
         for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
           if (diag_index != j || new_diag_value == 0)
@@ -774,8 +771,8 @@ namespace TrilinosWrappers
   {
     // Extract local indices in
     // the matrix.
-    TrilinosWrappers::types::int_type trilinos_i = matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
-                                     trilinos_j = matrix->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
+    int trilinos_i = matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
+      trilinos_j = matrix->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
     TrilinosScalar value = 0.;
 
     // If the data is not on the
@@ -798,14 +795,15 @@ namespace TrilinosWrappers
 
         // Prepare pointers for extraction
         // of a view of the row.
-        TrilinosWrappers::types::int_type nnz_present = matrix->NumMyEntries(trilinos_i);
-        TrilinosWrappers::types::int_type nnz_extracted;
-        TrilinosWrappers::types::int_type *col_indices;
+        int nnz_present = matrix->NumMyEntries(trilinos_i);
+        int nnz_extracted;
+        int *col_indices;
         TrilinosScalar *values;
 
         // Generate the view and make
         // sure that we have not generated
         // an error.
+        // TODO Check that col_indices are int and not long long
         int ierr = matrix->ExtractMyRowView(trilinos_i, nnz_extracted,
                                             values, col_indices);
         Assert (ierr==0, ExcTrilinosError(ierr));
@@ -817,11 +815,9 @@ namespace TrilinosWrappers
         // look for the value, and then
         // finally get it.
 
-        TrilinosWrappers::types::int_type *el_find = std::find(col_indices,
-            col_indices + nnz_present, trilinos_j);
+        int *el_find = std::find(col_indices, col_indices + nnz_present, trilinos_j);
 
-        TrilinosWrappers::types::int_type local_col_index =
-          (TrilinosWrappers::types::int_type)(el_find - col_indices);
+        int local_col_index = (int)(el_find - col_indices);
 
         // This is actually the only
         // difference to the el(i,j)
@@ -850,8 +846,7 @@ namespace TrilinosWrappers
   {
     // Extract local indices in
     // the matrix.
-    TrilinosWrappers::types::int_type trilinos_i =
-      matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
+    int trilinos_i = matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
       trilinos_j = matrix->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
     TrilinosScalar value = 0.;
 
@@ -873,9 +868,9 @@ namespace TrilinosWrappers
 
         // Prepare pointers for extraction
         // of a view of the row.
-        TrilinosWrappers::types::int_type nnz_present = matrix->NumMyEntries(trilinos_i);
-        TrilinosWrappers::types::int_type nnz_extracted;
-        TrilinosWrappers::types::int_type *col_indices;
+        int nnz_present = matrix->NumMyEntries(trilinos_i);
+        int nnz_extracted;
+        int *col_indices;
         TrilinosScalar *values;
 
         // Generate the view and make
@@ -891,11 +886,9 @@ namespace TrilinosWrappers
         // Search the index where we
         // look for the value, and then
         // finally get it.
-        TrilinosWrappers::types::int_type *el_find = std::find(col_indices,
-            col_indices + nnz_present, trilinos_j);
+        int *el_find = std::find(col_indices, col_indices + nnz_present, trilinos_j);
 
-        TrilinosWrappers::types::int_type local_col_index =
-          (TrilinosWrappers::types::int_type)(el_find - col_indices);
+        int local_col_index = (int)(el_find - col_indices);
 
 
         // This is actually the only
@@ -944,9 +937,8 @@ namespace TrilinosWrappers
 
     // get a representation of the
     // present row
-    TrilinosWrappers::types::int_type ncols = -1;
-    TrilinosWrappers::types::int_type local_row =
-      matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(row));
+    int ncols = -1;
+    int local_row = matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(row));
 
     // on the processor who owns this
     // row, we'll have a non-negative
@@ -1014,10 +1006,10 @@ namespace TrilinosWrappers
                   ExcMessage ("Parallel distribution of matrix B and vector V "
                               "does not match."));
 
-          const TrilinosWrappers::types::int_type local_N = inputright.local_size();
-          for (TrilinosWrappers::types::int_type i=0; i<local_N; ++i)
+          const int local_N = inputright.local_size();
+          for (int i=0; i<local_N; ++i)
             {
-              TrilinosWrappers::types::int_type N_entries = -1;
+              int N_entries = -1;
               double *new_data, *B_data;
               mod_B->ExtractMyRowView (i, N_entries, new_data);
               inputright.trilinos_matrix().ExtractMyRowView (i, N_entries, B_data);
@@ -1055,9 +1047,9 @@ namespace TrilinosWrappers
                                                inputleft.range_partitioner());
           Assert (inputleft.domain_partitioner().LinearMap() == true,
                   ExcMessage("Matrix must be partitioned contiguously between procs."));
-          for (size_type i=0; i<inputleft.local_size(); ++i)
+          for (unsigned int i=0; i<inputleft.local_size(); ++i)
             {
-              TrilinosWrappers::types::int_type num_entries, * indices;
+              int num_entries, * indices;
               inputleft.trilinos_sparsity_pattern().ExtractMyRowView(i, num_entries,
                                                                      indices);
               Assert (num_entries >= 0, ExcInternalError());
@@ -1069,9 +1061,9 @@ namespace TrilinosWrappers
 
           sparsity_transposed.compress();
           transposed_mat.reinit (sparsity_transposed);
-          for (size_type i=0; i<inputleft.local_size(); ++i)
+          for (unsigned int i=0; i<inputleft.local_size(); ++i)
             {
-              TrilinosWrappers::types::int_type num_entries, * indices;
+              int num_entries, * indices;
               double *values;
               inputleft.trilinos_matrix().ExtractMyRowView(i, num_entries,
                                                            values, indices);
@@ -1098,7 +1090,7 @@ namespace TrilinosWrappers
       // import data if necessary
       ML_Operator *Btmp, *Ctmp, *Ctmp2, *tptr;
       ML_CommInfoOP *getrow_comm;
-      TrilinosWrappers::types::int_type max_per_proc;
+      int max_per_proc;
       TrilinosWrappers::types::int_type N_input_vector = B_->invec_leng;
       getrow_comm = B_->getrow->pre_comm;
       if ( getrow_comm != NULL)
@@ -1224,7 +1216,7 @@ namespace TrilinosWrappers
 
           const TrilinosWrappers::types::int_type row_local =
             matrix->RowMap().LID(static_cast<TrilinosWrappers::types::int_type>(row));
-          TrilinosWrappers::types::int_type n_entries, rhs_n_entries;
+          int n_entries, rhs_n_entries;
           TrilinosScalar *value_ptr, *rhs_value_ptr;
 
           // In debug mode, we want to check
@@ -1236,7 +1228,7 @@ namespace TrilinosWrappers
           // indices is relatively slow compared to
           // just working with the values.
 #ifdef DEBUG
-          TrilinosWrappers::types::int_type *index_ptr, *rhs_index_ptr;
+          int *index_ptr, *rhs_index_ptr;
           ierr = rhs.matrix->ExtractMyRowView (row_local, rhs_n_entries,
                                                rhs_value_ptr, rhs_index_ptr);
           Assert (ierr == 0, ExcTrilinosError(ierr));
@@ -1270,14 +1262,12 @@ namespace TrilinosWrappers
     // respective add() function.
     else
       {
-        size_type max_row_length = 0;
+        int max_row_length = 0;
         for (size_type row=local_range.first;
              row < local_range.second; ++row)
           max_row_length
-            = std::max (max_row_length,
-                        static_cast<size_type>(rhs.matrix->NumGlobalEntries(row)));
+            = std::max (max_row_length,rhs.matrix->NumGlobalEntries(row));
 
-        std::vector<TrilinosWrappers::types::int_type> column_indices (max_row_length);
         std::vector<TrilinosScalar> values (max_row_length);
 
         if (matrix->Filled() == true && rhs.matrix->Filled() == true &&
@@ -1285,9 +1275,10 @@ namespace TrilinosWrappers
           for (size_type row=local_range.first;
                row < local_range.second; ++row)
             {
-              const TrilinosWrappers::types::int_type row_local =
+              std::vector<int> column_indices (max_row_length);
+              const int row_local =
                 matrix->RowMap().LID(static_cast<TrilinosWrappers::types::int_type>(row));
-              TrilinosWrappers::types::int_type n_entries;
+              int n_entries;
 
               ierr = rhs.matrix->ExtractMyRowCopy (row_local, max_row_length,
                                                    n_entries,
@@ -1306,10 +1297,14 @@ namespace TrilinosWrappers
             }
         else
           {
+            //TODO check that is normal that column_indices in the if is an
+            //int while the column_indices in the else is a
+            //TrilinosWrappers::types::int_type
+            std::vector<TrilinosWrappers::types::int_type> column_indices (max_row_length);
             for (size_type row=local_range.first;
                  row < local_range.second; ++row)
               {
-                TrilinosWrappers::types::int_type n_entries;
+                int n_entries;
                 ierr = rhs.matrix->Epetra_CrsMatrix::ExtractGlobalRowCopy
                        ((TrilinosWrappers::types::int_type)row, max_row_length,
                         n_entries, &values[0], &column_indices[0]);
@@ -1375,10 +1370,10 @@ namespace TrilinosWrappers
     else
       {
         double *values;
-        TrilinosWrappers::types::int_type *indices;
-        TrilinosWrappers::types::int_type num_entries;
+        int *indices;
+        int num_entries;
 
-        for (TrilinosWrappers::types::int_type i=0; i<matrix->NumMyRows(); ++i)
+        for (int i=0; i<matrix->NumMyRows(); ++i)
           {
             matrix->ExtractMyRowView (i, num_entries, values, indices);
             for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)

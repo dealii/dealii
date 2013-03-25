@@ -235,7 +235,7 @@ namespace TrilinosWrappers
       for (size_type block=0; block<v.n_blocks(); ++block)
         {
           TrilinosWrappers::types::int_type *glob_elements = 
-            v.block(block).vector_partitioner().MyGlobalElements();
+            v.block(block).vector_partitioner().MyGlobalElements64();
           for (size_type i=0; i<v.block(block).local_size(); ++i)
             global_ids[added_elements++] = glob_elements[i] + block_offset;
           block_offset += v.block(block).size();
