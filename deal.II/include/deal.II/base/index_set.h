@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -244,6 +244,16 @@ public:
    * index set with the interval, shifted
    * to the range <tt>[0,
    * end-begin)</tt>.
+   *
+   * In other words, the result of this operation is the
+   * intersection of the set represented by the current object
+   * and the interval <tt>[begin, end)</tt>, as seen
+   * <i>within the interval <tt>[begin, end)</tt></i> by
+   * shifting the result of the intersection operation to
+   * the left by <tt>begin</tt>. This corresponds to the notion
+   * of a <i>view</i>: The interval <tt>[begin, end)</tt> is
+   * a <i>window</i> through which we see the set represented
+   * by the current object.
    */
   IndexSet get_view (const types::global_dof_index begin,
                      const types::global_dof_index end) const;
@@ -1047,4 +1057,3 @@ IndexSet::serialize (Archive &ar, const unsigned int)
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-

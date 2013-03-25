@@ -426,7 +426,7 @@ namespace TrilinosWrappers
 
     column_space_map.reset (new Epetra_Map (input_col_map));
 
-    const size_t first_row = input_row_map.MinMyGID(),
+    const size_type first_row = input_row_map.MinMyGID(),
                        last_row = input_row_map.MaxMyGID()+1;
     std::vector<TrilinosWrappers::types::int_type> n_entries_per_row(last_row-first_row);
 

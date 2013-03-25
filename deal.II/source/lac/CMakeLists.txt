@@ -12,6 +12,8 @@
 ##
 #####
 
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+
 SET(src
   block_matrix_array.cc
   block_sparse_matrix.cc

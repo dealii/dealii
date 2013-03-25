@@ -21,7 +21,7 @@ CONFIGURE_FILE(
   )
 
 #
-# Add a rule on how to install the header files:
+# Add a rule for how to install the header files:
 #
 INSTALL(DIRECTORY deal.II
   DESTINATION ${DEAL_II_INCLUDE_RELDIR}

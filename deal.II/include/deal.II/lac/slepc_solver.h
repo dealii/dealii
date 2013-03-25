@@ -191,11 +191,23 @@ namespace SLEPcWrappers
 
     /**
      * Indicate which part of the spectrum is to be computed. By
-     * default largest magnitude eigenvalues are computed.  For other
-     * allowed values see the SLEPc documentation.
+     * default largest magnitude eigenvalues are computed.
+     *
+     * @note For other allowed values see the SLEPc documentation.
      */
     void
     set_which_eigenpairs (EPSWhich set_which);
+
+    /**
+     * Specify the type of the eigenspectrum problem. This can be used
+     * to exploit known symmetries of the matrices that make up the
+     * standard/generalized eigenspectrum problem.  By default a
+     * non-Hermitian problem is assumed.
+     *
+     * @note For other allowed values see the SLEPc documentation.
+     */
+    void
+    set_problem_type (EPSProblemType set_problem);
 
     /**
      * Solve the linear system for n_eigenvectors
@@ -289,6 +301,11 @@ namespace SLEPcWrappers
      * Which portion of the spectrum to solve from.
      */
     EPSWhich set_which;
+
+    /**
+     * Set the eigenspectrum problem type.
+     */
+    EPSProblemType set_problem;
 
     /**
      * The matrix $A$ of the generalized eigenvalue problem
@@ -643,6 +660,9 @@ namespace SLEPcWrappers
                      std::vector<OutputVector>       &vr,
                      const size_type                  n_eigenvectors = 1)
   {
+    // Panic if no eigenpairs are wanted.
+    AssertThrow (n_eigenvectors != 0, ExcSLEPcWrappersUsageError());
+
     size_type n_converged = 0;
 
     // Set the matrices of the problem
@@ -672,6 +692,9 @@ namespace SLEPcWrappers
                      std::vector<OutputVector>       &vr,
                      const size_type                  n_eigenvectors = 1)
   {
+    // Panic if no eigenpairs are wanted.
+    AssertThrow (n_eigenvectors != 0, ExcSLEPcWrappersUsageError());
+
     size_type n_converged = 0;
 
     // Set the matrices of the problem

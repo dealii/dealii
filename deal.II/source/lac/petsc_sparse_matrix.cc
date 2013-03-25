@@ -194,12 +194,9 @@ namespace PETScWrappers
     // signed integers. so we have to
     // convert, unless we want to play dirty
     // tricks with conversions of pointers
-#ifdef PETSC_USE_64BIT_INDICES
     const std::vector<PetscInt>
-#else
-    const std::vector<int>
-#endif
-    int_row_lengths (row_lengths.begin(), row_lengths.end());
+      int_row_lengths (row_lengths.begin(), row_lengths.end());
+
     const int ierr
       = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, 0,
                         &int_row_lengths[0], &matrix);
@@ -250,12 +247,7 @@ namespace PETScWrappers
     // class.
     if (preset_nonzero_locations == true)
       {
-#ifdef PETSC_USE_64BIT_INDICES
-        std::vector<PetscInt>
-#else
-        std::vector<int>
-#endif
-        row_entries;
+        std::vector<PetscInt>    row_entries;
         std::vector<PetscScalar> row_values;
         for (size_type i=0; i<sparsity_pattern.n_rows(); ++i)
           {
@@ -264,12 +256,7 @@ namespace PETScWrappers
             for (size_type j=0; j<row_lengths[i]; ++j)
               row_entries[j] = sparsity_pattern.column_number (i,j);
 
-#ifdef PETSC_USE_64BIT_INDICES
-            const PetscInt
-#else
-            const int
-#endif
-            int_row = i;
+            const PetscInt int_row = i;
             MatSetValues (matrix, 1, &int_row,
                           row_lengths[i], &row_entries[0],
                           &row_values[0], INSERT_VALUES);

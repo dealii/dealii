@@ -1443,12 +1443,19 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
       additional_width  = static_cast<int>(0.5+ height * .175); // additional width for colorbar // TODO [CW]: not enough / automatic adjustment ...
     }
 
-  out << "<!-- deal.ii GridOut " << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year + 1900
-      << ' ' << now->tm_hour << ':';
+
+//TODO: [CW] Only output date and time optionally
+//TODO: [CW] Use std::endl instead of '\n'
   
-  if (now->tm_min < 10) out << '0';
+  out << "<!-- deal.ii GridOut "
+//      << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year + 1900
+//      << ' ' << now->tm_hour << ':'
+    ;
   
-  out << now->tm_min << " -->"
+//  if (now->tm_min < 10) out << '0';
+  
+    out // << now->tm_min
+      << " -->"
       << '\n' << '\n';
   
   // basic svg header and inclusion of the corresponding style sheet
@@ -1484,7 +1491,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   
   for (unsigned int level_index = min_level; level_index <= max_level; level_index++)
     {
-      int font_size = cell_label_font_size * std::pow(.5, 1.*(level_index - min_level));
+      int font_size = static_cast<unsigned int>(0.5 + cell_label_font_size
+						* std::pow(.5, 1.*(level_index - min_level)));
       
       out << " text.l" << level_index << "{font-family:Helvetica; text-anchor:middle;"
           << "fill:rgb(25,25,25); font-size:" << font_size << '}'
@@ -1525,7 +1533,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           unsigned int  g = 0;
           unsigned int  b = 0;
 
-          unsigned int  i = floor(h * 6);
+          unsigned int  i = static_cast<int>(h * 6);
 
           double f = h * 6 - i;
           double q = 1 - f;
@@ -1878,7 +1886,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
       out << "</text>"
           << '\n';
 
-      unsigned int element_height = floor(((height/100.) * (72.5 - 2.*svg_flags.margin_in_percent)) / n);
+      unsigned int element_height = static_cast<unsigned int>(((height/100.) * (72.5 - 2.*svg_flags.margin_in_percent)) / n);
       unsigned int element_width  = static_cast<int>(0.5+ (height/100.) * 2.5);
 
       int labeling_index = 0;

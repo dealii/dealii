@@ -12,6 +12,8 @@
 ##
 #####
 
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+
 SET(src_base
   auto_derivative_function.cc
   conditional_ostream.cc

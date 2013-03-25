@@ -10,6 +10,8 @@ Some last bits and thoughts:
 
 * Provide a configuration template for cross compiling with CMake,
 
+* Support debug;optimized;general for all FEATURES
+
 * document that we no longer need the two-lib installation of p4est
 
 * adjust doc/development/testsuite.html

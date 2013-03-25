@@ -50,6 +50,7 @@ namespace SLEPcWrappers
     solver_control (cn),
     mpi_communicator (mpi_communicator),
     set_which (EPS_LARGEST_MAGNITUDE),
+    set_problem (EPS_NHEP),
     opA (NULL),
     opB (NULL),
     initial_vector (NULL),
@@ -95,7 +96,14 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::solve (const size_type n_eigenvectors, size_type *n_converged)
+  SolverBase::set_problem_type (const EPSProblemType eps_problem)
+  {
+    set_problem = eps_problem;
+  }
+
+  void
+  SolverBase::solve (const unsigned int  n_eigenvectors, 
+		     unsigned int       *n_converged)
   {
     int ierr;
 
