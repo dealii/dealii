@@ -272,11 +272,11 @@ namespace TrilinosWrappers
 
     if (input_row_map.Comm().NumProc() > 1)
       graph.reset(new Epetra_FECrsGraph(Copy, input_row_map,
-                                        n_entries_per_row[input_row_map.MinMyGID()],
+                                        n_entries_per_row[input_row_map.MinMyGID64()],
                                         false));
     else
       graph.reset(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
-                                        n_entries_per_row[input_row_map.MinMyGID()],
+                                        n_entries_per_row[input_row_map.MinMyGID64()],
                                         false));
   }
 
@@ -343,8 +343,8 @@ namespace TrilinosWrappers
     Assert (input_row_map.LinearMap() == true,
             ExcMessage ("This function is not efficient if the map is not contiguous."));
 
-    const size_type first_row = input_row_map.MinMyGID(),
-                       last_row = input_row_map.MaxMyGID()+1;
+    const size_type first_row = input_row_map.MinMyGID64(),
+                       last_row = input_row_map.MaxMyGID64()+1;
     std::vector<int> n_entries_per_row(last_row - first_row);
 
     for (size_type row=first_row; row<last_row; ++row)
@@ -598,8 +598,8 @@ namespace TrilinosWrappers
   SparsityPattern::local_range () const
   {
     size_type begin, end;
-    begin = graph -> RowMap().MinMyGID();
-    end = graph -> RowMap().MaxMyGID()+1;
+    begin = graph -> RowMap().MinMyGID64();
+    end = graph -> RowMap().MaxMyGID64()+1;
 
     return std::make_pair (begin, end);
   }
