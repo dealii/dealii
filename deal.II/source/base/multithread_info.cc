@@ -13,6 +13,7 @@
 
 
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/utilities.h>
 
 #ifdef HAVE_UNISTD_H
 #  include <unistd.h>
@@ -23,9 +24,13 @@
 #  include <sys/sysctl.h>
 #endif
 
+#ifdef DEAL_II_WITH_THREADS
+
+#  include <deal.II/base/thread_management.h>
+#  include <tbb/task_scheduler_init.h>
+#endif
 
 DEAL_II_NAMESPACE_OPEN
-
 
 #ifdef DEAL_II_WITH_THREADS
 
@@ -92,12 +97,46 @@ unsigned int MultithreadInfo::get_n_cpus()
 
 #  endif
 
+void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
+{
+  unsigned int max_threads_env = numbers::invalid_unsigned_int;
+  char* penv;
+  penv = getenv ("DEAL_II_NUM_THREADS");
+
+  if (penv!=NULL)
+    max_threads_env = Utilities::string_to_int(std::string(penv));
+
+  n_max_threads = std::min(max_threads, max_threads_env);
+  if (n_max_threads == numbers::invalid_unsigned_int)
+    n_max_threads = tbb::task_scheduler_init::default_num_threads();
+  else
+  {
+      static tbb::task_scheduler_init dummy (n_max_threads);
+  }
+}
+
+bool MultithreadInfo::is_running_single_threaded()
+{
+  if (n_max_threads == numbers::invalid_unsigned_int)
+    n_max_threads = tbb::task_scheduler_init::default_num_threads();
+  return n_max_threads == 1;
+}
+
 
 #else                            // not in MT mode
 
 unsigned int MultithreadInfo::get_n_cpus()
 {
   return 1;
+}
+
+bool MultithreadInfo::is_running_single_threaded()
+{
+  return true;
+}
+
+void MultithreadInfo::set_thread_limit(const unsigned int)
+{
 }
 
 #endif

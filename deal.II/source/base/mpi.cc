@@ -15,6 +15,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/vector_memory.h>
+#include <deal.II/base/multithread_info.h>
 
 #include <cstddef>
 #include <iostream>
@@ -306,11 +307,31 @@ namespace Utilities
 
 
 
+    MPI_InitFinalize::MPI_InitFinalize (int    &argc,
+                       char ** &argv,
+                       unsigned int max_num_threads)
+    :
+        owns_mpi (true)
+    {
+      do_init(argc, argv, max_num_threads);
+    }
+
+
+
 
     MPI_InitFinalize::MPI_InitFinalize (int    &argc,
                                         char ** &argv)
       :
       owns_mpi (true)
+    {
+      do_init(argc, argv, 1);
+    }
+
+
+    void
+    MPI_InitFinalize::do_init(int    &argc,
+              char ** &argv,
+              unsigned int max_num_threads)
     {
       static bool constructor_has_already_run = false;
       Assert (constructor_has_already_run == false,
@@ -348,6 +369,9 @@ namespace Utilities
 #endif
 
       constructor_has_already_run = true;
+
+      //set maximum number of threads:
+      multithread_info.set_thread_limit(max_num_threads);
     }
 
 

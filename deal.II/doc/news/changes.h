@@ -42,6 +42,13 @@ this function.
 
 
 <ol>
+  <li> New: The number of threads used by deal.II/TBB can now be limited at
+  run time. Using MPI based code using PETSc/Trilinos no longer requires you
+  to compile the library without threads. See MPI_InitFinalize and
+  MultithreadInfo::set_thread_limit for details.
+  </li>
+  (Timo Heister, 2013/03/26)
+
   <li> New: The results section of step-36 now explains how to use ARPACK
   as an alternative to SLEPc as eigenvalue solver.
   <br>
