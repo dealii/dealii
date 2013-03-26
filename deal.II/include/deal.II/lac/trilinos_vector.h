@@ -41,6 +41,28 @@ template <typename> class Vector;
 namespace TrilinosWrappers
 {
   class SparseMatrix;
+
+  namespace
+  {
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    // define a helper function that queries the global ID of local ID of 
+    // an Epetra_BlockMap object  by calling either the 32- or 64-bit 
+    // function necessary.
+    int gid(const Epetra_BlockMap &map, int i)
+    {
+      return map.GID(i);
+    }
+#else
+    // define a helper function that queries the global ID of local ID of 
+    // an Epetra_BlockMap object  by calling either the 32- or 64-bit 
+    // function necessary.
+    long long int gid(const Epetra_BlockMap &map, int i)
+    {
+      return map.GID64(i);
+    }
+#endif
+  }
+
   /**
    * Namespace for Trilinos vector classes that work in parallel over
    * MPI. This namespace is restricted to vectors only, whereas matrices
@@ -521,7 +543,7 @@ namespace TrilinosWrappers
       // deal.II might not use doubles, so
       // that a direct access is not possible.
       for (int i=0; i<size; ++i)
-        (*vector)[0][i] = v(parallel_partitioner.GID64(i));
+        (*vector)[0][i] = v(gid(parallel_partitioner,i));
     }
 
 

@@ -52,7 +52,6 @@ namespace TrilinosWrappers
   // forward declaration
   class VectorBase;
 
-
   /**
    * @cond internal
    */
@@ -1470,8 +1469,11 @@ namespace TrilinosWrappers
   VectorBase::size_type
   VectorBase::size () const
   {
-    return (size_type) (vector->Map().MaxAllGID64() + 1 -
-                           vector->Map().MinAllGID64());
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    return (size_type) (vector->Map().MaxAllGID() + 1 - vector->Map().MinAllGID());
+#else
+    return (size_type) (vector->Map().MaxAllGID64() + 1 - vector->Map().MinAllGID64());
+#endif
   }
 
 
@@ -1490,8 +1492,13 @@ namespace TrilinosWrappers
   VectorBase::local_range () const
   {
     TrilinosWrappers::types::int_type begin, end;
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    begin = vector->Map().MinMyGID();
+    end = vector->Map().MaxMyGID()+1;
+#else
     begin = vector->Map().MinMyGID64();
     end = vector->Map().MaxMyGID64()+1;
+#endif
     return std::make_pair (begin, end);
   }
 

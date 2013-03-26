@@ -32,6 +32,20 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
+  namespace
+  {
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    int global_length (const Epetra_MultiVector &vector)
+    {
+      return vector.GlobalLength();
+    }
+#else
+    long long int global_length (const Epetra_MultiVector &vector)
+    {
+      return vector.GlobalLength64();
+    }
+#endif
+  }
 
   PreconditionBase::PreconditionBase()
 #ifdef DEAL_II_WITH_MPI
@@ -591,9 +605,9 @@ namespace TrilinosWrappers
           Assert (n_relevant_rows == my_size,
                   ExcDimensionMismatch(n_relevant_rows, my_size));
         Assert (n_rows ==
-                static_cast<size_type>(distributed_constant_modes.GlobalLength64()),
+                static_cast<size_type>(global_length(distributed_constant_modes)),
                 ExcDimensionMismatch(n_rows,
-                                     distributed_constant_modes.GlobalLength64()));
+                                     global_length(distributed_constant_modes)));
 
         // Reshape null space as a
         // contiguous vector of

@@ -48,19 +48,24 @@ namespace TrilinosWrappers
       return map.MaxMyGID();
     }
 
-    int n_global_rows(const Epetra_FECrsGraph&graph)
+    int n_global_rows(const Epetra_CrsGraph &graph)
     {
       return graph.NumGlobalRows();
     }
 
-     int n_global_cols(const Epetra_FECrsGraph&graph)
+     int n_global_cols(const Epetra_CrsGraph &graph)
     {
       return graph.NumGlobalCols();
     }
 
-    int n_global_entries(const Epetra_FECrsGraph&graph)
+    int n_global_entries(const Epetra_CrsGraph &graph)
     {
       return graph.NumGlobalEntries();
+    }
+
+    int global_row_index(const Epetra_CrsGraph &graph, int i)
+    {
+      return graph.GRID(i);
     }
  #else
     long long int n_global_elements (const Epetra_BlockMap &map)
@@ -78,19 +83,24 @@ namespace TrilinosWrappers
       return map.MaxMyGID64();
     }
     
-    long long int n_global_rows(const Epetra_FECrsGraph&graph)
+    long long int n_global_rows(const Epetra_CrsGraph &graph)
     {
       return graph.NumGlobalRows64();
     }
 
-    long long int n_global_cols(const Epetra_FECrsGraph&graph)
+    long long int n_global_cols(const Epetra_CrsGraph &graph)
     {
       return graph.NumGlobalCols64();
     }
 
-    long long int n_global_entries(const Epetra_FECrsGraph&graph)
+    long long int n_global_entries(const Epetra_CrsGraph &graph)
     {
-      return graph.NumGlobalEntries();
+      return graph.NumGlobalEntries64();
+    }
+
+    long long int global_row_index(const Epetra_CrsGraph &graph, int i)
+    {
+      return graph.GRID64(i);
     }
 #endif
   }
@@ -315,7 +325,7 @@ namespace TrilinosWrappers
     // release memory before reallocation
     graph.reset ();
     AssertDimension (n_entries_per_row.size(),
-                     static_cast<size_type>(input_row_map.NumGlobalElements64()));
+                     static_cast<size_type>(n_global_elements(input_row_map)));
 
     column_space_map.reset (new Epetra_Map (input_col_map));
     compressed = false;
@@ -383,9 +393,9 @@ namespace TrilinosWrappers
     graph.reset ();
 
     AssertDimension (sp.n_rows(),
-                     static_cast<size_type>(input_row_map.NumGlobalElements64()));
+                     static_cast<size_type>(n_global_elements(input_row_map)));
     AssertDimension (sp.n_cols(),
-                     static_cast<size_type>(input_col_map.NumGlobalElements64()));
+                     static_cast<size_type>(n_global_elements(input_col_map)));
 
     column_space_map.reset (new Epetra_Map (input_col_map));
     compressed = false;
@@ -627,7 +637,7 @@ namespace TrilinosWrappers
     if (graph->Filled() == true)
       n_cols = n_global_cols(*graph);
     else
-      n_cols = column_space_map->NumGlobalElements64();
+      n_cols = n_global_elements(*column_space_map);
 
     return n_cols;
   }
@@ -724,7 +734,7 @@ namespace TrilinosWrappers
           {
             graph->ExtractMyRowView (i, num_entries, indices);
             for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-              out << "(" << i << "," << indices[graph->GRID64(j)] << ") "
+              out << "(" << i << "," << indices[global_row_index(*graph,j)] << ") "
                   << std::endl;
           }
       }
@@ -750,7 +760,7 @@ namespace TrilinosWrappers
           // j horizontal, gnuplot output is
           // x-y, that is we have to exchange
           // the order of output
-          out << indices[graph->GRID64(static_cast<TrilinosWrappers::types::int_type>(j))]
+          out << indices[global_row_index(*graph,static_cast<int>(j))]
             << " " << -static_cast<TrilinosWrappers::types::int_type>(row)
             << std::endl;
       }

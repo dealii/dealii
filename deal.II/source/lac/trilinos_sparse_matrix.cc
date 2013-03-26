@@ -34,11 +34,11 @@ namespace TrilinosWrappers
 {
   namespace
   {
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
     // define a helper function that queries the size of an Epetra_Map object
     // by calling either the 32- or 64-bit function necessary, and returns the
     // result in the correct data type so that we can use it in calling other
     // Epetra member functions that are overloaded by index type
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
     int n_global_elements (const Epetra_BlockMap &map)
     {
       return map.NumGlobalElements();
@@ -53,7 +53,26 @@ namespace TrilinosWrappers
     {
       return map.MaxMyGID();
     }
+
+    int n_global_cols(const Epetra_CrsGraph &graph)
+    {
+      return graph.NumGlobalCols();
+    }
+
+    int global_column_index(const Epetra_CrsMatrix &matrix, int i)
+    {
+      return matrix.GCID(i);
+    }
+
+    int global_row_index(const Epetra_CrsMatrix &matrix, int i)
+    {
+      return matrix.GRID(i);
+    }
 #else
+    // define a helper function that queries the size of an Epetra_Map object
+    // by calling either the 32- or 64-bit function necessary, and returns the
+    // result in the correct data type so that we can use it in calling other
+    // Epetra member functions that are overloaded by index type
     long long int n_global_elements (const Epetra_BlockMap &map)
     {
       return map.NumGlobalElements64();
@@ -67,6 +86,21 @@ namespace TrilinosWrappers
     long long int max_my_gid(const Epetra_BlockMap &map)
     {
       return map.MaxMyGID64();
+    }
+
+    long long int n_global_cols(const Epetra_CrsGraph &graph)
+    {
+      return graph.NumGlobalCols64();
+    }
+
+    long long int global_column_index(const Epetra_CrsMatrix &matrix, int i)
+    {
+      return matrix.GCID64(i);
+    }
+
+    long long int global_row_index(const Epetra_CrsMatrix &matrix, int i)
+    {
+      return matrix.GRID64(i);
     }
 #endif
   }
@@ -519,7 +553,8 @@ namespace TrilinosWrappers
     graph->OptimizeStorage();
 
     // check whether we got the number of columns right.
-    AssertDimension (sparsity_pattern.n_cols(),static_cast<size_type>(graph->NumGlobalCols64()));
+    AssertDimension (sparsity_pattern.n_cols(),static_cast<size_type>(
+          n_global_cols(*graph)));
 
     // And now finally generate the matrix.
     matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
@@ -1420,7 +1455,8 @@ namespace TrilinosWrappers
           {
             matrix->ExtractMyRowView (i, num_entries, values, indices);
             for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-              out << "(" << matrix->GRID64(i) << "," << matrix->GCID64(indices[j]) << ") "
+              out << "(" << global_row_index(*matrix,i) << "," 
+                  << global_column_index(*matrix,indices[j]) << ") "
                   << values[j] << std::endl;
           }
       }
