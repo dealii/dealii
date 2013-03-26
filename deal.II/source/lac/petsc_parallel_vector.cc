@@ -243,7 +243,6 @@ namespace PETScWrappers
       //64bit indices won't work yet:
       Assert (sizeof(unsigned int)==sizeof(PetscInt), ExcInternalError());
 
-
       std::vector<unsigned int> ghostindices;
       ghostnodes.fill_index_vector(ghostindices);
 
