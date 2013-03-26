@@ -426,12 +426,7 @@ int main (int argc, char **argv)
   try
     {
 
-      // Here is another difference from other steps: We initialize the SLEPc
-      // work space which inherently initializes the PETSc work space, then go
-      // ahead run the whole program. After that is done, we finalize the
-      // SLEPc-PETSc work.
-      SlepcInitialize (&argc, &argv, 0, 0);
-
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         using namespace dealii;
         using namespace Step36;
@@ -441,8 +436,6 @@ int main (int argc, char **argv)
         EigenvalueProblem<2> problem ("step-36.prm");
         problem.run ();
       }
-
-      SlepcFinalize ();
     }
 
   // All the while, we are watching out if any exceptions should have been
