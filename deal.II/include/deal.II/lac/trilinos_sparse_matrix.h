@@ -3746,8 +3746,14 @@ namespace TrilinosWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
 
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    const int n_global_elements = matrix->DomainMap().NumGlobalElements();
+#else
+    const long long int n_global_elements = matrix->DomainMap().NumGlobalElements64();
+#endif
+
     AssertDimension (static_cast<size_type>(matrix->DomainMap().NumMyElements()),
-                     static_cast<size_type>(matrix->DomainMap().NumGlobalElements()));
+                     static_cast<size_type>(n_global_elements));
     AssertDimension (dst.size(), static_cast<size_type>(matrix->RangeMap().NumMyElements()));
     AssertDimension (src.size(), static_cast<size_type>(matrix->DomainMap().NumMyElements()));
 
@@ -3813,8 +3819,14 @@ namespace TrilinosWrappers
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
 
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    const int n_global_elements = matrix->DomainMap().NumGlobalElements();
+#else
+    const long long int n_global_elements = matrix->DomainMap().NumGlobalElements64();
+#endif
+
     AssertDimension (static_cast<size_type>(matrix->DomainMap().NumMyElements()),
-                     static_cast<size_type>(matrix->DomainMap().NumGlobalElements()));
+                     static_cast<size_type>(n_global_elements));
     AssertDimension (dst.size(), static_cast<size_type>(matrix->DomainMap().NumMyElements()));
     AssertDimension (src.size(), static_cast<size_type>(matrix->RangeMap().NumMyElements()));
 

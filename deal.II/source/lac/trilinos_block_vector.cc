@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,6 +23,26 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
+  namespace
+  {
+    // define a helper function that queries the size of an Epetra_Map object
+    // by calling either the 32- or 64-bit function necessary, and returns the
+    // result in the correct data type so that we can use it in calling other
+    // Epetra member functions that are overloaded by index type
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    int n_global_elements (const Epetra_BlockMap &map)
+    {
+      return map.NumGlobalElements();
+    }
+#else
+    long long int n_global_elements (const Epetra_BlockMap &map)
+    {
+      return map.NumGlobalElements64();
+    }
+#endif
+  }
+
+
   namespace MPI
   {
     BlockVector &
@@ -33,7 +53,7 @@ namespace TrilinosWrappers
     }
 
 
-                                   
+
     BlockVector &
     BlockVector::operator = (const BlockVector &v)
     {
@@ -78,7 +98,7 @@ namespace TrilinosWrappers
 
       for (size_type i=0; i<no_blocks; ++i)
         {
-          block_sizes[i] = input_maps[i].NumGlobalElements();
+          block_sizes[i] = n_global_elements(input_maps[i]);
         }
 
       this->block_indices.reinit (block_sizes);
@@ -213,7 +233,7 @@ namespace TrilinosWrappers
     std::vector<size_type> block_sizes (no_blocks);
 
     for (size_type i=0; i<no_blocks; ++i)
-      block_sizes[i] = input_maps[i].NumGlobalElements();
+      block_sizes[i] = n_global_elements(input_maps[i]);
 
 
     this->block_indices.reinit (block_sizes);

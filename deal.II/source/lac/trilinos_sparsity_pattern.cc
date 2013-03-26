@@ -26,6 +26,26 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
+  namespace
+  {
+    // define a helper function that queries the size of an Epetra_Map object
+    // by calling either the 32- or 64-bit function necessary, and returns the
+    // result in the correct data type so that we can use it in calling other
+    // Epetra member functions that are overloaded by index type
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    int n_global_elements (const Epetra_BlockMap &map)
+    {
+      return map.NumGlobalElements();
+    }
+#else
+    long long int n_global_elements (const Epetra_BlockMap &map)
+    {
+      return map.NumGlobalElements64();
+    }
+#endif
+  }
+
+
   namespace SparsityPatternIterators
   {
     void
@@ -245,7 +265,7 @@ namespace TrilinosWrappers
     // release memory before reallocation
     graph.reset ();
     AssertDimension (n_entries_per_row.size(),
-                     static_cast<size_type>(input_row_map.NumGlobalElements()));
+                     static_cast<size_type>(n_global_elements(input_row_map)));
 
     column_space_map.reset (new Epetra_Map (input_col_map));
     compressed = false;
@@ -313,9 +333,9 @@ namespace TrilinosWrappers
     graph.reset ();
 
     AssertDimension (sp.n_rows(),
-                     static_cast<size_type>(input_row_map.NumGlobalElements()));
+                     static_cast<size_type>(n_global_elements(input_row_map)));
     AssertDimension (sp.n_cols(),
-                     static_cast<size_type>(input_col_map.NumGlobalElements()));
+                     static_cast<size_type>(n_global_elements(input_col_map)));
 
     column_space_map.reset (new Epetra_Map (input_col_map));
     compressed = false;
@@ -496,7 +516,7 @@ namespace TrilinosWrappers
             // Generate the view and make
             // sure that we have not generated
             // an error.
-            int ierr = graph->ExtractMyRowView(static_cast<int>(trilinos_i), 
+            int ierr = graph->ExtractMyRowView(static_cast<int>(trilinos_i),
                 nnz_extracted, col_indices);
             Assert (ierr==0, ExcTrilinosError(ierr));
 
@@ -504,7 +524,7 @@ namespace TrilinosWrappers
                     ExcDimensionMismatch(nnz_present, nnz_extracted));
 
             // Search the index
-            int *el_find = std::find(col_indices, col_indices + nnz_present, 
+            int *el_find = std::find(col_indices, col_indices + nnz_present,
                 static_cast<int>(trilinos_j));
 
             int local_col_index = (int)(el_find - col_indices);
@@ -557,7 +577,7 @@ namespace TrilinosWrappers
     if (graph->Filled() == true)
       n_cols = graph -> NumGlobalCols();
     else
-      n_cols = column_space_map->NumGlobalElements();
+      n_cols = n_global_elements(*column_space_map);
 
     return n_cols;
   }

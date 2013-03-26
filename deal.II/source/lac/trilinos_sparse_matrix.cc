@@ -32,6 +32,26 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
+  namespace
+  {
+    // define a helper function that queries the size of an Epetra_Map object
+    // by calling either the 32- or 64-bit function necessary, and returns the
+    // result in the correct data type so that we can use it in calling other
+    // Epetra member functions that are overloaded by index type
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    int n_global_elements (const Epetra_BlockMap &map)
+    {
+      return map.NumGlobalElements();
+    }
+#else
+    long long int n_global_elements (const Epetra_BlockMap &map)
+    {
+      return map.NumGlobalElements64();
+    }
+#endif
+  }
+
+
   namespace SparseMatrixIterators
   {
     void
@@ -419,9 +439,9 @@ namespace TrilinosWrappers
     if (input_row_map.Comm().MyPID() == 0)
       {
         AssertDimension (sparsity_pattern.n_rows(),
-                         static_cast<size_type>(input_row_map.NumGlobalElements()));
+                         static_cast<size_type>(n_global_elements(input_row_map)));
         AssertDimension (sparsity_pattern.n_cols(),
-                         static_cast<size_type>(input_col_map.NumGlobalElements()));
+                         static_cast<size_type>(n_global_elements(input_col_map)));
       }
 
     column_space_map.reset (new Epetra_Map (input_col_map));
@@ -580,20 +600,14 @@ namespace TrilinosWrappers
 
     const size_type n_rows = dealii_sparse_matrix.m();
 
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
-    Assert (static_cast<size_type>(input_row_map.NumGlobalElements()) == n_rows,
-            ExcDimensionMismatch (input_row_map.NumGlobalElements(),
+    Assert (static_cast<size_type>(n_global_elements(input_row_map)) == n_rows,
+            ExcDimensionMismatch (n_global_elements(input_row_map),
                                   n_rows));
-#else
-    Assert (static_cast<size_type>(input_row_map.NumGlobalElements64()) == n_rows,
-            ExcDimensionMismatch (input_row_map.NumGlobalElements64(),
+    Assert (n_global_elements(input_row_map) == (TrilinosWrappers::types::int_type)n_rows,
+            ExcDimensionMismatch (n_global_elements(input_row_map),
                                   n_rows));
-#endif
-    Assert (input_row_map.NumGlobalElements() == (TrilinosWrappers::types::int_type)n_rows,
-            ExcDimensionMismatch (input_row_map.NumGlobalElements(),
-                                  n_rows));
-    Assert (input_col_map.NumGlobalElements() == (TrilinosWrappers::types::int_type)dealii_sparse_matrix.n(),
-            ExcDimensionMismatch (input_col_map.NumGlobalElements(),
+    Assert (n_global_elements(input_col_map) == (TrilinosWrappers::types::int_type)dealii_sparse_matrix.n(),
+            ExcDimensionMismatch (n_global_elements(input_col_map),
                                   dealii_sparse_matrix.n()));
 
     const ::dealii::SparsityPattern &sparsity_pattern =

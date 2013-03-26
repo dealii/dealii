@@ -28,6 +28,25 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
+  namespace
+  {
+    // define a helper function that queries the size of an Epetra_Map object
+    // by calling either the 32- or 64-bit function necessary, and returns the
+    // result in the correct data type so that we can use it in calling other
+    // Epetra member functions that are overloaded by index type
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    int n_global_elements (const Epetra_BlockMap &map)
+    {
+      return map.NumGlobalElements();
+    }
+#else
+    long long int n_global_elements (const Epetra_BlockMap &map)
+    {
+      return map.NumGlobalElements64();
+    }
+#endif
+  }
+
   namespace MPI
   {
 
@@ -71,9 +90,9 @@ namespace TrilinosWrappers
       :
       VectorBase()
     {
-      AssertThrow (input_map.NumGlobalElements() == v.vector->Map().NumGlobalElements(),
-                   ExcDimensionMismatch (input_map.NumGlobalElements(),
-                                         v.vector->Map().NumGlobalElements()));
+      AssertThrow (n_global_elements(input_map) == n_global_elements(v.vector->Map()),
+		   ExcDimensionMismatch (n_global_elements(input_map),
+					 n_global_elements(v.vector->Map())));
 
       last_action = Zero;
 
@@ -94,9 +113,9 @@ namespace TrilinosWrappers
       :
       VectorBase()
     {
-      AssertThrow ((int)parallel_partitioner.size() == v.vector->Map().NumGlobalElements(),
+      AssertThrow ((size_type)parallel_partitioner.size() == n_global_elements(v.vector->Map()),
                    ExcDimensionMismatch (parallel_partitioner.size(),
-                                         v.vector->Map().NumGlobalElements()));
+                                         n_global_elements(v.vector->Map())));
 
       last_action = Zero;
 
@@ -386,7 +405,7 @@ namespace TrilinosWrappers
   Vector::Vector (const Epetra_Map &input_map)
   {
     last_action = Zero;
-    Epetra_LocalMap map (input_map.NumGlobalElements(),
+    Epetra_LocalMap map (n_global_elements(input_map),
                          input_map.IndexBase(),
                          input_map.Comm());
     vector.reset (new Epetra_FEVector(map));
@@ -414,7 +433,7 @@ namespace TrilinosWrappers
   Vector::Vector (const VectorBase &v)
   {
     last_action = Zero;
-    Epetra_LocalMap map (v.vector->Map().NumGlobalElements(),
+    Epetra_LocalMap map (n_global_elements(v.vector->Map()),
                          v.vector->Map().IndexBase(),
                          v.vector->Map().Comm());
     vector.reset (new Epetra_FEVector(map));
@@ -460,9 +479,9 @@ namespace TrilinosWrappers
   Vector::reinit (const Epetra_Map &input_map,
                   const bool        fast)
   {
-    if (vector->Map().NumGlobalElements() != input_map.NumGlobalElements())
+    if (n_global_elements(vector->Map()) != n_global_elements(input_map))
       {
-        Epetra_LocalMap map (input_map.NumGlobalElements(),
+        Epetra_LocalMap map (n_global_elements(input_map),
                              input_map.IndexBase(),
                              input_map.Comm());
         vector.reset (new Epetra_FEVector (map));
@@ -487,7 +506,7 @@ namespace TrilinosWrappers
                   const MPI_Comm &communicator,
                   const bool      fast)
   {
-    if (vector->Map().NumGlobalElements() !=
+    if (n_global_elements(vector->Map()) !=
         static_cast<TrilinosWrappers::types::int_type>(partitioning.size()))
       {
         Epetra_LocalMap map (static_cast<TrilinosWrappers::types::int_type>(partitioning.size()),
@@ -586,7 +605,7 @@ namespace TrilinosWrappers
   {
     if (size() != v.size())
       {
-        Epetra_LocalMap map (v.vector->Map().NumGlobalElements(),
+        Epetra_LocalMap map (n_global_elements(v.vector->Map()),
                              v.vector->Map().IndexBase(),
                              v.vector->Comm());
         vector.reset (new Epetra_FEVector(map));
@@ -603,14 +622,7 @@ namespace TrilinosWrappers
   {
     if (size() != v.size())
       {
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
-	const int n_global_elements
-	  = v.vector->Map().NumGlobalElements();
-#else
-	const long long int n_global_elements
-	  = v.vector->Map().NumGlobalElements64();
-#endif
-        Epetra_LocalMap map (n_global_elements,
+        Epetra_LocalMap map (n_global_elements(v.vector->Map()),
                              v.vector->Map().IndexBase(),
                              v.vector->Comm());
         vector.reset (new Epetra_FEVector(map));
