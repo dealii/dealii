@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -234,7 +234,7 @@ namespace TrilinosWrappers
       std::vector<TrilinosWrappers::types::int_type> global_ids (n_elements, -1);
       for (size_type block=0; block<v.n_blocks(); ++block)
         {
-          TrilinosWrappers::types::int_type *glob_elements = 
+          TrilinosWrappers::types::int_type *glob_elements =
             v.block(block).vector_partitioner().MyGlobalElements64();
           for (size_type i=0; i<v.block(block).local_size(); ++i)
             global_ids[added_elements++] = glob_elements[i] + block_offset;
@@ -603,7 +603,14 @@ namespace TrilinosWrappers
   {
     if (size() != v.size())
       {
-        Epetra_LocalMap map (v.vector->Map().NumGlobalElements(),
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+	const int n_global_elements
+	  = v.vector->Map().NumGlobalElements();
+#else
+	const long long int n_global_elements
+	  = v.vector->Map().NumGlobalElements64();
+#endif
+        Epetra_LocalMap map (n_global_elements,
                              v.vector->Map().IndexBase(),
                              v.vector->Comm());
         vector.reset (new Epetra_FEVector(map));
