@@ -28,25 +28,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  namespace
-  {
-    // define a helper function that queries the size of an Epetra_Map object
-    // by calling either the 32- or 64-bit function necessary, and returns the
-    // result in the correct data type so that we can use it in calling other
-    // Epetra member functions that are overloaded by index type
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
-    int n_global_elements (const Epetra_BlockMap &map)
-    {
-      return map.NumGlobalElements();
-    }
-#else
-    long long int n_global_elements (const Epetra_BlockMap &map)
-    {
-      return map.NumGlobalElements64();
-    }
-#endif
-  }
-
   namespace MPI
   {
 
@@ -90,9 +71,9 @@ namespace TrilinosWrappers
       :
       VectorBase()
     {
-      AssertThrow (n_global_elements(input_map) == n_global_elements(v.vector->Map()),
-		   ExcDimensionMismatch (n_global_elements(input_map),
-					 n_global_elements(v.vector->Map())));
+      AssertThrow (input_map.NumGlobalElements64() == v.vector->Map().NumGlobalElements64(),
+		   ExcDimensionMismatch (input_map.NumGlobalElements64(),
+					 v.vector->Map().NumGlobalElements64()));
 
       last_action = Zero;
 
@@ -113,9 +94,10 @@ namespace TrilinosWrappers
       :
       VectorBase()
     {
-      AssertThrow ((size_type)parallel_partitioner.size() == n_global_elements(v.vector->Map()),
+      AssertThrow (parallel_partitioner.size() == 
+                   static_cast<size_type>(v.vector->Map().NumGlobalElements64()),
                    ExcDimensionMismatch (parallel_partitioner.size(),
-                                         n_global_elements(v.vector->Map())));
+                                         v.vector->Map().NumGlobalElements64()));
 
       last_action = Zero;
 
@@ -283,9 +265,9 @@ namespace TrilinosWrappers
 
       if (import_data == true)
         {
-          AssertThrow (static_cast<size_type>(actual_vec->GlobalLength())
+          AssertThrow (static_cast<size_type>(actual_vec->GlobalLength64())
                        == v.size(),
-                       ExcDimensionMismatch (actual_vec->GlobalLength(),
+                       ExcDimensionMismatch (actual_vec->GlobalLength64(),
                                              v.size()));
 
           Epetra_Import data_exchange (vector->Map(), actual_vec->Map());
@@ -405,7 +387,7 @@ namespace TrilinosWrappers
   Vector::Vector (const Epetra_Map &input_map)
   {
     last_action = Zero;
-    Epetra_LocalMap map (n_global_elements(input_map),
+    Epetra_LocalMap map (input_map.NumGlobalElements64(),
                          input_map.IndexBase(),
                          input_map.Comm());
     vector.reset (new Epetra_FEVector(map));
@@ -433,7 +415,7 @@ namespace TrilinosWrappers
   Vector::Vector (const VectorBase &v)
   {
     last_action = Zero;
-    Epetra_LocalMap map (n_global_elements(v.vector->Map()),
+    Epetra_LocalMap map (v.vector->Map().NumGlobalElements64(),
                          v.vector->Map().IndexBase(),
                          v.vector->Map().Comm());
     vector.reset (new Epetra_FEVector(map));
@@ -479,9 +461,9 @@ namespace TrilinosWrappers
   Vector::reinit (const Epetra_Map &input_map,
                   const bool        fast)
   {
-    if (n_global_elements(vector->Map()) != n_global_elements(input_map))
+    if (vector->Map().NumGlobalElements64() != input_map.NumGlobalElements64())
       {
-        Epetra_LocalMap map (n_global_elements(input_map),
+        Epetra_LocalMap map (input_map.NumGlobalElements64(),
                              input_map.IndexBase(),
                              input_map.Comm());
         vector.reset (new Epetra_FEVector (map));
@@ -506,7 +488,7 @@ namespace TrilinosWrappers
                   const MPI_Comm &communicator,
                   const bool      fast)
   {
-    if (n_global_elements(vector->Map()) !=
+    if (vector->Map().NumGlobalElements64() !=
         static_cast<TrilinosWrappers::types::int_type>(partitioning.size()))
       {
         Epetra_LocalMap map (static_cast<TrilinosWrappers::types::int_type>(partitioning.size()),
@@ -550,7 +532,7 @@ namespace TrilinosWrappers
       {
         if (local_range() != v.local_range())
           {
-            Epetra_LocalMap map (v.vector->GlobalLength(),
+            Epetra_LocalMap map (v.vector->GlobalLength64(),
                                  v.vector->Map().IndexBase(),
                                  v.vector->Comm());
             vector.reset (new Epetra_FEVector(map));
@@ -605,7 +587,7 @@ namespace TrilinosWrappers
   {
     if (size() != v.size())
       {
-        Epetra_LocalMap map (n_global_elements(v.vector->Map()),
+        Epetra_LocalMap map (v.vector->Map().NumGlobalElements64(),
                              v.vector->Map().IndexBase(),
                              v.vector->Comm());
         vector.reset (new Epetra_FEVector(map));
@@ -622,7 +604,7 @@ namespace TrilinosWrappers
   {
     if (size() != v.size())
       {
-        Epetra_LocalMap map (n_global_elements(v.vector->Map()),
+        Epetra_LocalMap map (v.vector->Map().NumGlobalElements64(),
                              v.vector->Map().IndexBase(),
                              v.vector->Comm());
         vector.reset (new Epetra_FEVector(map));

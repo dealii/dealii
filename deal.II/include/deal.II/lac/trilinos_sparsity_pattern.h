@@ -1011,7 +1011,7 @@ namespace TrilinosWrappers
      * entries per row on the current
      * processor.
      */
-    size_type max_entries_per_row () const;
+    unsigned int max_entries_per_row () const;
 
     /**
      * Return the number of rows in this
@@ -1594,8 +1594,8 @@ namespace TrilinosWrappers
   SparsityPattern::in_local_range (const size_type index) const
   {
     TrilinosWrappers::types::int_type begin, end;
-    begin = graph->RowMap().MinMyGID();
-    end = graph->RowMap().MaxMyGID()+1;
+    begin = graph->RowMap().MinMyGID64();
+    end = graph->RowMap().MaxMyGID64()+1;
 
     return ((index >= static_cast<size_type>(begin)) &&
             (index < static_cast<size_type>(end)));

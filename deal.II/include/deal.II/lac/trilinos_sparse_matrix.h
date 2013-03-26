@@ -3027,8 +3027,8 @@ namespace TrilinosWrappers
   SparseMatrix::in_local_range (const size_type index) const
   {
     TrilinosWrappers::types::int_type begin, end;
-    begin = matrix->RowMap().MinMyGID();
-    end = matrix->RowMap().MaxMyGID()+1;
+    begin = matrix->RowMap().MinMyGID64();
+    end = matrix->RowMap().MaxMyGID64()+1;
 
     return ((index >= static_cast<size_type>(begin)) &&
             (index < static_cast<size_type>(end)));

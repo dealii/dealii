@@ -1490,8 +1490,8 @@ namespace TrilinosWrappers
   VectorBase::local_range () const
   {
     TrilinosWrappers::types::int_type begin, end;
-    begin = vector->Map().MinMyGID();
-    end = vector->Map().MaxMyGID()+1;
+    begin = vector->Map().MinMyGID64();
+    end = vector->Map().MaxMyGID64()+1;
     return std::make_pair (begin, end);
   }
 

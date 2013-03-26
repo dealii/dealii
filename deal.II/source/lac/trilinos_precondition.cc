@@ -591,9 +591,9 @@ namespace TrilinosWrappers
           Assert (n_relevant_rows == my_size,
                   ExcDimensionMismatch(n_relevant_rows, my_size));
         Assert (n_rows ==
-                static_cast<size_type>(distributed_constant_modes.GlobalLength()),
+                static_cast<size_type>(distributed_constant_modes.GlobalLength64()),
                 ExcDimensionMismatch(n_rows,
-                                     distributed_constant_modes.GlobalLength()));
+                                     distributed_constant_modes.GlobalLength64()));
 
         // Reshape null space as a
         // contiguous vector of

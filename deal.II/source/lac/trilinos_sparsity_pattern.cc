@@ -26,25 +26,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
-  namespace
-  {
-    // define a helper function that queries the size of an Epetra_Map object
-    // by calling either the 32- or 64-bit function necessary, and returns the
-    // result in the correct data type so that we can use it in calling other
-    // Epetra member functions that are overloaded by index type
-#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
-    int n_global_elements (const Epetra_BlockMap &map)
-    {
-      return map.NumGlobalElements();
-    }
-#else
-    long long int n_global_elements (const Epetra_BlockMap &map)
-    {
-      return map.NumGlobalElements64();
-    }
-#endif
-  }
-
 
   namespace SparsityPatternIterators
   {
@@ -69,6 +50,7 @@ namespace TrilinosWrappers
       // get a representation of the present
       // row
       int ncols;
+      // TODO: casting a size_type to an int, could be a problem
       int colnums = sparsity_pattern->n_cols();
 
       int ierr;
@@ -265,7 +247,7 @@ namespace TrilinosWrappers
     // release memory before reallocation
     graph.reset ();
     AssertDimension (n_entries_per_row.size(),
-                     static_cast<size_type>(n_global_elements(input_row_map)));
+                     static_cast<size_type>(input_row_map.NumGlobalElements64()));
 
     column_space_map.reset (new Epetra_Map (input_col_map));
     compressed = false;
@@ -333,9 +315,9 @@ namespace TrilinosWrappers
     graph.reset ();
 
     AssertDimension (sp.n_rows(),
-                     static_cast<size_type>(n_global_elements(input_row_map)));
+                     static_cast<size_type>(input_row_map.NumGlobalElements64()));
     AssertDimension (sp.n_cols(),
-                     static_cast<size_type>(n_global_elements(input_col_map)));
+                     static_cast<size_type>(input_col_map.NumGlobalElements64()));
 
     column_space_map.reset (new Epetra_Map (input_col_map));
     compressed = false;
@@ -575,9 +557,9 @@ namespace TrilinosWrappers
   {
     TrilinosWrappers::types::int_type n_cols;
     if (graph->Filled() == true)
-      n_cols = graph -> NumGlobalCols();
+      n_cols = graph -> NumGlobalCols64();
     else
-      n_cols = n_global_elements(*column_space_map);
+      n_cols = column_space_map->NumGlobalElements64();
 
     return n_cols;
   }
@@ -609,19 +591,19 @@ namespace TrilinosWrappers
   SparsityPattern::size_type
   SparsityPattern::n_nonzero_elements () const
   {
-    TrilinosWrappers::types::int_type nnz = graph->NumGlobalEntries();
+    TrilinosWrappers::types::int_type nnz = graph->NumGlobalEntries64();
 
     return static_cast<size_type>(nnz);
   }
 
 
 
-  SparsityPattern::size_type
+  unsigned int
   SparsityPattern::max_entries_per_row () const
   {
-    TrilinosWrappers::types::int_type nnz = graph->MaxNumIndices();
+    int nnz = graph->MaxNumIndices();
 
-    return static_cast<size_type>(nnz);
+    return static_cast<unsigned int>(nnz);
   }
 
 
