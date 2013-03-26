@@ -43,10 +43,30 @@ namespace TrilinosWrappers
     {
       return map.NumGlobalElements();
     }
+
+    int min_my_gid(const Epetra_BlockMap &map)
+    {
+      return map.MinMyGID();
+    }
+    
+    int max_my_gid(const Epetra_BlockMap &map)
+    {
+      return map.MaxMyGID();
+    }
 #else
     long long int n_global_elements (const Epetra_BlockMap &map)
     {
       return map.NumGlobalElements64();
+    }
+
+    long long int min_my_gid(const Epetra_BlockMap &map)
+    {
+      return map.MinMyGID64();
+    }
+
+    long long int max_my_gid(const Epetra_BlockMap &map)
+    {
+      return map.MaxMyGID64();
     }
 #endif
   }
@@ -446,8 +466,8 @@ namespace TrilinosWrappers
 
     column_space_map.reset (new Epetra_Map (input_col_map));
 
-    const size_type first_row = input_row_map.MinMyGID64(),
-                       last_row = input_row_map.MaxMyGID64()+1;
+    const size_type first_row = min_my_gid(input_row_map),
+      last_row = max_my_gid(input_row_map)+1;
     std::vector<int> n_entries_per_row(last_row-first_row);
 
     for (size_type row=first_row; row<last_row; ++row)

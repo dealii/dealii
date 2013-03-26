@@ -26,6 +26,74 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
+  namespace
+  {
+    // define a helper function that queries the size of an Epetra_Map object
+    // by calling either the 32- or 64-bit function necessary, and returns the
+    // result in the correct data type so that we can use it in calling other
+    // Epetra member functions that are overloaded by index type
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    int n_global_elements (const Epetra_BlockMap &map)
+    {
+      return map.NumGlobalElements();
+    }
+
+    int min_my_gid(const Epetra_BlockMap &map)
+    {
+      return map.MinMyGID();
+    }
+    
+    int max_my_gid(const Epetra_BlockMap &map)
+    {
+      return map.MaxMyGID();
+    }
+
+    int n_global_rows(const Epetra_FECrsGraph&graph)
+    {
+      return graph.NumGlobalRows();
+    }
+
+     int n_global_cols(const Epetra_FECrsGraph&graph)
+    {
+      return graph.NumGlobalCols();
+    }
+
+    int n_global_entries(const Epetra_FECrsGraph&graph)
+    {
+      return graph.NumGlobalEntries();
+    }
+ #else
+    long long int n_global_elements (const Epetra_BlockMap &map)
+    {
+      return map.NumGlobalElements64();
+    }
+    
+    long long int min_my_gid(const Epetra_BlockMap &map)
+    {
+      return map.MinMyGID64();
+    }
+    
+    long long int max_my_gid(const Epetra_BlockMap &map)
+    {
+      return map.MaxMyGID64();
+    }
+    
+    long long int n_global_rows(const Epetra_FECrsGraph&graph)
+    {
+      return graph.NumGlobalRows64();
+    }
+
+    long long int n_global_cols(const Epetra_FECrsGraph&graph)
+    {
+      return graph.NumGlobalCols64();
+    }
+
+    long long int n_global_entries(const Epetra_FECrsGraph&graph)
+    {
+      return graph.NumGlobalEntries();
+    }
+#endif
+  }
 
   namespace SparsityPatternIterators
   {
@@ -254,11 +322,11 @@ namespace TrilinosWrappers
 
     if (input_row_map.Comm().NumProc() > 1)
       graph.reset(new Epetra_FECrsGraph(Copy, input_row_map,
-                                        n_entries_per_row[input_row_map.MinMyGID64()],
+                                        n_entries_per_row[min_my_gid(input_row_map)],
                                         false));
     else
       graph.reset(new Epetra_FECrsGraph(Copy, input_row_map, input_col_map,
-                                        n_entries_per_row[input_row_map.MinMyGID64()],
+                                        n_entries_per_row[max_my_gid(input_row_map)],
                                         false));
   }
 
@@ -325,8 +393,8 @@ namespace TrilinosWrappers
     Assert (input_row_map.LinearMap() == true,
             ExcMessage ("This function is not efficient if the map is not contiguous."));
 
-    const size_type first_row = input_row_map.MinMyGID64(),
-                       last_row = input_row_map.MaxMyGID64()+1;
+    const size_type first_row = min_my_gid(input_row_map),
+      last_row = max_my_gid(input_row_map)+1;
     std::vector<int> n_entries_per_row(last_row - first_row);
 
     for (size_type row=first_row; row<last_row; ++row)
@@ -342,7 +410,7 @@ namespace TrilinosWrappers
                                          false));
 
     AssertDimension (sp.n_rows(),
-                     static_cast<size_type>(graph->NumGlobalRows()));
+                     static_cast<size_type>(n_global_rows(*graph)));
 
     std::vector<TrilinosWrappers::types::int_type> row_indices;
 
@@ -546,7 +614,7 @@ namespace TrilinosWrappers
   SparsityPattern::size_type
   SparsityPattern::n_rows () const
   {
-    const TrilinosWrappers::types::int_type n_rows = graph -> NumGlobalRows();
+    const TrilinosWrappers::types::int_type n_rows = n_global_rows(*graph);
     return n_rows;
   }
 
@@ -557,7 +625,7 @@ namespace TrilinosWrappers
   {
     TrilinosWrappers::types::int_type n_cols;
     if (graph->Filled() == true)
-      n_cols = graph -> NumGlobalCols64();
+      n_cols = n_global_cols(*graph);
     else
       n_cols = column_space_map->NumGlobalElements64();
 
@@ -580,8 +648,8 @@ namespace TrilinosWrappers
   SparsityPattern::local_range () const
   {
     size_type begin, end;
-    begin = graph -> RowMap().MinMyGID64();
-    end = graph -> RowMap().MaxMyGID64()+1;
+    begin =  min_my_gid(graph->RowMap());
+    end = max_my_gid(graph->RowMap())+1;
 
     return std::make_pair (begin, end);
   }
@@ -591,7 +659,7 @@ namespace TrilinosWrappers
   SparsityPattern::size_type
   SparsityPattern::n_nonzero_elements () const
   {
-    TrilinosWrappers::types::int_type nnz = graph->NumGlobalEntries64();
+    TrilinosWrappers::types::int_type nnz = n_global_entries(*graph);
 
     return static_cast<size_type>(nnz);
   }
