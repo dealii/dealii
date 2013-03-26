@@ -733,7 +733,7 @@ namespace TrilinosWrappers
         for (int i=0; i<graph->NumMyRows(); ++i)
           {
             graph->ExtractMyRowView (i, num_entries, indices);
-            for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
+            for (int j=0; j<num_entries; ++j)
               out << "(" << i << "," << indices[global_row_index(*graph,j)] << ") "
                   << std::endl;
           }
@@ -754,15 +754,14 @@ namespace TrilinosWrappers
         int num_entries;
         graph->ExtractMyRowView (row, num_entries, indices);
 
-        for (size_type j=0; j<(size_type)num_entries; ++j)
+        for (unsigned int j=0; j<(unsigned int)num_entries; ++j)
           // while matrix entries are usually
           // written (i,j), with i vertical and
           // j horizontal, gnuplot output is
           // x-y, that is we have to exchange
           // the order of output
           out << indices[global_row_index(*graph,static_cast<int>(j))]
-            << " " << -static_cast<TrilinosWrappers::types::int_type>(row)
-            << std::endl;
+            << " " << -static_cast<unsigned int>(row) << std::endl;
       }
 
     AssertThrow (out, ExcIO());

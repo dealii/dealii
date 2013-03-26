@@ -537,7 +537,7 @@ namespace TrilinosWrappers
 
     for (size_type row=first_row; row<last_row; ++row)
       {
-        const TrilinosWrappers::types::int_type row_length = sparsity_pattern.row_length(row);
+        const int row_length = sparsity_pattern.row_length(row);
         if (row_length == 0)
           continue;
 
@@ -1008,7 +1008,7 @@ namespace TrilinosWrappers
 
 
 
-  SparseMatrix::size_type
+  unsigned int
   SparseMatrix::row_length (const size_type row) const
   {
     Assert (row < m(), ExcInternalError());

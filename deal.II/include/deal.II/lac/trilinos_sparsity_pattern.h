@@ -1649,8 +1649,7 @@ namespace TrilinosWrappers
 
     TrilinosWrappers::types::int_type *col_index_ptr =
       (TrilinosWrappers::types::int_type *)(&*begin);
-    const TrilinosWrappers::types::int_type n_cols =
-      static_cast<TrilinosWrappers::types::int_type>(end - begin);
+    const int n_cols = static_cast<int>(end - begin);
     compressed = false;
 
     const int ierr = graph->InsertGlobalIndices (1,

@@ -1287,7 +1287,7 @@ namespace TrilinosWrappers
      * Number of entries in a
      * specific row.
      */
-    size_type row_length (const size_type row) const;
+    unsigned int row_length (const size_type row) const;
 
     /**
      * Returns the state of the matrix,
@@ -3248,9 +3248,10 @@ namespace TrilinosWrappers
       {
         if (matrix->Filled() == false)
           {
-            ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(row, n_columns,
-                                                                const_cast<double *>(col_value_ptr),
-                                                                col_index_ptr);
+            ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(
+                static_cast<TrilinosWrappers::types::int_type>(row), 
+                static_cast<int>(n_columns),const_cast<double *>(col_value_ptr), 
+                col_index_ptr);
 
             // When inserting elements, we do
             // not want to create exceptions in
