@@ -617,6 +617,7 @@ TimerOutput::reset ()
   Threads::Mutex::ScopedLock lock (mutex);
   sections.clear();
   active_sections.clear();
+  timer_all.restart();
 }
 
 
