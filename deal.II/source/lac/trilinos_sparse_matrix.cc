@@ -580,6 +580,15 @@ namespace TrilinosWrappers
 
     const size_type n_rows = dealii_sparse_matrix.m();
 
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    Assert (static_cast<size_type>(input_row_map.NumGlobalElements()) == n_rows,
+            ExcDimensionMismatch (input_row_map.NumGlobalElements(),
+                                  n_rows));
+#else
+    Assert (static_cast<size_type>(input_row_map.NumGlobalElements64()) == n_rows,
+            ExcDimensionMismatch (input_row_map.NumGlobalElements64(),
+                                  n_rows));
+#endif
     Assert (input_row_map.NumGlobalElements() == (TrilinosWrappers::types::int_type)n_rows,
             ExcDimensionMismatch (input_row_map.NumGlobalElements(),
                                   n_rows));
