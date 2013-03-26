@@ -102,8 +102,8 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::solve (const unsigned int  n_eigenvectors, 
-		     unsigned int       *n_converged)
+  SolverBase::solve (const size_type  n_eigenvectors, 
+		     size_type *n_converged)
   {
     int ierr;
 

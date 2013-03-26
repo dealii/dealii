@@ -3552,8 +3552,8 @@ namespace TrilinosWrappers
   SparseMatrix::local_range () const
   {
     size_type begin, end;
-    begin = matrix -> RowMap().MinMyGID();
-    end = matrix -> RowMap().MaxMyGID()+1;
+    begin = matrix -> RowMap().MinMyGID64();
+    end = matrix -> RowMap().MaxMyGID64()+1;
 
     return std::make_pair (begin, end);
   }

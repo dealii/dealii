@@ -97,6 +97,7 @@ int main (int argc,char **argv)
     {
       {
         TrilinosWrappers::SparseMatrix m (5U,5U,3U);
+
         test (m);
       }
     }
