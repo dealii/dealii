@@ -16,10 +16,28 @@ IF(DEAL_II_COMPONENT_EXAMPLES)
   INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
     DESTINATION ${DEAL_II_EXAMPLES_RELDIR}
     COMPONENT examples
-    PATTERN "${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt" EXCLUDE
-    PATTERN "doc" EXCLUDE
-    PATTERN "doxygen" EXCLUDE
-    PATTERN ".svn" EXCLUDE
-    PATTERN "TODO" EXCLUDE
+    FILES_MATCHING
+    #
+    # Exclude folder structures: doc, doxygen, CMakeFiles,...
+    #
+    PATTERN "CMakeFiles*" EXCLUDE
+    PATTERN "doc*" EXCLUDE
+    PATTERN "doxygen*" EXCLUDE
+    PATTERN ".svn*" EXCLUDE
+    #
+    # Glob Includes:
+    #
+    PATTERN "*.cc"
+    PATTERN "*.prm"
+    PATTERN "*.inp"
+    PATTERN "step*/CMakeLists.txt"
+    #
+    # Special files:
+    #
+    PATTERN "output.reference.dat" # step-39
+    PATTERN "postprocess.pl"       # step-39
+    PATTERN "obstacle_file.pbm"    # step-42
+    PATTERN "untitled.geo"         # step-49
+    PATTERN "untitled.msh"         # step-49
     )
 ENDIF()
