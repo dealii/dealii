@@ -204,9 +204,9 @@ namespace numbers
   invalid_size_type = static_cast<types::global_dof_index> (-1);
 
   /**
-                           * An invalid value for indices of degrees
-                           * of freedom.
-                           */
+   * An invalid value for indices of degrees
+   * of freedom.
+   */
   const types::global_dof_index invalid_dof_index = static_cast<types::global_dof_index>(-1);
 
   /**
