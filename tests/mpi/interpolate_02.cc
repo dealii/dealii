@@ -78,7 +78,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-  PetscInitialize(&argc,&argv,0,0);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
   deallog.push(Utilities::int_to_string(myid));
@@ -103,5 +103,5 @@ int main(int argc, char *argv[])
       test<3>();
     }
 
-  PetscFinalize();
+  
 }
