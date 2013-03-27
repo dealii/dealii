@@ -20,6 +20,7 @@ SET(src_base
   config.cc
   convergence_table.cc
   data_out_base.cc
+  # do NOT include dummy.cc
   event.cc
   exceptions.cc
   flow_function.cc
