@@ -24,6 +24,8 @@
 MACRO(ENABLE_IF_LINKS _variable _flag)
   STRING(STRIP "${_flag}" _flag_stripped)
   STRING(REGEX REPLACE "^-" "" _flag_name "${_flag_stripped}")
+  STRING(REPLACE "," "" _flag_name "${_flag_name}")
+  STRING(REPLACE "-" "_" _flag_name "${_flag_name}")
 
   IF(NOT "${_flag_stripped}" STREQUAL "")
     ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_flag_stripped}")
