@@ -35,6 +35,14 @@ ENDIF()
 ########################
 
 #
+# Set -pedantic if the compiler supports it.
+#
+IF(NOT (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
+        CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.4"))
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-pedantic")
+ENDIF()
+
+#
 # Enable all supported CPU instruction sets:
 #
 IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
@@ -51,14 +59,6 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
 # the deal.II library with it.
 #
 ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
-
-#
-# Set -pedantic if the compiler supports it.
-#
-IF(NOT (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
-        CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.4"))
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-pedantic")
-ENDIF()
 
 
 #
