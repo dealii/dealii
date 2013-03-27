@@ -27,12 +27,14 @@ MACRO(ENABLE_IF_LINKS _variable _flag)
     STRING(REGEX REPLACE "^-" "" _flag_name "${_flag_stripped}")
     STRING(REPLACE "," "" _flag_name "${_flag_name}")
     STRING(REPLACE "--" "__" _flag_name "${_flag_name}")
-    ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${_flag_stripped}")
+    SET(_backup ${CMAKE_REQUIRED_LIBRARIES})
+    SET(CMAKE_REQUIRED_LIBRARIES "${_flag_stripped}")
     CHECK_CXX_COMPILER_FLAG(
       ""
       DEAL_II_HAVE_FLAG_${_flag_name}
       )
-    STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${_flag_stripped}")
+    SET(CMAKE_REQUIRED_LIBRARIES ${_backup})
+
     IF(DEAL_II_HAVE_FLAG_${_flag_name})
       SET(${_variable} "${${_variable}} ${_flag_stripped}")
       STRING(STRIP "${${_variable}}" ${_variable})
