@@ -48,12 +48,7 @@ void test(const char *filename)
 
 int main(int argc, char *argv[])
 {
-#ifdef DEAL_II_WITH_MPI
-  MPI_Init (&argc,&argv);
-#else
-  (void)argc;
-  (void)argv;
-#endif
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   std::ofstream logfile("3d_coarse_grid_02/output");
   deallog.attach(logfile);
@@ -75,7 +70,5 @@ int main(int argc, char *argv[])
 
   deallog.pop();
 
-#ifdef DEAL_II_WITH_MPI
-  MPI_Finalize();
-#endif
+
 }

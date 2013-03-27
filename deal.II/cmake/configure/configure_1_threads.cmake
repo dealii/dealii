@@ -135,6 +135,15 @@ MACRO(FEATURE_THREADS_CONFIGURE_EXTERNAL)
 ENDMACRO()
 
 
+#
+# Resolve a cache invalidation problem by searching for these flags
+# unconditionally. They're used in FEATURE_THREADS_CONFIGURE_BUNDLED
+# depending on cached variables.
+#
+ENABLE_IF_SUPPORTED(_dummy "-Wno-parentheses")
+ENABLE_IF_SUPPORTED(_dummy "-Wno-long-long")
+
+
 MACRO(FEATURE_THREADS_CONFIGURE_BUNDLED)
   #
   # Setup threading (before configuring our build...)

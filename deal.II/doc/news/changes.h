@@ -42,6 +42,18 @@ this function.
 
 
 <ol>
+  <li> New: The number of threads used by deal.II/TBB can now be limited at
+  run time. Using MPI based code using PETSc/Trilinos no longer requires you
+  to compile the library without threads. See MPI_InitFinalize and
+  MultithreadInfo::set_thread_limit for details.
+  </li>
+  (Timo Heister, 2013/03/26)
+
+  <li> New: The results section of step-36 now explains how to use ARPACK
+  as an alternative to SLEPc as eigenvalue solver.
+  <br>
+  (Juan Carlos Araujo Cabarcas, 2013/03/25)
+
   <li> New: deal.II now uses <a href="http://www.cmake.org/">CMake</a>
   as its configuration and build tool. Please read through the
   readme and other installation files for information about how the
@@ -58,7 +70,6 @@ this function.
   </ul>
   <br>
   (Matthias Maier, 2013/03/07)
-
 </ol>
 
 
@@ -69,6 +80,19 @@ this function.
 
 <ol>
 
+<li> Changed: TimerOutput no longer assumes that sections are not nested
+when outputting percentage and total run time.
+<br>
+(Timo Heister, 2013/3/28)
+</li>
+
+<li> New: MPI_InitFinalize can also initialize PETSc/Slepc when
+not compiling with MPI. This is now the preferred way to initialize
+MPI/PETSc/Slepc in all cases.
+<br>
+(Timo Heister, 2013/3/26)
+</li>
+
 <li> Added/fixed: IterativeInverse::vmult() can now handle vectors
 using a different number type than the matrix type. As usual, the
 number types must be compatible. Addtitionally, the initial guess is
@@ -78,10 +102,10 @@ sense.
 (Guido Kanschat, 2013/03/21)
 </li>
 
-<li> Added GridOut::write_svg to allow for the output of two-dimensional 
-triangulations in two space dimensions in the SVG format (Scalable Vector 
-Graphics, an XML-based vector image format recommended by the World 
-Wide Web Consortium W3C). This function also provides cell coloring 
+<li> Added GridOut::write_svg to allow for the output of two-dimensional
+triangulations in two space dimensions in the SVG format (Scalable Vector
+Graphics, an XML-based vector image format recommended by the World
+Wide Web Consortium W3C). This function also provides cell coloring
 and cell labeling for the visualization of basic cell properties.
 <br>
 (Christian Wülker, 2013/03/21)

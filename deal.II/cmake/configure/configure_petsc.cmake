@@ -80,6 +80,13 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
 ENDMACRO()
 
 
+#
+# Resolve a cache invalidation problem by searching for this flag
+# unconditionally. It is used in FEATURE_PETSC_CONFIGURE_EXTERNAL
+# depending on cached variables.
+#
+ENABLE_IF_SUPPORTED(_dummy "-Wno-long-long")
+
 MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL)
   INCLUDE_DIRECTORIES(${PETSC_INCLUDE_DIRS})
 

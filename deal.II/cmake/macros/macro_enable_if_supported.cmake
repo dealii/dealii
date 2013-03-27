@@ -24,6 +24,8 @@ MACRO(ENABLE_IF_SUPPORTED _variable _flag)
   STRING(STRIP "${_flag}" _flag_stripped)
   IF(NOT "${_flag_stripped}" STREQUAL "")
     STRING(REGEX REPLACE "^-" "" _flag_name "${_flag_stripped}")
+    STRING(REPLACE "," "" _flag_name "${_flag_name}")
+    STRING(REPLACE "--" "__" _flag_name "${_flag_name}")
     CHECK_CXX_COMPILER_FLAG(
       "${_flag_stripped}"
       DEAL_II_HAVE_FLAG_${_flag_name}

@@ -2,7 +2,7 @@
 /*         Wolfgang Bangerth, Texas A&M University                */
 /*    $Id$*/
 /*                                                                */
-/*    Copyright (C) 2009, 2011-2012 by the deal.II authors */
+/*    Copyright (C) 2009, 2011-2013 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -298,7 +298,6 @@ namespace Step36
   template <int dim>
   unsigned int EigenvalueProblem<dim>::solve ()
   {
-
     // We start here, as we normally do, by assigning convergence control we
     // want:
     SolverControl solver_control (dof_handler.n_dofs(), 1e-9);
@@ -427,12 +426,7 @@ int main (int argc, char **argv)
   try
     {
 
-      // Here is another difference from other steps: We initialize the SLEPc
-      // work space which inherently initializes the PETSc work space, then go
-      // ahead run the whole program. After that is done, we finalize the
-      // SLEPc-PETSc work.
-      SlepcInitialize (&argc, &argv, 0, 0);
-
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         using namespace dealii;
         using namespace Step36;
@@ -442,8 +436,6 @@ int main (int argc, char **argv)
         EigenvalueProblem<2> problem ("step-36.prm");
         problem.run ();
       }
-
-      SlepcFinalize ();
     }
 
   // All the while, we are watching out if any exceptions should have been

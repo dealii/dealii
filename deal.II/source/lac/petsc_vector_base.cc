@@ -20,6 +20,7 @@
 #  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/petsc_parallel_vector.h>
 #  include <cmath>
+#  include <deal.II/base/multithread_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -149,7 +150,11 @@ namespace PETScWrappers
     ghosted(false),
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(true)
-  {}
+  {
+    Assert( multithread_info.is_running_single_threaded(),
+        ExcMessage("PETSc does not support multi-threaded access, set "
+            "the thread limit to 1 in MPI_InitFinalize()."));
+  }
 
 
 
@@ -161,6 +166,10 @@ namespace PETScWrappers
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(true)
   {
+    Assert( multithread_info.is_running_single_threaded(),
+        ExcMessage("PETSc does not support multi-threaded access, set "
+            "the thread limit to 1 in MPI_InitFinalize()."));
+
     int ierr = VecDuplicate (v.vector, &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -177,7 +186,11 @@ namespace PETScWrappers
     ghosted(false),
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(false)
-  {}
+  {
+    Assert( multithread_info.is_running_single_threaded(),
+        ExcMessage("PETSc does not support multi-threaded access, set "
+            "the thread limit to 1 in MPI_InitFinalize()."));
+  }
 
 
 

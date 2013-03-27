@@ -60,7 +60,7 @@ int main (int argc,char **argv)
 
   try
     {
-      PetscInitialize(&argc,&argv,0,0);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
 	typedef PETScWrappers::SparseMatrix::size_type size_type;
 	
@@ -69,7 +69,7 @@ int main (int argc,char **argv)
         PETScWrappers::SparseMatrix m (5,5,row_lengths);
         test (m);
       }
-      PetscFinalize();
+      
     }
   catch (std::exception &exc)
     {

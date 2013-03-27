@@ -55,6 +55,7 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     deal_ii_objects_${build_lowercase}
     )
   ADD_LIBRARY(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+    base/dummy.cc # Workaround for a bug in the Xcode generator
     ${deal_ii_objects_${build_lowercase}}
     )
 
@@ -70,6 +71,7 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_${build}}"
     COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
     COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${build}}"
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}"
     )
 
   TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}

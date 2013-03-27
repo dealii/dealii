@@ -140,7 +140,7 @@ void test(std::ostream& /*out*/)
 int main(int argc, char *argv[])
 {
 #ifdef DEAL_II_WITH_MPI
-  MPI_Init (&argc,&argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 #else
   (void)argc;
   (void)argv;
@@ -157,8 +157,5 @@ int main(int argc, char *argv[])
   deallog.push("3d");
   test<3>(logfile);
   deallog.pop();
-
-#ifdef DEAL_II_WITH_MPI
-  MPI_Finalize();
-#endif
+  
 }

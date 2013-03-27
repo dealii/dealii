@@ -78,11 +78,9 @@ void test()
   TrilinosWrappers::MPI::Vector x;
   x.reinit(owned_set, MPI_COMM_WORLD);
   x=2.0;
-  x.compress();
 
   TrilinosWrappers::MPI::Vector x_rel;
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
-  x_rel.compress();
 
   ConstraintMatrix cm(relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, cm);
@@ -131,12 +129,7 @@ void test()
 
 int main(int argc, char *argv[])
 {
-#ifdef DEAL_II_WITH_MPI
-  MPI_Init (&argc,&argv);
-#else
-  (void)argc;
-  (void)argv;
-#endif
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -157,7 +150,4 @@ int main(int argc, char *argv[])
   else
     test<2>();
 
-#ifdef DEAL_II_WITH_MPI
-  MPI_Finalize();
-#endif
 }

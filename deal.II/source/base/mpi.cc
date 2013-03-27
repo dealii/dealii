@@ -15,6 +15,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/vector_memory.h>
+#include <deal.II/base/multithread_info.h>
 
 #include <cstddef>
 #include <iostream>
@@ -306,20 +307,37 @@ namespace Utilities
 
 
 
+    MPI_InitFinalize::MPI_InitFinalize (int    &argc,
+                       char ** &argv,
+                       unsigned int max_num_threads)
+    :
+        owns_mpi (true)
+    {
+      do_init(argc, argv, max_num_threads);
+    }
+
+
+
 
     MPI_InitFinalize::MPI_InitFinalize (int    &argc,
                                         char ** &argv)
       :
       owns_mpi (true)
     {
+      do_init(argc, argv, 1);
+    }
+
+
+    void
+    MPI_InitFinalize::do_init(int    &argc,
+              char ** &argv,
+              unsigned int max_num_threads)
+    {
       static bool constructor_has_already_run = false;
       Assert (constructor_has_already_run == false,
               ExcMessage ("You can only create a single object of this class "
                           "in a program since it initializes the MPI system."));
 
-#ifdef DEAL_II_WITH_MPI
-      // if we have PETSc, we will initialize it and let it handle MPI.
-      // Otherwise, we will do it.
 #ifdef DEAL_II_WITH_PETSC
 #  ifdef DEAL_II_WITH_SLEPC
       // Initialise SLEPc (with PETSc):
@@ -329,6 +347,9 @@ namespace Utilities
       PetscInitialize(&argc, &argv, PETSC_NULL, PETSC_NULL);
 #  endif
 #else
+#  ifdef DEAL_II_WITH_MPI
+      // if we have PETSc, we will initialize it and let it handle MPI.
+      // Otherwise, we will do it.
       int MPI_has_been_started = 0;
       MPI_Initialized(&MPI_has_been_started);
       AssertThrow (MPI_has_been_started == 0,
@@ -338,41 +359,44 @@ namespace Utilities
       mpi_err = MPI_Init (&argc, &argv);
       AssertThrow (mpi_err == 0,
                    ExcMessage ("MPI could not be initialized."));
-#endif
-#else
+#  else
       // make sure the compiler doesn't warn
       // about these variables
       (void)argc;
       (void)argv;
       (void)owns_mpi;
+#  endif
 #endif
 
       constructor_has_already_run = true;
+
+      //set maximum number of threads:
+      multithread_info.set_thread_limit(max_num_threads);
     }
 
 
     MPI_InitFinalize::~MPI_InitFinalize()
     {
-#ifdef DEAL_II_WITH_MPI
-
-      // make memory pool release all MPI-based vectors that are no
+      // make memory pool release all PETSc/Trilinos/MPI-based vectors that are no
       // longer used at this point. this is relevant because the
       // static object destructors run for these vectors at the end of
       // the program would run after MPI_Finalize is called, leading
       // to errors
+
+#ifdef DEAL_II_WITH_MPI
+      // Start with Trilinos (need to do this before finalizing PETSc because it finalizes MPI.
+      // Delete vectors from the pools:
 #  if defined(DEAL_II_WITH_TRILINOS)
       GrowingVectorMemory<TrilinosWrappers::MPI::Vector>
       ::release_unused_memory ();
       GrowingVectorMemory<TrilinosWrappers::MPI::BlockVector>
       ::release_unused_memory ();
 #  endif
+#endif
 
-      // Same for PETSc. only do this if PETSc hasn't been
-      // terminated yet since PETSc deletes all vectors that
-      // have been allocated but not freed at the time of
-      // calling PETScFinalize. running the calls below after
-      // PetscFinalize has already been called will therefore
-      // yield errors of double deallocations
+
+      // Now deal with PETSc (with or without MPI). Only delete the vectors if finalize hasn't
+      // been called yet, otherwise this will lead to errors.
 #ifdef DEAL_II_WITH_PETSC
       if ((PetscInitializeCalled == PETSC_TRUE)
           &&
@@ -394,10 +418,14 @@ namespace Utilities
           // or just end PETSc.
           PetscFinalize();
 #  endif
-        }
-#else
+	}
+#endif	  
 
 
+      // only MPI_Finalize if we are running with MPI and we are not using PETSc
+      // (otherwise we called it above already):
+#ifdef DEAL_II_WITH_MPI
+#ifndef DEAL_II_WITH_PETSC
       int mpi_err = 0;
 
       int MPI_has_been_started = 0;

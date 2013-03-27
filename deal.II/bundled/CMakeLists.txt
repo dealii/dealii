@@ -98,6 +98,14 @@ OPTION(DEAL_II_FORCE_BUNDLED_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
   OFF)
 
+#
+# Resolve a cache invalidation problem by searching for these flags
+# unconditionally. They're used for compiling the sources in
+# ${UMFPACK_FOLDER}/UMFPACK/Source depending on cached variables.
+#
+ENABLE_IF_SUPPORTED(_dummy "-Wno-sign-compare")
+ENABLE_IF_SUPPORTED(_dummy "-Wno-write-strings")
+
 IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
   ADD_SUBDIRECTORY(${UMFPACK_FOLDER}/UMFPACK/Source)
   ADD_SUBDIRECTORY(${UMFPACK_FOLDER}/AMD/Source)
