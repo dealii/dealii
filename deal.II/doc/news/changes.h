@@ -80,6 +80,13 @@ this function.
 
 <ol>
 
+<li> New: MPI_InitFinalize can also initialize PETSc/Slepc when
+not compiling with MPI. This is now the preferred way to initialize
+MPI/PETSc/Slepc in all cases.
+<br>
+(Timo Heister, 2013/3/26)
+</li>
+
 <li> Added/fixed: IterativeInverse::vmult() can now handle vectors
 using a different number type than the matrix type. As usual, the
 number types must be compatible. Addtitionally, the initial guess is
