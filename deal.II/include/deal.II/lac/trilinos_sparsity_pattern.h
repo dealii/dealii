@@ -1647,6 +1647,18 @@ namespace TrilinosWrappers
     if (begin == end)
       return;
 
+    // verify that the size of the data type Trilinos expects matches that the
+    // iterator points to. we allow for some slippage between signed and
+    // unsigned and only compare that they are both eiter 32 or 64 bit. to
+    // write this test properly, not that we cannot compare the size of
+    // '*begin' because 'begin' may be an iterator and '*begin' may be an
+    // accessor class. consequently, we need to somehow get an actual value
+    // from it which we can by evaluating an expression such as when
+    // multiplying the value produced by 2
+    Assert (sizeof(TrilinosWrappers::types::int_type) ==
+	    sizeof((*begin)*2),
+	    ExcNotImplemented());
+
     TrilinosWrappers::types::int_type *col_index_ptr =
       (TrilinosWrappers::types::int_type *)(&*begin);
     const int n_cols = static_cast<int>(end - begin);
