@@ -1098,11 +1098,25 @@ public:
    * called on a face, then the
    * boundary indicator of the 4
    * edges that bound the face
-   * remain unchanged. On the other
-   * hand, the boundary indicators
-   * of face and edges are all set
-   * at the same time using the
-   * current function.
+   * remain unchanged. In contrast, if you call the current function,
+   * the boundary indicators
+   * of face and edges are all set to the given value.
+   *
+   * This function is useful if you set boundary indicators of faces
+   * in 3d (in 2d, the function does the same as set_boundary_indicator())
+   * and you do so because you want a curved boundary object to
+   * represent the part of the boundary that corresponds to the
+   * current face. In that case, the Triangulation class needs to figure
+   * out where to put new vertices upon mesh refinement, and higher order
+   * Mapping objects also need to figure out where new interpolation points
+   * for a curved boundary approximation should be. In either case, the
+   * two classes first determine where interpolation points on the edges
+   * of a boundary face should be, asking the boundary object, before
+   * asking the boundary object for the interpolation points corresponding
+   * to the interior of the boundary face. For this to work properly, it is
+   * not sufficient to have set the boundary indicator for the face alone,
+   * but you also need to set the boundary indicators of the edges that
+   * bound the face. This function does all of this at once.
    *
    * @ingroup boundary
    *
