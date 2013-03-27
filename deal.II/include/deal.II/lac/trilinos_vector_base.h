@@ -1513,23 +1513,22 @@ namespace TrilinosWrappers
   std::pair<VectorBase::size_type, VectorBase::size_type>
   VectorBase::local_range () const
   {
-    TrilinosWrappers::types::int_type begin, end;
+     begin, end;
 #ifndef DEAL_II_USE_LARGE_INDEX_TYPE
-    begin = vector->Map().MinMyGID();
-    end = vector->Map().MaxMyGID()+1;
-<<<<<<< .working
+    const TrilinosWrappers::types::int_type begin = vector->Map().MinMyGID();
+    const TrilinosWrappers::types::int_type end = vector->Map().MaxMyGID()+1;
+    const TrilinosWrappers::types::int_type n_elements = vector->Map().NumMyElements();
 #else
-    begin = vector->Map().MinMyGID64();
-    end = vector->Map().MaxMyGID64()+1;
+    const TrilinosWrappers::types::int_type begin = vector->Map().MinMyGID64();
+    const TrilinosWrappers::types::int_type end = vector->Map().MaxMyGID64()+1;
+    const TrilinosWrappers::types::int_type n_elements = vector->Map().NumMyElements64();
 #endif
-=======
 
-    Assert (end-begin == vector->Map().NumMyElements(),
+    Assert (end-begin == n_elements,
             ExcMessage ("This function only makes sense if the elements that this "
                         "vector stores on the current processor form a contiguous range. "
                         "This does not appear to be the case for the current vector."));
 
->>>>>>> .merge-right.r29088
     return std::make_pair (begin, end);
   }
 
