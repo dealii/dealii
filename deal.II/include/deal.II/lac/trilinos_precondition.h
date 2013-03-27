@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1275,6 +1275,12 @@ namespace TrilinosWrappers
   {
   public:
 
+    /**
+     * A data structure that is used to control details of how the algebraic
+     * multigrid is set up. The flags detailed in here are then passed to
+     * the Trilinos ML implementation. A structure of the current type are
+     * passed to the constructor of PreconditionAMG.
+     */
     struct AdditionalData
     {
       /**
