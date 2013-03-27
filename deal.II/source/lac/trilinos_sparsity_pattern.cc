@@ -42,7 +42,7 @@ namespace TrilinosWrappers
     {
       return map.MinMyGID();
     }
-    
+
     int max_my_gid(const Epetra_BlockMap &map)
     {
       return map.MaxMyGID();
@@ -72,17 +72,17 @@ namespace TrilinosWrappers
     {
       return map.NumGlobalElements64();
     }
-    
+
     long long int min_my_gid(const Epetra_BlockMap &map)
     {
       return map.MinMyGID64();
     }
-    
+
     long long int max_my_gid(const Epetra_BlockMap &map)
     {
       return map.MaxMyGID64();
     }
-    
+
     long long int n_global_rows(const Epetra_CrsGraph &graph)
     {
       return graph.NumGlobalRows64();
@@ -166,8 +166,13 @@ namespace TrilinosWrappers
     :
     compressed (true)
   {
-    column_space_map.reset(new Epetra_Map (0, 0, Utilities::Trilinos::comm_self()));
-    graph.reset (new Epetra_FECrsGraph(View, *column_space_map, *column_space_map, 0));
+    column_space_map.reset(new Epetra_Map (TrilinosWrappers::types::int_type(0),
+					   TrilinosWrappers::types::int_type(0),
+					   Utilities::Trilinos::comm_self()));
+    graph.reset (new Epetra_FECrsGraph(View,
+				       *column_space_map,
+				       *column_space_map,
+				       0));
     graph->FillComplete();
   }
 
@@ -228,10 +233,14 @@ namespace TrilinosWrappers
   SparsityPattern::SparsityPattern (const SparsityPattern &input_sparsity)
     :
     Subscriptor(),
-    column_space_map (new Epetra_Map(0, 0, Utilities::Trilinos::comm_self())),
+    column_space_map (new Epetra_Map(TrilinosWrappers::types::int_type(0),
+				     TrilinosWrappers::types::int_type(0),
+				     Utilities::Trilinos::comm_self())),
     compressed (false),
-    graph (new Epetra_FECrsGraph(View, *column_space_map,
-                                 *column_space_map, 0))
+    graph (new Epetra_FECrsGraph(View,
+				 *column_space_map,
+                                 *column_space_map,
+				 0))
   {
     Assert (input_sparsity.n_rows() == 0,
             ExcMessage ("Copy constructor only works for empty sparsity patterns."));
@@ -257,8 +266,10 @@ namespace TrilinosWrappers
                            const size_type  n,
                            const size_type  n_entries_per_row)
   {
-    const Epetra_Map rows (static_cast<TrilinosWrappers::types::int_type>(m), 0, Utilities::Trilinos::comm_self());
-    const Epetra_Map columns (static_cast<TrilinosWrappers::types::int_type>(n), 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map rows (TrilinosWrappers::types::int_type(m), 0,
+			   Utilities::Trilinos::comm_self());
+    const Epetra_Map columns (TrilinosWrappers::types::int_type(n), 0,
+			      Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, n_entries_per_row);
   }
@@ -307,9 +318,9 @@ namespace TrilinosWrappers
                            const size_type  n,
                            const std::vector<size_type> &n_entries_per_row)
   {
-    const Epetra_Map rows (static_cast<TrilinosWrappers::types::int_type>(m), 0,
-        Utilities::Trilinos::comm_self());
-    const Epetra_Map columns (static_cast<TrilinosWrappers::types::int_type>(n), 0,
+    const Epetra_Map rows (TrilinosWrappers::types::int_type(m), 0,
+			   Utilities::Trilinos::comm_self());
+    const Epetra_Map columns (TrilinosWrappers::types::int_type(n), 0,
         Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, n_entries_per_row);
@@ -471,8 +482,10 @@ namespace TrilinosWrappers
   void
   SparsityPattern::copy_from (const SparsityType &sp)
   {
-    const Epetra_Map rows (static_cast<TrilinosWrappers::types::int_type>(sp.n_rows()), 0, Utilities::Trilinos::comm_self());
-    const Epetra_Map columns (static_cast<TrilinosWrappers::types::int_type>(sp.n_cols()), 0, Utilities::Trilinos::comm_self());
+    const Epetra_Map rows (TrilinosWrappers::types::int_type(sp.n_rows()), 0,
+			   Utilities::Trilinos::comm_self());
+    const Epetra_Map columns (TrilinosWrappers::types::int_type(sp.n_cols()), 0,
+			      Utilities::Trilinos::comm_self());
 
     reinit (rows, columns, sp);
   }
@@ -485,7 +498,9 @@ namespace TrilinosWrappers
     // When we clear the matrix, reset
     // the pointer and generate an
     // empty sparsity pattern.
-    column_space_map.reset (new Epetra_Map (0, 0, Utilities::Trilinos::comm_self()));
+    column_space_map.reset (new Epetra_Map (TrilinosWrappers::types::int_type(0),
+					    TrilinosWrappers::types::int_type(0),
+					    Utilities::Trilinos::comm_self()));
     graph.reset (new Epetra_FECrsGraph(View, *column_space_map,
                                        *column_space_map, 0));
     graph->FillComplete();
