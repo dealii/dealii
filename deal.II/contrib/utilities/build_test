@@ -84,12 +84,6 @@ main:
 
 steps:= $(wildcard step-*)
 
-#
-# Run all configuration independent steps:
-#
-runsteps:= step-1 step-2 step-3 step-4 step-5 step-6 step-7 step-8 step-9 step-10 step-11 step-12 step-13 step-14 step-15 step-16 step-19 step-20 step-23 step-24 step-25 step-26 step-27 step-28 step-30 step-38 step-39 step-44 step-45 step-47 step-48 step-49
-
-
 %/%:
 	-cd $(@D) && $(CMAKE) . >/dev/null 2>&1
 	cd $(@D) && if [ -f Makefile ]; then make; fi
@@ -98,18 +92,22 @@ runsteps:= step-1 step-2 step-3 step-4 step-5 step-6 step-7 step-8 step-9 step-1
 build_examples: $(steps:%=%/%)
 
 
-%/OK-Debug:
+# Run a minimalistic set of steps in debug configuration:
+runsteps_debug:= step-1 step-2 step-3 step-4 step-5 step-6 step-47
+
+# Run all configuration independent steps in release configuration:
+runsteps_release= step-1 step-2 step-3 step-4 step-5 step-6 step-7 step-8 step-9 step-10 step-11 step-12 step-13 step-14 step-16 step-19 step-20 step-23 step-25 step-26 step-27 step-28 step-30 step-38 step-39 step-44 step-45 step-47 step-48 step-49
+# step-15 step-21 step-24
+
+
+%/OK_DEBUG:
 	cd $(@D) && $(CMAKE) -DCMAKE_BUILD_TYPE=Debug . >/dev/null 2>&1
-	cd $(@D) && if $(RUN_EXAMPLES); then make run; fi && touch OK-Debug
+	cd $(@D) && if $(RUN_EXAMPLES); then make run; fi && touch OK_DEBUG
 
-%/OK-Release:
+%/OK_RELEASE:
 	cd $(@D) && $(CMAKE) -DCMAKE_BUILD_TYPE=Release . >/dev/null 2>&1
-	cd $(@D) && if $(RUN_EXAMPLES); then make run; fi && touch OK-Release
-
-%/OK: %/OK-Debug %/OK-Release
-	cd $(@D) && touch OK
-
+	cd $(@D) && if $(RUN_EXAMPLES); then make run; fi && touch OK_RELEASE
 
 .PHONY: run_examples
-run_examples: $(runsteps:%=%/OK)
+run_examples: $(runsteps_debug:%=%/OK_DEBUG) $(runsteps_release:%=%/OK_RELEASE)
 
