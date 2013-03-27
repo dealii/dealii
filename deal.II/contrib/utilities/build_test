@@ -29,10 +29,10 @@ SOURCEDIR=$(CURDIR)
 LOGDIR=$(PWD)
 TMPDIR=/tmp
 CMAKE=cmake
-SVN=svn info
+SVN=svn info $(SOURCEDIR)
 
-branch:=$(shell $(SVN) $(SOURCEDIR) | perl -ne 'print "$$1" if m/svn\.dealii\.org\/(.+)\/deal.II/;')
-revision:=$(shell $(SVN) $(SOURCEDIR) | perl -ne 'print "$$_" if s/Last Changed Rev: //;')
+branch:=$(shell $(SVN) | perl -ne 'print "$$1" if m/svn\.dealii\.org.*\/(.+?)\/deal.II/;')
+revision:=$(shell $(SVN) | perl -ne 'print "$$_" if s/Last Changed Rev: //;')
 
 date:= $(shell date +%s)
 random:=$(shell echo "$$RANDOM")
