@@ -58,7 +58,8 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
 # Check whether the -as-needed flag is available. If so set it to link
 # the deal.II library with it.
 #
-ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
+# TODO: Disabled until ENABLE_IF_LINKS is properly implemented
+#ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
 
 
 #
