@@ -12,9 +12,9 @@
 //---------------------------------------------------------------------------
 
 
-// Test VectorTools::trilinos_vector_ghosts_01 for parallel computations. we
-// interpolate a linear function onto the grid with a symmetric mesh. the mean
-// value of the interpolation must be the mean of the linear function
+// During the conversion to 64-bit indices in Trilinos, we started to end up
+// with vectors on the locally_owned subset that returned true on
+// has_ghost_elements(). this shouldn't happen.
 
 #include "../tests.h"
 #include "coarse_grid_common.h"
