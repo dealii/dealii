@@ -400,7 +400,7 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
                          TrilinosWrappers::types::int_type(n_elements()),
                          (n_elements() > 0
                           ?
-                          reinterpret_cast<int *>(&indices[0])
+                          reinterpret_cast<TrilinosWrappers::types::int_type *>(&indices[0])
                           :
                           0),
                          0,
