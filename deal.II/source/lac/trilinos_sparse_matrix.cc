@@ -48,7 +48,7 @@ namespace TrilinosWrappers
     {
       return map.MinMyGID();
     }
-    
+
     int max_my_gid(const Epetra_BlockMap &map)
     {
       return map.MaxMyGID();
@@ -548,7 +548,9 @@ namespace TrilinosWrappers
       }
 
     // Eventually, optimize the graph structure (sort indices, make memory
-    // contiguous, etc).
+    // contiguous, etc). note that the documentation of the function indeed
+    // states that we first need to provide the column (domain) map and then
+    // the row (range) map
     graph->FillComplete(input_col_map, input_row_map);
     graph->OptimizeStorage();
 
@@ -1455,7 +1457,7 @@ namespace TrilinosWrappers
           {
             matrix->ExtractMyRowView (i, num_entries, values, indices);
             for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
-              out << "(" << global_row_index(*matrix,i) << "," 
+              out << "(" << global_row_index(*matrix,i) << ","
                   << global_column_index(*matrix,indices[j]) << ") "
                   << values[j] << std::endl;
           }
