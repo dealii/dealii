@@ -2,7 +2,7 @@
 //      $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -383,8 +383,8 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
   compress ();
 
   if ((is_contiguous() == true) && (!overlapping))
-    return Epetra_Map (static_cast<int>(size()),
-                       static_cast<int>(n_elements()),
+    return Epetra_Map (TrilinosWrappers::types::int_type(size()),
+                       TrilinosWrappers::types::int_type(n_elements()),
                        0,
 #ifdef DEAL_II_WITH_MPI
                        Epetra_MpiComm(communicator));
@@ -396,8 +396,8 @@ IndexSet::make_trilinos_map (const MPI_Comm &communicator,
       std::vector<types::global_dof_index> indices;
       fill_index_vector(indices);
 
-      return Epetra_Map (-1,
-                         static_cast<int>(n_elements()),
+      return Epetra_Map (TrilinosWrappers::types::int_type(-1),
+                         TrilinosWrappers::types::int_type(n_elements()),
                          (n_elements() > 0
                           ?
                           reinterpret_cast<int *>(&indices[0])
