@@ -50,7 +50,7 @@ int main (int argc,char **argv)
 
   try
     {
-      PetscInitialize(&argc,&argv,0,0);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
 	const unsigned int n_dofs=420;
 					 // check
@@ -71,7 +71,7 @@ int main (int argc,char **argv)
 	  v2 (mpi_communicator, n_dofs, n_dofs, n_local_dofs, n_local_dofs, 5);
         test (v2);
       }
-      PetscFinalize();
+      
     }
   catch (std::exception &exc)
     {

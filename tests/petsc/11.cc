@@ -44,12 +44,12 @@ int main (int argc,char **argv)
 
   try
     {
-      PetscInitialize(&argc,&argv,0,0);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         PETScWrappers::Vector v (100);
         test (v);
       }
-      PetscFinalize();
+      
     }
   catch (std::exception &exc)
     {

@@ -50,7 +50,7 @@ int main(int argc, char **argv)
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
   
-  PetscInitialize(&argc,&argv,0,0);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   {
     SolverControl control(100, 1.e-3);
 
@@ -91,6 +91,6 @@ int main(int argc, char **argv)
     preconditioner.vmult(t, u);
     deallog << t.l2_norm() << std::endl;    
   }
-  PetscFinalize ();
+  
 }
 
