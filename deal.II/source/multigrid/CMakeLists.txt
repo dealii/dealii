@@ -14,7 +14,11 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(src
+FILE(GLOB _header
+  ${CMAKE_SOURCE_DIR}/include/deal.II/multigrid/*.h
+  )
+
+SET(_src
   mg_base.cc
   mg_dof_handler.cc
   mg_tools.cc
@@ -24,7 +28,7 @@ SET(src
   multigrid.cc
   )
 
-SET(inst_in_files
+SET(_inst
   mg_base.inst.in
   mg_dof_handler.inst.in
   mg_tools.inst.in
@@ -34,5 +38,5 @@ SET(inst_in_files
   multigrid.inst.in
   )
 
-DEAL_II_ADD_LIBRARY(obj_multigrid OBJECT ${src})
-EXPAND_INSTANTIATIONS(obj_multigrid "${inst_in_files}")
+DEAL_II_ADD_LIBRARY(obj_multigrid OBJECT ${_src} ${_header} ${_inst})
+EXPAND_INSTANTIATIONS(obj_multigrid "${_inst}")

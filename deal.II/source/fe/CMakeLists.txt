@@ -14,7 +14,11 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(src
+FILE(GLOB _header
+  ${CMAKE_SOURCE_DIR}/include/deal.II/fe/*.h
+  )
+
+SET(_src
   block_mask.cc
   component_mask.cc
   fe_abf.cc
@@ -49,7 +53,7 @@ SET(src
   mapping_q_eulerian.cc
   )
 
-SET(inst_in_files
+SET(_inst
   fe_abf.inst.in
   fe_bdm.inst.in
   fe_dgp.inst.in
@@ -84,6 +88,6 @@ SET(inst_in_files
   mapping_q.inst.in
   )
 
-DEAL_II_ADD_LIBRARY(obj_fe OBJECT ${src})
-EXPAND_INSTANTIATIONS(obj_fe "${inst_in_files}")
+DEAL_II_ADD_LIBRARY(obj_fe OBJECT ${_src} ${_header} ${_inst})
+EXPAND_INSTANTIATIONS(obj_fe "${_inst}")
 

@@ -14,7 +14,11 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(src
+FILE(GLOB _header
+  ${CMAKE_SOURCE_DIR}/include/deal.II/lac/*.h
+  )
+
+SET(_src
   block_matrix_array.cc
   block_sparse_matrix.cc
   block_sparse_matrix_ez.cc
@@ -77,7 +81,7 @@ SET(src
   vector_view.cc
 )
 
-SET(inst_in_files
+SET(_inst
   block_sparse_matrix.inst.in
   block_vector.inst.in
   chunk_sparse_matrix.inst.in
@@ -98,6 +102,6 @@ SET(inst_in_files
   vector_view.inst.in
 )
 
-DEAL_II_ADD_LIBRARY(obj_lac OBJECT ${src})
-EXPAND_INSTANTIATIONS(obj_lac "${inst_in_files}")
+DEAL_II_ADD_LIBRARY(obj_lac OBJECT ${_src} ${_header} ${_inst})
+EXPAND_INSTANTIATIONS(obj_lac "${_inst}")
 
