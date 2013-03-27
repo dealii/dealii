@@ -13,7 +13,9 @@
 
 // extracted from deal_solver_02. at the time of writing this test, we ran
 // into weird crashes with Trilinos when in 64 bit mode
-
+//
+// this has been fixed in Trilinos versions after 11.0.3. see
+//   https://software.sandia.gov/bugzilla/show_bug.cgi?id=5884
 
 
 #include "../tests.h"
