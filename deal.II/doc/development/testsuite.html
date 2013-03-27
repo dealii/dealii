@@ -162,12 +162,15 @@
     </p>
 
     <p>
-    Not all tests will succeed on your machine, because you might not have
-    configured with all the required packages (for example PETSc or Trilinos)
-    or, because your machine has slightly different floating point outputs.
-    To improve the number of tests that work correctly, install the tool
-    numdiff and export the environment variable
-    <code>export DEALII_DIFF="numdiff -a 1e-6 -q"</code> 
+    Not all tests succeed on every machine even if all computations are
+    correct, because you might not have configured with all the required
+    packages (for example PETSc or Trilinos), or because your machine
+    generates slightly different floating point outputs.  To increase the
+    number of tests that work correctly, install the
+    <a href="http://www.nongnu.org/numdiff/">numdiff</a> toold that compares
+    stored and newly created output files based on floating point
+    tolerances. To use it, simply export the environment variable
+    <code>export DEAL_II_DIFF="numdiff -a 1e-6 -q"</code>
     before running the testsuite.
     </p>
 
@@ -193,13 +196,13 @@
       =====linking======= quadrature_test.exe
       ...
     </pre>
-    You should be aware that because of the number of tests we have,
-    running the entire testsuite can easily take an hour, even on a
-    fast system. (On the other hand, only a large testsuite can offer
-    comprehensive coverage of a software as big as deal.II.) This time
-    can be reduced, however, on multicore machines if you use the command
+    Be aware that because of the number of tests we have, running the entire
+    testsuite takes approximately 10 hours (as of early 2013), even on a fast
+    system. (On the other hand, of couse only a large testsuite can offer
+    comprehensive coverage of a software as big as deal.II.) This time can be
+    reduced, however, on multicore machines if you use the command
     <code>make -jN</code> where <code>N</code> is an integer equal to or
-    slight larger than the number of processor cores you have, as this
+    slightly larger than the number of processor cores you have, as this
     instructs <code>make</code> to run several tests at the same time.
     </p>
 

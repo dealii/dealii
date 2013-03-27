@@ -12,6 +12,8 @@
 ##
 #####
 
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+
 SET(src
   dof_faces.cc
   dof_handler.cc

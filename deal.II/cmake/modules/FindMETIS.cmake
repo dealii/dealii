@@ -73,7 +73,7 @@ IF(METIS_FOUND)
     METIS_DIR
   )
 ELSE()
-  SET(METIS_DIR "" CACHE STRING
+  SET(METIS_DIR "" CACHE PATH
     "An optional hint to a metis directory"
     )
 ENDIF()

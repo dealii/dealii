@@ -328,7 +328,8 @@ TimerOutput::~TimerOutput()
   while (active_sections.size() > 0)
     leave_subsection();
 
-  if (output_frequency != every_call && output_is_enabled == true)
+  if ( (output_frequency == summary || output_frequency == every_call_and_summary)
+      && output_is_enabled == true)
     print_summary();
 }
 
@@ -405,7 +406,8 @@ TimerOutput::leave_subsection (const std::string &section_name)
 
   // in case we have to print out
   // something, do that here...
-  if (output_frequency != summary && output_is_enabled == true)
+  if ((output_frequency == every_call || output_frequency == every_call_and_summary)
+      && output_is_enabled == true)
     {
       std::string output_time;
       std::ostringstream cpu;
@@ -522,19 +524,6 @@ TimerOutput::print_summary () const
     {
       double total_wall_time = timer_all.wall_time();
 
-      // check that the sum of all times is
-      // less or equal than the total
-      // time. otherwise, we might have
-      // generated a lot of overhead in this
-      // function.
-      double check_time = 0.;
-      for (std::map<std::string, Section>::const_iterator
-           i = sections.begin(); i!=sections.end(); ++i)
-        check_time += i->second.total_wall_time;
-
-      if (check_time > total_wall_time)
-        total_wall_time = check_time;
-
       // now generate a nice table
       out_stream << "\n\n"
                  << "+---------------------------------------------+------------"
@@ -579,12 +568,6 @@ TimerOutput::print_summary () const
                  << "+---------------------------------+-----------+"
                  << "------------+------------+\n"
                  << std::endl;
-
-      if (check_time > total_wall_time)
-        out_stream << std::endl
-                   << "Note: The sum of counted times is larger than the total time.\n"
-                   << "(Timer function may have introduced too much overhead, or different\n"
-                   << "section timers may have run at the same time.)" << std::endl;
     }
 
   // restore previous precision and width
@@ -607,6 +590,15 @@ void
 TimerOutput::enable_output ()
 {
   output_is_enabled = true;
+}
+
+void
+TimerOutput::reset ()
+{
+  Threads::Mutex::ScopedLock lock (mutex);
+  sections.clear();
+  active_sections.clear();
+  timer_all.restart();
 }
 
 

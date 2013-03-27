@@ -20,6 +20,7 @@
 #  include <deal.II/lac/petsc_vector.h>
 #  include <deal.II/lac/petsc_parallel_vector.h>
 #  include <cmath>
+#  include <deal.II/base/multithread_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -68,11 +69,7 @@ namespace PETScWrappers
           // an index set
           if (vector.ghosted)
             {
-#ifdef PETSC_USE_64BIT_INDICES
               PetscInt begin, end;
-#else
-              int begin, end;
-#endif
               ierr = VecGetOwnershipRange (vector.vector, &begin, &end);
               AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -119,12 +116,7 @@ namespace PETScWrappers
           // first verify that the requested
           // element is actually locally
           // available
-
-#ifdef PETSC_USE_64BIT_INDICES
           PetscInt begin, end;
-#else
-          int begin, end;
-#endif
 
           ierr = VecGetOwnershipRange (vector.vector, &begin, &end);
           AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -158,7 +150,11 @@ namespace PETScWrappers
     ghosted(false),
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(true)
-  {}
+  {
+    Assert( multithread_info.is_running_single_threaded(),
+        ExcMessage("PETSc does not support multi-threaded access, set "
+            "the thread limit to 1 in MPI_InitFinalize()."));
+  }
 
 
 
@@ -170,6 +166,10 @@ namespace PETScWrappers
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(true)
   {
+    Assert( multithread_info.is_running_single_threaded(),
+        ExcMessage("PETSc does not support multi-threaded access, set "
+            "the thread limit to 1 in MPI_InitFinalize()."));
+
     int ierr = VecDuplicate (v.vector, &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -186,7 +186,11 @@ namespace PETScWrappers
     ghosted(false),
     last_action (::dealii::VectorOperation::unknown),
     attained_ownership(false)
-  {}
+  {
+    Assert( multithread_info.is_running_single_threaded(),
+        ExcMessage("PETSc does not support multi-threaded access, set "
+            "the thread limit to 1 in MPI_InitFinalize()."));
+  }
 
 
 
@@ -266,12 +270,7 @@ namespace PETScWrappers
   unsigned int
   VectorBase::size () const
   {
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscInt
-#else
-    int
-#endif
-    sz;
+    PetscInt sz;
     const int ierr = VecGetSize (vector, &sz);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -283,12 +282,7 @@ namespace PETScWrappers
   unsigned int
   VectorBase::local_size () const
   {
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscInt
-#else
-    int
-#endif
-    sz;
+    PetscInt sz;
     const int ierr = VecGetLocalSize (vector, &sz);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -300,12 +294,7 @@ namespace PETScWrappers
   std::pair<unsigned int, unsigned int>
   VectorBase::local_range () const
   {
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscInt
-#else
-    int
-#endif
-    begin, end;
+    PetscInt begin, end;
     const int ierr = VecGetOwnershipRange (static_cast<const Vec &>(vector),
                                            &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));

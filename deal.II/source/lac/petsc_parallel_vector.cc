@@ -243,7 +243,6 @@ namespace PETScWrappers
       //64bit indices won't work yet:
       Assert (sizeof(unsigned int)==sizeof(PetscInt), ExcInternalError());
 
-
       std::vector<unsigned int> ghostindices;
       ghostnodes.fill_index_vector(ghostindices);
 
@@ -269,13 +268,7 @@ namespace PETScWrappers
 
 #if DEBUG
       // test ghost allocation in debug mode
-
-#ifdef PETSC_USE_64BIT_INDICES
-      PetscInt
-#else
-      int
-#endif
-      begin, end;
+      PetscInt begin, end;
 
       ierr = VecGetOwnershipRange (vector, &begin, &end);
 

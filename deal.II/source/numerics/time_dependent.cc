@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2006, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -16,6 +16,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/thread_management.h>
 #include <deal.II/base/utilities.h>
+#include <deal.II/base/parallel.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -203,30 +204,19 @@ void TimeDependent::start_sweep (const unsigned int s)
 
 
 
-void TimeDependent::end_sweep (const unsigned int n_threads)
+void TimeDependent::end_sweep (const unsigned int)
 {
-#ifdef DEAL_II_WITH_THREADS
-  if (n_threads > 1)
-    {
-      const unsigned int stride = timesteps.size() / n_threads;
-      Threads::ThreadGroup<> threads;
-      void (TimeDependent::*p) (const unsigned int, const unsigned int)
-        = &TimeDependent::end_sweep;
-      for (unsigned int i=0; i<n_threads; ++i)
-        threads += Threads::new_thread (p, *this, i*stride,
-                                        (i == n_threads-1 ?
-                                         timesteps.size() :
-                                         (i+1)*stride));
-      threads.join_all();
-    }
-  else
-    {
-      // now do the work
-      end_sweep (0, timesteps.size());
-    }
-#else
-  end_sweep (0, timesteps.size());
-#endif
+  end_sweep ();
+}
+
+
+void TimeDependent::end_sweep ()
+{
+  void (TimeDependent::*p) (const unsigned int, const unsigned int)
+    = &TimeDependent::end_sweep;
+  parallel::apply_to_subranges (0U, timesteps.size(),
+				std_cxx1x::bind (p, this, std_cxx1x::_1, std_cxx1x::_2),
+				1);
 }
 
 

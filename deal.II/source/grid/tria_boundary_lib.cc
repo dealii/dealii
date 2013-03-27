@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -36,9 +36,9 @@ CylinderBoundary<dim,spacedim>::CylinderBoundary (const double radius,
 
 
 template <int dim, int spacedim>
-CylinderBoundary<dim,spacedim>::CylinderBoundary (const double     radius,
-                                                  const Point<spacedim> direction,
-                                                  const Point<spacedim> point_on_axis)
+CylinderBoundary<dim,spacedim>::CylinderBoundary (const double           radius,
+                                                  const Point<spacedim> &direction,
+                                                  const Point<spacedim> &point_on_axis)
   :
   radius(radius),
   direction (direction / direction.norm()),
@@ -1553,4 +1553,3 @@ get_normals_at_vertices (const Triangulation<2,3 >::face_iterator &face,
 #include "tria_boundary_lib.inst"
 
 DEAL_II_NAMESPACE_CLOSE
-

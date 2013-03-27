@@ -69,7 +69,7 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
       UNSET(PETSC_INCLUDE_DIR_ARCH CACHE)
       UNSET(PETSC_INCLUDE_DIR_COMMON CACHE)
       UNSET(PETSC_LIBRARY CACHE)
-      SET(PETSC_DIR "" CACHE STRING
+      SET(PETSC_DIR "" CACHE PATH
         "An optional hint to a PETSc directory"
         )
       SET(PETSC_ARCH "" CACHE STRING
@@ -79,6 +79,13 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
   ENDIF()
 ENDMACRO()
 
+
+#
+# Resolve a cache invalidation problem by searching for this flag
+# unconditionally. It is used in FEATURE_PETSC_CONFIGURE_EXTERNAL
+# depending on cached variables.
+#
+ENABLE_IF_SUPPORTED(_dummy "-Wno-long-long")
 
 MACRO(FEATURE_PETSC_CONFIGURE_EXTERNAL)
   INCLUDE_DIRECTORIES(${PETSC_INCLUDE_DIRS})

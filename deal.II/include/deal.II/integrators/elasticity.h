@@ -75,10 +75,10 @@ namespace LocalIntegrators
      * - \int_Z \varepsilon(u): \varepsilon(v) \,dx
      * \f]
      */
-    template <int dim>
+    template <int dim, typename number>
     inline void
     cell_residual  (
-      Vector<double> &result,
+      Vector<number> &result,
       const FEValuesBase<dim> &fe,
       const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &input,
       double factor = 1.)
@@ -167,9 +167,9 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2013
      */
-    template <int dim>
+    template <int dim, typename number>
     void nitsche_residual (
-      Vector<double> &result,
+      Vector<number> &result,
       const FEValuesBase<dim> &fe,
       const VectorSlice<const std::vector<std::vector<double> > > &input,
       const VectorSlice<const std::vector<std::vector<Tensor<1,dim> > > > &Dinput,
@@ -292,11 +292,11 @@ namespace LocalIntegrators
      * @author Guido Kanschat
      * @date 2013
      */
-    template<int dim>
+    template<int dim, typename number>
     void
     ip_residual(
-      Vector<double> &result1,
-      Vector<double> &result2,
+      Vector<number> &result1,
+      Vector<number> &result2,
       const FEValuesBase<dim> &fe1,
       const FEValuesBase<dim> &fe2,
       const VectorSlice<const std::vector<std::vector<double> > > &input1,

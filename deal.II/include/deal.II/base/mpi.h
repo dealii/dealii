@@ -272,7 +272,9 @@ namespace Utilities
      * A class that is used to initialize the
      * MPI system at the beginning of a
      * program and to shut it down again at
-     * the end.
+     * the end. It also allows you to control
+     * the number threads used in each MPI
+     * task.
      *
      * If deal.II is configured with PETSc,
      * the library will also be initialized
@@ -307,10 +309,23 @@ namespace Utilities
        * constructor can only be called once
        * in a program, since MPI cannot be
        * initialized twice.
+       *
+       * This constructor sets max_num_threads
+       * to 1 (see other constructor).
        */
       MPI_InitFinalize (int    &argc,
-                        char ** &argv);
+                        char ** &argv) /*DEAL_II_DEPRECATED*/;
 
+      /**
+       * Initialize MPI (and optionally PETSc)
+       * and set the number of threads used by deal.II (and TBB) to the given
+       * parameter. If set to numbers::invalid_unsigned_int, the number
+       * of threads is determined by TBB. When in doubt, set this value
+       * to 1.
+       */
+      MPI_InitFinalize (int    &argc,
+                        char ** &argv,
+                        unsigned int max_num_threads);
       /**
        * Destructor. Calls
        * <tt>MPI_Finalize()</tt> in
@@ -332,6 +347,14 @@ namespace Utilities
        * be called at destruction.
        */
       const bool owns_mpi;
+
+
+      /**
+       * Called by the constructors.
+       */
+      void do_init(int    &argc,
+          char ** &argv,
+          unsigned int max_num_threads);
     };
 
     namespace internal

@@ -1285,11 +1285,7 @@ namespace PETScWrappers
      * adding/inserting local data into
      * the (large) sparse matrix.
      */
-#ifdef PETSC_USE_64BIT_INDICES
     std::vector<PetscInt> column_indices;
-#else
-    std::vector<int> column_indices;
-#endif
 
     /**
      * An internal array of double values
@@ -1547,13 +1543,9 @@ namespace PETScWrappers
   {
     prepare_action(LastAction::insert);
 
-#ifdef PETSC_USE_64BIT_INDICES
     const PetscInt petsc_i = row;
     PetscInt *col_index_ptr;
-#else
-    const int petsc_i = row;
-    int *col_index_ptr;
-#endif
+
     PetscScalar const *col_value_ptr;
     int n_columns;
 
@@ -1697,13 +1689,9 @@ namespace PETScWrappers
   {
     prepare_action(LastAction::add);
 
-#ifdef PETSC_USE_64BIT_INDICES
     const PetscInt petsc_i = row;
     PetscInt *col_index_ptr;
-#else
-    const int petsc_i = row;
-    int *col_index_ptr;
-#endif
+
     PetscScalar const *col_value_ptr;
     int n_columns;
 
@@ -1818,11 +1806,8 @@ namespace PETScWrappers
   bool
   MatrixBase::in_local_range (const unsigned int index) const
   {
-#ifdef PETSC_USE_64BIT_INDICES
     PetscInt begin, end;
-#else
-    int begin, end;
-#endif
+
     const int ierr = MatGetOwnershipRange (static_cast<const Mat &>(matrix),
                                            &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));

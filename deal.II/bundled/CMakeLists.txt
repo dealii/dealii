@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -66,13 +66,15 @@ ENDIF()
 #
 # Threading Building Blocks library
 #
-IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN" AND
-   NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
+  #
+  # Cygwin is currently unsupported by tbb
+  #
   SET(FEATURE_THREADS_HAVE_BUNDLED TRUE)
-  SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb30_104oss")
   OPTION(DEAL_II_FORCE_BUNDLED_THREADS
     "Always use the bundled tbb library instead of an external one."
     OFF)
+  SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb30_104oss")
 ENDIF()
 
 IF(FEATURE_THREADS_BUNDLED_CONFIGURED)
@@ -95,6 +97,14 @@ SET(UMFPACK_FOLDER "${CMAKE_SOURCE_DIR}/bundled/umfpack")
 OPTION(DEAL_II_FORCE_BUNDLED_UMFPACK
   "Always use the bundled umfpack library instead of an external one."
   OFF)
+
+#
+# Resolve a cache invalidation problem by searching for these flags
+# unconditionally. They're used for compiling the sources in
+# ${UMFPACK_FOLDER}/UMFPACK/Source depending on cached variables.
+#
+ENABLE_IF_SUPPORTED(_dummy "-Wno-sign-compare")
+ENABLE_IF_SUPPORTED(_dummy "-Wno-write-strings")
 
 IF(FEATURE_UMFPACK_BUNDLED_CONFIGURED)
   ADD_SUBDIRECTORY(${UMFPACK_FOLDER}/UMFPACK/Source)

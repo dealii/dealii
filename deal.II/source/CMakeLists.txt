@@ -18,8 +18,11 @@
 
 INCLUDE_DIRECTORIES(
   BEFORE # Ensure deal.II include directories come first
-  ${CMAKE_BINARY_DIR}/include/
+  #
+  # Reverse order due to BEFORE:
+  #
   ${CMAKE_SOURCE_DIR}/include/
+  ${CMAKE_BINARY_DIR}/include/
   )
 
 #
@@ -52,21 +55,23 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     deal_ii_objects_${build_lowercase}
     )
   ADD_LIBRARY(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+    base/dummy.cc # Workaround for a bug in the Xcode generator
     ${deal_ii_objects_${build_lowercase}}
     )
 
   SET_TARGET_PROPERTIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
     PROPERTIES
-    VERSION ${VERSION}
+    VERSION "${DEAL_II_PACKAGE_VERSION}"
     #
     # Sonaming: Well... we just use the version number.
     # No point to wrack one's brain over the question whether a new version of
     # a C++ library is still ABI backwards compatible :-]
     #
-    SOVERSION ${VERSION}
+    SOVERSION "${DEAL_II_PACKAGE_VERSION}"
     LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_${build}}"
     COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
     COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${build}}"
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}"
     )
 
   TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}

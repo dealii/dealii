@@ -1,5 +1,5 @@
 /***************************************************************************\
-|* Function Parser for C++ v4.5                                            *|
+|* Function Parser for C++ v4.5.1                                          *|
 |*-------------------------------------------------------------------------*|
 |* Copyright: Juha Nieminen, Joel Yliluoma                                 *|
 |*                                                                         *|
@@ -138,7 +138,6 @@ class FunctionParserBase
 // ------------
     Data* mData;
     unsigned mStackPtr;
-    static Value_t sEpsilon;
 
 
 // Private methods:

@@ -2,10 +2,10 @@
 	  "http://www.w3.org/TR/html4/loose.dtd">
 <html>
   <head>
-    <title>The deal.II Readme</title>
+    <title>Build system internals</title>
     <link href="../screen.css" rel="StyleSheet">
     <meta name="author" content="the deal.II authors <authors @ dealii.org>">
-    <meta name="copyright" content="Copyright (C) 2012 by the deal.II authors">
+    <meta name="copyright" content="Copyright (C) 2013 by the deal.II authors">
     <meta name="date" content="$Date$">
     <meta name="svn_id" content="$Id$">
     <meta name="keywords" content="deal.II">
@@ -14,10 +14,12 @@
   <body>
 
 
-    <h1>Details on the <acronym>deal.II</acronym> CMake build system</h1>
+    <h1><acronym>Build system internals</h1>
 
     <p>
-      This page provides details about <acronym>deal.II</acronym> CMake build system.
+      This page provides details about the CMake build system. Files
+      processed by the top level <code>CMakeLists.txt</code> script are
+      listed in the TOC in cronological order.
     </p>
 
     <p>
@@ -26,12 +28,23 @@
       <tr><td valign="top">
 	  <ul>
 	    <li><a href="#codingstyle">Coding convention</a>
+          </ul>
+          </br><b>Configuration:</b>
+	  <ul>
 	    <li><a href="#setup"><code>./CMakeLists.txt</code> and
               <code>./cmake/setup_*.cmake</code></a>
 	    <li><a href="#checks"><code>./cmake/checks/check_*.cmake</code></a>
-	    <li><a href="#config.h.in"><code>./include/deal.II/base/config.h.in</code></a>
+            <li><a href="#findmodules"><code>./cmake/modules/Find*.cmake</code></a>
+	    <li><a href="#configure"><code>./cmake/configure/configure_*.cmake</code></a>
 	    <li><a href="#variables">Global variables controlling the build process</a>
-	  </ul>
+          </ul>
+          </br><b>Target definition and installation</b>
+	  <ul>
+	    <li><a href="#config.h.in"><code>./include/deal.II/base/config.h.in</code></a>
+            <li><a href="#source"><code>./source/CMakeLists.txt</code></a>
+            <li><a href="#projectconfig"><code>./cmake/config/CMakeLists.txt</code></a>
+            <li>TODO
+          </ul>
 	</td>
       </tr>
     </table>
@@ -39,6 +52,7 @@
 
     <a name="codingstyle"></a>
     <h3> Coding convention </h3>
+    <p>
       Coding conventions are always a matter of choice. Nevertheless, the
       following rules should be considered:
       <ul>
@@ -119,6 +133,7 @@
           leading "_". Local variables cannot be assumed to remain valid.
           The may get overwritten at any time.
       </ul>
+    </p>
 
 
     <a name="setup"></a>
@@ -304,15 +319,173 @@
 
 
 
-    <a name="config.h.in"></a>
-    <h3> <code>./include/deal.II/base/config.h.in<</code> </h3>
-      <ul>
+    <a name="findmodules"></a>
+    <h3> <code>./cmake/modules/Find*.cmake</code> </h3>
 
-        <li> Definition toggles in
-          <code>include/deal.II/base/config.h.in</code> should have a
-          prominent comment explaining it and should be grouped by file
-          exporting the definition
+    <p>
+      These are find modules for the <code>configure_*.cmake</code> files
+      and the <code>CONFIGURE_FEATURE</code> macro as will explained later.
+      It is crucial that a find module behaves correctly. Therefore, the
+      following rules are mandatory:
+      <ul>
+        <li>
+          The <i>sole</i> purpose of a find module is to find an external
+          library (no deal.II specific dependency checking, no
+          compatibility checking).
+        <li>
+          It should do so by appropriate <code>FIND_LIBRARY</code> and
+          <code>FIND_PATH</code> calls. The results of this calls should be the
+          only cached variables.
+        <li>
+          <code>FIND_PACKAGE_HANDLE_STANDARD_ARGS</code> should be used for
+          setting <code>FEATURE_FOUND</code> as this already respects the
+          <code>QUIET</code> and <code>REQUIRED</code> keywords.
+        <li>
+          A <code>WARNING</code>, <code>SEND_ERROR</code> or
+          <code>FATAL_ERROR</code> must be avoided (the only exception is
+          the <code>REQUIRED</code> keyword).
+        <li>
+          If successful, the following uncached variables might be set:
+          <pre>
+
+    FEATURE_FOUND
+    FEATURE_LIBRARIES
+    FEATURE_INCLUDE_DIRS
+    FEATURE_LINKER_FLAGS
+
+    FEATURE_VERSION
+    FEATURE_VERSION_MAJOR
+    FEATURE_VERSION_MINOR
+    FEATURE_VERSION_SUBMINOR
+          </pre>
+          There are obviously valid exceptions from this rule, though.
+        <li>
+          Only "local" variables "<code>_&lt;all lowercase&gt;</code>" or
+          "global" variables prefixed by <code>FEATURE_</code> may be
+          altered. Do not set <code>DEAL_II_*</code> or <code>CMAKE_*</code>
+          variables directly!
+        <li>
+          A hint with <code>FEATURE_DIR</code> can be set up for
+          convenience. It is best to start the <code>Find</code> module by
+          <pre>
+
+    SET_IF_EMPTY(FEATURE_DIR "$ENV{FEATURE_DIR}")
+          </pre>
+          and use <code>FEATURE_DIR</code> as a hint. If the external
+          library could be found, hide it via
+          <code>MARK_AS_ADVANCED</code>, if the external library could not
+          be found, set a cache value:
+          <pre>
+
+    SET(FEATURE_DIR "" CACHE PATH "An optional hint to a FEATURE directory")
+          </pre>
       </ul>
+
+
+
+    <a name="configure"></a>
+    <h3> <code>./cmake/configure/configure_*.cmake</code> </h3>
+
+    <p>
+      The final step in the configuration phase is the setup of features
+      (which refer to external or bundled libraries
+      <acronym>deal.II</acronym> can optionally interface with.)
+
+    </p>
+
+    <p>
+      At bare minimum <code>configure_&lt;feature&gt;.cmake</code>
+      file for a feature just consists of a call to the
+      <code>CONFIGURE_FEATURE(&lt;FEATURE&gt;)</code> macro which is
+      implemented in
+      <code>./cmake/macros/macro_configure_feature.cmake</code>.
+      In this case the corresponding <code>Find&lt;FEATURE&gt;.cmake</code>
+      module is used to determine whether an external dependency can be
+      resolved or not. Depending on the current state of
+      <code>DEAL_II_WITH_&lt;FEATURE&gt;</code> (see
+      <a href="cmake.html#configurefeature">here</a>) the variables
+          <pre>
+
+    FEATURE_LIBRARIES
+    FEATURE_INCLUDE_DIRS
+    FEATURE_LINKER_FLAGS
+          </pre>
+      are appended to the set of <a href="#variables">global variables</a>
+      and <code>DEAL_II_WITH_&lt;FEATURE&gt;</code> is set to
+      <code>TRUE</code>.
+    </p>
+
+    <p>
+      It is possible to override this default behaviour with the following
+      variables and macros (all of them are optional and will be replaced
+      by an appropriate default action if unset):
+      <ul>
+        <li>
+         <code>&lt;FEATURE&gt;</code> means all caps,
+         <code>&lt;feature&gt;</code> means all lowercase
+
+	<li>
+          In <code>./cmake/configure/configure_&lt;feature&gt;.cmake</code>:
+	  <pre>
+
+    FEATURE_&lt;FEATURE&gt;_DEPENDS              (a variable)
+      - a variable which contains an optional list of other features
+        this feature depends on (and which have to be enbled for this feature
+        to work.) The features must be given with the full option toggle:
+        DEAL_II_WITH_[...]
+
+    FEATURE_&lt;FEATURE&gt;_FIND_EXTERNAL(var)   (a macro)
+      - which should set var to TRUE if all dependencies for the feature are
+        fulfilled. In this case all necessary variables for
+        FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL must be set.
+        Otherwise var should remain unset.
+        If this macro is undefined, FIND_PACKAGE(&lt;FEATURES&gt;) is
+        called directly instead.
+
+    FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL()  (a macro)
+      - which should setup all necessary configuration for the feature with
+        external dependencies. If something goes wrong this macro must
+        issue a FATAL_ERROR.
+        If this macro is undefined, the information provided in
+        &lt;FEATURES&gt;_LIBRARIES, &lt;FEATURES&gt;_INCLUDE_DIRS and
+        &lt;FEATURES&gt;_LINKER_FLAGS is used for the build.
+
+    FEATURE_&lt;FEATURE&gt;_CONFIGURE_BUNDLED()  (a macro)
+      - which should setup all necessary configuration for the feature with
+        bundled source dependencies. If something goes wrong this macro must
+        issue a FATAL_ERROR.
+
+    FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE()      (macro)
+      - which should print a meaningful error message (with FATAL_ERROR) for
+        the case that no external library was found (and bundled is not
+        allowed to be used.) If not defined, a suitable default error message
+        will be printed.
+	  </pre>
+
+	<li>
+          In <code>./bundled/CMakeLists.txt</code>:
+	  <pre>
+
+    FEATURE_&lt;FEATURE&gt;_HAVE_BUNDLED         (a boolean)
+      - which should either be set to TRUE if all necessary libraries of the
+        features comes bundled with deal.II and hence can be supported
+        without external dependencies, or unset.
+
+    DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt;        (an option)
+      - If &lt;feature&gt; can be set up by bundled libraries, this
+        configuration option must be present to force a use of bundled
+        dependencies
+	  </pre>
+
+        <li>
+          Furthermore, if
+          <code>FEATURE_&lt;FEATURE&gt;_BUNDLED_CONFIGURED</code> is set to
+          <code>TRUE</code> the file <code>./bundled/CMakeLists.txt</code>
+          must compile and install the bundled package appropriately.
+      </ul>
+    </p>
+
+
 
 
 
@@ -400,75 +573,87 @@
     </p>
 
 
-    <a name="devplatform"></a>
-    <h4>  Writing platform checks </h4>
+    <a name="config.h.in"></a>
+    <h3> <code>./include/deal.II/base/config.h.in</code> </h3>
 
-    <a name="devfeature"></a>
-    <h4> Writing feature tests </h4>
-
-    <p>
-      TODO: This section is a bit outdated, update it!
-    </p>
-    <p>
-      For a feature <code>&lt;feature&gt;</code> the following
-      the following toggles, variables and macros can be defined
-      defined (Note: <code>&lt;FEATURE&gt;</code> means all caps,
-      <code>&lt;feature&gt;</code> means all lowercase):
+    In contrast to autoconf there is no intermediate step any more that
+    automatically generates config.h.in. The setup in this file has to be
+    done by hand. Please note:
       <ul>
-
-	<li>
-          A file
-          <code>cmake/configure/configure_&lt;feature&gt;.cmake</code>
-          defining how to configure <code>&lt;feature&gt;</code>:
-	  <pre>
-    FEATURE_${feature}_DEPENDS    (a variable)
-      - a variable which contains an optional list of other features
-        this feature depends on (and which have to be enbled for this feature
-        to work.) The features must be given with the full option toggle:
-        DEAL_II_WITH_[...]
-
-    FEATURE_&lt;FEATURE&gt;_FIND_EXTERNAL(var)  (a macro)
-      - which should set var to TRUE if all dependencies for the feature are
-        fulfilled. In this case all necessary variables for
-        FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL must be set. Otherwise
-        var should remain unset.
-        If not defined, FIND_PACKAGE(${feature}) is called.
-
-    FEATURE_&lt;FEATURE&gt;_CONFIGURE_EXTERNAL()  (a macro)
-      - which should setup all necessary configuration for the feature with
-        external dependencies. If something goes wrong this macro must
-        issue a FATAL_ERROR.
-
-    FEATURE_&lt;FEATURE&gt;_CONFIGURE_BUNDLED()  (a macro)
-      - which should setup all necessary configuration for the feature with
-        bundled source dependencies. If something goes wrong this macro must
-        issue a FATAL_ERROR.
-
-    FEATURE_&lt;FEATURE&gt;_ERROR_MESSAGE()  (macro, optional)
-      - which should print a meaningful error message (with FATAL_ERROR) for
-        the case that no external library was found (and bundled is not
-        allowed to be used.) If not defined, a suitable default error message
-        will be printed.
-	  </pre>
-
-	<li>
-          In <code>bundled/CMakeLists.txt</code>:
-	  <pre>
-
-    DEAL_II_FORCE_BUNDLED_&lt;FEATURE&gt; (a boolean)
-      - If &lt;feature&gt; can be set up by bundled libraries, this
-        configuration option must be present to force use of bundled
-        dependencies
-
-    FEATURE_&lt;FEATURE&gt;_HAVE_BUNDLED  (a variable)
-      - which should either be set to TRUE if all necessary libraries of the
-        features comes bundled with deal.II and hence can be supported
-        without external dependencies, or unset.
-	  </pre>
-
-    Setup of compilation and installation if
-    <code>FEATURE_&lt;FEATURE&gt;_BUNDLED_CONFIGURED</code> is set.
+        <li> <code>config.h.in</code> should only contain a minimum of
+        necessary compile definitions to avoid unnecessary recompilation if
+        configuration changes.
+        <li> Definition toggles in <code>config.h.in</code> should have a
+          prominent comment explaining it and should be grouped by file
+          exporting the definition.
       </ul>
+
+
+    <a name="source"></a>
+    <h3><code>./source/CMakeLists.txt</code></h3>
+
+    <p>
+      All parts of the library are organized into logical object libraries
+      with their respective sources lying under
+      <code>./source/&lt;foo&gt;</code>, or
+      <code>./bundled/&lt;foo&gt;/&lt;...&gt;</code>. The actual setup of
+      an object library happens within that subdirectories with the help of
+      two macros:
+      <pre>
+
+    #
+    # A list of source files forming the object target:
+    #
+    SET(src
+      ...
+      dof_tools.cc
+      )
+
+    #
+    # A list of instantiations that must be expanded:
+    #
+    SET(inst_in_files
+      ...
+      dof_tools.inst.in
+      )
+
+    #
+    # The following macro will set up an obj_dofs.debug and
+    # obj_dofs.release target  with appropriate compile flags and
+    # definitions for a simultaneous build of debug and release library.
+    # Furthermore, the object name will be stored in
+    #   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_(debug/release)
+    # so that it is available in global scope.
+    #
+    DEAL_II_ADD_LIBRARY(obj_dofs OBJECT ${src})
+
+    #
+    # This macro will set up an obj_dofs.inst target for expanding all
+    # files listed in ${inst_in_files}. Appropriate target dependencies
+    # will be added to obj_dofs.debug and obj_dofs.release.
+    #
+    EXPAND_INSTANTIATIONS(obj_dofs "${inst_in_files}")
+      </pre>
+    </p>
+
+    <p>
+      Later, all object targets are collected in
+      <code>./source/CMakeLists.txt</code> to define the actual debug and
+      releases libraries. For further details, see
+      <code>./source/CMakelists.txt</code> and
+      <code>./cmake/macros/macro_deal_ii_add_library.cmake</code>.
+    </p>
+
+    <a name="projectconfig"></a>
+    <h3><code>./cmake/config/CMakeLists.txt</code></h3>
+
+    <p>
+      The final bits of configuration happens in
+      <code>./cmake/config/CMakeLists.txt</code> where the templates for
+      the project configuration <code>deal.IIConfig.cmake</code> and the
+      compatibility file <code>Make.global_options</code> get expanded.
+      Furthermore, the configuration for the template expansion mechanism
+      resides under <code>./cmake/config/template_arguments.in</code>.
     </p>
 
     <hr>

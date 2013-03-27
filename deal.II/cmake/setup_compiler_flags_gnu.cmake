@@ -35,6 +35,14 @@ ENDIF()
 ########################
 
 #
+# Set -pedantic if the compiler supports it.
+#
+IF(NOT (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
+        CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.4"))
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-pedantic")
+ENDIF()
+
+#
 # Enable all supported CPU instruction sets:
 #
 IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
@@ -51,14 +59,6 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
 # the deal.II library with it.
 #
 ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
-
-#
-# Set -pedantic if the compiler supports it.
-#
-IF(NOT (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
-        CMAKE_CXX_COMPILER_VERSION VERSION_LESS "4.4"))
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-pedantic")
-ENDIF()
 
 
 #
@@ -100,16 +100,6 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-function")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-private-field")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-variable")
-ENDIF()
-
-
-IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
-  #
-  # Use -Wno-long-long on Apple Darwin to avoid some unnecessary
-  # warnings. However, newer gccs on that platform do not have
-  # this flag any more, so check whether we can indeed do this
-  #
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-double")
 ENDIF()
 
 

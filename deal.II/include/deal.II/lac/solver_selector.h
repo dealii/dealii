@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,6 +22,7 @@
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/solver_bicgstab.h>
 #include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/solver_minres.h>
 #include <deal.II/lac/vector_memory.h>
 #include <deal.II/lac/solver_richardson.h>
 #include <deal.II/lac/precondition.h>
@@ -164,6 +165,13 @@ public:
    * Set the additional data. For more
    * info see the @p Solver class.
    */
+  void set_data(const typename SolverMinRes<VECTOR>
+                ::AdditionalData &data);
+
+  /**
+   * Set the additional data. For more
+   * info see the @p Solver class.
+   */
   void set_data(const typename SolverBicgstab<VECTOR>
                 ::AdditionalData &data);
 
@@ -224,6 +232,11 @@ private:
   /**
    * Stores the additional data.
    */
+  typename SolverMinRes<VECTOR>::AdditionalData minres_data;
+
+  /**
+   * Stores the additional data.
+   */
   typename SolverBicgstab<VECTOR>::AdditionalData bicgstab_data;
 
   /**
@@ -276,36 +289,34 @@ SolverSelector<VECTOR>::solve(const Matrix &A,
                               const VECTOR &b,
                               const Preconditioner &precond) const
 {
-  GrowingVectorMemory<VECTOR> vector_memory;
-
   if (solver_name=="richardson")
     {
-      SolverRichardson<VECTOR> solver(*control, vector_memory,
-                                      richardson_data);
+      SolverRichardson<VECTOR> solver(*control, richardson_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="cg")
     {
-      SolverCG<VECTOR> solver(*control, vector_memory,
-                              cg_data);
+      SolverCG<VECTOR> solver(*control, cg_data);
+      solver.solve(A,x,b,precond);
+    }
+  else if (solver_name=="minres")
+    {
+      SolverMinRes<VECTOR> solver(*control, minres_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="bicgstab")
     {
-      SolverBicgstab<VECTOR> solver(*control, vector_memory,
-                                    bicgstab_data);
+      SolverBicgstab<VECTOR> solver(*control, bicgstab_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="gmres")
     {
-      SolverGMRES<VECTOR> solver(*control,vector_memory,
-                                 gmres_data);
+      SolverGMRES<VECTOR> solver(*control, gmres_data);
       solver.solve(A,x,b,precond);
     }
   else if (solver_name=="fgmres")
     {
-      SolverFGMRES<VECTOR> solver(*control,vector_memory,
-                                  fgmres_data);
+      SolverFGMRES<VECTOR> solver(*control, fgmres_data);
       solver.solve(A,x,b,precond);
     }
   else
@@ -324,7 +335,7 @@ void SolverSelector<VECTOR>::set_control(
 template <class VECTOR>
 std::string SolverSelector<VECTOR>::get_solver_names()
 {
-  return "richardson|cg|bicgstab|gmres|fgmres";
+  return "richardson|cg|bicgstab|gmres|fgmres|minres";
 }
 
 
@@ -357,6 +368,14 @@ void SolverSelector<VECTOR>::set_data(
   const typename SolverCG<VECTOR>::AdditionalData &data)
 {
   cg_data=data;
+}
+
+
+template <class VECTOR>
+void SolverSelector<VECTOR>::set_data(
+  const typename SolverMinRes<VECTOR>::AdditionalData &data)
+{
+  minres_data=data;
 }
 
 

@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -649,11 +649,11 @@ public:
    * function as for the previous
    * one.
    *
-   * This function does not
+   * @note This function does not
    * guarantee that @p end_sweep is
    * called for successive time
-   * steps, rather the order of
-   * time steps for which the
+   * steps successively, rather the order of
+   * time step objects for which the
    * function is called is
    * arbitrary. You should
    * therefore not assume that that
@@ -661,22 +661,19 @@ public:
    * previous time steps
    * already. If in multithread
    * mode, the @p end_sweep function
-   * of several time steps is
+   * of several time steps may be
    * called at once, so you should
    * use synchronization
-   * mechanisms, if your program
+   * mechanisms if your program
    * requires so.
-   *
-   * The parameter denotes the
-   * number of threads that shall
-   * be spawned in parallel. It
-   * defaults to only one thread to
-   * avoid hidden synchronisation
-   * problems, and the value is
-   * ignored if not in multithread
-   * mode.
    */
-  virtual void end_sweep (const unsigned int n_threads = 1);
+  virtual void end_sweep ();
+
+  /**
+   * @deprecated Use the function without an argument.
+   * @arg n_threads This argument is ignored.
+   */
+  virtual void end_sweep (const unsigned int n_threads) DEAL_II_DEPRECATED;
 
   /**
    * Determine an estimate for the

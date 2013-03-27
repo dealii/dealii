@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2011 by the deal.II authors
+//    Copyright (C) 2011, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,8 +23,8 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include "../../deal.II/include/deal.II/base/index_set.h"
-#include "../../deal.II/include/deal.II/lac/trilinos_vector.h"
+#include <deal.II/base/index_set.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 
 void test ()

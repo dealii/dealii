@@ -3,11 +3,11 @@
 <head>
  <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
  <link href="style.css" rel="stylesheet" type="text/css" title="normal" media=screen>
- <title>Function Parser for C++ v4.5    : Documentation</title>
+ <title>Function Parser for C++ v4.5.1  : Documentation</title>
 </head>
 
 <body>
-<h1>Function Parser for C++ v4.5    </h1>
+<h1>Function Parser for C++ v4.5.1  </h1>
 
 <p>Authors: Juha Nieminen
 (<a href="http://iki.fi/warp/">http://iki.fi/warp/</a>),
@@ -69,6 +69,15 @@ Joel Yliluoma
 
 <a name="whatsnew"></a>
 <h2>What's new</h2>
+
+<p>What's new in v4.5.1
+  <ul>
+    <li>Reverted the automatic C++11 detection to a precompiler macro setting
+      (<code>FP_SUPPORT_CPLUSPLUS11_MATH_FUNCS</code>) because not all
+      compilers yet fully support the C++11 math functions.
+    <li>Fixed a potential duplicate symbol problem that happens with explicit
+      template instantiations.
+  </ul>
 
 <p>What's new in v4.5
   <ul>
@@ -324,6 +333,12 @@ file.
       types.) Note that <code>strtold()</code> will also be automatically used
       if <code>__cplusplus</code> indicates that C++11 is in use.
   </dd>
+
+  <dt><p><code>FP_SUPPORT_CPLUSPLUS11_MATH_FUNCS</code> : (Default off)</dt>
+  <dd><p>Use C++11 math functions where applicable. (These are ostensibly
+      faster than the equivalent formulas using C++98 math functions.) Note
+      that not all compilers support these functions (even if they otherwise
+      support C++11.)
 
   <dt><p><code>FP_SUPPORT_OPTIMIZER</code> : (Default on)</dt>
   <dd><p>If you are not going to use the <code>Optimize()</code> method, you

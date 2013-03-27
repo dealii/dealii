@@ -29,12 +29,11 @@ ENDIF()
 #
 # Are all dependencies fullfilled?
 #
-IF(NOT DEAL_II_WITH_PETSC OR NOT DEAL_II_WITH_P4EST OR DEAL_II_WITH_THREADS)
+IF(NOT DEAL_II_WITH_PETSC OR NOT DEAL_II_WITH_P4EST)
   MESSAGE(FATAL_ERROR "
 Error! The deal.II library found at ${DEAL_II_PATH} was not configured with
     DEAL_II_WITH_PETSC = ON
     DEAL_II_WITH_P4EST = ON
-    DEAL_II_WITH_THREADS = OFF
 which is required for this tutorial step."
     )
 ENDIF()

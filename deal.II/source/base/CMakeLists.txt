@@ -12,12 +12,15 @@
 ##
 #####
 
+INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
+
 SET(src_base
   auto_derivative_function.cc
   conditional_ostream.cc
   config.cc
   convergence_table.cc
   data_out_base.cc
+  # do NOT include dummy.cc
   event.cc
   exceptions.cc
   flow_function.cc

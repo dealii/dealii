@@ -125,12 +125,7 @@ void test()
 
 int main (int argc, char *argv[])
 {
-#ifdef DEAL_II_WITH_MPI
-  MPI_Init (&argc, &argv);
-#else
-  (void) argc;
-  (void) argv;
-#endif
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
@@ -150,8 +145,4 @@ int main (int argc, char *argv[])
     }
   else
     test<2>();
-
-#ifdef DEAL_II_WITH_MPI
-  MPI_Finalize();
-#endif
 }

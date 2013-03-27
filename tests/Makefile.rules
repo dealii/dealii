@@ -21,12 +21,12 @@ verbose = off
 # on the command line to use a different mail agent or to tunnel through ssh.
 # The mail program takes a single argument, which is the mail address for tests
 # The contents of the mail will be provided on STDIN
-MAIL=mail
+MAIL = mail
 
-#this lets you overwrite the diff tool for comparisons.
-#recommended environment setting:
-#export DEALII_DIFF="numdiff -a 1e-6 -q"
-DEALII_DIFF?=diff
+# this lets you overwrite the diff tool for comparisons.
+# recommended environment setting:
+#   export DEAL_II_DIFF="numdiff -a 1e-6 -q"
+DEAL_II_DIFF ?= diff
 
 PLATFORM = $(TARGET)+$(GXX-VERSION:intel_%=%)
 PLATFORM-HIERARCHY = $(shell $(PERL) ../hierarchy.pl $(PLATFORM))
@@ -128,9 +128,9 @@ endif
 	    if test -f $$testname/cmp/$$i ; then \
 		cmpfile_found=yes ; \
 		if test "x$(verbose)" = "xon" ; then \
-			cmd="$(DEALII_DIFF) $(DIFFOPT) $< $$testname/cmp/$$i" ; \
+			cmd="$(DEAL_II_DIFF) $(DIFFOPT) $< $$testname/cmp/$$i" ; \
 		 else \
-			cmd="$(DEALII_DIFF) $< $$testname/cmp/$$i > /dev/null" ; \
+			cmd="$(DEAL_II_DIFF) $< $$testname/cmp/$$i > /dev/null" ; \
 		 fi ; \
 		 if eval $$cmd ; then \
 			echo '=====OK============' $@ ; \

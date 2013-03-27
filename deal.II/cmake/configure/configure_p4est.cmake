@@ -38,7 +38,7 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
       UNSET(P4EST_INCLUDE_DIR CACHE)
       UNSET(SC_LIBRARY CACHE)
       UNSET(SC_INCLUDE_DIR CACHE)
-      SET(P4EST_DIR "" CACHE STRING
+      SET(P4EST_DIR "" CACHE PATH
         "An optional hint to a p4est installation/directory"
         )
     ELSE()

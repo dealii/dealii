@@ -16,16 +16,6 @@
 # Setup some convenience custom targets for the build system:
 #
 
-#
-# Dump log files, configuration and system information to a convenient
-# place:
-#
-ADD_CUSTOM_TARGET(log
-  COMMAND ${CMAKE_COMMAND} --system-information ${CMAKE_BINARY_DIR}/cmake.log
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-  COMMENT "Create cmake.log"
-  )
-
 
 ###########################################################################
 #                                                                         #

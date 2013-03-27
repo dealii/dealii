@@ -127,7 +127,7 @@ IF(TRILINOS_FOUND)
 
 ELSE()
 
-  SET(TRILINOS_DIR "" CACHE STRING
+  SET(TRILINOS_DIR "" CACHE PATH
     "An optional hint to a Trilinos installation"
     )
 ENDIF()

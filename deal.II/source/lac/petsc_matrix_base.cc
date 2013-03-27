@@ -217,12 +217,8 @@ namespace PETScWrappers
   MatrixBase::el (const unsigned int i,
                   const unsigned int j) const
   {
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscInt
-#else
-    int
-#endif
-    petsc_i = i, petsc_j = j;
+    PetscInt petsc_i = i, petsc_j = j;
+
     PetscScalar value;
 
     const int ierr
@@ -274,12 +270,8 @@ namespace PETScWrappers
   unsigned int
   MatrixBase::m () const
   {
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscInt
-#else
-    int
-#endif
-    n_rows, n_cols;
+    PetscInt n_rows, n_cols;
+
     int ierr = MatGetSize (matrix, &n_rows, &n_cols);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -291,12 +283,8 @@ namespace PETScWrappers
   unsigned int
   MatrixBase::n () const
   {
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscInt
-#else
-    int
-#endif
-    n_rows, n_cols;
+    PetscInt n_rows, n_cols;
+
     int ierr = MatGetSize (matrix, &n_rows, &n_cols);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -308,12 +296,8 @@ namespace PETScWrappers
   unsigned int
   MatrixBase::local_size () const
   {
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscInt
-#else
-    int
-#endif
-    n_rows, n_cols;
+    PetscInt n_rows, n_cols;
+
     int ierr = MatGetLocalSize (matrix, &n_rows, &n_cols);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
@@ -325,12 +309,8 @@ namespace PETScWrappers
   std::pair<unsigned int, unsigned int>
   MatrixBase::local_range () const
   {
-#ifdef PETSC_USE_64BIT_INDICES
-    PetscInt
-#else
-    int
-#endif
-    begin, end;
+    PetscInt begin, end;
+
     const int ierr = MatGetOwnershipRange (static_cast<const Mat &>(matrix),
                                            &begin, &end);
     AssertThrow (ierr == 0, ExcPETScError(ierr));

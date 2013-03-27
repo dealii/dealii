@@ -35,32 +35,6 @@ DEAL:Multiple blocks::  1,2 0x0 face 1,2 0x0
 DEAL:Multiple blocks::  2,0 0x0 face 2,0 0x0
 DEAL:Multiple blocks::  2,1 0x0 face 2,1 0x0
 DEAL:Multiple blocks::  2,2 0x0 face 2,2 0x0
-DEAL:Same blocks::No faces
-DEAL:Same blocks::J: 0
-DEAL:Same blocks::R: 0
-DEAL:Same blocks::M: 9 face 0
-DEAL:Same blocks::  0,0 0x0
-DEAL:Same blocks::  0,1 0x0
-DEAL:Same blocks::  0,2 0x0
-DEAL:Same blocks::  1,0 0x0
-DEAL:Same blocks::  1,1 0x0
-DEAL:Same blocks::  1,2 0x0
-DEAL:Same blocks::  2,0 0x0
-DEAL:Same blocks::  2,1 0x0
-DEAL:Same blocks::  2,2 0x0
-DEAL:Same blocks::With faces
-DEAL:Same blocks::J: 0
-DEAL:Same blocks::R: 0
-DEAL:Same blocks::M: 9 face 9
-DEAL:Same blocks::  0,0 0x0 face 0,0 0x0
-DEAL:Same blocks::  0,1 0x0 face 0,1 0x0
-DEAL:Same blocks::  0,2 0x0 face 0,2 0x0
-DEAL:Same blocks::  1,0 0x0 face 1,0 0x0
-DEAL:Same blocks::  1,1 0x0 face 1,1 0x0
-DEAL:Same blocks::  1,2 0x0 face 1,2 0x0
-DEAL:Same blocks::  2,0 0x0 face 2,0 0x0
-DEAL:Same blocks::  2,1 0x0 face 2,1 0x0
-DEAL:Same blocks::  2,2 0x0 face 2,2 0x0
 DEAL:More blocks::No faces
 DEAL:More blocks::J: 0
 DEAL:More blocks::R: 0

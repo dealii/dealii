@@ -17,3 +17,4 @@ done
 gnuplot script
 rm -rf script
 convert -density 150 baseline.eps baseline.png
+python interactive.py >index.html

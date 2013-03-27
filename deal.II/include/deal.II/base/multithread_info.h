@@ -15,6 +15,7 @@
 
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/types.h>
 #include <deal.II/base/exceptions.h>
 
 DEAL_II_NAMESPACE_OPEN
@@ -33,6 +34,10 @@ DEAL_II_NAMESPACE_OPEN
  * threads used for task-based parallel methods is selected automatically
  * by the Threading Building
  * Blocks library. See @ref threads for more information on this.
+ * To set n_default_threads add the following at the start of your main():
+ * <code>
+ * multithread_info.n_default_threads=1;
+ * </code> 
  *
  * @ingroup threads
  * @author Thomas Richter, Wolfgang Bangerth, 2000
@@ -98,6 +103,28 @@ public:
   static std::size_t memory_consumption ();
 
   /**
+   * Sets the maximum number of threads to be used
+   * to the minimum of the environment variable DEAL_II_NUM_THREADS
+   * and the given parameter (if not the default value). This
+   * affects the initialization of the TBB. If neither is given, the
+   * default from TBB is used (based on the number of cores in the system).
+   *
+   * This routine is called automatically by MPI_InitFinalize. Due to
+   * limitations in the way TBB can be controlled, only the first call to this
+   * method will have any effect. Use the parameter of the MPI_InitFinalize
+   * if you have an MPI based code.
+   */
+  void set_thread_limit(const unsigned int max_threads = numbers::invalid_unsigned_int);
+
+
+  /**
+   * Returns if the TBB is running using a single thread either
+   * because of thread affinity or because it is set via a call
+   * to set_thread_limit. This is used in the PETScWrappers to
+   * avoid using the interface that is not thread-safe.
+   */
+  bool is_running_single_threaded();
+  /**
    * Exception
    */
   DeclException0(ExcProcNotPresent);
@@ -115,6 +142,11 @@ private:
    * one.
    */
   static unsigned int get_n_cpus();
+
+  /**
+   * variable representing the maximum number of threads
+   */
+  unsigned int n_max_threads;
 };
 
 

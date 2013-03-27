@@ -38,36 +38,43 @@ MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
   #
   # We require at least version 1.44
   #
-  FIND_PACKAGE(Boost 1.44 COMPONENTS serialization system thread)
+  IF(DEAL_II_WITH_THREADS)
+    FIND_PACKAGE(Boost 1.44 COMPONENTS serialization system thread)
+  ELSE()
+    FIND_PACKAGE(Boost 1.44 COMPONENTS serialization system)
+  ENDIF()
 
-  IF(Boost_THREAD_FOUND AND
-     Boost_SERIALIZATION_FOUND AND
-     Boost_SYSTEM_FOUND)
+  IF( Boost_SERIALIZATION_FOUND AND
+      Boost_SYSTEM_FOUND AND
+      (NOT DEAL_II_WITH_THREADS OR Boost_THREAD_FOUND)
+    )
     SET(${var} TRUE)
-
-    # Get rid of this annoying unimportant variable:
     MARK_AS_ADVANCED(Boost_DIR)
   ENDIF()
 ENDMACRO()
 
 
 MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL)
-  INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIR})
+  INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
+
+  #
+  # Remove "pthread" from Boost_LIBRARIES. Threading, if necessary, is
+  # already set up via configure_1_threads.cmake.
+  #
+  LIST(REMOVE_ITEM Boost_LIBRARIES "pthread")
+
+  #
+  # Transform  Boost_LIBRARIES into a list of debug and release libraries
+  # without keywords:
+  #
+  SPLIT_DEBUG_RELEASE(_boost_debug _boost_release ${Boost_LIBRARIES})
 
   IF (CMAKE_BUILD_TYPE MATCHES "Debug")
-    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG
-      ${Boost_SERIALIZATION_LIBRARY_DEBUG}
-      ${Boost_SYSTEM_LIBRARY_DEBUG}
-      ${Boost_THREAD_LIBRARY_DEBUG}
-      )
+    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_DEBUG ${_boost_debug})
   ENDIF()
 
   IF (CMAKE_BUILD_TYPE MATCHES "Release")
-    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_RELEASE
-      ${Boost_SERIALIZATION_LIBRARY_RELEASE}
-      ${Boost_SYSTEM_LIBRARY_RELEASE}
-      ${Boost_THREAD_LIBRARY_RELEASE}
-      )
+    LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES_RELEASE ${_boost_release})
   ENDIF()
 ENDMACRO()
 

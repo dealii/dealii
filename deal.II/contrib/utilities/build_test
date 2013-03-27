@@ -8,17 +8,18 @@
 #
 # The following environment variables may be set:
 #
-#   SOURCEDIR    - the source directory to use (if not invoked in a source
-#                  directory)
-#   CONFIGFILE   - A cmake configuration file for the build test
-#   LOGDIR       - directory for the log file
-#   LOGFILE      - the logfile to use, defaults to
-#                      $LOGDIR/$CONFIGFILE.<unix time>.log
+#   SOURCEDIR     - the source directory to use (if not invoked in a source
+#                   directory)
+#   CONFIGFILE    - A cmake configuration file for the build test
+#   LOGDIR        - directory for the log file
+#   LOGFILE       - the logfile to use, defaults to
+#                       $LOGDIR/$CONFIGFILE.<unix time>.log
 #
-#   CMAKE        - the cmake executable to use
-#   SVN          - svn info command to use
-#   TMPDIR       - defaults to "/tmp"
-#   CLEAN_TMPDIR - defaults to "true"
+#   CMAKE         - the cmake executable to use
+#   SVN           - svn info command to use
+#   TMPDIR        - defaults to "/tmp"
+#   CLEAN_TMPDIR  - defaults to "true"
+#   RUN_EXAMPLES  - defaults to "true"
 #
 
 #
@@ -40,6 +41,7 @@ builddir:= $(testdir)/build
 installdir:= $(testdir)/install
 LOGFILE=$(LOGDIR)/$(firstword $(branch) unknown_branch).$(firstword $(notdir $(CONFIGFILE)) no_configuration).$(date).log
 CLEAN_TMPDIR=true
+RUN_EXAMPLES=false
 
 PIPEnTRAP:= >>$(LOGFILE) 2>&1 || (if ${CLEAN_TMPDIR}; then rm -rf $(testdir); fi; false)
 
@@ -60,9 +62,6 @@ main:
 	@echo "BEGIN CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
 	cd $(builddir) && "$(CMAKE)" -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(SOURCEDIR) $(PIPEnTRAP)
 	@echo "END CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
-	#@echo "BEGIN CMAKE SYSTEM INFORMATION `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
-	#cd $(builddir) && "$(CMAKE)" --system-information $(PIPEnTRAP)
-	#@echo "END CMAKE SYSTEM INFORMATION `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
 	@echo "BEGIN REPORT FEATURES `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
 	cd $(builddir) && make $(MAKEOPTS) run_report_features $(PIPEnTRAP)
 	@echo "END REPORT FEATURES `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
@@ -72,9 +71,9 @@ main:
 	@echo "BEGIN BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
 	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test DEAL_II_DIR=$(installdir) build_examples $(PIPEnTRAP)
 	@echo "END BUILD EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
-	#@echo "BEGIN RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
-	#cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test run_examples $(PIPEnTRAP)
-	#@echo "END RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
+	@echo "BEGIN RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
+	cd $(installdir)/examples && make -f $(SOURCEDIR)/contrib/utilities/build_test run_examples $(PIPEnTRAP)
+	@echo "END RUN EXAMPLES OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
 	@echo "BUILD TEST SUCCESSFUL `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
 	if ${CLEAN_TMPDIR}; then rm -rf $(testdir); fi
 
@@ -85,16 +84,32 @@ main:
 
 steps:= $(wildcard step-*)
 
+#
+# Run all configuration independent steps:
+#
+runsteps:= step-1 step-2 step-3 step-4 step-5 step-6 step-7 step-8 step-9 step-10 step-11 step-12 step-13 step-14 step-15 step-16 step-19 step-20 step-23 step-24 step-25 step-26 step-27 step-28 step-30 step-38 step-39 step-44 step-45 step-47 step-48 step-49
+
+
 %/%:
 	-cd $(@D) && cmake . >/dev/null 2>&1
 	cd $(@D) && if [ -f Makefile ]; then make; fi
 
-%/OK: %/%
-	cd $(@D) && if [ -f Makefile ]; then make run; fi && touch OK
-
 .PHONY: build_examples
 build_examples: $(steps:%=%/%)
 
+
+%/OK-Debug:
+	cd $(@D) && cmake -DCMAKE_BUILD_TYPE=Debug . >/dev/null 2>&1
+	cd $(@D) && if $(RUN_EXAMPLES); then make run; fi && touch OK-Debug
+
+%/OK-Release:
+	cd $(@D) && cmake -DCMAKE_BUILD_TYPE=Release . >/dev/null 2>&1
+	cd $(@D) && if $(RUN_EXAMPLES); then make run; fi && touch OK-Release
+
+%/OK: %/OK-Debug %/OK-Release
+	cd $(@D) && touch OK
+
+
 .PHONY: run_examples
-run_examples: $(steps:%=%/OK)
+run_examples: $(runsteps:%=%/OK)
 
