@@ -43,6 +43,8 @@ ADD_SUBDIRECTORY(hp)
 ADD_SUBDIRECTORY(multigrid)
 ADD_SUBDIRECTORY(distributed)
 
+ADD_SUBDIRECTORY(algorithms)
+
 
 FOREACH(build ${DEAL_II_BUILD_TYPES})
   STRING(TOLOWER ${build} build_lowercase)

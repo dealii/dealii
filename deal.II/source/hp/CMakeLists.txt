@@ -14,7 +14,11 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(src
+FILE(GLOB _header
+  ${CMAKE_SOURCE_DIR}/include/deal.II/hp/*.h
+  )
+
+SET(_src
   dof_faces.cc
   dof_handler.cc
   dof_levels.cc
@@ -24,13 +28,13 @@ SET(src
   mapping_collection.cc
   )
 
-SET(inst_in_files
+SET(_inst
   dof_handler.inst.in
   fe_collection.inst.in
   fe_values.inst.in
   mapping_collection.inst.in
   )
 
-DEAL_II_ADD_LIBRARY(obj_hp OBJECT ${src})
-EXPAND_INSTANTIATIONS(obj_hp "${inst_in_files}")
+DEAL_II_ADD_LIBRARY(obj_hp OBJECT ${_src} ${_header} ${_inst})
+EXPAND_INSTANTIATIONS(obj_hp "${_inst}")
 

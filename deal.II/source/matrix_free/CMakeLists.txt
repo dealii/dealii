@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -15,21 +15,10 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/distributed/*.h
+  ${CMAKE_SOURCE_DIR}/include/deal.II/matrix_free/*.h
   )
 
 SET(_src
-  grid_refinement.cc
-  solution_transfer.cc
-  tria.cc
   )
 
-SET(_inst
-  grid_refinement.inst.in
-  solution_transfer.inst.in
-  tria.inst.in
-  )
-
-DEAL_II_ADD_LIBRARY(obj_distributed OBJECT ${_src} ${_header} ${_inst})
-EXPAND_INSTANTIATIONS(obj_distributed "${_inst}")
-
+DEAL_II_ADD_LIBRARY(obj_matrix_free OBJECT ${_src} ${_header})
