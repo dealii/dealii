@@ -60,7 +60,7 @@ main:
 	@echo "dealii-feature: configuration=`basename \"$(CONFIGFILE)\"`" | tee -a $(LOGFILE)
 	@echo END HEADER `date -u '+%Y-%m-%d %T'`\n | tee -a $(LOGFILE)
 	@echo "BEGIN CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
-	cd $(builddir) && "$(CMAKE)" -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(SOURCEDIR) $(PIPEnTRAP)
+	cd $(builddir) && $(CMAKE) -C "$(CONFIGFILE)" -DCMAKE_INSTALL_PREFIX=$(installdir) $(SOURCEDIR) $(PIPEnTRAP)
 	@echo "END CONFIGURE OUTPUT `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
 	@echo "BEGIN REPORT FEATURES `date -u '+%Y-%m-%d %T'`" | tee -a $(LOGFILE)
 	cd $(builddir) && make $(MAKEOPTS) run_report_features $(PIPEnTRAP)
@@ -91,7 +91,7 @@ runsteps:= step-1 step-2 step-3 step-4 step-5 step-6 step-7 step-8 step-9 step-1
 
 
 %/%:
-	-cd $(@D) && cmake . >/dev/null 2>&1
+	-cd $(@D) && $(CMAKE) . >/dev/null 2>&1
 	cd $(@D) && if [ -f Makefile ]; then make; fi
 
 .PHONY: build_examples
@@ -99,11 +99,11 @@ build_examples: $(steps:%=%/%)
 
 
 %/OK-Debug:
-	cd $(@D) && cmake -DCMAKE_BUILD_TYPE=Debug . >/dev/null 2>&1
+	cd $(@D) && $(CMAKE) -DCMAKE_BUILD_TYPE=Debug . >/dev/null 2>&1
 	cd $(@D) && if $(RUN_EXAMPLES); then make run; fi && touch OK-Debug
 
 %/OK-Release:
-	cd $(@D) && cmake -DCMAKE_BUILD_TYPE=Release . >/dev/null 2>&1
+	cd $(@D) && $(CMAKE) -DCMAKE_BUILD_TYPE=Release . >/dev/null 2>&1
 	cd $(@D) && if $(RUN_EXAMPLES); then make run; fi && touch OK-Release
 
 %/OK: %/OK-Debug %/OK-Release
