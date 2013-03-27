@@ -535,8 +535,7 @@ namespace TrilinosWrappers
   {
     // Extract local indices in
     // the matrix.
-    TrilinosWrappers::types::int_type trilinos_i =
-      graph->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
+    int trilinos_i = graph->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
       trilinos_j = graph->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
 
     // If the data is not on the
@@ -563,8 +562,12 @@ namespace TrilinosWrappers
             // Generate the view and make
             // sure that we have not generated
             // an error.
-            int ierr = graph->ExtractGlobalRowView(trilinos_i, nnz_extracted,
-                                                   col_indices);
+            // TODO: trilinos_i is the local row index -> it is an int but 
+            // ExtractGlobalRowView requires trilinos_i to be the global row
+            // index and thus it should be a long long int
+            int ierr = graph->ExtractGlobalRowView(
+                static_cast<TrilinosWrappers::types::int_type>(trilinos_i), 
+                nnz_extracted, col_indices);
             Assert (ierr==0, ExcTrilinosError(ierr));
             Assert (nnz_present == nnz_extracted,
                     ExcDimensionMismatch(nnz_present, nnz_extracted));
@@ -591,7 +594,7 @@ namespace TrilinosWrappers
             // Generate the view and make
             // sure that we have not generated
             // an error.
-            int ierr = graph->ExtractMyRowView(static_cast<int>(trilinos_i),
+            int ierr = graph->ExtractMyRowView(trilinos_i,
                 nnz_extracted, col_indices);
             Assert (ierr==0, ExcTrilinosError(ierr));
 
@@ -619,12 +622,12 @@ namespace TrilinosWrappers
   {
     size_type local_b=0;
     TrilinosWrappers::types::int_type global_b=0;
-    for (int i=0; i<local_size(); ++i)
+    for (int i=0; i<(int)local_size(); ++i)
       {
         int *indices;
         int num_entries;
-        graph->ExtractMyRowView(static_cast<int>(i), num_entries, indices);
-        for (size_type j=0; j<(size_type)num_entries; ++j)
+        graph->ExtractMyRowView(i, num_entries, indices);
+        for (unsigned int j=0; j<(unsigned int)num_entries; ++j)
           {
             if (static_cast<size_type>(std::abs(static_cast<TrilinosWrappers::types::int_type>(i-indices[j]))) > local_b)
               local_b = std::abs(static_cast<TrilinosWrappers::types::int_type>(i-indices[j]));
@@ -659,7 +662,7 @@ namespace TrilinosWrappers
 
 
 
-  int
+  unsigned int
   SparsityPattern::local_size () const
   {
     int n_rows = graph -> NumMyRows();
@@ -763,7 +766,7 @@ namespace TrilinosWrappers
   SparsityPattern::print_gnuplot (std::ostream &out) const
   {
     Assert (graph->Filled() == true, ExcInternalError());
-    for (int row=0; row<local_size(); ++row)
+    for (unsigned int row=0; row<local_size(); ++row)
       {
         int *indices;
         int num_entries;
@@ -776,7 +779,7 @@ namespace TrilinosWrappers
           // x-y, that is we have to exchange
           // the order of output
           out << indices[global_row_index(*graph,static_cast<int>(j))]
-            << " " << -static_cast<unsigned int>(row) << std::endl;
+            << " " << -static_cast<signed int>(row) << std::endl;
       }
 
     AssertThrow (out, ExcIO());

@@ -1038,7 +1038,7 @@ namespace TrilinosWrappers
      * exactly are stored locally,
      * use local_range().
      */
-    int local_size () const;
+    unsigned int local_size () const;
 
     /**
      * Return a pair of indices
