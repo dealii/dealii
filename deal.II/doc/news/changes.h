@@ -80,6 +80,12 @@ this function.
 
 <ol>
 
+<li> Changed: TimerOutput no longer assumes that sections are not nested
+when outputting percentage and total run time.
+<br>
+(Timo Heister, 2013/3/28)
+</li>
+
 <li> New: MPI_InitFinalize can also initialize PETSc/Slepc when
 not compiling with MPI. This is now the preferred way to initialize
 MPI/PETSc/Slepc in all cases.

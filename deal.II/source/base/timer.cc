@@ -524,19 +524,6 @@ TimerOutput::print_summary () const
     {
       double total_wall_time = timer_all.wall_time();
 
-      // check that the sum of all times is
-      // less or equal than the total
-      // time. otherwise, we might have
-      // generated a lot of overhead in this
-      // function.
-      double check_time = 0.;
-      for (std::map<std::string, Section>::const_iterator
-           i = sections.begin(); i!=sections.end(); ++i)
-        check_time += i->second.total_wall_time;
-
-      if (check_time > total_wall_time)
-        total_wall_time = check_time;
-
       // now generate a nice table
       out_stream << "\n\n"
                  << "+---------------------------------------------+------------"
@@ -581,12 +568,6 @@ TimerOutput::print_summary () const
                  << "+---------------------------------+-----------+"
                  << "------------+------------+\n"
                  << std::endl;
-
-      if (check_time > total_wall_time)
-        out_stream << std::endl
-                   << "Note: The sum of counted times is larger than the total time.\n"
-                   << "(Timer function may have introduced too much overhead, or different\n"
-                   << "section timers may have run at the same time.)" << std::endl;
     }
 
   // restore previous precision and width
