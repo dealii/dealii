@@ -41,7 +41,7 @@ builddir:= $(testdir)/build
 installdir:= $(testdir)/install
 LOGFILE=$(LOGDIR)/$(firstword $(branch) unknown_branch).$(firstword $(notdir $(CONFIGFILE)) no_configuration).$(date).log
 CLEAN_TMPDIR=true
-RUN_EXAMPLES=false
+RUN_EXAMPLES=true
 
 PIPEnTRAP:= >>$(LOGFILE) 2>&1 || (if ${CLEAN_TMPDIR}; then rm -rf $(testdir); fi; false)
 
