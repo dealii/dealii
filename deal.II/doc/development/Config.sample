@@ -25,7 +25,7 @@
 #   )
 #
 # SET(DEAL_II_COMPONENT_DOCUMENTATION OFF CACHE BOOL
-#   "Enable configuration, build and installation of the documentation. This adds a COMPONENT \"documentation\" to the build system."
+#   "Enable configuration, build and installation of the html documentation. This adds a COMPONENT \"documentation\" to the build system."
 #   )
 #
 # SET(DEAL_II_COMPONENT_EXAMPLES ON CACHE BOOL
@@ -573,8 +573,12 @@
 #   "Relative installation directory for macros"
 #   )
 #
-# SET(DEAL_II_DOCUMENTATION_RELDIR "doc" CACHE STRING
+# SET(DEAL_II_DOCHTML_RELDIR "doc" CACHE STRING
 #   "Relative installation directory for html documentation"
+#   )
+#
+# SET(DEAL_II_DOCREADME_RELDIR "" CACHE STRING
+#   "Relative installation directory for readme"
 #   )
 #
 # SET(DEAL_II_EXAMPLES_RELDIR "examples" CACHE STRING
