@@ -26,6 +26,7 @@
 #
 #     DEAL_II_PACKAGE_NAME            *)
 #     DEAL_II_PACKAGE_VERSION         *)
+#     DEAL_II_PACKAGE_VENDOR          *)
 #     DEAL_II_VERSION_MAJOR
 #     DEAL_II_VERSION_MINOR
 #     DEAL_II_VERSION
@@ -65,6 +66,8 @@
 SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "8.0.pre") # TODO: Get this value from somewhere else
+
+SET_IF_EMPTY(DEAL_II_PACKAGE_VENDOR "http://www.dealii.org/")
 
 STRING(REGEX REPLACE
   "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${DEAL_II_PACKAGE_VERSION}"
