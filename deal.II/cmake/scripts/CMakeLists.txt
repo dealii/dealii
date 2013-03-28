@@ -44,7 +44,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
 
   INSTALL(TARGETS make_dependencies report_features expand_instantiations
     RUNTIME
-    DESTINATION common/scripts
+    DESTINATION ${DEAL_II_COMMON_RELDIR}/scripts
     COMPONENT compat_files
     )
 ENDIF()

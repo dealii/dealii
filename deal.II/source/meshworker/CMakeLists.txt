@@ -15,10 +15,10 @@
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
 FILE(GLOB _header
-  ${CMAKE_SOURCE_DIR}/include/deal.II/mesh_worker/*.h
+  ${CMAKE_SOURCE_DIR}/include/deal.II/meshworker/*.h
   )
 
 SET(_src
   )
 
-DEAL_II_ADD_LIBRARY(obj_mesh_worker OBJECT ${_src} ${_header})
+DEAL_II_ADD_LIBRARY(obj_meshworker OBJECT ${_src} ${_header})
