@@ -40,17 +40,6 @@
 #include <fstream>
 
 
-template <int dim>
-class LinearFunction : public Function<dim>
-{
-  public:
-    double value (const Point<dim> &p,
-		  const unsigned int) const
-      {
-	return p[0] + 2;
-      }
-};
-
 
 void test()
 {
@@ -67,6 +56,8 @@ void test()
 					     MPI_COMM_WORLD);
   Assert (interpolated.has_ghost_elements() == false,
 	  ExcInternalError());
+
+  deallog << "OK" << std::endl;
 }
 
 
@@ -81,18 +72,18 @@ int main(int argc, char *argv[])
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 
-
   deallog.push(Utilities::int_to_string(myid));
+  deallog.depth_console(0);
+  deallog.threshold_double(1.e-10);
 
   if (myid == 0)
     {
       std::ofstream logfile(output_file_for_mpi("trilinos_vector_ghosts_01").c_str());
       deallog.attach(logfile);
-      deallog.depth_console(0);
-      deallog.threshold_double(1.e-10);
+      test ();
     }
-
-  test();
+  else
+    test();
 
 #ifdef DEAL_II_WITH_MPI
   MPI_Finalize();
