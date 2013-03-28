@@ -425,12 +425,11 @@ int main (int argc, char **argv)
 {
   try
     {
+      using namespace dealii;
+      using namespace Step36;
 
       Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
-        using namespace dealii;
-        using namespace Step36;
-
         deallog.depth_console (0);
 
         EigenvalueProblem<2> problem ("step-36.prm");
