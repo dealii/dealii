@@ -32,7 +32,7 @@ else
   LIBS                 = @MAKEFILE_LIBS_RELEASE@
 endif
 
-LIBDIR               = @CMAKE_INSTALL_PREFIX@/@DEAL_II_LIBRARY_RELDIR@
+LIBDIR               = $(D)/@DEAL_II_LIBRARY_RELDIR@
 
 enable-threads       = @MAKEFILE_enablethreads@
 enable-shared        = @MAKEFILE_enableshared@
