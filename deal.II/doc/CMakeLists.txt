@@ -70,10 +70,18 @@ ENDIF(DEAL_II_COMPONENT_DOCUMENTATION)
 #
 # Always install a minimalistic README and LICENSE file:
 #
+
+# Bloody hack to get an empty relative path:
+IF(NOT "${DEAL_II_DOCREADME_RELDIR}" STREQUAL "")
+  SET(_foo ${DEAL_II_DOCREADME_RELDIR})
+ELSE()
+  SET(_foo \${__empty})
+ENDIF()
+
 SET(_destination)
 INSTALL(FILES
   ${CMAKE_SOURCE_DIR}/README
   ${CMAKE_SOURCE_DIR}/LICENSE
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/${DEAL_II_DOCREADME_RELDIR}
+  DESTINATION ${_foo}
   COMPONENT library
   )
