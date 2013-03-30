@@ -25,7 +25,7 @@ INCLUDE(FindPackageHandleStandardArgs)
 
 SET_IF_EMPTY(NETCDF_DIR "$ENV{NETCDF_DIR}")
 
-FIND_PATH(NETCDF_INCLUDE_DIR netcdf.hh
+FIND_PATH(NETCDF_INCLUDE_DIR netcdfcpp.h
   HINTS
     ${NETCDF_DIR}
   PATH_SUFFIXES
@@ -39,7 +39,7 @@ FIND_PATH(NETCDF_INCLUDE_DIR netcdf.hh
 # - separate C++ and C library search
 #
 
-FIND_LIBRARY(NETCDF_CPLUSPLUS_LIBRARY NAMES netcdf_c++ netcdf_cpp netcdf_c++4
+FIND_LIBRARY(NETCDF_CPLUSPLUS_LIBRARY NAMES netcdf_c++ netcdf_cpp
   HINTS
     ${NETCDF_DIR}
   PATH_SUFFIXES
