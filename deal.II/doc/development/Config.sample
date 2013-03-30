@@ -399,7 +399,6 @@
 #
 # Specify a hint with CMAKE_PREFIX_PATH or by setting
 # SET(SLEPC_DIR "/.../..." CACHE PATH "")
-# SET(SLEPC_ARCH "..." CACHE STRING "")
 #
 # Manual setup:
 #
