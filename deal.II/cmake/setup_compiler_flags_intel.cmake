@@ -84,6 +84,7 @@ IF (CMAKE_BUILD_TYPE MATCHES "Release")
   # General optimization flags:
   #
   ADD_FLAGS(DEAL_II_CXX_FLAGS_RELEASE "-O2")
+  ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-ip")
 
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-funroll-loops")
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_RELEASE "-ansi-alias") # equiv. -fstrict-aliasing
