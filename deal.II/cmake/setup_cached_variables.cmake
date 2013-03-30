@@ -107,8 +107,9 @@ ENDIF()
 #                                                                         #
 ###########################################################################
 
-SET(DEAL_II_ALLOW_PLATFORM_INTROSPECTION ON CACHE BOOL
+OPTION(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
   "Allow platform introspection for CPU command set, SSE and AVX"
+  ON
   )
 MARK_AS_ADVANCED(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
 

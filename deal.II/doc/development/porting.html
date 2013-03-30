@@ -122,23 +122,41 @@
       </ul>
     </p>
 
-    <!--
     <h2>Cross compiling</h2>
 
     <p>
       It is possible to use <a href="http://www.cmake.org/"
       target="_top">CMake</a> to cross compile
-      <acronym>deal.II</acronym> for a foreign platform.  It is best
-      to start cross compiling with minimal external dependencies
-      (<code>-DDEAL_II_ALLOW_AUTODETECTION=OFF</code>, see the
-      <a href="cmake.html">deal.II CMake documentation</a>).
-      Further information on that topic can be found in the <a
+      <acronym>deal.II</acronym> for a foreign platform.
+      Further information on that topic can be found at the <a
       href="http://www.cmake.org/Wiki/CMake_Cross_Compiling">CMake
       wiki</a>.
-    -->
+    </p>
+
+    <p>
+      You have to set up a native deal.II build directory first and run
+      <code>make expand_instantiations</code> in it. The executable is
+      needed for the build system (and obviously the cross compiled version
+      cannot be used). Assuming you have a working cross compilation
+      toolchain, set up a <i>toolchain file</i> next. An example toolchain
+      file can be found <a href="Toolchain.sample">here</a>. With that
+      invoke <code>cmake</code> e.g. with:
+      <pre>
+    cmake -DCMAKE_TOOLCHAIN_FILE=&lt;...&gt;/Toolchain.sample
+          -DDEAL_II_NATIVE=&lt;...&gt;/native/build/dir
+
+          -DDEAL_II_FORCE_BUNDLED_BOOST=ON
+          -DDEAL_II_ALLOW_AUTODETECTION=OFF
+          ../deal.II
+      </pre>
+      where <code>DEAL_II_NATIVE</code> points to the toolchain file and
+      <code>DEAL_II_NATIVE</code> to the native build directory (which
+      <code>expand_instantiations</code> will be picked from). The remaining
+      configuration can be adjusted at will, see <a
+        href="cmake.html">the documentation</a>.
+    </p>
 
     <hr>
-
     <address>
       <a href="../mail.html" target="body">The deal.II Group</a>
     </address>

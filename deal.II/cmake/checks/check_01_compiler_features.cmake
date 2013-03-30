@@ -263,18 +263,20 @@ ENDIF()
 #
 # - Matthias Maier, rewritten 2012
 #
-GET_CXX_SOURCE_RETURN_VALUE(
-  "
-  #include <vector>
-  int main () {
-    std::vector<int> v(1);
-    v.reserve (1);
-    v.resize (1);
-    return v.capacity();
-  }
-  "
-  DEAL_II_MIN_VECTOR_CAPACITY
-  DEAL_II_MIN_VECTOR_CAPACITY_RETURN_VALUE)
+IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+  GET_CXX_SOURCE_RETURN_VALUE(
+    "
+    #include <vector>
+    int main () {
+      std::vector<int> v(1);
+      v.reserve (1);
+      v.resize (1);
+      return v.capacity();
+    }
+    "
+    DEAL_II_MIN_VECTOR_CAPACITY
+    DEAL_II_MIN_VECTOR_CAPACITY_RETURN_VALUE)
+ENDIF()
 
 IF(NOT DEAL_II_MIN_VECTOR_CAPACITY)
   SET(DEAL_II_MIN_VECTOR_CAPACITY 1)
@@ -291,21 +293,23 @@ ENDIF()
 #
 # - Matthias Maier, rewritten 2012
 #
-GET_CXX_SOURCE_RETURN_VALUE(
-  "
-  #include <vector>
-  int main () {
-    std::vector<bool> v(1);
-    v.reserve (1);
-    v.resize (1);
-    return v.capacity();
-  }
-  "
-  DEAL_II_MIN_BOOL_VECTOR_CAPACITY
-  DEAL_II_MIN_BOOL_VECTOR_CAPACITY_RETURN_VALUE)
+IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+  GET_CXX_SOURCE_RETURN_VALUE(
+    "
+    #include <vector>
+    int main () {
+      std::vector<bool> v(1);
+      v.reserve (1);
+      v.resize (1);
+      return v.capacity();
+    }
+    "
+    DEAL_II_MIN_BOOL_VECTOR_CAPACITY
+    DEAL_II_MIN_BOOL_VECTOR_CAPACITY_RETURN_VALUE)
+ENDIF()
 
 IF(NOT DEAL_II_MIN_BOOL_VECTOR_CAPACITY)
-  SET(DEAL_II_MIN_VECTOR_CAPACITY 1)
+  SET(DEAL_II_MIN_BOOL_VECTOR_CAPACITY 1)
 ELSE()
   SET(DEAL_II_MIN_BOOL_VECTOR_CAPACITY
     ${DEAL_II_MIN_BOOL_VECTOR_CAPACITY_RETURN_VALUE})

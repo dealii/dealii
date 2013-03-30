@@ -127,6 +127,12 @@ IF(CMAKE_BUILD_TYPE MATCHES "Release")
 ENDIF()
 
 
+###########################################################################
+#                                                                         #
+#  Cleanup and Includes that have to happen after the call to PROJECT():  #
+#                                                                         #
+###########################################################################
+
 #
 # Cleanup some files used for storing the names of all object targets that
 # will be bundled to the deal.II library.
@@ -140,3 +146,21 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     )
 ENDFOREACH()
 
+
+#
+# Cross compilation stuff:
+#
+IF(CMAKE_CROSSCOMPILING)
+  #
+  # Disable platform introspection when cross compiling
+  #
+  SET(DEAL_II_ALLOW_PLATFORM_INTROSPECTION OFF CACHE BOOL "" FORCE)
+
+  #
+  # Import native expand_instantiations for use in cross compilation:
+  #
+  SET(DEAL_II_NATIVE "DEAL_II_NATIVE-NOTFOUND" CACHE FILEPATH
+    "A pointer to a native deal.Ii build directory"
+    )
+  INCLUDE(${DEAL_II_NATIVE}/cmake/scripts//importExecutables.cmake)
+ENDIF()

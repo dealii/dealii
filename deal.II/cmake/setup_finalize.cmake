@@ -80,17 +80,23 @@ _both(
 "###
 #
 #  ${DEAL_II_PACKAGE_NAME} configuration:
-#
 #        CMAKE_BUILD_TYPE:       ${CMAKE_BUILD_TYPE}
 #        BUILD_SHARED_LIBS:      ${BUILD_SHARED_LIBS}
 #        CMAKE_INSTALL_PREFIX:   ${CMAKE_INSTALL_PREFIX}
 #        CMAKE_SOURCE_DIR:       ${CMAKE_SOURCE_DIR} (Version ${DEAL_II_PACKAGE_VERSION})
 #        CMAKE_BINARY_DIR:       ${CMAKE_BINARY_DIR}
-#        CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME}
+#        CMAKE_CXX_COMPILER:     ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION} on platform ${CMAKE_SYSTEM_NAME} ${CMAKE_SYSTEM_PROCESSOR}
 #                                ${CMAKE_CXX_COMPILER}
-#
 "
   )
+IF(CMAKE_CROSSCOMPILING)
+  _both(
+    "#        CROSSCOMPILING!\n"
+    "#        DEAL_II_NATIVE:         ${DEAL_II_NATIVE}\n"
+    )
+ENDIF()
+
+_both("#\n")
 
 _detailed(
 "#  Compiler flags used for this build:
