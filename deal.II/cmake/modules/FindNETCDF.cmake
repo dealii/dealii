@@ -39,7 +39,7 @@ FIND_PATH(NETCDF_INCLUDE_DIR netcdf.hh
 # - separate C++ and C library search
 #
 
-FIND_LIBRARY(NETCDF_CPLUSPLUS_LIBRARY NAMES netcdf_c++ netcdf_cpp
+FIND_LIBRARY(NETCDF_CPLUSPLUS_LIBRARY NAMES netcdf_c++ netcdf_cpp netcdf_c++4
   HINTS
     ${NETCDF_DIR}
   PATH_SUFFIXES
