@@ -121,10 +121,18 @@
 
     <p>
       This automatically builds PETSc with both MPI and the algebraic
-      multigrid preconditioner package Hypre (which we use in step-40). You
-      may wish to put the <code>export</code> commands into
-      your <code>~/.bashrc</code> or <code>~/.cshrc</code> files, with the
-      first one replaced by something of the kind
+      multigrid preconditioner package Hypre (which we use in step-40). 
+      <br>
+      Now let PETSc check his own sanity:
+      <pre>
+
+	make test
+      </pre>
+      will self-check the serial (and MPI) implementation of PETSc.
+      <br>
+      You may wish to put the <code>export</code> commands into
+      your <code>~/.bashrc</code> or <code>~/.cshrc</code> files, with
+      the first one replaced by something of the kind
       <pre>
 
 	export PETSC_DIR=/path/to/petsc-x-y-z

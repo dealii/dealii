@@ -620,7 +620,7 @@
 	<p>
 	  To disable the PETSc interfaces in cases where <code>cmake</code>
 	  automatically finds it, use <code>-DDEAL_II_WITH_PETSC=OFF</code>
-	  More information on configuring and building PETSC can be
+	  More information on configuring and building PETSc can be
           found <a href="external-libs/petsc.html" target="body">here</a>.
 	</p>
       </dd>
@@ -629,15 +629,20 @@
       <dt><a href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a></dt>
       <dd>
 	<p>
-	  <a href="http://www.grycap.upv.es/slepc/" target="_top">SLEPc</a> is
-	  a library for eigenvalue computations that builds on PETSc. Its
-	  configuration works just like that for PETSc, except that the
-          variable to set is <code>SLEPC_DIR</code> and
-          <code>SLEPC_ARCH</code>.
-          If <code>SLEPC_ARCH</code> is left empty, <code>cmake</code> will
-          use the same architecture as specified in <code>PETSC_ARCH</code>.
-	  For the interface with SLEPc to work, <acronym>deal.II</acronym>'s
-	  PETSc interface must also be configured correctly (see above).
+	  <a href="http://www.grycap.upv.es/slepc/"
+	  target="_top">SLEPc</a> is a library for eigenvalue
+	  computations that builds on PETSc. Its configuration works
+	  just like that for PETSc, except that the variable to set
+	  is <code>SLEPC_DIR</code>.  For the interface with SLEPc to
+	  work, <acronym>deal.II</acronym>'s PETSc interface must also
+	  be configured correctly (see above).
+	</p>
+
+	<p>
+	  To disable the SLEPc interfaces in cases where <code>cmake</code>
+	  automatically finds it, use <code>-DDEAL_II_WITH_PETSC=OFF</code>
+	  More information on configuring and building SLEPc can be
+          found <a href="external-libs/slepc.html" target="body">here</a>.
 	</p>
       </dd>
 
