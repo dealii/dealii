@@ -1,0 +1,112 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>The deal.II Readme on interfacing to SLEPc</title>
+    <link href="../screen.css" rel="StyleSheet">
+    <meta name="author" content="the deal.II authors <authors @ dealii.org>">
+    <meta name="copyright" content="Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors">
+    <meta name="date" content="$Date$">
+    <meta name="svn_id" content="$Id$">
+    <meta name="keywords" content="deal.II">
+  </head>
+
+  <body>
+
+    <h1>Interfacing <acronym>deal.II</acronym> to SLEPc</h1>
+
+    <p>
+      <a href="http://www.grycap.upv.es/slepc/"
+      target="_top">SLEPc</a> is a software package that provides
+      functionality for solving a variety of eigenspectrum problems,
+      both standard and generalised. It relies on various different
+      sparse and dense matrix and vector formats that are defined in
+      the PETSc package.  Naturally, this means PETSc must be
+      correctly installed before a working copy of SLEPc can be
+      installed as described <a href="petsc.html">here</a>.
+    </p>
+
+    <p>
+      <acronym>deal.II</acronym> has wrapper classes to the solver and
+      spectral transformation parts of SLEPc that loosely provide
+      almost the same interfaces as the wrapper classes to the PETSc
+      functionality. They are used in a simple case in step-36.
+    </p>
+
+    <h4>Installing <acronym>deal.II</acronym> with SLEPc</h4>
+
+    <p>
+      SLEPc requires the environment variables <code>PETSC_DIR</code>
+      and <code>PETSC_ARCH</code> to be set already and usually
+      requires you to set the environment
+      variable <code>SLEPC_DIR</code> as well. If the environment
+      variable is set, then
+      <acronym>deal.II</acronym> will pick up on this during
+      configuration; just as before with PETSc.
+    </p>
+
+    <p>
+      Alternatively, the <code>-DSLEPC_DIR=DIR</code> option
+      for <code>cmake</code> can be used to override the values
+      of <code>SLEPc_DIR</code> if, for example, these environment
+      variables are not set at all. You can also
+      specify <code>-DDEAL_II_WITH_SLEPC=OFF</code> as a flag during
+      configuration to have <acronym>deal.II</acronym> completely
+      ignore a SLEPc installation.
+    </p>
+
+    <h4>Installing SLEPc</h4>
+
+    <p>
+      <b>Note:</b> The version numbers (x,y,z) of your SLEPc
+      installation must be identical to the same version numbers of
+      your PETSc installation.
+    </p>
+
+    <p>
+      Installing SLEPc is not much of a challenge once PETSc has been
+      correctly installed (check this first!). What is happening here,
+      is that SLEPc scans your PETSc installation and figures out how
+      that was configured; its location, the
+      given <code>PETSC_ARCH</code>, MPI settings, debug
+      mode, and so on.
+    </p>
+
+    <p>
+      This builds a simple SLEPc installation:
+      <pre>
+
+	tar xvzf slepc-x-y-z.tar.gz
+        cd slepc-x-y-z
+	export SLEPC_DIR=`pwd`
+	export LD_LIBRARY_PATH=$SLEPC_DIR/$PETSC_ARCH/lib:$LD_LIBRARY_PATH
+	./configure
+	make
+      </pre>
+      Now let SLEPc check his own sanity:
+      <pre>
+
+	make test
+      </pre>
+      will self-check the serial (and MPI) implementation of SLEPc.
+    </p>
+
+    <p>
+      Finally, you may want to put the two <code>export</code>
+      commands above into your <code>~/.bashrc</code>
+      or <code>~/.cshrc</code> files, with the first one replaced by
+      <pre>
+
+	export SLEPC_DIR=/path/to/slepc-x-y-z
+      </pre>
+    </p>
+    <hr>
+
+    <!-- TODO: <h4>Using the ARPACK solvers with SLEPc</4> -->
+
+    <address>
+      <a href="../mail.html" target="body">The deal.II Group</a>
+      $Date$
+    </address>
+  </body>
+</html>
