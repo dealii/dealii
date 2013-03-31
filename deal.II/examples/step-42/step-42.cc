@@ -1353,16 +1353,15 @@ namespace Step42
               break;
           }
 
-        if (resid<1e-8)
-          break;
-
         resid_old=resid;
 
         resid_vector = system_rhs_newton;
         resid_vector.compress (VectorOperation::insert);
 
-        if (active_set == active_set_old && resid < 1e-10)
-          break;
+        int is_my_set_changed = (active_set == active_set_old)?0:1;
+        int num_changed = Utilities::MPI::sum(is_my_set_changed, MPI_COMM_WORLD);
+        if (num_changed==0 && resid < 1e-8)
+                   break;
         active_set_old = active_set;
       } // End of active-set-loop
 
