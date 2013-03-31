@@ -1228,7 +1228,14 @@ ParameterHandler::demangle (const std::string &s)
 bool
 ParameterHandler::is_parameter_node (const boost::property_tree::ptree &p)
 {
-  return (p.get_optional<std::string>("value"));
+  // A parameter node must have a value key
+  if (p.get_optional<std::string>("value"))
+    {
+      // and the associated child ptree must be final, i.e. no children:
+      if(p.get_child("value").size() == 0)
+        return true;
+    }
+  return false;
 }
 
 
