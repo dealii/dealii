@@ -27,7 +27,9 @@ inconvenience this causes.
 
 <li> Removed: The interfaces to the obsolete direct solvers MA27 and MA47 from
 the Harwell Subroutine Library. Support for the HSL routines were not ported to
-the new build system
+the new build system. However, the sparse direct solver UMFPACK remains to be
+supported and is provided as part of the standard deal.II distribution, unlike
+the HSL functions.
 <br>
 (Matthias Maier, 2013/04/01)
 
