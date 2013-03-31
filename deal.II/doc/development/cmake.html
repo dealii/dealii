@@ -411,16 +411,14 @@
       detailed list of valid variables per feature.)
     </p>
     <p>
-      An example of use is to select BLAS and LAPACK manually as follows
-      (here, these libraries have been compiled with the gfortran compiler
+      An example of use is to select BLAS and LAPACK manually from a PETSc
+      configuration:
+      (Here, these libraries have been compiled with the gfortran compiler
       and need its support library):
       <pre>
 
-    cmake -DBLAS_FOUND=true \
-          -DBLAS_LIBRARIES="/apps/GotoBLAS/lib64/libgoto.so" \
-          -DBLAS_LINKER_FLAGS="-lgfortran" \
-          -DLAPACK_FOUND=true \
-          -DLAPACK_LIBRARIES="/apps/lapack-3.2.1/liblapack.so;/apps/GotoBLAS/lib64/libgoto.so" \
+    cmake -DLAPACK_FOUND=true \
+          -DLAPACK_LIBRARIES="/tmp/petsc-3.3-p6/arch-linux2-c-debug/lib/libflapack.a;/tmp/petsc-3.3-p6/arch-linux2-c-debug/lib/libfblas.a" \
           -DLAPACK_LINKER_FLAGS="-lgfortran"
       </pre>
 
