@@ -143,7 +143,7 @@ namespace SLEPcWrappers
     solve (const PETScWrappers::MatrixBase &A,
            std::vector<double>             &kr,
            std::vector<OutputVector>       &vr,
-           const unsigned int              n_eigenvectors);
+           const unsigned int              n_eigenvectors = 1);
 
     /**
      * Same as above, but here a composite method for solving the
@@ -155,7 +155,7 @@ namespace SLEPcWrappers
            const PETScWrappers::MatrixBase &B,
            std::vector<double>             &kr,
            std::vector<OutputVector>       &vr,
-           const unsigned int               n_eigenvectors);
+           const unsigned int               n_eigenvectors = 1);
 
     /**
      * Initialize solver for the linear system $Ax=\lambda x$. (Note:
@@ -654,7 +654,7 @@ namespace SLEPcWrappers
   SolverBase::solve (const PETScWrappers::MatrixBase &A,
                      std::vector<double>             &kr,
                      std::vector<OutputVector>       &vr,
-                     const unsigned int               n_eigenvectors = 1)
+                     const unsigned int               n_eigenvectors)
   {
     // Panic if no eigenpairs are wanted.
     AssertThrow (n_eigenvectors != 0, ExcSLEPcWrappersUsageError());
@@ -686,7 +686,7 @@ namespace SLEPcWrappers
                      const PETScWrappers::MatrixBase &B,
                      std::vector<double>             &kr,
                      std::vector<OutputVector>       &vr,
-                     const unsigned int               n_eigenvectors = 1)
+                     const unsigned int               n_eigenvectors)
   {
     // Panic if no eigenpairs are wanted.
     AssertThrow (n_eigenvectors != 0, ExcSLEPcWrappersUsageError());
@@ -723,4 +723,3 @@ DEAL_II_NAMESPACE_CLOSE
 #endif
 
 /*----------------------------   slepc_solver.h  ---------------------------*/
-
