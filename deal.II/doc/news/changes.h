@@ -89,6 +89,12 @@ this function.
 
 <ol>
 
+<li> Fixed: The ParameterHandler class could not deal with parameters named
+<code>"value"</code> (and a few other names). This is now fixed.
+<br>
+(Denis Davydov, Matthias Maier, Wolfgang Bangerth, 2013/3/31)
+</li>
+
 <li> Changed: TimerOutput no longer assumes that sections are not nested
 when outputting percentage and total run time.
 <br>

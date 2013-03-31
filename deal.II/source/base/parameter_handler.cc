@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1067,25 +1067,35 @@ std::string
 ParameterHandler::mangle (const std::string &s)
 {
   std::string u;
+
+  // reserve the minimum number of characters we will need. it may
+  // be more but this is the least we can do
   u.reserve (s.size());
 
-  static const std::string allowed_characters
-  ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+  // see if the name is special and if so mangle the whole thing
+  const bool mangle_whole_string = (s == "value");
 
   // for all parts of the string, see
   // if it is an allowed character or
   // not
   for (unsigned int i=0; i<s.size(); ++i)
-    if (allowed_characters.find (s[i]) != std::string::npos)
-      u.push_back (s[i]);
-    else
-      {
-        u.push_back ('_');
-        static const char hex[16]
-          = { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
-        u.push_back (hex[static_cast<unsigned char>(s[i])/16]);
-        u.push_back (hex[static_cast<unsigned char>(s[i])%16]);
-      }
+    {
+      static const std::string allowed_characters
+	("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+
+      if (mangle_whole_string
+	  ||
+	  (allowed_characters.find (s[i]) != std::string::npos))
+	u.push_back (s[i]);
+      else
+	{
+	  u.push_back ('_');
+	  static const char hex[16]
+	    = { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+	  u.push_back (hex[static_cast<unsigned char>(s[i])/16]);
+	  u.push_back (hex[static_cast<unsigned char>(s[i])%16]);
+	}
+    }
 
   return u;
 }
@@ -1228,14 +1238,7 @@ ParameterHandler::demangle (const std::string &s)
 bool
 ParameterHandler::is_parameter_node (const boost::property_tree::ptree &p)
 {
-  // A parameter node must have a value key
-  if (p.get_optional<std::string>("value"))
-    {
-      // and the associated child ptree must be final, i.e. no children:
-      if(p.get_child("value").size() == 0)
-        return true;
-    }
-  return false;
+  return (p.get_optional<std::string>("value"));
 }
 
 

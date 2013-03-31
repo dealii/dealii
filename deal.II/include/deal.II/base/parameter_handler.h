@@ -1772,9 +1772,8 @@ namespace Patterns
  *   numbers, every character in their names that is not a letter or number
  *   is replaced
  *   by an underscore followed by its two-digit hexadecimal representation.
- *   In addition, the special names "value", "default_value", "pattern",
- *   "pattern_index", and "documentation" are mangled when used as
- *   names of parameters given that these names are also used to name
+ *   In addition, the special name "value" is mangled when used as the
+ *   name of a parameter, given that this name is also used to name
  *   special files in the hierarchy structure.
  *   Finally, the entire tree is wrapped into a tag
  *   <code>%ParameterHandler</code> to satisfy the XML requirement that there
