@@ -25,6 +25,13 @@ inconvenience this causes.
 
 <ol>
 
+<li> Removed: The interfaces to the obsolete direct solvers MA27 and MA47 from
+the Harwell Subroutine Library. Support for the HSL routines were not ported to
+the new build system
+<br>
+(Matthias Maier, 2013/04/01)
+
+
 <li> Changed: The TimeDependent::end_sweep function with an argument indicating
 the number of threads has been removed. Use the corresponding function without
 an argument. Since the argument had a default value, few users will have used
