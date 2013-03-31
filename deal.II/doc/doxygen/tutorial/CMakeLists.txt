@@ -197,7 +197,7 @@ INSTALL(FILES
   toc-topics.html
   ${CMAKE_CURRENT_BINARY_DIR}/steps.png
   ${CMAKE_CURRENT_BINARY_DIR}/toc.html
-  DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}/doxygen/tutorial
+  DESTINATION ${DEAL_II_DOCHTML_RELDIR}/doxygen/tutorial
   COMPONENT documentation
   )
 

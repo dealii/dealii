@@ -693,6 +693,29 @@ namespace GridOutFlags
 //    void parse_parameters (ParameterHandler &param);
   };
 
+  /**
+   * Flags for grid output in MathGL format.
+   *
+   * @ingroup output
+   */
+  struct MathGL
+  {
+    /**
+     * Constructor.
+     */
+    MathGL ();
+
+    /**
+     * Declare parameters in ParameterHandler.
+     */
+    static void declare_parameters (ParameterHandler &param);
+
+    /**
+     * Parse parameters of ParameterHandler.
+     */
+    void parse_parameters (ParameterHandler &param);
+  };
+
 }
 
 
@@ -798,8 +821,9 @@ public:
     /// write() calls write_msh()
     msh,
     /// write() calls write_svg()
-    svg
-    /// write() calls write_svg()
+    svg,
+    /// write() calls write_mathgl()
+    mathgl
   };
 
   /**
@@ -1023,6 +1047,15 @@ public:
                   std::ostream            &out) const;
 
   /**
+   * Write triangulation in MathGL format.
+   *
+   * Not implemented for the codimension one case.
+   */
+  template <int dim>
+  void write_mathgl (const Triangulation<dim> &tria,
+		     std::ostream             &out) const;
+
+  /**
    * Write grid to @p out according to the given data format. This
    * function simply calls the appropriate <tt>write_*</tt> function.
    */
@@ -1086,6 +1119,11 @@ public:
    * Set flags for SVG output
    */
   void set_flags (const GridOutFlags::Svg &flags);
+
+  /**
+   * Set flags for MathGL output
+   */
+  void set_flags (const GridOutFlags::MathGL &flags);
 
   /**
    * Provide a function which tells us which
@@ -1218,6 +1256,11 @@ private:
    * Flags used for Svg output.
    */
   GridOutFlags::Svg svg_flags;
+
+  /**
+   * Flags for OpenDX output.
+   */
+  GridOutFlags::MathGL mathgl_flags;
 
   /**
    * Write the grid information about faces to @p out. Only those

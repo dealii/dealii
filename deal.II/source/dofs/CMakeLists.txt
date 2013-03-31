@@ -14,7 +14,11 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(src
+FILE(GLOB _header
+  ${CMAKE_SOURCE_DIR}/include/deal.II/dofs/*.h
+  )
+
+SET(_src
   block_info.cc
   dof_accessor.cc
   dof_faces.cc
@@ -26,7 +30,7 @@ SET(src
   number_cache.cc
   )
 
-SET(inst_in_files
+SET(_inst
   block_info.inst.in
   dof_accessor.inst.in
   dof_handler.inst.in
@@ -36,6 +40,6 @@ SET(inst_in_files
   dof_tools.inst.in
   )
 
-DEAL_II_ADD_LIBRARY(obj_dofs OBJECT ${src})
-EXPAND_INSTANTIATIONS(obj_dofs "${inst_in_files}")
+DEAL_II_ADD_LIBRARY(obj_dofs OBJECT ${_src} ${_header} ${_inst})
+EXPAND_INSTANTIATIONS(obj_dofs "${_inst}")
 

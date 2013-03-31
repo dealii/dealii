@@ -108,22 +108,25 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
   # below but it will throw an exception when run. So test
   # that as well.
   #
-  # TODO: Get somehow rid of the platform introspection...
-  #
   # TODO: This test will only succeed on platforms where "-pthread" is
   #       recognized. But this isn't easily fixable:
   #       configure_threads.cmake which will determine and setup threads
   #       has to be called later...
   #
-  PUSH_TEST_FLAG("-pthread")
-  CHECK_CXX_SOURCE_RUNS(
-    "
-    #include <thread>
-    void f(int){}
-    int main(){ std::thread t(f,1); t.join(); return 0; }
-    "
-    DEAL_II_HAVE_CXX11_THREAD)
-  POP_TEST_FLAG()
+  IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+    PUSH_TEST_FLAG("-pthread")
+    CHECK_CXX_SOURCE_RUNS(
+      "
+      #include <thread>
+      void f(int){}
+      int main(){ std::thread t(f,1); t.join(); return 0; }
+      "
+      DEAL_II_HAVE_CXX11_THREAD)
+    POP_TEST_FLAG()
+  ELSE()
+    # Just export it ;-)
+    SET_IF_EMPTY(DEAL_II_HAVE_CXX11_THREAD TRUE)
+  ENDIF()
 
   CHECK_CXX_SOURCE_COMPILES(
     "

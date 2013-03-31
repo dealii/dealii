@@ -25,6 +25,15 @@ inconvenience this causes.
 
 <ol>
 
+<li> Removed: The interfaces to the obsolete direct solvers MA27 and MA47 from
+the Harwell Subroutine Library. Support for the HSL routines were not ported to
+the new build system. However, the sparse direct solver UMFPACK remains to be
+supported and is provided as part of the standard deal.II distribution, unlike
+the HSL functions.
+<br>
+(Matthias Maier, 2013/04/01)
+
+
 <li> Changed: The TimeDependent::end_sweep function with an argument indicating
 the number of threads has been removed. Use the corresponding function without
 an argument. Since the argument had a default value, few users will have used
@@ -79,6 +88,12 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> Fixed: The ParameterHandler class could not deal with parameters named
+<code>"value"</code> (and a few other names). This is now fixed.
+<br>
+(Denis Davydov, Matthias Maier, Wolfgang Bangerth, 2013/3/31)
+</li>
 
 <li> Changed: TimerOutput no longer assumes that sections are not nested
 when outputting percentage and total run time.

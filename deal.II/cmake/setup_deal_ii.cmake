@@ -26,6 +26,7 @@
 #
 #     DEAL_II_PACKAGE_NAME            *)
 #     DEAL_II_PACKAGE_VERSION         *)
+#     DEAL_II_PACKAGE_VENDOR          *)
 #     DEAL_II_VERSION_MAJOR
 #     DEAL_II_VERSION_MINOR
 #     DEAL_II_VERSION
@@ -37,19 +38,16 @@
 #     DEAL_II_DEBUG_SUFFIX            *)
 #     DEAL_II_RELEASE_SUFFIX          *)
 #
-#     DEAL_II_PATH                    *)
 #     DEAL_II_CMAKE_MACROS_RELDIR     *)
-#     DEAL_II_DOCUMENTATION_RELDIR    *)
+#     DEAL_II_DOCHTML_RELDIR          *)
+#     DEAL_II_DOCREADME_RELDIR        *)
 #     DEAL_II_EXAMPLES_RELDIR         *)
 #     DEAL_II_EXECUTABLE_RELDIR       *)
 #     DEAL_II_INCLUDE_RELDIR          *)
 #     DEAL_II_LIBRARY_RELDIR          *)
 #     DEAL_II_PROJECT_CONFIG_RELDIR   *)
 #
-#     DEAL_II_INCLUDE_DIRS
-#     DEAL_II_LIBRARY_DIRS
-#
-#     DEAL_II_BUILD_TYPE
+#     DEAL_II_BUILD_TYPES
 #     DEAL_II_WITH_BUNDLED_DIRECTORY
 #     DEAL_II_WITH_DOC_DIRECTORY
 #
@@ -65,6 +63,8 @@
 SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "8.0.pre") # TODO: Get this value from somewhere else
+
+SET_IF_EMPTY(DEAL_II_PACKAGE_VENDOR "The deal.II Authors <http://www.dealii.org/>")
 
 STRING(REGEX REPLACE
   "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${DEAL_II_PACKAGE_VERSION}"
@@ -88,14 +88,14 @@ SET_IF_EMPTY(DEAL_II_BASE_NAME "${_base_name}")
 SET_IF_EMPTY(DEAL_II_DEBUG_SUFFIX ".g")
 SET_IF_EMPTY(DEAL_II_RELEASE_SUFFIX "")
 
-SET(DEAL_II_PATH ${CMAKE_INSTALL_PREFIX})
-
 IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
   # The good, old directory structure:
   #
   SET_IF_EMPTY(DEAL_II_CMAKE_MACROS_RELDIR "cmake/macros")
-  SET_IF_EMPTY(DEAL_II_DOCUMENTATION_RELDIR "doc")
+  SET_IF_EMPTY(DEAL_II_COMMON_RELDIR "common")
+  SET_IF_EMPTY(DEAL_II_DOCREADME_RELDIR "")
+  SET_IF_EMPTY(DEAL_II_DOCHTML_RELDIR "doc")
   SET_IF_EMPTY(DEAL_II_EXAMPLES_RELDIR "examples")
   SET_IF_EMPTY(DEAL_II_EXECUTABLE_RELDIR "bin")
   SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include")
@@ -107,7 +107,9 @@ ELSE()
   # obey the FSHS...
   #
   SET_IF_EMPTY(DEAL_II_CMAKE_MACROS_RELDIR "share/${DEAL_II_PACKAGE_NAME}/cmake/Macros")
-  SET_IF_EMPTY(DEAL_II_DOCUMENTATION_RELDIR "share/doc/${DEAL_II_PACKAGE_NAME}/html")
+  SET_IF_EMPTY(DEAL_II_COMMON_RELDIR "share/${DEAL_II_PACKAGE_NAME}/common")
+  SET_IF_EMPTY(DEAL_II_DOCREADME_RELDIR "share/doc/${DEAL_II_PACKAGE_NAME}")
+  SET_IF_EMPTY(DEAL_II_DOCHTML_RELDIR "${DEAL_II_DOCREADME_RELDIR}/html")
   SET_IF_EMPTY(DEAL_II_EXAMPLES_RELDIR "share/doc/${DEAL_II_PACKAGE_NAME}/examples")
   SET_IF_EMPTY(DEAL_II_EXECUTABLE_RELDIR "bin")
   SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include")
@@ -115,15 +117,6 @@ ELSE()
   SET_IF_EMPTY(DEAL_II_PROJECT_CONFIG_RELDIR "${DEAL_II_LIBRARY_RELDIR}/cmake/${DEAL_II_PROJECT_CONFIG_NAME}")
 ENDIF()
 
-LIST(APPEND DEAL_II_INCLUDE_DIRS
-  "${CMAKE_INSTALL_PREFIX}/${DEAL_II_INCLUDE_RELDIR}"
-  "${CMAKE_INSTALL_PREFIX}/${DEAL_II_INCLUDE_RELDIR}/deal.II"
-  "${CMAKE_INSTALL_PREFIX}/${DEAL_II_INCLUDE_RELDIR}/deal.II/bundled"
-  )
-
-LIST(APPEND DEAL_II_LIBRARY_DIRS
-  "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}"
-  )
 
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
   LIST(APPEND DEAL_II_BUILD_TYPES "DEBUG")
@@ -133,6 +126,12 @@ IF(CMAKE_BUILD_TYPE MATCHES "Release")
   LIST(APPEND DEAL_II_BUILD_TYPES "RELEASE")
 ENDIF()
 
+
+###########################################################################
+#                                                                         #
+#  Cleanup and Includes that have to happen after the call to PROJECT():  #
+#                                                                         #
+###########################################################################
 
 #
 # Cleanup some files used for storing the names of all object targets that
@@ -147,3 +146,21 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     )
 ENDFOREACH()
 
+
+#
+# Cross compilation stuff:
+#
+IF(CMAKE_CROSSCOMPILING)
+  #
+  # Disable platform introspection when cross compiling
+  #
+  SET(DEAL_II_ALLOW_PLATFORM_INTROSPECTION OFF CACHE BOOL "" FORCE)
+
+  #
+  # Import native expand_instantiations for use in cross compilation:
+  #
+  SET(DEAL_II_NATIVE "DEAL_II_NATIVE-NOTFOUND" CACHE FILEPATH
+    "A pointer to a native deal.Ii build directory"
+    )
+  INCLUDE(${DEAL_II_NATIVE}/cmake/scripts//importExecutables.cmake)
+ENDIF()

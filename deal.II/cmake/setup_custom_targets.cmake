@@ -35,11 +35,11 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
 ENDIF()
 
 IF(DEAL_II_COMPONENT_COMPAT_FILES)
-  ADD_CUSTOM_TARGET(compat_files)
-  ADD_DEPENDENCIES(compat_files
-    expand_instantiations
-    make_dependencies
-    report_features
+  ADD_CUSTOM_TARGET(compat_files
+    DEPENDS
+      expand_instantiations
+      make_dependencies
+      report_features
     )
 ENDIF()
 

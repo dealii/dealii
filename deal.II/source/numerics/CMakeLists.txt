@@ -14,7 +14,11 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(src
+FILE(GLOB _header
+  ${CMAKE_SOURCE_DIR}/include/deal.II/numerics/*.h
+  )
+
+SET(_src
   data_out.cc
   data_out_faces.cc
   data_out_rotation.cc
@@ -37,7 +41,7 @@ SET(src
   vector_tools.cc
   )
 
-SET(inst_in_files
+SET(_inst
   data_out_faces.inst.in
   data_out.inst.in
   data_out_rotation.inst.in
@@ -57,6 +61,6 @@ SET(inst_in_files
   vector_tools.inst.in
   )
 
-DEAL_II_ADD_LIBRARY(obj_numerics OBJECT ${src})
-EXPAND_INSTANTIATIONS(obj_numerics "${inst_in_files}")
+DEAL_II_ADD_LIBRARY(obj_numerics OBJECT ${_src} ${_header} ${_inst})
+EXPAND_INSTANTIATIONS(obj_numerics "${_inst}")
 

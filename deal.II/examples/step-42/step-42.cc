@@ -717,17 +717,12 @@ namespace Step42
 
       system_matrix_newton.reinit (sp);
 
-      // create a SP that only contains the diagonal
-      sp.reinit(locally_owned_dofs, mpi_communicator);
-      for (unsigned int idx=0; idx < locally_owned_dofs.n_elements();++idx)
-        {
-          unsigned int gidx = locally_owned_dofs.nth_index_in_set(idx);
-          sp.add(gidx, gidx);
-        }
-      sp.compress();
-
-      TrilinosWrappers::SparseMatrix mass_matrix;
-      mass_matrix.reinit (sp);
+				       // we are going to reuse the system
+				       // matrix for assembling the diagonal
+				       // of the mass matrix so that we do not
+				       // need to allocate two sparse matrices
+				       // at the same time:
+      TrilinosWrappers::SparseMatrix & mass_matrix = system_matrix_newton;
       assemble_mass_matrix_diagonal (mass_matrix);
       const unsigned int
       start = (system_rhs_newton.local_range().first),
@@ -735,8 +730,12 @@ namespace Step42
       for (unsigned int j=start; j<end; j++)
         diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
       number_iterations = 0;
-
+      
       diag_mass_matrix_vector.compress (VectorOperation::insert);
+
+				       // remove the mass matrix entries from the matrix:
+      mass_matrix = 0;
+
       computing_timer.exit_section("Setup: matrix");
     }
   }
@@ -1354,16 +1353,15 @@ namespace Step42
               break;
           }
 
-        if (resid<1e-8)
-          break;
-
         resid_old=resid;
 
         resid_vector = system_rhs_newton;
         resid_vector.compress (VectorOperation::insert);
 
-        if (active_set == active_set_old && resid < 1e-10)
-          break;
+        int is_my_set_changed = (active_set == active_set_old)?0:1;
+        int num_changed = Utilities::MPI::sum(is_my_set_changed, MPI_COMM_WORLD);
+        if (num_changed==0 && resid < 1e-8)
+                   break;
         active_set_old = active_set;
       } // End of active-set-loop
 

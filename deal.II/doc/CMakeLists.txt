@@ -48,7 +48,7 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
   # Install the static elements of the html documentation:
   #
   INSTALL(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/
-    DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}
+    DESTINATION ${DEAL_II_DOCHTML_RELDIR}
     COMPONENT documentation
     PATTERN "CMakeLists.txt" EXCLUDE
     PATTERN "doxygen" EXCLUDE
@@ -61,9 +61,27 @@ IF(DEAL_II_COMPONENT_DOCUMENTATION)
     )
   INSTALL(FILES
     ${CMAKE_CURRENT_BINARY_DIR}/title.html
-    DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}
+    DESTINATION ${DEAL_II_DOCHTML_RELDIR}
     COMPONENT documentation
     )
 
 ENDIF(DEAL_II_COMPONENT_DOCUMENTATION)
 
+#
+# Always install a minimalistic README and LICENSE file:
+#
+
+# Bloody hack to get an empty relative path:
+IF(NOT "${DEAL_II_DOCREADME_RELDIR}" STREQUAL "")
+  SET(_foo ${DEAL_II_DOCREADME_RELDIR})
+ELSE()
+  SET(_foo \${__empty})
+ENDIF()
+
+SET(_destination)
+INSTALL(FILES
+  ${CMAKE_SOURCE_DIR}/README
+  ${CMAKE_SOURCE_DIR}/LICENSE
+  DESTINATION ${_foo}
+  COMPONENT library
+  )

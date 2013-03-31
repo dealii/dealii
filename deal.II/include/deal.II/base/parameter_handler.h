@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1701,7 +1701,7 @@ namespace Patterns
  *     prm.leave_subsection ();
  *   @endcode
  *
- *   We can think of the parameters so arrange as a file system in which every
+ *   We can think of the parameters so arranged as a file system in which every
  *   parameter is a directory. The name of this directory is the name of the
  *   parameter, and in this directory lie files that describe the
  *   parameter. These files are:
@@ -1713,7 +1713,7 @@ namespace Patterns
  *   - <code>pattern</code>: A textual representation of the pattern that describes
  *     the parameter's possible values.
  *   - <code>pattern_index</code>: A number that indexes the Patterns::PatternBase
- *     object that is used to to describe the parameter.
+ *     object that is used to describe the parameter.
  *   - <code>documentation</code>: The content of this file is the documentation
  *     given for a parameter as the last argument of the
  *     ParameterHandler::declare_entry call.
@@ -1769,9 +1769,13 @@ namespace Patterns
  *   This representation closely resembles the directory/file structure
  *   discussed above. The only difference is that directory and file
  *   names are mangled: since they should only contain letters and
- *   numbers, every character in their names that's not one is replaced
+ *   numbers, every character in their names that is not a letter or number
+ *   is replaced
  *   by an underscore followed by its two-digit hexadecimal representation.
- *   In addition, the entire tree is wrapped into a tag
+ *   In addition, the special name "value" is mangled when used as the
+ *   name of a parameter, given that this name is also used to name
+ *   special files in the hierarchy structure.
+ *   Finally, the entire tree is wrapped into a tag
  *   <code>%ParameterHandler</code> to satisfy the XML requirement that there
  *   be only a single top-level construct in each file.
  *
