@@ -484,9 +484,10 @@ namespace Step42
     class Obstacle : public Function<dim>
     {
     public:
-      Obstacle (std_cxx1x::shared_ptr<Input<dim> > const &_input) :
+      Obstacle (std_cxx1x::shared_ptr<Input<dim> > const &_input, bool _use_read_obstacle) :
         Function<dim>(dim),
-        input_obstacle_copy(_input) {};
+        input_obstacle_copy(_input),
+        use_read_obstacle(_use_read_obstacle) {};
 
       virtual double value (const Point<dim>   &p,
                             const unsigned int  component = 0) const;
@@ -496,6 +497,7 @@ namespace Step42
 
     private:
       std_cxx1x::shared_ptr<Input<dim> >  const &input_obstacle_copy;
+      bool										use_read_obstacle;
     };
 
     template <int dim>
@@ -510,8 +512,10 @@ namespace Step42
         return_value = p(1);
       if (component == 2)
         {
-	  return_value = -std::sqrt (0.36 - (p(0)-0.5)*(p(0)-0.5) - (p(1)-0.5)*(p(1)-0.5)) + 1.59;
-          // return_value = 1.999 - input_obstacle_copy->obstacle_function (p(0), p(1));
+    	  if (use_read_obstacle)
+    		  return_value = 1.999 - input_obstacle_copy->obstacle_function (p(0), p(1));
+    	  else
+    		  return_value = -std::sqrt (0.36 - (p(0)-0.5)*(p(0)-0.5) - (p(1)-0.5)*(p(1)-0.5)) + 1.59;
         }
       return return_value;
     }
@@ -565,6 +569,7 @@ namespace Step42
 
     unsigned int         n_refinements_global;
     unsigned int         cycle;
+    bool                 use_read_obstacle;
 
     MPI_Comm             mpi_communicator;
 
@@ -1071,7 +1076,7 @@ namespace Step42
   {
     computing_timer.enter_section("Update solution and constraints");
 
-    const EquationData::Obstacle<dim>     obstacle (input_obstacle);
+    const EquationData::Obstacle<dim>     obstacle (input_obstacle, use_read_obstacle);
     std::vector<bool>                     vertex_touched (dof_handler.n_dofs (), false);
 
     typename DoFHandler<dim>::active_cell_iterator
@@ -1526,9 +1531,13 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::run ()
   {
-    pcout << "Read the obstacle from a file." << std::endl;
-    input_obstacle.reset (new Input<dim>("obstacle_file.pbm"));
-    pcout << "Ostacle is available now." << std::endl;
+	use_read_obstacle = false;
+	if (use_read_obstacle)
+	{
+		pcout << "Read the obstacle from a file." << std::endl;
+		input_obstacle.reset (new Input<dim>("obstacle_file.pbm"));
+		pcout << "Ostacle is available now." << std::endl;
+	}
 
     const unsigned int n_cycles = 6;
     for (cycle=0; cycle<n_cycles; ++cycle)
