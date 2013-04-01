@@ -48,6 +48,15 @@ SET(DEAL_II_LAPACK_FUNCTIONS
 
 MACRO(CHECK_FOR_LAPACK_FUNCTIONS)
   SET(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES})
+  #
+  # For some static lapack versions it is necessary to link with -lm.
+  # So link with it as well if -lm is already present in our link
+  # interface:
+  #
+  IF(NOT m_lib MATCHES "-NOTFOUND")
+    LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${m_lib})
+  ENDIF()
+
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${LAPACK_LINKER_FLAGS}")
 
   FOREACH(_func ${DEAL_II_LAPACK_FUNCTIONS})
