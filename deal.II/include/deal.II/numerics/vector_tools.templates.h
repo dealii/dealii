@@ -2609,7 +2609,7 @@ namespace VectorTools
       // vector t is largest by
       // magnitude, then
       // x1=t[1]/t[0]*x_0, etc.
-      types::global_dof_index largest_component = 0;
+      unsigned int largest_component = 0;
       for (unsigned int d=1; d<dim; ++d)
         if (std::fabs(tangent_vector[d]) > std::fabs(tangent_vector[largest_component]) + 1e-10)
           largest_component = d;
