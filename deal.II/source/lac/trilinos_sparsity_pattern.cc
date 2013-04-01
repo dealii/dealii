@@ -418,8 +418,10 @@ namespace TrilinosWrappers
       last_row = max_my_gid(input_row_map)+1;
     std::vector<int> n_entries_per_row(last_row - first_row);
 
+				     // Trilinos wants the row length as an int
+				     // this is hopefully never going to be a problem.
     for (size_type row=first_row; row<last_row; ++row)
-      n_entries_per_row[row-first_row] = sp.row_length(row);
+      n_entries_per_row[row-first_row] = static_cast<int>(sp.row_length(row));
 
     if (input_row_map.Comm().NumProc() > 1)
       graph.reset(new Epetra_FECrsGraph(Copy, input_row_map,

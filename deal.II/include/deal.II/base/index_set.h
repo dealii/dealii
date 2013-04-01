@@ -1007,7 +1007,7 @@ IndexSet::fill_binary_vector (Vector &vector) const
   for (std::vector<Range>::iterator it = ranges.begin();
        it != ranges.end();
        ++it)
-    for (unsigned int i=it->begin; i<it->end; ++i)
+    for (types::global_dof_index i=it->begin; i<it->end; ++i)
       vector[i] = 1;
 }
 

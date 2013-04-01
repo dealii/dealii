@@ -1175,7 +1175,8 @@ namespace internal
                 return;
               }
             else
-              pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
+              pointer += static_cast<types::global_dof_index>(
+		(*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
           }
       }
 
@@ -1263,7 +1264,8 @@ namespace internal
             if (this_fe_index == fe_index)
               return *(pointer + 1 + local_index);
             else
-              pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
+              pointer += static_cast<types::global_dof_index>(
+		(*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
           }
       }
 
@@ -1308,7 +1310,8 @@ namespace internal
               return counter;
             else
               {
-                pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
+                pointer += static_cast<types::global_dof_index>(
+		  (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
                 ++counter;
               }
           }
@@ -1366,7 +1369,8 @@ namespace internal
             Assert (this_fe_index != numbers::invalid_dof_index,
                     ExcInternalError());
 
-            pointer += (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1;
+            pointer += static_cast<types::global_dof_index>(
+	      (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
             ++counter;
           }
       }
