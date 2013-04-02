@@ -88,6 +88,12 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There is a class VectorFunctionFromTensorFunction that converts
+between objects of type TensorFunction and Function.
+<br>
+(Spencer Patty, 2013/4/2)
+</li>
+
 
 <li> Fixed: The ParameterHandler class could not deal with parameters named
 <code>"value"</code> (and a few other names). This is now fixed.
