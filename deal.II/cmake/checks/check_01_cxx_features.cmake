@@ -113,7 +113,7 @@ IF(DEAL_II_HAVE_CXX11_FLAG)
   #       configure_threads.cmake which will determine and setup threads
   #       has to be called later...
   #
-  IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+  IF(NOT CMAKE_CROSSOMPILING) # Todo: Is it better to use DEAL_II_ALLOW_PLATFORM_INTROSPECTION here?
     PUSH_TEST_FLAG("-pthread")
     CHECK_CXX_SOURCE_RUNS(
       "
