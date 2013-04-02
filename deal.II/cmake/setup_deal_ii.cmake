@@ -104,7 +104,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     # Otherwise stale headers might get included resulting in a failing
     # build.
     #
-    SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include/inst")
+    SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include/install")
   ELSE()
     SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include")
   ENDIF()
