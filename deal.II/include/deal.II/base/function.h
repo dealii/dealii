@@ -933,79 +933,80 @@ template <int dim>
 class VectorFunctionFromTensorFunction : public Function<dim>
 {
 public:
-    /** Given a TensorFunction object that takes a <tt>Point</tt> and returns a <tt>Tensor<1,dim></tt>
-     * value, convert this into an object that matches the Function@<dim@>
-     * interface.
-     *
-     * By default, create a Vector object of the same size as <tt>tensor_function</tt>
-     * returns, i.e., with <tt>dim</tt> components.
-     *
-     * @param tensor_function The TensorFunction that will form one component
-     *     of the resulting Vector Function object.
-     * @param n_components The total number of vector components of the
-     *     resulting TensorFunction object.
-     * @param selected_component The first component that should be
-     *     filled by the first argument.  This should be such that the entire tensor_function
-     *     fits inside the <tt>n_component</tt> length return vector.
-     */
-    VectorFunctionFromTensorFunction (const TensorFunction<1,dim> &tensor_function,
-                                      const unsigned int selected_component=0,
-                                      const unsigned int n_components=dim);
+  /**
+   * Given a TensorFunction object that takes a <tt>Point</tt> and returns a <tt>Tensor<1,dim></tt>
+   * value, convert this into an object that matches the Function@<dim@>
+   * interface.
+   *
+   * By default, create a Vector object of the same size as <tt>tensor_function</tt>
+   * returns, i.e., with <tt>dim</tt> components.
+   *
+   * @param tensor_function The TensorFunction that will form one component
+   *     of the resulting Vector Function object.
+   * @param n_components The total number of vector components of the
+   *     resulting TensorFunction object.
+   * @param selected_component The first component that should be
+   *     filled by the first argument.  This should be such that the entire tensor_function
+   *     fits inside the <tt>n_component</tt> length return vector.
+   */
+  VectorFunctionFromTensorFunction (const TensorFunction<1,dim> &tensor_function,
+                                    const unsigned int selected_component=0,
+                                    const unsigned int n_components=dim);
 
-    /**
-     * This destructor is defined as
-     * virtual so as to coincide with all
-     * other aspects of class.
-     */
-    virtual ~VectorFunctionFromTensorFunction();
+  /**
+   * This destructor is defined as
+   * virtual so as to coincide with all
+   * other aspects of class.
+   */
+  virtual ~VectorFunctionFromTensorFunction();
 
-    /**
-     * Return a single component of a
-     * vector-valued function at a
-     * given point.
-     */
-    virtual double value (const Point<dim> &p,
-                          const unsigned int component = 0) const;
+  /**
+   * Return a single component of a
+   * vector-valued function at a
+   * given point.
+   */
+  virtual double value (const Point<dim> &p,
+                        const unsigned int component = 0) const;
 
-    /**
-     * Return all components of a
-     * vector-valued function at a
-     * given point.
-     *
-     * <tt>values</tt> shall have the right
-     * size beforehand,
-     * i.e. #n_components.
-     */
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &values) const;
+  /**
+   * Return all components of a
+   * vector-valued function at a
+   * given point.
+   *
+   * <tt>values</tt> shall have the right
+   * size beforehand,
+   * i.e. #n_components.
+   */
+  virtual void vector_value (const Point<dim> &p,
+                             Vector<double>   &values) const;
 
-    /**
-     * Return all components of a
-     * vector-valued function at a
-     * list of points.
-     *
-     * <tt>value_list</tt> shall be the same
-     * size as <tt>points</tt> and each element
-     * of the vector will be passed to
-     * vector_value() to evaluate
-     * the function
-     */
-    virtual void vector_value_list (const std::vector<Point<dim> > &points,
-                                    std::vector<Vector<double> >   &value_list) const;
+  /**
+   * Return all components of a
+   * vector-valued function at a
+   * list of points.
+   *
+   * <tt>value_list</tt> shall be the same
+   * size as <tt>points</tt> and each element
+   * of the vector will be passed to
+   * vector_value() to evaluate
+   * the function
+   */
+  virtual void vector_value_list (const std::vector<Point<dim> > &points,
+                                  std::vector<Vector<double> >   &value_list) const;
 
 private:
-    /**
-     * The TensorFunction object which we call when this class's vector_value()
-     * or vector_value_list() functions are called.
-     **/
-    const TensorFunction<1,dim> & tensor_function;
+  /**
+   * The TensorFunction object which we call when this class's vector_value()
+   * or vector_value_list() functions are called.
+   **/
+  const TensorFunction<1,dim> & tensor_function;
 
-    /**
-     * The first vector component whose value is to be filled by the
-     * given TensorFunction.  The values will be placed in components
-     * selected_component to selected_component+dim-1 for a <tt>TensorFunction<1,dim></tt> object.
-     */
-    const unsigned int selected_component;
+  /**
+   * The first vector component whose value is to be filled by the
+   * given TensorFunction.  The values will be placed in components
+   * selected_component to selected_component+dim-1 for a <tt>TensorFunction<1,dim></tt> object.
+   */
+  const unsigned int selected_component;
 };
 
 
