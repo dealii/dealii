@@ -30,16 +30,20 @@ template <typename number> class Vector;
 template <int rank, int dim> class TensorFunction;
 
 /**
- * This class is a model for a general function. It serves the purpose
- * of representing scalar and vector valued functions. To this end, we
+ * This class is a model for a general function that, given a point at which
+ * to evaluate the function, returns a vector of values with one or more
+ * components.
+ *
+ * The class serves the purpose
+ * of representing both scalar and vector valued functions. To this end, we
  * consider scalar functions as a special case of vector valued
  * functions, in the former case only having a single component return
- * vector. Since handling with vectors is comparatively expensive,
- * functions are provided which only ask for a single component of the
- * function, which is what you will usually need in case you know that
- * your function is scalar-valued.
- *
- * Access to function objects therefore is through the following
+ * vector. Since handling vectors is comparatively expensive, the interface
+ * of this class has functions which only ask for a single component of the
+ * vector-valued results (this is what you will usually need in case you know that
+ * your function is scalar-valued) as well as functions you can ask for an
+ * entire vector of results with as many components as the function object
+ * represents. Access to function objects therefore is through the following
  * methods:
  * @code
  *                 // access to one component at one point
@@ -65,16 +69,16 @@ template <int rank, int dim> class TensorFunction;
  * @endcode
  *
  * Furthermore, there are functions returning the gradient of the
- * function at one or several points.
+ * function or even higher derivatives at one or several points.
  *
  * You will usually only overload those functions you need; the
  * functions returning several values at a time (value_list(),
- * vector_value_list(), and gradient analoga) will call those
+ * vector_value_list(), and gradient analogs) will call those
  * returning only one value (value(), vector_value(), and gradient
- * analoga), while those ones will throw an exception when called but
+ * analogs), while those ones will throw an exception when called but
  * not overloaded.
  *
- * Note however, that the functions returning all components of the
+ * Note however, that conversely the functions returning all components of the
  * function at one or several points (i.e. vector_value(),
  * vector_value_list()), will not call the function returning one
  * component at one point repeatedly, once for each point and
@@ -93,9 +97,13 @@ template <int rank, int dim> class TensorFunction;
  * Support for time dependent functions can be found in the base
  * class FunctionTime.
  *
- * @note if the functions you are dealing with have sizes which
+ * @note If the functions you are dealing with have sizes which
  * are a priori known (for example, <tt>dim</tt> elements), you might
- * consider using the TensorFunction class instead.
+ * consider using the TensorFunction class instead. On the other hand,
+ * functions like VectorTools::interpolate or
+ * VectorTools::interpolate_boundary_values definitely only want objects
+ * of the current type. You can use the VectorFunctionFromTensorFunction
+ * class to convert the former to the latter.
  *
  * @ingroup functions
  * @author Wolfgang Bangerth, 1998, 1999
