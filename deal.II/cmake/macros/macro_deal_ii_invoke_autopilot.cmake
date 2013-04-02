@@ -40,8 +40,10 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
   DEAL_II_SETUP_TARGET(${TARGET})
 
   IF(NOT "${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
-
-    MESSAGE(STATUS "Out-of-source build. Target ${TARGET} defined but additional autopilot funcionality is not available.")
+    MESSAGE(STATUS
+      "Out-of-source build. Target ${TARGET} defined but additional "
+      "autopilot funcionality is not available."
+      )
 
   ELSE()
 
@@ -51,8 +53,16 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     IF("${TARGET_RUN}" STREQUAL "")
       SET(TARGET_RUN ${TARGET})
     ENDIF()
+    #
+    # Hack for Cygwin targets: Export PATH to point to the dynamic library.
+    # This is more or less harmless, so do this unconditionally.
+    #
+    FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
+      "SET(ENV{PATH} \"${DEAL_II_PATH}/${DEAL_II_LIBRARY_RELDIR}:\$ENV{PATH}\")\n"
+      "EXECUTE_PROCESS(COMMAND ${TARGET_RUN})"
+      )
     ADD_CUSTOM_TARGET(run
-      COMMAND ${TARGET_RUN}
+      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
       DEPENDS ${TARGET}
       COMMENT "Run ${TARGET} with ${CMAKE_BUILD_TYPE} configuration"
       )
@@ -72,8 +82,8 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
         COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
         COMMENT "Switch CMAKE_BUILD_TYPE to Release"
         )
-      SET(_switch_targets ${_switch_targets}
-        "#      $ make release        - to switch the build type to \"Release\"\n"
+      SET(_switch_targets
+        "${_switch_targets}#      $ make release        - to switch the build type to \"Release\"\n"
         )
     ENDIF()
 
@@ -91,8 +101,7 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
       COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target clean
       COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target runclean
       COMMAND ${CMAKE_COMMAND} -E remove_directory CMakeFiles
-      COMMAND ${CMAKE_COMMAND} -E remove
-        cmake_install.cmake CMakeCache.txt Makefile
+      COMMAND ${CMAKE_COMMAND} -E remove CMakeCache.txt cmake_install.cmake Makefile
       COMMENT "distclean invoked"
       )
 
@@ -105,9 +114,10 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
         )
     ENDIF()
 
-    # Print out some usage information:
-    MESSAGE(
-"###
+    # Print out some usage information to file:
+    FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
+"MESSAGE(
+\"###
 #
 #  Successfully set up project  ${TARGET}  with  ${DEAL_II_PACKAGE_NAME}-${DEAL_II_PACKAGE_VERSION}  found at
 #      ${DEAL_II_PATH}
@@ -118,9 +128,9 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
 #  You can now run
 #      $ make                - to compile and link the program
 #      $ make run            - to (compile, link and) run the program
-#\n"
-${_switch_targets}
-"#      $ make edit_cache     - to change (cached) configuration variables
+#
+${_switch_targets}#
+#      $ make edit_cache     - to change (cached) configuration variables
 #                              and rerun the configure and generate phases of CMake
 #
 #      $ make strip_comments - strip the source files in this
@@ -132,10 +142,24 @@ ${_switch_targets}
 #                              files (includes clean, runclean and the removal
 #                              of the generated build system)
 #
+#      $ make help           - to view this message again
+#
 #  Have a nice day!
 #
-###"
+###\")"
       )
+
+    # A custom target to print the message:
+    ADD_CUSTOM_TARGET(help
+      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake
+      )
+
+    # Print this message once:
+    IF(NOT USAGE_PRINTED)
+      INCLUDE(${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake)
+      SET(USAGE_PRINTED TRUE CACHE INTERNAL "")
+    ENDIF()
+
   ENDIF()
 
 ENDMACRO()
