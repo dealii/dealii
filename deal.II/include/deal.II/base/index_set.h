@@ -408,7 +408,7 @@ public:
    */
   std::size_t memory_consumption () const;
 
-  DeclException1 (ExcIndexNotPresent, int,
+  DeclException1 (ExcIndexNotPresent, types::global_dof_index,
                   << "The global index " << arg1
                   << " is not an element of this set.");
 
@@ -662,11 +662,11 @@ IndexSet::add_range (const types::global_dof_index begin,
   Assert ((begin < index_space_size)
           ||
           ((begin == index_space_size) && (end == index_space_size)),
-          ExcIndexRange (begin, 0, index_space_size));
+          ExcIndexRangeType<types::global_dof_index> (begin, 0, index_space_size));
   Assert (end <= index_space_size,
-          ExcIndexRange (end, 0, index_space_size+1));
+          ExcIndexRangeType<types::global_dof_index> (end, 0, index_space_size+1));
   Assert (begin <= end,
-          ExcIndexRange (begin, 0, end));
+          ExcIndexRangeType<types::global_dof_index> (begin, 0, end));
 
   if (begin != end)
     {
@@ -693,7 +693,7 @@ void
 IndexSet::add_index (const types::global_dof_index index)
 {
   Assert (index < index_space_size,
-          ExcIndexRange (index, 0, index_space_size));
+          ExcIndexRangeType<types::global_dof_index> (index, 0, index_space_size));
 
   const Range new_range(index, index+1);
   if (ranges.size() == 0 || index > ranges.back().end)
@@ -873,7 +873,7 @@ IndexSet::nth_index_in_set (const types::global_dof_index n) const
   // to make this call thread-safe, compress()
   // must not be called through this function
   Assert (is_compressed == true, ExcMessage ("IndexSet must be compressed."));
-  Assert (n < n_elements(), ExcIndexRange (n, 0, n_elements()));
+  Assert (n < n_elements(), ExcIndexRangeType<types::global_dof_index> (n, 0, n_elements()));
 
   // first check whether the index is in the
   // largest range
@@ -925,7 +925,7 @@ IndexSet::index_within_set (const types::global_dof_index n) const
   // must not be called through this function
   Assert (is_compressed == true, ExcMessage ("IndexSet must be compressed."));
   Assert (is_element(n) == true, ExcIndexNotPresent (n));
-  Assert (n < size(), ExcIndexRange (n, 0, size()));
+  Assert (n < size(), ExcIndexRangeType<types::global_dof_index> (n, 0, size()));
 
   // check whether the index is in the largest
   // range. use the result to perform a
