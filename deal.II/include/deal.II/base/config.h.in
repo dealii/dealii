@@ -73,16 +73,6 @@
  */
 #cmakedefine __PRETTY_FUNCTION__ @__PRETTY_FUNCTION__@
 
-/* Set to the minimal number of elements a std::vector<T> can always hold,
- * i.e. its minimal capacity.
- */
-#define DEAL_II_MIN_VECTOR_CAPACITY @DEAL_II_MIN_VECTOR_CAPACITY@
-
-/* Set to the minimal number of elements a std::vector<bool> can always
- * hold, i.e. its minimal capacity.
- */
-#define DEAL_II_MIN_BOOL_VECTOR_CAPACITY @DEAL_II_MIN_BOOL_VECTOR_CAPACITY@
-
 /* If the compiler supports it, then this variable is defined to a string
  * that when written after a function name makes the compiler emit a warning
  * whenever this function is used somewhere that its use is deprecated.
