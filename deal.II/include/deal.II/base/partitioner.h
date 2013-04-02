@@ -284,7 +284,8 @@ namespace Utilities
        * Exception
        */
       DeclException2 (ExcIndexNotPresent,
-                      unsigned int, unsigned int,
+                      types::global_dof_index, 
+		      unsigned int,
                       << "Global index " << arg1
                       << " neither owned nor ghost on proc " << arg2);
 
