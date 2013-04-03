@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -13,7 +13,7 @@
 #####
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-#PROJECT(parameterGUI)
+#PROJECT(parameter_gui)
 
 FIND_PACKAGE(Qt4 REQUIRED QtCore QtGui QtXml)
 MARK_AS_ADVANCED(QT_QMAKE_EXECUTABLE)
@@ -33,7 +33,7 @@ QT4_ADD_RESOURCES(SOURCE_RCC
   application.qrc
   )
 
-ADD_EXECUTABLE(parameterGUI
+ADD_EXECUTABLE(parameter_gui
   browse_lineedit.cpp
   info_message.cpp
   main.cpp
@@ -45,15 +45,15 @@ ADD_EXECUTABLE(parameterGUI
   ${SOURCE_RCC}
   )
 
-TARGET_LINK_LIBRARIES(parameterGUI ${QT_LIBRARIES})
+TARGET_LINK_LIBRARIES(parameter_gui ${QT_LIBRARIES})
 
 IF("${DEAL_II_EXECUTABLE_RELDIR}" STREQUAL "")
   SET(DEAL_II_EXECUTABLE_RELDIR "bin")
 ENDIF()
 
-INSTALL(TARGETS parameterGUI
+INSTALL(TARGETS parameter_gui
   RUNTIME
   DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
-  COMPONENT contrib
+  COMPONENT parameter_gui
   )
 
