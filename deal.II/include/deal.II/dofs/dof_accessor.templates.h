@@ -1196,9 +1196,9 @@ namespace internal
       static
       types::global_dof_index
       get_vertex_dof_index (const dealii::DoFHandler<dim,spacedim> &dof_handler,
-                            const types::global_dof_index vertex_index,
+                            const unsigned int vertex_index,
                             const unsigned int fe_index,
-                            const types::global_dof_index local_index)
+                            const unsigned int local_index)
       {
         Assert ((fe_index == dealii::DoFHandler<dim,spacedim>::default_fe_index),
                 ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));
@@ -1220,9 +1220,9 @@ namespace internal
       static
       types::global_dof_index
       get_vertex_dof_index (const dealii::hp::DoFHandler<dim,spacedim> &dof_handler,
-                            const types::global_dof_index vertex_index,
+                            const unsigned int vertex_index,
                             const unsigned int fe_index,
-                            const types::global_dof_index local_index)
+                            const unsigned int local_index)
       {
         Assert ( (fe_index != dealii::hp::DoFHandler<dim,spacedim>::default_fe_index),
                  ExcMessage ("You need to specify a FE index when working "

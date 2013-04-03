@@ -86,8 +86,8 @@ namespace internal
       unsigned int
       max_couplings_between_dofs (const DoFHandler<1,spacedim> &dof_handler)
       {
-        return std::min(3*dof_handler.selected_fe->dofs_per_vertex +
-                        2*dof_handler.selected_fe->dofs_per_line,
+        return std::min(static_cast<types::global_dof_index>(3*dof_handler.selected_fe->dofs_per_vertex +
+							     2*dof_handler.selected_fe->dofs_per_line),
                         dof_handler.n_dofs());
       }
 
