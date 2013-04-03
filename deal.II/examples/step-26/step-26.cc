@@ -1,4 +1,4 @@
-/* Author: Wolfgang Bangerth, Texas A&M University, 2008 */
+/* Author: Wolfgang Bangerth, Texas A&M University, 2013 */
 
 /*    $Id$       */
 /*                                                                */
@@ -21,6 +21,7 @@
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
@@ -31,6 +32,8 @@
 #include <deal.II/fe/fe_values.h>
 #include <deal.II/numerics/data_out.h>
 #include <deal.II/numerics/vector_tools.h>
+#include <deal.II/numerics/error_estimator.h>
+#include <deal.II/numerics/solution_transfer.h>
 #include <deal.II/numerics/matrix_tools.h>
 
 #include <fstream>
@@ -54,6 +57,8 @@ namespace Step26
     void setup_system();
     void solve_time_step();
     void output_results() const;
+    void refine_mesh (const unsigned int min_grid_level,
+		      const unsigned int max_grid_level);
 
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -167,16 +172,16 @@ namespace Step26
   template<int dim>
   void HeatEquation<dim>::setup_system()
   {
-    GridGenerator::hyper_L (triangulation);
-    triangulation.refine_global (5);
-
-    std::cout << "Number of active cells: " << triangulation.n_active_cells()
-              << std::endl;
-
     dof_handler.distribute_dofs(fe);
 
-    std::cout << "Number of degrees of freedom: " << dof_handler.n_dofs()
-              << std::endl << std::endl;
+    std::cout << std::endl
+	      << "==========================================="
+	      << std::endl
+	      << "Number of active cells: " << triangulation.n_active_cells()
+              << std::endl
+	      << "Number of degrees of freedom: " << dof_handler.n_dofs()
+              << std::endl
+	      << std::endl;
 
     sparsity_pattern.reinit(dof_handler.n_dofs(),
                             dof_handler.n_dofs(),
@@ -240,11 +245,135 @@ namespace Step26
   }
 
 
+  // @sect4{BoussinesqFlowProblem::refine_mesh}
+  //
+  // This function takes care of the adaptive mesh refinement. The three tasks
+  // this function performs is to first find out which cells to
+  // refine/coarsen, then to actually do the refinement and eventually
+  // transfer the solution vectors between the two different grids. The first
+  // task is simply achieved by using the well-established Kelly error
+  // estimator on the temperature (it is the temperature we're mainly
+  // interested in for this program, and we need to be accurate in regions of
+  // high temperature gradients, also to not have too much numerical
+  // diffusion). The second task is to actually do the remeshing. That
+  // involves only basic functions as well, such as the
+  // <code>refine_and_coarsen_fixed_fraction</code> that refines those cells
+  // with the largest estimated error that together make up 80 per cent of the
+  // error, and coarsens those cells with the smallest error that make up for
+  // a combined 10 per cent of the error.
+  //
+  // If implemented like this, we would get a program that will not make much
+  // progress: Remember that we expect temperature fields that are nearly
+  // discontinuous (the diffusivity $\kappa$ is very small after all) and
+  // consequently we can expect that a freely adapted mesh will refine further
+  // and further into the areas of large gradients. This decrease in mesh size
+  // will then be accompanied by a decrease in time step, requiring an
+  // exceedingly large number of time steps to solve to a given final time. It
+  // will also lead to meshes that are much better at resolving
+  // discontinuities after several mesh refinement cycles than in the
+  // beginning.
+  //
+  // In particular to prevent the decrease in time step size and the
+  // correspondingly large number of time steps, we limit the maximal
+  // refinement depth of the mesh. To this end, after the refinement indicator
+  // has been applied to the cells, we simply loop over all cells on the
+  // finest level and unselect them from refinement if they would result in
+  // too high a mesh level.
+  template <int dim>
+  void HeatEquation<dim>::refine_mesh (const unsigned int min_grid_level,
+				       const unsigned int max_grid_level)
+  {
+    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+
+    KellyErrorEstimator<dim>::estimate (dof_handler,
+                                        QGauss<dim-1>(fe.degree+1),
+                                        typename FunctionMap<dim>::type(),
+                                        solution,
+                                        estimated_error_per_cell);
+
+    GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
+                                                       estimated_error_per_cell,
+                                                       0.6, 0.4);
+    if (triangulation.n_levels() > max_grid_level)
+      for (typename Triangulation<dim>::active_cell_iterator
+           cell = triangulation.begin_active(max_grid_level);
+           cell != triangulation.end(); ++cell)
+        cell->clear_refine_flag ();
+    for (typename Triangulation<dim>::active_cell_iterator
+           cell = triangulation.begin_active(min_grid_level);
+	 cell != triangulation.end_active(min_grid_level); ++cell)
+      cell->clear_coarsen_flag ();
+
+
+    // As part of mesh refinement we need to transfer the solution vectors
+    // from the old mesh to the new one. To this end we use the
+    // SolutionTransfer class and we have to prepare the solution vectors that
+    // should be transferred to the new grid (we will lose the old grid once
+    // we have done the refinement so the transfer has to happen concurrently
+    // with refinement). What we definetely need are the current and the old
+    // temperature (BDF-2 time stepping requires two old solutions). Since the
+    // SolutionTransfer objects only support to transfer one object per dof
+    // handler, we need to collect the two temperature solutions in one data
+    // structure. Moreover, we choose to transfer the Stokes solution, too,
+    // since we need the velocity at two previous time steps, of which only
+    // one is calculated on the fly.
+    //
+    // Consequently, we initialize two SolutionTransfer objects for the Stokes
+    // and temperature DoFHandler objects, by attaching them to the old dof
+    // handlers. With this at place, we can prepare the triangulation and the
+    // data vectors for refinement (in this order).
+    std::vector<Vector<double> > x_solution (2);
+    x_solution[0] = solution;
+    x_solution[1] = old_solution;
+
+    SolutionTransfer<dim> solution_trans(dof_handler);
+
+    triangulation.prepare_coarsening_and_refinement();
+    solution_trans.prepare_for_coarsening_and_refinement(x_solution);
+
+    // Now everything is ready, so do the refinement and recreate the dof
+    // structure on the new grid, and initialize the matrix structures and the
+    // new vectors in the <code>setup_dofs</code> function. Next, we actually
+    // perform the interpolation of the solutions between the grids. We create
+    // another copy of temporary vectors for temperature (now corresponding to
+    // the new grid), and let the interpolate function do the job. Then, the
+    // resulting array of vectors is written into the respective vector member
+    // variables. For the Stokes vector, everything is just the same &ndash;
+    // except that we do not need another temporary vector since we just
+    // interpolate a single vector. In the end, we have to tell the program
+    // that the matrices and preconditioners need to be regenerated, since the
+    // mesh has changed.
+    triangulation.execute_coarsening_and_refinement ();
+    setup_system ();
+
+    std::vector<Vector<double> > tmp (2);
+    tmp[0].reinit (solution);
+    tmp[1].reinit (solution);
+    solution_trans.interpolate(x_solution, tmp);
+
+    solution = tmp[0];
+    old_solution = tmp[1];
+  }
+
+
 
   template<int dim>
   void HeatEquation<dim>::run()
   {
+    const unsigned int initial_refinement = (dim == 2 ? 4 : 2);
+    const unsigned int n_pre_refinement_steps = 3;
+
+    GridGenerator::hyper_L (triangulation);
+    triangulation.refine_global (initial_refinement);
+
     setup_system();
+
+    unsigned int pre_refinement_step = 0;
+
+    Vector<double> tmp;
+    Vector<double> forcing_terms;
+
+start_time_iteration:
 
     VectorTools::interpolate(dof_handler,
                              ZeroFunction<dim>(),
@@ -252,10 +381,9 @@ namespace Step26
     solution = old_solution;
 
     timestep_number = 0;
-    output_results();
+    time            = 0;
 
-    Vector<double> tmp(solution.size());
-    Vector<double> forcing_terms(solution.size());
+    output_results();
 
     while (time <= 0.5)
       {
@@ -264,6 +392,9 @@ namespace Step26
 
         std::cout << "Time step " << timestep_number << " at t=" << time
                   << std::endl;
+
+	tmp.reinit (solution.size());
+	forcing_terms.reinit (solution.size());
 
         mass_matrix.vmult(system_rhs, old_solution);
 
@@ -310,6 +441,21 @@ namespace Step26
         solve_time_step();
 
         output_results();
+
+        if ((timestep_number == 1) &&
+            (pre_refinement_step < n_pre_refinement_steps))
+          {
+            refine_mesh (initial_refinement,
+			 initial_refinement + n_pre_refinement_steps);
+            ++pre_refinement_step;
+
+	    std::cout << std::endl;
+
+            goto start_time_iteration;
+          }
+        else if ((timestep_number > 0) && (timestep_number % 5 == 0))
+          refine_mesh (initial_refinement,
+		       initial_refinement + n_pre_refinement_steps);
 
         old_solution = solution;
       }

@@ -42,7 +42,7 @@ GLOBAL void AMD_debug_init ( char *s )
     }
     if (AMD_debug >= 0)
     {
-	printf ("%s: AMD_debug_init, D= "ID"\n", s, AMD_debug) ;
+	printf ("%s: AMD_debug_init, D= " ID "\n", s, AMD_debug) ;
     }
 }
 
@@ -76,7 +76,7 @@ GLOBAL void AMD_dump (
 
     if (AMD_debug < 0) return ;
     ASSERT (pfree <= iwlen) ;
-    AMD_DEBUG3 (("\nAMD dump, pfree: "ID"\n", pfree)) ;
+    AMD_DEBUG3 (("\nAMD dump, pfree: " ID "\n", pfree)) ;
     for (i = 0 ; i < n ; i++)
     {
 	pe = Pe [i] ;
@@ -89,7 +89,7 @@ GLOBAL void AMD_dump (
 	{
 	    if (nv == 0)
 	    {
-		AMD_DEBUG3 (("\nI "ID": nonprincipal:    ", i)) ;
+		AMD_DEBUG3 (("\nI " ID ": nonprincipal:    ", i)) ;
 		ASSERT (elen == EMPTY) ;
 		if (pe == EMPTY)
 		{
@@ -99,13 +99,13 @@ GLOBAL void AMD_dump (
 		else
 		{
 		    ASSERT (pe < EMPTY) ;
-		    AMD_DEBUG3 ((" i "ID" -> parent "ID"\n", i, FLIP (Pe[i])));
+		    AMD_DEBUG3 ((" i " ID " -> parent " ID "\n", i, FLIP (Pe[i])));
 		}
 	    }
 	    else
 	    {
-		AMD_DEBUG3 (("\nI "ID": active principal supervariable:\n",i));
-		AMD_DEBUG3 (("   nv(i): "ID"  Flag: %d\n", nv, (nv < 0))) ;
+		AMD_DEBUG3 (("\nI " ID ": active principal supervariable:\n",i));
+		AMD_DEBUG3 (("   nv(i): " ID "  Flag: %d\n", nv, (nv < 0))) ;
 		ASSERT (elen >= 0) ;
 		ASSERT (nv > 0 && pe >= 0) ;
 		p = pe ;
@@ -115,7 +115,7 @@ GLOBAL void AMD_dump (
 		for (k = 0 ; k < len ; k++)
 		{
 		    j = Iw [p] ;
-		    AMD_DEBUG3 (("  "ID"", j)) ;
+		    AMD_DEBUG3 (("  " ID "", j)) ;
 		    ASSERT (j >= 0 && j < n) ;
 		    if (k == elen-1) AMD_DEBUG3 ((" : ")) ;
 		    p++ ;
@@ -128,13 +128,13 @@ GLOBAL void AMD_dump (
 	    e = i ;
 	    if (w == 0)
 	    {
-		AMD_DEBUG3 (("\nE "ID": absorbed element: w "ID"\n", e, w)) ;
+		AMD_DEBUG3 (("\nE " ID ": absorbed element: w " ID "\n", e, w)) ;
 		ASSERT (nv > 0 && pe < 0) ;
-		AMD_DEBUG3 ((" e "ID" -> parent "ID"\n", e, FLIP (Pe [e]))) ;
+		AMD_DEBUG3 ((" e " ID " -> parent " ID "\n", e, FLIP (Pe [e]))) ;
 	    }
 	    else
 	    {
-		AMD_DEBUG3 (("\nE "ID": unabsorbed element: w "ID"\n", e, w)) ;
+		AMD_DEBUG3 (("\nE " ID ": unabsorbed element: w " ID "\n", e, w)) ;
 		ASSERT (nv > 0 && pe >= 0) ;
 		p = pe ;
 		AMD_DEBUG3 ((" : ")) ;
@@ -142,7 +142,7 @@ GLOBAL void AMD_dump (
 		for (k = 0 ; k < len ; k++)
 		{
 		    j = Iw [p] ;
-		    AMD_DEBUG3 (("  "ID"", j)) ;
+		    AMD_DEBUG3 (("  " ID "", j)) ;
 		    ASSERT (j >= 0 && j < n) ;
 		    p++ ;
 		}
@@ -163,7 +163,7 @@ GLOBAL void AMD_dump (
 	    AMD_DEBUG3 ((ID": \n", deg)) ;
 	    for (i = Head [deg] ; i != EMPTY ; i = Next [i])
 	    {
-		AMD_DEBUG3 (("   "ID" : next "ID" last "ID" deg "ID"\n",
+		AMD_DEBUG3 (("   " ID " : next " ID " last " ID " deg " ID "\n",
 		    i, Next [i], Last [i], Degree [i])) ;
 		ASSERT (i >= 0 && i < n && ilast == Last [i] &&
 		    deg == Degree [i]) ;

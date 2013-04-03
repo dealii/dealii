@@ -13,6 +13,7 @@
 
 
 #include <deal.II/base/function.h>
+#include <deal.II/base/tensor_function.h>
 #include <deal.II/base/point.h>
 #include <deal.II/lac/vector.h>
 #include <vector>
@@ -585,6 +586,101 @@ vector_value (const Point<dim>   &p,
 
 
 
+/**
+ * The constructor for <tt>VectorFunctionFromTensorFunction</tt> which initiates the return vector
+ * to be size <tt>n_components</tt>.
+ */
+template <int dim>
+VectorFunctionFromTensorFunction<dim>::VectorFunctionFromTensorFunction (const TensorFunction<1,dim>& tensor_function,
+    const unsigned int selected_component,
+    const unsigned int n_components)
+  :
+  Function<dim> (n_components),
+  tensor_function (tensor_function),
+  selected_component (selected_component)
+{
+
+  // Verify that the Tensor<1,dim> will fit in the given length selected_components
+  // and not hang over the end of the vector.
+  Assert (0 <= selected_component,
+          ExcIndexRange (selected_component,0,0));
+  Assert (selected_component + dim - 1 < this->n_components,
+          ExcIndexRange (selected_component, 0, this->n_components));
+}
+
+
+template <int dim>
+VectorFunctionFromTensorFunction<dim>::~VectorFunctionFromTensorFunction ()
+{}
+
+
+template <int dim>
+inline
+double VectorFunctionFromTensorFunction<dim>::value (const Point<dim> &p,
+                                                     const unsigned int component) const
+{
+  Assert (component<this->n_components,
+          ExcIndexRange(component, 0, this->n_components));
+
+  // if the requested component is out of the range selected, then we
+  // can return early
+  if ((component < selected_component)
+      ||
+      (component >= selected_component+dim))
+    return 0;
+
+  // otherwise retrieve the values from the <tt>tensor_function</tt> to be
+  // placed at the <tt>selected_component</tt> to <tt>selected_component + dim - 1</tt>
+  // elements of the <tt>Vector</tt> values and pick the correct one
+  const Tensor<1,dim> tensor_value = tensor_function.value (p);
+
+  return tensor_value[component-selected_component];
+}
+
+
+template <int dim>
+inline
+void VectorFunctionFromTensorFunction<dim>::vector_value (const Point<dim> &p,
+                                                          Vector<double>   &values) const
+{
+  Assert(values.size() == this->n_components,
+         ExcDimensionMismatch(values.size(),this->n_components));
+
+  // Retrieve the values from the <tt>tensor_function</tt> to be
+  // placed at the <tt>selected_component</tt> to <tt>selected_component + dim - 1</tt>
+  // elements of the <tt>Vector</tt> values.
+  const Tensor<1,dim> tensor_value = tensor_function.value (p);
+
+  // First we make all elements of values = 0
+  values = 0;
+
+  // Second we adjust the desired components to take on the values in <tt>tensor_value</tt>.
+  for (unsigned int i=0; i<dim; ++i)
+    values(i+selected_component) = tensor_value[i];
+}
+
+
+/** Member function <tt>vector_value_list </tt> is the interface for giving a list of
+ * points (<code>vector<Point<dim> ></code>) of which to evaluate using the <tt>vector_value</tt>
+ * member function.  Again, this function is written so as to not replicate the function definition
+ * but passes each point on to <tt>vector_value</tt> to be evaluated.
+ */
+template <int dim>
+void VectorFunctionFromTensorFunction<dim>::vector_value_list (const std::vector<Point<dim> > &points,
+    std::vector<Vector<double> > &value_list) const
+{
+  Assert (value_list.size() == points.size(),
+          ExcDimensionMismatch (value_list.size(), points.size()));
+
+  const unsigned int n_points = points.size();
+
+  for (unsigned int p=0; p<n_points; ++p)
+    VectorFunctionFromTensorFunction<dim>::vector_value (points[p], value_list[p]);
+}
+
+
+
+
 // explicit instantiations
 
 template class Function<1>;
@@ -593,6 +689,7 @@ template class ConstantFunction<1>;
 template class ComponentSelectFunction<1>;
 template class ScalarFunctionFromFunctionObject<1>;
 template class VectorFunctionFromScalarFunctionObject<1>;
+template class VectorFunctionFromTensorFunction<1>;
 
 template class Function<2>;
 template class ZeroFunction<2>;
@@ -600,6 +697,7 @@ template class ConstantFunction<2>;
 template class ComponentSelectFunction<2>;
 template class ScalarFunctionFromFunctionObject<2>;
 template class VectorFunctionFromScalarFunctionObject<2>;
+template class VectorFunctionFromTensorFunction<2>;
 
 template class Function<3>;
 template class ZeroFunction<3>;
@@ -607,6 +705,6 @@ template class ConstantFunction<3>;
 template class ComponentSelectFunction<3>;
 template class ScalarFunctionFromFunctionObject<3>;
 template class VectorFunctionFromScalarFunctionObject<3>;
-
+template class VectorFunctionFromTensorFunction<3>;
 
 DEAL_II_NAMESPACE_CLOSE

@@ -1,8 +1,0 @@
-/**
-  * @page ${_step_underscore} The ${_step} tutorial program
-@htmlonly
-<table class="tutorial" width="50%">
-<tr><th colspan="2"><b><small>Table of contents</small></b></th></tr>
-<tr><td width="50%" valign="top">
-<ol>
-  <li> <a href="#Intro" class=bold>Introduction</a>

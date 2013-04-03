@@ -62,28 +62,28 @@ GLOBAL Int AMD_valid
     {
 	p1 = Ap [j] ;
 	p2 = Ap [j+1] ;
-	AMD_DEBUG2 (("\nColumn: "ID" p1: "ID" p2: "ID"\n", j, p1, p2)) ;
+	AMD_DEBUG2 (("\nColumn: " ID " p1: " ID " p2: " ID "\n", j, p1, p2)) ;
 	if (p1 > p2)
 	{
 	    /* column pointers must be ascending */
-	    AMD_DEBUG0 (("column "ID" pointer bad\n", j)) ;
+	    AMD_DEBUG0 (("column " ID " pointer bad\n", j)) ;
 	    return (AMD_INVALID) ;
 	}
 	ilast = EMPTY ;
 	for (p = p1 ; p < p2 ; p++)
 	{
 	    i = Ai [p] ;
-	    AMD_DEBUG3 (("row: "ID"\n", i)) ;
+	    AMD_DEBUG3 (("row: " ID "\n", i)) ;
 	    if (i < 0 || i >= n_row)
 	    {
 		/* row index out of range */
-		AMD_DEBUG0 (("index out of range, col "ID" row "ID"\n", j, i));
+		AMD_DEBUG0 (("index out of range, col " ID " row " ID "\n", j, i));
 		return (AMD_INVALID) ;
 	    }
 	    if (i <= ilast)
 	    {
 		/* row index unsorted, or duplicate entry present */
-		AMD_DEBUG1 (("index unsorted/dupl col "ID" row "ID"\n", j, i));
+		AMD_DEBUG1 (("index unsorted/dupl col " ID " row " ID "\n", j, i));
 		result = AMD_OK_BUT_JUMBLED ;
 	    }
 	    ilast = i ;

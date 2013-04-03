@@ -396,11 +396,11 @@
       In this case you can set by hand:
       <pre>
 
-    cmake -D&lt;lib&gt;_FOUND=true \
-          -D&lt;lib&gt;_LIBRARIES="library;and;complete;link;interface" \
-        ( -D&lt;lib&gt;_INCLUDE_DIRS="semicolon;separated;list;of;include;dirs" \
-          -D&lt;lib&gt;_LINKER_FLAGS="..." \
-          -D&lt;lib&gt;_&lt;...depending on library...&gt; )
+    cmake -D&lt;feature&gt;_FOUND=true \
+          -D&lt;feature&gt;_LIBRARIES="library;and;complete;link;interface" \
+        ( -D&lt;feature&gt;_INCLUDE_DIRS="semicolon;separated;list;of;include;dirs" \
+          -D&lt;feature&gt;_LINKER_FLAGS="..." \
+          -D&lt;feature&gt;_&lt;...depending on library...&gt; )
       </pre>
 
       The first define ensures that <code>cmake</code> does not
@@ -411,17 +411,15 @@
       detailed list of valid variables per feature.)
     </p>
     <p>
-      An example of use is to select BLAS and LAPACK manually as follows
-      (here, these libraries have been compiled with the gfortran compiler
+      An example of use is to select BLAS and LAPACK manually from a PETSc
+      configuration:
+      (Here, these libraries have been compiled with the gfortran compiler
       and need its support library):
       <pre>
 
-    cmake -DBLAS_FOUND=true \
-          -DBLAS_LIBRARIES="/apps/GotoBLAS/lib64/libgoto.so" \
-          -DBLAS_LINKER_FLAGS="-lgfortran" \
-          -DLAPACK_FOUND=true \
-          -DLAPACK_LIBRARIES="/apps/lapack-3.2.1/liblapack.so;/apps/GotoBLAS/lib64/libgoto.so" \
-          -DLAPACK_LINKER_FLAGS="-lgfortran"
+    cmake -DLAPACK_FOUND=true \
+          -DLAPACK_LIBRARIES="/tmp/petsc-3.3-p6/arch-linux2-c-debug/lib/libflapack.a;/tmp/petsc-3.3-p6/arch-linux2-c-debug/lib/libfblas.a" \
+          -DLAPACK_LINKER_FLAGS="-lgfortran -lm"
       </pre>
 
       You can set these values on the command line, with <code>ccmake</code>

@@ -26,8 +26,6 @@
 #   HAVE_GLIBC_STACKTRACE
 #   HAVE_LIBSTDCXX_DEMANGLER
 #   DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION
-#   DEAL_II_MIN_VECTOR_CAPACITY
-#   DEAL_II_MIN_BOOL_VECTOR_CAPACITY
 #   DEAL_II_COMPILER_HAS_ATTRIBUTE_DEPRECATED
 #   DEAL_II_DEPRECATED
 #
@@ -255,64 +253,6 @@ IF(NOT DEAL_II_COMPILER_HAS_ATTRIBUTE_PRETTY_FUNCTION)
     SET(__PRETTY_FUNCTION__ "\"(not available)\"")
   ENDIF()
 
-ENDIF()
-
-
-#
-# Check for minimal vector capacity
-#
-# - Matthias Maier, rewritten 2012
-#
-IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-  GET_CXX_SOURCE_RETURN_VALUE(
-    "
-    #include <vector>
-    int main () {
-      std::vector<int> v(1);
-      v.reserve (1);
-      v.resize (1);
-      return v.capacity();
-    }
-    "
-    DEAL_II_MIN_VECTOR_CAPACITY
-    DEAL_II_MIN_VECTOR_CAPACITY_RETURN_VALUE)
-ENDIF()
-
-IF(NOT DEAL_II_MIN_VECTOR_CAPACITY)
-  SET(DEAL_II_MIN_VECTOR_CAPACITY 1)
-ELSE()
-  SET(DEAL_II_MIN_VECTOR_CAPACITY
-    ${DEAL_II_MIN_VECTOR_CAPACITY_RETURN_VALUE}
-    )
-ENDIF()
-
-
-
-#
-# Do same thing with std::vector<bool>
-#
-# - Matthias Maier, rewritten 2012
-#
-IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-  GET_CXX_SOURCE_RETURN_VALUE(
-    "
-    #include <vector>
-    int main () {
-      std::vector<bool> v(1);
-      v.reserve (1);
-      v.resize (1);
-      return v.capacity();
-    }
-    "
-    DEAL_II_MIN_BOOL_VECTOR_CAPACITY
-    DEAL_II_MIN_BOOL_VECTOR_CAPACITY_RETURN_VALUE)
-ENDIF()
-
-IF(NOT DEAL_II_MIN_BOOL_VECTOR_CAPACITY)
-  SET(DEAL_II_MIN_BOOL_VECTOR_CAPACITY 1)
-ELSE()
-  SET(DEAL_II_MIN_BOOL_VECTOR_CAPACITY
-    ${DEAL_II_MIN_BOOL_VECTOR_CAPACITY_RETURN_VALUE})
 ENDIF()
 
 

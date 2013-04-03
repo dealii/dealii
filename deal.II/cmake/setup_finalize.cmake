@@ -63,16 +63,16 @@ FILE(REMOVE ${_log_detailed} ${_log_summary})
 
 MACRO(_both)
   # Write to both log files:
-  FILE(APPEND ${_log_detailed} ${ARGN})
-  FILE(APPEND ${_log_summary} ${ARGN})
+  FILE(APPEND ${_log_detailed} "${ARGN}")
+  FILE(APPEND ${_log_summary} "${ARGN}")
 ENDMACRO()
 MACRO(_detailed)
   # Only write to detailed.log:
-  FILE(APPEND ${_log_detailed} ${ARGN})
+  FILE(APPEND ${_log_detailed} "${ARGN}")
 ENDMACRO()
 MACRO(_summary)
   # Only write to summary.log:
-  FILE(APPEND ${_log_summary} ${ARGN})
+  FILE(APPEND ${_log_summary} "${ARGN}")
 ENDMACRO()
 
 

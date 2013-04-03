@@ -28,13 +28,12 @@ namespace internal
                                    const unsigned int dimension,
                                    const unsigned int space_dimension)
     {
-      // we need space for total_cells
-      // cells. Maybe we have more already
-      // with those cells which are unused,
-      // so only allocate new space if needed.
+      // we need space for total_cells cells. Maybe we have more already
+      // with those cells which are unused, so only allocate new space if
+      // needed.
       //
-      // note that all arrays should have equal
-      // sizes (checked by @p{monitor_memory}
+      // note that all arrays should have equal sizes (checked by
+      // @p{monitor_memory}
       if (total_cells > refine_flags.size())
         {
           refine_flags.reserve (total_cells);
@@ -84,34 +83,6 @@ namespace internal
     void
     TriaLevel<dim>::monitor_memory (const unsigned int true_dimension) const
     {
-      // check that we have not allocated
-      // too much memory. note that bool
-      // vectors allocate their memory in
-      // chunks of whole integers, so
-      // they may over-allocate by up to
-      // as many elements as an integer
-      // has bits
-      Assert (refine_flags.size() <=
-              refine_flags.capacity()  + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("refine_flags",
-                               refine_flags.size(), refine_flags.capacity()));
-      Assert (coarsen_flags.size() <= coarsen_flags.capacity() + sizeof(int)*8 ||
-              coarsen_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
-              ExcMemoryWasted ("coarsen_flags",
-                               coarsen_flags.size(), coarsen_flags.capacity()));
-      Assert (neighbors.size() <=
-              neighbors.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("neighbors",
-                               neighbors.size(), neighbors.capacity()));
-      Assert (subdomain_ids.size() <=
-              subdomain_ids.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("subdomain_ids",
-                               subdomain_ids.size(), subdomain_ids.capacity()));
-      Assert (direction_flags.size() <=
-              direction_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("direction_flags",
-                               direction_flags.size(), direction_flags.capacity()));
-
       Assert (2*true_dimension*refine_flags.size() == neighbors.size(),
               ExcMemoryInexact (refine_flags.size(), neighbors.size()));
       Assert (2*true_dimension*coarsen_flags.size() == neighbors.size(),
@@ -196,33 +167,6 @@ namespace internal
     void
     TriaLevel<3>::monitor_memory (const unsigned int true_dimension) const
     {
-      // check that we have not allocated
-      // too much memory. note that bool
-      // vectors allocate their memory in
-      // chunks of whole integers, so
-      // they may over-allocate by up to
-      // as many elements as an integer
-      // has bits
-      Assert (refine_flags.size() <=
-              refine_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("refine_flags",
-                               refine_flags.size(), refine_flags.capacity()));
-      Assert (coarsen_flags.size() <= coarsen_flags.capacity() + sizeof(int)*8 ||
-              coarsen_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
-              ExcMemoryWasted ("coarsen_flags",
-                               coarsen_flags.size(), coarsen_flags.capacity()));
-      Assert (neighbors.size() <=
-              neighbors.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("neighbors",
-                               neighbors.size(), neighbors.capacity()));
-      Assert (subdomain_ids.size () <=
-              subdomain_ids.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("subdomain_ids",
-                               subdomain_ids.size(), subdomain_ids.capacity()));
-      Assert (direction_flags.size() <=
-              direction_flags.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("direction_flags",
-                               direction_flags.size(), direction_flags.capacity()));
       Assert (2*true_dimension*refine_flags.size() == neighbors.size(),
               ExcMemoryInexact (refine_flags.size(), neighbors.size()));
       Assert (2*true_dimension*coarsen_flags.size() == neighbors.size(),

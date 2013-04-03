@@ -354,7 +354,8 @@ like these. Namely, we will consider the linear system as not consisting of one
 large matrix and vectors, but we will want to decompose matrices into vectors
 into <i>blocks</i> that correspond to the individual operators that appear in
 the system. We note that the resulting solver is not optimal -- there are much
-better ways, for example those explained in the results section of step-22 --
+better ways, for example those explained in the results section of step-22 or
+the one we use in step-43 for a problem rather similar to the current one --
 but that the goal is to introduce techniques rather than optimal solvers.
 
 
@@ -407,6 +408,17 @@ matrix-vector products with it. We can do so in steps: to compute $Sv=B^TM^{-1}B
 Note how we evaluate the expression $B^TM^{-1}Bv$ right to left to
 avoid matrix-matrix products; this way, all we have to do is evaluate
 matrix-vector products.
+
+@note The key point in this consideration is to recognize that to implement
+an iterative solver such as CG or GMRES, we never actually need the actual
+<i>elements</i> of a matrix! All that is required is that we can form
+matrix-vector products. The same is true for preconditioners. In deal.II
+we encode this requirement by only requiring that matrices and preconditioners
+given to solver classes have a <code>vmult()</code> member function that does
+the matrix-vector product. How a class chooses to implement this function is
+not important to the solver. Consequently, classes can implement it by,
+for example, doing a sequence of products and linear solves as discussed
+above.
 
 Using this strategy, we can then implement a class that provides the
 function <code>vmult()</code> that is all that the SolverCG class

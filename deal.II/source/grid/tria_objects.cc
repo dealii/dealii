@@ -40,8 +40,7 @@ namespace internal
           last=used.size()-1;
       if (!reverse_order_next_free_single)
         {
-          // first sweep forward, only use
-          // really single slots, do not use
+          // first sweep forward, only use really single slots, do not use
           // pair slots
           for (; pos<last; ++pos)
             if (!used[pos])
@@ -118,8 +117,7 @@ namespace internal
       next_free_pair=0;
       reverse_order_next_free_single=false;
 
-      // count the number of objects, of
-      // unused single objects and of
+      // count the number of objects, of unused single objects and of
       // unused pairs of objects
       unsigned int n_objects=0;
       unsigned int n_unused_pairs=0;
@@ -150,8 +148,8 @@ namespace internal
       Assert(n_objects+2*n_unused_pairs+n_unused_singles==used.size(),
              ExcInternalError());
 
-      // how many single objects are needed in
-      // addition to n_unused_objects?
+      // how many single objects are needed in addition to
+      // n_unused_objects?
       const int additional_single_objects=
         new_objects_single-n_unused_singles;
 
@@ -318,9 +316,8 @@ namespace internal
       next_free_pair=0;
       reverse_order_next_free_single=false;
 
-      // count the number of objects, of unused
-      // single objects and of unused pairs of
-      // objects
+      // count the number of objects, of unused single objects and of
+      // unused pairs of objects
       unsigned int n_quads=0;
       unsigned int n_unused_pairs=0;
       unsigned int n_unused_singles=0;
@@ -350,8 +347,7 @@ namespace internal
       Assert(n_quads+2*n_unused_pairs+n_unused_singles==used.size(),
              ExcInternalError());
 
-      // how many single quads are needed in
-      // addition to n_unused_quads?
+      // how many single quads are needed in addition to n_unused_quads?
       const int additional_single_quads=
         new_quads_single-n_unused_singles;
 
@@ -365,8 +361,7 @@ namespace internal
         {
           // reseve space for the base class
           TriaObjects<TriaObject<2> >::reserve_space(new_quads_in_pairs,new_quads_single);
-          // reserve the field of the derived
-          // class
+          // reserve the field of the derived class
           line_orientations.reserve (new_size * GeometryInfo<2>::lines_per_cell);
           line_orientations.insert (line_orientations.end(),
                                     new_size * GeometryInfo<2>::lines_per_cell
@@ -386,29 +381,6 @@ namespace internal
     void
     TriaObjects<TriaObject<1> >::monitor_memory (const unsigned int) const
     {
-      // check that we have not allocated
-      // too much memory. note that bool
-      // vectors allocate their memory in
-      // chunks of whole integers, so
-      // they may over-allocate by up to
-      // as many elements as an integer
-      // has bits
-      Assert (cells.size() <=
-              cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("lines",
-                               cells.size(), cells.capacity()));
-      Assert (children.size() <=
-              children.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("children",
-                               children.size(), children.capacity()));
-      Assert (used.size() <= used.capacity() + sizeof(int)*8 ||
-              used.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
-              ExcMemoryWasted ("used",
-                               used.size(), used.capacity()));
-      Assert (user_flags.size() <= user_flags.capacity() + sizeof(int)*8 ||
-              user_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
-              ExcMemoryWasted ("user_flags",
-                               user_flags.size(), user_flags.capacity()));
       Assert (cells.size() == used.size(),
               ExcMemoryInexact (cells.size(), used.size()));
       Assert (cells.size() == user_flags.size(),
@@ -426,29 +398,6 @@ namespace internal
     void
     TriaObjects<TriaObject<2> >::monitor_memory (const unsigned int) const
     {
-      // check that we have not allocated
-      // too much memory. note that bool
-      // vectors allocate their memory in
-      // chunks of whole integers, so
-      // they may over-allocate by up to
-      // as many elements as an integer
-      // has bits
-      Assert (cells.size() <=
-              cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("quads",
-                               cells.size(), cells.capacity()));
-      Assert (children.size() <=
-              children.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("children",
-                               children.size(), children.capacity()));
-      Assert (used.size() <= used.capacity() + sizeof(int)*8 ||
-              used.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
-              ExcMemoryWasted ("used",
-                               used.size(), used.capacity()));
-      Assert (user_flags.size() <= user_flags.capacity() + sizeof(int)*8 ||
-              user_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
-              ExcMemoryWasted ("user_flags",
-                               user_flags.size(), user_flags.capacity()));
       Assert (cells.size() == used.size(),
               ExcMemoryInexact (cells.size(), used.size()));
       Assert (cells.size() == user_flags.size(),
@@ -467,29 +416,6 @@ namespace internal
     void
     TriaObjectsHex::monitor_memory (const unsigned int) const
     {
-      // check that we have not allocated
-      // too much memory. note that bool
-      // vectors allocate their memory in
-      // chunks of whole integers, so
-      // they may over-allocate by up to
-      // as many elements as an integer
-      // has bits
-      Assert (cells.size() <=
-              cells.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("hexes",
-                               cells.size(), cells.capacity()));
-      Assert (children.size() <=
-              children.capacity() + DEAL_II_MIN_VECTOR_CAPACITY,
-              ExcMemoryWasted ("children",
-                               children.size(), children.capacity()));
-      Assert (used.size() <= used.capacity() + sizeof(int)*8 ||
-              used.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
-              ExcMemoryWasted ("used",
-                               used.size(), used.capacity()));
-      Assert (user_flags.size() <= user_flags.capacity() + sizeof(int)*8 ||
-              user_flags.size()<DEAL_II_MIN_BOOL_VECTOR_CAPACITY,
-              ExcMemoryWasted ("user_flags",
-                               user_flags.size(), user_flags.capacity()));
       Assert (cells.size() == used.size(),
               ExcMemoryInexact (cells.size(), used.size()));
       Assert (cells.size() == user_flags.size(),
@@ -518,13 +444,9 @@ namespace internal
     void
     TriaObjectsQuad3D::monitor_memory (const unsigned int) const
     {
-      // check that we have not allocated
-      // too much memory. note that bool
-      // vectors allocate their memory in
-      // chunks of whole integers, so
-      // they may over-allocate by up to
-      // as many elements as an integer
-      // has bits
+      // check that we have not allocated too much memory. note that bool
+      // vectors allocate their memory in chunks of whole integers, so they
+      // may over-allocate by up to as many elements as an integer has bits
       Assert (cells.size() * GeometryInfo<2>::lines_per_cell
               == line_orientations.size(),
               ExcMemoryInexact (cells.size() * GeometryInfo<2>::lines_per_cell,

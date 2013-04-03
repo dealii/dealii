@@ -73,7 +73,7 @@ namespace Step42
 
   // This class has the the only purpose
   // to read in data from a picture file
-  // that has to be stored as a pbm ascii
+  // that has to be stored in pbm ascii
   // format. This data will be bilinear
   // interpolated and provides in this way
   // a function which describes an obstacle.
@@ -106,9 +106,7 @@ namespace Step42
       pcout (std::cout,
                (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
       obstacle_data (0),
-      lx (1.0), // length of the cube in x direction
-      ly (1.0), // length of the cube in y direction
-      hx (0), //
+      hx (0),
       hy (0),
       nx (0),
       ny (0)
@@ -125,11 +123,12 @@ namespace Step42
       MPI_Comm             mpi_communicator;
       ConditionalOStream   pcout;
       std::vector<double>  obstacle_data;
-      double               lx, ly;
       double               hx, hy;
       int                  nx, ny;
   };
 
+  // This function is used in obstacle_function ()
+  // to provide the proper value of the obstacle.
   template <int dim>
   double Input<dim>::hv (int i, int j)
   {
@@ -138,6 +137,8 @@ namespace Step42
     return obstacle_data[nx*(ny-1-j)+i]; // i indiziert x-werte, j indiziert y-werte
   }
 
+  // obstacle_function () calculates the bilinear interpolated
+  // value in the point (x,y).
   template <int dim>
   double Input<dim>::obstacle_function (double x,double y)
   {
@@ -206,6 +207,9 @@ namespace Step42
     return val;
   }
 
+  // As mentioned above this function reads in the
+  // obstacle datas and stores them in the std::vector
+  // obstacle_data. It will be used only in run ().
   template <int dim>
   void Input<dim>::read_obstacle (const char* name)
   {
@@ -239,10 +243,11 @@ namespace Step42
 
   // This class provides an interface
   // for a constitutive law. In this
-  // example we are using an elastic
-  // plastic material with linear,
+  // example we are using an elasto
+  // plastic material behavior with linear,
   // isotropic hardening.
-
+  // For gamma = 0 we obtain perfect elasto
+  // plasticity behavior.
   template <int dim>
   class ConstitutiveLaw
   {
@@ -280,6 +285,15 @@ namespace Step42
     ConditionalOStream pcout;
   };
 
+  // The constructor of the ConstitutiveLaw class sets the
+  // required material parameter for our deformable body:
+  // E -> elastic modulus
+  // nu -> Passion's number
+  // sigma_0 -> yield stress
+  // gamma -> hardening parameter.
+  // Also it supplies the stress strain tensor of forth order
+  // of the volumetric and deviator part. For further details
+  // see the documentation above.
   template <int dim>
   ConstitutiveLaw<dim>::ConstitutiveLaw(double _E, double _nu, double _sigma_0, double _gamma, MPI_Comm _mpi_communicator, ConditionalOStream _pcout)
     :E (_E),
@@ -295,6 +309,7 @@ namespace Step42
     stress_strain_tensor_mu = 2*mu*(identity_tensor<dim>() - outer_product(unit_symmetric_tensor<dim>(), unit_symmetric_tensor<dim>())/3.0);
   }
 
+  // Calculates the strain for the shape functions.
   template <int dim>
   inline
   SymmetricTensor<2,dim> ConstitutiveLaw<dim>::get_strain (const FEValues<dim> &fe_values,
@@ -309,6 +324,11 @@ namespace Step42
     return tmp;
   }
 
+  // This is the implemented constitutive law. It projects the
+  // deviator part of the stresses in a quadrature point back to
+  // the yield stress plus the linear isotropic hardening.
+  // Also we sum up the elastic and the plastic quadrature
+  // points.
   template <int dim>
   void ConstitutiveLaw<dim>::plast_linear_hardening (SymmetricTensor<4,dim> 	  &stress_strain_tensor,
                                                      const SymmetricTensor<2,dim> &strain_tensor,
@@ -342,6 +362,8 @@ namespace Step42
       }
   }
 
+  // This function returns the linearized stress strain tensor.
+  // It contains the derivative of the nonlinear constitutive law.
   template <int dim>
   void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,dim> 		 &stress_strain_tensor_linearized,
 		  	  	  	  	  	  	  	  	  	  	  	  	  	  	SymmetricTensor<4,dim> 	 	 &stress_strain_tensor,
@@ -373,8 +395,13 @@ namespace Step42
       }
   }
 
+  // In this namespace we provide three functions:
+  // one for the body force, one for the boundary displacement
+  // and one for the Obstacle.
   namespace EquationData
   {
+    // It possible to apply an additional body force
+    // but in here it is set to zero.
     template <int dim>
     class RightHandSide : public Function<dim>
     {
@@ -399,12 +426,7 @@ namespace Step42
       if (component == 1)
         return_value = 0.0;
       if (component == 2)
-        // if ((p(0)-0.5)*(p(0)-0.5)+(p(1)-0.5)*(p(1)-0.5) < 0.2)
-        //  return_value = -5000;
-        // else
         return_value = 0.0;
-      // for (unsigned int i=0; i<dim; ++i)
-      //   return_value += 4*std::pow(p(i), 4);
 
       return return_value;
     }
@@ -417,7 +439,8 @@ namespace Step42
         values(c) = RightHandSide<dim>::value (p, c);
     }
 
-
+    // This function class is used to describe the prescribed displacements
+    // at the boundary. But again we set this to zero.
     template <int dim>
     class BoundaryValues : public Function<dim>
     {
@@ -455,14 +478,19 @@ namespace Step42
         values(c) = BoundaryValues<dim>::value (p, c);
     }
 
-
+    // This function is obviously implemented to
+    // define the obstacle that penetrates our deformable
+    // body. You can choose between two ways to define
+    // your obstacle: to read it from a file or to use
+    // a function (here a ball).
     template <int dim>
     class Obstacle : public Function<dim>
     {
     public:
-      Obstacle (std_cxx1x::shared_ptr<Input<dim> > const &_input) :
+      Obstacle (std_cxx1x::shared_ptr<Input<dim> > const &_input, bool _use_read_obstacle) :
         Function<dim>(dim),
-        input_obstacle_copy(_input) {};
+        input_obstacle_copy(_input),
+        use_read_obstacle(_use_read_obstacle) {};
 
       virtual double value (const Point<dim>   &p,
                             const unsigned int  component = 0) const;
@@ -472,6 +500,7 @@ namespace Step42
 
     private:
       std_cxx1x::shared_ptr<Input<dim> >  const &input_obstacle_copy;
+      bool										use_read_obstacle;
     };
 
     template <int dim>
@@ -486,8 +515,10 @@ namespace Step42
         return_value = p(1);
       if (component == 2)
         {
-	  return_value = -std::sqrt (0.36 - (p(0)-0.5)*(p(0)-0.5) - (p(1)-0.5)*(p(1)-0.5)) + 1.59;
-          // return_value = 1.999 - input_obstacle_copy->obstacle_function (p(0), p(1));
+    	  if (use_read_obstacle)
+    		  return_value = 1.999 - input_obstacle_copy->obstacle_function (p(0), p(1));
+    	  else
+    		  return_value = -std::sqrt (0.36 - (p(0)-0.5)*(p(0)-0.5) - (p(1)-0.5)*(p(1)-0.5)) + 1.59;
         }
       return return_value;
     }
@@ -508,12 +539,12 @@ namespace Step42
   // the nonlinear contact problem. It is
   // close to step-41 but with some additional
   // features like: handling hanging nodes,
-  // a newton method, using Trilinos and p4est
+  // a Newton method, using Trilinos and p4est
   // for parallel distributed computing.
   // To deal with hanging nodes makes
   // life a bit more complicated since
   // we need an other ConstraintMatrix now.
-  // We create a newton method for the
+  // We create a Newton method for the
   // active set method for the contact
   // situation and to handle the nonlinear
   // operator for the constitutive law.
@@ -541,6 +572,7 @@ namespace Step42
 
     unsigned int         n_refinements_global;
     unsigned int         cycle;
+    bool                 use_read_obstacle;
 
     MPI_Comm             mpi_communicator;
 
@@ -610,7 +642,6 @@ namespace Step42
                      TimerOutput::never,
                      TimerOutput::wall_times)
   {
-    // double _E, double _nu, double _sigma_0, double _gamma
     plast_lin_hard.reset (new ConstitutiveLaw<dim> (e_modul, nu, sigma_0, gamma, mpi_communicator, pcout));
   }
 
@@ -618,7 +649,7 @@ namespace Step42
   void PlasticityContactProblem<dim>::make_grid ()
   {
     std::vector<unsigned int> repet(3);
-    repet[0] = 1;//20;
+    repet[0] = 1;
     repet[1] = 1;
     repet[2] = 1;
 
@@ -657,10 +688,15 @@ namespace Step42
     triangulation.refine_global (n_refinements_global);
   }
 
+  // In following function we setup the degrees of freedom before each refinement
+  // cycle. Except that we are using Trilinos here instead of PETSc most of it
+  // is similar to step-40.
+
+  // We are using TimerOutput to control the scaling for the distributing the dofs
+  // and setting of the sparsity pattern and the system matrix.
   template <int dim>
   void PlasticityContactProblem<dim>::setup_system ()
   {
-    // setup dofs
     {
       computing_timer.enter_section("Setup: distribute DoFs");
       dof_handler.distribute_dofs (fe);
@@ -672,7 +708,7 @@ namespace Step42
       computing_timer.exit_section("Setup: distribute DoFs");
     }
 
-    // setup hanging nodes and dirichlet constraints
+    					// Setup of the hanging nodes and the Dirichlet constraints.
     {
       constraints_hanging_nodes.clear ();
       constraints_hanging_nodes.reinit (locally_relevant_dofs);
@@ -693,7 +729,7 @@ namespace Step42
       dirichlet_constraints ();
     }
 
-    // Initialization for matrices and vectors
+    					// Initialization for matrices and vectors.
     {
       solution.reinit (locally_relevant_dofs, mpi_communicator);
       system_rhs_newton.reinit (locally_owned_dofs, mpi_communicator);
@@ -704,7 +740,7 @@ namespace Step42
       active_set.set_size (locally_relevant_dofs.size ());
     }
 
-    // setup sparsity pattern
+    					// Here we setup sparsity pattern.
     {
       computing_timer.enter_section("Setup: matrix");
       TrilinosWrappers::SparsityPattern sp (locally_owned_dofs,
@@ -1047,7 +1083,7 @@ namespace Step42
   {
     computing_timer.enter_section("Update solution and constraints");
 
-    const EquationData::Obstacle<dim>     obstacle (input_obstacle);
+    const EquationData::Obstacle<dim>     obstacle (input_obstacle, use_read_obstacle);
     std::vector<bool>                     vertex_touched (dof_handler.n_dofs (), false);
 
     typename DoFHandler<dim>::active_cell_iterator
@@ -1250,8 +1286,13 @@ namespace Step42
     computing_timer.exit_section("Solve");
   }
 
+  // @sect4{PlasticityContactProblem::solve_newton}
 
-
+  // In this function the damped Newton method is implemented.
+  // That means two nested loops: the outer loop for the newton
+  // iteration and the inner loop for the damping steps which
+  // will be used only if necessary. To obtain a good and reasonable
+  // starting value we solve an elastic problem in very first step (j=1).
   template <int dim>
   void PlasticityContactProblem<dim>::solve_newton ()
   {
@@ -1280,7 +1321,6 @@ namespace Step42
     unsigned int number_assemble_system = 0;
     for (; j<=100; j++)
       {
-        // Solve an elastic problem to obtain a better start solution
         if (j == 1 && cycle == 0)
           plast_lin_hard->set_sigma_0 (1e+10);
         else if (j == 2 || cycle > 0)
@@ -1305,16 +1345,23 @@ namespace Step42
         TrilinosWrappers::MPI::Vector distributed_solution (system_rhs_newton);
         distributed_solution = solution;
 
-        int damped = 0;
+
+        // We handle a highly nonlinear problem so we have to damp
+        // the Newtons method. We refer that we iterate the new solution
+        // in each Newton step and not only the solution update.
+        // Since the solution set is a convex set and not a space we
+        // compute for the damping a linear combination of the
+        // previous and the current solution to guarantee that the
+        // damped solution is in our solution set again.
+        // At most we apply 10 damping steps.
+        bool damped = false;
         tmp_vector = old_solution;
-//        constraints.distribute (old_solution);
         double a = 0;
         for (unsigned int i=0; (i<10)&&(!damped); i++)
           {
             a=std::pow(0.5, static_cast<double>(i));
             old_solution = tmp_vector;
             old_solution.sadd(1-a,a, distributed_solution);
-//            constraints.distribute (old_solution);
             old_solution.compress (VectorOperation::add);
 
             computing_timer.enter_section("Residual and lambda");
@@ -1337,7 +1384,7 @@ namespace Step42
             resid = res.l2_norm ();
 
             if (resid<resid_old)
-              damped=1;
+              damped=true;
 
             computing_timer.exit_section("Residual and lambda");
 
@@ -1363,7 +1410,7 @@ namespace Step42
         if (num_changed==0 && resid < 1e-8)
                    break;
         active_set_old = active_set;
-      } // End of active-set-loop
+      }
 
     pcout << "" << std::endl
           << "      Number of assembled systems = " << number_assemble_system
@@ -1491,9 +1538,13 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::run ()
   {
-    pcout << "Read the obstacle from a file." << std::endl;
-    input_obstacle.reset (new Input<dim>("obstacle_file.pbm"));
-    pcout << "Ostacle is available now." << std::endl;
+	use_read_obstacle = false;
+	if (use_read_obstacle)
+	{
+		pcout << "Read the obstacle from a file." << std::endl;
+		input_obstacle.reset (new Input<dim>("obstacle_file.pbm"));
+		pcout << "Ostacle is available now." << std::endl;
+	}
 
     const unsigned int n_cycles = 6;
     for (cycle=0; cycle<n_cycles; ++cycle)
