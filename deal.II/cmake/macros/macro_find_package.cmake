@@ -15,13 +15,18 @@
 #
 # A small wrapper around FIND_PACKAGE.
 # We guard the invocation of FIND_PACKAGE(package <...>) by
-# ${package}_FOUND to allow easy custom overrides
+# ${package}_FOUND and ${package}_LIBRARIES to allow easy custom overrides
 #
 
 MACRO(FIND_PACKAGE _package_name)
   STRING(TOUPPER ${_package_name} _package_name_uppercase)
 
-  IF(NOT DEFINED ${_package_name_uppercase}_FOUND)
+  IF( NOT DEFINED ${_package_name_uppercase}_FOUND AND
+      NOT DEFINED ${_package_name_uppercase}_LIBRARIES )
     _FIND_PACKAGE (${_package_name} ${ARGN})
+  ELSE()
+    IF(NOT DEFINED ${_package_name_uppercase}_FOUND)
+      SET(${_package_name_uppercase}_FOUND TRUE)
+    ENDIF()
   ENDIF()
 ENDMACRO()

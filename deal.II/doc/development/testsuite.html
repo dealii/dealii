@@ -29,96 +29,71 @@
     <a name="build_tests"></a>
     <h2>The build tests</h2>
 
-    <p>With our build tests, we check if deal.II can be compiled on
-    different systems and with different compilers as well as
-    different configuration options. Results are collected in a
-    database and can be accessed <a
-    href="http://www.dealii.org/testsuite.html">online</a>.<p>
-
-    <p>Running the build test suite is simple and we encourage deal.II
-    users with configurations not found on the <a
-    href="http://www.dealii.org/testsuite.html">test suite page</a> to
-    participate. Assuming you checked out deal.II into the directory
-    <code>dealtest</code>, running it is as simple as (you may want to pass
-    different options than the ones given as <code>BUILDTESTFLAGS</code> to
-    <code>./configure</code>):</p>
-
-    <pre>
-
-    cd dealtest
-    make distclean
-    svn update
-    make build-test BUILDTESTFLAGS='--with-umfpack --with-lapack'
-    mail build-tests@dealii.org < build-test-log
-
-    </pre>
-
-    <p>After cleaning up the directory and updating the library to the
-    most recent version, the <code>make</code> command configures the
-    library (here for use of UMFPack and LAPACK libraries) and
-    compiles everything. The result is in the file
-    <code>build-test-log</code>, which is sent to the build test demon
-    in the end. A status indicator should appear on the build test website
-    after some time (results are collected and processed by a program that is
-    run periodically, but not immediately after a mail has been received).
-    </p>
-
-    <h3>Configuring for a special compiler</h3>
-
-    <p>If your compiler is not in the standard path or has a strange
-    name (like <code>mycc</code> for C and <code>myCC</code> for C++),
-    your template would be something like this (assuming you work with the
-    <code>bash</code> shell):</p>
-
-    <pre>
-
-    export PATH=/my/compiler/path:$PATH
-    export CXX=myCC
-
-    cd dealtest
-    make clean
-    svn update
-    make build-test BUILDTESTFLAGS='CC=mycc CXX=myCC'
-    mail build-tests@dealii.org < build-test-log
-
-    </pre>
-
-
-    <h3>Dedicated tests</h3>
-
     <p>
-    Most of our tests are built in dedicated directories, i.e. work on copies
-    of deal.II that we don't usually use to work on every day. We do this,
-    because we want to see if the version in the subversion repository can be
-    compiled, not the version that we have made changes in.
+      With our build tests, we check if deal.II can be compiled on
+      different systems and with different compilers as well as
+      different configuration options. Results are collected in a
+      database and can be accessed <a
+      href="http://www.dealii.org/testsuite.html">online</a>.<p>
+
+      <p>Running the build test suite is simple and we encourage deal.II
+      users with configurations not found on the <a
+      href="http://www.dealii.org/testsuite.html">test suite page</a> to
+      participate. Assuming you checked out deal.II into the directory
+      <code>dealtest</code>, running it is as simple as:
+      <pre>
+
+    cd dealtest
+    svn update
+    ./contrib/utilities/build_test
+    mail build-tests@dealii.org &lt; *.log
+  ( rm *.log )
+      </pre>
     </p>
 
     <p>
-    In this case, one would check out a new version, and do essentially the
-    same things as above:
+      The <code>build_test</code> script supports the following options:
+      <pre>
 
-    <pre>
+    SOURCEDIR     - the source directory to use (otherwise the current directory is used)
+    CONFIGFILE    - A cmake configuration file for the build test
+    LOGDIR        - directory for the log file
+    LOGFILE       - the logfile to use, defaults to
+                        $LOGDIR/$BRANCH.$CONFIGFILE.<unix time>.log
 
-    export PATH=/my/compiler/path:$PATH
-    export CXX=myCC
+    CMAKE         - the cmake executable to use
+    SVN           - svn info command to use, defaults to
+                        svn info $(SOURCEDIR)
+    TMPDIR        - defaults to "/tmp"
+    CLEAN_TMPDIR  - defaults to "true"
+    RUN_EXAMPLES  - defaults to "true"
+      </pre>
+      An example configuration file can be found <a
+      href="Config.sample">here</a>. Options can be passed either via
+    environment
+      <pre>
 
-    svn co https://svn.dealii.org/trunk/deal.II
-    cd deal.II
-    svn update
-    make build-test BUILDTEST=yes BUILDTESTFLAGS='CC=mycc CXX=myCC'
-    mail build-tests@dealii.org < build-test-log
-    cd ..
-    rm -rf deal.II
+    export CONFIGFILE=MyConfiguration.conf
+    ./contrib/utilities/build_test
+      </pre>
+      or directly on the command line:
+      <pre>
 
-    </pre>
-
-    The only difference is that one has to give the option
-    <code>BUILDTEST=yes</code> to the call to <code>make</code>. This is so
-    because for the make file to work it depends on a file that is created by
-    <code>./configure</code>; the latter, however, hasn't run on this pristine
-    copy yet.
+    ./contrib/utilities/build_test CONFIGFILE=myConfiguration.conf
+      </pre>
     </p>
 
+    <p>
+      A status indicator should appear on the build test website after some
+      time (results are collected and processed by a program that is run
+      periodically, but not immediately after a mail has been received).
+    </p>
+
+
+    <h3>Dedicated build tests</h3>
+
+    There is a detailed example for dedicated build tests on the <a
+      href="https://code.google.com/p/dealii/wiki/BuildTests">wiki</a>.
 
     <a name="regression_tests"></a>
     <h2>The regression tests</h2>
@@ -135,7 +110,7 @@
     in both cases to make sure that future changes do not break what
     we have just checked in. In addition, some machines run the tests
     every night and send the results back home; this is then converted
-    into <a href="http://www.dealii.org/~archiver/cgi-bin/regression_quick.pl"
+    into <a href="http://www.dealii.org/cgi-bin/regression_quick.pl"
     target="body">a webpage showing the status of our regression
     tests</a>.
     </p>
@@ -153,6 +128,7 @@
     To run the testsuite, go to the directory where you want to test deal.II
     and do this:
     <pre>
+
        svn checkout https://svn.dealii.org/trunk/tests
        cd tests
        DEAL_II_DIR=/a/b/c ./configure
@@ -182,6 +158,7 @@
     archive. This is helpful if you want to figure out if any test is
     failing at all. Typical output looks like this:
     <pre>
+
       deal.II/tests> make
       cd base ; make
       make[1]: Entering directory `/ices/bangerth/p/deal.II/1/deal.II/tests/base'
@@ -221,10 +198,12 @@
     (the same applies as above: <code>make -jN</code> can be used on multicore
     machines):
     <pre>
+
       deal.II/tests> make report | tee report
     </pre>
     which produces the file report ( here in the test directory <tt>a-framework</tt>)
     <pre>
+
       =====Checking====== miscompare/output
       +++++Error+++++++++ miscompare/OK (miscompare/cmp/generic) Use make verbose=on for the diffs
       =====linking======= compile/exe
@@ -256,6 +235,7 @@
     If you only want to see the tests that failed, after the previous command,
     issue
     <pre>
+
       grep -v + report
     </pre>
     </p>
@@ -264,6 +244,7 @@
     If you want to do a little more than just that, you should
     consider running
     <pre>
+
       make report+mail | tee report
     </pre>
     instead. This does all the same stuff, but also mails the test
@@ -279,11 +260,13 @@
     <p>
     To get a quick overview you can run
     <pre>
+
       make report+summary
     </pre>
     instead. This runs all the tests and outputs a table in the following format
     at the end:
     <pre>
+
                 Compiling Linking Running   Check      OK     all
          a-framework	1	1	1	1	1	5
                 base	0	0	0	2	185	187
@@ -305,6 +288,7 @@
     given in the line with the equals signs; there are tests in other
     directories as well) and then type
     <pre>
+
       make hierarchical/exe
     </pre>
     to compile and link the executable. (For each test there is a not
@@ -316,6 +300,7 @@
     the test, you will want to make sure that it executes correctly
     and produces an output file:
     <pre>
+
       make hierarchical/output
     </pre>
     (As you see, the output file is also stored in the subdirectory with the
@@ -324,11 +309,13 @@
     the other hand, if you are sure that this also worked, you will
     want to compare the output with the stored output from subversion:
     <pre>
+
       make hierarchical/OK
     </pre>
     If the output isn't equal, then you'll see something like
     this:
     <pre>
+
       =====Checking====== hierarchical/output
       +++++Error+++++++++ hierarchical/OK. Use make verbose=on for the diffs
     </pre>
@@ -336,10 +323,12 @@
     expected can sometimes be very large, you don't get to see it by
     default. However, following the suggestion printed, if you type
     <pre>
+
       make hierarchical/OK verbose=on
     </pre>
     you get to see it all:
     <pre>
+
       =====Checking====== hierarchical/output
       12c12
       < DEAL::0.333 1.667 0.333 -0.889 0.296 -0.988 0.329 -0.999 0.333 -1.000 0.333 -1.000
@@ -370,6 +359,7 @@
     <p>
     For the testcase, we usually start from a template like this:
     <pre>
+
 //----------------------------  my_new_test.cc  ---------------------------
 //    $Id$
 //
@@ -446,12 +436,14 @@ int main ()
     <p> One convenient way to create this subdirectory with the correct
     properties is to use svn copy.
     <pre>
+
     svn copy existing_test_directory my_new_test
     </pre>
 
     <p>
     Once you have done this, you can try to run
     <pre>
+
       make my_new_test/output
     </pre>
     This should compile, link, and run your test. Running your test
@@ -507,6 +499,7 @@ int main ()
     <code>gcc4.0</code> as your compiler, then the following files will be
     sought (in this order):
     <pre>
+
 testname/cmp/i686-pc-linux-gnu+gcc4.0
 testname/cmp/i686-pc-linux-gnu+gcc3.4
 testname/cmp/i686-pc-linux-gnu+gcc3.3
@@ -532,6 +525,7 @@ testname/cmp/generic
     <p>
     At this point you can run
     <pre>
+
       make my_new_test/OK
     </pre>
     which should compare the present output with what you have just
@@ -548,6 +542,7 @@ testname/cmp/generic
     <code>testname/cmp/myplatform+compiler</code>, but your life can be easier
     if you simply type
     <pre>
+
       make my_new_test/ref
     </pre>
     which takes your output and copies it to the right place automatically.
@@ -565,6 +560,7 @@ testname/cmp/generic
     already, you can add the new test and the expected output
     file:
     <pre>
+
       svn add bits/my_new_test.cc
       svn add bits/my_new_test
       svn add bits/my_new_test/cmp
@@ -575,6 +571,7 @@ testname/cmp/generic
     generated while running the testsuite show up in the output of <code>svn
     status</code> commands:
     <pre>
+
       svn propset svn:ignore "obj.*
         exe
         output

@@ -101,14 +101,16 @@ IF("${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}")
     )
 ENDIF()
 
+
 ###########################################################################
 #                                                                         #
 #                        Compilation and linking:                         #
 #                                                                         #
 ###########################################################################
 
-SET(DEAL_II_ALLOW_PLATFORM_INTROSPECTION ON CACHE BOOL
+OPTION(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
   "Allow platform introspection for CPU command set, SSE and AVX"
+  ON
   )
 MARK_AS_ADVANCED(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
 
@@ -228,14 +230,40 @@ FOREACH(_flag ${DEAL_II_USED_FLAGS})
   MARK_AS_ADVANCED(${_flag})
 ENDFOREACH()
 
-IF(DEAL_II_FORCE_AUTODETECTION)
+
+###########################################################################
+#                                                                         #
+#                          Miscellanious setup:                           #
+#                                                                         #
+###########################################################################
+
+GET_CMAKE_PROPERTY(_res VARIABLES)
+FOREACH(_var ${_res})
   #
-  # Undefine all feature toggles DEAL_II_WITH_* prior to configure:
+  # Rename WITH_* by DEAL_II_WITH_*
   #
-  GET_CMAKE_PROPERTY(_res VARIABLES)
-  FOREACH(_var ${_res})
-    IF(_var MATCHES "DEAL_II_WITH_")
-      UNSET(${_var} CACHE)
-    ENDIF()
-  ENDFOREACH()
-ENDIF()
+  IF(_var MATCHES "^WITH_")
+    SET(DEAL_II_${_var} ${${_var}} CACHE BOOL "" FORCE)
+    UNSET(${_var} CACHE)
+  ENDIF()
+
+  #
+  # Same for components:
+  #
+  IF(_var MATCHES "^COMPONENT_")
+    SET(DEAL_II_${_var} ${${_var}} CACHE BOOL "" FORCE)
+    UNSET(${_var} CACHE)
+  ENDIF()
+  IF(_var MATCHES "^(COMPAT_FILES|DOCUMENTATION|EXAMPLES|CONTRIB)")
+    SET(DEAL_II_COMPONENT_${_var} ${${_var}} CACHE BOOL "" FORCE)
+    UNSET(${_var} CACHE)
+  ENDIF()
+
+  #
+  # If DEAL_II_FORCE_AUTODETECTION is set undefine all feature toggles
+  # DEAL_II_WITH_* prior to configure:
+  #
+  IF(DEAL_II_FORCE_AUTODETECTION AND _var MATCHES "^DEAL_II_WITH_")
+    UNSET(${_var} CACHE)
+  ENDIF()
+ENDFOREACH()

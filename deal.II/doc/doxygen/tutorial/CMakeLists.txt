@@ -89,17 +89,6 @@ ADD_CUSTOM_TARGET(tutorial
 
 FOREACH(_step ${_steps})
   GET_FILENAME_COMPONENT(_step "${_step}" NAME)
-  STRING(REGEX REPLACE "-" "_" _step_underscore "${_step}")
-
-  CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/_toc.intro.snippet.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${_step}_toc.intro.snippet
-    )
-
-  CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/_plain.snippet.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${_step}_plain.snippet
-    )
 
   ADD_CUSTOM_COMMAND(
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
@@ -107,75 +96,29 @@ FOREACH(_step ${_steps})
     ARGS
       ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain
       < ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
-      >> ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
+      > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.cc
     DEPENDS
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2plain
       ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
     VERBATIM
     )
 
   ADD_CUSTOM_COMMAND(
-    #
-    # This has to be refactored really, really badly...
-    #
     OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
-    COMMAND cat
-    ARGS
-      ${CMAKE_CURRENT_BINARY_DIR}/${_step}_toc.intro.snippet
-      >> ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
     COMMAND ${PERL_EXECUTABLE}
     ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/intro2toc
-      < ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/intro.dox
-      >> ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
-    COMMAND cat
-    ARGS
-      ${CMAKE_CURRENT_SOURCE_DIR}/_toc.prog.snippet
-      >> ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
-    COMMAND ${PERL_EXECUTABLE}
-    ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2toc
-      < ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
-      >> ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
-    COMMAND cat
-    ARGS
-      ${CMAKE_CURRENT_SOURCE_DIR}/_toc.results.snippet
-      >> ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
-    COMMAND ${PERL_EXECUTABLE}
-    ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/intro2toc
-      < ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/results.dox
-      >> ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
-    COMMAND cat
-    ARGS
-      ${CMAKE_CURRENT_SOURCE_DIR}/_toc.final.snippet
-      >> ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
-    COMMAND ${PERL_EXECUTABLE}
-    ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/create_anchors
-      < ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/intro.dox
-      >> ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
-    COMMAND ${PERL_EXECUTABLE}
-    ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/program2doxygen
-      < ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
-      >> ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
-    COMMAND ${PERL_EXECUTABLE}
-    ARGS
-      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/create_anchors
-      < ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/results.dox
-      >> ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
-    COMMAND cat
-    ARGS
-      ${CMAKE_CURRENT_BINARY_DIR}/${_step}_plain.snippet
-      >> ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_step.pl
+      ${_step} ${CMAKE_SOURCE_DIR}
+      > ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
     WORKING_DIRECTORY
       ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS
+      ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/make_step.pl
       ${CMAKE_SOURCE_DIR}/examples/${_step}/${_step}.cc
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/intro.dox
       ${CMAKE_SOURCE_DIR}/examples/${_step}/doc/results.dox
-    VERBATIM
     )
+
   ADD_CUSTOM_TARGET(tutorial_${_step}
     DEPENDS
       ${CMAKE_CURRENT_BINARY_DIR}/${_step}.h
@@ -183,7 +126,6 @@ FOREACH(_step ${_steps})
     )
   ADD_DEPENDENCIES(tutorial tutorial_${_step})
 ENDFOREACH()
-
 
 #
 # Install all bits:
@@ -197,7 +139,7 @@ INSTALL(FILES
   toc-topics.html
   ${CMAKE_CURRENT_BINARY_DIR}/steps.png
   ${CMAKE_CURRENT_BINARY_DIR}/toc.html
-  DESTINATION ${DEAL_II_DOCUMENTATION_RELDIR}/doxygen/tutorial
+  DESTINATION ${DEAL_II_DOCHTML_RELDIR}/doxygen/tutorial
   COMPONENT documentation
   )
 

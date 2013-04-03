@@ -43,9 +43,6 @@ MACRO(FEATURE_SLEPC_FIND_EXTERNAL var)
       SET(SLEPC_DIR "" CACHE PATH
         "An optional hint to a SLEPc directory"
         )
-      SET(SLEPC_ARCH "" CACHE STRING
-        "An optional hint to a SLEPc arch"
-        )
 
       SET(${var} FALSE)
     ENDIF()
@@ -74,8 +71,8 @@ MACRO(FEATURE_SLEPC_ERROR_MESSAGE)
     "    $ SLEPC_DIR=\"...\" cmake <...>\n"
     "    $ cmake -DSLEPC_DIR=\"...\" <...>\n"
     "SLEPc compiled in source tree:\n"
-    "    $ SLEPC_DIR=\"...\"  SLEPC_ARCH=\"...\" cmake <...>\n"
-    "    $ cmake -DSLEPC_DIR=\"...\" -DSLEPC_ARCH=\"...\" <...>\n"
+    "    $ SLEPC_DIR=\"...\"\n"
+    "    $ cmake -DSLEPC_DIR=\"...\"\n"
     "or set the relevant variables by hand in ccmake.\n\n"
     )
 ENDMACRO()

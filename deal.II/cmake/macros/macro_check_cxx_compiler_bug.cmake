@@ -24,14 +24,21 @@
 #
 
 MACRO(CHECK_CXX_COMPILER_BUG _source _var)
-  CHECK_CXX_SOURCE_COMPILES(
-    "${_source}"
-    ${_var}_OK)
+  IF(NOT DEFINED ${_var}_OK)
+    CHECK_CXX_SOURCE_COMPILES(
+      "${_source}"
+      ${_var}_OK
+      )
+    IF(${_var}_OK)
+      MESSAGE(STATUS "Test successful, do not define ${_var}")
+    ELSE()
+      MESSAGE(STATUS "Test unsuccessful, define ${_var}")
+    ENDIF()
+  ENDIF()
 
   IF(${_var}_OK)
-    MESSAGE(STATUS "Test successful, do not define ${_var}")
+    SET(${_var})
   ELSE()
-    MESSAGE(STATUS "Test unsuccessful, define ${_var}")
     SET(${_var} TRUE)
   ENDIF()
 ENDMACRO()

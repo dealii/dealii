@@ -13,6 +13,15 @@
 #####
 
 ADD_EXECUTABLE(expand_instantiations expand_instantiations.cc)
+IF(NOT CMAKE_CROSSCOMPILING)
+  #
+  # Export expand_instantiations for use in cross compilation:
+  #
+  EXPORT(TARGETS expand_instantiations
+    FILE ${CMAKE_CURRENT_BINARY_DIR}/importExecutables.cmake
+    NAMESPACE native- # Prefix a namespace
+    )
+ENDIF()
 
 IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
@@ -36,16 +45,24 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     ${CMAKE_CURRENT_SOURCE_DIR}/report_features.cc.in
     ${CMAKE_CURRENT_BINARY_DIR}/report_features.cc
     )
+
   ADD_EXECUTABLE(report_features
     ${CMAKE_CURRENT_BINARY_DIR}/report_features.cc
     )
   TARGET_LINK_LIBRARIES(report_features ${DEAL_II_EXTERNAL_LIBRARIES})
-  ADD_CUSTOM_TARGET(run_report_features COMMAND report_features)
+  SET_TARGET_PROPERTIES(report_features
+    PROPERTIES
+    LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}"
+    COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS}"
+    )
+
+  IF(NOT CMAKE_CROSSCOMPILING)
+    ADD_CUSTOM_TARGET(run_report_features COMMAND report_features)
+  ENDIF()
 
   INSTALL(TARGETS make_dependencies report_features expand_instantiations
-    RUNTIME
-    DESTINATION common/scripts
+    EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets
+    DESTINATION ${DEAL_II_COMMON_RELDIR}/scripts
     COMPONENT compat_files
     )
 ENDIF()
-

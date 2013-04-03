@@ -364,6 +364,14 @@ namespace GridOutFlags
     draw_legend(draw_legend)
   {}
 
+  MathGL::MathGL ()
+  {}
+
+  void MathGL::declare_parameters (ParameterHandler &param)
+  {}
+
+  void MathGL::parse_parameters (ParameterHandler &param)
+  {}
 
 }  // end namespace GridOutFlags
 
@@ -429,12 +437,16 @@ void GridOut::set_flags (const GridOutFlags::XFig &flags)
 }
 
 
-
 void GridOut::set_flags (const GridOutFlags::Svg &flags)
 {
   svg_flags = flags;
 }
 
+
+void GridOut::set_flags (const GridOutFlags::MathGL &flags)
+{
+  mathgl_flags = flags;
+}
 
 std::string
 GridOut::default_suffix (const OutputFormat output_format)
@@ -457,6 +469,8 @@ GridOut::default_suffix (const OutputFormat output_format)
       return ".msh";
     case svg:
       return ".svg";
+    case mathgl:
+      return ".mathgl";
     default:
       Assert (false, ExcNotImplemented());
       return "";
@@ -500,6 +514,9 @@ GridOut::parse_output_format (const std::string &format_name)
   if (format_name == "svg")
     return svg;
 
+  if (format_name == "mathgl")
+    return mathgl;
+
   AssertThrow (false, ExcInvalidState ());
   // return something weird
   return OutputFormat(-1);
@@ -509,7 +526,7 @@ GridOut::parse_output_format (const std::string &format_name)
 
 std::string GridOut::get_output_format_names ()
 {
-  return "none|dx|gnuplot|eps|ucd|xfig|msh|svg";
+  return "none|dx|gnuplot|eps|ucd|xfig|msh|svg|mathgl";
 }
 
 
@@ -545,6 +562,10 @@ GridOut::declare_parameters(ParameterHandler &param)
   param.enter_subsection("XFig");
   GridOutFlags::XFig::declare_parameters(param);
   param.leave_subsection();
+
+  param.enter_subsection("MathGl");
+  GridOutFlags::MathGL::declare_parameters(param);
+  param.leave_subsection();
 }
 
 
@@ -579,6 +600,10 @@ GridOut::parse_parameters(ParameterHandler &param)
   param.enter_subsection("XFig");
   xfig_flags.parse_parameters(param);
   param.leave_subsection();
+
+  param.enter_subsection("MathGL");
+  mathgl_flags.parse_parameters(param);
+  param.leave_subsection();
 }
 
 
@@ -586,14 +611,15 @@ GridOut::parse_parameters(ParameterHandler &param)
 std::size_t
 GridOut::memory_consumption () const
 {
-  return (sizeof(dx_flags) +
-          sizeof(msh_flags) +
-          sizeof(ucd_flags) +
+  return (sizeof(dx_flags)      +
+          sizeof(msh_flags)     +
+          sizeof(ucd_flags)     +
           sizeof(gnuplot_flags) +
-          sizeof(eps_flags_1) +
-          sizeof(eps_flags_2) +
-          sizeof(eps_flags_3) +
-          sizeof(xfig_flags));
+          sizeof(eps_flags_1)   +
+          sizeof(eps_flags_2)   +
+          sizeof(eps_flags_3)   +
+          sizeof(xfig_flags)    +
+          sizeof(mathgl_flags));
 }
 
 
@@ -1946,6 +1972,21 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
 }
 
+template <>
+void GridOut::write_mathgl (const Triangulation<1> &,
+			    std::ostream           &) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+template <int dim>
+void GridOut::write_mathgl (const Triangulation<dim> &tria,
+			    std::ostream             &out) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
 
 unsigned int GridOut::n_boundary_faces (const Triangulation<1> &) const
 {
@@ -3285,6 +3326,10 @@ void GridOut::write (const Triangulation<dim, spacedim> &tria,
 
     case svg:
       write_svg (tria, out);
+      return;
+
+    case mathgl:
+      write_mathgl (tria, out);
       return;
     }
 

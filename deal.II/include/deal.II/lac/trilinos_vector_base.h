@@ -189,9 +189,13 @@ namespace TrilinosWrappers
       DeclException3 (ExcAccessToNonLocalElement,
                       int, int, int,
                       << "You tried to access element " << arg1
-                      << " of a distributed vector, but only elements "
+                      << " of a distributed vector, but it is not stored on "
+                      << "the current processor. Note: the elements stored "
+                      << "on the current processor are within the range "
                       << arg2 << " through " << arg3
-                      << " are stored locally and can be accessed.");
+                      << " but Trilinos vectors need not store contiguous "
+                      << "ranges on each processor, and not every element in "
+                      << "this range may in fact be stored locally.");
 
     private:
       /**
@@ -484,9 +488,24 @@ namespace TrilinosWrappers
      * that is stored locally. If
      * this is a sequential vector,
      * then the result will be the
-     * pair (0,N), otherwise it will
-     * be a pair (i,i+n), where
-     * <tt>n=local_size()</tt>.
+     * pair <code>(0,N)</code>, otherwise it will
+     * be a pair <code>(i,i+n)</code>, where
+     * <code>n=local_size()</code> and <code>i</code> is the first
+     * element of the vector stored on this processor, corresponding
+     * to the half open interval $[i,i+n)$
+     *
+     * @note The description above is true most of the time, but
+     * not always. In particular, Trilinos vectors need not store
+     * contiguous ranges of elements such as $[i,i+n)$. Rather, it
+     * can store vectors where the elements are distributed in
+     * an arbitrary way across all processors and each processor
+     * simply stores a particular subset, not necessarily contiguous.
+     * In this case, this function clearly makes no sense since it
+     * could, at best, return a range that includes all elements
+     * that are stored locally. Thus, the function only succeeds
+     * if the locally stored range is indeed contiguous. It will
+     * trigger an assertion if the local portion of the vector
+     * is not contiguous.
      */
     std::pair<unsigned int, unsigned int> local_range () const;
 
@@ -494,6 +513,9 @@ namespace TrilinosWrappers
      * Return whether @p index is in
      * the local range or not, see
      * also local_range().
+     *
+     * @note The same limitation for the applicability of this
+     * function applies as listed in the documentation of local_range().
      */
     bool in_local_range (const unsigned int index) const;
 
@@ -1177,7 +1199,7 @@ namespace TrilinosWrappers
   bool
   VectorBase::in_local_range (const unsigned int index) const
   {
-    std::pair<unsigned int, unsigned int> range = local_range();
+    const std::pair<unsigned int, unsigned int> range = local_range();
 
     return ((index >= range.first) && (index <  range.second));
   }
@@ -1495,6 +1517,12 @@ namespace TrilinosWrappers
     int begin, end;
     begin = vector->Map().MinMyGID();
     end = vector->Map().MaxMyGID()+1;
+
+    Assert (end-begin == vector->Map().NumMyElements(),
+            ExcMessage ("This function only makes sense if the elements that this "
+                        "vector stores on the current processor form a contiguous range. "
+                        "This does not appear to be the case for the current vector."));
+
     return std::make_pair (begin, end);
   }
 

@@ -908,8 +908,7 @@ int main (int argc, char **argv)
       // destructor of <code>elastic_problem</code> would run after
       // <code>PetscFinalize</code>; since the destructor involves calls to
       // PETSc functions, we would get strange error messages from PETSc.)
-      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
-
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
       {
         deallog.depth_console (0);
 

@@ -12,8 +12,10 @@ Contains checks for platform features and compiler bugs and features
 ./config
 =======
 
-Contains configuration templates for installing deal.IIConfig.cmake and for
-the c++ template expansion mechanism
+Contains configuration templates for
+  - the project configuration (deal.IIConfig.cmake)
+  - the legacy Make.global_options mechanism
+  - the C++ template expansion mechanism (template-arguments)
 
 ./configure
 ===========
@@ -34,7 +36,7 @@ Contains Find<Library>.cmake modules for finding external libraries
 ./scripts
 =========
 
-Contains script files needed for the build system
+Contains script files needed for the build system, notably expand_instantiations
 
 
 ./setup_*.cmake

@@ -14,12 +14,17 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(src_base
+FILE(GLOB _header
+  ${CMAKE_SOURCE_DIR}/include/deal.II/base/*.h
+  )
+
+SET(_src
   auto_derivative_function.cc
   conditional_ostream.cc
   config.cc
   convergence_table.cc
   data_out_base.cc
+  # do NOT include dummy.cc
   event.cc
   exceptions.cc
   flow_function.cc
@@ -63,5 +68,7 @@ SET(src_base
   utilities.cc
   )
 
-DEAL_II_ADD_LIBRARY(obj_base OBJECT ${src_base})
+DEAL_II_ADD_LIBRARY(obj_base OBJECT ${_src} ${_header}
+  ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
+  )
 

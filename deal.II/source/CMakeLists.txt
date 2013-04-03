@@ -42,6 +42,10 @@ ADD_SUBDIRECTORY(grid)
 ADD_SUBDIRECTORY(hp)
 ADD_SUBDIRECTORY(multigrid)
 ADD_SUBDIRECTORY(distributed)
+ADD_SUBDIRECTORY(algorithms)
+ADD_SUBDIRECTORY(integrators)
+ADD_SUBDIRECTORY(matrix_free)
+ADD_SUBDIRECTORY(meshworker)
 
 
 FOREACH(build ${DEAL_II_BUILD_TYPES})
@@ -55,6 +59,7 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     deal_ii_objects_${build_lowercase}
     )
   ADD_LIBRARY(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
+    base/dummy.cc # Workaround for a bug in the Xcode generator
     ${deal_ii_objects_${build_lowercase}}
     )
 
@@ -70,6 +75,7 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_${build}}"
     COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
     COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${build}}"
+    INSTALL_NAME_DIR "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}"
     )
 
   TARGET_LINK_LIBRARIES(${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX}
@@ -82,14 +88,6 @@ FOREACH(build ${DEAL_II_BUILD_TYPES})
     DESTINATION ${DEAL_II_LIBRARY_RELDIR}
     COMPONENT library
     )
-
-  #
-  # Information for legacy Make.global_options
-  #
-  GET_TARGET_PROPERTY(lib ${DEAL_II_BASE_NAME}${DEAL_II_${build}_SUFFIX} LOCATION)
-  GET_FILENAME_COMPONENT(lib "${lib}" NAME)
-  SET(MAKEFILE_LIBRARY_${build} "${CMAKE_INSTALL_PREFIX}/${DEAL_II_LIBRARY_RELDIR}/${lib}" PARENT_SCOPE)
-
 ENDFOREACH()
 
 INSTALL(EXPORT ${DEAL_II_PROJECT_CONFIG_NAME}Targets

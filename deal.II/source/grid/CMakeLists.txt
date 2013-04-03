@@ -14,7 +14,11 @@
 
 INCLUDE_DIRECTORIES(BEFORE ${CMAKE_CURRENT_BINARY_DIR})
 
-SET(src
+FILE(GLOB _header
+  ${CMAKE_SOURCE_DIR}/include/deal.II/grid/*.h
+  )
+
+SET(_src
   grid_generator.cc
   grid_in.cc
   grid_out.cc
@@ -32,7 +36,7 @@ SET(src
   tria_objects.cc
   )
 
-SET(inst_in_files
+SET(_inst
   grid_generator.inst.in
   grid_in.inst.in
   grid_out.inst.in
@@ -46,6 +50,6 @@ SET(inst_in_files
   tria_objects.inst.in
   )
 
-DEAL_II_ADD_LIBRARY(obj_grid OBJECT ${src})
-EXPAND_INSTANTIATIONS(obj_grid "${inst_in_files}")
+DEAL_II_ADD_LIBRARY(obj_grid OBJECT ${_src} ${_header} ${_inst})
+EXPAND_INSTANTIATIONS(obj_grid "${_inst}")
 
