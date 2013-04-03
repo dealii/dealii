@@ -395,6 +395,9 @@ namespace Step42
       }
   }
 
+  // In this namespace we provide three functions:
+  // one for the body force, one for the boundary displacement
+  // and one for the Obstacle.
   namespace EquationData
   {
     // It possible to apply an additional body force
@@ -536,12 +539,12 @@ namespace Step42
   // the nonlinear contact problem. It is
   // close to step-41 but with some additional
   // features like: handling hanging nodes,
-  // a newton method, using Trilinos and p4est
+  // a Newton method, using Trilinos and p4est
   // for parallel distributed computing.
   // To deal with hanging nodes makes
   // life a bit more complicated since
   // we need an other ConstraintMatrix now.
-  // We create a newton method for the
+  // We create a Newton method for the
   // active set method for the contact
   // situation and to handle the nonlinear
   // operator for the constitutive law.
@@ -639,7 +642,6 @@ namespace Step42
                      TimerOutput::never,
                      TimerOutput::wall_times)
   {
-    // double _E, double _nu, double _sigma_0, double _gamma
     plast_lin_hard.reset (new ConstitutiveLaw<dim> (e_modul, nu, sigma_0, gamma, mpi_communicator, pcout));
   }
 
@@ -647,7 +649,7 @@ namespace Step42
   void PlasticityContactProblem<dim>::make_grid ()
   {
     std::vector<unsigned int> repet(3);
-    repet[0] = 1;//20;
+    repet[0] = 1;
     repet[1] = 1;
     repet[2] = 1;
 
@@ -686,10 +688,15 @@ namespace Step42
     triangulation.refine_global (n_refinements_global);
   }
 
+  // In following function we setup the degrees of freedom before each refinement
+  // cycle. Except that we are using Trilinos here instead of PETSc most of it
+  // is similar to step-40.
+
+  // We are using TimerOutput to control the scaling for the distributing the dofs
+  // and setting of the sparsity pattern and the system matrix.
   template <int dim>
   void PlasticityContactProblem<dim>::setup_system ()
   {
-    // setup dofs
     {
       computing_timer.enter_section("Setup: distribute DoFs");
       dof_handler.distribute_dofs (fe);
@@ -701,7 +708,7 @@ namespace Step42
       computing_timer.exit_section("Setup: distribute DoFs");
     }
 
-    // setup hanging nodes and dirichlet constraints
+    					// Setup of the hanging nodes and the Dirichlet constraints.
     {
       constraints_hanging_nodes.clear ();
       constraints_hanging_nodes.reinit (locally_relevant_dofs);
@@ -722,7 +729,7 @@ namespace Step42
       dirichlet_constraints ();
     }
 
-    // Initialization for matrices and vectors
+    					// Initialization for matrices and vectors.
     {
       solution.reinit (locally_relevant_dofs, mpi_communicator);
       system_rhs_newton.reinit (locally_owned_dofs, mpi_communicator);
@@ -733,7 +740,7 @@ namespace Step42
       active_set.set_size (locally_relevant_dofs.size ());
     }
 
-    // setup sparsity pattern
+    					// Here we setup sparsity pattern.
     {
       computing_timer.enter_section("Setup: matrix");
       TrilinosWrappers::SparsityPattern sp (locally_owned_dofs,
