@@ -33,18 +33,18 @@ print
   <li> <a href=\"#Intro\" class=bold>Introduction</a>
 ";
 
-system("perl $cmake_source_dir/doc/doxygen/scripts/intro2toc < $cmake_source_dir/examples/$step/doc/intro.dox");
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc", "$cmake_source_dir/examples/$step/doc/intro.dox";
 
 print "  <li> <a href=\"#CommProg\" class=bold>The commented program</a>\n";
 
-system("perl $cmake_source_dir/doc/doxygen/scripts/program2toc < $cmake_source_dir/examples/$step/$step.cc");
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2toc", "$cmake_source_dir/examples/$step/$step.cc";
 
 print
 "</ol></td><td width=\"50%\" valign=\"top\"><ol>
   <li value=\"3\"> <a href=\"#Results\" class=bold>Results</a>
 ";
 
-system("perl $cmake_source_dir/doc/doxygen/scripts/intro2toc < $cmake_source_dir/examples/$step/doc/results.dox");
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/intro2toc", "$cmake_source_dir/examples/$step/doc/results.dox";
 
 print
 "  <li> <a href=\"#PlainProg\" class=bold>The plain program</a>
@@ -52,11 +52,11 @@ print
 \@endhtmlonly
 ";
 
-system("perl $cmake_source_dir/doc/doxygen/scripts/create_anchors < $cmake_source_dir/examples/$step/doc/intro.dox");
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors", "$cmake_source_dir/examples/$step/doc/intro.dox";
 
-system("perl $cmake_source_dir/doc/doxygen/scripts/program2doxygen < $cmake_source_dir/examples/$step/$step.cc");
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/program2doxygen", "$cmake_source_dir/examples/$step/$step.cc";
 
-system("perl $cmake_source_dir/doc/doxygen/scripts/create_anchors < $cmake_source_dir/examples/$step/doc/results.dox");
+system $^X, "$cmake_source_dir/doc/doxygen/scripts/create_anchors", "$cmake_source_dir/examples/$step/doc/results.dox";
 
 print
 "<a name=\"PlainProg\"></a>
