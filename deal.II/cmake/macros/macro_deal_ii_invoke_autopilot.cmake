@@ -59,7 +59,12 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     #
     FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
       "SET(ENV{PATH} \"${DEAL_II_PATH}/${DEAL_II_LIBRARY_RELDIR}:\$ENV{PATH}\")\n"
-      "EXECUTE_PROCESS(COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_RUN})"
+      "EXECUTE_PROCESS(COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_RUN}\n"
+      "  RESULT_VARIABLE _return_value\n"
+      "  )\n"
+      "IF(NOT \"\${_return_value}\" STREQUAL "0")\n"
+      "  MESSAGE(SEND_ERROR \"\nProgram terminated with exit code: \${_return_value}\")\n"
+      "ENDIF()\n"
       )
     ADD_CUSTOM_TARGET(run
       COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
