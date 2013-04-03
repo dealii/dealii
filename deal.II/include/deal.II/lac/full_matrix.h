@@ -63,6 +63,9 @@ public:
   /**
    * Declare type of container size.
    */
+  // A FullMatrix will never require to use unsigned long long int instead of
+  // unsigned but because a ConstraintMatrix can be a SparseMatrix or a
+  // FullMatrix, we need have the same interface.
   typedef types::global_dof_index size_type;
 
   /**

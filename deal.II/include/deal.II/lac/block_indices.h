@@ -120,12 +120,12 @@ public:
    * of the vector space of the
    * block vector.
    */
-  std::size_t total_size () const;
+  size_type total_size () const;
 
   /**
    * The size of the @p ith block.
    */
-  std::size_t block_size (const size_type i) const;
+  size_type block_size (const size_type i) const;
 
   //@}
 
@@ -165,7 +165,7 @@ public:
   /**
    * The start index of the ith block.
    */
-  size_type block_start (const size_type i) const;
+  size_type block_start (const unsigned int i) const;
   //@}
 
   /**
@@ -350,7 +350,7 @@ BlockIndices::reinit (const std::vector<size_type> &n)
 {
   if (start_indices.size() != n.size()+1)
     {
-      n_blocks = n.size();
+      n_blocks = static_cast<unsigned int>(n.size());
       start_indices.resize(n_blocks+1);
     }
   start_indices[0] = 0;
@@ -385,7 +385,7 @@ BlockIndices::BlockIndices (
 inline
 BlockIndices::BlockIndices (const std::vector<size_type> &n)
   :
-  n_blocks(n.size()),
+  n_blocks(static_cast<unsigned int>(n.size())),
   start_indices(n.size()+1)
 {
   reinit (n);
@@ -441,7 +441,7 @@ BlockIndices::size () const
 
 
 inline
-std::size_t
+BlockIndices::size_type
 BlockIndices::total_size () const
 {
   if (n_blocks == 0) return 0;
@@ -451,7 +451,7 @@ BlockIndices::total_size () const
 
 
 inline
-std::size_t
+BlockIndices::size_type
 BlockIndices::block_size (const size_type block) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
@@ -462,7 +462,7 @@ BlockIndices::block_size (const size_type block) const
 
 inline
 BlockIndices::size_type
-BlockIndices::block_start (const size_type block) const
+BlockIndices::block_start (const unsigned int block) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
   return start_indices[block];

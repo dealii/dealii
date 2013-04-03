@@ -1505,7 +1505,7 @@ public:
    * return the first block of a
    * BlockVector it would generate.
    */
-  unsigned int first_block_of_base (const unsigned int b) const;
+  types::global_dof_index first_block_of_base (const unsigned int b) const;
 
   /**
    * For each vector component,
@@ -1548,7 +1548,7 @@ public:
    * inside the block for this
    * shape function.
    */
-  std::pair<unsigned int,unsigned int>
+  std::pair<unsigned int,types::global_dof_index>
   system_to_block_index (const unsigned int component) const;
 
   /**
@@ -2892,7 +2892,7 @@ FiniteElement<dim,spacedim>::face_system_to_base_index (const unsigned int index
 
 template <int dim, int spacedim>
 inline
-unsigned int
+types::global_dof_index
 FiniteElement<dim,spacedim>::first_block_of_base (const unsigned int index) const
 {
   return base_to_block_indices.block_start(index);
@@ -2925,7 +2925,7 @@ FiniteElement<dim,spacedim>::block_to_base_index (const unsigned int index) cons
 
 template <int dim, int spacedim>
 inline
-std::pair<unsigned int,unsigned int>
+std::pair<unsigned int,types::global_dof_index>
 FiniteElement<dim,spacedim>::system_to_block_index (const unsigned int index) const
 {
   Assert (index < this->dofs_per_cell,
@@ -2933,7 +2933,7 @@ FiniteElement<dim,spacedim>::system_to_block_index (const unsigned int index) co
   // The block is computed simply as
   // first block of this base plus
   // the index within the base blocks
-  return std::pair<unsigned int, unsigned int>(
+  return std::pair<unsigned int, types::global_dof_index>(
            first_block_of_base(system_to_base_table[index].first.first)
            + system_to_base_table[index].first.second,
            system_to_base_table[index].second);

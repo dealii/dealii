@@ -228,11 +228,11 @@ Householder<number>::least_squares (Vector<number2> &dst,
       // sum = v_i^T dst
       number2 sum = diagonal[j]* (*aux)(j);
       for (size_type i=j+1 ; i<m ; ++i)
-        sum += this->el(i,j)*(*aux)(i);
+        sum += static_cast<number2>(this->el(i,j))*(*aux)(i);
       // dst -= v * sum
       (*aux)(j) -= sum*diagonal[j];
       for (size_type i=j+1 ; i<m ; ++i)
-        (*aux)(i) -= sum*this->el(i,j);
+        (*aux)(i) -= sum*static_cast<number2>(this->el(i,j));
     }
   // Compute norm of residual
   number2 sum = 0.;

@@ -373,7 +373,7 @@ namespace FETools
            ExcDimensionMismatch(block_data.size(),
                                 element.n_blocks()));
 
-    unsigned int k=0;
+    types::global_dof_index k=0;
     unsigned int i=0;
     for (unsigned int b=0; b<element.n_base_elements(); ++b)
       for (unsigned int m=0; m<element.element_multiplicity(b); ++m)
@@ -385,7 +385,7 @@ namespace FETools
         }
     Assert (i == element.n_blocks(), ExcInternalError());
 
-    std::vector<unsigned int> start_indices(block_data.size());
+    std::vector<types::global_dof_index> start_indices(block_data.size());
     k = 0;
     for (unsigned int i=0; i<block_data.size(); ++i)
       if (return_start_indices)
@@ -399,7 +399,7 @@ namespace FETools
 //TODO:[GK] This does not work for a single RT
     for (unsigned int i=0; i<element.dofs_per_cell; ++i)
       {
-        std::pair<types::global_dof_index, types::global_dof_index>
+        std::pair<unsigned int, types::global_dof_index>
         indices = element.system_to_block_index(i);
         renumbering[i] = start_indices[indices.first]
                          +indices.second;
