@@ -26,7 +26,8 @@
 #                         ${TARGET}
 #       TARGET_RUN     -  (optional) the command line that should be
 #                         invoked by "make run", will be set to default
-#                         values if empty
+#                         values if undefined. If no run target should be
+#                         created, set it to an empty string.
 #       CLEAN_UP_FILES -  (optional) a list of files (globs) that will be
 #                         removed with "make runclean" and "make
 #                         distclean", will be set to default values if
@@ -50,27 +51,34 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     MESSAGE(STATUS "Autopilot invoked")
 
     # Define a custom target to easily run the program:
-    IF("${TARGET_RUN}" STREQUAL "")
+
+    IF(NOT DEFINED TARGET_RUN)
       SET(TARGET_RUN ${TARGET})
     ENDIF()
+
     #
     # Hack for Cygwin targets: Export PATH to point to the dynamic library.
     # This is more or less harmless, so do this unconditionally.
     #
     FILE(WRITE ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
-      "SET(ENV{PATH} \"${DEAL_II_PATH}/${DEAL_II_LIBRARY_RELDIR}:\$ENV{PATH}\")\n"
-      "EXECUTE_PROCESS(COMMAND ${CMAKE_CURRENT_BINARY_DIR}/${TARGET_RUN}\n"
+      "SET(ENV{PATH} \"${CMAKE_CURRENT_BINARY_DIR}:${DEAL_II_PATH}/${DEAL_II_LIBRARY_RELDIR}:\$ENV{PATH}\")\n"
+      "EXECUTE_PROCESS(COMMAND ${TARGET_RUN}\n"
       "  RESULT_VARIABLE _return_value\n"
       "  )\n"
       "IF(NOT \"\${_return_value}\" STREQUAL "0")\n"
       "  MESSAGE(SEND_ERROR \"\nProgram terminated with exit code: \${_return_value}\")\n"
       "ENDIF()\n"
       )
-    ADD_CUSTOM_TARGET(run
-      COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
-      DEPENDS ${TARGET}
-      COMMENT "Run ${TARGET} with ${CMAKE_BUILD_TYPE} configuration"
-      )
+    IF(NOT "${TARGET_RUN}" STREQUAL "")
+      ADD_CUSTOM_TARGET(run
+        COMMAND ${CMAKE_COMMAND} -P ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/run_target.cmake
+        DEPENDS ${TARGET}
+        COMMENT "Run ${TARGET} with ${CMAKE_BUILD_TYPE} configuration"
+        )
+      SET(_run_targets
+        "#      $ make run            - to (compile, link and) run the program\n"
+        )
+    ENDIF()
 
     # Define custom targets to easily switch the build type:
     IF(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
@@ -132,8 +140,7 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
 #
 #  You can now run
 #      $ make                - to compile and link the program
-#      $ make run            - to (compile, link and) run the program
-#
+${_run_targets}#
 ${_switch_targets}#
 #      $ make edit_cache     - to change (cached) configuration variables
 #                              and rerun the configure and generate phases of CMake

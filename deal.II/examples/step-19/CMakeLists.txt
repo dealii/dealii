@@ -12,7 +12,7 @@ SET(TARGET_SRC
   )
 
 # No sensible run target can be defined for this example step
-SET(TARGET_RUN ";")
+SET(TARGET_RUN "")
 
 # Usually, you will not need to modify anything beyond this point...
 
