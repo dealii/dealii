@@ -28,7 +28,7 @@
 #   "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
 #   )
 #
-# SET(DEAL_II_COMPONENT_MESH_CONVERTER OFF CACHE BOOL
+# SET(DEAL_II_COMPONENT_MESH_CONVERTER ON CACHE BOOL
 #   "Build and install the mesh_converter. This adds a COMPONENT \"mesh_converter\" to the build system."
 #   )
 #

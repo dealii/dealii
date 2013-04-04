@@ -81,7 +81,7 @@ OPTION(DEAL_II_COMPONENT_EXAMPLES
 
 OPTION(DEAL_II_COMPONENT_MESH_CONVERTER
   "Build and install the mesh_converter. This adds a COMPONENT \"mesh_converter\" to the build system."
-  OFF
+  ON
   )
 
 OPTION(DEAL_II_COMPONENT_PARAMETER_GUI
