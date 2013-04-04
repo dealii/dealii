@@ -27,6 +27,7 @@
 #     DEAL_II_PACKAGE_NAME            *)
 #     DEAL_II_PACKAGE_VERSION         *)
 #     DEAL_II_PACKAGE_VENDOR          *)
+#     DEAL_II_PACKAGE_DESCRIPTION     *)
 #     DEAL_II_VERSION_MAJOR
 #     DEAL_II_VERSION_MINOR
 #     DEAL_II_VERSION
@@ -64,7 +65,13 @@ SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "8.0.pre") # TODO: Get this value from somewhere else
 
-SET_IF_EMPTY(DEAL_II_PACKAGE_VENDOR "The deal.II Authors <http://www.dealii.org/>")
+SET_IF_EMPTY(DEAL_II_PACKAGE_VENDOR
+  "The deal.II Authors <http://www.dealii.org/>"
+  )
+
+SET_IF_EMPTY(DEAL_II_PACKAGE_DESCRIPTION
+  "Library for solving partial differential equations with the finite element method"
+  )
 
 STRING(REGEX REPLACE
   "^([0-9]+)\\..*" "\\1" DEAL_II_VERSION_MAJOR "${DEAL_II_PACKAGE_VERSION}"
