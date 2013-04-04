@@ -1,3 +1,296 @@
 <h1>Results</h1>
 
-The program produces a series of .eps files of the Triangulations. The methods are discussed above.
+The program produces a series of <code>.eps</code> files of the
+Triangulations. The methods are discussed above.
+
+
+<h3>Next steps</h3>
+
+As mentioned in the introduction,
+creating a coarse mesh using the methods discussed here is only the first
+step. In order to refine a mesh, the Triangulation needs to know where to put
+new vertices on the mid-points of edges and faces. By default, these new
+points will be placed at the centers of the old edge but this isn't what you
+want if you need curved boundaries that aren't already adequately resolved by
+the coarse mesh. Several of the meshes shown in the introduction section fall
+into this category. For example, for this mesh the central hole is supposed to
+be round:
+
+<img
+ src="http://www.dealii.org/images/steps/developer/step-49.grid-2a.png"
+ alt="" height="200px">
+
+On the other hand, if you simply refine it, the Triangulation class can not
+know whether you wanted the hole to be round or to be an octagon. The default
+is to place new points along existing edges. After two mesh refinement steps,
+this would yield the following mesh, which is not what we wanted:
+
+<img
+ src="http://www.dealii.org/images/steps/developer/step-49.grid-2d-refined.png"
+ alt="" height="200px">
+
+What needs to happen is that you tell the triangulation that you in fact want
+to use a curved boundary. The way to do this requires three steps:
+- Create an object that describes the boundary in terms that allow the
+  Triangulation::execute_coarsening_and_refinement function to ask the
+  boundary description where a new point should be located upon mesh
+  refinement.
+- Tell the triangulation object that you want this object to be used for all
+  boundaries with boundary indicates equal to a particular value (for more
+  information on boundary indicators, see the
+  @ref GlossBoundaryIndicator "glossary entry on this topic".)
+- Mark those parts of the boundary of the domain for which you want the
+  boundary to be so treated with the value of the boundary indicator used in
+  the previous step. (The order of this step and the previous one does not
+  matter.)
+
+To illustrate this process in more detail, let us consider an example created
+by Yuhan Zhou as part of a semester project at Texas A&amp;M University in
+2013. The goal was to generate (and use) a geometry that describes a
+microstructured electric device. In a CAD program, the geometry looks like
+this:
+
+<img
+ src="http://www.dealii.org/images/steps/developer/step-49.yuhan.1.png"
+ alt="" height="200px">
+
+The first step in getting there was to create a coarse mesh, which was done
+by creating a 2d coarse mesh for each of the two cross section, extruding them
+into the third direction, and gluing them together. The following code does
+this, using the techniques previously described:
+
+@code
+// Given a list of points and how vertices connect to cells,
+// create a mesh. This is in the same way as we do in step-14.
+void create_2d_grid (const Point<2> vertices_1[],
+	  	     const unsigned int n_vertices,
+		     const int cell_vertices[][4],
+		     const unsigned int n_cells,
+                     Triangulation<2> &coarse_grid)
+{
+  const std::vector<Point<2> > vertices (&vertices_1[0],
+			    	         &vertices_1[n_vertices]);
+
+  std::vector<CellData<2> > cells (n_cells, CellData<2>());
+  for (unsigned int i=0; i<n_cells; ++i)
+    {
+      for (unsigned int j=0;
+	   j<GeometryInfo<dimm>::vertices_per_cell;
+	   ++j)
+	cells[i].vertices[j] = cell_vertices[i][j];
+    }
+
+  coarse_grid.create_triangulation (vertices,
+				    cells,
+				    SubCellData());
+}
+
+
+// Create a triangulation that covers the entire volume
+void create_3d_grid (Triangulation<3> &triangulation)
+{
+  // Generate first cross section
+  const Point<2> vertices_1[]
+    = {  Point<2> (-1.5,   0.),
+	 Point<2> (-0.5,   0.),
+	 Point<2> ( 0.5,   0.),
+	 Point<2> ( 1.5,   0.),
+
+	 Point<2> (-1.5,  1.5),
+	 Point<2> (-0.5,  1.5),
+	 Point<2> ( 0.5,  1.5),
+	 Point<2> ( 1.5,  1.5),
+
+	 Point<2> (-1.5,   3.),
+	 Point<2> (-0.5,   3.),
+	 Point<2> ( 0.5,   3.),
+	 Point<2> ( 1.5,   3.),
+
+	 Point<2> (-0.5,   3+0.5*sqrt(3)),
+	 Point<2> ( 0.5,   3+0.5*sqrt(3)),
+
+	 Point<2> (-0.75,  3+0.75*sqrt(3)),
+	 Point<2> ( 0.75,  3+0.75*sqrt(3))
+  };
+  const int cell_vertices_1[][GeometryInfo<2>::vertices_per_cell]
+    = {{0, 1, 4, 5},
+       {1, 2, 5, 6},
+       {3, 7, 2, 6},
+       {4, 5, 8, 9},
+       {5, 6, 9, 10},
+       {7,11, 6,10},
+       {8, 9, 14,12},
+       {9, 10,12,13},
+       {11,15,10,13},
+       {14,12,15,13}
+  };
+
+  // Copy vertices into a 2d triangulation
+  Triangulation<dim-1> triangulation_2d_1;
+  create_2d_grid (vertices_1,
+                  sizeof(vertices_1)/sizeof(vertices_1[0]),
+		  cell_vertices_1,
+                  sizeof(cell_vertices_1)/sizeof(cell_vertices_1[0]),
+                  triangulation_2d_1);
+
+  // Then extrude it into a 3d piece
+  Triangulation<dim> triangulation_3d_1;
+  GridGenerator::extrude_triangulation (triangulation_2d_1,
+                                        5, 2.5,
+                                        triangulation_3d_1);
+
+  // Now do the same with the second volume
+  const Point<2> vertices_2[]
+    = {  Point<2> (-2.5,   0.),
+	 Point<2> (-1.5,   0.),
+	 Point<2> (-0.5,   0.),
+	 Point<2> ( 0.5,   0.),
+	 Point<2> ( 1.5,   0.),
+	 Point<2> ( 2.5,   0.),
+
+	 Point<2> (-2.5,  1.5),
+	 Point<2> (-1.5,  1.5),
+	 Point<2> (-0.5,  1.5),
+	 Point<2> ( 0.5,  1.5),
+	 Point<2> ( 1.5,  1.5),
+	 Point<2> ( 2.5,  1.5),
+
+	 Point<2> (-2.5,  3.),
+	 Point<2> (-1.5,  3.),
+	 Point<2> (-0.5,  3.),
+	 Point<2> ( 0.5,  3.),
+	 Point<2> ( 1.5,  3.),
+	 Point<2> ( 2.5,  3.),
+
+	 Point<2> (-0.5,   3.+0.5*sqrt(3)),
+	 Point<2> ( 0.5,   3.+0.5*sqrt(3)),
+
+	 Point<2> (-0.75,  3.+0.75*sqrt(3)),
+	 Point<2> ( 0.75,  3.+0.75*sqrt(3)),
+
+	 Point<2> (-1.25,  3.+1.25*sqrt(3)),
+	 Point<2> ( 1.25,  3.+1.25*sqrt(3))
+  };
+  const int cell_vertices_2[][GeometryInfo<2>::vertices_per_cell]
+    = {{0, 1, 6, 7},
+       {1, 2, 7, 8},
+       {2, 3, 8, 9},
+       {4, 10, 3, 9},
+       {5, 11, 4, 10},
+       {6, 7, 12, 13},
+       {7, 8, 13, 14},
+       {8, 9, 14, 15},
+       {10, 16, 9, 15},
+       {11, 17, 10, 16},
+       {12, 13, 22, 20},
+       {13, 14, 20, 18},
+       {14, 15, 18, 19},
+       {16, 21, 15, 19},
+       {17, 23, 16, 21},
+       {20, 18, 21, 19},
+       {22, 20, 23, 21}
+  };
+
+  Triangulation<dim-1> triangulation_2d_2;
+  create_2d_grid (vertices_2,
+                  sizeof(vertices_2)/sizeof(vertices_2[0]),
+		  cell_vertices_2,
+                  sizeof(cell_vertices_2)/sizeof(cell_vertices_2[0]),
+                  triangulation_2d_2);
+
+  Triangulation<dim> triangulation_3d_2;
+  GridGenerator::extrude_triangulation (triangulation_2d_2,
+                                        5, 2.5,
+                                        triangulation_3d_2);
+
+  // Also shift this triangulation in the z-direction so
+  // that it matches the end face of the first part
+  GridTools::shift (Point<3>(0,0,2.5),
+                    triangulation_3d_2);
+
+
+  // Now first merge these two pieces, then shift the
+  // first piece in z-direction beyond the second, and
+  // merge the shifted piece with the two previously
+  // merged one into the final one:
+  Triangulation<dim> triangulation_3d_tmp;
+  GridGenerator::merge_triangulations (triangulation_3d_1,
+                                       triangulation_3d_2,
+                                       triangulation_3d_tmp);
+
+  GridTools::shift (Point<3>(0,0,5),
+                    triangulation_3d_1);
+
+  GridGenerator::merge_triangulations (triangulation_3d_tmp,
+                                       triangulation_3d_1,
+                                       triangulation);
+@endcode
+
+With this code, you get a mesh that looks like this:
+
+<img
+ src="http://www.dealii.org/images/steps/developer/step-49.yuhan.2.png"
+ alt="" height="200px">
+
+The next step is to teach each of the top surfaces that they should be
+curved. We can do this by creating CylinderBoundary objects that
+describe this, where after some playing with the arguments one finds the
+correct values for the axes, offsets, and radii:
+
+@code
+  const double inner_radius = 1.5;
+  const double outer_radius = 2.5;
+
+  typename Triangulation<dim>::active_cell_iterator
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int f=0;
+	 f < GeometryInfo<dim>::faces_per_cell;
+	 ++f)
+      {
+	const Point<dim> face_center = cell->face(f)->center();
+
+	if (cell->face(f)->at_boundary())
+	  {
+	    const double dist = sqrt(pow(face_center[1]-3,2)+pow(face_center[0],2));
+
+	    if((face_center[2] <= 2.5 || face_center[2] >= 5) && face_center[1] >= 3 && dist <= (inner_radius+outer_radius)/2)
+	      cell->face(f)->set_boundary_indicator(8);
+
+	    if(face_center[2] >= 2.5 && face_center[2] <= 5 && face_center[1] >= 3 && dist >= (inner_radius+outer_radius)/2)
+	      cell->face(f)->set_boundary_indicator(9);
+	  }
+      }
+  static const CylinderBoundary<dim> inner_cylinder(inner_radius,2);
+  static const CylinderBoundary<dim> outer_cylinder(outer_radius,2);
+  triangulation.set_boundary (8, inner_cylinder);
+  triangulation.set_boundary (9, outer_cylinder);
+
+
+  for (typename Triangulation<dim>::active_face_iterator
+	 face=triangulation.begin_active_face();
+       face!=triangulation.end_face(); ++face)
+    if (face->at_boundary())
+      if ((face->boundary_indicator() == 8)
+	  ||
+	  (face->boundary_indicator() == 9))
+	for (unsigned int edge = 0; edge<GeometryInfo<dim>::lines_per_face;
+	     ++edge)
+	  face->line(edge)
+	    ->set_boundary_indicator (face->boundary_indicator());
+
+
+
+  //std::string filename = "grid-";
+  //filename += ('0');
+  //filename += ".eps";
+  //std::ofstream output (filename.c_str());
+
+  //GridOut grid_out;
+  //grid_out.write_eps (triangulation_2d_1, output);
+
+
+}
+
+@endcode

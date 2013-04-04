@@ -275,9 +275,20 @@ mesh, generated for example with gmsh, that is read in from a
 </table>
 
 
+<h3> After you have a coarse mesh </h3>
+
+Creating a coarse mesh using the methods discussed above is only the first
+step. When you have it, it will typically serve as the basis for further mesh
+refinement. This is not difficult &mdash; in fact, there is nothing else to do
+&mdash; if your geometry consists of only straight faces. However, this is
+often not the case if you have a more complex geometry and more steps than
+just creating the mesh are necessary. We will go over some of these steps in
+the <a href="#Results">results section</a> below.
+
+
 <!--
 
-<h4>Possible Extensions</h4>
+Possible Extensions
 
 - Modify a mesh:
   - change boundary indicators
