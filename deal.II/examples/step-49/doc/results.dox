@@ -52,7 +52,7 @@ this:
 
 <img
  src="http://www.dealii.org/images/steps/developer/step-49.yuhan.1.png"
- alt="" height="200px">
+ alt="">
 
 In the following, we will walk you through the entire process of creating a
 mesh for this geometry, including a number of common pitfalls by showing the
@@ -235,7 +235,7 @@ With this code, you get a mesh that looks like this:
 
 <img
  src="http://www.dealii.org/images/steps/developer/step-49.yuhan.2.png"
- alt="" height="200px">
+ alt="">
 
 The next step is to teach each of the top surfaces that they should be
 curved. We can do this by creating CylinderBoundary objects that
@@ -293,7 +293,7 @@ With this code, we get a mesh that looks like this:
 
 <img
  src="http://www.dealii.org/images/steps/developer/step-49.yuhan.3.png"
- alt="" height="200px">
+ alt="">
 
 This is clearly not correct: The new vertices that have been entered at
 mid-edge and mid-face points are not where they should have been. Upon some
@@ -317,7 +317,7 @@ This yields an improvement, though it is still not quite correct:
 
 <img
  src="http://www.dealii.org/images/steps/developer/step-49.yuhan.4.png"
- alt="" height="200px">
+ alt="">
 
 Looking closely at this mesh, we realize that the new points on mid-face
 vertices are where they should be, though the new vertices inserted at
@@ -331,7 +331,7 @@ the grid now looks like this:
 
 <img
  src="http://www.dealii.org/images/steps/developer/step-49.yuhan.5.png"
- alt="" height="200px">
+ alt="">
 
 This is already better. However, something is still going wrong on the
 front left face. On second look, we can also see that the faces where
@@ -388,14 +388,14 @@ With this, we finally get a mesh that looks good:
 
 <img
  src="http://www.dealii.org/images/steps/developer/step-49.yuhan.6.png"
- alt="" height="200px">
+ alt="">
 
 We can then refine the mesh two more times to see in more detail what
 happens to the curved part of the boundary:
 
  <img
  src="http://www.dealii.org/images/steps/developer/step-49.yuhan.7.png"
- alt="" height="200px">
+ alt="">
 
  So, yes!, this is finally what we were looking for!
 
