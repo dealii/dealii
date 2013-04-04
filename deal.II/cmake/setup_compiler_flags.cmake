@@ -38,14 +38,6 @@
 #   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
 #   ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
 #
-# Compiler flags for platform dependent optimization (such as
-# -march=native) must always be guarded with
-# DEAL_II_ALLOW_PLATFORM_INTROSPECTION:
-#
-#   IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-#     ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-march=native")
-#   ENDIF()
-#
 # Checks for compiler features (such as C++11 support) and compiler
 # specific bugs that
 #   - usually set up further configuration (such as preprocessor
