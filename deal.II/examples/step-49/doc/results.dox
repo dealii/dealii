@@ -65,7 +65,7 @@ this, using the techniques previously described:
 
 @code
 // Given a list of points and how vertices connect to cells,
-// create a mesh. This is in the same way as we do in step-14.
+// create a mesh. This is in the same way as we do in step 14.
 void create_2d_grid (const Point<2> vertices_1[],
 	  	     const unsigned int n_vertices,
 		     const int cell_vertices[][4],
