@@ -45,14 +45,18 @@ to use a curved boundary. The way to do this requires three steps:
   matter.)
 
 To illustrate this process in more detail, let us consider an example created
-by Yuhan Zhou as part of a semester project at Texas A&amp;M University in
-2013. The goal was to generate (and use) a geometry that describes a
+by Yuhan Zhou as part of a 2013 semester project at Texas A&amp;M University.
+The goal was to generate (and use) a geometry that describes a
 microstructured electric device. In a CAD program, the geometry looks like
 this:
 
 <img
  src="http://www.dealii.org/images/steps/developer/step-49.yuhan.1.png"
  alt="" height="200px">
+
+In the following, we will walk you through the entire process of creating a
+mesh for this geometry, including a number of common pitfalls by showing the
+things that can go wrong.
 
 The first step in getting there was to create a coarse mesh, which was done
 by creating a 2d coarse mesh for each of the two cross section, extruding them
@@ -75,7 +79,7 @@ void create_2d_grid (const Point<2> vertices_1[],
   for (unsigned int i=0; i<n_cells; ++i)
     {
       for (unsigned int j=0;
-	   j<GeometryInfo<dimm>::vertices_per_cell;
+	   j<GeometryInfo<2>::vertices_per_cell;
 	   ++j)
 	cells[i].vertices[j] = cell_vertices[i][j];
     }
@@ -126,7 +130,7 @@ void create_3d_grid (Triangulation<3> &triangulation)
   };
 
   // Copy vertices into a 2d triangulation
-  Triangulation<dim-1> triangulation_2d_1;
+  Triangulation<2> triangulation_2d_1;
   create_2d_grid (vertices_1,
                   sizeof(vertices_1)/sizeof(vertices_1[0]),
 		  cell_vertices_1,
@@ -134,7 +138,7 @@ void create_3d_grid (Triangulation<3> &triangulation)
                   triangulation_2d_1);
 
   // Then extrude it into a 3d piece
-  Triangulation<dim> triangulation_3d_1;
+  Triangulation<3> triangulation_3d_1;
   GridGenerator::extrude_triangulation (triangulation_2d_1,
                                         5, 2.5,
                                         triangulation_3d_1);
@@ -191,14 +195,14 @@ void create_3d_grid (Triangulation<3> &triangulation)
        {22, 20, 23, 21}
   };
 
-  Triangulation<dim-1> triangulation_2d_2;
+  Triangulation<2> triangulation_2d_2;
   create_2d_grid (vertices_2,
                   sizeof(vertices_2)/sizeof(vertices_2[0]),
 		  cell_vertices_2,
                   sizeof(cell_vertices_2)/sizeof(cell_vertices_2[0]),
                   triangulation_2d_2);
 
-  Triangulation<dim> triangulation_3d_2;
+  Triangulation<3> triangulation_3d_2;
   GridGenerator::extrude_triangulation (triangulation_2d_2,
                                         5, 2.5,
                                         triangulation_3d_2);
@@ -213,7 +217,7 @@ void create_3d_grid (Triangulation<3> &triangulation)
   // first piece in z-direction beyond the second, and
   // merge the shifted piece with the two previously
   // merged one into the final one:
-  Triangulation<dim> triangulation_3d_tmp;
+  Triangulation<3> triangulation_3d_tmp;
   GridGenerator::merge_triangulations (triangulation_3d_1,
                                        triangulation_3d_2,
                                        triangulation_3d_tmp);
@@ -224,6 +228,7 @@ void create_3d_grid (Triangulation<3> &triangulation)
   GridGenerator::merge_triangulations (triangulation_3d_tmp,
                                        triangulation_3d_1,
                                        triangulation);
+}
 @endcode
 
 With this code, you get a mesh that looks like this:
@@ -234,63 +239,163 @@ With this code, you get a mesh that looks like this:
 
 The next step is to teach each of the top surfaces that they should be
 curved. We can do this by creating CylinderBoundary objects that
-describe this, where after some playing with the arguments one finds the
-correct values for the axes, offsets, and radii:
+describe this. A first attempt looks like this:
 
 @code
+  Triangulation<3> triangulation;
+  create_3d_grid (triangulation);
+
+  // Create the objects that describe the boundaries and attach them
+  // to the triangulation as the ones to use on boundaries marked
+  // with boundary indicators 8 and 9 
   const double inner_radius = 1.5;
   const double outer_radius = 2.5;
 
-  typename Triangulation<dim>::active_cell_iterator
+  static const CylinderBoundary<3> inner_cylinder(inner_radius, 2);
+  static const CylinderBoundary<3> outer_cylinder(outer_radius, 2);
+
+  triangulation.set_boundary (8, inner_cylinder);
+  triangulation.set_boundary (9, outer_cylinder);
+
+  // Then loop over all faces of the domain and, if for the position
+  // of the center of a face the following holds then set boundary
+  // indicators:
+  // - if y>3 and z<=2.5 or z>=5 then use boundary indicator 8 
+  // - if y>3 and 2.5<=z<=5 then use boundary indicator 9 
+  typename Triangulation<3>::active_cell_iterator
     cell = triangulation.begin_active(),
     endc = triangulation.end();
   for (; cell!=endc; ++cell)
     for (unsigned int f=0;
-	 f < GeometryInfo<dim>::faces_per_cell;
+	 f < GeometryInfo<3>::faces_per_cell;
 	 ++f)
       {
-	const Point<dim> face_center = cell->face(f)->center();
+	const Point<3> face_center = cell->face(f)->center();
 
 	if (cell->face(f)->at_boundary())
 	  {
-	    const double dist = sqrt(pow(face_center[1]-3,2)+pow(face_center[0],2));
-
-	    if((face_center[2] <= 2.5 || face_center[2] >= 5) && face_center[1] >= 3 && dist <= (inner_radius+outer_radius)/2)
+	    if ((face_center[2] <= 2.5 || face_center[2] >= 5) && 
+	        face_center[1] >= 3)
 	      cell->face(f)->set_boundary_indicator(8);
 
-	    if(face_center[2] >= 2.5 && face_center[2] <= 5 && face_center[1] >= 3 && dist >= (inner_radius+outer_radius)/2)
+	    if (face_center[2] >= 2.5 && 
+	        face_center[2] <= 5
+	        && face_center[1] >= 3)
 	      cell->face(f)->set_boundary_indicator(9);
 	  }
       }
-  static const CylinderBoundary<dim> inner_cylinder(inner_radius,2);
-  static const CylinderBoundary<dim> outer_cylinder(outer_radius,2);
-  triangulation.set_boundary (8, inner_cylinder);
-  triangulation.set_boundary (9, outer_cylinder);
 
-
-  for (typename Triangulation<dim>::active_face_iterator
-	 face=triangulation.begin_active_face();
-       face!=triangulation.end_face(); ++face)
-    if (face->at_boundary())
-      if ((face->boundary_indicator() == 8)
-	  ||
-	  (face->boundary_indicator() == 9))
-	for (unsigned int edge = 0; edge<GeometryInfo<dim>::lines_per_face;
-	     ++edge)
-	  face->line(edge)
-	    ->set_boundary_indicator (face->boundary_indicator());
-
-
-
-  //std::string filename = "grid-";
-  //filename += ('0');
-  //filename += ".eps";
-  //std::ofstream output (filename.c_str());
-
-  //GridOut grid_out;
-  //grid_out.write_eps (triangulation_2d_1, output);
-
-
-}
-
+  // Then refine the mesh once
+  triangulation.refine_global (1);
 @endcode
+
+With this code, we get a mesh that looks like this:
+
+<img
+ src="http://www.dealii.org/images/steps/developer/step-49.yuhan.3.png"
+ alt="" height="200px">
+
+This is clearly not correct: The new vertices that have been entered at
+mid-edge and mid-face points are not where they should have been. Upon some
+reflection, it turns out that while the radii of the cylinders are correct,
+the axes of the two cylinder objects should not have been along coordinate
+axes but shifted. This can be corrected by creating them as follows, the
+two points given as arguments indicating the direction and a point on the
+axis:
+
+@code
+  static const CylinderBoundary<3> inner_cylinder (inner_radius,
+                                                   Point<3>(0,0,1),
+                                                   Point<3>(0,3,0));
+  static const CylinderBoundary<3> outer_cylinder (outer_radius,
+                                                   Point<3>(0,0,1),
+                                                   Point<3>(0,3,0));
+  triangulation.set_boundary (9, outer_cylinder);
+@encode
+
+This yields an improvement, though it is still not quite correct:
+
+<img
+ src="http://www.dealii.org/images/steps/developer/step-49.yuhan.4.png"
+ alt="" height="200px">
+
+Looking closely at this mesh, we realize that the new points on mid-face
+vertices are where they should be, though the new vertices inserted at
+mid-edge points are in the wrong place (you see this by comparing the
+picture with the one of the coarse mesh). What is happening is that we
+are only telling the triangulation to use these geometry objects for
+the <i>faces</i> but not for the adjacent <i>edges</i> as well. This is
+easily fixed by using the function TriaAccessor::set_all_boundary_indicators()
+instead of TriaAccessor::set_boundary_indicator() used above. With this change,
+the grid now looks like this:
+
+<img
+ src="http://www.dealii.org/images/steps/developer/step-49.yuhan.5.png"
+ alt="" height="200px">
+
+This is already better. However, something is still going wrong on the 
+front left face. On second look, we can also see that the faces where
+the geometry widens have been refined at the bottom, that there is one
+transition face that looks wrong because it has a triangle rather than
+a quadrilateral, and that finally the transition faces in the cylindrical
+region appear not to have been refined at all in radial direction.
+
+This due to the fact that we have (erroneously) marked all boundary faces
+between $0\le z\le 2.5$ with the boundary indicator for the small cylinder
+and similarly for the other regions. This condition includes the faces parallel
+to the x-y plane. To fix it, we need to exclude faces whose center points have
+$z$ values equal to (or at least close to, since we should not compare
+for equality in floating point arithmetic) 0, 2.5, 5 or 7.5. This replacement
+code does the trick:
+
+@code
+  // Then loop over all faces of the domain and, if for the position
+  // of the center of a face the following holds then set boundary
+  // indicators:
+  // - if y>3 and z<2.5 or z>5 then use boundary indicator 8
+  // - if y>3 and 2.5<z<5 then use boundary indicator 9
+  // In this process, exclude faces whose z-coordinates are
+  // within a small distance of z=0, z=2.5, z=5 or z=7.5.
+  typename Triangulation<3>::active_cell_iterator
+    cell = triangulation.begin_active(),
+    endc = triangulation.end();
+  for (; cell!=endc; ++cell)
+    for (unsigned int f=0;
+         f < GeometryInfo<3>::faces_per_cell;
+         ++f)
+      {
+        const Point<3> face_center = cell->face(f)->center();
+
+        if (cell->face(f)->at_boundary())
+          if ((face_center[2]>1e-6) &&
+              (face_center[2]<7.5-1e-6) &&
+              (std::fabs(face_center[2]-2.5)>1e-6) &&
+              (std::fabs(face_center[2]-5.0)>1e-6))
+            {
+              if ((face_center[2] < 2.5 || face_center[2] > 5)
+                  && face_center[1] >= 3)
+                cell->face(f)->set_all_boundary_indicators(8);
+
+              if (face_center[2] > 2.5 && face_center[2] < 5
+                  && face_center[1] >= 3)
+                cell->face(f)->set_all_boundary_indicators(9);
+            }
+      }
+}
+@endcode
+
+With this, we finally get a mesh that looks good:
+
+<img
+ src="http://www.dealii.org/images/steps/developer/step-49.yuhan.6.png"
+ alt="" height="200px">
+
+We can then refine the mesh two more times to see in more detail what
+happens to the curved part of the boundary:
+
+ <img
+ src="http://www.dealii.org/images/steps/developer/step-49.yuhan.7.png"
+ alt="" height="200px">
+ 
+ So, yes!, this is finally what we were looking for!
+ 
