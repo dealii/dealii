@@ -135,8 +135,7 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
 #  Successfully set up project  ${TARGET}  with  ${DEAL_II_PACKAGE_NAME}-${DEAL_II_PACKAGE_VERSION}  found at
 #      ${DEAL_II_PATH}
 #
-#  CMAKE_BUILD_TYPE:   ${CMAKE_BUILD_TYPE}
-#  TARGET_SRC:         ${TARGET_SRC}
+#  CMAKE_BUILD_TYPE:         ${CMAKE_BUILD_TYPE}
 #
 #  You can now run
 #      $ make                - to compile and link the program
