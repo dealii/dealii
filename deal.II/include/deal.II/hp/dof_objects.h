@@ -313,8 +313,9 @@ namespace internal
               if (*pointer == fe_index)
                 return *(pointer + 1 + local_index);
               else
-                pointer += dof_handler.get_fe()[*pointer]
-                           .template n_dofs_per_object<dim>() + 1;
+                pointer += static_cast<types::global_dof_index>(
+                    dof_handler.get_fe()[*pointer]
+                    .template n_dofs_per_object<dim>() + 1);
             }
         }
     }
@@ -606,8 +607,8 @@ namespace internal
           // an exception if we can't
           // find a set for this
           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const types::global_dof_index  *pointer = &dofs[starting_offset];
+          const types::global_dof_index starting_offset = dof_offsets[obj_index];
+          const types::global_dof_index *pointer = &dofs[starting_offset];
           while (true)
             {
               if (*pointer == numbers::invalid_dof_index)
@@ -616,8 +617,9 @@ namespace internal
               else if (*pointer == fe_index)
                 return true;
               else
-                pointer += dof_handler.get_fe()[*pointer]
-                           .template n_dofs_per_object<dim>() + 1;
+                pointer += static_cast<types::global_dof_index>(
+                    dof_handler.get_fe()[*pointer]
+                    .template n_dofs_per_object<dim>()+1);
             }
         }
     }

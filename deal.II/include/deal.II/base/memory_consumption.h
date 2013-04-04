@@ -530,7 +530,7 @@ namespace MemoryConsumption
   std::size_t memory_consumption (const std::vector<T> &v)
   {
     std::size_t mem = sizeof(std::vector<T>);
-    const unsigned int n = v.size();
+    const unsigned int n = static_cast<unsigned int>(v.size());
     for (unsigned int i=0; i<n; ++i)
       mem += memory_consumption(v[i]);
     mem += (v.capacity() - n)*sizeof(T);

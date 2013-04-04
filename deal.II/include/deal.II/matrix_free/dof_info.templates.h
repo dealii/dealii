@@ -178,7 +178,7 @@ namespace internal
       const unsigned int n_mpi_procs = vector_partitioner->n_mpi_processes();
       const types::global_dof_index first_owned = vector_partitioner->local_range().first;
       const types::global_dof_index last_owned  = vector_partitioner->local_range().second;
-      const unsigned int n_owned     = last_owned - first_owned;
+      const types::global_dof_index n_owned     = last_owned - first_owned;
       std::pair<unsigned short,unsigned short> constraint_iterator (0,0);
 
       unsigned int dofs_this_cell = (cell_active_fe_index.empty()) ?
@@ -208,7 +208,7 @@ namespace internal
               // to actually resolve the constraint entries
               const std::vector<std::pair<types::global_dof_index,double> >
               &entries = *entries_ptr;
-              const unsigned int n_entries = entries.size();
+              const types::global_dof_index n_entries = entries.size();
               if (n_entries == 1 && std::fabs(entries[0].second-1.)<1e-14)
                 {
                   current_dof = entries[0].first;
@@ -325,7 +325,7 @@ no_constraint:
       Assert (boundary_cells.size() < row_starts.size(), ExcInternalError());
 
       // sort ghost dofs and compress out duplicates
-      const unsigned int n_owned  = (vector_partitioner->local_range().second-
+      const types::global_dof_index n_owned  = (vector_partitioner->local_range().second-
                                      vector_partitioner->local_range().first);
       const size_dof n_ghosts = ghost_dofs.size();
       unsigned int       n_unique_ghosts= 0;
@@ -435,9 +435,9 @@ no_constraint:
     void
     DoFInfo::compute_renumber_serial (const std::vector<unsigned int> &boundary_cells,
                                       const SizeInfo                  &size_info,
-                                      std::vector<unsigned int>       &renumbering)
+                                      std::vector<types::global_dof_index> &renumbering)
     {
-      std::vector<unsigned int> reverse_numbering (size_info.n_active_cells,
+      std::vector<types::global_dof_index> reverse_numbering (size_info.n_active_cells,
                                                    numbers::invalid_unsigned_int);
       const unsigned int n_boundary_cells = boundary_cells.size();
       for (unsigned int j=0; j<n_boundary_cells; ++j)
@@ -469,7 +469,7 @@ no_constraint:
 
     void
     DoFInfo::compute_renumber_hp_serial (SizeInfo                  &size_info,
-                                         std::vector<unsigned int> &renumbering,
+                                         std::vector<types::global_dof_index> &renumbering,
                                          std::vector<unsigned int> &irregular_cells)
     {
       if (max_fe_index < 2)
@@ -551,9 +551,9 @@ no_constraint:
     void
     DoFInfo::compute_renumber_parallel (const std::vector<unsigned int> &boundary_cells,
                                         SizeInfo                        &size_info,
-                                        std::vector<unsigned int>       &renumbering)
+                                        std::vector<types::global_dof_index> &renumbering)
     {
-      std::vector<unsigned int> reverse_numbering (size_info.n_active_cells,
+      std::vector<types::global_dof_index> reverse_numbering (size_info.n_active_cells,
                                                    numbers::invalid_unsigned_int);
       const unsigned int n_boundary_cells = boundary_cells.size();
       for (unsigned int j=0; j<n_boundary_cells; ++j)
@@ -575,7 +575,7 @@ no_constraint:
 
     void
     DoFInfo::reorder_cells (const SizeInfo                  &size_info,
-                            const std::vector<unsigned int> &renumbering,
+                            const std::vector<types::global_dof_index> &renumbering,
                             const std::vector<unsigned int> &constraint_pool_row_index,
                             const std::vector<unsigned int> &irregular_cells,
                             const unsigned int               vectorization_length)
@@ -810,11 +810,11 @@ no_constraint:
 
 
     void DoFInfo::make_thread_graph_partition_color
-    (SizeInfo                  &size_info,
-     TaskInfo                  &task_info,
-     std::vector<unsigned int> &renumbering,
-     std::vector<unsigned int> &irregular_cells,
-     const bool                 hp_bool)
+    (SizeInfo                             &size_info,
+     TaskInfo                             &task_info,
+     std::vector<types::global_dof_index> &renumbering,
+     std::vector<unsigned int>            &irregular_cells,
+     const bool                            hp_bool)
     {
       if (size_info.n_macro_cells == 0)
         return;
@@ -923,12 +923,12 @@ no_constraint:
       // yet assigned a partition.
       std::vector<unsigned int> cell_partition(task_info.n_blocks,
                                                size_info.n_macro_cells);
-      std::vector<unsigned int> neighbor_list;
-      std::vector<unsigned int> neighbor_neighbor_list;
+      std::vector<types::global_dof_index> neighbor_list;
+      std::vector<types::global_dof_index> neighbor_neighbor_list;
 
       // In element j of this variable, one puts the old number of the block
       // that should be the jth block in the new numeration.
-      std::vector<unsigned int> partition_list      (task_info.n_blocks,0);
+      std::vector<types::global_dof_index> partition_list      (task_info.n_blocks,0);
       std::vector<unsigned int> partition_color_list(task_info.n_blocks,0);
 
       // This vector points to the start of each partition.
@@ -1121,7 +1121,7 @@ no_constraint:
       // check that the renumbering is one-to-one
 #ifdef DEBUG
       {
-        std::vector<unsigned int> sorted_renumbering (renumbering);
+        std::vector<types::global_dof_index> sorted_renumbering (renumbering);
         std::sort(sorted_renumbering.begin(), sorted_renumbering.end());
         for (unsigned int i=0; i<sorted_renumbering.size(); ++i)
           Assert(sorted_renumbering[i] == i, ExcInternalError());
@@ -1140,11 +1140,11 @@ no_constraint:
 
     void
     DoFInfo::make_thread_graph_partition_partition
-    (SizeInfo                  &size_info,
-     TaskInfo                  &task_info,
-     std::vector<unsigned int> &renumbering,
-     std::vector<unsigned int> &irregular_cells,
-     const bool                 hp_bool)
+    (SizeInfo                             &size_info,
+     TaskInfo                             &task_info,
+     std::vector<types::global_dof_index> &renumbering,
+     std::vector<unsigned int>            &irregular_cells,
+     const bool                            hp_bool)
     {
       if (size_info.n_macro_cells == 0)
         return;
@@ -1181,7 +1181,7 @@ no_constraint:
       // In element j of this variable, one puts the old number of the block
       // that should be the jth block in the new numeration.
       std::vector<unsigned int> partition_list(size_info.n_active_cells,0);
-      std::vector<unsigned int> partition_partition_list(size_info.n_active_cells,0);
+      std::vector<types::global_dof_index> partition_partition_list(size_info.n_active_cells,0);
 
       // This vector points to the start of each partition.
       std::vector<unsigned int> partition_size(2,0);
@@ -1436,7 +1436,7 @@ not_connect:
                       missing_macros = 0;
                       std::vector<unsigned int> remaining_per_macro_cell
                       (max_fe_index);
-                      std::vector<std::vector<unsigned int> >
+                      std::vector<std::vector<types::global_dof_index> >
                       renumbering_fe_index;
                       unsigned int cell;
                       bool filled = true;
@@ -1688,7 +1688,7 @@ not_connect:
     DoFInfo::make_connectivity_graph
     (const SizeInfo                  &size_info,
      const TaskInfo                  &task_info,
-     const std::vector<unsigned int> &renumbering,
+     const std::vector<types::global_dof_index> &renumbering,
      const std::vector<unsigned int> &irregular_cells,
      const bool                       do_blocking,
      CompressedSimpleSparsityPattern &connectivity) const
@@ -1741,9 +1741,9 @@ not_connect:
               scratch.insert(scratch.end(),
                              begin_indices(block), end_indices(block));
               std::sort(scratch.begin(), scratch.end());
-              const unsigned int n_unique =
+              const types::global_dof_index n_unique =
                 std::unique(scratch.begin(), scratch.end())-scratch.begin();
-              for (unsigned int i=0; i<n_unique; ++i)
+              for (types::global_dof_index i=0; i<n_unique; ++i)
                 row_lengths[scratch[i]]++;
             }
         }

@@ -2815,7 +2815,7 @@ inline
 unsigned int
 FiniteElement<dim,spacedim>::element_multiplicity (const unsigned int index) const
 {
-  return base_to_block_indices.block_size(index);
+  return static_cast<unsigned int>(base_to_block_indices.block_size(index));
 }
 
 

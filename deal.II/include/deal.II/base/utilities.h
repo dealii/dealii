@@ -749,7 +749,7 @@ namespace Utilities
     Assert (last - first >= 0,
             ExcMessage ("The given iterators do not satisfy the proper ordering."));
 
-    unsigned int len = last-first;
+    unsigned int len = static_cast<unsigned int>(last-first);
 
     if (len==0)
       return first;

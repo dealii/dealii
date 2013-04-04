@@ -178,7 +178,7 @@ namespace internal
        */
       void compute_renumber_serial (const std::vector<unsigned int> &boundary_cells,
                                     const SizeInfo                  &size_info,
-                                    std::vector<unsigned int>       &renumbering);
+                                    std::vector<types::global_dof_index> &renumbering);
 
       /**
        * Reorganizes cells in the hp case without parallelism such that all
@@ -187,7 +187,7 @@ namespace internal
        * DoFHandlers.
        */
       void compute_renumber_hp_serial (SizeInfo                  &size_info,
-                                       std::vector<unsigned int> &renumbering,
+                                     std::vector<types::global_dof_index> &renumbering,
                                        std::vector<unsigned int> &irregular_cells);
 
       /**
@@ -197,7 +197,7 @@ namespace internal
        */
       void compute_renumber_parallel (const std::vector<unsigned int> &boundary_cells,
                                       SizeInfo                        &size_info,
-                                      std::vector<unsigned int>       &renumbering);
+                                      std::vector<types::global_dof_index> &renumbering);
 
       /**
        * This method reorders the way cells are gone through based on a given
@@ -206,7 +206,7 @@ namespace internal
        * vectorization.
        */
       void reorder_cells (const SizeInfo                  &size_info,
-                          const std::vector<unsigned int> &renumbering,
+                          const std::vector<types::global_dof_index> &renumbering,
                           const std::vector<unsigned int> &constraint_pool_row_index,
                           const std::vector<unsigned int> &irregular_cells,
                           const unsigned int               vectorization_length);
@@ -237,7 +237,7 @@ namespace internal
       void
       make_thread_graph_partition_color (SizeInfo                  &size_info,
                                          TaskInfo                  &task_info,
-                                         std::vector<unsigned int> &renumbering,
+                                         std::vector<types::global_dof_index> &renumbering,
                                          std::vector<unsigned int> &irregular_cells,
                                          const bool                 hp_bool);
 
@@ -258,7 +258,7 @@ namespace internal
       void
       make_thread_graph_partition_partition (SizeInfo                  &size_info,
                                              TaskInfo                  &task_info,
-                                             std::vector<unsigned int> &renumbering,
+                                             std::vector<types::global_dof_index> &renumbering,
                                              std::vector<unsigned int> &irregular_cells,
                                              const bool                 hp_bool);
 
@@ -271,7 +271,7 @@ namespace internal
       void
       make_connectivity_graph (const SizeInfo                  &size_info,
                                const TaskInfo                  &task_info,
-                               const std::vector<unsigned int> &renumbering,
+                               const std::vector<types::global_dof_index> &renumbering,
                                const std::vector<unsigned int> &irregular_cells,
                                const bool                       do_blocking,
                                CompressedSimpleSparsityPattern &connectivity) const;

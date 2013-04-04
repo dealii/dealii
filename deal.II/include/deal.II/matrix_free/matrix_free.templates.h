@@ -620,7 +620,7 @@ void MatrixFree<dim,Number>::initialize_indices
   // reorganize the indices in order to overlap communication in MPI with
   // computations: Place all cells with ghost indices into one chunk. Also
   // reorder cells so that we can parallelize by threads
-  std::vector<unsigned int> renumbering;
+  std::vector<types::global_dof_index> renumbering;
   if (task_info.use_multithreading == true)
     {
       dof_info[0].compute_renumber_parallel (boundary_cells, size_info,
@@ -650,7 +650,7 @@ void MatrixFree<dim,Number>::initialize_indices
   // operations will then be done simultaneously).
 #ifdef DEBUG
   {
-    std::vector<unsigned int> sorted_renumbering (renumbering);
+    std::vector<types::global_dof_index> sorted_renumbering (renumbering);
     std::sort (sorted_renumbering.begin(), sorted_renumbering.end());
     for (unsigned int i=0; i<sorted_renumbering.size(); ++i)
       Assert (sorted_renumbering[i] == i, ExcInternalError());

@@ -160,7 +160,7 @@ public:
    * local_index obviously needs to be less
    * than n_elements().
    */
-  types::global_dof_index nth_index_in_set (const types::global_dof_index local_index) const;
+  types::global_dof_index nth_index_in_set (const unsigned int local_index) const;
 
   /**
    * Return the how-manyth element of this
@@ -172,7 +172,7 @@ public:
    * a member of this index set, i.e. if
    * is_element(global_index) is false.
    */
-  types::global_dof_index index_within_set (const types::global_dof_index global_index) const;
+  unsigned int index_within_set (const types::global_dof_index global_index) const;
 
   /**
    * Each index set can be
@@ -868,7 +868,7 @@ IndexSet::n_elements () const
 
 inline
 types::global_dof_index
-IndexSet::nth_index_in_set (const types::global_dof_index n) const
+IndexSet::nth_index_in_set (const unsigned int n) const
 {
   // to make this call thread-safe, compress()
   // must not be called through this function
@@ -918,7 +918,7 @@ IndexSet::nth_index_in_set (const types::global_dof_index n) const
 
 
 inline
-types::global_dof_index
+unsigned int
 IndexSet::index_within_set (const types::global_dof_index n) const
 {
   // to make this call thread-safe, compress()

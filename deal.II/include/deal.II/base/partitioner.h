@@ -442,7 +442,7 @@ namespace Utilities
       Assert(in_local_range(global_index) || is_ghost_entry (global_index),
              ExcIndexNotPresent(global_index, my_pid));
       if (in_local_range(global_index))
-        return global_index - local_range_data.first;
+        return static_cast<unsigned int>(global_index - local_range_data.first);
       else if (is_ghost_entry (global_index))
         return (local_size() +
                 ghost_indices_data.index_within_set (global_index));

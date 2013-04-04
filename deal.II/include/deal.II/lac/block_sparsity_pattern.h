@@ -342,7 +342,7 @@ public:
    * all the blocks that form this
    * row.
    */
-  size_type row_length (const size_type row) const;
+  unsigned int row_length (const size_type row) const;
 
   /**
    * Return the number of nonzero
@@ -1302,14 +1302,14 @@ BlockSparsityPatternBase<SparsityPatternBase>::exists (const size_type i,
 
 template <class SparsityPatternBase>
 inline
-typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
+unsigned int
 BlockSparsityPatternBase<SparsityPatternBase>::
 row_length (const size_type row) const
 {
   const std::pair<size_type , size_type>
   row_index = row_indices.global_to_local (row);
 
-  size_type c = 0;
+  unsigned int c = 0;
 
   for (size_type b=0; b<rows; ++b)
     c += sub_objects[row_index.first][b]->row_length (row_index.second);
