@@ -613,9 +613,15 @@
     <h4> Installation </h4>
 
     <p>
-      <code>CMAKE_INSTALL_PREFIX</code> determines the location,
+      the location,
       where the <acronym>deal.II</acronym> library will be
-      installed to.  Please note that depending on whether
+      installed to is set with the help of
+      <pre>
+
+    CMAKE_INSTALL_PREFIX
+      </pre>
+
+      Please note that depending on whether
       <code>DEAL_II_COMPONENT_COMPAT_FILES</code> is set, there will be
       different directory structures:
       <ul>
@@ -658,7 +664,8 @@
       <pre>
 
     DEAL_II_CMAKE_MACROS_RELDIR
-    DEAL_II_DOCUMENTATION_RELDIR
+    DEAL_II_DOCHTML_RELDIR
+    DEAL_II_DOCREADME_RELDIR
     DEAL_II_EXAMPLES_RELDIR
     DEAL_II_EXECUTABLE_RELDIR
     DEAL_II_INCLUDE_RELDIR
