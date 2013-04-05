@@ -54,6 +54,46 @@
 #
 
 
+###########################################################################
+#                                                                         #
+#                             Sanity checks:                              #
+#                                                                         #
+###########################################################################
+
+#
+# Check the user provided C and CXX flags:
+# Only do this for CMAKE_C_FLAGS and CMAKE_CXX_FLAGS as this check is very
+# costly
+#
+SET(CMAKE_REQUIRED_FLAGS "${CMAKE_C_FLAGS_SAVED}")
+CHECK_C_SOURCE_COMPILES(
+  "int main(){ return 0; }"
+  DEAL_II_HAVE_USABLE_C_FLAGS)
+
+IF(NOT DEAL_II_HAVE_USABLE_C_FLAGS)
+  UNSET(DEAL_II_HAVE_USABLE_C_FLAGS CACHE)
+  MESSAGE(FATAL_ERROR "\n"
+    "Configuration error: Cannot compile with the specified C flags: "
+    "${CMAKE_C_FLAGS_SAVED}\n"
+    )
+ENDIF()
+UNSET(DEAL_II_HAVE_USABLE_C_FLAGS CACHE)
+
+SET(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX_FLAGS_SAVED}")
+CHECK_CXX_SOURCE_COMPILES(
+  "int main(){ return 0; }"
+  DEAL_II_HAVE_USABLE_CXX_FLAGS)
+SET(CMAKE_REQUIRED_FLAGS "")
+
+IF(NOT DEAL_II_HAVE_USABLE_CXX_FLAGS)
+  UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
+  MESSAGE(FATAL_ERROR "\n"
+    "Configuration error: Cannot compile with the specified CXX flags: "
+    "${CMAKE_CXX_FLAGS_SAVED}\n"
+    )
+ENDIF()
+UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
+
 #
 # CMAKE_C_COMPILER and CMAKE_CXX_COMPILER have to be of the same brand.
 #
@@ -67,6 +107,12 @@ IF(NOT ( "${CMAKE_C_COMPILER_ID}" STREQUAL "${CMAKE_CXX_COMPILER_ID}" AND
       )
 ENDIF()
 
+
+###########################################################################
+#                                                                         #
+#                            Compiler setup:                              #
+#                                                                         #
+###########################################################################
 
 IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   #
