@@ -4,7 +4,7 @@ The program produces a series of <code>.eps</code> files of the
 Triangulations. The methods are discussed above.
 
 
-<h3>Next steps</h3>
+<h3>Next steps: Curved boundaries</h3>
 
 As mentioned in the introduction,
 creating a coarse mesh using the methods discussed here is only the first
@@ -398,4 +398,3 @@ happens to the curved part of the boundary:
  alt="">
 
  So, yes!, this is finally what we were looking for!
-
