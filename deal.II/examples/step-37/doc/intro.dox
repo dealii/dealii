@@ -410,8 +410,66 @@ thereby decreases efficiency (for more detail see e.g. Y. Saad,
 Iterative Methods for Sparse Linear Systems, SIAM, 2nd edition, 2003, chapters
 11 & 12).
 
-The implementation into the multigrid framework is then straightforward. The multigrid implementation in this
-program is based on an earlier version of step-16 that demonstrated multigrid
-on uniformly refined grids.
+The implementation into the multigrid framework is then straightforward. The
+multigrid implementation in this program is based on a simplified version of
+step-16 that disregards adaptivity.
 
+
+<h3>Using CPU-dependent instructions (vectorization)</h3>
+
+The computational kernels for evaluation in FEEvaluation are written in a way
+to optimally use computational resources. Indeed, they operate not on double
+data types, but something we call VectorizedArray (check e.g. the return type
+of FEEvaluationBase::get_value, which is VectorizedArray for a scalar element
+and a Tensor of VectorizedArray for a vector finite element). VectorizedArray
+is a short array of doubles or float whose length depends on the particular
+computer system in use. For example, systems based on x86-64 support the
+streaming SIMD extensions (SSE), where the processor's vector units can
+process two doubles (or four single-precision floats) by one CPU
+instruction. Newer processors with support for the so-called advanced vector
+extensions (AVX) with 256 bit operands can use four doubles and eight floats,
+respectively. Vectorization is a single-instruction/multiple-data (SIMD)
+concept, that is, one CPU instruction is used to process multiple data values
+at once. Often, finite element programs do not use vectorization explicitly as
+the benefits of this concept are only in arithmetic intensive operations. The
+bulk of typical finite element workloads are memory bandwidth limited
+(operations on sparse matrices and vectors) where the additional computational
+power is useless.
+
+Behind the scenes, optimized BLAS packages might heavily rely on
+vectorization, though. Also, optimizing compilers might automatically
+transform loops involving standard code into more efficient vectorized
+form. However, the data flow must be very regular in order for compilers to
+produce efficient code. For example, already the automatic vectorization of
+the prototype operation that benefits from vectorization, matrix-matrix
+products, fails on most compilers (as of writing this tutorial in early 2012,
+neither gcc-4.6 nor the Intel compiler v. 12 manage to produce useful
+vectorized code for the FullMatrix::mmult function, and not even on the
+simpler case where the matrix bounds are compile-time constants instead of
+run-time constants as in FullMatrix::mmult). The main reason for this is that
+the information to be processed at the innermost loop (that is where
+vectorization is applied) is not necessarily a multiple of the vector length,
+leaving parts of the resources unused. Moreover, the data that can potentially
+be processed together might not be laid out in a contiguous way in memory or
+not with the necessary alignment to address boundaries that are needed by the
+processor. Or the compiler might not be able to prove that data arrays do not
+overlap when loading several elements at once.
+
+In the matrix-free implementation in deal.II, we have therefore chosen to
+apply vectorization at the level which is most appropriate for finite element
+computations: The cell-wise computations are typically exactly the same for
+all cells (except for reading from and writing to vectors), and hence SIMD can
+be used to process several cells at once. In all what follows, you can think
+of a VectorizedArray to hold data from several cells. Remember that it is not
+related to the spatial dimension and the number of elements e.g. in a Tensor
+or Point.
+
+Note that vectorization depends on the CPU that is used for deal.II. In order
+to generate the fastest kernels of FEEvaluation for your computer, you should
+compile deal.II with the so-called <i>native</i> processor variant. When using
+the gcc compiler, it can be enabled by setting the variable
+<tt>CMAKE_CXX_FLAGS</tt> to <tt>"-march=native"</tt> in the cmake build
+settings (on the command line, specify
+<tt>-DCMAKE_CXX_FLAGS="-march=native"</tt>, see the deal.II README for more
+information). Similar options exist for other compilers.
 
