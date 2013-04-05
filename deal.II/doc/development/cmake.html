@@ -581,12 +581,6 @@
 
       <ol>
 	<li>
-	  Disable the configuration completely by setting
-	  <code>DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS</code> to
-	  <code>OFF</code>.  Beware of the fact that certain features
-	  may still pull in necessary compiler flags.
-
-	<li>
 	  Override the default configuration by setting the following
 	  cached variables:
 	  <pre>
@@ -605,6 +599,18 @@
 
     cmake -DCMAKE_CXX_FLAGS="-Wno-sign-compare" &lt;...&gt;
 	  </pre>
+
+        <li>
+          Set the corresponding environment variables: <code>CFLAGS</code>,
+          <code>CXXFLAGS</code>, or <code>LDFLAGS</code> environment. These
+          variables will also be appended after the default compiler flags
+          (but before the corresponding cached variables).
+
+	<li>
+	  Disable the configuration completely by setting
+	  <code>DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS</code> to
+	  <code>OFF</code>.  Beware of the fact that certain features
+	  may still pull in necessary compiler flags.
       </ol>
     </p>
 

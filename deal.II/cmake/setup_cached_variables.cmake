@@ -195,16 +195,6 @@ FOREACH(_flag
 ENDFOREACH()
 
 #
-# Read in CFLAGS, CXXFLAGS and LDFLAGS from environment
-#
-SET_IF_EMPTY(CMAKE_C_FLAGS "$ENV{CFLAGS}")
-SET_IF_EMPTY(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS}")
-SET_IF_EMPTY(CMAKE_SHARED_LINKER_FLAGS "$ENV{LDFLAGS}")
-UNSET(ENV{CFLAGS})
-UNSET(ENV{CXXFLAGS})
-UNSET(ENV{LDFLAGS})
-
-#
 # Set cached compiler flags to an empty string:
 #
 SET(DEAL_II_USED_FLAGS
@@ -239,6 +229,18 @@ FOREACH(_flag ${DEAL_II_USED_FLAGS})
   #
   MARK_AS_ADVANCED(${_flag})
 ENDFOREACH()
+
+
+#
+# Finally, read in CFLAGS, CXXFLAGS and LDFLAGS from environment and
+# prepend them to the saved variables:
+#
+SET(CMAKE_C_FLAGS_SAVED "$ENV{CFLAGS} ${CMAKE_C_FLAGS_SAVED}")
+SET(CMAKE_CXX_FLAGS_SAVED "$ENV{CXXFLAGS} ${CMAKE_CXX_FLAGS_SAVED}")
+SET(CMAKE_SHARED_LINKER_FLAGS_SAVED "$ENV{LDFLAGS} ${CMAKE_SHARED_LINKER_FLAGS}")
+UNSET(ENV{CFLAGS})
+UNSET(ENV{CXXFLAGS})
+UNSET(ENV{LDFLAGS})
 
 
 ###########################################################################
