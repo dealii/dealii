@@ -105,11 +105,12 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   SET_IF_EMPTY(DEAL_II_DOCHTML_RELDIR "doc")
   SET_IF_EMPTY(DEAL_II_EXAMPLES_RELDIR "examples")
   SET_IF_EMPTY(DEAL_II_EXECUTABLE_RELDIR "bin")
-  IF("${CMAKE_INSTALL_PREFIX}" STREQUAL "${CMAKE_BINARY_DIR}")
+  IF( "${CMAKE_INSTALL_PREFIX}" STREQUAL "${CMAKE_BINARY_DIR}" AND
+      (NOT "${CMAKE_SOURCE_DIR}" STREQUAL "${CMAKE_BINARY_DIR}") )
     #
-    # Ensure that always BINARY_DIR/include != INSTALL_PREFIX/include.
-    # Otherwise stale headers might get included resulting in a failing
-    # build.
+    # Ensure that in case of an out of source build BINARY_DIR/include !=
+    # INSTALL_PREFIX/include us always true. Otherwise stale headers might
+    # get included resulting in a failing build.
     #
     SET_IF_EMPTY(DEAL_II_INCLUDE_RELDIR "include/install")
   ELSE()
