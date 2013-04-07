@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2011, 2012 by deal.II authors
+//    Copyright (C) 2011, 2012, 2013 by deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -284,7 +284,7 @@ namespace Utilities
        * Exception
        */
       DeclException2 (ExcIndexNotPresent,
-                      types::global_dof_index, 
+                      types::global_dof_index,
 		      unsigned int,
                       << "Global index " << arg1
                       << " neither owned nor ghost on proc " << arg2);
@@ -407,7 +407,8 @@ namespace Utilities
     Partitioner::local_size () const
     {
       types::global_dof_index size= local_range_data.second - local_range_data.first;
-      Assert(size<=UINT32_MAX, ExcNotImplemented());
+      Assert(size<=std::numeric_limits<unsigned int>::max(),
+	     ExcNotImplemented());
       return static_cast<unsigned int>(size);
     }
 
