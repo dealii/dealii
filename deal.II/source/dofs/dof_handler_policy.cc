@@ -585,17 +585,19 @@ namespace internal
                           const unsigned int level,
                           const bool check_validity)
         {
-          for (typename std::vector<typename DoFHandler<1,spacedim>::MGVertexDoFs>::iterator i=dof_handler.mg_vertex_dofs.begin();
-               i!=dof_handler.mg_vertex_dofs.end(); ++i)
+          for (typename std::vector<typename DoFHandler<1,spacedim>::MGVertexDoFs>::iterator
+		 i=dof_handler.mg_vertex_dofs.begin();
+               i!=dof_handler.mg_vertex_dofs.end();
+	       ++i)
             // if the present vertex lives on
             // the current level
             if ((i->get_coarsest_level() <= level) &&
                 (i->get_finest_level() >= level))
               for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
                 {
-                  unsigned int idx = i->get_index (level, d /*,dof_handler.get_fe().dofs_per_vertex ???*/);
+                  unsigned int idx = i->get_index (level, d);
                   if (idx != DoFHandler<1>::invalid_dof_index)
-                    i->set_index (level, d /*, dof_handler.get_fe().dofs_per_vertex ???*/,
+                    i->set_index (level, d,
                                   (indices.n_elements() == 0)?
                                   (new_numbers[idx]) :
                                   (new_numbers[indices.index_within_set(idx)]));
@@ -605,8 +607,10 @@ namespace internal
                 }
 
 
-          for (std::vector<unsigned int>::iterator i=dof_handler.mg_levels[level]->dof_object.dofs.begin();
-               i!=dof_handler.mg_levels[level]->dof_object.dofs.end(); ++i)
+          for (std::vector<unsigned int>::iterator
+		 i=dof_handler.mg_levels[level]->dof_object.dofs.begin();
+               i!=dof_handler.mg_levels[level]->dof_object.dofs.end();
+	       ++i)
             {
               if (*i != DoFHandler<1>::invalid_dof_index)
                 {
