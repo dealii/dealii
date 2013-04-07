@@ -852,7 +852,7 @@ public:
    * @ingroup Exceptions
    */
   DeclException1 (ExcNewNumbersNotConsecutive,
-                  int,
+                  types::global_dof_index,
                   << "The given list of new dof indices is not consecutive: "
                   << "the index " << arg1 << " does not exist.");
   /**

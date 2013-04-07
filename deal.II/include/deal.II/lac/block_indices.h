@@ -125,7 +125,7 @@ public:
   /**
    * The size of the @p ith block.
    */
-  size_type block_size (const size_type i) const;
+  size_type block_size (const unsigned int i) const;
 
   //@}
 
@@ -227,13 +227,13 @@ inline
 LogStream &
 operator << (LogStream &s, const BlockIndices &bi)
 {
-  const std::size_t n = bi.size();
+  const unsigned int n = bi.size();
   s << n << ":[";
   // Write first size without leading space
   if (n>0)
     s << bi.block_size(0);
   // Write all other sizes
-  for (std::size_t i=1; i<n; ++i)
+  for (unsigned int i=1; i<n; ++i)
     s << ' ' << bi.block_size(i);
   s << "]->" << bi.total_size();
   return s;
@@ -406,8 +406,8 @@ inline
 std::pair<unsigned int,BlockIndices::size_type>
 BlockIndices::global_to_local (const size_type i) const
 {
-  Assert (i<total_size(), ExcIndexRange(i, 0, total_size()));
-  Assert (n_blocks > 0, ExcLowerRange(i, 1));
+  Assert (i<total_size(), ExcIndexRangeType<size_type>(i, 0, total_size()));
+  Assert (n_blocks > 0, ExcLowerRangeType<size_type>(i, size_type(1)));
 
   unsigned int block = n_blocks-1;
   while (i < start_indices[block])
@@ -425,7 +425,7 @@ BlockIndices::local_to_global (const unsigned int block,
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
   Assert (index < start_indices[block+1]-start_indices[block],
-          ExcIndexRange (index, 0, start_indices[block+1]-start_indices[block]));
+          ExcIndexRangeType<size_type> (index, 0, start_indices[block+1]-start_indices[block]));
 
   return start_indices[block]+index;
 }
@@ -452,7 +452,7 @@ BlockIndices::total_size () const
 
 inline
 BlockIndices::size_type
-BlockIndices::block_size (const size_type block) const
+BlockIndices::block_size (const unsigned int block) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
   return start_indices[block+1]-start_indices[block];

@@ -753,6 +753,15 @@ namespace StandardExceptions
                   << arg2);
 
   /**
+   * A generic exception definition for the ExcLowerRange above.
+   */
+  template<typename T>
+  DeclException2 (ExcLowerRangeType,
+                  T, T,
+                  << "Number " << arg1 << " must be larger or equal "
+                  << arg2);
+
+  /**
    * This exception indicates that the first argument should be an
    * integer multiple of the second, but is not.
    */

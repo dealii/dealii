@@ -406,7 +406,9 @@ namespace Utilities
     unsigned int
     Partitioner::local_size () const
     {
-      return local_range_data.second - local_range_data.first;
+      types::global_dof_index size= local_range_data.second - local_range_data.first;
+      Assert(size<=UINT32_MAX, ExcNotImplemented());
+      return static_cast<unsigned int>(size);
     }
 
 
