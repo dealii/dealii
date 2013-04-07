@@ -33,6 +33,7 @@
               <ul>
                 <li><a href="#operatingmanip">Manipulating the cache</a>
                 <li><a href="#operatingccmake"><code>ccmake</code> and special build targets </a>
+                <li><a href="#operatingshortcuts">Shortcuts</a>
               </ul>
 	    <li><a href="#configure">Configuration options</a>
 	      <ul>
@@ -130,6 +131,7 @@
     <a name="operatingmanip"></a>
     <h4> Manipulating the cache </h4>
 
+    <p>
       A cached variable can be set on the command line via
       <pre>
 
@@ -148,10 +150,12 @@
 
     cmake -U"DEAL_II_WITH_*" .
       </pre>
+    </p>
 
     <a name="operatingccmake"></a>
     <h4> <code>ccmake</code> and special build targets </h4>
 
+    <p>
       A very convenient way to alter the configuration is to use the graphical
       user interface <code>ccmake</code> to the
       variables <code>cmake</code> stores upon running. It can be invoked via
@@ -170,6 +174,29 @@
 
     make rebuild_cache
       </pre>
+    </p>
+
+    <a name="operatingshortcuts"></a>
+    <h4> Shortcuts </h4>
+
+    <p>
+      All variables starting with <code>WITH_</code> will be automatically
+      renamed to <code>DEAL_II_WITH_*</code>. So, it suffices to specify
+    <pre>
+
+    cmake -DWITH_MPI=ON &lt;...&gt;
+    </pre>
+      instead of the longer
+    <pre>
+
+    cmake -DDEAL_II_WITH_MPI=ON &lt;...&gt;
+    </pre>
+      The same holds for all variables starting with <code>COMPONENT_</code>
+      and all individual component names: <code>COMPAT_FILES</code>,
+      <code>DOCUMENTATION</code>, <code>EXAMPLES</code>,
+      <code>MESH_CONVERTER</code> and <code>PARAMETER_GUI</code> (which
+      will be expanded to the full <code>DEAL_II_COMPONENT_*</code> variable name).
+    </p>
 
     <a name="configure"></a>
     <h3>Configuration options</h3>
@@ -658,7 +685,7 @@
         lib${LIB_SUFFIX}/cmake/deal.II
         share/deal.II/
         share/deal.II/cmake/macros
-        share/doc/deal.II/examples
+        share/deal.II/examples
         share/doc/deal.II/html
 	  </pre>
       </ul>
@@ -670,6 +697,7 @@
       <pre>
 
     DEAL_II_CMAKE_MACROS_RELDIR
+    DEAL_II_COMMON_RELDIR
     DEAL_II_DOCHTML_RELDIR
     DEAL_II_DOCREADME_RELDIR
     DEAL_II_EXAMPLES_RELDIR
