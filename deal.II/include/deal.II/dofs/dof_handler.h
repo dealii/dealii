@@ -966,23 +966,93 @@ private:
    */
   DoFHandler &operator = (const DoFHandler &);
 
+  /**
+   * A data structure that is used to store the DoF indices associated with
+   * a particular vertex. Unlike cells, vertices live on several levels of
+   * a multigrid hierarchy; consequently, we need to store DoF indices for
+   * each vertex for each of the levels it lives on. This class does
+   * this.
+   */
   class MGVertexDoFs
   {
-  private:
-    unsigned int coarsest_level;
-    unsigned int finest_level;
-    types::global_dof_index *indices;
-    types::global_dof_index *indices_offset;
-
   public:
-    DeclException0 (ExcNoMemory);
+    /**
+     * Constructor.
+     */
     MGVertexDoFs ();
+
+    /**
+     * Destructor.
+     */
     ~MGVertexDoFs ();
+
+    /**
+     * A function that is called to allocate the necessary amount of memory
+     * to store the indices of the DoFs that live on this vertex for the
+     * given (inclusive) range of levels.
+     */
+    void init (const unsigned int coarsest_level,
+	       const unsigned int finest_level,
+	       const unsigned int dofs_per_vertex);
+
+    /**
+     * Return the coarsest level for which this structure
+     * stores data.
+     */
     unsigned int get_coarsest_level () const;
+
+    /**
+     * Return the finest level for which this structure
+     * stores data.
+     */
     unsigned int get_finest_level () const;
-    types::global_dof_index get_index (const unsigned int level, const unsigned int dof_number) const;
-    void init (const unsigned int coarsest_level, const unsigned int finest_level, const unsigned int dofs_per_vertex);
-    void set_index (const unsigned int level, const unsigned int dof_number, const types::global_dof_index index);
+
+    /**
+     * Return the index of the <code>dof_number</code>th degree of
+     * freedom for the given level stored for the current vertex.
+     */
+    types::global_dof_index
+    get_index (const unsigned int level,
+	       const unsigned int dof_number) const;
+
+    /**
+     * Set the index of the <code>dof_number</code>th degree of
+     * freedom for the given level stored for the current vertex
+     * to <code>index</code>.
+     */
+    void set_index (const unsigned int level,
+		    const unsigned int dof_number,
+		    const types::global_dof_index index);
+
+    /**
+     * Exception.
+     */
+    DeclException0 (ExcNoMemory);
+
+  private:
+    /**
+     * Coarsest level for which this object stores DoF indices.
+     */
+    unsigned int coarsest_level;
+
+    /**
+     * Finest level for which this object stores DoF indices.
+     */
+    unsigned int finest_level;
+
+    /**
+     * A pointer to an array where we store the indices of the
+     * DoFs that live on the various levels this vertex exists
+     * on.
+     */
+    types::global_dof_index *indices;
+
+    /**
+     * This array stores, for each level starting with coarsest_level,
+     * the offset in the <code>indices</code> array where the DoF
+     * indices for each level are stored.
+     */
+    types::global_dof_index *indices_offset;
   };
 
   void clear_mg_space ();
