@@ -2173,7 +2173,7 @@ namespace internal
                 endc = dof_handler.end(level);
 
                 for (; cell != endc; ++cell)
-                  if (cell->level_subdomain_id() != DoFHandler<dim,spacedim>::invalid_dof_index &&
+                  if (!cell->is_artificial() &&
                       (cell->level_subdomain_id() < tr->locally_owned_subdomain()))
                     {
                       // we found a
