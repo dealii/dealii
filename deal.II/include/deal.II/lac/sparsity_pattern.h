@@ -1670,7 +1670,7 @@ inline
 SparsityPattern::iterator
 SparsityPattern::begin (const size_type r) const
 {
-  Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
+  Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
 
   return iterator(this, rowstart[r]);
 }
@@ -1681,7 +1681,7 @@ inline
 SparsityPattern::iterator
 SparsityPattern::end (const size_type r) const
 {
-  Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
+  Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
 
   return iterator(this, rowstart[r+1]);
 }
@@ -1692,7 +1692,7 @@ inline
 SparsityPattern::row_iterator
 SparsityPattern::row_begin (const size_type r) const
 {
-  Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
+  Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
   return &colnums[rowstart[r]];
 }
 
@@ -1702,7 +1702,7 @@ inline
 SparsityPattern::row_iterator
 SparsityPattern::row_end (const size_type r) const
 {
-  Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()));
+  Assert (r<n_rows(), ExcIndexRangeType<size_type>(r,0,n_rows()));
   return &colnums[rowstart[r+1]];
 }
 
@@ -1769,7 +1769,7 @@ inline
 SparsityPattern::size_type 
 SparsityPattern::row_length (const size_type row) const
 {
-  Assert(row<rows, ExcIndexRange(row,0,rows));
+  Assert(row<rows, ExcIndexRangeType<size_type>(row,0,rows));
   return rowstart[row+1]-rowstart[row];
 }
 
@@ -1780,8 +1780,8 @@ SparsityPattern::size_type
 SparsityPattern::column_number (const size_type row,
                                 const size_type index) const
 {
-  Assert(row<rows, ExcIndexRange(row,0,rows));
-  Assert(index<row_length(row), ExcIndexRange(index,0,row_length(row)));
+  Assert(row<rows, ExcIndexRangeType<size_type>(row,0,rows));
+  Assert(index<row_length(row), ExcIndexRangeType<size_type>(index,0,row_length(row)));
 
   return colnums[rowstart[row]+index];
 }

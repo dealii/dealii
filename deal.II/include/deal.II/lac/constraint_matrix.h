@@ -1465,7 +1465,7 @@ public:
    * @ingroup Exceptions
    */
   DeclException4 (ExcEntryAlreadyExists,
-                  int, int, double, double,
+                  size_type, size_type, double, double,
                   << "The entry for the indices " << arg1 << " and "
                   << arg2 << " already exists, but the values "
                   << arg3 << " (old) and " << arg4 << " (new) differ "
@@ -1486,7 +1486,7 @@ public:
    * @ingroup Exceptions
    */
   DeclException1 (ExcDoFIsConstrainedFromBothObjects,
-                  int,
+                  size_type,
                   << "Degree of freedom " << arg1
                   << " is constrained from both object in a merge operation.");
   /**
@@ -1495,7 +1495,7 @@ public:
    * @ingroup Exceptions
    */
   DeclException1 (ExcDoFIsConstrainedToConstrainedDoF,
-                  int,
+                  size_type,
                   << "In the given argument a degree of freedom is constrained "
                   << "to another DoF with number " << arg1
                   << ", which however is constrained by this object. This is not"
@@ -1506,7 +1506,7 @@ public:
    * @ingroup Exceptions
    */
   DeclException1 (ExcRowNotStoredHere,
-                  int,
+                  size_type,
                   << "The index set given to this constraint matrix indicates "
                   << "constraints for degree of freedom " << arg1
                   << " should not be stored by this object, but a constraint "

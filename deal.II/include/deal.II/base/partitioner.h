@@ -448,7 +448,7 @@ namespace Utilities
         return static_cast<unsigned int>(global_index - local_range_data.first);
       else if (is_ghost_entry (global_index))
         return (local_size() +
-                ghost_indices_data.index_within_set (global_index));
+                static_cast<unsigned int>(ghost_indices_data.index_within_set (global_index)));
       else
         // should only end up here in
         // optimized mode, when we use this

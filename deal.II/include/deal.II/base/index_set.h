@@ -15,7 +15,6 @@
 #include <deal.II/base/config.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/exceptions.h>
-
 #include <vector>
 #include <algorithm>
 
@@ -172,7 +171,7 @@ public:
    * a member of this index set, i.e. if
    * is_element(global_index) is false.
    */
-  unsigned int index_within_set (const types::global_dof_index global_index) const;
+  types::global_dof_index index_within_set (const types::global_dof_index global_index) const;
 
   /**
    * Each index set can be
@@ -918,7 +917,7 @@ IndexSet::nth_index_in_set (const unsigned int n) const
 
 
 inline
-unsigned int
+types::global_dof_index
 IndexSet::index_within_set (const types::global_dof_index n) const
 {
   // to make this call thread-safe, compress()
