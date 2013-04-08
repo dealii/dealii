@@ -5645,18 +5645,14 @@ namespace VectorTools
     Assert(p_select.size() == 0 || p_select.size() == n,
            ExcDimensionMismatch(p_select.size(), n));
 
-    typename VECTOR::value_type s = 0.;
-
     if(p_select.size() == 0)
       {
         // In case of an empty boolean mask operate on the whole vector:
-        for (unsigned int i=0; i<n; ++i)
-          s += v(i);
-
-        v.add(-s/n);
+        v.add( - v.mean_value() );
       }
     else
       {
+        typename VECTOR::value_type s = 0.;
         unsigned int counter = 0;
         for (unsigned int i=0; i<n; ++i)
           if (p_select[i])
