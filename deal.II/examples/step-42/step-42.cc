@@ -1325,6 +1325,7 @@ namespace Step42
 
     double sigma_hlp = sigma_0;
 
+    additional_data.constant_modes = constant_modes;
     additional_data.elliptic = true;
     additional_data.n_cycles = 1;
     additional_data.w_cycle = false;
