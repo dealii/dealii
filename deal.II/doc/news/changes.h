@@ -87,6 +87,12 @@ this function.
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
+<li> Fixed: It is now possible to call ConvergenceTable::evaluate_convergence_rates
+multiple times.
+<br>
+(Matthias Maier, 2013/04/08)
+</li>
+
 <ol>
 <li> Fixed: GridTools::distort_random (previously called Triangulation::distort_random)
 had a bug where points were only ever moved in <i>positive</i> coordinate
