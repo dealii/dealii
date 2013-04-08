@@ -87,13 +87,20 @@ this function.
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
+<ol>
+<li> Fixed: VectorTools::subtract_mean_value can now be called without a
+boolean mask. The vector type is templatified and instantiated for all
+non distributed vectors.
+<br>
+(Matthias Maier, 2013/04/08)
+</li>
+
 <li> Fixed: It is now possible to call ConvergenceTable::evaluate_convergence_rates
 multiple times.
 <br>
 (Matthias Maier, 2013/04/08)
 </li>
 
-<ol>
 <li> Fixed: GridTools::distort_random (previously called Triangulation::distort_random)
 had a bug where points were only ever moved in <i>positive</i> coordinate
 directions rather than with uniform probability in either direction. The 1d

@@ -11,47 +11,11 @@
 //
 //---------------------------------------------------------------------------
 
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/hp/dof_handler.h>
-
 #include <deal.II/numerics/vector_tools.templates.h>
 
 DEAL_II_NAMESPACE_OPEN
 
-
-namespace VectorTools
-{
-
-  void
-  subtract_mean_value(Vector<double>     &v,
-                      const std::vector<bool> &p_select)
-  {
-    const unsigned int n = v.size();
-    Assert(n == p_select.size(),
-           ExcDimensionMismatch(n, p_select.size()));
-
-    double       s       = 0;
-    unsigned int counter = 0;
-
-    for (unsigned int i=0; i<n; ++i)
-      if (p_select[i])
-        {
-          s += v(i);
-          ++counter;
-        }
-    Assert (counter > 0, ExcNoComponentSelected());
-
-    s /= counter;
-
-    for (unsigned int i=0; i<n; ++i)
-      if (p_select[i])
-        v(i) -= s;
-  }
-}
-
-
 // ---------------------------- explicit instantiations --------------------
 #include "vector_tools.inst"
-
 
 DEAL_II_NAMESPACE_CLOSE

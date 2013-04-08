@@ -5635,6 +5635,49 @@ namespace VectorTools
   }
 
 
+
+  template <class VECTOR>
+  void
+  subtract_mean_value(VECTOR                  &v,
+                      const std::vector<bool> &p_select)
+  {
+    const unsigned int n = v.size();
+    Assert(p_select.size() == 0 || p_select.size() == n,
+           ExcDimensionMismatch(p_select.size(), n));
+
+    typename VECTOR::value_type s = 0.;
+
+    if(p_select.size() == 0)
+      {
+        // In case of an empty boolean mask operate on the whole vector:
+        for (unsigned int i=0; i<n; ++i)
+          s += v(i);
+
+        v.add(-s/n);
+      }
+    else
+      {
+        unsigned int counter = 0;
+        for (unsigned int i=0; i<n; ++i)
+          if (p_select[i])
+            {
+              s += v(i);
+              ++counter;
+            }
+        // Error out if we have not constrained anything. Note that in this
+        // case the vector v is always nonempty.
+        Assert (n == 0 || counter > 0, ExcNoComponentSelected());
+
+        s /= counter;
+
+        for (unsigned int i=0; i<n; ++i)
+          if (p_select[i])
+            v(i) -= s;
+      }
+  }
+
+
+
   template <int dim, class InVector, int spacedim>
   double
   compute_mean_value (const Mapping<dim, spacedim>    &mapping,
@@ -5672,9 +5715,8 @@ namespace VectorTools
         }
 
 #ifdef DEAL_II_WITH_P4EST
-    // if this was a distributed
-    // DoFHandler, we need to do the
-    // reduction over the entire domain
+    // if this was a distributed DoFHandler, we need to do the reduction
+    // over the entire domain
     if (const parallel::distributed::Triangulation<dim,spacedim> *
         p_d_triangulation
         = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>(&dof.get_tria()))
