@@ -270,7 +270,11 @@ void PointValueHistory<dim>
 
   std::vector<types::global_dof_index>
   local_dof_indices (dof_handler->get_fe ().dofs_per_cell);
-  std::vector <int> new_solution_indices;
+#ifndef deal_ii_use_large_index_type
+      std::vector <int> new_solution_indices;
+#else
+      std::vector <long long int> new_solution_indices;
+#endif
   current_cell->get_dof_indices (local_dof_indices);
   // there is an implicit assumption here
   // that all the closest support point to
@@ -415,7 +419,11 @@ void PointValueHistory<dim>
   for (unsigned int point = 0; point < locations.size (); point++)
     {
       current_cell[point]->get_dof_indices (local_dof_indices);
+#ifndef deal_ii_use_large_index_type
       std::vector <int> new_solution_indices;
+#else
+      std::vector <long long int> new_solution_indices;
+#endif
 
       for (unsigned int component = 0; component < dof_handler->get_fe ().n_components (); component++)
         {

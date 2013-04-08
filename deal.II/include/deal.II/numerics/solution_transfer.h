@@ -377,7 +377,7 @@ private:
    * Stores the number of DoFs before the
    * refinement and/or coarsening.
    */
-  unsigned int n_dofs_old;
+  types::global_dof_index n_dofs_old;
 
   /**
    * Declaration of

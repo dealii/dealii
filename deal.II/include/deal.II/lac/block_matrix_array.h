@@ -140,8 +140,8 @@ public:
    * Constructor fixing the
    * dimensions.
    */
-  BlockMatrixArray (const size_type n_block_rows,
-                    const size_type n_block_cols);
+  BlockMatrixArray (const unsigned int n_block_rows,
+                    const unsigned int n_block_cols);
 
   /**
    * Initialize object
@@ -150,8 +150,8 @@ public:
    * created by the default
    * constructor.
    */
-  void initialize (const size_type n_block_rows,
-                   const size_type n_block_cols);
+  void initialize (const unsigned int n_block_rows,
+                   const unsigned int n_block_cols);
 
   /**
    * Constructor fixing the
@@ -160,8 +160,8 @@ public:
    * @deprecated The last argument is ignored. Use the constructor with only
    * the first two arguments.
    */
-  BlockMatrixArray (const size_type n_block_rows,
-                    const size_type n_block_cols,
+  BlockMatrixArray (const unsigned int n_block_rows,
+                    const unsigned int n_block_cols,
                     VectorMemory<Vector<number> > &mem) DEAL_II_DEPRECATED;
 
   /**
@@ -174,16 +174,16 @@ public:
    * @deprecated The last argument is ignored. Use the function with same name
    * but only the first two arguments.
    */
-  void initialize (const size_type n_block_rows,
-                   const size_type n_block_cols,
+  void initialize (const unsigned int n_block_rows,
+                   const unsigned int n_block_cols,
                    VectorMemory<Vector<number> > &mem) DEAL_II_DEPRECATED;
 
   /**
    * Adjust the matrix to a new
    * size and delete all blocks.
    */
-  void reinit (const size_type n_block_rows,
-               const size_type n_block_cols);
+  void reinit (const unsigned int n_block_rows,
+               const unsigned int n_block_cols);
 
   /**
    * Add a block matrix entry. The
@@ -205,11 +205,11 @@ public:
    * the multiplication functions.
    */
   template <class MATRIX>
-  void enter (const MATRIX   &matrix,
-              const size_type row,
-              const size_type col,
-              const double    prefix = 1.,
-              const bool      transpose = false);
+  void enter (const MATRIX       &matrix,
+              const unsigned int  row,
+              const unsigned int  col,
+              const double        prefix = 1.,
+              const bool          transpose = false);
 
   /**
    * Add an entry like with enter,
@@ -223,11 +223,11 @@ public:
    */
   template <class MATRIX>
   void enter_aux (VectorMemory<Vector<number> > &mem,
-                  const MATRIX   &matrix,
-                  const size_type row,
-                  const size_type col,
-                  const double    prefix = 1.,
-                  const bool      transpose = false) DEAL_II_DEPRECATED;
+                  const MATRIX       &matrix,
+                  const unsigned int  row,
+                  const unsigned int  col,
+                  const double        prefix = 1.,
+                  const bool          transpose = false) DEAL_II_DEPRECATED;
 
 
   /**
@@ -240,13 +240,13 @@ public:
    * Number of block-entries per
    * column.
    */
-  size_type n_block_rows () const;
+  unsigned int n_block_rows () const;
 
   /**
    * Number of block-entries per
    * row.
    */
-  size_type n_block_cols () const;
+  unsigned int n_block_cols () const;
 
   /**
    * Matrix-vector multiplication.
@@ -404,11 +404,11 @@ private:
   /**
    * Number of blocks per column.
    */
-  size_type block_rows;
+  unsigned int block_rows;
   /**
    * number of blocks per row.
    */
-  size_type block_cols;
+  unsigned int block_cols;
 };
 
 /*@}*/
@@ -495,7 +495,7 @@ public:
    * <tt>n_blocks</tt> is the
    * number of blocks in each direction.
    */
-  BlockTrianglePrecondition (const size_type n_blocks);
+  BlockTrianglePrecondition (const unsigned int n_blocks);
 
   /**
    * Constructor. This matrix must be
@@ -506,7 +506,7 @@ public:
    * @deprecated The second argument is ignored. Use the constructor with only
    * the first and third argument.
    */
-  BlockTrianglePrecondition (const size_type n_block_rows,
+  BlockTrianglePrecondition (const unsigned int n_block_rows,
                              VectorMemory<Vector<number> > &mem,
                              const bool backward = false) DEAL_II_DEPRECATED;
 
@@ -520,7 +520,7 @@ public:
    * @deprecated The second argument
    * is ignored. Use the function without that argument.
    */
-  void initialize (const size_type n_block_rows,
+  void initialize (const unsigned int n_block_rows,
                    VectorMemory<Vector<number> > &mem,
                    const bool backward = false) DEAL_II_DEPRECATED;
 
@@ -528,7 +528,7 @@ public:
    * Resize preconditioner to a new
    * size and clear all blocks.
    */
-  void reinit (const size_type n_block_rows);
+  void reinit (const unsigned int n_block_rows);
 
 
   /**
@@ -679,8 +679,8 @@ inline
 void
 BlockMatrixArray<number>::enter (
   const MATRIX &matrix,
-  size_type row,
-  size_type col,
+  unsigned int row,
+  unsigned int col,
   double prefix,
   bool transpose)
 {
@@ -697,8 +697,8 @@ void
 BlockMatrixArray<number>::enter_aux (
   VectorMemory<Vector<number> > &mem,
   const MATRIX &matrix,
-  size_type row,
-  size_type col,
+  unsigned int row,
+  unsigned int col,
   double prefix,
   bool transpose)
 {
@@ -766,8 +766,8 @@ BlockMatrixArray<number>::print_latex (STREAM &out) const
 
       array(m->row, m->col) += stream.str();
     }
-  for (size_type i=0; i<n_block_rows(); ++i)
-    for (size_type j=0; j<n_block_cols(); ++j)
+  for (unsigned int i=0; i<n_block_rows(); ++i)
+    for (unsigned int j=0; j<n_block_cols(); ++j)
       {
         out << '\t' << array(i,j);
         if (j==n_block_cols()-1)

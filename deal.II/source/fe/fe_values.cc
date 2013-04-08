@@ -40,7 +40,7 @@ namespace
   template <class VectorType>
   double
   get_vector_element (const VectorType &vector,
-                      const unsigned int cell_number)
+                      const types::global_dof_index cell_number)
   {
     return vector[cell_number];
   }
@@ -48,7 +48,7 @@ namespace
 
   double
   get_vector_element (const IndexSet &is,
-                      const unsigned int cell_number)
+                      const types::global_dof_index cell_number)
   {
     return (is.is_element(cell_number) ? 1 : 0);
   }

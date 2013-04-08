@@ -2688,7 +2688,8 @@ namespace MatrixTools
         // maps with the respective indices.
         std::vector<std::map<types::global_dof_index,double> > block_boundary_values(n_blocks);
         {
-          int offset = 0, block=0;
+          int block=0;
+          types::global_dof_index offset = 0;
           for (std::map<types::global_dof_index,double>::const_iterator
                dof  = boundary_values.begin();
                dof != boundary_values.end();
