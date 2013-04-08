@@ -36,6 +36,7 @@
 #include <deal.II/lac/block_sparsity_pattern.h>
 #include <deal.II/lac/solver_cg.h>
 #include <deal.II/lac/solver_gmres.h>
+#include <deal.II/lac/solver_bicgstab.h>
 #include <deal.II/lac/precondition.h>
 #include <deal.II/lac/constraint_matrix.h>
 
@@ -1262,17 +1263,32 @@ namespace Step42
     const double solver_tolerance = 1e-3 *
                                     system_matrix_newton.residual (tmp, distributed_solution, system_rhs_newton);
 
+//    SolverControl solver_control (system_matrix_newton.m(), solver_tolerance);
+//    SolverFGMRES<TrilinosWrappers::MPI::Vector>
+//    solver(solver_control, mem,
+//           SolverFGMRES<TrilinosWrappers::MPI::Vector>::
+//           AdditionalData(30, true));
+//
+//    solver.solve(system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);
+//
+//    pcout << "         Error: " << solver_control.initial_value()
+//          << " -> " << solver_control.last_value()
+//          << " in " << solver_control.last_step()
+//          << " FGMRES iterations."
+//          << std::endl;
+
     SolverControl solver_control (system_matrix_newton.m(), solver_tolerance);
-    SolverFGMRES<TrilinosWrappers::MPI::Vector>
+    SolverBicgstab<TrilinosWrappers::MPI::Vector>
     solver(solver_control, mem,
-           SolverFGMRES<TrilinosWrappers::MPI::Vector>::
-           AdditionalData(30, true));
+    		SolverBicgstab<TrilinosWrappers::MPI::Vector>::
+    		AdditionalData(false, 1.e-10));
+
     solver.solve(system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);
 
     pcout << "         Error: " << solver_control.initial_value()
           << " -> " << solver_control.last_value()
           << " in " << solver_control.last_step()
-          << " FGMRES iterations."
+          << " Bicgstab iterations."
           << std::endl;
 
     computing_timer.exit_section("Solve: iterate");

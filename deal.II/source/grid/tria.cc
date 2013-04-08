@@ -2793,20 +2793,12 @@ namespace internal
 
         std::vector<double> minimal_length (triangulation.vertices.size(),
                                             almost_infinite_length);
-        // also note if a vertex is at
-        // the boundary
         std::vector<bool>   at_boundary (triangulation.vertices.size(), false);
 
         for (typename Triangulation<dim,spacedim>::active_line_iterator
              line=triangulation.begin_active_line();
              line != triangulation.end_line(); ++line)
           {
-            if (keep_boundary && line->at_boundary())
-              {
-                at_boundary[line->vertex_index(0)] = true;
-                at_boundary[line->vertex_index(1)] = true;
-              }
-
             minimal_length[line->vertex_index(0)]
               = std::min(line->diameter(),
                          minimal_length[line->vertex_index(0)]);
@@ -2814,6 +2806,16 @@ namespace internal
               = std::min(line->diameter(),
                          minimal_length[line->vertex_index(1)]);
           }
+
+        // also note if a vertex is at the boundary if we are asked to
+        // keep boundary vertices untouched
+	if (keep_boundary)
+	  for (typename Triangulation<dim,spacedim>::active_line_iterator
+		 line=triangulation.begin_active_line();
+	       line != triangulation.end_line(); ++line)
+	    for (unsigned int vertex=0; vertex<2; ++vertex)
+	      if (line->at_boundary(vertex) == true)
+		at_boundary[line->vertex_index(vertex)] = true;
 
 
         const unsigned int n_vertices = triangulation.vertices.size();
@@ -2831,7 +2833,7 @@ namespace internal
             // first compute a random shift
             // vector
             for (unsigned int d=0; d<spacedim; ++d)
-              shift_vector(d) = std::rand()*1.0/RAND_MAX;
+              shift_vector(d) = std::rand()*2.0/RAND_MAX-1;
 
             shift_vector *= factor * minimal_length[vertex] /
                             std::sqrt(shift_vector.square());
@@ -2927,7 +2929,7 @@ namespace internal
             // first compute a random shift
             // vector
             for (unsigned int d=0; d<spacedim; ++d)
-              shift_vector(d) = std::rand()*1.0/RAND_MAX;
+              shift_vector(d) = std::rand()*2.0/RAND_MAX-1;
 
             shift_vector *= factor * minimal_length[vertex] /
                             std::sqrt(shift_vector.square());

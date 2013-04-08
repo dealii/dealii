@@ -198,6 +198,8 @@ private:
                   << " Arnoldi vectors.");
 };
 
+
+inline
 ArpackSolver::AdditionalData::
 AdditionalData (const unsigned int number_of_arnoldi_vectors,
                 const WhichEigenvalues eigenvalue_of_interest)
@@ -206,6 +208,8 @@ AdditionalData (const unsigned int number_of_arnoldi_vectors,
   eigenvalue_of_interest(eigenvalue_of_interest)
 {}
 
+
+inline
 ArpackSolver::ArpackSolver (SolverControl &control,
                             const AdditionalData &data)
   :
@@ -214,8 +218,10 @@ ArpackSolver::ArpackSolver (SolverControl &control,
 
 {}
 
+
 template <typename VECTOR, typename MATRIX1,
          typename MATRIX2, typename INVERSE>
+inline
 void ArpackSolver::solve (
   const MATRIX1 &system_matrix,
   const MATRIX2 &mass_matrix,
@@ -501,12 +507,15 @@ void ArpackSolver::solve (
     }
 }
 
+
+inline
 SolverControl &ArpackSolver::control () const
 {
   return solver_control;
 }
 
 DEAL_II_NAMESPACE_CLOSE
+
 
 #endif
 #endif

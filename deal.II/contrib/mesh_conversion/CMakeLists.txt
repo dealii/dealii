@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -15,9 +15,9 @@
 #####
 
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8)
-#PROJECT(parameter_gui)
+#PROJECT(mesh_converter)
 
-ADD_EXECUTABLE(mesh_conversion
+ADD_EXECUTABLE(mesh_converter
   Main.cc
   MeshConversion.cc
   )
@@ -26,9 +26,9 @@ IF("${DEAL_II_EXECUTABLE_RELDIR}" STREQUAL "")
   SET(DEAL_II_EXECUTABLE_RELDIR "bin")
 ENDIF()
 
-INSTALL(TARGETS mesh_conversion
+INSTALL(TARGETS mesh_converter
   RUNTIME
   DESTINATION ${DEAL_II_EXECUTABLE_RELDIR}
-  COMPONENT contrib
+  COMPONENT mesh_converter
   )
 

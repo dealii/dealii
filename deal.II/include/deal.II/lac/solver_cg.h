@@ -35,9 +35,9 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Like all other solver classes, this class has a local structure
  * called @p AdditionalData which is used to pass additional
- * parameters to the solver, like damping parameters or the number of
- * temporary vectors. For this class, there is a switch allowing for
- * additional output for the computation of eigenvalues of the matrix.
+ * parameters to the solver. For this class, there is (among other things)
+ * a switch allowing for additional output for the computation of
+ * eigenvalues of the matrix.
  *
  * <h3>Eigenvalue computation</h3>
  *

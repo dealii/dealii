@@ -1733,7 +1733,9 @@ public:
    * face with boundary number @p number is
    * refined, this object is used to find
    * the location of new vertices on the
-   * boundary. It is also used for for
+   * boundary (see the results section of step-49
+   * for a more in-depth discussion of this, with examples).
+   * It is also used for
    * non-linear (i.e.: non-Q1)
    * transformations of cells to the unit
    * cell in shape function calculations.

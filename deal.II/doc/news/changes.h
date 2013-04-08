@@ -87,13 +87,28 @@ this function.
 <a name="specific"></a>
 <h3>Specific improvements</h3>
 
+<li> Fixed: It is now possible to call ConvergenceTable::evaluate_convergence_rates
+multiple times.
+<br>
+(Matthias Maier, 2013/04/08)
+</li>
+
 <ol>
+<li> Fixed: GridTools::distort_random (previously called Triangulation::distort_random)
+had a bug where points were only ever moved in <i>positive</i> coordinate
+directions rather than with uniform probability in either direction. The 1d
+implementation also had the problem that it did not move vertices if the
+<i>cell</i> they were on was at the boundary, even if the <i>vertex</i>
+itself was not. All of these problems are now fixed.
+<br>
+(Wolfgang Bangerth, 2013/4/5)
+</li>
+
 <li> New: There is a class VectorFunctionFromTensorFunction that converts
 between objects of type TensorFunction and Function.
 <br>
 (Spencer Patty, 2013/4/2)
 </li>
-
 
 <li> Fixed: The ParameterHandler class could not deal with parameters named
 <code>"value"</code> (and a few other names). This is now fixed.

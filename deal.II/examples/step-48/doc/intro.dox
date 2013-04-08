@@ -133,13 +133,16 @@ interaction.
 
 <h3> Parallelization </h3>
 
-The MatrixFree class comes with the option to be
-parallelized on three levels: MPI parallelization on clusters of
-distributed nodes, thread parallelization scheduled by the Threading
-Building Blocks library, and finally with a vectorization by clustering of two
-(or more) cells into a SIMD data type for the operator application. We
-have already seen how shared-memory parallelism can be exploited in
-step-37. Here, we demonstrate MPI parallelization.
+The MatrixFree class comes with the option to be parallelized on three levels:
+MPI parallelization on clusters of distributed nodes, thread parallelization
+scheduled by the Threading Building Blocks library, and finally with a
+vectorization by clustering of two (or more) cells into a SIMD data type for
+the operator application. As we have already discussed in step-37, you will
+get best performance by using an instruction set specific to your system,
+e.g. with the cmake variable
+<tt>-DCMAKE_CXX_FLAGS="-march=native"</tt>. Shared memory (thread)
+parallelization was also exploited in step-37. Here, we demonstrate MPI
+parallelization.
 
 To facilitate parallelism with distributed memory (MPI), we use a special
 vector type parallel::distributed::Vector that holds the

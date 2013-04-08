@@ -132,7 +132,8 @@ _both("DEAL_II_ALLOW_AUTODETECTION = ${DEAL_II_ALLOW_AUTODETECTION}):\n")
 
 
 #
-# Cache for quicker access:
+# Cache for quicker access to avoid the O(n^2) complexity of a loop over
+# _all_ defined variables.
 #
 GET_CMAKE_PROPERTY(_variables VARIABLES)
 FOREACH(_var ${_variables})
@@ -140,7 +141,11 @@ FOREACH(_var ${_variables})
     LIST(APPEND _features "${_var}")
   ELSEIF(_var MATCHES "DEAL_II_COMPONENT")
     LIST(APPEND _components "${_var}")
-  ELSEIF(_var MATCHES "(COMPILER|COMPILE_FLAGS|LINK_FLAGS|LIBRARIES|INCLUDE_PATH|INCLUDE_DIRS|LINKER_FLAGS)")
+  ELSEIF(_var MATCHES "(MPI_CXX_COMPILER|MPI_CXX_COMPILE_FLAGS|MPI_CXX_LINK_FLAGS)")
+    LIST(APPEND _features_config ${_var})
+  ELSEIF(_var MATCHES "(LIBRARIES|INCLUDE_PATH|INCLUDE_DIRS|LINKER_FLAGS)"
+         # Avoid a lot of Trilinos variables:
+         AND (NOT _var MATCHES "_TPL_|_MPI_") )
     LIST(APPEND _features_config ${_var})
   ENDIF()
 ENDFOREACH()

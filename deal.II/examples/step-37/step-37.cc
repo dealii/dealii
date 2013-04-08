@@ -98,54 +98,14 @@ namespace Step37
 
 
   // This is the new function mentioned above: Evaluate the coefficient for
-  // abstract type @p number: It might be just a usual double, but it can also
+  // abstract type @p number. It might be just a usual double, but it can also
   // be a somewhat more complicated type that we call VectorizedArray. This
-  // data type is essentially a short array of doubles whose length depends on
-  // the particular computer system in use. For example, systems based on
-  // x86-64 support the streaming SIMD extensions (SSE), where the processor's
-  // vector units can process two doubles (or four single-precision floats) by
-  // one CPU instruction. Newer processors with support for the so-called
-  // advanced vector extensions (AVX) with 256 bit operands can use four
-  // doubles and eight floats, respectively. Vectorization is a
-  // single-instruction/multiple-data (SIMD) concept, that is, one CPU
-  // instruction is used to process multiple data values at once. Often,
-  // finite element programs do not use vectorization explicitly as the
-  // benefits of this concept are only in arithmetic intensive operations. The
-  // bulk of typical finite element workloads are memory bandwidth limited
-  // (operations on sparse matrices and vectors) where the additional
-  // computational power is useless.
-  //
-  // Behind the scenes, optimized BLAS packages might heavily rely on
-  // vectorization, though. Also, optimizing compilers might automatically
-  // transform loops involving standard code into more efficient vectorized
-  // form. However, the data flow must be very regular in order for compilers
-  // to produce efficient code. For example, already the automatic
-  // vectorization of the prototype operation that benefits from
-  // vectorization, matrix-matrix products, fails on most compilers (as of
-  // writing this tutorial in early 2012, neither gcc-4.6 nor the Intel
-  // compiler v. 12 manage to produce useful vectorized code for the
-  // FullMatrix::mmult function, and not even on the simpler case where
-  // the matrix bounds are compile-time constants instead of run-time
-  // constants as in FullMatrix::mmult). The main reason for this is that the
-  // information to be processed at the innermost loop (that is where
-  // vectorization is applied) is not necessarily a multiple of the vector
-  // length, leaving parts of the resources unused. Moreover, the data that
-  // can potentially be processed together might not be laid out in a
-  // contiguous way in memory or not with the necessary alignment to address
-  // boundaries that are needed by the processor. Or the compiler might not be
-  // able to prove that.
-  //
-  // In the matrix-free implementation in deal.II, we have therefore chosen to
-  // apply vectorization at the level which is most appropriate for finite
-  // element computations: The cell-wise computations are typically exactly
-  // the same for all cells (except for reading from and writing to vectors),
-  // and hence SIMD can be used to process several cells at once. In all what
-  // follows, you can think of a VectorizedArray to hold data from several
-  // cells. For example, we evaluate the coefficient shown here not on a
-  // simple point as usually done, but we hand it a
-  // Point<dim,VectorizedArray<double> > point, which is actually a collection
-  // of two points in the case of SSE2. Do not confuse the entries in
-  // VectorizedArray<double> with the different coordinates of the
+  // data type is essentially a short array of doubles as discussed in the
+  // introduction that holds data from several cells. For example, we evaluate
+  // the coefficient shown here not on a simple point as usually done, but we
+  // hand it a Point<dim,VectorizedArray<double> > point, which is actually a
+  // collection of two points in the case of SSE2. Do not confuse the entries
+  // in VectorizedArray<double> with the different coordinates of the
   // point. Indeed, the data is laid out such that <code>p[0]</code> returns a
   // VectorizedArray<double>, which in turn contains the x-coordinate for the
   // first point and the second point. You may access the coordinates

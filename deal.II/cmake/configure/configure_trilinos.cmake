@@ -112,61 +112,64 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       SET(${var} FALSE)
     ENDIF()
 
+
     #
     # Some verions of Sacado_cmath.hpp does things that aren't compatible
     # with the -std=c++0x flag of GCC, see deal.II FAQ.
     # Test whether that is indeed the case
     #
-    SET(CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIRS})
-    PUSH_TEST_FLAG("${DEAL_II_CXX11_FLAG}")
+    IF(${var})
+      SET(CMAKE_REQUIRED_INCLUDES ${TRILINOS_INCLUDE_DIRS})
+      PUSH_TEST_FLAG("${DEAL_II_CXX11_FLAG}")
 
-    CHECK_CXX_SOURCE_COMPILES(
-      "
-      #include <Sacado_cmath.hpp>
-      int main(){ return 0; }
-      "
-      TRILINOS_SUPPORTS_CPP11)
-
-    IF(DEAL_II_CAN_USE_CXX11 AND NOT TRILINOS_SUPPORTS_CPP11)
-      #
-      # Try whether exporting HAS_C99_TR1_CMATH helps:
-      #
-      PUSH_TEST_FLAG("-DHAS_C99_TR1_CMATH")
       CHECK_CXX_SOURCE_COMPILES(
         "
         #include <Sacado_cmath.hpp>
         int main(){ return 0; }
         "
-        TRILINOS_HAS_C99_TR1_WORKAROUND)
-      POP_TEST_FLAG()
+        TRILINOS_SUPPORTS_CPP11)
 
-      IF(TRILINOS_HAS_C99_TR1_WORKAROUND)
-        LIST(APPEND DEAL_II_DEFINITIONS "HAS_C99_TR1_CMATH")
-        LIST(APPEND DEAL_II_USER_DEFINITIONS "HAS_C99_TR1_CMATH")
-      ELSE()
-        MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
-          "The installation is not compatible with the C++ standard selected for "
-          "this compiler."
-          )
-        SET(TRILINOS_ADDITIONAL_ERROR_STRING
-          ${TRILINOS_ADDITIONAL_ERROR_STRING}
-          "The Trilinos installation found at\n"
-          "  ${TRILINOS_DIR}\n"
-          "is not compatible with the C++ standard selected for\n"
-          "this compiler. See the deal.II FAQ page for a solution.\n\n"
-          )
-        SET(${var} FALSE)
+      IF(DEAL_II_CAN_USE_CXX11 AND NOT TRILINOS_SUPPORTS_CPP11)
+        #
+        # Try whether exporting HAS_C99_TR1_CMATH helps:
+        #
+        PUSH_TEST_FLAG("-DHAS_C99_TR1_CMATH")
+        CHECK_CXX_SOURCE_COMPILES(
+          "
+          #include <Sacado_cmath.hpp>
+          int main(){ return 0; }
+          "
+          TRILINOS_HAS_C99_TR1_WORKAROUND)
+        POP_TEST_FLAG()
+
+        IF(TRILINOS_HAS_C99_TR1_WORKAROUND)
+          LIST(APPEND DEAL_II_DEFINITIONS "HAS_C99_TR1_CMATH")
+          LIST(APPEND DEAL_II_USER_DEFINITIONS "HAS_C99_TR1_CMATH")
+        ELSE()
+          MESSAGE(STATUS "Could not find a sufficient Trilinos installation: "
+            "The installation is not compatible with the C++ standard selected for "
+            "this compiler."
+            )
+          SET(TRILINOS_ADDITIONAL_ERROR_STRING
+            ${TRILINOS_ADDITIONAL_ERROR_STRING}
+            "The Trilinos installation found at\n"
+            "  ${TRILINOS_DIR}\n"
+            "is not compatible with the C++ standard selected for\n"
+            "this compiler. See the deal.II FAQ page for a solution.\n\n"
+            )
+          SET(${var} FALSE)
+        ENDIF()
       ENDIF()
+
+      POP_TEST_FLAG()
+      SET(CMAKE_REQUIRED_INCLUDES)
+
+      #
+      # Remove the following variables from the cache to force a recheck:
+      #
+      UNSET(TRILINOS_SUPPORTS_CPP11 CACHE)
+      UNSET(TRILINOS_HAS_C99_TR1_WORKAROUND CACHE)
     ENDIF()
-
-    POP_TEST_FLAG()
-    SET(CMAKE_REQUIRED_INCLUDES)
-
-    #
-    # Remove the following variables from the cache to force a recheck:
-    #
-    UNSET(TRILINOS_SUPPORTS_CPP11 CACHE)
-    UNSET(TRILINOS_HAS_C99_TR1_WORKAROUND CACHE)
 
   ENDIF(TRILINOS_FOUND)
 ENDMACRO()
