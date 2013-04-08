@@ -718,10 +718,7 @@ namespace Step42
       constraints_hanging_nodes.close ();
 
       pcout << "   Number of active cells: "
-            << triangulation.n_active_cells()
-            << std::endl
-            << "   Total number of cells: "
-            << triangulation.n_cells()
+            << triangulation.n_global_active_cells()
             << std::endl
             << "   Number of degrees of freedom: "
             << dof_handler.n_dofs ()
