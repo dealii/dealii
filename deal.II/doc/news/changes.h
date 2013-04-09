@@ -88,6 +88,11 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: It is now possible to use the MeshWorker framework in 1d as well.
+<br>
+(Wolfgang Bangerth, Scott Miller, 2013/04/09)
+</li>
+
 <li> Fixed: It was not possible to create a default-constructed object of
 type Triangulation<1>::face_iterator. This is now fixed.
 <br>
