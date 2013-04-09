@@ -88,7 +88,13 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
-<li> Fixed: VectorTools::subtract_mean_value can now be called without a
+<li> Fixed: It was not possible to create a default-constructed object of
+type Triangulation<1>::face_iterator. This is now fixed.
+<br>
+(Wolfgang Bangerth, Scott Miller, 2013/04/09)
+</li>
+
+<li> New: VectorTools::subtract_mean_value can now be called without a
 boolean mask. The vector type is templatified and instantiated for all
 non distributed vectors.
 <br>
@@ -108,7 +114,7 @@ implementation also had the problem that it did not move vertices if the
 <i>cell</i> they were on was at the boundary, even if the <i>vertex</i>
 itself was not. All of these problems are now fixed.
 <br>
-(Wolfgang Bangerth, 2013/4/5)
+(Wolfgang Bangerth, 2013/04/05)
 </li>
 
 <li> New: There is a class VectorFunctionFromTensorFunction that converts
