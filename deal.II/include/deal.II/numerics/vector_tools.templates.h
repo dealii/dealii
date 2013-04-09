@@ -5641,10 +5641,6 @@ namespace VectorTools
   subtract_mean_value(VECTOR                  &v,
                       const std::vector<bool> &p_select)
   {
-    const unsigned int n = v.size();
-    Assert(p_select.size() == 0 || p_select.size() == n,
-           ExcDimensionMismatch(p_select.size(), n));
-
     if(p_select.size() == 0)
       {
         // In case of an empty boolean mask operate on the whole vector:
@@ -5652,6 +5648,21 @@ namespace VectorTools
       }
     else
       {
+        // This function is not implemented for distributed vectors, so
+        // if v is not a boring Vector or BlockVector:
+        Assert(   dynamic_cast<Vector<double> *>(& v)
+               || dynamic_cast<Vector<float> *>(& v)
+               || dynamic_cast<Vector<long double> *>(& v)
+               || dynamic_cast<BlockVector<double> *>(& v)
+               || dynamic_cast<BlockVector<float> *>(& v)
+               || dynamic_cast<BlockVector<long double> *>(& v),
+               ExcNotImplemented());
+
+        const unsigned int n = v.size();
+
+        Assert(p_select.size() == n,
+               ExcDimensionMismatch(p_select.size(), n));
+
         typename VECTOR::value_type s = 0.;
         unsigned int counter = 0;
         for (unsigned int i=0; i<n; ++i)

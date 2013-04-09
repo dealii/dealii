@@ -268,11 +268,11 @@ for (VEC : SERIAL_VECTORS ; deal_II_dimension : DIMENSIONS; deal_II_space_dimens
   }
 
 
-for (VEC : DEAL_II_VEC_TEMPLATES; real : REAL_SCALARS)
+for (VEC : SERIAL_VECTORS)
 {
     namespace VectorTools \{
       template
-        void subtract_mean_value(VEC<real> &, const std::vector<bool> &);
+        void subtract_mean_value(VEC &, const std::vector<bool> &);
     \}
 }
 
