@@ -29,7 +29,7 @@ MACRO(FEATURE_P4EST_FIND_EXTERNAL var)
       MESSAGE(STATUS "Insufficient p4est installation found: "
         "p4est has to be configured with MPI enabled."
         )
-      SET(HDF5_ADDITIONAL_ERROR_STRING
+      SET(P4EST_ADDITIONAL_ERROR_STRING
         "Insufficient p4est installation found!\n"
         "p4est has to be configured with MPI enabled.\n"
         )
