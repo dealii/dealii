@@ -28,6 +28,7 @@ SET(_src
   dof_output_operator.cc
   error_estimator.cc
   fe_field_function.cc
+  matrix_tools.cc
   histogram.cc
   point_value_history.cc
   solution_transfer.cc
@@ -46,6 +47,7 @@ SET(_inst
   dof_output_operator.inst.in
   error_estimator.inst.in
   fe_field_function.inst.in
+  matrix_tools.inst.in
   point_value_history.inst.in
   solution_transfer.inst.in
   time_dependent.inst.in
