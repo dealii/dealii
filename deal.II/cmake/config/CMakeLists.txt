@@ -66,7 +66,6 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     ENDIF()
   ENDIF()
 
-
   #
   # Get library name directly from the target:
   #
@@ -148,7 +147,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   #
   # Transform some cmake lists into a string that the old Makefile
   # mechanism actually understands:
-
+  #
   TO_STRING_AND_ADD_PREFIX(MAKEFILE_INCLUDE_DIRS "${CMAKE_INCLUDE_FLAG_CXX}"
     $(D)/${DEAL_II_INCLUDE_RELDIR}
     $(D)/${DEAL_II_INCLUDE_RELDIR}/deal.II
@@ -164,16 +163,27 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
       ${DEAL_II_USER_DEFINITIONS_${build}}
       )
 
-    TO_STRING(MAKEFILE_TARGETS_${build}
-        $(D)/${DEAL_II_LIBRARY_RELDIR}/${CONFIG_LIBRARY_${build}}
+    #
+    # Ideally, DEAL_II_EXTERNAL_LIBRARIES should just contain a list of
+    # full library paths. Nevertheless, filter out all elements that are
+    # not a full path starting with "/".
+    #
+    SET(_libs)
+    FOREACH(_lib
         ${DEAL_II_EXTERNAL_LIBRARIES}
         ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
         )
+      IF(_lib MATCHES "^/")
+        LIST(APPEND _libs "${_lib}")
+      ENDIF()
+    ENDFOREACH()
 
-    #
-    # TODO: Come up with an idea how to get the link line directly from
-    # CMake...
-    #
+    TO_STRING(MAKEFILE_TARGETS_${build}
+        $(D)/${DEAL_II_LIBRARY_RELDIR}/${CONFIG_LIBRARY_${build}}
+        ${_libs}
+        )
+
+    SET(_paths)
     FOREACH(_lib
         $(D)/${DEAL_II_LIBRARY_RELDIR}/${CONFIG_LIBRARY_${build}}
         ${DEAL_II_EXTERNAL_LIBRARIES}
@@ -181,13 +191,24 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
         )
       LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
       #
-      # Add an rpath directive for each library:
+      # Extract library paths where possible:
       #
-      GET_FILENAME_COMPONENT(_path ${_lib} PATH)
-      LIST(APPEND MAKEFILE_LIBS_${build} "-Wl,-rpath,${_path}")
+      IF(_lib MATCHES "^(/|\\$\\(D\\))")
+        GET_FILENAME_COMPONENT(_path ${_lib} PATH)
+        LIST(APPEND _paths ${_path})
+      ENDIF()
     ENDFOREACH()
 
-    TO_STRING(MAKEFILE_LIBS_${build} ${MAKEFILE_LIBS_${build}})
+    #
+    # And build up an rpath:
+    #
+    SET(_rpath "")
+    LIST(REMOVE_DUPLICATES _paths)
+    FOREACH(_path ${_paths})
+      SET(_rpath "${_rpath} -Wl,-rpath,${_path}")
+    ENDFOREACH()
+
+    TO_STRING(MAKEFILE_LIBS_${build} ${MAKEFILE_LIBS_${build}} ${_rpath})
 
     #
     # Set up our linker flags:

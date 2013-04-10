@@ -19,6 +19,13 @@ FILE(GLOB _header
   )
 
 SET(_src
+  operator.cc
+  timestep_control.cc
   )
 
-DEAL_II_ADD_LIBRARY(obj_algorithms OBJECT ${_src} ${_header})
+SET(_inst
+  operator.inst.in
+  )
+
+DEAL_II_ADD_LIBRARY(obj_algorithms OBJECT ${_src} ${_header} ${_inst})
+EXPAND_INSTANTIATIONS(obj_algorithms "${_inst}")

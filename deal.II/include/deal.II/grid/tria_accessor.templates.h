@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2042,16 +2042,22 @@ TriaAccessor (const Triangulation<1,spacedim> *tria,
 template <int spacedim>
 inline
 TriaAccessor<0, 1, spacedim>::
-TriaAccessor (const Triangulation<1,spacedim> *,
-              const int,
-              const int,
+TriaAccessor (const Triangulation<1,spacedim> *tria,
+              const int level,
+              const int index,
               const AccessorData *)
   :
-  tria (0),
+  tria (tria),
   vertex_kind (interior_vertex),
   global_vertex_index (numbers::invalid_unsigned_int)
 {
-  Assert (false, ExcInternalError());
+  // in general, calling this constructor should yield an error -- users should
+  // instead call the one immediately above. however, if you create something
+  // like Triangulation<1>::face_iterator() then this calls the default constructor
+  // of the iterator which calls the accessor with argument list (0,-2,-2,0), so
+  // in this particular case accept this call and create an object that corresponds
+  // to the default constructed (invalid) vertex accessor
+  Assert ((level == -2) && (index == -2), ExcInternalError());
 }
 
 

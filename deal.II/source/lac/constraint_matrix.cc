@@ -127,15 +127,11 @@ ConstraintMatrix::add_entries
   ConstraintLine *line_ptr = &lines[lines_cache[calculate_line_index(line)]];
   Assert (line_ptr->line == line, ExcInternalError());
 
-  // if in debug mode, check whether an
-  // entry for this column already
-  // exists and if its the same as
-  // the one entered at present
+  // if in debug mode, check whether an entry for this column already
+  // exists and if its the same as the one entered at present
   //
-  // in any case: skip this entry if
-  // an entry for this column already
-  // exists, since we don't want to
-  // enter it twice
+  // in any case: skip this entry if an entry for this column already
+  // exists, since we don't want to enter it twice
   for (std::vector<std::pair<size_type,double> >::const_iterator
        col_val_pair = col_val_pairs.begin();
        col_val_pair!=col_val_pairs.end(); ++col_val_pair)
@@ -148,8 +144,7 @@ ConstraintMatrix::add_entries
            p != line_ptr->entries.end(); ++p)
         if (p->first == col_val_pair->first)
           {
-            // entry exists, break
-            // innermost loop
+            // entry exists, break innermost loop
             Assert (p->second == col_val_pair->second,
                     ExcEntryAlreadyExists(line, col_val_pair->first,
                                           p->second, col_val_pair->second));
@@ -195,10 +190,8 @@ void ConstraintMatrix::close ()
   // sort the lines
   std::sort (lines.begin(), lines.end());
 
-  // update list of pointers and give the
-  // vector a sharp size since we won't
-  // modify the size any more after this
-  // point.
+  // update list of pointers and give the vector a sharp size since we
+  // won't modify the size any more after this point.
   {
     std::vector<size_type> new_lines (lines_cache.size(),
                                          numbers::invalid_size_type);
@@ -209,24 +202,18 @@ void ConstraintMatrix::close ()
     std::swap (lines_cache, new_lines);
   }
 
-  // in debug mode: check whether we really
-  // set the pointers correctly.
+  // in debug mode: check whether we really set the pointers correctly.
   for (size_type i=0; i<lines_cache.size(); ++i)
     if (lines_cache[i] != numbers::invalid_size_type)
       Assert (i == calculate_line_index(lines[lines_cache[i]].line),
               ExcInternalError());
 
-  // first, strip zero entries, as we
-  // have to do that only once
+  // first, strip zero entries, as we have to do that only once
   for (std::vector<ConstraintLine>::iterator line = lines.begin();
        line!=lines.end(); ++line)
-    // first remove zero
-    // entries. that would mean that
-    // in the linear constraint for a
-    // node, x_i = ax_1 + bx_2 + ...,
-    // another node times 0
-    // appears. obviously,
-    // 0*something can be omitted
+    // first remove zero entries. that would mean that in the linear
+    // constraint for a node, x_i = ax_1 + bx_2 + ..., another node times 0
+    // appears. obviously, 0*something can be omitted
     line->entries.erase (std::remove_if (line->entries.begin(),
                                          line->entries.end(),
                                          &check_zero_weight),
@@ -253,31 +240,18 @@ void ConstraintMatrix::close ()
     }
 #endif
 
-  // replace references to dofs that
-  // are themselves constrained. note
-  // that because we may replace
-  // references to other dofs that
-  // may themselves be constrained to
-  // third ones, we have to iterate
-  // over all this until we replace
-  // no chains of constraints any
-  // more
+  // replace references to dofs that are themselves constrained. note that
+  // because we may replace references to other dofs that may themselves be
+  // constrained to third ones, we have to iterate over all this until we
+  // replace no chains of constraints any more
   //
-  // the iteration replaces
-  // references to constrained
-  // degrees of freedom by
-  // second-order references. for
-  // example if x3=x0/2+x2/2 and
-  // x2=x0/2+x1/2, then the new list
-  // will be x3=x0/2+x0/4+x1/4. note
-  // that x0 appear twice. we will
-  // throw this duplicate out in the
-  // following step, where we sort
-  // the list so that throwing out
-  // duplicates becomes much more
-  // efficient. also, we have to do
-  // it only once, rather than in
-  // each iteration
+  // the iteration replaces references to constrained degrees of freedom by
+  // second-order references. for example if x3=x0/2+x2/2 and x2=x0/2+x1/2,
+  // then the new list will be x3=x0/2+x0/4+x1/4. note that x0 appear
+  // twice. we will throw this duplicate out in the following step, where
+  // we sort the list so that throwing out duplicates becomes much more
+  // efficient. also, we have to do it only once, rather than in each
+  // iteration
   size_type iteration = 0;
   while (true)
     {
@@ -292,18 +266,10 @@ void ConstraintMatrix::close ()
           size_type n_replacements = 0;
 #endif
 
-
-
-          // loop over all entries of
-          // this line (including
-          // ones that we have
-          // appended in this go
-          // around) and see whether
-          // they are further
-          // constrained. ignore
-          // elements that we don't
-          // store on the current
-          // processor
+          // loop over all entries of this line (including ones that we
+          // have appended in this go around) and see whether they are
+          // further constrained. ignore elements that we don't store on
+          // the current processor
           size_type entry = 0;
           while (entry < line->entries.size())
             if (((local_lines.size() == 0)
@@ -312,14 +278,10 @@ void ConstraintMatrix::close ()
                 &&
                 is_constrained (line->entries[entry].first))
               {
-                // ok, this entry is
-                // further
-                // constrained:
+                // ok, this entry is further constrained:
                 chained_constraint_replaced = true;
 
-                // look up the chain
-                // of constraints for
-                // this entry
+                // look up the chain of constraints for this entry
                 const size_type  dof_index = line->entries[entry].first;
                 const double     weight = line->entries[entry].second;
 
@@ -331,28 +293,13 @@ void ConstraintMatrix::close ()
                 Assert (constrained_line->line == dof_index,
                         ExcInternalError());
 
-                // now we have to
-                // replace an entry
-                // by its
-                // expansion. we do
-                // that by
-                // overwriting the
-                // entry by the first
-                // entry of the
-                // expansion and
-                // adding the
-                // remaining ones to
-                // the end, where we
-                // will later process
-                // them once more
+                // now we have to replace an entry by its expansion. we do
+                // that by overwriting the entry by the first entry of the
+                // expansion and adding the remaining ones to the end,
+                // where we will later process them once more
                 //
-                // we can of course
-                // only do that if
-                // the DoF that we
-                // are currently
-                // handle is
-                // constrained by a
-                // linear combination
+                // we can of course only do that if the DoF that we are
+                // currently handle is constrained by a linear combination
                 // of other dofs:
                 if (constrained_line->entries.size() > 0)
                   {
@@ -360,10 +307,8 @@ void ConstraintMatrix::close ()
                       Assert (dof_index != constrained_line->entries[i].first,
                               ExcMessage ("Cycle in constraints detected!"));
 
-                    // replace first
-                    // entry, then tack
-                    // the rest to the
-                    // end of the list
+                    // replace first entry, then tack the rest to the end
+                    // of the list
                     line->entries[entry] =
                       std::make_pair (constrained_line->entries[0].first,
                                       constrained_line->entries[0].second *
@@ -376,8 +321,9 @@ void ConstraintMatrix::close ()
                                                   weight));
 
 #ifdef DEBUG
-                    // keep track of how many entries we replace in this line. If we do more than
-                    // there are constraints or dofs in our system, we must have a cycle.
+                    // keep track of how many entries we replace in this
+                    // line. If we do more than there are constraints or
+                    // dofs in our system, we must have a cycle.
                     ++n_replacements;
                     Assert(n_replacements/2<largest_idx, ExcMessage("Cycle in constraints detected!"));
                     if (n_replacements/2>=largest_idx)
@@ -385,18 +331,11 @@ void ConstraintMatrix::close ()
 #endif
                   }
                 else
-                  // the DoF that we
-                  // encountered is not
-                  // constrained by a linear
-                  // combination of other
-                  // dofs but is equal to
-                  // just the inhomogeneity
-                  // (i.e. its chain of
-                  // entries is empty). in
-                  // that case, we can't just
-                  // overwrite the current
-                  // entry, but we have to
-                  // actually eliminate it
+                  // the DoF that we encountered is not constrained by a
+                  // linear combination of other dofs but is equal to just
+                  // the inhomogeneity (i.e. its chain of entries is
+                  // empty). in that case, we can't just overwrite the
+                  // current entry, but we have to actually eliminate it
                   {
                     line->entries.erase (line->entries.begin()+entry);
                   }
@@ -404,60 +343,41 @@ void ConstraintMatrix::close ()
                 line->inhomogeneity += constrained_line->inhomogeneity *
                                        weight;
 
-                // now that we're here, do
-                // not increase index by
-                // one but rather make
-                // another pass for the
-                // present entry because we
-                // have replaced the
-                // present entry by another
-                // one, or because we have
-                // deleted it and shifted
-                // all following ones one
-                // forward
+                // now that we're here, do not increase index by one but
+                // rather make another pass for the present entry because
+                // we have replaced the present entry by another one, or
+                // because we have deleted it and shifted all following
+                // ones one forward
               }
             else
-              // entry not further
-              // constrained. just move
-              // ahead by one
+              // entry not further constrained. just move ahead by one
               ++entry;
         }
 
-      // if we didn't do anything in
-      // this round, then quit the
-      // loop
+      // if we didn't do anything in this round, then quit the loop
       if (chained_constraint_replaced == false)
         break;
 
-      // increase iteration count. note
-      // that we should not iterate more
-      // times than there are constraints,
-      // since this puts a natural upper
-      // bound on the length of constraint
-      // chains
+      // increase iteration count. note that we should not iterate more
+      // times than there are constraints, since this puts a natural upper
+      // bound on the length of constraint chains
       ++iteration;
       Assert (iteration <= lines.size(), ExcInternalError());
     }
 
-  // finally sort the entries and re-scale
-  // them if necessary. in this step, we also
-  // throw out duplicates as mentioned
-  // above. moreover, as some entries might
-  // have had zero weights, we replace them
-  // by a vector with sharp sizes.
+  // finally sort the entries and re-scale them if necessary. in this step,
+  // we also throw out duplicates as mentioned above. moreover, as some
+  // entries might have had zero weights, we replace them by a vector with
+  // sharp sizes.
   for (std::vector<ConstraintLine>::iterator line = lines.begin();
        line!=lines.end(); ++line)
     {
       std::sort (line->entries.begin(), line->entries.end());
 
-      // loop over the now sorted list and
-      // see whether any of the entries
-      // references the same dofs more than
-      // once in order to find how many
-      // non-duplicate entries we have. This
-      // lets us allocate the correct amount
-      // of memory for the constraint
-      // entries.
+      // loop over the now sorted list and see whether any of the entries
+      // references the same dofs more than once in order to find how many
+      // non-duplicate entries we have. This lets us allocate the correct
+      // amount of memory for the constraint entries.
       size_type duplicates = 0;
       for (size_type i=1; i<line->entries.size(); ++i)
         if (line->entries[i].first == line->entries[i-1].first)
@@ -467,16 +387,13 @@ void ConstraintMatrix::close ()
         {
           ConstraintLine::Entries new_entries;
 
-          // if we have no duplicates, copy
-          // verbatim the entries. this
-          // way, the final size is of the
-          // vector is correct.
+          // if we have no duplicates, copy verbatim the entries. this way,
+          // the final size is of the vector is correct.
           if (duplicates == 0)
             new_entries = line->entries;
           else
             {
-              // otherwise, we need to go
-              // through the list by and and
+              // otherwise, we need to go through the list by and and
               // resolve the duplicates
               new_entries.reserve (line->entries.size() - duplicates);
               new_entries.push_back(line->entries[0]);
@@ -493,10 +410,8 @@ void ConstraintMatrix::close ()
               Assert (new_entries.size() == line->entries.size() - duplicates,
                       ExcInternalError());
 
-              // make sure there are
-              // really no duplicates
-              // left and that the list
-              // is still sorted
+              // make sure there are really no duplicates left and that the
+              // list is still sorted
               for (size_type j=1; j<new_entries.size(); ++j)
                 {
                   Assert (new_entries[j].first != new_entries[j-1].first,
@@ -506,38 +421,20 @@ void ConstraintMatrix::close ()
                 }
             }
 
-          // replace old list of
-          // constraints for this dof by
-          // the new one
+          // replace old list of constraints for this dof by the new one
           line->entries.swap (new_entries);
         }
 
-      // finally do the following
-      // check: if the sum of
-      // weights for the
-      // constraints is close to
-      // one, but not exactly
-      // one, then rescale all
-      // the weights so that they
-      // sum up to 1. this adds a
-      // little numerical
-      // stability and avoids all
-      // sorts of problems where
-      // the actual value is
-      // close to, but not quite
-      // what we expected
+      // finally do the following check: if the sum of weights for the
+      // constraints is close to one, but not exactly one, then rescale all
+      // the weights so that they sum up to 1. this adds a little numerical
+      // stability and avoids all sorts of problems where the actual value
+      // is close to, but not quite what we expected
       //
-      // the case where the
-      // weights don't quite sum
-      // up happens when we
-      // compute the
-      // interpolation weights
-      // "on the fly", i.e. not
-      // from precomputed
-      // tables. in this case,
-      // the interpolation
-      // weights are also subject
-      // to round-off
+      // the case where the weights don't quite sum up happens when we
+      // compute the interpolation weights "on the fly", i.e. not from
+      // precomputed tables. in this case, the interpolation weights are
+      // also subject to round-off
       double sum = 0;
       for (size_type i=0; i<line->entries.size(); ++i)
         sum += line->entries[i].second;
@@ -550,11 +447,9 @@ void ConstraintMatrix::close ()
     } // end of loop over all constraint lines
 
 #ifdef DEBUG
-  // if in debug mode: check that no dof is
-  // constrained to another dof that is also
-  // constrained. exclude dofs from this
-  // check whose constraint lines are not
-  // stored on the local processor
+  // if in debug mode: check that no dof is constrained to another dof that
+  // is also constrained. exclude dofs from this check whose constraint
+  // lines are not stored on the local processor
   for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
        line!=lines.end(); ++line)
     for (ConstraintLine::Entries::const_iterator
@@ -564,8 +459,7 @@ void ConstraintMatrix::close ()
           ||
           (local_lines.is_element(entry->first)))
         {
-          // make sure that entry->first is
-          // not the index of a line itself
+          // make sure that entry->first is not the index of a line itself
           const bool is_circle = is_constrained(entry->first);
           Assert (is_circle == false,
                   ExcDoFConstrainedToConstrainedDoF(line->line, entry->first));
@@ -584,8 +478,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
   AssertThrow(local_lines == other_constraints.local_lines,
               ExcNotImplemented());
 
-  // store the previous state with
-  // respect to sorting
+  // store the previous state with respect to sorting
   const bool object_was_sorted = sorted;
   sorted = false;
 
@@ -593,21 +486,14 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
     lines_cache.resize(other_constraints.lines_cache.size(),
                        numbers::invalid_size_type);
 
-  // first action is to fold into the present
-  // object possible constraints in the
-  // second object. we don't strictly need to
-  // do this any more since the
-  // ConstraintMatrix has learned to deal
-  // with chains of constraints in the
-  // close() function, but we have
-  // traditionally done this and it's not
+  // first action is to fold into the present object possible constraints
+  // in the second object. we don't strictly need to do this any more since
+  // the ConstraintMatrix has learned to deal with chains of constraints in
+  // the close() function, but we have traditionally done this and it's not
   // overly hard to do.
   //
-  // for this, loop over all
-  // constraints and replace the
-  // constraint lines with a new one
-  // where constraints are replaced
-  // if necessary.
+  // for this, loop over all constraints and replace the constraint lines
+  // with a new one where constraints are replaced if necessary.
   ConstraintLine::Entries tmp;
   for (std::vector<ConstraintLine>::iterator line=lines.begin();
        line!=lines.end(); ++line)
@@ -615,10 +501,8 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
       tmp.clear ();
       for (size_type i=0; i<line->entries.size(); ++i)
         {
-          // if the present dof is not
-          // constrained, or if we won't take
-          // the constraint from the other
-          // object, then simply copy it over
+          // if the present dof is not constrained, or if we won't take the
+          // constraint from the other object, then simply copy it over
           if (other_constraints.is_constrained(line->entries[i].first) == false
               ||
               ((merge_conflict_behavior != right_object_wins)
@@ -628,14 +512,9 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
                this->is_constrained(line->entries[i].first)))
             tmp.push_back(line->entries[i]);
           else
-            // otherwise resolve
-            // further constraints by
-            // replacing the old
-            // entry by a sequence of
-            // new entries taken from
-            // the other object, but
-            // with multiplied
-            // weights
+            // otherwise resolve further constraints by replacing the old
+            // entry by a sequence of new entries taken from the other
+            // object, but with multiplied weights
             {
               const ConstraintLine::Entries *other_line
                 = other_constraints.get_constraint_entries (line->entries[i].first);
@@ -653,15 +532,13 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
                                      weight;
             }
         }
-      // finally exchange old and
-      // newly resolved line
+      // finally exchange old and newly resolved line
       line->entries.swap (tmp);
     }
 
 
 
-  // next action: append those lines at the
-  // end that we want to add
+  // next action: append those lines at the end that we want to add
   for (std::vector<ConstraintLine>::const_iterator
        line=other_constraints.lines.begin();
        line!=other_constraints.lines.end(); ++line)
@@ -669,10 +546,8 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
       lines.push_back (*line);
     else
       {
-        // the constrained dof we want to
-        // copy from the other object is also
-        // constrained here. let's see what
-        // we should do with that
+        // the constrained dof we want to copy from the other object is
+        // also constrained here. let's see what we should do with that
         switch (merge_conflict_behavior)
           {
           case no_conflicts_allowed:
@@ -685,10 +560,8 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
             break;
 
           case right_object_wins:
-            // we need to replace the
-            // existing constraint by
-            // the one from the other
-            // object
+            // we need to replace the existing constraint by the one from
+            // the other object
             lines[lines_cache[calculate_line_index(line->line)]].entries
               = line->entries;
             lines[lines_cache[calculate_line_index(line->line)]].inhomogeneity
@@ -706,11 +579,8 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
        line!=lines.end(); ++line, ++counter)
     lines_cache[calculate_line_index(line->line)] = counter;
 
-  // if the object was sorted before,
-  // then make sure it is so
-  // afterward as well. otherwise
-  // leave everything in the unsorted
-  // state
+  // if the object was sorted before, then make sure it is so afterward as
+  // well. otherwise leave everything in the unsorted state
   if (object_was_sorted == true)
     close ();
 }
@@ -770,11 +640,8 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
   Assert (uncondensed.is_compressed() == true, ExcMatrixNotClosed());
   Assert (uncondensed.n_rows() == uncondensed.n_cols(), ExcNotQuadratic());
 
-
-  // store for each line of the matrix
-  // its new line number
-  // after compression. If the shift is
-  // -1, this line will be condensed away
+  // store for each line of the matrix its new line number after
+  // compression. If the shift is -1, this line will be condensed away
   std::vector<int> new_line;
 
   new_line.reserve (uncondensed.n_rows());
@@ -797,8 +664,7 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
           ++shift;
           ++next_constraint;
           if (next_constraint == lines.end())
-            // nothing more to do; finish rest
-            // of loop
+            // nothing more to do; finish rest of loop
             {
               for (size_type i=row+1; i<n_rows; ++i)
                 new_line.push_back (i-shift);
@@ -872,13 +738,10 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
   Assert (sparsity.is_compressed() == false, ExcMatrixIsClosed());
   Assert (sparsity.n_rows() == sparsity.n_cols(), ExcNotQuadratic());
 
-  // store for each index whether it must be
-  // distributed or not. If entry is
-  // numbers::invalid_size_type,
-  // no distribution is necessary.
-  // otherwise, the number states which line
-  // in the constraint matrix handles this
-  // index
+  // store for each index whether it must be distributed or not. If entry
+  // is numbers::invalid_unsigned_int, no distribution is necessary.
+  // otherwise, the number states which line in the constraint matrix
+  // handles this index
   std::vector<size_type> distribute(sparsity.n_rows(),
                                     numbers::invalid_size_type);
 
@@ -910,11 +773,8 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
 
               if (distribute[column] != numbers::invalid_size_type)
                 {
-                  // distribute entry
-                  // at regular row
-                  // @p{row} and
-                  // irregular column
-                  // sparsity.colnums[j]
+                  // distribute entry at regular row @p{row} and irregular
+                  // column sparsity.colnums[j]
                   for (size_type q=0;
                        q!=lines[distribute[column]].entries.size();
                        ++q)
@@ -924,27 +784,23 @@ void ConstraintMatrix::condense (SparsityPattern &sparsity) const
             }
         }
       else
-        // row must be
-        // distributed. note that
-        // here the present row is
-        // not touched (unlike above)
+        // row must be distributed. note that here the present row is not
+        // touched (unlike above)
         {
           for (SparsityPattern::iterator entry = sparsity.begin(row);
                (entry != sparsity.end(row)) && entry->is_valid_entry(); ++entry)
             {
               const size_type column = entry->column();
               if (distribute[column] == numbers::invalid_size_type)
-                // distribute entry at irregular
-                // row @p{row} and regular column
-                // sparsity.colnums[j]
+                // distribute entry at irregular row @p{row} and regular
+                // column sparsity.colnums[j]
                 for (size_type q=0;
                      q!=lines[distribute[row]].entries.size(); ++q)
                   sparsity.add (lines[distribute[row]].entries[q].first,
                                 column);
               else
-                // distribute entry at irregular
-                // row @p{row} and irregular column
-                // sparsity.get_column_numbers()[j]
+                // distribute entry at irregular row @p{row} and irregular
+                // column sparsity.get_column_numbers()[j]
                 for (size_type p=0; p!=lines[distribute[row]].entries.size(); ++p)
                   for (size_type q=0;
                        q!=lines[distribute[column]].entries.size(); ++q)
@@ -965,13 +821,10 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
   Assert (sparsity.n_rows() == sparsity.n_cols(),
           ExcNotQuadratic());
 
-  // store for each index whether it must be
-  // distributed or not. If entry is
-  // numbers::invalid_size_type,
-  // no distribution is necessary.
-  // otherwise, the number states which line
-  // in the constraint matrix handles this
-  // index
+  // store for each index whether it must be distributed or not. If entry
+  // is numbers::invalid_unsigned_int, no distribution is necessary.
+  // otherwise, the number states which line in the constraint matrix
+  // handles this index
   std::vector<size_type> distribute(sparsity.n_rows(),
                                     numbers::invalid_size_type);
 
@@ -982,70 +835,30 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
   for (size_type row=0; row<n_rows; ++row)
     {
       if (distribute[row] == numbers::invalid_size_type)
-        // regular line. loop over
-        // cols. note that as we
-        // proceed to distribute
-        // cols, the loop may get
-        // longer
+        // regular line. loop over cols. note that as we proceed to
+        // distribute cols, the loop may get longer
         for (size_type j=0; j<sparsity.row_length(row); ++j)
           {
             const size_type column = sparsity.column_number(row,j);
 
             if (distribute[column] != numbers::invalid_size_type)
               {
-                // distribute entry
-                // at regular row
-                // @p{row} and
-                // irregular column
-                // column. note that
-                // this changes the
-                // line we are
-                // presently working
-                // on: we add
-                // additional
-                // entries. if we add
-                // another entry at a
-                // column behind the
-                // present one, we
-                // will encounter it
-                // later on (but
-                // since it can't be
-                // further
-                // constrained, won't
-                // have to do
-                // anything about
-                // it). if we add it
-                // up front of the
-                // present column, we
-                // will find the
-                // present column
-                // later on again as
-                // it was shifted
-                // back (again
-                // nothing happens,
-                // in particular no
-                // endless loop, as
-                // when we encounter
-                // it the second time
-                // we won't be able
-                // to add more
-                // entries as they
-                // all already exist,
-                // but we do the same
-                // work more often
-                // than necessary,
-                // and the loop gets
-                // longer), so move
-                // the cursor one to
-                // the right in the
-                // case that we add
-                // an entry up front
-                // that did not exist
-                // before. check
-                // whether it existed
-                // before by tracking
-                // the length of this
-                // row
+                // distribute entry at regular row @p{row} and irregular
+                // column column. note that this changes the line we are
+                // presently working on: we add additional entries. if we
+                // add another entry at a column behind the present one, we
+                // will encounter it later on (but since it can't be
+                // further constrained, won't have to do anything about
+                // it). if we add it up front of the present column, we
+                // will find the present column later on again as it was
+                // shifted back (again nothing happens, in particular no
+                // endless loop, as when we encounter it the second time we
+                // won't be able to add more entries as they all already
+                // exist, but we do the same work more often than
+                // necessary, and the loop gets longer), so move the cursor
+                // one to the right in the case that we add an entry up
+                // front that did not exist before. check whether it
+                // existed before by tracking the length of this row
                 size_type old_rowlength = sparsity.row_length(row);
                 for (size_type q=0;
                      q!=lines[distribute[column]].entries.size();
@@ -1070,17 +883,15 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
             const size_type column = sparsity.column_number(row,j);
 
             if (distribute[column] == numbers::invalid_size_type)
-              // distribute entry at irregular
-              // row @p{row} and regular column
-              // sparsity.colnums[j]
+              // distribute entry at irregular row @p{row} and regular
+              // column sparsity.colnums[j]
               for (size_type q=0;
                    q!=lines[distribute[row]].entries.size(); ++q)
                 sparsity.add (lines[distribute[row]].entries[q].first,
                               column);
             else
-              // distribute entry at irregular
-              // row @p{row} and irregular column
-              // sparsity.get_column_numbers()[j]
+              // distribute entry at irregular row @p{row} and irregular
+              // column sparsity.get_column_numbers()[j]
               for (size_type p=0; p!=lines[distribute[row]].entries.size(); ++p)
                 for (size_type q=0;
                      q!=lines[distribute[sparsity.column_number(row,j)]]
@@ -1100,13 +911,10 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
   Assert (sparsity.n_rows() == sparsity.n_cols(),
           ExcNotQuadratic());
 
-  // store for each index whether it must be
-  // distributed or not. If entry is
-  // numbers::invalid_size_type,
-  // no distribution is necessary.
-  // otherwise, the number states which line
-  // in the constraint matrix handles this
-  // index
+  // store for each index whether it must be distributed or not. If entry
+  // is numbers::invalid_unsigned_int, no distribution is necessary.
+  // otherwise, the number states which line in the constraint matrix
+  // handles this index
   std::vector<size_type> distribute(sparsity.n_rows(),
                                     numbers::invalid_size_type);
 
@@ -1118,10 +926,8 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
     {
       if (distribute[row] == numbers::invalid_size_type)
         {
-          // regular line. loop over
-          // cols. note that as we proceed to
-          // distribute cols, the loop may
-          // get longer
+          // regular line. loop over cols. note that as we proceed to
+          // distribute cols, the loop may get longer
           CompressedSetSparsityPattern::row_iterator col_num = sparsity.row_begin (row);
 
           for (; col_num != sparsity.row_end (row); ++col_num)
@@ -1153,17 +959,15 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
               const size_type column = *col_num;
 
               if (distribute[column] == numbers::invalid_size_type)
-                // distribute entry at irregular
-                // row @p{row} and regular column
-                // sparsity.colnums[j]
+                // distribute entry at irregular row @p{row} and regular
+                // column sparsity.colnums[j]
                 for (size_type q=0;
                      q!=lines[distribute[row]].entries.size(); ++q)
                   sparsity.add (lines[distribute[row]].entries[q].first,
                                 column);
               else
-                // distribute entry at irregular
-                // row @p{row} and irregular column
-                // sparsity.get_column_numbers()[j]
+                // distribute entry at irregular row @p{row} and irregular
+                // column sparsity.get_column_numbers()[j]
                 for (size_type p=0; p!=lines[distribute[row]].entries.size(); ++p)
                   for (size_type q=0;
                        q!=lines[distribute[column]]
@@ -1184,13 +988,10 @@ void ConstraintMatrix::condense (CompressedSimpleSparsityPattern &sparsity) cons
   Assert (sparsity.n_rows() == sparsity.n_cols(),
           ExcNotQuadratic());
 
-  // store for each index whether it must be
-  // distributed or not. If entry is
-  // numbers::invalid_size_type,
-  // no distribution is necessary.
-  // otherwise, the number states which line
-  // in the constraint matrix handles this
-  // index
+  // store for each index whether it must be distributed or not. If entry
+  // is numbers::invalid_unsigned_int, no distribution is necessary.
+  // otherwise, the number states which line in the constraint matrix
+  // handles this index
   std::vector<size_type> distribute(sparsity.n_rows(),
                                        numbers::invalid_size_type);
 
@@ -1201,70 +1002,30 @@ void ConstraintMatrix::condense (CompressedSimpleSparsityPattern &sparsity) cons
   for (size_type row=0; row<n_rows; ++row)
     {
       if (distribute[row] == numbers::invalid_size_type)
-        // regular line. loop over
-        // cols. note that as we
-        // proceed to distribute
-        // cols, the loop may get
-        // longer
+        // regular line. loop over cols. note that as we proceed to
+        // distribute cols, the loop may get longer
         for (size_type j=0; j<sparsity.row_length(row); ++j)
           {
             const size_type column = sparsity.column_number(row,j);
 
             if (distribute[column] != numbers::invalid_size_type)
               {
-                // distribute entry
-                // at regular row
-                // @p{row} and
-                // irregular column
-                // column. note that
-                // this changes the
-                // line we are
-                // presently working
-                // on: we add
-                // additional
-                // entries. if we add
-                // another entry at a
-                // column behind the
-                // present one, we
-                // will encounter it
-                // later on (but
-                // since it can't be
-                // further
-                // constrained, won't
-                // have to do
-                // anything about
-                // it). if we add it
-                // up front of the
-                // present column, we
-                // will find the
-                // present column
-                // later on again as
-                // it was shifted
-                // back (again
-                // nothing happens,
-                // in particular no
-                // endless loop, as
-                // when we encounter
-                // it the second time
-                // we won't be able
-                // to add more
-                // entries as they
-                // all already exist,
-                // but we do the same
-                // work more often
-                // than necessary,
-                // and the loop gets
-                // longer), so move
-                // the cursor one to
-                // the right in the
-                // case that we add
-                // an entry up front
-                // that did not exist
-                // before. check
-                // whether it existed
-                // before by tracking
-                // the length of this
-                // row
+                // distribute entry at regular row @p{row} and irregular
+                // column column. note that this changes the line we are
+                // presently working on: we add additional entries. if we
+                // add another entry at a column behind the present one, we
+                // will encounter it later on (but since it can't be
+                // further constrained, won't have to do anything about
+                // it). if we add it up front of the present column, we
+                // will find the present column later on again as it was
+                // shifted back (again nothing happens, in particular no
+                // endless loop, as when we encounter it the second time we
+                // won't be able to add more entries as they all already
+                // exist, but we do the same work more often than
+                // necessary, and the loop gets longer), so move the cursor
+                // one to the right in the case that we add an entry up
+                // front that did not exist before. check whether it
+                // existed before by tracking the length of this row
                 size_type old_rowlength = sparsity.row_length(row);
                 for (size_type q=0;
                      q!=lines[distribute[column]].entries.size();
@@ -1289,17 +1050,15 @@ void ConstraintMatrix::condense (CompressedSimpleSparsityPattern &sparsity) cons
             const size_type column = sparsity.column_number(row,j);
 
             if (distribute[column] == numbers::invalid_size_type)
-              // distribute entry at irregular
-              // row @p{row} and regular column
-              // sparsity.colnums[j]
+              // distribute entry at irregular row @p{row} and regular
+              // column sparsity.colnums[j]
               for (size_type q=0;
                    q!=lines[distribute[row]].entries.size(); ++q)
                 sparsity.add (lines[distribute[row]].entries[q].first,
                               column);
             else
-              // distribute entry at irregular
-              // row @p{row} and irregular column
-              // sparsity.get_column_numbers()[j]
+              // distribute entry at irregular row @p{row} and irregular
+              // column sparsity.get_column_numbers()[j]
               for (size_type p=0; p!=lines[distribute[row]].entries.size(); ++p)
                 for (size_type q=0;
                      q!=lines[distribute[sparsity.column_number(row,j)]]
@@ -1329,13 +1088,10 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
 
   const size_type n_blocks = sparsity.n_block_rows();
 
-  // store for each index whether it must be
-  // distributed or not. If entry is
-  // numbers::invalid_size_type,
-  // no distribution is necessary.
-  // otherwise, the number states which line
-  // in the constraint matrix handles this
-  // index
+  // store for each index whether it must be distributed or not. If entry
+  // is numbers::invalid_unsigned_int, no distribution is necessary.
+  // otherwise, the number states which line in the constraint matrix
+  // handles this index
   std::vector<size_type> distribute (sparsity.n_rows(),
                                         numbers::invalid_size_type);
 
@@ -1345,25 +1101,18 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
   const size_type n_rows = sparsity.n_rows();
   for (size_type row=0; row<n_rows; ++row)
     {
-      // get index of this row
-      // within the blocks
+      // get index of this row within the blocks
       const std::pair<size_type,size_type>
       block_index = index_mapping.global_to_local(row);
       const size_type block_row = block_index.first;
 
       if (distribute[row] == numbers::invalid_size_type)
-        // regular line. loop over
-        // all columns and see
-        // whether this column must
-        // be distributed
+        // regular line. loop over all columns and see whether this column
+        // must be distributed
         {
 
-          // to loop over all entries
-          // in this row, we have to
-          // loop over all blocks in
-          // this blockrow and the
-          // corresponding row
-          // therein
+          // to loop over all entries in this row, we have to loop over all
+          // blocks in this blockrow and the corresponding row therein
           for (size_type block_col=0; block_col<n_blocks; ++block_col)
             {
               const SparsityPattern &
@@ -1379,9 +1128,8 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
                     = index_mapping.local_to_global(block_col, entry->column());
 
                   if (distribute[global_col] != numbers::invalid_size_type)
-                    // distribute entry at regular
-                    // row @p{row} and irregular column
-                    // global_col
+                    // distribute entry at regular row @p{row} and
+                    // irregular column global_col
                     {
                       for (size_type q=0;
                            q!=lines[distribute[global_col]].entries.size(); ++q)
@@ -1393,11 +1141,8 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
         }
       else
         {
-          // row must be
-          // distributed. split the
-          // whole row into the
-          // chunks defined by the
-          // blocks
+          // row must be distributed. split the whole row into the chunks
+          // defined by the blocks
           for (size_type block_col=0; block_col<n_blocks; ++block_col)
             {
               const SparsityPattern &
@@ -1413,17 +1158,15 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
                     = index_mapping.local_to_global (block_col, entry->column());
 
                   if (distribute[global_col] == numbers::invalid_size_type)
-                    // distribute entry at irregular
-                    // row @p{row} and regular column
-                    // global_col.
+                    // distribute entry at irregular row @p{row} and
+                    // regular column global_col.
                     {
                       for (size_type q=0; q!=lines[distribute[row]].entries.size(); ++q)
                         sparsity.add (lines[distribute[row]].entries[q].first, global_col);
                     }
                   else
-                    // distribute entry at irregular
-                    // row @p{row} and irregular column
-                    // @p{global_col}
+                    // distribute entry at irregular row @p{row} and
+                    // irregular column @p{global_col}
                     {
                       for (size_type p=0; p!=lines[distribute[row]].entries.size(); ++p)
                         for (size_type q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
@@ -1455,13 +1198,10 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
 
   const size_type n_blocks = sparsity.n_block_rows();
 
-  // store for each index whether it must be
-  // distributed or not. If entry is
-  // numbers::invalid_size_type,
-  // no distribution is necessary.
-  // otherwise, the number states which line
-  // in the constraint matrix handles this
-  // index
+  // store for each index whether it must be distributed or not. If entry
+  // is numbers::invalid_unsigned_int, no distribution is necessary.
+  // otherwise, the number states which line in the constraint matrix
+  // handles this index
   std::vector<size_type> distribute (sparsity.n_rows(),
                                         numbers::invalid_size_type);
 
@@ -1471,39 +1211,25 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
   const size_type n_rows = sparsity.n_rows();
   for (size_type row=0; row<n_rows; ++row)
     {
-      // get index of this row
-      // within the blocks
+      // get index of this row within the blocks
       const std::pair<size_type,size_type>
       block_index = index_mapping.global_to_local(row);
       const size_type block_row = block_index.first;
       const size_type local_row = block_index.second;
 
       if (distribute[row] == numbers::invalid_size_type)
-        // regular line. loop over
-        // all columns and see
-        // whether this column must
-        // be distributed. note that
-        // as we proceed to
-        // distribute cols, the loop
-        // over cols may get longer.
+        // regular line. loop over all columns and see whether this column
+        // must be distributed. note that as we proceed to distribute cols,
+        // the loop over cols may get longer.
         //
-        // don't try to be clever
-        // here as in the algorithm
-        // for the
-        // CompressedSparsityPattern,
-        // as that would be much more
-        // complicated here. after
-        // all, we know that
-        // compressed patterns are
-        // inefficient...
+        // don't try to be clever here as in the algorithm for the
+        // CompressedSparsityPattern, as that would be much more
+        // complicated here. after all, we know that compressed patterns
+        // are inefficient...
         {
 
-          // to loop over all entries
-          // in this row, we have to
-          // loop over all blocks in
-          // this blockrow and the
-          // corresponding row
-          // therein
+          // to loop over all entries in this row, we have to loop over all
+          // blocks in this blockrow and the corresponding row therein
           for (size_type block_col=0; block_col<n_blocks; ++block_col)
             {
               const CompressedSparsityPattern &
@@ -1516,9 +1242,8 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
                                                     block_sparsity.column_number(local_row,j));
 
                   if (distribute[global_col] != numbers::invalid_size_type)
-                    // distribute entry at regular
-                    // row @p{row} and irregular column
-                    // global_col
+                    // distribute entry at regular row @p{row} and
+                    // irregular column global_col
                     {
                       for (size_type q=0;
                            q!=lines[distribute[global_col]]
@@ -1531,11 +1256,8 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
         }
       else
         {
-          // row must be
-          // distributed. split the
-          // whole row into the
-          // chunks defined by the
-          // blocks
+          // row must be distributed. split the whole row into the chunks
+          // defined by the blocks
           for (size_type block_col=0; block_col<n_blocks; ++block_col)
             {
               const CompressedSparsityPattern &
@@ -1548,18 +1270,16 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
                                                      block_sparsity.column_number(local_row,j));
 
                   if (distribute[global_col] == numbers::invalid_size_type)
-                    // distribute entry at irregular
-                    // row @p{row} and regular column
-                    // global_col.
+                    // distribute entry at irregular row @p{row} and
+                    // regular column global_col.
                     {
                       for (size_type q=0; q!=lines[distribute[row]].entries.size(); ++q)
                         sparsity.add (lines[distribute[row]].entries[q].first,
                                       global_col);
                     }
                   else
-                    // distribute entry at irregular
-                    // row @p{row} and irregular column
-                    // @p{global_col}
+                    // distribute entry at irregular row @p{row} and
+                    // irregular column @p{global_col}
                     {
                       for (size_type p=0; p!=lines[distribute[row]].entries.size(); ++p)
                         for (size_type q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
@@ -1589,13 +1309,10 @@ void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) co
 
   const size_type n_blocks = sparsity.n_block_rows();
 
-  // store for each index whether it must be
-  // distributed or not. If entry is
-  // numbers::invalid_size_type,
-  // no distribution is necessary.
-  // otherwise, the number states which line
-  // in the constraint matrix handles this
-  // index
+  // store for each index whether it must be distributed or not. If entry
+  // is numbers::invalid_unsigned_int, no distribution is necessary.
+  // otherwise, the number states which line in the constraint matrix
+  // handles this index
   std::vector<size_type> distribute (sparsity.n_rows(),
                                         numbers::invalid_size_type);
 
@@ -1605,39 +1322,25 @@ void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) co
   const size_type n_rows = sparsity.n_rows();
   for (size_type row=0; row<n_rows; ++row)
     {
-      // get index of this row
-      // within the blocks
+      // get index of this row within the blocks
       const std::pair<size_type,size_type>
       block_index = index_mapping.global_to_local(row);
       const size_type block_row = block_index.first;
       const size_type local_row = block_index.second;
 
       if (distribute[row] == numbers::invalid_size_type)
-        // regular line. loop over
-        // all columns and see
-        // whether this column must
-        // be distributed. note that
-        // as we proceed to
-        // distribute cols, the loop
-        // over cols may get longer.
+        // regular line. loop over all columns and see whether this column
+        // must be distributed. note that as we proceed to distribute cols,
+        // the loop over cols may get longer.
         //
-        // don't try to be clever
-        // here as in the algorithm
-        // for the
-        // CompressedSparsityPattern,
-        // as that would be much more
-        // complicated here. after
-        // all, we know that
-        // compressed patterns are
-        // inefficient...
+        // don't try to be clever here as in the algorithm for the
+        // CompressedSparsityPattern, as that would be much more
+        // complicated here. after all, we know that compressed patterns
+        // are inefficient...
         {
 
-          // to loop over all entries
-          // in this row, we have to
-          // loop over all blocks in
-          // this blockrow and the
-          // corresponding row
-          // therein
+          // to loop over all entries in this row, we have to loop over all
+          // blocks in this blockrow and the corresponding row therein
           for (size_type block_col=0; block_col<n_blocks; ++block_col)
             {
               const CompressedSetSparsityPattern &
@@ -1651,9 +1354,8 @@ void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) co
                     = index_mapping.local_to_global(block_col, *j);
 
                   if (distribute[global_col] != numbers::invalid_size_type)
-                    // distribute entry at regular
-                    // row @p{row} and irregular column
-                    // global_col
+                    // distribute entry at regular row @p{row} and
+                    // irregular column global_col
                     {
                       for (size_type q=0;
                            q!=lines[distribute[global_col]]
@@ -1666,11 +1368,8 @@ void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) co
         }
       else
         {
-          // row must be
-          // distributed. split the
-          // whole row into the
-          // chunks defined by the
-          // blocks
+          // row must be distributed. split the whole row into the chunks
+          // defined by the blocks
           for (size_type block_col=0; block_col<n_blocks; ++block_col)
             {
               const CompressedSetSparsityPattern &
@@ -1684,18 +1383,16 @@ void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) co
                     = index_mapping.local_to_global (block_col, *j);
 
                   if (distribute[global_col] == numbers::invalid_size_type)
-                    // distribute entry at irregular
-                    // row @p{row} and regular column
-                    // global_col.
+                    // distribute entry at irregular row @p{row} and
+                    // regular column global_col.
                     {
                       for (size_type q=0; q!=lines[distribute[row]].entries.size(); ++q)
                         sparsity.add (lines[distribute[row]].entries[q].first,
                                       global_col);
                     }
                   else
-                    // distribute entry at irregular
-                    // row @p{row} and irregular column
-                    // @p{global_col}
+                    // distribute entry at irregular row @p{row} and
+                    // irregular column @p{global_col}
                     {
                       for (size_type p=0; p!=lines[distribute[row]].entries.size(); ++p)
                         for (size_type q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
@@ -1725,13 +1422,10 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
 
   const size_type n_blocks = sparsity.n_block_rows();
 
-  // store for each index whether it must be
-  // distributed or not. If entry is
-  // numbers::invalid_size_type,
-  // no distribution is necessary.
-  // otherwise, the number states which line
-  // in the constraint matrix handles this
-  // index
+  // store for each index whether it must be distributed or not. If entry
+  // is numbers::invalid_unsigned_int, no distribution is necessary.
+  // otherwise, the number states which line in the constraint matrix
+  // handles this index
   std::vector<size_type> distribute (sparsity.n_rows(),
                                         numbers::invalid_size_type);
 
@@ -1741,39 +1435,25 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
   const size_type n_rows = sparsity.n_rows();
   for (size_type row=0; row<n_rows; ++row)
     {
-      // get index of this row
-      // within the blocks
+      // get index of this row within the blocks
       const std::pair<size_type,size_type>
       block_index = index_mapping.global_to_local(row);
       const size_type block_row = block_index.first;
       const size_type local_row = block_index.second;
 
       if (distribute[row] == numbers::invalid_size_type)
-        // regular line. loop over
-        // all columns and see
-        // whether this column must
-        // be distributed. note that
-        // as we proceed to
-        // distribute cols, the loop
-        // over cols may get longer.
+        // regular line. loop over all columns and see whether this column
+        // must be distributed. note that as we proceed to distribute cols,
+        // the loop over cols may get longer.
         //
-        // don't try to be clever
-        // here as in the algorithm
-        // for the
-        // CompressedSparsityPattern,
-        // as that would be much more
-        // complicated here. after
-        // all, we know that
-        // compressed patterns are
-        // inefficient...
+        // don't try to be clever here as in the algorithm for the
+        // CompressedSparsityPattern, as that would be much more
+        // complicated here. after all, we know that compressed patterns
+        // are inefficient...
         {
 
-          // to loop over all entries
-          // in this row, we have to
-          // loop over all blocks in
-          // this blockrow and the
-          // corresponding row
-          // therein
+          // to loop over all entries in this row, we have to loop over all
+          // blocks in this blockrow and the corresponding row therein
           for (size_type block_col=0; block_col<n_blocks; ++block_col)
             {
               const CompressedSimpleSparsityPattern &
@@ -1786,9 +1466,8 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
                                                     block_sparsity.column_number(local_row,j));
 
                   if (distribute[global_col] != numbers::invalid_size_type)
-                    // distribute entry at regular
-                    // row @p{row} and irregular column
-                    // global_col
+                    // distribute entry at regular row @p{row} and
+                    // irregular column global_col
                     {
                       for (size_type q=0;
                            q!=lines[distribute[global_col]]
@@ -1801,11 +1480,8 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
         }
       else
         {
-          // row must be
-          // distributed. split the
-          // whole row into the
-          // chunks defined by the
-          // blocks
+          // row must be distributed. split the whole row into the chunks
+          // defined by the blocks
           for (size_type block_col=0; block_col<n_blocks; ++block_col)
             {
               const CompressedSimpleSparsityPattern &
@@ -1818,20 +1494,18 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
                                                      block_sparsity.column_number(local_row,j));
 
                   if (distribute[global_col] == numbers::invalid_size_type)
-                    // distribute entry at irregular
-                    // row @p{row} and regular column
-                    // global_col.
-                    {
-                      for (size_type q=0; q!=lines[distribute[row]].entries.size(); ++q)
+                    // distribute entry at irregular row @p{row} and
+                    // regular column global_col.
+                    { for (size_type q=0;
+                           q!=lines[distribute[row]].entries.size(); ++q)
                         sparsity.add (lines[distribute[row]].entries[q].first,
                                       global_col);
                     }
                   else
-                    // distribute entry at irregular
-                    // row @p{row} and irregular column
-                    // @p{global_col}
-                    {
-                      for (size_type p=0; p!=lines[distribute[row]].entries.size(); ++p)
+                    // distribute entry at irregular row @p{row} and
+                    // irregular column @p{global_col}
+                    { for (size_type int p=0;
+                           p!=lines[distribute[row]].entries.size(); ++p)
                         for (size_type q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
                           sparsity.add (lines[distribute[row]].entries[p].first,
                                         lines[distribute[global_col]].entries[q].first);
@@ -1846,12 +1520,9 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
 
 #ifdef DEAL_II_WITH_TRILINOS
 
-// this is a specialization for a
-// parallel (non-block) Trilinos
-// vector. The basic idea is to just work
-// on the local range of the vector. But
-// we need access to values that the
-// local nodes are constrained to.
+// this is a specialization for a parallel (non-block) Trilinos vector. The
+// basic idea is to just work on the local range of the vector. But we need
+// access to values that the local nodes are constrained to.
 
 template<>
 void
@@ -1859,12 +1530,10 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
 {
   Assert (sorted==true, ExcMatrixIsClosed());
 
-  //TODO: not implemented yet, we need to fix
-  //LocalRange() first to only include
-  //"owned" indices. For this we need to keep
-  //track of the owned indices, because
-  //Trilinos doesn't. Use same constructor
-  //interface as in PETSc with two IndexSets!
+  //TODO: not implemented yet, we need to fix LocalRange() first to only
+  //include "owned" indices. For this we need to keep track of the owned
+  //indices, because Trilinos doesn't. Use same constructor interface as in
+  //PETSc with two IndexSets!
   AssertThrow (vec.vector_partitioner().IsOneToOne(),
                ExcMessage ("Distribute does not work on vectors with overlapping parallel partitioning."));
 
@@ -1878,10 +1547,8 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
   const constraint_iterator end_my_constraints
     = Utilities::lower_bound(lines.begin(),lines.end(),index_comparison);
 
-  // Here we search all the indices that we
-  // need to have read-access to - the
-  // local nodes and all the nodes that the
-  // constraints indicate.
+  // Here we search all the indices that we need to have read-access to -
+  // the local nodes and all the nodes that the constraints indicate.
   IndexSet my_indices (vec.size());
   {
     const std::pair<size_type, size_type>
@@ -1921,9 +1588,8 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
   for (constraint_iterator it = begin_my_constraints;
        it != end_my_constraints; ++it)
     {
-      // fill entry in line
-      // next_constraint.line by adding the
-      // different contributions
+      // fill entry in line next_constraint.line by adding the different
+      // contributions
       double new_value = it->inhomogeneity;
       for (size_type i=0; i<it->entries.size(); ++i)
         new_value += (vec_distribute(it->entries[i].first) *
@@ -1931,10 +1597,8 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
       vec(it->line) = new_value;
     }
 
-  // some processes might not apply
-  // constraints, so we need to explicitly
-  // state, that the others are doing an
-  // insert here:
+  // some processes might not apply constraints, so we need to explicitly
+  // state, that the others are doing an insert here:
   vec.compress (::dealii::VectorOperation::insert);
 }
 
@@ -1962,12 +1626,10 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
       const constraint_iterator end_my_constraints
         = Utilities::lower_bound(lines.begin(),lines.end(),index_comparison);
 
-      // Here we search all the indices that we
-      // need to have read-access to - the local
-      // nodes and all the nodes that the
-      // constraints indicate. No caching done
-      // yet. would need some more clever data
-      // structures for doing that.
+      // Here we search all the indices that we need to have read-access to
+      // - the local nodes and all the nodes that the constraints indicate.
+      // No caching done yet. would need some more clever data structures
+      // for doing that.
       const std::pair<size_type, size_type>
       local_range = vec.block(block).local_range();
 
@@ -2020,8 +1682,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
       for (constraint_iterator it = begin_my_constraints;
            it != end_my_constraints; ++it)
         {
-          // fill entry in line
-          // next_constraint.line by adding the
+          // fill entry in line next_constraint.line by adding the
           // different contributions
           double new_value = it->inhomogeneity;
           for (size_type i=0; i<it->entries.size(); ++i)
@@ -2037,12 +1698,9 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
 
 #ifdef DEAL_II_WITH_PETSC
 
-// this is a specialization for a
-// parallel (non-block) PETSc
-// vector. The basic idea is to just work
-// on the local range of the vector. But
-// we need access to values that the
-// local nodes are constrained to.
+// this is a specialization for a parallel (non-block) PETSc vector. The
+// basic idea is to just work on the local range of the vector. But we need
+// access to values that the local nodes are constrained to.
 
 template<>
 void
@@ -2091,14 +1749,12 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
   ghost_vec = vec;
   ghost_vec.update_ghost_values();
 
-  // finally do the distribution on own
-  // constraints
+  // finally do the distribution on own constraints
   for (constraint_iterator it = begin_my_constraints;
        it != end_my_constraints; ++it)
     {
-      // fill entry in line
-      // next_constraint.line by adding the
-      // different contributions
+      // fill entry in line next_constraint.line by adding the different
+      // contributions
       PetscScalar new_value = it->inhomogeneity;
       for (size_type i=0; i<it->entries.size(); ++i)
         new_value += (PetscScalar(ghost_vec(it->entries[i].first)) *
@@ -2130,9 +1786,8 @@ bool ConstraintMatrix::is_identity_constrained (const size_type index) const
   const ConstraintLine &p = lines[lines_cache[calculate_line_index(index)]];
   Assert (p.line == index, ExcInternalError());
 
-  // return if an entry for this
-  // line was found and if it has
-  // only one entry equal to 1.0
+  // return if an entry for this line was found and if it has only one
+  // entry equal to 1.0
   return ((p.entries.size() == 1) &&
           (p.entries[0].second == 1.0));
 }
@@ -2145,8 +1800,7 @@ ConstraintMatrix::max_constraint_indirections () const
   size_type return_value = 0;
   for (std::vector<ConstraintLine>::const_iterator i=lines.begin();
        i!=lines.end(); ++i)
-    // use static cast, since
-    // typeof(size)==std::size_t, which is !=
+    // use static cast, since typeof(size)==std::size_t, which is !=
     // size_type on AIX
     return_value = std::max(return_value,
                             static_cast<size_type>(i->entries.size()));
@@ -2171,9 +1825,7 @@ void ConstraintMatrix::print (std::ostream &out) const
 {
   for (size_type i=0; i!=lines.size(); ++i)
     {
-      // output the list of
-      // constraints as pairs of dofs
-      // and their weights
+      // output the list of constraints as pairs of dofs and their weights
       if (lines[i].entries.size() > 0)
         {
           for (size_type j=0; j<lines[i].entries.size(); ++j)
@@ -2187,12 +1839,9 @@ void ConstraintMatrix::print (std::ostream &out) const
                 << ": " << lines[i].inhomogeneity << "\n";
         }
       else
-        // but also output something
-        // if the constraint simply
-        // reads x[13]=0, i.e. where
-        // the right hand side is not
-        // a linear combination of
-        // other dofs
+        // but also output something if the constraint simply reads
+        // x[13]=0, i.e. where the right hand side is not a linear
+        // combination of other dofs
         {
           if (lines[i].inhomogeneity != 0)
             out << "    " << lines[i].line
@@ -2215,8 +1864,7 @@ ConstraintMatrix::write_dot (std::ostream &out) const
       << std::endl;
   for (size_type i=0; i!=lines.size(); ++i)
     {
-      // same concept as in the
-      // previous function
+      // same concept as in the previous function
       if (lines[i].entries.size() > 0)
         for (size_type j=0; j<lines[i].entries.size(); ++j)
           out << "  " << lines[i].line << "->" << lines[i].entries[j].first

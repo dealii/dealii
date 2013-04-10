@@ -299,7 +299,7 @@ public:
    * @p PETScWrappers::Vector class.
    *
    * For the PETSc vector wrapper class,
-   * thios function compresses the
+   * this function compresses the
    * underlying representation of the PETSc
    * object, i.e. flushes the buffers of
    * the vector object if it has any. This

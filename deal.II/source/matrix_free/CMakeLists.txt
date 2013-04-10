@@ -19,6 +19,12 @@ FILE(GLOB _header
   )
 
 SET(_src
+  matrix_free.cc
   )
 
-DEAL_II_ADD_LIBRARY(obj_matrix_free OBJECT ${_src} ${_header})
+SET(_inst
+  matrix_free.inst.in
+  )
+
+DEAL_II_ADD_LIBRARY(obj_matrix_free OBJECT ${_src} ${_header} ${_inst})
+EXPAND_INSTANTIATIONS(obj_matrix_free "${_inst}")

@@ -85,6 +85,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # (that are mainly triggered in third party headers so that we cannot
   # easily fix them...)
   #
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-dangling-else")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-delete-non-virtual-dtor") # not harmless but needed for boost <1.50.0
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-newline-eof")
