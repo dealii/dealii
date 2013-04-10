@@ -29,11 +29,6 @@ SET(_src
   error_estimator.cc
   fe_field_function.cc
   histogram.cc
-  matrix_free.cc
-  matrix_tools.cc
-  mesh_worker.cc
-  mesh_worker_info.cc
-  mesh_worker_vector_selector.cc
   point_value_history.cc
   solution_transfer.cc
   solution_transfer_inst2.cc
@@ -51,10 +46,6 @@ SET(_inst
   dof_output_operator.inst.in
   error_estimator.inst.in
   fe_field_function.inst.in
-  matrix_free.inst.in
-  matrix_tools.inst.in
-  mesh_worker_info.inst.in
-  mesh_worker_vector_selector.inst.in
   point_value_history.inst.in
   solution_transfer.inst.in
   time_dependent.inst.in
