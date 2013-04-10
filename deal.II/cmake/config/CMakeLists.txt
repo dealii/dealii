@@ -193,7 +193,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
       #
       # Extract library paths where possible:
       #
-      IF(_lib MATCHES "^/")
+      IF(_lib MATCHES "^(/|\\$\\(D\\))")
         GET_FILENAME_COMPONENT(_path ${_lib} PATH)
         LIST(APPEND _paths ${_path})
       ENDIF()
