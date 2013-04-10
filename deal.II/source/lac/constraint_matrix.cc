@@ -642,7 +642,11 @@ void ConstraintMatrix::condense (const SparsityPattern &uncondensed,
 
   // store for each line of the matrix its new line number after
   // compression. If the shift is -1, this line will be condensed away
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
   std::vector<int> new_line;
+#else
+  std::vector<long long int> new_line;
+#endif
 
   new_line.reserve (uncondensed.n_rows());
 
@@ -1504,7 +1508,7 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
                   else
                     // distribute entry at irregular row @p{row} and
                     // irregular column @p{global_col}
-                    { for (size_type int p=0;
+                    { for (size_type p=0;
                            p!=lines[distribute[row]].entries.size(); ++p)
                         for (size_type q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
                           sparsity.add (lines[distribute[row]].entries[p].first,

@@ -1236,7 +1236,7 @@ namespace MatrixCreator
 #ifdef DEBUG
       if (true)
         {
-          unsigned int max_element = 0;
+          types::global_dof_index max_element = 0;
           for (std::vector<types::global_dof_index>::const_iterator i=dof_to_boundary_mapping.begin();
                i!=dof_to_boundary_mapping.end(); ++i)
             if ((*i != hp::DoFHandler<dim,spacedim>::invalid_dof_index) &&
@@ -1960,7 +1960,7 @@ namespace MatrixTools
       return;
 
 
-    const unsigned int n_dofs = matrix.m();
+    const types::global_dof_index n_dofs = matrix.m();
 
     // if a diagonal entry is zero
     // later, then we use another
@@ -2048,7 +2048,7 @@ namespace MatrixTools
                  q = matrix.begin(dof_number)+1;
                  q != matrix.end(dof_number); ++q)
               {
-                const unsigned int row = q->column();
+                const types::global_dof_index row = q->column();
 
                 // find the position of
                 // element
@@ -2125,7 +2125,7 @@ namespace MatrixTools
       return;
 
 
-    const unsigned int n_dofs = matrix.m();
+    const types::global_dof_index n_dofs = matrix.m();
 
     // if a diagonal entry is zero
     // later, then we use another
@@ -2290,7 +2290,7 @@ namespace MatrixTools
                     // get the number of the column in this row in which a
                     // nonzero entry is. this is also the row of the transpose
                     // block which has an entry in the interesting row
-                    const unsigned int row = q->column();
+                    const types::global_dof_index row = q->column();
 
                     // find the position of element (row,dof_number) in this
                     // block (not in the transpose one). note that we have to
@@ -2389,7 +2389,7 @@ namespace MatrixTools
         // matrix that we can see. if we can't
         // find such an entry, take one
         PetscScalar average_nonzero_diagonal_entry = 1;
-        for (unsigned int i=local_range.first; i<local_range.second; ++i)
+        for (types::global_dof_index i=local_range.first; i<local_range.second; ++i)
           if (matrix.diag_element(i) != 0)
             {
               average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
@@ -2507,7 +2507,8 @@ namespace MatrixTools
     // maps with the respective indices.
     std::vector<std::map<dealii::types::global_dof_index,double> > block_boundary_values(n_blocks);
     {
-      int offset = 0, block=0;
+      int block = 0;
+      dealii::types::global_dof_index offset = 0;
       for (std::map<types::global_dof_index,double>::const_iterator
            dof  = boundary_values.begin();
            dof != boundary_values.end();

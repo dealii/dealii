@@ -524,11 +524,11 @@ void MGTransferComponentBase::build_matrices (
                                                      ende = prolongation_matrices[level]->block(iblock,jblock).end(i);
                       for (; anfang != ende; ++anfang)
                         {
-                          const unsigned int column_number = anfang->column();
+                          const types::global_dof_index column_number = anfang->column();
 
                           //convert global indices into local ones
                           const BlockIndices block_indices_coarse (dofs_per_component[level]);
-                          const unsigned int global_j = block_indices_coarse.local_to_global(iblock, column_number);
+                          const types::global_dof_index global_j = block_indices_coarse.local_to_global(iblock, column_number);
 
                           std::set<types::global_dof_index>::const_iterator found_dof =
                             boundary_indices[level].find(global_j);

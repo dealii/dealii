@@ -218,7 +218,7 @@ private:
   /**
    * Sizes of the multi-level vectors.
    */
-  std::vector<unsigned int> sizes;
+  std::vector<types::global_dof_index> sizes;
 
   /**
    * Sparsity patterns for transfer
