@@ -57,6 +57,9 @@ ENDMACRO()
 MACRO(FEATURE_BOOST_CONFIGURE_EXTERNAL)
   INCLUDE_DIRECTORIES (${Boost_INCLUDE_DIRS})
 
+  # The user has to know the location of the boost headers as well:
+  LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${Boost_INCLUDE_DIRS})
+
   #
   # Remove "pthread" from Boost_LIBRARIES. Threading, if necessary, is
   # already set up via configure_1_threads.cmake.
