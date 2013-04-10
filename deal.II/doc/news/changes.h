@@ -88,6 +88,12 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The results section of step-23 did not show the movie in release 7.3
+due to a poor HTML markup. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2013/04/10)
+</li>
+
 <li> Fixed: It is now possible to use the MeshWorker framework in 1d as well.
 <br>
 (Wolfgang Bangerth, Scott Miller, 2013/04/09)
