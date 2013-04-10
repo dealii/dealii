@@ -185,11 +185,18 @@ ENABLE_IF_SUPPORTED(_dummy "-Wno-extra")
 ENABLE_IF_SUPPORTED(_dummy "-Wno-overloaded-virtual")
 
 MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
+  #
+  # *Boy* Sanitize the include paths given by TrilinosConfig.cmake...
+  #
+  STRING(REGEX REPLACE
+    "(lib64|lib)\\/cmake\\/Trilinos\\/\\.\\.\\/\\.\\.\\/\\.\\.\\/" ""
+    TRILINOS_INCLUDE_DIRS "${TRILINOS_INCLUDE_DIRS}"
+    )
+
   INCLUDE_DIRECTORIES(${TRILINOS_INCLUDE_DIRS})
 
   # The user has to know the location of the trilinos headers as well:
   LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${TRILINOS_INCLUDE_DIRS})
-
 
   LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
     # The Trilinos libraries:
