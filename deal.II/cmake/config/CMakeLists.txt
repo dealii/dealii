@@ -207,6 +207,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
     FOREACH(_path ${_paths})
       SET(_rpath "${_rpath}${_path}:")
     ENDFOREACH()
+    STRING(REGEX REPLACE ":$" "" _rpath "${_rpath}")
 
     TO_STRING(MAKEFILE_LIBS_${build} ${MAKEFILE_LIBS_${build}} ${_rpath})
 
