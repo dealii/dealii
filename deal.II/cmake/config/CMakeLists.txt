@@ -183,10 +183,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
         ${_libs}
         )
 
-    #
-    # TODO: Come up with an idea how to get the link line directly from
-    # CMake...
-    #
+    SET(_paths)
     FOREACH(_lib
         $(D)/${DEAL_II_LIBRARY_RELDIR}/${CONFIG_LIBRARY_${build}}
         ${DEAL_II_EXTERNAL_LIBRARIES}
@@ -194,13 +191,24 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
         )
       LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
       #
-      # Add an rpath directive for each library:
+      # Extract library paths where possible:
       #
-      GET_FILENAME_COMPONENT(_path ${_lib} PATH)
-      LIST(APPEND MAKEFILE_LIBS_${build} "-Wl,-rpath,${_path}")
+      IF(_lib MATCHES "^/")
+        GET_FILENAME_COMPONENT(_path ${_lib} PATH)
+        LIST(APPEND _paths ${_path})
+      ENDIF()
     ENDFOREACH()
 
-    TO_STRING(MAKEFILE_LIBS_${build} ${MAKEFILE_LIBS_${build}})
+    #
+    # And build up an rpath:
+    #
+    SET(_rpath "-Wl,rpath,")
+    LIST(REMOVE_DUPLICATES _paths)
+    FOREACH(_path ${_paths})
+      SET(_rpath "${_rpath}${_path}:")
+    ENDFOREACH()
+
+    TO_STRING(MAKEFILE_LIBS_${build} ${MAKEFILE_LIBS_${build}} ${_rpath})
 
     #
     # Set up our linker flags:
