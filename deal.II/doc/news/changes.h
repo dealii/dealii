@@ -88,6 +88,13 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Improved: The SolverCG implementation now uses only three auxiliary
+vectors, down from previously four. Also, there are some shortcuts in case
+PreconditionIdentity is used that improve the solver's performance.
+<br>
+(Martin Kronbichler, 2013/04/11)
+</li>
+
 <li> Fixed: The results section of step-23 did not show the movie in release 7.3
 due to a poor HTML markup. This is now fixed.
 <br>

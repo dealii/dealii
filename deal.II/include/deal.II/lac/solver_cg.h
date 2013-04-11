@@ -24,6 +24,10 @@
 
 DEAL_II_NAMESPACE_OPEN
 
+// forward declaration
+class PreconditionIdentity;
+
+
 /*!@addtogroup Solvers */
 /*@{*/
 
@@ -184,7 +188,6 @@ protected:
   VECTOR *Vr;
   VECTOR *Vp;
   VECTOR *Vz;
-  VECTOR *VAp;
 
   /**
    * Within the iteration loop, the
@@ -272,7 +275,6 @@ SolverCG<VECTOR>::cleanup()
   this->memory.free(Vr);
   this->memory.free(Vp);
   this->memory.free(Vz);
-  this->memory.free(VAp);
   deallog.pop();
 }
 
@@ -301,10 +303,9 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   deallog.push("cg");
 
   // Memory allocation
-  Vr  = this->memory.alloc();
-  Vp  = this->memory.alloc();
-  Vz  = this->memory.alloc();
-  VAp = this->memory.alloc();
+  Vr = this->memory.alloc();
+  Vz = this->memory.alloc();
+  Vp = this->memory.alloc();
   // Should we build the matrix for
   // eigenvalue computations?
   bool do_eigenvalues = additional_data.compute_condition_number
@@ -320,17 +321,15 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
   try
     {
       // define some aliases for simpler access
-      VECTOR &g  = *Vr;
-      VECTOR &h  = *Vp;
-      VECTOR &d  = *Vz;
-      VECTOR &Ad = *VAp;
+      VECTOR &g = *Vr;
+      VECTOR &d = *Vz;
+      VECTOR &h = *Vp;
       // resize the vectors, but do not set
       // the values since they'd be overwritten
       // soon anyway.
       g.reinit(x, true);
-      h.reinit(x, true);
       d.reinit(x, true);
-      Ad.reinit(x, true);
+      h.reinit(x, true);
       // Implementation taken from the DEAL
       // library
       int  it=0;
@@ -355,23 +354,31 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
           return;
         }
 
-      precondition.vmult(h,g);
+      if (types_are_equal<PRECONDITIONER,PreconditionIdentity>::value == false)
+        {
+          precondition.vmult(h,g);
 
-      d.equ(-1.,h);
+          d.equ(-1.,h);
 
-      gh = g*h;
+          gh = g*h;
+        }
+      else
+        {
+          d.equ(-1.,g);
+          gh = res*res;
+        }
 
       while (conv == SolverControl::iterate)
         {
           it++;
-          A.vmult(Ad,d);
+          A.vmult(h,d);
 
-          alpha = d*Ad;
+          alpha = d*h;
           Assert(alpha != 0., ExcDivideByZero());
           alpha = gh/alpha;
 
-          g.add(alpha,Ad);
-          x.add(alpha,d );
+          g.add(alpha,h);
+          x.add(alpha,d);
           res = g.l2_norm();
 
           print_vectors(it, x, g, d);
@@ -380,12 +387,24 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
           if (conv != SolverControl::iterate)
             break;
 
-          precondition.vmult(h,g);
+          if (types_are_equal<PRECONDITIONER,PreconditionIdentity>::value
+              == false)
+            {
+              precondition.vmult(h,g);
 
-          beta = gh;
-          Assert(beta != 0., ExcDivideByZero());
-          gh   = g*h;
-          beta = gh/beta;
+              beta = gh;
+              Assert(beta != 0., ExcDivideByZero());
+              gh   = g*h;
+              beta = gh/beta;
+              d.sadd(beta,-1.,h);
+            }
+          else
+            {
+              beta = gh;
+              gh = res*res;
+              beta = gh/beta;
+              d.sadd(beta,-1.,g);
+            }
 
           if (additional_data.log_coefficients)
             deallog << "alpha-beta:" << alpha << '\t' << beta << std::endl;
@@ -413,8 +432,6 @@ SolverCG<VECTOR>::solve (const MATRIX         &A,
               deallog << "Condition number estimate: " <<
                       T.eigenvalue(T.n()-1)/T.eigenvalue(0) << std::endl;
             }
-
-          d.sadd(beta,-1.,h);
         }
     }
   catch (...)
