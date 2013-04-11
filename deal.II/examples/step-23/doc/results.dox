@@ -65,7 +65,9 @@ In addition to the screen output, the program writes the solution of each time
 step to an output file. If we process them adequately and paste them into a
 movie, we get the following:
 
-<img src="http://www.dealii.org/images/steps/developer/step-23.movie.gif" alt="Animation of the solution of step-23.">
+<img
+src="http://www.dealii.org/images/steps/developer/step-23.movie.gif"
+alt="Animation of the solution of step 23.">
 
 The movie shows the generated wave nice traveling through the domain and back,
 being reflected at the clamped boundary. Some numerical noise is trailing the
@@ -80,7 +82,7 @@ If you want to explore a bit, try out some of the following things:
 <ul>
   <li>Varying $\theta$. This gives different time stepping schemes, some of
   which are stable while others are not. Take a look at how the energy
-  evolves. 
+  evolves.
 
   <li>Different initial and boundary conditions, right hand sides.
 
@@ -91,7 +93,7 @@ If you want to explore a bit, try out some of the following things:
 
   <li>Variable coefficients: In real media, the wave speed is often
   variable. In particular, the "real" wave equation in realistic media would
-  read 
+  read
   @f[
      \rho(x) \frac{\partial^2 u}{\partial t^2}
      -
@@ -120,8 +122,8 @@ If you want to explore a bit, try out some of the following things:
 					solution_u,
 					system_rhs,
 					false);
-  @endcode 
-  
+  @endcode
+
   <li>deal.II being a library that supports adaptive meshes it would of course be
   nice if this program supported change the mesh every few time steps. Given the
   structure of the solution &mdash; a wave that travels through the domain &mdash;
@@ -133,7 +135,7 @@ If you want to explore a bit, try out some of the following things:
   the initial wave going in every direction and filling every corner of the domain.
   At this point, there is in general little one can gain using local mesh
   refinement.)
-  
+
   To make adaptively changing meshes possible, there are basically two routes.
   The "correct" way would be to go back to the weak form we get using Rothe's
   method. For example, the first of the two equations to be solved in each time
@@ -148,19 +150,19 @@ If you want to explore a bit, try out some of the following things:
   \theta (f^n,\varphi) + (1-\theta) (f^{n-1},\varphi)
   \right].
   \f}
-  Now, note that we solve for $u^n$ on mesh ${\mathbb T}^n$, and 
+  Now, note that we solve for $u^n$ on mesh ${\mathbb T}^n$, and
   consequently the test functions $\varphi$ have to be from the space
   $V_h^n$ as well. As discussed in the introduction, terms like
   $(u^{n-1},\varphi)$ then require us to integrate the solution of the
   previous step (which may have been computed on a different mesh
   ${\mathbb T}^{n-1}$) against the test functions of the current mesh,
-  leading to a matrix $M^{n,n-1}$. This process of integrating shape 
+  leading to a matrix $M^{n,n-1}$. This process of integrating shape
   functions from different meshes is, at best, awkward. It can be done
   but because it is difficult to ensure that ${\mathbb T}^{n-1}$ and
   ${\mathbb T}^{n}$ differ by at most one level of refinement, one
   has to recursively match cells from both meshes. It is feasible to
   do this, but it leads to lengthy and not entirely obvious code.
-  
+
   The second approach is the following: whenever we change the mesh,
   we simply interpolate the solution from the last time step on the old
   mesh to the new mesh, using the SolutionTransfer class. In other words,
@@ -174,21 +176,21 @@ If you want to explore a bit, try out some of the following things:
   \left[
   \theta (f^n,\varphi) + (1-\theta) (f^{n-1},\varphi)
   \right],
-  \f}  
-  where $I^n$ interpolates a given function onto mesh ${\mathbb T}^n$. 
+  \f}
+  where $I^n$ interpolates a given function onto mesh ${\mathbb T}^n$.
   This is a much simpler approach because, in each time step, we no
   longer have to worry whether $u^{n-1},v^{n-1}$ were computed on the
-  same mesh as we are using now or on a different mesh. Consequently, 
+  same mesh as we are using now or on a different mesh. Consequently,
   the only changes to the code necessary are the addition of a function
   that computes the error, marks cells for refinement, sets up a
   SolutionTransfer object, transfers the solution to the new mesh, and
   rebuilds matrices and right hand side vectors on the new mesh. Neither
   the functions building the matrices and right hand sides, nor the
-  solvers need to be changed. 
-  
+  solvers need to be changed.
+
   While this second approach is, strictly speaking,
   not quite correct in the Rothe framework (it introduces an addition source
-  of error, namely the interpolation), it is nevertheless what 
+  of error, namely the interpolation), it is nevertheless what
   almost everyone solving time dependent equations does. We will use this
   method in step-31, for example.
 </ul>

@@ -125,7 +125,7 @@ namespace Step37
 
     void reinit (const DoFHandler<dim>  &dof_handler,
                  const ConstraintMatrix &constraints,
-                 const unsigned int       level = numbers::invalid_unsigned_int);
+                 const unsigned int      level = numbers::invalid_unsigned_int);
 
     unsigned int m () const;
     unsigned int n () const;
@@ -223,7 +223,7 @@ namespace Step37
   LaplaceOperator<dim,fe_degree,number>::
   evaluate_coefficient (const Coefficient<dim> &coefficient_function)
   {
-    const unsigned int n_cells = data.get_size_info().n_macro_cells;
+    const unsigned int n_cells = data.n_macro_cells();
     FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi (data);
     coefficient.resize (n_cells * phi.n_q_points);
     for (unsigned int cell=0; cell<n_cells; ++cell)
@@ -248,7 +248,7 @@ namespace Step37
   {
     FEEvaluation<dim,fe_degree,fe_degree+1,1,number> phi (data);
     AssertDimension (coefficient.size(),
-                     data.get_size_info().n_macro_cells * phi.n_q_points);
+                     data.n_macro_cells() * phi.n_q_points);
 
     for (unsigned int cell=cell_range.first; cell<cell_range.second; ++cell)
       {
@@ -375,7 +375,7 @@ namespace Step37
 
     Triangulation<dim>               triangulation;
     FE_Q<dim>                        fe;
-    DoFHandler<dim>                  mg_dof_handler;
+    DoFHandler<dim>                  dof_handler;
     ConstraintMatrix                 constraints;
 
     SystemMatrixType                 system_matrix;
@@ -393,7 +393,7 @@ namespace Step37
   LaplaceProblem<dim>::LaplaceProblem ()
     :
     fe (degree_finite_element),
-    mg_dof_handler (triangulation)
+    dof_handler (triangulation)
   {}
 
 
@@ -406,23 +406,23 @@ namespace Step37
     mg_matrices.clear();
     mg_constraints.clear();
 
-    mg_dof_handler.distribute_dofs (fe);
-    mg_dof_handler.distribute_mg_dofs (fe);
+    dof_handler.distribute_dofs (fe);
+    dof_handler.distribute_mg_dofs (fe);
 
     deallog << "Number of degrees of freedom: "
-            << mg_dof_handler.n_dofs()
+            << dof_handler.n_dofs()
             << std::endl;
 
     constraints.clear();
-    VectorTools::interpolate_boundary_values (mg_dof_handler,
+    VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
                                               ZeroFunction<dim>(),
                                               constraints);
     constraints.close();
 
-    system_matrix.reinit (mg_dof_handler, constraints);
-    solution.reinit (mg_dof_handler.n_dofs());
-    system_rhs.reinit (mg_dof_handler.n_dofs());
+    system_matrix.reinit (dof_handler, constraints);
+    solution.reinit (dof_handler.n_dofs());
+    system_rhs.reinit (dof_handler.n_dofs());
 
     const unsigned int nlevels = triangulation.n_levels();
     mg_matrices.resize(0, nlevels-1);
@@ -432,7 +432,7 @@ namespace Step37
     ZeroFunction<dim>               homogeneous_dirichlet_bc (1);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
     std::vector<std::set<unsigned int> > boundary_indices(triangulation.n_levels());
-    MGTools::make_boundary_list (mg_dof_handler,
+    MGTools::make_boundary_list (dof_handler,
                                  dirichlet_boundary,
                                  boundary_indices);
     for (unsigned int level=0; level<nlevels; ++level)
@@ -442,12 +442,12 @@ namespace Step37
           mg_constraints[level].add_line(*bc_it);
 
         mg_constraints[level].close();
-        mg_matrices[level].reinit(mg_dof_handler,
+        mg_matrices[level].reinit(dof_handler,
                                   mg_constraints[level],
                                   level);
       }
-    coarse_matrix.reinit (mg_dof_handler.n_dofs(0),
-                          mg_dof_handler.n_dofs(0));
+    coarse_matrix.reinit (dof_handler.n_dofs(0),
+                          dof_handler.n_dofs(0));
   }
 
 
@@ -467,8 +467,8 @@ namespace Step37
     const Coefficient<dim> coefficient;
     std::vector<double>    coefficient_values (n_q_points);
 
-    typename DoFHandler<dim>::active_cell_iterator cell = mg_dof_handler.begin_active(),
-                                                   endc = mg_dof_handler.end();
+    typename DoFHandler<dim>::active_cell_iterator cell = dof_handler.begin_active(),
+                                                   endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
         cell->get_dof_indices (local_dof_indices);
@@ -508,11 +508,11 @@ namespace Step37
     const unsigned int n_levels = triangulation.n_levels();
     std::vector<Vector<float> > diagonals (n_levels);
     for (unsigned int level=0; level<n_levels; ++level)
-      diagonals[level].reinit (mg_dof_handler.n_dofs(level));
+      diagonals[level].reinit (dof_handler.n_dofs(level));
 
     std::vector<unsigned int> cell_no(triangulation.n_levels());
-    typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
-                                            endc = mg_dof_handler.end();
+    typename DoFHandler<dim>::cell_iterator cell = dof_handler.begin(),
+                                            endc = dof_handler.end();
     for (; cell!=endc; ++cell)
       {
         const unsigned int level = cell->level();
@@ -564,17 +564,15 @@ namespace Step37
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
-    GrowingVectorMemory<>   vector_memory;
-
     MGTransferPrebuilt<Vector<double> > mg_transfer;
-    mg_transfer.build_matrices(mg_dof_handler);
+    mg_transfer.build_matrices(dof_handler);
 
     MGCoarseGridHouseholder<float, Vector<double> > mg_coarse;
     mg_coarse.initialize(coarse_matrix);
 
     typedef PreconditionChebyshev<LevelMatrixType,Vector<double> > SMOOTHER;
     MGSmootherPrecondition<LevelMatrixType, SMOOTHER, Vector<double> >
-    mg_smoother(vector_memory);
+      mg_smoother;
 
     typename SMOOTHER::AdditionalData smoother_data;
     smoother_data.smoothing_range = 10.;
@@ -585,7 +583,7 @@ namespace Step37
     MGMatrix<LevelMatrixType, Vector<double> >
     mg_matrix(&mg_matrices);
 
-    Multigrid<Vector<double> > mg(mg_dof_handler,
+    Multigrid<Vector<double> > mg(dof_handler,
                                   mg_matrix,
                                   mg_coarse,
                                   mg_transfer,
@@ -593,7 +591,7 @@ namespace Step37
                                   mg_smoother);
     PreconditionMG<dim, Vector<double>,
                    MGTransferPrebuilt<Vector<double> > >
-                   preconditioner(mg_dof_handler, mg, mg_transfer);
+                   preconditioner(dof_handler, mg, mg_transfer);
 
     const std::size_t multigrid_memory
       = (mg_matrices.memory_consumption() +

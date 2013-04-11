@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -195,7 +195,7 @@ namespace parallel
      * 1 sets the boundary indicators of the external boundaries of the cell it owns
      * to 42. Since processor 0 does not own this cell, it doesn't set the boundary
      * indicators of its ghost cell copy of this cell. Now, assume we do several mesh
-     * refinement cycles and end up with a configuration where suddenly finds itself
+     * refinement cycles and end up with a configuration where this processor suddenly finds itself
      * as the owner of this cell. If boundary indicator 42 means that we need to
      * integrate Neumann boundary conditions along this boundary, then processor 0
      * will forget to do so because it has never set the boundary indicator along
@@ -207,7 +207,98 @@ namespace parallel
      * for sequential triangulations because, there, these flags are inherited
      * from mother to child cell and remain with a cell even if it is refined
      * and the children are later coarsened again, but this does not hold for
-     * distributed triangulations.
+     * distributed triangulations. It is made even more difficult by the fact
+     * that in the process of refining a parallel distributed triangulation,
+     * the triangulation may call dealii::Triangulation::execute_coarsening_and_refinement
+     * multiple times and this function needs to know about boundaries. In
+     * other words, it is <i>not</i> enough to just set boundary indicators on
+     * newly created faces only <i>after</i> calling
+     * distributed::parallel::Triangulation::execute_coarsening_and_refinement:
+     * it actually has to happen while that function is still running.
+     *
+     * The way to do this is by writing a function that sets boundary
+     * indicators and that will be called by the dealii::Triangulation class. The
+     * triangulation does not provide a pointer to itself to the function being
+     * called, nor any other information, so the trick is to get this information
+     * into the function. C++ provides a nice mechanism for this that is best
+     * explained using an example:
+     * @code
+     *     #include <deal.II/base/std_cxx1x/bind.h>
+     *
+     *     template <int dim>
+     *     void set_boundary_indicators (parallel::distributed::Triangulation<dim> &triangulation)
+     *     {
+     *       ... set boundary indicators on the triangulation object ...
+     *     }
+     *
+     *     template <int dim>
+     *     void
+     *     MyClass<dim>::
+     *     create_coarse_mesh (parallel::distributed::Triangulation<dim> &coarse_grid) const
+     *     {
+     *       ... create the coarse mesh ...
+     *
+     *       coarse_grid.signals.post_refinement.connect
+     *         (std_cxx1x::bind (&set_boundary_indicators<dim>,
+     *                           std_cxx1x::ref(coarse_grid)));
+     *
+     *     }
+     * @endcode
+     *
+     * What the call to <code>std_cxx1x::bind</code> does is to produce an object that
+     * can be called like a function with no arguments. It does so by taking the
+     * address of a function that does, in fact, take an argument but permanently fix
+     * this one argument to a reference to the coarse grid triangulation. After each
+     * refinement step, the triangulation will then call the object so created which
+     * will in turn call <code>set_boundary_indicators<dim></code> with the reference
+     * to the coarse grid as argument.
+     *
+     * This approach can be generalized. In the example above, we have used a global
+     * function that will be called. However, sometimes it is necessary that this
+     * function is in fact a member function of the class that generates the mesh,
+     * for example because it needs to access run-time parameters. This can be
+     * achieved as follows: assuming the <code>set_boundary_indicators()</code>
+     * function has been declared as a (non-static, but possibly private) member
+     * function of the <code>MyClass</code> class, then the following will work:
+     * @code
+     *     #include <deal.II/base/std_cxx1x/bind.h>
+     *
+     *     template <int dim>
+     *     void
+     *     MyClass<dim>::
+     *     set_boundary_indicators (parallel::distributed::Triangulation<dim> &triangulation) const
+     *     {
+     *       ... set boundary indicators on the triangulation object ...
+     *     }
+     *
+     *     template <int dim>
+     *     void
+     *     MyClass<dim>::
+     *     create_coarse_mesh (parallel::distributed::Triangulation<dim> &coarse_grid) const
+     *     {
+     *       ... create the coarse mesh ...
+     *
+     *       coarse_grid.signals.post_refinement.connect
+     *         (std_cxx1x::bind (&MyGeometry<dim>::set_boundary_indicators,
+     *                           std_cxx1x::cref(*this),
+     *                           std_cxx1x::ref(coarse_grid)));
+     *     }
+     * @endcode
+     * Here, like any other member function, <code>set_boundary_indicators</code>
+     * implicitly takes a pointer or reference to the object it belongs to as first
+     * argument. <code>std::bind</code> again creates an object that can be called like a
+     * global function with no arguments, and this object in turn calls
+     * <code>set_boundary_indicators</code> with a pointer to the current object and a
+     * reference to the triangulation to work on. Note that because the
+     * <code>create_coarse_mesh</code> function is declared as <code>const</code>, it is
+     * necessary that the <code>set_boundary_indicators</code> function is also
+     * declared <code>const</code>.
+     *
+     * <b>Note:</b>For reasons that have to do with the way the
+     *   parallel::distributed::Triangulation is implemented, functions that
+     *   have been attached to the post-refinement signal of the triangulation are
+     *   called more than once, sometimes several times, every time the triangulation
+     *  is actually refined.
      *
      *
      * @author Wolfgang Bangerth, Timo Heister 2008, 2009, 2010, 2011

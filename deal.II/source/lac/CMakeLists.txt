@@ -34,7 +34,6 @@ SET(_src
   lapack_full_matrix.cc
   matrix_lib.cc
   matrix_out.cc
-  operator.cc
   parallel_vector.cc
   petsc_block_sparse_matrix.cc
   petsc_full_matrix.cc
@@ -66,7 +65,6 @@ SET(_src
   sparsity_pattern.cc
   sparsity_tools.cc
   swappable_vector.cc
-  timestep_control.cc
   tridiagonal_matrix.cc
   trilinos_block_sparse_matrix.cc
   trilinos_block_vector.cc
@@ -88,7 +86,6 @@ SET(_inst
   constraint_matrix.inst.in
   full_matrix.inst.in
   lapack_full_matrix.inst.in
-  operator.inst.in
   parallel_vector.inst.in
   precondition_block.inst.in
   relaxation_block.inst.in

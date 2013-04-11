@@ -16,20 +16,14 @@
 #
 # Prepare steps.png and steps.cmapx:
 #
-
-file(GLOB _steps
-  ${CMAKE_SOURCE_DIR}/examples/step-*
-  )
-
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/steps.dot
   COMMAND ${PERL_EXECUTABLE}
   ARGS
     ${CMAKE_SOURCE_DIR}/doc/doxygen/scripts/steps.pl
-    ${_steps}
+    ${DEAL_II_STEPS}
     > ${CMAKE_CURRENT_BINARY_DIR}/steps.dot
   )
-
 ADD_CUSTOM_COMMAND(
   OUTPUT
     ${CMAKE_CURRENT_BINARY_DIR}/steps.png
@@ -47,13 +41,11 @@ ADD_CUSTOM_COMMAND(
 #
 # Prepare toc.html:
 #
-
 CONFIGURE_FILE(
   ${CMAKE_CURRENT_SOURCE_DIR}/toc.html.in
   ${CMAKE_CURRENT_BINARY_DIR}/toc.html.in
   COPYONLY
   )
-
 ADD_CUSTOM_COMMAND(
   OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/toc.html
   COMMAND ${PERL_EXECUTABLE}
@@ -82,12 +74,10 @@ ADD_CUSTOM_TARGET(tutorial
     ${CMAKE_CURRENT_BINARY_DIR}/toc.html
   )
 
-
 #
 # Prepare the steps for documentation generation
 #
-
-FOREACH(_step ${_steps})
+FOREACH(_step ${DEAL_II_STEPS})
   GET_FILENAME_COMPONENT(_step "${_step}" NAME)
 
   ADD_CUSTOM_COMMAND(

@@ -1060,7 +1060,8 @@ public:
    * face and edges at the same
    * time, use the
    * set_all_boundary_indicators()
-   * function.
+   * function. You can see the result of not using the correct function in the
+   * results section of step-49.
    *
    * @warning You should never set the
    * boundary indicator of an interior face
@@ -1116,7 +1117,9 @@ public:
    * to the interior of the boundary face. For this to work properly, it is
    * not sufficient to have set the boundary indicator for the face alone,
    * but you also need to set the boundary indicators of the edges that
-   * bound the face. This function does all of this at once.
+   * bound the face. This function does all of this at once. You can see
+   * the result of not using the correct function in the
+   * results section of step-49.
    *
    * @ingroup boundary
    *

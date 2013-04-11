@@ -3,7 +3,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -339,7 +339,8 @@
  * object with a particular boundary indicator. This allows the Triangulation
  * object to use a different method of finding new points on faces and edges
  * to be refined; the default is to use a StraightBoundary object for all
- * faces and edges.
+ * faces and edges. The results section of step-49 has a worked example that
+ * shows all of this in action.
  *
  * The second use of boundary indicators is to describe not only which geometry
  * object to use on a particular boundary but to select a part of the boundary

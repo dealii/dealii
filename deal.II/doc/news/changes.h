@@ -88,12 +88,58 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Improved: The SolverCG implementation now uses only three auxiliary
+vectors, down from previously four. Also, there are some shortcuts in case
+PreconditionIdentity is used that improve the solver's performance.
+<br>
+(Martin Kronbichler, 2013/04/11)
+</li>
+
+<li> Fixed: The results section of step-23 did not show the movie in release 7.3
+due to a poor HTML markup. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2013/04/10)
+</li>
+
+<li> Fixed: It is now possible to use the MeshWorker framework in 1d as well.
+<br>
+(Wolfgang Bangerth, Scott Miller, 2013/04/09)
+</li>
+
+<li> Fixed: It was not possible to create a default-constructed object of
+type Triangulation<1>::face_iterator. This is now fixed.
+<br>
+(Wolfgang Bangerth, Scott Miller, 2013/04/09)
+</li>
+
+<li> New: VectorTools::subtract_mean_value can now be called without a
+boolean mask. The vector type is templatified and instantiated for all
+non distributed vectors.
+<br>
+(Matthias Maier, 2013/04/08)
+</li>
+
+<li> Fixed: It is now possible to call ConvergenceTable::evaluate_convergence_rates
+multiple times.
+<br>
+(Matthias Maier, 2013/04/08)
+</li>
+
+<li> Fixed: GridTools::distort_random (previously called Triangulation::distort_random)
+had a bug where points were only ever moved in <i>positive</i> coordinate
+directions rather than with uniform probability in either direction. The 1d
+implementation also had the problem that it did not move vertices if the
+<i>cell</i> they were on was at the boundary, even if the <i>vertex</i>
+itself was not. All of these problems are now fixed.
+<br>
+(Wolfgang Bangerth, 2013/04/05)
+</li>
+
 <li> New: There is a class VectorFunctionFromTensorFunction that converts
 between objects of type TensorFunction and Function.
 <br>
 (Spencer Patty, 2013/4/2)
 </li>
-
 
 <li> Fixed: The ParameterHandler class could not deal with parameters named
 <code>"value"</code> (and a few other names). This is now fixed.

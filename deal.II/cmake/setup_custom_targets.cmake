@@ -42,12 +42,3 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
       report_features
     )
 ENDIF()
-
-IF(DEAL_II_COMPONENT_CONTRIB)
-  ADD_CUSTOM_TARGET(contrib
-    DEPENDS
-      mesh_conversion
-      parameter_gui
-    )
-ENDIF()
-

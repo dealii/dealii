@@ -38,14 +38,6 @@
 #   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
 #   ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
 #
-# Compiler flags for platform dependent optimization (such as
-# -march=native) must always be guarded with
-# DEAL_II_ALLOW_PLATFORM_INTROSPECTION:
-#
-#   IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-#     ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-march=native")
-#   ENDIF()
-#
 # Checks for compiler features (such as C++11 support) and compiler
 # specific bugs that
 #   - usually set up further configuration (such as preprocessor
@@ -62,6 +54,56 @@
 #
 
 
+###########################################################################
+#                                                                         #
+#                             Sanity checks:                              #
+#                                                                         #
+###########################################################################
+
+#
+# Check the user provided C and CXX flags:
+#
+
+IF(NOT "${CMAKE_C_FLAGS_SAVED}" STREQUAL "${DEAL_II_C_FLAGS_SAVED}")
+  UNSET(DEAL_II_HAVE_USABLE_C_FLAGS CACHE)
+ENDIF()
+SET(DEAL_II_C_FLAGS_SAVED "${CMAKE_C_FLAGS_SAVED}" CACHE INTERNAL "" FORCE)
+
+SET(CMAKE_REQUIRED_FLAGS "${CMAKE_C_FLAGS_SAVED}")
+CHECK_C_SOURCE_COMPILES(
+  "int main(){ return 0; }"
+  DEAL_II_HAVE_USABLE_C_FLAGS)
+SET(CMAKE_REQUIRED_FLAGS "")
+
+IF(NOT DEAL_II_HAVE_USABLE_C_FLAGS)
+  UNSET(DEAL_II_HAVE_USABLE_C_FLAGS CACHE)
+  MESSAGE(FATAL_ERROR "\n"
+    "Configuration error: Cannot compile with the specified C flags: "
+    "${CMAKE_C_FLAGS_SAVED}\n"
+    )
+ENDIF()
+
+
+IF(NOT "${CMAKE_CXX_FLAGS_SAVED}" STREQUAL "${DEAL_II_CXX_FLAGS_SAVED}")
+  UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
+ENDIF()
+SET(DEAL_II_CXX_FLAGS_SAVED "${CMAKE_CXX_FLAGS_SAVED}" CACHE INTERNAL "" FORCE)
+
+SET(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX_FLAGS_SAVED}")
+CHECK_CXX_SOURCE_COMPILES(
+  "int main(){ return 0; }"
+  DEAL_II_HAVE_USABLE_CXX_FLAGS)
+SET(CMAKE_REQUIRED_FLAGS "")
+
+IF(NOT DEAL_II_HAVE_USABLE_CXX_FLAGS)
+  UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
+  MESSAGE(FATAL_ERROR "\n"
+    "Configuration error: Cannot compile with the specified CXX flags: "
+    "${CMAKE_CXX_FLAGS_SAVED}\n"
+    )
+ENDIF()
+
+
 #
 # CMAKE_C_COMPILER and CMAKE_CXX_COMPILER have to be of the same brand.
 #
@@ -75,6 +117,12 @@ IF(NOT ( "${CMAKE_C_COMPILER_ID}" STREQUAL "${CMAKE_CXX_COMPILER_ID}" AND
       )
 ENDIF()
 
+
+###########################################################################
+#                                                                         #
+#                            Compiler setup:                              #
+#                                                                         #
+###########################################################################
 
 IF(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
   #

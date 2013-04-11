@@ -31,7 +31,8 @@ DEAL_II_NAMESPACE_OPEN
  *
  * This class was developed to be used in conjunction with the
  * @p cylinder function of GridGenerator. It should be used for
- * the hull of the cylinder only (boundary indicator 0).
+ * the hull of the cylinder only (boundary indicator 0). Its use is
+ * discussed in detail in the results section of step-49.
  *
  * This class is derived from StraightBoundary rather than from
  * Boundary, which would seem natural, since this way we can use the

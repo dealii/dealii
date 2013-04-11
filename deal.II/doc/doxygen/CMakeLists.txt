@@ -13,9 +13,16 @@
 #####
 
 #
+# A glob. I'm sorry
+#
+file(GLOB DEAL_II_STEPS
+  ${CMAKE_SOURCE_DIR}/examples/step-*
+  )
+
+#
 # Prepare the example steps for doxygen:
 #
-ADD_SUBDIRECTORY(tutorial)
+ADD_SUBDIRECTORY(tutorial) # uses ${DEAL_II_STEPS}
 ADD_SUBDIRECTORY(images)
 
 #
@@ -46,28 +53,36 @@ CONFIGURE_FILE(
 #
 # Finalize the doxygen configuration:
 #
-file(GLOB doxygen_input
-  ${CMAKE_CURRENT_SOURCE_DIR}/headers
-  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui
-  ${CMAKE_SOURCE_DIR}/doc/news
-  ${CMAKE_SOURCE_DIR}/include/deal.II/*/
-  ${CMAKE_BINARY_DIR}/include/deal.II/*/
-  ${CMAKE_CURRENT_BINARY_DIR}/tutorial
-  )
-TO_STRING(doxygen_input_string ${doxygen_input})
+file(GLOB _doxygen_input
+  ${CMAKE_CURRENT_SOURCE_DIR}/headers/*.h
+  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/*.h
+  ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/main.cpp
+  ${CMAKE_SOURCE_DIR}/doc/news/*.h
+  ${CMAKE_SOURCE_DIR}/include/deal.II/**/*.h
 
-file(GLOB doxygen_image_path
+  ${CMAKE_BINARY_DIR}/include/deal.II/base/config.h
+  )
+FOREACH(_step ${DEAL_II_STEPS})
+  GET_FILENAME_COMPONENT(_step "${_step}" NAME)
+  LIST(APPEND _doxygen_input
+    ${CMAKE_CURRENT_BINARY_DIR}/tutorial/${_step}.h
+    )
+ENDFOREACH()
+TO_STRING(_doxygen_input_string ${_doxygen_input})
+
+file(GLOB _doxygen_image_path
   ${CMAKE_CURRENT_SOURCE_DIR}/images
   ${CMAKE_SOURCE_DIR}/examples/*/doc
   ${CMAKE_SOURCE_DIR}/contrib/parameter_gui/images
+
   ${CMAKE_CURRENT_BINARY_DIR}/images
   )
-TO_STRING(doxygen_image_path_string ${doxygen_image_path})
+TO_STRING(_doxygen_image_path_string ${_doxygen_image_path})
 
 FILE(APPEND "${CMAKE_CURRENT_BINARY_DIR}/options.dox"
   "
-  INPUT=${doxygen_input_string}
-  IMAGE_PATH=${doxygen_image_path_string}
+  INPUT=${_doxygen_input_string}
+  IMAGE_PATH=${_doxygen_image_path_string}
   "
   )
 
@@ -85,7 +100,7 @@ ADD_CUSTOM_COMMAND(
     tutorial
     images
     ${CMAKE_CURRENT_BINARY_DIR}/options.dox
-    ${doxygen_input}
+    ${_doxygen_input}
   COMMENT "Generating documentation via doxygen (This may take a _really_ long time)"
   VERBATIM
   )

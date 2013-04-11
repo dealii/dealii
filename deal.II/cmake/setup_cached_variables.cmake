@@ -19,12 +19,13 @@
 #
 # General configuration options:
 #
+#     DEAL_II_ALLOW_AUTODETECTION
 #     DEAL_II_ALLOW_BUNDLED
 #     DEAL_II_COMPONENT_COMPAT_FILES
-#     DEAL_II_COMPONENT_CONTRIB
 #     DEAL_II_COMPONENT_DOCUMENTATION
 #     DEAL_II_COMPONENT_EXAMPLES
-#     DEAL_II_ALLOW_AUTODETECTION
+#     DEAL_II_COMPONENT_MESH_CONVERTER
+#     DEAL_II_COMPONENT_PARAMETER_GUI
 #     DEAL_II_FORCE_AUTODETECTION
 #
 # Options regarding compilation and linking:
@@ -66,11 +67,6 @@ OPTION(DEAL_II_COMPONENT_COMPAT_FILES
   ON
   )
 
-OPTION(DEAL_II_COMPONENT_CONTRIB
-  "Enable installation of contrib packages. This adds a COMPONENT \"contrib\" to the build system."
-  OFF
-  )
-
 If(DEAL_II_HAVE_DOC_DIRECTORY)
   OPTION(DEAL_II_COMPONENT_DOCUMENTATION
     "Enable configuration, build and installation of the documentation. This adds a COMPONENT \"documentation\" to the build system."
@@ -81,6 +77,16 @@ ENDIF()
 OPTION(DEAL_II_COMPONENT_EXAMPLES
   "Enable configuration and installation of the example steps. This adds a COMPONENT \"examples\" to the build system."
   ON
+  )
+
+OPTION(DEAL_II_COMPONENT_MESH_CONVERTER
+  "Build and install the mesh_converter. This adds a COMPONENT \"mesh_converter\" to the build system."
+  ON
+  )
+
+OPTION(DEAL_II_COMPONENT_PARAMETER_GUI
+  "Build and install the parameter_gui. This adds a COMPONENT \"parameter_gui\" to the build system."
+  OFF
   )
 
 OPTION(DEAL_II_ALLOW_AUTODETECTION
@@ -189,16 +195,10 @@ FOREACH(_flag
 ENDFOREACH()
 
 #
-# Read in CFLAGS, CXXFLAGS and LDFLAGS from environment
-#
-SET_IF_EMPTY(CMAKE_C_FLAGS "$ENV{CFLAGS}")
-SET_IF_EMPTY(CMAKE_CXX_FLAGS "$ENV{CXXFLAGS}")
-SET_IF_EMPTY(CMAKE_SHARED_LINKER_FLAGS "$ENV{LDFLAGS}")
-
-#
 # Set cached compiler flags to an empty string:
 #
 SET(DEAL_II_USED_FLAGS
+  CMAKE_C_FLAGS
   CMAKE_CXX_FLAGS
   DEAL_II_CXX_FLAGS_DEBUG
   DEAL_II_CXX_FLAGS_RELEASE
@@ -231,6 +231,18 @@ FOREACH(_flag ${DEAL_II_USED_FLAGS})
 ENDFOREACH()
 
 
+#
+# Finally, read in CFLAGS, CXXFLAGS and LDFLAGS from environment and
+# prepend them to the saved variables:
+#
+SET(CMAKE_C_FLAGS_SAVED "$ENV{CFLAGS} ${CMAKE_C_FLAGS_SAVED}")
+SET(CMAKE_CXX_FLAGS_SAVED "$ENV{CXXFLAGS} ${CMAKE_CXX_FLAGS_SAVED}")
+SET(CMAKE_SHARED_LINKER_FLAGS_SAVED "$ENV{LDFLAGS} ${CMAKE_SHARED_LINKER_FLAGS}")
+UNSET(ENV{CFLAGS})
+UNSET(ENV{CXXFLAGS})
+UNSET(ENV{LDFLAGS})
+
+
 ###########################################################################
 #                                                                         #
 #                          Miscellanious setup:                           #
@@ -254,7 +266,7 @@ FOREACH(_var ${_res})
     SET(DEAL_II_${_var} ${${_var}} CACHE BOOL "" FORCE)
     UNSET(${_var} CACHE)
   ENDIF()
-  IF(_var MATCHES "^(COMPAT_FILES|DOCUMENTATION|EXAMPLES|CONTRIB)")
+  IF(_var MATCHES "^(COMPAT_FILES|DOCUMENTATION|EXAMPLES|MESH_CONVERTER|PARAMETER_GUI)")
     SET(DEAL_II_COMPONENT_${_var} ${${_var}} CACHE BOOL "" FORCE)
     UNSET(${_var} CACHE)
   ENDIF()

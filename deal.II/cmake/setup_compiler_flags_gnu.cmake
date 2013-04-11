@@ -43,13 +43,6 @@ IF(NOT (CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
 ENDIF()
 
 #
-# Enable all supported CPU instruction sets:
-#
-IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-march=native")
-ENDIF()
-
-#
 # Set the pic flag.
 #
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
@@ -60,7 +53,6 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
 #
 ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
 
-
 #
 # Setup various warnings:
 #
@@ -70,7 +62,6 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wwrite-strings")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wsynth")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wsign-compare")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wswitch")
-
 
 #
 # Newer versions of gcc have a flag -Wunused-local-typedefs that, though in
@@ -94,6 +85,7 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   # (that are mainly triggered in third party headers so that we cannot
   # easily fix them...)
   #
+  ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-dangling-else")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-delete-non-virtual-dtor") # not harmless but needed for boost <1.50.0
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-long")
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-newline-eof")

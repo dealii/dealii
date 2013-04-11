@@ -1,6 +1,6 @@
 /* $Id$
  *
- * Copyright (C) 1999-2003, 2005-2007, 2009, 2011-2012 by the deal.II authors
+ * Copyright (C) 1999-2003, 2005-2007, 2009, 2011-2013 by the deal.II authors
  *
  * This file is subject to QPL and may not be  distributed
  * without copyright and license information. Please refer
@@ -110,7 +110,10 @@ void second_grid ()
   // parts with a non-zero boundary indicator, but other boundary description
   // objects can be associated with those non-zero indicators. If no boundary
   // description is associated with a particular boundary indicator, a
-  // straight boundary is implied.
+  // straight boundary is implied. (Boundary indicators are a slightly
+  // complicated topic; if you're confused about what exactly is happening
+  // here, you may want to look at the
+  // @ref GlossBoundaryIndicator "glossary entry on this topic".)
   const HyperShellBoundary<2> boundary_description(center);
   triangulation.set_boundary (0, boundary_description);
 

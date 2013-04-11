@@ -467,11 +467,11 @@ namespace Step48
     data_out.build_patches ();
 
     const std::string filename =
-      "solution-" + Utilities::int_to_string (timestep_number, 3) +
-      "." + Utilities::int_to_string (Utilities::MPI::
-                                      this_mpi_process(MPI_COMM_WORLD),4);
+      "solution-" + Utilities::int_to_string (timestep_number, 3);
 
-    std::ofstream output ((filename + ".vtu").c_str());
+    std::ofstream output ((filename +
+      "." + Utilities::int_to_string (Utilities::MPI::
+                                      this_mpi_process(MPI_COMM_WORLD),4) + ".vtu").c_str());
     data_out.write_vtu (output);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

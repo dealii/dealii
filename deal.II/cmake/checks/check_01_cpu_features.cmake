@@ -42,6 +42,27 @@ TEST_BIG_ENDIAN(DEAL_II_WORDS_BIGENDIAN)
 
 
 IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+
+  #
+  # These tests depend on certain cpu instruction sets being enabled, so
+  # use the user supplied compiler flags for the tests as well:
+  #
+  SET(CMAKE_REQUIRED_FLAGS "${CMAKE_CXX_FLAGS_SAVED}")
+
+
+  #
+  # Take care that the following tests are rerun if CMAKE_REQUIRED_FLAGS
+  # changes..
+  #
+  IF(NOT "${CMAKE_REQUIRED_FLAGS}" STREQUAL "${DEAL_II_CHECK_CPU_FEATURES_SAVED}")
+    UNSET(DEAL_II_HAVE_SSE2 CACHE)
+    UNSET(DEAL_II_HAVE_AVX CACHE)
+  ENDIF()
+  SET(DEAL_II_CHECK_CPU_FEATURES_SAVED
+    "${CMAKE_REQUIRED_FLAGS}" CACHE INTERNAL "" FORCE
+    )
+
+
   #
   # Check whether the compiler allows for vectorization and that
   # vectorization actually works on the given CPU. For this test, we use
@@ -114,8 +135,9 @@ IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
     }
     "
     DEAL_II_HAVE_AVX)
-ENDIF()
 
+  SET(CMAKE_REQUIRED_FLAGS "")
+ENDIF()
 
 IF(DEAL_II_HAVE_SSE2)
   IF(DEAL_II_HAVE_AVX)
@@ -126,3 +148,4 @@ IF(DEAL_II_HAVE_SSE2)
 ELSE()
   SET(DEAL_II_COMPILER_VECTORIZATION_LEVEL 0)
 ENDIF()
+

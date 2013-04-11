@@ -516,8 +516,8 @@ namespace PETScWrappers
     real_type lp_norm (const real_type p) const;
 
     /**
-     * Maximum absolute value of the
-     * elements.
+     * $l_\infty$-norm of the vector. Return the value of the vector
+     * element with the maximum absolute value.
      */
     real_type linfty_norm () const;
 
