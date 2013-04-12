@@ -5,7 +5,7 @@ What is deal.II?
   state-of-the-art programming techniques to offer you a modern interface to
   the complex data structures and algorithms required.
 
-For the impatient one:
+For the impatient:
 
   Configure compile and install the deal.II library with:
 
@@ -22,6 +22,10 @@ Getting started:
   The tutorial steps are located under ./examples
   Information about the tutorial steps can be found at
   ./doc/doxygen/tutorial/index.html or at http://www.dealii.org/.
+
+License:
+
+  Please see the file LICENSE for details
 
 For further information have a look at ./doc/readme.html or at
 http://www.dealii.org.
