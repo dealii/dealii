@@ -9,13 +9,13 @@ and/or modify it under the terms of the GNU Lesser General Public
 License as published by the Free Software Foundation; either version
 2.1 of the License, or (at your option) any later version.
 
-The subdirectory bundled is not licensed by the deal.II authors.
-PLEASE NOTE THAT THE SOFTWARE THERE IS COPYRIGHTED BY OTHERS THAN THE deal.II
-AUTHORS, but are included by permission. For details, consult the stated
-licenses there.
-
 The full text of the GNU Lesser General Public version 2.1 is quoted
 below.
+
+The subdirectory bundled is not licensed by the deal.II authors. PLEASE
+NOTE THAT THE SOFTWARE THERE IS COPYRIGHTED BY OTHERS THAN THE deal.II
+AUTHORS, but is included by permission. For details, consult the stated
+licenses there.
 
 ----------------------------------------------------------------------
 
