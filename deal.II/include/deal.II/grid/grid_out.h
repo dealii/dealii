@@ -706,6 +706,11 @@ namespace GridOutFlags
     MathGL ();
 
     /**
+     * Draw a bounding box around the graph.
+     */
+    bool draw_bounding_box;
+
+    /**
      * Declare parameters in ParameterHandler.
      */
     static void declare_parameters (ParameterHandler &param);
@@ -1041,15 +1046,25 @@ public:
    */
   template <int dim, int spacedim>
   void write_svg (const Triangulation<dim,spacedim> &tria,
-                  std::ostream            &out) const;
+                  std::ostream                      &out) const;
 
   void write_svg (const Triangulation<2,2> &tria,
-                  std::ostream            &out) const;
+                  std::ostream             &out) const;
 
   /**
-   * Write triangulation in MathGL format.
+   * Write triangulation in MathGL script format. To interpret this
+   * file a version of MathGL>=2.0.0 is required.
    *
-   * Not implemented for the codimension one case.
+   * To get a handle on the resultant MathGL script within a graphical
+   * environment an interpreter is needed. A suggestion to start with
+   * is <code>mglview</code>, which is bundled with MathGL.  With
+   * <code>mglview</code> can interpret and display small-to-medium
+   * MathGL scripts in a graphical window and enables conversion to
+   * other formats such as EPS, PNG, JPG, SVG, as well as view/display
+   * animations. Some minor editing, such as modifying the lighting or
+   * alpha channels, can also be done.
+   *
+   * @note Not implemented for the codimensional one case.
    */
   template <int dim>
   void write_mathgl (const Triangulation<dim> &tria,
@@ -1061,8 +1076,8 @@ public:
    */
   template <int dim, int spacedim>
   void write (const Triangulation<dim,spacedim> &tria,
-              std::ostream             &out,
-              const OutputFormat        output_format,
+              std::ostream                      &out,
+              const OutputFormat                 output_format,
               const Mapping<dim,spacedim>       *mapping=0) const;
 
   /**
@@ -1070,7 +1085,7 @@ public:
    */
   template <int dim, int spacedim>
   void write (const Triangulation<dim,spacedim> &tria,
-              std::ostream             &out,
+              std::ostream                      &out,
               const Mapping<dim,spacedim>       *mapping=0) const;
 
   /**
