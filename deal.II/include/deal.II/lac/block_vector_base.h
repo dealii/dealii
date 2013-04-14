@@ -627,7 +627,7 @@ namespace internal
        * element presently pointed
        * to.
        */
-      size_type current_block;
+      unsigned int current_block;
       size_type index_within_block;
 
       /**
@@ -804,13 +804,13 @@ public:
    * Access to a single block.
    */
   BlockType &
-  block (const size_type i);
+  block (const unsigned int i);
 
   /**
    * Read-only access to a single block.
    */
   const BlockType &
-  block (const size_type i) const;
+  block (const unsigned int i) const;
 
   /**
    * Return a reference on the
@@ -1786,7 +1786,7 @@ BlockVectorBase<VectorType>::n_blocks () const
 template <class VectorType>
 inline
 typename BlockVectorBase<VectorType>::BlockType &
-BlockVectorBase<VectorType>::block (const size_type i)
+BlockVectorBase<VectorType>::block (const unsigned int i)
 {
   Assert(i<n_blocks(), ExcIndexRange(i,0,n_blocks()));
 
@@ -1798,7 +1798,7 @@ BlockVectorBase<VectorType>::block (const size_type i)
 template <class VectorType>
 inline
 const typename BlockVectorBase<VectorType>::BlockType &
-BlockVectorBase<VectorType>::block (const size_type i) const
+BlockVectorBase<VectorType>::block (const unsigned int i) const
 {
   Assert(i<n_blocks(), ExcIndexRange(i,0,n_blocks()));
 

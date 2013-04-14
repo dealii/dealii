@@ -436,7 +436,7 @@ private:
      * Cache of entries that have not yet
      * been written to #entries;
      */
-    mutable unsigned int cache[cache_size];
+    mutable size_type cache[cache_size];
 
     /**
      * Number of entries in the cache.
@@ -529,8 +529,8 @@ void
 CompressedSparsityPattern::add (const size_type i,
                                 const size_type j)
 {
-  Assert (i<rows, ExcIndexRange(i, 0, rows));
-  Assert (j<cols, ExcIndexRange(j, 0, cols));
+  Assert (i<rows, ExcIndexRangeType<size_type>(i, 0, rows));
+  Assert (j<cols, ExcIndexRangeType<size_type>(j, 0, cols));
 
   lines[i].add (j);
 }
@@ -564,7 +564,7 @@ inline
 types::global_dof_index
 CompressedSparsityPattern::row_length (const size_type row) const
 {
-  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  Assert (row < n_rows(), ExcIndexRangeType<size_type> (row, 0, n_rows()));
 
   if (lines[row].cache_entries != 0)
     lines[row].flush_cache ();
@@ -578,9 +578,9 @@ types::global_dof_index
 CompressedSparsityPattern::column_number (const size_type row,
                                           const size_type index) const
 {
-  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  Assert (row < n_rows(), ExcIndexRangeType<size_type> (row, 0, n_rows()));
   Assert (index < lines[row].entries.size(),
-          ExcIndexRange (index, 0, lines[row].entries.size()));
+          ExcIndexRangeType<size_type> (index, 0, lines[row].entries.size()));
 
   if (lines[row].cache_entries != 0)
     lines[row].flush_cache ();
@@ -593,7 +593,7 @@ inline
 CompressedSparsityPattern::row_iterator
 CompressedSparsityPattern::row_begin (const size_type row) const
 {
-  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  Assert (row < n_rows(), ExcIndexRangeType<size_type> (row, 0, n_rows()));
 
   if (lines[row].cache_entries != 0)
     lines[row].flush_cache ();
@@ -606,7 +606,7 @@ inline
 CompressedSparsityPattern::row_iterator
 CompressedSparsityPattern::row_end (const size_type row) const
 {
-  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  Assert (row < n_rows(), ExcIndexRangeType<size_type> (row, 0, n_rows()));
   return lines[row].entries.end();
 }
 

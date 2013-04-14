@@ -1560,7 +1560,7 @@ namespace TrilinosWrappers
   SparsityPattern::const_iterator
   SparsityPattern::begin(const size_type r) const
   {
-    Assert (r < n_rows(), ExcIndexRange(r, 0, n_rows()));
+    Assert (r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
     if (row_length(r) > 0)
       return const_iterator(this, r, 0);
     else
@@ -1573,7 +1573,7 @@ namespace TrilinosWrappers
   SparsityPattern::const_iterator
   SparsityPattern::end(const size_type r) const
   {
-    Assert (r < n_rows(), ExcIndexRange(r, 0, n_rows()));
+    Assert (r < n_rows(), ExcIndexRangeType<size_type>(r, 0, n_rows()));
 
     // place the iterator on the first entry
     // past this line, or at the end of the
