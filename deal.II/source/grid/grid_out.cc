@@ -2015,7 +2015,7 @@ void GridOut::write_mathgl (const Triangulation<dim> &tria,
 	  << "\n# For a description of the MathGL script format see the MathGL manual.  "
 	  << "\n#"
 	  << "\n# Note: This file is understood by MathGL v2.1 and higher only, and can "
-	  << "\n#       be quickly viewed in a graphical environment using "mglview".   "
+	  << "\n#       be quickly viewed in a graphical environment using \'mglview\'. "
 	  << "\n#" << "\n"
 	;
     }
