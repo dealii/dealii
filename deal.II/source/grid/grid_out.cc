@@ -1513,7 +1513,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
     case GridOutFlags::Svg::subdomain_id:
       n = n_subdomains;
       break;
-      // case GridOutFlags::Svg::Coloring::level_subdomain_id: n = n_level_subdomains;
+      // case GridOutFlags::Svg::level_subdomain_id: n = n_level_subdomains;
       //   break;
     default:
       break;
@@ -1700,7 +1700,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
       << '\n' << '\n';
 
 
-  if (svg_flags.background == GridOutFlags::Svg::Background::dealii)
+  if (svg_flags.background == GridOutFlags::Svg::dealii)
     {
       out << " <linearGradient id=\"background_gradient\" gradientUnits=\"userSpaceOnUse\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"" << height << "\">" << '\n'
           << "  <stop offset=\"0\" style=\"stop-color:white\"/>" << '\n'
@@ -1715,8 +1715,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
       << "<style type=\"text/css\"><![CDATA[" << '\n';
 
   // set the background of the output graphic
-  if (svg_flags.background == GridOutFlags::Svg::Background::dealii) out << " rect.background{fill:url(#background_gradient)}" << '\n';
-  else if (svg_flags.background == GridOutFlags::Svg::Background::white) out << " rect.background{fill:white}" << '\n';
+  if (svg_flags.background == GridOutFlags::Svg::dealii) out << " rect.background{fill:url(#background_gradient)}" << '\n';
+  else if (svg_flags.background == GridOutFlags::Svg::white) out << " rect.background{fill:white}" << '\n';
   else out << " rect.background{fill:none}" << '\n';
 
   // basic svg graphic element styles
@@ -1774,16 +1774,16 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
           switch (svg_flags.coloring)
             {
-            case GridOutFlags::Svg::Coloring::material_id:
+            case GridOutFlags::Svg::material_id:
               while (!materials[labeling_index]) labeling_index++;
               break;
-            case GridOutFlags::Svg::Coloring::level_number:
+            case GridOutFlags::Svg::level_number:
               while (!levels[labeling_index]) labeling_index++;
               break;
-            case GridOutFlags::Svg::Coloring::subdomain_id:
+            case GridOutFlags::Svg::subdomain_id:
               while (!subdomains[labeling_index]) labeling_index++;
               break;
-              // case GridOutFlags::Svg::Coloring::level_subdomain_id: while(!level_subdomains[labeling_index]) labeling_index++;
+              // case GridOutFlags::Svg::level_subdomain_id: while(!level_subdomains[labeling_index]) labeling_index++;
               //   break;
             default:
               break;
@@ -1810,7 +1810,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   // background rectangle
   out << " <rect class=\"background\" width=\"" << width + additional_width << "\" height=\"" << height << "\"/>" << '\n';
 
-  if (svg_flags.background == GridOutFlags::Svg::Background::dealii)
+  if (svg_flags.background == GridOutFlags::Svg::dealii)
     {
       unsigned int x_offset = 0;
 
@@ -1854,16 +1854,16 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
               switch (svg_flags.coloring)
                 {
-                case GridOutFlags::Svg::Coloring::material_id:
+                case GridOutFlags::Svg::material_id:
                   out << (unsigned int)cell->material_id();
                   break;
-                case GridOutFlags::Svg::Coloring::level_number:
+                case GridOutFlags::Svg::level_number:
                   out << (unsigned int)cell->level();
                   break;
-                case GridOutFlags::Svg::Coloring::subdomain_id:
+                case GridOutFlags::Svg::subdomain_id:
                   out << (unsigned int)cell->subdomain_id();
                   break;
-                  // case GridOutFlags::Svg::Coloring::level_subdomain_id: out << (unsigned int)cell->level_subdomain_id();
+                  // case GridOutFlags::Svg::level_subdomain_id: out << (unsigned int)cell->level_subdomain_id();
                   //   break;
                 default:
                   break;
@@ -2165,16 +2165,16 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
         {
           switch (svg_flags.coloring)
             {
-            case GridOutFlags::Svg::Coloring::material_id:
+            case GridOutFlags::Svg::material_id:
               while (!materials[labeling_index]) labeling_index++;
               break;
-            case GridOutFlags::Svg::Coloring::level_number:
+            case GridOutFlags::Svg::level_number:
               while (!levels[labeling_index]) labeling_index++;
               break;
-            case GridOutFlags::Svg::Coloring::subdomain_id:
+            case GridOutFlags::Svg::subdomain_id:
               while (!subdomains[labeling_index]) labeling_index++;
               break;
-              // case GridOutFlags::Svg::Coloring::level_subdomain_id: while(!level_subdomains[labeling_index]) labeling_index++;
+              // case GridOutFlags::Svg::level_subdomain_id: while(!level_subdomains[labeling_index]) labeling_index++;
               //   break;
             default:
               break;
