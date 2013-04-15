@@ -74,7 +74,7 @@ IF(NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN")
   OPTION(DEAL_II_FORCE_BUNDLED_THREADS
     "Always use the bundled tbb library instead of an external one."
     OFF)
-  SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb30_104oss")
+  SET(TBB_FOLDER "${CMAKE_SOURCE_DIR}/bundled/tbb41_20130401oss")
 ENDIF()
 
 IF(FEATURE_THREADS_BUNDLED_CONFIGURED)

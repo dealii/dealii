@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1252"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="square"
+	ProjectGUID="{7462FB4A-C9BE-40D4-A568-5D08F507EEB1}"
+	VCNestedProjectGUID="{A21C0AEE-ADDC-45F0-A668-58FF10351D23}"
+	VCNestedProjectFileName="square.vcproj">
+	<Configurations/>
+	<Files/>
+</VisualStudioProject>

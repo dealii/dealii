@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="sub_string_finder_pretty"
+	ProjectGUID="{8ADCDB85-B3E0-4376-9378-0C349F9E6140}"
+	VCNestedProjectGUID="{3AA40693-F93D-4D4B-B32E-068F511A2524}"
+	VCNestedProjectFileName="sub_string_finder_pretty.vcproj">
+	<Configurations/>
+	<Files/>
+</VisualStudioProject>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="primes"
+	ProjectGUID="{D731702C-B704-468D-9497-A75EE0521C89}"
+	VCNestedProjectGUID="{3AA40693-F93D-4D4B-B32E-068F511A252A}"
+	VCNestedProjectFileName="primes.vcproj">
+	<Configurations/>
+	<Files/>
+</VisualStudioProject>

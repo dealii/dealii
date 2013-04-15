@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="pover"
+	ProjectGUID="{B175D396-7260-45F8-9E18-842ED8A32A16}"
+	VCNestedProjectGUID="{4BB7B455-1E09-41D3-BC89-6E67C9032F8C}"
+	VCNestedProjectFileName="pover.vcproj">
+	<Configurations/>
+	<Files/>
+</VisualStudioProject>

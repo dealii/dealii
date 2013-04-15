@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="parallel_preorder"
+	ProjectGUID="{68C4AFEA-1847-4EEE-9CC5-D4FCB712D09F}"
+	VCNestedProjectGUID="{3AA40693-F93D-4D4B-B32E-068F511A252B}"
+	VCNestedProjectFileName="parallel_preorder.vcproj">
+	<Configurations/>
+	<Files/>
+</VisualStudioProject>

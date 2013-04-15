@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="tachyon.tbb1d"
+	ProjectGUID="{4F173D3A-AE8C-4F7E-A4D0-6527F46B8495}"
+	VCNestedProjectGUID="{924517DF-2B6A-47D5-8A11-CC347CC4D8E9}"
+	VCNestedProjectFileName="tachyon.tbb1d.vcproj">
+	<Configurations/>
+	<Files/>
+</VisualStudioProject>
