@@ -2289,7 +2289,7 @@ DoFAccessor<0,DH<1,spacedim>, lda>::get_dof_indices (
   std::vector<types::global_dof_index> &dof_indices,
   const unsigned int fe_index) const
 {
-  for (types::global_dof_index i=0; i<dof_indices.size(); ++i)
+  for (unsigned int i=0; i<dof_indices.size(); ++i)
     dof_indices[i]
       = dealii::internal::DoFAccessor::Implementation::get_vertex_dof_index (
           *dof_handler,
@@ -2613,6 +2613,9 @@ namespace internal
           for (unsigned int d=0; d<dofs_per_vertex; ++d, ++index)
             accessor.set_vertex_dof_index(vertex,d,
                                           local_dof_indices[index]);
+        //TODO[bt] the function dof_index expects two unsigned int (I am not
+        //sure what should be the type of fe_index) but the following loop
+        //seems to do nothing but incrementing index.
         for (unsigned int d=0; d<dofs_per_line; ++d, ++index)
           accessor.dof_index(d, local_dof_indices[index]);
 

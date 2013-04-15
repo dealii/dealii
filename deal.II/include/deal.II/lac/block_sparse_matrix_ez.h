@@ -66,8 +66,8 @@ public:
    * blocks themselves still have
    * zero dimension.
    */
-  BlockSparseMatrixEZ (const size_type block_rows,
-                       const size_type block_cols);
+  BlockSparseMatrixEZ (const unsigned int block_rows,
+                       const unsigned int block_cols);
 
   /**
    * Copy constructor. This is
@@ -128,8 +128,8 @@ public:
    * called to update internal data
    * structures.
    */
-  void reinit (const size_type n_block_rows,
-               const size_type n_block_cols);
+  void reinit (const unsigned int n_block_rows,
+               const unsigned int n_block_cols);
   /**
    * This function collects the
    * sizes of the sub-objects and
@@ -149,8 +149,8 @@ public:
    * given coordinates.
    */
   SparseMatrixEZ<Number> &
-  block (const size_type row,
-         const size_type column);
+  block (const unsigned int row,
+         const unsigned int column);
 
 
   /**
@@ -159,20 +159,20 @@ public:
    * constant objects.
    */
   const SparseMatrixEZ<Number> &
-  block (const size_type row,
-         const size_type column) const;
+  block (const unsigned int row,
+         const unsigned int column) const;
 
   /**
    * Return the number of blocks in a
    * column.
    */
-  size_type n_block_rows () const;
+  unsigned int n_block_rows () const;
 
   /**
    * Return the number of blocks in a
    * row.
    */
-  size_type n_block_cols () const;
+  unsigned int n_block_cols () const;
 
   /**
    * Return whether the object is
@@ -333,7 +333,7 @@ private:
 
 template <typename Number>
 inline
-typename BlockSparseMatrixEZ<Number>::size_type
+unsigned int
 BlockSparseMatrixEZ<Number>::n_block_rows () const
 {
   return row_indices.size();
@@ -353,7 +353,7 @@ BlockSparseMatrixEZ<Number>::n_rows () const
 
 template <typename Number>
 inline
-typename BlockSparseMatrixEZ<Number>::size_type
+unsigned int
 BlockSparseMatrixEZ<Number>::n_block_cols () const
 {
   return column_indices.size();
@@ -374,8 +374,8 @@ BlockSparseMatrixEZ<Number>::n_cols () const
 template <typename Number>
 inline
 SparseMatrixEZ<Number> &
-BlockSparseMatrixEZ<Number>::block (const size_type row,
-                                    const size_type column)
+BlockSparseMatrixEZ<Number>::block (const unsigned int row,
+                                    const unsigned int column)
 {
   Assert (row<n_block_rows(), ExcIndexRange (row, 0, n_block_rows()));
   Assert (column<n_block_cols(), ExcIndexRange (column, 0, n_block_cols()));
@@ -388,8 +388,8 @@ BlockSparseMatrixEZ<Number>::block (const size_type row,
 template <typename Number>
 inline
 const SparseMatrixEZ<Number> &
-BlockSparseMatrixEZ<Number>::block (const size_type row,
-                                    const size_type column) const
+BlockSparseMatrixEZ<Number>::block (const unsigned int row,
+                                    const unsigned int column) const
 {
   Assert (row<n_block_rows(), ExcIndexRange (row, 0, n_block_rows()));
   Assert (column<n_block_cols(), ExcIndexRange (column, 0, n_block_cols()));
@@ -449,7 +449,7 @@ BlockSparseMatrixEZ<Number>::add (const size_type i,
 
   Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
-  const std::pair<size_type,size_type>
+  const std::pair<unsigned int,size_type>
   row_index = row_indices.global_to_local (i),
   col_index = column_indices.global_to_local (j);
   block(row_index.first,col_index.first).add (row_index.second,
@@ -514,8 +514,8 @@ Tvmult (BlockVector<somenumber>       &dst,
 
   dst = 0.;
 
-  for (size_type row=0; row<n_block_rows(); ++row)
-    for (size_type col=0; col<n_block_cols(); ++col)
+  for (unsigned int row=0; row<n_block_rows(); ++row)
+    for (unsigned int col=0; col<n_block_cols(); ++col)
       block(row,col).Tvmult_add (dst.block(col),
                                  src.block(row));
 }
@@ -534,12 +534,10 @@ Tvmult_add (BlockVector<somenumber>       &dst,
   Assert (src.n_blocks() == n_block_rows(),
           ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
-  for (size_type row=0; row<n_block_rows(); ++row)
-    {
-      for (size_type col=0; col<n_block_cols(); ++col)
+  for (unsigned int row=0; row<n_block_rows(); ++row)
+      for (unsigned int col=0; col<n_block_cols(); ++col)
         block(row,col).Tvmult_add (dst.block(col),
                                    src.block(row));
-    };
 }
 
 
