@@ -63,7 +63,7 @@
 
 #include <deal.II/lac/abstract_linear_algebra.h>
 
-//#define USE_PETSC_LA
+#define USE_PETSC_LA
 
 namespace LA
 {
@@ -1713,9 +1713,8 @@ namespace Step32
 
     std::vector<double> rhs_values(n_q_points);
 
-    LA::MPI::Vector
-    rhs (temperature_mass_matrix.row_partitioner()),
-        solution (temperature_mass_matrix.row_partitioner());
+    LA::MPI::Vector rhs (temperature_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
+    LA::MPI::Vector solution (temperature_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
 
     const EquationData::TemperatureInitialValues<dim> initial_temperature;
 
@@ -1763,7 +1762,11 @@ namespace Step32
     SolverCG<LA::MPI::Vector> cg(solver_control);
 
     LA::MPI::PreconditionJacobi preconditioner_mass;
+#ifdef USE_PETSC_LA
+    preconditioner_mass.initialize(temperature_mass_matrix);
+#else
     preconditioner_mass.initialize(temperature_mass_matrix, 1.3);
+#endif
 
     cg.solve (temperature_mass_matrix, solution, rhs, preconditioner_mass);
 
