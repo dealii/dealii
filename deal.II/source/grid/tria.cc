@@ -2809,13 +2809,13 @@ namespace internal
 
         // also note if a vertex is at the boundary if we are asked to
         // keep boundary vertices untouched
-	if (keep_boundary)
-	  for (typename Triangulation<dim,spacedim>::active_line_iterator
-		 line=triangulation.begin_active_line();
-	       line != triangulation.end_line(); ++line)
-	    for (unsigned int vertex=0; vertex<2; ++vertex)
-	      if (line->at_boundary(vertex) == true)
-		at_boundary[line->vertex_index(vertex)] = true;
+        if (keep_boundary)
+          for (typename Triangulation<dim,spacedim>::active_line_iterator
+               line=triangulation.begin_active_line();
+               line != triangulation.end_line(); ++line)
+            for (unsigned int vertex=0; vertex<2; ++vertex)
+              if (line->at_boundary(vertex) == true)
+                at_boundary[line->vertex_index(vertex)] = true;
 
 
         const unsigned int n_vertices = triangulation.vertices.size();

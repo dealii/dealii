@@ -208,7 +208,7 @@ more parallelism from more cells, exploited by the (involved) dynamic task
 scheduling approach taken in the cell loop of the MatrixFree class. Note
 that about 30% of the time in the
 matrix-free solver is spent on restriction and prolongation, which use sparse
-matrices. So the speedup could be even better if all parts where done
+matrices. So the speedup could be even better if all parts were done
 efficiently.
 
 Of course, this picture does not necessarily translate to all cases, as there

@@ -29,18 +29,25 @@ SET_IF_EMPTY(TBB_DIR "$ENV{TBB_DIR}")
 FIND_PATH(TBB_INCLUDE_DIR tbb/parallel_reduce.h
   HINTS
     ${TBB_DIR}
-  PATH_SUFFIXES include include/tbb tbb)
+  PATH_SUFFIXES include include/tbb tbb
+  )
+
+FILE(GLOB _path ${TBB_DIR}/build/*_release)
 
 FIND_LIBRARY(TBB_LIBRARY
   NAMES tbb
   HINTS
+    ${_path}
     ${TBB_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )
 
+FILE(GLOB _path ${TBB_DIR}/build/*_debug)
+
 FIND_LIBRARY(TBB_DEBUG_LIBRARY
   NAMES tbb_debug
   HINTS
+    ${_path}
     ${TBB_DIR}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
   )

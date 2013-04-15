@@ -1,0 +1,496 @@
+/*
+    Copyright 2005-2013 Intel Corporation.  All Rights Reserved.
+
+    This file is part of Threading Building Blocks.
+
+    Threading Building Blocks is free software; you can redistribute it
+    and/or modify it under the terms of the GNU General Public License
+    version 2 as published by the Free Software Foundation.
+
+    Threading Building Blocks is distributed in the hope that it will be
+    useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+    of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Threading Building Blocks; if not, write to the Free Software
+    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
+
+    As a special exception, you may use this file as part of a free software
+    library without restriction.  Specifically, if other files instantiate
+    templates or use macros or inline functions from this file, or you compile
+    this file and link it with other files to produce an executable, this
+    file does not by itself cause the resulting executable to be covered by
+    the GNU General Public License.  This exception does not however
+    invalidate any other reasons why the executable file might be covered by
+    the GNU General Public License.
+*/
+
+#ifndef __TBB_tuple_H
+#define __TBB_tuple_H
+
+#include <utility>
+#include "../tbb_stddef.h"
+
+// build preprocessor variables for varying number of arguments
+// Need the leading comma so the empty __TBB_T_PACK will not cause a syntax error.
+#if __TBB_VARIADIC_MAX <= 5
+#define __TBB_T_PACK
+#define __TBB_U_PACK
+#define __TBB_TYPENAME_T_PACK
+#define __TBB_TYPENAME_U_PACK
+#define __TBB_NULL_TYPE_PACK
+#define __TBB_REF_T_PARAM_PACK
+#define __TBB_CONST_REF_T_PARAM_PACK
+#define __TBB_T_PARAM_LIST_PACK
+#define __TBB_CONST_NULL_REF_PACK
+//
+#elif __TBB_VARIADIC_MAX == 6
+#define __TBB_T_PACK ,T5
+#define __TBB_U_PACK ,U5
+#define __TBB_TYPENAME_T_PACK , typename T5
+#define __TBB_TYPENAME_U_PACK , typename U5
+#define __TBB_NULL_TYPE_PACK , null_type
+#define __TBB_REF_T_PARAM_PACK ,T5& t5
+#define __TBB_CONST_REF_T_PARAM_PACK ,const T5& t5
+#define __TBB_T_PARAM_LIST_PACK ,t5
+#define __TBB_CONST_NULL_REF_PACK , const null_type&
+//
+#elif __TBB_VARIADIC_MAX == 7
+#define __TBB_T_PACK ,T5, T6
+#define __TBB_U_PACK ,U5, U6
+#define __TBB_TYPENAME_T_PACK , typename T5 , typename T6
+#define __TBB_TYPENAME_U_PACK , typename U5 , typename U6
+#define __TBB_NULL_TYPE_PACK , null_type, null_type
+#define __TBB_REF_T_PARAM_PACK ,T5& t5, T6& t6
+#define __TBB_CONST_REF_T_PARAM_PACK ,const T5& t5, const T6& t6
+#define __TBB_T_PARAM_LIST_PACK ,t5 ,t6
+#define __TBB_CONST_NULL_REF_PACK , const null_type&, const null_type&
+//
+#elif __TBB_VARIADIC_MAX == 8
+#define __TBB_T_PACK ,T5, T6, T7
+#define __TBB_U_PACK ,U5, U6, U7
+#define __TBB_TYPENAME_T_PACK , typename T5 , typename T6, typename T7
+#define __TBB_TYPENAME_U_PACK , typename U5 , typename U6, typename U7
+#define __TBB_NULL_TYPE_PACK , null_type, null_type, null_type
+#define __TBB_REF_T_PARAM_PACK ,T5& t5, T6& t6, T7& t7
+#define __TBB_CONST_REF_T_PARAM_PACK , const T5& t5, const T6& t6, const T7& t7
+#define __TBB_T_PARAM_LIST_PACK ,t5 ,t6 ,t7
+#define __TBB_CONST_NULL_REF_PACK , const null_type&, const null_type&, const null_type&
+//
+#elif __TBB_VARIADIC_MAX == 9
+#define __TBB_T_PACK ,T5, T6, T7, T8
+#define __TBB_U_PACK ,U5, U6, U7, U8
+#define __TBB_TYPENAME_T_PACK , typename T5, typename T6, typename T7, typename T8
+#define __TBB_TYPENAME_U_PACK , typename U5, typename U6, typename U7, typename U8
+#define __TBB_NULL_TYPE_PACK , null_type, null_type, null_type, null_type
+#define __TBB_REF_T_PARAM_PACK ,T5& t5, T6& t6, T7& t7, T8& t8
+#define __TBB_CONST_REF_T_PARAM_PACK , const T5& t5, const T6& t6, const T7& t7, const T8& t8
+#define __TBB_T_PARAM_LIST_PACK ,t5 ,t6 ,t7 ,t8
+#define __TBB_CONST_NULL_REF_PACK , const null_type&, const null_type&, const null_type&, const null_type&
+//
+#elif __TBB_VARIADIC_MAX >= 10
+#define __TBB_T_PACK ,T5, T6, T7, T8, T9
+#define __TBB_U_PACK ,U5, U6, U7, U8, U9
+#define __TBB_TYPENAME_T_PACK , typename T5, typename T6, typename T7, typename T8, typename T9
+#define __TBB_TYPENAME_U_PACK , typename U5, typename U6, typename U7, typename U8, typename U9
+#define __TBB_NULL_TYPE_PACK , null_type, null_type, null_type, null_type, null_type
+#define __TBB_REF_T_PARAM_PACK ,T5& t5, T6& t6, T7& t7, T8& t8, T9& t9
+#define __TBB_CONST_REF_T_PARAM_PACK , const T5& t5, const T6& t6, const T7& t7, const T8& t8, const T9& t9
+#define __TBB_T_PARAM_LIST_PACK ,t5 ,t6 ,t7 ,t8 ,t9
+#define __TBB_CONST_NULL_REF_PACK , const null_type&, const null_type&, const null_type&, const null_type&, const null_type&
+#endif
+
+
+
+namespace tbb {
+namespace interface5 {
+
+namespace internal {
+struct null_type { };
+}
+using internal::null_type;
+
+// tuple forward declaration
+template <typename T0=null_type, typename T1=null_type, typename T2=null_type,
+          typename T3=null_type, typename T4=null_type
+#if __TBB_VARIADIC_MAX >= 6
+, typename T5=null_type
+#if __TBB_VARIADIC_MAX >= 7
+, typename T6=null_type
+#if __TBB_VARIADIC_MAX >= 8
+, typename T7=null_type
+#if __TBB_VARIADIC_MAX >= 9
+, typename T8=null_type
+#if __TBB_VARIADIC_MAX >= 10
+, typename T9=null_type
+#endif
+#endif
+#endif
+#endif
+#endif
+>
+class tuple;
+
+namespace internal {
+
+// const null_type temp
+inline const null_type cnull() { return null_type(); }
+
+// cons forward declaration
+template <typename HT, typename TT> struct cons;
+
+// type of a component of the cons
+template<int N, typename T>
+struct component {
+    typedef typename T::tail_type next;
+    typedef typename component<N-1,next>::type type;
+};
+
+template<typename T>
+struct component<0,T> {
+    typedef typename T::head_type type;
+};
+
+template<>
+struct component<0,null_type> {
+    typedef null_type type;
+};
+
+// const version of component
+
+template<int N, typename T>
+struct component<N, const T>
+{
+    typedef typename T::tail_type next;
+    typedef const typename component<N-1,next>::type type;
+};
+
+template<typename T>
+struct component<0, const T>
+{
+    typedef const typename T::head_type type;
+};
+
+
+// helper class for getting components of cons
+template< int N>
+struct get_helper {
+template<typename HT, typename TT>
+inline static typename component<N, cons<HT,TT> >::type& get(cons<HT,TT>& ti) {
+    return get_helper<N-1>::get(ti.tail);
+}
+template<typename HT, typename TT>
+inline static typename component<N, cons<HT,TT> >::type const& get(const cons<HT,TT>& ti) {
+    return get_helper<N-1>::get(ti.tail);
+}
+};
+
+template<>
+struct get_helper<0> {
+template<typename HT, typename TT>
+inline static typename component<0, cons<HT,TT> >::type& get(cons<HT,TT>& ti) {
+    return ti.head;
+}
+template<typename HT, typename TT>
+inline static typename component<0, cons<HT,TT> >::type const& get(const cons<HT,TT>& ti) {
+    return ti.head;
+}
+};
+
+// traits adaptor
+template <typename T0, typename T1, typename T2, typename T3, typename T4 __TBB_TYPENAME_T_PACK>
+struct tuple_traits {
+    typedef cons <T0, typename tuple_traits<T1, T2, T3, T4 __TBB_T_PACK , null_type>::U > U;
+};
+
+template <typename T0>
+struct tuple_traits<T0, null_type, null_type, null_type, null_type __TBB_NULL_TYPE_PACK > {
+    typedef cons<T0, null_type> U;
+};
+
+template<>
+struct tuple_traits<null_type, null_type, null_type, null_type, null_type __TBB_NULL_TYPE_PACK > {
+    typedef null_type U;
+};
+
+
+// core cons defs
+template <typename HT, typename TT>
+struct cons{
+
+    typedef HT head_type;
+    typedef TT tail_type;
+
+    head_type head; 
+    tail_type tail;
+
+    static const int length = 1 + tail_type::length;
+
+    // default constructors
+    explicit cons() : head(), tail() { }
+
+    // non-default constructors
+    cons(head_type& h, const tail_type& t) : head(h), tail(t) { }
+
+    template <typename T0, typename T1, typename T2, typename T3, typename T4 __TBB_TYPENAME_T_PACK >
+    cons(const T0& t0, const T1& t1, const T2& t2, const T3& t3, const T4& t4 __TBB_CONST_REF_T_PARAM_PACK) :
+        head(t0), tail(t1, t2, t3, t4 __TBB_T_PARAM_LIST_PACK, cnull()) { }
+
+    template <typename T0, typename T1, typename T2, typename T3, typename T4 __TBB_TYPENAME_T_PACK >
+    cons(T0& t0, T1& t1, T2& t2, T3& t3, T4& t4 __TBB_REF_T_PARAM_PACK) :
+        head(t0), tail(t1, t2, t3, t4 __TBB_T_PARAM_LIST_PACK , cnull()) { }
+
+    template <typename HT1, typename TT1>
+    cons(const cons<HT1,TT1>& other) : head(other.head), tail(other.tail) { }
+
+    cons& operator=(const cons& other) { head = other.head; tail = other.tail; return *this; }
+
+    friend bool operator==(const cons& me, const cons& other) {
+        return me.head == other.head && me.tail == other.tail;
+    }
+    friend bool operator<(const cons& me, const cons& other)  {
+        return me.head < other.head || (!(other.head < me.head) && me.tail < other.tail);
+    }
+    friend bool operator>(const cons& me, const cons& other)  { return other<me; }
+    friend bool operator!=(const cons& me, const cons& other) { return !(me==other); }
+    friend bool operator>=(const cons& me, const cons& other) { return !(me<other); }
+    friend bool operator<=(const cons& me, const cons& other) { return !(me>other); }
+
+    template<typename HT1, typename TT1>
+    friend bool operator==(const cons<HT,TT>& me, const cons<HT1,TT1>& other) {
+        return me.head == other.head && me.tail == other.tail;
+    }
+
+    template<typename HT1, typename TT1>
+    friend bool operator<(const cons<HT,TT>& me, const cons<HT1,TT1>& other) {
+        return me.head < other.head || (!(other.head < me.head) && me.tail < other.tail);
+    }
+
+    template<typename HT1, typename TT1>
+    friend bool operator>(const cons<HT,TT>& me, const cons<HT1,TT1>& other) { return other<me; }
+
+    template<typename HT1, typename TT1>
+    friend bool operator!=(const cons<HT,TT>& me, const cons<HT1,TT1>& other) { return !(me==other); }
+
+    template<typename HT1, typename TT1>
+    friend bool operator>=(const cons<HT,TT>& me, const cons<HT1,TT1>& other) { return !(me<other); }
+
+    template<typename HT1, typename TT1>
+    friend bool operator<=(const cons<HT,TT>& me, const cons<HT1,TT1>& other) { return !(me>other); }
+
+
+};  // cons
+
+
+template <typename HT>
+struct cons<HT,null_type> { 
+
+    typedef HT head_type;
+    typedef null_type tail_type;
+
+    head_type head; 
+
+    static const int length = 1;
+
+    // default constructor
+    cons() : head() { /*std::cout << "default constructor 1\n";*/ }
+
+    cons(const null_type&, const null_type&, const null_type&, const null_type&, const null_type& __TBB_CONST_NULL_REF_PACK) : head() { /*std::cout << "default constructor 2\n";*/ }
+
+    // non-default constructor
+    template<typename T1>
+    cons(T1& t1, const null_type&, const null_type&, const null_type&, const null_type& __TBB_CONST_NULL_REF_PACK) : head(t1) { /*std::cout << "non-default a1, t1== " << t1 << "\n";*/}
+
+    cons(head_type& h, const null_type& = null_type() ) : head(h) { }
+    cons(const head_type& t0, const null_type&, const null_type&, const null_type&, const null_type& __TBB_CONST_NULL_REF_PACK) : head(t0) { }
+
+    // converting constructor
+    template<typename HT1>
+    cons(HT1 h1, const null_type&, const null_type&, const null_type&, const null_type& __TBB_CONST_NULL_REF_PACK) : head(h1) { }
+
+    // copy constructor
+    template<typename HT1>
+    cons( const cons<HT1, null_type>& other) : head(other.head) { }
+
+    // assignment operator
+    cons& operator=(const cons& other) { head = other.head; return *this; }
+
+    friend bool operator==(const cons& me, const cons& other) { return me.head == other.head; }
+    friend bool operator<(const cons& me, const cons& other) { return me.head < other.head; }
+    friend bool operator>(const cons& me, const cons& other) { return other<me; }
+    friend bool operator!=(const cons& me, const cons& other) {return !(me==other); }
+    friend bool operator<=(const cons& me, const cons& other) {return !(me>other); }
+    friend bool operator>=(const cons& me, const cons& other) {return !(me<other); }
+
+    template<typename HT1>
+    friend bool operator==(const cons<HT,null_type>& me, const cons<HT1,null_type>& other) {
+        return me.head == other.head;
+    }
+
+    template<typename HT1>
+    friend bool operator<(const cons<HT,null_type>& me, const cons<HT1,null_type>& other) {
+        return me.head < other.head;
+    }
+
+    template<typename HT1>
+    friend bool operator>(const cons<HT,null_type>& me, const cons<HT1,null_type>& other) { return other<me; }
+
+    template<typename HT1>
+    friend bool operator!=(const cons<HT,null_type>& me, const cons<HT1,null_type>& other) { return !(me==other); }
+
+    template<typename HT1>
+    friend bool operator<=(const cons<HT,null_type>& me, const cons<HT1,null_type>& other) { return !(me>other); }
+
+    template<typename HT1>
+    friend bool operator>=(const cons<HT,null_type>& me, const cons<HT1,null_type>& other) { return !(me<other); }
+
+};  // cons
+
+template <>
+struct cons<null_type,null_type> { typedef null_type tail_type; static const int length = 0; };
+
+// wrapper for default constructor
+template<typename T>
+inline const T wrap_dcons(T*) { return T(); }
+
+} // namespace internal
+
+// tuple definition
+template<typename T0, typename T1, typename T2, typename T3, typename T4 __TBB_TYPENAME_T_PACK >
+class tuple : public internal::tuple_traits<T0, T1, T2, T3, T4 __TBB_T_PACK >::U {
+    // friends
+    template <typename T> friend class tuple_size;
+    template<int N, typename T> friend struct tuple_element;
+
+    // stl components
+    typedef tuple<T0,T1,T2,T3,T4 __TBB_T_PACK > value_type;
+    typedef value_type *pointer;
+    typedef const value_type *const_pointer;
+    typedef value_type &reference;
+    typedef const value_type &const_reference;
+    typedef size_t size_type;
+
+    typedef typename internal::tuple_traits<T0,T1,T2,T3, T4 __TBB_T_PACK >::U my_cons;
+
+public:
+    tuple(const T0& t0=internal::wrap_dcons((T0*)NULL)
+          ,const T1& t1=internal::wrap_dcons((T1*)NULL)
+          ,const T2& t2=internal::wrap_dcons((T2*)NULL)
+          ,const T3& t3=internal::wrap_dcons((T3*)NULL)
+          ,const T4& t4=internal::wrap_dcons((T4*)NULL)
+#if __TBB_VARIADIC_MAX >= 6
+          ,const T5& t5=internal::wrap_dcons((T5*)NULL)
+#if __TBB_VARIADIC_MAX >= 7
+          ,const T6& t6=internal::wrap_dcons((T6*)NULL)
+#if __TBB_VARIADIC_MAX >= 8
+          ,const T7& t7=internal::wrap_dcons((T7*)NULL)
+#if __TBB_VARIADIC_MAX >= 9
+          ,const T8& t8=internal::wrap_dcons((T8*)NULL)
+#if __TBB_VARIADIC_MAX >= 10
+          ,const T9& t9=internal::wrap_dcons((T9*)NULL)
+#endif
+#endif
+#endif
+#endif
+#endif
+          ) :
+        my_cons(t0,t1,t2,t3,t4 __TBB_T_PARAM_LIST_PACK) { }
+
+    template<int N>
+    struct internal_tuple_element {
+        typedef typename internal::component<N,my_cons>::type type;
+    };
+
+    template<int N>
+    typename internal_tuple_element<N>::type& get() { return internal::get_helper<N>::get(*this); }
+
+    template<int N>
+    typename internal_tuple_element<N>::type const& get() const { return internal::get_helper<N>::get(*this); }
+
+    template<typename U1, typename U2>
+    tuple& operator=(const internal::cons<U1,U2>& other) {
+        my_cons::operator=(other);
+        return *this;
+    }
+
+    template<typename U1, typename U2>
+    tuple& operator=(const std::pair<U1,U2>& other) {
+        // __TBB_ASSERT(tuple_size<value_type>::value == 2, "Invalid size for pair to tuple assignment");
+        this->head = other.first;
+        this->tail.head = other.second;
+        return *this;
+    }
+
+    friend bool operator==(const tuple& me, const tuple& other) {return static_cast<const my_cons &>(me)==(other);}
+    friend bool operator<(const tuple& me,  const tuple& other) {return static_cast<const my_cons &>(me)<(other);}
+    friend bool operator>(const tuple& me,  const tuple& other) {return static_cast<const my_cons &>(me)>(other);}
+    friend bool operator!=(const tuple& me, const tuple& other) {return static_cast<const my_cons &>(me)!=(other);}
+    friend bool operator>=(const tuple& me, const tuple& other) {return static_cast<const my_cons &>(me)>=(other);}
+    friend bool operator<=(const tuple& me, const tuple& other) {return static_cast<const my_cons &>(me)<=(other);}
+
+};  // tuple
+
+// empty tuple
+template<>
+class tuple<null_type, null_type, null_type, null_type, null_type __TBB_NULL_TYPE_PACK > : public null_type {
+};
+
+// helper classes
+
+template < typename T>
+class tuple_size {
+public:
+    static const size_t value = 1 + tuple_size<typename T::tail_type>::value;
+};
+
+template <>
+class tuple_size<tuple<> > { 
+public:
+    static const size_t value = 0;
+};
+
+template <>
+class tuple_size<null_type> {
+public:
+    static const size_t value = 0;
+};
+
+template<int N, typename T>
+struct tuple_element {
+    typedef typename internal::component<N, typename T::my_cons>::type type;
+};
+
+template<int N, typename T0, typename T1, typename T2, typename T3, typename T4 __TBB_TYPENAME_T_PACK >
+inline static typename tuple_element<N,tuple<T0,T1,T2,T3,T4 __TBB_T_PACK > >::type&
+    get(tuple<T0,T1,T2,T3,T4 __TBB_T_PACK >& t) { return internal::get_helper<N>::get(t); }
+
+template<int N, typename T0, typename T1, typename T2, typename T3, typename T4 __TBB_TYPENAME_T_PACK >
+inline static typename tuple_element<N,tuple<T0,T1,T2,T3,T4 __TBB_T_PACK > >::type const&
+    get(const tuple<T0,T1,T2,T3,T4 __TBB_T_PACK >& t) { return internal::get_helper<N>::get(t); }
+
+}  // interface5
+} // tbb
+
+#if !__TBB_CPP11_TUPLE_PRESENT
+namespace tbb {
+    namespace flow {
+        using tbb::interface5::tuple;
+        using tbb::interface5::tuple_size;
+        using tbb::interface5::tuple_element;
+        using tbb::interface5::get;
+    }
+}
+#endif
+
+#undef __TBB_T_PACK
+#undef __TBB_U_PACK
+#undef __TBB_TYPENAME_T_PACK
+#undef __TBB_TYPENAME_U_PACK
+#undef __TBB_NULL_TYPE_PACK
+#undef __TBB_REF_T_PARAM_PACK
+#undef __TBB_CONST_REF_T_PARAM_PACK
+#undef __TBB_T_PARAM_LIST_PACK
+#undef __TBB_CONST_NULL_REF_PACK
+ 
+#endif /* __TBB_tuple_H */

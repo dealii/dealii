@@ -172,6 +172,8 @@ namespace Step26
   template<int dim>
   void HeatEquation<dim>::setup_system()
   {
+//TODO: we need to take care of constraints here! :-)
+
     dof_handler.distribute_dofs(fe);
 
     std::cout << std::endl

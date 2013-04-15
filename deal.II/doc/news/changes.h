@@ -25,6 +25,13 @@ inconvenience this causes.
 
 <ol>
 
+<li> Removed: A number of header files that have been deprecated a long time
+ago have been removed. All of them had previously only included the header file
+that had superseded them. To upgrade, simply include the currently used
+header file. This is also backward compatible with deal.II 7.3.
+<br>
+(Guido Kanschat, 2013/04/12)
+
 <li> Removed: The interfaces to the obsolete direct solvers MA27 and MA47 from
 the Harwell Subroutine Library. Support for the HSL routines were not ported to
 the new build system. However, the sparse direct solver UMFPACK remains to be
@@ -32,7 +39,6 @@ supported and is provided as part of the standard deal.II distribution, unlike
 the HSL functions.
 <br>
 (Matthias Maier, 2013/04/01)
-
 
 <li> Changed: The TimeDependent::end_sweep function with an argument indicating
 the number of threads has been removed. Use the corresponding function without
@@ -51,6 +57,11 @@ this function.
 
 
 <ol>
+  <li> New: The step-49 tutorial program now also has a discussion on
+  what to do once you have a coarse mesh and want to refine it.
+  </li>
+  (Wolfgang Bangerth, 2013/04/03)
+
   <li> New: The number of threads used by deal.II/TBB can now be limited at
   run time. Using MPI based code using PETSc/Trilinos no longer requires you
   to compile the library without threads. See MPI_InitFinalize and
@@ -88,6 +99,19 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Improved: The SolverCG implementation now uses only three auxiliary
+vectors, down from previously four. Also, there are some shortcuts in case
+PreconditionIdentity is used that improve the solver's performance.
+<br>
+(Martin Kronbichler, 2013/04/11)
+</li>
+
+<li> Fixed: The results section of step-23 did not show the movie in release 7.3
+due to a poor HTML markup. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2013/04/10)
+</li>
+
 <li> Fixed: It is now possible to use the MeshWorker framework in 1d as well.
 <br>
 (Wolfgang Bangerth, Scott Miller, 2013/04/09)
