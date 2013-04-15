@@ -1377,7 +1377,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   unsigned int width;
 
   unsigned int margin_in_percent = 0;
-  if (svg_flags.margin || svg_flags.background == GridOutFlags::Svg::dealii) margin_in_percent = 8.5;
+  if (svg_flags.margin || svg_flags.background == GridOutFlags::Svg::dealii)
+    margin_in_percent = 8;
 
   // initial font size for cell labels
   unsigned int cell_label_font_size;
@@ -1503,13 +1504,13 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
   switch (svg_flags.coloring)
     {
-    case GridOutFlags::Svg::Coloring::material_id:
+      case GridOutFlags::Svg::material_id:
       n = n_materials;
       break;
-    case GridOutFlags::Svg::Coloring::level_number:
+    case GridOutFlags::Svg::level_number:
       n = n_levels;
       break;
-    case GridOutFlags::Svg::Coloring::subdomain_id:
+    case GridOutFlags::Svg::subdomain_id:
       n = n_subdomains;
       break;
       // case GridOutFlags::Svg::Coloring::level_subdomain_id: n = n_level_subdomains;
