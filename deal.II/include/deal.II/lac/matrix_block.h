@@ -351,14 +351,14 @@ public:
    * position of the data member
    * matrix on the global matrix.
    */
-  size_type row;
+  unsigned int row;
   /**
    * Column coordinate.  This is
    * the position of the data
    * member matrix on the global
    * matrix.
    */
-  size_type column;
+  unsigned int column;
 
   /**
    * The matrix itself

@@ -463,8 +463,8 @@ void
 CompressedSetSparsityPattern::add (const size_type i,
                                    const size_type j)
 {
-  Assert (i<rows, ExcIndexRange(i, 0, rows));
-  Assert (j<cols, ExcIndexRange(j, 0, cols));
+  Assert (i<rows, ExcIndexRangeType<size_type>(i, 0, rows));
+  Assert (j<cols, ExcIndexRangeType<size_type>(j, 0, cols));
 
   lines[i].add (j);
 }
@@ -479,7 +479,7 @@ CompressedSetSparsityPattern::add_entries (const size_type row,
                                            ForwardIterator end,
                                            const bool         /*indices_are_sorted*/)
 {
-  Assert (row < rows, ExcIndexRange (row, 0, rows));
+  Assert (row < rows, ExcIndexRangeType<size_type> (row, 0, rows));
 
   lines[row].add_entries (begin, end);
 }
@@ -490,7 +490,7 @@ inline
 CompressedSetSparsityPattern::size_type
 CompressedSetSparsityPattern::row_length (const size_type row) const
 {
-  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  Assert (row < n_rows(), ExcIndexRangeType<size_type> (row, 0, n_rows()));
 
   return lines[row].entries.size();
 }
