@@ -1377,7 +1377,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   unsigned int width;
 
   unsigned int margin_in_percent = 0;
-  if (svg_flags.margin || svg_flags.background == GridOutFlags::Svg::Background::dealii) margin_in_percent = 8.5;
+  if (svg_flags.margin || svg_flags.background == GridOutFlags::Svg::dealii) margin_in_percent = 8.5;
 
   // initial font size for cell labels
   unsigned int cell_label_font_size;
@@ -1386,10 +1386,10 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   unsigned int font_size = static_cast<unsigned int>(.5 + (height/100.) * 2.);
 
   // get date and time
-  time_t time_stamp;
-  tm *now;
-  time_stamp = time(0);
-  now = localtime(&time_stamp);
+  // time_t time_stamp;
+  // tm *now;
+  // time_stamp = time(0);
+  // now = localtime(&time_stamp);
 
   // vectors and variables for the perspective view
   Point<3> camera_position;
