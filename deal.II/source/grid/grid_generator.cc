@@ -47,7 +47,7 @@ DEAL_II_NAMESPACE_OPEN
 namespace
 {
   // Corner points of the cube [-1,1]^3
-  const Point<3> hexahedron[8] =
+    const Point<3> hexahedron[8] =
   {
     Point<3>(-1,-1,-1),
     Point<3>(+1,-1,-1),
