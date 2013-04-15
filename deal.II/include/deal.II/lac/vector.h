@@ -1261,7 +1261,7 @@ template <typename Number>
 inline
 Number &Vector<Number>::operator() (const size_type i)
 {
-  Assert (i<vec_size, ExcIndexRange(i,0,vec_size));
+  Assert (i<vec_size, ExcIndexRangeType<size_type>(i,0,vec_size));
   return val[i];
 }
 

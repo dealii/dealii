@@ -510,8 +510,8 @@ void
 CompressedSimpleSparsityPattern::add (const size_type i,
                                       const size_type j)
 {
-  Assert (i<rows, ExcIndexRange(i, 0, rows));
-  Assert (j<cols, ExcIndexRange(j, 0, cols));
+  Assert (i<rows, ExcIndexRangeType<size_type>(i, 0, rows));
+  Assert (j<cols, ExcIndexRangeType<size_type>(j, 0, cols));
 
   if (rowset.size() > 0 && !rowset.is_element(i))
     return;
@@ -531,7 +531,7 @@ CompressedSimpleSparsityPattern::add_entries (const size_type row,
                                               ForwardIterator end,
                                               const bool      indices_are_sorted)
 {
-  Assert (row < rows, ExcIndexRange (row, 0, rows));
+  Assert (row < rows, ExcIndexRangeType<size_type> (row, 0, rows));
 
   if (rowset.size() > 0 && !rowset.is_element(row))
     return;
@@ -553,7 +553,7 @@ inline
 types::global_dof_index
 CompressedSimpleSparsityPattern::row_length (const size_type row) const
 {
-  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  Assert (row < n_rows(), ExcIndexRangeType<size_type> (row, 0, n_rows()));
   if (rowset.size() > 0 && !rowset.is_element(row))
     return 0;
 
@@ -569,12 +569,12 @@ types::global_dof_index
 CompressedSimpleSparsityPattern::column_number (const size_type row,
                                                 const size_type index) const
 {
-  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  Assert (row < n_rows(), ExcIndexRangeType<size_type> (row, 0, n_rows()));
   Assert( rowset.size() == 0 || rowset.is_element(row), ExcInternalError());
 
   const size_type local_row = rowset.size() ? rowset.index_within_set(row) : row;
   Assert (index < lines[local_row].entries.size(),
-          ExcIndexRange (index, 0, lines[local_row].entries.size()));
+          ExcIndexRangeType<size_type> (index, 0, lines[local_row].entries.size()));
   return lines[local_row].entries[index];
 }
 
@@ -584,7 +584,7 @@ inline
 CompressedSimpleSparsityPattern::row_iterator
 CompressedSimpleSparsityPattern::row_begin (const size_type row) const
 {
-  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  Assert (row < n_rows(), ExcIndexRangeType<size_type> (row, 0, n_rows()));
   const size_type local_row = rowset.size() ? rowset.index_within_set(row) : row;
   return lines[local_row].entries.begin();
 }
@@ -595,7 +595,7 @@ inline
 CompressedSimpleSparsityPattern::row_iterator
 CompressedSimpleSparsityPattern::row_end (const size_type row) const
 {
-  Assert (row < n_rows(), ExcIndexRange (row, 0, n_rows()));
+  Assert (row < n_rows(), ExcIndexRangeType<size_type> (row, 0, n_rows()));
   const size_type local_row = rowset.size() ? rowset.index_within_set(row) : row;
   return lines[local_row].entries.end();
 }

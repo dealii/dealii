@@ -1836,7 +1836,7 @@ inline
 void
 BlockVectorBase<VectorType>::compress (::dealii::VectorOperation::values operation)
 {
-  for (size_type i=0; i<n_blocks(); ++i)
+  for (unsigned int i=0; i<n_blocks(); ++i)
     block(i).compress (operation);
 }
 

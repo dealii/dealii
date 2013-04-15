@@ -426,7 +426,7 @@ namespace parallel
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());
 
-      for (size_type i=0; i<this->n_blocks(); ++i)
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
         this->block(i).reinit(v.block(i), fast);
     }
 

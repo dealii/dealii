@@ -446,7 +446,7 @@ namespace TrilinosWrappers
     BlockVector::is_compressed () const
     {
       bool compressed = true;
-      for (size_type row=0; row<n_blocks(); ++row)
+      for (unsigned int row=0; row<n_blocks(); ++row)
         if (block(row).is_compressed() == false)
           {
             compressed = false;
@@ -504,7 +504,7 @@ namespace TrilinosWrappers
       Assert (n_blocks() == v.n_blocks(),
               ExcDimensionMismatch(n_blocks(),v.n_blocks()));
 
-      for (size_type row=0; row<n_blocks(); ++row)
+      for (unsigned int row=0; row<n_blocks(); ++row)
         block(row).swap (v.block(row));
     }
 

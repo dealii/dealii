@@ -566,7 +566,7 @@ namespace internal
               ExcMessage ("No finite element collection is associated with "
                           "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
-              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+              ExcIndexRange (obj_index, 0, static_cast<unsigned int>(dof_offsets.size())));
       Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
