@@ -359,6 +359,14 @@ namespace GridTools
    * as it simultaneously delivers the
    * local coordinate of the given point
    * without additional computational cost.
+   *
+   * @note When applied to a triangulation or DoF handler object based
+   * on a parallel::distributed::Triangulation object, the cell
+   * returned may in fact be a ghost or artificial cell (see
+   * @ref GlossArtificialCell and @ref GlossGhostCell). If so,
+   * many of the operations one may want to do on this cell
+   * (e.g., evaluating the solution) may not be possible and you
+   * will have to decide what to do in that case.
    */
   template <int dim, template <int,int> class Container, int spacedim>
   typename Container<dim,spacedim>::active_cell_iterator
@@ -418,6 +426,14 @@ namespace GridTools
    * using GeometryInfo::project_to_unit_cell.
    * This is not automatically performed
    * by the algorithm.
+   *
+   * @note When applied to a triangulation or DoF handler object based
+   * on a parallel::distributed::Triangulation object, the cell
+   * returned may in fact be a ghost or artificial cell (see
+   * @ref GlossArtificialCell and @ref GlossGhostCell). If so,
+   * many of the operations one may want to do on this cell
+   * (e.g., evaluating the solution) may not be possible and you
+   * will have to decide what to do in that case.
    */
   template <int dim, template<int, int> class Container, int spacedim>
   std::pair<typename Container<dim,spacedim>::active_cell_iterator, Point<dim> >
@@ -434,6 +450,14 @@ namespace GridTools
    * for hp problems, since the active
    * finite element index for all other DoF
    * handlers is always zero.
+   *
+   * @note When applied to a triangulation or DoF handler object based
+   * on a parallel::distributed::Triangulation object, the cell
+   * returned may in fact be a ghost or artificial cell (see
+   * @ref GlossArtificialCell and @ref GlossGhostCell). If so,
+   * many of the operations one may want to do on this cell
+   * (e.g., evaluating the solution) may not be possible and you
+   * will have to decide what to do in that case.
    */
   template <int dim, int spacedim>
   std::pair<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator, Point<dim> >
