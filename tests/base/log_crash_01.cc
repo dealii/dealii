@@ -24,11 +24,17 @@
 
 int main()
 {
-  deal_II_exceptions::disable_abort_on_exception ();
+  deal_II_exceptions::disable_abort_on_exception();
 
-  std::ofstream logfile("log_crash_01/output");
-  deallog.attach(logfile);
-  deallog << "OK" << std::endl;
-
-  deallog << "no newline here!";
+  try
+    {
+      std::ofstream logfile("log_crash_01/output");
+      deallog.attach(logfile);
+      deallog << "OK" << std::endl;
+      deallog << "no newline here!";
+    }
+  catch (ExceptionBase &e)
+    {
+      deallog << e.get_exc_name() << std::endl;
+    }
 }

@@ -52,8 +52,6 @@ void test ()
 
   v_tmp.reinit(v,false,true);
 
-  deal_II_exceptions::disable_abort_on_exception();
-
   bool exc = false;
   double norm;
   try
@@ -62,6 +60,7 @@ void test ()
     }
   catch (TrilinosWrappers::VectorBase::ExcTrilinosError e)
     {
+      deallog << e.get_exc_name() << std::endl;
       exc = true;
     }
   
@@ -79,6 +78,8 @@ void test ()
 
 int main (int argc, char **argv)
 {
+  deal_II_exceptions::disable_abort_on_exception();
+
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

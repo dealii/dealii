@@ -249,8 +249,9 @@ user_indices(Triangulation<dim>& tr)
     {
       tr.begin()->user_pointer();
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
   tr.begin()->user_index();
   
@@ -283,6 +284,7 @@ void check()
 int main()
 {
   deal_II_exceptions::disable_abort_on_exception();
+
   std::ofstream logfile("user_data_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);

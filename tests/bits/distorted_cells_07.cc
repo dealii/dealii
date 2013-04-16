@@ -80,8 +80,9 @@ void check (const unsigned int testcase)
     {
       fe_values.reinit(coarse_grid.begin());
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
 }
 
@@ -89,6 +90,7 @@ void check (const unsigned int testcase)
 int main ()
 {
   deal_II_exceptions::disable_abort_on_exception();
+
   std::ofstream logfile("distorted_cells_07/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
