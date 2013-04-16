@@ -725,12 +725,13 @@ public:
    *
    * @ingroup Exceptions
    */
-  DeclException2 (ExcDistortedMappedCell,
-                  Point<spacedim>, int,
+  DeclException3 (ExcDistortedMappedCell,
+                  Point<spacedim>, double, int,
                   << "The image of the mapping applied to cell with center ["
                   << arg1 << "] is distorted. The cell geometry or the "
-                  << "mapping are invalid and yield non-positive volume "
-                  << "fractions in quadrature point " << arg2 << ".");
+                  << "mapping are invalid, giving a non-positive volume "
+                  << "fraction of " << arg2 << " in quadrature point "
+                  << arg3 << ".");
 
 private:
 
