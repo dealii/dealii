@@ -118,7 +118,7 @@ namespace Functions
    * will own the cell at which the solution is evaluated. Rather, it may be
    * that the cell in which this point is found is in fact a ghost or
    * artificial cell (see @ref GlossArtificialCell and
-   * @ref @ref GlossGhostCell). If the cell is artificial, we have no access
+   * @ref GlossGhostCell). If the cell is artificial, we have no access
    * to the solution there and functions that evaluate the solution at
    * such a point will trigger an exception of type
    * FEFieldFunction::ExcPointNotAvailableHere. The same kind of exception
