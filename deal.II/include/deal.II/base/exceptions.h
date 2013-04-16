@@ -70,7 +70,7 @@ public:
   /**
    * Get exception name.
    */
-  const char * get_exc_name() const;
+  const char *get_exc_name() const;
 
   /**
    * Print out the general part of the error information.

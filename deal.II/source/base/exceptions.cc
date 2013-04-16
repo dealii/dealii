@@ -146,7 +146,7 @@ void ExceptionBase::set_fields (const char *f,
 
 
 
-const char * ExceptionBase::get_exc_name () const
+const char *ExceptionBase::get_exc_name () const
 {
   return exc;
 }
@@ -281,7 +281,7 @@ namespace deal_II_exceptions
 
     void abort (const ExceptionBase &exc)
     {
-      if(dealii::deal_II_exceptions::abort_on_exception)
+      if (dealii::deal_II_exceptions::abort_on_exception)
         {
           //* Print the error message and bail out:
           std::cerr << exc.what() << std::endl;
