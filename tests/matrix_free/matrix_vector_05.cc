@@ -28,8 +28,8 @@ void test ()
   points[1][1] = 0.314159265358979;
   if (dim == 3)
     {
-      //points[2][0] = 0.21;
-      //points[2][2] = 0.4123;
+      points[2][0] = 0.21;
+      points[2][2] = 0.4123;
     }
   GridGenerator::parallelepiped (tria, points);
   typename Triangulation<dim>::active_cell_iterator
