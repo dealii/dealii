@@ -64,7 +64,7 @@ namespace internal
        * computation, then this
        * equals n_global_dofs.
        */
-      unsigned int n_locally_owned_dofs;
+      types::global_dof_index n_locally_owned_dofs;
 
       /**
        * An index set denoting the
