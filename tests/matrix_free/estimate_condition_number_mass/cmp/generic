@@ -1,0 +1,90 @@
+
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d:cg::Starting value 0.117
+DEAL:2d:cg::Convergence step 16 value 0
+DEAL:2d:cg::Condition number estimate: 15.4
+DEAL:2d::
+DEAL:2d::Testing FE_DGQ<2>(1)
+DEAL:2d:cg::Starting value 0.0625
+DEAL:2d:cg::Convergence step 1 value 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(2)
+DEAL:2d:cg::Starting value 0.0686
+DEAL:2d:cg::Convergence step 38 value 0
+DEAL:2d:cg::Condition number estimate: 29.1
+DEAL:2d::
+DEAL:2d::Testing FE_DGQ<2>(2)
+DEAL:2d:cg::Starting value 0.0625
+DEAL:2d:cg::Convergence step 3 value 0
+DEAL:2d:cg::Condition number estimate: 6.95
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(4)
+DEAL:2d:cg::Starting value 0.0367
+DEAL:2d:cg::Convergence step 92 value 0
+DEAL:2d:cg::Condition number estimate: 148.
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(QGaussLobatto(5))
+DEAL:2d:cg::Starting value 0.0355
+DEAL:2d:cg::Convergence step 62 value 0
+DEAL:2d:cg::Condition number estimate: 74.3
+DEAL:2d::
+DEAL:2d::Testing FE_DGQ<2>(4)
+DEAL:2d:cg::Starting value 0.0353
+DEAL:2d:cg::Convergence step 7 value 0
+DEAL:2d:cg::Condition number estimate: 200.
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(6)
+DEAL:2d:cg::Starting value 0.0310
+DEAL:2d:cg::Convergence step 209 value 0
+DEAL:2d:cg::Condition number estimate: 1.56e+03
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(QGaussLobatto(7))
+DEAL:2d:cg::Starting value 0.0241
+DEAL:2d:cg::Convergence step 86 value 0
+DEAL:2d:cg::Condition number estimate: 140.
+DEAL:2d::
+DEAL:2d::Testing FE_DGQ<2>(6)
+DEAL:2d:cg::Starting value 0.0305
+DEAL:2d:cg::Convergence step 15 value 0
+DEAL:2d:cg::Condition number estimate: 1.95e+03
+DEAL:2d::
+DEAL:2d::Testing FE_DGQArbitraryNodes<2>(QGaussLobatto(7))
+DEAL:2d:cg::Starting value 0.0240
+DEAL:2d:cg::Convergence step 12 value 0
+DEAL:2d:cg::Condition number estimate: 185.
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(10)
+DEAL:2d:cg::Starting value 0.173
+DEAL:2d:cg::Convergence step 1305 value 0
+DEAL:2d:cg::Condition number estimate: 2.21e+06
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(QGaussLobatto(11))
+DEAL:2d:cg::Starting value 0.0148
+DEAL:2d:cg::Convergence step 132 value 0
+DEAL:2d:cg::Condition number estimate: 328.
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(QGaussLobatto(17))
+DEAL:2d:cg::Starting value 0.00937
+DEAL:2d:cg::Convergence step 200 value 0
+DEAL:2d:cg::Condition number estimate: 759.
+DEAL:2d::
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d:cg::Starting value 0.102
+DEAL:3d:cg::Convergence step 12 value 0
+DEAL:3d:cg::Condition number estimate: 57.8
+DEAL:3d::
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d:cg::Starting value 0.0498
+DEAL:3d:cg::Convergence step 51 value 0
+DEAL:3d:cg::Condition number estimate: 161.
+DEAL:3d::
+DEAL:3d::Testing FE_Q<3>(5)
+DEAL:3d:cg::Starting value 0.0121
+DEAL:3d:cg::Convergence step 475 value 0
+DEAL:3d:cg::Condition number estimate: 8.96e+03
+DEAL:3d::
+DEAL:3d::Testing FE_Q<3>(QGaussLobatto(6))
+DEAL:3d:cg::Starting value 0.0137
+DEAL:3d:cg::Convergence step 167 value 0
+DEAL:3d:cg::Condition number estimate: 1.06e+03
+DEAL:3d::
