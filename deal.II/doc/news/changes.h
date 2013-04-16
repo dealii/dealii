@@ -25,6 +25,13 @@ inconvenience this causes.
 
 <ol>
 
+<li> Changed: Internal structures of ExceptionBase are now thread safe. The
+Assert macro does not print an exception to deallog any more prior to
+throwing if deal_II_exceptions::abort_on_exception==false. Removed: A
+number of obsolete Exceptions that are not used in the library any more.
+<br>
+(Matthias Maier, 2013/04/16)
+
 <li> Removed: A number of header files that have been deprecated a long time
 ago have been removed. All of them had previously only included the header file
 that had superseded them. To upgrade, simply include the currently used

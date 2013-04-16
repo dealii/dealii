@@ -130,10 +130,12 @@ void ExceptionBase::set_fields (const char *f,
   print_stack_trace (converter);
 
   if (!deal_II_exceptions::additional_assert_output.empty())
-    converter << "--------------------------------------------------------"
-              << std::endl
-              << deal_II_exceptions::additional_assert_output
-              << std::endl;
+    {
+      converter << "--------------------------------------------------------"
+                << std::endl
+                << deal_II_exceptions::additional_assert_output
+                << std::endl;
+    }
 
   converter << "--------------------------------------------------------"
             << std::endl;
@@ -281,6 +283,7 @@ namespace deal_II_exceptions
     {
       if(dealii::deal_II_exceptions::abort_on_exception)
         {
+          //* Print the error message and bail out:
           std::cerr << exc.what() << std::endl;
           std::abort();
         }

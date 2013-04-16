@@ -195,8 +195,8 @@ namespace deal_II_exceptions
     /**
      * Conditionally abort the program. Depending on whether
      * disable_abort_on_exception was called, this function either aborts
-     * the program flow by printing an error message and calling
-     * <tt>std::abort()</tt>, or throws @p exc instead.
+     * the program flow by printing the error message provided by @p exc
+     * and calling <tt>std::abort()</tt>, or throws @p exc instead.
      */
     void abort (const ExceptionBase &exc);
 
