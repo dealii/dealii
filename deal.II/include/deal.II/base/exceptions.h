@@ -75,7 +75,7 @@ public:
    * well as the violated condition and the name of the exception as
    * a char pointer.
    */
-  void set_fields (const char *f,
+  void set_fields (const char *file,
                    const int   line,
                    const char *function,
                    const char *cond,
@@ -786,17 +786,9 @@ namespace StandardExceptions
                   << arg1);
 
   /**
-   * Exception used when running into functions that are only supported
-   * in a backward compatibility mode.
+   * Parallel vectors with ghost elements are read-only vectors.
    */
-  DeclException1 (ExcCompatibility,
-                  char *,
-                  << "You are using a backward compatibility feature\n"
-                  << "that you have disabled during configuration of\n"
-                  << "the library by the --disable-compat="
-                  << arg1 << " switch. You should either use an\n"
-                  << "alternative function, or configure again without\n"
-                  << "this switch and recompile the library.");
+  DeclException0 (ExcGhostsPresent);
 
   /**
    * Some of our numerical classes allow for setting alll entries to
@@ -808,52 +800,24 @@ namespace StandardExceptions
   DeclException0 (ExcScalarAssignmentOnlyForZeroValue);
 
   /**
-   * This function requires the LAPACK library. Please reconfigure using
-   * the option <tt>--with-lapack</tt> and check if it is actually included.
+   * This function requires support for the LAPACK library.
    */
   DeclException0 (ExcNeedsLAPACK);
 
   /**
-   * This function requires the UMFPack library. Please reconfigure
-   * using the option <tt>--with-umfpack</tt> and check if it is actually
-   * included.
-   */
-  DeclException0 (ExcNeedsUMFPACK);
-
-  /**
-   * This function requires the METIS library. Please reconfigure using
-   * the option <tt>--with-metis</tt> and check if it is actually included.
-   */
-  DeclException0 (ExcNeedsMETIS);
-
-  /**
-   * This function requires the Petsc library. Please reconfigure using
-   * the option <tt>--with-petsc</tt> and check if it is actually included.
-   */
-  DeclException0 (ExcNeedsPETSC);
-
-  /**
-   * This function requires the NetCDF library, which is neither in your
-   * standard path nor configured with --with-netcdf.
+   * This function requires support for the NetCDF library.
    */
   DeclException0 (ExcNeedsNetCDF);
 
   /**
-   * Parallel vectors with ghost elements are read-only vectors.
+   * This function requires support for the FunctionParser library.
    */
-  DeclException0 (ExcGhostsPresent);
+  DeclException0 (ExcNeedsFunctionparser);
 
-  /**
-   * A configuration option disabled this feature. In order to use it,
-   * you must reconfigure and recompile the libraries.
-   */
-  DeclException1 (ExcDisabled, char *,
-                  << "This feature was disabled by the "
-                  "configuration option --disable-"
-                  << arg1 << ". Reconfigure to use it!");
 
 //@}
 } /*namespace StandardExceptions*/
+
 
 /**
  * Special assertion for dimension mismatch.
@@ -868,6 +832,7 @@ namespace StandardExceptions
 #define AssertDimension(dim1,dim2) Assert((dim1) == (dim2),       \
                                           ExcDimensionMismatch((dim1),(dim2)))
 
+
 /**
  * Special assertion, testing whether <tt>vec</tt> has size
  * <tt>dim1</tt>, and each entry of the vector has the
@@ -878,6 +843,7 @@ namespace StandardExceptions
  */
 #define AssertVectorVectorDimension(vec,dim1,dim2) AssertDimension((vec).size(), (dim1)) \
   for (unsigned int i=0;i<dim1;++i) { AssertDimension((vec)[i].size(), (dim2)); }
+
 
 /**
  * Special assertion for index range of nonnegative indices.
@@ -895,31 +861,6 @@ namespace StandardExceptions
  */
 #define AssertIndexRange(index,range) Assert((index) < (range), \
                                              ExcIndexRange((index),0,(range)))
-
-
-/*
- * Unfortunately, the following must be repeated for each library,
- * since we cannot have ifdefs in macros.
- */
-
-/**
- * Assert support for the LAPACK library
- */
-#ifdef DEAL_II_WITH_LAPACK
-#  define AssertLAPACK {}
-#else
-#  define AssertLAPACK Assert(false, ExcNeedsLAPACK())
-#endif
-
-/**
- * Assert support for the UMFPACK library
- */
-#ifdef DEAL_II_WITH_UMFPACK
-#  define AssertUMFPACK {}
-#else
-#  define AssertUMFPACK Assert(false, ExcNeedsUMFPACK())
-#endif
-
 
 using namespace StandardExceptions;
 
