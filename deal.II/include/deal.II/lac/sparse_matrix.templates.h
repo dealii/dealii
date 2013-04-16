@@ -385,10 +385,10 @@ SparseMatrix<number>::copy_from (const TrilinosWrappers::SparseMatrix &matrix)
       value_cache.resize(ncols);
       colnum_cache.resize(ncols);
 
-      // then copy everything
-      for (int i = 0; i < ncols; ++i)
-	this->set(row, colnum_cache[i],
-		  value_cache[i]);
+      // then copy everything in one swoop
+      this->set(row,
+		colnum_cache,
+		value_cache);
     }
 
   return *this;

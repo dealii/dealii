@@ -35,6 +35,8 @@ int main (int argc,char **argv)
   SparsityPattern sparsity (5,5,5);
   sparsity.add (1,2);
   sparsity.add (2,3);
+  sparsity.add (3,2);
+  sparsity.add (3,3);
   sparsity.add (3,4);
   sparsity.add (4,3);
   sparsity.compress();
