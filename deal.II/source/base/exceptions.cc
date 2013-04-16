@@ -40,8 +40,6 @@ namespace deal_II_exceptions
     additional_assert_output = p;
   }
 
-
-
   bool show_stacktrace = true;
 
   void suppress_stacktrace_in_exceptions ()
@@ -49,30 +47,25 @@ namespace deal_II_exceptions
     show_stacktrace = false;
   }
 
-
   bool abort_on_exception = true;
 
   void disable_abort_on_exception ()
   {
     abort_on_exception = false;
   }
+
 }
 
 
 
 ExceptionBase::ExceptionBase ()
   :
-  file(""), line(0), function(""), cond(""), exc(""),
-  stacktrace (0),
-  n_stacktrace_frames (0)
-{}
-
-
-
-ExceptionBase::ExceptionBase (const char *f, const int l, const char *func,
-                              const char *c, const char *e)
-  :
-  file(f), line(l), function(func), cond(c), exc(e),
+  std::runtime_error(""),
+  file(""),
+  line(0),
+  function(""),
+  cond(""),
+  exc(""),
   stacktrace (0),
   n_stacktrace_frames (0)
 {}
@@ -81,11 +74,13 @@ ExceptionBase::ExceptionBase (const char *f, const int l, const char *func,
 
 ExceptionBase::ExceptionBase (const ExceptionBase &exc)
   :
-  std::exception (exc),
-  file(exc.file), line(exc.line),
-  function(exc.function), cond(exc.cond), exc(exc.exc),
-  // don't copy stacktrace to avoid double de-allocation problem
-  stacktrace (0),
+  std::runtime_error (exc),
+  file(exc.file),
+  line(exc.line),
+  function(exc.function),
+  cond(exc.cond),
+  exc(exc.exc),
+  stacktrace (0), // don't copy stacktrace to avoid double de-allocation problem
   n_stacktrace_frames (0)
 {}
 
@@ -103,7 +98,7 @@ ExceptionBase::~ExceptionBase () throw ()
 
 
 void ExceptionBase::set_fields (const char *f,
-                                const int l,
+                                const int  l,
                                 const char *func,
                                 const char *c,
                                 const char *e)
@@ -120,6 +115,60 @@ void ExceptionBase::set_fields (const char *f,
   n_stacktrace_frames = backtrace(array, 25);
   stacktrace = backtrace_symbols(array, n_stacktrace_frames);
 #endif
+
+  // build up a string with the error message...
+
+  std::ostringstream converter;
+
+  converter << std::endl
+            << "--------------------------------------------------------"
+            << std::endl;
+  // print out general data
+  print_exc_data (converter);
+  // print out exception specific data
+  print_info (converter);
+  print_stack_trace (converter);
+
+  if (!deal_II_exceptions::additional_assert_output.empty())
+    converter << "--------------------------------------------------------"
+              << std::endl
+              << deal_II_exceptions::additional_assert_output
+              << std::endl;
+
+  converter << "--------------------------------------------------------"
+            << std::endl;
+
+  // ... and setup the final error message with it:
+  static_cast<std::runtime_error &>(*this) = std::runtime_error(converter.str());
+}
+
+
+
+const char * ExceptionBase::get_exc_name () const
+{
+  return exc;
+}
+
+
+
+void ExceptionBase::print_exc_data (std::ostream &out) const
+{
+  out << "An error occurred in line <" << line
+      << "> of file <" << file
+      << "> in function" << std::endl
+      << "    " << function << std::endl
+      << "The violated condition was: "<< std::endl
+      << "    " << cond << std::endl
+      << "The name and call sequence of the exception was:" << std::endl
+      << "    " << exc  << std::endl
+      << "Additional Information: " << std::endl;
+}
+
+
+
+void ExceptionBase::print_info (std::ostream &out) const
+{
+  out << "(none)" << std::endl;
 }
 
 
@@ -131,7 +180,6 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 
   if (deal_II_exceptions::show_stacktrace == false)
     return;
-
 
   // if there is a stackframe stored, print it
   out << std::endl;
@@ -223,177 +271,32 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
 }
 
 
-void ExceptionBase::print_exc_data (std::ostream &out) const
-{
-  out << "An error occurred in line <" << line
-      << "> of file <" << file
-      << "> in function" << std::endl
-      << "    " << function << std::endl
-      << "The violated condition was: "<< std::endl
-      << "    " << cond << std::endl
-      << "The name and call sequence of the exception was:" << std::endl
-      << "    " << exc  << std::endl
-      << "Additional Information: " << std::endl;
-  // Additionally, leave a trace in deallog if we do not stop here
-  if (deal_II_exceptions::abort_on_exception == false)
-    deallog << exc << std::endl;
-}
-
-
-void ExceptionBase::print_info (std::ostream &out) const
-{
-  out << "(none)" << std::endl;
-}
-
-
-// TODO !
-const char *ExceptionBase::what () const throw ()
-{
-  // if we say that this function does not throw exceptions, we better make
-  // sure it does not
-  try
-    {
-      // have a place where to store the description of the exception as a
-      // char *
-      //
-      // this thing obviously is not multi-threading safe, but we don't
-      // care about that for now
-      //
-      // we need to make this object static, since we want to return the
-      // data stored in it and therefore need a lifetime which is longer
-      // than the execution time of this function
-      static std::string description;
-      // convert the messages printed by the exceptions into a std::string
-      std::ostringstream converter;
-
-      converter << "--------------------------------------------------------"
-                << std::endl;
-      // put general info into the std::string
-      print_exc_data (converter);
-      // put in exception specific data
-      print_info (converter);
-
-      print_stack_trace (converter);
-
-      converter << "--------------------------------------------------------"
-                << std::endl;
-
-      description = converter.str();
-
-      return description.c_str();
-    }
-  catch (std::exception &exc)
-    {
-      std::cerr << "*** Exception encountered in exception handling routines ***"
-                << std::endl
-                << "*** Message is "   << std::endl
-                << exc.what ()         << std::endl
-                << "*** Aborting! ***" << std::endl;
-
-      std::abort ();
-    }
-  catch (...)
-    {
-      std::cerr << "*** Exception encountered in exception handling routines ***"
-                << std::endl
-                << "*** Aborting! ***" << std::endl;
-
-      std::abort ();
-    }
-  return 0;
-}
-
-
 
 namespace deal_II_exceptions
 {
   namespace internals
   {
 
-    /**
-     * Number of exceptions dealt with so far. Zero at program start.
-     * Messages are only displayed if the value is zero.
-     */
-    unsigned int n_treated_exceptions;
-    ExceptionBase *last_exception;
-
-
-    void issue_error_assert (const char *file,
-                             int         line,
-                             const char *function,
-                             const char *cond,
-                             const char *exc_name,
-                             ExceptionBase &e)
+    void abort (const ExceptionBase &exc)
     {
-      // fill the fields of the exception object
-      e.set_fields (file, line, function, cond, exc_name);
-
-      // if no other exception has been displayed before, show this one
-      if (n_treated_exceptions == 0)
+      if(dealii::deal_II_exceptions::abort_on_exception)
         {
-          std::cerr << "--------------------------------------------------------"
-                    << std::endl;
-          // print out general data
-          e.print_exc_data (std::cerr);
-          // print out exception specific data
-          e.print_info (std::cerr);
-          e.print_stack_trace (std::cerr);
-          std::cerr << "--------------------------------------------------------"
-                    << std::endl;
-
-          // if there is more to say, do so
-          if (!additional_assert_output.empty())
-            std::cerr << additional_assert_output << std::endl;
+          std::cerr << exc.what() << std::endl;
+          std::abort();
         }
       else
         {
-          // if this is the first follow-up message, display a message that
-          // further exceptions are suppressed
-          if (n_treated_exceptions == 1)
-            std::cerr << "******** More assertions fail but messages are suppressed! ********"
-                      << std::endl;
-        };
-
-      // increase number of treated exceptions by one
-      n_treated_exceptions++;
-      last_exception = &e;
-
-
-      // abort the program now since something has gone horribly wrong.
-      // however, there is one case where we do not want to do that, namely
-      // when another exception, possibly thrown by AssertThrow is active,
-      // since in that case we will not come to see the original exception.
-      // in that case indicate that the program is not aborted due to this
-      // reason.
-      if (std::uncaught_exception() == true)
-        {
-          // only display message once
-          if (n_treated_exceptions <= 1)
-            std::cerr << "******** Program is not aborted since another exception is active! ********"
-                      << std::endl;
-        }
-      else if (deal_II_exceptions::abort_on_exception == true)
-        std::abort ();
-      else
-        {
-          --n_treated_exceptions;
-          throw e;
+          throw exc;
         }
     }
 
+  } /*namespace internals*/
+} /*namespace deal_II_exceptions*/
 
 
-    void abort ()
-    {
-      if (deal_II_exceptions::abort_on_exception == true)
-        std::abort ();
-    }
-
-  }
-
-}
 
 DEAL_II_NAMESPACE_CLOSE
+
 
 
 // Newer versions of gcc have a very nice feature: you can set a verbose
