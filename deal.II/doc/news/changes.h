@@ -99,6 +99,12 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: There is now a version of SparseMatrix::copy_from that can copy
+from TrilinosWrappers::SparseMatrix.
+<br>
+(Wolfgang Bangerth, J&ouml;rg Frohne, 2013/04/15)
+</li>
+
 <li> Improved: The SolverCG implementation now uses only three auxiliary
 vectors, down from previously four. Also, there are some shortcuts in case
 PreconditionIdentity is used that improve the solver's performance.
