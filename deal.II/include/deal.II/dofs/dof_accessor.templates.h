@@ -2613,9 +2613,6 @@ namespace internal
           for (unsigned int d=0; d<dofs_per_vertex; ++d, ++index)
             accessor.set_vertex_dof_index(vertex,d,
                                           local_dof_indices[index]);
-        //TODO[bt] the function dof_index expects two unsigned int (I am not
-        //sure what should be the type of fe_index) but the following loop
-        //seems to do nothing but incrementing index.
         for (unsigned int d=0; d<dofs_per_line; ++d, ++index)
           accessor.dof_index(d, local_dof_indices[index]);
 

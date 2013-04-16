@@ -471,8 +471,8 @@ BlockSparseMatrixEZ<Number>::vmult (BlockVector<somenumber>       &dst,
 
   dst = 0.;
 
-  for (size_type row=0; row<n_block_rows(); ++row)
-    for (size_type col=0; col<n_block_cols(); ++col)
+  for (unsigned int row=0; row<n_block_rows(); ++row)
+    for (unsigned int col=0; col<n_block_cols(); ++col)
       block(row,col).vmult_add (dst.block(row),
                                 src.block(col));
 }
@@ -491,8 +491,8 @@ vmult_add (BlockVector<somenumber>       &dst,
   Assert (src.n_blocks() == n_block_cols(),
           ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
-  for (size_type row=0; row<n_block_rows(); ++row)
-    for (size_type col=0; col<n_block_cols(); ++col)
+  for (unsigned int row=0; row<n_block_rows(); ++row)
+    for (unsigned int col=0; col<n_block_cols(); ++col)
       block(row,col).vmult_add (dst.block(row),
                                 src.block(col));
 }

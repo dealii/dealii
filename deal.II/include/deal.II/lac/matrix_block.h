@@ -48,7 +48,7 @@ namespace internal
  * system. Using the add() functions of this class, it is possible to
  * use the standard assembling functions used for block matrices, but
  * only enter in one of the blocks and still avoiding the index
- * computations innvolved.
+ * computations involved.
 
  * The reason for this class is, that we may need a different number
  * of matrices for different blocks in a block system. For example, a
@@ -128,7 +128,7 @@ public:
   /**
    * Reinitialize the matrix for a
    * new BlockSparsityPattern. This
-   * adujusts the #matrix as well
+   * adjusts the #matrix as well
    * as the #row_indices and
    * #column_indices.
    *
@@ -351,14 +351,14 @@ public:
    * position of the data member
    * matrix on the global matrix.
    */
-  unsigned int row;
+  size_type row;
   /**
    * Column coordinate.  This is
    * the position of the data
    * member matrix on the global
    * matrix.
    */
-  unsigned int column;
+  size_type column;
 
   /**
    * The matrix itself
@@ -707,8 +707,8 @@ template <class MATRIX>
 inline
 MatrixBlock<MATRIX>::MatrixBlock()
   :
-  row(deal_II_numbers::invalid_unsigned_int),
-  column(deal_II_numbers::invalid_unsigned_int)
+  row(deal_II_numbers::invalid_size_type),
+  column(deal_II_numbers::invalid_size_type)
 {}
 
 

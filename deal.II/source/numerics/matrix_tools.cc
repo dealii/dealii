@@ -1236,7 +1236,7 @@ namespace MatrixCreator
 #ifdef DEBUG
       if (true)
         {
-          types::global_dof_index max_element = 0;
+          types::global_dof_index max_element = static_cast<types::global_dof_index>(0);
           for (std::vector<types::global_dof_index>::const_iterator i=dof_to_boundary_mapping.begin();
                i!=dof_to_boundary_mapping.end(); ++i)
             if ((*i != hp::DoFHandler<dim,spacedim>::invalid_dof_index) &&
@@ -2177,7 +2177,7 @@ namespace MatrixTools
         // in the block in which this
         // dof is located
         const types::global_dof_index dof_number = dof->first;
-        const std::pair<types::global_dof_index,unsigned int>
+        const std::pair<unsigned int,types::global_dof_index>
         block_index = index_mapping.global_to_local (dof_number);
 
         // for each boundary dof:

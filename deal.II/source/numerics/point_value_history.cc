@@ -39,7 +39,7 @@ namespace internal
     PointGeometryData<dim>
     ::PointGeometryData (const Point <dim> &new_requested_location,
                          const std::vector <Point <dim> > &new_locations,
-                         const std::vector <int> &new_sol_indices)
+                         const std::vector <types::global_dof_index> &new_sol_indices)
     {
       requested_location = new_requested_location;
       support_point_locations = new_locations;
@@ -270,7 +270,7 @@ void PointValueHistory<dim>
 
   std::vector<types::global_dof_index>
   local_dof_indices (dof_handler->get_fe ().dofs_per_cell);
-  std::vector <int> new_solution_indices;
+  std::vector <types::global_dof_index> new_solution_indices;
   current_cell->get_dof_indices (local_dof_indices);
   // there is an implicit assumption here
   // that all the closest support point to
@@ -415,7 +415,7 @@ void PointValueHistory<dim>
   for (unsigned int point = 0; point < locations.size (); point++)
     {
       current_cell[point]->get_dof_indices (local_dof_indices);
-      std::vector <int> new_solution_indices;
+      std::vector<types::global_dof_index> new_solution_indices;
 
       for (unsigned int component = 0; component < dof_handler->get_fe ().n_components (); component++)
         {
