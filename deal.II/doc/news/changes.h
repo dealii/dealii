@@ -99,6 +99,12 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: Functions::FEFieldFunction can now deal with
+parallel::distributed::Triangulation objects.
+<br>
+(Wolfgang Bangerth, 2013/04/15)
+</li>
+
 <li> New: There is now a version of SparseMatrix::copy_from that can copy
 from TrilinosWrappers::SparseMatrix.
 <br>
