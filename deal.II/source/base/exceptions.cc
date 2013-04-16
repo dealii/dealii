@@ -84,9 +84,7 @@ ExceptionBase::ExceptionBase (const ExceptionBase &exc)
   std::exception (exc),
   file(exc.file), line(exc.line),
   function(exc.function), cond(exc.cond), exc(exc.exc),
-  // don't copy stacktrace to
-  // avoid double de-allocation
-  // problem
+  // don't copy stacktrace to avoid double de-allocation problem
   stacktrace (0),
   n_stacktrace_frames (0)
 {}
@@ -116,8 +114,7 @@ void ExceptionBase::set_fields (const char *f,
   cond = c;
   exc  = e;
 
-  // if the system supports this, get
-  // a stacktrace how we got here
+  // if the system supports this, get a stacktrace how we got here
 #ifdef HAVE_GLIBC_STACKTRACE
   void *array[25];
   n_stacktrace_frames = backtrace(array, 25);
@@ -141,15 +138,10 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
   out << "Stacktrace:" << std::endl
       << "-----------" << std::endl;
 
-  // print the stacktrace. first
-  // omit all those frames that have
-  // ExceptionBase or
-  // deal_II_exceptions in their
-  // names, as these correspond to
-  // the exception raising mechanism
-  // themselves, rather than the
-  // place where the exception was
-  // triggered
+  // print the stacktrace. first omit all those frames that have
+  // ExceptionBase or deal_II_exceptions in their names, as these
+  // correspond to the exception raising mechanism themselves, rather than
+  // the place where the exception was triggered
   int frame = 0;
   while ((frame < n_stacktrace_frames)
          &&
@@ -165,28 +157,19 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
       out << '#' << frame - first_significant_frame
           << "  ";
 
-      // the stacktrace frame is
-      // actually of the format
-      // "filename(functionname+offset)
-      // [address]". let's try to
-      // get the mangled
-      // functionname out:
+      // the stacktrace frame is actually of the format
+      // "filename(functionname+offset) [address]". let's try to get the
+      // mangled functionname out:
       std::string stacktrace_entry (stacktrace[frame]);
       const unsigned int pos_start = stacktrace_entry.find('('),
                          pos_end   = stacktrace_entry.find('+');
       std::string functionname = stacktrace_entry.substr (pos_start+1,
                                                           pos_end-pos_start-1);
 
-      // demangle, and if successful
-      // replace old mangled string
-      // by unmangled one (skipping
-      // address and offset). treat
-      // "main" differently, since
-      // it is apparently demangled
-      // as "unsigned int" for
-      // unknown reasons :-)
-      // if we can, demangle the
-      // function name
+      // demangle, and if successful replace old mangled string by
+      // unmangled one (skipping address and offset). treat "main"
+      // differently, since it is apparently demangled as "unsigned int"
+      // for unknown reasons :-) if we can, demangle the function name
 #ifdef HAVE_LIBSTDCXX_DEMANGLER
       int         status;
       char *p = abi::__cxa_demangle(functionname.c_str(), 0, 0, &status);
@@ -194,21 +177,12 @@ void ExceptionBase::print_stack_trace (std::ostream &out) const
       if ((status == 0) && (functionname != "main"))
         {
           std::string realname(p);
-          // in MT mode, one often
-          // gets backtraces
-          // spanning several lines
-          // because we have so many
-          // boost::tuple arguments
-          // in the MT calling
-          // functions. most of the
-          // trailing arguments of
-          // these tuples are
-          // actually unused
-          // boost::tuples::null_type,
-          // so we should split them
-          // off if they are
-          // trailing a template
-          // argument list
+          // in MT mode, one often gets backtraces spanning several lines
+          // because we have so many boost::tuple arguments in the MT
+          // calling functions. most of the trailing arguments of these
+          // tuples are actually unused boost::tuples::null_type, so we
+          // should split them off if they are trailing a template argument
+          // list
           while (realname.find (", boost::tuples::null_type>")
                  != std::string::npos)
             realname.erase (realname.find (", boost::tuples::null_type>"),
@@ -260,8 +234,7 @@ void ExceptionBase::print_exc_data (std::ostream &out) const
       << "The name and call sequence of the exception was:" << std::endl
       << "    " << exc  << std::endl
       << "Additional Information: " << std::endl;
-  // Additionally, leave a trace in
-  // deallog if we do not stop here
+  // Additionally, leave a trace in deallog if we do not stop here
   if (deal_II_exceptions::abort_on_exception == false)
     deallog << exc << std::endl;
 }
@@ -273,31 +246,24 @@ void ExceptionBase::print_info (std::ostream &out) const
 }
 
 
+// TODO !
 const char *ExceptionBase::what () const throw ()
 {
-  // if we say that this function
-  // does not throw exceptions, we
-  // better make sure it does not
+  // if we say that this function does not throw exceptions, we better make
+  // sure it does not
   try
     {
-      // have a place where to store the
-      // description of the exception as
-      // a char *
+      // have a place where to store the description of the exception as a
+      // char *
       //
-      // this thing obviously is not
-      // multi-threading safe, but we
-      // don't care about that for now
+      // this thing obviously is not multi-threading safe, but we don't
+      // care about that for now
       //
-      // we need to make this object
-      // static, since we want to return
-      // the data stored in it and
-      // therefore need a lifetime which
-      // is longer than the execution
-      // time of this function
+      // we need to make this object static, since we want to return the
+      // data stored in it and therefore need a lifetime which is longer
+      // than the execution time of this function
       static std::string description;
-      // convert the messages printed by
-      // the exceptions into a
-      // std::string
+      // convert the messages printed by the exceptions into a std::string
       std::ostringstream converter;
 
       converter << "--------------------------------------------------------"
@@ -345,11 +311,8 @@ namespace deal_II_exceptions
   {
 
     /**
-     * Number of exceptions dealt
-     * with so far. Zero at program
-     * start. Messages are only
-     * displayed if the value is
-     * zero.
+     * Number of exceptions dealt with so far. Zero at program start.
+     * Messages are only displayed if the value is zero.
      */
     unsigned int n_treated_exceptions;
     ExceptionBase *last_exception;
@@ -362,61 +325,45 @@ namespace deal_II_exceptions
                              const char *exc_name,
                              ExceptionBase &e)
     {
-      // fill the fields of the
-      // exception object
+      // fill the fields of the exception object
       e.set_fields (file, line, function, cond, exc_name);
 
-      // if no other exception has
-      // been displayed before, show
-      // this one
+      // if no other exception has been displayed before, show this one
       if (n_treated_exceptions == 0)
         {
           std::cerr << "--------------------------------------------------------"
                     << std::endl;
           // print out general data
           e.print_exc_data (std::cerr);
-          // print out exception
-          // specific data
+          // print out exception specific data
           e.print_info (std::cerr);
           e.print_stack_trace (std::cerr);
           std::cerr << "--------------------------------------------------------"
                     << std::endl;
 
-          // if there is more to say,
-          // do so
+          // if there is more to say, do so
           if (!additional_assert_output.empty())
             std::cerr << additional_assert_output << std::endl;
         }
       else
         {
-          // if this is the first
-          // follow-up message,
-          // display a message that
-          // further exceptions are
-          // suppressed
+          // if this is the first follow-up message, display a message that
+          // further exceptions are suppressed
           if (n_treated_exceptions == 1)
             std::cerr << "******** More assertions fail but messages are suppressed! ********"
                       << std::endl;
         };
 
-      // increase number of treated
-      // exceptions by one
+      // increase number of treated exceptions by one
       n_treated_exceptions++;
       last_exception = &e;
 
 
-      // abort the program now since
-      // something has gone horribly
-      // wrong. however, there is one
-      // case where we do not want to
-      // do that, namely when another
-      // exception, possibly thrown
-      // by AssertThrow is active,
-      // since in that case we will
-      // not come to see the original
-      // exception. in that case
-      // indicate that the program is
-      // not aborted due to this
+      // abort the program now since something has gone horribly wrong.
+      // however, there is one case where we do not want to do that, namely
+      // when another exception, possibly thrown by AssertThrow is active,
+      // since in that case we will not come to see the original exception.
+      // in that case indicate that the program is not aborted due to this
       // reason.
       if (std::uncaught_exception() == true)
         {
@@ -446,20 +393,17 @@ namespace deal_II_exceptions
 
 }
 
-
 DEAL_II_NAMESPACE_CLOSE
 
 
-// from the aclocal file:
-// Newer versions of gcc have a very nice feature: you can set
-// a verbose terminate handler, that not only aborts a program
-// when an exception is thrown and not caught somewhere, but
-// before aborting it prints that an exception has been thrown,
-// and possibly what the std::exception::what() function has to
-// say. Since many people run into the trap of not having a
-// catch clause in main(), they wonder where that abort may be
-// coming from. The terminate handler then at least says what is
-// missing in their program.
+// Newer versions of gcc have a very nice feature: you can set a verbose
+// terminate handler, that not only aborts a program when an exception is
+// thrown and not caught somewhere, but before aborting it prints that an
+// exception has been thrown, and possibly what the std::exception::what()
+// function has to say. Since many people run into the trap of not having a
+// catch clause in main(), they wonder where that abort may be coming from.
+// The terminate handler then at least says what is missing in their
+// program.
 #ifdef HAVE_VERBOSE_TERMINATE
 namespace __gnu_cxx
 {
@@ -478,5 +422,4 @@ namespace
 
   static preload_terminate_dummy dummy;
 }
-
 #endif
