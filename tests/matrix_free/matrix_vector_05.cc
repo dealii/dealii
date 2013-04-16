@@ -58,7 +58,6 @@ void test ()
           cell->set_refine_flag();
       tria.execute_coarsening_and_refinement();
     }
-  std::cout << dim << " " << tria.n_active_cells() << std::endl;
 
   FE_Q<dim> fe (fe_degree);
   DoFHandler<dim> dof (tria);
