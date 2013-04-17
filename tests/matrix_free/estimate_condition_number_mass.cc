@@ -100,7 +100,9 @@ void test (const FiniteElement<dim> &fe)
   MatrixFree<dim,number> mf_data;
   {
     const QGauss<1> quad (fe_degree+1);
-    mf_data.reinit (dof, constraints, quad);
+    typename MatrixFree<dim,number>::AdditionalData data;
+    data.tasks_block_size = 2;
+    mf_data.reinit (dof, constraints, quad, data);
   }
 
   MatrixFreeTest<dim,fe_degree,number> mf (mf_data);
