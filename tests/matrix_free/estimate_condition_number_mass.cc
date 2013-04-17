@@ -82,7 +82,8 @@ private:
 
 
 template <int dim, int fe_degree>
-void test (const FiniteElement<dim> &fe)
+void test (const FiniteElement<dim> &fe,
+           const unsigned int n_iterations)
 {
   typedef double number;
 
@@ -101,7 +102,7 @@ void test (const FiniteElement<dim> &fe)
   {
     const QGauss<1> quad (fe_degree+1);
     typename MatrixFree<dim,number>::AdditionalData data;
-    data.tasks_block_size = 2;
+    data.tasks_block_size = 8/VectorizedArray<number>::n_array_elements;
     mf_data.reinit (dof, constraints, quad, data);
   }
 
@@ -111,11 +112,21 @@ void test (const FiniteElement<dim> &fe)
   VectorTools::create_right_hand_side(dof, QGauss<dim>(fe_degree+1),
                                       Functions::CosineFunction<dim>(), in);
 
-  SolverControl control(10000, 1e-9*in.l2_norm());
+  // prescribe number of iterations in CG instead of tolerance. This is needed
+  // to get the same test output on different platforms where roundoff errors
+  // accumulate differently. Beware of this strange solver setting when seeing
+  // "failure" in the output
+  SolverControl control(n_iterations, 0);
   typename SolverCG<>::AdditionalData data;
   data.compute_condition_number = true;
   SolverCG<> solver(control,data);
-  solver.solve(mf, out, in, PreconditionIdentity());
+  try
+    {
+      solver.solve(mf, out, in, PreconditionIdentity());
+    }
+  catch (...)
+    {
+    }
   deallog << std::endl;
 }
 
@@ -128,29 +139,30 @@ int main ()
   deallog << std::setprecision (2);
 
   {
+    // iterations taken from results at tolerance 1e-9
     deallog.threshold_double(1.e-9);
     deallog.push("2d");
-    test<2,1>(FE_Q<2>(1));
-    test<2,1>(FE_DGQ<2>(1));
-    test<2,2>(FE_Q<2>(2));
-    test<2,2>(FE_DGQ<2>(2));
-    test<2,4>(FE_Q<2>(4));
-    test<2,4>(FE_Q<2>(QGaussLobatto<1>(5)));
-    test<2,4>(FE_DGQ<2>(4));
-    test<2,4>(FE_Q_Hierarchical<2>(4));
-    test<2,6>(FE_Q<2>(6));
-    test<2,6>(FE_Q<2>(QGaussLobatto<1>(7)));
-    test<2,6>(FE_DGQ<2>(6));
-    test<2,6>(FE_DGQArbitraryNodes<2>(QGaussLobatto<1>(7)));
-    test<2,10>(FE_Q<2>(10));
-    test<2,10>(FE_Q<2>(QGaussLobatto<1>(11)));
-    test<2,16>(FE_Q<2>(QGaussLobatto<1>(17)));
+    test<2,1>(FE_Q<2>(1), 15);
+    test<2,1>(FE_DGQ<2>(1), 3);
+    test<2,2>(FE_Q<2>(2), 34);
+    test<2,2>(FE_DGQ<2>(2), 6);
+    test<2,4>(FE_Q<2>(4), 75);
+    test<2,4>(FE_Q<2>(QGaussLobatto<1>(5)), 56);
+    test<2,4>(FE_DGQ<2>(4), 18);
+    test<2,4>(FE_Q_Hierarchical<2>(4), 736);
+    test<2,6>(FE_Q<2>(6), 161);
+    test<2,6>(FE_Q<2>(QGaussLobatto<1>(7)), 77);
+    test<2,6>(FE_DGQ<2>(6), 38);
+    test<2,6>(FE_DGQArbitraryNodes<2>(QGaussLobatto<1>(7)), 32);
+    test<2,10>(FE_Q<2>(10), 782);
+    test<2,10>(FE_Q<2>(QGaussLobatto<1>(11)), 108);
+    test<2,16>(FE_Q<2>(QGaussLobatto<1>(17)), 156);
     deallog.pop();
     deallog.push("3d");
-    test<3,1>(FE_Q<3>(1));
-    test<3,2>(FE_Q<3>(2));
-    test<3,5>(FE_Q<3>(5));
-    test<3,5>(FE_Q<3>(QGaussLobatto<1>(6)));
+    test<3,1>(FE_Q<3>(1), 37);
+    test<3,2>(FE_Q<3>(2), 80);
+    test<3,5>(FE_Q<3>(5), 494);
+    test<3,5>(FE_Q<3>(QGaussLobatto<1>(6)), 187);
     deallog.pop();
   }
 }
