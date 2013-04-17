@@ -56,6 +56,7 @@ LogStream::LogStream()
 #if defined(HAVE_UNISTD_H) && defined(HAVE_TIMES)
   reference_time_val = 1./sysconf(_SC_CLK_TCK) * times(&reference_tms);
 #endif
+
 }
 
 
@@ -64,12 +65,7 @@ LogStream::~LogStream()
   // if there was anything left in the stream that is current to this
   // thread, make sure we flush it before it gets lost
   {
-    const unsigned int id = Threads::this_thread_id();
-    if ((outstreams.find(id) != outstreams.end())
-        &&
-        (*outstreams[id] != 0)
-        &&
-        (outstreams[id]->str().length() > 0))
+    if (get_stream().str().length() > 0)
       {
         // except the situation is not quite that simple. if this object is
         // the 'deallog' object, then it is destroyed upon exit of the
@@ -100,20 +96,6 @@ LogStream::~LogStream()
 
   if (old_cerr)
     std::cerr.rdbuf(old_cerr);
-
-  // on some systems, destroying the outstreams objects of deallog triggers
-  // some sort of memory corruption, in particular when we also link with
-  // Trilinos; since this happens at the very end of the program, we take
-  // the liberty to simply not do it by putting that object into a
-  // deliberate memory leak and instead destroying an empty object
-#ifdef DEAL_II_WITH_TRILINOS
-  if (this == &deallog)
-    {
-      stream_map_type *dummy = new stream_map_type();
-      dummy->swap (outstreams);
-      delete dummy;
-    }
-#endif
 }
 
 
@@ -173,23 +155,6 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
     }
 
   return *this;
-}
-
-
-std::ostringstream &
-LogStream::get_stream()
-{
-//TODO: use a ThreadLocalStorage object here
-  Threads::Mutex::ScopedLock lock(log_lock);
-  const unsigned int id = Threads::this_thread_id();
-
-  // if necessary allocate a stream object
-  if (outstreams.find (id) == outstreams.end())
-    {
-      outstreams[id].reset (new std::ostringstream());
-      outstreams[id]->setf(std::ios::showpoint | std::ios::left);
-    }
-  return *outstreams[id];
 }
 
 

@@ -13,9 +13,10 @@
 #define __deal2__logstream_h
 
 #include <deal.II/base/config.h>
-#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/smartpointer.h>
 #include <deal.II/base/std_cxx1x/shared_ptr.h>
+#include <deal.II/base/thread_local_storage.h>
 
 #include <string>
 #include <stack>
@@ -31,6 +32,7 @@ struct tms
   int tms_utime, tms_stime, tms_cutime, tms_cstime;
 };
 #endif
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -53,7 +55,7 @@ DEAL_II_NAMESPACE_OPEN
  *
  * Before entering a new phase of your program, e.g. a new loop,
  * a new prefix can be set via <tt>LogStream::Prefix p("loopname");</tt>.
- * The destructor of the prefix will pop the prefix text from the stack. 
+ * The destructor of the prefix will pop the prefix text from the stack.
  *
  * Writes via the <tt>&lt;&lt;</tt> operator,
  * <tt> deallog << "This is a log notice";</tt> will be buffered thread
@@ -123,7 +125,7 @@ public:
      * the variable is destroyed.
      */
     Prefix(const std::string &text,
-	   LogStream &stream);
+           LogStream &stream);
 
     /**
      * Remove the prefix associated with this variable.
@@ -488,17 +490,17 @@ private:
    * function will return the correct internal ostringstream buffer for
    * operater<<.
    */
-  std::ostringstream &get_stream();
+  std::ostringstream &get_stream()
+  {
+    outstreams.get().setf(std::ios::showpoint | std::ios::left);
+    return outstreams.get();
+  }
 
   /**
-   * Type of the stream map
+   * We use tbb's thread local storage facility to generate a stringstream
+   * for every thread that sends log messages.
    */
-  typedef std::map<unsigned int, std_cxx1x::shared_ptr<std::ostringstream> > stream_map_type;
-
-  /**
-   * We generate a stringstream for every process that sends log messages.
-   */
-  stream_map_type outstreams;
+  Threads::ThreadLocalStorage<std::ostringstream> outstreams;
 
 };
 
