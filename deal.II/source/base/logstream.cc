@@ -49,7 +49,7 @@ LogStream::LogStream()
   std_depth(10000), file_depth(10000),
   print_utime(false), diff_utime(false),
   last_time (0.), double_threshold(0.), float_threshold(0.),
-  offset(0), old_cerr(0)
+  offset(0), old_cerr(0), at_newline(true)
 {
   prefixes.push("DEAL:");
   std_out->setf(std::ios::showpoint | std::ios::left);
@@ -61,10 +61,8 @@ LogStream::LogStream()
 
 LogStream::~LogStream()
 {
-  // if there was anything left in
-  // the stream that is current to
-  // this thread, make sure we flush
-  // it before it gets lost
+  // if there was anything left in the stream that is current to this
+  // thread, make sure we flush it before it gets lost
   {
     const unsigned int id = Threads::this_thread_id();
     if ((outstreams.find(id) != outstreams.end())
@@ -73,42 +71,20 @@ LogStream::~LogStream()
         &&
         (outstreams[id]->str().length() > 0))
       {
-        // except the situation is
-        // not quite that simple. if
-        // this object is the
-        // 'deallog' object, then it
-        // is destroyed upon exit of
-        // the program. since it's
-        // defined in a shared
-        // library that depends on
-        // libstdc++.so, destruction
-        // happens before destruction
-        // of std::cout/cerr, but
-        // after all file variables
-        // defined in user programs
-        // have been destroyed. in
-        // other words, if we get
-        // here and the object being
-        // destroyed is 'deallog' and
-        // if 'deallog' is associated
-        // with a file stream, then
-        // we're in trouble: we'll
-        // try to write to a file
-        // that doesn't exist any
-        // more, and we're likely
-        // going to crash (this is
-        // tested by
-        // base/log_crash_01). rather
-        // than letting it come to
-        // this, print a message to
-        // the screen (note that we
-        // can't issue an assertion
-        // here either since Assert
-        // may want to write to
-        // 'deallog' itself, and
-        // AssertThrow will throw an
-        // exception that can't be
-        // caught)
+        // except the situation is not quite that simple. if this object is
+        // the 'deallog' object, then it is destroyed upon exit of the
+        // program. since it's defined in a shared library that depends on
+        // libstdc++.so, destruction happens before destruction of
+        // std::cout/cerr, but after all file variables defined in user
+        // programs have been destroyed. in other words, if we get here and
+        // the object being destroyed is 'deallog' and if 'deallog' is
+        // associated with a file stream, then we're in trouble: we'll try
+        // to write to a file that doesn't exist any more, and we're likely
+        // going to crash (this is tested by base/log_crash_01). rather
+        // than letting it come to this, print a message to the screen
+        // (note that we can't issue an assertion here either since Assert
+        // may want to write to 'deallog' itself, and AssertThrow will
+        // throw an exception that can't be caught)
         if ((this == &deallog) && file)
           std::cerr << ("You still have content that was written to 'deallog' "
                         "but not flushed to the screen or a file while the "
@@ -125,18 +101,11 @@ LogStream::~LogStream()
   if (old_cerr)
     std::cerr.rdbuf(old_cerr);
 
-  // on some systems, destroying the
-  // outstreams objects of deallog
-  // triggers some sort of memory
-  // corruption, in particular when
-  // we also link with Trilinos;
-  // since this happens at the very
-  // end of the program, we take the
-  // liberty to simply not do it by
-  // putting that object into a
-  // deliberate memory leak and
-  // instead destroying an empty
-  // object
+  // on some systems, destroying the outstreams objects of deallog triggers
+  // some sort of memory corruption, in particular when we also link with
+  // Trilinos; since this happens at the very end of the program, we take
+  // the liberty to simply not do it by putting that object into a
+  // deliberate memory leak and instead destroying an empty object
 #ifdef DEAL_II_WITH_TRILINOS
   if (this == &deallog)
     {
@@ -170,19 +139,29 @@ LogStream::test_mode(bool on)
 LogStream &
 LogStream::operator<< (std::ostream& (*p) (std::ostream &))
 {
-  // do the work that is common to
-  // the operator<< functions
-  print (p);
+  std::ostringstream &stream = get_stream();
 
-  // next check whether this is the
-  // <tt>endl</tt> manipulator, and if so
-  // set a flag
+  // Print to the internal stringstream:
+  stream << p;
+
+  // Next check whether this is the <tt>flush</tt> or <tt>endl</tt>
+  // manipulator, and if so print out the message.
+  std::ostream & (* const p_flush) (std::ostream &) = &std::flush;
   std::ostream & (* const p_endl) (std::ostream &) = &std::endl;
-  if (p == p_endl)
+  if (p == p_flush || p == p_endl)
     {
       Threads::Mutex::ScopedLock lock(write_lock);
-      print_line_head();
-      std::ostringstream &stream = get_stream();
+
+      // Print the line head in case of a newline:
+      if (at_newline)
+        print_line_head();
+
+      if(p == p_flush)
+        at_newline = false;
+
+      if(p == p_endl)
+        at_newline = true;
+
       if (prefixes.size() <= std_depth)
         *std_out << stream.str();
 
@@ -192,6 +171,7 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
       // Start a new string
       stream.str("");
     }
+
   return *this;
 }
 
@@ -211,7 +191,6 @@ LogStream::get_stream()
     }
   return *outstreams[id];
 }
-
 
 
 void

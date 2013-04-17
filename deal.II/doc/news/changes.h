@@ -106,6 +106,12 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Improved: Logstream (and deallog) now respect std::flush in addition to std::endl
+to write out content to the console/file.
+<br>
+(Matthias Maier, 2013/04/17)
+</li>
+
 <li> New: Functions::FEFieldFunction can now deal with
 parallel::distributed::Triangulation objects.
 <br>
