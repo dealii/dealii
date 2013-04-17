@@ -2592,15 +2592,8 @@ namespace internal
             accessor.set_vertex_dof_index(vertex,d,
                                           local_dof_indices[index]);
 
-	// the call to dof_index coming next can't be right. it
-	// should be set_dof_index!? abort here to see if we ever
-	// run through this code and which tests are going to fail
-	// as a debugging aid. i'll remove this check again
-	// as part of the fix
-	Assert (false, ExcNotImplemented());
-
         for (unsigned int d=0; d<dofs_per_line; ++d, ++index)
-          accessor.dof_index(d, local_dof_indices[index]);
+          accessor.set_dof_index(d, local_dof_indices[index]);
 
         Assert (index == dofs_per_cell,
                 ExcInternalError());
