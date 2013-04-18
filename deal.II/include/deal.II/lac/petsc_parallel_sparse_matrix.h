@@ -369,6 +369,18 @@ namespace PETScWrappers
                    const bool                       preset_nonzero_locations = true);
 
       /**
+       * Create a matrix where the size() of the IndexSets determine the global
+       * number of rows and columns and the entries of the IndexSet give
+       * the rows and columns for the calling processor.
+       * Note that only contiguous IndexSets are supported.
+       */
+      template <typename SparsityType>
+      void reinit (const IndexSet & local_rows,
+                  const IndexSet & local_columns,
+                   const SparsityType         &sparsity_pattern,
+                   const MPI_Comm                  &communicator);
+
+      /**
        * Return a reference to the MPI
        * communicator object in use with
        * this matrix.
@@ -471,6 +483,14 @@ namespace PETScWrappers
                       const std::vector<unsigned int> &local_columns_per_process,
                       const unsigned int               this_process,
                       const bool                       preset_nonzero_locations);
+
+      /**
+       * Same as previous functions.
+       */
+      template <typename SparsityType>
+      void do_reinit (const IndexSet & local_rows,
+                      const IndexSet & local_columns,
+                       const SparsityType         &sparsity_pattern);
 
       /**
        *  To allow calling protected
