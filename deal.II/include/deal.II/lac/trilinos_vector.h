@@ -241,9 +241,9 @@ namespace TrilinosWrappers
        * own unknowns, add optional ghost
        * values ghost.
        */
-      void reinit (const MPI_Comm &communicator,
-                   const IndexSet &local,
-                   const IndexSet &ghost=IndexSet(0));
+      void reinit (const IndexSet &local,
+          const IndexSet &ghost,
+          const MPI_Comm &communicator = MPI_COMM_WORLD);
 
       /**
        * Set all components of the
@@ -707,6 +707,8 @@ namespace TrilinosWrappers
     void reinit (const IndexSet   &input_map,
                  const MPI_Comm   &communicator = MPI_COMM_WORLD,
                  const bool        fast = false);
+
+
 
     /**
      * Reinit function. Takes the

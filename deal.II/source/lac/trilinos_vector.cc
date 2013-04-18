@@ -290,7 +290,7 @@ namespace TrilinosWrappers
     }
 
 
-    void Vector::reinit(const MPI_Comm &communicator, const IndexSet &local, const IndexSet &ghost)
+    void Vector::reinit(const IndexSet &local, const IndexSet &ghost, const MPI_Comm &communicator)
     {
       IndexSet parallel_partitioning = local;
       parallel_partitioning.add_indices(ghost);
