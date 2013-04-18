@@ -8,6 +8,7 @@ class LA_PETSc
     {
       public:
 	typedef LinearAlgebraPETSc::MPI::Vector Vector;
+	typedef LinearAlgebraPETSc::MPI::SparseMatrix SparseMatrix;
     };
 };
 
@@ -17,7 +18,8 @@ class LA_Trilinos
     class MPI
     {
       public:
-	typedef LinearAlgebraPETSc::MPI::Vector Vector;
+	typedef LinearAlgebraTrilinos::MPI::Vector Vector;
+	typedef LinearAlgebraTrilinos::MPI::SparseMatrix SparseMatrix;
     };
 };
 
@@ -77,6 +79,26 @@ class LA_Dummy
 		return d;
 	      }
 	    
+	    
+	};
+
+	class SparseMatrix
+	{
+	  public:
+	    template <typename SP>
+	    SparseMatrix(const IndexSet & local,
+			 const IndexSet &,
+			 SP & sp,
+			 const MPI_Comm &comm=MPI_COMM_WORLD)
+	      {}
+	    
+	    void set(unsigned int, unsigned int, double);
+	    
+	    const double & operator()(unsigned int, unsigned int) const
+	      {
+		static double d;
+		return d;
+	      }
 	    
 	};
 	
