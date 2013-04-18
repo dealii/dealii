@@ -40,19 +40,27 @@ namespace
 }
 
 
+// The standard log object of deal.II:
 LogStream deallog;
 
 
 LogStream::LogStream()
   :
-  std_out(&std::cerr), file(0),
-  std_depth(10000), file_depth(10000),
-  print_utime(false), diff_utime(false),
-  last_time (0.), double_threshold(0.), float_threshold(0.),
-  offset(0), old_cerr(0), at_newline(true)
+  std_out(&std::cerr),
+  file(0),
+  std_depth(10000),
+  file_depth(10000),
+  print_utime(false),
+  diff_utime(false),
+  last_time (0.),
+  double_threshold(0.),
+  float_threshold(0.),
+  offset(0),
+  old_cerr(0),
+  at_newline(true)
 {
-  prefixes.push("DEAL:");
-  std_out->setf(std::ios::showpoint | std::ios::left);
+  get_prefixes().push("DEAL:");
+
 #if defined(HAVE_UNISTD_H) && defined(HAVE_TIMES)
   reference_time_val = 1./sysconf(_SC_CLK_TCK) * times(&reference_tms);
 #endif
@@ -144,10 +152,10 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
       if(p == p_endl)
         at_newline = true;
 
-      if (prefixes.size() <= std_depth)
+      if (get_prefixes().size() <= std_depth)
         *std_out << stream.str();
 
-      if (file && (prefixes.size() <= file_depth))
+      if (file && (get_prefixes().size() <= file_depth))
         *file << stream.str() << std::flush;
 
       // Start a new string
@@ -215,26 +223,24 @@ LogStream::has_file() const
 const std::string &
 LogStream::get_prefix() const
 {
-  return prefixes.top();
+  return get_prefixes().top();
 }
 
 
 void
 LogStream::push (const std::string &text)
 {
-  Threads::Mutex::ScopedLock lock(log_lock);
-  std::string pre=prefixes.top();
+  std::string pre=get_prefixes().top();
   pre += text;
   pre += std::string(":");
-  prefixes.push(pre);
+  get_prefixes().push(pre);
 }
 
 
 void LogStream::pop ()
 {
-  Threads::Mutex::ScopedLock lock(log_lock);
-  if (prefixes.size() > 1)
-    prefixes.pop();
+  if (get_prefixes().size() > 1)
+    get_prefixes().pop();
 }
 
 
@@ -303,6 +309,38 @@ LogStream::log_thread_id (const bool flag)
   return h;
 }
 
+std::stack<std::string> &
+LogStream::get_prefixes() const
+{
+#ifdef DEAL_II_WITH_THREADS
+  bool exists = false;
+  std::stack<std::string> &local_prefixes = prefixes.get(exists);
+
+  // If this is a new locally stored stack, copy the "blessed" prefixes
+  // from the initial thread that created logstream.
+  if(! exists)
+    {
+      const tbb::enumerable_thread_specific<std::stack<std::string> > &impl
+        = prefixes.get_implementation();
+
+      // The thread that created this LogStream object should be the first
+      // in tbb's enumerable_thread_specific containter.
+      const tbb::enumerable_thread_specific<std::stack<std::string> >::const_iterator first_elem
+        = impl.begin();
+
+      if (first_elem != impl.end())
+        {
+          local_prefixes = *first_elem;
+        }
+    }
+
+  return local_prefixes;
+
+#else
+  return prefixes.get();
+#endif
+}
+
 
 void
 LogStream::print_line_head()
@@ -360,7 +398,7 @@ LogStream::print_line_head()
   const std::string &head = get_prefix();
   const unsigned int thread = Threads::this_thread_id();
 
-  if (prefixes.size() <= std_depth)
+  if (get_prefixes().size() <= std_depth)
     {
       if (print_utime)
         {
@@ -377,7 +415,7 @@ LogStream::print_line_head()
       *std_out <<  head << ':';
     }
 
-  if (file && (prefixes.size() <= file_depth))
+  if (file && (get_prefixes().size() <= file_depth))
     {
       if (print_utime)
         {
@@ -419,17 +457,20 @@ LogStream::timestamp ()
 std::size_t
 LogStream::memory_consumption () const
 {
+  // TODO
+  Assert(false, ExcNotImplemented());
+
   std::size_t mem = sizeof(*this);
   // to determine size of stack
   // elements, we have to copy the
   // stack since we can't access
   // elements from further below
-  std::stack<std::string> tmp = prefixes;
-  while (tmp.empty() == false)
-    {
-      mem += MemoryConsumption::memory_consumption (tmp.top());
-      tmp.pop ();
-    }
+//   std::stack<std::string> tmp = prefixes;
+//   while (tmp.empty() == false)
+//     {
+//       mem += MemoryConsumption::memory_consumption (tmp.top());
+//       tmp.pop ();
+//     }
 
   return mem;
 }

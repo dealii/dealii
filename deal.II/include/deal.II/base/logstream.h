@@ -63,6 +63,24 @@ DEAL_II_NAMESPACE_OPEN
  * encountered, which will trigger a writeout to the console and, if set
  * up, the log file.
  *
+ * <h3>LogStream and thread safety</h3>
+ *
+ * In the vicinity of concurrent threads, LogStream behaves in the
+ * following manner:
+ * <ul>
+ * <li> Every write to a Logstream with operator <tt>&lt;&lt;</tt> (or with
+ * one of the special member functions) is buffered in a thread-local
+ * storage.
+ * <li> An <tt>std::flush</tt> or <tt>std::endl</tt> will trigger a
+ * writeout to the console and (if attached) to the file stream. This
+ * writeout is sequentialized so that output from concurrent threads don't
+ * interleave.
+ * <li> On a new thread, invoking a writeout, as well as a call to #push or
+ * #pop will copy the current prefix of the "blessed" thread that created
+ * the LogStream instance to a thread-local storage. After that prefixes
+ * are thread-local.
+ * </ul>
+ *
  * <h3>LogStream and reproducible regression test output</h3>
  *
  * Generating reproducible floating point output for regression tests
@@ -371,11 +389,21 @@ public:
 
 private:
 
+
+  /**
+   * Internal wrapper around thread-local prefixes. This private
+   * function will return the correct internal prefix stack. More
+   * important, a new thread-local stack will be copied from the current
+   * stack of the "blessed" thread that created this LogStream instance
+   * (usually, in the case of deallog, the "main" thread).
+   */
+  std::stack<std::string> &get_prefixes() const;
+
   /**
    * Stack of strings which are printed at the beginning of each line to
    * allow identification where the output was generated.
    */
-  std::stack<std::string> prefixes;
+  mutable Threads::ThreadLocalStorage<std::stack<std::string> > prefixes;
 
   /**
    * Default stream, where the output is to go to. This stream defaults to
@@ -575,9 +603,8 @@ LogStream::Prefix::~Prefix()
 }
 
 
-
 /**
- * The standard log object of DEAL.
+ * The standard log object of deal.II:
  *
  * @author Guido Kanschat, 1999
  */
@@ -591,7 +618,6 @@ LogStream::Prefix::Prefix(const std::string &text)
 {
   stream->push(text);
 }
-
 
 
 DEAL_II_NAMESPACE_CLOSE

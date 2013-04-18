@@ -110,17 +110,20 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> Improved and Fixed: LogStream (and deallog) now respect std::flush in
+addition to std::endl to write out content to the console/file.
+Furthermore, LogStream::push(...) and LogStream::pop() now work in a thread
+safe manner.
+<br>
+(Matthias Maier, 2013/04/18)
+</li>
+
 <li> Fixed: The HalfHyperShellBoundary class got refining
 the edges that sit at the perimeter of the circular face of the domain
 wrong. This is now fixed.
 <br>
 (Wolfgang Bangerth, J&ouml;rg Frohne, 2013/04/17)
-</li>
-
-<li> Improved: Logstream (and deallog) now respect std::flush in addition to std::endl
-to write out content to the console/file.
-<br>
-(Matthias Maier, 2013/04/17)
 </li>
 
 <li> New: Functions::FEFieldFunction can now deal with
