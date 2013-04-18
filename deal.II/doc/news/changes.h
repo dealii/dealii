@@ -66,20 +66,23 @@ this function.
 <ol>
   <li> New: The step-49 tutorial program now also has a discussion on
   what to do once you have a coarse mesh and want to refine it.
-  </li>
+  <br>
   (Wolfgang Bangerth, 2013/04/03)
+  </li>
 
   <li> New: The number of threads used by deal.II/TBB can now be limited at
   run time. Using MPI based code using PETSc/Trilinos no longer requires you
   to compile the library without threads. See MPI_InitFinalize and
   MultithreadInfo::set_thread_limit for details.
-  </li>
+  <br>
   (Timo Heister, 2013/03/26)
+  </li>
 
   <li> New: The results section of step-36 now explains how to use ARPACK
   as an alternative to SLEPc as eigenvalue solver.
   <br>
   (Juan Carlos Araujo Cabarcas, 2013/03/25)
+  </li>
 
   <li> New: deal.II now uses <a href="http://www.cmake.org/">CMake</a>
   as its configuration and build tool. Please read through the
@@ -97,6 +100,7 @@ this function.
   </ul>
   <br>
   (Matthias Maier, 2013/03/07)
+  </li>
 </ol>
 
 
@@ -110,7 +114,7 @@ this function.
 the edges that sit at the perimeter of the circular face of the domain
 wrong. This is now fixed.
 <br>
-(Wolfgang Bangerth, Joerg Frohne, 2013/04/17)
+(Wolfgang Bangerth, J&ouml;rg Frohne, 2013/04/17)
 </li>
 
 <li> Improved: Logstream (and deallog) now respect std::flush in addition to std::endl
