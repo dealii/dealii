@@ -64,6 +64,13 @@ this function.
 
 
 <ol>
+  <li> Fixed: TimerOutput constructed with an MPI_COMM in wall_time
+  mode now constructs synchronized Timer objects. This gives reliable
+  parallel benchmark timings.
+  <br>
+  (Timo Heister, 2013/04/18)
+  </li>
+
   <li> New: The step-49 tutorial program now also has a discussion on
   what to do once you have a coarse mesh and want to refine it.
   <br>

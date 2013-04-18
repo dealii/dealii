@@ -409,6 +409,8 @@ public:
    */
   void enter_section (const std::string &section_name);
 
+  //TODO: make some of these functions DEPRECATED (I would keep enter/exit_section)
+
   /**
    * Leave a section. If no name is given,
    * the last section that was entered is
