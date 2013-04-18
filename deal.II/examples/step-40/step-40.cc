@@ -245,11 +245,9 @@ namespace Step40
     // locally owned cells (of course the linear solvers will read from it,
     // but they do not care about the geometric location of degrees of
     // freedom).
-    locally_relevant_solution.reinit (mpi_communicator,
-                                      locally_owned_dofs,
-                                      locally_relevant_dofs);
-    system_rhs.reinit (mpi_communicator,
-                       locally_owned_dofs);
+    locally_relevant_solution.reinit (locally_owned_dofs,
+                                      locally_relevant_dofs, mpi_communicator);
+    system_rhs.reinit (locally_owned_dofs, mpi_communicator);
 
     system_rhs = 0;
 
@@ -302,30 +300,19 @@ namespace Step40
     // entries that will exist in that part of the finite element matrix that
     // it will own. The final step is to initialize the matrix with the
     // sparsity pattern.
-    CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-                                         dof_handler.n_dofs(),
-                                         locally_relevant_dofs);
-    DoFTools::make_sparsity_pattern (dof_handler,
-                                     csp,
+    CompressedSimpleSparsityPattern csp (locally_relevant_dofs);
+
+    DoFTools::make_sparsity_pattern (dof_handler, csp,
                                      constraints, false);
     SparsityTools::distribute_sparsity_pattern (csp,
                                                 dof_handler.n_locally_owned_dofs_per_processor(),
                                                 mpi_communicator,
                                                 locally_relevant_dofs);
 
-#ifdef USE_PETSC_LA
-    system_matrix.reinit (mpi_communicator,
-                          csp,
-                          dof_handler.n_locally_owned_dofs_per_processor(),
-                          dof_handler.n_locally_owned_dofs_per_processor(),
-                          Utilities::MPI::this_mpi_process(mpi_communicator));
-#else
     system_matrix.reinit (locally_owned_dofs,
                           locally_owned_dofs,
                           csp,
-                          mpi_communicator,
-                          false);
-#endif
+                          mpi_communicator);
   }
 
 
@@ -453,8 +440,7 @@ namespace Step40
   void LaplaceProblem<dim>::solve ()
   {
     LA::MPI::Vector
-    completely_distributed_solution (mpi_communicator,
-                                     locally_owned_dofs);
+    completely_distributed_solution (locally_owned_dofs, mpi_communicator);
 
     SolverControl solver_control (dof_handler.n_dofs(), 1e-12);
 
