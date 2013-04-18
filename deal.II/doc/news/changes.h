@@ -106,6 +106,13 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The HalfHyperShellBoundary class got refining
+the edges that sit at the perimeter of the circular face of the domain
+wrong. This is now fixed.
+<br>
+(Wolfgang Bangerth, Joerg Frohne, 2013/04/17)
+</li>
+
 <li> Improved: Logstream (and deallog) now respect std::flush in addition to std::endl
 to write out content to the console/file.
 <br>
