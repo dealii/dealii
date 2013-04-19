@@ -156,10 +156,8 @@ struct DeadlockKiller
 	      }
 	  }
 	else
-					   // environment variable is
-					   // not set, so assume
-					   // infinite wait time and
-					   // simply quit this thread
+          // environment variable is not set, so assume infinite wait time
+          // and simply quit this thread
 	  {
 	  }
       }

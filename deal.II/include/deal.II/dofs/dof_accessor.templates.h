@@ -2613,8 +2613,9 @@ namespace internal
           for (unsigned int d=0; d<dofs_per_vertex; ++d, ++index)
             accessor.set_vertex_dof_index(vertex,d,
                                           local_dof_indices[index]);
+
         for (unsigned int d=0; d<dofs_per_line; ++d, ++index)
-          accessor.dof_index(d, local_dof_indices[index]);
+          accessor.set_dof_index(d, local_dof_indices[index]);
 
         Assert (index == dofs_per_cell,
                 ExcInternalError());

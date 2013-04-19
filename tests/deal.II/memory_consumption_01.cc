@@ -381,6 +381,7 @@ void Step6<dim>::run ()
 int main()
 {
   deal_II_exceptions::disable_abort_on_exception();
+
   std::ofstream logfile("memory_consumption_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);

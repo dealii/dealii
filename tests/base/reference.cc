@@ -45,6 +45,7 @@ class Test : public Subscriptor
 int main()
 {
   deal_II_exceptions::disable_abort_on_exception();
+
   std::ofstream logfile("reference/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -81,12 +82,12 @@ int main()
       r = &c;
       Test d("D");
       r = &d;
-				       // Destruction of "Test R" will
-				       // cause a spurious ExcNotUsed
-				       // here, since D was deleted first
+      // Destruction of "Test R" will cause a spurious ExcNotUsed here,
+      // since D was deleted first
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
   
 }

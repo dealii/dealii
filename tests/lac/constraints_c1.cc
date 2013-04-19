@@ -125,14 +125,14 @@ setup_constraints(const DoFHandler<dim>& dof_handler)
     }
 
   deallog << "Closing" << std::endl;
-  deal_II_exceptions::disable_abort_on_exception();
   try
     {
       constraints.close();
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
-    }  
+      deallog << e.get_exc_name() << std::endl;
+    }
   deallog << "Closed" << std::endl;
 }
 
@@ -157,9 +157,12 @@ run(const FiniteElement<dim>& fe)
 
 int main()
 {
+  deal_II_exceptions::disable_abort_on_exception();
+
   const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
   std::ofstream logfile(logname.c_str());
   deallog.attach(logfile);
+  deallog.depth_console(0);
   
   FE_Q<2> fe(3);
   run(fe);

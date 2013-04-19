@@ -2693,6 +2693,11 @@ GridGenerator::half_hyper_ball (Triangulation<3> &tria,
   Triangulation<3>::cell_iterator cell = tria.begin();
   Triangulation<3>::cell_iterator end = tria.end();
 
+  // go over all faces. for the ones on the flat face, set boundary
+  // indicator for face and edges to one; the rest will remain at
+  // zero but we have to pay attention to those edges that are
+  // at the perimeter of the flat face since they should not be
+  // set to one
   while (cell != end)
     {
       for (unsigned int i=0; i<GeometryInfo<3>::faces_per_cell; ++i)
@@ -2700,27 +2705,24 @@ GridGenerator::half_hyper_ball (Triangulation<3> &tria,
           if (!cell->at_boundary(i))
             continue;
 
-          // If the center is on the plane x=0, this is a planar
-          // element
-          if (cell->face(i)->center()(0) < center(0)+1.e-5)
+          // If the center is on the plane x=0, this is a planar element. set
+          // its boundary indicator. also set the boundary indicators of the
+          // bounding faces unless both vertices are on the perimeter
+          if (cell->face(i)->center()(0) < center(0)+1.e-5*radius)
             {
               cell->face(i)->set_boundary_indicator(1);
               for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
-                cell->face(i)->line(j)->set_boundary_indicator(1);
-            }
-        }
-      // With this loop we restore back the indicator of the outer lines
-      for (unsigned int i=0; i<GeometryInfo<3>::faces_per_cell; ++i)
-        {
-          if (!cell->at_boundary(i))
-            continue;
-
-          // If the center is not on the plane x=0, this is a curvilinear
-          // element
-          if (cell->face(i)->center()(0) > center(0)+1.e-5)
-            {
-              for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
-                cell->face(i)->line(j)->set_boundary_indicator(0);
+		{
+		  const Point<3> vertices[2]
+		    = { cell->face(i)->line(j)->vertex(0),
+			cell->face(i)->line(j)->vertex(1) };
+		  if ((std::fabs(vertices[0].distance(center)-radius) >
+		       1e-5*radius)
+		      ||
+		      (std::fabs(vertices[1].distance(center)-radius) >
+		       1e-5*radius))
+		    cell->face(i)->line(j)->set_boundary_indicator(1);
+		}
             }
         }
       ++cell;

@@ -28,6 +28,8 @@
 
 void test ()
 {
+  deal_II_exceptions::disable_abort_on_exception();
+
 				   // test for an initialized mask
   Assert (BlockMask(12,true).n_selected_blocks() == 12,
 	  ExcInternalError());
@@ -49,8 +51,9 @@ void test ()
       Assert (BlockMask(12,true).n_selected_blocks(13) == 12,
 	      ExcInternalError());
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
   
 }
@@ -58,8 +61,6 @@ void test ()
 
 int main()
 {
-  deal_II_exceptions::disable_abort_on_exception();
-
   std::ofstream logfile ("block_mask_06/output");
   deallog << std::setprecision (4);
 

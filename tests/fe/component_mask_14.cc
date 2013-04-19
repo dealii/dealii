@@ -51,9 +51,10 @@ void test ()
       {
 	deallog << fe.block_mask (component_mask) << std::endl;
       }
-    catch (...)
+    catch (ExceptionBase &e)
       {
-      } 
+        deallog << e.get_exc_name() << std::endl;
+      }
   }
 
   deallog << "OK" << std::endl;

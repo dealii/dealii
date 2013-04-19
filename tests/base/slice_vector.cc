@@ -34,6 +34,7 @@ void f(const std::vector<int>& v)
 int main()
 {
   deal_II_exceptions::disable_abort_on_exception();
+
   std::ofstream logfile("slice_vector/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
@@ -59,8 +60,8 @@ int main()
     {
       make_slice(v, 3, 5);
     }
-  catch(...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
-  
 }

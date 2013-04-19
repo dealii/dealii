@@ -47,8 +47,9 @@ void test ()
     {
       fe_collection.n_blocks();
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
 
   deallog << "OK" << std::endl;

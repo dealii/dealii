@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2007, 2009, 2012 by the deal.II authors
+//    Copyright (C) 2007, 2009, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -110,13 +110,57 @@ namespace Functions
    * tell where your points are, you will save a lot of computational
    * time by letting this class know.
    *
-   * An optimization based on a caching mechanism was used by the
-   * author of this class for the implementation of a Finite Element
-   * Immersed Boundary Method.
    *
-   *  \ingroup functions
+   * <h3>Using FEFieldFunction with parallel::distributed::Triangulation</h3>
    *
-   *  \author Luca Heltai, 2006, Markus Buerg, 2012
+   * When using this class with a parallel distributed triangulation object
+   * and evaluating the solution at a particular point, not every processor
+   * will own the cell at which the solution is evaluated. Rather, it may be
+   * that the cell in which this point is found is in fact a ghost or
+   * artificial cell (see @ref GlossArtificialCell and
+   * @ref GlossGhostCell). If the cell is artificial, we have no access
+   * to the solution there and functions that evaluate the solution at
+   * such a point will trigger an exception of type
+   * FEFieldFunction::ExcPointNotAvailableHere. The same kind of exception
+   * will also be produced if the cell is a ghost cell: On such cells, one
+   * could in principle evaluate the solution, but it becomes easier if we
+   * do not allow to do so because then there is exactly one processor in
+   * a parallel distributed computation that can indeed evaluate the
+   * solution. Consequently, it is clear which processor is responsible
+   * for producing output if the point evaluation is done as a postprocessing
+   * step.
+   *
+   * To deal with this situation, you will want to use code as follows
+   * when, for example, evaluating the solution at the origin (here using
+   * a parallel TrilinosWrappers vector to hold the solution):
+   * @code
+   *   Functions::FEFieldFunction<dim,DoFHandler<dim>,TrilinosWrappers::MPI::Vector>
+   *     solution_function (dof_handler, solution);
+   *   Point<dim> origin = Point<dim>();
+   *
+   *   double solution_at_origin;
+   *   bool   point_found = true;
+   *   try
+   *     {
+   *       solution_at_origin = solution_function.value (origin);
+   *     }
+   *   catch (const typename Functions::FEFieldFunction<dim,DoFHandler<dim>,TrilinosWrappers::MPI::Vector>::ExcPointNotAvailableHere &)
+   *     {
+   *       point_found = false;
+   *     }
+   *
+   *   if (point_found == true)
+   *     ...do something...;
+   * @endcode
+   *
+   * @note To C++, <code>Functions::FEFieldFunction<dim>::ExcPointNotAvailableHere</code>
+   * and <code>Functions::FEFieldFunction<dim,DoFHandler<dim>,TrilinosWrappers::MPI::Vector>::ExcPointNotAvailableHere</code>
+   * are distinct types. You need to make sure that the type of the exception you
+   * catch matches the type of the object that throws it, as shown in
+   * the example above.
+   *
+   * @ingroup functions
+   * @author Luca Heltai, 2006, Markus Buerg, 2012, Wolfgang Bangerth, 2013
    */
   template <int dim,
            typename DH=DoFHandler<dim>,
@@ -157,7 +201,7 @@ namespace Functions
     void set_active_cell (const typename DH::active_cell_iterator &newcell);
 
     /**
-     * Get ONE vector value at the
+     * Get one vector value at the
      * given point. It is
      * inefficient to use single
      * points. If you need more
@@ -169,6 +213,12 @@ namespace Functions
      * cell. This is not mandatory,
      * however it does speed things
      * up.
+     *
+     * @note When using this function on a parallel::distributed::Triangulation
+     * you may get an exception when trying to evaluate the solution at a
+     * point that does not lie in a locally owned cell (see
+     * @ref GlossLocallyOwnedCell). See the section in the general
+     * documentation of this class for more information.
      */
     virtual void vector_value (const Point<dim> &p,
                                Vector<double>   &values) const;
@@ -193,6 +243,12 @@ namespace Functions
      * cell. This is not mandatory,
      * however it does speed things
      * up.
+     *
+     * @note When using this function on a parallel::distributed::Triangulation
+     * you may get an exception when trying to evaluate the solution at a
+     * point that does not lie in a locally owned cell (see
+     * @ref GlossLocallyOwnedCell). See the section in the general
+     * documentation of this class for more information.
      */
     virtual double value (const Point< dim >     &p,
                           const unsigned int  component = 0)    const;
@@ -210,6 +266,12 @@ namespace Functions
      * lie on the same cell. If
      * this is not the case, things
      * may slow down a bit.
+     *
+     * @note When using this function on a parallel::distributed::Triangulation
+     * you may get an exception when trying to evaluate the solution at a
+     * point that does not lie in a locally owned cell (see
+     * @ref GlossLocallyOwnedCell). See the section in the general
+     * documentation of this class for more information.
      */
     virtual void value_list (const std::vector<Point< dim > >     &points,
                              std::vector< double > &values,
@@ -228,6 +290,12 @@ namespace Functions
      * lie on the same cell. If
      * this is not the case, things
      * may slow down a bit.
+     *
+     * @note When using this function on a parallel::distributed::Triangulation
+     * you may get an exception when trying to evaluate the solution at a
+     * point that does not lie in a locally owned cell (see
+     * @ref GlossLocallyOwnedCell). See the section in the general
+     * documentation of this class for more information.
      */
     virtual void vector_value_list (const std::vector<Point< dim > >     &points,
                                     std::vector< Vector<double> > &values) const;
@@ -246,6 +314,12 @@ namespace Functions
      * cell. This is not mandatory,
      * however it does speed things
      * up.
+     *
+     * @note When using this function on a parallel::distributed::Triangulation
+     * you may get an exception when trying to evaluate the solution at a
+     * point that does not lie in a locally owned cell (see
+     * @ref GlossLocallyOwnedCell). See the section in the general
+     * documentation of this class for more information.
      */
     virtual void
     vector_gradient (const Point< dim > &p,
@@ -265,6 +339,12 @@ namespace Functions
      * cell. This is not mandatory,
      * however it does speed things
      * up.
+     *
+     * @note When using this function on a parallel::distributed::Triangulation
+     * you may get an exception when trying to evaluate the solution at a
+     * point that does not lie in a locally owned cell (see
+     * @ref GlossLocallyOwnedCell). See the section in the general
+     * documentation of this class for more information.
      */
     virtual Tensor<1,dim> gradient(const Point< dim > &p,
                                    const unsigned int component = 0)const;
@@ -278,6 +358,12 @@ namespace Functions
      * same cell. If this is not
      * the case, things may slow
      * down a bit.
+     *
+     * @note When using this function on a parallel::distributed::Triangulation
+     * you may get an exception when trying to evaluate the solution at a
+     * point that does not lie in a locally owned cell (see
+     * @ref GlossLocallyOwnedCell). See the section in the general
+     * documentation of this class for more information.
      */
     virtual void
     vector_gradient_list (const std::vector< Point< dim > > &p,
@@ -293,6 +379,12 @@ namespace Functions
      * lie on the same cell. If
      * this is not the case, things
      * may slow down a bit.
+     *
+     * @note When using this function on a parallel::distributed::Triangulation
+     * you may get an exception when trying to evaluate the solution at a
+     * point that does not lie in a locally owned cell (see
+     * @ref GlossLocallyOwnedCell). See the section in the general
+     * documentation of this class for more information.
      */
     virtual void
     gradient_list (const std::vector< Point< dim > > &p,
@@ -303,6 +395,12 @@ namespace Functions
     /**
      * Compute the Laplacian of a
      * given component at point <tt>p</tt>.
+     *
+     * @note When using this function on a parallel::distributed::Triangulation
+     * you may get an exception when trying to evaluate the solution at a
+     * point that does not lie in a locally owned cell (see
+     * @ref GlossLocallyOwnedCell). See the section in the general
+     * documentation of this class for more information.
      */
     virtual double
     laplacian (const Point<dim>   &p,
@@ -312,6 +410,12 @@ namespace Functions
      * Compute the Laplacian of all
      * components at point <tt>p</tt> and
      * store them in <tt>values</tt>.
+     *
+     * @note When using this function on a parallel::distributed::Triangulation
+     * you may get an exception when trying to evaluate the solution at a
+     * point that does not lie in a locally owned cell (see
+     * @ref GlossLocallyOwnedCell). See the section in the general
+     * documentation of this class for more information.
      */
     virtual void
     vector_laplacian (const Point<dim>   &p,
@@ -320,6 +424,12 @@ namespace Functions
     /**
      * Compute the Laplacian of one
      * component at a set of points.
+     *
+     * @note When using this function on a parallel::distributed::Triangulation
+     * you may get an exception when trying to evaluate the solution at a
+     * point that does not lie in a locally owned cell (see
+     * @ref GlossLocallyOwnedCell). See the section in the general
+     * documentation of this class for more information.
      */
     virtual void
     laplacian_list (const std::vector<Point<dim> > &points,
@@ -329,6 +439,12 @@ namespace Functions
     /**
      * Compute the Laplacians of all
      * components at a set of points.
+     *
+     * @note When using this function on a parallel::distributed::Triangulation
+     * you may get an exception when trying to evaluate the solution at a
+     * point that does not lie in a locally owned cell (see
+     * @ref GlossLocallyOwnedCell). See the section in the general
+     * documentation of this class for more information.
      */
     virtual void
     vector_laplacian_list (const std::vector<Point<dim> > &points,
@@ -365,12 +481,18 @@ namespace Functions
                             std::vector<std::vector<Point<dim> > > &qpoints,
                             std::vector<std::vector<unsigned int> > &maps) const;
 
+    /**
+     * Exception
+     */
+    DeclException0 (ExcPointNotAvailableHere);
+
   private:
     /**
      * Typedef holding the local cell_hint.
      */
-    typedef Threads::ThreadLocalStorage <
-    typename DH::active_cell_iterator > cell_hint_t;
+    typedef
+    Threads::ThreadLocalStorage <typename DH::active_cell_iterator >
+    cell_hint_t;
 
     /**
      * Pointer to the dof handler.

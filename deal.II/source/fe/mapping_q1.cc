@@ -781,7 +781,7 @@ MappingQ1<dim,spacedim>::fill_fe_values (
                 // (dimension-independent) criterion
                 Assert (det > 1e-12*Utilities::fixed_power<dim>(cell->diameter()/
                                                                 std::sqrt(double(dim))),
-                        (typename Mapping<dim,spacedim>::ExcDistortedMappedCell(cell->center(), point)));
+                        (typename Mapping<dim,spacedim>::ExcDistortedMappedCell(cell->center(), det, point)));
 
                 JxW_values[point] = weights[point] * det;
               }

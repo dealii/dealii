@@ -66,10 +66,10 @@ void test()
 	  for (unsigned int q=0; q<quad.size(); ++q)
 	    integral += fe_val.JxW(q);
 	}
-      catch (...)
-	{
-	}
-      
+      catch (ExceptionBase &e)
+        {
+          deallog << e.get_exc_name() << std::endl;
+        }
     }
   deallog << "Integral = " << integral << std::endl;
 }
@@ -79,6 +79,7 @@ int
 main()
 {
   deal_II_exceptions::disable_abort_on_exception();
+
   std::ofstream logfile ("distorted_mapped_cells_01/output");
   deallog << std::setprecision(4) << std::fixed;
   deallog.attach(logfile);

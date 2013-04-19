@@ -45,8 +45,9 @@ void test (const Triangulation<dim>& tr,
     {
       fe_values[extr];             // invalid access
     }
-  catch (const std::exception &exc)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
       goto ok;
     }
 
@@ -71,14 +72,14 @@ void test()
 
 int main()
 {
+  deal_II_exceptions::disable_abort_on_exception();
+
   std::ofstream logfile ("fe_values_view_invalid_01/output");
   deallog << std::setprecision (2);
 
   deallog.attach(logfile);
   deallog.depth_console (0);
   deallog.threshold_double(1.e-7);
-
-  deal_II_exceptions::disable_abort_on_exception();
 
   test<1>();
   test<2>();

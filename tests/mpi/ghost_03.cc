@@ -52,29 +52,40 @@ void test ()
 
   Assert(!vb.has_ghost_elements(), ExcInternalError());
   Assert(v.has_ghost_elements(), ExcInternalError());
-  
-  deal_II_exceptions::disable_abort_on_exception();
-  try 
+
+  try
     {
       v(0)=1.0;
     }
-  catch (...){}
-  try 
+  catch (ExceptionBase &e)
     {
-      v(0)*=2.0;      
+      deallog << e.get_exc_name() << std::endl;
     }
-  catch (...){}
-  try 
+  try
+    {
+      v(0)*=2.0;
+    }
+  catch (ExceptionBase &e)
+    {
+      deallog << e.get_exc_name() << std::endl;
+    }
+  try
     {
       v=0.0;
     }
-  catch (...){}
-  try 
+  catch (ExceptionBase &e)
     {
-      v+=v;      
+      deallog << e.get_exc_name() << std::endl;
     }
-  catch (...){}
-  
+  try
+    {
+      v+=v;
+    }
+  catch (ExceptionBase &e)
+    {
+      deallog << e.get_exc_name() << std::endl;
+    }
+
 				   // done
   if (myid==0)
     deallog << "OK" << std::endl;
@@ -84,6 +95,8 @@ void test ()
 
 int main (int argc, char **argv)
 {
+  deal_II_exceptions::disable_abort_on_exception();
+
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 

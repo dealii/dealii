@@ -19,11 +19,10 @@ include $D/common/Make.global_options
 %.OK :
 	@echo "=================== $@"
 	@if test -n "`echo $< | grep 2d`" ; then \
-	  (($D/contrib/mesh_conversion/convert_mesh 2 $< $(@:OK=ucd) 2>&1) > $(@:OK=log)) ; \
+	  (($D/bin/mesh_converter 2 $< $(@:OK=ucd) 2>&1) > $(@:OK=log)) ; \
 	else \
-	  (($D/contrib/mesh_conversion/convert_mesh 3 $< $(@:OK=ucd) 2>&1) > $(@:OK=log)) ; \
+	  (($D/bin/mesh_converter 3 $< $(@:OK=ucd) 2>&1) > $(@:OK=log)) ; \
 	fi
-	@perl -pi -e 's#$D/contrib/mesh_conversion/##g;' $(@:OK=ucd)
 	@cmd="diff $(<:%.inp=%.ucd) $(@:OK=ucd) > /dev/null" ; \
 	 if eval $$cmd ; then \
 			echo '=====OK============' $@ ; \
@@ -37,24 +36,20 @@ include $D/common/Make.global_options
 default: all
 
 # collect all headers
-MESH_INPUTS = $(shell echo $D/contrib/mesh_conversion/mesh/?d/*.inp)
+MESH_INPUTS = $(shell echo meshes/?d/*.inp)
 TESTS_X   = $(shell for i in $(MESH_INPUTS) ; do echo $$i | $(PERL) -pi -e 's/.inp$$/.OK/g;' ; done)
 TESTS     = $(shell echo $(TESTS_X:$D/%=%) | $(PERL) -pi -e 's/\//-/g;')
 
 ID = `id -un`"@"`hostname`
 
 
-# how to make the executable if that hasn't happened yet
-$D/contrib/mesh_conversion/convert_mesh:
-	@cd $(@D) && $(MAKE)
-
 # next the target that creates the target rules. First, we list all the header
 # files as the head of the rule, followed by a colon. Then the actual rule
 # that includes writing the .cc file that only includes a single header file,
 # compiles it, and then deletes everything again
-Makefile.dep: $D/contrib/mesh_conversion/convert_mesh $(MESH_INPUTS)
-	for i in $(MESH_INPUTS:$D/%=%) ; do \
-		echo `echo $$i | $(PERL) -pi -e 's/\.inp/.OK/g; s/\//-/g;'` : $D/$$i ; \
+Makefile.dep: $D/bin/mesh_converter $(MESH_INPUTS)
+	@for i in $(MESH_INPUTS) ; do \
+		echo `echo $$i | $(PERL) -pi -e 's/\.inp/.OK/g; s/\//-/g;'` : $$i ; \
 	 done > Makefile.dep
 
 -include Makefile.dep
@@ -81,7 +76,7 @@ report:
 
 report+mail: all
 	@$(MAKE) report | tee testresults
-	@cat testresults | mail regression-tests@dealii.org
+	@cat testresults | mail bangerth@brazos.tamu.edu
 	@rm testresults
 
 

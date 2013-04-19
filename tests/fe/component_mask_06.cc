@@ -49,8 +49,9 @@ void test ()
       Assert (ComponentMask(12,true).n_selected_components(13) == 12,
 	      ExcInternalError());
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
   
 }

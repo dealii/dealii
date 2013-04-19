@@ -12,8 +12,7 @@
 //-------------------------------------------------------------------------
 
 /**
- * @page GlobalDoFIndex When to use types::global_dof_index instead of
- * unsigned int
+ * @page GlobalDoFIndex When to use types::global_dof_index instead of unsigned int
  *
  * When the 64-bits version of deal.II is used, it becomes necessary to
  * declare as types::global_dof_index (unsigned long long int) instead of
