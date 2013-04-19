@@ -173,7 +173,7 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
         ${DEAL_II_EXTERNAL_LIBRARIES}
         ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
         )
-      IF(_lib MATCHES "^/")
+      IF(_lib MATCHES "^\\s*/")
         LIST(APPEND _libs "${_lib}")
       ENDIF()
     ENDFOREACH()
@@ -189,13 +189,30 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
         ${DEAL_II_EXTERNAL_LIBRARIES}
         ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
         )
-      LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
+
       #
-      # Extract library paths where possible:
+      # Strip leading and trailing whitespace
       #
+      STRING(STRIP "${_lib}" _lib)
+
       IF(_lib MATCHES "^(/|\\$\\(D\\))")
+        # Full path: /path/to/libfoo.so:
+
+        # Extract library paths:
         GET_FILENAME_COMPONENT(_path ${_lib} PATH)
         LIST(APPEND _paths ${_path})
+
+        LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
+
+      ELSEIF(_lib MATCHES "^-l")
+        # Library is of the form "-lfoo":
+        LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
+
+      ELSEIF(NOT "${_lib}" STREQUAL "")
+        # Well in this case we just assume that we have to append an "-l"
+        # I'm sorry, but this won't get libfoo.so right, ...
+        LIST(APPEND MAKEFILE_LIBS_${build} "-l${_lib}")
+
       ENDIF()
     ENDFOREACH()
 
