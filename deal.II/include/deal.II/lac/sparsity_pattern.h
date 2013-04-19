@@ -436,7 +436,7 @@ public:
    */
   SparsityPattern (const size_type m,
                    const size_type n,
-                   const size_type max_per_row,
+                   const unsigned int max_per_row,
                    const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -448,7 +448,7 @@ public:
    */
   SparsityPattern (const size_type m,
                    const size_type n,
-                   const size_type max_per_row);
+                   const unsigned int max_per_row);
 
   /**
    * Initialize a rectangular matrix.
@@ -464,7 +464,7 @@ public:
    */
   SparsityPattern (const size_type               m,
                    const size_type               n,
-                   const std::vector<size_type> &row_lengths,
+                   const std::vector<unsigned int> &row_lengths,
                    const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -477,7 +477,7 @@ public:
    */
   SparsityPattern (const size_type               m,
                    const size_type               n,
-                   const std::vector<size_type> &row_lengths);
+                   const std::vector<unsigned int> &row_lengths);
 
   /**
    * Initialize a quadratic matrix of dimension <tt>n</tt> with at most
@@ -488,7 +488,7 @@ public:
    * numbers separately.
    */
   SparsityPattern (const size_type n,
-                   const size_type max_per_row);
+                   const unsigned int max_per_row);
 
   /**
    * Initialize a quadratic matrix.
@@ -502,7 +502,7 @@ public:
    *   it is ignored.
    */
   SparsityPattern (const size_type               m,
-                   const std::vector<size_type> &row_lengths,
+                   const std::vector<unsigned int> &row_lengths,
                    const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -513,7 +513,7 @@ public:
    * vector must have one entry for each row.
    */
   SparsityPattern (const size_type               m,
-                   const std::vector<size_type> &row_lengths);
+                   const std::vector<unsigned int> &row_lengths);
 
   /**
    * Make a copy with extra off-diagonals.
@@ -538,7 +538,7 @@ public:
    * compressed after this function finishes.
    */
   SparsityPattern (const SparsityPattern  &original,
-                   const size_type        max_per_row,
+                   const unsigned int        max_per_row,
                    const size_type        extra_off_diagonals);
 
   /**
@@ -566,7 +566,7 @@ public:
    */
   void reinit (const size_type m,
                const size_type n,
-               const size_type max_per_row,
+               const unsigned int max_per_row,
                const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -579,7 +579,7 @@ public:
    */
   void reinit (const size_type m,
                const size_type n,
-               const size_type max_per_row);
+               const unsigned int max_per_row);
 
   /**
    * Reallocate memory for a matrix of size <tt>m x n</tt>. The number of
@@ -600,7 +600,7 @@ public:
    */
   void reinit (const size_type               m,
                const size_type               n,
-               const std::vector<size_type> &row_lengths,
+               const std::vector<unsigned int> &row_lengths,
                const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -619,7 +619,7 @@ public:
    */
   void reinit (const size_type               m,
                const size_type               n,
-               const std::vector<size_type> &row_lengths);
+               const std::vector<unsigned int> &row_lengths);
 
   /**
    * Same as above, but with a VectorSlice argument instead.
@@ -629,7 +629,7 @@ public:
    */
   void reinit (const size_type                                   m,
                const size_type                                   n,
-               const VectorSlice<const std::vector<size_type> > &row_lengths,
+               const VectorSlice<const std::vector<unsigned int> > &row_lengths,
                const bool optimize_diagonal) DEAL_II_DEPRECATED;
 
   /**
@@ -637,7 +637,7 @@ public:
    */
   void reinit (const size_type                                   m,
                const size_type                                   n,
-               const VectorSlice<const std::vector<size_type> > &row_lengths);
+               const VectorSlice<const std::vector<unsigned int> > &row_lengths);
 
   /**
    * This function compresses the sparsity structure that this object
@@ -1028,7 +1028,7 @@ public:
   /**
    * Number of entries in a specific row.
    */
-  size_type row_length (const size_type row) const;
+  unsigned int row_length (const size_type row) const;
 
   /**
    * Determine whether the matrix uses the special convention for quadratic
@@ -1131,7 +1131,7 @@ public:
    * <tt>column_number(row,i+1)</tt>.
    */
   size_type column_number (const size_type row,
-                           const size_type index) const;
+                           const unsigned int index) const;
 
 
 // @}
@@ -1367,7 +1367,7 @@ private:
    * reinit versions are called. Its value is more or less meaningless after
    * compress() has been called.
    */
-  size_type max_row_length;
+  unsigned int max_row_length;
 
   /**
    * Array which hold for each row which is the first element in #colnums
@@ -1766,7 +1766,7 @@ SparsityPattern::get_column_numbers () const
 
 
 inline
-SparsityPattern::size_type 
+unsigned int
 SparsityPattern::row_length (const size_type row) const
 {
   Assert(row<rows, ExcIndexRangeType<size_type>(row,0,rows));
@@ -1778,10 +1778,10 @@ SparsityPattern::row_length (const size_type row) const
 inline
 SparsityPattern::size_type 
 SparsityPattern::column_number (const size_type row,
-                                const size_type index) const
+                                const unsigned int index) const
 {
   Assert(row<rows, ExcIndexRangeType<size_type>(row,0,rows));
-  Assert(index<row_length(row), ExcIndexRangeType<size_type>(index,0,row_length(row)));
+  Assert(index<row_length(row), ExcIndexRange(index,0,row_length(row)));
 
   return colnums[rowstart[row]+index];
 }
@@ -1928,7 +1928,7 @@ SparsityPattern::copy_from (const size_type       n_rows,
   // is not yet present. as we have to call compress anyway later on, don't
   // bother to check whether that diagonal entry is in a certain row or not
   const bool is_square = (n_rows == n_cols);
-  std::vector<size_type> row_lengths;
+  std::vector<unsigned int> row_lengths;
   row_lengths.reserve(n_rows);
   for (ForwardIterator i=begin; i!=end; ++i)
     row_lengths.push_back (std::distance (i->begin(), i->end())

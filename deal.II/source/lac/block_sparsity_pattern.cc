@@ -359,7 +359,7 @@ void
 BlockSparsityPattern::reinit(
   const BlockIndices &rows,
   const BlockIndices &cols,
-  const std::vector<std::vector<size_type> > &row_lengths)
+  const std::vector<std::vector<unsigned int> > &row_lengths)
 {
   AssertDimension (row_lengths.size(), cols.size());
 
@@ -375,7 +375,7 @@ BlockSparsityPattern::reinit(
                             cols.block_size(j), row_lengths[j][0]);
         else
           {
-            VectorSlice<const std::vector<size_type > >
+            VectorSlice<const std::vector<unsigned int> >
             block_rows(row_lengths[j], start, length);
             block(i,j).reinit(rows.block_size(i),
                               cols.block_size(j),

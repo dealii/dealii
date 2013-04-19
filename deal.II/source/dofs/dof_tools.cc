@@ -5830,7 +5830,7 @@ namespace DoFTools
                                              numbers::invalid_unsigned_int);
 
     // Estimate for the number of dofs at this point
-    std::vector<types::global_dof_index> vertex_dof_count(dof_handler.get_tria().n_vertices(), 0);
+    std::vector<unsigned int> vertex_dof_count(dof_handler.get_tria().n_vertices(), 0);
 
     // Identify all vertices active on this level and remember some data
     // about them

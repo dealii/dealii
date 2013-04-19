@@ -540,7 +540,7 @@ public:
    */
   void reinit (const BlockIndices &row_indices,
                const BlockIndices &col_indices,
-               const std::vector<std::vector<size_type> > &row_lengths);
+               const std::vector<std::vector<unsigned int> > &row_lengths);
 
 
   /**
@@ -968,7 +968,7 @@ public:
    * the @p index th entry in row @p row.
    */
   size_type column_number (const size_type row,
-                           const size_type index) const;
+                           const unsigned int index) const;
 
   /**
    * Allow the use of the reinit
@@ -1341,7 +1341,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_block_rows () const
 inline
 BlockCompressedSimpleSparsityPattern::size_type
 BlockCompressedSimpleSparsityPattern::column_number (const size_type row,
-                                                     const size_type index) const
+                                                     const unsigned int index) const
 {
   // .first= ith block, .second = jth row in that block
   const std::pair<size_type ,size_type >
@@ -1350,9 +1350,9 @@ BlockCompressedSimpleSparsityPattern::column_number (const size_type row,
   Assert(index<row_length(row), ExcIndexRange(index, 0, row_length(row)));
 
   size_type c = 0;
-  for (size_type b=0; b<columns; ++b)
+  for (unsigned int b=0; b<columns; ++b)
     {
-      size_type rowlen = sub_objects[row_index.first][b]->row_length (row_index.second);
+      unsigned int rowlen = sub_objects[row_index.first][b]->row_length (row_index.second);
       if (index<c+rowlen)
         return c+sub_objects[row_index.first][b]->column_number(row_index.second, index-c);
       c += rowlen;

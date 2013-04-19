@@ -72,7 +72,7 @@ SparsityPattern::SparsityPattern (const SparsityPattern &s)
 
 SparsityPattern::SparsityPattern (const size_type m,
                                   const size_type n,
-                                  const size_type max_per_row,
+                                  const unsigned int max_per_row,
                                   const bool)
   :
   max_dim(0),
@@ -89,7 +89,7 @@ SparsityPattern::SparsityPattern (const size_type m,
 
 SparsityPattern::SparsityPattern (const size_type m,
                                   const size_type n,
-                                  const size_type max_per_row)
+                                  const unsigned int max_per_row)
   :
   max_dim(0),
   max_vec_len(0),
@@ -105,7 +105,7 @@ SparsityPattern::SparsityPattern (const size_type m,
 
 SparsityPattern::SparsityPattern (const size_type m,
                                   const size_type n,
-                                  const std::vector<size_type> &row_lengths,
+                                  const std::vector<unsigned int> &row_lengths,
                                   const bool)
   :
   max_dim(0),
@@ -120,7 +120,7 @@ SparsityPattern::SparsityPattern (const size_type m,
 
 SparsityPattern::SparsityPattern (const size_type m,
                                   const size_type n,
-                                  const std::vector<size_type> &row_lengths)
+                                  const std::vector<unsigned int> &row_lengths)
   :
   max_dim(0),
   max_vec_len(0),
@@ -134,7 +134,7 @@ SparsityPattern::SparsityPattern (const size_type m,
 
 
 SparsityPattern::SparsityPattern (const size_type n,
-                                  const size_type max_per_row)
+                                  const unsigned int max_per_row)
   :
   max_dim(0),
   max_vec_len(0),
@@ -147,7 +147,7 @@ SparsityPattern::SparsityPattern (const size_type n,
 
 
 SparsityPattern::SparsityPattern (const size_type               m,
-                                  const std::vector<size_type> &row_lengths,
+                                  const std::vector<unsigned int> &row_lengths,
                                   const bool)
   :
   max_dim(0),
@@ -160,7 +160,7 @@ SparsityPattern::SparsityPattern (const size_type               m,
 
 
 SparsityPattern::SparsityPattern (const size_type               m,
-                                  const std::vector<size_type> &row_lengths)
+                                  const std::vector<unsigned int> &row_lengths)
   :
   max_dim(0),
   max_vec_len(0),
@@ -173,7 +173,7 @@ SparsityPattern::SparsityPattern (const size_type               m,
 
 
 SparsityPattern::SparsityPattern (const SparsityPattern &original,
-                                  const size_type        max_per_row,
+                                  const unsigned int        max_per_row,
                                   const size_type        extra_off_diagonals)
   :
   max_dim(0),
@@ -303,12 +303,12 @@ SparsityPattern::operator = (const SparsityPattern &s)
 void
 SparsityPattern::reinit (const size_type m,
                          const size_type n,
-                         const size_type max_per_row,
+                         const unsigned int max_per_row,
                          const bool)
 {
   // simply map this function to the
   // other @p{reinit} function
-  const std::vector<size_type> row_lengths (m, max_per_row);
+  const std::vector<unsigned int> row_lengths (m, max_per_row);
   reinit (m, n, row_lengths);
 }
 
@@ -317,11 +317,11 @@ SparsityPattern::reinit (const size_type m,
 void
 SparsityPattern::reinit (const size_type m,
                          const size_type n,
-                         const size_type max_per_row)
+                         const unsigned int max_per_row)
 {
   // simply map this function to the
   // other @p{reinit} function
-  const std::vector<size_type> row_lengths (m, max_per_row);
+  const std::vector<unsigned int> row_lengths (m, max_per_row);
   reinit (m, n, row_lengths);
 }
 
@@ -330,7 +330,7 @@ SparsityPattern::reinit (const size_type m,
 void
 SparsityPattern::reinit (const size_type m,
                          const size_type n,
-                         const VectorSlice<const std::vector<size_type> > &row_lengths,
+                         const VectorSlice<const std::vector<unsigned int> > &row_lengths,
                          const bool)
 {
   reinit (m, n, row_lengths);
@@ -341,7 +341,7 @@ SparsityPattern::reinit (const size_type m,
 void
 SparsityPattern::reinit (const size_type m,
                          const size_type n,
-                         const VectorSlice<const std::vector<size_type> > &row_lengths)
+                         const VectorSlice<const std::vector<unsigned int> > &row_lengths)
 {
   AssertDimension (row_lengths.size(), m);
 
@@ -381,11 +381,12 @@ SparsityPattern::reinit (const size_type m,
   // note that the number of elements
   // per row is bounded by the number
   // of columns
+  //
   std::size_t vec_len = 0;
   for (size_type i=0; i<m; ++i)
-    vec_len += std::min((store_diagonal_first_in_row ?
-                         std::max(row_lengths[i], static_cast<size_type> (1U)) :
-                         row_lengths[i]),
+    vec_len += std::min(static_cast<size_type>(store_diagonal_first_in_row ?
+					       std::max(row_lengths[i], 1U) :
+					       row_lengths[i]),
                         n);
 
   // sometimes, no entries are
@@ -410,8 +411,8 @@ SparsityPattern::reinit (const size_type m,
 
   max_row_length = (row_lengths.size() == 0 ?
                     0 :
-                    std::min (*std::max_element(row_lengths.begin(),
-                                                row_lengths.end()),
+                    std::min (static_cast<size_type>(*std::max_element(row_lengths.begin(),
+								       row_lengths.end())),
                               n));
 
   if (store_diagonal_first_in_row && (max_row_length==0) && (m!=0))
@@ -462,8 +463,9 @@ SparsityPattern::reinit (const size_type m,
   for (size_type i=1; i<=rows; ++i)
     rowstart[i] = rowstart[i-1] +
                   (store_diagonal_first_in_row ?
-                   std::max(std::min(row_lengths[i-1],n),static_cast<size_type> (1U)) :
-                   std::min(row_lengths[i-1],n));
+                   std::max(std::min(static_cast<size_type>(row_lengths[i-1]),n),
+			    static_cast<size_type> (1U)) :
+                   std::min(static_cast<size_type>(row_lengths[i-1]),n));
   Assert ((rowstart[rows]==vec_len)
           ||
           ((vec_len == 1) && (rowstart[rows] == 0)),
@@ -637,7 +639,7 @@ SparsityPattern::copy_from (const CSP &csp)
   // diagonal entry is in a certain
   // row or not
   const bool do_diag_optimize = (csp.n_rows() == csp.n_cols());
-  std::vector<size_type> row_lengths (csp.n_rows());
+  std::vector<unsigned int> row_lengths (csp.n_rows());
   for (size_type i=0; i<csp.n_rows(); ++i)
     {
       row_lengths[i] = csp.row_length(i);
@@ -693,7 +695,7 @@ void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
   // also have to allocate memory for the
   // diagonal entry, unless we have already
   // counted it
-  std::vector<size_type> entries_per_row (matrix.m(), 0);
+  std::vector<unsigned int> entries_per_row (matrix.m(), 0);
   for (size_type row=0; row<matrix.m(); ++row)
     {
       for (size_type col=0; col<matrix.n(); ++col)
@@ -723,7 +725,7 @@ void SparsityPattern::copy_from (const FullMatrix<number> &matrix)
 void
 SparsityPattern::reinit (const size_type               m,
                          const size_type               n,
-                         const std::vector<size_type> &row_lengths,
+                         const std::vector<unsigned int> &row_lengths,
                          const bool)
 {
   reinit(m, n, make_slice(row_lengths));
@@ -734,7 +736,7 @@ SparsityPattern::reinit (const size_type               m,
 void
 SparsityPattern::reinit (const size_type               m,
                          const size_type               n,
-                         const std::vector<size_type> &row_lengths)
+                         const std::vector<unsigned int> &row_lengths)
 {
   reinit(m, n, make_slice(row_lengths));
 }

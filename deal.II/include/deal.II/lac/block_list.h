@@ -296,7 +296,7 @@ inline
 void
 BlockList::create_sparsity_pattern(SparsityPattern &sparsity, size_type n) const
 {
-  std::vector<size_type> sizes(size());
+  std::vector<unsigned int> sizes(size());
   for (size_type b=0; b<size(); ++b)
     sizes[b] = block_size(b);
 

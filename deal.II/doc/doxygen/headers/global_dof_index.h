@@ -56,6 +56,11 @@
  * <dt class="glossary">@anchor GlobalDoFIndexSparseMatrix
  * <b>SparseMatrix</b></dt>
  * <dd>
- * The size SparseMatrix can be arbitrary large therefore,
- * types::global_do_index is used.
+ * The size of SparseMatrix can be arbitrary large therefore,
+ * types::global_do_index is used. However, even for a large complex problem we
+ * can solve now, there is no reason for the number of non-zero entries in a 
+ * sparse matrix to go over four billions. Thus, we still use unsigned int
+ * for, e.g., row_lengths in the object.
+ *
+ * 
  */

@@ -222,7 +222,7 @@ ChunkSparsityPattern::reinit (
   // row zero at columns {0,2} and for row
   // one at {4,6} --> we'll need 4 chunks for
   // the first chunk row!) :
-  std::vector<size_type> chunk_row_lengths (m_chunks, 0);
+  std::vector<unsigned int> chunk_row_lengths (m_chunks, 0);
   for (size_type i=0; i<m; ++i)
     chunk_row_lengths[i/chunk_size] += row_lengths[i];
 

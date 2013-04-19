@@ -1010,7 +1010,7 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
   // create an array that caches some
   // elements that are going to be written
   // into the new matrix.
-  size_type max_n_cols_B = 0;
+  unsigned int max_n_cols_B = 0;
   for (size_type i=0; i<B.m(); ++i)
     max_n_cols_B = std::max (max_n_cols_B, sp_B.row_length(i));
   std::vector<numberC> new_entries(max_n_cols_B);
@@ -1140,7 +1140,7 @@ SparseMatrix<number>::Tmmult (SparseMatrix<numberC>       &C,
   // create an array that caches some
   // elements that are going to be written
   // into the new matrix.
-  size_type max_n_cols_B = 0;
+  unsigned int max_n_cols_B = 0;
   for (size_type i=0; i<B.m(); ++i)
     max_n_cols_B = std::max (max_n_cols_B, sp_B.row_length(i));
   std::vector<numberC> new_entries(max_n_cols_B);

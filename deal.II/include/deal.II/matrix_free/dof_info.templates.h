@@ -1702,10 +1702,10 @@ not_connect:
                                     task_info.n_blocks : size_info.n_active_cells;
 
       // first determine row lengths
-      std::vector<types::global_dof_index> row_lengths(n_rows);
+      std::vector<unsigned int> row_lengths(n_rows);
       unsigned int cell_start = 0, mcell_start = 0;
       std::vector<types::global_dof_index> scratch;
-      for (types::global_dof_index block = 0; block < n_blocks; ++block)
+      for (unsigned int block = 0; block < n_blocks; ++block)
         {
           // if we have the blocking variant (used in the coloring scheme), we
           // want to build a graph with the blocks with interaction with
