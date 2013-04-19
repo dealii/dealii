@@ -189,23 +189,13 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
         ${DEAL_II_EXTERNAL_LIBRARIES}
         ${DEAL_II_EXTERNAL_LIBRARIES_${build}}
         )
+      LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
+      #
+      # Extract library paths where possible:
+      #
       IF(_lib MATCHES "^(/|\\$\\(D\\))")
-
-        # Extract library paths where possible:
         GET_FILENAME_COMPONENT(_path ${_lib} PATH)
         LIST(APPEND _paths ${_path})
-
-        # Append the library with full path to the link line:
-        LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
-      ELSE()
-
-        # Not a full path, append a "-l" if not already present:
-        IF(_lib MATCHES "^-l")
-          LIST(APPEND MAKEFILE_LIBS_${build} ${_lib})
-        ELSE()
-          LIST(APPEND MAKEFILE_LIBS_${build} "-l${_lib}")
-        ENDIF()
-
       ENDIF()
     ENDFOREACH()
 
