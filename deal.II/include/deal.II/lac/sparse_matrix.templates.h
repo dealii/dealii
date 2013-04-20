@@ -366,9 +366,9 @@ SparseMatrix<number>::copy_from (const TrilinosWrappers::SparseMatrix &matrix)
   *this = 0;
 
   std::vector < TrilinosScalar > value_cache;
-  std::vector<unsigned int> colnum_cache;
+  std::vector<size_type> colnum_cache;
 
-  for (unsigned int row = 0; row < matrix.m(); ++row)
+  for (size_type row = 0; row < matrix.m(); ++row)
     {
       value_cache.resize(matrix.n());
       colnum_cache.resize(matrix.n());
