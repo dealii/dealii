@@ -57,8 +57,20 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  * for the generalized eigenvalue problem $Ax=B\lambda x$, where the
  * variable <code>const unsigned int size_of_spectrum</code> tells
- * SLEPc the number of eigenvector/eigenvalue pairs to solve for: See
- * also <code>step-36</code> for a hands-on example.
+
+ * SLEPc the number of eigenvector/eigenvalue pairs to solve
+ * for. Additional options and solver parameters can be passed to the
+ * SLEPc solvers before calling <code>solve()</code>. For example, if
+ * the matrices of the general eigenspectrum problem are not hermitian
+ * and the lower eigenvalues are wanted only, the following code can
+ * be implemented:
+ * @code
+ *  system.set_problem_type (EPS_NHEP);
+ *  system.set_which_eigenpairs (EPS_SMALLEST_REAL);
+ * @endcode
+ * These options can also be set at the commandline.
+ *
+ * See also <code>step-36</code> for a hands-on example.
  *
  * An alternative implementation to the one above is to use the API
  * internals directly within the application code. In this way the
