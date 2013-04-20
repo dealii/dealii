@@ -460,6 +460,41 @@ namespace SLEPcWrappers
 #endif
   }
 
+
+  /* ---------------------- LAPACK ------------------------- */
+  SolverLAPACK::SolverLAPACK (SolverControl        &cn,
+			      const MPI_Comm       &mpi_communicator,
+			      const AdditionalData &data)
+    :
+    SolverBase (cn, mpi_communicator),
+    additional_data (data)
+  {}
+
+  void
+  SolverLAPACK::set_solver_type (EPS &eps) const
+  {
+    // 'Tis overwhelmingly likely that PETSc/SLEPc *always* has
+    // BLAS/LAPACK, but let's be defensive.
+#if PETSC_HAVE_BLASLAPACK
+    int ierr;
+    ierr = EPSSetType (eps, const_cast<char *>(EPSLAPACK));
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+
+    // hand over the absolute tolerance and the maximum number of
+    // iteration steps to the SLEPc convergence criterion.
+    ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
+                             this->solver_control.max_steps());
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+#else
+    // Supress compiler warnings about unused paameters.
+    (void) eps;
+
+    Assert ((false),
+            ExcMessage ("Your PETSc/SLEPc installation was not configured with BLAS/LAPACK "
+                        "but this is needed to use the LAPACK solver."));
+#endif
+  }
+
 }
 
 DEAL_II_NAMESPACE_CLOSE
