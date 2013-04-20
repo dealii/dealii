@@ -1,18 +1,13 @@
-//------------------  matrix_free_01.cc  ------------------------
+//------------------  matrix_free_04.cc  ------------------------
 //    $Id$
 //    Version: $Name$
 //
-//------------------  matrix_free_01.cc  ------------------------
+//------------------  matrix_free_04.cc  ------------------------
 
 
-// this tests the correctness of matrix free matrix-vector products by
-// comparing the result with a Trilinos sparse matrix assembled in the usual
-// way. The mesh is distributed among processors (hypercube) and has both
-// hanging nodes (by randomly refining some cells, so the mesh is going to be
-// different when run with different numbers of processors) and Dirichlet
-// boundary conditions
-//
-// this test does not use multithreading within the MPI nodes.
+// this tests the correctness of matrix free matrix-vector products for
+// BlockVector using two vectors on the same DoFHandler. Otherwise the same as
+// matrix_free_01/03
 
 #include "../tests.h"
 
@@ -22,7 +17,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/function.h>
-#include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/parallel_block_vector.h>
 #include <deal.II/distributed/tria.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/tria_boundary_lib.h>
@@ -41,11 +36,11 @@
 template <int dim, int fe_degree, typename Number>
 void
 helmholtz_operator (const MatrixFree<dim,Number>  &data,
-                    parallel::distributed::Vector<Number>       &dst,
-                    const parallel::distributed::Vector<Number> &src,
+                    parallel::distributed::BlockVector<Number> &dst,
+                    const parallel::distributed::BlockVector<Number> &src,
                     const std::pair<unsigned int,unsigned int>  &cell_range)
 {
-  FEEvaluation<dim,fe_degree,fe_degree+1,1,Number> fe_eval (data);
+  FEEvaluation<dim,fe_degree,fe_degree+1,2,Number> fe_eval (data);
   const unsigned int n_q_points = fe_eval.n_q_points;
 
   for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
@@ -56,7 +51,8 @@ helmholtz_operator (const MatrixFree<dim,Number>  &data,
       fe_eval.evaluate (true, true, false);
       for (unsigned int q=0; q<n_q_points; ++q)
         {
-          fe_eval.submit_value (Number(10)*fe_eval.get_value(q),q);
+          fe_eval.submit_value (make_vectorized_array(Number(10))*
+                                fe_eval.get_value(q), q);
           fe_eval.submit_gradient (fe_eval.get_gradient(q),q);
         }
       fe_eval.integrate (true,true);
@@ -77,13 +73,13 @@ class MatrixFreeTest
     data (data_in)
   {};
 
-  void vmult (parallel::distributed::Vector<Number>       &dst,
-              const parallel::distributed::Vector<Number> &src) const
+  void vmult (parallel::distributed::BlockVector<Number>       &dst,
+              const parallel::distributed::BlockVector<Number> &src) const
   {
     dst = 0;
     const std_cxx1x::function<void(const MatrixFree<dim,Number>  &,
-                                   parallel::distributed::Vector<Number>&,
-                                   const parallel::distributed::Vector<Number>&,
+                                   parallel::distributed::BlockVector<Number> &,
+                                   const parallel::distributed::BlockVector<Number> &,
                                    const std::pair<unsigned int,unsigned int>&)>
       wrap = helmholtz_operator<dim,fe_degree,Number>;
     data.cell_loop (wrap, dst, src);
@@ -166,18 +162,26 @@ void test ()
   }
 
   MatrixFreeTest<dim,fe_degree,number> mf (mf_data);
-  parallel::distributed::Vector<number> in, out, ref;
-  mf_data.initialize_dof_vector (in);
-  out.reinit (in);
-  ref.reinit (in);
+  parallel::distributed::Vector<number> ref;
+  parallel::distributed::BlockVector<number> in(2), out(2);
+  for (unsigned int i=0; i<2; ++i)
+    {
+      mf_data.initialize_dof_vector (in.block(i));
+      mf_data.initialize_dof_vector (out.block(i));
+    }
+  in.collect_sizes();
+  out.collect_sizes();
 
-  for (unsigned int i=0; i<in.local_size(); ++i)
+  mf_data.initialize_dof_vector (ref);
+
+  for (unsigned int i=0; i<in.block(0).local_size(); ++i)
     {
       const unsigned int glob_index =
         owned_set.nth_index_in_set (i);
       if(constraints.is_constrained(glob_index))
         continue;
-      in.local_element(i) = (double)rand()/RAND_MAX;
+      in.block(0).local_element(i) = (double)rand()/RAND_MAX;
+      in.block(1).local_element(i) = (double)rand()/RAND_MAX;
     }
 
   mf.vmult (out, in);
@@ -189,8 +193,7 @@ void test ()
   TrilinosWrappers::SparseMatrix sparse_matrix;
   {
     TrilinosWrappers::SparsityPattern csp (owned_set, MPI_COMM_WORLD);
-    DoFTools::make_sparsity_pattern (dof, csp, constraints, true,
-                                     Utilities::MPI::this_mpi_process(MPI_COMM_WORLD));
+    DoFTools::make_sparsity_pattern (dof, csp, constraints, true);
     csp.compress();
     sparse_matrix.reinit (csp);
   }
@@ -237,11 +240,15 @@ void test ()
   }
   sparse_matrix.compress(VectorOperation::add);
 
-  sparse_matrix.vmult (ref, in);
-  out -= ref;
-  const double diff_norm = out.linfty_norm();
-
-  deallog << "Norm of difference: " << diff_norm << std::endl << std::endl;
+  deallog << "Norm of difference (component 1/2): ";
+  for (unsigned int i=0; i<2; ++i)
+    {
+      sparse_matrix.vmult (ref, in.block(i));
+      out.block(i) -= ref;
+      const double diff_norm = out.block(i).linfty_norm();
+      deallog << diff_norm << " ";
+    }
+  deallog << std::endl << std::endl;
 }
 
 
@@ -254,7 +261,7 @@ int main (int argc, char ** argv)
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("matrix_free_01").c_str());
+      std::ofstream logfile(output_file_for_mpi("matrix_free_04").c_str());
       deallog.attach(logfile);
       deallog << std::setprecision(4);
       deallog.depth_console(0);

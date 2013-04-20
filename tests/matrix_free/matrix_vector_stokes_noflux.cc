@@ -65,10 +65,10 @@ class MatrixFreeTest
     for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
       {
         velocity.reinit (cell);
-        velocity.read_dof_values (src[0]);
+        velocity.read_dof_values (src.block(0));
         velocity.evaluate (false,true,false);
         pressure.reinit (cell);
-        pressure.read_dof_values (src[1]);
+        pressure.read_dof_values (src.block(1));
         pressure.evaluate (true,false,false);
 
         for (unsigned int q=0; q<velocity.n_q_points; ++q)
@@ -87,9 +87,9 @@ class MatrixFreeTest
           }
 
         velocity.integrate (false,true);
-        velocity.distribute_local_to_global (dst[0]);
+        velocity.distribute_local_to_global (dst.block(0));
         pressure.integrate (true,false);
-        pressure.distribute_local_to_global (dst[1]);
+        pressure.distribute_local_to_global (dst.block(1));
       }
   }
 
@@ -97,9 +97,7 @@ class MatrixFreeTest
   void vmult (VectorType &dst,
               const VectorType &src) const
   {
-    AssertDimension (dst.size(), 2);
-    for (unsigned int d=0; d<2; ++d)
-      dst[d] = 0;
+    dst = 0;
     data.cell_loop (&MatrixFreeTest<dim,degree_p,VectorType>::local_apply,
                     this, dst, src);
   };
@@ -144,7 +142,7 @@ void test ()
 
   BlockVector<double> solution;
   BlockVector<double> system_rhs;
-  std::vector<Vector<double> > vec1, vec2;
+  BlockVector<double> mf_solution;
 
   dof_handler.distribute_dofs (fe);
   dof_handler_u.distribute_dofs (fe_u);
@@ -268,14 +266,7 @@ void test ()
   solution.collect_sizes ();
 
   system_rhs.reinit (solution);
-
-  vec1.resize (2);
-  vec2.resize (2);
-  for (unsigned int d=0; d<2; ++d)
-    {
-      vec1[d].reinit (dofs_per_block[d]);
-      vec2[d].reinit (vec1[d]);
-    }
+  mf_solution.reinit (solution);
 
                                 // fill system_rhs with random numbers
   for (unsigned int j=0; j<system_rhs.block(0).size(); ++j)
@@ -283,14 +274,12 @@ void test ()
       {
         const double val = -1 + 2.*(double)rand()/double(RAND_MAX);
         system_rhs.block(0)(j) = val;
-        vec1[0](j) = val;
       }
   for (unsigned int j=0; j<system_rhs.block(1).size(); ++j)
     if (constraints_p.is_constrained(j) == false)
       {
         const double val = -1 + 2.*(double)rand()/double(RAND_MAX);
         system_rhs.block(1)(j) = val;
-        vec1[1](j) = val;
       }
 
                                 // setup matrix-free structure
@@ -311,16 +300,13 @@ void test ()
 
   system_matrix.vmult (solution, system_rhs);
 
-  typedef std::vector<Vector<double> > VectorType;
-  MatrixFreeTest<dim,fe_degree,VectorType> mf (mf_data);
-  mf.vmult (vec2, vec1);
+  MatrixFreeTest<dim,fe_degree,BlockVector<double> > mf (mf_data);
+  mf.vmult (mf_solution, system_rhs);
 
                                 // Verification
-  double error = 0.;
-  for (unsigned int i=0; i<2; ++i)
-    for (unsigned int j=0; j<solution.block(i).size(); ++j)
-      error += std::fabs (solution.block(i)(j)-vec2[i](j));
-  double relative = solution.l1_norm();
+  mf_solution -= solution;
+  const double error = mf_solution.linfty_norm();
+  const double relative = solution.linfty_norm();
   deallog << "Verification fe degree " << fe_degree  <<  ": "
           << error/relative << std::endl << std::endl;
 }

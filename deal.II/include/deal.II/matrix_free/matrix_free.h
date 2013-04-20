@@ -18,11 +18,13 @@
 #include <deal.II/base/parallel.h>
 #include <deal.II/base/quadrature.h>
 #include <deal.II/base/vectorization.h>
+#include <deal.II/base/template_constraints.h>
 #include <deal.II/fe/fe.h>
 #include <deal.II/fe/mapping.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/parallel_vector.h>
+#include <deal.II/lac/block_vector_base.h>
 #include <deal.II/lac/constraint_matrix.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/multigrid/mg_dof_handler.h>
@@ -616,7 +618,7 @@ public:
    * different MPI processors need to be accessed at a certain time when
    * accessing remote data and overlapping communication with computation.
    */
-  typename DoFHandler<dim>::active_cell_iterator
+  typename DoFHandler<dim>::cell_iterator
   get_cell_iterator (const unsigned int macro_cell_number,
                      const unsigned int vector_number,
                      const unsigned int fe_component = 0) const;
@@ -1191,7 +1193,7 @@ MatrixFree<dim,Number>::get_dof_handler (const unsigned int dof_index) const
 
 template <int dim, typename Number>
 inline
-typename DoFHandler<dim>::active_cell_iterator
+typename DoFHandler<dim>::cell_iterator
 MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
                                           const unsigned int vector_number,
                                           const unsigned int dof_index) const
@@ -1222,7 +1224,7 @@ MatrixFree<dim,Number>::get_cell_iterator(const unsigned int macro_cell_number,
 
   std::pair<unsigned int,unsigned int> index =
     cell_level_index[macro_cell_number*vectorization_length+vector_number];
-  return typename DoFHandler<dim>::active_cell_iterator
+  return typename DoFHandler<dim>::cell_iterator
          (&dofh->get_tria(), index.first, index.second, dofh);
 }
 
@@ -1638,158 +1640,251 @@ reinit(const Mapping<dim>                         &mapping,
 // internal helper functions that define how to call MPI data exchange
 // functions: for generic vectors, do nothing at all. For distributed vectors,
 // can call update_ghost_values_start function and so on. If we have
-// collections of vectors, just do the individual functions of the components
+// collections of vectors, just do the individual functions of the
+// components. this is a bit messy for block vectors, which use some
+// additional helper functions to select the blocks
 namespace internal
 {
   template<typename VectorStruct>
+  void update_ghost_values_start_block (const VectorStruct &vec,
+                                        const unsigned int channel,
+                                        internal::bool2type<true>);
+  template<typename VectorStruct>
+  void update_ghost_values_finish_block (const VectorStruct &vec,
+                                         internal::bool2type<true>);
+  template<typename VectorStruct>
+  void compress_start_block (const VectorStruct &vec,
+                             const unsigned int channel,
+                             internal::bool2type<true>);
+  template<typename VectorStruct>
+  void compress_finish_block (const VectorStruct &vec,
+                              internal::bool2type<true>);
+
+  template<typename VectorStruct>
+  void update_ghost_values_start_block (const VectorStruct &,
+                                        const unsigned int,
+                                        internal::bool2type<false>)
+  {}
+  template<typename VectorStruct>
+  void update_ghost_values_finish_block (const VectorStruct &,
+                                         internal::bool2type<false>)
+  {}
+  template<typename VectorStruct>
+  void compress_start_block (const VectorStruct &,
+                             const unsigned int,
+                             internal::bool2type<false>)
+  {}
+  template<typename VectorStruct>
+  void compress_finish_block (const VectorStruct &,
+                              internal::bool2type<false>)
+  {}
+
+
+
+  template<typename VectorStruct>
   inline
-  void update_ghost_values_start (const VectorStruct &,
+  void update_ghost_values_start (const VectorStruct &vec,
                                   const unsigned int channel = 0)
   {
-    (void)channel;
+    update_ghost_values_start_block(vec, channel,
+                                    internal::bool2type<IsBlockVector<VectorStruct>::value>());
   }
 
 
 
   template<typename Number>
   inline
-  void update_ghost_values_start (const parallel::distributed::Vector<Number>  &src,
+  void update_ghost_values_start (const parallel::distributed::Vector<Number> &vec,
                                   const unsigned int                  channel = 0)
   {
-    src.update_ghost_values_start(channel);
+    vec.update_ghost_values_start(channel);
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void update_ghost_values_start (const std::vector<VectorStruct>  &src)
+  void update_ghost_values_start (const std::vector<VectorStruct> &vec)
   {
-    for (unsigned int comp=0; comp<src.size(); comp++)
-      update_ghost_values_start(src[comp], comp);
+    for (unsigned int comp=0; comp<vec.size(); comp++)
+      update_ghost_values_start(vec[comp], comp);
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void update_ghost_values_start (const std::vector<VectorStruct *>  &src)
+  void update_ghost_values_start (const std::vector<VectorStruct *> &vec)
   {
-    for (unsigned int comp=0; comp<src.size(); comp++)
-      update_ghost_values_start(*src[comp], comp);
+    for (unsigned int comp=0; comp<vec.size(); comp++)
+      update_ghost_values_start(*vec[comp], comp);
+  }
+
+
+
+  template<typename VectorStruct>
+  inline
+  void update_ghost_values_start_block (const VectorStruct &vec,
+                                        const unsigned int channel,
+                                        internal::bool2type<true>)
+  {
+    for (unsigned int i=0; i<vec.n_blocks(); ++i)
+      update_ghost_values_start(vec.block(i), channel+500*i);
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void update_ghost_values_finish (const VectorStruct &)
-  {}
+  void update_ghost_values_finish (const VectorStruct &vec)
+  {
+    update_ghost_values_finish_block(vec,
+                                     internal::bool2type<IsBlockVector<VectorStruct>::value>());
+  }
 
 
 
   template <typename Number>
   inline
-  void update_ghost_values_finish (const parallel::distributed::Vector<Number>  &src)
+  void update_ghost_values_finish (const parallel::distributed::Vector<Number> &vec)
   {
-    src.update_ghost_values_finish();
+    vec.update_ghost_values_finish();
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void update_ghost_values_finish (const std::vector<VectorStruct>  &src)
+  void update_ghost_values_finish (const std::vector<VectorStruct> &vec)
   {
-    for (unsigned int comp=0; comp<src.size(); comp++)
-      update_ghost_values_finish(src[comp]);
+    for (unsigned int comp=0; comp<vec.size(); comp++)
+      update_ghost_values_finish(vec[comp]);
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void update_ghost_values_finish (const std::vector<VectorStruct *>  &src)
+  void update_ghost_values_finish (const std::vector<VectorStruct *> &vec)
   {
-    for (unsigned int comp=0; comp<src.size(); comp++)
-      update_ghost_values_finish(*src[comp]);
+    for (unsigned int comp=0; comp<vec.size(); comp++)
+      update_ghost_values_finish(*vec[comp]);
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void compress_start (VectorStruct &,
+  void update_ghost_values_finish_block (const VectorStruct &vec,
+                                         internal::bool2type<true>)
+  {
+    for (unsigned int i=0; i<vec.n_blocks(); ++i)
+      update_ghost_values_finish(vec.block(i));
+  }
+
+
+
+  template <typename VectorStruct>
+  inline
+  void compress_start (VectorStruct &vec,
                        const unsigned int channel = 0)
   {
-    (void)channel;
+    compress_start_block (vec, channel,
+                          internal::bool2type<IsBlockVector<VectorStruct>::value>());
   }
 
 
 
   template <typename Number>
   inline
-  void compress_start (parallel::distributed::Vector<Number> &dst,
+  void compress_start (parallel::distributed::Vector<Number> &vec,
                        const unsigned int           channel = 0)
   {
-    dst.compress_start(channel);
+    vec.compress_start(channel);
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void compress_start (std::vector<VectorStruct> &dst)
+  void compress_start (std::vector<VectorStruct> &vec)
   {
-    for (unsigned int comp=0; comp<dst.size(); comp++)
-      compress_start (dst[comp], comp);
+    for (unsigned int comp=0; comp<vec.size(); comp++)
+      compress_start (vec[comp], comp);
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void compress_start (std::vector<VectorStruct *> &dst)
+  void compress_start (std::vector<VectorStruct *> &vec)
   {
-    for (unsigned int comp=0; comp<dst.size(); comp++)
-      compress_start (*dst[comp], comp);
+    for (unsigned int comp=0; comp<vec.size(); comp++)
+      compress_start (*vec[comp], comp);
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void compress_finish (VectorStruct &)
-  {}
+  void compress_start_block (VectorStruct      &vec,
+                             const unsigned int channel,
+                             internal::bool2type<true>)
+  {
+    for (unsigned int i=0; i<vec.n_blocks(); ++i)
+      compress_start(vec.block(i), channel + 500*i);
+  }
+
+
+
+  template <typename VectorStruct>
+  inline
+  void compress_finish (VectorStruct &vec)
+  {
+    compress_finish_block(vec,
+                          internal::bool2type<IsBlockVector<VectorStruct>::value>());
+  }
 
 
 
   template <typename Number>
   inline
-  void compress_finish (parallel::distributed::Vector<Number> &dst)
+  void compress_finish (parallel::distributed::Vector<Number> &vec)
   {
-    dst.compress_finish();
+    vec.compress_finish();
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void compress_finish (std::vector<VectorStruct> &dst)
+  void compress_finish (std::vector<VectorStruct> &vec)
   {
-    for (unsigned int comp=0; comp<dst.size(); comp++)
-      compress_finish(dst[comp]);
+    for (unsigned int comp=0; comp<vec.size(); comp++)
+      compress_finish(vec[comp]);
   }
 
 
 
   template <typename VectorStruct>
   inline
-  void compress_finish (std::vector<VectorStruct *> &dst)
+  void compress_finish (std::vector<VectorStruct *> &vec)
   {
-    for (unsigned int comp=0; comp<dst.size(); comp++)
-      compress_finish(*dst[comp]);
+    for (unsigned int comp=0; comp<vec.size(); comp++)
+      compress_finish(*vec[comp]);
   }
+
+
+
+  template <typename VectorStruct>
+  inline
+  void compress_finish_block (VectorStruct &vec,
+                              internal::bool2type<true>)
+  {
+    for (unsigned int i=0; i<vec.n_blocks(); ++i)
+      compress_finish(vec.block(i));
+  }
+
 
 
 #ifdef DEAL_II_WITH_THREADS
