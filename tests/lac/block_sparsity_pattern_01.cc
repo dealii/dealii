@@ -44,9 +44,9 @@ int main()
   BlockIndices rows(row_blocks);
   BlockIndices cols(col_blocks);
 
-  std::vector<std::vector<types::global_dof_index> >
+  std::vector<std::vector<unsigned int> >
     row_length(cols.size(),
-	       std::vector<types::global_dof_index>(rows.total_size()));
+	       std::vector<unsigned int>(rows.total_size()));
   for (unsigned int jb=0;jb<row_length.size();++jb)
       for (unsigned int i=0;i<row_length[jb].size();++i)
 	{
