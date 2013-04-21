@@ -111,7 +111,14 @@ this function.
 
 <ol>
 
-<li> New: class TimerOutput::Scope does automatic scope based enter/
+<li> New: SparseDirectUMFPACK has long had the ability to work with
+BlockSparseMatrix objects, but couldn't deal with BlockVector objects.
+This is now fixed.
+<br>
+(Wolfgang Bangerth, 2013/04/21)
+</li>
+
+<li> New: Class TimerOutput::Scope does automatic scope based enter/
 exit_section of a TimerOutput object.
 <br>
 (Timo Heister, 2013/04/18)
