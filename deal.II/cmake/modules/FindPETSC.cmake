@@ -33,27 +33,6 @@ INCLUDE(FindPackageHandleStandardArgs)
 SET_IF_EMPTY(PETSC_DIR "$ENV{PETSC_DIR}")
 SET_IF_EMPTY(PETSC_ARCH "$ENV{PETSC_ARCH}")
 
-#
-# So, well, yes. I'd like to include the PETScConfig.cmake file via
-# FIND_PACKAGE(), but it is broken beyond belief:
-#
-# - In source, i.e. PETSC_DIR/PETSC_ARCH, it sets BUILD_SHARED_LIBS.
-# - It does not contain its very own version number
-# - It does not contain its very own library location(s) or name(s)
-# - It does not contain necessary includes
-#
-# - It writes a lot of FIND_LIBRARY(..) statements. Seriously. What the
-#   heck? If its not the same library you're linking against, you cannot
-#   assume to be API compatible, so why not just give a list of libraries?
-#
-# - It is not even considered to be installed in the gentoo petsc package
-#   :-]
-#
-
-#
-# TODO: We'll have to guess which external libraries we'll have to link
-# against someday to avoid underlinkage
-#
 
 FIND_LIBRARY(PETSC_LIBRARY
   NAMES petsc
@@ -62,12 +41,54 @@ FIND_LIBRARY(PETSC_LIBRARY
     ${PETSC_DIR}
     ${PETSC_DIR}/${PETSC_ARCH}
   PATH_SUFFIXES lib${LIB_SUFFIX} lib64 lib
-)
+  )
 
 
 #
-# So, up to this point it was easy. Now, the tricky part:
+# So, up to this point it was easy. Now, the tricky part. Search for
+# petscvariables and determine the link interface from that file:
 #
+FIND_FILE(PETSC_PETSCVARIABLES
+  NAMES petscvariables
+  HINTS
+    ${PETSC_DIR}
+    ${PETSC_DIR}/${PETSC_ARCH}
+  PATH_SUFFIXES conf
+  )
+
+IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
+
+  FILE(STRINGS "${PETSC_PETSCVARIABLES}" _external_link_line
+    REGEX "^PETSC_WITH_EXTERNAL_LIB =.*")
+  SEPARATE_ARGUMENTS(_external_link_line)
+
+  SET(_hints)
+  FOREACH(_token ${_external_link_line}})
+    IF(_token MATCHES "^-L")
+      # Build up hints with the help of all tokens passed with -L:
+      STRING(REGEX REPLACE "^-L" "" _token "${_token}")
+      LIST(APPEND _hints ${_token})
+    ELSEIF(_token MATCHES "^-l")
+      # Search for every library that was specified with -l:
+      STRING(REGEX REPLACE "^-l" "" _token "${_token}")
+      IF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s)")
+        FIND_LIBRARY(PETSC_LIBRARY_${_token}
+          NAMES ${_token}
+          HINTS ${_hintes}
+          )
+        IF(NOT PETSC_LIBRARY_${_token} MATCHES "-NOTFOUND")
+          LIST(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})
+        ENDIF()
+        #
+        # Remove from cache, so that updating PETSC search paths will
+        # find a (possibly) new link interface
+        #
+        UNSET(PETSC_LIBRARY_${_token} CACHE)
+      ENDIF()
+    ENDIF()
+  ENDFOREACH()
+ENDIF()
+
 
 #
 # Search for the first part of the includes:
@@ -111,6 +132,7 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(PETSC DEFAULT_MSG
 IF(PETSC_FOUND)
   SET(PETSC_LIBRARIES
     ${PETSC_LIBRARY}
+    ${_petsc_libraries}
     )
   SET(PETSC_INCLUDE_DIRS
     ${PETSC_INCLUDE_DIR_ARCH}
