@@ -2225,10 +2225,10 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 {
   // select between block vectors and non-block vectors. Note that the number
   // of components is checked in the internal data
-  typename internal::BlockVectorSelector<const VectorType,
+  const typename internal::BlockVectorSelector<VectorType,
     IsBlockVector<VectorType>::value>::BaseVectorType *src_data[n_components];
   for (unsigned int d=0; d<n_components; ++d)
-    src_data[d] = internal::BlockVectorSelector<const VectorType, IsBlockVector<VectorType>::value>::get_vector_component(src, d);
+    src_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(const_cast<VectorType &>(src), d);
 
   read_dof_values_plain (src_data);
 }
