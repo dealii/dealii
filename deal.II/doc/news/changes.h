@@ -111,6 +111,14 @@ this function.
 
 <ol>
 
+<li> Fixed: PETScWrappers::VectorBase::print now saves and restores
+the precision
+and width associated with the stream it prints to around setting
+the values passed as arguments.
+<br>
+(Fahad Alrashed, 2013/04/22)
+</li>
+
 <li> Fixed: FullMatrix::print now saves and restores the precision
 and width associated with the stream it prints to around setting
 the values passed as arguments.
