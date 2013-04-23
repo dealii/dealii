@@ -692,8 +692,10 @@ public:
   number trace () const;
 
   /**
-   * Output of the matrix in
-   * user-defined format.
+   * Output of the matrix in user-defined format given by the specified
+   * precision and width. This function saves width and precision of the
+   * stream before setting these given values for output, and restores the
+   * previous values after output.
    */
   template <class STREAM>
   void print (STREAM             &s,
@@ -1847,12 +1849,24 @@ FullMatrix<number>::print (STREAM             &s,
 {
   Assert (!this->empty(), ExcEmptyMatrix());
 
+  // save the state of out stream
+  const unsigned int old_precision = s.precision (p);
+  const unsigned int old_width = s.width (w);
+
   for (unsigned int i=0; i<this->m(); ++i)
     {
       for (unsigned int j=0; j<this->n(); ++j)
-        s << std::setw(w) << std::setprecision(p) << this->el(i,j);
+	{
+	  s.width(w);
+	  s.precision(p);
+	  s << this->el(i,j);
+	}
       s << std::endl;
     }
+
+  // reset output format
+  s.precision(old_precision);
+  s.width(old_width);
 }
 
 
