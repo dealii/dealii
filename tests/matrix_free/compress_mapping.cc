@@ -121,62 +121,19 @@ void test_cube ()
 
 
 
-void create_parallelogram(Triangulation<2> &tria)
-{
-  const int dim = 2;
-  std::vector<Point<dim> > points (4);
-  points[0] = Point<dim> (0, 0);
-  points[1] = Point<dim> (0, 1);
-  points[2] = Point<dim> (1 ,0.5);
-  points[3] = Point<dim> (1 ,1.5);
-
-  std::vector<CellData<dim> > cells(1);
-  cells[0].vertices[0] = 0;
-  cells[0].vertices[1] = 2;
-  cells[0].vertices[2] = 1;
-  cells[0].vertices[3] = 3;
-  cells[0].material_id = 0;
-
-  tria.create_triangulation (points, cells, SubCellData());
-}
-
-
-
-void create_parallelogram(Triangulation<3> &tria)
-{
-  const int dim = 3;
-  std::vector<Point<dim> > points (8);
-  points[0] = Point<dim> (0,0,0);
-  points[1] = Point<dim> (0,1.,0.5);
-  points[2] = Point<dim> (0,0,1);
-  points[3] = Point<dim> (0,1.,1.5);
-  points[4] = Point<dim> (1.,0,1.);
-  points[5] = Point<dim> (1.,1.,1.5);
-  points[6] = Point<dim> (1.,0,2);
-  points[7] = Point<dim> (1.,1.,2.5);
-
-  std::vector<CellData<dim> > cells(1);
-  cells[0].vertices[0] = 0;
-  cells[0].vertices[1] = 4;
-  cells[0].vertices[2] = 1;
-  cells[0].vertices[3] = 5;
-  cells[0].vertices[4] = 2;
-  cells[0].vertices[5] = 6;
-  cells[0].vertices[6] = 3;
-  cells[0].vertices[7] = 7;
-  cells[0].material_id = 0;
-
-  tria.create_triangulation (points, cells, SubCellData());
-}
-
-
-
 template <int dim>
 void test_parallelogram ()
 {
   deallog << "Parallelogram" << std::endl;
   Triangulation<dim> tria;
-  create_parallelogram(tria);
+  Point<dim> corners[dim];
+  for (unsigned int d=0; d<dim; ++d)
+    {
+      corners[d][d] = 1.;
+      if (d>0)
+        corners[d][0] = 0.5+0.5*d;
+    }
+  GridGenerator::parallelepiped(tria, corners);
   tria.refine_global(5-dim);
 
   FE_Q<dim> fe (1);

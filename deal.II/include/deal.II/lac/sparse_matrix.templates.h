@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,6 +21,7 @@
 #include <deal.II/base/multithread_info.h>
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/compressed_simple_sparsity_pattern.h>
@@ -348,6 +349,52 @@ SparseMatrix<number>::copy_from (const FullMatrix<somenumber> &matrix)
         set (row, col, matrix(row,col));
 }
 
+
+
+#ifdef DEAL_II_WITH_TRILINOS
+
+template <typename number>
+SparseMatrix<number> &
+SparseMatrix<number>::copy_from (const TrilinosWrappers::SparseMatrix &matrix)
+{
+  Assert (m() == matrix.m(), ExcDimensionMismatch(m(), matrix.m()));
+  Assert (n() == matrix.n(), ExcDimensionMismatch(n(), matrix.n()));
+  
+  // first delete previous content
+  *this = 0;
+
+  std::vector < TrilinosScalar > value_cache;
+  std::vector<unsigned int> colnum_cache;
+
+  for (unsigned int row = 0; row < matrix.m(); ++row)
+    {
+      value_cache.resize(matrix.n());
+      colnum_cache.resize(matrix.n());
+
+      // copy column indices and values and at the same time enquire about the
+      // length of the row
+      int ncols;
+      int ierr
+	= matrix.trilinos_matrix().ExtractGlobalRowCopy
+	(row, matrix.row_length(row), ncols,
+	 &(value_cache[0]),
+	 reinterpret_cast<int*>(&(colnum_cache[0])));
+      Assert (ierr==0, ExcTrilinosError(ierr));
+
+      // resize arrays to the size actually used
+      value_cache.resize(ncols);
+      colnum_cache.resize(ncols);
+
+      // then copy everything in one swoop
+      this->set(row,
+		colnum_cache,
+		value_cache);
+    }
+
+  return *this;
+}
+
+#endif
 
 
 template <typename number>

@@ -36,8 +36,28 @@ namespace SLEPcWrappers
    * solvers which are selected based on flags passed to the spectral
    * transformation.
    *
+   * <code>SLEPcWrappers::TransformationXXX</code>, where
+   * <code>XXX</code> is your favourite transformation type, can then
+   * be implemented in application codes in the following way for
+   * <code>XXX=INVERT</code> with the solver object
+   * <code>eigensolver</code>:
+   * @code
+   *  // Set a transformation, this one shifts the eigenspectrum by 3.142..
+   *  SLEPcWrappers::TransformationShift::AdditionalData additional_data (3.142); 
+   *  SLEPcWrappers::TransformationShift shift (additional_data);
+   *  eigensolver.set_transformation (shift);
+   * @endcode
+   * and later calling the <code>solve()</code> function as usual:
+   * @code
+   *  SolverControl solver_control (1000, 1e-9);
+   *  SolverArnoldi system (solver_control, mpi_communicator);
+   *  eigensolver.solve (A, B, lambda, x, size_of_spectrum);
+   * @endcode
+   * 
+   * @note These options can also be set at the commandline.
+   *
    * @ingroup SLEPcWrappers
-   * @author Toby D. Young 2009
+   * @author Toby D. Young 2009, 2013
    **/
   class TransformationBase
   {

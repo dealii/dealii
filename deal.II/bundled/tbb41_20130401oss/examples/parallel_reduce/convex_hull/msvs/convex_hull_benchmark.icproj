@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="convex_hull_benchmark"
+	ProjectGUID="{347CD752-84DD-4E7C-9DB3-90B740C03E8E}"
+	VCNestedProjectGUID="{3AA40693-F93D-4D4B-B32E-068F511A252A}"
+	VCNestedProjectFileName="convex_hull_benchmark.vcproj">
+	<Configurations/>
+	<Files/>
+</VisualStudioProject>

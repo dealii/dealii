@@ -243,12 +243,12 @@ void GridRefinement::refine (Triangulation<dim,spacedim> &tria,
   unsigned int marked=0;
   for (unsigned int index=0; index<n_cells; ++cell, ++index)
     if (std::fabs(criteria(index)) >= new_threshold)
-    {
-      if (max_to_mark!=numbers::invalid_unsigned_int && marked>=max_to_mark)
-        break;
-      marked++;
-      cell->set_refine_flag();
-    }
+      {
+        if (max_to_mark!=numbers::invalid_unsigned_int && marked>=max_to_mark)
+          break;
+        marked++;
+        cell->set_refine_flag();
+      }
 }
 
 

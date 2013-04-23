@@ -214,25 +214,18 @@ namespace Step42
   template <int dim>
   void Input<dim>::read_obstacle (const char* name)
   {
-    int SZ = 100000;
-    FILE* fp = fopen (name, "r");
-    char* hlp_str = new char[SZ];
-    double hlp;
+    std::ifstream f(name);
 
-    fscanf (fp, "%s", hlp_str);
-    fscanf (fp, "%d", &nx);
-    fscanf (fp, "%d", &ny);
-
+    std::string temp;
+    f >> temp >> nx >> ny;
     assert(nx>0 && ny>0);
 
     for (int k=0; k<nx*ny; k++)
       {
-        fscanf (fp, "%lf", &hlp);
-        obstacle_data.push_back (hlp);
+	double val;
+	f >> val;
+	obstacle_data.push_back(val);
       }
-
-    fclose (fp);
-    delete[] hlp_str;
 
     hx = 1.0/(nx - 1);
     hy = 1.0/(ny - 1);
@@ -490,7 +483,8 @@ namespace Step42
       Obstacle (std_cxx1x::shared_ptr<Input<dim> > const &_input, bool _use_read_obstacle) :
         Function<dim>(dim),
         input_obstacle_copy(_input),
-        use_read_obstacle(_use_read_obstacle) {};
+        use_read_obstacle(_use_read_obstacle)
+	  {}
 
       virtual double value (const Point<dim>   &p,
                             const unsigned int  component = 0) const;

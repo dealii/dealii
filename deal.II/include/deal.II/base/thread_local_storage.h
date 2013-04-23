@@ -99,6 +99,12 @@ namespace Threads
     T &get ();
 
     /**
+     * Same as above, except that @p exists is set to true if an element
+     * was already present for the current thread; false otherwise.
+     */
+    T &get (bool &exists);
+
+    /**
      * Conversion operator that simply converts the thread-local object
      * to the data type that it stores. This function is equivalent to
      * calling the get() member function; it's purpose is to make the
@@ -119,6 +125,19 @@ namespace Threads
      * @return The current object, after the changes have been made
      **/
     ThreadLocalStorage<T> &operator = (const T &t);
+
+    /**
+     * Returns a reference to the internal implementation.
+     */
+#ifdef DEAL_II_WITH_THREADS
+    tbb::enumerable_thread_specific<T> &
+#else
+    T &
+#endif
+    get_implementation()
+    {
+      return data;
+    }
 
   private:
 #ifdef DEAL_II_WITH_THREADS
@@ -170,6 +189,19 @@ namespace Threads
 #endif
   }
 
+
+  template <typename T>
+  inline
+  T &
+  ThreadLocalStorage<T>::get (bool &exists)
+  {
+#ifdef DEAL_II_WITH_THREADS
+    return data.local(exists);
+#else
+    exists = true;
+    return data;
+#endif
+  }
 
 
   template <typename T>

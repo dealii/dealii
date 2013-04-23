@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+	  "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+  <head>
+    <title>deal.II indentation</title>
+    <link href="../screen.css" rel="StyleSheet">
+    <meta name="author" content="the deal.II authors <authors @ dealii.org>">
+    <meta name="copyright" content="Copyright (C) 2012, 2013 by the deal.II authors">
+    <meta name="date" content="$Date$">
+    <meta name="svn_id" content="$Id$">
+    <meta name="keywords" content="deal.II">
+  </head>
+
+  <body>
+    <h1>Notes on deal.II indentation</h1>
+    
+    <p>deal.II uses <code>astyle</code> to normalize indentation. A
+    style file is provided at
+      <code>
+	DEAL/contrib/utilities/astyle.rc
+      </code>
+      where DEAL is the path to you deal.II source directory.</p>
+    
+    <p>All header and source files in the SVN repository are supposed
+    to conform to this style file. It is very important that we adhere
+    to this indentation style in order to avoid false conflicts on svn
+    updates.</p>
+    
+    <p>Before every commit, you should run
+      <code>
+	astyle --options=DEAL/contrib/utilities/astyle.rc <file>
+      </code>
+      on each of your files. This will make sure indentation is
+      conforming to our style.</p>
+
+    <p>Upon commit, svn will output comments on the conformity of your files. If you see a line of the form
+      <code>
+	!! file style mismatch detected
+      </code>
+      please re-indent the file. SVN may reject those files soon!</p>
+  </body>
+</html>

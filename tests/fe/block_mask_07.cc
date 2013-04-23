@@ -50,8 +50,9 @@ void test ()
       Assert (BlockMask(12,true).first_selected_block(13) == 0,
 	      ExcInternalError());
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
   
 				   // as should this: 
@@ -60,8 +61,9 @@ void test ()
       Assert (BlockMask(12,false).first_selected_block() == 0,
 	      ExcInternalError());
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
 }
 

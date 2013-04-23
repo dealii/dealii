@@ -342,20 +342,26 @@ namespace GridOutFlags
 
   Svg::Svg(const unsigned int line_thickness,
            const unsigned int boundary_line_thickness,
-           const unsigned int margin_in_percent,
+           bool margin,
            const Background background,
+           const int azimuth_angle,
+           const int polar_angle,
            const Coloring coloring,
+           const bool convert_level_number_to_height,
            const bool label_level_number,
            const bool label_cell_index,
            const bool label_material_id,
            const bool label_subdomain_id,
-	   const bool draw_colorbar,
+           const bool draw_colorbar,
            const bool draw_legend) :
     line_thickness(line_thickness),
     boundary_line_thickness(boundary_line_thickness),
-    margin_in_percent(margin_in_percent),
+    margin(margin),
     background(background),
+    azimuth_angle(azimuth_angle),
+    polar_angle(polar_angle),
     coloring(coloring),
+    convert_level_number_to_height(convert_level_number_to_height),
     label_level_number(label_level_number),
     label_cell_index(label_cell_index),
     label_material_id(label_material_id),
@@ -365,13 +371,19 @@ namespace GridOutFlags
   {}
 
   MathGL::MathGL ()
+    :
+    draw_bounding_box (false) // box
   {}
 
   void MathGL::declare_parameters (ParameterHandler &param)
-  {}
+  {
+    param.declare_entry ("Draw bounding box", "false", Patterns::Bool ());
+  }
 
   void MathGL::parse_parameters (ParameterHandler &param)
-  {}
+  {
+    draw_bounding_box = param.get_bool ("Draw bounding box");
+  }
 
 }  // end namespace GridOutFlags
 
@@ -619,6 +631,7 @@ GridOut::memory_consumption () const
           sizeof(eps_flags_2)   +
           sizeof(eps_flags_3)   +
           sizeof(xfig_flags)    +
+          sizeof(svg_flags)     +
           sizeof(mathgl_flags));
 }
 
@@ -1335,6 +1348,7 @@ void GridOut::write_xfig (
 }
 
 
+
 template <int dim, int spacedim>
 void GridOut::write_svg(const Triangulation<dim,spacedim> &tria, std::ostream &out) const
 {
@@ -1345,105 +1359,141 @@ void GridOut::write_svg(const Triangulation<dim,spacedim> &tria, std::ostream &o
 void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 {
 
-  const int dim = 2;
+  unsigned int n_materials = 0;
+  unsigned int n_levels = 0;
+  unsigned int n_subdomains = 0;
+  //unsigned int n_level_subdomains = 0;           // TODO [CW]: CellAccessor<dim, spacedim> does not seem to possess this attribute ...
 
-//------------------ determine the bounding box of the given triangulation,
-//------------------ the materials being used, the levels being used,
-//------------------ the subdomains being used (, and the level subdomains being used)
-  unsigned int  n_materials      = 0;
-  unsigned int  n_levels         = 0;
-  unsigned int  n_subdomains     = 0;
-  //unsigned int n_level_subdomains    = 0;         // TODO [CW]: CellAccessor<dim, spacedim> does not
-  // seem to possess this attribute ...
+  unsigned int n = 0;
 
-  const unsigned int  height     = 4000;            // TODO [CW]: consider other options ...
-// the following
-  
-  unsigned int  cell_label_font_size     = static_cast<int>(0.5+ (height/100.) * 2.25);   // initial font size for cell labels
-  unsigned int  font_size                = static_cast<int>(0.5+ (height/100.) * 2.);   // font size for date, time, legend, and colorbar
+  unsigned int min_level, max_level;
+
+  // Svg files require an underlying drawing grid.
+  // We set the number of height elements of this
+  // grid to 4000 and adapt the number of width
+  // elements with respect to the bounding box of
+  // the given triangulation.
+  const unsigned int height = 4000;               // TODO [CW]: consider other options, especially if the polar angle approaches 90°
+  unsigned int width;
+
+  unsigned int margin_in_percent = 0;
+  if (svg_flags.margin || svg_flags.background == GridOutFlags::Svg::dealii)
+    margin_in_percent = 8;
+
+  // initial font size for cell labels
+  unsigned int cell_label_font_size;
+
+  // font size for date, time, legend, and colorbar
+  unsigned int font_size = static_cast<unsigned int>(.5 + (height/100.) * 2.);
 
   // get date and time
-  time_t time_stamp;
-  tm *now;
-  time_stamp = time(0);
-  now = localtime(&time_stamp);
+  // time_t time_stamp;
+  // tm *now;
+  // time_stamp = time(0);
+  // now = localtime(&time_stamp);
+
+  // vectors and variables for the perspective view
+  Point<3> camera_position;
+  Point<3> camera_direction;
+  Point<3> camera_horizontal;
+  float  camera_focus;
+
+  Point<3> point;
+  Point<2> projection_decomposition;
+
+  float x_max_perspective, x_min_perspective;
+  float y_max_perspective, y_min_perspective;
+
+  float x_dimension_perspective, y_dimension_perspective;
+
 
   Triangulation<2,2>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
 
+  // auxiliary variables for the bounding box and the range of cell levels
   double x_min = cell->vertex(0)[0];
   double x_max = cell->vertex(0)[0];
   double y_min = cell->vertex(0)[1];
   double y_max = cell->vertex(0)[1];
 
-  unsigned int min_level = cell->level();
-  unsigned int max_level = cell->level();
+  double x_dimension, y_dimension;
 
-  // array for the materials being used
+  min_level = cell->level();
+  max_level = cell->level();
+
+  // auxiliary array for the materials being used (material ids 255 max.)
   unsigned int materials[256];
-  for (unsigned int material_index = 0; material_index < 256; material_index++) materials[material_index] = 0;
+  for (unsigned int material_index = 0; material_index < 256; material_index++)
+    materials[material_index] = 0;
 
-  // array for the levels being used
+  // auxiliary array for the levels being used (level number 255 max.)
   unsigned int levels[256];
-  for (unsigned int level_index = 0; level_index < 256; level_index++) levels[level_index] = 0;
+  for (unsigned int level_index = 0; level_index < 256; level_index++)
+    levels[level_index] = 0;
 
-  // array for the subdomains being used
+  // auxiliary array for the subdomains being used (subdomain id 255 max.)
   unsigned int subdomains[256];
-  for (unsigned int subdomain_index = 0; subdomain_index < 256; subdomain_index++) subdomains[subdomain_index] = 0;
+  for (unsigned int subdomain_index = 0; subdomain_index < 256; subdomain_index++)
+    subdomains[subdomain_index] = 0;
 
+  // TODO [CW]: not yet implemented ...
   /*
-  // array for the level subdomains being used
+  // auxiliary array for the level subdomains being used
   int level_subdomains[256];
   for(int level_subdomain_index = 0; level_subdomain_index < 256; level_subdomain_index++) level_subdomains[level_subdomain_index] = 0;
   */
 
-  // determine the bounding box of the triangulation and check the cells for material and subdomain
+  // We use an active cell iterator to determine the
+  // bounding box of the given triangulation and check
+  // the cells for material id, level number, subdomain id
+  // (, and level subdomain id).
   for (; cell != endc; ++cell)
     {
-      for (unsigned int vertex_index = 0; vertex_index < GeometryInfo<dim>::vertices_per_cell; vertex_index++)
+      for (unsigned int vertex_index = 0; vertex_index < 4; vertex_index++)
         {
           if (cell->vertex(vertex_index)[0] < x_min) x_min = cell->vertex(vertex_index)[0];
           if (cell->vertex(vertex_index)[0] > x_max) x_max = cell->vertex(vertex_index)[0];
+
           if (cell->vertex(vertex_index)[1] < y_min) y_min = cell->vertex(vertex_index)[1];
           if (cell->vertex(vertex_index)[1] > y_max) y_max = cell->vertex(vertex_index)[1];
         }
-      
-      if ((unsigned int)cell->level() < min_level)      min_level = cell->level();
-      if ((unsigned int)cell->level() > max_level)      max_level = cell->level();
-      
-      if ((unsigned int)cell->material_id())            materials[(unsigned int)cell->material_id()] = 1;
-      else if ((unsigned int)cell->material_id() == 0)  materials[0] = 1;
-      
-      if ((int)cell->level())                           levels[(unsigned int)cell->level()] = 1;
-      else if ((unsigned int)cell->level() == 0)        levels[0] = 1;
 
-      if ((unsigned int)cell->subdomain_id())           subdomains[(unsigned int)cell->subdomain_id()] = 1;
+      if ((unsigned int)cell->level() < min_level) min_level = cell->level();
+      if ((unsigned int)cell->level() > max_level) max_level = cell->level();
+
+      if ((unsigned int)cell->material_id()) materials[(unsigned int)cell->material_id()] = 1;
+      else if ((unsigned int)cell->material_id() == 0) materials[0] = 1;
+
+      if ((int)cell->level()) levels[(unsigned int)cell->level()] = 1;
+      else if ((unsigned int)cell->level() == 0) levels[0] = 1;
+
+      if ((unsigned int)cell->subdomain_id()) subdomains[(unsigned int)cell->subdomain_id()] = 1;
       else if ((unsigned int)cell->subdomain_id() == 0) subdomains[0] = 1;
 
-      //  if((unsigned int)(cell->level_subdomain_id()))           level_subdomains[(unsigned int)cell->level_subdomain_id()] = 1;
-      //  else if((unsigned int)(cell->level_subdomain_id()) == 0) level_subdomains[0] = 1;
+      // if((unsigned int)(cell->level_subdomain_id())) level_subdomains[(unsigned int)cell->level_subdomain_id()] = 1;
+      // else if((unsigned int)(cell->level_subdomain_id()) == 0) level_subdomains[0] = 1;
     }
 
-  const double x_dimension = x_max - x_min;
-  const double y_dimension = y_max - y_min;
-  
+  x_dimension = x_max - x_min;
+  y_dimension = y_max - y_min;
+
   // count the materials being used
   for (unsigned int material_index = 0; material_index < 256; material_index++)
     {
       if (materials[material_index]) n_materials++;
     }
-  
+
   // count the levels being used
   for (unsigned int level_index = 0; level_index < 256; level_index++)
     {
       if (levels[level_index]) n_levels++;
     }
-  
+
   // count the subdomains being used
   for (unsigned int subdomain_index = 0; subdomain_index < 256; subdomain_index++)
     {
       if (subdomains[subdomain_index]) n_subdomains++;
     }
-  
+
   /*
   // count the level subdomains being used
   for(int level_subdomain_index = 0; level_subdomain_index < 256; level_subdomain_index++)
@@ -1452,114 +1502,247 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   }
   */
 
-//------------------ create the svg file with internal style sheet
-  const unsigned int width  = static_cast<int>(0.5+ height * (x_dimension/y_dimension));
+  switch (svg_flags.coloring)
+    {
+      case GridOutFlags::Svg::material_id:
+      n = n_materials;
+      break;
+    case GridOutFlags::Svg::level_number:
+      n = n_levels;
+      break;
+    case GridOutFlags::Svg::subdomain_id:
+      n = n_subdomains;
+      break;
+      // case GridOutFlags::Svg::level_subdomain_id: n = n_level_subdomains;
+      //   break;
+    default:
+      break;
+    }
+
+
+  // set the camera position to top view, targeting at the origin
+  camera_position[0] = 0;
+  camera_position[1] = 0;
+  camera_position[2] = 2. * std::max(x_dimension, y_dimension);
+
+  camera_direction[0] = 0;
+  camera_direction[1] = 0;
+  camera_direction[2] = -1;
+
+  camera_horizontal[0] = 1;
+  camera_horizontal[1] = 0;
+  camera_horizontal[2] = 0;
+
+  camera_focus = .5 * std::max(x_dimension, y_dimension);
+
+  float *camera_position_temp = new float[3];
+  float *camera_direction_temp = new float[3];
+  float *camera_horizontal_temp = new float[3];
+
+  const float angle_factor = 3.14159265 / 180.;
+
+  // (I) rotate the camera to the chosen polar angle
+  camera_position_temp[1] = cos(angle_factor * svg_flags.polar_angle) * camera_position[1] - sin(angle_factor * svg_flags.polar_angle) * camera_position[2];
+  camera_position_temp[2] = sin(angle_factor * svg_flags.polar_angle) * camera_position[1] + cos(angle_factor * svg_flags.polar_angle) * camera_position[2];
+
+  camera_direction_temp[1] = cos(angle_factor * svg_flags.polar_angle) * camera_direction[1] - sin(angle_factor * svg_flags.polar_angle) * camera_direction[2];
+  camera_direction_temp[2] = sin(angle_factor * svg_flags.polar_angle) * camera_direction[1] + cos(angle_factor * svg_flags.polar_angle) * camera_direction[2];
+
+  camera_horizontal_temp[1] = cos(angle_factor * svg_flags.polar_angle) * camera_horizontal[1] - sin(angle_factor * svg_flags.polar_angle) * camera_horizontal[2];
+  camera_horizontal_temp[2] = sin(angle_factor * svg_flags.polar_angle) * camera_horizontal[1] + cos(angle_factor * svg_flags.polar_angle) * camera_horizontal[2];
+
+  camera_position[1] = camera_position_temp[1];
+  camera_position[2] = camera_position_temp[2];
+
+  camera_direction[1] = camera_direction_temp[1];
+  camera_direction[2] = camera_direction_temp[2];
+
+  camera_horizontal[1] = camera_horizontal_temp[1];
+  camera_horizontal[2] = camera_horizontal_temp[2];
+
+  // (II) rotate the camera to the chosen azimuth angle
+  camera_position_temp[0] = cos(angle_factor * svg_flags.azimuth_angle) * camera_position[0] - sin(angle_factor * svg_flags.azimuth_angle) * camera_position[1];
+  camera_position_temp[1] = sin(angle_factor * svg_flags.azimuth_angle) * camera_position[0] + cos(angle_factor * svg_flags.azimuth_angle) * camera_position[1];
+
+  camera_direction_temp[0] = cos(angle_factor * svg_flags.azimuth_angle) * camera_direction[0] - sin(angle_factor * svg_flags.azimuth_angle) * camera_direction[1];
+  camera_direction_temp[1] = sin(angle_factor * svg_flags.azimuth_angle) * camera_direction[0] + cos(angle_factor * svg_flags.azimuth_angle) * camera_direction[1];
+
+  camera_horizontal_temp[0] = cos(angle_factor * svg_flags.azimuth_angle) * camera_horizontal[0] - sin(angle_factor * svg_flags.azimuth_angle) * camera_horizontal[1];
+  camera_horizontal_temp[1] = sin(angle_factor * svg_flags.azimuth_angle) * camera_horizontal[0] + cos(angle_factor * svg_flags.azimuth_angle) * camera_horizontal[1];
+
+  camera_position[0] = camera_position_temp[0];
+  camera_position[1] = camera_position_temp[1];
+
+  camera_direction[0] = camera_direction_temp[0];
+  camera_direction[1] = camera_direction_temp[1];
+
+  camera_horizontal[0] = camera_horizontal_temp[0];
+  camera_horizontal[1] = camera_horizontal_temp[1];
+
+  delete camera_position_temp;
+  delete camera_direction_temp;
+  delete camera_horizontal_temp;
+
+  // translate the camera to the given triangulation
+  camera_position[0] = x_min + .5 * x_dimension;
+  camera_position[1] = y_min + .5 * y_dimension;
+
+  camera_position[0] += 2. * std::max(x_dimension, y_dimension) * sin(angle_factor * svg_flags.polar_angle) * sin(angle_factor * svg_flags.azimuth_angle);
+  camera_position[1] -= 2. * std::max(x_dimension, y_dimension) * sin(angle_factor * svg_flags.polar_angle) * cos(angle_factor * svg_flags.azimuth_angle);
+
+
+  // determine the bounding box of the given triangulation on the projection plane of the camera viewing system
+  cell = tria.begin_active();
+  endc = tria.end();
+
+  point[0] = cell->vertex(0)[0];
+  point[1] = cell->vertex(0)[1];
+  point[2] = 0;
+
+  float min_level_min_vertex_distance = 0;
+
+  if (svg_flags.convert_level_number_to_height)
+    {
+      point[2] = .3 * ((float)cell->level() / (float)n_levels) * std::max(x_dimension, y_dimension);
+    }
+
+  projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+  x_max_perspective = projection_decomposition[0];
+  x_min_perspective = projection_decomposition[0];
+
+  y_max_perspective = projection_decomposition[1];
+  y_min_perspective = projection_decomposition[1];
+
+  for (; cell != endc; ++cell)
+    {
+      point[0] = cell->vertex(0)[0];
+      point[1] = cell->vertex(0)[1];
+      point[2] = 0;
+
+      if (svg_flags.convert_level_number_to_height)
+        {
+          point[2] = .3 * ((float)cell->level() / (float)n_levels) * std::max(x_dimension, y_dimension);
+        }
+
+      projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+      if (x_max_perspective < projection_decomposition[0]) x_max_perspective = projection_decomposition[0];
+      if (x_min_perspective > projection_decomposition[0]) x_min_perspective = projection_decomposition[0];
+
+      if (y_max_perspective < projection_decomposition[1]) y_max_perspective = projection_decomposition[1];
+      if (y_min_perspective > projection_decomposition[1]) y_min_perspective = projection_decomposition[1];
+
+      point[0] = cell->vertex(1)[0];
+      point[1] = cell->vertex(1)[1];
+
+      projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+      if (x_max_perspective < projection_decomposition[0]) x_max_perspective = projection_decomposition[0];
+      if (x_min_perspective > projection_decomposition[0]) x_min_perspective = projection_decomposition[0];
+
+      if (y_max_perspective < projection_decomposition[1]) y_max_perspective = projection_decomposition[1];
+      if (y_min_perspective > projection_decomposition[1]) y_min_perspective = projection_decomposition[1];
+
+      point[0] = cell->vertex(2)[0];
+      point[1] = cell->vertex(2)[1];
+
+      projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+      if (x_max_perspective < projection_decomposition[0]) x_max_perspective = projection_decomposition[0];
+      if (x_min_perspective > projection_decomposition[0]) x_min_perspective = projection_decomposition[0];
+
+      if (y_max_perspective < projection_decomposition[1]) y_max_perspective = projection_decomposition[1];
+      if (y_min_perspective > projection_decomposition[1]) y_min_perspective = projection_decomposition[1];
+
+      point[0] = cell->vertex(3)[0];
+      point[1] = cell->vertex(3)[1];
+
+      projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+      if (x_max_perspective < projection_decomposition[0]) x_max_perspective = projection_decomposition[0];
+      if (x_min_perspective > projection_decomposition[0]) x_min_perspective = projection_decomposition[0];
+
+      if (y_max_perspective < projection_decomposition[1]) y_max_perspective = projection_decomposition[1];
+      if (y_min_perspective > projection_decomposition[1]) y_min_perspective = projection_decomposition[1];
+
+      if ((unsigned int)cell->level() == min_level) min_level_min_vertex_distance = cell->minimum_vertex_distance();
+    }
+
+  x_dimension_perspective = x_max_perspective - x_min_perspective;
+  y_dimension_perspective = y_max_perspective - y_min_perspective;
+
+  cell_label_font_size = static_cast<unsigned int>(.5 + (height/100.) * 2.25) * 9. * (min_level_min_vertex_distance / std::min(x_dimension, y_dimension));
+
+
+// create the svg file with an internal style sheet
+  width = static_cast<unsigned int>(.5 + height * (x_dimension_perspective / y_dimension_perspective));
   unsigned int additional_width = 0;
 
-  if (svg_flags.draw_legend &&
-      (svg_flags.label_level_number ||
-       svg_flags.label_cell_index ||
-       svg_flags.label_material_id ||
-       svg_flags.label_subdomain_id)) // || svg_flags.label_level_subdomain_id ))
+  if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id)) // || svg_flags.label_level_subdomain_id ))
     {
-      additional_width  = static_cast<int>(0.5+ height * .4); // additional width for legend
+      additional_width = static_cast<unsigned int>(.5 + height * .4); // additional width for legend
     }
   else if (svg_flags.draw_colorbar && svg_flags.coloring)
     {
-      additional_width  = static_cast<int>(0.5+ height * .175); // additional width for colorbar // TODO [CW]: not enough / automatic adjustment ...
+      additional_width = static_cast<unsigned int>(.5 + height * .175); // additional width for colorbar
     }
 
+  //out << "<!-- deal.ii GridOut " << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year + 1900
+  //    << ' ' << now->tm_hour << ':';
+  //
+  //if (now->tm_min < 10) out << '0';
+  //
+  //out << now->tm_min << " -->" << '\n';
 
-//TODO: [CW] Only output date and time optionally
-//TODO: [CW] Use std::endl instead of '\n'
-  
-  out << "<!-- deal.ii GridOut "
-//      << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year + 1900
-//      << ' ' << now->tm_hour << ':'
-    ;
-  
-//  if (now->tm_min < 10) out << '0';
-  
-    out // << now->tm_min
-      << " -->"
+  // basic svg header
+  out << "<svg width=\"" << width + additional_width << "\" height=\"" << height << "\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">"
       << '\n' << '\n';
-  
-  // basic svg header and inclusion of the corresponding style sheet
-  out << "<svg width=\"" << width + additional_width << "\" height=\"" << height
-      << "\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">"
-      << '\n' << '\n';
-  
-  if (svg_flags.background == 2)
+
+
+  if (svg_flags.background == GridOutFlags::Svg::dealii)
     {
       out << " <linearGradient id=\"background_gradient\" gradientUnits=\"userSpaceOnUse\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"" << height << "\">" << '\n'
           << "  <stop offset=\"0\" style=\"stop-color:white\"/>" << '\n'
           << "  <stop offset=\"1\" style=\"stop-color:lightsteelblue\"/>" << '\n'
-          << " </linearGradient>"
-          << '\n';
+          << " </linearGradient>" << '\n';
     }
-  
+
   out << '\n';
-  
-  out << "<style type=\"text/css\"><![CDATA["
-      << '\n';
-  
-  if (svg_flags.background == 0)      out << " rect.background{fill:none}" << '\n';
-  else if (svg_flags.background == 1) out << " rect.background{fill:white}" << '\n';
-  else                                out << " rect.background{fill:url(#background_gradient)}" << '\n';
-  
+
+  // header for the internal style sheet
+  out << "<!-- internal style sheet -->" << '\n'
+      << "<style type=\"text/css\"><![CDATA[" << '\n';
+
+  // set the background of the output graphic
+  if (svg_flags.background == GridOutFlags::Svg::dealii) out << " rect.background{fill:url(#background_gradient)}" << '\n';
+  else if (svg_flags.background == GridOutFlags::Svg::white) out << " rect.background{fill:white}" << '\n';
+  else out << " rect.background{fill:none}" << '\n';
+
   // basic svg graphic element styles
   out << " rect{fill:none; stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}' << '\n'
       << " text{font-family:Helvetica; text-anchor:middle; fill:rgb(25,25,25)}" << '\n'
       << " line{stroke:rgb(25,25,25); stroke-width:" << svg_flags.boundary_line_thickness << '}' << '\n'
-      << " path{fill:none; stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}' << '\n';
-  
-  out << '\n';
-  
-  for (unsigned int level_index = min_level; level_index <= max_level; level_index++)
-    {
-      int font_size = static_cast<unsigned int>(0.5 + cell_label_font_size
-						* std::pow(.5, 1.*(level_index - min_level)));
-      
-      out << " text.l" << level_index << "{font-family:Helvetica; text-anchor:middle;"
-          << "fill:rgb(25,25,25); font-size:" << font_size << '}'
-          << '\n';
-    }
+      << " path{fill:none; stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}' << '\n'
+      << '\n';
 
-  out << '\n';
-
+  // polygon styles with respect to the chosen cell coloring
   if (svg_flags.coloring)
     {
       unsigned int labeling_index = 0;
-      unsigned int n = 0;
-
-      switch (svg_flags.coloring)
-        {
-        case 1:
-          n = n_materials;
-          break;
-        case 2:
-          n = n_levels;
-          break;
-        case 3:
-          n = n_subdomains;
-          break;
-//    case 4:  n = n_level_subdomains; break;
-        default:
-          break;
-        }
 
       for (unsigned int index = 0; index < n; index++)
         {
           double h;
 
           if (n != 1)  h = .6 - (index / (n-1.)) * .6;
-          else    h = .6;
+          else h = .6;
 
           unsigned int  r = 0;
           unsigned int  g = 0;
           unsigned int  b = 0;
 
-          unsigned int  i = static_cast<int>(h * 6);
+          unsigned int  i = static_cast<unsigned int>(h * 6);
 
           double f = h * 6 - i;
           double q = 1 - f;
@@ -1568,261 +1751,324 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           switch (i % 6)
             {
             case 0:
-		  r = 255;
-		  g = static_cast<int>(0.5+ 255*t);
-		  break;
+              r = 255, g = static_cast<unsigned int>(.5 + 255*t);
+              break;
             case 1:
-		  r = static_cast<int>(0.5+ 255*q);
-		  g = 255;
-		  break;
+              r = static_cast<unsigned int>(.5 + 255*q), g = 255;
+              break;
             case 2:
-		  g = 255;
-		  b = static_cast<int>(0.5+ 255*t);
-		  break;
+              g = 255, b = static_cast<unsigned int>(.5 + 255*t);
+              break;
             case 3:
-		  g = static_cast<int>(0.5+ 255*q);
-		  b = 255;
-		  break;
+              g = static_cast<unsigned int>(.5 + 255*q), b = 255;
+              break;
             case 4:
-		  r = static_cast<int>(0.5+ 255*t);
-		  b = 255;
-		  break;
+              r = static_cast<unsigned int>(.5 + 255*t), b = 255;
+              break;
             case 5:
-		  r = 255;
-		  b = static_cast<int>(0.5+ 255*q);
-		  break;
+              r = 255, b = static_cast<unsigned int>(.5 + 255*q);
+              break;
             default:
-		  break;
+              break;
             }
 
           switch (svg_flags.coloring)
             {
-            case 1:
-              while (!materials[labeling_index])   labeling_index++;
+            case GridOutFlags::Svg::material_id:
+              while (!materials[labeling_index]) labeling_index++;
               break;
-            case 2:
-              while (!levels[labeling_index])      labeling_index++;
+            case GridOutFlags::Svg::level_number:
+              while (!levels[labeling_index]) labeling_index++;
               break;
-            case 3:
-              while (!subdomains[labeling_index])  labeling_index++;
+            case GridOutFlags::Svg::subdomain_id:
+              while (!subdomains[labeling_index]) labeling_index++;
               break;
-              //  case 4: while(!level_subdomains[labeling_index]) labeling_index++; break;
+              // case GridOutFlags::Svg::level_subdomain_id: while(!level_subdomains[labeling_index]) labeling_index++;
+              //   break;
             default:
               break;
             }
 
           out << " path.p" << labeling_index
               << "{fill:rgb(" << r << ',' << g << ',' << b << "); "
-              << "stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}'
-              << '\n';
+              << "stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}' << '\n';
+
+          out << " path.ps" << labeling_index
+              << "{fill:rgb(" << static_cast<unsigned int>(.5 + .75 * r) << ',' << static_cast<unsigned int>(.5 + .75 * g) << ',' << static_cast<unsigned int>(.5 + .75 * b) << "); "
+              << "stroke:rgb(20,20,20); stroke-width:" << svg_flags.line_thickness << '}' << '\n';
 
           out << " rect.r" << labeling_index
               << "{fill:rgb(" << r << ',' << g << ',' << b << "); "
-              << "stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}'
-              << '\n';
+              << "stroke:rgb(25,25,25); stroke-width:" << svg_flags.line_thickness << '}' << '\n';
 
           labeling_index++;
         }
     }
 
-  out << " ]]></style>"
-      << '\n' << '\n';
+  out << "]]></style>" << '\n' << '\n';
 
-  out << " <rect class=\"background\" width=\"" << width + additional_width
-      << "\" height=\"" << height << "\"/>"
-      << '\n';
-  
-  if (svg_flags.background == 2)
+  // background rectangle
+  out << " <rect class=\"background\" width=\"" << width + additional_width << "\" height=\"" << height << "\"/>" << '\n';
+
+  if (svg_flags.background == GridOutFlags::Svg::dealii)
     {
       unsigned int x_offset = 0;
-      
-      if (svg_flags.margin_in_percent)
-	x_offset = static_cast<int>(0.5+ (height/100.) * (svg_flags.margin_in_percent/2.));
-      else
-	x_offset = static_cast<int>(0.5+ height * .025);
 
-      out << " <text x=\"" << x_offset << "\" y=\"" << static_cast<int>(0.5+ height * .045) << '\"'
-          << " style=\"font-weight:100; fill:lightsteelblue; text-anchor:start; font-family:Courier; font-size:"
-	  << static_cast<int>(0.5+ height * .035) << "\">"
-          << "deal.II" << "</text>"
-          << '\n';
-      
-      out << " <text x=\"" << x_offset + static_cast<int>(0.5+ height * .045 * 3.75) << "\" y=\"" << static_cast<int>(0.5+ height * .045) << '\"'
-          << " style=\"fill:lightsteelblue; text-anchor:start; font-size:" << static_cast<int>(0.5+ font_size * .75) << "\">"
-          << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year + 1900
-          << " - " << now->tm_hour << ':';
-      
-      if (now->tm_min < 10) out << '0';
-      
-      out << now->tm_min
-          << "</text>"
-          << '\n' << '\n';
+      if (svg_flags.margin) x_offset = static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent/2.));
+      else x_offset = static_cast<unsigned int>(.5 + height * .025);
+
+      out << " <text x=\"" << x_offset << "\" y=\"" << static_cast<unsigned int>(.5 + height * .0525) << '\"'
+          << " style=\"font-weight:100; fill:lightsteelblue; text-anchor:start; font-family:Courier; font-size:" << static_cast<unsigned int>(.5 + height * .045) << "\">"
+          << "deal.II" << "</text>" << '\n';
+
+      // out << " <text x=\"" << x_offset + static_cast<unsigned int>(.5 + height * .045 * 4.75) << "\" y=\"" << static_cast<unsigned int>(.5 + height * .0525) << '\"'
+      //     << " style=\"fill:lightsteelblue; text-anchor:start; font-size:" << font_size << "\">"
+      //     << now->tm_mday << '/' << now->tm_mon + 1 << '/' << now->tm_year + 1900
+      //     << " - " << now->tm_hour << ':';
+      //
+      // if(now->tm_min < 10) out << '0';
+      //
+      // out << now->tm_min
+      //     << "</text>"<< '\n' << '\n';
     }
 
-//------------------ draw the cells
-  out << "  <!-- cells -->"
-      << '\n';
+// draw the cells, starting out from the minimal level (in order to guaranty a correct perspective view)
+  out << "  <!-- cells -->" << '\n';
 
-  cell = tria.begin_active();
-  endc = tria.end();
-
-  for (; cell != endc; ++cell)
+  for (unsigned int level_index = min_level; level_index <= max_level; level_index++)
     {
-      // draw the current cell
-      out << "  <path";
+      Triangulation<2,2>::cell_iterator cell = tria.begin(level_index), endc = tria.end(level_index);
 
-      if (svg_flags.coloring)
+      for (; cell != endc; ++cell)
         {
-          out << " class=\"p";
+          if (!svg_flags.convert_level_number_to_height && !cell->active()) continue;
 
-          switch (svg_flags.coloring)
+          // draw the current cell
+          out << "  <path";
+
+          if (svg_flags.coloring)
             {
-            case 1:
-              out << (unsigned int)cell->material_id();
-              break;
-            case 2:
-              out << (unsigned int)cell->level();
-              break;
-            case 3:
-              out << (unsigned int)cell->subdomain_id();
-              break;
-              // case 4: out << (unsigned int)cell->level_subdomain_id(); break;
-            default:
-              break;
-            }
+              out << " class=\"p";
 
-          out << '\"';
-        }
+              if (!cell->active() && svg_flags.convert_level_number_to_height) out << 's';
 
-      out << " d=\""
-          <<  "M " << static_cast<int>(0.5+ ((cell->vertex(0)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << ' '   << static_cast<int>(0.5+ ((cell->vertex(0)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << " L " << static_cast<int>(0.5+ ((cell->vertex(1)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << ' '   << static_cast<int>(0.5+ ((cell->vertex(1)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << " L " << static_cast<int>(0.5+ ((cell->vertex(3)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << ' '   << static_cast<int>(0.5+ ((cell->vertex(3)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << " L " << static_cast<int>(0.5+ ((cell->vertex(2)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << ' '   << static_cast<int>(0.5+ ((cell->vertex(2)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << " L " << static_cast<int>(0.5+ ((cell->vertex(0)[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << ' '   << static_cast<int>(0.5+ ((cell->vertex(0)[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-          << "\"/>"
-          << '\n';
-
-      // label the current cell
-      if (svg_flags.label_level_number ||
-	  svg_flags.label_cell_index ||
-	  svg_flags.label_material_id ||
-	  svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
-        {
-          out << "  <text class=\"l" << cell->level()
-              << "\" x=\"" << static_cast<int>(0.5+ ((cell->center()[0] - x_min) / x_dimension) * (width - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-              << "\" y=\"" << static_cast<int>(0.5+ ((cell->center()[1] - y_min) / y_dimension) * (height - (height/100.) * 2. * svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-              << "\">";
-
-          if (svg_flags.label_level_number)
-            {
-              out << cell->level();
-            }
-
-          if (svg_flags.label_cell_index)
-            {
-              if (svg_flags.label_level_number) out << ',';
-              out << cell->index();
-            }
-
-          if (svg_flags.label_material_id)
-            {
-              if (svg_flags.label_level_number
-		  || svg_flags.label_cell_index) out << ',';
-              out << (int)cell->material_id();
-            }
-
-          if (svg_flags.label_subdomain_id)
-            {
-              if (svg_flags.label_level_number
-		  || svg_flags.label_cell_index
-		  || svg_flags.label_material_id) out << ',';
-              out << cell->subdomain_id();
-            }
-          /*
-                if(svg_flags.label_level_subdomain_id)
+              switch (svg_flags.coloring)
                 {
-                  if(svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id) out << ',';
-                  out << cell->level_subdomain_id();
+                case GridOutFlags::Svg::material_id:
+                  out << (unsigned int)cell->material_id();
+                  break;
+                case GridOutFlags::Svg::level_number:
+                  out << (unsigned int)cell->level();
+                  break;
+                case GridOutFlags::Svg::subdomain_id:
+                  out << (unsigned int)cell->subdomain_id();
+                  break;
+                  // case GridOutFlags::Svg::level_subdomain_id: out << (unsigned int)cell->level_subdomain_id();
+                  //   break;
+                default:
+                  break;
                 }
-          */
-          out << "</text>"
-              << '\n';
-        }
 
-//------------------ draw the boundary
-      if (svg_flags.boundary_line_thickness)
-        {
-          for (unsigned int faceIndex = 0; faceIndex < GeometryInfo<dim>::faces_per_cell; faceIndex++)
+              out << '\"';
+            }
+
+          out << " d=\"M ";
+
+          point[0] = cell->vertex(0)[0];
+          point[1] = cell->vertex(0)[1];
+          point[2] = 0;
+
+          if (svg_flags.convert_level_number_to_height)
             {
-              if (cell->at_boundary(faceIndex))
+              point[2] = .3 * ((float)cell->level() / (float)n_levels) * std::max(x_dimension, y_dimension);
+            }
+
+          projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+          out << static_cast<unsigned int>(.5 + ((projection_decomposition[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent)) << ' '
+              << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((projection_decomposition[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent));
+
+          out << " L ";
+
+          point[0] = cell->vertex(1)[0];
+          point[1] = cell->vertex(1)[1];
+
+          projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+          out << static_cast<unsigned int>(.5 + ((projection_decomposition[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent)) << ' '
+              << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((projection_decomposition[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent));
+
+          out << " L ";
+
+          point[0] = cell->vertex(3)[0];
+          point[1] = cell->vertex(3)[1];
+
+          projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+          out << static_cast<unsigned int>(.5 + ((projection_decomposition[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent)) << ' '
+              << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((projection_decomposition[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent));
+
+          out << " L ";
+
+          point[0] = cell->vertex(2)[0];
+          point[1] = cell->vertex(2)[1];
+
+          projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+          out << static_cast<unsigned int>(.5 + ((projection_decomposition[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent)) << ' '
+              << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((projection_decomposition[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent));
+
+          out << " L ";
+
+          point[0] = cell->vertex(0)[0];
+          point[1] = cell->vertex(0)[1];
+
+          projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+          out << static_cast<unsigned int>(.5 + ((projection_decomposition[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent)) << ' '
+              << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((projection_decomposition[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent));
+
+          out << "\"/>" << '\n';
+
+          // label the current cell
+          if (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
+            {
+              point[0] = cell->center()[0];
+              point[1] = cell->center()[1];
+              point[2] = 0;
+
+              if (svg_flags.convert_level_number_to_height)
                 {
-                  out << "  <line x1=\"" << static_cast<int>(0.5+ ((cell->face(faceIndex)->vertex(0)[0] - x_min)/x_dimension) * (width - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-                      << "\" y1=\""      << static_cast<int>(0.5+ ((cell->face(faceIndex)->vertex(0)[1] - y_min)/y_dimension) * (height - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-                      << "\" x2=\""      << static_cast<int>(0.5+ ((cell->face(faceIndex)->vertex(1)[0] - x_min)/x_dimension) * (width - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-                      << "\" y2=\""      << static_cast<int>(0.5+ ((cell->face(faceIndex)->vertex(1)[1] - y_min)/y_dimension) * (height - (height/100.) *2.* svg_flags.margin_in_percent) + ((height/100.) * svg_flags.margin_in_percent))
-                      << "\"/>"
-                      << '\n';
+                  point[2] = .3 * ((float)cell->level() / (float)n_levels) * std::max(x_dimension, y_dimension);
+                }
+
+              float distance_to_camera = sqrt(pow(point[0] - camera_position[0], 2.) + pow(point[1] - camera_position[1], 2.) + pow(point[2] - camera_position[2], 2.));
+              float distance_factor = distance_to_camera / (2. * std::max(x_dimension, y_dimension));
+
+              projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+              out << "  <text"
+                  << " x=\"" << static_cast<unsigned int>(.5 + ((projection_decomposition[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent))
+                  << "\" y=\"" << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((projection_decomposition[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent))
+                  << "\" style=\"font-size:" << static_cast<unsigned int>(.5 + cell_label_font_size * pow(.5, (float)cell->level() - 4. + 3.5 * distance_factor))
+                  << "\">";
+
+              if (svg_flags.label_level_number)
+                {
+                  out << cell->level();
+                }
+
+              if (svg_flags.label_cell_index)
+                {
+                  if (svg_flags.label_level_number) out << ',';
+                  out << cell->index();
+                }
+
+              if (svg_flags.label_material_id)
+                {
+                  if (svg_flags.label_level_number || svg_flags.label_cell_index) out << ',';
+                  out << (int)cell->material_id();
+                }
+
+              if (svg_flags.label_subdomain_id)
+                {
+                  if (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id) out << ',';
+                  out << cell->subdomain_id();
+                }
+
+              // if(svg_flags.label_level_subdomain_id)
+              // {
+              //   if(svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id) out << ',';
+              //   out << cell->level_subdomain_id();
+              // }
+
+              out << "</text>" << '\n';
+            }
+
+          // if the current cell lies at the boundary of the triangulation, draw the additional boundary line
+          if (svg_flags.boundary_line_thickness)
+            {
+              for (unsigned int faceIndex = 0; faceIndex < 4; faceIndex++)
+                {
+                  if (cell->at_boundary(faceIndex))
+                    {
+
+                      point[0] = cell->face(faceIndex)->vertex(0)[0];
+                      point[1] = cell->face(faceIndex)->vertex(0)[1];
+                      point[2] = 0;
+
+                      if (svg_flags.convert_level_number_to_height)
+                        {
+                          point[2] = .3 * ((float)cell->level() / (float)n_levels) * std::max(x_dimension, y_dimension);
+                        }
+
+                      projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+                      out << "  <line x1=\""
+                          << static_cast<unsigned int>(.5 + ((projection_decomposition[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent))
+                          << "\" y1=\""
+                          << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((projection_decomposition[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent));
+
+                      point[0] = cell->face(faceIndex)->vertex(1)[0];
+                      point[1] = cell->face(faceIndex)->vertex(1)[1];
+                      point[2] = 0;
+
+                      if (svg_flags.convert_level_number_to_height)
+                        {
+                          point[2] = .3 * ((float)cell->level() / (float)n_levels) * std::max(x_dimension, y_dimension);
+                        }
+
+                      projection_decomposition = GridOut::svg_project_point(point, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+                      out << "\" x2=\""
+                          << static_cast<unsigned int>(.5 + ((projection_decomposition[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent))
+                          << "\" y2=\""
+                          << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((projection_decomposition[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent))
+                          << "\"/>" << '\n';
+                    }
                 }
             }
         }
     }
 
-//------------------ draw the legend
-  if (svg_flags.draw_legend &&
-      (svg_flags.label_level_number ||
-       svg_flags.label_cell_index ||
-       svg_flags.label_material_id ||
-       svg_flags.label_subdomain_id)) // || svg_flags.label_level_subdomain_id ))
+
+// draw the legend
+  if (svg_flags.draw_legend) out << '\n' << " <!-- legend -->" << '\n';
+
+  unsigned int line_offset = 0;
+
+  additional_width = 0;
+  if (!svg_flags.margin) additional_width = static_cast<unsigned int>(.5 + (height/100.) * 2.5);
+
+  // explanation of the cell labeling
+  if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id)) // || svg_flags.label_level_subdomain_id ))
     {
-      out << '\n';
+      out << " <rect x=\"" << width + additional_width << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent)
+          << "\" width=\"" << static_cast<unsigned int>(.5 + (height/100.) * (40. - margin_in_percent)) << "\" height=\"" << static_cast<unsigned int>(.5 + height * .165) << "\"/>" << '\n';
 
-      out << " <!-- legend -->"
-          << '\n';
-
-      unsigned int additional_width = 0;
-      if (!svg_flags.margin_in_percent) additional_width = static_cast<int>(0.5+ (height/100.) * 2.5);
-
-      out << " <rect x=\"" << width + additional_width << "\" y=\""
-	  << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent)
-          << "\" width=\"" << static_cast<int>(0.5+ (height/100.) * (40. - svg_flags.margin_in_percent))
-	  << "\" height=\"" << static_cast<int>(0.5+ height*.2) << "\"/>"
-          << '\n';
-
-      unsigned int line_offset = 0;
-
-      out << " <text x=\"" << width + additional_width + static_cast<int>(0.5+ (height/100.) * 1.25)
-          << "\" y=\""     << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size)
+      out << " <text x=\"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 1.25)
+          << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size)
           << "\" style=\"text-anchor:start; font-weight:bold; font-size:" << font_size
-          << "\">"
-          << "cell label"
-          << "</text>"
-          << '\n';
+          << "\">" << "cell label"
+          << "</text>" << '\n';
 
       if (svg_flags.label_level_number)
         {
-          out << "  <text x=\"" << width + additional_width + static_cast<int>(0.5+ (height/100.) * 2.)
-              << "\" y=\""      << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size)
+          out << "  <text x=\"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 2.)
+              << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size)
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
-              << "\">"
-              << "level_number";
+              << "\">" << "level_number";
 
           if (svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
             out << ',';
 
-          out << "</text>"
-              << '\n';
+          out << "</text>" << '\n';
         }
 
       if (svg_flags.label_cell_index)
         {
-          out << "  <text x=\"" << width + additional_width + static_cast<int>(0.5+ (height/100.) * 2.)
-              << "\" y=\""      << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
+          out << "  <text x=\"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 2.)
+              << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size )
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
               << "\">"
               << "cell_index";
@@ -1830,14 +2076,13 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           if (svg_flags.label_material_id || svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
             out << ',';
 
-          out << "</text>"
-              << '\n';
+          out << "</text>" << '\n';
         }
 
       if (svg_flags.label_material_id)
         {
-          out << "  <text x=\"" << width + additional_width + static_cast<int>(0.5+ (height/100.) * 2.)
-              << "\" y=\""      << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
+          out << "  <text x=\"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 2.)
+              << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size )
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
               << "\">"
               << "material_id";
@@ -1845,75 +2090,74 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           if (svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
             out << ',';
 
-          out << "</text>"
-              << '\n';
+          out << "</text>" << '\n';
         }
 
       if (svg_flags.label_subdomain_id)
         {
-          out << "  <text x= \""  << width + additional_width + static_cast<int>(0.5+ (height/100.) * 2.)
-              << "\" y=\""    << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
+          out << "  <text x= \"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 2.)
+              << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size )
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
               << "\">"
               << "subdomain_id";
 
           // if(svg_flags.label_level_subdomain_id)
-          // out << ',';
+          //   out << ',';
 
-          out << "</text>"
-              << '\n';
+          out << "</text>" << '\n';
         }
-      /*
-          if(svg_flags.label_level_subdomain_id)
-          {
-            out << "  <text x= \"" << width + additional_width + static_cast<int>(0.5+ (height/100.) * 2.)
-                << "\" y=\""       << static_cast<int>(0.5+ (height/100.) * svg_flags.margin_in_percent + (++line_offset) * 1.5 * font_size )
-                << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
-                << "\">"
-                << "level_subdomain_id"
-                << "</text>" << '\n';
-          }
-      */
+
+      // if(svg_flags.label_level_subdomain_id)
+      // {
+      //   out << "  <text x= \"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 2.)
+      //       << "\" y=\""       << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size )
+      //       << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
+      //       << "\">"
+      //       << "level_subdomain_id"
+      //       << "</text>" << '\n';
+      // }
     }
 
-//------------------ draw the colorbar
+  // show azimuth angle and polar angle as text below the explanation of the cell labeling
+  if (svg_flags.draw_legend)
+    {
+      out << "  <text x=\"" << width + additional_width
+          << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + 10.75 * font_size)
+          << "\" style=\"text-anchor:start; font-size:" << font_size << "\">"
+          << "azimuth: " << svg_flags.azimuth_angle << "°, polar: " << svg_flags.polar_angle << "°</text>" << '\n';
+    }
+
+
+// draw the colorbar
   if (svg_flags.draw_colorbar && svg_flags.coloring)
     {
-      out << '\n';
-
-      out << " <!-- colorbar -->"
-          << '\n';
-
-      unsigned int additional_width = 0;
-      if (!svg_flags.margin_in_percent) additional_width = static_cast<int>(0.5+ (height/100.) * 2.5);
-
-      unsigned int n = 0;
+      out << '\n' << " <!-- colorbar -->" << '\n';
 
       out << " <text x=\"" << width + additional_width
-          << "\" y=\""     << static_cast<int>(0.5+ (height/100.) * (svg_flags.margin_in_percent+27.5) - (font_size/1.25))
+          << "\" y=\""     << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29.) - (font_size/1.25))
           << "\" style=\"text-anchor:start; font-weight:bold; font-size:" << font_size << "\">";
 
       switch (svg_flags.coloring)
         {
         case 1:
-          out << "material_id",        n = n_materials;
+          out << "material_id";
           break;
         case 2:
-          out << "level_number",       n = n_levels;
+          out << "level_number";
           break;
         case 3:
-          out << "subdomain_id",       n = n_subdomains;
+          out << "subdomain_id";
           break;
-          // case 4: out << "level_subdomain_id", n = n_level_subdomains; break;
+          // case 4: out << "level_subdomain_id";
+          //   break;
         default:
           break;
         }
 
-      out << "</text>"
-          << '\n';
+      out << "</text>" << '\n';
 
-      unsigned int element_height = static_cast<unsigned int>(((height/100.) * (72.5 - 2.*svg_flags.margin_in_percent)) / n);
-      unsigned int element_width  = static_cast<int>(0.5+ (height/100.) * 2.5);
+      unsigned int element_height = static_cast<unsigned int>(((height/100.) * (71. - 2.*margin_in_percent)) / n);
+      unsigned int element_width = static_cast<unsigned int>(.5 + (height/100.) * 2.5);
 
       int labeling_index = 0;
 
@@ -1921,60 +2165,56 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
         {
           switch (svg_flags.coloring)
             {
-            case 1:
-              while (!materials[labeling_index])        labeling_index++;
+            case GridOutFlags::Svg::material_id:
+              while (!materials[labeling_index]) labeling_index++;
               break;
-            case 2:
-              while (!levels[labeling_index])           labeling_index++;
+            case GridOutFlags::Svg::level_number:
+              while (!levels[labeling_index]) labeling_index++;
               break;
-            case 3:
-              while (!subdomains[labeling_index])       labeling_index++;
+            case GridOutFlags::Svg::subdomain_id:
+              while (!subdomains[labeling_index]) labeling_index++;
               break;
-              // case 4: while(!level_subdomains[labeling_index]) labeling_index++; break;
+              // case GridOutFlags::Svg::level_subdomain_id: while(!level_subdomains[labeling_index]) labeling_index++;
+              //   break;
             default:
               break;
             }
 
           out << "  <rect class=\"r" << labeling_index
-              << "\" x=\""           << width + additional_width
-              << "\" y=\""           << static_cast<int>(0.5+ (height/100.) * (svg_flags.margin_in_percent + 27.5)) + (n-index-1) * element_height
-              << "\" width=\""       << element_width
-              << "\" height=\""      << element_height
-              << "\"/>"
-              << '\n';
-
-          unsigned int additional_width = 0;
-          if (!svg_flags.margin_in_percent) additional_width = static_cast<int>(0.5+ (height/100.) * 2.5);
+              << "\" x=\"" << width + additional_width
+              << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29)) + (n-index-1) * element_height
+              << "\" width=\"" << element_width
+              << "\" height=\"" << element_height
+              << "\"/>" << '\n';
 
           out << "  <text x=\"" << width + additional_width + 1.5 * element_width
-              << "\" y=\""      << static_cast<int>(0.5+ (height/100.) * (svg_flags.margin_in_percent + 27.5)) + (n-index-1 + .5) * element_height + static_cast<int>(0.5+ font_size * .35) << "\""
-              << " style=\"text-anchor:start; font-size:" << static_cast<int>(0.5+ font_size);
+              << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29)) + (n-index-1 + .5) * element_height + static_cast<unsigned int>(.5 + font_size * .35) << "\""
+              << " style=\"text-anchor:start; font-size:" << static_cast<unsigned int>(.5 + font_size);
 
           if (index == 0 || index == n-1) out << "; font-weight:bold";
 
           out << "\">" << labeling_index;
 
           if (index == n-1) out << " max";
-          if (index == 0)   out << " min";
+          if (index == 0) out << " min";
 
-          out << "</text>"
-              << '\n';
+          out << "</text>" << '\n';
 
           labeling_index++;
         }
     }
 
-//------------------ finalize the svg file
-  out << '\n';
-  out << "</svg>";
 
+// finalize the svg file
+  out << '\n' << "</svg>";
   out.flush();
 
 }
 
+
 template <>
 void GridOut::write_mathgl (const Triangulation<1> &,
-			    std::ostream           &) const
+                            std::ostream &) const
 {
   Assert (false, ExcNotImplemented());
 }
@@ -1982,9 +2222,120 @@ void GridOut::write_mathgl (const Triangulation<1> &,
 
 template <int dim>
 void GridOut::write_mathgl (const Triangulation<dim> &tria,
-			    std::ostream             &out) const
+                            std::ostream             &out) const
 {
-  Assert (false, ExcNotImplemented());
+  AssertThrow (out, ExcIO ());
+  Assert (dim!=3, ExcNotImplemented ());
+
+  // (i) write header
+  if (true)
+    {
+      // block this to have local variables destroyed after use
+      const std::time_t  time1 = std::time (0);
+      const std::tm     *time  = std::localtime (&time1);
+
+      out << "\n#"
+          << "\n# This file was generated by the deal.II library."
+          << "\n#   Date =  "
+          << time->tm_year+1900 << "/"
+          << std::setfill('0') << std::setw (2) << time->tm_mon+1 << "/"
+          << std::setfill('0') << std::setw (2) << time->tm_mday
+          << "\n#   Time =  "
+          << std::setfill('0') << std::setw (2) << time->tm_hour << ":"
+          << std::setfill('0') << std::setw (2) << time->tm_min  << ":"
+          << std::setfill('0') << std::setw (2) << time->tm_sec
+          << "\n#"
+          << "\n# For a description of the MathGL script format see the MathGL manual.  "
+          << "\n#"
+          << "\n# Note: This file is understood by MathGL v2.1 and higher only, and can "
+          << "\n#       be quickly viewed in a graphical environment using \'mglview\'. "
+          << "\n#" << "\n"
+          ;
+    }
+
+  // define a helper to keep loops approximately dim-independent
+  // since MathGL labels axes as x, y, z
+  Assert (dim<=3, ExcInternalError ());
+  const std::string axes = "xyz";
+
+  // (ii) write preamble and graphing tweaks
+  out << "\n#"
+      << "\n#   Preamble."
+      << "\n#" << "\n";
+
+  if (mathgl_flags.draw_bounding_box)
+    out << "\nbox";
+
+  // Default, cf. MathGL / gnuplot.
+  out << "\nsetsize 800 800";
+
+  out << "\n";
+
+  // (iii) write vertex ordering
+  out << "\n#"
+      << "\n#   Vertex ordering."
+      << "\n#   list <vertex order> <vertex indices>"
+      << "\n#" << "\n";
+
+  // todo: This denotes the natural ordering of vertices, but it needs
+  // to check this is really always true for a given grid (it's not
+  // true in step-1 grid-2 for instance).
+  out << "\nlist f 0 1 2 3"
+      << "\n";
+
+  // (iv) write a list of vertices of cells
+  out << "\n#"
+      << "\n#   List of vertices."
+      << "\n#   list <id> <vertices>"
+      << "\n#" << "\n";
+
+  // run over all active cells and write out a list of
+  // xyz-coordinates that correspond to vertices
+  typename dealii::Triangulation<dim>::active_cell_iterator
+  cell=tria.begin_active (),
+  endc=tria.end ();
+
+  // No global indices in deal.II, so we make one up here.
+  unsigned int cell_global_index = 0;
+
+  for (; cell!=endc; ++cell, ++cell_global_index)
+    {
+      for (unsigned int i=0; i<dim; ++i)
+        {
+          // if (cell->direction_flag ()==true)
+          //   out << "\ntrue";
+          // else
+          //   out << "\nfalse";
+
+          out << "\nlist " << axes[i] << cell_global_index << " ";
+          for (unsigned int j=0; j<GeometryInfo<dim>::vertices_per_cell; ++j)
+            out << cell->vertex(j)[i] << " ";
+        }
+      out << '\n';
+    }
+
+  // (v) write out cells to plot as quadplot objects
+  out << "\n#"
+      << "\n#   List of cells to quadplot."
+      << "\n#   quadplot <vertex order> <id> <style>"
+      << "\n#" << "\n";
+  for (unsigned int i=0; i<tria.n_active_cells (); ++i)
+    {
+      out << "\nquadplot f ";
+      for (unsigned int j=0; j<dim; ++j)
+        out << axes[j] << i << " ";
+      out << "\'k#\'";
+    }
+  out << "\n";
+
+  // (vi) write footer
+  out << "\n#"
+      << "\n#"
+      << "\n#" << "\n";
+
+  // make sure everything now gets to the output stream
+  out.flush ();
+  AssertThrow (out, ExcIO ());
 }
 
 
@@ -2305,7 +2656,6 @@ void GridOut::write_ucd_lines (const Triangulation<2,3> &,
 
 
 
-
 template <int dim, int spacedim>
 void GridOut::write_ucd_faces (const Triangulation<dim, spacedim> &tria,
                                const unsigned int        starting_index,
@@ -2392,6 +2742,37 @@ void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
   const_cast<dealii::Triangulation<dim,spacedim>&>(tria)
   .load_user_flags_line (line_flags);
 }
+
+
+Point<2> GridOut::svg_project_point(Point<3> point, Point<3> camera_position, Point<3> camera_direction, Point<3> camera_horizontal, float camera_focus) const
+{
+  // ...
+  Point<3> camera_vertical;
+  camera_vertical[0] = camera_horizontal[1] * camera_direction[2] - camera_horizontal[2] * camera_direction[1];
+  camera_vertical[1] = camera_horizontal[2] * camera_direction[0] - camera_horizontal[0] * camera_direction[2];
+  camera_vertical[2] = camera_horizontal[0] * camera_direction[1] - camera_horizontal[1] * camera_direction[0];
+
+  float phi;
+  phi  = camera_focus;
+  phi /= (point[0] - camera_position[0]) * camera_direction[0] + (point[1] - camera_position[1]) * camera_direction[1] + (point[2] - camera_position[2]) * camera_direction[2];
+
+  Point<3> projection;
+  projection[0] = camera_position[0] + phi * (point[0] - camera_position[0]);
+  projection[1] = camera_position[1] + phi * (point[1] - camera_position[1]);
+  projection[2] = camera_position[2] + phi * (point[2] - camera_position[2]);
+
+  Point<2> projection_decomposition;
+  projection_decomposition[0]  = (projection[0] - camera_position[0] - camera_focus * camera_direction[0]) * camera_horizontal[0];
+  projection_decomposition[0] += (projection[1] - camera_position[1] - camera_focus * camera_direction[1]) * camera_horizontal[1];
+  projection_decomposition[0] += (projection[2] - camera_position[2] - camera_focus * camera_direction[2]) * camera_horizontal[2];
+
+  projection_decomposition[1]  = (projection[0] - camera_position[0] - camera_focus * camera_direction[0]) * camera_vertical[0];
+  projection_decomposition[1] += (projection[1] - camera_position[1] - camera_focus * camera_direction[1]) * camera_vertical[1];
+  projection_decomposition[1] += (projection[2] - camera_position[2] - camera_focus * camera_direction[2]) * camera_vertical[2];
+
+  return projection_decomposition;
+}
+
 
 
 namespace internal

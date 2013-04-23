@@ -41,8 +41,9 @@ void test(std::ostream& /*out*/)
     {
       tr.execute_coarsening_and_refinement ();
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
   
 }
@@ -50,6 +51,8 @@ void test(std::ostream& /*out*/)
 
 int main(int argc, char *argv[])
 {
+  deal_II_exceptions::disable_abort_on_exception();
+
 #ifdef DEAL_II_WITH_MPI
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
 #else
@@ -62,16 +65,10 @@ int main(int argc, char *argv[])
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-				   // we want to catch exceptions
-				   // instead of aborting the program
-  deal_II_exceptions::disable_abort_on_exception();
-
   deallog.push("2d");
   test<2>(logfile);
   deallog.pop();
   deallog.push("2d");
   test<3>(logfile);
   deallog.pop();
-
-
 }

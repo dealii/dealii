@@ -16,6 +16,11 @@
 <a name="overview"></a>
 <h2>Overview</h2>
 
+<p><b>New to <acronym>deal.II</acronym>?</b> You might want to start with tutorial <a href="../../doxygen/deal.II/step_1.html">Step-1</a> and work your way up to Step-5.
+At that point you can explore what features you are interested in and look at the large collection
+of programs listed below.
+<p>
+
 <p>
 The <acronym>deal.II</acronym> tutorial contains a collection of
 programs, each more

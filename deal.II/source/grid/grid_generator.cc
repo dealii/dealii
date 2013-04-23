@@ -2693,6 +2693,11 @@ GridGenerator::half_hyper_ball (Triangulation<3> &tria,
   Triangulation<3>::cell_iterator cell = tria.begin();
   Triangulation<3>::cell_iterator end = tria.end();
 
+  // go over all faces. for the ones on the flat face, set boundary
+  // indicator for face and edges to one; the rest will remain at
+  // zero but we have to pay attention to those edges that are
+  // at the perimeter of the flat face since they should not be
+  // set to one
   while (cell != end)
     {
       for (unsigned int i=0; i<GeometryInfo<3>::faces_per_cell; ++i)
@@ -2700,27 +2705,24 @@ GridGenerator::half_hyper_ball (Triangulation<3> &tria,
           if (!cell->at_boundary(i))
             continue;
 
-          // If the center is on the plane x=0, this is a planar
-          // element
-          if (cell->face(i)->center()(0) < center(0)+1.e-5)
+          // If the center is on the plane x=0, this is a planar element. set
+          // its boundary indicator. also set the boundary indicators of the
+          // bounding faces unless both vertices are on the perimeter
+          if (cell->face(i)->center()(0) < center(0)+1.e-5*radius)
             {
               cell->face(i)->set_boundary_indicator(1);
               for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
-                cell->face(i)->line(j)->set_boundary_indicator(1);
-            }
-        }
-      // With this loop we restore back the indicator of the outer lines
-      for (unsigned int i=0; i<GeometryInfo<3>::faces_per_cell; ++i)
-        {
-          if (!cell->at_boundary(i))
-            continue;
-
-          // If the center is not on the plane x=0, this is a curvilinear
-          // element
-          if (cell->face(i)->center()(0) > center(0)+1.e-5)
-            {
-              for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
-                cell->face(i)->line(j)->set_boundary_indicator(0);
+		{
+		  const Point<3> vertices[2]
+		    = { cell->face(i)->line(j)->vertex(0),
+			cell->face(i)->line(j)->vertex(1) };
+		  if ((std::fabs(vertices[0].distance(center)-radius) >
+		       1e-5*radius)
+		      ||
+		      (std::fabs(vertices[1].distance(center)-radius) >
+		       1e-5*radius))
+		    cell->face(i)->line(j)->set_boundary_indicator(1);
+		}
             }
         }
       ++cell;
@@ -3378,7 +3380,7 @@ merge_triangulations (const Triangulation<dim, spacedim> &triangulation_1,
 
 void
 GridGenerator::
-extrude_triangulation(const Triangulation<2, 2> & input,
+extrude_triangulation(const Triangulation<2, 2> &input,
                       const unsigned int n_slices,
                       const double height,
                       Triangulation<3,3> &result)
@@ -3393,30 +3395,30 @@ extrude_triangulation(const Triangulation<2, 2> & input,
   std::vector<CellData<3> > cells;
   cells.reserve((n_slices-1)*input.n_active_cells());
 
-  for (unsigned int slice=0;slice<n_slices;++slice)
+  for (unsigned int slice=0; slice<n_slices; ++slice)
     {
-      for (unsigned int i=0;i<input.n_vertices();++i)
+      for (unsigned int i=0; i<input.n_vertices(); ++i)
 
-      {
-        const Point<2> & v = input.get_vertices()[i];
-        points[i+slice*input.n_vertices()](0) = v(0);
-        points[i+slice*input.n_vertices()](1) = v(1);
-        points[i+slice*input.n_vertices()](2) = height * slice / (n_slices-1);
-      }
+        {
+          const Point<2> &v = input.get_vertices()[i];
+          points[i+slice*input.n_vertices()](0) = v(0);
+          points[i+slice*input.n_vertices()](1) = v(1);
+          points[i+slice*input.n_vertices()](2) = height * slice / (n_slices-1);
+        }
     }
 
   for (Triangulation<2,2>::cell_iterator
-      cell = input.begin(); cell != input.end(); ++cell)
+       cell = input.begin(); cell != input.end(); ++cell)
     {
-      for (unsigned int slice=0;slice<n_slices-1;++slice)
+      for (unsigned int slice=0; slice<n_slices-1; ++slice)
         {
           CellData<3> this_cell;
           for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
             {
               this_cell.vertices[v]
-                                 = cell->vertex_index(v)+slice*input.n_vertices();
+                = cell->vertex_index(v)+slice*input.n_vertices();
               this_cell.vertices[v+GeometryInfo<2>::vertices_per_cell]
-                                 = cell->vertex_index(v)+(slice+1)*input.n_vertices();
+                = cell->vertex_index(v)+(slice+1)*input.n_vertices();
             }
 
           this_cell.material_id = cell->material_id();
@@ -3428,27 +3430,27 @@ extrude_triangulation(const Triangulation<2, 2> & input,
   types::boundary_id bid=0;
   s.boundary_quads.reserve(input.n_active_lines()*(n_slices-1) + input.n_active_cells()*2);
   for (Triangulation<2,2>::cell_iterator
-      cell = input.begin(); cell != input.end(); ++cell)
+       cell = input.begin(); cell != input.end(); ++cell)
     {
       CellData<2> quad;
-      for (unsigned int f=0; f<4;++f)
+      for (unsigned int f=0; f<4; ++f)
         if (cell->at_boundary(f))
           {
             quad.boundary_id = cell->face(f)->boundary_indicator();
             bid = std::max(bid, quad.boundary_id);
-          for (unsigned int slice=0;slice<n_slices-1;++slice)
-            {
-              quad.vertices[0] = cell->face(f)->vertex_index(0)+slice*input.n_vertices();
-              quad.vertices[1] = cell->face(f)->vertex_index(1)+slice*input.n_vertices();
-              quad.vertices[2] = cell->face(f)->vertex_index(0)+(slice+1)*input.n_vertices();
-              quad.vertices[3] = cell->face(f)->vertex_index(1)+(slice+1)*input.n_vertices();
-              s.boundary_quads.push_back(quad);
-            }
+            for (unsigned int slice=0; slice<n_slices-1; ++slice)
+              {
+                quad.vertices[0] = cell->face(f)->vertex_index(0)+slice*input.n_vertices();
+                quad.vertices[1] = cell->face(f)->vertex_index(1)+slice*input.n_vertices();
+                quad.vertices[2] = cell->face(f)->vertex_index(0)+(slice+1)*input.n_vertices();
+                quad.vertices[3] = cell->face(f)->vertex_index(1)+(slice+1)*input.n_vertices();
+                s.boundary_quads.push_back(quad);
+              }
           }
     }
 
   for (Triangulation<2,2>::cell_iterator
-      cell = input.begin(); cell != input.end(); ++cell)
+       cell = input.begin(); cell != input.end(); ++cell)
     {
       CellData<2> quad;
       quad.boundary_id = bid + 1;
@@ -3459,7 +3461,7 @@ extrude_triangulation(const Triangulation<2, 2> & input,
       s.boundary_quads.push_back(quad);
 
       quad.boundary_id = bid + 2;
-      for (int i=0;i<4;++i)
+      for (int i=0; i<4; ++i)
         quad.vertices[i] += (n_slices-1)*input.n_vertices();
       s.boundary_quads.push_back(quad);
     }

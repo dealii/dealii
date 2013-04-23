@@ -43,8 +43,9 @@ void test ()
     {
       m[v.size()];
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
 
   deallog << "OK" << std::endl;
@@ -54,6 +55,7 @@ void test ()
 int main()
 {
   deal_II_exceptions::disable_abort_on_exception();
+
   std::ofstream logfile ("component_mask_02/output");
   deallog << std::setprecision (4);
 

@@ -54,21 +54,21 @@ void test ()
 
   Assert (v_tmp.has_ghost_elements(), ExcInternalError());
 
-  deal_II_exceptions::disable_abort_on_exception();
-
   try
     {
       v_tmp.l2_norm();
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
   try
     {
       v_tmp(0)=3.0;
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
   
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
@@ -79,6 +79,8 @@ void test ()
 
 int main (int argc, char **argv)
 {
+  deal_II_exceptions::disable_abort_on_exception();
+
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
 
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);

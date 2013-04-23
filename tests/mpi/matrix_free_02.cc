@@ -44,8 +44,6 @@ helmholtz_operator (const MatrixFree<dim,Number>  &data,
     {
       fe_eval.reinit (cell);
 
-                                // compare values with the ones the FEValues
-                                // gives us. Those are seen as reference
       fe_eval.read_dof_values (src);
       fe_eval.evaluate (true, true, false);
       for (unsigned int q=0; q<n_q_points; ++q)

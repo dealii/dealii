@@ -618,40 +618,46 @@ namespace GridOutFlags
     unsigned int boundary_line_thickness;
 
     /// Margin around the plotted area
-    unsigned int margin_in_percent;
+    bool margin;
 
     /**
      * Background style.
      */
-    enum Background {
+    enum Background{
 	/// Use transparent value of SVG
         transparent,
 	/// Use white background
         white,
-	/// Use a gradient from white (top) to steelblue (bottom), and add date and time plus a "deal.II" logo.
-        dealii };
+	/// Use a gradient from white (top) to steelblue (bottom), and add date and time plus a deal.II logo. Automatically draws a margin.
+        dealii};
 
     Background background;
+
+    // View angles for the perspective view of the grid; Default is 0, 0 (top view).
+    int azimuth_angle, polar_angle;
 
     /**
      * Cell coloring.
      */
-    enum Coloring { 
+    enum Coloring{ 
         /// No cell coloring
         none, 
-        /// Convert the material id into the cell color
+        /// Convert the material id into the cell color (default)
         material_id, 
         /// Convert the level number into the cell color
         level_number, 
         /// Convert the subdomain id into the cell color
-        subdomain_id }; 
+        subdomain_id}; 
  
     Coloring coloring;
+
+    // Interpret the level number of the cells as altitude over the x-y-plane (may be useful in the perpspective view).
+    bool convert_level_number_to_height;
 
     /**
      * Cell labeling (fixed order).
      * 
-     * The following booleans determine which property of the cell
+     * The following booleans determine which properties of the cell
      * shall be displayed as text in the middle of each cell.
      */
     bool label_level_number;    /// default: true
@@ -668,17 +674,20 @@ namespace GridOutFlags
     /**
      * Constructor.
      */
-    Svg (const unsigned int line_thickness = 3,
-         const unsigned int boundary_line_thickness = 7,
-         const unsigned int margin_in_percent = 7,
-         const Background background = dealii,
-         const Coloring coloring = material_id,
-         const bool label_level_number = true,
-         const bool label_cell_index = true,
-         const bool label_material_id = false,
-         const bool label_subdomain_id = false,
-	 const bool draw_colorbar = true,
-         const bool draw_legend = true);
+    Svg(const unsigned int line_thickness = 3,
+        const unsigned int boundary_line_thickness = 7,
+        bool margin = true,
+        const Background background = dealii,
+        const int azimuth_angle = 0,
+        const int polar_angle = 0,
+        const Coloring coloring = material_id,
+        const bool convert_level_number_to_height = false,
+        const bool label_level_number = true,
+        const bool label_cell_index = true,
+        const bool label_material_id = false,
+        const bool label_subdomain_id = false,
+        const bool draw_colorbar = true,
+        const bool draw_legend = true);
 
     /**
      * Declare parameters in
@@ -704,6 +713,11 @@ namespace GridOutFlags
      * Constructor.
      */
     MathGL ();
+
+    /**
+     * Draw a bounding box around the graph.
+     */
+    bool draw_bounding_box;
 
     /**
      * Declare parameters in ParameterHandler.
@@ -791,7 +805,8 @@ namespace GridOutFlags
  *
  * @ingroup grid
  * @ingroup output
- * @author Wolfgang Bangerth, Guido Kanschat, Luca Heltai, 1999, 2003, 2006; SVG by Christian Wülker, 2013; postscript format based on an implementation by Stefan Nauber, 1999
+ * @author Wolfgang Bangerth, Guido Kanschat, Luca Heltai, Stefan Nauber, Christian Wülker
+ * @date 1999 - 2013
  */
 class GridOut
 {
@@ -1023,10 +1038,13 @@ public:
   /**
    * Write the triangulation in the SVG format.
    * 
-   * SVG (Scalable Vector Graphics) is an XML-based vector image
-   * format recommended by the World Wide Web Consortium (W3C). This
-   * function conforms to the latest specification SVG 1.1, released
-   * on August 16, 2011.
+   * SVG (Scalable Vector Graphics) is 
+   * an XML-based vector image format 
+   * developed and maintained by the 
+   * World Wide Web Consortium (W3C). 
+   * This function conforms to the 
+   * latest specification SVG 1.1, 
+   * released on August 16, 2011.
    * 
    * The cells of the triangulation are written as polygons with
    * additional lines at the boundary of the triangulation. A coloring
@@ -1035,21 +1053,32 @@ public:
    * colorbar can be drawn to encode the chosen coloring.  Moreover, a
    * cell label can be added, showing level index, etc.
    *
-   * @note Only implemented for two-dimensional grids in two space
-   * dimensions.
+   * @note Yet only implemented for 
+   * two-dimensional grids in two
+   * space dimensions.
    * 
    */
   template <int dim, int spacedim>
   void write_svg (const Triangulation<dim,spacedim> &tria,
-                  std::ostream            &out) const;
+                  std::ostream                      &out) const;
 
   void write_svg (const Triangulation<2,2> &tria,
-                  std::ostream            &out) const;
+                  std::ostream             &out) const;
 
   /**
-   * Write triangulation in MathGL format.
+   * Write triangulation in MathGL script format. To interpret this
+   * file a version of MathGL>=2.0.0 is required.
    *
-   * Not implemented for the codimension one case.
+   * To get a handle on the resultant MathGL script within a graphical
+   * environment an interpreter is needed. A suggestion to start with
+   * is <code>mglview</code>, which is bundled with MathGL.  With
+   * <code>mglview</code> can interpret and display small-to-medium
+   * MathGL scripts in a graphical window and enables conversion to
+   * other formats such as EPS, PNG, JPG, SVG, as well as view/display
+   * animations. Some minor editing, such as modifying the lighting or
+   * alpha channels, can also be done.
+   *
+   * @note Not implemented for the codimensional one case.
    */
   template <int dim>
   void write_mathgl (const Triangulation<dim> &tria,
@@ -1061,8 +1090,8 @@ public:
    */
   template <int dim, int spacedim>
   void write (const Triangulation<dim,spacedim> &tria,
-              std::ostream             &out,
-              const OutputFormat        output_format,
+              std::ostream                      &out,
+              const OutputFormat                 output_format,
               const Mapping<dim,spacedim>       *mapping=0) const;
 
   /**
@@ -1070,7 +1099,7 @@ public:
    */
   template <int dim, int spacedim>
   void write (const Triangulation<dim,spacedim> &tria,
-              std::ostream             &out,
+              std::ostream                      &out,
               const Mapping<dim,spacedim>       *mapping=0) const;
 
   /**
@@ -1463,12 +1492,36 @@ private:
                         const unsigned int      starting_index,
                         std::ostream           &out) const;
 
+
+  /**
+   * This function projects a three-dimensional 
+   * point (Point<3> point) onto a two-dimensional 
+   * image plane, specified by the position of 
+   * the camera viewing system 
+   * (Point<3> camera_position), 
+   * camera direction
+   * (Point<3> camera_position),
+   * camera horizontal 
+   * (Point<3> camera_horizontal, necessary for 
+   * the correct alignment of the later images),
+   * and the focus of the camera 
+   * (float camera_focus).
+   *
+   * For SVG output of grids.
+   */
+  Point<2> svg_project_point(Point<3> point, 
+                             Point<3> camera_position, 
+                             Point<3> camera_direction, 
+                             Point<3> camera_horizontal, 
+                             float  camera_focus) const;
+
   /**
    * Return the number of faces in the triangulation which have a
    * boundary indicator not equal to zero. Only these faces are
    * explicitly printed in the <tt>write_*</tt> functions; all faces
    * with indicator numbers::internal_face_boundary_id are interior
    * ones and an indicator with value zero for faces at the boundary
+
    * are considered default.
    *
    * This function always returns an empty list in one dimension.

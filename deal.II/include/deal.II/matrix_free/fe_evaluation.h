@@ -1781,6 +1781,36 @@ namespace internal
     }
   };
 
+  // allows to select between block vectors and non-block vectors, which
+  // allows to use a unified interface for extracting blocks on block vectors
+  // and doing nothing on usual vectors
+  template <typename VectorType, bool>
+  struct BlockVectorSelector {};
+
+  template <typename VectorType>
+  struct BlockVectorSelector<VectorType,true>
+  {
+    typedef typename VectorType::BlockType BaseVectorType;
+
+    static BaseVectorType* get_vector_component (VectorType &vec,
+                                                 const unsigned int component)
+    {
+      AssertIndexRange (component, vec.n_blocks());
+      return &vec.block(component);
+    }
+  };
+
+  template <typename VectorType>
+  struct BlockVectorSelector<VectorType,false>
+  {
+    typedef VectorType BaseVectorType;
+
+    static BaseVectorType* get_vector_component (VectorType &vec,
+                                                 const unsigned int)
+    {
+      return &vec;
+    }
+  };
 }
 
 
@@ -2110,13 +2140,12 @@ void
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 ::read_dof_values (const VectorType &src)
 {
-  AssertDimension (n_components_, n_fe_components);
-
-  // only need one component, but to silent compiler warnings, use
-  // n_components copies here (but these will not be used)
-  VectorType *src_data[n_components];
+  // select between block vectors and non-block vectors. Note that the number
+  // of components is checked in the internal data
+  typename internal::BlockVectorSelector<VectorType,
+    IsBlockVector<VectorType>::value>::BaseVectorType *src_data[n_components];
   for (unsigned int d=0; d<n_components; ++d)
-    src_data[d] = const_cast<VectorType *>(&src);
+    src_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(const_cast<VectorType &>(src), d);
 
   internal::VectorReader<Number> reader;
   read_write_operation (reader, src_data);
@@ -2194,13 +2223,13 @@ void
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 ::read_dof_values_plain (const VectorType &src)
 {
-  AssertDimension (n_components_, n_fe_components);
-
-  // only need one component, but to avoid compiler warnings, use n_components
-  // copies here (but these will not be used)
-  const VectorType *src_data[n_components];
+  // select between block vectors and non-block vectors. Note that the number
+  // of components is checked in the internal data
+  const typename internal::BlockVectorSelector<VectorType,
+    IsBlockVector<VectorType>::value>::BaseVectorType *src_data[n_components];
   for (unsigned int d=0; d<n_components; ++d)
-    src_data[d] = &src;
+    src_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(const_cast<VectorType &>(src), d);
+
   read_dof_values_plain (src_data);
 }
 
@@ -2258,15 +2287,15 @@ void
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 ::distribute_local_to_global (VectorType &dst) const
 {
-  AssertDimension (n_components_, n_fe_components);
   Assert (dof_values_initialized==true,
           internal::ExcAccessToUninitializedField());
 
-  // only need one component, but to avoid compiler warnings, use n_components
-  // copies here (but these will not be used)
-  VectorType *dst_data [n_components];
+  // select between block vectors and non-block vectors. Note that the number
+  // of components is checked in the internal data
+  typename internal::BlockVectorSelector<VectorType,
+    IsBlockVector<VectorType>::value>::BaseVectorType *dst_data[n_components];
   for (unsigned int d=0; d<n_components; ++d)
-    dst_data[d] = &dst;
+    dst_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(dst, d);
 
   internal::VectorDistributorLocalToGlobal<Number> distributor;
   read_write_operation (distributor, dst_data);
@@ -2336,15 +2365,15 @@ void
 FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 ::set_dof_values (VectorType &dst) const
 {
-  AssertDimension (n_components_, n_fe_components);
   Assert (dof_values_initialized==true,
           internal::ExcAccessToUninitializedField());
 
-  // only need one component, but to avoid compiler warnings, use n_components
-  // copies here (but these will not be used)
-  VectorType *dst_data [n_components];
+  // select between block vectors and non-block vectors. Note that the number
+  // of components is checked in the internal data
+  typename internal::BlockVectorSelector<VectorType,
+    IsBlockVector<VectorType>::value>::BaseVectorType *dst_data[n_components];
   for (unsigned int d=0; d<n_components; ++d)
-    dst_data[d] = &dst;
+    dst_data[d] = internal::BlockVectorSelector<VectorType, IsBlockVector<VectorType>::value>::get_vector_component(dst, d);
 
   internal::VectorSetter<Number> setter;
   read_write_operation (setter, dst_data);

@@ -1083,8 +1083,8 @@ ParameterHandler::mangle (const std::string &s)
       static const std::string allowed_characters
 	("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 
-      if (mangle_whole_string
-	  ||
+      if ((! mangle_whole_string)
+	  &&
 	  (allowed_characters.find (s[i]) != std::string::npos))
 	u.push_back (s[i]);
       else

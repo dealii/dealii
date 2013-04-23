@@ -27,6 +27,14 @@ template <typename number> class FullMatrix;
 template <typename Matrix> class BlockMatrixBase;
 template <typename number> class SparseILU;
 
+
+#ifdef DEAL_II_WITH_TRILINOS
+namespace TrilinosWrappers
+{
+  class SparseMatrix;
+}
+#endif
+
 /**
  * @addtogroup Matrix1
  * @{
@@ -862,7 +870,7 @@ public:
   void symmetrize ();
 
   /**
-   * Copy the given matrix to this one.  The operation throws an error if the
+   * Copy the given matrix to this one.  The operation triggers an assertion if the
    * sparsity patterns of the two involved matrices do not point to the same
    * object, since in this case the copy operation is cheaper. Since this
    * operation is notheless not for free, we do not make it available through
@@ -906,6 +914,20 @@ public:
   template <typename somenumber>
   void copy_from (const FullMatrix<somenumber> &matrix);
 
+#ifdef DEAL_II_WITH_TRILINOS
+  /**
+   * Copy the given Trilinos matrix to this one. The operation triggers an
+   * assertion if the sparsity patterns of the current object does not contain
+   * the location of a non-zero entry of the given argument.
+   *
+   * This function assumes that the two matrices have the same sizes.
+   *
+   * The function returns a reference to <tt>*this</tt>.
+   */
+  SparseMatrix<number> &
+  copy_from (const TrilinosWrappers::SparseMatrix &matrix);
+#endif
+  
   /**
    * Add <tt>matrix</tt> scaled by <tt>factor</tt> to this matrix, i.e. the
    * matrix <tt>factor*matrix</tt> is added to <tt>this</tt>. This function

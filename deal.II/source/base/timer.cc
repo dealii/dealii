@@ -350,6 +350,14 @@ TimerOutput::enter_subsection (const std::string &section_name)
 
   if (sections.find (section_name) == sections.end())
     {
+#ifdef DEAL_II_WITH_MPI
+      if (mpi_communicator != MPI_COMM_SELF)
+        {
+          sections[section_name].timer = Timer(mpi_communicator, true);
+        }
+#endif
+
+
       sections[section_name].total_cpu_time = 0;
       sections[section_name].total_wall_time = 0;
       sections[section_name].n_calls = 0;

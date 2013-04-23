@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="dining_philosophers"
+	ProjectGUID="{bbdf68ee-c8b2-4836-b3fc-385ce2265dc0}"
+	VCNestedProjectGUID="{3894d1d2-a574-4937-ad56-726758efe5b7}"
+	VCNestedProjectFileName="dining_philosophers.vcproj">
+	<Configurations/>
+	<Files/>
+</VisualStudioProject>

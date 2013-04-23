@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="tachyon.serial"
+	ProjectGUID="{E085A8DB-75D4-4927-9631-6368E6D0EE72}"
+	VCNestedProjectGUID="{924517DF-2B6A-47D5-8A11-CC047CC4D8E9}"
+	VCNestedProjectFileName="tachyon.serial.vcproj">
+	<Configurations/>
+	<Files/>
+</VisualStudioProject>

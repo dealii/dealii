@@ -280,7 +280,7 @@ FunctionParser<dim>::initialize(const std::string &,
                                 const bool,
                                 const bool)
 {
-  Assert(false, ExcDisabled("parser"));
+  Assert(false, ExcNeedsFunctionparser());
 }
 
 
@@ -293,7 +293,7 @@ FunctionParser<dim>::initialize(const std::string &,
                                 const bool,
                                 const bool)
 {
-  Assert(false, ExcDisabled("parser"));
+  Assert(false, ExcNeedsFunctionparser());
 }
 
 
@@ -305,7 +305,7 @@ FunctionParser<dim>::initialize(const std::string &,
                                 const bool,
                                 const bool)
 {
-  Assert(false, ExcDisabled("parser"));
+  Assert(false, ExcNeedsFunctionparser());
 }
 
 
@@ -318,7 +318,7 @@ FunctionParser<dim>::initialize(const std::string &,
                                 const bool,
                                 const bool)
 {
-  Assert(false, ExcDisabled("parser"));
+  Assert(false, ExcNeedsFunctionparser());
 }
 
 
@@ -326,7 +326,7 @@ template <int dim>
 double FunctionParser<dim>::value (
   const Point<dim> &, unsigned int) const
 {
-  Assert(false, ExcDisabled("parser"));
+  Assert(false, ExcNeedsFunctionparser());
   return 0.;
 }
 
@@ -335,7 +335,7 @@ template <int dim>
 void FunctionParser<dim>::vector_value (
   const Point<dim> &, Vector<double> &) const
 {
-  Assert(false, ExcDisabled("parser"));
+  Assert(false, ExcNeedsFunctionparser());
 }
 
 

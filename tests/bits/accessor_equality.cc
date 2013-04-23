@@ -92,8 +92,9 @@ void test ()
       {
 	(dof_handler.begin_active() != dof_handler2.begin_active());
       }
-    catch (...)
+    catch (ExceptionBase &e)
       {
+        deallog << e.get_exc_name() << std::endl;
       }
   }
 }
@@ -102,6 +103,7 @@ void test ()
 int main ()
 {
   deal_II_exceptions::disable_abort_on_exception();
+
   std::ofstream logfile("accessor_equality/output");
   deallog.attach(logfile);
   deallog.depth_console(0);

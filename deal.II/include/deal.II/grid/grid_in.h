@@ -164,9 +164,9 @@ struct SubCellData;
  * plug-in script can be found on the deal.II wiki page,
  * http://code.google.com/p/dealii/wiki/MeshInputAndOutput .
  *
- * There is also a little program, written by Jean-Paul Pelteret, that
- * can be found in the <code>contrib/mesh_conversion</code> directory and that can
- * convert Cubit ABAQUS files into UCD format that can be read in as
+ * There is also a little program <code>bin/mesh_conversion</code> (in the directory
+ * where deal.II was installed), written by Jean-Paul Pelteret, that can
+ * convert Cubit ABAQUS files into the UCD format that can be read in as
  * discussed above. The program was designed with the intention of
  * exporting geometries with complex boundary condition surfaces and
  * multiple materials from Cubit - information which is currently not
@@ -174,12 +174,16 @@ struct SubCellData;
  * program is simple: to use it, it needs to be built and run with the
  * command
  * @code
- * ./convert_mesh <spatial_dimension> /path/to/input_file.inp /path/to/output_file.ucd
+ *  /path/to/deal.II/bin/mesh_conversion <spatial_dimension> /path/to/input_file.inp /path/to/output_file.ucd
  * @endcode.
  * More information is available in the readme file included with the
- * program. Note that the program's copyright remains with its author
+ * program and located in the <code>contrib/mesh_conversion/README.txt</code> file in
+ * the deal.II source directory tree. Note that the program's copyright remains with its author
  * and that it is under a separate license than the rest of the
  * library.
+ *
+ * To build the program, see the <code>doc/readmes.html</code> and
+ * <code>doc/development/cmake.html</code> files.
  * </ul>
  *
  *

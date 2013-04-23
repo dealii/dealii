@@ -832,12 +832,19 @@ Point<dim>
 HalfHyperBallBoundary<dim>::
 get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) const
 {
-  // check whether center of object is
-  // at x==0, since then it belongs
-  // to the plane part of the
-  // boundary
+  // check whether center of object is at x==x_center, since then it belongs
+  // to the plane part of the boundary. however, this is not the case if it is
+  // at the outer perimeter
   const Point<dim> line_center = line->center();
-  if (line_center(0) == this->center(0))
+  const Point<dim> vertices[2] = { line->vertex(0), line->vertex(1) };
+
+  if ((line_center(0) == this->center(0))
+      &&
+      ((std::fabs(vertices[0].distance(this->center)-this->radius) >
+	1e-5*this->radius)
+       ||
+       (std::fabs(vertices[1].distance(this->center)-this->radius) >
+	1e-5*this->radius)))
     return line_center;
   else
     return HyperBallBoundary<dim>::get_new_point_on_line (line);

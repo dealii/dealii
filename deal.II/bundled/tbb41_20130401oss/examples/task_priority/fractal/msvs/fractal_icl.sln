@@ -1,0 +1,49 @@
+Microsoft Visual Studio Solution File, Format Version 9.00
+# Visual Studio 2005
+Project("{EAF909A5-FA59-4C3D-9431-0FCC20D5BCF9}") = "fractal", "fractal.icproj", "{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		DD Debug|Win32 = DD Debug|Win32
+		DD Debug|x64 = DD Debug|x64
+		DD Release|Win32 = DD Release|Win32
+		DD Release|x64 = DD Release|x64
+		GDI Debug|Win32 = GDI Debug|Win32
+		GDI Debug|x64 = GDI Debug|x64
+		_GDI Release|Win32 = _GDI Release|Win32
+		_GDI Release|x64 = _GDI Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}.DD Debug|Win32.ActiveCfg = DDDebug|Win32
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}.DD Debug|Win32.Build.0 = DDDebug|Win32
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}.DD Debug|x64.ActiveCfg = DDDebug|x64
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}.DD Debug|x64.Build.0 = DDDebug|x64
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}.DD Release|Win32.ActiveCfg = DDRelease|Win32
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}.DD Release|Win32.Build.0 = DDRelease|Win32
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}.DD Release|x64.ActiveCfg = DDRelease|x64
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}.DD Release|x64.Build.0 = DDRelease|x64
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}.GDI Debug|Win32.ActiveCfg = GDIDebug|x64
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}.GDI Debug|x64.ActiveCfg = GDIRelease|x64
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}.GDI Debug|x64.Build.0 = GDIRelease|x64
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}._GDI Release|Win32.ActiveCfg = GDIRelease|x64
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}._GDI Release|x64.ActiveCfg = GDIRelease|x64
+		{BF088DF5-BAEA-4EB2-8EA5-1E8DFBC75E5C}._GDI Release|x64.Build.0 = GDIRelease|x64
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}._GDI Release|x64.Build.0 = GDIRelease|x64
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}._GDI Release|x64.ActiveCfg = GDIRelease|x64
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}._GDI Release|Win32.ActiveCfg = GDIRelease|x64
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}.GDI Debug|x64.Build.0 = GDIRelease|x64
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}.GDI Debug|x64.ActiveCfg = GDIRelease|x64
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}.GDI Debug|Win32.ActiveCfg = GDIDebug|x64
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}.DD Release|x64.Build.0 = DDRelease|x64
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}.DD Release|x64.ActiveCfg = DDRelease|x64
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}.DD Release|Win32.Build.0 = DDRelease|Win32
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}.DD Release|Win32.ActiveCfg = DDRelease|Win32
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}.DD Debug|x64.Build.0 = DDDebug|x64
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}.DD Debug|x64.ActiveCfg = DDDebug|x64
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}.DD Debug|Win32.Build.0 = DDDebug|Win32
+		{3AA40693-F93D-4D4B-B32E-068F511A2527}.DD Debug|Win32.ActiveCfg = DDDebug|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

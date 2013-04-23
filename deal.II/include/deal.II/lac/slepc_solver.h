@@ -57,8 +57,19 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  * for the generalized eigenvalue problem $Ax=B\lambda x$, where the
  * variable <code>const unsigned int size_of_spectrum</code> tells
- * SLEPc the number of eigenvector/eigenvalue pairs to solve for: See
- * also <code>step-36</code> for a hands-on example.
+ * SLEPc the number of eigenvector/eigenvalue pairs to solve
+ * for. Additional options and solver parameters can be passed to the
+ * SLEPc solvers before calling <code>solve()</code>. For example, if
+ * the matrices of the general eigenspectrum problem are not hermitian
+ * and the lower eigenvalues are wanted only, the following code can
+ * be implemented before calling <code>solve()</code>:
+ * @code
+ *  system.set_problem_type (EPS_NHEP);
+ *  system.set_which_eigenpairs (EPS_SMALLEST_REAL);
+ * @endcode
+ * These options can also be set at the commandline.
+ *
+ * See also <code>step-36</code> for a hands-on example.
  *
  * An alternative implementation to the one above is to use the API
  * internals directly within the application code. In this way the
@@ -90,7 +101,6 @@ DEAL_II_NAMESPACE_OPEN
  * @note Various tweaks and enhancments contributed by Eloy Romero and
  * Jose E. Roman 2009, 2010.
  */
-
 namespace SLEPcWrappers
 {
 
@@ -130,9 +140,9 @@ namespace SLEPcWrappers
      * Set up matrices for solving; Actually solve the system; Gather
      * the solution(s); and reset.
      *
-     * Note that the number of converged eigenvectors can be larger
-     * than the number of eigenvectors requested; this is due to a
-     * round off error (success) of the eigenproblem solver
+     * @note Note that the number of converged eigenvectors can be
+     * larger than the number of eigenvectors requested; this is due
+     * to a round off error (success) of the eigenproblem solver
      * context. If this is found to be the case we simply do not
      * bother with more eigenpairs than requested, but handle that it
      * may be more than specified by ignoring any extras. By default
@@ -158,21 +168,6 @@ namespace SLEPcWrappers
            const unsigned int               n_eigenvectors = 1);
 
     /**
-     * Initialize solver for the linear system $Ax=\lambda x$. (Note:
-     * this is required before calling solve ())
-     */
-    void
-    set_matrices (const PETScWrappers::MatrixBase &A);
-
-    /**
-     * Same as above, but here initialize solver for the linear system
-     * $A x=\lambda B x$.
-     */
-    void
-    set_matrices (const PETScWrappers::MatrixBase &A,
-                  const PETScWrappers::MatrixBase &B);
-
-    /**
      * Set the initial vector for the solver.
      */
     void
@@ -184,6 +179,13 @@ namespace SLEPcWrappers
      */
     void
     set_transformation (SLEPcWrappers::TransformationBase &this_transformation);
+
+    /**
+     * Set target eigenvalues in the spectrum to be computed. By
+     * default, no target is set.
+     */
+    void
+    set_target_eigenvalue (const double &this_target);
 
     /**
      * Indicate which part of the spectrum is to be computed. By
@@ -204,6 +206,71 @@ namespace SLEPcWrappers
      */
     void
     set_problem_type (EPSProblemType set_problem);
+
+    /**
+     * Take the information provided from SLEPc and checks it against
+     * deal.II's own SolverControl objects to see if convergence has
+     * been reached.
+     */
+    void 
+    get_solver_state (const SolverControl::State state);
+
+    /**
+     * Exception. Standard exception.
+     */
+    DeclException0 (ExcSLEPcWrappersUsageError);
+
+    /**
+     * Exception. SLEPc error with error number.
+     */
+    DeclException1 (ExcSLEPcError,
+                    int,
+                    << "    An error with error number " << arg1
+                    << " occurred while calling a SLEPc function");
+
+    /**
+     * Exception. Convergence failure on the number of eigenvectors.
+     */
+    DeclException2 (ExcSLEPcEigenvectorConvergenceMismatchError,
+                    int, int,
+                    << "    The number of converged eigenvectors is " << arg1
+                    << " but " << arg2 << " were requested. ");
+
+    /**
+     * Access to the object that controls convergence.
+     */
+    SolverControl &control () const;
+
+  protected:
+
+    /**
+     * Reference to the object that controls convergence of the
+     * iterative solver.
+     */
+    SolverControl &solver_control;
+
+    /**
+     * Copy of the MPI communicator object to be used for the solver.
+     */
+    const MPI_Comm mpi_communicator;
+
+    /**
+     * Function that takes an Eigenvalue Problem Solver context
+     * object, and sets the type of solver that is requested by the
+     * derived class.
+     */
+    virtual void set_solver_type (EPS &eps) const = 0;
+
+    /**
+     * Reset the solver, and return memory for eigenvectors
+     */
+    void
+    reset ();
+
+    /**
+     * Retrieve the SLEPc solver object that is internally used.
+     */
+    EPS *get_eps ();
 
     /**
      * Solve the linear system for n_eigenvectors
@@ -230,68 +297,24 @@ namespace SLEPcWrappers
                    PETScWrappers::VectorBase &vr);
 
     /**
-     * Reset the solver, and return memory for eigenvectors
+     * Initialize solver for the linear system $Ax=\lambda x$. (Note:
+     * this is required before calling solve ())
      */
     void
-    reset ();
+    set_matrices (const PETScWrappers::MatrixBase &A);
 
     /**
-     * Retrieve the SLEPc solver object that is internally used.
+     * Same as above, but here initialize solver for the linear system
+     * $A x=\lambda B x$.
      */
-    EPS *get_eps ();
+    void
+    set_matrices (const PETScWrappers::MatrixBase &A,
+                  const PETScWrappers::MatrixBase &B);
 
     /**
-     * Take the information provided from SLEPc and checks it against
-     * deal.II's own SolverControl objects to see if convergence has
-     * been reached.
+     * Target eigenvalue to solve for.
      */
-    void get_solver_state (const SolverControl::State state);
-
-    /**
-     * Access to the object that controls convergence.
-     */
-    SolverControl &control () const;
-
-    /**
-     * Exception. Standard exception.
-     */
-    DeclException0 (ExcSLEPcWrappersUsageError);
-
-    /**
-     * Exception. SLEPc error with error number.
-     */
-    DeclException1 (ExcSLEPcError,
-                    int,
-                    << "    An error with error number " << arg1
-                    << " occurred while calling a SLEPc function");
-
-    /**
-     * Exception. Convergence failure on the number of eigenvectors.
-     */
-    DeclException2 (ExcSLEPcEigenvectorConvergenceMismatchError,
-                    int, int,
-                    << "    The number of converged eigenvectors is " << arg1
-                    << " but " << arg2 << " were requested. ");
-
-  protected:
-
-    /**
-     * Reference to the object that controls convergence of the
-     * iterative solver.
-     */
-    SolverControl &solver_control;
-
-    /**
-     * Copy of the MPI communicator object to be used for the solver.
-     */
-    const MPI_Comm mpi_communicator;
-
-    /**
-     * Function that takes an Eigenvalue Problem Solver context
-     * object, and sets the type of solver that is requested by the
-     * derived class.
-     */
-    virtual void set_solver_type (EPS &eps) const = 0;
+    PetscScalar target_eigenvalue;
 
     /**
      * Which portion of the spectrum to solve from.
@@ -302,6 +325,8 @@ namespace SLEPcWrappers
      * Set the eigenspectrum problem type.
      */
     EPSProblemType set_problem;
+
+  private:
 
     /**
      * The matrix $A$ of the generalized eigenvalue problem
@@ -326,8 +351,6 @@ namespace SLEPcWrappers
      * be applied to the eigenvalue problem.
      */
     SLEPcWrappers::TransformationBase *transformation;
-
-  private:
 
     /**
      * A function that can be used in SLEPc as a callback to check on
@@ -643,6 +666,50 @@ namespace SLEPcWrappers
     virtual void set_solver_type (EPS &eps) const;
   };
 
+
+  /**
+   * An implementation of the solver interface using the SLEPc LAPACK
+   * direct solver.
+   *
+   * @ingroup SLEPcWrappers
+   *
+   * @author Toby D. Young 2013
+   */
+  class SolverLAPACK : public SolverBase
+  {
+  public:
+
+    /**
+     * Standardized data struct to pipe additional data to the solver,
+     * should it be needed.
+     */
+    struct AdditionalData
+    {};
+
+    /**
+     * SLEPc solvers will want to have an MPI communicator context
+     * over which computations are parallelized. By default, this
+     * carries the same behaviour has the PETScWrappers, but you can
+     * change that.
+     */
+    SolverLAPACK (SolverControl        &cn,
+		  const MPI_Comm       &mpi_communicator = PETSC_COMM_SELF,
+		  const AdditionalData &data = AdditionalData());
+
+  protected:
+
+    /**
+     * Store a copy of the flags for this particular solver.
+     */
+    const AdditionalData additional_data;
+
+    /**
+     * Function that takes a Eigenvalue Problem Solver context object,
+     * and sets the type of solver that is appropriate for this class.
+     */
+    virtual void set_solver_type (EPS &eps) const;
+  };
+
   // --------------------------- inline and template functions -----------
   /**
    * This is declared here to make it possible to take a std::vector
@@ -662,7 +729,7 @@ namespace SLEPcWrappers
     unsigned int n_converged = 0;
 
     // Set the matrices of the problem
-    set_matrices (A);
+    set_matrices (A); 
 
     // and solve
     solve (n_eigenvectors, &n_converged);
@@ -682,11 +749,11 @@ namespace SLEPcWrappers
 
   template <typename OutputVector>
   void
-  SolverBase::solve (const PETScWrappers::MatrixBase &A,
-                     const PETScWrappers::MatrixBase &B,
-                     std::vector<double>             &kr,
-                     std::vector<OutputVector>       &vr,
-                     const unsigned int               n_eigenvectors)
+    SolverBase::solve (const PETScWrappers::MatrixBase &A,
+		       const PETScWrappers::MatrixBase &B,
+		       std::vector<double>             &kr,
+		       std::vector<OutputVector>       &vr,
+		       const unsigned int               n_eigenvectors)
   {
     // Panic if no eigenpairs are wanted.
     AssertThrow (n_eigenvectors != 0, ExcSLEPcWrappersUsageError());

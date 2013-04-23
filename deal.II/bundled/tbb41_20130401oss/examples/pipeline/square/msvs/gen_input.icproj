@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="windows-1251"?>
+<VisualStudioProject
+	ProjectType="Intel C++ Project"
+	Version="11.1"
+	Name="gen_input"
+	ProjectGUID="{18ECAB6C-2630-4F8F-BEF2-3DBDEF7355AA}"
+	VCNestedProjectGUID="{25A46A49-406F-4681-8AC9-5FE46F38E5A7}"
+	VCNestedProjectFileName="gen_input.vcproj">
+	<Configurations/>
+	<Files/>
+</VisualStudioProject>

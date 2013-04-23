@@ -40,75 +40,58 @@ namespace
 }
 
 
+// The standard log object of deal.II:
 LogStream deallog;
 
 
 LogStream::LogStream()
   :
-  std_out(&std::cerr), file(0),
-  std_depth(10000), file_depth(10000),
-  print_utime(false), diff_utime(false),
-  last_time (0.), double_threshold(0.), float_threshold(0.),
-  offset(0), old_cerr(0)
+  std_out(&std::cerr),
+  file(0),
+  std_depth(10000),
+  file_depth(10000),
+  print_utime(false),
+  diff_utime(false),
+  last_time (0.),
+  double_threshold(0.),
+  float_threshold(0.),
+  offset(0),
+  old_cerr(0),
+  at_newline(true),
+  stream_flags(std::ios::showpoint | std::ios::left),
+  stream_width(std::cout.width()),
+  stream_precision(std::cout.precision())
 {
-  prefixes.push("DEAL:");
-  std_out->setf(std::ios::showpoint | std::ios::left);
+  get_prefixes().push("DEAL:");
+
 #if defined(HAVE_UNISTD_H) && defined(HAVE_TIMES)
   reference_time_val = 1./sysconf(_SC_CLK_TCK) * times(&reference_tms);
 #endif
+
 }
 
 
 LogStream::~LogStream()
 {
-  // if there was anything left in
-  // the stream that is current to
-  // this thread, make sure we flush
-  // it before it gets lost
+  // if there was anything left in the stream that is current to this
+  // thread, make sure we flush it before it gets lost
   {
-    const unsigned int id = Threads::this_thread_id();
-    if ((outstreams.find(id) != outstreams.end())
-        &&
-        (*outstreams[id] != 0)
-        &&
-        (outstreams[id]->str().length() > 0))
+    if (get_stream().str().length() > 0)
       {
-        // except the situation is
-        // not quite that simple. if
-        // this object is the
-        // 'deallog' object, then it
-        // is destroyed upon exit of
-        // the program. since it's
-        // defined in a shared
-        // library that depends on
-        // libstdc++.so, destruction
-        // happens before destruction
-        // of std::cout/cerr, but
-        // after all file variables
-        // defined in user programs
-        // have been destroyed. in
-        // other words, if we get
-        // here and the object being
-        // destroyed is 'deallog' and
-        // if 'deallog' is associated
-        // with a file stream, then
-        // we're in trouble: we'll
-        // try to write to a file
-        // that doesn't exist any
-        // more, and we're likely
-        // going to crash (this is
-        // tested by
-        // base/log_crash_01). rather
-        // than letting it come to
-        // this, print a message to
-        // the screen (note that we
-        // can't issue an assertion
-        // here either since Assert
-        // may want to write to
-        // 'deallog' itself, and
-        // AssertThrow will throw an
-        // exception that can't be
-        // caught)
+        // except the situation is not quite that simple. if this object is
+        // the 'deallog' object, then it is destroyed upon exit of the
+        // program. since it's defined in a shared library that depends on
+        // libstdc++.so, destruction happens before destruction of
+        // std::cout/cerr, but after all file variables defined in user
+        // programs have been destroyed. in other words, if we get here and
+        // the object being destroyed is 'deallog' and if 'deallog' is
+        // associated with a file stream, then we're in trouble: we'll try
+        // to write to a file that doesn't exist any more, and we're likely
+        // going to crash (this is tested by base/log_crash_01). rather
+        // than letting it come to this, print a message to the screen
+        // (note that we can't issue an assertion here either since Assert
+        // may want to write to 'deallog' itself, and AssertThrow will
+        // throw an exception that can't be caught)
         if ((this == &deallog) && file)
           std::cerr << ("You still have content that was written to 'deallog' "
                         "but not flushed to the screen or a file while the "
@@ -124,27 +107,6 @@ LogStream::~LogStream()
 
   if (old_cerr)
     std::cerr.rdbuf(old_cerr);
-
-  // on some systems, destroying the
-  // outstreams objects of deallog
-  // triggers some sort of memory
-  // corruption, in particular when
-  // we also link with Trilinos;
-  // since this happens at the very
-  // end of the program, we take the
-  // liberty to simply not do it by
-  // putting that object into a
-  // deliberate memory leak and
-  // instead destroying an empty
-  // object
-#ifdef DEAL_II_WITH_TRILINOS
-  if (this == &deallog)
-    {
-      stream_map_type *dummy = new stream_map_type();
-      dummy->swap (outstreams);
-      delete dummy;
-    }
-#endif
 }
 
 
@@ -170,48 +132,51 @@ LogStream::test_mode(bool on)
 LogStream &
 LogStream::operator<< (std::ostream& (*p) (std::ostream &))
 {
-  // do the work that is common to
-  // the operator<< functions
-  print (p);
 
-  // next check whether this is the
-  // <tt>endl</tt> manipulator, and if so
-  // set a flag
+  std::ostringstream &stream = get_stream();
+  // save the state of out stream
+  std::ios::fmtflags old_flags = stream.flags(stream_flags);
+  unsigned int old_precision = stream.precision (stream_precision);
+  unsigned int old_width = stream.width (stream_width);
+
+  // Print to the internal stringstream:
+  stream << p;
+
+  // Next check whether this is the <tt>flush</tt> or <tt>endl</tt>
+  // manipulator, and if so print out the message.
+  std::ostream & (* const p_flush) (std::ostream &) = &std::flush;
   std::ostream & (* const p_endl) (std::ostream &) = &std::endl;
-  if (p == p_endl)
+  if (p == p_flush || p == p_endl)
     {
       Threads::Mutex::ScopedLock lock(write_lock);
-      print_line_head();
-      std::ostringstream &stream = get_stream();
-      if (prefixes.size() <= std_depth)
+
+      // Print the line head in case of a newline:
+      if (at_newline)
+        print_line_head();
+
+      if(p == p_flush)
+        at_newline = false;
+
+      if(p == p_endl)
+        at_newline = true;
+
+      if (get_prefixes().size() <= std_depth)
         *std_out << stream.str();
 
-      if (file && (prefixes.size() <= file_depth))
+      if (file && (get_prefixes().size() <= file_depth))
         *file << stream.str() << std::flush;
 
       // Start a new string
       stream.str("");
     }
+
+  // reset output format
+  stream.flags (old_flags);
+  stream.precision(old_precision);
+  stream.width(old_width);
+
   return *this;
 }
-
-
-std::ostringstream &
-LogStream::get_stream()
-{
-//TODO: use a ThreadLocalStorage object here
-  Threads::Mutex::ScopedLock lock(log_lock);
-  const unsigned int id = Threads::this_thread_id();
-
-  // if necessary allocate a stream object
-  if (outstreams.find (id) == outstreams.end())
-    {
-      outstreams[id].reset (new std::ostringstream());
-      outstreams[id]->setf(std::ios::showpoint | std::ios::left);
-    }
-  return *outstreams[id];
-}
-
 
 
 void
@@ -271,26 +236,57 @@ LogStream::has_file() const
 const std::string &
 LogStream::get_prefix() const
 {
-  return prefixes.top();
+  return get_prefixes().top();
 }
 
 
 void
 LogStream::push (const std::string &text)
 {
-  Threads::Mutex::ScopedLock lock(log_lock);
-  std::string pre=prefixes.top();
+  std::string pre=get_prefixes().top();
   pre += text;
   pre += std::string(":");
-  prefixes.push(pre);
+  get_prefixes().push(pre);
 }
 
 
 void LogStream::pop ()
 {
+  if (get_prefixes().size() > 1)
+    get_prefixes().pop();
+}
+
+
+std::ios::fmtflags
+LogStream::flags(const std::ios::fmtflags f)
+{
   Threads::Mutex::ScopedLock lock(log_lock);
-  if (prefixes.size() > 1)
-    prefixes.pop();
+
+  std::ios::fmtflags tmp = stream_flags;
+  stream_flags = f;
+  return tmp;
+}
+
+
+std::streamsize
+LogStream::precision (const std::streamsize prec)
+{
+  Threads::Mutex::ScopedLock lock(log_lock);
+
+  std::streamsize tmp = stream_precision;
+  stream_precision = prec;
+  return tmp;
+}
+
+
+std::streamsize
+LogStream::width (const std::streamsize wide)
+{
+  Threads::Mutex::ScopedLock lock(log_lock);
+
+  std::streamsize tmp = stream_width;
+  stream_width = wide;
+  return tmp;
 }
 
 
@@ -359,6 +355,38 @@ LogStream::log_thread_id (const bool flag)
   return h;
 }
 
+std::stack<std::string> &
+LogStream::get_prefixes() const
+{
+#ifdef DEAL_II_WITH_THREADS
+  bool exists = false;
+  std::stack<std::string> &local_prefixes = prefixes.get(exists);
+
+  // If this is a new locally stored stack, copy the "blessed" prefixes
+  // from the initial thread that created logstream.
+  if(! exists)
+    {
+      const tbb::enumerable_thread_specific<std::stack<std::string> > &impl
+        = prefixes.get_implementation();
+
+      // The thread that created this LogStream object should be the first
+      // in tbb's enumerable_thread_specific containter.
+      const tbb::enumerable_thread_specific<std::stack<std::string> >::const_iterator first_elem
+        = impl.begin();
+
+      if (first_elem != impl.end())
+        {
+          local_prefixes = *first_elem;
+        }
+    }
+
+  return local_prefixes;
+
+#else
+  return prefixes.get();
+#endif
+}
+
 
 void
 LogStream::print_line_head()
@@ -416,7 +444,7 @@ LogStream::print_line_head()
   const std::string &head = get_prefix();
   const unsigned int thread = Threads::this_thread_id();
 
-  if (prefixes.size() <= std_depth)
+  if (get_prefixes().size() <= std_depth)
     {
       if (print_utime)
         {
@@ -433,7 +461,7 @@ LogStream::print_line_head()
       *std_out <<  head << ':';
     }
 
-  if (file && (prefixes.size() <= file_depth))
+  if (file && (get_prefixes().size() <= file_depth))
     {
       if (print_utime)
         {
@@ -475,17 +503,20 @@ LogStream::timestamp ()
 std::size_t
 LogStream::memory_consumption () const
 {
+  // TODO
+  Assert(false, ExcNotImplemented());
+
   std::size_t mem = sizeof(*this);
   // to determine size of stack
   // elements, we have to copy the
   // stack since we can't access
   // elements from further below
-  std::stack<std::string> tmp = prefixes;
-  while (tmp.empty() == false)
-    {
-      mem += MemoryConsumption::memory_consumption (tmp.top());
-      tmp.pop ();
-    }
+//   std::stack<std::string> tmp = prefixes;
+//   while (tmp.empty() == false)
+//     {
+//       mem += MemoryConsumption::memory_consumption (tmp.top());
+//       tmp.pop ();
+//     }
 
   return mem;
 }

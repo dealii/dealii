@@ -68,23 +68,24 @@ void test ()
 				// try to add an invalid list of indices to
 				// first and last row, should throw an
 				// exception
-  deal_II_exceptions::disable_abort_on_exception();
   for (unsigned int i=0; i<m.m(); ++i)
     values[i] = 0.5*i - 1.5;
   try
     {
       m.add(0,m.m(),&indices[0], &values[0], false, true);
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
 
   try
     {
       m.add(m.m()-1,m.m(),&indices[0], &values[0], false, true);
     }
-  catch (...)
+  catch (ExceptionBase &e)
     {
+      deallog << e.get_exc_name() << std::endl;
     }
 
   deallog << "OK" << std::endl;
@@ -94,6 +95,8 @@ void test ()
 
 int main ()
 {
+  deal_II_exceptions::disable_abort_on_exception();
+
   std::ofstream logfile("sparse_matrix_add_entries_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);

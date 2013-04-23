@@ -14,7 +14,7 @@
 
 #
 # Remove -Wall and -pedantic from CMAKE_CXX_FLAGS (in directory scope) to
-# aboid some annoying warnings...
+# avoid some annoying warnings...
 #
 STRIP_FLAG(CMAKE_CXX_FLAGS "-Wall")
 STRIP_FLAG(CMAKE_CXX_FLAGS "-pedantic")

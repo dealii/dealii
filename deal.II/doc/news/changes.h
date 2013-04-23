@@ -25,6 +25,20 @@ inconvenience this causes.
 
 <ol>
 
+<li> Changed: Internal structures of ExceptionBase are now thread safe. The
+Assert macro does not print an exception to deallog any more prior to
+throwing if deal_II_exceptions::abort_on_exception==false. Removed: A
+number of obsolete Exceptions that are not used in the library any more.
+<br>
+(Matthias Maier, 2013/04/16)
+
+<li> Removed: A number of header files that have been deprecated a long time
+ago have been removed. All of them had previously only included the header file
+that had superseded them. To upgrade, simply include the currently used
+header file. This is also backward compatible with deal.II 7.3.
+<br>
+(Guido Kanschat, 2013/04/12)
+
 <li> Removed: The interfaces to the obsolete direct solvers MA27 and MA47 from
 the Harwell Subroutine Library. Support for the HSL routines were not ported to
 the new build system. However, the sparse direct solver UMFPACK remains to be
@@ -32,7 +46,6 @@ supported and is provided as part of the standard deal.II distribution, unlike
 the HSL functions.
 <br>
 (Matthias Maier, 2013/04/01)
-
 
 <li> Changed: The TimeDependent::end_sweep function with an argument indicating
 the number of threads has been removed. Use the corresponding function without
@@ -51,17 +64,25 @@ this function.
 
 
 <ol>
+  <li> New: The step-49 tutorial program now also has a discussion on
+  what to do once you have a coarse mesh and want to refine it.
+  <br>
+  (Wolfgang Bangerth, 2013/04/03)
+  </li>
+
   <li> New: The number of threads used by deal.II/TBB can now be limited at
   run time. Using MPI based code using PETSc/Trilinos no longer requires you
   to compile the library without threads. See MPI_InitFinalize and
   MultithreadInfo::set_thread_limit for details.
-  </li>
+  <br>
   (Timo Heister, 2013/03/26)
+  </li>
 
   <li> New: The results section of step-36 now explains how to use ARPACK
   as an alternative to SLEPc as eigenvalue solver.
   <br>
   (Juan Carlos Araujo Cabarcas, 2013/03/25)
+  </li>
 
   <li> New: deal.II now uses <a href="http://www.cmake.org/">CMake</a>
   as its configuration and build tool. Please read through the
@@ -79,6 +100,7 @@ this function.
   </ul>
   <br>
   (Matthias Maier, 2013/03/07)
+  </li>
 </ol>
 
 
@@ -88,6 +110,76 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> Fixed: PETScWrappers::VectorBase::print now saves and restores
+the precision
+and width associated with the stream it prints to around setting
+the values passed as arguments.
+<br>
+(Fahad Alrashed, 2013/04/22)
+</li>
+
+<li> Fixed: FullMatrix::print now saves and restores the precision
+and width associated with the stream it prints to around setting
+the values passed as arguments.
+<br>
+(Fahad Alrashed, 2013/04/22)
+</li>
+
+<li> New: LogStream now has member functions LogStream::width,
+LogStream::precision and LogStream::flags that make it look more
+like normal objects of type <code>std::ostream</code>.
+<br>
+(Fahad Alrashed, 2013/04/22)
+</li>
+
+<li> New: SparseDirectUMFPACK has long had the ability to work with
+BlockSparseMatrix objects, but couldn't deal with BlockVector objects.
+This is now fixed.
+<br>
+(Wolfgang Bangerth, 2013/04/21)
+</li>
+
+<li> New: Class TimerOutput::Scope does automatic scope based enter/
+exit_section of a TimerOutput object.
+<br>
+(Timo Heister, 2013/04/18)
+</li>
+
+<li> Fixed: TimerOutput constructed with an MPI_COMM in wall_time
+mode now constructs synchronized Timer objects. This gives reliable
+parallel benchmark timings.
+<br>
+(Timo Heister, 2013/04/18)
+</li>
+
+<li> Improved and Fixed: LogStream (and deallog) now respect std::flush in
+addition to std::endl to write out content to the console/file.
+Furthermore, LogStream::push(...) and LogStream::pop() now work in a thread
+safe manner.
+<br>
+(Matthias Maier, 2013/04/18)
+</li>
+
+<li> Fixed: The HalfHyperShellBoundary class got refining
+the edges that sit at the perimeter of the circular face of the domain
+wrong. This is now fixed.
+<br>
+(Wolfgang Bangerth, J&ouml;rg Frohne, 2013/04/17)
+</li>
+
+<li> New: Functions::FEFieldFunction can now deal with
+parallel::distributed::Triangulation objects.
+<br>
+(Wolfgang Bangerth, 2013/04/15)
+</li>
+
+<li> New: There is now a version of SparseMatrix::copy_from that can copy
+from TrilinosWrappers::SparseMatrix.
+<br>
+(Wolfgang Bangerth, J&ouml;rg Frohne, 2013/04/15)
+</li>
+
 <li> Improved: The SolverCG implementation now uses only three auxiliary
 vectors, down from previously four. Also, there are some shortcuts in case
 PreconditionIdentity is used that improve the solver's performance.

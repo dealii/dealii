@@ -321,6 +321,41 @@ class TimerOutput
 {
 public:
   /**
+   * Helper class to enter/exit sections in TimerOutput be constructing
+   * a simple scope-based object.
+   */
+  class Scope
+  {
+  public:
+    /**
+     * Enter the given section in the timer. Exit automatically when calling
+     * stop() or destructor runs.
+     */
+    Scope(dealii::TimerOutput &timer_, const std::string &section_name);
+
+    /**
+     * Destructor calls stop()
+     */
+    ~Scope();
+
+    /**
+     * In case you want to exit the scope before the destructor is executed,
+     * call this function.
+     */
+    void stop();
+
+  private:
+    /**
+     * Reference to the TimerOutput object
+     */
+    dealii::TimerOutput & timer;
+    /**
+     * Do we still need to exit the section we are in?
+     */
+    bool in;
+  };
+
+  /**
    * Sets whether to generate output every
    * time we exit a section, just in the
    * end, both, or never.
@@ -408,6 +443,8 @@ public:
    * Same as @p enter_subsection.
    */
   void enter_section (const std::string &section_name);
+
+  //TODO: make some of these functions DEPRECATED (I would keep enter/exit_section)
 
   /**
    * Leave a section. If no name is given,
@@ -581,6 +618,30 @@ void
 TimerOutput::exit_section (const std::string &section_name)
 {
   leave_subsection(section_name);
+}
+
+inline
+TimerOutput::Scope::Scope(dealii::TimerOutput &timer_, const std::string &section_name)
+:
+timer(timer_), in(true)
+{
+  timer.enter_section(section_name);
+}
+
+inline
+TimerOutput::Scope::~Scope()
+{
+  stop();
+}
+
+inline
+void
+TimerOutput::Scope::stop()
+{
+  if (!in) return;
+  in=false;
+
+  timer.exit_section();
 }
 
 
