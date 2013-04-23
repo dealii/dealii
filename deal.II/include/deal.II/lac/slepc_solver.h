@@ -57,7 +57,6 @@ DEAL_II_NAMESPACE_OPEN
  * @endcode
  * for the generalized eigenvalue problem $Ax=B\lambda x$, where the
  * variable <code>const unsigned int size_of_spectrum</code> tells
-
  * SLEPc the number of eigenvector/eigenvalue pairs to solve
  * for. Additional options and solver parameters can be passed to the
  * SLEPc solvers before calling <code>solve()</code>. For example, if
