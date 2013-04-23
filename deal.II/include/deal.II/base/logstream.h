@@ -330,6 +330,30 @@ public:
 
 
   /**
+   * set the precision for the underlying stream and returns the
+   * previous stream precision. This fuction mimics
+   * http://www.cplusplus.com/reference/ios/ios_base/precision/
+   */
+  std::streamsize precision (const std::streamsize prec);
+
+
+  /**
+   * set the width for the underlying stream and returns the
+   * previous stream width. This fuction mimics
+   * http://www.cplusplus.com/reference/ios/ios_base/width/
+   */
+  std::streamsize width (const std::streamsize wide);
+
+
+  /**
+   * set the flags for the underlying stream and returns the
+   * previous stream flags. This fuction mimics
+   * http://www.cplusplus.com/reference/ios/ios_base/flags/
+   */
+  std::ios::fmtflags flags(const std::ios::fmtflags f);
+
+
+  /**
    * Output a constant something through this stream.
    */
   template <typename T>
@@ -508,6 +532,27 @@ private:
   bool at_newline;
 
   /**
+   * The flags used to modify how
+   * the stream returned by get_stream() is used.
+   */
+  std::ios_base::fmtflags stream_flags;
+
+  /**
+   * The minimum width of characters
+   * used to represent a number. Used by width() to
+   * change the stream return by get_stream()
+   */
+  std::streamsize stream_width;
+
+  /**
+   * The maximum width of characters
+   * used to represent a floating point number.
+   * Used by precision() to
+   * change the stream return by get_stream()
+   */
+  std::streamsize stream_precision;
+
+  /**
    * Print head of line. This prints optional time information and the
    * contents of the prefix stack.
    */
@@ -520,7 +565,6 @@ private:
    */
   std::ostringstream &get_stream()
   {
-    outstreams.get().setf(std::ios::showpoint | std::ios::left);
     return outstreams.get();
   }
 
@@ -541,8 +585,22 @@ inline
 LogStream &
 LogStream::operator<< (const T &t)
 {
-  // print to the internal stringstream:
-  get_stream() << t;
+  // save the state of the output stream
+  std::ostringstream &stream = get_stream();
+  
+  const std::ios::fmtflags old_flags = stream.flags(stream_flags);
+  const unsigned int old_precision = stream.precision (stream_precision);
+  const unsigned int old_width = stream.width (stream_width);
+
+  // print to the internal stringstream, using the flags we have just set for
+  // the stream object:
+  stream << t;
+
+  // reset output format to whatever it was before
+  stream.flags (old_flags);
+  stream.precision(old_precision);
+  stream.width(old_width);
+
   return *this;
 }
 
@@ -552,16 +610,27 @@ inline
 LogStream &
 LogStream::operator<< (const double t)
 {
+  // save the state of out stream
+  std::ostringstream &stream = get_stream();
+  const std::ios::fmtflags old_flags = stream.flags(stream_flags);
+  const unsigned int old_precision = stream.precision (stream_precision);
+  const unsigned int old_width = stream.width (stream_width);
+
   // we have to make sure that we don't catch NaN's and +-Inf's with the
   // test, because for these denormals all comparisons are always false.
   // thus, for a NaN, both t<=0 and t>=0 are false at the same time, which
   // can't be said for any other number
   if (! (t<=0) && !(t>=0))
-    get_stream() << t;
+    stream << t;
   else if (std::fabs(t) < double_threshold)
-    get_stream() << '0';
+    stream << '0';
   else
-    get_stream() << t*(1.+offset);
+    stream << t*(1.+offset);
+
+  // reset output format
+  stream.flags (old_flags);
+  stream.precision(old_precision);
+  stream.width(old_width);
 
   return *this;
 }
@@ -572,16 +641,27 @@ inline
 LogStream &
 LogStream::operator<< (const float t)
 {
+  // save the state of out stream
+  std::ostringstream &stream = get_stream();
+  const std::ios::fmtflags old_flags = stream.flags(stream_flags);
+  const unsigned int old_precision = stream.precision (stream_precision);
+  const unsigned int old_width = stream.width (stream_width);
+
   // we have to make sure that we don't catch NaN's and +-Inf's with the
   // test, because for these denormals all comparisons are always false.
   // thus, for a NaN, both t<=0 and t>=0 are false at the same time, which
   // can't be said for any other number
   if (! (t<=0) && !(t>=0))
-    get_stream() << t;
+    stream << t;
   else if (std::fabs(t) < float_threshold)
-    get_stream() << '0';
+    stream << '0';
   else
-    get_stream() << t*(1.+offset);
+    stream << t*(1.+offset);
+
+  // reset output format
+  stream.flags (old_flags);
+  stream.precision(old_precision);
+  stream.width(old_width);
 
   return *this;
 }

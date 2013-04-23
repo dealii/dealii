@@ -111,6 +111,13 @@ this function.
 
 <ol>
 
+<li> New: LogStream now has member functions LogStream::width,
+LogStream::precision and LogStream::flags that make it look more
+like normal objects of type <code>std::ostream</code>.
+<br>
+(Fahad Alrashed, 2013/04/22)
+</li>
+
 <li> New: SparseDirectUMFPACK has long had the ability to work with
 BlockSparseMatrix objects, but couldn't deal with BlockVector objects.
 This is now fixed.
