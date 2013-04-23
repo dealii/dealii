@@ -587,19 +587,10 @@ LogStream::operator<< (const T &t)
 {
   // save the state of the output stream
   std::ostringstream &stream = get_stream();
-  
-  const std::ios::fmtflags old_flags = stream.flags(stream_flags);
-  const unsigned int old_precision = stream.precision (stream_precision);
-  const unsigned int old_width = stream.width (stream_width);
 
   // print to the internal stringstream, using the flags we have just set for
   // the stream object:
   stream << t;
-
-  // reset output format to whatever it was before
-  stream.flags (old_flags);
-  stream.precision(old_precision);
-  stream.width(old_width);
 
   return *this;
 }
@@ -612,9 +603,6 @@ LogStream::operator<< (const double t)
 {
   // save the state of out stream
   std::ostringstream &stream = get_stream();
-  const std::ios::fmtflags old_flags = stream.flags(stream_flags);
-  const unsigned int old_precision = stream.precision (stream_precision);
-  const unsigned int old_width = stream.width (stream_width);
 
   // we have to make sure that we don't catch NaN's and +-Inf's with the
   // test, because for these denormals all comparisons are always false.
@@ -627,11 +615,6 @@ LogStream::operator<< (const double t)
   else
     stream << t*(1.+offset);
 
-  // reset output format
-  stream.flags (old_flags);
-  stream.precision(old_precision);
-  stream.width(old_width);
-
   return *this;
 }
 
@@ -643,9 +626,6 @@ LogStream::operator<< (const float t)
 {
   // save the state of out stream
   std::ostringstream &stream = get_stream();
-  const std::ios::fmtflags old_flags = stream.flags(stream_flags);
-  const unsigned int old_precision = stream.precision (stream_precision);
-  const unsigned int old_width = stream.width (stream_width);
 
   // we have to make sure that we don't catch NaN's and +-Inf's with the
   // test, because for these denormals all comparisons are always false.
@@ -657,11 +637,6 @@ LogStream::operator<< (const float t)
     stream << '0';
   else
     stream << t*(1.+offset);
-
-  // reset output format
-  stream.flags (old_flags);
-  stream.precision(old_precision);
-  stream.width(old_width);
 
   return *this;
 }
