@@ -49,6 +49,7 @@ namespace SLEPcWrappers
     :
     solver_control (cn),
     mpi_communicator (mpi_communicator),
+    target_eigenvalue (PETSC_NULL),
     set_which (EPS_LARGEST_MAGNITUDE),
     set_problem (EPS_NHEP),
     opA (NULL),
@@ -87,6 +88,12 @@ namespace SLEPcWrappers
   SolverBase::set_transformation (SLEPcWrappers::TransformationBase &this_transformation)
   {
     transformation = &this_transformation;
+  }
+
+  void
+  SolverBase::set_target_eigenvalue (const double &this_target)
+  {
+    target_eigenvalue = this_target;
   }
 
   void
@@ -147,6 +154,10 @@ namespace SLEPcWrappers
     if (transformation)
       transformation->set_context (solver_data->eps);
 
+    // set target eigenvalues to solve for
+    ierr = EPSSetTarget (solver_data->eps, target_eigenvalue);
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+    
     // set which portion of the eigenspectrum to solve for
     ierr = EPSSetWhichEigenpairs (solver_data->eps, set_which);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
