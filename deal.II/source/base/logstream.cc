@@ -260,6 +260,8 @@ void LogStream::pop ()
 std::ios::fmtflags
 LogStream::flags(const std::ios::fmtflags f)
 {
+  Threads::Mutex::ScopedLock lock(log_lock);
+
   std::ios::fmtflags tmp = stream_flags;
   stream_flags = f;
   return tmp;
@@ -269,6 +271,8 @@ LogStream::flags(const std::ios::fmtflags f)
 std::streamsize
 LogStream::precision (const std::streamsize prec)
 {
+  Threads::Mutex::ScopedLock lock(log_lock);
+
   std::streamsize tmp = stream_precision;
   stream_precision = prec;
   return tmp;
@@ -278,6 +282,8 @@ LogStream::precision (const std::streamsize prec)
 std::streamsize
 LogStream::width (const std::streamsize wide)
 {
+  Threads::Mutex::ScopedLock lock(log_lock);
+
   std::streamsize tmp = stream_width;
   stream_width = wide;
   return tmp;
