@@ -298,11 +298,13 @@ FESystem<dim,spacedim>::FESystem (const FiniteElement<dim,spacedim> &fe1,
   fes.push_back(&fe2);
   fes.push_back(&fe3);
   fes.push_back(&fe4);
+  fes.push_back(&fe5);
   std::vector<unsigned int> multiplicities;
   multiplicities.push_back(n1);
   multiplicities.push_back(n2);
   multiplicities.push_back(n3);
   multiplicities.push_back(n4);
+  multiplicities.push_back(n5);
   initialize(fes, multiplicities);
 }
 
