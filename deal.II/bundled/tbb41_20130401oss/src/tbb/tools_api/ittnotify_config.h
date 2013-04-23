@@ -264,7 +264,7 @@ INLINE int __TBB_machine_fetchadd4(volatile void* ptr, long addend)
     int result;
     __asm__ __volatile__("lock\nxaddl %0,%1"
                           : "=r"(result),"=m"(*(long*)ptr)
-                          : "0"(addend), "m"(*(long*)ptr)
+                          : "0"((int)addend), "m"(*(long*)ptr)
                           : "memory");
     return result;
 }
