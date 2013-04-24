@@ -565,6 +565,8 @@ private:
    */
   std::ostringstream &get_stream()
   {
+    // ??? why the following?
+    outstreams.get().setf(std::ios::showpoint | std::ios::left);
     return outstreams.get();
   }
 
