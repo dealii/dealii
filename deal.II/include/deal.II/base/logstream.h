@@ -532,27 +532,6 @@ private:
   bool at_newline;
 
   /**
-   * The flags used to modify how
-   * the stream returned by get_stream() is used.
-   */
-  std::ios_base::fmtflags stream_flags;
-
-  /**
-   * The minimum width of characters
-   * used to represent a number. Used by width() to
-   * change the stream return by get_stream()
-   */
-  std::streamsize stream_width;
-
-  /**
-   * The maximum width of characters
-   * used to represent a floating point number.
-   * Used by precision() to
-   * change the stream return by get_stream()
-   */
-  std::streamsize stream_precision;
-
-  /**
    * Print head of line. This prints optional time information and the
    * contents of the prefix stack.
    */
@@ -604,12 +583,8 @@ inline
 LogStream &
 LogStream::operator<< (const T &t)
 {
-  // save the state of the output stream
-  std::ostringstream &stream = get_stream();
-
-  // print to the internal stringstream, using the flags we have just set for
-  // the stream object:
-  stream << t;
+  // print to the internal stringstream
+  get_stream() << t;
 
   return *this;
 }
@@ -620,7 +595,6 @@ inline
 LogStream &
 LogStream::operator<< (const double t)
 {
-  // save the state of out stream
   std::ostringstream &stream = get_stream();
 
   // we have to make sure that we don't catch NaN's and +-Inf's with the
@@ -643,7 +617,6 @@ inline
 LogStream &
 LogStream::operator<< (const float t)
 {
-  // save the state of out stream
   std::ostringstream &stream = get_stream();
 
   // we have to make sure that we don't catch NaN's and +-Inf's with the

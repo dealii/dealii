@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -57,10 +57,7 @@ LogStream::LogStream()
   float_threshold(0.),
   offset(0),
   old_cerr(0),
-  at_newline(true),
-  stream_flags(std::ios::showpoint | std::ios::left),
-  stream_width(std::cout.width()),
-  stream_precision(std::cout.precision())
+  at_newline(true)
 {
   get_prefixes().push("DEAL:");
 
@@ -134,10 +131,6 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
 {
 
   std::ostringstream &stream = get_stream();
-  // save the state of out stream
-  std::ios::fmtflags old_flags = stream.flags(stream_flags);
-  unsigned int old_precision = stream.precision (stream_precision);
-  unsigned int old_width = stream.width (stream_width);
 
   // Print to the internal stringstream:
   stream << p;
@@ -169,11 +162,6 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
       // Start a new string
       stream.str("");
     }
-
-  // reset output format
-  stream.flags (old_flags);
-  stream.precision(old_precision);
-  stream.width(old_width);
 
   return *this;
 }
@@ -260,33 +248,21 @@ void LogStream::pop ()
 std::ios::fmtflags
 LogStream::flags(const std::ios::fmtflags f)
 {
-  Threads::Mutex::ScopedLock lock(log_lock);
-
-  std::ios::fmtflags tmp = stream_flags;
-  stream_flags = f;
-  return tmp;
+  return get_stream().flags (f);
 }
 
 
 std::streamsize
 LogStream::precision (const std::streamsize prec)
 {
-  Threads::Mutex::ScopedLock lock(log_lock);
-
-  std::streamsize tmp = stream_precision;
-  stream_precision = prec;
-  return tmp;
+  return get_stream().precision (prec);
 }
 
 
 std::streamsize
 LogStream::width (const std::streamsize wide)
 {
-  Threads::Mutex::ScopedLock lock(log_lock);
-
-  std::streamsize tmp = stream_width;
-  stream_width = wide;
-  return tmp;
+  return get_stream().width (wide);
 }
 
 
