@@ -3789,8 +3789,9 @@ FEEvaluationGeneral<dim,fe_degree,n_q_points_1d,n_components_,Number>
 namespace internal
 {
   // evaluates the given shape data in 1d-3d using the tensor product
-  // form. does not use the tensor product form and corresponds to a usual
-  // matrix-matrix product
+  // form. does not use a particular layout of entries in the matrices
+  // like the functions below and corresponds to a usual matrix-matrix
+  // product
   template <int dim, int fe_degree, int n_q_points_1d, typename Number,
            int direction, bool dof_to_quad, bool add>
   inline
@@ -3855,6 +3856,724 @@ namespace internal
           {
             in += nn*(mm-1);
             out += nn*(nn-1);
+          }
+      }
+  }
+
+
+
+  // This method specializes the general application of tensor-product based
+  // elements for "symmetric" finite elements, i.e., when the shape functions
+  // are symmetric about 0.5 and the quadrature points are, too. In that case,
+  // the 1D shape values read (sorted lexicographically, rows run over 1D
+  // dofs, columns over quadrature points):
+  // Q2 --> [ 0.687  0 -0.087 ]
+  //        [ 0.4    1  0.4   ]
+  //        [-0.087  0  0.687 ]
+  // Q3 --> [ 0.66   0.003  0.002  0.049 ]
+  //        [ 0.521  1.005 -0.01  -0.230 ]
+  //        [-0.230 -0.01   1.005  0.521 ]
+  //        [ 0.049  0.002  0.003  0.66  ]
+  // Q4 --> [ 0.658  0.022  0 -0.007 -0.032 ]
+  //        [ 0.608  1.059  0  0.039  0.176 ]
+  //        [-0.409 -0.113  1 -0.113 -0.409 ]
+  //        [ 0.176  0.039  0  1.059  0.608 ]
+  //        [-0.032 -0.007  0  0.022  0.658 ]
+  //
+  // In these matrices, we want to use avoid computations involving zeros and
+  // ones and in addition use the symmetry in entries to reduce the number of
+  // read operations.
+  template <int dim, int fe_degree, int n_q_points_1d, typename Number,
+           int direction, bool dof_to_quad, bool add>
+  inline
+  void
+  apply_tensor_product_values (const VectorizedArray<Number> *shape_values,
+			       const VectorizedArray<Number> in [],
+			       VectorizedArray<Number>       out [])
+  {
+    AssertIndexRange (direction, dim);
+    const int mm     = dof_to_quad ? (fe_degree+1) : n_q_points_1d,
+      nn     = dof_to_quad ? n_q_points_1d : (fe_degree+1);
+    const int n_cols = nn / 2;
+    const int mid    = mm / 2;
+
+    const int n_blocks1 = (dim > 1 ? (direction > 0 ? nn : mm) : 1);
+    const int n_blocks2 = (dim > 2 ? (direction > 1 ? nn : mm) : 1);
+    const int stride    = Utilities::fixed_int_power<nn,direction>::value;
+
+    for (int i2=0; i2<n_blocks2; ++i2)
+      {
+        for (int i1=0; i1<n_blocks1; ++i1)
+          {
+            for (int col=0; col<n_cols; ++col)
+              {
+        	VectorizedArray<Number> val0, val1, in0, in1, res0, res1;
+        	if (dof_to_quad == true)
+        	  {
+        	    val0 = shape_values[col];
+        	    val1 = shape_values[nn-1-col];
+        	  }
+        	else
+        	  {
+        	    val0 = shape_values[col*n_q_points_1d];
+        	    val1 = shape_values[(col+1)*n_q_points_1d-1];
+        	  }
+        	if (mid > 0)
+        	  {
+        	    in0 = in[0];
+        	    in1 = in[stride*(mm-1)];
+        	    res0 = val0 * in0;
+        	    res1 = val1 * in0;
+        	    res0 += val1 * in1;
+        	    res1 += val0 * in1;
+        	    for (int ind=1; ind<mid; ++ind)
+        	      {
+        		if (dof_to_quad == true)
+        		  {
+        		    val0 = shape_values[ind*n_q_points_1d+col];
+        		    val1 = shape_values[ind*n_q_points_1d+nn-1-col];
+        		  }
+        		else
+        		  {
+        		    val0 = shape_values[col*n_q_points_1d+ind];
+        		    val1 = shape_values[(col+1)*n_q_points_1d-1-ind];
+        		  }
+        		in0 = in[stride*ind];
+        		in1 = in[stride*(mm-1-ind)];
+        		res0 += val0 * in0;
+        		res1 += val1 * in0;
+        		res0 += val1 * in1;
+        		res1 += val0 * in1;
+        	      }
+        	  }
+        	else
+        	  res0 = res1 = VectorizedArray<Number>();
+        	if (dof_to_quad == true)
+        	  {
+        	    if (mm % 2 == 1)
+        	      {
+        		val0 = shape_values[mid*n_q_points_1d+col];
+        		val1 = val0 * in[stride*mid];
+        		res0 += val1;
+        		res1 += val1;
+        	      }
+        	  }
+        	else
+        	  {
+        	    if (mm % 2 == 1 && nn % 2 == 0)
+        	      {
+        		val0 = shape_values[col*n_q_points_1d+mid];
+        		val1 = val0 * in[stride*mid];
+        		res0 += val1;
+        		res1 += val1;
+        	      }
+        	  }
+        	if (add == false)
+        	  {
+        	    out[stride*col]         = res0;
+        	    out[stride*(nn-1-col)]  = res1;
+        	  }
+        	else
+        	  {
+        	    out[stride*col]        += res0;
+        	    out[stride*(nn-1-col)] += res1;
+        	  }
+              }
+            if ( dof_to_quad == true && nn%2==1 && mm%2==1 )
+              {
+        	if (add==false)
+        	  out[stride*n_cols]  = in[stride*mid];
+        	else
+        	  out[stride*n_cols] += in[stride*mid];
+              }
+            else if (dof_to_quad == true && nn%2==1)
+              {
+        	VectorizedArray<Number> res0;
+        	VectorizedArray<Number> val0  = shape_values[n_cols];
+        	if (mid > 0)
+        	  {
+        	    res0  = in[0] + in[stride*(mm-1)];
+        	    res0 *= val0;
+        	    for (int ind=1; ind<mid; ++ind)
+        	      {
+        		val0  = shape_values[ind*n_q_points_1d+n_cols];
+        		VectorizedArray<Number> val1  = in[stride*ind] + in[stride*(mm-1-ind)];
+        		val1 *= val0;
+        		res0 += val1;
+        	      }
+        	  }
+        	else
+        	  res0 = VectorizedArray<Number>();
+        	if (add == false)
+        	  out[stride*n_cols]  = res0;
+        	else
+        	  out[stride*n_cols] += res0;
+              }
+            else if (dof_to_quad == false && nn%2 == 1)
+              {
+        	VectorizedArray<Number> res0;
+        	if (mid > 0)
+        	  {
+        	    VectorizedArray<Number> val0 = shape_values[n_cols*n_q_points_1d];
+        	    res0 = in[0] + in[stride*(mm-1)];
+        	    res0 *= val0;
+        	    for (int ind=1; ind<mid; ++ind)
+        	      {
+        		val0  = shape_values[n_cols*n_q_points_1d+ind];
+        		VectorizedArray<Number> val1 = in[stride*ind] + in[stride*(mm-1-ind)];
+        		val1 *= val0;
+        		res0 += val1;
+        	      }
+        	    if (mm % 2)
+        	      res0 += in[stride*mid];
+        	  }
+        	else
+        	  res0 = in[0];
+        	if (add == false)
+        	  out[stride*n_cols]  = res0;
+        	else
+        	  out[stride*n_cols] += res0;
+              }
+
+            // increment: in regular case, just go to the next point in
+            // x-direction. If we are at the end of one chunk in x-dir, need to
+            // jump over to the next layer in z-direction
+            switch (direction)
+              {
+              case 0:
+        	in += mm;
+        	out += nn;
+        	break;
+              case 1:
+              case 2:
+        	++in;
+        	++out;
+        	break;
+              default:
+        	Assert (false, ExcNotImplemented());
+              }
+          }
+        if (direction == 1)
+          {
+            in += nn*(mm-1);
+            out += nn*(nn-1);
+          }
+      }
+  }
+
+
+
+  // evaluates the given shape data in 1d-3d using the tensor product
+  // form assuming the symmetries of unit cell shape gradients for
+  // finite elements in FEEvaluation
+
+  // For the specialized loop used for the gradient computation in
+  // here, the 1D shape values read (sorted lexicographically, rows
+  // run over 1D dofs, columns over quadrature points):
+  // Q2 --> [-2.549 -1  0.549 ]
+  //        [ 3.098  0 -3.098 ]
+  //        [-0.549  1  2.549 ]
+  // Q3 --> [-4.315 -1.03  0.5  -0.44  ]
+  //        [ 6.07  -1.44 -2.97  2.196 ]
+  //        [-2.196  2.97  1.44 -6.07  ]
+  //        [ 0.44  -0.5   1.03  4.315 ]
+  // Q4 --> [-6.316 -1.3    0.333 -0.353  0.413 ]
+  //        [10.111 -2.76  -2.667  2.066 -2.306 ]
+  //        [-5.688  5.773  0     -5.773  5.688 ]
+  //        [ 2.306 -2.066  2.667  2.76 -10.111 ]
+  //        [-0.413  0.353 -0.333 -0.353  0.413 ]
+  //
+  // In these matrices, we want to use avoid computations involving
+  // zeros and ones and in addition use the symmetry in entries to
+  // reduce the number of read operations.
+  template <int dim, int fe_degree, int n_q_points_1d, typename Number,
+           int direction, bool dof_to_quad, bool add>
+  inline
+  void
+  apply_tensor_product_gradients (const VectorizedArray<Number> *shape_gradients,
+				  const VectorizedArray<Number> in [],
+				  VectorizedArray<Number>       out [])
+  {
+    AssertIndexRange (direction, dim);
+    const int mm     = dof_to_quad ? (fe_degree+1) : n_q_points_1d,
+      nn     = dof_to_quad ? n_q_points_1d : (fe_degree+1);
+    const int n_cols = nn / 2;
+    const int mid    = mm / 2;
+
+    const int n_blocks1 = (dim > 1 ? (direction > 0 ? nn : mm) : 1);
+    const int n_blocks2 = (dim > 2 ? (direction > 1 ? nn : mm) : 1);
+    const int stride    = Utilities::fixed_int_power<nn,direction>::value;
+
+    for (int i2=0; i2<n_blocks2; ++i2)
+      {
+        for (int i1=0; i1<n_blocks1; ++i1)
+          {
+            for (int col=0; col<n_cols; ++col)
+              {
+                VectorizedArray<Number> val0, val1, in0, in1, res0, res1;
+                if (dof_to_quad == true)
+                  {
+                    val0 = shape_gradients[col];
+                    val1 = shape_gradients[nn-1-col];
+                  }
+                else
+                  {
+                    val0 = shape_gradients[col*n_q_points_1d];
+                    val1 = shape_gradients[(nn-col-1)*n_q_points_1d];
+                  }
+                if (mid > 0)
+                  {
+                    in0 = in[0];
+                    in1 = in[stride*(mm-1)];
+                    res0 = val0 * in0;
+                    res1 = val1 * in0;
+                    res0 -= val1 * in1;
+                    res1 -= val0 * in1;
+                    for (int ind=1; ind<mid; ++ind)
+                      {
+                        if (dof_to_quad == true)
+                          {
+                            val0 = shape_gradients[ind*n_q_points_1d+col];
+                            val1 = shape_gradients[ind*n_q_points_1d+nn-1-col];
+                          }
+                        else
+                          {
+                            val0 = shape_gradients[col*n_q_points_1d+ind];
+                            val1 = shape_gradients[(nn-col-1)*n_q_points_1d+ind];
+                          }
+                        in0 = in[stride*ind];
+                        in1 = in[stride*(mm-1-ind)];
+                        res0 += val0 * in0;
+                        res1 += val1 * in0;
+                        res0 -= val1 * in1;
+                        res1 -= val0 * in1;
+                      }
+                  }
+                else
+                  res0 = res1 = VectorizedArray<Number>();
+                if (mm % 2 == 1)
+                  {
+                    if (dof_to_quad == true)
+                      val0 = shape_gradients[mid*n_q_points_1d+col];
+                    else
+                      val0 = shape_gradients[col*n_q_points_1d+mid];
+                    val1 = val0 * in[stride*mid];
+                    res0 += val1;
+                    res1 -= val1;
+                  }
+                if (add == false)
+                  {
+                    out[stride*col]         = res0;
+                    out[stride*(nn-1-col)]  = res1;
+                  }
+                else
+                  {
+                    out[stride*col]        += res0;
+                    out[stride*(nn-1-col)] += res1;
+                  }
+              }
+            if ( nn%2 == 1 )
+              {
+                VectorizedArray<Number> val0, res0;
+                if (dof_to_quad == true)
+                  val0 = shape_gradients[n_cols];
+                else
+                  val0 = shape_gradients[n_cols*n_q_points_1d];
+                res0  = in[0] - in[stride*(mm-1)];
+                res0 *= val0;
+                for (int ind=1; ind<mid; ++ind)
+                  {
+                    if (dof_to_quad == true)
+                      val0 = shape_gradients[ind*n_q_points_1d+n_cols];
+                    else
+                      val0 = shape_gradients[n_cols*n_q_points_1d+ind];
+                    VectorizedArray<Number> val1  = in[stride*ind] - in[stride*(mm-1-ind)];
+                    val1 *= val0;
+                    res0 += val1;
+                  }
+                if (add == false)
+                  out[stride*n_cols]  = res0;
+                else
+                  out[stride*n_cols] += res0;
+              }
+
+            // increment: in regular case, just go to the next point in
+            // x-direction. for y-part in 3D and if we are at the end of one
+            // chunk in x-dir, need to jump over to the next layer in
+            // z-direction
+            switch (direction)
+              {
+              case 0:
+                in += mm;
+                out += nn;
+                break;
+              case 1:
+              case 2:
+                ++in;
+                ++out;
+                break;
+              default:
+                Assert (false, ExcNotImplemented());
+              }
+          }
+
+        if (direction == 1)
+          {
+            in  += nn * (mm-1);
+            out += nn * (nn-1);
+          }
+      }
+  }
+
+
+
+  // evaluates the given shape data in 1d-3d using the tensor product
+  // form assuming the symmetries of unit cell shape hessians for
+  // finite elements in FEEvaluation
+  template <int dim, int fe_degree, int n_q_points_1d, typename Number,
+           int direction, bool dof_to_quad, bool add>
+  inline
+  void
+  apply_tensor_product_hessians (const VectorizedArray<Number> *shape_hessians,
+				 const VectorizedArray<Number> in [],
+				 VectorizedArray<Number>       out [])
+  {
+    AssertIndexRange (direction, dim);
+    const int mm     = dof_to_quad ? (fe_degree+1) : n_q_points_1d,
+      nn     = dof_to_quad ? n_q_points_1d : (fe_degree+1);
+    const int n_cols = nn / 2;
+    const int mid    = mm / 2;
+
+    const int n_blocks1 = (dim > 1 ? (direction > 0 ? nn : mm) : 1);
+    const int n_blocks2 = (dim > 2 ? (direction > 1 ? nn : mm) : 1);
+    const int stride    = Utilities::fixed_int_power<nn,direction>::value;
+
+    for (int i2=0; i2<n_blocks2; ++i2)
+      {
+        for (int i1=0; i1<n_blocks1; ++i1)
+          {
+            for (int col=0; col<n_cols; ++col)
+              {
+                VectorizedArray<Number> val0, val1, in0, in1, res0, res1;
+                if (dof_to_quad == true)
+                  {
+                    val0 = shape_hessians[col];
+                    val1 = shape_hessians[nn-1-col];
+                  }
+                else
+                  {
+                    val0 = shape_hessians[col*n_q_points_1d];
+                    val1 = shape_hessians[(col+1)*n_q_points_1d-1];
+                  }
+                if (mid > 0)
+                  {
+                    in0 = in[0];
+                    in1 = in[stride*(mm-1)];
+                    res0 = val0 * in0;
+                    res1 = val1 * in0;
+                    res0 += val1 * in1;
+                    res1 += val0 * in1;
+                    for (int ind=1; ind<mid; ++ind)
+                      {
+                        if (dof_to_quad == true)
+                          {
+                            val0 = shape_hessians[ind*n_q_points_1d+col];
+                            val1 = shape_hessians[ind*n_q_points_1d+nn-1-col];
+                          }
+                        else
+                          {
+                            val0 = shape_hessians[col*n_q_points_1d+ind];
+                            val1 = shape_hessians[(col+1)*n_q_points_1d-1-ind];
+                          }
+                        in0 = in[stride*ind];
+                        in1 = in[stride*(mm-1-ind)];
+                        res0 += val0 * in0;
+                        res1 += val1 * in0;
+                        res0 += val1 * in1;
+                        res1 += val0 * in1;
+                      }
+                  }
+                else
+                  res0 = res1 = VectorizedArray<Number>();
+                if (mm % 2 == 1)
+                  {
+                    if (dof_to_quad == true)
+                      val0 = shape_hessians[mid*n_q_points_1d+col];
+                    else
+                      val0 = shape_hessians[col*n_q_points_1d+mid];
+                    val1 = val0 * in[stride*mid];
+                    res0 += val1;
+                    res1 += val1;
+                  }
+                if (add == false)
+                  {
+                    out[stride*col]         = res0;
+                    out[stride*(nn-1-col)]  = res1;
+                  }
+                else
+                  {
+                    out[stride*col]        += res0;
+                    out[stride*(nn-1-col)] += res1;
+                  }
+              }
+            if ( nn%2 == 1 )
+              {
+                VectorizedArray<Number> val0, res0;
+                if (dof_to_quad == true)
+                  val0 = shape_hessians[n_cols];
+                else
+                  val0 = shape_hessians[n_cols*n_q_points_1d];
+                if (mid > 0)
+                  {
+                    res0  = in[0] + in[stride*(mm-1)];
+                    res0 *= val0;
+                    for (int ind=1; ind<mid; ++ind)
+                      {
+                        if (dof_to_quad == true)
+                          val0 = shape_hessians[ind*n_q_points_1d+n_cols];
+                        else
+                          val0 = shape_hessians[n_cols*n_q_points_1d+ind];
+                        VectorizedArray<Number> val1  = in[stride*ind] + in[stride*(mm-1-ind)];
+                        val1 *= val0;
+                        res0 += val1;
+                      }
+                  }
+                else
+                  res0 = VectorizedArray<Number>();
+                if (mm % 2 == 1)
+                  {
+                    if (dof_to_quad == true)
+                      val0 = shape_hessians[mid*n_q_points_1d+n_cols];
+                    else
+                      val0 = shape_hessians[n_cols*n_q_points_1d+mid];
+                    res0 += val0 * in[stride*mid];
+                  }
+                if (add == false)
+                  out[stride*n_cols]  = res0;
+                else
+                  out[stride*n_cols] += res0;
+              }
+
+            // increment: in regular case, just go to the next point in
+            // x-direction. If we are at the end of one chunk in x-dir, need to
+            // jump over to the next layer in z-direction
+            switch (direction)
+              {
+              case 0:
+                in += mm;
+                out += nn;
+                break;
+              case 1:
+              case 2:
+                ++in;
+                ++out;
+                break;
+              default:
+                Assert (false, ExcNotImplemented());
+              }
+          }
+        if (direction == 1)
+          {
+            in += nn*(mm-1);
+            out += nn*(nn-1);
+          }
+      }
+  }
+
+
+
+  // evaluates the given shape data in 1d-3d using the tensor product
+  // form assuming the symmetries of unit cell shape gradients for
+  // finite elements in FEEvaluationGL
+
+  // This function specializes the application of the tensor product loop for
+  // Gauss-Lobatto elements which are symmetric about 0.5 just as the general
+  // class of elements treated by FEEvaluation, have diagonal shape matrices
+  // for the values and have the following gradient matrices (notice the zeros
+  // on the diagonal in the interior points, which is due to the construction
+  // of Legendre polynomials):
+  // Q2 --> [-3 -1  1 ]
+  //        [ 4  0 -4 ]
+  //        [-1  1  3 ]
+  // Q3 --> [-6    -1.618  0.618 -1    ]
+  //        [ 8.09  0     -2.236  3.09 ]
+  //        [-3.09  2.236  0     -8.09 ]
+  //        [ 1    -0.618  1.618  6    ]
+  // Q4 --> [-10    -2.482  0.75  -0.518  1     ]
+  //        [ 13.51  0     -2.673  1.528 -2.82  ]
+  //        [-5.333  3.491  0     -3.491  5.333 ]
+  //        [ 2.82  -1.528  2.673  0    -13.51  ]
+  //        [-1      0.518 -0.75   2.482 10     ]
+  template <int dim, int fe_degree, typename Number,
+           int direction, bool dof_to_quad, bool add>
+  inline
+  void
+  apply_tensor_product_gradients_gl (const VectorizedArray<Number> *shape_gradients,
+				     const VectorizedArray<Number> in [],
+				     VectorizedArray<Number>       out [])
+  {
+    AssertIndexRange (direction, dim);
+    const int mm     = fe_degree+1;
+    const int nn     = fe_degree+1;
+    const int n_cols = nn / 2;
+    const int mid    = mm / 2;
+
+    const int n_blocks1 = (dim > 1 ? (direction > 0 ? nn : mm) : 1);
+    const int n_blocks2 = (dim > 2 ? (direction > 1 ? nn : mm) : 1);
+    const int stride    = Utilities::fixed_int_power<nn,direction>::value;
+
+    for (int i2=0; i2<n_blocks2; ++i2)
+      {
+        for (int i1=0; i1<n_blocks1; ++i1)
+          {
+            for (int col=0; col<n_cols; ++col)
+              {
+                VectorizedArray<Number> val0, val1, in0, in1, res0, res1;
+                if (mid > 0)
+                  {
+                    if (dof_to_quad == true)
+                      {
+                        val0 = shape_gradients[col];
+                        val1 = shape_gradients[nn-1-col];
+                      }
+                    else
+                      {
+                        val0 = shape_gradients[col*mm];
+                        val1 = shape_gradients[(nn-col-1)*mm];
+                      }
+                    in0 = in[0];
+                    in1 = in[stride*(mm-1)];
+                    if (col == 0)
+                      {
+                        if ((mm+dof_to_quad)%2 == 1)
+                          {
+                            res0 = val0 * in0;
+                            res1 = -in0;
+                            res0 += in1;
+                            res1 -= val0 * in1;
+                          }
+                        else
+                          {
+                            res0 = val0 * in0;
+                            res0 -= in1;
+                            res1 = in0;
+                            res1 -= val0 * in1;
+                          }
+                      }
+                    else
+                      {
+                        res0 = val0 * in0;
+                        res1 = val1 * in0;
+                        res0 -= val1 * in1;
+                        res1 -= val0 * in1;
+                      }
+                    for (int ind=1; ind<mid; ++ind)
+                      {
+                        if (dof_to_quad == true)
+                          {
+                            val0 = shape_gradients[ind*mm+col];
+                            val1 = shape_gradients[ind*mm+nn-1-col];
+                          }
+                        else
+                          {
+                            val0 = shape_gradients[col*mm+ind];
+                            val1 = shape_gradients[(nn-col-1)*mm+ind];
+                          }
+
+                        // at inner points, the gradient is zero for ind==col
+                        in0 = in[stride*ind];
+                        in1 = in[stride*(mm-1-ind)];
+                        if (ind == col)
+                          {
+                            res1 += val1 * in0;
+                            res0 -= val1 * in1;
+                          }
+                        else
+                          {
+                            res0 += val0 * in0;
+                            res1 += val1 * in0;
+                            res0 -= val1 * in1;
+                            res1 -= val0 * in1;
+                          }
+                      }
+                  }
+                else
+                  res0 = res1 = VectorizedArray<Number>();
+                if (mm % 2 == 1)
+                  {
+                    if (dof_to_quad == true)
+                      val0 = shape_gradients[mid*mm+col];
+                    else
+                      val0 = shape_gradients[col*mm+mid];
+                    val1 = val0 * in[stride*mid];
+                    res0 += val1;
+                    res1 -= val1;
+                  }
+                if (add == false)
+                  {
+                    out[stride*col]         = res0;
+                    out[stride*(nn-1-col)]  = res1;
+                  }
+                else
+                  {
+                    out[stride*col]        += res0;
+                    out[stride*(nn-1-col)] += res1;
+                  }
+              }
+            if ( nn%2 == 1 )
+              {
+                VectorizedArray<Number> val0, res0;
+                if (dof_to_quad == true)
+                  val0 = shape_gradients[n_cols];
+                else
+                  val0 = shape_gradients[n_cols*mm];
+                if (mid > 0)
+                  {
+                    res0  = in[0] - in[stride*(mm-1)];
+                    res0 *= val0;
+                    for (int ind=1; ind<mid; ++ind)
+                      {
+                        if (dof_to_quad == true)
+                          val0 = shape_gradients[ind*mm+n_cols];
+                        else
+                          val0 = shape_gradients[n_cols*mm+ind];
+                        VectorizedArray<Number> val1  = in[stride*ind] - in[stride*(mm-1-ind)];
+                        val1 *= val0;
+                        res0 += val1;
+                      }
+                  }
+                else
+                  res0 = VectorizedArray<Number>();
+                if (add == false)
+                  out[stride*n_cols]  = res0;
+                else
+                  out[stride*n_cols] += res0;
+              }
+
+            // increment: in regular case, just go to the next point in
+            // x-direction. for y-part in 3D and if we are at the end of one
+            // chunk in x-dir, need to jump over to the next layer in
+            // z-direction
+            switch (direction)
+              {
+              case 0:
+                in += mm;
+                out += nn;
+                break;
+              case 1:
+              case 2:
+                ++in;
+                ++out;
+                break;
+              default:
+                Assert (false, ExcNotImplemented());
+              }
+          }
+
+        if (direction == 1)
+          {
+            in  += nn * (mm-1);
+            out += nn * (nn-1);
           }
       }
   }
@@ -4393,8 +5112,6 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 
 
 
-/*----------------- optimized implementation tensor product symmetric case --*/
-
 template <int dim, int fe_degree,  int n_q_points_1d, int n_components_,
          typename Number>
 template <int direction, bool dof_to_quad, bool add>
@@ -4404,196 +5121,9 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::apply_values (const VectorizedArray<Number> in [],
                 VectorizedArray<Number>       out [])
 {
-  AssertIndexRange (direction, dim);
-  const int mm     = dof_to_quad ? (fe_degree+1) : n_q_points_1d,
-            nn     = dof_to_quad ? n_q_points_1d : (fe_degree+1);
-  const int n_cols = nn / 2;
-  const int mid    = mm / 2;
-
-  const int n_blocks1 = (dim > 1 ? (direction > 0 ? nn : mm) : 1);
-  const int n_blocks2 = (dim > 2 ? (direction > 1 ? nn : mm) : 1);
-  const int stride    = Utilities::fixed_int_power<nn,direction>::value;
-
-  // This loop specializes the general application of tensor-product based
-  // elements for "symmetric" finite elements, i.e., when the shape functions
-  // are symmetric about 0.5 and the quadrature points are, too. In that case,
-  // the 1D shape values read (sorted lexicographically, rows run over 1D
-  // dofs, columns over quadrature points):
-  // Q2 --> [ 0.687  0 -0.087 ]
-  //        [ 0.4    1  0.4   ]
-  //        [-0.087  0  0.687 ]
-  // Q3 --> [ 0.66   0.003  0.002  0.049 ]
-  //        [ 0.521  1.005 -0.01  -0.230 ]
-  //        [-0.230 -0.01   1.005  0.521 ]
-  //        [ 0.049  0.002  0.003  0.66  ]
-  // Q4 --> [ 0.658  0.022  0 -0.007 -0.032 ]
-  //        [ 0.608  1.059  0  0.039  0.176 ]
-  //        [-0.409 -0.113  1 -0.113 -0.409 ]
-  //        [ 0.176  0.039  0  1.059  0.608 ]
-  //        [-0.032 -0.007  0  0.022  0.658 ]
-  //
-  // In these matrices, we want to use avoid computations involving zeros and
-  // ones and in addition use the symmetry in entries to reduce the number of
-  // read operations.
-  const VectorizedArray<Number> *shape_values = this->data.shape_values.begin();
-  for (int i2=0; i2<n_blocks2; ++i2)
-    {
-      for (int i1=0; i1<n_blocks1; ++i1)
-        {
-          for (int col=0; col<n_cols; ++col)
-            {
-              VectorizedArray<Number> val0, val1, in0, in1, res0, res1;
-              if (dof_to_quad == true)
-                {
-                  val0 = shape_values[col];
-                  val1 = shape_values[nn-1-col];
-                }
-              else
-                {
-                  val0 = shape_values[col*n_q_points_1d];
-                  val1 = shape_values[(col+1)*n_q_points_1d-1];
-                }
-              if (mid > 0)
-                {
-                  in0 = in[0];
-                  in1 = in[stride*(mm-1)];
-                  res0 = val0 * in0;
-                  res1 = val1 * in0;
-                  res0 += val1 * in1;
-                  res1 += val0 * in1;
-                  for (int ind=1; ind<mid; ++ind)
-                    {
-                      if (dof_to_quad == true)
-                        {
-                          val0 = shape_values[ind*n_q_points_1d+col];
-                          val1 = shape_values[ind*n_q_points_1d+nn-1-col];
-                        }
-                      else
-                        {
-                          val0 = shape_values[col*n_q_points_1d+ind];
-                          val1 = shape_values[(col+1)*n_q_points_1d-1-ind];
-                        }
-                      in0 = in[stride*ind];
-                      in1 = in[stride*(mm-1-ind)];
-                      res0 += val0 * in0;
-                      res1 += val1 * in0;
-                      res0 += val1 * in1;
-                      res1 += val0 * in1;
-                    }
-                }
-              else
-                res0 = res1 = VectorizedArray<Number>();
-              if (dof_to_quad == true)
-                {
-                  if (mm % 2 == 1)
-                    {
-                      val0 = shape_values[mid*n_q_points_1d+col];
-                      val1 = val0 * in[stride*mid];
-                      res0 += val1;
-                      res1 += val1;
-                    }
-                }
-              else
-                {
-                  if (mm % 2 == 1 && nn % 2 == 0)
-                    {
-                      val0 = shape_values[col*n_q_points_1d+mid];
-                      val1 = val0 * in[stride*mid];
-                      res0 += val1;
-                      res1 += val1;
-                    }
-                }
-              if (add == false)
-                {
-                  out[stride*col]         = res0;
-                  out[stride*(nn-1-col)]  = res1;
-                }
-              else
-                {
-                  out[stride*col]        += res0;
-                  out[stride*(nn-1-col)] += res1;
-                }
-            }
-          if ( dof_to_quad == true && nn%2==1 && mm%2==1 )
-            {
-              if (add==false)
-                out[stride*n_cols]  = in[stride*mid];
-              else
-                out[stride*n_cols] += in[stride*mid];
-            }
-          else if (dof_to_quad == true && nn%2==1)
-            {
-              VectorizedArray<Number> res0;
-              VectorizedArray<Number> val0  = shape_values[n_cols];
-              if (mid > 0)
-                {
-                  res0  = in[0] + in[stride*(mm-1)];
-                  res0 *= val0;
-                  for (int ind=1; ind<mid; ++ind)
-                    {
-                      val0  = shape_values[ind*n_q_points_1d+n_cols];
-                      VectorizedArray<Number> val1  = in[stride*ind] + in[stride*(mm-1-ind)];
-                      val1 *= val0;
-                      res0 += val1;
-                    }
-                }
-              else
-                res0 = VectorizedArray<Number>();
-              if (add == false)
-                out[stride*n_cols]  = res0;
-              else
-                out[stride*n_cols] += res0;
-            }
-          else if (dof_to_quad == false && nn%2 == 1)
-            {
-              VectorizedArray<Number> res0;
-              if (mid > 0)
-                {
-                  VectorizedArray<Number> val0 = shape_values[n_cols*n_q_points_1d];
-                  res0 = in[0] + in[stride*(mm-1)];
-                  res0 *= val0;
-                  for (int ind=1; ind<mid; ++ind)
-                    {
-                      val0  = shape_values[n_cols*n_q_points_1d+ind];
-                      VectorizedArray<Number> val1 = in[stride*ind] + in[stride*(mm-1-ind)];
-                      val1 *= val0;
-                      res0 += val1;
-                    }
-                  if (mm % 2)
-                    res0 += in[stride*mid];
-                }
-              else
-                res0 = in[0];
-              if (add == false)
-                out[stride*n_cols]  = res0;
-              else
-                out[stride*n_cols] += res0;
-            }
-
-          // increment: in regular case, just go to the next point in
-          // x-direction. If we are at the end of one chunk in x-dir, need to
-          // jump over to the next layer in z-direction
-          switch (direction)
-            {
-            case 0:
-              in += mm;
-              out += nn;
-              break;
-            case 1:
-            case 2:
-              ++in;
-              ++out;
-              break;
-            default:
-              Assert (false, ExcNotImplemented());
-            }
-        }
-      if (direction == 1)
-        {
-          in += nn*(mm-1);
-          out += nn*(nn-1);
-        }
-    }
+  internal::apply_tensor_product_values<dim,fe_degree,n_q_points_1d,Number,
+           direction, dof_to_quad, add>
+           (this->data.shape_values.begin(), in, out);
 }
 
 
@@ -4607,155 +5137,9 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::apply_gradients (const VectorizedArray<Number> in [],
                    VectorizedArray<Number>       out [])
 {
-  AssertIndexRange (direction, dim);
-  const int mm     = dof_to_quad ? (fe_degree+1) : n_q_points_1d,
-            nn     = dof_to_quad ? n_q_points_1d : (fe_degree+1);
-  const int n_cols = nn / 2;
-  const int mid    = mm / 2;
-
-  const int n_blocks1 = (dim > 1 ? (direction > 0 ? nn : mm) : 1);
-  const int n_blocks2 = (dim > 2 ? (direction > 1 ? nn : mm) : 1);
-  const int stride    = Utilities::fixed_int_power<nn,direction>::value;
-
-  const VectorizedArray<Number> *shape_gradients = this->data.shape_gradients.begin();
-  for (int i2=0; i2<n_blocks2; ++i2)
-    {
-      for (int i1=0; i1<n_blocks1; ++i1)
-        {
-          // For the specialized loop used for the gradient computation in
-          // here, the 1D shape values read (sorted lexicographically, rows
-          // run over 1D dofs, columns over quadrature points):
-          // Q2 --> [-2.549 -1  0.549 ]
-          //        [ 3.098  0 -3.098 ]
-          //        [-0.549  1  2.549 ]
-          // Q3 --> [-4.315 -1.03  0.5  -0.44  ]
-          //        [ 6.07  -1.44 -2.97  2.196 ]
-          //        [-2.196  2.97  1.44 -6.07  ]
-          //        [ 0.44  -0.5   1.03  4.315 ]
-          // Q4 --> [-6.316 -1.3    0.333 -0.353  0.413 ]
-          //        [10.111 -2.76  -2.667  2.066 -2.306 ]
-          //        [-5.688  5.773  0     -5.773  5.688 ]
-          //        [ 2.306 -2.066  2.667  2.76 -10.111 ]
-          //        [-0.413  0.353 -0.333 -0.353  0.413 ]
-          //
-          // In these matrices, we want to use avoid computations involving
-          // zeros and ones and in addition use the symmetry in entries to
-          // reduce the number of read operations.
-          for (int col=0; col<n_cols; ++col)
-            {
-              VectorizedArray<Number> val0, val1, in0, in1, res0, res1;
-              if (dof_to_quad == true)
-                {
-                  val0 = shape_gradients[col];
-                  val1 = shape_gradients[nn-1-col];
-                }
-              else
-                {
-                  val0 = shape_gradients[col*n_q_points_1d];
-                  val1 = shape_gradients[(nn-col-1)*n_q_points_1d];
-                }
-              if (mid > 0)
-                {
-                  in0 = in[0];
-                  in1 = in[stride*(mm-1)];
-                  res0 = val0 * in0;
-                  res1 = val1 * in0;
-                  res0 -= val1 * in1;
-                  res1 -= val0 * in1;
-                  for (int ind=1; ind<mid; ++ind)
-                    {
-                      if (dof_to_quad == true)
-                        {
-                          val0 = shape_gradients[ind*n_q_points_1d+col];
-                          val1 = shape_gradients[ind*n_q_points_1d+nn-1-col];
-                        }
-                      else
-                        {
-                          val0 = shape_gradients[col*n_q_points_1d+ind];
-                          val1 = shape_gradients[(nn-col-1)*n_q_points_1d+ind];
-                        }
-                      in0 = in[stride*ind];
-                      in1 = in[stride*(mm-1-ind)];
-                      res0 += val0 * in0;
-                      res1 += val1 * in0;
-                      res0 -= val1 * in1;
-                      res1 -= val0 * in1;
-                    }
-                }
-              else
-                res0 = res1 = VectorizedArray<Number>();
-              if (mm % 2 == 1)
-                {
-                  if (dof_to_quad == true)
-                    val0 = shape_gradients[mid*n_q_points_1d+col];
-                  else
-                    val0 = shape_gradients[col*n_q_points_1d+mid];
-                  val1 = val0 * in[stride*mid];
-                  res0 += val1;
-                  res1 -= val1;
-                }
-              if (add == false)
-                {
-                  out[stride*col]         = res0;
-                  out[stride*(nn-1-col)]  = res1;
-                }
-              else
-                {
-                  out[stride*col]        += res0;
-                  out[stride*(nn-1-col)] += res1;
-                }
-            }
-          if ( nn%2 == 1 )
-            {
-              VectorizedArray<Number> val0, res0;
-              if (dof_to_quad == true)
-                val0 = shape_gradients[n_cols];
-              else
-                val0 = shape_gradients[n_cols*n_q_points_1d];
-              res0  = in[0] - in[stride*(mm-1)];
-              res0 *= val0;
-              for (int ind=1; ind<mid; ++ind)
-                {
-                  if (dof_to_quad == true)
-                    val0 = shape_gradients[ind*n_q_points_1d+n_cols];
-                  else
-                    val0 = shape_gradients[n_cols*n_q_points_1d+ind];
-                  VectorizedArray<Number> val1  = in[stride*ind] - in[stride*(mm-1-ind)];
-                  val1 *= val0;
-                  res0 += val1;
-                }
-              if (add == false)
-                out[stride*n_cols]  = res0;
-              else
-                out[stride*n_cols] += res0;
-            }
-
-          // increment: in regular case, just go to the next point in
-          // x-direction. for y-part in 3D and if we are at the end of one
-          // chunk in x-dir, need to jump over to the next layer in
-          // z-direction
-          switch (direction)
-            {
-            case 0:
-              in += mm;
-              out += nn;
-              break;
-            case 1:
-            case 2:
-              ++in;
-              ++out;
-              break;
-            default:
-              Assert (false, ExcNotImplemented());
-            }
-        }
-
-      if (direction == 1)
-        {
-          in  += nn * (mm-1);
-          out += nn * (nn-1);
-        }
-    }
+  internal::apply_tensor_product_gradients<dim,fe_degree,n_q_points_1d,Number,
+           direction, dof_to_quad, add>
+           (this->data.shape_gradients.begin(), in, out);
 }
 
 
@@ -4772,146 +5156,9 @@ FEEvaluation<dim,fe_degree,n_q_points_1d,n_components_,Number>
 ::apply_hessians (const VectorizedArray<Number> in [],
                   VectorizedArray<Number>       out [])
 {
-  AssertIndexRange (direction, dim);
-  const int mm     = dof_to_quad ? (fe_degree+1) : n_q_points_1d,
-            nn     = dof_to_quad ? n_q_points_1d : (fe_degree+1);
-  const int n_cols = nn / 2;
-  const int mid    = mm / 2;
-
-  const int n_blocks1 = (dim > 1 ? (direction > 0 ? nn : mm) : 1);
-  const int n_blocks2 = (dim > 2 ? (direction > 1 ? nn : mm) : 1);
-  const int stride    = Utilities::fixed_int_power<nn,direction>::value;
-
-  for (int i2=0; i2<n_blocks2; ++i2)
-    {
-      for (int i1=0; i1<n_blocks1; ++i1)
-        {
-          for (int col=0; col<n_cols; ++col)
-            {
-              VectorizedArray<Number> val0, val1, in0, in1, res0, res1;
-              if (dof_to_quad == true)
-                {
-                  val0 = this->data.shape_hessians[col];
-                  val1 = this->data.shape_hessians[nn-1-col];
-                }
-              else
-                {
-                  val0 = this->data.shape_hessians[col*n_q_points_1d];
-                  val1 = this->data.shape_hessians[(col+1)*n_q_points_1d-1];
-                }
-              if (mid > 0)
-                {
-                  in0 = in[0];
-                  in1 = in[stride*(mm-1)];
-                  res0 = val0 * in0;
-                  res1 = val1 * in0;
-                  res0 += val1 * in1;
-                  res1 += val0 * in1;
-                  for (int ind=1; ind<mid; ++ind)
-                    {
-                      if (dof_to_quad == true)
-                        {
-                          val0 = this->data.shape_hessians[ind*n_q_points_1d+col];
-                          val1 = this->data.shape_hessians[ind*n_q_points_1d+nn-1-col];
-                        }
-                      else
-                        {
-                          val0 = this->data.shape_hessians[col*n_q_points_1d+ind];
-                          val1 = this->data.shape_hessians[(col+1)*n_q_points_1d-1-ind];
-                        }
-                      in0 = in[stride*ind];
-                      in1 = in[stride*(mm-1-ind)];
-                      res0 += val0 * in0;
-                      res1 += val1 * in0;
-                      res0 += val1 * in1;
-                      res1 += val0 * in1;
-                    }
-                }
-              else
-                res0 = res1 = VectorizedArray<Number>();
-              if (mm % 2 == 1)
-                {
-                  if (dof_to_quad == true)
-                    val0 = this->data.shape_hessians[mid*n_q_points_1d+col];
-                  else
-                    val0 = this->data.shape_hessians[col*n_q_points_1d+mid];
-                  val1 = val0 * in[stride*mid];
-                  res0 += val1;
-                  res1 += val1;
-                }
-              if (add == false)
-                {
-                  out[stride*col]         = res0;
-                  out[stride*(nn-1-col)]  = res1;
-                }
-              else
-                {
-                  out[stride*col]        += res0;
-                  out[stride*(nn-1-col)] += res1;
-                }
-            }
-          if ( nn%2 == 1 )
-            {
-              VectorizedArray<Number> val0, res0;
-              if (dof_to_quad == true)
-                val0 = this->data.shape_hessians[n_cols];
-              else
-                val0 = this->data.shape_hessians[n_cols*n_q_points_1d];
-              if (mid > 0)
-                {
-                  res0  = in[0] + in[stride*(mm-1)];
-                  res0 *= val0;
-                  for (int ind=1; ind<mid; ++ind)
-                    {
-                      if (dof_to_quad == true)
-                        val0 = this->data.shape_hessians[ind*n_q_points_1d+n_cols];
-                      else
-                        val0 = this->data.shape_hessians[n_cols*n_q_points_1d+ind];
-                      VectorizedArray<Number> val1  = in[stride*ind] + in[stride*(mm-1-ind)];
-                      val1 *= val0;
-                      res0 += val1;
-                    }
-                }
-              else
-                res0 = VectorizedArray<Number>();
-              if (mm % 2 == 1)
-                {
-                  if (dof_to_quad == true)
-                    val0 = this->data.shape_hessians[mid*n_q_points_1d+n_cols];
-                  else
-                    val0 = this->data.shape_hessians[n_cols*n_q_points_1d+mid];
-                  res0 += val0 * in[stride*mid];
-                }
-              if (add == false)
-                out[stride*n_cols]  = res0;
-              else
-                out[stride*n_cols] += res0;
-            }
-
-          // increment: in regular case, just go to the next point in
-          // x-direction. If we are at the end of one chunk in x-dir, need to
-          // jump over to the next layer in z-direction
-          switch (direction)
-            {
-            case 0:
-              in += mm;
-              out += nn;
-              break;
-            case 1:
-            case 2:
-              ++in;
-              ++out;
-              break;
-            default:
-              Assert (false, ExcNotImplemented());
-            }
-        }
-      if (direction == 1)
-        {
-          in += nn*(mm-1);
-          out += nn*(nn-1);
-        }
-    }
+  internal::apply_tensor_product_hessians<dim,fe_degree,n_q_points_1d,Number,
+           direction, dof_to_quad, add>
+           (this->data.shape_hessians.begin(), in, out);
 }
 
 
@@ -5152,192 +5399,13 @@ FEEvaluationGL<dim,fe_degree,n_components_,Number>
 ::apply_gradients (const VectorizedArray<Number> in [],
                    VectorizedArray<Number>       out [])
 {
-  AssertIndexRange (direction, dim);
-  const int mm     = fe_degree+1;
-  const int nn     = fe_degree+1;
-  const int n_cols = nn / 2;
-  const int mid    = mm / 2;
+  internal::apply_tensor_product_gradients_gl<dim,fe_degree,Number,
+           direction, dof_to_quad, add>
+           (this->data.shape_gradients.begin(), in, out);
+}
 
-  const int n_blocks1 = (dim > 1 ? (direction > 0 ? nn : mm) : 1);
-  const int n_blocks2 = (dim > 2 ? (direction > 1 ? nn : mm) : 1);
-  const int stride    = Utilities::fixed_int_power<nn,direction>::value;
-
-  // This loop specializes the application of the tensor product loop for
-  // Gauss-Lobatto elements which are symmetric about 0.5 just as the general
-  // class of elements treated by FEEvaluation, have diagonal shape matrices
-  // for the values and have the following gradient matrices (notice the zeros
-  // on the diagonal in the interior points, which is due to the construction
-  // of Legendre polynomials):
-  // Q2 --> [-3 -1  1 ]
-  //        [ 4  0 -4 ]
-  //        [-1  1  3 ]
-  // Q3 --> [-6    -1.618  0.618 -1    ]
-  //        [ 8.09  0     -2.236  3.09 ]
-  //        [-3.09  2.236  0     -8.09 ]
-  //        [ 1    -0.618  1.618  6    ]
-  // Q4 --> [-10    -2.482  0.75  -0.518  1     ]
-  //        [ 13.51  0     -2.673  1.528 -2.82  ]
-  //        [-5.333  3.491  0     -3.491  5.333 ]
-  //        [ 2.82  -1.528  2.673  0    -13.51  ]
-  //        [-1      0.518 -0.75   2.482 10     ]
-  for (int i2=0; i2<n_blocks2; ++i2)
-    {
-      for (int i1=0; i1<n_blocks1; ++i1)
-        {
-          for (int col=0; col<n_cols; ++col)
-            {
-              VectorizedArray<Number> val0, val1, in0, in1, res0, res1;
-              if (mid > 0)
-                {
-                  if (dof_to_quad == true)
-                    {
-                      val0 = this->data.shape_gradients[col];
-                      val1 = this->data.shape_gradients[nn-1-col];
-                    }
-                  else
-                    {
-                      val0 = this->data.shape_gradients[col*mm];
-                      val1 = this->data.shape_gradients[(nn-col-1)*mm];
-                    }
-                  in0 = in[0];
-                  in1 = in[stride*(mm-1)];
-                  if (col == 0)
-                    {
-                      if ((mm+dof_to_quad)%2 == 1)
-                        {
-                          res0 = val0 * in0;
-                          res1 = -in0;
-                          res0 += in1;
-                          res1 -= val0 * in1;
-                        }
-                      else
-                        {
-                          res0 = val0 * in0;
-                          res0 -= in1;
-                          res1 = in0;
-                          res1 -= val0 * in1;
-                        }
-                    }
-                  else
-                    {
-                      res0 = val0 * in0;
-                      res1 = val1 * in0;
-                      res0 -= val1 * in1;
-                      res1 -= val0 * in1;
-                    }
-                  for (int ind=1; ind<mid; ++ind)
-                    {
-                      if (dof_to_quad == true)
-                        {
-                          val0 = this->data.shape_gradients[ind*mm+col];
-                          val1 = this->data.shape_gradients[ind*mm+nn-1-col];
-                        }
-                      else
-                        {
-                          val0 = this->data.shape_gradients[col*mm+ind];
-                          val1 = this->data.shape_gradients[(nn-col-1)*mm+ind];
-                        }
-
-                      // at inner points, the gradient is zero for ind==col
-                      in0 = in[stride*ind];
-                      in1 = in[stride*(mm-1-ind)];
-                      if (ind == col)
-                        {
-                          res1 += val1 * in0;
-                          res0 -= val1 * in1;
-                        }
-                      else
-                        {
-                          res0 += val0 * in0;
-                          res1 += val1 * in0;
-                          res0 -= val1 * in1;
-                          res1 -= val0 * in1;
-                        }
-                    }
-                }
-              else
-                res0 = res1 = VectorizedArray<Number>();
-              if (mm % 2 == 1)
-                {
-                  if (dof_to_quad == true)
-                    val0 = this->data.shape_gradients[mid*mm+col];
-                  else
-                    val0 = this->data.shape_gradients[col*mm+mid];
-                  val1 = val0 * in[stride*mid];
-                  res0 += val1;
-                  res1 -= val1;
-                }
-              if (add == false)
-                {
-                  out[stride*col]         = res0;
-                  out[stride*(nn-1-col)]  = res1;
-                }
-              else
-                {
-                  out[stride*col]        += res0;
-                  out[stride*(nn-1-col)] += res1;
-                }
-            }
-          if ( nn%2 == 1 )
-            {
-              VectorizedArray<Number> val0, res0;
-              if (dof_to_quad == true)
-                val0 = this->data.shape_gradients[n_cols];
-              else
-                val0 = this->data.shape_gradients[n_cols*mm];
-              if (mid > 0)
-                {
-                  res0  = in[0] - in[stride*(mm-1)];
-                  res0 *= val0;
-                  for (int ind=1; ind<mid; ++ind)
-                    {
-                      if (dof_to_quad == true)
-                        val0 = this->data.shape_gradients[ind*mm+n_cols];
-                      else
-                        val0 = this->data.shape_gradients[n_cols*mm+ind];
-                      VectorizedArray<Number> val1  = in[stride*ind] - in[stride*(mm-1-ind)];
-                      val1 *= val0;
-                      res0 += val1;
-                    }
-                }
-              else
-                res0 = VectorizedArray<Number>();
-              if (add == false)
-                out[stride*n_cols]  = res0;
-              else
-                out[stride*n_cols] += res0;
-            }
-
-          // increment: in regular case, just go to the next point in
-          // x-direction. for y-part in 3D and if we are at the end of one
-          // chunk in x-dir, need to jump over to the next layer in
-          // z-direction
-          switch (direction)
-            {
-            case 0:
-              in += mm;
-              out += nn;
-              break;
-            case 1:
-            case 2:
-              ++in;
-              ++out;
-              break;
-            default:
-              Assert (false, ExcNotImplemented());
-            }
-        }
-
-      if (direction == 1)
-        {
-          in  += nn * (mm-1);
-          out += nn * (nn-1);
-        }
-    }
 
 #endif  // ifndef DOXYGEN
-
-}
 
 
 DEAL_II_NAMESPACE_CLOSE
