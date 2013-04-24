@@ -563,23 +563,40 @@ private:
    * function will return the correct internal ostringstream buffer for
    * operater<<.
    */
-  std::ostringstream &get_stream()
-  {
-    // ??? why the following?
-    outstreams.get().setf(std::ios::showpoint | std::ios::left);
-    return outstreams.get();
-  }
+  std::ostringstream &get_stream();
 
   /**
    * We use tbb's thread local storage facility to generate a stringstream
    * for every thread that sends log messages.
    */
-  Threads::ThreadLocalStorage<std::ostringstream> outstreams;
-
+  Threads::ThreadLocalStorage<std_cxx1x::shared_ptr<std::ostringstream> > outstreams;
 };
 
 
 /* ----------------------------- Inline functions and templates ---------------- */
+
+
+inline
+std::ostringstream &
+LogStream::get_stream()
+{
+  // see if we have already created this stream. if not, do so and
+  // set the default flags (why we set these flags is lost to
+  // history, but this is what we need to keep several hundred tests
+  // from producing different output)
+  //
+  // note that in all of this we need not worry about thread-safety
+  // because we operate on a thread-local object and by definition
+  // there can only be one access at a time
+  if (outstreams.get() == 0)
+    {
+      outstreams.get().reset (new std::ostringstream);
+      outstreams.get()->setf(std::ios::showpoint | std::ios::left);
+    }
+
+  // then return the stream
+  return *outstreams.get();
+}
 
 
 template <class T>
