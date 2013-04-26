@@ -136,11 +136,6 @@ ADD_SUBDIRECTORY(examples)
 INCLUDE(setup_custom_targets)
 
 #
-# Include CPack configuration:
-#
-INCLUDE(setup_cpack)
-
-#
 # And finally, print the configuration:
 #
 FILE(READ ${CMAKE_BINARY_DIR}/summary.log DEAL_II_LOG_SUMMARY)

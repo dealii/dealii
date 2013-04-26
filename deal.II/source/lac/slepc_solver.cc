@@ -49,6 +49,7 @@ namespace SLEPcWrappers
     :
     solver_control (cn),
     mpi_communicator (mpi_communicator),
+    target_eigenvalue (PETSC_NULL),
     set_which (EPS_LARGEST_MAGNITUDE),
     set_problem (EPS_NHEP),
     opA (NULL),
@@ -87,6 +88,12 @@ namespace SLEPcWrappers
   SolverBase::set_transformation (SLEPcWrappers::TransformationBase &this_transformation)
   {
     transformation = &this_transformation;
+  }
+
+  void
+  SolverBase::set_target_eigenvalue (const double &this_target)
+  {
+    target_eigenvalue = this_target;
   }
 
   void
@@ -147,6 +154,10 @@ namespace SLEPcWrappers
     if (transformation)
       transformation->set_context (solver_data->eps);
 
+    // set target eigenvalues to solve for
+    ierr = EPSSetTarget (solver_data->eps, target_eigenvalue);
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+    
     // set which portion of the eigenspectrum to solve for
     ierr = EPSSetWhichEigenpairs (solver_data->eps, set_which);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
@@ -457,6 +468,41 @@ namespace SLEPcWrappers
     Assert ((false),
             ExcMessage ("Your SLEPc installation does not include a copy of the "
                         "Jacobi-Davidson solver. A SLEPc version > 3.1.0 is required."));
+#endif
+  }
+
+
+  /* ---------------------- LAPACK ------------------------- */
+  SolverLAPACK::SolverLAPACK (SolverControl        &cn,
+			      const MPI_Comm       &mpi_communicator,
+			      const AdditionalData &data)
+    :
+    SolverBase (cn, mpi_communicator),
+    additional_data (data)
+  {}
+
+  void
+  SolverLAPACK::set_solver_type (EPS &eps) const
+  {
+    // 'Tis overwhelmingly likely that PETSc/SLEPc *always* has
+    // BLAS/LAPACK, but let's be defensive.
+#if PETSC_HAVE_BLASLAPACK
+    int ierr;
+    ierr = EPSSetType (eps, const_cast<char *>(EPSLAPACK));
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+
+    // hand over the absolute tolerance and the maximum number of
+    // iteration steps to the SLEPc convergence criterion.
+    ierr = EPSSetTolerances (eps, this->solver_control.tolerance(),
+                             this->solver_control.max_steps());
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+#else
+    // Supress compiler warnings about unused paameters.
+    (void) eps;
+
+    Assert ((false),
+            ExcMessage ("Your PETSc/SLEPc installation was not configured with BLAS/LAPACK "
+                        "but this is needed to use the LAPACK solver."));
 #endif
   }
 

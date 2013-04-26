@@ -330,6 +330,30 @@ public:
 
 
   /**
+   * set the precision for the underlying stream and returns the
+   * previous stream precision. This fuction mimics
+   * http://www.cplusplus.com/reference/ios/ios_base/precision/
+   */
+  std::streamsize precision (const std::streamsize prec);
+
+
+  /**
+   * set the width for the underlying stream and returns the
+   * previous stream width. This fuction mimics
+   * http://www.cplusplus.com/reference/ios/ios_base/width/
+   */
+  std::streamsize width (const std::streamsize wide);
+
+
+  /**
+   * set the flags for the underlying stream and returns the
+   * previous stream flags. This fuction mimics
+   * http://www.cplusplus.com/reference/ios/ios_base/flags/
+   */
+  std::ios::fmtflags flags(const std::ios::fmtflags f);
+
+
+  /**
    * Output a constant something through this stream.
    */
   template <typename T>
@@ -518,22 +542,40 @@ private:
    * function will return the correct internal ostringstream buffer for
    * operater<<.
    */
-  std::ostringstream &get_stream()
-  {
-    outstreams.get().setf(std::ios::showpoint | std::ios::left);
-    return outstreams.get();
-  }
+  std::ostringstream &get_stream();
 
   /**
    * We use tbb's thread local storage facility to generate a stringstream
    * for every thread that sends log messages.
    */
-  Threads::ThreadLocalStorage<std::ostringstream> outstreams;
-
+  Threads::ThreadLocalStorage<std_cxx1x::shared_ptr<std::ostringstream> > outstreams;
 };
 
 
 /* ----------------------------- Inline functions and templates ---------------- */
+
+
+inline
+std::ostringstream &
+LogStream::get_stream()
+{
+  // see if we have already created this stream. if not, do so and
+  // set the default flags (why we set these flags is lost to
+  // history, but this is what we need to keep several hundred tests
+  // from producing different output)
+  //
+  // note that in all of this we need not worry about thread-safety
+  // because we operate on a thread-local object and by definition
+  // there can only be one access at a time
+  if (outstreams.get() == 0)
+    {
+      outstreams.get().reset (new std::ostringstream);
+      outstreams.get()->setf(std::ios::showpoint | std::ios::left);
+    }
+
+  // then return the stream
+  return *outstreams.get();
+}
 
 
 template <class T>
@@ -541,8 +583,9 @@ inline
 LogStream &
 LogStream::operator<< (const T &t)
 {
-  // print to the internal stringstream:
+  // print to the internal stringstream
   get_stream() << t;
+
   return *this;
 }
 
@@ -552,16 +595,18 @@ inline
 LogStream &
 LogStream::operator<< (const double t)
 {
+  std::ostringstream &stream = get_stream();
+
   // we have to make sure that we don't catch NaN's and +-Inf's with the
   // test, because for these denormals all comparisons are always false.
   // thus, for a NaN, both t<=0 and t>=0 are false at the same time, which
   // can't be said for any other number
   if (! (t<=0) && !(t>=0))
-    get_stream() << t;
+    stream << t;
   else if (std::fabs(t) < double_threshold)
-    get_stream() << '0';
+    stream << '0';
   else
-    get_stream() << t*(1.+offset);
+    stream << t*(1.+offset);
 
   return *this;
 }
@@ -572,16 +617,18 @@ inline
 LogStream &
 LogStream::operator<< (const float t)
 {
+  std::ostringstream &stream = get_stream();
+
   // we have to make sure that we don't catch NaN's and +-Inf's with the
   // test, because for these denormals all comparisons are always false.
   // thus, for a NaN, both t<=0 and t>=0 are false at the same time, which
   // can't be said for any other number
   if (! (t<=0) && !(t>=0))
-    get_stream() << t;
+    stream << t;
   else if (std::fabs(t) < float_threshold)
-    get_stream() << '0';
+    stream << '0';
   else
-    get_stream() << t*(1.+offset);
+    stream << t*(1.+offset);
 
   return *this;
 }

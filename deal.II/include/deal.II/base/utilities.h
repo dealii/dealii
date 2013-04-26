@@ -702,8 +702,6 @@ namespace Utilities
     Assert (N>0, ExcNotImplemented());
     switch (N)
       {
-      case 0:
-        return 1;
       case 1:
         return n;
       case 2:
@@ -713,8 +711,8 @@ namespace Utilities
       case 4:
         return n*n*n*n;
       default:
-        T result = 1;
-        for (int d=0; d<N; ++d)
+        T result = n;
+        for (int d=1; d<N; ++d)
           result *= n;
         return result;
       }

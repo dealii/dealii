@@ -12,6 +12,13 @@
 ##
 #####
 
+#
+# Remove -Wall and -pedantic from CMAKE_CXX_FLAGS (in directory scope) to
+# avoid some annoying warnings...
+#
+STRIP_FLAG(CMAKE_CXX_FLAGS "-Wall")
+STRIP_FLAG(CMAKE_CXX_FLAGS "-pedantic")
+
 SET(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/rml/include
@@ -20,7 +27,6 @@ INCLUDE_DIRECTORIES(
 IF(NOT EXISTS "${CMAKE_CURRENT_BINARY_DIR}/version_string.ver")
   FILE(WRITE "${CMAKE_CURRENT_BINARY_DIR}/version_string.ver"
     "#define __TBB_VERSION_STRINGS(N) \"Empty\"\n"
-    "#define TBB_VERSION_STRINGS(N) \"Empty\"\n"
     )
 ENDIF()
 

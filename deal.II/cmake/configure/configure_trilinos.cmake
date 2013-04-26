@@ -27,6 +27,13 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     SET(${var} TRUE)
 
     #
+    # Set TRILINOS_DIR to something meaningful if empty
+    #
+    IF("${TRILINOS_DIR}" STREQUAL "")
+      SET(TRILINOS_DIR "<system location>")
+    ENDIF()
+
+    #
     # Check whether all required modules of trilinos are installed:
     #
     MESSAGE(STATUS
@@ -34,9 +41,9 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       )
 
     FOREACH(_module
-      amesos epetra ifpack aztecoo sacado teuchos
+      Amesos Epetra Ifpack AztecOO Sacado Teuchos
       )
-      ITEM_MATCHES(_module_found ${_module}$ ${Trilinos_LIBRARIES})
+      ITEM_MATCHES(_module_found ${_module} ${Trilinos_PACKAGE_LIST})
       IF(_module_found)
         MESSAGE(STATUS "Found ${_module}")
       ELSE()
@@ -51,12 +58,10 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         "Missing ${_modules_missing}"
         )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
-        "The Trilinos installation found at\n"
-        "  ${TRILINOS_DIR}\n"
+        "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "is missing one or more modules necessary for the deal.II Trilinos interfaces:\n"
         "  ${_modules_missing}\n\n"
-        "Please re-install Trilinos with the missing Trilinos subpackages
-        enabled.\n\n"
+        "Please re-install Trilinos with the missing Trilinos subpackages enabled.\n\n"
         )
     ENDIF()
 
@@ -82,8 +87,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
-        "The Trilinos installation found at\n"
-        "  ${TRILINOS_DIR}\n"
+        "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "with version ${TRILINOS_VERSION_MAJOR}.${TRILINOS_VERSION_MINOR}.${TRILINOS_VERSION_SUBMINOR} has bugs that make\n"
         "it incompatible with deal.II. Please use versions before 10.6 or after\n"
         "10.8.1.\n\n"
@@ -103,8 +107,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
         )
       SET(TRILINOS_ADDITIONAL_ERROR_STRING
         ${TRILINOS_ADDITIONAL_ERROR_STRING}
-        "The Trilinos installation found at\n"
-        "  ${TRILINOS_DIR}\n"
+        "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
         "has to be configured with the same MPI configuration as deal.II, but found:\n"
         "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
         "  TRILINOS_WITH_MPI = ${TRILINOS_WITH_MPI}\n"
@@ -152,8 +155,7 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
             )
           SET(TRILINOS_ADDITIONAL_ERROR_STRING
             ${TRILINOS_ADDITIONAL_ERROR_STRING}
-            "The Trilinos installation found at\n"
-            "  ${TRILINOS_DIR}\n"
+            "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
             "is not compatible with the C++ standard selected for\n"
             "this compiler. See the deal.II FAQ page for a solution.\n\n"
             )

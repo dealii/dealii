@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -129,6 +129,7 @@ LogStream::test_mode(bool on)
 LogStream &
 LogStream::operator<< (std::ostream& (*p) (std::ostream &))
 {
+
   std::ostringstream &stream = get_stream();
 
   // Print to the internal stringstream:
@@ -241,6 +242,27 @@ void LogStream::pop ()
 {
   if (get_prefixes().size() > 1)
     get_prefixes().pop();
+}
+
+
+std::ios::fmtflags
+LogStream::flags(const std::ios::fmtflags f)
+{
+  return get_stream().flags (f);
+}
+
+
+std::streamsize
+LogStream::precision (const std::streamsize prec)
+{
+  return get_stream().precision (prec);
+}
+
+
+std::streamsize
+LogStream::width (const std::streamsize wide)
+{
+  return get_stream().width (wide);
 }
 
 

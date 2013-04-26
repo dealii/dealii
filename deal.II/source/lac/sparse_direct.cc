@@ -314,11 +314,34 @@ SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution) const
 }
 
 
+void
+SparseDirectUMFPACK::solve (BlockVector<double> &rhs_and_solution) const
+{
+  // the UMFPACK functions want a contiguous array of elements, so
+  // there is no way around copying data around. thus, just copy the
+  // data into a regular vector and back
+  Vector<double> tmp (rhs_and_solution.size());
+  tmp = rhs_and_solution;
+  solve (tmp);
+  rhs_and_solution = tmp;
+}
+
+
 
 template <class Matrix>
 void
 SparseDirectUMFPACK::solve (const Matrix   &matrix,
                             Vector<double> &rhs_and_solution)
+{
+  factorize (matrix);
+  solve (rhs_and_solution);
+}
+
+
+template <class Matrix>
+void
+SparseDirectUMFPACK::solve (const Matrix   &matrix,
+                            BlockVector<double> &rhs_and_solution)
 {
   factorize (matrix);
   solve (rhs_and_solution);
@@ -355,10 +378,28 @@ SparseDirectUMFPACK::solve (Vector<double> &) const
 }
 
 
+
+void
+SparseDirectUMFPACK::solve (BlockVector<double> &) const
+{
+  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
+}
+
+
 template <class Matrix>
 void
 SparseDirectUMFPACK::solve (const Matrix &,
                             Vector<double> &)
+{
+  AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
+}
+
+
+
+template <class Matrix>
+void
+SparseDirectUMFPACK::solve (const Matrix &,
+                            BlockVector<double> &)
 {
   AssertThrow(false, ExcMessage("To call this function you need UMFPACK, but configured deal.II without passing the necessary switch to 'cmake'. Please consult the installation instructions in doc/readme.html."));
 }
@@ -379,6 +420,17 @@ void
 SparseDirectUMFPACK::vmult (
   Vector<double>       &dst,
   const Vector<double> &src) const
+{
+  dst = src;
+  this->solve(dst);
+}
+
+
+
+void
+SparseDirectUMFPACK::vmult (
+  BlockVector<double>       &dst,
+  const BlockVector<double> &src) const
 {
   dst = src;
   this->solve(dst);
@@ -595,6 +647,9 @@ void SparseDirectMUMPS::vmult (Vector<double>       &dst,
   template    \
   void SparseDirectUMFPACK::solve (const MATRIX   &,    \
                                    Vector<double> &);    \
+  template    \
+  void SparseDirectUMFPACK::solve (const MATRIX   &,    \
+                                   BlockVector<double> &);    \
   template    \
   void SparseDirectUMFPACK::initialize (const MATRIX &,    \
                                         const AdditionalData);

@@ -23,7 +23,11 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     MARK_AS_ADVANCED(
       atlas_LIBRARY
       blas_LIBRARY
+      gslcblas_LIBRARY
       lapack_LIBRARY
+      m_LIBRARY
+      ptf77blas_LIBRARY
+      ptlapack_LIBRARY
       refblas_LIBRARY
       reflapack_LIBRARY
       )

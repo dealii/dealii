@@ -80,9 +80,7 @@ class MatrixFreeTest
   void vmult (VectorType &dst,
               const VectorType &src) const
   {
-    AssertDimension (dst.size(), dim);
-    for (unsigned int d=0; d<dim; ++d)
-      dst[d] = 0;
+    dst = 0;
     data.cell_loop (&MatrixFreeTest<dim,degree,VectorType>::local_apply,
                     this, dst, src);
   };
@@ -128,9 +126,8 @@ void test ()
   BlockSparsityPattern      sparsity_pattern;
   BlockSparseMatrix<double> system_matrix;
 
-  BlockVector<double> solution;
+  BlockVector<double> solution, mf_solution;
   BlockVector<double> system_rhs;
-  std::vector<Vector<double> > vec1, vec2;
 
   dof_handler.distribute_dofs (fe);
   dof_handler_sca.distribute_dofs (fe_sca);
@@ -160,16 +157,7 @@ void test ()
   solution.collect_sizes ();
 
   system_rhs.reinit (solution);
-
-  vec1.resize (dim);
-  vec2.resize (dim);
-  vec1[0].reinit (dofs_per_block);
-  vec2[0].reinit (vec1[0]);
-  for (unsigned int i=1; i<dim; ++i)
-    {
-      vec1[i].reinit (vec1[0]);
-      vec2[i].reinit (vec1[0]);
-    }
+  mf_solution.reinit (solution);
 
                                 // assemble curl-curl operator
   {
@@ -244,8 +232,6 @@ void test ()
         system_rhs.block(i)(j) = val;
       }
   constraints.condense(system_rhs);
-  for (unsigned int i=0; i<dim; ++i)
-    vec1[i] = system_rhs.block(i);
 
                                 // setup matrix-free structure
   {
@@ -258,16 +244,13 @@ void test ()
 
   system_matrix.vmult (solution, system_rhs);
 
-  typedef std::vector<Vector<double> > VectorType;
-  MatrixFreeTest<dim,fe_degree,VectorType> mf (mf_data);
-  mf.vmult (vec2, vec1);
+  MatrixFreeTest<dim,fe_degree,BlockVector<double> > mf (mf_data);
+  mf.vmult (mf_solution, system_rhs);
 
                                 // Verification
-  double error = 0.;
-  for (unsigned int i=0; i<dim; ++i)
-    for (unsigned int j=0; j<system_rhs.block(i).size(); ++j)
-      error += std::fabs (solution.block(i)(j)-vec2[i](j));
-  double relative = solution.block(0).l1_norm();
+  mf_solution -= solution;
+  const double error = mf_solution.linfty_norm();
+  const double relative = solution.linfty_norm();
   deallog << "  Verification fe degree " << fe_degree  <<  ": "
           << error/relative << std::endl << std::endl;
 }

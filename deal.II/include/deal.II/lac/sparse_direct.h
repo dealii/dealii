@@ -103,8 +103,15 @@ public:
   ~SparseDirectUMFPACK ();
 
   /**
-   * This function does nothing. It is only here to provide a consistent
-   * interface.
+   * @name Setting up a sparse factorization
+   */
+  /**
+   * @{
+   */
+   
+  /**
+   * This function does nothing. It is only here to provide a interface
+   * consistent with other sparse direct solvers.
    */
   void initialize (const SparsityPattern &sparsity_pattern);
 
@@ -137,29 +144,64 @@ public:
                   const AdditionalData additional_data = AdditionalData());
 
   /**
+   * @}
+   */
+
+  /**
+   * @name Functions that represent the inverse of a matrix
+   */
+  /**
+   * @{
+   */
+  
+  /**
    * Preconditioner interface function. Usually, given the source vector,
    * this method returns an approximated solution of <i>Ax = b</i>. As this
    * class provides a wrapper to a direct solver, here it is actually the
    * exact solution (exact within the range of numerical accuracy of
    * course).
+   *
+   * In other words, this function actually multiplies with the exact
+   * inverse of the matrix, $A^{-1}$.
    */
-  void vmult (Vector<double> &, const Vector<double> &) const;
+  void vmult (Vector<double> &dst,
+	      const Vector<double> &src) const;
 
   /**
-   * Not implemented but necessary for compiling.
+   * Same as before, but for block vectors.
    */
-  void Tvmult (Vector<double> &, const Vector<double> &) const;
+  void vmult (BlockVector<double> &dst,
+	      const BlockVector<double> &src) const;
+
+  /**
+   * Not implemented but necessary for compiling certain other classes.
+   */
+  void Tvmult (Vector<double> &dst,
+	       const Vector<double> &src) const;
 
   /**
    * Same as vmult(), but adding to the previous solution. Not implemented
-   * yet.
+   * yet but necessary for compiling certain other classes.
    */
-  void vmult_add (Vector<double> &, const Vector<double> &) const;
+  void vmult_add (Vector<double> &dst,
+		  const Vector<double> &src) const;
 
   /**
-   * Not implemented but necessary for compiling.
+   * Not implemented but necessary for compiling certain other classes.
    */
-  void Tvmult_add (Vector<double> &, const Vector<double> &) const;
+  void Tvmult_add (Vector<double> &dst,
+		   const Vector<double> &src) const;
+  
+  /**
+   * @}
+   */
+
+  /**
+   * @name Functions that solve linear systems
+   */
+  /**
+   * @{
+   */
 
   /**
    * Solve for a certain right hand side vector. This function may be
@@ -178,7 +220,12 @@ public:
   void solve (Vector<double> &rhs_and_solution) const;
 
   /**
-   * Call the two functions factorize and solve in that order, i.e. perform
+   * Same as before, but for block vectors.
+   */
+  void solve (BlockVector<double> &rhs_and_solution) const;
+  
+  /**
+   * Call the two functions factorize() and solve() in that order, i.e. perform
    * the whole solution process for the given right hand side vector.
    *
    * The solution will be returned in place of the right hand side vector.
@@ -187,6 +234,17 @@ public:
   void solve (const Matrix   &matrix,
               Vector<double> &rhs_and_solution);
 
+  /**
+   * Same as before, but for block vectors.
+   */
+  template <class Matrix>
+  void solve (const Matrix        &matrix,
+              BlockVector<double> &rhs_and_solution);
+
+  /**
+   * @}
+   */
+  
   /**
    * One of the UMFPack routines threw an error. The error code is included
    * in the output and can be looked up in the UMFPack user manual. The

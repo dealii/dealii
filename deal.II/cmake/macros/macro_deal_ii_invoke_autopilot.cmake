@@ -169,6 +169,8 @@ ${_switch_targets}#
     IF(NOT USAGE_PRINTED)
       INCLUDE(${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/print_usage.cmake)
       SET(USAGE_PRINTED TRUE CACHE INTERNAL "")
+    ELSE()
+      MESSAGE(STATUS "Run   $ make help   to print a detailed help message")
     ENDIF()
 
   ENDIF()

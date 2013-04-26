@@ -1022,6 +1022,11 @@ namespace PETScWrappers
     int ierr = VecGetArray (vector, &val);
 
     AssertThrow (ierr == 0, ExcPETScError(ierr));
+
+    // save the state of out stream
+    const std::ios::fmtflags old_flags = out.flags();
+    const unsigned int old_precision = out.precision (precision);
+
     out.precision (precision);
     if (scientific)
       out.setf (std::ios::scientific, std::ios::floatfield);
@@ -1035,6 +1040,10 @@ namespace PETScWrappers
       for (size_type i=0; i<size(); ++i)
         out << val[i] << std::endl;
     out << std::endl;
+
+    // reset output format
+    out.flags (old_flags);
+    out.precision(old_precision);
 
     // restore the representation of the
     // vector

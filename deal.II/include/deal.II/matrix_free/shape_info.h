@@ -46,29 +46,16 @@ namespace internal
       ShapeInfo ();
 
       /**
-       * Initializes the data fields. Takes a
-       * one-dimensional quadrature formula and a
-       * finite element as arguments and evaluates
-       * the shape functions, gradients and Hessians
-       * on the one-dimensional unit cell. This
-       * function assumes that the finite element is
-       * derived from a one-dimensional element by a
-       * tensor product. It uses FETools::get_name()
-       * and FETools::get_fe_from_name() to find the
-       * one-dimensional element corresponding to
-       * the input element in @p dim dimensions.
+       * Initializes the data fields. Takes a one-dimensional quadrature
+       * formula and a finite element as arguments and evaluates the shape
+       * functions, gradients and Hessians on the one-dimensional unit
+       * cell. This function assumes that the finite element is derived from a
+       * one-dimensional element by a tensor product and that the zeroth shape
+       * function in zero evaluates to one.
        */
       template <int dim>
       void reinit (const Quadrature<1> &quad,
                    const FiniteElement<dim> &fe_dim);
-
-      /**
-       * Internal helper function for initialization
-       * that does the main work.
-       */
-      void do_initialize (const Quadrature<1>    &quad,
-                          const FiniteElement<1> &fe,
-                          const unsigned int      dim);
 
       /**
        * Returns the memory consumption of this

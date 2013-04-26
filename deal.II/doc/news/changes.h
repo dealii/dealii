@@ -111,7 +111,36 @@ this function.
 
 <ol>
 
-<li> New: class TimerOutput::Scope does automatic scope based enter/
+<li> Fixed: PETScWrappers::VectorBase::print now saves and restores
+the precision
+and width associated with the stream it prints to around setting
+the values passed as arguments.
+<br>
+(Fahad Alrashed, 2013/04/22)
+</li>
+
+<li> Fixed: FullMatrix::print now saves and restores the precision
+and width associated with the stream it prints to around setting
+the values passed as arguments.
+<br>
+(Fahad Alrashed, 2013/04/22)
+</li>
+
+<li> New: LogStream now has member functions LogStream::width,
+LogStream::precision and LogStream::flags that make it look more
+like normal objects of type <code>std::ostream</code>.
+<br>
+(Fahad Alrashed, 2013/04/22)
+</li>
+
+<li> New: SparseDirectUMFPACK has long had the ability to work with
+BlockSparseMatrix objects, but couldn't deal with BlockVector objects.
+This is now fixed.
+<br>
+(Wolfgang Bangerth, 2013/04/21)
+</li>
+
+<li> New: Class TimerOutput::Scope does automatic scope based enter/
 exit_section of a TimerOutput object.
 <br>
 (Timo Heister, 2013/04/18)
