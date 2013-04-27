@@ -63,7 +63,8 @@
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
 
-SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "8.0.pre") # TODO: Get this value from somewhere else
+FILE(STRINGS "${CMAKE_SOURCE_DIR}/VERSION" _version LIMIT_COUNT 1)
+SET_IF_EMPTY(DEAL_II_PACKAGE_VERSION "${_version}")
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_VENDOR
   "The deal.II Authors <http://www.dealii.org/>"
