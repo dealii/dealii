@@ -32,13 +32,20 @@ struct SubCellData;
  * This class implements an input mechanism for grid data. It allows to read a
  * grid structure into a triangulation object. At present, UCD (unstructured
  * cell data), DB Mesh, XDA, Gmsh, Tecplot, NetCDF, UNV, and Cubit are supported as
- * input format for grid data. Any numerical data after the block of geometric
+ * input format for grid data. Any numerical data other than geometric
  * (vertex locations) and topological (how vertices form cells) information is
- * ignored. Notice also that at the moment in the codimension 1 case only UCD
- * and Gmsh format are accepted.
+ * ignored.
  *
- * Since the coarse mesh fed into a @p Triangulation object cannot have
- * hanging nodes, strange things will happen if the input file has them. This
+ * @note Since deal.II only supports line, quadrilateral and hexahedral meshes,
+ * the functions in this class can only read meshes that consist exclusively
+ * of such cells. If you absolutely need to work with a mesh that uses triangles
+ * or tetrahedra, then your only option is to convert the mesh to quadrilaterals
+ * and hexahedra. A tool that can do this is tethex, see
+ * http://code.google.com/p/tethex/wiki/Tethex .
+ *
+ * Since the coarse mesh fed into a @p Triangulation object must not have
+ * hanging nodes, strange things will happen if the mesh represented by the
+ * input file does in fact have them. This
  * is due to the fact that most mesh description formats do not store
  * neighborship information between cells, so the grid reading functions have
  * to regenerate it. They do so by checking whether two cells have a common
