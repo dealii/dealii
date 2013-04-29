@@ -538,7 +538,7 @@ namespace parallel
        * of active cells in the
        * distributed triangulation.
        */
-      unsigned int n_global_active_cells () const;
+      types::global_dof_index n_global_active_cells () const;
 
       /**
        * Returns the global maximum level. This may be bigger than n_levels.
@@ -730,7 +730,7 @@ namespace parallel
       struct NumberCache
       {
         std::vector<unsigned int> n_locally_owned_active_cells;
-        unsigned int              n_global_active_cells;
+        types::global_dof_index   n_global_active_cells;
         unsigned int              n_global_levels;
       };
 
@@ -929,7 +929,7 @@ namespace parallel
        * of active cells in the
        * distributed triangulation.
        */
-      unsigned int n_global_active_cells () const;
+      types::global_dof_index n_global_active_cells () const;
       virtual unsigned int n_global_levels () const;
 
       /**

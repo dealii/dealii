@@ -3032,7 +3032,7 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    unsigned int
+    types::global_dof_index
     Triangulation<dim,spacedim>::n_global_active_cells () const
     {
       return number_cache.n_global_active_cells;
@@ -3293,7 +3293,7 @@ namespace parallel
 
 
     template <>
-    unsigned int
+    types::global_dof_index
     Triangulation<1,1>::n_global_active_cells () const
     {
       Assert (false, ExcNotImplemented());
@@ -3351,7 +3351,7 @@ namespace parallel
 
 
     template <>
-    unsigned int
+    types::global_dof_index
     Triangulation<1,2>::n_global_active_cells () const
     {
       Assert (false, ExcNotImplemented());
@@ -3401,7 +3401,7 @@ namespace parallel
 
 
     template <>
-    unsigned int
+    types::global_dof_index
     Triangulation<1,3>::n_global_active_cells () const
     {
       Assert (false, ExcNotImplemented());
