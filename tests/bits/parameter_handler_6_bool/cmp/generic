@@ -1,0 +1,17 @@
+
+# Listing of Parameters
+# ---------------------
+subsection Testing
+  # docs 1
+  set bool = true
+end
+
+
+# Listing of Parameters
+# ---------------------
+subsection Testing
+  # docs 1
+  set bool = false # default: true
+end
+
+
