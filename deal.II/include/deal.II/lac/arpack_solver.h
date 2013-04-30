@@ -479,7 +479,7 @@ void ArpackSolver::solve (
         }
       else if (info == 3)
         {
-          Assert (false, ExcArpackNoShifts(1));;
+          Assert (false, ExcArpackNoShifts(1));
         }
       else if (info!=0)
         {

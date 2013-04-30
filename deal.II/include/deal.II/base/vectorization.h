@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2011, 2012 by the deal.II authors
+//    Copyright (C) 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -661,7 +661,7 @@ public:
   operator [] (const unsigned int comp) const
   {
     AssertIndexRange (comp, 4);
-    return *(reinterpret_cast<const float *>(&data)+comp);;
+    return *(reinterpret_cast<const float *>(&data)+comp);
   }
 
   /**
