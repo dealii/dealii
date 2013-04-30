@@ -1133,10 +1133,17 @@ namespace TrilinosWrappers
               inputleft.trilinos_sparsity_pattern().ExtractMyRowView(i, num_entries,
                                                                      indices);
               Assert (num_entries >= 0, ExcInternalError());
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
               const size_type GID = inputleft.row_partitioner().GID(i);
               for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
                 sparsity_transposed.add (inputleft.col_partitioner().GID(indices[j]),
                                          GID);
+#else
+              const size_type GID = inputleft.row_partitioner().GID64(i);
+              for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
+                sparsity_transposed.add (inputleft.col_partitioner().GID64(indices[j]),
+                                         GID);
+#endif
             }
 
           sparsity_transposed.compress();
@@ -1148,10 +1155,17 @@ namespace TrilinosWrappers
               inputleft.trilinos_matrix().ExtractMyRowView(i, num_entries,
                                                            values, indices);
               Assert (num_entries >= 0, ExcInternalError());
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
               const size_type GID = inputleft.row_partitioner().GID(i);
               for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
                 transposed_mat.set (inputleft.col_partitioner().GID(indices[j]),
                                     GID, values[j]);
+#else
+              const size_type GID = inputleft.row_partitioner().GID64(i);
+              for (TrilinosWrappers::types::int_type j=0; j<num_entries; ++j)
+                transposed_mat.set (inputleft.col_partitioner().GID64(indices[j]),
+                                    GID, values[j]);
+#endif
             }
           transposed_mat.compress();
           ML_Operator_WrapEpetraCrsMatrix
