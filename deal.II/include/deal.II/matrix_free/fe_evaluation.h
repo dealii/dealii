@@ -688,22 +688,6 @@ protected:
   unsigned int cell_data_number;
 
   /**
-   * If the present cell chunk for vectorization is not completely filled up
-   * with data, this field stores how many physical cells are underlying. Is
-   * between 1 and VectorizedArray<Number>::n_array_elements-1 (inclusive).
-   */
-  unsigned int n_irreg_components_filled;
-
-  /**
-   * Stores whether the present cell chunk used in vectorization is not
-   * completely filled up with physical cells. E.g. if vectorization dictates
-   * that four cells should be worked with but only three physical cells are
-   * left, this flag will be set to true, otherwise to false. Mainly used for
-   * internal checking when reading from vectors or writing to vectors.
-   */
-  bool at_irregular_cell;
-
-  /**
    * Debug information to track whether dof values have been initialized
    * before accessed. Used to control exceptions when uninitialized data is
    * used.
@@ -1465,17 +1449,14 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
   jacobian_grad_upper(0),
   cell               (numbers::invalid_unsigned_int),
   cell_type          (internal::MatrixFreeFunctions::undefined),
-  cell_data_number   (0),
-  n_irreg_components_filled (0),
-  at_irregular_cell  (false)
+  cell_data_number   (0)
 {
-  Assert (matrix_info.indices_initialized() == true,
-          ExcNotInitialized());
   Assert (matrix_info.mapping_initialized() == true,
           ExcNotInitialized());
   AssertDimension (matrix_info.get_size_info().vectorization_length,
                    VectorizedArray<Number>::n_array_elements);
   Assert (n_fe_components == 1 ||
+          n_components == 1 ||
           n_components == n_fe_components,
           ExcMessage ("The underlying FE is vector-valued. In this case, the "
                       "template argument n_components must be a the same "
@@ -1553,9 +1534,6 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
         }
     }
 
-  n_irreg_components_filled =
-    std_cxx1x::get<2>(dof_info.row_starts[cell_in]);
-  at_irregular_cell = n_irreg_components_filled > 0;
 #ifdef DEBUG
   dof_values_initialized      = false;
   values_quad_initialized     = false;
@@ -1832,6 +1810,8 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
   // into the local data field or write local data into the vector. Certain
   // operations are no-ops for the given use case.
 
+  Assert (matrix_info.indices_initialized() == true,
+          ExcNotInitialized());
   Assert (cell != numbers::invalid_unsigned_int, ExcNotInitialized());
 
   // loop over all local dofs. ind_local holds local number on cell, index
@@ -1843,6 +1823,10 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
   const std::pair<unsigned short,unsigned short> *indicators_end =
     dof_info.end_indicators(cell);
   unsigned int ind_local = 0;
+
+  const unsigned int n_irreg_components_filled =
+    std_cxx1x::get<2>(dof_info.row_starts[cell]);
+  const bool at_irregular_cell = n_irreg_components_filled > 0;
 
   // scalar case (or case when all components have the same degrees of freedom
   // and sit on a different vector each)
@@ -2447,6 +2431,8 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
 {
   // this is different from the other three operations because we do not use
   // constraints here, so this is a separate function.
+  Assert (matrix_info.indices_initialized() == true,
+          ExcNotInitialized());
   Assert (cell != numbers::invalid_unsigned_int, ExcNotInitialized());
   Assert (dof_info.store_plain_indices == true, ExcNotInitialized());
 
@@ -2454,6 +2440,10 @@ FEEvaluationBase<dim,dofs_per_cell_,n_q_points_,n_components_,Number>
   // iterates over the elements of index_local_to_global and dof_indices
   // points to the global indices stored in index_local_to_global
   const unsigned int *dof_indices = dof_info.begin_indices_plain(cell);
+
+  const unsigned int n_irreg_components_filled =
+    std_cxx1x::get<2>(dof_info.row_starts[cell]);
+  const bool at_irregular_cell = n_irreg_components_filled > 0;
 
   // scalar case (or case when all components have the same degrees of freedom
   // and sit on a different vector each)

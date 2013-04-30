@@ -131,6 +131,7 @@ namespace internal
       constrained_dofs (dof_info_in.constrained_dofs),
       row_starts_plain_indices (dof_info_in.row_starts_plain_indices),
       plain_dof_indices (dof_info_in.plain_dof_indices),
+      dimension (dof_info_in.dimension),
       n_components (dof_info_in.n_components),
       dofs_per_cell (dof_info_in.dofs_per_cell),
       dofs_per_face (dof_info_in.dofs_per_face),
@@ -153,6 +154,7 @@ namespace internal
       ghost_dofs.clear();
       dofs_per_cell.clear();
       dofs_per_face.clear();
+      dimension = 2;
       n_components = 0;
       row_starts_plain_indices.clear();
       plain_dof_indices.clear();

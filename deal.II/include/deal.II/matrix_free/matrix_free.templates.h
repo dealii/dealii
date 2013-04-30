@@ -159,6 +159,32 @@ internal_reinit(const Mapping<dim>                          &mapping,
       initialize_indices (constraint, locally_owned_set);
     }
 
+  // initialize bare structures
+  else if (dof_info.size() != dof_handler.size())
+    {
+      initialize_dof_handlers(dof_handler, additional_data.level_mg_handler);
+      std::vector<unsigned int> dummy;
+      size_info.make_layout (cell_level_index.size(),
+                             VectorizedArray<Number>::n_array_elements,
+                             dummy, dummy);
+      for (unsigned int i=0; i<dof_info.size(); ++i)
+        {
+          dof_info[i].dimension    = dim;
+          dof_info[i].n_components = dof_handler[i]->get_fe().element_multiplicity(0);
+          dof_info[i].dofs_per_cell.push_back(dof_handler[i]->get_fe().dofs_per_cell);
+          dof_info[i].row_starts.resize(size_info.n_macro_cells+1);
+          std_cxx1x::get<2>(dof_info[i].row_starts.back()) =
+            cell_level_index.size() % VectorizedArray<Number>::n_array_elements;
+
+          // if indices are not initialized, the cell_level_index might not be
+          // divisible by the vectorization length. But it must be for
+          // mapping_info...
+          while (cell_level_index.size() % VectorizedArray<Number>::n_array_elements
+                 != 0)
+            cell_level_index.push_back(cell_level_index.back());
+        }
+    }
+
   // Reads out the FE information and stores the shape function values,
   // gradients and Hessians for quadrature points.
   const unsigned int n_fe   = dof_handler.size();
@@ -252,6 +278,33 @@ internal_reinit(const Mapping<dim>                            &mapping,
       // (to separate cells with overlap to other processors from others
       // without).
       initialize_indices (constraint, locally_owned_set);
+    }
+
+  // initialize bare structures
+  else if (dof_info.size() != dof_handler.size())
+    {
+      initialize_dof_handlers(dof_handler, additional_data.level_mg_handler);
+      std::vector<unsigned int> dummy;
+      size_info.make_layout (cell_level_index.size(),
+                             VectorizedArray<Number>::n_array_elements,
+                             dummy, dummy);
+      for (unsigned int i=0; i<dof_info.size(); ++i)
+        {
+          Assert(dof_handler[i]->get_fe().size() == 1, ExcNotImplemented());
+          dof_info[i].dimension    = dim;
+          dof_info[i].n_components = dof_handler[i]->get_fe()[0].element_multiplicity(0);
+          dof_info[i].dofs_per_cell.push_back(dof_handler[i]->get_fe()[0].dofs_per_cell);
+          dof_info[i].row_starts.resize(size_info.n_macro_cells+1);
+          std_cxx1x::get<2>(dof_info[i].row_starts.back()) =
+            cell_level_index.size() % VectorizedArray<Number>::n_array_elements;
+
+          // if indices are not initialized, the cell_level_index might not be
+          // divisible by the vectorization length. But it must be for
+          // mapping_info...
+          while (cell_level_index.size() % VectorizedArray<Number>::n_array_elements
+                 != 0)
+            cell_level_index.push_back(cell_level_index.back());
+        }
     }
 
   // Reads out the FE information and stores the shape function values,
@@ -460,8 +513,8 @@ void MatrixFree<dim,Number>::initialize_indices
           // cache number of finite elements and dofs_per_cell
           dof_info[no].dofs_per_cell.push_back (fe.dofs_per_cell);
           dof_info[no].dofs_per_face.push_back (fe.dofs_per_face);
-          dof_info[no].n_components  = n_fe_components;
-
+          dof_info[no].dimension    = dim;
+          dof_info[no].n_components = n_fe_components;
 
           // get permutation that gives lexicographic renumbering of the cell
           // dofs renumber (this is necessary for FE_Q, for example, since
