@@ -148,15 +148,7 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   HAVE_GLIBC_STACKTRACE)
 
-#
-# On Mac OS X, -rdynamic is accepted by the compiler (i.e.
-# it doesn't produce an error) but we always get a warning
-# that it isn't supported. So, only enable -rdynamic on non-Darwin
-# platforms.
-#
-# - Matthias Maier, rewritten 2012
-#
-IF(HAVE_GLIBC_STACKTRACE AND NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
+IF(HAVE_GLIBC_STACKTRACE)
   ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-rdynamic")
 ENDIF()
 
@@ -269,10 +261,18 @@ ENDIF()
 # per email by John Fowkes on the mailing list in Feb 2012,
 # so don't run the test on cygwin.
 #
-# - Matthias Maier, rewritten 2012
+# Finally, Intel's icpc compiler complains about the flag
+# but apparently only if the file to be compiled contains
+# particular content. See bug #46 in the Google Code bug
+# data base (http://code.google.com/p/dealii/issues/detail?id=46).
+# It proved impossible to track down under which circumstances
+# this happens, and so it was disabled for icpc.
+#
+# - Matthias Maier, rewritten 2012, 2013
 #
 IF( (NOT CMAKE_SYSTEM_NAME MATCHES "CYGWIN") AND
-    (NOT CMAKE_SYSTEM_NAME MATCHES "Windows") )
+    (NOT CMAKE_SYSTEM_NAME MATCHES "Windows") AND
+    (NOT CMAKE_CXX_COMPILER_ID MATCHES "Intel") )
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-Wa,--compress-debug-sections")
 ENDIF()
 
