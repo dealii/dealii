@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -669,9 +669,9 @@ void TableHandler::get_selected_columns(std::vector<std::string> &sel_columns) c
         {
           // i.e. key is a supercolumn key
           const unsigned int n_subcolumns=super_iter->second.size();
-          for (unsigned int j=0; j<n_subcolumns; ++j)
+          for (unsigned int k=0; k<n_subcolumns; ++k)
             {
-              const std::string subkey=super_iter->second[j];
+              const std::string subkey=super_iter->second[k];
               Assert(columns.count(subkey), ExcInternalError());
               sel_columns.push_back(subkey);
             }
