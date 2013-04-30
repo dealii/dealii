@@ -744,27 +744,13 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
 
   const size_type m = this->m(), n = src.m(), l = this->n();
 
-<<<<<<< .working
-  // arrange the loops in a way that
-  // we keep write operations low,
-  // (writing is usually more costly
-  // than reading).
-  for (size_type i=0; i<m; i++)
-    for (size_type j=0; j<n; j++)
-      {
-        number2 add_value = adding ? dst(i,j) : 0.;
-        for (size_type k=0; k<l; k++)
-          add_value += (number2)(*this)(i,k) * (number2)(src(j,k));
-        dst(i,j) = add_value;
-      }
-=======
   // symmetric matrix if the two matrices are the same
   if (PointerComparison::equal(this, &src))
-    for (unsigned int i=0; i<m; ++i)
-      for (unsigned int j=i; j<m; ++j)
+    for (size_type i=0; i<m; ++i)
+      for (size_type j=i; j<m; ++j)
         {
           number2 add_value = 0.;
-          for (unsigned int k=0; k<l; ++k)
+          for (size_type k=0; k<l; ++k)
             add_value += (number2)(*this)(i,k) * (number2)(*this)(j,k);
           if (adding)
             {
@@ -778,15 +764,14 @@ void FullMatrix<number>::mTmult (FullMatrix<number2>       &dst,
   else
     // arrange the loops in a way that we keep write operations low, (writing is
     // usually more costly than reading).
-    for (unsigned int i=0; i<m; i++)
-      for (unsigned int j=0; j<n; j++)
+    for (size_type i=0; i<m; i++)
+      for (size_type j=0; j<n; j++)
         {
           number2 add_value = adding ? dst(i,j) : 0.;
-          for (unsigned int k=0; k<l; k++)
+          for (size_type k=0; k<l; k++)
             add_value += (number2)(*this)(i,k) * (number2)(src(j,k));
           dst(i,j) = add_value;
         }
->>>>>>> .merge-right.r29408
 }
 
 
