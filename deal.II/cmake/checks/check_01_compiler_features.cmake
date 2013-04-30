@@ -148,15 +148,7 @@ CHECK_CXX_SOURCE_COMPILES(
   "
   HAVE_GLIBC_STACKTRACE)
 
-#
-# On Mac OS X, -rdynamic is accepted by the compiler (i.e.
-# it doesn't produce an error) but we always get a warning
-# that it isn't supported. So, only enable -rdynamic on non-Darwin
-# platforms.
-#
-# - Matthias Maier, rewritten 2012
-#
-IF(HAVE_GLIBC_STACKTRACE AND NOT CMAKE_SYSTEM_NAME MATCHES "Darwin")
+IF(HAVE_GLIBC_STACKTRACE)
   ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-rdynamic")
 ENDIF()
 

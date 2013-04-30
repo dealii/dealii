@@ -669,15 +669,15 @@ namespace VectorTools
                 const bool                project_to_boundary_first = false);
 
   /**
-   * Prepare Dirichlet boundary
-   * conditions.  Make up the list
+   * Compute Dirichlet boundary
+   * conditions.  This function makes up a map
    * of degrees of freedom subject
    * to Dirichlet boundary
-   * conditions and the values to
+   * conditions and the corresponding values to
    * be assigned to them, by
    * interpolation around the
    * boundary. If the
-   * @p boundary_values contained
+   * @p boundary_values object contained
    * values before, the new ones
    * are added, or the old ones
    * overwritten if a node of the
@@ -717,13 +717,24 @@ namespace VectorTools
    * boundary function will be used
    * for which the respective flag
    * was set in the component mask.
-   * See also @ref GlossComponentMask.
+   * See also @ref GlossComponentMask. As an example, assume that you are
+   * solving the Stokes equations in 2d, with variables $(u,v,p)$ and that
+   * you only want to interpolate boundary values for the pressure, then
+   * the component mask should correspond to <code>(true,true,false)</code>.
    *
-   * It is assumed that the number
-   * of components of the function
-   * in @p boundary_function matches that
+   * @note Whether a component mask has been specified or not, the number
+   * of components of the functions
+   * in @p function_map must match that
    * of the finite element used by
-   * @p dof.
+   * @p dof. In other words, for the example above, you need to provide a
+   * Function object that has 3 components (the two velocities and the
+   * pressure), even though you are only
+   * interested in the first two of them. interpolate_boundary_values()
+   * will then call this function to obtain a vector of 3 values at each
+   * interpolation point but only take the first two and discard the third.
+   * In other words, you are free to return whatever you like in the third
+   * component of the vector returned by Function::vector_value, but the
+   * Function object must state that it has 3 components.
    *
    * If the finite element used has
    * shape functions that are
@@ -739,7 +750,7 @@ namespace VectorTools
    * non-primitive shape functions
    * must be @p false.
    *
-   * See the general doc for more
+   * See the general documentation of this class for more
    * information.
    */
   template <class DH>
@@ -755,9 +766,9 @@ namespace VectorTools
    * taking only one pair of
    * boundary indicator and
    * corresponding boundary
-   * function. Calls the other
-   * function with remapped
-   * arguments.
+   * function. The same comments apply as for the previous function, in particular
+   * about the use of the component mask and the requires size of the function
+   * object.
    *
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
@@ -775,6 +786,9 @@ namespace VectorTools
    * interpolate_boundary_values()
    * function, see above, with
    * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * The same comments apply as for the previous function, in particular
+   * about the use of the component mask and the requires size of the function
+   * object.
    *
    * @see @ref GlossBoundaryIndicator "Glossary entry on boundary indicators"
    */
@@ -792,6 +806,9 @@ namespace VectorTools
    * interpolate_boundary_values()
    * function, see above, with
    * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * The same comments apply as for the previous function, in particular
+   * about the use of the component mask and the requires size of the function
+   * object.
    */
   template <class DH>
   void
@@ -841,32 +858,44 @@ namespace VectorTools
    * The parameter @p boundary_component
    * corresponds to the number @p
    * boundary_indicator of the face.
-   * numbers::internal_face_boundary_id
-   * is an illegal value, since it is
-   * reserved for interior faces.
    *
-   * The flags in the last parameter, @p
-   * component_mask (see @ref GlossComponentMask)
-   * denote which
-   * components of the finite element
-   * space shall be interpolated. If it
-   * is left as specified by the default
-   * value (i.e. an empty array), all
-   * components are interpolated. If it
-   * is different from the default value,
-   * it is assumed that the number of
-   * entries equals the number of
-   * components in the boundary functions
-   * and the finite element, and those
-   * components in the given boundary
-   * function will be used for which the
-   * respective flag was set in the
-   * component mask.
+   * The flags in the last
+   * parameter, @p component_mask
+   * denote which components of the
+   * finite element space shall be
+   * interpolated. If it is left as
+   * specified by the default value
+   * (i.e. an empty array), all
+   * components are
+   * interpolated. If it is
+   * different from the default
+   * value, it is assumed that the
+   * number of entries equals the
+   * number of components in the
+   * boundary functions and the
+   * finite element, and those
+   * components in the given
+   * boundary function will be used
+   * for which the respective flag
+   * was set in the component mask.
+   * See also @ref GlossComponentMask. As an example, assume that you are
+   * solving the Stokes equations in 2d, with variables $(u,v,p)$ and that
+   * you only want to interpolate boundary values for the pressure, then
+   * the component mask should correspond to <code>(true,true,false)</code>.
    *
-   * It is assumed that the number of
-   * components of the function in @p
-   * boundary_function matches that of
-   * the finite element used by @p dof.
+   * @note Whether a component mask has been specified or not, the number
+   * of components of the functions
+   * in @p function_map must match that
+   * of the finite element used by
+   * @p dof. In other words, for the example above, you need to provide a
+   * Function object that has 3 components (the two velocities and the
+   * pressure), even though you are only
+   * interested in the first two of them. interpolate_boundary_values()
+   * will then call this function to obtain a vector of 3 values at each
+   * interpolation point but only take the first two and discard the third.
+   * In other words, you are free to return whatever you like in the third
+   * component of the vector returned by Function::vector_value, but the
+   * Function object must state that it has 3 components.
    *
    * If the finite element used has shape
    * functions that are non-zero in more
@@ -879,7 +908,7 @@ namespace VectorTools
    * components of these non-primitive
    * shape functions must be @p false.
    *
-   * See the general doc for more
+   * See the general documentation of this class for more
    * information.
    *
    * @ingroup constraints
@@ -896,8 +925,10 @@ namespace VectorTools
    * Same function as above, but taking
    * only one pair of boundary indicator
    * and corresponding boundary
-   * function. Calls the other function
-   * with remapped arguments.
+   * function.
+   * The same comments apply as for the previous function, in particular
+   * about the use of the component mask and the requires size of the function
+   * object.
    *
    * @ingroup constraints
    *
@@ -917,6 +948,9 @@ namespace VectorTools
    * interpolate_boundary_values()
    * function, see above, with
    * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * The same comments apply as for the previous function, in particular
+   * about the use of the component mask and the requires size of the function
+   * object.
    *
    * @ingroup constraints
    *
@@ -936,6 +970,9 @@ namespace VectorTools
    * interpolate_boundary_values()
    * function, see above, with
    * <tt>mapping=MappingQ1@<dim@>()</tt>.
+   * The same comments apply as for the previous function, in particular
+   * about the use of the component mask and the requires size of the function
+   * object.
    *
    * @ingroup constraints
    */

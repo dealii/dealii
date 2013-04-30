@@ -1,0 +1,5 @@
+
+DEAL::Testing FE_Q<2>(1) without read
+DEAL::OK
+DEAL::Testing FE_Q<2>(1) with read
+DEAL::ExcNotInitialized()

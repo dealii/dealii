@@ -369,6 +369,13 @@ namespace internal
       std::vector<types::global_dof_index> plain_dof_indices;
 
       /**
+       * Stores the dimension of the underlying DoFHandler. Since the indices
+       * are not templated, this is the variable that makes the dimension
+       * accessible in the (rare) cases it is needed inside this class.
+       */
+      unsigned int dimension;
+
+      /**
        * Stores the number of components in the DoFHandler where the indices
        * have been read from.
        */

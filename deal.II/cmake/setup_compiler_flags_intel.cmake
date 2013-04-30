@@ -1,6 +1,6 @@
 #####
 ##
-## Copyright (C) 2012 by the deal.II authors
+## Copyright (C) 2012, 2013 by the deal.II authors
 ##
 ## This file is part of the deal.II library.
 ##
@@ -62,6 +62,10 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-w2")
 #   -w175  subscript out of range
 #   -w177  declared but not referenced
 #   -w279  controlling expression is constant
+#   -w383  value copied to temporary, reference to temporary used
+#   -w981  operands are evaluated in unspecified order
+#   -w1418 external function definition with no prior declaration
+#          (happens in boost)
 #   -w1478 deprecation warning
 #   -w1572 floating-point equality and inequality comparisons are unreliable
 #
@@ -69,6 +73,9 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd68")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd175")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd177")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd279")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd383")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd981")
+ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1418")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1478")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1572")
 

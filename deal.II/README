@@ -1,9 +1,9 @@
 What is deal.II?
 
-  deal.II is a C++ program library targeted at the computational solution of
-  partial differential equations using adaptive finite elements. It uses
-  state-of-the-art programming techniques to offer you a modern interface to
-  the complex data structures and algorithms required.
+  deal.II is a C++ program library targeted at the computational solution
+  of partial differential equations using adaptive finite elements. It uses
+  state-of-the-art programming techniques to offer you a modern interface
+  to the complex data structures and algorithms required.
 
 For the impatient:
 
@@ -27,5 +27,7 @@ License:
 
   Please see the file LICENSE for details
 
-For further information have a look at ./doc/readme.html or at
-http://www.dealii.org.
+Further information:
+
+  For further information have a look at ./doc/readme.html or at
+  http://www.dealii.org.
