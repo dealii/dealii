@@ -426,7 +426,7 @@ start_time_iteration:
           BoundaryValues<dim> boundary_values_function;
           boundary_values_function.set_time(time);
 
-          std::map<unsigned int, double> boundary_values;
+          std::map<types::global_dof_index, double> boundary_values;
           VectorTools::interpolate_boundary_values(dof_handler,
                                                    0,
                                                    boundary_values_function,

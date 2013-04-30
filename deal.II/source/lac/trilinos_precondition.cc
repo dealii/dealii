@@ -39,10 +39,20 @@ namespace TrilinosWrappers
     {
       return vector.GlobalLength();
     }
+
+    int gid(const Epetra_Map &map, unsigned int i)
+    {
+      return map.GID(i);
+    }
 #else
     long long int global_length (const Epetra_MultiVector &vector)
     {
       return vector.GlobalLength64();
+    }
+
+    long long int gid(const Epetra_Map &map, dealii::types::global_dof_index i)
+    {
+      return map.GID64(i);
     }
 #endif
   }
@@ -617,7 +627,7 @@ namespace TrilinosWrappers
           for (size_type row=0; row<my_size; ++row)
             {
               TrilinosWrappers::types::int_type global_row_id = 
-                constant_modes_are_global ? domain_map.GID(row) : row;
+                constant_modes_are_global ? gid(domain_map,row) : row;
               distributed_constant_modes[d][row] =
                 additional_data.constant_modes[d][global_row_id];
             }
