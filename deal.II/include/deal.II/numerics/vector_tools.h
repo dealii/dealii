@@ -1993,7 +1993,7 @@ namespace VectorTools
    * instead, and similar considerations hold when computing the $L_\infty$
    * norm of the error.
    *
-   * @note Instantiations for this template
+   * Instantiations for this template
    * are provided for some vector types
    * (see the general documentation of the
    * class), but only for InVectors as in
