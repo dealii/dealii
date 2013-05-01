@@ -1983,6 +1983,15 @@ namespace VectorTools
    * @f{align*}
    *   \textrm{error} = \sqrt{\sum_K \|u-u_h\|_{L_2(K)}^2}
    * @f}
+   * Obviously, if you are interested in computing the $L_1$ norm of the
+   * error, the correct form of the last two lines would have been
+   * @code
+   *    const double total_local_error = local_errors.l1_norm();
+   *    const double total_global_error
+   *      = Utilities::MPI::sum (total_local_error);
+   * @endcode
+   * instead, and similar considerations hold when computing the $L_\infty$
+   * norm of the error.
    *
    * @note Instantiations for this template
    * are provided for some vector types
