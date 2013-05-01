@@ -1550,7 +1550,7 @@ namespace Step42
 	{
 		pcout << "Read the obstacle from a file." << std::endl;
 		input_obstacle.reset (new Input<dim>("obstacle_file.pbm"));
-		pcout << "Ostacle is available now." << std::endl;
+		pcout << "Obstacle is available now." << std::endl;
 	}
 
     const unsigned int n_cycles = 6;

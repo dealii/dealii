@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2677,11 +2677,18 @@ FESystem<dim,spacedim>::multiply_dof_numbers (
         summed_multiplicities += multiplicities[i];
       }
 
-  unsigned char total_conformity = 0xff;;
+  // assume maximal conformity and then take away bits
+  // as indicated by the base elements
+  typename FiniteElementData<dim>::Conformity
+    total_conformity
+    = std::numeric_limits<typename FiniteElementData<dim>::Conformity>::max();
 
   for (unsigned int i=0; i<fes.size(); i++)
     if (multiplicities[i]>0)
-      total_conformity &= fes[i]->conforming_space;
+      total_conformity =
+	typename FiniteElementData<dim>::Conformity(total_conformity
+						    &
+						    fes[i]->conforming_space);
 
   std::vector<unsigned int> dpo;
   dpo.push_back(multiplied_dofs_per_vertex);
@@ -2689,12 +2696,11 @@ FESystem<dim,spacedim>::multiply_dof_numbers (
   if (dim>1) dpo.push_back(multiplied_dofs_per_quad);
   if (dim>2) dpo.push_back(multiplied_dofs_per_hex);
 
-  return FiniteElementData<dim> (
-           dpo,
-           multiplied_n_components,
-           degree,
-           typename FiniteElementData<dim>::Conformity(total_conformity),
-           summed_multiplicities);
+  return FiniteElementData<dim> (dpo,
+				 multiplied_n_components,
+				 degree,
+				 total_conformity,
+				 summed_multiplicities);
 }
 
 

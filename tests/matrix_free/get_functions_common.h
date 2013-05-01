@@ -59,7 +59,7 @@ class MatrixFreeTest
 
     virtual ~MatrixFreeTest ()
       {}
-    
+
                                 // make function virtual to allow derived
                                 // classes to define a different function
   virtual void
@@ -269,4 +269,3 @@ int main ()
     deallog.pop();
   }
 }
-

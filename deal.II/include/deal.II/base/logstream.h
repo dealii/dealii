@@ -532,27 +532,6 @@ private:
   bool at_newline;
 
   /**
-   * The flags used to modify how
-   * the stream returned by get_stream() is used.
-   */
-  std::ios_base::fmtflags stream_flags;
-
-  /**
-   * The minimum width of characters
-   * used to represent a number. Used by width() to
-   * change the stream return by get_stream()
-   */
-  std::streamsize stream_width;
-
-  /**
-   * The maximum width of characters
-   * used to represent a floating point number.
-   * Used by precision() to
-   * change the stream return by get_stream()
-   */
-  std::streamsize stream_precision;
-
-  /**
    * Print head of line. This prints optional time information and the
    * contents of the prefix stack.
    */
@@ -563,21 +542,40 @@ private:
    * function will return the correct internal ostringstream buffer for
    * operater<<.
    */
-  std::ostringstream &get_stream()
-  {
-    return outstreams.get();
-  }
+  std::ostringstream &get_stream();
 
   /**
    * We use tbb's thread local storage facility to generate a stringstream
    * for every thread that sends log messages.
    */
-  Threads::ThreadLocalStorage<std::ostringstream> outstreams;
-
+  Threads::ThreadLocalStorage<std_cxx1x::shared_ptr<std::ostringstream> > outstreams;
 };
 
 
 /* ----------------------------- Inline functions and templates ---------------- */
+
+
+inline
+std::ostringstream &
+LogStream::get_stream()
+{
+  // see if we have already created this stream. if not, do so and
+  // set the default flags (why we set these flags is lost to
+  // history, but this is what we need to keep several hundred tests
+  // from producing different output)
+  //
+  // note that in all of this we need not worry about thread-safety
+  // because we operate on a thread-local object and by definition
+  // there can only be one access at a time
+  if (outstreams.get().get() == 0)
+    {
+      outstreams.get().reset (new std::ostringstream);
+      outstreams.get()->setf(std::ios::showpoint | std::ios::left);
+    }
+
+  // then return the stream
+  return *outstreams.get();
+}
 
 
 template <class T>
@@ -585,12 +583,8 @@ inline
 LogStream &
 LogStream::operator<< (const T &t)
 {
-  // save the state of the output stream
-  std::ostringstream &stream = get_stream();
-
-  // print to the internal stringstream, using the flags we have just set for
-  // the stream object:
-  stream << t;
+  // print to the internal stringstream
+  get_stream() << t;
 
   return *this;
 }
@@ -601,7 +595,6 @@ inline
 LogStream &
 LogStream::operator<< (const double t)
 {
-  // save the state of out stream
   std::ostringstream &stream = get_stream();
 
   // we have to make sure that we don't catch NaN's and +-Inf's with the
@@ -624,7 +617,6 @@ inline
 LogStream &
 LogStream::operator<< (const float t)
 {
-  // save the state of out stream
   std::ostringstream &stream = get_stream();
 
   // we have to make sure that we don't catch NaN's and +-Inf's with the

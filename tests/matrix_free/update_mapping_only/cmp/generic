@@ -1,0 +1,79 @@
+
+DEAL:2d::Testing FE_Q<2>(1)
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(2)
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(3)
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Testing FE_Q<2>(4)
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:2d::Error function values: 0
+DEAL:2d::Error function gradients: 0
+DEAL:2d::Error function Laplacians: 0
+DEAL:2d::Error function diagonal of Hessian: 0
+DEAL:2d::Error function Hessians: 0
+DEAL:2d::
+DEAL:3d::Testing FE_Q<3>(1)
+DEAL:3d::Error function values: 0
+DEAL:3d::Error function gradients: 0
+DEAL:3d::Error function Laplacians: 0
+DEAL:3d::Error function diagonal of Hessian: 0
+DEAL:3d::Error function Hessians: 0
+DEAL:3d::
+DEAL:3d::Error function values: 0
+DEAL:3d::Error function gradients: 0
+DEAL:3d::Error function Laplacians: 0
+DEAL:3d::Error function diagonal of Hessian: 0
+DEAL:3d::Error function Hessians: 0
+DEAL:3d::
+DEAL:3d::Testing FE_Q<3>(2)
+DEAL:3d::Error function values: 0
+DEAL:3d::Error function gradients: 0
+DEAL:3d::Error function Laplacians: 0
+DEAL:3d::Error function diagonal of Hessian: 0
+DEAL:3d::Error function Hessians: 0
+DEAL:3d::
+DEAL:3d::Error function values: 0
+DEAL:3d::Error function gradients: 0
+DEAL:3d::Error function Laplacians: 0
+DEAL:3d::Error function diagonal of Hessian: 0
+DEAL:3d::Error function Hessians: 0
+DEAL:3d::

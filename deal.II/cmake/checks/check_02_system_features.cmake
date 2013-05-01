@@ -82,7 +82,17 @@ IF(CMAKE_SYSTEM_NAME MATCHES "Darwin")
   # this flag any more, so check whether we can indeed do this
   #
   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-long-double")
+
+  #
+  # On Mac OS X, -rdynamic is accepted by the compiler (i.e.
+  # it doesn't produce an error) but we always get a warning
+  # that it isn't supported.
+  #
+  # TODO: MM: Check whether this is still necessary...
+  #
+  STRIP_FLAG(CMAKE_SHARED_LINKER_FLAGS "-rdynamic")
 ENDIF()
+
 
 
 ###########################################################################

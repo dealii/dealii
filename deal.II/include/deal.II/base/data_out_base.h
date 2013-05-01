@@ -1693,6 +1693,13 @@ public:
    * provisions that allow these components to be output by a single
    * name rather than having to group several scalar fields into a
    * vector later on in the visualization program.
+   *
+   * @note VTK is a legacy format and has largely been supplanted by the VTU
+   * format (an XML-structured version of VTK). In particular, VTU allows for
+   * the compression of data and consequently leads to much smaller file
+   * sizes that equivalent VTK files for large files. Since all visualization
+   * programs that support VTK also support VTU, you should consider using the
+   * latter file format instead, by using the write_vtu() function.
    */
   template <int dim, int spacedim>
   static void write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
@@ -1703,7 +1710,7 @@ public:
 
 
   /**
-   * Write the given list of patches to the output stream in VTK
+   * Write the given list of patches to the output stream in VTU
    * format. The data is written in the XML-based VTK format as opposed to the
    * traditional format that write_vtk() produces.
    *
@@ -2290,6 +2297,13 @@ public:
    * and write it to <tt>out</tt>
    * in Vtk format. See
    * DataOutBase::write_vtk.
+   *
+   * @note VTK is a legacy format and has largely been supplanted by the VTU
+   * format (an XML-structured version of VTK). In particular, VTU allows for
+   * the compression of data and consequently leads to much smaller file
+   * sizes that equivalent VTK files for large files. Since all visualization
+   * programs that support VTK also support VTU, you should consider using the
+   * latter file format instead, by using the write_vtu() function.
    */
   void write_vtk (std::ostream &out) const;
 
