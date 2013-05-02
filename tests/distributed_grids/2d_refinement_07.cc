@@ -34,9 +34,9 @@ void test(std::ostream& /*out*/)
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD);
 
   GridGenerator::hyper_cube(tr);
-  for (unsigned int i=0;i<35;++i)
+  for (unsigned int i=0;i<30;++i)
     {
-      std::cout << "cells: " << tr.n_active_cells() << " level:" << tr.n_levels() << std::endl;
+      deallog << "cells: " << tr.n_active_cells() << " level:" << tr.n_levels() << std::endl;
 
       typename parallel::distributed::Triangulation<dim>::cell_iterator it;
       it=tr.begin_active();
