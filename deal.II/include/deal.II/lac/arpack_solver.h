@@ -15,6 +15,8 @@
 #define __deal2__arpack_solver_h
 
 #include <deal.II/base/config.h>
+#include <deal.II/base/smartpointer.h>
+#include <deal.II/lac/solver_control.h>
 
 #ifdef DEAL_II_WITH_ARPACK
 
@@ -485,7 +487,7 @@ void ArpackSolver::solve (
         }
       else if (info == 3)
         {
-          Assert (false, ExcArpackNoShifts(1));;
+          Assert (false, ExcArpackNoShifts(1));
         }
       else if (info!=0)
         {

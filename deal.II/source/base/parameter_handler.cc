@@ -1732,12 +1732,10 @@ void
 ParameterHandler::set (const std::string &entry_string,
                        const bool        &new_value)
 {
-  std::ostringstream s;
-  s << new_value;
-
   // hand this off to the function that
   // actually sets the value as a string
-  set (entry_string, s.str());
+  set (entry_string,
+       (new_value ? "true" : "false"));
 }
 
 

@@ -111,6 +111,18 @@ this function.
 
 <ol>
 
+<li> Fixed: Generate an error if the users tries to refine a cell
+that is already on the maximum level in a distributed triangulation.
+<br>
+(Timo Heister, 2013/05/01)
+</li>
+
+<li> Fixed: The version of ParameterHandler::set that takes a boolean
+as second argument was broken and did not work. This is now fixed.
+<br>
+(Ashkan Dorostkar, Wolfgang Bangerth, 2013/04/30)
+</li>
+
 <li> Fixed: PETScWrappers::VectorBase::print now saves and restores
 the precision
 and width associated with the stream it prints to around setting

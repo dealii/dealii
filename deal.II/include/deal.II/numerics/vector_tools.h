@@ -1893,77 +1893,107 @@ namespace VectorTools
   //@{
 
   /**
-   * Compute the error of the
-   * finite element solution.
-   * Integrate the difference
-   * between a reference function
-   * which is given as a continuous
-   * function object, and a finite
-   * element function.
+   * Compute the error of the finite element solution.  Integrate the
+   * difference between a reference function which is given as a
+   * continuous function object, and a finite element function. The
+   * result of this function is the vector @p difference that contains
+   * one value per active cell $K$ of the triangulation. Each of the values
+   * of this vector $d$ equals
+   * @f{align*}
+   *   d_K = \| u-u_h \|_X
+   * @f}
+   * where $X$ denotes the norm chosen and $u$ represents the exact solution.
    *
-   * The value of @p exponent is
-   * used for computing $L^p$-norms
-   * and $W^{1,p}$-norms.
+   * It is assumed that the number of components of the function
+   * @p exact_solution matches that of the finite element used by @p dof.
    *
-   * The additional argument @p
-   * weight allows to evaluate
-   * weighted norms.  The weight
-   * function may be scalar,
-   * establishing a weight in the
-   * domain for all components
-   * equally. This may be used, for
-   * instance, to only integrates
-   * over parts of the domain.
+   * @param[in] mapping The mapping that is used when integrating the
+   *     difference $u-u_h$.
+   * @param[in] dof The DoFHandler object that describes the finite
+   *     element space in which the solution vector lives.
+   * @param[in] fe_function A vector with nodal values representing the
+   *     numerical approximation $u_h$. This vector needs to correspond
+   *     to the finite element space represented by @p dof
+   * @param[out] difference The vector of values $d_K$ computed as above.
+   * @param[in] q The quadrature formula used to approximate the integral
+   *     shown above. Note that some quadrature formulas are more useful
+   *     than other in integrating $u-u_h$. For example, it is known that
+   *     the $Q_1$ approximation $u_h$ to the exact solution $u$ of a Laplace
+   *     equation is particularly accurate (in fact, superconvergent, i.e.
+   *     accurate to higher order) at the 4 Gauss points of a cell in 2d
+   *     (or 8 points in 3d) that correspond to a QGauss(2) object. Consequently,
+   *     because a QGauss(2) formula only evaluates the two solutions at these
+   *     particular points, choosing this quadrature formula may indicate an error
+   *     far smaller than it actually is.
+   * @param[in] norm The norm $X$ shown above that should be computed.
+   * @param[in] weight The additional argument @p weight allows to evaluate weighted
+   *     norms.  The weight function may be scalar, establishing a weight
+   *     in the domain for all components equally. This may be used, for
+   *     instance, to only integrate over parts of the domain. The weight function
+   *     may also be vector-valued, with as many components as the finite element:
+   *     Then, different components get different weights. A typical application is when
+   *     the error with respect to only one or a subset of the solution
+   *     variables is to be computed, in which the other components would
+   *     have weight values equal to zero. The ComponentSelectFunction
+   *     class is particularly useful for this purpose as it provides
+   *     such as "mask" weight..
+   *     The weight function is expected to be positive, but negative
+   *     values are not filtered. By default, no weighting function is
+   *     given, i.e. weight=1 in the whole domain for all vector
+   *     components uniformly.
+   * @param[in] exponent This value denotes the $p$ used in computing
+   *     $L^p$-norms and $W^{1,p}$-norms. The value is ignores if a @p norm
+   *     other than NormType::Lp_norm or NormType::W1p_norm is chosen.
    *
-   * The weight function may also
-   * be vector-valued, with as many
-   * components as the finite
-   * element function: Then,
-   * different components get
-   * different weights. A typical
-   * application is when the error
-   * with respect to only one or a
-   * subset of the solution
-   * variables is to be computed,
-   * in which the other components
-   * would have weight values equal
-   * to zero. The
-   * ComponentSelectFunction class
-   * is particularly useful for
-   * this purpose.
-   *
-   * The weight function is
-   * expected to be positive, but
-   * negative values are not
-   * filtered. By default, no
-   * weighting function is given,
-   * i.e. weight=1 in the whole
-   * domain for all vector
-   * components uniformly. Note that
-   * one often wants to compute the
-   * error in only one component of
-   * a solution vector (e.g. for the
-   * pressure in the Stokes system,
-   * when the solution vector also
-   * contains the velocity components).
-   * In these cases, the weight should
-   * be a <i>mask</i>, i.e., be a
-   * vector function for which individual
-   * components are either zero or one.
-   * This can easily be achieved using
-   * the ComponentSelectFunction
-   * class.
-   *
-   * It is assumed that the number
-   * of components of the function
-   * @p exact_solution matches that
-   * of the finite element used by
-   * @p dof.
    *
    * See the general documentation of this
    * class for more information.
    *
-   * @note Instantiations for this template
+   * @note If the integration here happens over the cells of a
+   * parallel::distribute::Triangulation object, then this function
+   * computes the vector elements $d_K$ for an output vector with as
+   * many cells as there are active cells of the triangulation object
+   * of the current processor. However, not all active cells are in
+   * fact locally owned: some may be ghost or artificial cells (see
+   * @ref GlossGhostCell "here" and @ref GlossArtificialCell
+   * "here"). The vector computed will, in the case of a distributed
+   * triangulation, contain zeros for cells that are not locally
+   * owned. As a consequence, in order to compute the <i>global</i>
+   * $L_2$ error (for example), the errors from different processors
+   * need to be combined, but this is simple because every processor
+   * only computes contributions for those cells of the global
+   * triangulation it locally owns (and these sets are, by definition,
+   * mutually disjoint). Consequently, the following piece of code
+   * computes the global $L_2$ error across multiple processors
+   * sharing a parallel::distribute::Triangulation:
+   * @code
+   *    Vector<double> local_errors (tria.n_active_cells());
+   *    VectorTools::integrate_difference (mapping, dof,
+   *                                       solution, exact_solution,
+   *                                       local_errors,
+   *                                       QGauss<dim>(fe.degree+2),
+   *                                       NormType::L2_norm);
+   *    const double total_local_error = local_errors.l2_norm();
+   *    const double total_global_error
+   *      = std::sqrt (Utilities::MPI::sum (total_local_error * total_local_error));
+   * @endcode
+   * The squaring and taking the square root is necessary in order to
+   * compute the sum of squares of norms over all all cells in the definition
+   * of the $L_2$ norm:
+   * @f{align*}
+   *   \textrm{error} = \sqrt{\sum_K \|u-u_h\|_{L_2(K)}^2}
+   * @f}
+   * Obviously, if you are interested in computing the $L_1$ norm of the
+   * error, the correct form of the last two lines would have been
+   * @code
+   *    const double total_local_error = local_errors.l1_norm();
+   *    const double total_global_error
+   *      = Utilities::MPI::sum (total_local_error);
+   * @endcode
+   * instead, and similar considerations hold when computing the $L_\infty$
+   * norm of the error.
+   *
+   * Instantiations for this template
    * are provided for some vector types
    * (see the general documentation of the
    * class), but only for InVectors as in
@@ -1998,8 +2028,8 @@ namespace VectorTools
                              const double exponent = 2.);
 
   /**
-  * Same as above for hp.
-  */
+   * Same as above for hp.
+   */
   template <int dim, class InVector, class OutVector, int spacedim>
   void integrate_difference (const hp::MappingCollection<dim,spacedim> &mapping,
                              const hp::DoFHandler<dim,spacedim>        &dof,

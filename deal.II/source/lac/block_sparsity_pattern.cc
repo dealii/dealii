@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -307,7 +307,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::print_gnuplot(std::ostream &out) 
               const SparsityPatternBase &b = block(ib,jb);
               for (size_type j=0; j<b.n_cols(); ++j)
                 if (b.exists(i,j))
-                  out << l+j << " " << -static_cast<signed int>(i+k) << std::endl;;
+                  out << l+j << " " << -static_cast<signed int>(i+k) << std::endl;
               l += b.n_cols();
             }
         }

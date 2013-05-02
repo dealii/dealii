@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2012 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -755,7 +755,7 @@ InverseMatrixRichardson<VECTOR>::initialize (const MATRIX &m, const PRECONDITION
   matrix = new PointerMatrix<MATRIX, VECTOR>(&m);
   if (precondition != 0)
     delete precondition;
-  precondition = new PointerMatrix<PRECONDITION, VECTOR>(&p);;
+  precondition = new PointerMatrix<PRECONDITION, VECTOR>(&p);
 }
 
 

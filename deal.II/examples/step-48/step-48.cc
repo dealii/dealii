@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2011-2012 by the deal.II authors             */
+/*    Copyright (C) 2011-2013 by the deal.II authors             */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -603,13 +603,20 @@ namespace Step48
 
 // @sect3{The <code>main</code> function}
 
-// This is as in all other programs:
+// As in step-40, we initialize MPI at the start of the program. Since we will
+// in general mix MPI parallelization with threads, we also set the third
+// argument in MPI_InitFinalize that controls the number of threads to an
+// invalid number, which means that the TBB library chooses the number of
+// threads automatically, typically to the number of available cores in the
+// system. As an alternative, you can also set this number manually if you
+// want to set a specific number of threads (e.g. when MPI-only is required).
 int main (int argc, char **argv)
 {
   using namespace Step48;
   using namespace dealii;
 
-  Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv);
+  Utilities::System::MPI_InitFinalize mpi_initialization(argc, argv,
+                                                         numbers::invalid_unsigned_int);
 
   try
     {
