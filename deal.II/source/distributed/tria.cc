@@ -2862,7 +2862,7 @@ namespace parallel
                      cell = this->begin_active(dealii::internal::p4est::functions<dim>::max_level-1);
                      cell != this->end(dealii::internal::p4est::functions<dim>::max_level-1); ++cell)
             {
-              AssertThrow(cell->refine_flag_set(),
+              AssertThrow(!(cell->refine_flag_set()),
                   ExcMessage("Fatal Error: maximum refinement level of p4est reached."));
             }
         }
