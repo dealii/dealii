@@ -3037,20 +3037,21 @@ namespace TrilinosWrappers
 
     Epetra_CombineMode mode = last_action;
     if (last_action == Zero)
-      {
-        if (operation==::dealii::VectorOperation::add)
-          mode = Add;
-        else if (operation==::dealii::VectorOperation::insert)
-          mode = Insert;
-      }
+    {
+      if ((operation==::dealii::VectorOperation::add) &&
+          (operation==::dealii::VectorOperation::unknown))
+        mode = Add;
+      else if (operation==::dealii::VectorOperation::insert)
+        mode = Insert;
+    }
     else
-      {
-        Assert(
-            ((last_action == Add) && (operation==::dealii::VectorOperation::add))
-            ||
-            ((last_action == Insert) && (operation==::dealii::VectorOperation::insert)),
-            ExcMessage("operation and argument to compress() do not match"));
-      }
+    {
+      Assert(
+          ((last_action == Add) && (operation!=::dealii::VectorOperation::insert))
+          ||
+          ((last_action == Insert) && (operation!=::dealii::VectorOperation::add)),
+          ExcMessage("operation and argument to compress() do not match"));
+    }
 
     // flush buffers
     int ierr;
