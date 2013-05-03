@@ -95,7 +95,7 @@ namespace PETScWrappers
          for (unsigned int c=0; c<this->n_block_cols(); ++c)
            {
              Assert(rows[r].size() == bcsp.block(r,c).n_rows(), ExcMessage("invalid size"));
-             Assert(cols[r].size() == bcsp.block(r,c).n_cols(), ExcMessage("invalid size"));
+             Assert(cols[c].size() == bcsp.block(r,c).n_cols(), ExcMessage("invalid size"));
 
              BlockType *p = new BlockType();
              p->reinit(rows[r],
