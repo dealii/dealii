@@ -3143,7 +3143,9 @@ namespace Step32
       temperature[0] *= -1.0;
       Utilities::MPI::max (temperature, MPI_COMM_WORLD, global_temperature);
       global_temperature[0] *= -1.0;
-
+      global_temperature[0]=0.0; // TODO
+      global_temperature[1]=1.0;
+      
       pcout << "   Temperature range: "
             << global_temperature[0] << ' ' << global_temperature[1]
             << std::endl;
