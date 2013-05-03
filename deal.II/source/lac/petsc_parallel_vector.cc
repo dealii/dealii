@@ -207,6 +207,7 @@ namespace PETScWrappers
       communicator = comm;
 
       Assert(local.is_contiguous(), ExcNotImplemented());
+      Assert(local.size()>0, ExcMessage("can not create vector of size 0."));
       create_vector(local.size(), local.n_elements());
     }
 
