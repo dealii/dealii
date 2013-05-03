@@ -82,12 +82,12 @@ namespace PETScWrappers
           bcsp.n_block_cols());
 
       std::vector<unsigned int> row_sizes;
-      for (unsigned int r=0; r<this->n_block_rows(); ++r)
+      for (unsigned int r=0; r<bcsp.n_block_rows(); ++r)
               row_sizes.push_back( bcsp.block(r,0).n_rows() );
       this->row_block_indices.reinit (row_sizes);
 
       std::vector<unsigned int> col_sizes;
-      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+      for (unsigned int c=0; c<bcsp.n_block_cols(); ++c)
               col_sizes.push_back( bcsp.block(0,c).n_cols() );
       this->column_block_indices.reinit (col_sizes);
 
