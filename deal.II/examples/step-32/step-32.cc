@@ -906,6 +906,9 @@ namespace Step32
     DoFHandler<dim>                           temperature_dof_handler;
     ConstraintMatrix                          temperature_constraints;
 
+
+      std::vector<IndexSet> stokes_partitioning, stokes_relevant_partitioning;
+ 
     LA::MPI::SparseMatrix temperature_mass_matrix;
     LA::MPI::SparseMatrix temperature_stiffness_matrix;
     LA::MPI::SparseMatrix temperature_matrix;
@@ -1842,8 +1845,11 @@ namespace Step32
   {
     stokes_matrix.clear ();
 
+#ifdef PETSC_LA    
     LA::MPI::CompressedBlockSparsityPattern sp(stokes_partitioning, MPI_COMM_WORLD);
-
+#else
+    LA::MPI::CompressedBlockSparsityPattern sp(stokes_partitioning);    
+#endif
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
 
     for (unsigned int c=0; c<dim+1; ++c)
@@ -1858,9 +1864,13 @@ namespace Step32
                                      stokes_constraints, false,
                                      Utilities::MPI::
                                      this_mpi_process(MPI_COMM_WORLD));
+
+    //    distribute_sp();
+    
+    
     sp.compress();
 
-    stokes_matrix.reinit (sp);
+    stokes_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
   }
 
 
@@ -1875,7 +1885,7 @@ namespace Step32
     stokes_preconditioner_matrix.clear ();
 
 #ifdef USE_PETSC_LA
-    PETScWrappers::BlockSparsityPattern sp (stokes_partitioning,
+    LA::MPI::CompressedBlockSparsityPattern sp (stokes_partitioning,
                                             MPI_COMM_WORLD);
 #else
     TrilinosWrappers::BlockSparsityPattern sp(stokes_partitioning,
@@ -1897,7 +1907,7 @@ namespace Step32
                                      this_mpi_process(MPI_COMM_WORLD));
     sp.compress();
 
-    stokes_preconditioner_matrix.reinit (sp);
+    stokes_preconditioner_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
   }
 
 
@@ -1911,7 +1921,8 @@ namespace Step32
     temperature_matrix.clear ();
 
 #ifdef USE_PETSC_LA
-    PETScWrappers::SparsityPattern sp (temperature_partitioner,
+    // TODO:    LA::MPI::CompressedSparsityPattern
+    CompressedSimpleSparsityPattern sp (temperature_partitioner,
                                        MPI_COMM_WORLD);
 #else
     TrilinosWrappers::SparsityPattern sp(temperature_partitioner,
@@ -1923,9 +1934,9 @@ namespace Step32
                                      this_mpi_process(MPI_COMM_WORLD));
     sp.compress();
 
-    temperature_matrix.reinit (sp);
-    temperature_mass_matrix.reinit (sp);
-    temperature_stiffness_matrix.reinit (sp);
+    temperature_matrix.reinit (temperature_partitioner, temperature_partitioner, sp, MPI_COMM_WORLD);
+    temperature_mass_matrix.reinit (temperature_partitioner, temperature_partitioner, sp, MPI_COMM_WORLD);
+    temperature_stiffness_matrix.reinit (temperature_partitioner, temperature_partitioner, sp, MPI_COMM_WORLD);
   }
 
 
@@ -2003,7 +2014,8 @@ namespace Step32
     // of each matrix or vector will be stored where, then call the functions
     // that actually set up the matrices, and at the end also resize the
     // various vectors we keep around in this program.
-    std::vector<IndexSet> stokes_partitioning, stokes_relevant_partitioning;
+    stokes_partitioning.clear();
+    stokes_relevant_partitioning.clear();   
     IndexSet temperature_partitioning (n_T), temperature_relevant_partitioning (n_T);
     IndexSet stokes_relevant_set;
     {
@@ -2294,19 +2306,19 @@ namespace Step32
 
 #ifdef USE_PETSC_LA
     Mp_preconditioner.reset (new PETScWrappers::PreconditionJacobi());
-    Amg_preconditioner.reset (new PETScWrappers::PreconditionAMG());
-    PETScWrappers::PreconditionAMG::AdditionalData Amg_data;
+    Amg_preconditioner.reset (new LA::MPI::PreconditionAMG());
+    LA::MPI::PreconditionAMG::AdditionalData Amg_data;
 #else
     Mp_preconditioner.reset(new TrilinosWrappers::PreconditionJacobi());
     Amg_preconditioner.reset(new TrilinosWrappers::PreconditionAMG());
     TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
-#endif
-
     Amg_data.constant_modes = constant_modes;
     Amg_data.elliptic = true;
     Amg_data.higher_order_elements = true;
     Amg_data.smoother_sweeps = 2;
     Amg_data.aggregation_threshold = 0.02;
+#endif
+
 
     Mp_preconditioner->initialize (stokes_preconditioner_matrix.block(1,1));
     Amg_preconditioner->initialize (stokes_preconditioner_matrix.block(0,0),
