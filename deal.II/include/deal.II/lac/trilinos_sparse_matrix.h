@@ -543,7 +543,7 @@ namespace TrilinosWrappers
     typedef TrilinosScalar value_type;
 
     /**
-     * @name Constructors and initalization.
+     * @name Constructors and initialization.
      */
 //@{
     /**
@@ -769,7 +769,7 @@ namespace TrilinosWrappers
      * they might be spread out. The
      * second Epetra_Map is only used to
      * specify the number of columns and
-     * for internal arragements when
+     * for internal arrangements when
      * doing matrix-vector products with
      * vectors based on that column map.
      *
@@ -3032,12 +3032,32 @@ namespace TrilinosWrappers
 
   inline
   void
-  SparseMatrix::compress (::dealii::VectorOperation::values /*operation*/)
+  SparseMatrix::compress (::dealii::VectorOperation::values operation)
   {
+
+    Epetra_CombineMode mode = last_action;
+    if (last_action == Zero)
+      {
+        if (operation==::dealii::VectorOperation::add)
+          mode = Add;
+        else if (operation==::dealii::VectorOperation::insert)
+          mode = Insert;
+      }
+    else
+      {
+        Assert(
+            ((last_action == Add) && (operation==::dealii::VectorOperation::add))
+            ||
+            ((last_action == Insert) && (operation==::dealii::VectorOperation::insert)),
+            ExcMessage("operation and argument to compress() do not match"));
+      }
+
+    std::cout << "compress " << (mode==Add) << (mode==Insert) << std::endl;
+
     // flush buffers
     int ierr;
     ierr = matrix->GlobalAssemble (*column_space_map, matrix->RowMap(),
-                                   true);
+        true, mode);
 
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -3301,6 +3321,7 @@ namespace TrilinosWrappers
         // zero. However, these actions are done
         // in case we pass on to the other
         // function.
+        // TODO: fix this (do not run compress here, but fail)
         if (last_action == Insert)
           {
             int ierr;
