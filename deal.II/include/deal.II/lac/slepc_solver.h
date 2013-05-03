@@ -155,8 +155,8 @@ namespace SLEPcWrappers
     template <typename OutputVector>
     void
     solve (const PETScWrappers::MatrixBase &A,
-           std::vector<double>             &kr,
-           std::vector<OutputVector>       &vr,
+           std::vector<double>             &r_eigenvalues,
+           std::vector<OutputVector>       &r_eigenvectors = std::vector<OutputVector> (),
            const size_type                  n_eigenvectors = 1);
 
     /**
@@ -167,8 +167,8 @@ namespace SLEPcWrappers
     void
     solve (const PETScWrappers::MatrixBase &A,
            const PETScWrappers::MatrixBase &B,
-           std::vector<double>             &kr,
-           std::vector<OutputVector>       &vr,
+           std::vector<double>             &r_eigenvalues,
+           std::vector<OutputVector>       &r_eigenvectors = std::vector<OutputVector> (),
            const size_type                  n_eigenvectors = 1);
 
     /**
@@ -292,12 +292,8 @@ namespace SLEPcWrappers
      * \text{n\_converged}-1$.
      */
     void
-    get_eigenpair (const unsigned int index,
-#ifndef PETSC_USE_COMPLEX
+    get_eigenpair (const unsigned int         index,
                    double                    &kr,
-#else
-                   std::complex<double>      &kr,
-#endif
                    PETScWrappers::VectorBase &vr);
 
     /**
@@ -727,15 +723,15 @@ namespace SLEPcWrappers
                      std::vector<OutputVector>       &vr,
                      const size_type                  n_eigenvectors)
   {
-    // Panic if no eigenpairs are wanted.
-    AssertThrow (n_eigenvectors != 0, ExcSLEPcWrappersUsageError());
-
-    size_type n_converged = 0;
+    // Panic if the number of eigenpairs wanted is out of bounds.
+    AssertThrow ((n_eigenvectors > 0) && (n_eigenvectors <= A.m ()), 
+		 ExcSLEPcWrappersUsageError());
 
     // Set the matrices of the problem
     set_matrices (A); 
 
     // and solve
+    unsigned int n_converged = 0;
     solve (n_eigenvectors, &n_converged);
 
     if (n_converged > n_eigenvectors)
@@ -753,29 +749,25 @@ namespace SLEPcWrappers
 
   template <typename OutputVector>
   void
-<<<<<<< .working
-  SolverBase::solve (const PETScWrappers::MatrixBase &A,
-                     const PETScWrappers::MatrixBase &B,
-                     std::vector<double>             &kr,
-                     std::vector<OutputVector>       &vr,
-                     const size_type                  n_eigenvectors)
-=======
     SolverBase::solve (const PETScWrappers::MatrixBase &A,
 		       const PETScWrappers::MatrixBase &B,
 		       std::vector<double>             &kr,
 		       std::vector<OutputVector>       &vr,
-		       const unsigned int               n_eigenvectors)
->>>>>>> .merge-right.r29387
+		       const size_type                  n_eigenvectors)
   {
-    // Panic if no eigenpairs are wanted.
-    AssertThrow (n_eigenvectors != 0, ExcSLEPcWrappersUsageError());
+    // Guard against incompatible matrix sizes:
+    AssertThrow (A.m() == B.m (), ExcDimensionMismatch(A.m(), B.m()));
+    AssertThrow (A.n() == B.n (), ExcDimensionMismatch(A.n(), B.n()));
 
-    size_type n_converged = 0;
+    // Panic if the number of eigenpairs wanted is out of bounds.
+    AssertThrow ((n_eigenvectors > 0) && (n_eigenvectors <= A.m ()), 
+		 ExcSLEPcWrappersUsageError());
 
     // Set the matrices of the problem
     set_matrices (A, B);
 
     // and solve
+    unsigned int n_converged = 0;
     solve (n_eigenvectors, &n_converged);
 
     if (n_converged >= n_eigenvectors)

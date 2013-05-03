@@ -12,8 +12,8 @@
 //----------------------  trilinos_matvec_01.cc  ---------------------------
 
 
-// Test whether TrilinosWrappers::SparseMatrix::vmult gives same result with
-// Trilinos vector and parallel distributed vector
+// Test if Add() and Insert work correctly in Trilinos in parallel
+// it turns out Trilinos always adds
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
@@ -74,7 +74,6 @@ void test ()
   sp.compress();
 
   TrilinosWrappers::SparseMatrix A;
-  A.clear ();
   A.reinit (sp);
   if (my_id==0)
     {
@@ -82,7 +81,11 @@ void test ()
       A.set(0, 2, 0.2);
     }
   if ((n_procs == 1) || (my_id == 1))
-    A.set(2,3, 0.3);
+    {
+      A.set(0, 0, 0.1);
+      A.set(0, 2, 0.2);
+      A.set(2,3, 0.3);
+    }  
 
   A.compress(VectorOperation::insert);
   

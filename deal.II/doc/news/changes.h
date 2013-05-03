@@ -64,6 +64,12 @@ this function.
 
 
 <ol>
+  <li> Fixed: setting values in TrilinosWrappers::SparseMatrix
+  in parallel was adding the values instead.
+  <br>
+  (Bruno Turcksin, Timo Heister, 2013/05/03)
+  </li>
+
   <li> New: The step-49 tutorial program now also has a discussion on
   what to do once you have a coarse mesh and want to refine it.
   <br>
