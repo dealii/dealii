@@ -74,7 +74,6 @@ void test ()
   sp.compress();
 
   TrilinosWrappers::SparseMatrix A;
-  A.clear ();
   A.reinit (sp);
   if (my_id==0)
     {
@@ -86,8 +85,7 @@ void test ()
       A.set(0, 0, 0.1);
       A.set(0, 2, 0.2);
       A.set(2,3, 0.3);
-    }
-  
+    }  
 
   A.compress(VectorOperation::insert);
   
