@@ -33,6 +33,7 @@
 #include <deal.II/lac/trilinos_block_sparse_matrix.h>
 #include <deal.II/lac/trilinos_precondition.h>
 #include <deal.II/lac/trilinos_solver.h>
+#include <deal.II/lac/sparsity_tools.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -1866,21 +1867,18 @@ namespace Step32
                                      this_mpi_process(MPI_COMM_WORLD));
 
     //    distribute_sp();
-    /*
+    IndexSet relevant;
+    
+    DoFTools::extract_locally_relevant_dofs (stokes_dof_handler,
+                                               relevant);
+
     SparsityTools::distribute_sparsity_pattern(sp,
-					       
-                                   const std::vector<unsigned int> &rows_per_cpu,
-                                   const MPI_Comm &mpi_comm,
-                                   const IndexSet &myrange);
-    */
+					       stokes_dof_handler.n_locally_owned_dofs_per_processor(),
+					       MPI_COMM_WORLD, relevant);
+    
     sp.compress();
 
     stokes_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
-    std::cout << stokes_matrix.m() << "x"<< stokes_matrix.n() << std::endl;
-    std::cout << stokes_matrix.block(0,0).m() << "x"<< stokes_matrix.block(0,0).n() << std::endl;
-    std::cout << stokes_matrix.block(1,0).m() << "x"<< stokes_matrix.block(1,0).n() << std::endl;
-    std::cout << stokes_matrix.block(0,1).m() << "x"<< stokes_matrix.block(0,1).n() << std::endl;
-    std::cout << stokes_matrix.block(1,1).m() << "x"<< stokes_matrix.block(1,1).n() << std::endl;
   }
 
 
@@ -1914,6 +1912,14 @@ namespace Step32
                                      stokes_constraints, false,
                                      Utilities::MPI::
                                      this_mpi_process(MPI_COMM_WORLD));
+    IndexSet relevant;
+    
+    DoFTools::extract_locally_relevant_dofs (stokes_dof_handler,
+                                               relevant);
+
+    SparsityTools::distribute_sparsity_pattern(sp,
+					       stokes_dof_handler.n_locally_owned_dofs_per_processor(),
+					       MPI_COMM_WORLD, relevant);
     sp.compress();
 
     stokes_preconditioner_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
@@ -1940,6 +1946,14 @@ namespace Step32
                                      temperature_constraints, false,
                                      Utilities::MPI::
                                      this_mpi_process(MPI_COMM_WORLD));
+    IndexSet relevant;
+    
+    DoFTools::extract_locally_relevant_dofs (temperature_dof_handler,
+                                               relevant);
+
+    SparsityTools::distribute_sparsity_pattern(sp,
+					       temperature_dof_handler.n_locally_owned_dofs_per_processor(),
+					       MPI_COMM_WORLD, relevant);
     sp.compress();
 
     temperature_matrix.reinit (temperature_partitioner, temperature_partitioner, sp, MPI_COMM_WORLD);
