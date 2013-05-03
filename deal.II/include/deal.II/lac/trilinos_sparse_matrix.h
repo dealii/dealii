@@ -3052,8 +3052,6 @@ namespace TrilinosWrappers
             ExcMessage("operation and argument to compress() do not match"));
       }
 
-    std::cout << "compress " << (mode==Add) << (mode==Insert) << std::endl;
-
     // flush buffers
     int ierr;
     ierr = matrix->GlobalAssemble (*column_space_map, matrix->RowMap(),
