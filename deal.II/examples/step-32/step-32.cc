@@ -1845,7 +1845,7 @@ namespace Step32
   {
     stokes_matrix.clear ();
 
-#ifdef PETSC_LA    
+#ifdef USE_PETSC_LA
     LA::MPI::CompressedBlockSparsityPattern sp(stokes_partitioning, MPI_COMM_WORLD);
 #else
     LA::MPI::CompressedBlockSparsityPattern sp(stokes_partitioning);    
@@ -2822,15 +2822,28 @@ namespace Step32
 
     if (use_bdf2_scheme == true)
       {
+#ifdef USE_PETSC_LA
+        temperature_matrix = temperature_mass_matrix; // TODO: fast?
+        temperature_matrix *= (2*time_step + old_time_step) /
+                              (time_step + old_time_step);
+        temperature_matrix.add (temperature_stiffness_matrix, time_step);
+	
+#else
         temperature_matrix.copy_from (temperature_mass_matrix);
         temperature_matrix *= (2*time_step + old_time_step) /
                               (time_step + old_time_step);
         temperature_matrix.add (time_step, temperature_stiffness_matrix);
+#endif
       }
     else
       {
+#ifdef USE_PETSC_LA
+        temperature_matrix = temperature_mass_matrix;
+        temperature_matrix.add (temperature_stiffness_matrix, time_step);
+#else
         temperature_matrix.copy_from (temperature_mass_matrix);
         temperature_matrix.add (time_step, temperature_stiffness_matrix);
+#endif
       }
 
     if (rebuild_temperature_preconditioner == true)
@@ -3095,6 +3108,7 @@ namespace Step32
                               };
       double global_temperature[2];
 
+      
       for (unsigned int i=0; i<distributed_temperature_solution.local_size(); ++i)
         {
           temperature[0] = std::min<double> (temperature[0],
