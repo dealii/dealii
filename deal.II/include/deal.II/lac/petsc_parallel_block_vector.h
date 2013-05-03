@@ -472,7 +472,7 @@ namespace PETScWrappers
         this->components.resize(this->n_blocks());
 
       for (unsigned int i=0; i<this->n_blocks(); ++i)
-        block(i).reinit(communicator, parallel_partitioning[i]);
+        block(i).reinit(parallel_partitioning[i], communicator);
     }
 
 
