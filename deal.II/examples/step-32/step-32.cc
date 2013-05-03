@@ -1846,9 +1846,9 @@ namespace Step32
     stokes_matrix.clear ();
 
 #ifdef USE_PETSC_LA
-    LA::MPI::CompressedBlockSparsityPattern sp(stokes_partitioning, MPI_COMM_WORLD);
+    LA::MPI::CompressedBlockSparsityPattern sp(stokes_partitioning);
 #else
-    LA::MPI::CompressedBlockSparsityPattern sp(stokes_partitioning);    
+    LA::MPI::CompressedBlockSparsityPattern sp(stokes_partitioning, MPI_COMM_WORLD);    
 #endif
     Table<2,DoFTools::Coupling> coupling (dim+1, dim+1);
 
@@ -1866,11 +1866,21 @@ namespace Step32
                                      this_mpi_process(MPI_COMM_WORLD));
 
     //    distribute_sp();
-    
-    
+    /*
+    SparsityTools::distribute_sparsity_pattern(sp,
+					       
+                                   const std::vector<unsigned int> &rows_per_cpu,
+                                   const MPI_Comm &mpi_comm,
+                                   const IndexSet &myrange);
+    */
     sp.compress();
 
     stokes_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
+    std::cout << stokes_matrix.m() << "x"<< stokes_matrix.n() << std::endl;
+    std::cout << stokes_matrix.block(0,0).m() << "x"<< stokes_matrix.block(0,0).n() << std::endl;
+    std::cout << stokes_matrix.block(1,0).m() << "x"<< stokes_matrix.block(1,0).n() << std::endl;
+    std::cout << stokes_matrix.block(0,1).m() << "x"<< stokes_matrix.block(0,1).n() << std::endl;
+    std::cout << stokes_matrix.block(1,1).m() << "x"<< stokes_matrix.block(1,1).n() << std::endl;
   }
 
 
@@ -1885,8 +1895,7 @@ namespace Step32
     stokes_preconditioner_matrix.clear ();
 
 #ifdef USE_PETSC_LA
-    LA::MPI::CompressedBlockSparsityPattern sp (stokes_partitioning,
-                                            MPI_COMM_WORLD);
+    LA::MPI::CompressedBlockSparsityPattern sp (stokes_partitioning);
 #else
     TrilinosWrappers::BlockSparsityPattern sp(stokes_partitioning,
                                               MPI_COMM_WORLD);
@@ -1922,8 +1931,7 @@ namespace Step32
 
 #ifdef USE_PETSC_LA
     // TODO:    LA::MPI::CompressedSparsityPattern
-    CompressedSimpleSparsityPattern sp (temperature_partitioner,
-                                       MPI_COMM_WORLD);
+    CompressedSimpleSparsityPattern sp (temperature_partitioner);
 #else
     TrilinosWrappers::SparsityPattern sp(temperature_partitioner,
                                          MPI_COMM_WORLD);
@@ -3108,7 +3116,7 @@ namespace Step32
                               };
       double global_temperature[2];
 
-      
+      /*
       for (unsigned int i=0; i<distributed_temperature_solution.local_size(); ++i)
         {
           temperature[0] = std::min<double> (temperature[0],
@@ -3116,7 +3124,8 @@ namespace Step32
           temperature[1] = std::max<double> (temperature[1],
                                              distributed_temperature_solution.trilinos_vector()[0][i]);
         }
-
+      */
+      
       temperature[0] *= -1.0;
       Utilities::MPI::max (temperature, MPI_COMM_WORLD, global_temperature);
       global_temperature[0] *= -1.0;
@@ -3367,9 +3376,14 @@ namespace Step32
     locally_relevant_joint_solution.reinit (locally_relevant_joint_dofs, MPI_COMM_WORLD);
     locally_relevant_joint_solution = joint_solution;
 
+    
     Postprocessor postprocessor (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD),
-                                 stokes_solution.block(1).minimal_value());
-
+#ifdef USE_PETSC_LA				 
+				 stokes_solution.block(1).min());
+#else				 
+				 stokes_solution.block(1).minimal_value());
+#endif
+  
     DataOut<dim> data_out;
     data_out.attach_dof_handler (joint_dof_handler);
     data_out.add_data_vector (locally_relevant_joint_solution, postprocessor);
