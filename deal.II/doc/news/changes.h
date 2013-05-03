@@ -64,6 +64,12 @@ this function.
 
 
 <ol>
+  <li> Fixed: setting values in TrilinosWrappers::SparseMatrix
+  in parallel was adding the values instead.
+  <br>
+  (Bruno Turcksin, Timo Heister, 2013/05/03)
+  </li>
+
   <li> New: The step-49 tutorial program now also has a discussion on
   what to do once you have a coarse mesh and want to refine it.
   <br>
@@ -110,6 +116,12 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> Fixed: Generate an error if the users tries to refine a cell
+that is already on the maximum level in a distributed triangulation.
+<br>
+(Timo Heister, 2013/05/01)
+</li>
 
 <li> Fixed: The version of ParameterHandler::set that takes a boolean
 as second argument was broken and did not work. This is now fixed.

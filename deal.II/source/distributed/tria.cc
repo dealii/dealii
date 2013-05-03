@@ -197,6 +197,8 @@ namespace internal
 
       static
       size_t (&connectivity_memory_used) (types<2>::connectivity *p4est);
+
+      static const unsigned max_level;
     };
 
     int (&functions<2>::quadrant_compare) (const void *v1, const void *v2)
@@ -327,6 +329,7 @@ namespace internal
     size_t (&functions<2>::connectivity_memory_used) (types<2>::connectivity *p4est)
       = p4est_connectivity_memory_used;
 
+    const unsigned int functions<2>::max_level = P4EST_MAXLEVEL;
 
     template <> struct functions<3>
     {
@@ -457,6 +460,8 @@ namespace internal
 
       static
       size_t (&connectivity_memory_used) (types<3>::connectivity *p4est);
+
+      static const unsigned max_level;
     };
 
 
@@ -590,6 +595,7 @@ namespace internal
     size_t (&functions<3>::connectivity_memory_used) (types<3>::connectivity *p4est)
       = p8est_connectivity_memory_used;
 
+    const unsigned int functions<3>::max_level = P8EST_MAXLEVEL;
 
 
     template <int dim>
@@ -2848,6 +2854,18 @@ namespace parallel
                           ExcMessage ("This class does not support anisotropic refinement"));
 #endif
 
+
+      // safety check: p4est has an upper limit on the level of a cell
+      if (this->n_levels()==dealii::internal::p4est::functions<dim>::max_level)
+        {
+          for (typename Triangulation<dim,spacedim>::active_cell_iterator
+                     cell = this->begin_active(dealii::internal::p4est::functions<dim>::max_level-1);
+                     cell != this->end(dealii::internal::p4est::functions<dim>::max_level-1); ++cell)
+            {
+              AssertThrow(!(cell->refine_flag_set()),
+                  ExcMessage("Fatal Error: maximum refinement level of p4est reached."));
+            }
+        }
 
       // now do the work we're
       // supposed to do when we are

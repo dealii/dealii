@@ -2677,18 +2677,27 @@ FESystem<dim,spacedim>::multiply_dof_numbers (
         summed_multiplicities += multiplicities[i];
       }
 
-  // assume maximal conformity and then take away bits
-  // as indicated by the base elements
-  typename FiniteElementData<dim>::Conformity
-    total_conformity
-    = std::numeric_limits<typename FiniteElementData<dim>::Conformity>::max();
+  // assume conformity of the first finite element and then take away
+  // bits as indicated by the base elements. if all multiplicities
+  // happen to be zero, then it doesn't matter what we set it to.
+  typename FiniteElementData<dim>::Conformity total_conformity
+    = typename FiniteElementData<dim>::Conformity();
+  {
+    unsigned int index = 0;
+    for (unsigned int index=0; index<fes.size(); ++index)
+      if (multiplicities[index]>0)
+	{
+	  total_conformity = fes[index]->conforming_space;
+	  break;
+	}
 
-  for (unsigned int i=0; i<fes.size(); i++)
-    if (multiplicities[i]>0)
-      total_conformity =
-	typename FiniteElementData<dim>::Conformity(total_conformity
-						    &
-						    fes[i]->conforming_space);
+    for (; index<fes.size(); ++index)
+      if (multiplicities[index]>0)
+	total_conformity =
+	  typename FiniteElementData<dim>::Conformity(total_conformity
+						      &
+						      fes[index]->conforming_space);
+  }
 
   std::vector<unsigned int> dpo;
   dpo.push_back(multiplied_dofs_per_vertex);
