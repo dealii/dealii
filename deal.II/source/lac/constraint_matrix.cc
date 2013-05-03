@@ -1768,10 +1768,88 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
 
 template<>
 void
-ConstraintMatrix::distribute (PETScWrappers::MPI::BlockVector &/*vec*/) const
+ConstraintMatrix::distribute (PETScWrappers::MPI::BlockVector &vec) const
 {
   Assert (sorted==true, ExcMatrixIsClosed());
-  AssertThrow (false, ExcNotImplemented());
+
+  std::vector<IndexSet> is_ghost(vec.n_blocks());
+  std::vector<IndexSet> is_owned(vec.n_blocks());
+  unsigned int startidx = 0; // this is the global dof index of the first dof in the current block
+  for (unsigned int block=0; block<vec.n_blocks(); ++block)
+    {
+      is_ghost[block].set_size(vec.block(block).size());
+      is_owned[block].set_size(vec.block(block).size());
+
+      typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
+      ConstraintLine index_comparison;
+      index_comparison.line = vec.block(block).local_range().first
+                              +vec.get_block_indices().block_start(block);
+      const constraint_iterator begin_my_constraints =
+        Utilities::lower_bound (lines.begin(),lines.end(),index_comparison);
+
+      index_comparison.line = vec.block(block).local_range().second
+                              +vec.get_block_indices().block_start(block);
+
+      const constraint_iterator end_my_constraints
+        = Utilities::lower_bound(lines.begin(),lines.end(),index_comparison);
+
+      // Here we search all the indices that we need to have read-access to
+      // - the local nodes and all the nodes that the constraints indicate.
+      // No caching done yet. would need some more clever data structures
+      // for doing that.
+      const std::pair<unsigned int, unsigned int>
+      local_range = vec.block(block).local_range();
+
+      is_owned[block].add_range (local_range.first, local_range.second);
+
+      std::set<unsigned int> individual_indices;
+      for (constraint_iterator it = begin_my_constraints;
+           it != end_my_constraints; ++it)
+        for (unsigned int i=0; i<it->entries.size(); ++i)
+          if ((it->entries[i].first < local_range.first)
+              ||
+              (it->entries[i].first >= local_range.second))
+            individual_indices.insert (it->entries[i].first - startidx);
+
+      is_ghost[block].add_indices (individual_indices.begin(),
+            individual_indices.end());
+
+      startidx+=vec.block(block).size();
+    }
+
+
+  PETScWrappers::MPI::BlockVector ghost_vec;
+  ghost_vec.reinit(is_owned, is_ghost, vec.get_mpi_communicator());
+  ghost_vec = vec;
+
+  for (unsigned int block=0; block<vec.n_blocks(); ++block)
+    {
+      typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
+      ConstraintLine index_comparison;
+      index_comparison.line = vec.block(block).local_range().first
+                              +vec.get_block_indices().block_start(block);
+      const constraint_iterator begin_my_constraints =
+        Utilities::lower_bound (lines.begin(),lines.end(),index_comparison);
+
+      index_comparison.line = vec.block(block).local_range().second
+                              +vec.get_block_indices().block_start(block);
+
+      const constraint_iterator end_my_constraints
+        = Utilities::lower_bound(lines.begin(),lines.end(),index_comparison);
+
+      for (constraint_iterator it = begin_my_constraints;
+           it != end_my_constraints; ++it)
+        {
+          // fill entry in line next_constraint.line by adding the
+          // different contributions
+          double new_value = it->inhomogeneity;
+          for (unsigned int i=0; i<it->entries.size(); ++i)
+            new_value += (ghost_vec(it->entries[i].first) *
+                          it->entries[i].second);
+          vec(it->line) = new_value;
+        }
+      vec.block(block).compress(::dealii::VectorOperation::insert);
+    }
 }
 
 #endif
