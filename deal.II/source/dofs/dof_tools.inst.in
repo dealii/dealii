@@ -913,7 +913,7 @@ DoFTools::compute_intergrid_transfer_representation<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const unsigned int,
  const DoFHandler<deal_II_dimension> &, const unsigned int,
  const InterGridMap<DoFHandler<deal_II_dimension> > &,
- std::vector<std::map<unsigned int, float> > &);
+ std::vector<std::map<types::global_dof_index, float> > &);
 
 
 template

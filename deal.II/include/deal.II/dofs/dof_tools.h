@@ -2568,7 +2568,7 @@ namespace DoFTools
                                              const DoFHandler<dim,spacedim>              &fine_grid,
                                              const unsigned int                  fine_component,
                                              const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-                                             std::vector<std::map<unsigned int, float> > &transfer_representation);
+                                             std::vector<std::map<types::global_dof_index, float> > &transfer_representation);
 
   /**
    * Create a mapping from degree
@@ -3084,7 +3084,7 @@ namespace DoFTools
     // previous function into the
     // output arg
     point_to_index_map.clear ();
-    for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    for (types::global_dof_index i=0; i<dof_handler.n_dofs(); ++i)
       point_to_index_map[support_points[i]] = i;
   }
 }

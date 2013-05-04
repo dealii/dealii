@@ -61,7 +61,7 @@ namespace DoFTools
                          const bool              keep_constrained_dofs,
                          const types::subdomain_id subdomain_id)
   {
-    const unsigned int n_dofs = dof.n_dofs();
+    const types::global_dof_index n_dofs = dof.n_dofs();
 
     Assert (sparsity.n_rows() == n_dofs,
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
@@ -120,7 +120,7 @@ namespace DoFTools
                          const bool               keep_constrained_dofs,
                          const types::subdomain_id subdomain_id)
   {
-    const unsigned int n_dofs = dof.n_dofs();
+    const types::global_dof_index n_dofs = dof.n_dofs();
 
     Assert (sparsity.n_rows() == n_dofs,
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs));
@@ -232,8 +232,8 @@ namespace DoFTools
     const DH        &dof_col,
     SparsityPattern &sparsity)
   {
-    const unsigned int n_dofs_row = dof_row.n_dofs();
-    const unsigned int n_dofs_col = dof_col.n_dofs();
+    const types::global_dof_index n_dofs_row = dof_row.n_dofs();
+    const types::global_dof_index n_dofs_col = dof_col.n_dofs();
 
     Assert (sparsity.n_rows() == n_dofs_row,
             ExcDimensionMismatch (sparsity.n_rows(), n_dofs_row));
@@ -348,7 +348,7 @@ namespace DoFTools
         return;
       }
 
-    const unsigned int n_dofs = dof.n_dofs();
+    const types::global_dof_index n_dofs = dof.n_dofs();
 
     AssertDimension (dof_to_boundary_mapping.size(), n_dofs);
     AssertDimension (sparsity.n_rows(), dof.n_boundary_dofs());
@@ -436,7 +436,7 @@ namespace DoFTools
         return;
       }
 
-    const unsigned int n_dofs = dof.n_dofs();
+    const types::global_dof_index n_dofs = dof.n_dofs();
 
     AssertDimension (dof_to_boundary_mapping.size(), n_dofs);
     Assert (boundary_indicators.find(numbers::internal_face_boundary_id) == boundary_indicators.end(),
@@ -493,7 +493,7 @@ namespace DoFTools
   // TODO: QA: reduce the indentation level of this method..., Maier 2012
 
   {
-    const unsigned int n_dofs = dof.n_dofs();
+    const types::global_dof_index n_dofs = dof.n_dofs();
 
     AssertDimension (sparsity.n_rows(), n_dofs);
     AssertDimension (sparsity.n_cols(), n_dofs);
@@ -1133,7 +1133,7 @@ namespace DoFTools
   {
     // do the error checking and frame code here, and then pass on to more
     // specialized functions in the internal namespace
-    const unsigned int n_dofs = dof.n_dofs();
+    const types::global_dof_index n_dofs = dof.n_dofs();
     const unsigned int n_comp = dof.get_fe().n_components();
 
     Assert (sparsity.n_rows() == n_dofs,
@@ -3420,7 +3420,7 @@ namespace DoFTools
 
     // compute the mean value on all the dofs by dividing with the number
     // of summands.
-    for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    for (types::global_dof_index i=0; i<dof_handler.n_dofs(); ++i)
       {
         // assert that each dof was used at least once. this needs not be
         // the case if the vector has more than one component
@@ -3470,7 +3470,7 @@ namespace DoFTools
     internal::get_component_association (dof, component_mask,
                                          dofs_by_component);
 
-    for (unsigned int i=0; i<dof.n_locally_owned_dofs(); ++i)
+    for (types::global_dof_index i=0; i<dof.n_locally_owned_dofs(); ++i)
       if (component_mask[dofs_by_component[i]] == true)
         selected_dofs[i] = true;
   }
@@ -3515,7 +3515,7 @@ namespace DoFTools
     internal::get_component_association (dof, component_mask,
                                          dofs_by_component);
 
-    for (unsigned int i=0; i<dof.n_dofs(); ++i)
+    for (types::global_dof_index i=0; i<dof.n_dofs(); ++i)
       if (component_mask[dofs_by_component[i]] == true)
         selected_dofs[i] = true;
   }
@@ -4314,7 +4314,7 @@ namespace DoFTools
 
     for (unsigned int c=0; c<dof_handler.get_fe().n_components(); ++c)
       {
-        for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+        for (types::global_dof_index i=0; i<dof_handler.n_dofs(); ++i)
           if ((subdomain_association[i] == subdomain) &&
               (component_association[i] == static_cast<unsigned char>(c)))
             ++n_dofs_on_subdomain[c];
@@ -4630,7 +4630,7 @@ namespace DoFTools
         const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
         const std::vector<dealii::Vector<double> > &parameter_dofs,
         const std::vector<int>             &weight_mapping,
-        std::vector<std::map<unsigned int, float> > &weights,
+        std::vector<std::map<types::global_dof_index, float> > &weights,
         const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &begin,
         const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &end)
       {
@@ -4748,8 +4748,8 @@ namespace DoFTools
                         // only overwrite old value if not by zero
                         if (global_parameter_representation(i) != 0)
                           {
-                            const unsigned int wi = parameter_dof_indices[local_dof],
-                                               wj = weight_mapping[i];
+                            const types::global_dof_index wi = parameter_dof_indices[local_dof],
+			      wj = weight_mapping[i];
                             weights[wi][wj] = global_parameter_representation(i);
                           };
                       }
@@ -4774,7 +4774,7 @@ namespace DoFTools
         const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
         const std::vector<dealii::Vector<double> > &parameter_dofs,
         const std::vector<int>             &weight_mapping,
-        std::vector<std::map<unsigned int,float> > &weights)
+        std::vector<std::map<types::global_dof_index,float> > &weights)
       {
         // simply distribute the range of cells to different threads
         typedef typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator active_cell_iterator;
@@ -4791,7 +4791,7 @@ namespace DoFTools
                          const InterGridMap<dealii::DoFHandler<dim,spacedim> > &,
                          const std::vector<dealii::Vector<double> > &,
                          const std::vector<int> &,
-                         std::vector<std::map<unsigned int, float> > &,
+                         std::vector<std::map<types::global_dof_index, float> > &,
                          const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &,
                          const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &)
           = &compute_intergrid_weights_3<dim>;
@@ -4822,7 +4822,7 @@ namespace DoFTools
         const dealii::DoFHandler<dim,spacedim>              &fine_grid,
         const unsigned int                  fine_component,
         const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-        std::vector<std::map<unsigned int, float> > &weights,
+        std::vector<std::map<types::global_dof_index, float> > &weights,
         std::vector<int>                   &weight_mapping)
       {
         // aliases to the finite elements used by the dof handlers:
@@ -4830,8 +4830,8 @@ namespace DoFTools
                                            &fine_fe   = fine_grid.get_fe();
 
         // global numbers of dofs
-        const unsigned int n_coarse_dofs = coarse_grid.n_dofs(),
-                           n_fine_dofs   = fine_grid.n_dofs();
+        const types::global_dof_index n_coarse_dofs = coarse_grid.n_dofs(),
+	  n_fine_dofs   = fine_grid.n_dofs();
 
         // local numbers of dofs
         const unsigned int fine_dofs_per_cell   = fine_fe.dofs_per_cell;
@@ -5005,7 +5005,7 @@ namespace DoFTools
         for (unsigned int col=0; col<n_parameters_on_fine_grid; ++col)
           {
             double sum=0;
-            for (unsigned int row=0; row<n_coarse_dofs; ++row)
+            for (types::global_dof_index row=0; row<n_coarse_dofs; ++row)
               if (weights[row].find(col) != weights[row].end())
                 sum += weights[row][col];
             Assert ((std::fabs(sum-1) < 1.e-12) ||
@@ -5054,7 +5054,7 @@ namespace DoFTools
     // to save some memory and since the weights are usually (negative)
     // powers of 2, we choose the value type of the matrix to be @p{float}
     // rather than @p{double}.
-    std::vector<std::map<unsigned int, float> > weights;
+    std::vector<std::map<types::global_dof_index, float> > weights;
 
     // this is this mapping. there is one entry for each dof on the fine
     // grid; if it is a parameter dof, then its value is the column in
@@ -5069,7 +5069,7 @@ namespace DoFTools
                                                weights, weight_mapping);
 
     // global numbers of dofs
-    const unsigned int n_coarse_dofs = coarse_grid.n_dofs(),
+    const types::global_dof_index n_coarse_dofs = coarse_grid.n_dofs(),
                        n_fine_dofs   = fine_grid.n_dofs();
 
 
@@ -5094,7 +5094,7 @@ namespace DoFTools
     // will become an unconstrained degree of freedom, while all others
     // will be constrained to this dof (and possibly others)
     std::vector<int> representants(n_coarse_dofs, -1);
-    for (unsigned int parameter_dof=0; parameter_dof<n_coarse_dofs;
+    for (types::global_dof_index parameter_dof=0; parameter_dof<n_coarse_dofs;
          ++parameter_dof)
       if (coarse_dof_is_parameter[parameter_dof] == true)
         {
@@ -5104,17 +5104,17 @@ namespace DoFTools
           Assert (weights[parameter_dof].size() > 0, ExcInternalError());
 
           // find the column where the representant is mentioned
-          std::map<unsigned int,float>::const_iterator i = weights[parameter_dof].begin();
+          std::map<types::global_dof_index,float>::const_iterator i = weights[parameter_dof].begin();
           for (; i!=weights[parameter_dof].end(); ++i)
             if (i->second == 1)
               break;
           Assert (i!=weights[parameter_dof].end(), ExcInternalError());
-          const unsigned int column = i->first;
+          const types::global_dof_index column = i->first;
 
           // now we know in which column of weights the representant is,
           // but we don't know its global index. get it using the inverse
           // operation of the weight_mapping
-          unsigned int global_dof=0;
+          types::global_dof_index global_dof=0;
           for (; global_dof<weight_mapping.size(); ++global_dof)
             if (weight_mapping[global_dof] == static_cast<int>(column))
               break;
@@ -5151,11 +5151,11 @@ namespace DoFTools
           const unsigned int col = weight_mapping[global_dof];
           Assert (col < n_parameters_on_fine_grid, ExcInternalError());
 
-          unsigned int first_used_row=0;
+          types::global_dof_index first_used_row=0;
 
           {
             Assert (weights.size() > 0, ExcInternalError());
-            std::map<unsigned int,float>::const_iterator
+            std::map<types::global_dof_index,float>::const_iterator
             col_entry = weights[0].end();
             for (; first_used_row<n_coarse_dofs; ++first_used_row)
               {
@@ -5179,9 +5179,9 @@ namespace DoFTools
           constraints.add_line (global_dof);
 
           constraint_line.clear ();
-          for (unsigned int row=first_used_row; row<n_coarse_dofs; ++row)
+          for (types::global_dof_index row=first_used_row; row<n_coarse_dofs; ++row)
             {
-              const std::map<unsigned int,float>::const_iterator
+              const std::map<types::global_dof_index,float>::const_iterator
               j = weights[row].find(col);
               if ((j != weights[row].end()) && (j->second != 0))
                 constraint_line.push_back (std::pair<types::global_dof_index,double>(representants[row],
@@ -5202,7 +5202,7 @@ namespace DoFTools
     const DoFHandler<dim,spacedim>              &fine_grid,
     const unsigned int                  fine_component,
     const InterGridMap<DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
-    std::vector<std::map<unsigned int, float> > &transfer_representation)
+    std::vector<std::map<types::global_dof_index, float> > &transfer_representation)
   {
     // store the weights with which a dof on the parameter grid contributes
     // to a dof on the fine grid. see the long doc below for more info
@@ -5225,7 +5225,7 @@ namespace DoFTools
     // to save some memory and since the weights are usually (negative)
     // powers of 2, we choose the value type of the matrix to be @p{float}
     // rather than @p{double}.
-    std::vector<std::map<unsigned int, float> > weights;
+    std::vector<std::map<types::global_dof_index, float> > weights;
 
     // this is this mapping. there is one entry for each dof on the fine
     // grid; if it is a parameter dof, then its value is the column in
@@ -5246,9 +5246,9 @@ namespace DoFTools
     // first construct the inverse mapping of weight_mapping
     std::vector<types::global_dof_index> inverse_weight_mapping (n_global_parm_dofs,
                                                       DoFHandler<dim,spacedim>::invalid_dof_index);
-    for (unsigned int i=0; i<weight_mapping.size(); ++i)
+    for (types::global_dof_index i=0; i<weight_mapping.size(); ++i)
       {
-        const unsigned int parameter_dof = weight_mapping[i];
+        const types::global_dof_index parameter_dof = weight_mapping[i];
         // if this global dof is a parameter
         if (parameter_dof != numbers::invalid_unsigned_int)
           {
@@ -5261,18 +5261,18 @@ namespace DoFTools
       };
 
     // next copy over weights array and replace respective numbers
-    const unsigned int n_rows = weight_mapping.size();
+    const types::global_dof_index n_rows = weight_mapping.size();
 
     transfer_representation.clear ();
     transfer_representation.resize (n_rows);
 
-    const unsigned int n_coarse_dofs = coarse_grid.n_dofs();
-    for (unsigned int i=0; i<n_coarse_dofs; ++i)
+    const types::global_dof_index n_coarse_dofs = coarse_grid.n_dofs();
+    for (types::global_dof_index i=0; i<n_coarse_dofs; ++i)
       {
-        std::map<unsigned int, float>::const_iterator j = weights[i].begin();
+        std::map<types::global_dof_index, float>::const_iterator j = weights[i].begin();
         for (; j!=weights[i].end(); ++j)
           {
-            const unsigned int p = inverse_weight_mapping[j->first];
+            const types::global_dof_index p = inverse_weight_mapping[j->first];
             Assert (p<n_rows, ExcInternalError());
 
             transfer_representation[p][i] = j->second;
@@ -5295,7 +5295,7 @@ namespace DoFTools
 
     std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (max_dofs_per_face(dof_handler));
-    unsigned int next_boundary_index = 0;
+    types::global_dof_index next_boundary_index = 0;
 
     // now loop over all cells and check whether their faces are at the
     // boundary. note that we need not take special care of single lines
@@ -5343,7 +5343,7 @@ namespace DoFTools
 
     std::vector<types::global_dof_index> dofs_on_face;
     dofs_on_face.reserve (max_dofs_per_face(dof_handler));
-    unsigned int next_boundary_index = 0;
+    types::global_dof_index next_boundary_index = 0;
 
     typename DH::active_cell_iterator cell = dof_handler.begin_active(),
                                       endc = dof_handler.end();
@@ -5434,7 +5434,7 @@ namespace DoFTools
 
         // now convert from the map to the linear vector. make sure every
         // entry really appeared in the map
-        for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+        for (types::global_dof_index i=0; i<dof_handler.n_dofs(); ++i)
           {
             Assert (x_support_points.find(i) != x_support_points.end(),
                     ExcInternalError());
@@ -5683,7 +5683,7 @@ namespace DoFTools
         if (selected_dofs.size()!=0)
           AssertDimension(indices.size(), selected_dofs.size());
 
-        for (unsigned int j=0; j<indices.size(); ++j)
+        for (types::global_dof_index j=0; j<indices.size(); ++j)
           {
             if (selected_dofs.size() == 0)
               block_list.add(i,indices[j]-offset);
@@ -5728,13 +5728,13 @@ namespace DoFTools
               if (cell->at_boundary(face) || cell->neighbor(face)->level() != cell->level())
                 for (unsigned int i=0; i<dpf; ++i)
                   exclude[fe.face_to_cell_index(i,face)] = true;
-            for (unsigned int j=0; j<indices.size(); ++j)
+            for (types::global_dof_index j=0; j<indices.size(); ++j)
               if (!exclude[j])
                 block_list.add(0, indices[j]);
           }
         else
           {
-            for (unsigned int j=0; j<indices.size(); ++j)
+            for (types::global_dof_index j=0; j<indices.size(); ++j)
               block_list.add(0, indices[j]);
           }
       }
