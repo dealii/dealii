@@ -368,70 +368,63 @@ public:
    */
 
   /**
-   * Return the indices of the dofs of this object in the standard
-   * ordering: dofs on vertex 0, dofs on vertex 1, etc, dofs on line
-   * 0, dofs on line 1, etc, dofs on quad 0, etc.
+   * Return the <i>global</i> indices of the degrees of freedom located on
+   * this object in the standard ordering defined by the finite element (i.e.,
+   * dofs on vertex 0, dofs on vertex 1, etc, dofs on line 0, dofs on line 1,
+   * etc, dofs on quad 0, etc.) This function is only available on
+   * <i>active</i> objects (see @ref GlossActive "this glossary entry").
    *
-   * The vector has to have the right size before being passed to this
-   * function.
+   * @param[out] dof_indices The vector into which the indices will be
+   *     written. It has to have the right size (namely,
+   *     <code>fe.dofs_per_cell</code>, <code>fe.dofs_per_face</code>,
+   *     or <code>fe.dofs_per_line</code>, depending on which kind of
+   *     object this function is called) before being passed to this
+   *     function.
+   * @param[in] fe_index The finite element index. For the   
+   *     standard ::DoFHandler class, this value must be equal to its default
+   *     value since that class only supports the same finite element on all
+   *     cells anyway. However, for hp objects (i.e. the hp::DoFHandler
+   *     class), different finite element objects may be used on different
+   *     cells. On faces between two cells, as well as vertices, there may
+   *     therefore be two sets of degrees of freedom, one for each of the
+   *     finite elements used on the adjacent cells. In order to specify which
+   *     set of degrees of freedom to work on, the last argument is used to
+   *     disambiguate. Finally, if this function is called for a cell object,
+   *     there can only be a single set of degrees of freedom, and fe_index
+   *     has to match the result of active_fe_index(). (Consequently,
+   *     the derived DoFCellAccessor class has an overloaded version of this
+   *     function that calls the present function with
+   *     <code>cell-@>active_fe_index</code> as last argument.)
    *
-   * @note The behavior descibed below for non-active cells will
-   * be removed in a future release. It is not very intuitive and its
-   * use is limited to FE_Q elements of degree 1.
    *
-   * This function is most often used on active objects (edges, faces,
-   * cells). It can be used on non-active objects as well
-   * (i.e. objects that have children), but only if the finite element
-   * under consideration has degrees of freedom exclusively on
-   * vertices. Otherwise, the function doesn't make much sense, since
-   * for example inactive edges do not have degrees of freedom
-   * associated with them at all.
-   *
-   * The last argument denotes the finite element index. For the
-   * standard ::DoFHandler class, this value must be equal to its
-   * default value since that class only supports the same finite
-   * element on all cells anyway.
-   *
-   * However, for hp objects (i.e. the hp::DoFHandler class),
-   * different finite element objects may be used on different
-   * cells. On faces between two cells, as well as vertices, there may
-   * therefore be two sets of degrees of freedom, one for each of the
-   * finite elements used on the adjacent cells. In order to specify
-   * which set of degrees of freedom to work on, the last argument is
-   * used to disambiguate. Finally, if this function is called for a
-   * cell object, there can only be a single set of degrees of
-   * freedom, and fe_index has to match the result of
-   * active_fe_index().
-   *
-   * For cells, there is only a single possible finite element index
-   * (namely the one for that cell, returned by
-   * <code>cell-@>active_fe_index</code>. Consequently, the derived
-   * DoFCellAccessor class has an overloaded version of this function
-   * that calls the present function with
-   * <code>cell-@>active_fe_index</code> as last argument.
-   *
+   * @note In many places in the tutorial and elsewhere in the library, the
+   *   first argument to this function is called
+   *   <code>local_dof_indices</code> by convention. The name is not meant to
+   *   indicate the <i>local</i> numbers of degrees of freedom (which are
+   *   always between zero and <code>fe.dofs_per_cell</code>, or similar faces
+   *   or edges) but instead that the returned values are the <i>global</i>
+   *   indices of those degrees of freedom that are located locally on the
+   *   current cell, face or edge.
    */
   void get_dof_indices (std::vector<types::global_dof_index> &dof_indices,
                         const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
-   * Return the indices of the dofs of this
-   * object in the standard ordering: dofs
-   * on vertex 0, dofs on vertex 1, ...
-   * dofs on line 0, dofs on line 1, ...,
-   * then quads, then hexes.
-   *
-   * It is assumed that the vector already
-   * has the right size beforehand. The
-   * indices refer to the local numbering
-   * for the level this line lives on.
+   * Return the global multilevel indices of the degrees of freedom that live
+   * on the current object with respect to the given level within the
+   * multigrid hierarchy. The indices refer to the local numbering for the
+   * level this line lives on.
    */
-  void get_mg_dof_indices (const int level, std::vector<types::global_dof_index> &dof_indices, const unsigned int fe_index = DH::default_fe_index) const;
+  void get_mg_dof_indices (const int level,
+			   std::vector<types::global_dof_index> &dof_indices,
+			   const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
    * Sets the level DoF indices that are returned by get_mg_dof_indices.
    */
-  void set_mg_dof_indices (const int level, const std::vector<types::global_dof_index> &dof_indices, const unsigned int fe_index = DH::default_fe_index);
+  void set_mg_dof_indices (const int level,
+			   const std::vector<types::global_dof_index> &dof_indices,
+			   const unsigned int fe_index = DH::default_fe_index);
 
   /**
    * Global DoF index of the <i>i</i>
@@ -474,11 +467,14 @@ public:
                                             const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
-   * Returns the Global DoF index of the <code>i</code>th degree of
+   * Returns the global DoF index of the <code>i</code>th degree of
    * freedom associated with the <code>vertex</code>th vertex on
    * level @p level. Also see vertex_dof_index().
    */
-  types::global_dof_index mg_vertex_dof_index (const int level, const unsigned int vertex, const unsigned int i, const unsigned int fe_index = DH::default_fe_index) const;
+  types::global_dof_index mg_vertex_dof_index (const int level,
+					       const unsigned int vertex,
+					       const unsigned int i,
+					       const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
    * Index of the <i>i</i>th degree
@@ -1076,75 +1072,33 @@ public:
    */
 
   /**
-   * Return the indices of the dofs of this
-   * object in the standard ordering: dofs
-   * on vertex 0, dofs on vertex 1, etc,
-   * dofs on line 0, dofs on line 1, etc,
-   * dofs on quad 0, etc.
+   * Return the <i>global</i> indices of the degrees of freedom located on
+   * this object in the standard ordering defined by the finite element (i.e.,
+   * dofs on vertex 0, dofs on vertex 1, etc, dofs on line 0, dofs on line 1,
+   * etc, dofs on quad 0, etc.) This function is only available on
+   * <i>active</i> objects (see @ref GlossActive "this glossary entry").
    *
-   * The vector has to have the
-   * right size before being passed
-   * to this function.
-   *
-   * This function is most often
-   * used on active objects (edges,
-   * faces, cells). It can be used
-   * on non-active objects as well
-   * (i.e. objects that have
-   * children), but only if the
-   * finite element under
-   * consideration has degrees of
-   * freedom exclusively on
-   * vertices. Otherwise, the
-   * function doesn't make much
-   * sense, since for example
-   * inactive edges do not have
-   * degrees of freedom associated
-   * with them at all.
-   *
-   * The last argument denotes the
-   * finite element index. For the
-   * standard ::DoFHandler class,
-   * this value must be equal to
-   * its default value since that
-   * class only supports the same
-   * finite element on all cells
-   * anyway.
-   *
-   * However, for hp objects
-   * (i.e. the hp::DoFHandler
-   * class), different finite
-   * element objects may be used on
-   * different cells. On faces
-   * between two cells, as well as
-   * vertices, there may therefore
-   * be two sets of degrees of
-   * freedom, one for each of the
-   * finite elements used on the
-   * adjacent cells. In order to
-   * specify which set of degrees
-   * of freedom to work on, the
-   * last argument is used to
-   * disambiguate. Finally, if this
-   * function is called for a cell
-   * object, there can only be a
-   * single set of degrees of
-   * freedom, and fe_index has to
-   * match the result of
-   * active_fe_index().
-   *
-   * For cells, there is only a
-   * single possible finite element
-   * index (namely the one for that
-   * cell, returned by
-   * <code>cell-@>active_fe_index</code>. Consequently,
-   * the derived DoFCellAccessor
-   * class has an overloaded
-   * version of this function that
-   * calls the present function
-   * with
-   * <code>cell-@>active_fe_index</code>
-   * as last argument.
+   * @param[out] dof_indices The vector into which the indices will be
+   *     written. It has to have the right size (namely,
+   *     <code>fe.dofs_per_cell</code>, <code>fe.dofs_per_face</code>,
+   *     or <code>fe.dofs_per_line</code>, depending on which kind of
+   *     object this function is called) before being passed to this
+   *     function.
+   * @param[in] fe_index The finite element index. For the   
+   *     standard ::DoFHandler class, this value must be equal to its default
+   *     value since that class only supports the same finite element on all
+   *     cells anyway. However, for hp objects (i.e. the hp::DoFHandler
+   *     class), different finite element objects may be used on different
+   *     cells. On faces between two cells, as well as vertices, there may
+   *     therefore be two sets of degrees of freedom, one for each of the
+   *     finite elements used on the adjacent cells. In order to specify which
+   *     set of degrees of freedom to work on, the last argument is used to
+   *     disambiguate. Finally, if this function is called for a cell object,
+   *     there can only be a single set of degrees of freedom, and fe_index
+   *     has to match the result of active_fe_index(). (Consequently,
+   *     the derived DoFCellAccessor class has an overloaded version of this
+   *     function that calls the present function with
+   *     <code>cell-@>active_fe_index</code> as last argument.)
    */
   void get_dof_indices (std::vector<types::global_dof_index> &dof_indices,
                         const unsigned int fe_index = AccessorData::default_fe_index) const;
@@ -2076,37 +2030,33 @@ public:
   void get_active_or_mg_dof_indices (std::vector<types::global_dof_index> &dof_indices) const;
 
   /**
-   * Return the indices of the dofs of this
-   * quad in the standard ordering: dofs
-   * on vertex 0, dofs on vertex 1, etc,
-   * dofs on line 0, dofs on line 1, etc,
-   * dofs on quad 0, etc.
+   * Return the <i>global</i> indices of the degrees of freedom located on
+   * this object in the standard ordering defined by the finite element (i.e.,
+   * dofs on vertex 0, dofs on vertex 1, etc, dofs on line 0, dofs on line 1,
+   * etc, dofs on quad 0, etc.) This function is only available on
+   * <i>active</i> objects (see @ref GlossActive "this glossary entry").
    *
-   * It is assumed that the vector already
-   * has the right size beforehand.
+   * @param[out] dof_indices The vector into which the indices will be
+   *     written. It has to have the right size (namely,
+   *     <code>fe.dofs_per_cell</code>, <code>fe.dofs_per_face</code>,
+   *     or <code>fe.dofs_per_line</code>, depending on which kind of
+   *     object this function is called) before being passed to this
+   *     function.
    *
-   * This function reimplements the
-   * same function in the base
-   * class. The functions in the
-   * base classes are available for
-   * all geometric objects,
-   * i.e. even in 3d they can be
-   * used to access the dof indices
-   * of edges, for example. On the
-   * other hand, the most common
-   * case is clearly the use on
-   * cells, which is why we cache
-   * the array for each cell, but
-   * not edge. To retrieve the
-   * cached values, rather than
-   * collect the necessary
-   * information every time, this
-   * function overwrites the one in
-   * the base class.
-   *
-   * This is a function which requires that the cell be active.
+   * This function reimplements the same function in the base class.
+   * In contrast to the function in the base class, we do not need the
+   * <code>fe_index</code> here because there is always a unique finite
+   * element index on cells.
    *
    * Also see get_active_or_mg_dof_indices().
+   *
+   * @note In many places in the tutorial and elsewhere in the library,
+   *   the argument to this function is called <code>local_dof_indices</code>
+   *   by convention. The name is not meant to indicate the <i>local</i>
+   *   numbers of degrees of freedom (which are always between zero and
+   *   <code>fe.dofs_per_cell</code>) but instead that the returned values
+   *   are the <i>global</i> indices of those degrees of freedom that
+   *   are located locally on the current cell.
    *
    * @deprecated Currently, this function can also be called for non-active cells, if all degrees of freedom of the FiniteElement are located in vertices. This functionality will vanish in a future release.
    */
@@ -2115,7 +2065,8 @@ public:
   /**
    * @deprecated Use get_active_or_mg_dof_indices() with level_cell_iterator returned from begin_mg().
    *
-   * Retrieve the global indices of the degrees of freedom on this cell in the level vector associated to the level of the cell.
+   * Retrieve the global indices of the degrees of freedom on this cell in the
+   * level vector associated to the level of the cell.
    */
   void get_mg_dof_indices (std::vector<types::global_dof_index> &dof_indices) const;
 
