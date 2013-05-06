@@ -117,6 +117,12 @@ this function.
 
 <ol>
 
+<li> Changed: FETools::interpolate is now instantiated for all
+vector types, not just dealii::Vector and dealii::BlockVector.
+<br>
+(Wolfgang Bangerth, 2013/05/06)
+</li>
+
 <li> Fixed: Generate an error if the users tries to refine a cell
 that is already on the maximum level in a distributed triangulation.
 <br>
