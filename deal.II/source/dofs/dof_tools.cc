@@ -4629,7 +4629,7 @@ namespace DoFTools
         const unsigned int                  coarse_component,
         const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
         const std::vector<dealii::Vector<double> > &parameter_dofs,
-        const std::vector<int>             &weight_mapping,
+        const std::vector<types::global_dof_index>             &weight_mapping,
         std::vector<std::map<types::global_dof_index, float> > &weights,
         const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &begin,
         const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &end)
@@ -4683,7 +4683,7 @@ namespace DoFTools
 
         // vector to hold the representation of a single degree of freedom
         // on the coarse grid (for the selected fe) on the fine grid
-        const unsigned int n_fine_dofs = weight_mapping.size();
+        const types::global_dof_index n_fine_dofs = weight_mapping.size();
         dealii::Vector<double> global_parameter_representation (n_fine_dofs);
 
         typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator cell;
@@ -4741,9 +4741,9 @@ namespace DoFTools
                   // weights, have only one mutex for all of them
                   static Threads::Mutex mutex;
                   Threads::Mutex::ScopedLock lock (mutex);
-                  for (unsigned int i=0; i<global_parameter_representation.size(); ++i)
+                  for (types::global_dof_index i=0; i<global_parameter_representation.size(); ++i)
                     // set this weight if it belongs to a parameter dof.
-                    if (weight_mapping[i] != -1)
+                    if (weight_mapping[i] != numbers::invalid_dof_index)
                       {
                         // only overwrite old value if not by zero
                         if (global_parameter_representation(i) != 0)
@@ -4773,7 +4773,7 @@ namespace DoFTools
         const unsigned int                  coarse_component,
         const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
         const std::vector<dealii::Vector<double> > &parameter_dofs,
-        const std::vector<int>             &weight_mapping,
+        const std::vector<types::global_dof_index>             &weight_mapping,
         std::vector<std::map<types::global_dof_index,float> > &weights)
       {
         // simply distribute the range of cells to different threads
@@ -4790,7 +4790,7 @@ namespace DoFTools
                          const unsigned int                  ,
                          const InterGridMap<dealii::DoFHandler<dim,spacedim> > &,
                          const std::vector<dealii::Vector<double> > &,
-                         const std::vector<int> &,
+                         const std::vector<types::global_dof_index> &,
                          std::vector<std::map<types::global_dof_index, float> > &,
                          const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &,
                          const typename dealii::DoFHandler<dim,spacedim>::active_cell_iterator &)
@@ -4823,7 +4823,7 @@ namespace DoFTools
         const unsigned int                  fine_component,
         const InterGridMap<dealii::DoFHandler<dim,spacedim> > &coarse_to_fine_grid_map,
         std::vector<std::map<types::global_dof_index, float> > &weights,
-        std::vector<int>                   &weight_mapping)
+        std::vector<types::global_dof_index>                   &weight_mapping)
       {
         // aliases to the finite elements used by the dof handlers:
         const FiniteElement<dim,spacedim> &coarse_fe = coarse_grid.get_fe(),
@@ -4949,7 +4949,7 @@ namespace DoFTools
         weights.resize (n_coarse_dofs);
 
         weight_mapping.clear ();
-        weight_mapping.resize (n_fine_dofs, -1);
+        weight_mapping.resize (n_fine_dofs, numbers::invalid_dof_index);
 
         if (true)
           {
@@ -4964,7 +4964,7 @@ namespace DoFTools
                   // if this DoF is a parameter dof and has not yet been
                   // numbered, then do so
                   if ((fine_fe.system_to_component_index(i).first == fine_component) &&
-                      (weight_mapping[local_dof_indices[i]] == -1))
+                      (weight_mapping[local_dof_indices[i]] == numbers::invalid_dof_index))
                     {
                       weight_mapping[local_dof_indices[i]] = next_free_index;
                       ++next_free_index;
@@ -5060,7 +5060,7 @@ namespace DoFTools
     // grid; if it is a parameter dof, then its value is the column in
     // weights for that parameter dof, if it is any other dof, then its
     // value is -1, indicating an error
-    std::vector<int> weight_mapping;
+    std::vector<types::global_dof_index> weight_mapping;
 
     const unsigned int n_parameters_on_fine_grid
       = internal::compute_intergrid_weights_1 (coarse_grid, coarse_component,
@@ -5093,7 +5093,7 @@ namespace DoFTools
     // element in this row with weight identical to one. the representant
     // will become an unconstrained degree of freedom, while all others
     // will be constrained to this dof (and possibly others)
-    std::vector<int> representants(n_coarse_dofs, -1);
+    std::vector<types::global_dof_index> representants(n_coarse_dofs, numbers::invalid_dof_index);
     for (types::global_dof_index parameter_dof=0; parameter_dof<n_coarse_dofs;
          ++parameter_dof)
       if (coarse_dof_is_parameter[parameter_dof] == true)
@@ -5116,7 +5116,7 @@ namespace DoFTools
           // operation of the weight_mapping
           types::global_dof_index global_dof=0;
           for (; global_dof<weight_mapping.size(); ++global_dof)
-            if (weight_mapping[global_dof] == static_cast<int>(column))
+            if (weight_mapping[global_dof] == static_cast<types::global_dof_index>(column))
               break;
           Assert (global_dof < weight_mapping.size(), ExcInternalError());
 
@@ -5139,7 +5139,7 @@ namespace DoFTools
     // but it is not known to the author how to make it faster...
     std::vector<std::pair<types::global_dof_index,double> > constraint_line;
     for (types::global_dof_index global_dof=0; global_dof<n_fine_dofs; ++global_dof)
-      if (weight_mapping[global_dof] != -1)
+      if (weight_mapping[global_dof] != numbers::invalid_dof_index)
         // this global dof is a parameter dof, so it may carry a constraint
         // note that for each global dof, the sum of weights shall be one,
         // so we can find out whether this dof is constrained in the
@@ -5148,7 +5148,7 @@ namespace DoFTools
         // is is the present dof, then we consider this dof to be
         // unconstrained. otherwise, all other dofs are constrained
         {
-          const unsigned int col = weight_mapping[global_dof];
+          const types::global_dof_index col = weight_mapping[global_dof];
           Assert (col < n_parameters_on_fine_grid, ExcInternalError());
 
           types::global_dof_index first_used_row=0;
@@ -5231,7 +5231,7 @@ namespace DoFTools
     // grid; if it is a parameter dof, then its value is the column in
     // weights for that parameter dof, if it is any other dof, then its
     // value is -1, indicating an error
-    std::vector<int> weight_mapping;
+    std::vector<types::global_dof_index> weight_mapping;
 
     internal::compute_intergrid_weights_1 (coarse_grid, coarse_component,
                                            fine_grid, fine_component,
@@ -5241,7 +5241,7 @@ namespace DoFTools
     // now compute the requested representation
     const types::global_dof_index n_global_parm_dofs
       = std::count_if (weight_mapping.begin(), weight_mapping.end(),
-                       std::bind2nd (std::not_equal_to<int> (), -1));
+                       std::bind2nd (std::not_equal_to<types::global_dof_index> (), numbers::invalid_dof_index));
 
     // first construct the inverse mapping of weight_mapping
     std::vector<types::global_dof_index> inverse_weight_mapping (n_global_parm_dofs,
@@ -5250,7 +5250,7 @@ namespace DoFTools
       {
         const types::global_dof_index parameter_dof = weight_mapping[i];
         // if this global dof is a parameter
-        if (parameter_dof != numbers::invalid_unsigned_int)
+        if (parameter_dof != numbers::invalid_dof_index)
           {
             Assert (parameter_dof < n_global_parm_dofs, ExcInternalError());
             Assert ((inverse_weight_mapping[parameter_dof] == DoFHandler<dim,spacedim>::invalid_dof_index),
