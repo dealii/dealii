@@ -1,8 +1,15 @@
 
 DEAL:Bicgstab::Starting value 0.1379
-DEAL:Bicgstab::Convergence step 1 value 0
+DEAL:Bicgstab::Convergence step 2 value 0
 DEAL::0
-DEAL::0.009242
+DEAL::0.009750
 DEAL::0
-DEAL::0.009242
+DEAL::0.002321
 DEAL::residual=0
+DEAL:Bicgstab::Starting value 2.384e-07
+DEAL:Bicgstab::Convergence step 0 value 2.384e-07
+DEAL::0
+DEAL::0.009750
+DEAL::0
+DEAL::0.002321
+DEAL::residual=2.384e-07
