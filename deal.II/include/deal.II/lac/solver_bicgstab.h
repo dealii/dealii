@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -179,10 +179,6 @@ protected:
   /**
    * Auxiliary vector.
    */
-  VECTOR *Vs;
-  /**
-   * Auxiliary vector.
-   */
   VECTOR *Vt;
   /**
    * Auxiliary vector.
@@ -283,7 +279,7 @@ double
 SolverBicgstab<VECTOR>::criterion (const MATRIX &A, const VECTOR &x, const VECTOR &b)
 {
   A.vmult(*Vt, x);
-  Vt->sadd(-1.,1.,b);
+  Vt->add(-1.,b);
   res = Vt->l2_norm();
 
   return res;
@@ -300,9 +296,6 @@ SolverBicgstab<VECTOR>::start(const MATRIX &A)
   Vr->sadd(-1.,1.,*Vb);
   res = Vr->l2_norm();
 
-  Vp->reinit(*Vx);
-  Vv->reinit(*Vx);
-  *Vrbar = *Vr;
   return this->control().check(step, res);
 }
 
@@ -333,9 +326,12 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
   VECTOR &p = *Vp;
   VECTOR &y = *Vy;
   VECTOR &z = *Vz;
-  VECTOR &s = *Vs;
   VECTOR &t = *Vt;
   VECTOR &v = *Vv;
+
+  v = 0;
+  p = 0;
+  rbar = r;
 
   do
     {
@@ -356,13 +352,13 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
       if (std::fabs(alpha) > 1.e10)
         return true;
 
-      s.equ(1., r, -alpha, v);
+      r.add(-alpha, v);
 
       // check for early success, see
       // the lac/bicgstab_early
       // testcase as to why this is
       // necessary
-      if (this->control().check(step, s.l2_norm()/Vb->l2_norm())
+      if (this->control().check(step, r.l2_norm()/Vb->l2_norm())
           == SolverControl::success)
         {
           Vx->add(alpha, y);
@@ -370,12 +366,12 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
           return false;
         }
 
-      precondition.vmult(z,s);
+      precondition.vmult(z,r);
       A.vmult(t,z);
-      rhobar = t*s;
+      rhobar = t*r;
       omega = rhobar/(t*t);
       Vx->add(alpha, y, omega, z);
-      r.equ(1., s, -omega, t);
+      r.add(-omega, t);
 
       if (additional_data.exact_residual)
         res = criterion(A, *Vx, *Vb);
@@ -400,19 +396,19 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
 {
   deallog.push("Bicgstab");
   Vr    = this->memory.alloc();
-  Vr->reinit(x);
+  Vr->reinit(x, true);
   Vrbar = this->memory.alloc();
-  Vrbar->reinit(x);
+  Vrbar->reinit(x, true);
   Vp    = this->memory.alloc();
+  Vp->reinit(x, true);
   Vy    = this->memory.alloc();
-  Vy->reinit(x);
+  Vy->reinit(x, true);
   Vz    = this->memory.alloc();
-  Vz->reinit(x);
-  Vs    = this->memory.alloc();
-  Vs->reinit(x);
+  Vz->reinit(x, true);
   Vt    = this->memory.alloc();
-  Vt->reinit(x);
+  Vt->reinit(x, true);
   Vv    = this->memory.alloc();
+  Vv->reinit(x, true);
 
   Vx = &x;
   Vb = &b;
@@ -436,7 +432,6 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
   this->memory.free(Vp);
   this->memory.free(Vy);
   this->memory.free(Vz);
-  this->memory.free(Vs);
   this->memory.free(Vt);
   this->memory.free(Vv);
 
