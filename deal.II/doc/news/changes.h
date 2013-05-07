@@ -117,6 +117,23 @@ this function.
 
 <ol>
 
+<li> Fixed: The stopping criterion for early exit in SolverBicgstab did not
+work properly for systems with large values, leading to premature exit. This
+is now fixed.
+<br>
+(Martin Kronbichler, 2013/05/07)
+</li>
+
+<li> Changed: The SolverGMRES implementation previously applied two
+iterations of the modified Gram&ndash;Schmidt algorithm for
+orthogonalization. In many situations one iteration is enough. The algorithm
+can now detect loss of orthogonality and enables re-orthogonalization only if
+necessary. The second iteration can be forced by the flag
+SolverGMRES::AdditionalData::force_re_orthogonalization, though.
+<br>
+(Martin Kronbichler, 2013/05/06)
+</li>
+
 <li> Changed: FETools::interpolate is now instantiated for all
 vector types, not just dealii::Vector and dealii::BlockVector.
 <br>
