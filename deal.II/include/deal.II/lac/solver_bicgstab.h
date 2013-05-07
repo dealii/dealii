@@ -63,28 +63,22 @@ class SolverBicgstab : public Solver<VECTOR>
 {
 public:
   /**
-   * There are two possibilities to
-   * compute the residual: one is an
-   * estimate using the computed value @p
-   * tau. The other is exact computation
-   * using another matrix vector
-   * multiplication. This increases the
-   * costs of the algorithm, so it is
-   * should be set to false whenever the
-   * problem allows it.
+   * There are two possibilities to compute the residual: one is an estimate
+   * using the computed value @p tau. The other is exact computation using
+   * another matrix vector multiplication. This increases the costs of the
+   * algorithm, so it is should be set to false whenever the problem allows
+   * it.
    *
-   * Bicgstab is susceptible to breakdowns, so
-   * we need a parameter telling us, which
-   * numbers are considered zero.
+   * Bicgstab is susceptible to breakdowns, so we need a parameter telling us,
+   * which numbers are considered zero.
    */
   struct AdditionalData
   {
     /**
      * Constructor.
      *
-     * The default is to perform an
-     * exact residual computation and
-     * breakdown parameter 1e-10.
+     * The default is to perform an exact residual computation and breakdown
+     * parameter 1e-10.
      */
     AdditionalData(const bool   exact_residual = true,
                    const double breakdown      = 1.e-10) :
@@ -109,9 +103,8 @@ public:
                   const AdditionalData &data=AdditionalData());
 
   /**
-   * Constructor. Use an object of
-   * type GrowingVectorMemory as
-   * a default to allocate memory.
+   * Constructor. Use an object of type GrowingVectorMemory as a default to
+   * allocate memory.
    */
   SolverBicgstab (SolverControl        &cn,
                   const AdditionalData &data=AdditionalData());
@@ -139,13 +132,9 @@ protected:
   double criterion (const MATRIX &A, const VECTOR &x, const VECTOR &b);
 
   /**
-   * Interface for derived class.
-   * This function gets the current
-   * iteration vector, the residual
-   * and the update vector in each
-   * step. It can be used for a
-   * graphical output of the
-   * convergence history.
+   * Interface for derived class.  This function gets the current iteration
+   * vector, the residual and the update vector in each step. It can be used
+   * for a graphical output of the convergence history.
    */
   virtual void print_vectors(const unsigned int step,
                              const VECTOR &x,
@@ -329,9 +318,8 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
   VECTOR &t = *Vt;
   VECTOR &v = *Vv;
 
-  v = 0;
-  p = 0;
   rbar = r;
+  bool startup = true;
 
   do
     {
@@ -340,7 +328,14 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
       rhobar = r*rbar;
       beta   = rhobar * alpha / (rho * omega);
       rho    = rhobar;
-      p.sadd(beta, 1., r, -beta*omega, v);
+      if (startup == true)
+        {
+          p = r;
+          startup = false;
+        }
+      else
+        p.sadd(beta, 1., r, -beta*omega, v);
+
       precondition.vmult(y,p);
       A.vmult(v,y);
       rhobar = rbar * v;
@@ -354,12 +349,9 @@ SolverBicgstab<VECTOR>::iterate(const MATRIX &A,
 
       r.add(-alpha, v);
 
-      // check for early success, see
-      // the lac/bicgstab_early
-      // testcase as to why this is
-      // necessary
-      if (this->control().check(step, r.l2_norm()/Vb->l2_norm())
-          == SolverControl::success)
+      // check for early success, see the lac/bicgstab_early testcase as to
+      // why this is necessary
+      if (this->control().check(step, r.l2_norm()) == SolverControl::success)
         {
           Vx->add(alpha, y);
           print_vectors(step, *Vx, r, y);
@@ -437,8 +429,7 @@ SolverBicgstab<VECTOR>::solve(const MATRIX &A,
 
   deallog.pop();
 
-  // in case of failure: throw
-  // exception
+  // in case of failure: throw exception
   if (this->control().last_check() != SolverControl::success)
     throw SolverControl::NoConvergence (this->control().last_step(),
                                         this->control().last_value());
