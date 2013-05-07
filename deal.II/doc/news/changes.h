@@ -117,6 +117,19 @@ this function.
 
 <ol>
 
+<li> New: The matrix-vector product ChunkSparseMatrix::vmult now runs in
+parallel in shared memory.
+<br>
+(Martin Kronbichler, 2013/05/07)
+</li>
+
+<li> New: The class ChunkSparseMatrix and the associated
+ChunkSparsityPattern now offer iterator classes to iterate over rows or the
+whole matrix in an STL-like way.
+<br>
+(Martin Kronbichler, 2013/05/07)
+</li>
+
 <li> Fixed: The stopping criterion for early exit in SolverBicgstab did not
 work properly for systems with large values, leading to premature exit. This
 is now fixed.
