@@ -44,8 +44,7 @@ int main()
   M.diag_element(3) = 42;
 
   Vector<double> rhs(4);
-  rhs(0) = rhs(2) = 0;
-  rhs(1) = rhs(3) = 0.0975;
+  rhs = 1;
 
   Vector<double> solution (4);
 
@@ -55,8 +54,7 @@ int main()
     bicgstab.solve (M, solution, rhs, PreconditionIdentity());
   }
 
-  for (unsigned int i=0; i<4; ++i)
-    deallog << solution(i) << std::endl;
+  solution.print(deallog);
 
   Vector<double> res (4);
   M.residual (res, solution, rhs);
@@ -68,16 +66,14 @@ int main()
   SparseMatrix<double> M1 (sparsity_pattern);
   M1.add(1e10,M);
   rhs *= 1e10;
+  solution = 0;
 
   {
     SolverControl control(100, 1.e7);
     SolverBicgstab<> bicgstab(control);
     bicgstab.solve (M1, solution, rhs, PreconditionIdentity());
   }
-
-  for (unsigned int i=0; i<4; ++i)
-    deallog << solution(i) << std::endl;
-
+  solution.print(deallog);
   M1.residual (res, solution, rhs);
   deallog << "residual=" << res.l2_norm()
 	  << std::endl;
