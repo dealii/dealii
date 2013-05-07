@@ -191,7 +191,7 @@ public:
     /**
      * Flag to force re-orthogonalization of orthonormal basis in every
      * step. If set to false, the solver automatically checks for loss of
-     * orthogonality every 10 iterations and enables re-orthogonalization only
+     * orthogonality every 5 iterations and enables re-orthogonalization only
      * if necessary.
      */
     bool force_re_orthogonalization;
