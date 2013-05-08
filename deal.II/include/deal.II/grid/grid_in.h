@@ -43,8 +43,9 @@ struct SubCellData;
  * and hexahedra. A tool that can do this is tethex, see
  * http://code.google.com/p/tethex/wiki/Tethex .
  *
- * Since the coarse mesh fed into a @p Triangulation object must not have
- * hanging nodes, strange things will happen if the mesh represented by the
+ * The mesh you read will form the coarsest level of a @p Triangulation object.
+ * As such, it must not contain hanging nodes or other forms or adaptive
+ * refinement and strange things will happen if the mesh represented by the
  * input file does in fact have them. This
  * is due to the fact that most mesh description formats do not store
  * neighborship information between cells, so the grid reading functions have
@@ -53,13 +54,19 @@ struct SubCellData;
  * common (complete) face, so the grid reader concludes that the adjacent
  * cells have no neighbors along these faces and must therefore be at the
  * boundary. In effect, an internal crack of the domain is introduced this
- * way. Since such cases are very hard to detect, the library does not make
- * any attempt to abort on such situations, and you will get a triangulation
- * that probably does not do what you want. A solution to this problem is the
+ * way. Since such cases are very hard to detect (how is GridIn supposed to
+ * decide whether a place where the faces of two small cells coincide with
+ * the face or a larger cell is in fact a hanging node associated with local
+ * refinement, or is indeed meant to be a crack in the domain?), the library
+ * does not make any attempt to catch such situations, and you will get a triangulation
+ * that probably does not do what you want. If your goal is to save and later
+ * read again a triangulation that has been adaptively refined, then this
+ * class is not your solution; rather take a look at the
  * PersistentTriangulation class.
  *
- * Note: if you experience unexpected problems with the use of this
- * class, be sure to read the documentation right until the end, and
+ * @note It is not uncommon to experience unexpected problems when reading
+ * generated meshes for the first time using this class. If this applies to
+ * you, be sure to read the documentation right until the end, and
  * also read the documentation of the GridReordering class.
  *
  * To read grid data, the triangulation to be fed with has to be empty.
