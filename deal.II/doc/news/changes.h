@@ -117,6 +117,14 @@ this function.
 
 <ol>
 
+<li> New: The classes TrilinosWrappers::SparseMatrix and
+TrilinosWrappers::BlockSparseMatrix now fully implement vmult and Tvmult with
+deal.II's own vector classes Vector<double> and
+parallel::distributed::Vector<double>.
+<br>
+(Martin Kronbichler, 2013/05/08)
+</li>
+
 <li> Improved: The matrix-vector product ChunkSparseMatrix::vmult now runs in
 parallel in shared memory.
 <br>

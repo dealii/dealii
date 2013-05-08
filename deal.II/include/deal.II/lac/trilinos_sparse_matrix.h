@@ -1851,171 +1851,123 @@ namespace TrilinosWrappers
 //@{
 
     /**
-     * Matrix-vector multiplication:
-     * let <i>dst = M*src</i> with
-     * <i>M</i> being this matrix.
+     * Matrix-vector multiplication: let <i>dst = M*src</i> with <i>M</i>
+     * being this matrix.
      *
-     * Source and destination must
-     * not be the same vector.
+     * Source and destination must not be the same vector.
      *
-     * Note that both vectors have to
-     * be distributed vectors
-     * generated using the same Map
-     * as was used for the matrix in
-     * case you work on a distributed
-     * memory architecture, using the
-     * interface in the
-     * TrilinosWrappers::VectorBase
-     * class (or one of the two
-     * derived classes Vector and
-     * MPI::Vector).
+     * Note that both vectors have to be distributed vectors generated using
+     * the same Map as was used for the matrix in case you work on a
+     * distributed memory architecture, using the interface in the
+     * TrilinosWrappers::VectorBase class (or one of the two derived classes
+     * Vector and MPI::Vector).
      *
-     * In case of a localized Vector,
-     * this function will only work
-     * when running on one processor,
-     * since the matrix object is
-     * inherently
-     * distributed. Otherwise, and
-     * exception will be thrown.
+     * In case of a localized Vector, this function will only work when
+     * running on one processor, since the matrix object is inherently
+     * distributed. Otherwise, and exception will be thrown.
      */
     void vmult (VectorBase       &dst,
                 const VectorBase &src) const;
 
     /**
-     * Same as before, but working with
-     * deal.II's own distributed vector
+     * Same as before, but working with deal.II's own distributed vector
      * class.
      */
     void vmult (parallel::distributed::Vector<TrilinosScalar>       &dst,
                 const parallel::distributed::Vector<TrilinosScalar> &src) const;
 
     /**
-     * Same as before, but working with
-     * deal.II's own vector
-     * class.
+     * Same as before, but working with deal.II's own vector class.
      */
     void vmult (dealii::Vector<TrilinosScalar>       &dst,
                 const dealii::Vector<TrilinosScalar> &src) const;
 
     /**
-     * Matrix-vector multiplication:
-     * let <i>dst =
-     * M<sup>T</sup>*src</i> with
-     * <i>M</i> being this
-     * matrix. This function does the
-     * same as vmult() but takes the
-     * transposed matrix.
+     * Matrix-vector multiplication: let <i>dst = M<sup>T</sup>*src</i> with
+     * <i>M</i> being this matrix. This function does the same as vmult() but
+     * takes the transposed matrix.
      *
-     * Source and destination must
-     * not be the same vector.
+     * Source and destination must not be the same vector.
      *
-     * Note that both vectors have to
-     * be distributed vectors
-     * generated using the same Map
-     * as was used for the matrix in
-     * case you work on a distributed
-     * memory architecture, using the
-     * interface in the
-     * TrilinosWrappers::VectorBase
-     * class (or one of the two
-     * derived classes Vector and
-     * MPI::Vector).
+     * Note that both vectors have to be distributed vectors generated using
+     * the same Map as was used for the matrix in case you work on a
+     * distributed memory architecture, using the interface in the
+     * TrilinosWrappers::VectorBase class (or one of the two derived classes
+     * Vector and MPI::Vector).
      *
-     * In case of a localized Vector,
-     * this function will only work
-     * when running on one processor,
-     * since the matrix object is
-     * inherently
-     * distributed. Otherwise, and
-     * exception will be thrown.
+     * In case of a localized Vector, this function will only work when
+     * running on one processor, since the matrix object is inherently
+     * distributed. Otherwise, and exception will be thrown.
      */
     void Tvmult (VectorBase       &dst,
                  const VectorBase &src) const;
 
     /**
-     * Same as before, but working with
-     * deal.II's own distributed vector
+     * Same as before, but working with deal.II's own distributed vector
      * class.
      */
     void Tvmult (parallel::distributed::Vector<TrilinosScalar>       &dst,
                  const parallel::distributed::Vector<TrilinosScalar> &src) const;
 
     /**
-     * Same as before, but working with
-     * deal.II's own vector
-     * class.
+     * Same as before, but working with deal.II's own vector class.
      */
     void Tvmult (dealii::Vector<TrilinosScalar>       &dst,
                  const dealii::Vector<TrilinosScalar> &src) const;
 
     /**
-     * Adding Matrix-vector
-     * multiplication. Add
-     * <i>M*src</i> on <i>dst</i>
-     * with <i>M</i> being this
-     * matrix.
+     * Adding matrix-vector multiplication. Add <i>M*src</i> on <i>dst</i>
+     * with <i>M</i> being this matrix.
      *
-     * Source and destination must
-     * not be the same vector.
+     * Source and destination must not be the same vector.
      *
-     * Note that both vectors have to
-     * be distributed vectors
-     * generated using the same Map
-     * as was used for the matrix in
-     * case you work on a distributed
-     * memory architecture, using the
-     * interface in the
-     * TrilinosWrappers::VectorBase
-     * class (or one of the two
-     * derived classes Vector and
-     * MPI::Vector).
+     * This function can be called with several different vector objects,
+     * namely TrilinosWrappers::Vector, TrilinosWrappers::MPI::Vector as well
+     * as deal.II's own vector classes Vector<double> and
+     * parallel::distributed::Vector<double>.
      *
-     * In case of a localized Vector,
-     * this function will only work
-     * when running on one processor,
-     * since the matrix object is
-     * inherently
-     * distributed. Otherwise, and
-     * exception will be thrown.
+     * When using a vector of type TrilinosWrappers::MPI::Vector, both vectors
+     * have to be distributed vectors generated using the same Map as was used
+     * for the matrix rows and columns in case you work on a distributed
+     * memory architecture, using the interface in the
+     * TrilinosWrappers::VectorBase class.
+     *
+     * In case of a localized Vector (i.e., TrilinosWrappers::Vector or
+     * Vector<double>), this function will only work when running on one
+     * processor, since the matrix object is inherently
+     * distributed. Otherwise, and exception will be thrown.
+     *
      */
-    void vmult_add (VectorBase       &dst,
-                    const VectorBase &src) const;
+    template<typename VectorType>
+    void vmult_add (VectorType       &dst,
+                    const VectorType &src) const;
 
     /**
-     * Adding Matrix-vector
-     * multiplication. Add
-     * <i>M<sup>T</sup>*src</i> to
-     * <i>dst</i> with <i>M</i> being
-     * this matrix. This function
-     * does the same as vmult_add()
-     * but takes the transposed
-     * matrix.
+     * Adding matrix-vector multiplication. Add <i>M<sup>T</sup>*src</i> to
+     * <i>dst</i> with <i>M</i> being this matrix. This function does the same
+     * as vmult_add() but takes the transposed matrix.
      *
-     * Source and destination must
-     * not be the same vector.
+     * Source and destination must not be the same vector.
      *
-     * Note that both vectors have to
-     * be distributed vectors
-     * generated using the same Map
-     * as was used for the matrix in
-     * case you work on a distributed
-     * memory architecture, using the
-     * interface in the
-     * TrilinosWrappers::VectorBase
-     * class (or one of the two
-     * derived classes Vector and
-     * MPI::Vector).
+     * This function can be called with several different vector objects,
+     * namely TrilinosWrappers::Vector, TrilinosWrappers::MPI::Vector as well
+     * as deal.II's own vector classes Vector<double> and
+     * parallel::distributed::Vector<double>.
      *
-     * In case of a localized Vector,
-     * this function will only work
-     * when running on one processor,
-     * since the matrix object is
-     * inherently
-     * distributed. Otherwise, and
-     * exception will be thrown.
+     * When using a vector of type TrilinosWrappers::MPI::Vector, both vectors
+     * have to be distributed vectors generated using the same Map as was used
+     * for the matrix rows and columns in case you work on a distributed
+     * memory architecture, using the interface in the
+     * TrilinosWrappers::VectorBase class.
+     *
+     * In case of a localized Vector (i.e., TrilinosWrappers::Vector or
+     * Vector<double>), this function will only work when running on one
+     * processor, since the matrix object is inherently
+     * distributed. Otherwise, and exception will be thrown.
      */
-    void Tvmult_add (VectorBase       &dst,
-                     const VectorBase &src) const;
+    template <typename VectorType>
+    void Tvmult_add (VectorType       &dst,
+                     const VectorType &src) const;
 
     /**
      * Return the square of the norm
@@ -2584,33 +2536,6 @@ namespace TrilinosWrappers
      * vector is compressed or not.
      */
     bool compressed;
-
-    /**
-     * An internal Trilinos vector that
-     * is used for accelerating vmult_add
-     * functions (in order not to need to
-     * recreate temporary vectors every
-     * time that function is called).
-     */
-    mutable VectorBase temp_vector;
-
-    /**
-     * An internal array of integer
-     * values that is used to store the
-     * column indices when
-     * adding/inserting local data into
-     * the (large) sparse matrix.
-     */
-    std::vector<unsigned int> column_indices;
-
-    /**
-     * An internal array of double values
-     * that is used to store the column
-     * indices when adding/inserting
-     * local data into the (large) sparse
-     * matrix.
-     */
-    std::vector<TrilinosScalar> column_values;
 
     /**
      *  To allow calling protected
@@ -3187,26 +3112,39 @@ namespace TrilinosWrappers
     last_action = Insert;
 
     int *col_index_ptr;
-    TrilinosScalar const *col_value_ptr;
+    TrilinosScalar *col_value_ptr;
     int n_columns;
 
-    // If we don't elide zeros, the pointers
-    // are already available...
+    TrilinosScalar short_val_array[100];
+    int short_index_array[100];
+    std::vector<TrilinosScalar> long_val_array;
+    std::vector<int> long_index_array;
+
+
+    // If we don't elide zeros, the pointers are already available... need to
+    // cast to non-const pointers as that is the format taken by Trilinos (but
+    // we will not modify const data)
     if (elide_zero_values == false)
       {
         col_index_ptr = (int *)col_indices;
-        col_value_ptr = values;
+        col_value_ptr = const_cast<TrilinosScalar*>(values);
         n_columns = n_cols;
       }
     else
       {
-        // Otherwise, extract nonzero values in
-        // each row and get the respective
-        // indices.
-        if (column_indices.size() < n_cols)
+        // Otherwise, extract nonzero values in each row and get the
+        // respective indices.
+        if (n_cols > 100)
           {
-            column_indices.resize(n_cols);
-            column_values.resize(n_cols);
+            long_val_array.resize(n_cols);
+            long_index_array.resize(n_cols);
+            col_index_ptr = &long_index_array[0];
+            col_value_ptr = &long_val_array[0];
+          }
+        else
+          {
+            col_index_ptr = &short_index_array[0];
+            col_value_ptr = &short_val_array[0];
           }
 
         n_columns = 0;
@@ -3216,66 +3154,51 @@ namespace TrilinosWrappers
             Assert (numbers::is_finite(value), ExcNumberNotFinite());
             if (value != 0)
               {
-                column_indices[n_columns] = col_indices[j];
-                column_values[n_columns] = value;
+                col_index_ptr[n_columns] = col_indices[j];
+                col_value_ptr[n_columns] = value;
                 n_columns++;
               }
           }
 
         Assert(n_columns <= (int)n_cols, ExcInternalError());
-
-        col_index_ptr = (int *)&column_indices[0];
-        col_value_ptr = &column_values[0];
       }
 
 
-    // If the calling matrix owns the row to
-    // which we want to insert values, we
-    // can directly call the Epetra_CrsMatrix
-    // input function, which is much faster
-    // than the Epetra_FECrsMatrix
-    // function. We distinguish between two
-    // cases: the first one is when the matrix
-    // is not filled (i.e., it is possible to
-    // add new elements to the sparsity pattern),
-    // and the second one is when the pattern is
-    // already fixed. In the former case, we
-    // add the possibility to insert new values,
-    // and in the second we just replace
+    // If the calling matrix owns the row to which we want to insert values,
+    // we can directly call the Epetra_CrsMatrix input function, which is much
+    // faster than the Epetra_FECrsMatrix function. We distinguish between two
+    // cases: the first one is when the matrix is not filled (i.e., it is
+    // possible to add new elements to the sparsity pattern), and the second
+    // one is when the pattern is already fixed. In the former case, we add
+    // the possibility to insert new values, and in the second we just replace
     // data.
     if (row_partitioner().MyGID(static_cast<int>(row)) == true)
       {
         if (matrix->Filled() == false)
           {
             ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(row, n_columns,
-                                                                const_cast<double *>(col_value_ptr),
+                                                                col_value_ptr,
                                                                 col_index_ptr);
 
-            // When inserting elements, we do
-            // not want to create exceptions in
-            // the case when inserting non-local
-            // data (since that's what we want
-            // to do right now).
+            // When inserting elements, we do not want to create exceptions in
+            // the case when inserting non-local data (since that's what we
+            // want to do right now).
             if (ierr > 0)
               ierr = 0;
           }
         else
           ierr = matrix->Epetra_CrsMatrix::ReplaceGlobalValues(row, n_columns,
-                                                               const_cast<double *>(col_value_ptr),
+                                                               col_value_ptr,
                                                                col_index_ptr);
       }
     else
       {
-        // When we're at off-processor data, we
-        // have to stick with the standard
-        // Insert/ReplaceGlobalValues
-        // function. Nevertheless, the way we
-        // call it is the fastest one (any other
-        // will lead to repeated allocation and
-        // deallocation of memory in order to
-        // call the function we already use,
-        // which is very unefficient if writing
-        // one element at a time).
+        // When we're at off-processor data, we have to stick with the
+        // standard Insert/ReplaceGlobalValues function. Nevertheless, the way
+        // we call it is the fastest one (any other will lead to repeated
+        // allocation and deallocation of memory in order to call the function
+        // we already use, which is very unefficient if writing one element at
+        // a time).
         compressed = false;
 
         if (matrix->Filled() == false)
@@ -3310,16 +3233,12 @@ namespace TrilinosWrappers
 
     if (value == 0)
       {
-        // we have to do checkings on Insert/Add
-        // in any case
-        // to be consistent with the MPI
-        // communication model (see the comments
-        // in the documentation of
-        // TrilinosWrappers::Vector), but we can
-        // save some work if the addend is
-        // zero. However, these actions are done
-        // in case we pass on to the other
-        // function.
+        // we have to do checkings on Insert/Add in any case to be consistent
+        // with the MPI communication model (see the comments in the
+        // documentation of TrilinosWrappers::Vector), but we can save some
+        // work if the addend is zero. However, these actions are done in case
+        // we pass on to the other function.
+
         // TODO: fix this (do not run compress here, but fail)
         if (last_action == Insert)
           {
@@ -3416,15 +3335,21 @@ namespace TrilinosWrappers
     last_action = Add;
 
     int *col_index_ptr;
-    TrilinosScalar const *col_value_ptr;
+    TrilinosScalar *col_value_ptr;
     int n_columns;
 
-    // If we don't elide zeros, the pointers
-    // are already available...
+    double short_val_array[100];
+    int short_index_array[100];
+    std::vector<TrilinosScalar> long_val_array;
+    std::vector<int> long_index_array;
+
+    // If we don't elide zeros, the pointers are already available... need to
+    // cast to non-const pointers as that is the format taken by Trilinos (but
+    // we will not modify const data)
     if (elide_zero_values == false)
       {
         col_index_ptr = (int *)col_indices;
-        col_value_ptr = values;
+        col_value_ptr = const_cast<TrilinosScalar*>(values);
         n_columns = n_cols;
 #ifdef DEBUG
         for (unsigned int j=0; j<n_cols; ++j)
@@ -3433,56 +3358,56 @@ namespace TrilinosWrappers
       }
     else
       {
-        // Otherwise, extract nonzero values in
-        // each row and the corresponding index.
-        if (column_indices.size() < n_cols)
+        // Otherwise, extract nonzero values in each row and the corresponding
+        // index.
+        if (n_cols > 100)
           {
-            column_indices.resize(n_cols);
-            column_values.resize(n_cols);
+            long_val_array.resize(n_cols);
+            long_index_array.resize(n_cols);
+            col_index_ptr = &long_index_array[0];
+            col_value_ptr = &long_val_array[0];
+          }
+        else
+          {
+            col_index_ptr = &short_index_array[0];
+            col_value_ptr = &short_val_array[0];
           }
 
         n_columns = 0;
         for (unsigned int j=0; j<n_cols; ++j)
           {
             const double value = values[j];
+
             Assert (numbers::is_finite(value), ExcNumberNotFinite());
             if (value != 0)
               {
-                column_indices[n_columns] = col_indices[j];
-                column_values[n_columns] = value;
+                col_index_ptr[n_columns] = col_indices[j];
+                col_value_ptr[n_columns] = value;
                 n_columns++;
               }
           }
 
         Assert(n_columns <= (int)n_cols, ExcInternalError());
 
-        col_index_ptr = (int *)&column_indices[0];
-        col_value_ptr = &column_values[0];
       }
 
-    // If the calling matrix owns the row to
-    // which we want to add values, we
-    // can directly call the Epetra_CrsMatrix
-    // input function, which is much faster
-    // than the Epetra_FECrsMatrix function.
+    // If the calling matrix owns the row to which we want to add values, we
+    // can directly call the Epetra_CrsMatrix input function, which is much
+    // faster than the Epetra_FECrsMatrix function.
     if (row_partitioner().MyGID(static_cast<int>(row)) == true)
       {
         ierr = matrix->Epetra_CrsMatrix::SumIntoGlobalValues(row, n_columns,
-                                                             const_cast<double *>(col_value_ptr),
+                                                             col_value_ptr,
                                                              col_index_ptr);
       }
     else
       {
-        // When we're at off-processor data, we
-        // have to stick with the standard
-        // SumIntoGlobalValues
-        // function. Nevertheless, the way we
-        // call it is the fastest one (any other
-        // will lead to repeated allocation and
-        // deallocation of memory in order to
-        // call the function we already use,
-        // which is very unefficient if writing
-        // one element at a time).
+        // When we're at off-processor data, we have to stick with the
+        // standard SumIntoGlobalValues function. Nevertheless, the way we
+        // call it is the fastest one (any other will lead to repeated
+        // allocation and deallocation of memory in order to call the function
+        // we already use, which is very inefficient if writing one element at
+        // a time).
         compressed = false;
 
         ierr = matrix->SumIntoGlobalValues (1, (int *)&row, n_columns,
@@ -3831,18 +3756,18 @@ namespace TrilinosWrappers
 
 
 
+  template <typename VectorType>
   inline
   void
-  SparseMatrix::vmult_add (VectorBase       &dst,
-                           const VectorBase &src) const
+  SparseMatrix::vmult_add (VectorType       &dst,
+                           const VectorType &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    // Choose to reinit the vector with fast
-    // argument set, which does not overwrite
-    // the content -- this is what we need
-    // since we're going to overwrite that
-    // anyway in the vmult operation.
+    // Choose to reinit the vector with fast argument set, which does not
+    // overwrite the content -- this is what we needs since we're going to
+    // overwrite that anyway in the vmult operation.
+    VectorType temp_vector;
     temp_vector.reinit(dst, true);
 
     vmult (temp_vector, src);
@@ -3851,13 +3776,14 @@ namespace TrilinosWrappers
 
 
 
+  template <typename VectorType>
   inline
   void
-  SparseMatrix::Tvmult_add (VectorBase       &dst,
-                            const VectorBase &src) const
+  SparseMatrix::Tvmult_add (VectorType       &dst,
+                            const VectorType &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
-
+    VectorType temp_vector;
     temp_vector.reinit(dst, true);
 
     Tvmult (temp_vector, src);
@@ -3873,7 +3799,8 @@ namespace TrilinosWrappers
     Assert (row_partitioner().SameAs(domain_partitioner()),
             ExcNotQuadratic());
 
-    temp_vector.reinit(v);
+    VectorBase temp_vector;
+    temp_vector.reinit(v, true);
 
     vmult (temp_vector, v);
     return temp_vector*v;
@@ -3889,7 +3816,8 @@ namespace TrilinosWrappers
     Assert (row_partitioner().SameAs(domain_partitioner()),
             ExcNotQuadratic());
 
-    temp_vector.reinit(v);
+    VectorBase temp_vector;
+    temp_vector.reinit(v, true);
 
     vmult (temp_vector, v);
     return u*temp_vector;
