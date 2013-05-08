@@ -1920,7 +1920,7 @@ namespace ChunkSparseMatrixIterators
     if (*this < other)
       {
         Iterator copy = *this;
-        while (copy < other)
+        while (copy != other)
           {
             ++copy;
             --difference;
@@ -1929,7 +1929,7 @@ namespace ChunkSparseMatrixIterators
     else
       {
         Iterator copy = other;
-        while (copy < *this)
+        while (copy != *this)
           {
             ++copy;
             ++difference;

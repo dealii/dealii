@@ -76,12 +76,6 @@ namespace ChunkSparsityPatternIterators
     unsigned int row () const;
 
     /**
-     * Index in row of the element represented by this object. This function
-     * can only be called for entries for which is_valid_entry() is true.
-     */
-    unsigned int index () const;
-
-    /**
      * Returns the global index from the reduced sparsity pattern.
      */
     std::size_t reduced_index() const;
@@ -131,12 +125,12 @@ namespace ChunkSparsityPatternIterators
     SparsityPatternIterators::Accessor reduced_accessor;
 
     /**
-     * Current row number.
+     * Current chunk row number.
      */
     unsigned int chunk_row;
 
     /**
-     * Current index in row.
+     * Current chunk col number.
      */
     unsigned int chunk_col;
 
@@ -964,7 +958,8 @@ namespace ChunkSparsityPatternIterators
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
 
-    return sparsity_pattern->get_chunk_size()*reduced_accessor.row()+chunk_row;
+    return sparsity_pattern->get_chunk_size()*reduced_accessor.row() +
+      chunk_row;
   }
 
 
@@ -976,18 +971,6 @@ namespace ChunkSparsityPatternIterators
     Assert (is_valid_entry() == true, ExcInvalidIterator());
 
     return sparsity_pattern->get_chunk_size()*reduced_accessor.column() +
-      chunk_col;
-  }
-
-
-
-  inline
-  unsigned int
-  Accessor::index() const
-  {
-    Assert (is_valid_entry() == true, ExcInvalidIterator());
-
-    return sparsity_pattern->get_chunk_size()*reduced_accessor.index() +
       chunk_col;
   }
 
@@ -1026,17 +1009,7 @@ namespace ChunkSparsityPatternIterators
     Assert (sparsity_pattern == other.sparsity_pattern,
             ExcInternalError());
 
-    // comparison is a bit messy because of the way ChunkSparsityPattern
-    // stores entry: chunk rows run faster than the indices of the reduced
-    // sparsity pattern, but the accessors should of course compare less based
-    // on the actual row, not the reduced one.
-    if (chunk_row == other.chunk_row)
-      return (reduced_accessor.index_within_sparsity <
-              other.reduced_accessor.index_within_sparsity ||
-              (reduced_accessor.index_within_sparsity ==
-               other.reduced_accessor.index_within_sparsity &&
-               chunk_col < other.chunk_col));
-    else
+    if (chunk_row != other.chunk_row)
       {
         if (reduced_accessor.index_within_sparsity ==
             reduced_accessor.sparsity_pattern->n_nonzero_elements())
@@ -1044,24 +1017,23 @@ namespace ChunkSparsityPatternIterators
         if (other.reduced_accessor.index_within_sparsity ==
             reduced_accessor.sparsity_pattern->n_nonzero_elements())
           return true;
-        const unsigned int row = reduced_accessor.row(),
-          other_row = other.reduced_accessor.row();
-        return (row < other_row
-                ||
-                (row == other_row
-                 &&
-                 (chunk_row < other.chunk_row
-                  ||
-                  (chunk_row == other.chunk_row
-                   &&
-                   (reduced_accessor.index_within_sparsity <
-                    other.reduced_accessor.index_within_sparsity
-                    ||
-                    (reduced_accessor.index_within_sparsity ==
-                     other.reduced_accessor.index_within_sparsity
-                     &&
-                     chunk_col < other.chunk_col))))));
+
+        const unsigned int
+          global_row = sparsity_pattern->get_chunk_size()*reduced_accessor.row()
+          +chunk_row,
+          other_global_row = sparsity_pattern->get_chunk_size()*
+          other.reduced_accessor.row()+other.chunk_row;
+        if (global_row < other_global_row)
+          return true;
+        else if (global_row > other_global_row)
+          return false;
       }
+
+    return (reduced_accessor.index_within_sparsity <
+            other.reduced_accessor.index_within_sparsity ||
+            (reduced_accessor.index_within_sparsity ==
+             other.reduced_accessor.index_within_sparsity &&
+             chunk_col < other.chunk_col));
   }
 
 
@@ -1078,6 +1050,11 @@ namespace ChunkSparsityPatternIterators
             reduced_accessor.column() * chunk_size + chunk_col <
             sparsity_pattern->n_cols(),
             ExcIteratorPastEnd());
+    if (chunk_size == 1)
+      {
+        reduced_accessor.advance();
+        return;
+      }
 
     ++chunk_col;
 
@@ -1087,34 +1064,30 @@ namespace ChunkSparsityPatternIterators
         reduced_accessor.column() * chunk_size + chunk_col ==
         sparsity_pattern->n_cols())
       {
+        const unsigned int reduced_row = reduced_accessor.row();
         // end of row
-        if (reduced_accessor.index() + 1 ==
-            reduced_accessor.sparsity_pattern->row_length(reduced_accessor.row()))
+        if (reduced_accessor.index_within_sparsity + 1 ==
+            reduced_accessor.sparsity_pattern->rowstart[reduced_row+1])
           {
             ++chunk_row;
-            chunk_col = 0;
-            const unsigned int old_reduced_row = reduced_accessor.row();
 
-            // end of matrix
-            if (old_reduced_row * chunk_size + chunk_row ==
-                sparsity_pattern->n_rows())
+            chunk_col = 0;
+
+            // end of chunk rows or end of matrix
+            if (chunk_row == chunk_size ||
+                (reduced_row * chunk_size + chunk_row ==
+                 sparsity_pattern->n_rows()))
               {
                 chunk_row = 0;
-                reduced_accessor =
-                  SparsityPatternIterators::Accessor(&sparsity_pattern->sparsity_pattern,
-                                                     sparsity_pattern->sparsity_pattern.n_nonzero_elements());
+                reduced_accessor.advance();
               }
-            // end of chunk rows
-            else if (chunk_row == chunk_size)
-              {
-                reduced_accessor =
-                  *sparsity_pattern->sparsity_pattern.begin(old_reduced_row+1);
-                chunk_row = 0;
-              }
+            // go back to the beginning of the same reduced row but with
+            // chunk_row increased by one
             else
-              reduced_accessor =
-                *sparsity_pattern->sparsity_pattern.begin(old_reduced_row);
+              reduced_accessor.index_within_sparsity =
+                reduced_accessor.sparsity_pattern->rowstart[reduced_row];
           }
+        // advance within chunk
         else
           {
             reduced_accessor.advance();
@@ -1185,7 +1158,7 @@ namespace ChunkSparsityPatternIterators
   bool
   Iterator::operator != (const Iterator &other) const
   {
-    return ! (*this == other);
+    return ! (accessor == other.accessor);
   }
 
 
