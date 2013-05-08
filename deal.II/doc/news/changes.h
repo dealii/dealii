@@ -117,7 +117,7 @@ this function.
 
 <ol>
 
-<li> New: The matrix-vector product ChunkSparseMatrix::vmult now runs in
+<li> Improved: The matrix-vector product ChunkSparseMatrix::vmult now runs in
 parallel in shared memory.
 <br>
 (Martin Kronbichler, 2013/05/07)
