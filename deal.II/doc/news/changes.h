@@ -117,6 +117,15 @@ this function.
 
 <ol>
 
+<li> Improved: The functions MatrixTools::create_mass_matrix and
+MatrixTools::create_laplace_matrix take now an optional ConstraintMatrix
+argument that allows to directly apply the constraints. This also helps
+VectorTools::project. Note that not providing constraints remains the default
+and recommended way to ensure consistency when several matrices are added.
+<br>
+(Martin Kronbichler, 2013/05/08)
+</li>
+
 <li> New: The classes TrilinosWrappers::SparseMatrix and
 TrilinosWrappers::BlockSparseMatrix now fully implement vmult and Tvmult with
 deal.II's own vector classes Vector<double> and

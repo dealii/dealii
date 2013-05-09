@@ -209,6 +209,7 @@ namespace MatrixCreator
         std::vector<unsigned int> dof_indices;
         FullMatrix<double>        cell_matrix;
         dealii::Vector<double>    cell_rhs;
+        const ConstraintMatrix   *constraints;
       };
     }
 
@@ -592,10 +593,15 @@ namespace MatrixCreator
               (data.cell_rhs.size() == dofs_per_cell),
               ExcInternalError());
 
-      matrix->add(data.dof_indices, data.cell_matrix);
       if (right_hand_side != 0)
-        for (unsigned int i=0; i<dofs_per_cell; ++i)
-          (*right_hand_side)(data.dof_indices[i]) += data.cell_rhs(i);
+        data.constraints->distribute_local_to_global(data.cell_matrix,
+                                                     data.cell_rhs,
+                                                     data.dof_indices,
+                                                     *matrix, *right_hand_side);
+      else
+        data.constraints->distribute_local_to_global(data.cell_matrix,
+                                                     data.dof_indices,
+                                                     *matrix);
     }
   }
 }
@@ -609,7 +615,8 @@ namespace MatrixCreator
                            const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> *const coefficient)
+                           const Function<spacedim> *const coefficient,
+                           const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -631,6 +638,7 @@ namespace MatrixCreator
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.constraints = &constraints;
 
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
@@ -648,10 +656,11 @@ namespace MatrixCreator
   void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
                            const Quadrature<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> *const coefficient)
+                           const Function<spacedim> *const coefficient,
+                           const ConstraintMatrix   &constraints)
   {
     create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof,
-                       q, matrix, coefficient);
+                       q, matrix, coefficient, constraints);
   }
 
 
@@ -663,7 +672,8 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim>      &rhs,
                            Vector<double>           &rhs_vector,
-                           const Function<spacedim> *const coefficient)
+                           const Function<spacedim> *const coefficient,
+                           const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -684,6 +694,7 @@ namespace MatrixCreator
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.constraints = &constraints;
 
     WorkStream::run (dof.begin_active(),
                      static_cast<typename DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
@@ -703,10 +714,12 @@ namespace MatrixCreator
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim>      &rhs,
                            Vector<double>           &rhs_vector,
-                           const Function<spacedim> *const coefficient)
+                           const Function<spacedim> *const coefficient,
+                           const ConstraintMatrix   &constraints)
   {
     create_mass_matrix(StaticMappingQ1<dim,spacedim>::mapping,
-                       dof, q, matrix, rhs, rhs_vector, coefficient);
+                       dof, q, matrix, rhs, rhs_vector, coefficient,
+                       constraints);
   }
 
 
@@ -716,7 +729,8 @@ namespace MatrixCreator
                            const hp::DoFHandler<dim,spacedim>    &dof,
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> *const coefficient)
+                           const Function<spacedim> *const coefficient,
+                           const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -734,6 +748,7 @@ namespace MatrixCreator
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.constraints = &constraints;
 
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
@@ -748,24 +763,27 @@ namespace MatrixCreator
 
 
   template <int dim, typename number, int spacedim>
-  void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
-                           const hp::QCollection<dim>    &q,
+  void create_mass_matrix (const hp::DoFHandler<dim,spacedim> &dof,
+                           const hp::QCollection<dim> &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim> *const coefficient)
+                           const Function<spacedim> *const coefficient,
+                           const ConstraintMatrix   &constraints)
   {
-    create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
+    create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection,
+                       dof, q, matrix, coefficient, constraints);
   }
 
 
 
   template <int dim, typename number, int spacedim>
-  void create_mass_matrix (const hp::MappingCollection<dim,spacedim>       &mapping,
-                           const hp::DoFHandler<dim,spacedim>    &dof,
+  void create_mass_matrix (const hp::MappingCollection<dim,spacedim> &mapping,
+                           const hp::DoFHandler<dim,spacedim> &dof,
                            const hp::QCollection<dim>    &q,
                            SparseMatrix<number>     &matrix,
                            const Function<spacedim>      &rhs,
                            Vector<double>           &rhs_vector,
-                           const Function<spacedim> *const coefficient)
+                           const Function<spacedim> *const coefficient,
+                           const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -783,6 +801,7 @@ namespace MatrixCreator
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.constraints = &constraints;
 
     WorkStream::run (dof.begin_active(),
                      static_cast<typename hp::DoFHandler<dim,spacedim>::active_cell_iterator>(dof.end()),
@@ -797,15 +816,16 @@ namespace MatrixCreator
 
 
   template <int dim, typename number, int spacedim>
-  void create_mass_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
-                           const hp::QCollection<dim>    &q,
+  void create_mass_matrix (const hp::DoFHandler<dim,spacedim> &dof,
+                           const hp::QCollection<dim> &q,
                            SparseMatrix<number>     &matrix,
-                           const Function<spacedim>      &rhs,
+                           const Function<spacedim> &rhs,
                            Vector<double>           &rhs_vector,
-                           const Function<spacedim> *const coefficient)
+                           const Function<spacedim> *const coefficient,
+                           const ConstraintMatrix   &constraints)
   {
     create_mass_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
-                       matrix, rhs, rhs_vector, coefficient);
+                       matrix, rhs, rhs_vector, coefficient, constraints);
   }
 
 
@@ -1706,7 +1726,8 @@ namespace MatrixCreator
                               const DoFHandler<dim,spacedim>    &dof,
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<spacedim> *const coefficient)
+                              const Function<spacedim> *const coefficient,
+                              const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -1727,6 +1748,7 @@ namespace MatrixCreator
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.constraints = &constraints;
 
     void (*copy_local_to_global) (const MatrixCreator::internal::AssemblerData::CopyData &,
                                   SparseMatrix<double> *,
@@ -1749,7 +1771,8 @@ namespace MatrixCreator
   void create_laplace_matrix (const DoFHandler<dim,spacedim>    &dof,
                               const Quadrature<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<spacedim> *const coefficient)
+                              const Function<spacedim> *const coefficient,
+                              const ConstraintMatrix   &constraints)
   {
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q, matrix, coefficient);
   }
@@ -1763,7 +1786,8 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<spacedim> *const coefficient)
+                              const Function<spacedim> *const coefficient,
+                              const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -1784,6 +1808,7 @@ namespace MatrixCreator
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.constraints = &constraints;
 
     void (*copy_local_to_global) (const MatrixCreator::internal::AssemblerData::CopyData &,
                                   SparseMatrix<double> *,
@@ -1808,7 +1833,8 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<spacedim> *const coefficient)
+                              const Function<spacedim> *const coefficient,
+                              const ConstraintMatrix   &constraints)
   {
     create_laplace_matrix(StaticMappingQ1<dim,spacedim>::mapping, dof, q,
                           matrix, rhs, rhs_vector, coefficient);
@@ -1821,7 +1847,8 @@ namespace MatrixCreator
                               const hp::DoFHandler<dim,spacedim>    &dof,
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<spacedim> *const coefficient)
+                              const Function<spacedim> *const coefficient,
+                              const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -1839,6 +1866,7 @@ namespace MatrixCreator
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.constraints = &constraints;
 
     void (*copy_local_to_global) (const MatrixCreator::internal::AssemblerData::CopyData &,
                                   SparseMatrix<double> *,
@@ -1861,7 +1889,8 @@ namespace MatrixCreator
   void create_laplace_matrix (const hp::DoFHandler<dim,spacedim>    &dof,
                               const hp::QCollection<dim>    &q,
                               SparseMatrix<double>     &matrix,
-                              const Function<spacedim> *const coefficient)
+                              const Function<spacedim> *const coefficient,
+                              const ConstraintMatrix   &constraints)
   {
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q, matrix, coefficient);
   }
@@ -1875,7 +1904,8 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<spacedim> *const coefficient)
+                              const Function<spacedim> *const coefficient,
+                              const ConstraintMatrix   &constraints)
   {
     Assert (matrix.m() == dof.n_dofs(),
             ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -1893,6 +1923,7 @@ namespace MatrixCreator
                                   assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
     copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
+    copy_data.constraints = &constraints;
 
     void (*copy_local_to_global) (const MatrixCreator::internal::AssemblerData::CopyData &,
                                   SparseMatrix<double> *,
@@ -1917,7 +1948,8 @@ namespace MatrixCreator
                               SparseMatrix<double>     &matrix,
                               const Function<spacedim>      &rhs,
                               Vector<double>           &rhs_vector,
-                              const Function<spacedim> *const coefficient)
+                              const Function<spacedim> *const coefficient,
+                              const ConstraintMatrix   &constraints)
   {
     create_laplace_matrix(hp::StaticMappingQ1<dim,spacedim>::mapping_collection, dof, q,
                           matrix, rhs, rhs_vector, coefficient);
