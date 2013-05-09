@@ -69,7 +69,7 @@ int main(int argc, char **argv)
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   {
-    SolverControl control(100, 1.e-3);
+    SolverControl control(100, 1.e-10);
 
     const unsigned int size = 32;
     unsigned int dim = (size-1)*(size-1);

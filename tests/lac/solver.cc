@@ -77,8 +77,8 @@ int main()
   SolverControl verbose_control(100, 1.e-3, true);
   SolverCG<> cg(control, mem);
   SolverGMRES<> gmres(control, mem, 8);
-  SolverGMRES<>::AdditionalData(8, true);
-  SolverGMRES<> gmresright(control, mem, 8);  
+  SolverGMRES<>::AdditionalData data(8, true);
+  SolverGMRES<> gmresright(control, mem, data);  
   SolverMinRes<> minres(control, mem);
   SolverBicgstab<> bicgstab(control, mem);
   SolverRichardson<> rich(control, mem);

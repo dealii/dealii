@@ -2536,13 +2536,9 @@ BlockMatrixBase<MatrixType>::vmult_add (BlockVectorType       &dst,
           ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   for (unsigned int row=0; row<n_block_rows(); ++row)
-    {
-      block(row,0).vmult_add (dst.block(row),
-                              src.block(0));
-      for (unsigned int col=1; col<n_block_cols(); ++col)
-        block(row,col).vmult_add (dst.block(row),
-                                  src.block(col));
-    };
+    for (unsigned int col=0; col<n_block_cols(); ++col)
+      block(row,col).vmult_add (dst.block(row),
+                                src.block(col));
 }
 
 
@@ -2643,11 +2639,9 @@ BlockMatrixBase<MatrixType>::Tvmult_add (BlockVectorType &dst,
           ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
   for (unsigned int row=0; row<n_block_rows(); ++row)
-    {
-      for (unsigned int col=0; col<n_block_cols(); ++col)
-        block(row,col).Tvmult_add (dst.block(col),
-                                   src.block(row));
-    };
+    for (unsigned int col=0; col<n_block_cols(); ++col)
+      block(row,col).Tvmult_add (dst.block(col),
+                                 src.block(row));
 }
 
 

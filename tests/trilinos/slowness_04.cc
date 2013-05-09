@@ -93,7 +93,7 @@ void test ()
             matrix.set(global, global+N, rand());
           }
       }
-  matrix.compress ();
+  matrix.compress (VectorOperation::insert);
 
                                    // then do a single matrix-vector
                                    // multiplication with subsequent formation

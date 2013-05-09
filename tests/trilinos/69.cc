@@ -56,7 +56,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
       norm_sqr += s*s;
       ++nnz;
     }
-  m.compress ();
+  m.compress (VectorOperation::insert);
   
   deallog << m.frobenius_norm() << ' ' << std::sqrt (norm_sqr)
           << std::endl;

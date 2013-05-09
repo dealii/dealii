@@ -18,6 +18,7 @@
 #ifdef DEAL_II_WITH_TRILINOS
 
 #  include <deal.II/base/table.h>
+#  include <deal.II/base/template_constraints.h>
 #  include <deal.II/lac/block_matrix_base.h>
 #  include <deal.II/lac/trilinos_sparse_matrix.h>
 #  include <deal.II/lac/trilinos_block_vector.h>
@@ -292,161 +293,23 @@ namespace TrilinosWrappers
     size_type n_nonzero_elements () const;
 
     /**
-     * Matrix-vector multiplication:
-     * let $dst = M*src$ with $M$
-     * being this matrix.
+     * Matrix-vector multiplication: let $dst = M*src$ with $M$ being this
+     * matrix. The vector types can be block vectors or non-block vectors
+     * (only if the matrix has only one row or column, respectively), and need
+     * to define TrilinosWrappers::SparseMatrix::vmult.
      */
-    void vmult (MPI::BlockVector       &dst,
-                const MPI::BlockVector &src) const;
-
-
-    /**
-     * Matrix-vector multiplication:
-     * let $dst = M*src$ with $M$
-     * being this matrix, now applied
-     * to localized block vectors
-     * (works only when run on one
-     * processor).
-     */
-    void vmult (BlockVector       &dst,
-                const BlockVector &src) const;
+    template <typename VectorType1, typename VectorType2>
+    void vmult (VectorType1       &dst,
+                const VectorType2 &src) const;
 
     /**
-     * Matrix-vector
-     * multiplication. Just like the
-     * previous function, but only
-     * applicable if the matrix has
-     * only one block column.
+     * Matrix-vector multiplication: let $dst = M^T*src$ with $M$ being this
+     * matrix. This function does the same as vmult() but takes the transposed
+     * matrix.
      */
-    void vmult (MPI::BlockVector  &dst,
-                const MPI::Vector &src) const;
-
-    /**
-     * Matrix-vector
-     * multiplication. Just like the
-     * previous function, but only
-     * applicable if the matrix has
-     * only one block column, now
-     * applied to localized vectors
-     * (works only when run on one
-     * processor).
-     */
-    void vmult (BlockVector  &dst,
-                const Vector &src) const;
-
-    /**
-     * Matrix-vector
-     * multiplication. Just like the
-     * previous function, but only
-     * applicable if the matrix has
-     * only one block row.
-     */
-    void vmult (MPI::Vector            &dst,
-                const MPI::BlockVector &src) const;
-
-    /**
-     * Matrix-vector
-     * multiplication. Just like the
-     * previous function, but only
-     * applicable if the matrix has
-     * only one block row, now
-     * applied to localized vectors
-     * (works only when run on one
-     * processor).
-     */
-    void vmult (Vector            &dst,
-                const BlockVector &src) const;
-
-    /**
-     * Matrix-vector
-     * multiplication. Just like the
-     * previous function, but only
-     * applicable if the matrix has
-     * only one block.
-     */
-    void vmult (VectorBase       &dst,
-                const VectorBase &src) const;
-
-    /**
-     * Matrix-vector multiplication:
-     * let $dst = M^T*src$ with $M$
-     * being this matrix. This
-     * function does the same as
-     * vmult() but takes the
-     * transposed matrix.
-     */
-    void Tvmult (MPI::BlockVector       &dst,
-                 const MPI::BlockVector &src) const;
-
-    /**
-     * Matrix-vector multiplication:
-     * let $dst = M^T*src$ with $M$
-     * being this matrix. This
-     * function does the same as
-     * vmult() but takes the
-     * transposed matrix, now applied
-     * to localized Trilinos vectors
-     * (works only when run on one
-     * processor).
-     */
-    void Tvmult (BlockVector       &dst,
-                 const BlockVector &src) const;
-
-    /**
-     * Matrix-vector
-     * multiplication. Just like the
-     * previous function, but only
-     * applicable if the matrix has
-     * only one block row.
-     */
-    void Tvmult (MPI::BlockVector  &dst,
-                 const MPI::Vector &src) const;
-
-    /**
-     * Matrix-vector
-     * multiplication. Just like the
-     * previous function, but only
-     * applicable if the matrix has
-     * only one block row, now
-     * applied to localized Trilinos
-     * vectors (works only when run
-     * on one processor).
-     */
-    void Tvmult (BlockVector  &dst,
-                 const Vector &src) const;
-
-    /**
-     * Matrix-vector
-     * multiplication. Just like the
-     * previous function, but only
-     * applicable if the matrix has
-     * only one block column.
-     */
-    void Tvmult (MPI::Vector    &dst,
-                 const MPI::BlockVector &src) const;
-
-    /**
-     * Matrix-vector
-     * multiplication. Just like the
-     * previous function, but only
-     * applicable if the matrix has
-     * only one block column, now
-     * applied to localized Trilinos
-     * vectors (works only when run
-     * on one processor).
-     */
-    void Tvmult (Vector    &dst,
-                 const BlockVector &src) const;
-
-    /**
-     * Matrix-vector
-     * multiplication. Just like the
-     * previous function, but only
-     * applicable if the matrix has
-     * only one block.
-     */
-    void Tvmult (VectorBase       &dst,
-                 const VectorBase &src) const;
+    template <typename VectorType1, typename VectorType2>
+    void Tvmult (VectorType1       &dst,
+                 const VectorType2 &src) const;
 
     /**
      * Compute the residual of an
@@ -623,6 +486,51 @@ namespace TrilinosWrappers
                     << "The blocks [" << arg1 << ',' << arg2 << "] and ["
                     << arg3 << ',' << arg4 << "] have differing column numbers.");
     ///@}
+
+  private:
+    /**
+     * Internal version of (T)vmult with two block vectors
+     */
+    template <typename VectorType1, typename VectorType2>
+    void vmult (VectorType1       &dst,
+                const VectorType2 &src,
+                const bool         transpose,
+                const dealii::internal::bool2type<true>,
+                const dealii::internal::bool2type<true>) const;
+
+    /**
+     * Internal version of (T)vmult where the source vector is a block vector
+     * but the destination vector is a non-block vector
+     */
+    template <typename VectorType1, typename VectorType2>
+    void vmult (VectorType1       &dst,
+                const VectorType2 &src,
+                const bool         transpose,
+                const dealii::internal::bool2type<false>,
+                const dealii::internal::bool2type<true>) const;
+
+    /**
+     * Internal version of (T)vmult where the source vector is a non-block
+     * vector but the destination vector is a block vector
+     */
+    template <typename VectorType1, typename VectorType2>
+    void vmult (VectorType1       &dst,
+                const VectorType2 &src,
+                const bool         transpose,
+                const dealii::internal::bool2type<true>,
+                const dealii::internal::bool2type<false>) const;
+
+    /**
+     * Internal version of (T)vmult where both source vector and the
+     * destination vector are non-block vectors (only defined if the matrix
+     * consists of only one block)
+     */
+    template <typename VectorType1, typename VectorType2>
+    void vmult (VectorType1       &dst,
+                const VectorType2 &src,
+                const bool         transpose,
+                const dealii::internal::bool2type<false>,
+                const dealii::internal::bool2type<false>) const;
   };
 
 
@@ -666,142 +574,97 @@ namespace TrilinosWrappers
 
 
 
+  template <typename VectorType1, typename VectorType2>
   inline
   void
-  BlockSparseMatrix::vmult (MPI::BlockVector       &dst,
-                            const MPI::BlockVector &src) const
+  BlockSparseMatrix::vmult (VectorType1       &dst,
+                            const VectorType2 &src) const
   {
-    BaseClass::vmult_block_block (dst, src);
+    vmult(dst, src, false,
+          dealii::internal::bool2type<IsBlockVector<VectorType1>::value>(),
+          dealii::internal::bool2type<IsBlockVector<VectorType2>::value>());
   }
 
 
 
+  template <typename VectorType1, typename VectorType2>
   inline
   void
-  BlockSparseMatrix::vmult (BlockVector       &dst,
-                            const BlockVector &src) const
+  BlockSparseMatrix::Tvmult (VectorType1       &dst,
+                             const VectorType2 &src) const
   {
-    BaseClass::vmult_block_block (dst, src);
+    vmult(dst, src, true,
+          dealii::internal::bool2type<IsBlockVector<VectorType1>::value>(),
+          dealii::internal::bool2type<IsBlockVector<VectorType2>::value>());
   }
 
 
 
+  template <typename VectorType1, typename VectorType2>
   inline
   void
-  BlockSparseMatrix::vmult (MPI::BlockVector  &dst,
-                            const MPI::Vector &src) const
+  BlockSparseMatrix::vmult (VectorType1       &dst,
+                            const VectorType2 &src,
+                            const bool         transpose,
+                            dealii::internal::bool2type<true>,
+                            dealii::internal::bool2type<true>) const
   {
-    BaseClass::vmult_block_nonblock (dst, src);
+    if (transpose == true)
+      BaseClass::Tvmult_block_block (dst, src);
+    else
+      BaseClass::vmult_block_block (dst, src);
   }
 
 
 
+
+  template <typename VectorType1, typename VectorType2>
   inline
   void
-  BlockSparseMatrix::vmult (BlockVector  &dst,
-                            const Vector &src) const
+  BlockSparseMatrix::vmult (VectorType1       &dst,
+                            const VectorType2 &src,
+                            const bool         transpose,
+                            dealii::internal::bool2type<false>,
+                            dealii::internal::bool2type<true>) const
   {
-    BaseClass::vmult_block_nonblock (dst, src);
+    if (transpose == true)
+      BaseClass::Tvmult_nonblock_block (dst, src);
+    else
+      BaseClass::vmult_nonblock_block (dst, src);
   }
 
 
 
+  template <typename VectorType1, typename VectorType2>
   inline
   void
-  BlockSparseMatrix::vmult (MPI::Vector            &dst,
-                            const MPI::BlockVector &src) const
+  BlockSparseMatrix::vmult (VectorType1       &dst,
+                            const VectorType2 &src,
+                            const bool         transpose,
+                            dealii::internal::bool2type<true>,
+                            dealii::internal::bool2type<false>) const
   {
-    BaseClass::vmult_nonblock_block (dst, src);
+    if (transpose == true)
+      BaseClass::Tvmult_block_nonblock (dst, src);
+    else
+      BaseClass::vmult_block_nonblock (dst, src);
   }
 
 
 
+  template <typename VectorType1, typename VectorType2>
   inline
   void
-  BlockSparseMatrix::vmult (Vector            &dst,
-                            const BlockVector &src) const
+  BlockSparseMatrix::vmult (VectorType1       &dst,
+                            const VectorType2 &src,
+                            const bool         transpose,
+                            dealii::internal::bool2type<false>,
+                            dealii::internal::bool2type<false>) const
   {
-    BaseClass::vmult_nonblock_block (dst, src);
-  }
-
-
-
-  inline
-  void
-  BlockSparseMatrix::vmult (VectorBase       &dst,
-                            const VectorBase &src) const
-  {
-    BaseClass::vmult_nonblock_nonblock (dst, src);
-  }
-
-
-
-  inline
-  void
-  BlockSparseMatrix::Tvmult (MPI::BlockVector       &dst,
-                             const MPI::BlockVector &src) const
-  {
-    BaseClass::Tvmult_block_block (dst, src);
-  }
-
-
-
-  inline
-  void
-  BlockSparseMatrix::Tvmult (BlockVector       &dst,
-                             const BlockVector &src) const
-  {
-    BaseClass::Tvmult_block_block (dst, src);
-  }
-
-
-
-  inline
-  void
-  BlockSparseMatrix::Tvmult (MPI::BlockVector  &dst,
-                             const MPI::Vector &src) const
-  {
-    BaseClass::Tvmult_block_nonblock (dst, src);
-  }
-
-
-
-  inline
-  void
-  BlockSparseMatrix::Tvmult (BlockVector  &dst,
-                             const Vector &src) const
-  {
-    BaseClass::Tvmult_block_nonblock (dst, src);
-  }
-
-
-
-  inline
-  void
-  BlockSparseMatrix::Tvmult (MPI::Vector            &dst,
-                             const MPI::BlockVector &src) const
-  {
-    BaseClass::Tvmult_nonblock_block (dst, src);
-  }
-
-
-
-  inline
-  void
-  BlockSparseMatrix::Tvmult (Vector            &dst,
-                             const BlockVector &src) const
-  {
-    BaseClass::Tvmult_nonblock_block (dst, src);
-  }
-
-
-
-  inline
-  void
-  BlockSparseMatrix::Tvmult (VectorBase       &dst,
-                             const VectorBase &src) const
-  {
-    BaseClass::Tvmult_nonblock_nonblock (dst, src);
+    if (transpose == true)
+      BaseClass::Tvmult_nonblock_nonblock (dst, src);
+    else
+      BaseClass::vmult_nonblock_nonblock (dst, src);
   }
 
 }

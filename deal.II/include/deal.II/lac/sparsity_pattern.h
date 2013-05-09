@@ -1434,6 +1434,7 @@ private:
    */
   friend class SparsityPatternIterators::Iterator;
   friend class SparsityPatternIterators::Accessor;
+  friend class ChunkSparsityPatternIterators::Accessor;
 };
 
 

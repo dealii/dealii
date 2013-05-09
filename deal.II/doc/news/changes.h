@@ -117,6 +117,59 @@ this function.
 
 <ol>
 
+<li> Improved: The functions MatrixTools::create_mass_matrix and
+MatrixTools::create_laplace_matrix take now an optional ConstraintMatrix
+argument that allows to directly apply the constraints. This also helps
+VectorTools::project. Note that not providing constraints remains the default
+and recommended way to ensure consistency when several matrices are added.
+<br>
+(Martin Kronbichler, 2013/05/08)
+</li>
+
+<li> New: The classes TrilinosWrappers::SparseMatrix and
+TrilinosWrappers::BlockSparseMatrix now fully implement vmult and Tvmult with
+deal.II's own vector classes Vector<double> and
+parallel::distributed::Vector<double>.
+<br>
+(Martin Kronbichler, 2013/05/08)
+</li>
+
+<li> Improved: The matrix-vector product ChunkSparseMatrix::vmult now runs in
+parallel in shared memory.
+<br>
+(Martin Kronbichler, 2013/05/07)
+</li>
+
+<li> New: The class ChunkSparseMatrix and the associated
+ChunkSparsityPattern now offer iterator classes to iterate over rows or the
+whole matrix in an STL-like way.
+<br>
+(Martin Kronbichler, 2013/05/07)
+</li>
+
+<li> Fixed: The stopping criterion for early exit in SolverBicgstab did not
+work properly for systems with large values, leading to premature exit. This
+is now fixed.
+<br>
+(Martin Kronbichler, 2013/05/07)
+</li>
+
+<li> Changed: The SolverGMRES implementation previously applied two
+iterations of the modified Gram&ndash;Schmidt algorithm for
+orthogonalization. In many situations one iteration is enough. The algorithm
+can now detect loss of orthogonality and enables re-orthogonalization only if
+necessary. The second iteration can be forced by the flag
+SolverGMRES::AdditionalData::force_re_orthogonalization, though.
+<br>
+(Martin Kronbichler, 2013/05/06)
+</li>
+
+<li> Changed: FETools::interpolate is now instantiated for all
+vector types, not just dealii::Vector and dealii::BlockVector.
+<br>
+(Wolfgang Bangerth, 2013/05/06)
+</li>
+
 <li> Fixed: Generate an error if the users tries to refine a cell
 that is already on the maximum level in a distributed triangulation.
 <br>

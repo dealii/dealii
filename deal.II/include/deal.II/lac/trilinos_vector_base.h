@@ -272,10 +272,12 @@ namespace TrilinosWrappers
      * <tt>C</tt> standard libraries
      * <tt>vector<...></tt> class.
      */
-    typedef TrilinosScalar            value_type;
-    typedef TrilinosScalar            real_type;
-    typedef dealii::types::global_dof_index   size_type;
-    typedef internal::VectorReference reference;
+    typedef TrilinosScalar                  value_type;
+    typedef TrilinosScalar                  real_type;
+    typedef dealii::types::global_dof_index size_type;
+    typedef value_type                     *iterator;
+    typedef const value_type               *const_iterator;
+    typedef internal::VectorReference       reference;
     typedef const internal::VectorReference const_reference;
 
     /**
@@ -663,6 +665,33 @@ namespace TrilinosWrappers
      * process.
      */
     TrilinosScalar el (const size_type index) const;
+
+    /**
+     * Make the Vector class a bit like the <tt>vector<></tt> class of
+     * the C++ standard library by returning iterators to the start and end
+     * of the locally owned elements of this vector. The ordering of local elements corresponds to the one given 
+     *
+     * It holds that end() - begin() == local_size().
+     */
+    iterator begin ();
+
+    /**
+     * Return constant iterator to the start of the locally owned elements
+     * of the vector.
+     */
+    const_iterator begin () const;
+
+    /**
+     * Return an iterator pointing to the element past the end of the array
+     * of locally owned entries.
+     */
+    iterator end ();
+
+    /**
+     * Return a constant iterator pointing to the element past the end of
+     * the array of the locally owned entries.
+     */
+    const_iterator end () const;
 
     /**
      * A collective set operation:
@@ -1233,6 +1262,42 @@ namespace TrilinosWrappers
   VectorBase::operator [] (const size_type index) const
   {
     return operator() (index);
+  }
+
+
+
+  inline
+  typename VectorBase::iterator
+  VectorBase::begin()
+  {
+    return (*vector)[0];
+  }
+
+
+
+  inline
+  typename VectorBase::iterator
+  VectorBase::end()
+  {
+    return (*vector)[0]+local_size();
+  }
+
+
+
+  inline
+  typename VectorBase::const_iterator
+  VectorBase::begin() const
+  {
+    return (*vector)[0];
+  }
+
+
+
+  inline
+  typename VectorBase::const_iterator
+  VectorBase::end() const
+  {
+    return (*vector)[0]+local_size();
   }
 
 
