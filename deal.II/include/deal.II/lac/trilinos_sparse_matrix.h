@@ -33,7 +33,7 @@
 #  include <Epetra_FECrsMatrix.h>
 #  include <Epetra_Map.h>
 #  include <Epetra_CrsGraph.h>
-#  include <Epetra_Vector.h>
+#  include <Epetra_MultiVector.h>
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #    include "mpi.h"
@@ -3648,9 +3648,11 @@ namespace TrilinosWrappers
     const int src_local_size = src.end() - src.begin();
     AssertDimension (src_local_size, matrix->DomainMap().NumMyElements());
 
-    Epetra_Vector tril_dst (View, matrix->RangeMap(), dst.begin());
-    Epetra_Vector tril_src (View, matrix->DomainMap(),
-                            const_cast<TrilinosScalar *>(src.begin()));
+    Epetra_MultiVector tril_dst (View, matrix->RangeMap(), dst.begin(),
+                                 matrix->DomainMap().NumMyPoints(), 1);
+    Epetra_MultiVector tril_src (View, matrix->DomainMap(),
+                                 const_cast<TrilinosScalar *>(src.begin()),
+                                 matrix->DomainMap().NumMyPoints(), 1);
 
     const int ierr = matrix->Multiply (false, tril_src, tril_dst);
     Assert (ierr == 0, ExcTrilinosError(ierr));
@@ -3674,9 +3676,11 @@ namespace TrilinosWrappers
     const int src_local_size = src.end() - src.begin();
     AssertDimension (src_local_size, matrix->RangeMap().NumMyElements());
 
-    Epetra_Vector tril_dst (View, matrix->DomainMap(), dst.begin());
-    Epetra_Vector tril_src (View, matrix->RangeMap(),
-                            const_cast<double *>(src.begin()));
+    Epetra_MultiVector tril_dst (View, matrix->DomainMap(), dst.begin(),
+                                 matrix->DomainMap().NumMyPoints(), 1);
+    Epetra_MultiVector tril_src (View, matrix->RangeMap(),
+                                 const_cast<double *>(src.begin()),
+                                 matrix->DomainMap().NumMyPoints(), 1);
 
     const int ierr = matrix->Multiply (true, tril_src, tril_dst);
     Assert (ierr == 0, ExcTrilinosError(ierr));
