@@ -2948,7 +2948,7 @@ namespace TrilinosWrappers
     Epetra_CombineMode mode = last_action;
     if (last_action == Zero)
     {
-      if ((operation==::dealii::VectorOperation::add) &&
+      if ((operation==::dealii::VectorOperation::add) ||
           (operation==::dealii::VectorOperation::unknown))
         mode = Add;
       else if (operation==::dealii::VectorOperation::insert)
