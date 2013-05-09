@@ -526,31 +526,29 @@ namespace parallel
       bool is_ghost_entry (const types::global_dof_index global_index) const;
 
       /**
-       * Make the @p Vector class a bit like
-       * the <tt>vector<></tt> class of the C++
-       * standard library by returning
-       * iterators to the start and end of the
-       * locally owned elements of this vector.
+       * Make the @p Vector class a bit like the <tt>vector<></tt> class of
+       * the C++ standard library by returning iterators to the start and end
+       * of the <i>locally owned</i> elements of this vector.
+       *
+       * It holds that end() - begin() == local_size().
        */
       iterator begin ();
 
       /**
-       * Return constant iterator to the start of
-       * the vector.
+       * Return constant iterator to the start of the locally owned elements
+       * of the vector.
        */
       const_iterator begin () const;
 
       /**
-       * Return an iterator pointing to the
-       * element past the end of the array of
-       * locally owned entries.
+       * Return an iterator pointing to the element past the end of the array
+       * of locally owned entries.
        */
       iterator end ();
 
       /**
-       * Return a constant iterator pointing to
-       * the element past the end of the array
-       * of the locally owned entries.
+       * Return a constant iterator pointing to the element past the end of
+       * the array of the locally owned entries.
        */
       const_iterator end () const;
       //@}

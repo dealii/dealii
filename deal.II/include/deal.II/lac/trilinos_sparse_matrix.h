@@ -22,8 +22,8 @@
 #  include <deal.II/base/index_set.h>
 #  include <deal.II/lac/full_matrix.h>
 #  include <deal.II/lac/exceptions.h>
-#  include <deal.II/lac/trilinos_vector_base.h>
-#  include <deal.II/lac/parallel_vector.h>
+#  include <deal.II/lac/trilinos_vector.h>
+#  include <deal.II/lac/vector_view.h>
 
 #  include <vector>
 #  include <cmath>
@@ -52,7 +52,6 @@ class SparsityPattern;
 namespace TrilinosWrappers
 {
   // forward declarations
-  class VectorBase;
   class SparseMatrix;
   class SparsityPattern;
 
@@ -1856,6 +1855,11 @@ namespace TrilinosWrappers
      *
      * Source and destination must not be the same vector.
      *
+     * This function can be called with several different vector objects,
+     * namely TrilinosWrappers::Vector, TrilinosWrappers::MPI::Vector as well
+     * as deal.II's own vector classes Vector<double> and
+     * parallel::distributed::Vector<double>.
+     *
      * Note that both vectors have to be distributed vectors generated using
      * the same Map as was used for the matrix in case you work on a
      * distributed memory architecture, using the interface in the
@@ -1866,21 +1870,9 @@ namespace TrilinosWrappers
      * running on one processor, since the matrix object is inherently
      * distributed. Otherwise, and exception will be thrown.
      */
-    void vmult (VectorBase       &dst,
-                const VectorBase &src) const;
-
-    /**
-     * Same as before, but working with deal.II's own distributed vector
-     * class.
-     */
-    void vmult (parallel::distributed::Vector<TrilinosScalar>       &dst,
-                const parallel::distributed::Vector<TrilinosScalar> &src) const;
-
-    /**
-     * Same as before, but working with deal.II's own vector class.
-     */
-    void vmult (dealii::Vector<TrilinosScalar>       &dst,
-                const dealii::Vector<TrilinosScalar> &src) const;
+    template<typename VectorType>
+    void vmult (VectorType       &dst,
+                const VectorType &src) const;
 
     /**
      * Matrix-vector multiplication: let <i>dst = M<sup>T</sup>*src</i> with
@@ -1889,6 +1881,11 @@ namespace TrilinosWrappers
      *
      * Source and destination must not be the same vector.
      *
+     * This function can be called with several different vector objects,
+     * namely TrilinosWrappers::Vector, TrilinosWrappers::MPI::Vector as well
+     * as deal.II's own vector classes Vector<double> and
+     * parallel::distributed::Vector<double>.
+     *
      * Note that both vectors have to be distributed vectors generated using
      * the same Map as was used for the matrix in case you work on a
      * distributed memory architecture, using the interface in the
@@ -1899,21 +1896,9 @@ namespace TrilinosWrappers
      * running on one processor, since the matrix object is inherently
      * distributed. Otherwise, and exception will be thrown.
      */
-    void Tvmult (VectorBase       &dst,
-                 const VectorBase &src) const;
-
-    /**
-     * Same as before, but working with deal.II's own distributed vector
-     * class.
-     */
-    void Tvmult (parallel::distributed::Vector<TrilinosScalar>       &dst,
-                 const parallel::distributed::Vector<TrilinosScalar> &src) const;
-
-    /**
-     * Same as before, but working with deal.II's own vector class.
-     */
-    void Tvmult (dealii::Vector<TrilinosScalar>       &dst,
-                 const dealii::Vector<TrilinosScalar> &src) const;
+    template <typename VectorType>
+    void Tvmult (VectorType       &dst,
+                 const VectorType &src) const;
 
     /**
      * Adding matrix-vector multiplication. Add <i>M*src</i> on <i>dst</i>
@@ -3622,41 +3607,50 @@ namespace TrilinosWrappers
 
 
 
-  inline
-  void
-  SparseMatrix::vmult (VectorBase       &dst,
-                       const VectorBase &src) const
+  namespace internal
   {
-    Assert (&src != &dst, ExcSourceEqualsDestination());
-    Assert (matrix->Filled(), ExcMatrixNotCompressed());
+    namespace SparseMatrix
+    {
+      template <typename VectorType>
+      inline
+      void check_vector_map_equality(const Epetra_CrsMatrix &,
+                                     const VectorType &,
+                                     const VectorType &)
+      {
+      }
 
-    Assert (src.vector_partitioner().SameAs(matrix->DomainMap()) == true,
-            ExcMessage ("Column map of matrix does not fit with vector map!"));
-    Assert (dst.vector_partitioner().SameAs(matrix->RangeMap()) == true,
-            ExcMessage ("Row map of matrix does not fit with vector map!"));
-
-    const int ierr = matrix->Multiply (false, src.trilinos_vector(),
-                                       dst.trilinos_vector());
-    Assert (ierr == 0, ExcTrilinosError(ierr));
-    (void)ierr; // removes -Wunused-variable in optimized mode
+      inline
+      void check_vector_map_equality(const Epetra_CrsMatrix              &m,
+                                     const TrilinosWrappers::MPI::Vector &in,
+                                     const TrilinosWrappers::MPI::Vector &out)
+      {
+        Assert (in.vector_partitioner().SameAs(m.DomainMap()) == true,
+                ExcMessage ("Column map of matrix does not fit with vector map!"));
+        Assert (out.vector_partitioner().SameAs(m.RangeMap()) == true,
+                ExcMessage ("Row map of matrix does not fit with vector map!"));
+      }
+    }
   }
 
 
-
+  template <typename VectorType>
   inline
   void
-  SparseMatrix::vmult (parallel::distributed::Vector<TrilinosScalar>       &dst,
-                       const parallel::distributed::Vector<TrilinosScalar> &src) const
+  SparseMatrix::vmult (VectorType       &dst,
+                       const VectorType &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
 
-    AssertDimension (dst.local_size(), static_cast<unsigned int>(matrix->RangeMap().NumMyElements()));
-    AssertDimension (src.local_size(), static_cast<unsigned int>(matrix->DomainMap().NumMyElements()));
+    internal::SparseMatrix::check_vector_map_equality(*matrix, src, dst);
+    const int dst_local_size = dst.end() - dst.begin();
+    AssertDimension (dst_local_size, matrix->RangeMap().NumMyElements());
+    const int src_local_size = src.end() - src.begin();
+    AssertDimension (src_local_size, matrix->DomainMap().NumMyElements());
 
     Epetra_Vector tril_dst (View, matrix->RangeMap(), dst.begin());
     Epetra_Vector tril_src (View, matrix->DomainMap(),
-                            const_cast<double *>(src.begin()));
+                            const_cast<TrilinosScalar *>(src.begin()));
 
     const int ierr = matrix->Multiply (false, tril_src, tril_dst);
     Assert (ierr == 0, ExcTrilinosError(ierr));
@@ -3664,86 +3658,21 @@ namespace TrilinosWrappers
   }
 
 
-
+ 
+  template <typename VectorType>
   inline
   void
-  SparseMatrix::vmult (dealii::Vector<TrilinosScalar>       &dst,
-                       const dealii::Vector<TrilinosScalar> &src) const
+  SparseMatrix::Tvmult (VectorType       &dst,
+                        const VectorType &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
 
-    AssertDimension (static_cast<unsigned int>(matrix->DomainMap().NumMyElements()),
-                     static_cast<unsigned int>(matrix->DomainMap().NumGlobalElements()));
-    AssertDimension (dst.size(), static_cast<unsigned int>(matrix->RangeMap().NumMyElements()));
-    AssertDimension (src.size(), static_cast<unsigned int>(matrix->DomainMap().NumMyElements()));
-
-    Epetra_Vector tril_dst (View, matrix->RangeMap(), dst.begin());
-    Epetra_Vector tril_src (View, matrix->DomainMap(),
-                            const_cast<double *>(src.begin()));
-
-    const int ierr = matrix->Multiply (false, tril_src, tril_dst);
-    Assert (ierr == 0, ExcTrilinosError(ierr));
-    (void)ierr; // removes -Wunused-variable in optimized mode
-  }
-
-
-
-  inline
-  void
-  SparseMatrix::Tvmult (VectorBase       &dst,
-                        const VectorBase &src) const
-  {
-    Assert (&src != &dst, ExcSourceEqualsDestination());
-    Assert (matrix->Filled(), ExcMatrixNotCompressed());
-
-    Assert (src.vector_partitioner().SameAs(matrix->RangeMap()) == true,
-            ExcMessage ("Column map of matrix does not fit with vector map!"));
-    Assert (dst.vector_partitioner().SameAs(matrix->DomainMap()) == true,
-            ExcMessage ("Row map of matrix does not fit with vector map!"));
-
-    const int ierr = matrix->Multiply (true, src.trilinos_vector(),
-                                       dst.trilinos_vector());
-    Assert (ierr == 0, ExcTrilinosError(ierr));
-    (void)ierr; // removes -Wunused-variable in optimized mode
-  }
-
-
-
-  inline
-  void
-  SparseMatrix::Tvmult (parallel::distributed::Vector<TrilinosScalar>      &dst,
-                        const parallel::distributed::Vector<TrilinosScalar> &src) const
-  {
-    Assert (&src != &dst, ExcSourceEqualsDestination());
-    Assert (matrix->Filled(), ExcMatrixNotCompressed());
-
-    AssertDimension (dst.local_size(), static_cast<unsigned int>(matrix->DomainMap().NumMyElements()));
-    AssertDimension (src.local_size(), static_cast<unsigned int>(matrix->RangeMap().NumMyElements()));
-
-    Epetra_Vector tril_dst (View, matrix->DomainMap(), dst.begin());
-    Epetra_Vector tril_src (View, matrix->RangeMap(),
-                            const_cast<double *>(src.begin()));
-
-    const int ierr = matrix->Multiply (true, tril_src, tril_dst);
-    Assert (ierr == 0, ExcTrilinosError(ierr));
-    (void)ierr; // removes -Wunused-variable in optimized mode
-  }
-
-
-
-  inline
-  void
-  SparseMatrix::Tvmult (dealii::Vector<TrilinosScalar>      &dst,
-                        const dealii::Vector<TrilinosScalar> &src) const
-  {
-    Assert (&src != &dst, ExcSourceEqualsDestination());
-    Assert (matrix->Filled(), ExcMatrixNotCompressed());
-
-    AssertDimension (static_cast<unsigned int>(matrix->DomainMap().NumMyElements()),
-                     static_cast<unsigned int>(matrix->DomainMap().NumGlobalElements()));
-    AssertDimension (dst.size(), static_cast<unsigned int>(matrix->DomainMap().NumMyElements()));
-    AssertDimension (src.size(), static_cast<unsigned int>(matrix->RangeMap().NumMyElements()));
+    internal::SparseMatrix::check_vector_map_equality(*matrix, dst, src);
+    const int dst_local_size = dst.end() - dst.begin();
+    AssertDimension (dst_local_size, matrix->DomainMap().NumMyElements());
+    const int src_local_size = src.end() - src.begin();
+    AssertDimension (src_local_size, matrix->RangeMap().NumMyElements());
 
     Epetra_Vector tril_dst (View, matrix->DomainMap(), dst.begin());
     Epetra_Vector tril_src (View, matrix->RangeMap(),
@@ -3764,14 +3693,18 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
 
-    // Choose to reinit the vector with fast argument set, which does not
-    // overwrite the content -- this is what we needs since we're going to
-    // overwrite that anyway in the vmult operation.
-    VectorType temp_vector;
-    temp_vector.reinit(dst, true);
-
-    vmult (temp_vector, src);
-    dst += temp_vector;
+    // Reinit a temporary vector with fast argument set, which does not
+    // overwrite the content (to save time). However, the
+    // TrilinosWrappers::Vector classes do not support this, so create a
+    // deal.II local vector that has this fast setting. It will be accepted in
+    // vmult because it only checks the local size.
+    dealii::Vector<TrilinosScalar> temp_vector;
+    temp_vector.reinit(dst.end()-dst.begin(), true);
+    dealii::VectorView<TrilinosScalar> src_view(src.end()-src.begin(), src.begin());
+    dealii::VectorView<TrilinosScalar> dst_view(dst.end()-dst.begin(), dst.begin());
+    vmult (temp_vector, static_cast<const dealii::Vector<TrilinosScalar>&>(src_view));
+    if (dst_view.size() > 0)
+      dst_view += temp_vector;
   }
 
 
@@ -3783,11 +3716,19 @@ namespace TrilinosWrappers
                             const VectorType &src) const
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
-    VectorType temp_vector;
-    temp_vector.reinit(dst, true);
 
-    Tvmult (temp_vector, src);
-    dst += temp_vector;
+    // Reinit a temporary vector with fast argument set, which does not
+    // overwrite the content (to save time). However, the
+    // TrilinosWrappers::Vector classes do not support this, so create a
+    // deal.II local vector that has this fast setting. It will be accepted in
+    // vmult because it only checks the local size.
+    dealii::Vector<TrilinosScalar> temp_vector;
+    temp_vector.reinit(dst.end()-dst.begin(), true);
+    dealii::VectorView<TrilinosScalar> src_view(src.end()-src.begin(), src.begin());
+    dealii::VectorView<TrilinosScalar> dst_view(dst.end()-dst.begin(), dst.begin());
+    Tvmult (temp_vector, static_cast<const dealii::Vector<TrilinosScalar>&>(src_view));
+    if (dst_view.size() > 0)
+      dst_view += temp_vector;
   }
 
 
