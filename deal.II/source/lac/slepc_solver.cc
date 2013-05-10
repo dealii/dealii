@@ -232,6 +232,22 @@ namespace SLEPcWrappers
   }
 
   void
+  SolverBase::get_eigenpair (const unsigned int         index,
+                             double                    &real_eigenvalues,
+                             double                    &imag_eigenvalues,
+                             PETScWrappers::VectorBase &real_eigenvectors,
+                             PETScWrappers::VectorBase &imag_eigenvectors)
+  {
+    AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());
+    
+    // get converged eigenpair
+    int ierr = EPSGetEigenpair (solver_data->eps, index,
+				&real_eigenvalues, &imag_eigenvalues, 
+				real_eigenvectors, imag_eigenvectors);
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+  }
+
+  void
   SolverBase::reset ()
   {
     AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());

@@ -84,7 +84,7 @@ DEAL_II_NAMESPACE_OPEN
                      const PETScWrappers::MatrixBase &B,
                      std::vector<double>             &kr,
                      std::vector<OutputVector>       &vr,
-                     const unsigned int               n_eigenvectors)
+                     const unsigned int               n_eigenpairs)
   { ... }
  @endcode
  * as an example on how to do this.
@@ -134,11 +134,11 @@ namespace SLEPcWrappers
      * that we can use as a template when resizing, since we do not
      * know the parameters of the specific vector class used
      * (i.e. local_dofs for MPI vectors). However, while copying
-     * eigenvectors, at least twice the memory size of <tt>vr</tt> is
-     * being used (and can be more). To avoid doing this, the fairly
-     * standard calling sequence executed here is used: Initialise;
-     * Set up matrices for solving; Actually solve the system; Gather
-     * the solution(s); and reset.
+     * eigenvectors, at least twice the memory size of
+     * <tt>eigenvectors</tt> is being used (and can be more). To avoid
+     * doing this, the fairly standard calling sequence executed here
+     * is used: Initialise; Set up matrices for solving; Actually
+     * solve the system; Gather the solution(s); and reset.
      *
      * @note Note that the number of converged eigenvectors can be
      * larger than the number of eigenvectors requested; this is due
@@ -151,8 +151,8 @@ namespace SLEPcWrappers
     template <typename OutputVector>
     void
     solve (const PETScWrappers::MatrixBase &A,
-           std::vector<double>             &r_eigenvalues,
-           std::vector<OutputVector>       &r_eigenvectors = std::vector<OutputVector> (),
+           std::vector<double>             &eigenvalues,
+           std::vector<OutputVector>       &eigenvectors,
            const unsigned int               n_eigenvectors = 1);
 
     /**
@@ -163,8 +163,23 @@ namespace SLEPcWrappers
     void
     solve (const PETScWrappers::MatrixBase &A,
            const PETScWrappers::MatrixBase &B,
-           std::vector<double>             &r_eigenvalues,
-           std::vector<OutputVector>       &r_eigenvectors = std::vector<OutputVector> (),
+           std::vector<double>             &eigenvalues,
+           std::vector<OutputVector>       &eigenvectors,
+           const unsigned int               n_eigenvectors = 1);
+
+    /**
+     * Same as above, but here a composite method for solving the
+     * system $A x=\lambda B x$ with real and imaginary parts to the
+     * eigenvalues/eigenvectors.
+     */
+    template <typename OutputVector>
+    void
+    solve (const PETScWrappers::MatrixBase &A,
+           const PETScWrappers::MatrixBase &B,
+           std::vector<double>             &real_eigenvalues,
+           std::vector<double>             &imag_eigenvalues,
+           std::vector<OutputVector>       &real_eigenvectors,
+           std::vector<OutputVector>       &imag_eigenvectors,
            const unsigned int               n_eigenvectors = 1);
 
     /**
@@ -283,14 +298,26 @@ namespace SLEPcWrappers
     solve (const unsigned int n_eigenvectors, unsigned int *n_converged);
 
     /**
-     * Access the solutions for a solved eigenvector problem, pair
-     * index solutions, $\text{index}\,\in\,0\hdots
+     * Access the real parts of solutions for a solved eigenvector
+     * problem, pair index solutions, $\text{index}\,\in\,0\hdots
      * \text{n\_converged}-1$.
      */
     void
     get_eigenpair (const unsigned int         index,
-                   double                    &kr,
-                   PETScWrappers::VectorBase &vr);
+                   double                    &eigenvalues,
+                   PETScWrappers::VectorBase &eigenvectors);
+
+    /**
+     * Access the real and imaginary parts of solutions for a solved
+     * eigenvector problem, pair index solutions,
+     * $\text{index}\,\in\,0\hdots \text{n\_converged}-1$.
+     */
+    void
+    get_eigenpair (const unsigned int         index,
+                   double                    &real_eigenvalues,
+                   double                    &imag_eigenvalues,
+                   PETScWrappers::VectorBase &real_eigenvectors,
+                   PETScWrappers::VectorBase &imag_eigenvectors);
 
     /**
      * Initialize solver for the linear system $Ax=\lambda x$. (Note:
@@ -711,74 +738,126 @@ namespace SLEPcWrappers
    * This is declared here to make it possible to take a std::vector
    * of different PETScWrappers vector types
    */
+  // todo: The logic of these functions can be simplified without breaking backward compatibility...
 
   template <typename OutputVector>
-  void
-  SolverBase::solve (const PETScWrappers::MatrixBase &A,
-                     std::vector<double>             &kr,
-                     std::vector<OutputVector>       &vr,
-                     const unsigned int               n_eigenvectors)
-  {
-    // Panic if the number of eigenpairs wanted is out of bounds.
-    AssertThrow ((n_eigenvectors > 0) && (n_eigenvectors <= A.m ()), 
-		 ExcSLEPcWrappersUsageError());
-
-    // Set the matrices of the problem
-    set_matrices (A); 
-
-    // and solve
-    unsigned int n_converged = 0;
-    solve (n_eigenvectors, &n_converged);
-
-    if (n_converged > n_eigenvectors)
-      n_converged = n_eigenvectors;
-    AssertThrow (n_converged == n_eigenvectors,
-                 ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
-
-    AssertThrow (vr.size() != 0, ExcSLEPcWrappersUsageError());
-    vr.resize (n_converged, vr.front());
-    kr.resize (n_converged);
-
-    for (unsigned int index=0; index<n_converged; ++index)
-      get_eigenpair (index, kr[index], vr[index]);
-  }
-
+    void
+    SolverBase::solve (const PETScWrappers::MatrixBase &A,
+		       std::vector<double>             &eigenvalues,
+		       std::vector<OutputVector>       &eigenvectors,
+		       const unsigned int               n_eigenvectors)
+    {
+      // Panic if the number of eigenpairs wanted is out of bounds.
+      AssertThrow ((n_eigenvectors > 0) && (n_eigenvectors <= A.m ()), 
+		   ExcSLEPcWrappersUsageError());
+      
+      // Set the matrices of the problem
+      set_matrices (A);  
+      
+      // and solve
+      unsigned int n_converged = 0; 
+      solve (n_eigenvectors, &n_converged); 
+      
+      if (n_converged > n_eigenvectors) 
+	n_converged = n_eigenvectors; 
+      AssertThrow (n_converged == n_eigenvectors, 
+		   ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors)); 
+      
+      AssertThrow (eigenvectors.size() != 0, ExcSLEPcWrappersUsageError()); 
+      eigenvectors.resize (n_converged, eigenvectors.front()); 
+      eigenvalues.resize (n_converged); 
+      
+      for (unsigned int index=0; index<n_converged; ++index) 
+	get_eigenpair (index, eigenvalues[index], eigenvectors[index]); 
+    }
+  
   template <typename OutputVector>
-  void
+    void
     SolverBase::solve (const PETScWrappers::MatrixBase &A,
 		       const PETScWrappers::MatrixBase &B,
-		       std::vector<double>             &kr,
-		       std::vector<OutputVector>       &vr,
+		       std::vector<double>             &eigenvalues,
+		       std::vector<OutputVector>       &eigenvectors,
 		       const unsigned int               n_eigenvectors)
-  {
-    // Guard against incompatible matrix sizes:
-    AssertThrow (A.m() == B.m (), ExcDimensionMismatch(A.m(), B.m()));
-    AssertThrow (A.n() == B.n (), ExcDimensionMismatch(A.n(), B.n()));
+    { 
+      // Guard against incompatible matrix sizes:
+      AssertThrow (A.m() == B.m (), ExcDimensionMismatch(A.m(), B.m()));
+      AssertThrow (A.n() == B.n (), ExcDimensionMismatch(A.n(), B.n()));
+      
+      // Panic if the number of eigenpairs wanted is out of bounds.
+      AssertThrow ((n_eigenvectors > 0) && (n_eigenvectors <= A.m ()), 
+		   ExcSLEPcWrappersUsageError());
+      
+      // Set the matrices of the problem
+      set_matrices (A, B);
+      
+      // and solve
+      unsigned int n_converged = 0;
+      solve (n_eigenvectors, &n_converged);
+      
+      if (n_converged >= n_eigenvectors)
+	n_converged = n_eigenvectors;
+      
+      AssertThrow (n_converged == n_eigenvectors,
+		   ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
+      AssertThrow (eigenvectors.size() != 0, ExcSLEPcWrappersUsageError());
+      
+      eigenvectors.resize (n_converged, eigenvectors.front());
+      eigenvalues.resize (n_converged);
+      
+      for (unsigned int index=0; index<n_converged; ++index)
+	get_eigenpair (index, eigenvalues[index], eigenvectors[index]);
+    }
 
-    // Panic if the number of eigenpairs wanted is out of bounds.
-    AssertThrow ((n_eigenvectors > 0) && (n_eigenvectors <= A.m ()), 
-		 ExcSLEPcWrappersUsageError());
+  template <typename OutputVector>
+    void
+    SolverBase::solve (const PETScWrappers::MatrixBase &A,
+		       const PETScWrappers::MatrixBase &B,
+		       std::vector<double>             &real_eigenvalues,
+		       std::vector<double>             &imag_eigenvalues,
+		       std::vector<OutputVector>       &real_eigenvectors,
+		       std::vector<OutputVector>       &imag_eigenvectors,
+		       const unsigned int               n_eigenvectors)
+    { 
+      // Guard against incompatible matrix sizes:
+      AssertThrow (A.m() == B.m (), ExcDimensionMismatch(A.m(), B.m()));
+      AssertThrow (A.n() == B.n (), ExcDimensionMismatch(A.n(), B.n()));
 
-    // Set the matrices of the problem
-    set_matrices (A, B);
+      // and incompatible eigenvalue/eigenvector sizes
+      AssertThrow (real_eigenvalues.size() == imag_eigenvalues.size(),  
+       		   ExcDimensionMismatch(real_eigenvalues.size(), imag_eigenvalues.size())); 
+      AssertThrow (real_eigenvectors.size() == imag_eigenvectors.n (),  
+       		   ExcDimensionMismatch(real_eigenvectors.size(), imag_eigenvectors.size())); 
 
-    // and solve
-    unsigned int n_converged = 0;
-    solve (n_eigenvectors, &n_converged);
+      // Panic if the number of eigenpairs wanted is out of bounds.
+      AssertThrow ((n_eigenvectors > 0) && (n_eigenvectors <= A.m ()), 
+		   ExcSLEPcWrappersUsageError());
+      
+      // Set the matrices of the problem
+      set_matrices (A, B);
+      
+      // and solve
+      unsigned int n_converged = 0;
+      solve (n_eigenvectors, &n_converged);
+      
+      if (n_converged >= n_eigenvectors)
+	n_converged = n_eigenvectors;
+      
+      AssertThrow (n_converged == n_eigenvectors,
+		   ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
+      AssertThrow ((real_eigenvectors.size()!=0) && (imag_eigenvectors.size()!=0), 
+		   ExcSLEPcWrappersUsageError());
+      
+      real_eigenvectors.resize (n_converged, real_eigenvectors.front());
+      imag_eigenvectors.resize (n_converged, imag_eigenvectors.front());
+      real_eigenvalues.resize (n_converged);
+      imag_eigenvalues.resize (n_converged);
+      
+      for (unsigned int index=0; index<n_converged; ++index)
+	get_eigenpair (index, 
+		       real_eigenvalues[index], imag_eigenvalues[index], 
+		       real_eigenvectors[index], imag_eigenvectors[index]);
+    }
 
-    if (n_converged >= n_eigenvectors)
-      n_converged = n_eigenvectors;
-
-    AssertThrow (n_converged == n_eigenvectors,
-                 ExcSLEPcEigenvectorConvergenceMismatchError(n_converged, n_eigenvectors));
-    AssertThrow (vr.size() != 0, ExcSLEPcWrappersUsageError());
-
-    vr.resize (n_converged, vr.front());
-    kr.resize (n_converged);
-
-    for (unsigned int index=0; index<n_converged; ++index)
-      get_eigenpair (index, kr[index], vr[index]);
-  }
 }
 
 DEAL_II_NAMESPACE_CLOSE
