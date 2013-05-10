@@ -73,75 +73,59 @@ public:
      */
     none,
     /**
-     * Quotient of values in
-     * the previous row and in
-     * this row.
+     * Quotient of values in the previous row and in this row.
      */
     reduction_rate,
     /**
-     * Logarithm of
-     * #reduction_rate to the
-     * base 2 representing the
-     * order of convergence
-     * when halving the grid
-     * size, e.g. from h to
-     * h/2.
+     * Logarithm of #reduction_rate to the base 2 representing the order of
+     * convergence when halving the grid size, e.g. from h to h/2.
      */
     reduction_rate_log2
   };
 
   /**
-   * Evaluates the convergence rates of the
-   * data column <tt>data_column_key</tt>
-   * due to the #RateMode in relation to
-   * the reference column <tt>reference_column_key</tt>.
-   * Be sure that the value types of the
-   * table entries of the
-   * data column and the reference data column
-   * is a number, i.e. double, float,
-   * (unsigned) int, and so on.
+   * Evaluates the convergence rates of the data column
+   * <tt>data_column_key</tt> due to the #RateMode in relation to the
+   * reference column <tt>reference_column_key</tt>. Be sure that the value
+   * types of the table entries of the data column and the reference data
+   * column is a number, i.e. double, float, (unsigned) int, and so on.
    *
-   * The new rate column and the data column
-   * will be merged to a supercolumn. The
-   * tex caption of the supercolumn will be
-   * (by default) the same as the one of the
-   * data column. This may be changed by using
-   * the <tt>set_tex_supercaption (...)</tt> function
-   * of the base class TableHandler.
+   * As this class has no information on the space dimension upon which the
+   * reference column vs. the value column is based upon, it needs to be
+   * passed as last argument to this method. The default dimension is two.
+   *
+   * The new rate column and the data column will be merged to a
+   * supercolumn. The tex caption of the supercolumn will be (by default) the
+   * same as the one of the data column. This may be changed by using the
+   * <tt>set_tex_supercaption (...)</tt> function of the base class
+   * TableHandler.
    *
    * This method behaves in the following way:
    *
-   * If RateMode is reduction_rate, then the computed
-   * output is
+   * If RateMode is reduction_rate, then the computed output is
    * $ \frac{e_{n-1}/k_{n-1}}{e_n/k_n} $.
    *
    * Where $k$ is the reference column.
    *
-   * If RateMode is reduction_rate_log2, then the
-   * computed output is
+   * If RateMode is reduction_rate_log2, then the computed output is
    * $
-   * 2\frac{\log |e_{n-1}/e_{n}|}{\log |k_n/k_{n-1}|}
+   * dim \frac{\log |e_{n-1}/e_{n}|}{\log |k_n/k_{n-1}|}
    * $.
    *
-   * This is useful, for example, if we use as
-   * reference key the number of degrees of freedom.
-   * Assuming that the error is proportional to
-   * $ C (1/\sqrt{k})^r $, then this method will
-   * produce the rate $r$ as a result.
+   * This is useful, for example, if we use as reference key the number of
+   * degrees of freedom.  Assuming that the error is proportional to $ C
+   * (1/\sqrt{k})^r $, then this method will produce the rate $r$ as a result.
    *
-   * @note Since this function adds columns
-   * to the table after several rows have
-   * already been filled, it switches off
-   * the auto fill mode of the TableHandler
-   * base class. If you intend to add
-   * further data with auto fill, you will
-   * have to re-enable it after calling
-   * this function.
+   * @note Since this function adds columns to the table after several rows
+   * have already been filled, it switches off the auto fill mode of the
+   * TableHandler base class. If you intend to add further data with auto
+   * fill, you will have to re-enable it after calling this function.
    */
   void
   evaluate_convergence_rates (const std::string &data_column_key,
                               const std::string &reference_column_key,
-                              const RateMode     rate_mode);
+                              const RateMode     rate_mode,
+                              const unsigned int dim = 2);
 
 
   /**

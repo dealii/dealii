@@ -23,7 +23,8 @@ ConvergenceTable::ConvergenceTable()
 
 void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
                                                   const std::string &reference_column_key,
-                                                  const RateMode     rate_mode)
+                                                  const RateMode     rate_mode,
+                                                  const unsigned int dim)
 {
   Assert(columns.count(data_column_key),
          ExcColumnNotExistent(data_column_key));
@@ -91,7 +92,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
             }
           else
             {
-              add_value(rate_key, 2*std::log(std::fabs(values[i-1]/values[i])) /
+              add_value(rate_key, dim*std::log(std::fabs(values[i-1]/values[i])) /
                         std::log(std::fabs(ref_values[i]/ref_values[i-1])));
             }
         }
