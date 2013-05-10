@@ -40,7 +40,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
 
   std::vector<internal::TableEntry> &entries=columns[data_column_key].entries;
   std::vector<internal::TableEntry> &ref_entries=columns[reference_column_key].entries;
-  std::string rate_key = data_column_key;
+  std::string rate_key = data_column_key+"...";
 
   const unsigned int n = entries.size();
   const unsigned int n_ref = ref_entries.size();
@@ -80,7 +80,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
         }
       break;
     case reduction_rate_log2:
-      rate_key += "red.rate";
+      rate_key += "red.rate.log2";
       no_rate_entries = columns[rate_key].entries.size();
       // Calculate all missing rate values:
       for (unsigned int i = no_rate_entries; i<n; ++i)

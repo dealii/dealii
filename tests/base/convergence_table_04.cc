@@ -26,6 +26,9 @@
 // reference_column_key and data from various dimension where the reference
 // data must be scaled by dimension
 
+// data generated from a run of step-7 with Q2 elements for 1D, 2D and Q1
+// elements for 3D
+
 int main ()
 {
   std::ofstream logfile("convergence_table_04/output");
@@ -37,7 +40,7 @@ int main ()
   ConvergenceTable table_2;
   ConvergenceTable table_3;
 
-  deallog.push("1d");
+  deallog << "Testing 1D data" << std::endl;
   table_1.add_value("n_cells", 16);
   table_1.add_value("error", 4.841e-04);
   table_1.add_value("n_cells", 24);
@@ -53,12 +56,11 @@ int main ()
   table_1.add_value("n_cells", 128);
   table_1.add_value("error", 9.597e-07); 
   table_1.set_scientific("error", true);
-  //table_1.evaluate_convergence_rates("error", "n_cells", ConvergenceTable::reduction_rate);
+  table_1.evaluate_convergence_rates("error", "n_cells", ConvergenceTable::reduction_rate);
   table_1.evaluate_convergence_rates("error", "n_cells", ConvergenceTable::reduction_rate_log2, 1);
   table_1.write_text(deallog.get_file_stream());
-  deallog.pop();
 
-  deallog.push("2d");
+  deallog << std::endl << "Testing 2d data" << std::endl;
   table_2.add_value("n_cells", 64);
   table_2.add_value("error", 7.755e-03);
   table_2.add_value("n_cells", 144);
@@ -74,12 +76,11 @@ int main ()
   table_2.add_value("n_cells", 4096);
   table_2.add_value("error", 1.587e-05);
   table_2.set_scientific("error", true);
-  //table_2.evaluate_convergence_rates("error", "n_cells", ConvergenceTable::reduction_rate);
+  table_2.evaluate_convergence_rates("error", "n_cells", ConvergenceTable::reduction_rate);
   table_2.evaluate_convergence_rates("error", "n_cells", ConvergenceTable::reduction_rate_log2, 2);
   table_2.write_text(deallog.get_file_stream());
-  deallog.pop();
 
-  deallog.push("3d");
+  deallog << std::endl << "Testing 3d data" << std::endl;
   table_3.add_value("n_cells", 512);
   table_3.add_value("error", 5.791e-02);
   table_3.add_value("n_cells", 1728);
@@ -95,10 +96,9 @@ int main ()
   table_3.add_value("n_cells", 262144);
   table_3.add_value("error", 9.275e-04);
   table_3.set_scientific("error", true);
-  //table_3.evaluate_convergence_rates("error", "n_cells", ConvergenceTable::reduction_rate);
+  table_3.evaluate_convergence_rates("error", "n_cells", ConvergenceTable::reduction_rate);
   table_3.evaluate_convergence_rates("error", "n_cells", ConvergenceTable::reduction_rate_log2, 3);
   table_3.write_text(deallog.get_file_stream());
-  deallog.pop();
 
 
 }
