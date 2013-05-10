@@ -2216,6 +2216,7 @@ template <>
 void GridOut::write_mathgl (const Triangulation<1> &,
                             std::ostream &) const
 {
+  // 1d specialization not done yet
   Assert (false, ExcNotImplemented());
 }
 
@@ -2225,7 +2226,6 @@ void GridOut::write_mathgl (const Triangulation<dim> &tria,
                             std::ostream             &out) const
 {
   AssertThrow (out, ExcIO ());
-  Assert (dim>1, ExcNotImplemented ());
 
   // (i) write header
   if (true)
