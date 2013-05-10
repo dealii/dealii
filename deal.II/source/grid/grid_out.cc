@@ -2225,7 +2225,7 @@ void GridOut::write_mathgl (const Triangulation<dim> &tria,
                             std::ostream             &out) const
 {
   AssertThrow (out, ExcIO ());
-  Assert (dim!=3, ExcNotImplemented ());
+  Assert (dim>1, ExcNotImplemented ());
 
   // (i) write header
   if (true)
@@ -2255,7 +2255,6 @@ void GridOut::write_mathgl (const Triangulation<dim> &tria,
 
   // define a helper to keep loops approximately dim-independent
   // since MathGL labels axes as x, y, z
-  Assert (dim<=3, ExcInternalError ());
   const std::string axes = "xyz";
 
   // (ii) write preamble and graphing tweaks
@@ -2266,9 +2265,21 @@ void GridOut::write_mathgl (const Triangulation<dim> &tria,
   if (mathgl_flags.draw_bounding_box)
     out << "\nbox";
 
-  // Default, cf. MathGL / gnuplot.
-  out << "\nsetsize 800 800";
-
+  // deal with dimension dependent preamble; eg. default sizes and
+  // views for MathGL (cf. gnuplot).
+  switch (dim)
+    {
+    case 2:
+      out << "\nsetsize 800 800";
+      out << "\nrotate 0 0";
+      break;
+    case 3:
+      out << "\nsetsize 800 800";
+      out << "\nrotate 60 40";
+      break;
+    default:
+      Assert (false, ExcNotImplemented ());
+    };
   out << "\n";
 
   // (iii) write vertex ordering
@@ -2280,8 +2291,19 @@ void GridOut::write_mathgl (const Triangulation<dim> &tria,
   // todo: This denotes the natural ordering of vertices, but it needs
   // to check this is really always true for a given grid (it's not
   // true in step-1 grid-2 for instance).
-  out << "\nlist f 0 1 2 3"
-      << "\n";
+  switch (dim)
+    {
+    case 2:
+      out << "\nlist f 0 1 2 3"
+	  << "\n";
+      break;
+    case 3:
+      out << "\nlist f 0 2 4 6 | 1 3 5 7 | 0 4 1 5 | 2 6 3 7 | 0 1 2 3 | 4 5 6 7"
+	  << "\n";
+      break;
+    default:
+      Assert (false, ExcNotImplemented ());
+    };
 
   // (iv) write a list of vertices of cells
   out << "\n#"
