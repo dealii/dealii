@@ -109,7 +109,7 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::solve (const unsigned int  n_eigenvectors, 
+  SolverBase::solve (const unsigned int  n_eigenpairs, 
 		     unsigned int       *n_converged)
   {
     int ierr;
@@ -163,7 +163,7 @@ namespace SLEPcWrappers
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     // set number of eigenvectors to compute
-    ierr = EPSSetDimensions (solver_data->eps, n_eigenvectors,
+    ierr = EPSSetDimensions (solver_data->eps, n_eigenpairs,
                              PETSC_DECIDE, PETSC_DECIDE);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
