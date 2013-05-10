@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1262,7 +1262,7 @@ namespace TrilinosWrappers
 
 
   inline
-  typename VectorBase::iterator
+  VectorBase::iterator
   VectorBase::begin()
   {
     return (*vector)[0];
@@ -1271,7 +1271,7 @@ namespace TrilinosWrappers
 
 
   inline
-  typename VectorBase::iterator
+  VectorBase::iterator
   VectorBase::end()
   {
     return (*vector)[0]+local_size();
@@ -1280,7 +1280,7 @@ namespace TrilinosWrappers
 
 
   inline
-  typename VectorBase::const_iterator
+  VectorBase::const_iterator
   VectorBase::begin() const
   {
     return (*vector)[0];
@@ -1289,7 +1289,7 @@ namespace TrilinosWrappers
 
 
   inline
-  typename VectorBase::const_iterator
+  VectorBase::const_iterator
   VectorBase::end() const
   {
     return (*vector)[0]+local_size();
