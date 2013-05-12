@@ -21,6 +21,7 @@
 
 #include <vector>
 #include <string>
+#include <limits>
 
 #include <deal.II/base/mpi.h>
 
@@ -1186,34 +1187,54 @@ public:
   /**
    * Flags controlling the details
    * of output in VTK
-   * format. At present no flags
-   * are implemented.
+   * format.
    *
    * @ingroup output
    */
   struct VtkFlags
   {
-  private:
-    /**
-     * Dummy entry to suppress compiler
-     * warnings when copying an empty
-     * structure. Remove this member
-     * when adding the first flag to
-     * this structure (and remove the
-     * <tt>private</tt> as well).
-     */
-    int dummy;
-
   public:
+    /**
+     * The time of the time step if this file is part of a
+     * time dependent simulation.
+     *
+     * The value of this variable is written into the output file according
+     * to the instructions provided in
+     * http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
+     * unless it is at its default value of std::numeric_limits<double>::min().
+     */
+    double time;
+
+    /**
+     * The number of the time step if this file is part of a
+     * time dependent simulation, or the cycle within a nonlinear or other
+     * iteration.
+     *
+     * The value of this variable is written into the output file according
+     * to the instructions provided in
+     * http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
+     * unless it is at its default value of std::numeric_limits<unsigned int>::min().
+     */
+    unsigned int cycle;
+
     /**
      * Default constructor.
      */
-    VtkFlags ();
+    VtkFlags (const double       time  = std::numeric_limits<double>::min(),
+              const unsigned int cycle = std::numeric_limits<unsigned int>::min());
 
     /**
-     * Declare all flags with name
+     * Declare the flags with name
      * and type as offered by this
      * class, for use in input files.
+     *
+     * Unlike the flags in many of the other classes similar to this one, we do
+     * not actually declare parameters for the #cycle and #time member variables
+     * of this class. The reason is that there wouldn't appear to be a case where
+     * one would want to declare these parameters in an input file. Rather, these
+     * are typically values that change during the course of a simulation and
+     * can only reasonably be set as part of the execution of a program, rather
+     * than a priori by a user who runs this program.
      */
     static void declare_parameters (ParameterHandler &prm);
 
@@ -1246,6 +1267,8 @@ public:
      */
     std::size_t memory_consumption () const;
   };
+
+
   /**
    * Flags controlling the details
    * of output in deal.II
