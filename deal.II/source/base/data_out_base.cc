@@ -4670,7 +4670,7 @@ DataOutBase::write_vtk (const std::vector<Patch<dim,spacedim> > &patches,
     // now output the data header
     out << "DATASET UNSTRUCTURED_GRID\n"
         << '\n';
-}
+  }
 
   // if desired, output time and cycle of the simulation, following
   // the instructions at
@@ -5016,6 +5016,37 @@ void DataOutBase::write_vtu_main (const std::vector<Patch<dim,spacedim> > &patch
       return;
     }
 #endif
+
+  // first up: metadata
+  //
+  // if desired, output time and cycle of the simulation, following
+  // the instructions at
+  // http://www.visitusers.org/index.php?title=Time_and_Cycle_in_VTK_files
+  {
+    const unsigned int
+    n_metadata = ((flags.cycle != std::numeric_limits<unsigned int>::min() ? 1 : 0)
+                  +
+                  (flags.time != std::numeric_limits<double>::min() ? 1 : 0));
+    if (n_metadata > 0)
+      out << "<FieldData>\n";
+
+    if (flags.cycle != std::numeric_limits<unsigned int>::min())
+      {
+        out << "<DataArray type=\"Float32\" Name=\"CYCLE\" NumberOfTuples=\"1\" format=\"ascii\">"
+            << flags.cycle
+            << "</DataArray>\n";
+      }
+    if (flags.time != std::numeric_limits<double>::min())
+      {
+        out << "<DataArray type=\"Float32\" Name=\"TIME\" NumberOfTuples=\"1\" format=\"ascii\">"
+            << flags.time
+            << "</DataArray>\n";
+      }
+
+    if (n_metadata > 0)
+      out << "</FieldData>\n";
+}
+
 
   VtuStream vtu_out(out, flags);
 

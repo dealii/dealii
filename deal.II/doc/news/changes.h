@@ -117,6 +117,14 @@ this function.
 
 <ol>
 
+<li> Improved: Through the fields DataOutBase::VtkFlags::time and
+DataOutBase::VtkFlags::cycle, it is now possible to encode the time and/or
+cycle within a nonlinear or other iteration in VTK and VTU files written
+via DataOutBase::write_vtk and DataOutBase::write_vtu.
+<br>
+(Wolfgang Bangerth, 2013/05/12)
+</li>
+
 <li> Improved: The functions MatrixTools::create_mass_matrix and
 MatrixTools::create_laplace_matrix take now an optional ConstraintMatrix
 argument that allows to directly apply the constraints. This also helps
