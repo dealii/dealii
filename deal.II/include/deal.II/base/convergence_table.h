@@ -118,7 +118,9 @@ public:
    * This is useful, for example, if we use as reference key the number of
    * degrees of freedom or better, the number of cells.  Assuming that the
    * error is proportional to $ C (1/\sqrt{k})^r $ in 2D, then this method
-   * will produce the rate $r$ as a result.
+   * will produce the rate $r$ as a result. For general dimension, as described
+   * by the last parameter of this function, the formula needs to be
+   * $ C (1/\sqrt[dim]{k})^r $.
    *
    * @note Since this function adds columns to the table after several rows
    * have already been filled, it switches off the auto fill mode of the
