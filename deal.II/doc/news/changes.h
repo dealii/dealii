@@ -125,6 +125,14 @@ via DataOutBase::write_vtk and DataOutBase::write_vtu.
 (Wolfgang Bangerth, 2013/05/12)
 </li>
 
+<li> Fixed: The method ConvergenceTable::evaluate_convergence_rates with
+ reference column did not take the dimension of the reference column into
+ account, leading to wrong logarithmic rates for dim!=2. This can now be fixed
+ by specifying the dimension as a last argument.
+<br>
+(Martin Kronbichler, 2013/05/10)
+</li>
+
 <li> Improved: The functions MatrixTools::create_mass_matrix and
 MatrixTools::create_laplace_matrix take now an optional ConstraintMatrix
 argument that allows to directly apply the constraints. This also helps
