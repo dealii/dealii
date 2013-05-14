@@ -19,7 +19,6 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
-#include "../../include/deal.II/grid/tria.h"
 
 
 namespace dealii
