@@ -56,10 +56,11 @@ DEAL_II_NAMESPACE_OPEN
  *
  * <li> Systems of PDEs where certain variables demand for higher resolutions
  * than the others and the additional degrees of freedom should be spend on
- * increasing the resolution of linears instead of higher order
- * polynomials. This can be the case when irregularities (shocks) appear in
- * the solution and stabilization techniques are used that work for linears
- * but not higher order elements. </li>
+ * increasing the resolution of linears instead of higher order polynomials,
+ * and you do not want to use two different meshes for the different
+ * components. This can be the case when irregularities (shocks) appear in the
+ * solution and stabilization techniques are used that work for linears but
+ * not higher order elements. </li>
  *
  * <li> Stokes/Navier Stokes systems as the one discussed in step-22 could be
  * solved with Q2-iso-Q1 elements for velocities instead of Q2
