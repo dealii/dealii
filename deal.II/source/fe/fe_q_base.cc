@@ -185,14 +185,15 @@ struct FE_Q_Base<POLY,xdim,xspacedim>::Implementation
     const std::vector<unsigned int> &index_map_inverse =
       fe.poly_space.get_numbering_inverse();
     const std::vector<unsigned int> face_index_map =
-      FE_Q_Helper::face_lexicographic_to_hierarchic_numbering<2>(fe.degree);
-    Assert(fe.poly_space.compute_value(index_map_inverse[0],Point<2>()) == 1.,
+      FE_Q_Helper::face_lexicographic_to_hierarchic_numbering<dim>(fe.degree);
+    Assert(std::abs(fe.poly_space.compute_value(index_map_inverse[0],Point<dim>())
+                    - 1.) < 1e-14,
            ExcInternalError());
 
     for (unsigned int i=0; i<constraint_points.size(); ++i)
       for (unsigned int j=0; j<fe.degree+1; ++j)
         {
-          Point<2> p;
+          Point<dim> p;
           p[0] = constraint_points[i](0);
           fe.interface_constraints(i,face_index_map[j]) =
             fe.poly_space.compute_value(index_map_inverse[j], p);
@@ -304,8 +305,9 @@ struct FE_Q_Base<POLY,xdim,xspacedim>::Implementation
     const std::vector<unsigned int> &index_map_inverse =
       fe.poly_space.get_numbering_inverse();
     const std::vector<unsigned int> face_index_map =
-      FE_Q_Helper::face_lexicographic_to_hierarchic_numbering<3>(fe.degree);
-    Assert(fe.poly_space.compute_value(index_map_inverse[0],Point<3>()) == 1.,
+      FE_Q_Helper::face_lexicographic_to_hierarchic_numbering<dim>(fe.degree);
+    Assert(std::abs(fe.poly_space.compute_value(index_map_inverse[0],Point<dim>())
+                    - 1.) < 1e-14,
            ExcInternalError());
 
     fe.interface_constraints
