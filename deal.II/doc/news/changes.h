@@ -64,6 +64,17 @@ this function.
 
 
 <ol>
+
+  <li> New: A new element FE_Q_iso_Q1 has been implemented that is defined by
+  a subdivision of the element into smaller Q1 elements. An element of order
+  @p p is similar to FE_Q of degree @p p with the same numbering of degrees of
+  freedom. The element is useful e.g. for defining a sparser preconditioner
+  matrix for AMG at higher order FE_Q elements or for representing a component
+  of a system of PDEs where higher resolution is preferred over high order.
+  <br>
+  (Martin Kronbichler, 2013/05/14)
+  </li>
+
   <li> Fixed: setting values in TrilinosWrappers::SparseMatrix
   in parallel was adding the values instead.
   <br>

@@ -102,15 +102,12 @@ namespace Polynomials
     Assert (values.size() > 0, ExcZero());
     const unsigned int values_size=values.size();
 
-    // evaluate Lagrange polynomial and
-    // derivatives
+    // evaluate Lagrange polynomial and derivatives
     if (in_lagrange_product_form == true)
       {
-        // to compute the value and all derivatives of
-        // a polynomial of the form
-        // (x-x_1)*(x-x_2)*...*(x-x_n), expand the
-        // derivatives like automatic differentiation
-        // does.
+        // to compute the value and all derivatives of a polynomial of the
+        // form (x-x_1)*(x-x_2)*...*(x-x_n), expand the derivatives like
+        // automatic differentiation does.
         const unsigned int n_supp = lagrange_support_points.size();
         switch (values_size)
           {
@@ -122,31 +119,24 @@ namespace Polynomials
               {
                 const number v = x-lagrange_support_points[i];
 
-                // multiply by (x-x_i) and compute action on
-                // all derivatives, too (inspired from
-                // automatic differentiation: implement the
-                // product rule for the old value and the new
-                // variable 'v', i.e., expand value v and
-                // derivative one). since we reuse a value
-                // from the next lower derivative from the
-                // steps before, need to start from the
-                // highest derivative
+                // multiply by (x-x_i) and compute action on all derivatives,
+                // too (inspired from automatic differentiation: implement the
+                // product rule for the old value and the new variable 'v',
+                // i.e., expand value v and derivative one). since we reuse a
+                // value from the next lower derivative from the steps before,
+                // need to start from the highest derivative
                 for (unsigned int k=values_size-1; k>0; --k)
                   values[k] = (values[k] * v + values[k-1]);
                 values[0] *= v;
               }
-            // finally, multiply by the weight in the
-            // Lagrange denominator. Could be done instead
-            // of setting values[0] = 1 above, but that
-            // gives different accumulation of round-off
-            // errors (multiplication is not associative)
-            // compared to when we computed the weight,
-            // and hence a basis function might not be
-            // exactly one at the center point, which is
-            // nice to have. We also multiply derivatives
-            // by k! to transform the product p_n =
-            // p^(n)(x)/k! into the actual form of the
-            // derivative
+            // finally, multiply by the weight in the Lagrange
+            // denominator. Could be done instead of setting values[0] = 1
+            // above, but that gives different accumulation of round-off
+            // errors (multiplication is not associative) compared to when we
+            // computed the weight, and hence a basis function might not be
+            // exactly one at the center point, which is nice to have. We also
+            // multiply derivatives by k! to transform the product p_n =
+            // p^(n)(x)/k! into the actual form of the derivative
             {
               number k_faculty = 1;
               for (unsigned int k=0; k<values_size; ++k)
@@ -157,11 +147,9 @@ namespace Polynomials
             }
             break;
 
-            // manually implement size 1 (values only),
-            // size 2 (value + first derivative), and size
-            // 3 (up to second derivative) since they
-            // might be called often. then, we can unroll
-            // the loop.
+            // manually implement size 1 (values only), size 2 (value + first
+            // derivative), and size 3 (up to second derivative) since they
+            // might be called often. then, we can unroll the loop.
           case 1:
             values[0] = 1;
             for (unsigned int i=0; i<n_supp; ++i)
@@ -206,33 +194,24 @@ namespace Polynomials
 
     Assert (coefficients.size() > 0, ExcEmptyObject());
 
-    // if we only need the value, then
-    // call the other function since
-    // that is significantly faster
-    // (there is no need to allocate
-    // and free memory, which is really
-    // expensive compared to all the
-    // other operations!)
+    // if we only need the value, then call the other function since that is
+    // significantly faster (there is no need to allocate and free memory,
+    // which is really expensive compared to all the other operations!)
     if (values_size == 1)
       {
         values[0] = value(x);
         return;
       };
 
-    // if there are derivatives needed,
-    // then do it properly by the
-    // full Horner scheme
+    // if there are derivatives needed, then do it properly by the full Horner
+    // scheme
     const unsigned int m=coefficients.size();
     std::vector<number> a(coefficients);
     unsigned int j_faculty=1;
 
-    // loop over all requested
-    // derivatives. note that
-    // derivatives @p{j>m} are
-    // necessarily zero, as they
-    // differentiate the polynomial
-    // more often than the highest
-    // power is
+    // loop over all requested derivatives. note that derivatives @p{j>m} are
+    // necessarily zero, as they differentiate the polynomial more often than
+    // the highest power is
     const unsigned int min_valuessize_m=std::min(values_size, m);
     for (unsigned int j=0; j<min_valuessize_m; ++j)
       {
@@ -254,13 +233,11 @@ namespace Polynomials
   void
   Polynomial<number>::transform_into_standard_form ()
   {
-    // should only be called when the product form
-    // is active
+    // should only be called when the product form is active
     Assert (in_lagrange_product_form == true, ExcInternalError());
     Assert (coefficients.size() == 0, ExcInternalError());
 
-    // compute coefficients by expanding the
-    // product (x-x_i) term by term
+    // compute coefficients by expanding the product (x-x_i) term by term
     coefficients.resize (lagrange_support_points.size()+1);
     if (lagrange_support_points.size() == 0)
       coefficients[0] = 1.;
@@ -738,9 +715,8 @@ namespace Polynomials
   {
     Assert (coefficients.size() == 0, ExcInternalError());
 
-    // For polynomial order up to 3, we have
-    // precomputed weights. Use these weights
-    // instead of the product form
+    // For polynomial order up to 3, we have precomputed weights. Use these
+    // weights instead of the product form
     if (n <= 3)
       {
         this->in_lagrange_product_form = false;

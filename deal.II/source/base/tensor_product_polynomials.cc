@@ -13,6 +13,7 @@
 
 
 #include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/table.h>
 
@@ -22,56 +23,72 @@ DEAL_II_NAMESPACE_OPEN
 
 /* ------------------- TensorProductPolynomials -------------- */
 
-template <>
-inline
-void
-TensorProductPolynomials<1>::
-compute_index (const unsigned int i,
-               unsigned int       (&indices)[1]) const
+
+namespace internal
 {
-  Assert (i<polynomials.size(), ExcInternalError());
-  indices[0] = index_map[i];
+  namespace
+  {
+    template <int dim>
+    inline
+    void compute_tensor_index(const unsigned int,
+                              const unsigned int,
+                              const unsigned int,
+                              unsigned int      (&)[dim])
+    {
+      Assert(false, ExcNotImplemented());
+    }
+
+    inline
+    void compute_tensor_index(const unsigned int n,
+                              const unsigned int ,
+                              const unsigned int ,
+                              unsigned int       (&indices)[1])
+    {
+      indices[0] = n;
+    }
+
+    inline
+    void compute_tensor_index(const unsigned int n,
+                              const unsigned int n_pols_0,
+                              const unsigned int ,
+                              unsigned int       (&indices)[2])
+    {
+      indices[0] = n % n_pols_0;
+      indices[1] = n / n_pols_0;
+    }
+
+    inline
+    void compute_tensor_index(const unsigned int n,
+                              const unsigned int n_pols_0,
+                              const unsigned int n_pols_1,
+                              unsigned int       (&indices)[3])
+    {
+      indices[0] = n % n_pols_0;
+      indices[1] = (n/n_pols_0) % n_pols_1;
+      indices[2] = n / (n_pols_0*n_pols_1);
+    }
+  }
 }
 
 
 
-template <>
+template <int dim, typename POLY>
 inline
 void
-TensorProductPolynomials<2>::
+TensorProductPolynomials<dim,POLY>::
 compute_index (const unsigned int i,
-               unsigned int       (&indices)[2]) const
+               unsigned int       (&indices)[(dim > 0 ? dim : 1)]) const
 {
-  const unsigned int n_pols = polynomials.size();
-  Assert (i<n_pols*n_pols, ExcInternalError());
-  const unsigned int n=index_map[i];
-
-  indices[0] = n % n_pols;
-  indices[1] = n / n_pols;
+  Assert (i<Utilities::fixed_power<dim>(polynomials.size()),ExcInternalError());
+  internal::compute_tensor_index(index_map[i], polynomials.size(),
+                                 polynomials.size(), indices);
 }
 
 
 
-template <>
-inline
+template <int dim, typename POLY>
 void
-TensorProductPolynomials<3>::
-compute_index (const unsigned int i,
-               unsigned int       (&indices)[3]) const
-{
-  const unsigned int n_pols = polynomials.size();
-  Assert (i<n_pols*n_pols*n_pols, ExcInternalError());
-  const unsigned int n=index_map[i];
-
-  indices[0] = n % n_pols;
-  indices[1] = (n/n_pols) % n_pols;
-  indices[2] = n / (n_pols*n_pols);
-}
-
-
-template <int dim>
-void
-TensorProductPolynomials<dim>::output_indices(std::ostream &out) const
+TensorProductPolynomials<dim,POLY>::output_indices(std::ostream &out) const
 {
   unsigned int ix[dim];
   for (unsigned int i=0; i<n_tensor_pols; ++i)
@@ -86,9 +103,9 @@ TensorProductPolynomials<dim>::output_indices(std::ostream &out) const
 
 
 
-template <int dim>
+template <int dim, typename POLY>
 void
-TensorProductPolynomials<dim>::set_numbering(
+TensorProductPolynomials<dim,POLY>::set_numbering(
   const std::vector<unsigned int> &renumber)
 {
   Assert(renumber.size()==index_map.size(),
@@ -101,11 +118,13 @@ TensorProductPolynomials<dim>::set_numbering(
 
 
 
-template <int dim>
+template <int dim, typename POLY>
 double
-TensorProductPolynomials<dim>::compute_value (const unsigned int i,
-                                              const Point<dim> &p) const
+TensorProductPolynomials<dim,POLY>::compute_value (const unsigned int i,
+                                                   const Point<dim> &p) const
 {
+  Assert(dim>0, ExcNotImplemented());
+
   unsigned int indices[dim];
   compute_index (i, indices);
 
@@ -118,21 +137,10 @@ TensorProductPolynomials<dim>::compute_value (const unsigned int i,
 
 
 
-template <>
-double
-TensorProductPolynomials<0>::compute_value (const unsigned int ,
-                                            const Point<0> &) const
-{
-  Assert (false, ExcNotImplemented());
-  return 0.;
-}
-
-
-
-template <int dim>
+template <int dim, typename POLY>
 Tensor<1,dim>
-TensorProductPolynomials<dim>::compute_grad (const unsigned int i,
-                                             const Point<dim> &p) const
+TensorProductPolynomials<dim,POLY>::compute_grad (const unsigned int i,
+                                                  const Point<dim> &p) const
 {
   unsigned int indices[dim];
   compute_index (i, indices);
@@ -164,10 +172,11 @@ TensorProductPolynomials<dim>::compute_grad (const unsigned int i,
 }
 
 
-template <int dim>
+
+template <int dim, typename POLY>
 Tensor<2,dim>
-TensorProductPolynomials<dim>::compute_grad_grad (const unsigned int i,
-                                                  const Point<dim> &p) const
+TensorProductPolynomials<dim,POLY>::compute_grad_grad (const unsigned int i,
+                                                       const Point<dim> &p) const
 {
   unsigned int indices[dim];
   compute_index (i, indices);
@@ -209,9 +218,9 @@ TensorProductPolynomials<dim>::compute_grad_grad (const unsigned int i,
 
 
 
-template <int dim>
+template <int dim, typename POLY>
 void
-TensorProductPolynomials<dim>::
+TensorProductPolynomials<dim,POLY>::
 compute (const Point<dim>            &p,
          std::vector<double>         &values,
          std::vector<Tensor<1,dim> > &grads,
@@ -308,24 +317,6 @@ compute (const Point<dim>            &p,
 
 
 
-template <int dim>
-unsigned int
-TensorProductPolynomials<dim>::n() const
-{
-  return n_tensor_pols;
-}
-
-
-
-template <>
-unsigned int
-TensorProductPolynomials<0>::n() const
-{
-  return numbers::invalid_unsigned_int;
-}
-
-
-
 
 /* ------------------- AnisotropicPolynomials -------------- */
 
@@ -347,45 +338,19 @@ AnisotropicPolynomials(const std::vector<std::vector<Polynomials::Polynomial<dou
 
 
 
-template <>
+template <int dim>
 void
-AnisotropicPolynomials<1>::
+AnisotropicPolynomials<dim>::
 compute_index (const unsigned int i,
-               unsigned int       (&indices)[1]) const
+               unsigned int       (&indices)[dim]) const
 {
-  Assert (i<polynomials[0].size(), ExcInternalError());
-  indices[0] = i;
-}
+  unsigned int n_poly = 1;
+  for (unsigned int d=0; d<dim; ++d)
+    n_poly *= polynomials[d].size();
+  Assert (i < n_poly, ExcInternalError());
 
-
-
-template <>
-void
-AnisotropicPolynomials<2>::
-compute_index (const unsigned int i,
-               unsigned int       (&indices)[2]) const
-{
-  Assert (i < polynomials[0].size()*polynomials[1].size(),
-          ExcInternalError());
-
-  indices[0] = i % polynomials[0].size();
-  indices[1] = i / polynomials[0].size();
-}
-
-
-
-template <>
-void
-AnisotropicPolynomials<3>::
-compute_index (const unsigned int i,
-               unsigned int       (&indices)[3]) const
-{
-  Assert (i < polynomials[0].size()*polynomials[1].size()*polynomials[2].size(),
-          ExcInternalError());
-
-  indices[0] = i % polynomials[0].size();
-  indices[1] = (i/polynomials[0].size()) % polynomials[1].size();
-  indices[2] = i / (polynomials[0].size()*polynomials[1].size());
+  internal::compute_tensor_index(i, polynomials[0].size(),
+                                 polynomials[1].size(), indices);
 }
 
 
@@ -587,9 +552,13 @@ get_n_tensor_pols (const std::vector<std::vector<Polynomials::Polynomial<double>
 
 
 /* ------------------- explicit instantiations -------------- */
-template class TensorProductPolynomials<1>;
-template class TensorProductPolynomials<2>;
-template class TensorProductPolynomials<3>;
+template class TensorProductPolynomials<1,Polynomials::Polynomial<double> >;
+template class TensorProductPolynomials<2,Polynomials::Polynomial<double> >;
+template class TensorProductPolynomials<3,Polynomials::Polynomial<double> >;
+
+template class TensorProductPolynomials<1,Polynomials::PiecewisePolynomial<double> >;
+template class TensorProductPolynomials<2,Polynomials::PiecewisePolynomial<double> >;
+template class TensorProductPolynomials<3,Polynomials::PiecewisePolynomial<double> >;
 
 template class AnisotropicPolynomials<1>;
 template class AnisotropicPolynomials<2>;
