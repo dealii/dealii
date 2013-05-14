@@ -68,11 +68,6 @@ namespace Polynomials
                          const bool                spans_next_interval);
 
     /**
-     * Default constructor creating an illegal object.
-     */
-    PiecewisePolynomial ();
-
-    /**
      * Return the value of this polynomial at the given point, evaluating the
      * underlying polynomial. The polynomial evaluates to zero when outside of
      * the given interval (and possible the next one to the right when it
@@ -121,13 +116,13 @@ namespace Polynomials
     /**
      * Stores the number of intervals that the unit interval is divided into.
      */
-    const unsigned int n_intervals;
+    unsigned int n_intervals;
 
     /**
      * Stores the index of the current polynomial in the range of
      * intervals.
      */
-    const unsigned int interval;
+    unsigned int interval;
 
     /**
      * Store if the polynomial spans over two adjacent intervals, i.e., the
