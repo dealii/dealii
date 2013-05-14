@@ -76,14 +76,14 @@ DEAL_II_NAMESPACE_OPEN
  * calling sequence requires calling several of SolverBase functions
  * rather than just one. This freedom is intended for use of the
  * SLEPcWrappers that require a greater handle on the eigenvalue
- * problem solver context. See also the API of:
+ * problem solver context. See also the API of, for example:
  @code
   template <typename OutputVector>
   void
   SolverBase::solve (const PETScWrappers::MatrixBase &A,
                      const PETScWrappers::MatrixBase &B,
-                     std::vector<double>             &kr,
-                     std::vector<OutputVector>       &vr,
+                     std::vector<double>             &eigenvalues,
+                     std::vector<OutputVector>       &eigenvectors,
                      const unsigned int               n_eigenpairs)
   { ... }
  @endcode
@@ -157,7 +157,8 @@ namespace SLEPcWrappers
 
     /**
      * Same as above, but here a composite method for solving the
-     * system $A x=\lambda B x$.
+     * system $A x=\lambda B x$, for real matrices, vectors, and
+     * values $A, B, x, \lambda$.
      */
     template <typename OutputVector>
     void
@@ -169,8 +170,8 @@ namespace SLEPcWrappers
 
     /**
      * Same as above, but here a composite method for solving the
-     * system $A x=\lambda B x$ with real and imaginary parts to the
-     * eigenvalues/eigenvectors.
+     * system $A x=\lambda B x$ with real matrices $A, B$ and
+     * imaginary eigenpairs $x, \lamda$.
      */
     template <typename OutputVector>
     void
@@ -384,8 +385,8 @@ namespace SLEPcWrappers
     static
     int
     convergence_test (EPS          eps,
-                      PetscScalar  kr,
-                      PetscScalar  ki,
+                      PetscScalar  real_eigenvalue,
+                      PetscScalar  imag_eigenvalue,
                       PetscReal    residual_norm,
                       PetscReal   *estimated_error,
                       void        *solver_control);
