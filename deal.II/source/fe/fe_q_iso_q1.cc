@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 template <int dim, int spacedim>
 FE_Q_iso_Q1<dim,spacedim>::FE_Q_iso_Q1 (const unsigned int subdivisions)
   :
-  FE_Q_Base<TensorProductPolynomials<dim,Polynomials::PiecewisePolynomial<double>>, dim, spacedim> (
+  FE_Q_Base<TensorProductPolynomials<dim,Polynomials::PiecewisePolynomial<double> >, dim, spacedim> (
     TensorProductPolynomials<dim,Polynomials::PiecewisePolynomial<double> >
       (Polynomials::generate_complete_Lagrange_basis_on_subdivisions(subdivisions, 1)),
     FiniteElementData<dim>(this->get_dpo_vector(subdivisions),
