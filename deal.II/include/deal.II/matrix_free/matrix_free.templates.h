@@ -793,6 +793,8 @@ void MatrixFree<dim,Number>::clear()
   cell_level_index.clear();
   size_info.clear();
   task_info.clear();
+  dof_handlers.dof_handler.clear();
+  dof_handlers.hp_dof_handler.clear();
   indices_are_initialized = false;
   mapping_is_initialized  = false;
 }
