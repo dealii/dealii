@@ -2630,22 +2630,15 @@ namespace FETools
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     // polynomial degree
     const unsigned int degree = fe.dofs_per_line+1;
-    // number of grid points in each
-    // direction
+    // number of grid points in each direction
     const unsigned int n = degree+1;
 
-    // the following lines of code are
-    // somewhat odd, due to the way the
-    // hierarchic numbering is
-    // organized. if someone would
-    // really want to understand these
-    // lines, you better draw some
-    // pictures where you indicate the
-    // indices and orders of vertices,
-    // lines, etc, along with the
-    // numbers of the degrees of
-    // freedom in hierarchical and
-    // lexicographical order
+    // the following lines of code are somewhat odd, due to the way the
+    // hierarchic numbering is organized. if someone would really want to
+    // understand these lines, you better draw some pictures where you
+    // indicate the indices and orders of vertices, lines, etc, along with the
+    // numbers of the degrees of freedom in hierarchical and lexicographical
+    // order
     switch (dim)
       {
       case 1:

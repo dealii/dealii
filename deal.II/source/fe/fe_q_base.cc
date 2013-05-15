@@ -449,11 +449,8 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
                           FullMatrix<double>       &interpolation_matrix) const
 {
   // this is only implemented, if the source FE is also a Q element
-  typedef FE_Q_Base<POLY,dim,spacedim> FEQ;
-  typedef FiniteElement<dim,spacedim> FEL;
-
-  AssertThrow (dynamic_cast<const FEQ *>(&x_source_fe) != 0,
-               typename FEL::ExcInterpolationNotImplemented());
+  AssertThrow ((dynamic_cast<const FE_Q_Base<POLY,dim,spacedim> *>(&x_source_fe) != 0),
+               (typename FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented()));
 
   Assert (interpolation_matrix.m() == this->dofs_per_cell,
           ExcDimensionMismatch (interpolation_matrix.m(),
@@ -466,42 +463,41 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
   const FE_Q_Base<POLY,dim,spacedim> &source_fe
     = dynamic_cast<const FE_Q_Base<POLY,dim,spacedim>&>(x_source_fe);
 
-  // compute the interpolation matrices in much the same way as we do for the
-  // embedding matrices from mother to child.
-  FullMatrix<double> cell_interpolation (this->dofs_per_cell,
-                                         this->dofs_per_cell);
-  FullMatrix<double> source_interpolation (this->dofs_per_cell,
-                                           source_fe.dofs_per_cell);
-
   // only evaluate Q dofs
   const unsigned int q_dofs_per_cell = Utilities::fixed_power<dim>(this->degree+1);
   const unsigned int source_q_dofs_per_cell = Utilities::fixed_power<dim>(source_fe.degree+1);
+
+  // evaluation is simply done by evaluating the other FE's basis functions on
+  // the unit support points (FE_Q has the property that the cell
+  // interpolation matrix is a unit matrix, so no need to evaluate it and
+  // invert it)
   for (unsigned int j=0; j<q_dofs_per_cell; ++j)
     {
       // read in a point on this cell and evaluate the shape functions there
       const Point<dim> p = this->unit_support_points[j];
-      for (unsigned int i=0; i<q_dofs_per_cell; ++i)
-        cell_interpolation(j,i) = this->poly_space.compute_value (i, p);
+
+      // FE_Q element evaluates to 1 in unit support point and to zero in all
+      // other points by construction
+      Assert(std::abs(this->poly_space.compute_value (j, p)-1.)<1e-13,
+             ExcInternalError());
 
       for (unsigned int i=0; i<source_q_dofs_per_cell; ++i)
-        source_interpolation(j,i) = source_fe.poly_space.compute_value (i, p);
+        interpolation_matrix(j,i) = source_fe.poly_space.compute_value (i, p);
     }
 
   // for FE_Q_DG0, add one last row of identity
   if (q_dofs_per_cell < this->dofs_per_cell)
     {
       AssertDimension(source_q_dofs_per_cell+1, source_fe.dofs_per_cell);
-      cell_interpolation(q_dofs_per_cell, q_dofs_per_cell) = 1.;
-      source_interpolation(q_dofs_per_cell, source_q_dofs_per_cell) = 1.;
+      for (unsigned int i=0; i<source_q_dofs_per_cell; ++i)
+        interpolation_matrix(q_dofs_per_cell, i) = 0.;
+      for (unsigned int j=0; j<q_dofs_per_cell; ++j)
+        interpolation_matrix(j, source_q_dofs_per_cell) = 0.;
+      interpolation_matrix(q_dofs_per_cell, source_q_dofs_per_cell) = 1.;
     }
 
-  // then compute the interpolation matrix for this coordinate direction
-  cell_interpolation.gauss_jordan ();
-  cell_interpolation.mmult (interpolation_matrix, source_interpolation);
-
-  const double eps = 2e-13*this->degree*dim;
-
   // cut off very small values
+  const double eps = 2e-13*this->degree*dim;
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     for (unsigned int j=0; j<source_fe.dofs_per_cell; ++j)
       if (std::fabs(interpolation_matrix(i,j)) < eps)
@@ -530,10 +526,9 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
   Assert (dim > 1, ExcImpossibleInDim(1));
 
   // this is only implemented, if the source FE is also a Q element
-  typedef FE_Q_Base<POLY,dim,spacedim> FEQ;
-  typedef FiniteElement<dim,spacedim> FEL;
-  AssertThrow (dynamic_cast<const FEQ *>(&x_source_fe) != 0,
-               typename FEL::ExcInterpolationNotImplemented());
+  AssertThrow ((dynamic_cast<const FE_Q_Base<POLY,dim,spacedim> *>(&x_source_fe) != 0),
+               (typename FiniteElement<dim,spacedim>::
+                ExcInterpolationNotImplemented()));
 
   Assert (interpolation_matrix.n() == this->dofs_per_face,
           ExcDimensionMismatch (interpolation_matrix.n(),
@@ -552,8 +547,8 @@ get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
   // in that case might lead to problems in the hp procedures, which use this
   // method.
   Assert (this->dofs_per_face <= source_fe.dofs_per_face,
-          typename FEL::
-          ExcInterpolationNotImplemented ());
+          (typename FiniteElement<dim,spacedim>::
+           ExcInterpolationNotImplemented ()));
 
   // generate a quadrature with the unit support points.  This is later based
   // as a basis for the QProjector, which returns the support points on the
