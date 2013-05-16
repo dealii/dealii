@@ -47,6 +47,15 @@ namespace FE_Q_Helper
       return face_renumber;
     }
 
+    // dummy specialization for dim == 1 to avoid linker errors
+    template <>
+    inline
+    std::vector<unsigned int>
+    face_lexicographic_to_hierarchic_numbering<1> (const unsigned int)
+    {
+      return std::vector<unsigned int>();
+    }
+
 
 
     // in initialize_embedding() and initialize_restriction(), want to undo

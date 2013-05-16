@@ -118,6 +118,17 @@ TensorProductPolynomials<dim,POLY>::set_numbering(
 
 
 
+template <>
+double
+TensorProductPolynomials<0,Polynomials::Polynomial<double> >
+::compute_value(const unsigned int,
+                const Point<0> &) const
+{
+  Assert (false, ExcNotImplemented());
+}
+
+
+
 template <int dim, typename POLY>
 double
 TensorProductPolynomials<dim,POLY>::compute_value (const unsigned int i,
