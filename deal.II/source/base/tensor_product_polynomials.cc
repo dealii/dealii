@@ -125,6 +125,7 @@ TensorProductPolynomials<0,Polynomials::Polynomial<double> >
                 const Point<0> &) const
 {
   Assert (false, ExcNotImplemented());
+  return 0;
 }
 
 
