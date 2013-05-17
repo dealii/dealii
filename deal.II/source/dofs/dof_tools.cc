@@ -2797,6 +2797,8 @@ namespace DoFTools
     // the matrix so provided will be the identity matrix. if face 2 is once refined
     // from face 1, then the matrix needs to be the interpolation matrix from a face
     // to this particular child
+    //
+    // @precondition: face_1 is supposed to be active
     template <typename FaceIterator>
     void
     set_periodicity_constraints (const FaceIterator                          &face_1,
@@ -2813,85 +2815,101 @@ namespace DoFTools
 
       // we should be in the case were both faces are active
       // and have no children:
-      Assert (!face_1->has_children() && !face_2->has_children(),
-              ExcNotImplemented());
-
-      Assert (face_1->n_active_fe_indices() == 1 && face_2->n_active_fe_indices() == 1,
+      Assert (!face_1->has_children(),
               ExcInternalError());
 
-      // ... then we match the corresponding DoFs of both faces ...
-      const unsigned int face_1_index = face_1->nth_active_fe_index(0);
-      const unsigned int face_2_index = face_2->nth_active_fe_index(0);
-      Assert (face_1->get_fe(face_1_index) == face_2->get_fe(face_1_index),
+      Assert (face_1->n_active_fe_indices() == 1,
+              ExcInternalError());
+
+      // if face_2 does have children, then we need to iterate over them
+      if (face_2->has_children())
+        {
+          Assert (face_2->n_children() == GeometryInfo<dim>::max_children_per_face,
+                  ExcNotImplemented());
+          const unsigned int dofs_per_face
+          = face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face;
+          FullMatrix<double> child_transformation (dofs_per_face, dofs_per_face);
+          for (unsigned int c=0; c<face_2->n_children(); ++c)
+            {
+//TODO: Need to get interpolation matrix right
+              set_periodicity_constraints(face_1, face_2->child(c),
+                  transformation,
+                  constraint_matrix, component_mask,
+                  face_orientation, face_flip, face_rotation);
+            }
+        }
+      else
+      // both faces are active. we need to match the corresponding DoFs of both faces
+        {
+          const unsigned int face_1_index = face_1->nth_active_fe_index(0);
+          const unsigned int face_2_index = face_2->nth_active_fe_index(0);
+          Assert(
+              face_1->get_fe(face_1_index) == face_2->get_fe(face_1_index),
               ExcMessage ("Matching periodic cells need to use the same finite element"));
 
-      const FiniteElement<dim,spacedim> &fe = face_1->get_fe(face_1_index);
+          const FiniteElement<dim, spacedim> &fe = face_1->get_fe(
+              face_1_index);
 
-      Assert (component_mask.represents_n_components(fe.n_components()),
-              ExcMessage ("The number of components in the mask has to be either "
-                          "zero or equal to the number of components in the finite "
-                          "element."));
+          Assert(component_mask.represents_n_components(fe.n_components()),
+              ExcMessage ("The number of components in the mask has to be either " "zero or equal to the number of components in the finite " "element."));
 
-      const unsigned int dofs_per_face = fe.dofs_per_face;
+          const unsigned int dofs_per_face = fe.dofs_per_face;
 
-      std::vector<unsigned int> dofs_1(dofs_per_face);
-      std::vector<unsigned int> dofs_2(dofs_per_face);
+          std::vector<unsigned int> dofs_1(dofs_per_face);
+          std::vector<unsigned int> dofs_2(dofs_per_face);
 
-      face_1->get_dof_indices(dofs_1, face_1_index);
-      face_2->get_dof_indices(dofs_2, face_2_index);
+          face_1->get_dof_indices(dofs_1, face_1_index);
+          face_2->get_dof_indices(dofs_2, face_2_index);
 
+          // Well, this is a hack:
+          //
+          // There is no
+          //   face_to_face_index(face_index,
+          //                      face_orientation,
+          //                      face_flip,
+          //                      face_rotation)
+          // function in FiniteElementData, so we have to use
+          //   face_to_cell_index(face_index, face
+          //                      face_orientation,
+          //                      face_flip,
+          //                      face_rotation)
+          // But this will give us an index on a cell - something we cannot work
+          // with directly. But luckily we can match them back :-]
 
-      // Well, this is a hack:
-      //
-      // There is no
-      //   face_to_face_index(face_index,
-      //                      face_orientation,
-      //                      face_flip,
-      //                      face_rotation)
-      // function in FiniteElementData, so we have to use
-      //   face_to_cell_index(face_index, face
-      //                      face_orientation,
-      //                      face_flip,
-      //                      face_rotation)
-      // But this will give us an index on a cell - something we cannot work
-      // with directly. But luckily we can match them back :-]
+          std::map<unsigned int, unsigned int> cell_to_rotated_face_index;
 
-      std::map<unsigned int, unsigned int> cell_to_rotated_face_index;
-
-      // Build up a cell to face index for face_2:
-      for (unsigned int i = 0; i < dofs_per_face; ++i)
-        {
-          const unsigned int cell_index =
-            fe.face_to_cell_index(i,
-                                  0, /* It doesn't really matter, just assume
-                                      * we're on the first face...
-                                      */
-                                  true, false, false // default orientation
-                                 );
-          cell_to_rotated_face_index[cell_index] = i;
-        }
-
-      for (unsigned int i = 0; i < dofs_per_face; ++i)
-        {
-          // Query the correct face_index on face_2 respecting the given
-          // orientation:
-          const unsigned int j =
-            cell_to_rotated_face_index[fe.face_to_cell_index(i,
-                                                             0, /* It doesn't really matter, just assume
-                                                                 * we're on the first face...
-                                                                 */
-                                                             face_orientation,
-                                                             face_flip,
-                                                             face_rotation)];
-
-          // And finally constrain the two DoFs respecting component_mask:
-          if (component_mask.n_selected_components(fe.n_components()) == fe.n_components()
-              || component_mask[fe.face_system_to_component_index(i).first])
+          // Build up a cell to face index for face_2:
+          for (unsigned int i = 0; i < dofs_per_face; ++i)
             {
-              if (!constraint_matrix.is_constrained(dofs_1[i]))
+              const unsigned int cell_index = fe.face_to_cell_index(i, 0, /* It doesn't really matter, just assume
+               * we're on the first face...
+               */
+                  true, false, false // default orientation
+              );
+              cell_to_rotated_face_index[cell_index] = i;
+            }
+
+          for (unsigned int i = 0; i < dofs_per_face; ++i)
+            {
+              // Query the correct face_index on face_2 respecting the given
+              // orientation:
+              const unsigned int j =
+                  cell_to_rotated_face_index[fe.face_to_cell_index(i, 0, /* It doesn't really matter, just assume
+                   * we're on the first face...
+                   */
+                      face_orientation, face_flip, face_rotation)];
+
+              // And finally constrain the two DoFs respecting component_mask:
+              if (component_mask.n_selected_components(fe.n_components())
+                  == fe.n_components()
+                  || component_mask[fe.face_system_to_component_index(i).first])
                 {
-                  constraint_matrix.add_line(dofs_1[i]);
-                  constraint_matrix.add_entry(dofs_1[i], dofs_2[j], 1.0);
+                  if (!constraint_matrix.is_constrained(dofs_1[i]))
+                    {
+                      constraint_matrix.add_line(dofs_1[i]);
+                      constraint_matrix.add_entry(dofs_1[i], dofs_2[j],
+                          1.0);
+                    }
                 }
             }
         }
@@ -2999,11 +3017,18 @@ namespace DoFTools
     else
       // otherwise at least one of the two faces is active and
       // we need to enter the constraints
-      set_periodicity_constraints(face_1, face_2,
-				  FullMatrix<double>(IdentityMatrix(face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face)),
-				  constraint_matrix,
-				  component_mask,
-                                  face_orientation, face_flip, face_rotation);
+      if (face_1->has_children())
+        set_periodicity_constraints(face_2, face_1,
+                                    FullMatrix<double>(IdentityMatrix(face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face)),
+				    constraint_matrix,
+				    component_mask,
+                                    face_orientation, face_flip, face_rotation);
+      else
+        set_periodicity_constraints(face_1, face_2,
+                                    FullMatrix<double>(IdentityMatrix(face_1->get_fe(face_1->nth_active_fe_index(0)).dofs_per_face)),
+                                    constraint_matrix,
+                                    component_mask,
+                                    face_orientation, face_flip, face_rotation);
   }
 
 
