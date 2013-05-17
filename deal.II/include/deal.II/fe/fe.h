@@ -904,7 +904,7 @@ public:
   bool restriction_is_additive (const unsigned int index) const;
 
   /**
-   * Return a readonly reference to
+   * Return a read only reference to
    * the matrix which describes the
    * constraints at the interface
    * between a refined and an
@@ -927,7 +927,7 @@ public:
    * use the
    * constraints_are_implemented()
    * function to check up front
-   * whethehr this function will
+   * whether this function will
    * succeed or generate the
    * exception.
    */
