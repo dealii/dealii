@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2011 by the deal.II authors
+//    Copyright (C) 2011, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/fe/fe_poly.h>
 
 #include <deal.II/matrix_free/shape_info.h>
