@@ -2813,8 +2813,7 @@ namespace DoFTools
       static const int dim      = FaceIterator::AccessorType::dimension;
       static const int spacedim = FaceIterator::AccessorType::space_dimension;
 
-      // we should be in the case were both faces are active
-      // and have no children:
+      // we should be in the case where face_1 is active, i.e. has no children:
       Assert (!face_1->has_children(),
               ExcInternalError());
 
@@ -2890,8 +2889,8 @@ namespace DoFTools
           for (unsigned int i = 0; i < dofs_per_face; ++i)
             {
               const unsigned int cell_index = fe.face_to_cell_index(i, 0, /* It doesn't really matter, just assume
-               * we're on the first face...
-               */
+                                                                           * we're on the first face...
+                                                                           */
                                                                     true, false, false // default orientation
                                                                    );
               cell_to_rotated_face_index[cell_index] = i;
