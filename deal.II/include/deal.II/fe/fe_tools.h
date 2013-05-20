@@ -21,6 +21,8 @@
 #include <deal.II/base/symmetric_tensor.h>
 
 #include <vector>
+#include <string>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -35,19 +37,8 @@ namespace hp
 }
 template <int dim> class FiniteElementData;
 class ConstraintMatrix;
-namespace PETScWrappers
-{
-  namespace MPI
-  {
-    class Vector;
-  }
-}
 
 
-#include <deal.II/base/config.h>
-#include <deal.II/base/exceptions.h>
-#include <vector>
-#include <string>
 
 /*!@addtogroup feall */
 /*@{*/
