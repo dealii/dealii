@@ -128,6 +128,13 @@ this function.
 
 <ol>
 
+<li> Improved: DoFTools::make_periodicity_constraints now also works
+for meshes where the refinement level of the two sides of the domain
+is not the same, i.e., one side is more refined than the other.
+<br>
+(Wolfgang Bangerth, 2013/05/20)
+</li>
+
 <li> Improved: Through the fields DataOutBase::VtkFlags::time and
 DataOutBase::VtkFlags::cycle, it is now possible to encode the time and/or
 cycle within a nonlinear or other iteration in VTK and VTU files written

@@ -1,4 +1,4 @@
-//----------------------------  periodicity_01.cc  ---------------------------
+//----------------------------  periodicity_03.cc  ---------------------------
 //    $Id$
 //    Version: $Name$ 
 //
@@ -9,13 +9,14 @@
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//----------------------------  periodicity_01.cc  ---------------------------
+//----------------------------  periodicity_03.cc  ---------------------------
 
 
 // check periodic boundary conditions for a simple enough case where we know
 // the exact set of constraints
 //
-// this test simply uses two hypercubes and matches the faces at the far ends
+// this test simply uses two hypercubes, refines one of them twice and matches
+// the faces at the far ends. this requires recursing into children
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -36,7 +37,9 @@
 template <int dim>
 void test () 
 {
-  // create a 2x1 (or 2x1x1) mesh
+  deallog << dim << "D" << std::endl;
+  
+  // create a 2x1 (or 2x1x1) mesh and refine the leftmost cell twice
   Triangulation<dim> triangulation;
   std::vector<unsigned int> repetitions (dim, 1);
   repetitions[0] = 2;
@@ -46,6 +49,10 @@ void test ()
 					     (dim == 2 ?
 					      Point<dim>(2,1) :
 					      Point<dim>(2,1,1)));
+  triangulation.begin_active()->set_refine_flag ();
+  triangulation.execute_coarsening_and_refinement ();
+  triangulation.begin_active(1)->set_refine_flag ();
+  triangulation.execute_coarsening_and_refinement ();
   
   FE_Q<dim>          fe(1);
   DoFHandler<dim>    dof_handler (triangulation);
@@ -62,7 +69,7 @@ void test ()
 
 int main () 
 {
-  std::ofstream logfile("periodicity_01/output");
+  std::ofstream logfile("periodicity_03/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
