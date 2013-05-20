@@ -1707,6 +1707,8 @@ void
 ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
 {
   Assert (sorted==true, ExcMatrixIsClosed());
+  Assert (vec.has_ghost_elements() == false,
+          ExcMessage ("This operation can only be performed on vectors without ghost elements."));
 
   typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
   ConstraintLine index_comparison;
