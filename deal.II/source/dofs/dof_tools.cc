@@ -2899,7 +2899,10 @@ namespace DoFTools
           // loop over all dofs on face 2 and constrain them again the ones on face 1
           for (unsigned int i=0; i<dofs_per_face; ++i)
             if (!constraint_matrix.is_constrained(dofs_2[i]))
-              if (component_mask[fe.face_system_to_component_index(i).first])
+              if ((component_mask.n_selected_components(fe.n_components())
+		   == fe.n_components())
+		  ||
+		  component_mask[fe.face_system_to_component_index(i).first])
                 {
                   constraint_matrix.add_line(dofs_2[i]);
                   for (unsigned int jj=0; jj<dofs_per_face; ++jj)
