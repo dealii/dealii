@@ -167,7 +167,7 @@ via DataOutBase::write_vtk and DataOutBase::write_vtu.
 MatrixTools::create_laplace_matrix take now an optional ConstraintMatrix
 argument that allows to directly apply the constraints. This also helps
 VectorTools::project. Note that not providing constraints remains the default
-and recommended way to ensure consistency when several matrices are added.
+and recommended way to ensure consistency when several matrices are combined.
 <br>
 (Martin Kronbichler, 2013/05/08)
 </li>
@@ -187,8 +187,8 @@ parallel in shared memory.
 </li>
 
 <li> New: The class ChunkSparseMatrix and the associated
-ChunkSparsityPattern now offer iterator classes to iterate over rows or the
-whole matrix in an STL-like way.
+ChunkSparsityPattern now offer iterator classes to iterate over rows of the
+matrix in an STL-like way.
 <br>
 (Martin Kronbichler, 2013/05/07)
 </li>
@@ -204,8 +204,8 @@ is now fixed.
 iterations of the modified Gram&ndash;Schmidt algorithm for
 orthogonalization. In many situations one iteration is enough. The algorithm
 can now detect loss of orthogonality and enables re-orthogonalization only if
-necessary. The second iteration can be forced by the flag
-SolverGMRES::AdditionalData::force_re_orthogonalization, though.
+necessary. The second iteration (and, hence, old behavior) can be forced by
+the flag SolverGMRES::AdditionalData::force_re_orthogonalization.
 <br>
 (Martin Kronbichler, 2013/05/06)
 </li>
@@ -216,7 +216,7 @@ vector types, not just dealii::Vector and dealii::BlockVector.
 (Wolfgang Bangerth, 2013/05/06)
 </li>
 
-<li> Fixed: Generate an error if the users tries to refine a cell
+<li> Fixed: Generate an error if the user tries to refine a cell
 that is already on the maximum level in a distributed triangulation.
 <br>
 (Timo Heister, 2013/05/01)
