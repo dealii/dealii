@@ -128,6 +128,18 @@ this function.
 
 <ol>
 
+<li> Fixed: The method parallel::distributed::Vector::compress
+(VectorOperation::insert) previously set the elements of ghost elements
+unconditionally on the owning processor, even if they had not been touched.
+This led to a problem in certain library functions where vector entries became
+zero in a spurious way. This is now fixed by discarding the elements in ghost
+entries for the VectorOperation::insert operation. This is legitimate since we
+assume consistency of set elements across processors, so the owning processor
+sets the element already.
+<br>
+(Martin Kronbichler, 2013/05/21)
+</li>
+
 <li> Improved: DoFTools::make_periodicity_constraints now also works
 for meshes where the refinement level of the two sides of the domain
 is not the same, i.e., one side is more refined than the other.

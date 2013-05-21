@@ -67,30 +67,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace VectorTools
 {
-  namespace
-  {
-    template <typename VEC>
-    void perform_compress_insert (VEC &vec)
-    {
-      vec.compress(::dealii::VectorOperation::insert);
-    }
-
-    template <typename Number>
-    void perform_compress_insert (::dealii::parallel::distributed::Vector<Number> &vec)
-    {
-      // should not do compress when inserting
-      // elements as the ghosts are fixed and some
-      // will not be set at all. Instead, zero the
-      // ghost data afterwards to get consistent
-      // data. Otherwise, at least with the layout
-      // in r27671 the tests/mpi/step-48/ncpu_10
-      // will signal incorrect results because of
-      // incorrect interpolation.
-      vec.zero_out_ghosts();
-    }
-
-  }
-
 
   template <class VECTOR, class DH>
   void interpolate (const Mapping<DH::dimension,DH::space_dimension>    &mapping,
@@ -284,7 +260,7 @@ namespace VectorTools
                   = function_values_scalar[fe_index][dof_to_rep_index_table[fe_index][i]];
             }
         }
-    perform_compress_insert(vec);
+    vec.compress(VectorOperation::insert);
   }
 
 

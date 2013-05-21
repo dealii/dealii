@@ -1,17 +1,19 @@
-//--------------------------  parallel_vector_05.cc  -----------------------
+//--------------------------  parallel_vector_13.cc  -----------------------
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2011 by the deal.II authors
+//    Copyright (C) 2011, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
 //    to the file deal.II/doc/license.html for the  text  and
 //    further information on this license.
 //
-//--------------------------  parallel_vector_05.cc  -----------------------
+//--------------------------  parallel_vector_13.cc  -----------------------
 
-// check that compress(add) with zero add does not change the vector entry
+// check for ghosts on parallel vector: similar to parallel_vector_03, but
+// setting where one ghost is zero and should not have an effect on vector
+// entries
 
 #include "../tests.h"
 #include <deal.II/base/utilities.h>
@@ -37,6 +39,7 @@ void test ()
   IndexSet local_relevant(numproc*2);
   local_relevant = local_owned;
   local_relevant.add_range(1,2);
+  local_relevant.add_range(4,5);
 
   parallel::distributed::Vector<double> v(local_owned, local_relevant, MPI_COMM_WORLD);
 
@@ -46,20 +49,30 @@ void test ()
 
   v.compress(VectorOperation::insert);
   v*=2.0;
+  v.add(1.0);
 
-  Assert(v(myid*2) == myid*4.0, ExcInternalError());
-  Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+  Assert(v(myid*2) == myid*4.0+1, ExcInternalError());
+  Assert(v(myid*2+1) == myid*4.0+3.0, ExcInternalError());
 
-                                // set ghost dof to zero on remote processors,
-                                // compress
-  if (myid > 0)
-    v(1) = 0;
+                                // set ghost dof on all processors, compress
+                                // (insert mode)
+  v(1) = 7;
+  v.compress(VectorOperation::insert);
 
-  v.compress(VectorOperation::add);
+  if (myid == 0)
+    {
+      deallog << myid*2 << ":" << v(myid*2) << std::endl;
+      deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
+    }
 
-                                // check that nothing has changed
-  Assert(v(myid*2) == myid*4.0, ExcInternalError());
-  Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+                                // import ghosts onto all procs
+  v.update_ghost_values();
+  Assert (v(1) == 7.0, ExcInternalError());
+
+                                // check l2 norm
+  const double l2_norm = v.l2_norm();
+  if (myid == 0)
+    deallog << "L2 norm: " << l2_norm << std::endl;
 
   if (myid == 0)
     deallog << "OK" << std::endl;
@@ -76,7 +89,7 @@ int main (int argc, char **argv)
 
   if (myid == 0)
     {
-      std::ofstream logfile(output_file_for_mpi("parallel_vector_05").c_str());
+      std::ofstream logfile(output_file_for_mpi("parallel_vector_13").c_str());
       deallog.attach(logfile);
       deallog << std::setprecision(4);
       deallog.depth_console(0);
