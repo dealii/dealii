@@ -33,6 +33,7 @@ namespace parallel
 {
   namespace distributed
   {
+    template <typename Number> class BlockVector;
 
     /*! @addtogroup Vectors
      *@{
@@ -309,7 +310,7 @@ namespace parallel
       void compress_finish (::dealii::VectorOperation::values operation);
 
       /**
-       * @deprecated: use compress(VectorOperation::values) instead.
+       * @deprecated: use compress_finish(VectorOperation::values) instead.
        */
       void compress_finish (const bool add_ghost_data = true) DEAL_II_DEPRECATED;
 
@@ -757,6 +758,53 @@ namespace parallel
 
     private:
       /**
+       * Local part of all_zero().
+       */
+      bool all_zero_local () const;
+
+      /**
+       * Local part of is_non_negative().
+       */
+      bool is_non_negative_local () const;
+
+      /**
+       * Local part of operator==.
+       */
+      template <typename Number2>
+      bool vectors_equal_local (const Vector<Number2> &v) const;
+
+      /**
+       * Local part of the inner product of two vectors.
+       */
+      template <typename Number2>
+      Number inner_product_local (const Vector<Number2> &V) const;
+
+      /**
+       * Local part of norm_sqr().
+       */
+      real_type norm_sqr_local () const;
+
+      /**
+       * Local part of mean_value().
+       */
+      Number mean_value_local () const;
+
+      /**
+       * Local part of l1_norm().
+       */
+      real_type l1_norm_local () const;
+
+      /**
+       * Local part of lp_norm().
+       */
+      real_type lp_norm_local (const real_type p) const;
+
+      /**
+       * Local part of linfty_norm().
+       */
+      real_type linfty_norm_local () const;
+
+      /**
        * Shared pointer to store the parallel partitioning information. This
        * information can be shared between several vectors that have the same
        * partitioning.
@@ -826,6 +874,11 @@ namespace parallel
        * Make all other vector types friends.
        */
       template <typename Number2> friend class Vector;
+
+      /**
+       * Make BlockVector type friends.
+       */
+      template <typename Number2> friend class BlockVector;
     };
 
     /*@}*/
@@ -1051,16 +1104,39 @@ namespace parallel
     template <typename Number>
     inline
     bool
+    Vector<Number>::all_zero_local () const
+    {
+      return partitioner->local_size()>0 ? vector_view.all_zero () : true;
+    }
+
+
+
+    template <typename Number>
+    inline
+    bool
     Vector<Number>::all_zero () const
     {
-      // use int instead of bool
-      int local_result = (partitioner->local_size()>0 ?
-                          -vector_view.all_zero () : -1);
+      // use int instead of bool. in order to make global reduction operations
+      // work also when MPI_Init was not called, only call MPI_Allreduce
+      // commands when there is more than one processor (note that reinit()
+      // functions handle this case correctly through the job_supports_mpi()
+      // query). this is the same in all the functions below
+      int local_result = -static_cast<int>(all_zero_local());
       if (partitioner->n_mpi_processes() > 1)
         return -Utilities::MPI::max(local_result,
                                     partitioner->get_communicator());
       else
-        return local_result;
+        return -local_result;
+    }
+
+
+
+    template <typename Number>
+    inline
+    bool
+    Vector<Number>::is_non_negative_local () const
+    {
+      return partitioner->local_size()>0 ? vector_view.is_non_negative () : true;
     }
 
 
@@ -1070,17 +1146,25 @@ namespace parallel
     bool
     Vector<Number>::is_non_negative () const
     {
-      // use int instead of bool. in order to make this operation work also
-      // when MPI_Init was not called, only call MPI_Allreduce commands when
-      // there is more than one processor (note that reinit() functions handle
-      // this case correctly through the job_supports_mpi() query)
-      int local_result = (partitioner->local_size()>0 ?
-                          -vector_view.is_non_negative () : -1);
+      int local_result = -static_cast<int>(is_non_negative_local());
       if (partitioner->n_mpi_processes() > 1)
-        return  -Utilities::MPI::max(local_result,
-                                     partitioner->get_communicator());
+        return -Utilities::MPI::max(local_result,
+                                    partitioner->get_communicator());
       else
-        return local_result;
+        return -local_result;
+    }
+
+
+
+    template <typename Number>
+    template <typename Number2>
+    inline
+    bool
+    Vector<Number>::vectors_equal_local (const Vector<Number2> &v) const
+    {
+      return partitioner->local_size()>0 ?
+        vector_view.template operator == <Number2>(v.vector_view)
+        : true;
     }
 
 
@@ -1091,14 +1175,9 @@ namespace parallel
     bool
     Vector<Number>::operator == (const Vector<Number2> &v) const
     {
-      AssertDimension (local_size(), v.local_size());
-
       // MPI does not support bools, so use unsigned int instead. Two vectors
       // are equal if the check for non-equal fails on all processors
-      unsigned int local_result = (partitioner->local_size()>0 ?
-                                   vector_view.template operator !=
-                                   <Number2>(v.vector_view)
-                                   : 0 );
+      unsigned int local_result = static_cast<int>(!vectors_equal_local(v));
       unsigned int result =
         partitioner->n_mpi_processes() > 1
         ?
@@ -1125,11 +1204,24 @@ namespace parallel
     template <typename Number2>
     inline
     Number
+    Vector<Number>::inner_product_local(const Vector<Number2> &V) const
+    {
+      // on some processors, the size might be zero, which is not allowed by
+      // the dealii::Vector class. Therefore, insert a check here
+      return (partitioner->local_size()>0 ?
+              vector_view.operator* (V.vector_view)
+              : Number());
+    }
+
+
+
+    template <typename Number>
+    template <typename Number2>
+    inline
+    Number
     Vector<Number>::operator * (const Vector<Number2> &V) const
     {
-      Number local_result = (partitioner->local_size()>0 ?
-                             vector_view.operator* (V.vector_view)
-                             : 0);
+      Number local_result = inner_product_local(V);
       if (partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum (local_result,
                                     partitioner->get_communicator());
@@ -1142,14 +1234,19 @@ namespace parallel
     template <typename Number>
     inline
     typename Vector<Number>::real_type
+    Vector<Number>::norm_sqr_local () const
+    {
+      return partitioner->local_size()>0 ? vector_view.norm_sqr() : real_type();
+    }
+
+
+
+    template <typename Number>
+    inline
+    typename Vector<Number>::real_type
     Vector<Number>::norm_sqr () const
     {
-      // on some processors, the size might be zero,
-      // which is not allowed by the base
-      // class. Therefore, insert a check here
-      real_type local_result = (partitioner->local_size()>0 ?
-                                vector_view.norm_sqr()
-                                : 0);
+      real_type local_result = norm_sqr_local();
       if (partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(local_result,
                                    partitioner->get_communicator());
@@ -1162,16 +1259,27 @@ namespace parallel
     template <typename Number>
     inline
     Number
+    Vector<Number>::mean_value_local () const
+    {
+      Assert (partitioner->size()!=0, ExcEmptyObject());
+      return (partitioner->local_size()>0 ?
+              vector_view.mean_value()
+              : Number());
+    }
+
+
+
+    template <typename Number>
+    inline
+    Number
     Vector<Number>::mean_value () const
     {
-      Number local_result =
-        (partitioner->local_size()>0 ?
-         vector_view.mean_value()
-         : 0)
-        *((real_type)partitioner->local_size()/(real_type)partitioner->size());
+      Number local_result = mean_value_local();
       if (partitioner->n_mpi_processes() > 1)
-        return Utilities::MPI::sum (local_result,
-                                    partitioner->get_communicator());
+        return Utilities::MPI::sum (local_result *
+                                    (real_type)partitioner->local_size(),
+                                    partitioner->get_communicator())
+          /(real_type)partitioner->size();
       else
         return local_result;
     }
@@ -1181,11 +1289,19 @@ namespace parallel
     template <typename Number>
     inline
     typename Vector<Number>::real_type
+    Vector<Number>::l1_norm_local () const
+    {
+      return partitioner->local_size()>0 ? vector_view.l1_norm() : real_type();
+    }
+
+
+
+    template <typename Number>
+    inline
+    typename Vector<Number>::real_type
     Vector<Number>::l1_norm () const
     {
-      real_type local_result = (partitioner->local_size()>0 ?
-                                vector_view.l1_norm()
-                                : 0);
+      real_type local_result = l1_norm_local();
       if (partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum(local_result,
                                    partitioner->get_communicator());
@@ -1208,11 +1324,19 @@ namespace parallel
     template <typename Number>
     inline
     typename Vector<Number>::real_type
+    Vector<Number>::lp_norm_local (const real_type p) const
+    {
+      return partitioner->local_size()>0 ? vector_view.lp_norm(p) : real_type();
+    }
+
+
+
+    template <typename Number>
+    inline
+    typename Vector<Number>::real_type
     Vector<Number>::lp_norm (const real_type p) const
     {
-      const real_type local_result = (partitioner->local_size()>0 ?
-                                      vector_view.lp_norm(p)
-                                      : 0);
+      const real_type local_result = lp_norm_local(p);
       if (partitioner->n_mpi_processes() > 1)
         return std::pow (Utilities::MPI::sum(std::pow(local_result,p),
                                              partitioner->get_communicator()),
@@ -1226,11 +1350,19 @@ namespace parallel
     template <typename Number>
     inline
     typename Vector<Number>::real_type
+    Vector<Number>::linfty_norm_local () const
+    {
+      return partitioner->local_size()>0 ? vector_view.linfty_norm() : real_type();
+    }
+
+
+
+    template <typename Number>
+    inline
+    typename Vector<Number>::real_type
     Vector<Number>::linfty_norm () const
     {
-      const real_type local_result = (partitioner->local_size()>0 ?
-                                      vector_view.linfty_norm()
-                                      : 0);
+      const real_type local_result = linfty_norm_local();
       if (partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::max (local_result,
                                     partitioner->get_communicator());

@@ -61,7 +61,6 @@ void test ()
 
   v1.update_ghost_values();
   FETools::interpolate(dof1, v1, dof2, v2);
-  v2.print(std::cout);
   for (unsigned int i=0; i<v2.local_size(); ++i)
     Assert(v2.local_element(i) == 1., ExcInternalError());
 

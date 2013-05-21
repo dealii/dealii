@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -17,6 +17,7 @@
 #include <deal.II/base/exceptions.h>
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/lac/block_vector_base.h>
+#include <deal.II/lac/parallel_vector.h>
 
 #include <cstdio>
 #include <vector>
@@ -24,9 +25,6 @@
 DEAL_II_NAMESPACE_OPEN
 
 
-// TODO: global reduction operations (operator *, {l1,l2,lp,linfty}norm, mean
-// value) should use one MPI communication with several Number values, not use
-// the parallel::distributed::Vector operation directly.
 
 namespace parallel
 {
@@ -56,20 +54,17 @@ namespace parallel
     {
     public:
       /**
-       * Typedef the base class for simpler
-       * access to its own typedefs.
+       * Typedef the base class for simpler access to its own typedefs.
        */
       typedef BlockVectorBase<Vector<Number> > BaseClass;
 
       /**
-       * Typedef the type of the underlying
-       * vector.
+       * Typedef the type of the underlying vector.
        */
       typedef typename BaseClass::BlockType  BlockType;
 
       /**
-       * Import the typedefs from the base
-       * class.
+       * Import the typedefs from the base class.
        */
       typedef typename BaseClass::value_type      value_type;
       typedef typename BaseClass::real_type       real_type;
@@ -82,55 +77,37 @@ namespace parallel
       typedef typename BaseClass::const_iterator  const_iterator;
 
       /**
-       *  Constructor. There are three
-       *  ways to use this
-       *  constructor. First, without
-       *  any arguments, it generates
-       *  an object with no
-       *  blocks. Given one argument,
-       *  it initializes <tt>num_blocks</tt>
-       *  blocks, but these blocks have
-       *  size zero. The third variant
-       *  finally initializes all
-       *  blocks to the same size
-       *  <tt>block_size</tt>.
+       *  Constructor. There are three ways to use this constructor. First,
+       *  without any arguments, it generates an object with no blocks. Given
+       *  one argument, it initializes <tt>num_blocks</tt> blocks, but these
+       *  blocks have size zero. The third variant finally initializes all
+       *  blocks to the same size <tt>block_size</tt>.
        *
-       *  Confer the other constructor
-       *  further down if you intend to
-       *  use blocks of different
-       *  sizes.
+       *  Confer the other constructor further down if you intend to use
+       *  blocks of different sizes.
        */
       explicit BlockVector (const unsigned int num_blocks = 0,
                             const unsigned int block_size = 0);
 
       /**
-       * Copy-Constructor. Dimension set to
-       * that of V, all components are copied
-       * from V
+       * Copy-Constructor. Dimension set to that of V, all components are
+       * copied from V
        */
       BlockVector (const BlockVector<Number> &V);
 
 
 #ifndef DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
       /**
-       * Copy constructor taking a BlockVector of
-       * another data type. This will fail if
-       * there is no conversion path from
-       * <tt>OtherNumber</tt> to <tt>Number</tt>. Note that
-       * you may lose accuracy when copying
-       * to a BlockVector with data elements with
-       * less accuracy.
+       * Copy constructor taking a BlockVector of another data type. This will
+       * fail if there is no conversion path from <tt>OtherNumber</tt> to
+       * <tt>Number</tt>. Note that you may lose accuracy when copying to a
+       * BlockVector with data elements with less accuracy.
        *
-       * Older versions of gcc did not honor
-       * the @p explicit keyword on template
-       * constructors. In such cases, it is
-       * easy to accidentally write code that
-       * can be very inefficient, since the
-       * compiler starts performing hidden
-       * conversions. To avoid this, this
-       * function is disabled if we have
-       * detected a broken compiler during
-       * configuration.
+       * Older versions of gcc did not honor the @p explicit keyword on
+       * template constructors. In such cases, it is easy to accidentally
+       * write code that can be very inefficient, since the compiler starts
+       * performing hidden conversions. To avoid this, this function is
+       * disabled if we have detected a broken compiler during configuration.
        */
       template <typename OtherNumber>
       explicit
@@ -138,38 +115,31 @@ namespace parallel
 #endif
 
       /**
-       * Constructor. Set the number of
-       * blocks to
-       * <tt>block_sizes.size()</tt> and
-       * initialize each block with
-       * <tt>block_sizes[i]</tt> zero
-       * elements.
+       * Constructor. Set the number of blocks to <tt>block_sizes.size()</tt>
+       * and initialize each block with <tt>block_sizes[i]</tt> zero elements.
        */
       BlockVector (const std::vector<unsigned int> &block_sizes);
 
       /**
-       * Destructor. Clears memory
+       * Destructor. Clears memory.
        */
       ~BlockVector ();
 
       /**
-       * Copy operator: fill all components of
-       * the vector with the given scalar
-       * value.
+       * Copy operator: fill all components of the vector with the given
+       * scalar value.
        */
       BlockVector &operator = (const value_type s);
 
       /**
-       * Copy operator for arguments of the
-       * same type. Resize the
-       * present vector if necessary.
+       * Copy operator for arguments of the same type. Resize the present
+       * vector if necessary.
        */
       BlockVector &
       operator= (const BlockVector &V);
 
       /**
-       * Copy operator for template arguments
-       * of different types. Resize the
+       * Copy operator for template arguments of different types. Resize the
        * present vector if necessary.
        */
       template <class Number2>
@@ -177,152 +147,173 @@ namespace parallel
       operator= (const BlockVector<Number2> &V);
 
       /**
-       * Copy a regular vector into a
-       * block vector.
+       * Copy a regular vector into a block vector.
        */
       BlockVector &
       operator= (const Vector<Number> &V);
 
       /**
-       * Reinitialize the BlockVector to
-       * contain <tt>num_blocks</tt> blocks of
+       * Reinitialize the BlockVector to contain <tt>num_blocks</tt> blocks of
        * size <tt>block_size</tt> each.
        *
-       * If the second argument is left
-       * at its default value, then the
-       * block vector allocates the
-       * specified number of blocks but
-       * leaves them at zero size. You
-       * then need to later
-       * reinitialize the individual
-       * blocks, and call
-       * collect_sizes() to update the
-       * block system's knowledge of
+       * If the second argument is left at its default value, then the block
+       * vector allocates the specified number of blocks but leaves them at
+       * zero size. You then need to later reinitialize the individual blocks,
+       * and call collect_sizes() to update the block system's knowledge of
        * its individual block's sizes.
        *
-       * If <tt>fast==false</tt>, the vector
-       * is filled with zeros.
+       * If <tt>fast==false</tt>, the vector is filled with zeros.
        */
       void reinit (const unsigned int num_blocks,
                    const unsigned int block_size = 0,
                    const bool fast = false);
 
       /**
-       * Reinitialize the BlockVector such that
-       * it contains
-       * <tt>block_sizes.size()</tt>
-       * blocks. Each block is reinitialized to
+       * Reinitialize the BlockVector such that it contains
+       * <tt>block_sizes.size()</tt> blocks. Each block is reinitialized to
        * dimension <tt>block_sizes[i]</tt>.
        *
-       * If the number of blocks is the
-       * same as before this function
-       * was called, all vectors remain
-       * the same and reinit() is
-       * called for each vector.
+       * If the number of blocks is the same as before this function was
+       * called, all vectors remain the same and reinit() is called for each
+       * vector.
        *
-       * If <tt>fast==false</tt>, the vector
-       * is filled with zeros.
+       * If <tt>fast==false</tt>, the vector is filled with zeros.
        *
-       * Note that you must call this
-       * (or the other reinit()
-       * functions) function, rather
-       * than calling the reinit()
-       * functions of an individual
-       * block, to allow the block
-       * vector to update its caches of
-       * vector sizes. If you call
-       * reinit() on one of the
-       * blocks, then subsequent
-       * actions on this object may
-       * yield unpredictable results
-       * since they may be routed to
-       * the wrong block.
+       * Note that you must call this (or the other reinit() functions)
+       * function, rather than calling the reinit() functions of an individual
+       * block, to allow the block vector to update its caches of vector
+       * sizes. If you call reinit() on one of the blocks, then subsequent
+       * actions on this object may yield unpredictable results since they may
+       * be routed to the wrong block.
        */
       void reinit (const std::vector<unsigned int> &N,
                    const bool                       fast=false);
 
       /**
-       * Change the dimension to that
-       * of the vector <tt>V</tt>. The same
-       * applies as for the other
-       * reinit() function.
+       * Change the dimension to that of the vector <tt>V</tt>. The same
+       * applies as for the other reinit() function.
        *
-       * The elements of <tt>V</tt> are not
-       * copied, i.e.  this function is
-       * the same as calling <tt>reinit
-       * (V.size(), fast)</tt>.
+       * The elements of <tt>V</tt> are not copied, i.e.  this function is the
+       * same as calling <tt>reinit (V.size(), fast)</tt>.
        *
-       * Note that you must call this
-       * (or the other reinit()
-       * functions) function, rather
-       * than calling the reinit()
-       * functions of an individual
-       * block, to allow the block
-       * vector to update its caches of
-       * vector sizes. If you call
-       * reinit() of one of the
-       * blocks, then subsequent
-       * actions of this object may
-       * yield unpredictable results
-       * since they may be routed to
-       * the wrong block.
+       * Note that you must call this (or the other reinit() functions)
+       * function, rather than calling the reinit() functions of an individual
+       * block, to allow the block vector to update its caches of vector
+       * sizes. If you call reinit() of one of the blocks, then subsequent
+       * actions of this object may yield unpredictable results since they may
+       * be routed to the wrong block.
        */
       template <typename Number2>
       void reinit (const BlockVector<Number2> &V,
                    const bool                 fast=false);
 
       /**
-       * Scale each element of the
-       * vector by the given factor.
+       * Return whether the vector contains only elements with value
+       * zero. This function is mainly for internal consistency checks and
+       * should seldom be used when not in debug mode since it uses quite some
+       * time.
+       */
+      bool all_zero () const;
+
+      /**
+       * Return @p true if the vector has no negative entries, i.e. all
+       * entries are zero or positive. This function is used, for example, to
+       * check whether refinement indicators are really all positive (or
+       * zero).
        *
-       * This function is deprecated
-       * and will be removed in a
-       * future version. Use
-       * <tt>operator *=</tt> and
-       * <tt>operator /=</tt> instead.
+       * The function obviously only makes sense if the template argument of
+       * this class is a real type. If it is a complex type, then an exception
+       * is thrown.
+       */
+      bool is_non_negative () const;
+
+      /**
+       * Checks for equality of the two vectors.
+       */
+      template <typename Number2>
+      bool operator == (const BlockVector<Number2> &v) const;
+
+      /**
+       * Checks for inequality of the two vectors.
+       */
+      template <typename Number2>
+      bool operator != (const BlockVector<Number2> &v) const;
+
+      /**
+       * Perform the inner product of two vectors.
+       */
+      template <typename Number2>
+      Number operator * (const BlockVector<Number2> &V) const;
+
+      /**
+       * Computes the square of the l<sub>2</sub> norm of the vector (i.e.,
+       * the sum of the squares of all entries among all processors).
+       */
+      real_type norm_sqr () const;
+
+      /**
+       * Computes the mean value of all the entries in the vector.
+       */
+      Number mean_value () const;
+
+      /**
+       * Returns the l<sub>1</sub> norm of the vector (i.e., the sum of the
+       * absolute values of all entries among all processors).
+       */
+      real_type l1_norm () const;
+
+      /**
+       * Returns the l<sub>2</sub> norm of the vector (i.e., square root of
+       * the sum of the square of all entries among all processors).
+       */
+      real_type l2_norm () const;
+
+      /**
+       * Returns the l<sub>p</sub> norm with real @p p of the vector (i.e.,
+       * the pth root of sum of the pth power of all entries among all
+       * processors).
+       */
+      real_type lp_norm (const real_type p) const;
+
+      /**
+       * Returns the maximum norm of the vector (i.e., maximum absolute value
+       * among all entries among all processors).
+       */
+      real_type linfty_norm () const;
+
+      /**
+       * Scale each element of the vector by the given factor.
        *
-       * @deprecated Use <tt>operator*=</tt>
-       * instead.
+       * This function is deprecated and will be removed in a future
+       * version. Use <tt>operator *=</tt> and <tt>operator /=</tt> instead.
+       *
+       * @deprecated Use <tt>operator*=</tt> instead.
        */
       void scale (const value_type factor) DEAL_II_DEPRECATED;
 
       /**
-       * Multiply each element of this
-       * vector by the corresponding
-       * element of <tt>v</tt>.
+       * Multiply each element of this vector by the corresponding element of
+       * <tt>v</tt>.
        */
       template <class BlockVector2>
       void scale (const BlockVector2 &v);
 
       /**
-       * Swap the contents of this
-       * vector and the other vector
-       * <tt>v</tt>. One could do this
-       * operation with a temporary
-       * variable and copying over the
-       * data elements, but this
-       * function is significantly more
-       * efficient since it only swaps
-       * the pointers to the data of
-       * the two vectors and therefore
-       * does not need to allocate
-       * temporary storage and move
-       * data around.
+       * Swap the contents of this vector and the other vector <tt>v</tt>. One
+       * could do this operation with a temporary variable and copying over
+       * the data elements, but this function is significantly more efficient
+       * since it only swaps the pointers to the data of the two vectors and
+       * therefore does not need to allocate temporary storage and move data
+       * around.
        *
-       * Limitation: right now this
-       * function only works if both
-       * vectors have the same number
-       * of blocks. If needed, the
-       * numbers of blocks should be
+       * Limitation: right now this function only works if both vectors have
+       * the same number of blocks. If needed, the numbers of blocks should be
        * exchanged, too.
        *
-       * This function is analog to the
-       * the swap() function of all C++
-       * standard containers. Also,
-       * there is a global function
-       * swap(u,v) that simply calls
-       * <tt>u.swap(v)</tt>, again in analogy
-       * to standard functions.
+       * This function is analog to the the swap() function of all C++
+       * standard containers. Also, there is a global function swap(u,v) that
+       * simply calls <tt>u.swap(v)</tt>, again in analogy to standard
+       * functions.
        */
       void swap (BlockVector<Number> &v);
 
@@ -485,6 +476,221 @@ namespace parallel
       reinit (v, true);
       BaseClass::operator = (v);
       return *this;
+    }
+
+
+    template <typename Number>
+    inline
+    bool
+    BlockVector<Number>::all_zero () const
+    {
+      Assert (this->n_blocks() > 0, ExcEmptyObject());
+
+      // use int instead of bool. in order to make global reduction operations
+      // work also when MPI_Init was not called, only call MPI_Allreduce
+      // commands when there is more than one processor (note that reinit()
+      // functions handle this case correctly through the job_supports_mpi()
+      // query). this is the same in all the functions below
+      int local_result = -1;
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        local_result = std::max(local_result,
+                                -static_cast<int>(this->block(i).all_zero_local()));
+
+      if (this->block(0).partitioner->n_mpi_processes() > 1)
+        return -Utilities::MPI::max(local_result,
+                                    this->block(0).partitioner->get_communicator());
+      else
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    inline
+    bool
+    BlockVector<Number>::is_non_negative () const
+    {
+      Assert (this->n_blocks() > 0, ExcEmptyObject());
+      int local_result = -1;
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        local_result = std::max(local_result,
+                                -static_cast<int>(this->block(i).is_non_negative_local()));
+      if (this->block(0).partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::max(local_result,
+                                   this->block(0).partitioner->get_communicator());
+      else
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    template <typename Number2>
+    inline
+    bool
+    BlockVector<Number>::operator == (const BlockVector<Number2> &v) const
+    {
+      Assert (this->n_blocks() > 0, ExcEmptyObject());
+      AssertDimension (this->n_blocks(), v.n_blocks());
+
+      // MPI does not support bools, so use unsigned int instead. Two vectors
+      // are equal if the check for non-equal fails on all processors
+      unsigned int local_result = 0;
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        local_result = std::max(local_result,
+                                static_cast<unsigned int>(!this->block(i).vectors_equal_local(v.block(i))));
+      unsigned int result =
+        this->block(0).partitioner->n_mpi_processes() > 1
+        ?
+        Utilities::MPI::max(local_result, this->block(0).partitioner->get_communicator())
+        :
+        local_result;
+      return result==0;
+    }
+
+
+
+    template <typename Number>
+    template <typename Number2>
+    inline
+    bool
+    BlockVector<Number>::operator != (const BlockVector<Number2> &v) const
+    {
+      return !(operator == (v));
+    }
+
+
+
+    template <typename Number>
+    template <typename Number2>
+    inline
+    Number
+    BlockVector<Number>::operator * (const BlockVector<Number2> &v) const
+    {
+      Assert (this->n_blocks() > 0, ExcEmptyObject());
+      AssertDimension (this->n_blocks(), v.n_blocks());
+
+      Number local_result = Number();
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        local_result += this->block(i).inner_product_local(v.block(i));
+
+      if (this->block(0).partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum (local_result,
+                                    this->block(0).partitioner->get_communicator());
+      else
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    inline
+    typename BlockVector<Number>::real_type
+    BlockVector<Number>::norm_sqr () const
+    {
+      Assert (this->n_blocks() > 0, ExcEmptyObject());
+
+      real_type local_result = real_type();
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        local_result += this->block(i).norm_sqr_local();
+
+      if (this->block(0).partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum (local_result,
+                                    this->block(0).partitioner->get_communicator());
+      else
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    inline
+    Number
+    BlockVector<Number>::mean_value () const
+    {
+      Assert (this->n_blocks() > 0, ExcEmptyObject());
+
+      Number local_result = Number();
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        local_result += this->block(i).mean_value_local()*(real_type)this->block(i).partitioner->local_size();
+
+      if (this->block(0).partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum (local_result,
+                                    this->block(0).partitioner->get_communicator())/
+          (real_type)this->size();
+      else
+        return local_result/(real_type)this->size();
+    }
+
+
+
+    template <typename Number>
+    inline
+    typename BlockVector<Number>::real_type
+    BlockVector<Number>::l1_norm () const
+    {
+      Assert (this->n_blocks() > 0, ExcEmptyObject());
+
+      real_type local_result = real_type();
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        local_result += this->block(i).l1_norm_local();
+
+      if (this->block(0).partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::sum (local_result,
+                                    this->block(0).partitioner->get_communicator());
+      else
+        return local_result;
+    }
+
+
+
+    template <typename Number>
+    inline
+    typename BlockVector<Number>::real_type
+    BlockVector<Number>::l2_norm () const
+    {
+      return std::sqrt(norm_sqr());
+    }
+
+
+
+    template <typename Number>
+    inline
+    typename BlockVector<Number>::real_type
+    BlockVector<Number>::lp_norm (const real_type p) const
+    {
+      Assert (this->n_blocks() > 0, ExcEmptyObject());
+
+      real_type local_result = real_type();
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        local_result += std::pow(this->block(i).lp_norm_local(p), p);
+
+      if (this->block(0).partitioner->n_mpi_processes() > 1)
+        return std::pow (Utilities::MPI::sum(local_result,
+                                             this->block(0).partitioner->get_communicator()),
+                         static_cast<real_type>(1.0/p));
+      else
+        return std::pow (local_result, static_cast<real_type>(1.0/p));
+    }
+
+
+
+    template <typename Number>
+    inline
+    typename BlockVector<Number>::real_type
+    BlockVector<Number>::linfty_norm () const
+    {
+      Assert (this->n_blocks() > 0, ExcEmptyObject());
+
+      real_type local_result = real_type();
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        local_result = std::max(local_result, this->block(i).linfty_norm_local());
+
+      if (this->block(0).partitioner->n_mpi_processes() > 1)
+        return Utilities::MPI::max (local_result,
+                                    this->block(0).partitioner->get_communicator());
+      else
+        return local_result;
     }
 
 
