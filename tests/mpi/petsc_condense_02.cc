@@ -26,8 +26,11 @@
 //
 // compared to the _01 test, here the ConstraintMatrix object acts on an index
 // set that only includes the locally owned vector elements, without any
-// overlap. this verifies that we really only need to know about the *sources*
-// of constraints locally, not the *targets*.
+// overlap. this verifies that we really only need to know about the *targets*
+// of constraints locally, not the *sources*. (at the time of writing this
+// test, ConstraintMatrix::distribute for PETSc distributed vectors actively
+// imported the source vector elements for those target elements we locally
+// own.)
 
 
 #include "../tests.h"
@@ -63,12 +66,12 @@ void test()
   }
 
 
-  // create a ConstraintMatrix with a range that only includes locally active
+  // create a ConstraintMatrix with a range that only includes locally owned
   // DoFs
-  IndexSet locally_relevant_range (vec.size());
-  locally_relevant_range.add_range (100*myid,
+  IndexSet locally_owned_range (vec.size());
+  locally_owned_range.add_range (100*myid,
 				    100*myid+100);
-  ConstraintMatrix cm (locally_relevant_range);
+  ConstraintMatrix cm (locally_owned_range);
 
   // add constraints that constrain an element in the middle of the
   // local range of each processor against an element outside, both in
@@ -79,7 +82,7 @@ void test()
   // DoF inside the locally relevant range
   for (unsigned int p=0; p<n_processes; ++p)
     {
-      if ((p != 0) && locally_relevant_range.is_element (p*100+10))
+      if ((p != 0) && locally_owned_range.is_element (p*100+10))
 	{
 	  cm.add_line (p*100+10);
 	  cm.add_entry (p*100+10,
@@ -87,7 +90,7 @@ void test()
 			1);
 	}
 
-      if ((p != n_processes-1) && locally_relevant_range.is_element (p*100+90))
+      if ((p != n_processes-1) && locally_owned_range.is_element (p*100+90))
 	{
 	  cm.add_line (p*100+90);
 	  cm.add_entry (p*100+90,
