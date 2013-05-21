@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,7 +15,8 @@
 
 #include <deal.II/base/named_data.h>
 #include <deal.II/lac/block_indices.h>
-#include <deal.II/numerics/mesh_worker_info.h>
+#include <deal.II/lac/block_vector.h>
+#include <deal.II/mesh_worker/dof_info.h>
 
 DEAL_II_NAMESPACE_OPEN
 
