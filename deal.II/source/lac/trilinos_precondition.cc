@@ -566,6 +566,7 @@ namespace TrilinosWrappers
                        static_cast<int>(additional_data.smoother_overlap));
     parameter_list.set("aggregation: threshold",
                        additional_data.aggregation_threshold);
+    parameter_list.set("coarse: max size", 2000);
 
     if (additional_data.output_details)
       parameter_list.set("ML output", 10);
