@@ -109,7 +109,7 @@ void test()
     {
       if ((i != vec.local_range().first+10)
 	  &&
-	  (vec(vec.local_range().first+90)))
+	  (i != vec.local_range().first+90))
 	{
 	  double val = vec(i);
 	  Assert (std::fabs(val - i) <= 1e-6, ExcInternalError());
@@ -127,13 +127,10 @@ void test()
     for (unsigned int p=0; p<n_processes; ++p)
       {
 	if (p != 0)
-	  exact_l1 = exact_l1 - p*100+10 + p*100-25;
+	  exact_l1 = exact_l1 - (p*100+10) + (p*100-25);
 	if (p != n_processes-1)
-	  exact_l1 = exact_l1 - p*100+90 + p*100+105;
+	  exact_l1 = exact_l1 - (p*100+90) + (p*100+105);
       }
-
-    std::cout << "Processor = " << myid  << ' ' << exact_l1 << ' ' << vec.l1_norm() << std::endl;
-
 
     Assert (vec.l1_norm() == exact_l1, ExcInternalError());
 
