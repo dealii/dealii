@@ -2,7 +2,7 @@
 DEAL:2d::Cycle 0
 DEAL:2d::Number of degrees of freedom: 81
 DEAL:2d:cg::Starting value 0.132
-DEAL:2d:cg::Convergence step 5 value 0
+DEAL:2d:cg::Convergence step 4 value 0
 DEAL:2d::
 DEAL:2d::Cycle 1
 DEAL:2d::Number of degrees of freedom: 289
@@ -12,7 +12,7 @@ DEAL:2d::
 DEAL:2d::Cycle 2
 DEAL:2d::Number of degrees of freedom: 1089
 DEAL:2d:cg::Starting value 0.0343
-DEAL:2d:cg::Convergence step 6 value 0
+DEAL:2d:cg::Convergence step 5 value 0
 DEAL:2d::
 DEAL:3d::Cycle 0
 DEAL:3d::Number of degrees of freedom: 125
@@ -22,7 +22,7 @@ DEAL:3d::
 DEAL:3d::Cycle 1
 DEAL:3d::Number of degrees of freedom: 729
 DEAL:3d:cg::Starting value 0.0479
-DEAL:3d:cg::Convergence step 5 value 0
+DEAL:3d:cg::Convergence step 4 value 0
 DEAL:3d::
 DEAL:3d::Cycle 2
 DEAL:3d::Number of degrees of freedom: 4913
