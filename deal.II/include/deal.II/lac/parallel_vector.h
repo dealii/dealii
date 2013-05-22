@@ -62,20 +62,20 @@ namespace parallel
      *   access vector entries in the local index space with the function @p
      *   local_element(). Locally owned indices are placed first, [0,
      *   local_size()), and then all ghost indices follow after them
-     *   contiguously, [local_size(), local_size()+n_ghost_indices()).
+     *   contiguously, [local_size(), local_size()+n_ghost_entries()).
      *
      * Functions related to parallel functionality:
      * - The function <code>compress()</code> goes through the data associated
      *   with ghost indices and communicates it to the owner process, which can
      *   then add/set it to the correct position. This can be used e.g. after
      *   having run an assembly routine involving ghosts that fill this vector.
-     * - The <code>update_ghost_values()</code> function imports the data from the owning
-     *   processor to the ghost indices in order to provide read access to the
-     *   data associated with ghosts.
-     * - It is possible to split the above functions into two phases, where the first
-     *   initiates the communication and the second one finishes it. These
-     *   functions can be used to overlap communication with computations in
-     *   other parts of the code.
+     * - The <code>update_ghost_values()</code> function imports the data from
+     *   the owning processor to the ghost indices in order to provide read
+     *   access to the data associated with ghosts.
+     * - It is possible to split the above functions into two phases, where
+     *   the first initiates the communication and the second one finishes
+     *   it. These functions can be used to overlap communication with
+     *   computations in other parts of the code.
      * - Of course, reduction operations (like norms) make use of collective
      *   all-to-all MPI communications.
      *
