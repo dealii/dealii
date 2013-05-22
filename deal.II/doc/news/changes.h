@@ -128,6 +128,12 @@ this function.
 
 <ol>
 
+<li> Removed: The file <code>mesh_worker/vector_info.h</code> was unused and
+untested. It has thus been removed.
+<br>
+(Wolfgang Bangerth, Guido Kanschat, 2013/05/21)
+</li>
+
 <li> Fixed: The method parallel::distributed::Vector::compress
 (VectorOperation::insert) previously set the elements of ghost elements
 unconditionally on the owning processor, even if they had not been touched.
