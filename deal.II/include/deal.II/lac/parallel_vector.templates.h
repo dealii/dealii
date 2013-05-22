@@ -338,7 +338,7 @@ namespace parallel
                    j++, read_position++)
                 Assert(*read_position == 0. ||
                        std::abs(local_element(j) - *read_position) <
-                       local_element(j) * 100. *
+                       std::abs(local_element(j)) * 100. *
                        std::numeric_limits<Number>::epsilon(),
                        ExcMessage("Inserted elements do not match."));
           AssertDimension(read_position-import_data,part.n_import_indices());
