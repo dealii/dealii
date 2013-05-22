@@ -5584,9 +5584,9 @@ void DataOutBase::write_vtu_main (const std::vector<Patch<dim,spacedim> > &patch
 
 
 template <int dim, int spacedim>
-void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim>> &patches,
+void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
                              const std::vector<std::string> &data_names,
-                             const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string>> &vector_data_ranges,
+                             const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                              const SvgFlags &flags,
                              std::ostream &out)
 {
@@ -5606,7 +5606,7 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim>> &patches,
   double x_max, y_max, z_max;
   double x_dimension, y_dimension, z_dimension;
 
-  typename std::vector<Patch<dim,spacedim>>::const_iterator patch = patches.begin();
+  typename std::vector<Patch<dim,spacedim> >::const_iterator patch = patches.begin();
 
   unsigned int n_subdivisions = patch->n_subdivisions;
   unsigned int n = n_subdivisions + 1;
