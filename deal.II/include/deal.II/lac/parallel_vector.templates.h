@@ -357,7 +357,7 @@ namespace parallel
 
       zero_out_ghosts ();
 #else
-      (void)add_ghost_data;
+      (void)operation;
 #endif
     }
 
