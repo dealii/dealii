@@ -384,13 +384,17 @@ sense.
 (Guido Kanschat, 2013/03/21)
 </li>
 
-<li> Added GridOut::write_svg to allow for the output of two-dimensional
-triangulations in two space dimensions in the SVG format (Scalable Vector
-Graphics, an XML-based vector image format recommended by the World
-Wide Web Consortium W3C). This function also provides cell coloring
-and cell labeling for the visualization of basic cell properties.
+<li> Added GridOut::write_svg() to allow for the output of 
+two-dimensional triangulations in two space dimensions in the SVG 
+format (Scalable Vector Graphics, an generic XML-based vector image 
+format developed and maintained by the World Wide Web Consortium W3C). 
+This function also provides cell coloring and cell labeling for the 
+visualization of basic cell properties. Pespective view is further 
+possible and the cell level number may be converted into altitude, 
+revealing the inactive cells lying below. 
 <br>
 (Christian Wülker, 2013/03/21)
+</li>
 
 <li> Added TimerOutput::reset to remove the collected information so far and
 added a new frequency TimerOutput::never to only output information if
@@ -413,6 +417,16 @@ values, but can of course not be used in any useful way.
 This is now fixed.
 <br>
 (Timo Heister, 2013/03/01)
+</li>
+
+<li> Added DataOutBase::write_svg() to allow for the output of a given 
+list of patches in two space dimensions in the SVG format (Scalable Vector
+Graphics, an generic XML-based vector image format developed and maintained 
+by the World Wide Web Consortium W3C). An additional dimension (z-direction) 
+is employed for the visualization of data values taken from a data vector.
+This function also provides patch coloring for the visual enhancement.  
+<br>
+(Christian Wülker, 2013/05/10)
 </li>
 
 </ol>

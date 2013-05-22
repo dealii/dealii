@@ -1384,7 +1384,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   unsigned int cell_label_font_size;
 
   // font size for date, time, legend, and colorbar
-  unsigned int font_size = static_cast<unsigned int>(.5 + (height/100.) * 2.);
+  unsigned int font_size = static_cast<unsigned int>(.5 + (height/100.) * 1.75);
 
   // get date and time
   // time_t time_stamp;
@@ -1519,7 +1519,6 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
       break;
     }
 
-
   // set the camera position to top view, targeting at the origin
   camera_position[0] = 0;
   camera_position[1] = 0;
@@ -1535,9 +1534,9 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
   camera_focus = .5 * std::max(x_dimension, y_dimension);
 
-  float *camera_position_temp = new float[3];
-  float *camera_direction_temp = new float[3];
-  float *camera_horizontal_temp = new float[3];
+  Point<3> camera_position_temp;
+  Point<3> camera_direction_temp;
+  Point<3> camera_horizontal_temp;
 
   const float angle_factor = 3.14159265 / 180.;
 
@@ -1578,10 +1577,6 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
   camera_horizontal[0] = camera_horizontal_temp[0];
   camera_horizontal[1] = camera_horizontal_temp[1];
-
-  delete camera_position_temp;
-  delete camera_direction_temp;
-  delete camera_horizontal_temp;
 
   // translate the camera to the given triangulation
   camera_position[0] = x_min + .5 * x_dimension;
@@ -1672,7 +1667,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   x_dimension_perspective = x_max_perspective - x_min_perspective;
   y_dimension_perspective = y_max_perspective - y_min_perspective;
 
-  cell_label_font_size = static_cast<unsigned int>(.5 + (height/100.) * 2.25) * 9. * (min_level_min_vertex_distance / std::min(x_dimension, y_dimension));
+  cell_label_font_size = static_cast<unsigned int>(.5 + (height/100.) * 2.75) * 9. * (min_level_min_vertex_distance / std::min(x_dimension, y_dimension));
 
 
 // create the svg file with an internal style sheet
@@ -2766,7 +2761,7 @@ void GridOut::write_ucd_lines (const Triangulation<dim, spacedim> &tria,
 }
 
 
-Point<2> GridOut::svg_project_point(Point<3> point, Point<3> camera_position, Point<3> camera_direction, Point<3> camera_horizontal, float camera_focus) const
+Point<2> GridOut::svg_project_point(Point<3> point, Point<3> camera_position, Point<3> camera_direction, Point<3> camera_horizontal, float camera_focus)
 {
   // ...
   Point<3> camera_vertical;
