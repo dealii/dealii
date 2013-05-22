@@ -65,9 +65,18 @@ void test ()
       deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
     }
 
+  v(1) = -7;
+  v.compress(VectorOperation::insert);
+
+  if (myid == 0)
+    {
+      deallog << myid*2 << ":" << v(myid*2) << std::endl;
+      deallog << myid*2+1 << ":" << v(myid*2+1) << std::endl;
+    }
+
                                 // import ghosts onto all procs
   v.update_ghost_values();
-  Assert (v(1) == 7.0, ExcInternalError());
+  Assert (v(1) == -7.0, ExcInternalError());
 
                                 // check l2 norm
   const double l2_norm = v.l2_norm();
