@@ -730,6 +730,12 @@ namespace parallel
        */
       //@{
       /**
+       * Return a reference to the MPI communicator object in use with this
+       * vector.
+       */
+      const MPI_Comm &get_mpi_communicator () const;
+      
+      /**
        * Checks whether the given partitioner is compatible with the
        * partitioner used for this vector. Two partitioners are compatible if
        * the have the same local size and the same ghost indices. They do not
@@ -1928,6 +1934,16 @@ namespace parallel
       // for parallel implementation
       if (local_size()>0)
         vector_view.ratio (a.vector_view, b.vector_view);
+    }
+
+
+
+    template <typename Number>
+    inline
+    const MPI_Comm&
+    Vector<Number>::get_mpi_communicator() const
+    {
+      return partitioner->get_communicator();
     }
 
 
