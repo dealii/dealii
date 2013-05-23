@@ -128,6 +128,12 @@ this function.
 
 <ol>
 
+<li> Fixed: FETools::back_interpolate has been revised to work correctly
+also with parallel::distributed::Vector.
+<br>
+(Martin Steigemann, 2013/05/23)
+</li>
+
 <li> Removed: The file <code>mesh_worker/vector_info.h</code> was unused and
 untested. It has thus been removed.
 <br>
