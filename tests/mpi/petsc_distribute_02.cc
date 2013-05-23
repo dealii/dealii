@@ -26,11 +26,10 @@
 //
 // compared to the _01 test, here the ConstraintMatrix object acts on an index
 // set that only includes the locally owned vector elements, without any
-// overlap. this verifies that we really only need to know about the *targets*
-// of constraints locally, not the *sources*. (at the time of writing this
-// test, ConstraintMatrix::distribute for PETSc distributed vectors actively
-// imported the source vector elements for those target elements we locally
-// own.)
+// overlap. this means that the owners of a source DoF in a constraint
+// do not know about the constraint if the constrained DoF is owned by
+// another processor. This is not allowed, and should trigger an
+// exception.
 
 
 #include "../tests.h"
@@ -100,52 +99,22 @@ void test()
     }
   cm.close ();
 
-  // now distribute these constraints
-  cm.distribute (vec);
-
-  // verify correctness
-  vec.compress ();
-
-  if (myid != 0)
-    Assert (vec(vec.local_range().first+10) == vec.local_range().first-25,
-	    ExcInternalError());
-
-  if (myid != n_processes-1)
-    Assert (vec(vec.local_range().first+90) == vec.local_range().first+105,
-	    ExcInternalError());
-
-  for (unsigned int i=vec.local_range().first; i<vec.local_range().second; ++i)
+  // now distribute these constraints. this should trigger an exception
+  bool exception_caught = false;
+  deal_II_exceptions::disable_abort_on_exception();
+  try
     {
-      if ((i != vec.local_range().first+10)
-	  &&
-	  (i != vec.local_range().first+90))
-	{
-	  double val = vec(i);
-	  Assert (std::fabs(val - i) <= 1e-6, ExcInternalError());
-	}
+      cm.distribute (vec);
     }
+  catch (...)
+    {
+      exception_caught = true;
+    }
+  if (n_processes > 1)
+    Assert (exception_caught == true, ExcInternalError());
 
-  {
-    double exact_l1 = 0;
-
-    // add up original values of vector entries
-    for (unsigned int i=0; i<vec.size(); ++i)
-      exact_l1 += i;
-
-    // but then correct for the constrained values
-    for (unsigned int p=0; p<n_processes; ++p)
-      {
-	if (p != 0)
-	  exact_l1 = exact_l1 - (p*100+10) + (p*100-25);
-	if (p != n_processes-1)
-	  exact_l1 = exact_l1 - (p*100+90) + (p*100+105);
-      }
-
-    Assert (vec.l1_norm() == exact_l1, ExcInternalError());
-
-    if (myid == 0)
-      deallog << "Norm = " << vec.l1_norm() << std::endl;
-  }
+  if (myid == 0)
+    deallog << "OK" << std::endl;
 }
 
 
