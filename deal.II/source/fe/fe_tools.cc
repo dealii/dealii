@@ -1665,7 +1665,7 @@ namespace FETools
         DoFTools::extract_locally_relevant_dofs (dof2,
                                                  dof2_locally_relevant_dofs);
 
-        PETScWrappers::MPI::Vector  u2_out (&u1.get_mpi_communicator(),
+        PETScWrappers::MPI::Vector  u2_out (u1.get_mpi_communicator(),
                                             dof2_locally_owned_dofs);
         interpolate(dof1, u1, dof2, constraints2, u2_out);
         PETScWrappers::MPI::Vector  u2 (u1.get_mpi_communicator(),
