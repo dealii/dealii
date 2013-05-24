@@ -180,11 +180,9 @@ FiniteElement<dim,spacedim>::FiniteElement (
               ExcInternalError());
     };
 
-  // initialize some tables in the
-  // default way, i.e. if there is
-  // only one (vector-)component; if
-  // the element is not primitive,
-  // leave these tables empty.
+  // initialize some tables in the default way, i.e. if there is only one
+  // (vector-)component; if the element is not primitive, leave these tables
+  // empty.
   if (this->is_primitive())
     {
       system_to_component_table.resize(this->dofs_per_cell);
@@ -200,15 +198,11 @@ FiniteElement<dim,spacedim>::FiniteElement (
           face_system_to_base_table[j] = std::make_pair(std::make_pair(0U,0U),j);
         }
     }
-  // Fill with default value; may be
-  // changed by constructor of
-  // derived class.
+  // Fill with default value; may be changed by constructor of derived class.
   base_to_block_indices.reinit(1,1);
 
-  // initialize the restriction and
-  // prolongation matrices. the default
-  // contructur of FullMatrix<dim> initializes
-  // them with size zero
+  // initialize the restriction and prolongation matrices. the default
+  // contructur of FullMatrix<dim> initializes them with size zero
   prolongation.resize(RefinementCase<dim>::isotropic_refinement);
   restriction.resize(RefinementCase<dim>::isotropic_refinement);
   for (unsigned int ref=RefinementCase<dim>::cut_x;
@@ -337,11 +331,9 @@ FiniteElement<dim,spacedim>::get_restriction_matrix (const unsigned int child,
           ExcMessage("Restriction matrices are only available for refined cells!"));
   Assert (child<GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case)),
           ExcIndexRange(child,0,GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case))));
-  // we use refinement_case-1 here. the -1 takes care
-  // of the origin of the vector, as for
-  // RefinementCase<dim>::no_refinement (=0) there is no
-  // data available and so the vector indices
-  // are shifted
+  // we use refinement_case-1 here. the -1 takes care of the origin of the
+  // vector, as for RefinementCase<dim>::no_refinement (=0) there is no data
+  // available and so the vector indices are shifted
   Assert (restriction[refinement_case-1][child].n() == this->dofs_per_cell, ExcProjectionVoid());
   return restriction[refinement_case-1][child];
 }
@@ -614,6 +606,8 @@ FiniteElement<dim,spacedim>::prolongation_is_implemented () const
     for (unsigned int c=0;
          c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
       {
+        // make sure also the lazily initialized matrices are created
+        get_prolongation_matrix(c, RefinementCase<dim>(ref_case));
         Assert ((prolongation[ref_case-1][c].m() == this->dofs_per_cell) ||
                 (prolongation[ref_case-1][c].m() == 0),
                 ExcInternalError());
@@ -638,6 +632,8 @@ FiniteElement<dim,spacedim>::restriction_is_implemented () const
     for (unsigned int c=0;
          c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
       {
+        // make sure also the lazily initialized matrices are created
+        get_restriction_matrix(c, RefinementCase<dim>(ref_case));
         Assert ((restriction[ref_case-1][c].m() == this->dofs_per_cell) ||
                 (restriction[ref_case-1][c].m() == 0),
                 ExcInternalError());
@@ -662,6 +658,8 @@ FiniteElement<dim,spacedim>::isotropic_prolongation_is_implemented () const
   for (unsigned int c=0;
        c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
     {
+      // make sure also the lazily initialized matrices are created
+      get_prolongation_matrix(c, RefinementCase<dim>(ref_case));
       Assert ((prolongation[ref_case-1][c].m() == this->dofs_per_cell) ||
               (prolongation[ref_case-1][c].m() == 0),
               ExcInternalError());
@@ -686,6 +684,8 @@ FiniteElement<dim,spacedim>::isotropic_restriction_is_implemented () const
   for (unsigned int c=0;
        c<GeometryInfo<dim>::n_children(RefinementCase<dim>(ref_case)); ++c)
     {
+      // make sure also the lazily initialized matrices are created
+      get_restriction_matrix(c, RefinementCase<dim>(ref_case));
       Assert ((restriction[ref_case-1][c].m() == this->dofs_per_cell) ||
               (restriction[ref_case-1][c].m() == 0),
               ExcInternalError());

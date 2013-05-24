@@ -14,6 +14,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/fe/fe_poly.h>
+#include <deal.II/base/thread_management.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -94,6 +95,62 @@ public:
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
                                     const unsigned int face_index) const;
+
+  /**
+   * Projection from a fine grid space onto a coarse grid space. Overrides the
+   * respective method in FiniteElement, implementing lazy evaluation
+   * (initialize when requested).
+   *
+   * If this projection operator is associated with a matrix @p P, then the
+   * restriction of this matrix @p P_i to a single child cell is returned
+   * here.
+   *
+   * The matrix @p P is the concatenation or the sum of the cell matrices @p
+   * P_i, depending on the #restriction_is_additive_flags. This distinguishes
+   * interpolation (concatenation) and projection with respect to scalar
+   * products (summation).
+   *
+   * Row and column indices are related to coarse grid and fine grid spaces,
+   * respectively, consistent with the definition of the associated operator.
+   *
+   * If projection matrices are not implemented in the derived finite element
+   * class, this function aborts with ExcProjectionVoid. You can check whether
+   * this is the case by calling the restriction_is_implemented() or the
+   * isotropic_restriction_is_implemented() function.
+   */
+  virtual const FullMatrix<double> &
+  get_restriction_matrix (const unsigned int child,
+                          const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
+
+  /**
+   * Embedding matrix between grids. Overrides the respective method in
+   * FiniteElement, implementing lazy evaluation (initialize when queried).
+   *
+   * The identity operator from a coarse grid space into a fine grid space is
+   * associated with a matrix @p P. The restriction of this matrix @p P_i to a
+   * single child cell is returned here.
+   *
+   * The matrix @p P is the concatenation, not the sum of the cell matrices @p
+   * P_i. That is, if the same non-zero entry <tt>j,k</tt> exists in in two
+   * different child matrices @p P_i, the value should be the same in both
+   * matrices and it is copied into the matrix @p P only once.
+   *
+   * Row and column indices are related to fine grid and coarse grid spaces,
+   * respectively, consistent with the definition of the associated operator.
+   *
+   * These matrices are used by routines assembling the prolongation matrix
+   * for multi-level methods.  Upon assembling the transfer matrix between
+   * cells using this matrix array, zero elements in the prolongation matrix
+   * are discarded and will not fill up the transfer matrix.
+   *
+   * If projection matrices are not implemented in the derived finite element
+   * class, this function aborts with ExcEmbeddingVoid. You can check whether
+   * this is the case by calling the prolongation_is_implemented() or the
+   * isotropic_prolongation_is_implemented() function.
+   */
+  virtual const FullMatrix<double> &
+  get_prolongation_matrix (const unsigned int child,
+                           const RefinementCase<dim> &refinement_case=RefinementCase<dim>::isotropic_refinement) const;
 
   /**
    * @name Functions to support hp
@@ -183,16 +240,6 @@ protected:
   void initialize_constraints (const std::vector<Point<1> > &points);
 
   /**
-   * Initialize the embedding matrices. Called from initialize().
-   */
-  void initialize_embedding ();
-
-  /**
-   * Initialize the restriction matrices. Called from initialize().
-   */
-  void initialize_restriction ();
-
-  /**
   * Initialize the @p unit_support_points field of the FiniteElement
   * class. Called from initialize().
   */
@@ -222,6 +269,12 @@ protected:
    * Declare implementation friend.
    */
   friend struct FE_Q_Base<POLY,dim,spacedim>::Implementation;
+
+private:
+  /*
+   * Mutex for protecting initialization of restriction and embedding matrix.
+   */
+  mutable Threads::Mutex mutex;
 };
 
 
