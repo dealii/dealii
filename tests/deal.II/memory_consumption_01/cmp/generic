@@ -7,7 +7,7 @@ DEAL:cg::Starting value 0.261041
 DEAL:cg::Convergence step 13 value 0
 DEAL::Memory consumption -- Triangulation: 2778
 DEAL::Memory consumption -- DoFHandler:    976
-DEAL::Memory consumption -- FE:            1776
+DEAL::Memory consumption -- FE:            1488
 DEAL::Memory consumption -- Constraints:   78
 DEAL::Memory consumption -- Sparsity:      456
 DEAL::Memory consumption -- Matrix:        632
@@ -20,7 +20,7 @@ DEAL:cg::Starting value 0.235472
 DEAL:cg::Convergence step 16 value 0
 DEAL::Memory consumption -- Triangulation: 3618
 DEAL::Memory consumption -- DoFHandler:    1164
-DEAL::Memory consumption -- FE:            1776
+DEAL::Memory consumption -- FE:            1488
 DEAL::Memory consumption -- Constraints:   78
 DEAL::Memory consumption -- Sparsity:      576
 DEAL::Memory consumption -- Matrix:        824
@@ -33,7 +33,7 @@ DEAL:cg::Starting value 0.226008
 DEAL:cg::Convergence step 21 value 0
 DEAL::Memory consumption -- Triangulation: 4426
 DEAL::Memory consumption -- DoFHandler:    1356
-DEAL::Memory consumption -- FE:            1776
+DEAL::Memory consumption -- FE:            1488
 DEAL::Memory consumption -- Constraints:   78
 DEAL::Memory consumption -- Sparsity:      736
 DEAL::Memory consumption -- Matrix:        1080
@@ -46,7 +46,7 @@ DEAL:cg::Starting value 0.204506
 DEAL:cg::Convergence step 27 value 0
 DEAL::Memory consumption -- Triangulation: 5442
 DEAL::Memory consumption -- DoFHandler:    1584
-DEAL::Memory consumption -- FE:            1776
+DEAL::Memory consumption -- FE:            1488
 DEAL::Memory consumption -- Constraints:   78
 DEAL::Memory consumption -- Sparsity:      936
 DEAL::Memory consumption -- Matrix:        1400
@@ -61,7 +61,7 @@ DEAL:cg::Starting value 0.351647
 DEAL:cg::Convergence step 22 value 0
 DEAL::Memory consumption -- Triangulation: 4887
 DEAL::Memory consumption -- DoFHandler:    1936
-DEAL::Memory consumption -- FE:            14272
+DEAL::Memory consumption -- FE:            3904
 DEAL::Memory consumption -- Constraints:   78
 DEAL::Memory consumption -- Sparsity:      5736
 DEAL::Memory consumption -- Matrix:        10616
@@ -74,7 +74,7 @@ DEAL:cg::Starting value 0.271387
 DEAL:cg::Convergence step 30 value 0
 DEAL::Memory consumption -- Triangulation: 10047
 DEAL::Memory consumption -- DoFHandler:    3728
-DEAL::Memory consumption -- FE:            14272
+DEAL::Memory consumption -- FE:            3904
 DEAL::Memory consumption -- Constraints:   3102
 DEAL::Memory consumption -- Sparsity:      13992
 DEAL::Memory consumption -- Matrix:        26168
@@ -87,7 +87,7 @@ DEAL:cg::Starting value 0.203851
 DEAL:cg::Convergence step 51 value 0
 DEAL::Memory consumption -- Triangulation: 19591
 DEAL::Memory consumption -- DoFHandler:    7184
-DEAL::Memory consumption -- FE:            14272
+DEAL::Memory consumption -- FE:            3904
 DEAL::Memory consumption -- Constraints:   10734
 DEAL::Memory consumption -- Sparsity:      31240
 DEAL::Memory consumption -- Matrix:        58744
@@ -100,7 +100,7 @@ DEAL:cg::Starting value 0.151971
 DEAL:cg::Convergence step 71 value 0
 DEAL::Memory consumption -- Triangulation: 39319
 DEAL::Memory consumption -- DoFHandler:    14672
-DEAL::Memory consumption -- FE:            14272
+DEAL::Memory consumption -- FE:            3904
 DEAL::Memory consumption -- Constraints:   19966
 DEAL::Memory consumption -- Sparsity:      64168
 DEAL::Memory consumption -- Matrix:        120824
@@ -115,7 +115,7 @@ DEAL:cg::Starting value 0.206362
 DEAL:cg::Convergence step 29 value 0
 DEAL::Memory consumption -- Triangulation: 22643
 DEAL::Memory consumption -- DoFHandler:    9760
-DEAL::Memory consumption -- FE:            315544
+DEAL::Memory consumption -- FE:            12280
 DEAL::Memory consumption -- Constraints:   78
 DEAL::Memory consumption -- Sparsity:      120280
 DEAL::Memory consumption -- Matrix:        236280
@@ -128,7 +128,7 @@ DEAL:cg::Starting value 0.116541
 DEAL:cg::Convergence step 31 value 0
 DEAL::Memory consumption -- Triangulation: 88881
 DEAL::Memory consumption -- DoFHandler:    37996
-DEAL::Memory consumption -- FE:            315544
+DEAL::Memory consumption -- FE:            12280
 DEAL::Memory consumption -- Constraints:   55262
 DEAL::Memory consumption -- Sparsity:      567152
 DEAL::Memory consumption -- Matrix:        1116424
@@ -141,7 +141,7 @@ DEAL:cg::Starting value 0.0978429
 DEAL:cg::Convergence step 55 value 0
 DEAL::Memory consumption -- Triangulation: 355923
 DEAL::Memory consumption -- DoFHandler:    151280
-DEAL::Memory consumption -- FE:            315544
+DEAL::Memory consumption -- FE:            12280
 DEAL::Memory consumption -- Constraints:   367086
 DEAL::Memory consumption -- Sparsity:      2517208
 DEAL::Memory consumption -- Matrix:        4959288
@@ -154,7 +154,7 @@ DEAL:cg::Starting value 0.0425276
 DEAL:cg::Convergence step 82 value 0
 DEAL::Memory consumption -- Triangulation: 1252759
 DEAL::Memory consumption -- DoFHandler:    542008
-DEAL::Memory consumption -- FE:            315544
+DEAL::Memory consumption -- FE:            12280
 DEAL::Memory consumption -- Constraints:   1307806
 DEAL::Memory consumption -- Sparsity:      8321768
 DEAL::Memory consumption -- Matrix:        16383928
