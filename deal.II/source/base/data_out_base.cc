@@ -6021,7 +6021,7 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
           << "  </linearGradient>" << '\n';
 
       // draw current triangle
-      double x1,y1,x2,y2;
+      double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
       double x3 = cell->projected_center[0];
       double y3 = cell->projected_center[1];
    
