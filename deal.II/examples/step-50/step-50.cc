@@ -300,12 +300,21 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::setup_system ()
   {
-    std::ofstream out ("grid.svg");
+    std::string filename = "grid-"
+      + Utilities::int_to_string(triangulation.n_levels(), 2)
+      + "-"
+      + Utilities::int_to_string (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD), 3)
+      + ".svg";
+    
+    std::ofstream out (filename.c_str());
     GridOut grid_out;
+    GridOutFlags::Svg svg_flags;
+    svg_flags.polar_angle = 60;
+    svg_flags.label_level_subdomain_id = true;
+    svg_flags.convert_level_number_to_height = true;
+    grid_out.set_flags(svg_flags);
     grid_out.write_svg (triangulation, out);
-
-
-
+    
     mg_dof_handler.distribute_dofs (fe);
     mg_dof_handler.distribute_mg_dofs (fe);
 
@@ -981,12 +990,12 @@ namespace Step50
 
         if (cycle == 0)
           {
-            GridGenerator::hyper_ball (triangulation);
+            GridGenerator::hyper_cube (triangulation);
 
-            static const HyperBallBoundary<dim> boundary;
-            triangulation.set_boundary (0, boundary);
+            // static const HyperBallBoundary<dim> boundary;
+            // triangulation.set_boundary (0, boundary);
 
-            triangulation.refine_global (1);
+            triangulation.refine_global (2);
           }
         else
           refine_grid ();

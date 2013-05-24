@@ -1362,8 +1362,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   unsigned int n_materials = 0;
   unsigned int n_levels = 0;
   unsigned int n_subdomains = 0;
-  //unsigned int n_level_subdomains = 0;           // TODO [CW]: CellAccessor<dim, spacedim> does not seem to possess this attribute ...
-
+  unsigned int n_level_subdomains = 0;
+  
   unsigned int n = 0;
 
   unsigned int min_level, max_level;
@@ -1407,7 +1407,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   float x_dimension_perspective, y_dimension_perspective;
 
 
-  Triangulation<2,2>::active_cell_iterator cell = tria.begin_active(), endc = tria.end();
+  Triangulation<2,2>::cell_iterator cell = tria.begin(), endc = tria.end();
 
   // auxiliary variables for the bounding box and the range of cell levels
   double x_min = cell->vertex(0)[0];
@@ -1435,12 +1435,10 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   for (unsigned int subdomain_index = 0; subdomain_index < 256; subdomain_index++)
     subdomains[subdomain_index] = 0;
 
-  // TODO [CW]: not yet implemented ...
-  /*
   // auxiliary array for the level subdomains being used
   int level_subdomains[256];
-  for(int level_subdomain_index = 0; level_subdomain_index < 256; level_subdomain_index++) level_subdomains[level_subdomain_index] = 0;
-  */
+  for(int level_subdomain_index = 0; level_subdomain_index < 256; level_subdomain_index++)
+    level_subdomains[level_subdomain_index] = 0;
 
   // We use an active cell iterator to determine the
   // bounding box of the given triangulation and check
@@ -1460,17 +1458,10 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
       if ((unsigned int)cell->level() < min_level) min_level = cell->level();
       if ((unsigned int)cell->level() > max_level) max_level = cell->level();
 
-      if ((unsigned int)cell->material_id()) materials[(unsigned int)cell->material_id()] = 1;
-      else if ((unsigned int)cell->material_id() == 0) materials[0] = 1;
-
-      if ((int)cell->level()) levels[(unsigned int)cell->level()] = 1;
-      else if ((unsigned int)cell->level() == 0) levels[0] = 1;
-
-      if ((unsigned int)cell->subdomain_id()) subdomains[(unsigned int)cell->subdomain_id()] = 1;
-      else if ((unsigned int)cell->subdomain_id() == 0) subdomains[0] = 1;
-
-      // if((unsigned int)(cell->level_subdomain_id())) level_subdomains[(unsigned int)cell->level_subdomain_id()] = 1;
-      // else if((unsigned int)(cell->level_subdomain_id()) == 0) level_subdomains[0] = 1;
+      materials[(unsigned int)cell->material_id()] = 1;      
+      levels[(unsigned int)cell->level()] = 1;
+      subdomains[cell->subdomain_id()+2] = 1;
+      level_subdomains[cell->level_subdomain_id()+2] = 1;
     }
 
   x_dimension = x_max - x_min;
@@ -1494,13 +1485,11 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
       if (subdomains[subdomain_index]) n_subdomains++;
     }
 
-  /*
   // count the level subdomains being used
   for(int level_subdomain_index = 0; level_subdomain_index < 256; level_subdomain_index++)
   {
     if(level_subdomains[level_subdomain_index]) n_level_subdomains++;
   }
-  */
 
   switch (svg_flags.coloring)
     {
@@ -1513,8 +1502,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
     case GridOutFlags::Svg::subdomain_id:
       n = n_subdomains;
       break;
-      // case GridOutFlags::Svg::level_subdomain_id: n = n_level_subdomains;
-      //   break;
+    case GridOutFlags::Svg::level_subdomain_id: n = n_level_subdomains;
+      break;
     default:
       break;
     }
@@ -1587,7 +1576,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
 
   // determine the bounding box of the given triangulation on the projection plane of the camera viewing system
-  cell = tria.begin_active();
+  cell = tria.begin();
   endc = tria.end();
 
   point[0] = cell->vertex(0)[0];
@@ -1674,7 +1663,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   width = static_cast<unsigned int>(.5 + height * (x_dimension_perspective / y_dimension_perspective));
   unsigned int additional_width = 0;
 
-  if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id)) // || svg_flags.label_level_subdomain_id ))
+  if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id || svg_flags.label_level_subdomain_id ))
     {
       additional_width = static_cast<unsigned int>(.5 + height * .4); // additional width for legend
     }
@@ -1778,8 +1767,9 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
             case GridOutFlags::Svg::subdomain_id:
               while (!subdomains[labeling_index]) labeling_index++;
               break;
-              // case GridOutFlags::Svg::level_subdomain_id: while(!level_subdomains[labeling_index]) labeling_index++;
-              //   break;
+	    case GridOutFlags::Svg::level_subdomain_id:
+	      while(!level_subdomains[labeling_index]) labeling_index++;
+	      break;
             default:
               break;
             }
@@ -1856,10 +1846,11 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
                   out << (unsigned int)cell->level();
                   break;
                 case GridOutFlags::Svg::subdomain_id:
-                  out << (unsigned int)cell->subdomain_id();
+                  out << cell->subdomain_id() + 2;
                   break;
-                  // case GridOutFlags::Svg::level_subdomain_id: out << (unsigned int)cell->level_subdomain_id();
-                  //   break;
+		case GridOutFlags::Svg::level_subdomain_id:
+		  out << cell->level_subdomain_id() + 2;
+		  break;
                 default:
                   break;
                 }
@@ -1926,7 +1917,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
           out << "\"/>" << '\n';
 
           // label the current cell
-          if (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
+          if (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id || svg_flags.label_level_subdomain_id)
             {
               point[0] = cell->center()[0];
               point[1] = cell->center()[1];
@@ -1968,14 +1959,18 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
               if (svg_flags.label_subdomain_id)
                 {
                   if (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id) out << ',';
-                  out << cell->subdomain_id();
+                  out << static_cast<int>(cell->subdomain_id());
                 }
 
-              // if(svg_flags.label_level_subdomain_id)
-              // {
-              //   if(svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id) out << ',';
-              //   out << cell->level_subdomain_id();
-              // }
+	      if(svg_flags.label_level_subdomain_id)
+		{
+		  if(svg_flags.label_level_number
+		     || svg_flags.label_cell_index
+		     || svg_flags.label_material_id
+		     || svg_flags.label_subdomain_id)
+		    out << ',';
+		  out << static_cast<int>(cell->level_subdomain_id());
+		}
 
               out << "</text>" << '\n';
             }
@@ -2036,7 +2031,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   if (!svg_flags.margin) additional_width = static_cast<unsigned int>(.5 + (height/100.) * 2.5);
 
   // explanation of the cell labeling
-  if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id)) // || svg_flags.label_level_subdomain_id ))
+  if (svg_flags.draw_legend && (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id || svg_flags.label_level_subdomain_id ))
     {
       out << " <rect x=\"" << width + additional_width << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent)
           << "\" width=\"" << static_cast<unsigned int>(.5 + (height/100.) * (40. - margin_in_percent)) << "\" height=\"" << static_cast<unsigned int>(.5 + height * .165) << "\"/>" << '\n';
@@ -2054,7 +2049,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
               << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
               << "\">" << "level_number";
 
-          if (svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
+          if (svg_flags.label_cell_index || svg_flags.label_material_id || svg_flags.label_subdomain_id || svg_flags.label_level_subdomain_id)
             out << ',';
 
           out << "</text>" << '\n';
@@ -2068,7 +2063,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
               << "\">"
               << "cell_index";
 
-          if (svg_flags.label_material_id || svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
+          if (svg_flags.label_material_id || svg_flags.label_subdomain_id || svg_flags.label_level_subdomain_id)
             out << ',';
 
           out << "</text>" << '\n';
@@ -2082,7 +2077,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
               << "\">"
               << "material_id";
 
-          if (svg_flags.label_subdomain_id) // || svg_flags.label_level_subdomain_id)
+          if (svg_flags.label_subdomain_id || svg_flags.label_level_subdomain_id)
             out << ',';
 
           out << "</text>" << '\n';
@@ -2096,21 +2091,21 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
               << "\">"
               << "subdomain_id";
 
-          // if(svg_flags.label_level_subdomain_id)
-          //   out << ',';
+	  if(svg_flags.label_level_subdomain_id)
+	    out << ',';
 
           out << "</text>" << '\n';
         }
 
-      // if(svg_flags.label_level_subdomain_id)
-      // {
-      //   out << "  <text x= \"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 2.)
-      //       << "\" y=\""       << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size )
-      //       << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
-      //       << "\">"
-      //       << "level_subdomain_id"
-      //       << "</text>" << '\n';
-      // }
+      if(svg_flags.label_level_subdomain_id)
+	{
+	  out << "  <text x= \"" << width + additional_width + static_cast<unsigned int>(.5 + (height/100.) * 2.)
+	      << "\" y=\""       << static_cast<unsigned int>(.5 + (height/100.) * margin_in_percent + (++line_offset) * 1.5 * font_size )
+	      << "\" style=\"text-anchor:start; font-style:oblique; font-size:" << font_size
+	      << "\">"
+	      << "level_subdomain_id"
+	      << "</text>" << '\n';
+	}
     }
 
   // show azimuth angle and polar angle as text below the explanation of the cell labeling
@@ -2143,8 +2138,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
         case 3:
           out << "subdomain_id";
           break;
-          // case 4: out << "level_subdomain_id";
-          //   break;
+	case 4: out << "level_subdomain_id";
+	  break;
         default:
           break;
         }
@@ -2169,8 +2164,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
             case GridOutFlags::Svg::subdomain_id:
               while (!subdomains[labeling_index]) labeling_index++;
               break;
-              // case GridOutFlags::Svg::level_subdomain_id: while(!level_subdomains[labeling_index]) labeling_index++;
-              //   break;
+	    case GridOutFlags::Svg::level_subdomain_id: while(!level_subdomains[labeling_index]) labeling_index++;
+	      break;
             default:
               break;
             }

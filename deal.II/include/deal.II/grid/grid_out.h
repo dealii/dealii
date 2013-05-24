@@ -634,7 +634,14 @@ namespace GridOutFlags
     Background background;
 
     // View angles for the perspective view of the grid; Default is 0, 0 (top view).
-    int azimuth_angle, polar_angle;
+    /**
+     * The azimuth angle measured from ??? in degrees. Default is 0.
+     */
+    int azimuth_angle;
+    /**
+     * The angle from vertically above the xy-plane. Default is 0.
+     */
+    int polar_angle;
 
     /**
      * Cell coloring.
@@ -647,11 +654,13 @@ namespace GridOutFlags
         /// Convert the level number into the cell color
         level_number, 
         /// Convert the subdomain id into the cell color
-        subdomain_id}; 
+        subdomain_id, 
+        /// Convert the level subdomain id into the cell color
+        level_subdomain_id}; 
  
     Coloring coloring;
 
-    // Interpret the level number of the cells as altitude over the x-y-plane (may be useful in the perpspective view).
+    /// Interpret the level number of the cells as altitude over the x-y-plane (useful in the perpspective view).
     bool convert_level_number_to_height;
 
     /**
@@ -660,11 +669,11 @@ namespace GridOutFlags
      * The following booleans determine which properties of the cell
      * shall be displayed as text in the middle of each cell.
      */
-    bool label_level_number;    /// default: true
-    bool label_cell_index;      /// default: true
-    bool label_material_id;     /// default: false
-    bool label_subdomain_id;    /// default: false
-    //bool label_level_subdomain_id;  // TODO [CW]: not yet implemented ...
+    bool label_level_number;    // default: true
+    bool label_cell_index;      // default: true
+    bool label_material_id;     // default: false
+    bool label_subdomain_id;    // default: false
+    bool label_level_subdomain_id;  // default: false
 
     /// Draw a colorbar next to the plotted grid with respect to the chosen coloring of the cells
     bool draw_colorbar;
