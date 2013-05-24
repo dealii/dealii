@@ -65,6 +65,15 @@ this function.
 
 <ol>
 
+  <li> New: All vector classes now have a member function
+  <code>locally_owned_elements</code> that returns an index
+  set indicating which elements of this vector the current
+  processor owns.
+  <br>
+  (Wolfgang Bangerth, 2013/05/24)
+  </li>
+
+
   <li> New: A new element FE_Q_iso_Q1 has been implemented that is defined by
   a subdivision of the element into smaller Q1 elements. An element of order
   @p p is similar to FE_Q of degree @p p with the same numbering of degrees of

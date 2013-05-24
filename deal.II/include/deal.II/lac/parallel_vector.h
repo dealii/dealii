@@ -459,6 +459,22 @@ namespace parallel
       bool in_local_range (const types::global_dof_index global_index) const;
 
       /**
+       * Return an index set that describes which elements of this vector
+       * are owned by the current processor. Note that this index set does
+       * not include elements this vector may store locally as ghost
+       * elements but that are in fact owned by another processor.
+       * As a consequence, the index sets returned on different
+       * processors if this is a distributed vector will form disjoint
+       * sets that add up to the complete index set.
+       * Obviously, if a vector is created on only one processor, then
+       * the result would satisfy
+       * @code
+       *   vec.locally_owned_elements() == complete_index_set (vec.size())
+       * @endcode
+       */
+      IndexSet locally_owned_elements () const;
+
+      /**
        * Returns the number of ghost elements present on the vector.
        */
       unsigned int n_ghost_entries () const;
@@ -1426,6 +1442,20 @@ namespace parallel
     (const types::global_dof_index global_index) const
     {
       return partitioner->in_local_range (global_index);
+    }
+
+
+    template <typename Number>
+    inline
+    IndexSet
+    Vector<Number>::locally_owned_elements() const
+    {
+      IndexSet is (size());
+
+      const std::pair<types::global_dof_index,types::global_dof_index> x = local_range();
+      is.add_range (x.first, x.second);
+
+      return is;
     }
 
 

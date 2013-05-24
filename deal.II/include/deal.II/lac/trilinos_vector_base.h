@@ -522,6 +522,22 @@ namespace TrilinosWrappers
     bool in_local_range (const unsigned int index) const;
 
     /**
+     * Return an index set that describes which elements of this vector
+     * are owned by the current processor. Note that this index set does
+     * not include elements this vector may store locally as ghost
+     * elements but that are in fact owned by another processor.
+     * As a consequence, the index sets returned on different
+     * processors if this is a distributed vector will form disjoint
+     * sets that add up to the complete index set.
+     * Obviously, if a vector is created on only one processor, then
+     * the result would satisfy
+     * @code
+     *   vec.locally_owned_elements() == complete_index_set (vec.size())
+     * @endcode
+     */
+    IndexSet locally_owned_elements () const;
+
+    /**
      * Return if the vector contains ghost
      * elements. This answer is true if there
      * are ghost elements on at least one
@@ -1222,6 +1238,23 @@ namespace TrilinosWrappers
     const std::pair<unsigned int, unsigned int> range = local_range();
 
     return ((index >= range.first) && (index <  range.second));
+  }
+
+
+
+  inline
+  IndexSet
+  VectorBase::locally_owned_elements() const
+  {
+    IndexSet is (size());
+
+    // TODO: Trilinos does allow non-contiguous ranges for locally
+    // owned elements. if that is the case for the current
+    // vector, local_range() will throw an exception. Fix this.
+    const std::pair<unsigned int, unsigned int> x = local_range();
+    is.add_range (x.first, x.second);
+
+    return is;
   }
 
 

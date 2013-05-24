@@ -1435,6 +1435,15 @@ void Vector<Number>::block_read (std::istream &in)
 
 
 template <typename Number>
+IndexSet
+Vector<Number>::locally_owned_elements() const
+{
+  return complete_index_set(size());
+}
+
+
+
+template <typename Number>
 std::size_t
 Vector<Number>::memory_consumption () const
 {

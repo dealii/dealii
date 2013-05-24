@@ -847,6 +847,26 @@ public:
   unsigned int size () const;
 
   /**
+   * Return an index set that describes which elements of this vector
+   * are owned by the current processor. Note that this index set does
+   * not include elements this vector may store locally as ghost
+   * elements but that are in fact owned by another processor.
+   * As a consequence, the index sets returned on different
+   * processors if this is a distributed vector will form disjoint
+   * sets that add up to the complete index set.
+   * Obviously, if a vector is created on only one processor, then
+   * the result would satisfy
+   * @code
+   *   vec.locally_owned_elements() == complete_index_set (vec.size())
+   * @endcode
+   *
+   * For block vectors, this function returns the union of the
+   * locally owned elements of the individual blocks, shifted by
+   * their respective index offsets.
+   */
+  IndexSet locally_owned_elements () const;
+
+  /**
    * Return an iterator pointing to
    * the first element.
    */
@@ -1779,6 +1799,32 @@ unsigned int
 BlockVectorBase<VectorType>::size () const
 {
   return block_indices.total_size();
+}
+
+
+
+template <class VectorType>
+inline
+IndexSet
+BlockVectorBase<VectorType>::locally_owned_elements () const
+{
+  IndexSet is (size());
+
+  // copy index sets from blocks into the global one
+  for (unsigned int b=0; b<n_blocks(); ++b)
+    {
+      IndexSet x = block(b).locally_owned_elements();
+
+      //TODO: This can surely be made more efficient by just shifting
+      // x
+      for (unsigned int i=0; i<block(b).size(); ++i)
+        if (x.is_element(i))
+          is.add_index(block_indices.local_to_global(b,i));
+    }
+
+  is.compress();
+
+  return is;
 }
 
 
