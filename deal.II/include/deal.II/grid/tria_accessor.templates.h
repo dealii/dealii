@@ -2197,6 +2197,7 @@ unsigned int
 TriaAccessor<0, 1, spacedim>::vertex_index (const unsigned int i) const
 {
   Assert(i==0, ExcIndexRange(i, 0, 1));
+  (void)i;
   return global_vertex_index;
 }
 
@@ -2208,6 +2209,7 @@ Point<spacedim> &
 TriaAccessor<0, 1, spacedim>::vertex (const unsigned int i) const
 {
   Assert(i==0, ExcIndexRange(i, 0, 1));
+  (void)i;
   return const_cast<Point<spacedim> &> (this->tria->vertices[global_vertex_index]);
 }
 
