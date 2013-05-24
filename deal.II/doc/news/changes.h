@@ -75,12 +75,6 @@ this function.
   (Martin Kronbichler, 2013/05/14)
   </li>
 
-  <li> Fixed: setting values in TrilinosWrappers::SparseMatrix
-  in parallel was adding the values instead.
-  <br>
-  (Bruno Turcksin, Timo Heister, 2013/05/03)
-  </li>
-
   <li> New: The step-49 tutorial program now also has a discussion on
   what to do once you have a coarse mesh and want to refine it.
   <br>
@@ -127,6 +121,15 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: All vector classes now have a static member variable
+<code>supports_distributed_data</code> that indicates whether the
+vector class supports data that is distributed across multiple
+processors. This variable is provided as a <i>traits variable</i>
+to allow generic algorithms working on general vector types to
+query the capabilities of the vector class at compile time.
+<br>
+(Wolfgang Bangerth, 2013/05/23)
+</li>
 
 <li> Fixed: FETools::back_interpolate has been revised to work correctly
 also with parallel::distributed::Vector.
@@ -226,6 +229,12 @@ the flag SolverGMRES::AdditionalData::force_re_orthogonalization.
 vector types, not just dealii::Vector and dealii::BlockVector.
 <br>
 (Wolfgang Bangerth, 2013/05/06)
+</li>
+
+<li> Fixed: setting values in TrilinosWrappers::SparseMatrix
+in parallel was adding the values instead.
+<br>
+(Bruno Turcksin, Timo Heister, 2013/05/03)
 </li>
 
 <li> Fixed: Generate an error if the user tries to refine a cell

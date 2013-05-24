@@ -140,6 +140,19 @@ public:
    */
   typedef typename numbers::NumberTraits<Number>::real_type real_type;
 
+  /**
+   * A variable that indicates whether this vector
+   * supports distributed data storage. If true, then
+   * this vector also needs an appropriate compress()
+   * function that allows communicating recent set or
+   * add operations to individual elements to be communicated
+   * to other processors.
+   *
+   * For the current class, the variable equals
+   * false, since it does not support parallel data storage.
+   */
+  static const bool supports_distributed_data = false;
+
 public:
 
   /**

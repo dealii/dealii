@@ -1717,37 +1717,40 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
   typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
 
 #ifdef DEBUG
-  // the algorithm below pushes contributions c_ij x_j to a constrained
-  // DoF x_j *from the side of the owner of x_j*, as opposed to pulling
-  // it from the owner of the target side x_i. this relies on the
-  // assumption that both target and source know about the constraint
-  // on x_i.
-  //
-  // the disadvantage is that it is incredibly difficult to find out what
-  // is happening if the assumption is not satisfied. to help debug
-  // problems of this kind, we do the following in a first step if
-  // debugging is enabled:
-  // - every processor who owns an x_j where c_ij!=0 sends a one
-  //   to the owner of x_i to add up
-  // - the owner of x_i knows how many nonzero entries exist, so can
-  //   verify that the correct number of ones has been added
-  // - if the sum is not correct, then apparently one of the owners
-  //   of the x_j's did not know to send its one and, consequently,
-  //   will also not know to send the correct c_ij*x_j later on,
-  //   leading to a bug
-  set_zero (vec);
-  for (constraint_iterator it = lines.begin();
-       it != lines.end(); ++it)
-    for (unsigned int i=0; i<it->entries.size(); ++i)
-      if (vec_owned_elements.is_element (it->entries[i].first))
-        vec(it->line) += 1;
-  vec.compress (VectorOperation::add);
+  if (vec.supports_distributed_data == true)
+    {
+      // the algorithm below pushes contributions c_ij x_j to a constrained
+      // DoF x_j *from the side of the owner of x_j*, as opposed to pulling
+      // it from the owner of the target side x_i. this relies on the
+      // assumption that both target and source know about the constraint
+      // on x_i.
+      //
+      // the disadvantage is that it is incredibly difficult to find out what
+      // is happening if the assumption is not satisfied. to help debug
+      // problems of this kind, we do the following in a first step if
+      // debugging is enabled:
+      // - every processor who owns an x_j where c_ij!=0 sends a one
+      //   to the owner of x_i to add up
+      // - the owner of x_i knows how many nonzero entries exist, so can
+      //   verify that the correct number of ones has been added
+      // - if the sum is not correct, then apparently one of the owners
+      //   of the x_j's did not know to send its one and, consequently,
+      //   will also not know to send the correct c_ij*x_j later on,
+      //   leading to a bug
+      set_zero (vec);
+      for (constraint_iterator it = lines.begin();
+          it != lines.end(); ++it)
+        for (unsigned int i=0; i<it->entries.size(); ++i)
+          if (vec_owned_elements.is_element (it->entries[i].first))
+            vec(it->line) += 1;
+      vec.compress (VectorOperation::add);
 
-  for (constraint_iterator it = lines.begin();
-       it != lines.end(); ++it)
-    if (vec_owned_elements.is_element(it->line))
-      Assert (vec(it->line) == it->entries.size(),
+      for (constraint_iterator it = lines.begin();
+          it != lines.end(); ++it)
+        if (vec_owned_elements.is_element(it->line))
+          Assert (vec(it->line) == it->entries.size(),
               ExcIncorrectConstraint(it->line, it->entries.size()));
+    }
 #endif
 
   // set the values of all constrained DoFs to zero, then add the
