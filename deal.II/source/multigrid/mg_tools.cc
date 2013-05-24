@@ -1201,6 +1201,8 @@ namespace MGTools
         endc = dof.end();
         for (; cell!=endc; ++cell)
           {
+            if (cell->level_subdomain_id()!=dof.get_tria().locally_owned_subdomain())
+              continue;
             const FiniteElement<dim> &fe = cell->get_fe();
             const unsigned int level = cell->level();
             local_dofs.resize(fe.dofs_per_face);
@@ -1430,6 +1432,9 @@ namespace MGTools
 
     for (; cell!=endc; ++cell)
       {
+        if (cell->level_subdomain_id()!=mg_dof_handler.get_tria().locally_owned_subdomain())
+          continue;
+
         std::fill (cell_dofs.begin(), cell_dofs.end(), false);
 
         for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
@@ -1484,6 +1489,9 @@ namespace MGTools
 
     for (; cell!=endc; ++cell)
       {
+        if (cell->level_subdomain_id()!=mg_dof_handler.get_tria().locally_owned_subdomain())
+          continue;
+
         std::fill (cell_dofs.begin(), cell_dofs.end(), false);
         std::fill (cell_dofs_interface.begin(), cell_dofs_interface.end(), false);
 
@@ -1571,6 +1579,9 @@ namespace MGTools
 
     for (; cell!=endc; ++cell)
       {
+        if (cell->level_subdomain_id()!=mg_dof_handler.get_tria().locally_owned_subdomain())
+          continue;
+
         bool has_coarser_neighbor = false;
 
         std::fill (cell_dofs.begin(), cell_dofs.end(), false);
