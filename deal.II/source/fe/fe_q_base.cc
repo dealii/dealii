@@ -1019,8 +1019,8 @@ FE_Q_Base<POLY,dim,spacedim>
   Assert (child<GeometryInfo<dim>::n_children(refinement_case),
           ExcIndexRange(child,0,GeometryInfo<dim>::n_children(refinement_case)));
 
-  // needs initialization?
-  Threads::Mutex::ScopedLock(this->mutex);
+  // initialization upon first request
+  Threads::Mutex::ScopedLock lock(this->mutex);
   if (this->prolongation[refinement_case-1][child].n() == 0)
     {
       // distinguish q/q_dg0 case: only treat Q dofs first
@@ -1188,8 +1188,8 @@ FE_Q_Base<POLY,dim,spacedim>
   Assert (child<GeometryInfo<dim>::n_children(refinement_case),
           ExcIndexRange(child,0,GeometryInfo<dim>::n_children(refinement_case)));
 
-  // needs initialization?
-  Threads::Mutex::ScopedLock(this->mutex);
+  // initialization upon first request
+  Threads::Mutex::ScopedLock lock(this->mutex);
   if (this->restriction[refinement_case-1][child].n() == 0)
     {
       FullMatrix<double> &restriction =

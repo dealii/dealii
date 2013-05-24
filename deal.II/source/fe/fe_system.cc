@@ -603,8 +603,8 @@ FESystem<dim,spacedim>
   Assert (child<GeometryInfo<dim>::n_children(refinement_case),
           ExcIndexRange(child,0,GeometryInfo<dim>::n_children(refinement_case)));
 
-  // needs initialization?
-  Threads::Mutex::ScopedLock(this->mutex);
+  // initialization upon first request
+  Threads::Mutex::ScopedLock lock(this->mutex);
   if (this->restriction[refinement_case-1][child].n() == 0)
     {
       // Check if some of the matrices of the base elements are void.
@@ -685,8 +685,8 @@ FESystem<dim,spacedim>
   Assert (child<GeometryInfo<dim>::n_children(refinement_case),
           ExcIndexRange(child,0,GeometryInfo<dim>::n_children(refinement_case)));
 
-  // needs initialization?
-  Threads::Mutex::ScopedLock(this->mutex);
+  // initialization upon first request
+  Threads::Mutex::ScopedLock lock(this->mutex);
   if (this->prolongation[refinement_case-1][child].n() == 0)
     {
       // Check if some of the matrices of the base elements are void.
