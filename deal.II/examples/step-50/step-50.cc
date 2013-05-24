@@ -11,6 +11,8 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+// parallel geometric multi-grid. work in progress!
+
 // As discussed in the introduction, most of
 // this program is copied almost verbatim
 // from step-6, which itself is only a slight
