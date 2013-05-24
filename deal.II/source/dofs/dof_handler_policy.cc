@@ -2177,7 +2177,7 @@ namespace internal
                 endc = dof_handler.end(level);
 
                 for (; cell != endc; ++cell)
-                  if (!cell->is_artificial() &&
+                  if (cell->level_subdomain_id()!=numbers::artificial_subdomain_id &&
                       (cell->level_subdomain_id() < tr->locally_owned_subdomain()))
                     {
                       // we found a
