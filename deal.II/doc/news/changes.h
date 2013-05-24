@@ -121,6 +121,13 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The global function <code>complete_index_set()</code>
+creates and returns an index set of given size that contains
+every single index with this range.
+<br>
+(Wolfgang Bangerth, 2013/05/24)
+</li>
+
 <li> New: All vector classes now have a static member variable
 <code>supports_distributed_data</code> that indicates whether the
 vector class supports data that is distributed across multiple

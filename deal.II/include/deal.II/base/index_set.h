@@ -571,6 +571,32 @@ private:
 };
 
 
+/**
+ * Create and return an index set of size $N$ that contains every
+ * single index within this range. In essence, this function
+ * returns an index set created by
+ * @code
+ *  IndexSet is (N);
+ *  is.add_range(0, N);
+ * @endcode
+ * This function exists so that one can create and initialize
+ * index sets that are complete in one step, or so one can write
+ * code like
+ * @code
+ *   if (my_index_set == complete_index_set(my_index_set.size())
+ *     ...
+ * @endcode
+ *
+ * @relates IndexSet
+ */
+inline
+IndexSet complete_index_set (const unsigned int N)
+{
+  IndexSet is (N);
+  is.add_range(0, N);
+  return is;
+}
+
 /* ------------------ inline functions ------------------ */
 
 inline
