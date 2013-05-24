@@ -49,6 +49,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 
@@ -299,6 +300,12 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::setup_system ()
   {
+    std::ofstream out ("grid.svg");
+    GridOut grid_out;
+    grid_out.write_svg (triangulation, out);
+
+
+
     mg_dof_handler.distribute_dofs (fe);
     mg_dof_handler.distribute_mg_dofs (fe);
 
