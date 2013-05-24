@@ -68,9 +68,8 @@ void test()
   parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
 					       Triangulation<dim>::none,
 					       parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy);
-  GridGenerator::hyper_ball (tr);
-  //GridGenerator::hyper_cube(tr);
-  tr.refine_global(1);
+  GridGenerator::hyper_cube(tr);
+  tr.refine_global(2);
   DoFHandler<dim> dofh(tr);
 
   output(tr);
