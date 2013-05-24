@@ -132,10 +132,11 @@ void test()
 	  exact_l1 = exact_l1 - (p*100+90) + (p*100+105);
       }
 
-    Assert (vec.l1_norm() == exact_l1, ExcInternalError());
+    const double l1_norm = vec.l1_norm();
+    Assert (l1_norm == exact_l1, ExcInternalError());
 
     if (myid == 0)
-      deallog << "Norm = " << vec.l1_norm() << std::endl;
+      deallog << "Norm = " << l1_norm << std::endl;
   }
 }
 
