@@ -1742,7 +1742,6 @@ namespace internal
               MPI_Isend(&(*buffer)[0], buffer->size(),
                         MPI_BYTE, it->first,
                         123, tr->get_communicator(), &requests[idx]);
-              std::cout << "send ghostdata: " << tr->locally_owned_subdomain() << "->" << it->first << std::endl;
             }
 
 
@@ -1797,8 +1796,6 @@ namespace internal
               MPI_Get_count(&status, MPI_BYTE, &len);
               receive.resize(len);
 
-              std::cout << "receive ghostdata: " << status.MPI_SOURCE << "->" << tr->locally_owned_subdomain() << std::endl;
-
               char *ptr = &receive[0];
               MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
                        tr->get_communicator(), &status);
@@ -1850,8 +1847,6 @@ namespace internal
             unsigned int sum_recv=0;
             unsigned int sent=needs_to_get_cells.size();
             unsigned int recv=senders.size();
-
-            std::cout << tr->locally_owned_subdomain() << " " << sent << " " << recv << std::endl;
 
             MPI_Reduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, 0, tr->get_communicator());
             MPI_Reduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, 0, tr->get_communicator());
@@ -2153,7 +2148,6 @@ namespace internal
 
         for (unsigned int level = 0; level < n_levels; ++level)
           {
-            std::cout << tr->locally_owned_subdomain() << ": on level " << level << std::endl;
             NumberCache &number_cache = number_caches[level];
 
             //* 1. distribute on own
