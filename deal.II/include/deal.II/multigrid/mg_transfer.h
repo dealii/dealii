@@ -217,14 +217,12 @@ public:
   set_component_to_block_map (const std::vector<unsigned int> &map);
 
   /**
-   * Finite element does not
-   * provide prolongation matrices.
+   * Finite element does not provide prolongation matrices.
    */
   DeclException0(ExcNoProlongation);
 
   /**
-   * Call @p build_matrices
-   * function first.
+   * You have to call build_matrices() before using this object.
    */
   DeclException0(ExcMatricesNotBuilt);
 
@@ -232,7 +230,11 @@ public:
    * Memory used by this object.
    */
   std::size_t memory_consumption () const;
-
+  
+  /**
+   * Print all the matrices for debugging purposes.
+   */
+  void print_matrices(std::ostream& os) const;
 
 private:
 

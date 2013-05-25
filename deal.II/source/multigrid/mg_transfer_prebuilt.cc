@@ -336,6 +336,17 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 }
 
 
+template <class VECTOR>
+void
+MGTransferPrebuilt<VECTOR>::print_matrices (std::ostream& os) const
+{
+  for (unsigned int level = 0;level<prolongation_matrices.size();++level)
+    {
+      os << "Level " << level << std::endl;
+      prolongation_matrices[level]->print(os);
+      os << std::endl;
+    }
+}
 
 
 // explicit instantiation
