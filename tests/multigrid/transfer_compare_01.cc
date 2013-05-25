@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 - 2007, 2010 by the deal.II authors
+//    Copyright (C) 2000 - 2007, 2010, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -64,8 +64,8 @@ reinit_vector_by_blocks (
       MGTools::count_dofs_per_block (mg_dof, ndofs);
     }
 
-  for (unsigned int level=v.get_minlevel();
-       level<=v.get_maxlevel();++level)
+  for (unsigned int level=v.min_level();
+       level<=v.max_level();++level)
     {
       v[level].reinit(ndofs[level][selected_block]);
     }
@@ -96,8 +96,8 @@ reinit_vector_by_blocks (
       MGTools::count_dofs_per_block (mg_dof, ndofs);
     }
 
-  for (unsigned int level=v.get_minlevel();
-       level<=v.get_maxlevel();++level)
+  for (unsigned int level=v.min_level();
+       level<=v.max_level();++level)
     {
       v[level].reinit(n_selected, 0);
       unsigned int k=0;
