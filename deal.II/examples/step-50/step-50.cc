@@ -135,7 +135,6 @@ namespace Step50
     typedef TrilinosWrappers::SparseMatrix matrix_t;
     typedef TrilinosWrappers::MPI::Vector vector_t;
 
-    SparsityPattern      sparsity_pattern;
     matrix_t system_matrix;
 
     // We need an additional object for the
@@ -191,7 +190,6 @@ namespace Step50
     // transpose of the other, and so we only
     // have to build one; we choose the one
     // from coarse to fine.
-    MGLevelObject<SparsityPattern>       mg_sparsity_patterns;
     MGLevelObject<matrix_t> mg_matrices;
     MGLevelObject<matrix_t> mg_interface_matrices;
     MGConstrainedDoFs                    mg_constrained_dofs;
@@ -331,11 +329,6 @@ namespace Step50
               << mg_dof_handler.n_dofs(l);
     deallog  << std::endl;
 
-    sparsity_pattern.reinit (mg_dof_handler.n_dofs(),
-                             mg_dof_handler.n_dofs(),
-                             mg_dof_handler.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (mg_dof_handler, sparsity_pattern);
-
 
     //solution.reinit (mg_dof_handler.n_dofs());
     //system_rhs.reinit (mg_dof_handler.n_dofs());
@@ -375,9 +368,10 @@ namespace Step50
                                               constraints);
     constraints.close ();
     hanging_node_constraints.close ();
-    constraints.condense (sparsity_pattern);
-    sparsity_pattern.compress();
-    system_matrix.reinit (sparsity_pattern);
+
+    CompressedSimpleSparsityPattern csp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (mg_dof_handler, csp, constraints);
+    system_matrix.reinit (mg_dof_handler.locally_owned_dofs(), csp, MPI_COMM_WORLD, true);
 
     // The multigrid constraints have to be
     // initialized. They need to know about
@@ -409,7 +403,6 @@ namespace Step50
     mg_interface_matrices.clear ();
     mg_matrices.resize(0, n_levels-1);
     mg_matrices.clear ();
-    mg_sparsity_patterns.resize(0, n_levels-1);
 
     // Now, we have to provide a matrix on each
     // level. To this end, we first use the
@@ -444,10 +437,10 @@ namespace Step50
                    mg_dof_handler.n_dofs(level));
         MGTools::make_sparsity_pattern(mg_dof_handler, csp, level);
 
-        mg_sparsity_patterns[level].copy_from (csp);
-
-        mg_matrices[level].reinit(mg_sparsity_patterns[level]);
-        mg_interface_matrices[level].reinit(mg_sparsity_patterns[level]);
+        mg_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
+            mg_dof_handler.locally_owned_mg_dofs(level),
+            csp,
+            MPI_COMM_WORLD, true);
       }
   }
 
