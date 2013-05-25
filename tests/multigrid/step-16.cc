@@ -5,7 +5,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010 by the deal.II authors                   */
+/*    Copyright (C) 2003, 2004, 2006, 2007, 2008, 2009, 2010, 2013 by the deal.II authors                   */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -750,88 +750,19 @@ void LaplaceProblem<dim>::solve ()
   coarse_matrix.copy_from (mg_matrices[0]);
   MGCoarseGridHouseholder<> coarse_grid_solver;
   coarse_grid_solver.initialize (coarse_matrix);
-				   // The next component of a multilevel
-				   // solver or preconditioner is that we need
-				   // a smoother on each level. A common
-				   // choice for this is to use the
-				   // application of a relaxation method (such
-				   // as the SOR, Jacobi or Richardson method)
-				   // or a small number of iterations of a
-				   // solver method (such as CG or GMRES). The
-				   // MGSmootherRelaxation and
-				   // MGSmootherPrecondition classes provide
-				   // support for these two kinds of
-				   // smoothers. Here, we opt for the
-				   // application of a single SOR
-				   // iteration. To this end, we define an
-				   // appropriate <code>typedef</code> and
-				   // then setup a smoother object.
-				   //
-				   // Since this smoother needs temporary
-				   // vectors to store intermediate results,
-				   // we need to provide a VectorMemory
-				   // object. Since these vectors will be
-				   // reused over and over, the
-				   // GrowingVectorMemory is more time
-				   // efficient than the PrimitiveVectorMemory
-				   // class in the current case.
-				   //
-				   // The last step is to initialize the
-				   // smoother object with our level matrices
-				   // and to set some smoothing parameters.
-				   // The <code>initialize()</code> function
-				   // can optionally take additional arguments
-				   // that will be passed to the smoother
-				   // object on each level. In the current
-				   // case for the SOR smoother, this could,
-				   // for example, include a relaxation
-				   // parameter. However, we here leave these
-				   // at their default values. The call to
-				   // <code>set_steps()</code> indicates that
-				   // we will use two pre- and two
-				   // post-smoothing steps on each level; to
-				   // use a variable number of smoother steps
-				   // on different levels, more options can be
-				   // set in the constructor call to the
-				   // <code>mg_smoother</code> object.
-				   //
-				   // The last step results from the fact that
-				   // we use the SOR method as a smoother -
-				   // which is not symmetric - but we use the
-				   // conjugate gradient iteration (which
-				   // requires a symmetric preconditioner)
-				   // below, we need to let the multilevel
-				   // preconditioner make sure that we get a
-				   // symmetric operator even for nonsymmetric
-				   // smoothers:
+  
   typedef PreconditionSOR<SparseMatrix<double> > Smoother;
   GrowingVectorMemory<>   vector_memory;
   MGSmootherRelaxation<SparseMatrix<double>, Smoother, Vector<double> >
-    mg_smoother(vector_memory);
+    mg_smoother;
   mg_smoother.initialize(mg_matrices);
   mg_smoother.set_steps(2);
   mg_smoother.set_symmetric(true);
 
-				   // The next preparatory step is that we
-				   // must wrap our level and interface
-				   // matrices in an object having the
-				   // required multiplication functions. We
-				   // will create two objects for the
-				   // interface objects going from coarse to
-				   // fine and the other way around; the
-				   // multigrid algorithm will later use the
-				   // transpose operator for the latter
-				   // operation, allowing us to initialize
-				   // both up and down versions of the
-				   // operator with the matrices we already
-				   // built:
   MGMatrix<> mg_matrix(&mg_matrices);
   MGMatrix<> mg_interface_up(&mg_interface_matrices);
   MGMatrix<> mg_interface_down(&mg_interface_matrices);
 
-				   // Now, we are ready to set up the
-				   // V-cycle operator and the
-				   // multilevel preconditioner.
   Multigrid<Vector<double> > mg(mg_dof_handler,
 				mg_matrix,
 				coarse_grid_solver,
@@ -843,9 +774,6 @@ void LaplaceProblem<dim>::solve ()
   PreconditionMG<dim, Vector<double>, MGTransferPrebuilt<Vector<double> > >
   preconditioner(mg_dof_handler, mg, mg_transfer);
 
-				   // With all this together, we can finally
-				   // get about solving the linear system in
-				   // the usual way:
   SolverControl solver_control (1000, 1e-12);
   SolverCG<>    cg (solver_control);
 

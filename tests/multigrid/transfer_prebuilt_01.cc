@@ -39,7 +39,7 @@
 using namespace std;
 
 template <int dim>
-void check_simple(const FiniteElement<dim>& fe, std::ostream& os)
+void check_simple(const FiniteElement<dim>& fe)
 {
   deallog << fe.get_name() << std::endl;
 
@@ -57,30 +57,26 @@ void check_simple(const FiniteElement<dim>& fe, std::ostream& os)
   MGTransferPrebuilt<Vector<double> > transfer;
   transfer.build_matrices(mgdof);
   
-  transfer.print_matrices(os);
+  transfer.print_matrices(deallog.get_file_stream());
 }
 
 
 int main()
 {
-  std::ofstream logfile("transfer_01/output");
-  deallog << std::setprecision(6);
-  deallog.attach(logfile);
-  deallog.depth_console(0);
-  deallog.threshold_double(1.e-10);
+  initlog(__FILE__);
+  
+  check_simple (FE_DGP<2>(0));
+  check_simple (FE_DGP<2>(1));
+  check_simple (FE_DGQ<2>(1));
+  check_simple (FE_DGQ<2>(2));
+  check_simple (FE_Q<2>(1));
+  check_simple (FE_Q<2>(2));
+  check_simple (FESystem<2>(FE_DGQ<2>(1), 2));
+  check_simple (FESystem<2>(FE_DGP<2>(1), 2, FE_DGQ<2>(1), 3));
 
-  check_simple (FE_DGP<2>(0), logfile);
-  check_simple (FE_DGP<2>(1), logfile);
-  check_simple (FE_DGQ<2>(1), logfile);
-  check_simple (FE_DGQ<2>(2), logfile);
-  check_simple (FE_Q<2>(1), logfile);
-  check_simple (FE_Q<2>(2), logfile);
-  check_simple (FESystem<2>(FE_DGQ<2>(1), 2), logfile);
-  check_simple (FESystem<2>(FE_DGP<2>(1), 2, FE_DGQ<2>(1), 3), logfile);
+  check_simple (FE_RaviartThomasNodal<2>(1));
+//  check_simple (FESystem<2>(FE_RaviartThomas<2>(1),1,FE_DGQ<2>(0),2));
 
-  check_simple (FE_RaviartThomasNodal<2>(1), logfile);
-//  check_simple (FESystem<2>(FE_RaviartThomas<2>(1),1,FE_DGQ<2>(0),2), logfile);
-
-  check_simple (FE_DGQ<3>(1), logfile);
-  check_simple (FE_Q<3>(2), logfile);
+  check_simple (FE_DGQ<3>(1));
+  check_simple (FE_Q<3>(2));
 }
