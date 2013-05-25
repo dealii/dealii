@@ -11,7 +11,7 @@
 //
 //----------------------------------------------------------------------------
 
-// Output transfer matrices on locally refined meshes without constraints
+// Output transfer matrices on locally refined meshes with hanging node constraints
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
@@ -30,6 +30,7 @@
 #include <deal.II/multigrid/mg_dof_handler.h>
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_tools.h>
+#include <deal.II/multigrid/mg_constrained_dofs.h>
 
 #include <fstream>
 #include <iomanip>
@@ -54,7 +55,14 @@ void check_simple(const FiniteElement<dim>& fe)
   MGDoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
 
-  MGTransferPrebuilt<Vector<double> > transfer;
+  ConstraintMatrix     hanging_node_constraints;
+  DoFTools::make_hanging_node_constraints (mgdof, hanging_node_constraints);
+  hanging_node_constraints.close ();
+  
+  MGConstrainedDoFs mg_constrained_dofs;
+  mg_constrained_dofs.initialize(mgdof);
+
+  MGTransferPrebuilt<Vector<double> > transfer(hanging_node_constraints, mg_constrained_dofs);
   transfer.build_matrices(mgdof);
   
   transfer.print_matrices(deallog.get_file_stream());
