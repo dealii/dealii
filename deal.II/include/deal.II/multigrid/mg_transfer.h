@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,6 +43,13 @@ namespace internal
   {
     typedef ::dealii::SparsityPattern Sparsity;
     typedef ::dealii::SparseMatrix<typename VECTOR::value_type> Matrix;
+    
+    template <class CSP, class DH>
+    static void reinit(Matrix& matrix, Sparsity& sparsity, int level, const CSP& csp, const DH&)
+    {
+      sparsity.copy_from (csp);
+      matrix.reinit (sparsity);
+    }
   };
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -51,6 +58,15 @@ namespace internal
   {
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
+    
+    template <class CSP, class DH>
+    static void reinit(Matrix& matrix, Sparsity& sparsity, int level, const CSP& csp, DH& dh)
+    {
+      matrix.reinit(dh.locally_owned_mg_dofs(level+1),
+		    dh.locally_owned_mg_dofs(level),
+		    csp, MPI_COMM_WORLD, true);
+    }
+    
   };
 
   template <>
@@ -58,6 +74,11 @@ namespace internal
   {
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
+    
+    template <class CSP, class DH>
+    static void reinit(Matrix& matrix, Sparsity& sparsity, int level, const CSP& csp, DH& dh)
+    {
+    }
   };
 #endif
 }

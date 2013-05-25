@@ -175,10 +175,13 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                   }
               }
           }
-
-      prolongation_sparsities[level]->copy_from (csp);
+      
+      internal::MatrixSelector<VECTOR>::reinit(*prolongation_matrices[level],
+					       *prolongation_sparsities[level],
+					       level,
+					       csp,
+					       mg_dof);
       csp.reinit(0,0);
-      prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
 
       // now actually build the matrices
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
