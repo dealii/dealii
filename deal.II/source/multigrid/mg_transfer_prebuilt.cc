@@ -142,7 +142,10 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       std::vector<unsigned int> entries (dofs_per_cell);
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
-        if (cell->has_children() && cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain())
+        if (cell->has_children() &&
+            ( mg_dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
+                || cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain()
+                ))
           {
             cell->get_mg_dof_indices (dof_indices_parent);
 
@@ -186,7 +189,10 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       // now actually build the matrices
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
-        if (cell->has_children() && cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain())
+        if (cell->has_children() &&
+            (mg_dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
+             || cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain())
+             )
           {
             cell->get_mg_dof_indices (dof_indices_parent);
 
@@ -286,7 +292,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
         {
-          if (level_cell->level_subdomain_id()!=mg_dof.get_tria().locally_owned_subdomain())
+          if (mg_dof.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+              &&  level_cell->level_subdomain_id()!=mg_dof.get_tria().locally_owned_subdomain())
             continue;
 
           // get the dof numbers of
