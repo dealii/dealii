@@ -1020,9 +1020,15 @@ FE_Q_Base<POLY,dim,spacedim>
           ExcIndexRange(child,0,GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request
-  Threads::Mutex::ScopedLock lock(this->mutex);
   if (this->prolongation[refinement_case-1][child].n() == 0)
     {
+      Threads::Mutex::ScopedLock lock(this->mutex);
+
+      // if matrix got updated while waiting for the lock
+      if (this->prolongation[refinement_case-1][child].n() ==
+          this->dofs_per_cell)
+        return this->prolongation[refinement_case-1][child];
+
       // distinguish q/q_dg0 case: only treat Q dofs first
       const unsigned int q_dofs_per_cell = Utilities::fixed_power<dim>(this->degree+1);
 
@@ -1072,9 +1078,7 @@ FE_Q_Base<POLY,dim,spacedim>
           }
       }
 
-      FullMatrix<double>& prolongate = const_cast<FullMatrix<double>&>
-        (this->prolongation[refinement_case-1][child]);
-      prolongate.reinit(this->dofs_per_cell, this->dofs_per_cell);
+      FullMatrix<double> prolongate (this->dofs_per_cell, this->dofs_per_cell);
 
       // go through the points in diagonal to capture variation in all
       // directions simultaneously
@@ -1167,6 +1171,10 @@ FE_Q_Base<POLY,dim,spacedim>
           Assert (std::fabs(sum-1.) < eps, ExcInternalError());
         }
 #endif
+
+      // swap matrices
+      std::swap(const_cast<FullMatrix<double> &>
+                (this->prolongation[refinement_case-1][child]), prolongate);
     }
 
   // finally return the matrix
@@ -1189,12 +1197,16 @@ FE_Q_Base<POLY,dim,spacedim>
           ExcIndexRange(child,0,GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request
-  Threads::Mutex::ScopedLock lock(this->mutex);
   if (this->restriction[refinement_case-1][child].n() == 0)
     {
-      FullMatrix<double> &restriction =
-        const_cast<FullMatrix<double> &>(this->restriction[refinement_case-1][child]);
+      Threads::Mutex::ScopedLock lock(this->mutex);
 
+      // if matrix got updated while waiting for the lock...
+      if (this->restriction[refinement_case-1][child].n() ==
+          this->dofs_per_cell)
+        return this->restriction[refinement_case-1][child];
+
+      FullMatrix<double> restriction(this->dofs_per_cell, this->dofs_per_cell);
       // distinguish q/q_dg0 case
       const unsigned int q_dofs_per_cell = Utilities::fixed_power<dim>(this->degree+1);
 
@@ -1291,7 +1303,13 @@ FE_Q_Base<POLY,dim,spacedim>
             restriction(this->dofs_per_cell-1,this->dofs_per_cell-1) =
               1./GeometryInfo<dim>::n_children(RefinementCase<dim>(refinement_case));
         }
+
+      // swap matrices
+      std::swap(const_cast<FullMatrix<double> &>
+                (this->restriction[refinement_case-1][child]), restriction);
+
     }
+
   return this->restriction[refinement_case-1][child];
 }
 
