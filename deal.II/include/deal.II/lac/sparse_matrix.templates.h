@@ -1931,6 +1931,11 @@ SparseMatrix<number>::block_read (std::istream &in)
 }
 
 
+template <typename number>
+void
+SparseMatrix<number>::compress (::dealii::VectorOperation::values)
+{}
+
 
 template <typename number>
 std::size_t

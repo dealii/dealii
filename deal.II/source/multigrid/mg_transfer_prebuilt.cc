@@ -227,6 +227,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                                                      true);
               }
           }
+      prolongation_matrices[level]->compress(VectorOperation::insert);
     }
 
 
