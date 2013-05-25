@@ -54,11 +54,8 @@ int main (int argc, char *argv[])
   deallog.attach(logfile);
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
-  Triangulation<2> tria;
 
-  deallog << tria.locally_owned_subdomain() << std::endl;
-  
-  
+  Triangulation<2> tria;
   parallel::distributed::Triangulation<2> tria2(MPI_COMM_WORLD);
   GridGenerator::hyper_cube (tria);
   tria.refine_global (2);
