@@ -185,7 +185,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 					       csp,
 					       mg_dof);
       csp.reinit(0,0);
-
+      
+      FullMatrix<double> prolongation;
+      
       // now actually build the matrices
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
@@ -203,9 +205,15 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                 // set an alias to the
                 // prolongation matrix for
                 // this child
-                const FullMatrix<double> &prolongation
+                prolongation
                   = mg_dof.get_fe().get_prolongation_matrix (child,
                                                              cell->refinement_case());
+		
+		if (mg_constrained_dofs != 0 && mg_constrained_dofs->set_boundary_values())
+		  for (unsigned int j=0;j<dofs_per_cell; ++j)
+		    if (mg_constrained_dofs->is_boundary_index(level, dof_indices_parent[j]))
+		      for (unsigned int i=0; i<dofs_per_cell; ++i)
+			prolongation(i,j) = 0.;
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
@@ -221,46 +229,6 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
           }
     }
 
-
-  // impose boundary conditions
-  // but only in the column of
-  // the prolongation matrix
-  if (mg_constrained_dofs != 0)
-    if (mg_constrained_dofs->set_boundary_values())
-      {
-        std::vector<unsigned int> constrain_indices;
-        for (int level=n_levels-2; level>=0; --level)
-          {
-            if (mg_constrained_dofs->get_boundary_indices()[level].size() == 0)
-              continue;
-
-            // need to delete all the columns in the
-            // matrix that are on the boundary. to achieve
-            // this, create an array as long as there are
-            // matrix columns, and find which columns we
-            // need to filter away.
-            constrain_indices.resize (0);
-            constrain_indices.resize (prolongation_matrices[level]->n(), 0);
-            std::set<unsigned int>::const_iterator dof
-            = mg_constrained_dofs->get_boundary_indices()[level].begin(),
-            endd = mg_constrained_dofs->get_boundary_indices()[level].end();
-            for (; dof != endd; ++dof)
-              constrain_indices[*dof] = 1;
-
-            const unsigned int n_dofs = prolongation_matrices[level]->m();
-            for (unsigned int i=0; i<n_dofs; ++i)
-              {
-                typename internal::MatrixSelector<VECTOR>::Matrix::iterator
-                start_row = prolongation_matrices[level]->begin(i),
-                end_row   = prolongation_matrices[level]->end(i);
-                for (; start_row != end_row; ++start_row)
-                  {
-                    if (constrain_indices[start_row->column()] == 1)
-                      start_row->value() = 0;
-                  }
-              }
-          }
-      }
 
   // to find the indices that describe the
   // relation between global dofs and local
