@@ -490,8 +490,8 @@ private:
                             const Range &range_2)
     {
       return ((range_1.begin == range_2.begin)
-              ||
-              (range_1.begin == range_2.begin));
+              &&
+              (range_1.end == range_2.end));
     }
 
     std::size_t memory_consumption () const

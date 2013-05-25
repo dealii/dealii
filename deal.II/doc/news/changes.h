@@ -130,6 +130,12 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: IndexSet::operator== returned the wrong results
+in some cases.
+<br>
+(Wolfgang Bangerth, 2013/05/25)
+</li>
+
 <li> New: The global function <code>complete_index_set()</code>
 creates and returns an index set of given size that contains
 every single index with this range.
