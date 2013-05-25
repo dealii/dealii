@@ -604,7 +604,6 @@ FESystem<dim,spacedim>
           ExcIndexRange(child,0,GeometryInfo<dim>::n_children(refinement_case)));
 
   // initialization upon first request
-  Threads::Mutex::ScopedLock lock(this->mutex);
   if (this->restriction[refinement_case-1][child].n() == 0)
     {
       Threads::Mutex::ScopedLock lock(this->mutex);
