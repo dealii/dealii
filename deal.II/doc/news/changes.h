@@ -130,6 +130,12 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: ConstraintMatrix::distribute is now also implemented for
+arguments of type PETScWrappers::MPI::BlockVector.
+<br>
+(Wolfgang Bangerth, 2013/05/25)
+</li>
+
 <li> Fixed: IndexSet::operator== returned the wrong results
 in some cases.
 <br>

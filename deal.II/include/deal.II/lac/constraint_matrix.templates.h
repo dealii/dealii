@@ -982,22 +982,98 @@ template<class VectorType>
 void
 ConstraintMatrix::distribute (VectorType &vec) const
 {
-  Assert (sorted == true, ExcMatrixNotClosed());
+  Assert (sorted==true, ExcMatrixIsClosed());
 
-  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  for (; next_constraint != lines.end(); ++next_constraint)
+  // if the vector type supports parallel storage and if the
+  // vector actually does it, we need to be a bit more
+  // careful about how we do things
+  if ((vec.supports_distributed_data == true)
+      &&
+      (vec.locally_owned_elements() != complete_index_set(vec.size())))
     {
-      // fill entry in line
-      // next_constraint.line by adding the
-      // different contributions
-      typename VectorType::value_type
-      new_value = next_constraint->inhomogeneity;
-      for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
-        new_value += (static_cast<typename VectorType::value_type>
-                      (vec(next_constraint->entries[i].first)) *
-                      next_constraint->entries[i].second);
-      Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
-      vec(next_constraint->line) = new_value;
+      const IndexSet vec_owned_elements = vec.locally_owned_elements();
+
+      typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
+
+#ifdef DEBUG
+      {
+        // the algorithm below pushes contributions c_ij x_j to a constrained
+        // DoF x_j *from the side of the owner of x_j*, as opposed to pulling
+        // it from the owner of the target side x_i. this relies on the
+        // assumption that both target and source know about the constraint
+        // on x_i.
+        //
+        // the disadvantage is that it is incredibly difficult to find out what
+        // is happening if the assumption is not satisfied. to help debug
+        // problems of this kind, we do the following in a first step if
+        // debugging is enabled:
+        // - every processor who owns an x_j where c_ij!=0 sends a one
+        //   to the owner of x_i to add up
+        // - the owner of x_i knows how many nonzero entries exist, so can
+        //   verify that the correct number of ones has been added
+        // - if the sum is not correct, then apparently one of the owners
+        //   of the x_j's did not know to send its one and, consequently,
+        //   will also not know to send the correct c_ij*x_j later on,
+        //   leading to a bug
+        set_zero (vec);
+        for (constraint_iterator it = lines.begin();
+            it != lines.end(); ++it)
+          for (unsigned int i=0; i<it->entries.size(); ++i)
+            if (vec_owned_elements.is_element (it->entries[i].first))
+              vec(it->line) += 1;
+        vec.compress (VectorOperation::add);
+
+        for (constraint_iterator it = lines.begin();
+            it != lines.end(); ++it)
+          if (vec_owned_elements.is_element(it->line))
+            Assert (vec(it->line) == it->entries.size(),
+                ExcIncorrectConstraint(it->line, it->entries.size()));
+      }
+#endif
+
+      // set the values of all constrained DoFs to zero, then add the
+      // contributions for each constrained DoF of all the ones we
+      // own locally
+      set_zero (vec);
+
+      for (constraint_iterator it = lines.begin();
+          it != lines.end(); ++it)
+        for (unsigned int i=0; i<it->entries.size(); ++i)
+          if (vec_owned_elements.is_element(it->entries[i].first))
+            vec(it->line) += it->entries[i].second *
+                             vec(it->entries[i].first);
+
+      // in a final step, add the inhomogeneities to the elements we
+      // own locally
+      for (constraint_iterator it = lines.begin();
+          it != lines.end(); ++it)
+        if (vec_owned_elements.is_element(it->line))
+          vec(it->line) += it->inhomogeneity;
+
+      // now compress to communicate the entries that we added to
+      // and that weren't to local processors to the owner
+      vec.compress (VectorOperation::add);
+    }
+  else
+    // purely sequential vector (either because the type doesn't
+    // support anything else or because it's completely stored
+    // locally
+    {
+      std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
+      for (; next_constraint != lines.end(); ++next_constraint)
+        {
+          // fill entry in line
+          // next_constraint.line by adding the
+          // different contributions
+          typename VectorType::value_type
+          new_value = next_constraint->inhomogeneity;
+          for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
+            new_value += (static_cast<typename VectorType::value_type>
+                          (vec(next_constraint->entries[i].first)) *
+                           next_constraint->entries[i].second);
+          Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
+          vec(next_constraint->line) = new_value;
+        }
     }
 }
 
