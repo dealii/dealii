@@ -86,7 +86,7 @@ report:
 
 report+mail: all
 	@$(MAKE) report | tee testresults
-	@cat testresults | $(MAIL) bangerth@brazos.tamu.edu
+	@cat testresults | $(MAIL) dealii.regression.tests@gmail.com
 	@rm testresults
 
 

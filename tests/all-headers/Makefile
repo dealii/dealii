@@ -92,7 +92,7 @@ report:
 
 report+mail: all
 	@$(MAKE) report | tee testresults
-	@cat testresults | $(MAIL) regression-tests@dealii.org
+	@cat testresults | $(MAIL) dealii.regression.tests@gmail.com
 	@rm testresults
 
 
