@@ -285,7 +285,10 @@ namespace Step50
     fe (degree),
     mg_dof_handler (triangulation),
     degree(degree)
-  {}
+  {
+    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)!=0)
+      deallog.depth_console(0);
+  }
 
 
 
@@ -397,7 +400,7 @@ namespace Step50
     // SparseMatrix classes, since they have to
     // release their SparsityPattern before the
     // can be destroyed upon resizing.
-    const unsigned int n_levels = triangulation.n_levels();
+    const unsigned int n_levels = triangulation.n_global_levels();
 
     mg_interface_matrices.resize(0, n_levels-1);
     mg_interface_matrices.clear ();
@@ -438,6 +441,11 @@ namespace Step50
         MGTools::make_sparsity_pattern(mg_dof_handler, csp, level);
 
         mg_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
+            mg_dof_handler.locally_owned_mg_dofs(level),
+            csp,
+            MPI_COMM_WORLD, true);
+
+        mg_interface_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
             mg_dof_handler.locally_owned_mg_dofs(level),
             csp,
             MPI_COMM_WORLD, true);
@@ -516,6 +524,9 @@ namespace Step50
                                                   local_dof_indices,
                                                   system_matrix, system_rhs);
         }
+
+    system_matrix.compress(VectorOperation::add);
+    system_rhs.compress(VectorOperation::add);
   }
 
 
@@ -750,6 +761,12 @@ namespace Step50
                                        local_dof_indices,
                                        mg_interface_matrices[cell->level()]);
         }
+
+    for (unsigned int i=0;i<triangulation.n_global_levels();++i)
+      {
+        mg_matrices[i].compress(VectorOperation::add);
+        mg_interface_matrices[i].compress(VectorOperation::add);
+      }
   }
 
 
@@ -857,11 +874,11 @@ namespace Step50
     // preconditioner make sure that we get a
     // symmetric operator even for nonsymmetric
     // smoothers:
-    typedef TrilinosWrappers::PreconditionSOR Smoother;
+    typedef TrilinosWrappers::PreconditionJacobi Smoother;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices);
     mg_smoother.set_steps(2);
-    mg_smoother.set_symmetric(true);
+    //mg_smoother.set_symmetric(false);
 
     // The next preparatory step is that we
     // must wrap our level and interface
@@ -889,6 +906,7 @@ namespace Step50
                             mg_transfer,
                             mg_smoother,
                             mg_smoother);
+    //mg.set_debug(6);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t> >
@@ -897,7 +915,7 @@ namespace Step50
     // With all this together, we can finally
     // get about solving the linear system in
     // the usual way:
-    SolverControl solver_control (1000, 1e-12);
+    SolverControl solver_control (50, 1e-12, false);
     SolverCG<vector_t>    cg (solver_control);
 
     solution = 0;
@@ -950,8 +968,15 @@ namespace Step50
   {
     DataOut<dim> data_out;
 
+    TrilinosWrappers::MPI::Vector temp_solution;
+    IndexSet idx;
+    DoFTools::extract_locally_relevant_dofs (mg_dof_handler,
+                                             idx);
+    temp_solution.reinit(idx, MPI_COMM_WORLD);
+    temp_solution = solution;
+
     data_out.attach_dof_handler (mg_dof_handler);
-    data_out.add_data_vector (solution, "solution");
+    data_out.add_data_vector (temp_solution, "solution");
     data_out.build_patches ();
 
     std::ostringstream filename;
@@ -988,14 +1013,15 @@ namespace Step50
             // static const HyperBallBoundary<dim> boundary;
             // triangulation.set_boundary (0, boundary);
 
-            triangulation.refine_global (2);
+            triangulation.refine_global (3);
           }
         else
-          refine_grid ();
+          triangulation.refine_global (1);
+          //refine_grid ();
 
 
         deallog << "   Number of active cells:       "
-                << triangulation.n_active_cells()
+                << triangulation.n_global_active_cells()
                 << std::endl;
 
         setup_system ();
