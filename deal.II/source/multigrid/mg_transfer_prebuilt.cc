@@ -85,7 +85,7 @@ template <int dim, int spacedim>
 void MGTransferPrebuilt<VECTOR>::build_matrices (
   const DoFHandler<dim,spacedim>  &mg_dof)
 {
-  const unsigned int n_levels      = mg_dof.get_tria().n_levels();
+  const unsigned int n_levels      = mg_dof.get_tria().n_global_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
 
   sizes.resize(n_levels);
