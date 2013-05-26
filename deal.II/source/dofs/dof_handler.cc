@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -797,8 +797,10 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::cell_iterator
 DoFHandler<dim,spacedim>::begin (const unsigned int level) const
 {
-  return cell_iterator (*this->get_tria().begin(level),
-                        this);
+  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_tria().begin(level);
+  if (cell == this->get_tria().end(level))
+    return end(level);
+  return cell_iterator (*cell, this);
 }
 
 
@@ -834,9 +836,10 @@ template <int dim, int spacedim>
 typename DoFHandler<dim,spacedim>::cell_iterator
 DoFHandler<dim,spacedim>::end (const unsigned int level) const
 {
-  return (level == this->get_tria().n_levels()-1 ?
-          end() :
-          begin (level+1));
+  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_tria().end(level);
+  if (cell.state() != IteratorState::valid)
+    return end();
+  return cell_iterator (*cell, this);
 }
 
 
@@ -844,9 +847,10 @@ template <int dim, int spacedim>
 typename DoFHandler<dim, spacedim>::active_cell_iterator
 DoFHandler<dim, spacedim>::end_active (const unsigned int level) const
 {
-  return (level == this->get_tria().n_levels()-1 ?
-          active_cell_iterator(end()) :
-          begin_active (level+1));
+  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_tria().end_active(level);
+  if (cell.state() != IteratorState::valid)
+    return active_cell_iterator(end());
+  return active_cell_iterator (*cell, this);
 }
 
 
@@ -857,8 +861,10 @@ DoFHandler<dim, spacedim>::begin_mg (const unsigned int level) const
 {
   // Assert(this->has_level_dofs(), ExcMessage("You can only iterate over mg "
   //     "levels if mg dofs got distributed."));
-  return level_cell_iterator (*this->get_tria().begin(level),
-                              this);
+  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_tria().begin(level);
+  if (cell == this->get_tria().end(level))
+    return end_mg(level);
+  return level_cell_iterator (*cell, this);
 }
 
 
@@ -868,9 +874,10 @@ DoFHandler<dim, spacedim>::end_mg (const unsigned int level) const
 {
   // Assert(this->has_level_dofs(), ExcMessage("You can only iterate over mg "
   //     "levels if mg dofs got distributed."));
-  return (level == this->get_tria().n_levels()-1 ?
-          end() :
-          begin (level+1));
+  typename Triangulation<dim,spacedim>::cell_iterator cell = this->get_tria().end(level);
+  if (cell.state() != IteratorState::valid)
+    return end();
+  return level_cell_iterator (*cell, this);
 }
 
 
