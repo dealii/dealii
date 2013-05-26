@@ -59,6 +59,39 @@ initlog(const char* filename, bool console=false)
 }
 
 
+// append the directory name with an output file name that indicates
+// the number of MPI processes
+inline std::string
+output_file_for_mpi (const std::string &directory)
+{
+#ifdef DEAL_II_WITH_MPI
+  return (directory + "/ncpu_" +
+	  Utilities::int_to_string (Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) +
+	  "/output");
+#else
+  return (directory + "/ncpu_1/output");
+#endif
+}
+
+inline
+void
+mpi_initlog(const char* filename, bool console=false)
+{
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  if (myid == 0)
+    {
+      deallogname = output_file_for_mpi(JobIdentifier::base_name(filename));
+      deallogfile.open(deallogname.c_str());
+      deallog.attach(deallogfile);
+      if (!console)
+	deallog.depth_console(0);
+
+//TODO: Remove this line and replace by test_mode()
+      deallog.threshold_float(1.e-8);
+    }
+}
+
+
 #ifndef DEAL_II_STACKTRACE_SWITCH
 #define DEAL_II_STACKTRACE_SWITCH
 
@@ -173,19 +206,6 @@ struct DeadlockKiller
 
 DEAL_II_NAMESPACE_CLOSE
 
-
-// append the directory name with an output file name that indicates
-// the number of MPI processes
-std::string output_file_for_mpi (const std::string &directory)
-{
-#ifdef DEAL_II_WITH_MPI
-  return (directory + "/ncpu_" +
-	  Utilities::int_to_string (Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) +
-	  "/output");
-#else
-  return (directory + "/ncpu_1/output");
-#endif
-}
 
 
 
