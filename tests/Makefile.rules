@@ -18,10 +18,11 @@ verbose = off
 #
 # MAIL=mymailprog
 #
-# on the command line to use a different mail agent or to tunnel through ssh.
-# The mail program takes a single argument, which is the mail address for tests
-# The contents of the mail will be provided on STDIN
-MAIL = mail
+# as part of the 'make' arguments or in the environment to use a different
+# mail agent or to tunnel through ssh.  The mail program takes a single
+# argument, which is the mail address for tests The contents of the mail will
+# be provided on STDIN
+MAIL ?= mail
 
 # this lets you overwrite the diff tool for comparisons.
 # recommended environment setting:

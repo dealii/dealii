@@ -9,6 +9,16 @@
 include ../Makefile.paths
 include $D/common/Make.global_options
 
+# The mail program. Override this by something like
+#
+# MAIL=mymailprog
+#
+# as part of the 'make' arguments or in the environment to use a different
+# mail agent or to tunnel through ssh.  The mail program takes a single
+# argument, which is the mail address for tests The contents of the mail will
+# be provided on STDIN
+MAIL ?= mail
+
 
 ############################################################
 # First how to create executables, including all necessary
@@ -82,7 +92,7 @@ report:
 
 report+mail: all
 	@$(MAKE) report | tee testresults
-	@cat testresults | mail regression-tests@dealii.org
+	@cat testresults | $(MAIL) regression-tests@dealii.org
 	@rm testresults
 
 
