@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-// check ConstraintMatrix.distribute() for a petsc vector
+// check ConstraintMatrix.distribute() for a trilinos vector
 //
 // we do this by creating a vector where each processor has 100
 // elements but no ghost elements. then we add constraints on each
@@ -34,7 +34,7 @@
 
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
-#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
 #include <deal.II/lac/constraint_matrix.h>
 
 #include <fstream>
@@ -48,13 +48,18 @@ void test()
   const unsigned int n_processes = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   // create a vector that consists of elements indexed from 0 to n
-  PETScWrappers::MPI::Vector vec (MPI_COMM_WORLD, 100 * n_processes, 100);
+  TrilinosWrappers::MPI::Vector vec;
+  {
+    IndexSet is (100*n_processes);
+    is.add_range (100*myid, 100*myid+100);
+    vec.reinit (is, MPI_COMM_WORLD);
+  }
   Assert (vec.local_size() == 100, ExcInternalError());
   Assert (vec.local_range().first == 100*myid, ExcInternalError());
   Assert (vec.local_range().second == 100*myid+100, ExcInternalError());
   for (unsigned int i=vec.local_range().first; i<vec.local_range().second; ++i)
     vec(i) = i;
-  vec.compress();
+  vec.compress(VectorOperation::insert);
 
   // verify correctness so far
   {
