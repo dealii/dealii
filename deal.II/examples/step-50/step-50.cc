@@ -950,10 +950,17 @@ namespace Step50
   {
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
+    TrilinosWrappers::MPI::Vector temp_solution;
+    IndexSet idx;
+    DoFTools::extract_locally_relevant_dofs (mg_dof_handler,
+                                             idx);
+    temp_solution.reinit(idx, MPI_COMM_WORLD);
+    temp_solution = solution;
+    
     KellyErrorEstimator<dim>::estimate (static_cast<DoFHandler<dim>&>(mg_dof_handler),
                                         QGauss<dim-1>(3),
                                         typename FunctionMap<dim>::type(),
-                                        solution,
+                                        temp_solution,
                                         estimated_error_per_cell);
     GridRefinement::refine_and_coarsen_fixed_number (triangulation,
                                                      estimated_error_per_cell,
@@ -1017,7 +1024,7 @@ namespace Step50
           }
         else
           triangulation.refine_global (1);
-          //refine_grid ();
+	   //refine_grid ();
 
 
         deallog << "   Number of active cells:       "
