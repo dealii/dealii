@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -195,7 +195,7 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
   // have fine level basis
   // functions
   dst = 0;
-  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_global_levels(); ++level)
     {
       typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
 
@@ -227,7 +227,7 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
   // to the coarse level, but
   // have fine level basis
   // functions
-  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_global_levels(); ++level)
     {
       typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
       for (IT i= copy_indices[level].begin();
