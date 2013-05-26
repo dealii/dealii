@@ -161,6 +161,8 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
            i != copy_indices[level].end(); ++i)
         dst_level(i->second) = src(i->first);
 
+      dst_level.compress(VectorOperation::insert);
+
       // For non-DG: degrees of
       // freedom in the refinement
       // face may need special
