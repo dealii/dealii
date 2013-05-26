@@ -151,7 +151,7 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 {
   reinit_vector(mg_dof_handler, component_to_block_map, dst);
   bool first = true;
-  for (unsigned int level=mg_dof_handler.get_tria().n_levels(); level != 0;)
+  for (unsigned int level=mg_dof_handler.get_tria().n_global_levels(); level != 0;)
     {
       --level;
       VECTOR &dst_level = dst[level];
