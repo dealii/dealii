@@ -1173,8 +1173,8 @@ FE_Q_Base<POLY,dim,spacedim>
 #endif
 
       // swap matrices
-      std::swap(const_cast<FullMatrix<double> &>
-                (this->prolongation[refinement_case-1][child]), prolongate);
+      prolongate.swap(const_cast<FullMatrix<double> &>
+                      (this->prolongation[refinement_case-1][child]));
     }
 
   // finally return the matrix
@@ -1305,9 +1305,8 @@ FE_Q_Base<POLY,dim,spacedim>
         }
 
       // swap matrices
-      std::swap(const_cast<FullMatrix<double> &>
-                (this->restriction[refinement_case-1][child]), restriction);
-
+      restriction.swap(const_cast<FullMatrix<double> &>
+                       (this->restriction[refinement_case-1][child]));
     }
 
   return this->restriction[refinement_case-1][child];

@@ -669,8 +669,8 @@ FESystem<dim,spacedim>
                 restriction(i,j) = (*base_matrices[base])(base_index_i,base_index_j);
               }
 
-          std::swap(restriction, const_cast<FullMatrix<double> &>
-                    (this->restriction[refinement_case-1][child]));
+          restriction.swap(const_cast<FullMatrix<double> &>
+                           (this->restriction[refinement_case-1][child]));
         }
     }
 
@@ -734,8 +734,8 @@ FESystem<dim,spacedim>
                   base_index_j = this->system_to_base_table[j].second;
                 prolongate(i,j) = (*base_matrices[base])(base_index_i,base_index_j);
               }
-          std::swap(prolongate, const_cast<FullMatrix<double> &>
-                    (this->prolongation[refinement_case-1][child]));
+          prolongate.swap(const_cast<FullMatrix<double> &>
+                          (this->prolongation[refinement_case-1][child]));
         }
     }
 
