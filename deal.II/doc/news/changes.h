@@ -130,6 +130,14 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> Improved: Triangulation::begin(level) and Triangulation::end(level) now return an
+empty iterator range if the level is larger than the maximal locally owned level,
+but still in the global level range of a distributed Triangulation.
+<br>
+(Timo Heister and Guido Kanschat, 2013/05/26)
+</li>
+
 <li> New: The IndexSet::add_indices function that takes another IndexSet
 object now has an additional argument <code>offset</code> that can be used
 to offset the indices of first argument.
