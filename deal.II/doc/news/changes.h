@@ -130,6 +130,13 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> New: The IndexSet::add_indices function that takes another IndexSet
+object now has an additional argument <code>offset</code> that can be used
+to offset the indices of first argument.
+<br>
+(Wolfgang Bangerth, 2013/05/25)
+</li>
+
 <li> New: ConstraintMatrix::distribute is now also implemented for
 arguments of type PETScWrappers::MPI::BlockVector.
 <br>

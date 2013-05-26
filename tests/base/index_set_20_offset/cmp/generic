@@ -1,0 +1,22 @@
+
+DEAL::* add empty: 
+DEAL::Original index set: 
+DEAL::{[3,4], 7}
+DEAL::other index set: 
+DEAL::{}
+DEAL::merged index set: 
+DEAL::{[3,4], 7}
+DEAL::* add self: 
+DEAL::Original index set: 
+DEAL::{[3,4], 7}
+DEAL::other index set: 
+DEAL::{[3,4], 7}
+DEAL::merged index set: 
+DEAL::{[3,7], 9}
+DEAL::* add id2: 
+DEAL::Original index set: 
+DEAL::{[3,4], 7}
+DEAL::other index set: 
+DEAL::{0, [2,3]}
+DEAL::merged index set: 
+DEAL::{[3,7]}

@@ -1810,16 +1810,12 @@ BlockVectorBase<VectorType>::locally_owned_elements () const
 {
   IndexSet is (size());
 
-  // copy index sets from blocks into the global one
+  // copy index sets from blocks into the global one, shifted
+  // by the appropriate amount for each block
   for (unsigned int b=0; b<n_blocks(); ++b)
     {
       IndexSet x = block(b).locally_owned_elements();
-
-      //TODO: This can surely be made more efficient by just shifting
-      // x
-      for (unsigned int i=0; i<block(b).size(); ++i)
-        if (x.is_element(i))
-          is.add_index(block_indices.local_to_global(b,i));
+      is.add_indices(x, block_indices.block_start(b));
     }
 
   is.compress();
