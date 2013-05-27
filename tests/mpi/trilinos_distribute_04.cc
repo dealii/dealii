@@ -85,12 +85,15 @@ void test()
     vec(i) = i;
   vec.compress(VectorOperation::insert);
 
-  deallog <<"--" << std::endl;
-  solution.locally_owned_elements().print(deallog);
-  deallog <<"--" << std::endl;
+  deallog <<"locally owned:" << std::endl;
+  vec.locally_owned_elements().print(deallog);
+  deallog <<"relevant set:" << std::endl;
   locally_relevant_set.print(deallog);
-  deallog <<"--" << std::endl;
-  constraints.print(deallog);
+  if (myid==0)
+    {
+      deallog <<"constraint_matrix:" << std::endl;
+      cm.print(deallog.get_file_stream());
+    }
   
   cm.distribute (vec);
 
