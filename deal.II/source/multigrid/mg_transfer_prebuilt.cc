@@ -230,35 +230,36 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       prolongation_matrices[level]->compress(VectorOperation::insert);
     }
 
-
-  // to find the indices that describe the
-  // relation between global dofs and local
-  // numbering on the individual level, first
-  // create a temp vector where the ith level
-  // entry contains the respective global
-  // entry. this gives a neat way to find those
-  // indices. in a second step, actually build
-  // the std::vector<std::pair<uint,uint> > that
-  // only contains the active dofs on the
-  // levels.
+  // Now we are filling the variables copy_indices*, which are essentially
+  // maps from global to mg dof for each level stored as a std::vector of
+  // pairs. We need to split this map on each level depending on the ownership
+  // of the global and mg dof, so that we later not access non-local elements
+  // in copy_to/from_mg.
+  // Here we keep track in the bitfield dof_touched which global dof has
+  // been processed already (otherwise we would get dublicates on each level
+  // and on different levels). Note that it is important that we iterate
+  // the levels starting from 0, so that mg dofs on coarser levels "win".
 
   copy_indices.resize(n_levels);
-  std::vector<unsigned int> temp_copy_indices;
+  copy_indices_from_me.resize(n_levels);
+  copy_indices_to_me.resize(n_levels);
+  IndexSet globally_relevant;
+  DoFTools::extract_locally_relevant_dofs(mg_dof, globally_relevant);
+  std::vector<bool> dof_touched(globally_relevant.n_elements(), false);
+
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
-  for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
+  for (unsigned int level=0; level<mg_dof.get_tria().n_levels(); ++level)
     {
       copy_indices[level].clear();
+      copy_indices_from_me[level].clear();
+      copy_indices_to_me[level].clear();
+
       typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_cell = mg_dof.begin_active(level);
       const typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_end  = mg_dof.end_active(level);
 
-      temp_copy_indices.resize (0);
-      temp_copy_indices.resize (mg_dof.n_dofs(level), numbers::invalid_unsigned_int);
-
-      // Compute coarse level right hand side
-      // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
         {
           if (mg_dof.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
@@ -269,39 +270,34 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
           // this cell for the global
           // and the level-wise
           // numbering
-          level_cell->get_dof_indices(global_dof_indices);
+          level_cell->get_dof_indices (global_dof_indices);
           level_cell->get_mg_dof_indices (level_dof_indices);
 
           // ignore dofs that
           // 1. are not locally owned
           // 2. are constrained at a refinement edge
           for (unsigned int i=0; i<dofs_per_cell; ++i)
-	    if (mg_dof.locally_owned_dofs().is_element(global_dof_indices[i])
-	        &&
-	        (
-	        mg_constrained_dofs == 0
-		|| !mg_constrained_dofs->at_refinement_edge(level,level_dof_indices[i])
-		))
-	      temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
-        }
+            {
+              unsigned int global_idx = globally_relevant.index_within_set(global_dof_indices[i]);
+              //skip if we did this global dof already (on this or a coarser level)
+              if (dof_touched[global_idx])
+                continue;
+              dof_touched[global_idx] = true;
 
-      // now all the active dofs got a valid entry,
-      // the other ones have an invalid entry. Count
-      // the invalid entries and then resize the
-      // copy_indices object. Then, insert the pairs
-      // of global index and level index into
-      // copy_indices.
-      const unsigned int n_active_dofs =
-        std::count_if (temp_copy_indices.begin(), temp_copy_indices.end(),
-                       std::bind2nd(std::not_equal_to<unsigned int>(),
-                                    numbers::invalid_unsigned_int));
-      copy_indices[level].resize (n_active_dofs);
-      unsigned int counter = 0;
-      for (unsigned int i=0; i<temp_copy_indices.size(); ++i)
-        if (temp_copy_indices[i] != numbers::invalid_unsigned_int)
-          copy_indices[level][counter++] =
-            std::pair<unsigned int, unsigned int> (temp_copy_indices[i], i);
-      Assert (counter == n_active_dofs, ExcInternalError());
+              bool global_mine = mg_dof.locally_owned_dofs().is_element(global_dof_indices[i]);
+              bool level_mine = mg_dof.locally_owned_mg_dofs(level).is_element(level_dof_indices[i]);
+
+              if (global_mine && level_mine)
+                copy_indices[level].push_back(
+                    std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+              else if (!global_mine)
+                copy_indices_from_me[level].push_back(
+                    std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+              else
+                copy_indices_to_me[level].push_back(
+                    std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+            }
+        }
     }
 }
 
