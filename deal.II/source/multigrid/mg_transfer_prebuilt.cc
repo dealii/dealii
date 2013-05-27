@@ -266,18 +266,18 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
               &&  level_cell->level_subdomain_id()!=mg_dof.get_tria().locally_owned_subdomain())
             continue;
 
-          // get the dof numbers of
-          // this cell for the global
-          // and the level-wise
+          // get the dof numbers of this cell for the global and the level-wise
           // numbering
           level_cell->get_dof_indices (global_dof_indices);
           level_cell->get_mg_dof_indices (level_dof_indices);
 
-          // ignore dofs that
-          // 1. are not locally owned
-          // 2. are constrained at a refinement edge
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             {
+              // we need to ignore if the DoF is on a refinement edge (hanging node)
+              if (mg_constrained_dofs != 0
+                  && mg_constrained_dofs->at_refinement_edge(level, level_dof_indices[i]))
+                continue;
+
               unsigned int global_idx = globally_relevant.index_within_set(global_dof_indices[i]);
               //skip if we did this global dof already (on this or a coarser level)
               if (dof_touched[global_idx])
