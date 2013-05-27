@@ -244,29 +244,48 @@ private:
   std::vector<unsigned int> sizes;
 
   /**
-   * Sparsity patterns for transfer
-   * matrices.
+   * Sparsity patterns for transfer matrices.
    */
   std::vector<std_cxx1x::shared_ptr<typename internal::MatrixSelector<VECTOR>::Sparsity> >   prolongation_sparsities;
 
   /**
-   * The actual prolongation matrix.
-   * column indices belong to the
-   * dof indices of the mother cell,
-   * i.e. the coarse level.
-   * while row indices belong to the
-   * child cell, i.e. the fine level.
+   * The actual prolongation matrix.  column indices belong to the dof
+   * indices of the mother cell, i.e. the coarse level.  while row
+   * indices belong to the child cell, i.e. the fine level.
    */
   std::vector<std_cxx1x::shared_ptr<typename internal::MatrixSelector<VECTOR>::Matrix> > prolongation_matrices;
 
   /**
-   * Mapping for the
-   * <tt>copy_to/from_mg</tt>-functions.
-   * The data is first the global
-   * index, then the level index.
+   * Mapping for the copy_to_mg() and copy_from_mg() functions. Here only
+   * index pairs locally owned
+   * 
+   * The data is organized as follows: one vector per level. Each
+   * element of these vectors contains first the global index, then
+   * the level index.
    */
   std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
   copy_indices;
+
+  /**
+   * Additional degrees of freedom for the copy_to_mg()
+   * function. These are the ones where the global degree of freedom
+   * is locally owned and the level degree of freedom is not.
+   *
+   * Organization of the data is like for #copy_indices_mine.
+   */
+  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  copy_indices_to_me;
+
+  /**
+   * Additional degrees of freedom for the copy_from_mg()
+   * function. These are the ones where the level degree of freedom
+   * is locally owned and the global degree of freedom is not.
+   *
+   * Organization of the data is like for #copy_indices_mine.
+   */
+  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  copy_indices_from_me;
+  
 
   /**
    * The vector that stores what
