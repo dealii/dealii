@@ -1793,14 +1793,19 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
       // read the log stream: grab the first and last eigenvalue
       std::string cg_message = log_msg.str();
       const std::size_t pos = cg_message.find("cg:: ");
-      Assert(pos < std::string::npos, ExcInternalError());
-      cg_message.erase(0, pos+5);
-      std::istringstream os1(cg_message);
-      os1 >> min_eigenvalue;
-      for (unsigned int i=0; i<control.last_step()-1; ++i)
-        cg_message.erase(0, cg_message.find_first_of(" ")+1);
-      std::istringstream os2(cg_message);
-      os2 >> max_eigenvalue;
+      if (pos != std::string::npos)
+        {
+          cg_message.erase(0, pos+5);
+          std::string first = cg_message;
+
+          first.erase(cg_message.find_first_of(" "), std::string::npos);
+          std::istringstream(first)      >> min_eigenvalue;
+
+          cg_message.erase(0, cg_message.find_last_of(" ")+1);
+          std::istringstream(cg_message) >> max_eigenvalue;
+        }
+      else
+        min_eigenvalue = max_eigenvalue = 1;
 
       // reset deal.II stream
       deallog.detach();

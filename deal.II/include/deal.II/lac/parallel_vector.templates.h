@@ -561,8 +561,9 @@ namespace parallel
       // as there are processors and start writing
       // when it's our turn
 #ifdef DEAL_II_WITH_MPI
-      for (unsigned int i=0; i<partitioner->this_mpi_process(); i++)
-        MPI_Barrier (partitioner->get_communicator());
+      if (partitioner->n_mpi_processes() > 1)
+        for (unsigned int i=0; i<partitioner->this_mpi_process(); i++)
+          MPI_Barrier (partitioner->get_communicator());
 #endif
 
       out << "Process #" << partitioner->this_mpi_process() << std::endl
@@ -590,11 +591,14 @@ namespace parallel
       out << std::endl << std::flush;
 
 #ifdef DEAL_II_WITH_MPI
-      MPI_Barrier (partitioner->get_communicator());
+      if (partitioner->n_mpi_processes() > 1)
+        {
+          MPI_Barrier (partitioner->get_communicator());
 
-      for (unsigned int i=partitioner->this_mpi_process()+1;
-           i<partitioner->n_mpi_processes(); i++)
-        MPI_Barrier (partitioner->get_communicator());
+          for (unsigned int i=partitioner->this_mpi_process()+1;
+               i<partitioner->n_mpi_processes(); i++)
+            MPI_Barrier (partitioner->get_communicator());
+        }
 #endif
 
       AssertThrow (out, ExcIO());
