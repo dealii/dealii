@@ -236,6 +236,11 @@ public:
    */
   void print_matrices(std::ostream& os) const;
 
+  /**
+   * Print the copy index fields for debugging purposes.
+   */
+  void print_indices(std::ostream& os) const;
+  
 private:
 
   /**

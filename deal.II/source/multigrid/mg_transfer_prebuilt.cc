@@ -314,6 +314,20 @@ MGTransferPrebuilt<VECTOR>::print_matrices (std::ostream& os) const
     }
 }
 
+template <class VECTOR>
+void
+MGTransferPrebuilt<VECTOR>::print_indices (std::ostream& os) const
+{
+  os << "Copy indices" << std::endl;
+  for (unsigned int level = 0;level<copy_indices.size();++level)
+    {
+      os << "Level " << level << std::endl;
+      for (unsigned int i=0;i<copy_indices[level].size();++i)
+	os << copy_indices[level][i].first << '\t' << copy_indices[level][i].second << std::endl;
+      os << std::endl;
+    }
+}
+
 
 // explicit instantiation
 #include "mg_transfer_prebuilt.inst"
