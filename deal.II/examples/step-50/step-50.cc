@@ -820,8 +820,8 @@ namespace Step50
     // pass it as an argument.
     mg_transfer.build_matrices(mg_dof_handler);
 
-    matrix_t coarse_matrix;
-    coarse_matrix.copy_from (mg_matrices[0]);
+    matrix_t & coarse_matrix = mg_matrices[0];
+    //coarse_matrix.copy_from (mg_matrices[0]);
     //MGCoarseGridHouseholder<double,vector_t> coarse_grid_solver;
     //coarse_grid_solver.initialize (coarse_matrix);
 
@@ -1020,7 +1020,7 @@ namespace Step50
             // static const HyperBallBoundary<dim> boundary;
             // triangulation.set_boundary (0, boundary);
 
-            triangulation.refine_global (3);
+            triangulation.refine_global (1);
           }
         else
           triangulation.refine_global (1);
