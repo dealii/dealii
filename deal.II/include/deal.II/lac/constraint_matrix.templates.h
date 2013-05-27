@@ -987,9 +987,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
   // if the vector type supports parallel storage and if the
   // vector actually does it, we need to be a bit more
   // careful about how we do things
-  if ((vec.supports_distributed_data == true)
-      &&
-      (vec.locally_owned_elements() != complete_index_set(vec.size())))
+  if (vec.supports_distributed_data == true)
     {
       const IndexSet vec_owned_elements = vec.locally_owned_elements();
 
