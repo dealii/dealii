@@ -34,6 +34,8 @@
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer.templates.h>
 
+#include <algorithm>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -249,7 +251,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
-  for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
+  //  for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
+  for (unsigned int level=0; level<mg_dof.get_tria().n_levels(); ++level)
     {
       copy_indices[level].clear();
       copy_indices_from_me[level].clear();
@@ -302,6 +305,18 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
             }
         }
     }
+
+  // If we are in debugging mode, we order the copy indices, so we get
+  // more reliable output for regression texts
+#ifdef DEBUG
+  std::less<std::pair<unsigned int, unsigned int> > compare;
+  for (unsigned int level=0;level<copy_indices.size();++level)
+    std::sort(copy_indices[level].begin(), copy_indices[level].end(), compare);
+  for (unsigned int level=0;level<copy_indices_from_me.size();++level)
+    std::sort(copy_indices_from_me[level].begin(), copy_indices_from_me[level].end(), compare);
+  for (unsigned int level=0;level<copy_indices_to_me.size();++level)
+    std::sort(copy_indices_to_me[level].begin(), copy_indices_to_me[level].end(), compare);
+#endif
 }
 
 
@@ -321,13 +336,24 @@ template <class VECTOR>
 void
 MGTransferPrebuilt<VECTOR>::print_indices (std::ostream& os) const
 {
-  os << "Copy indices" << std::endl;
   for (unsigned int level = 0;level<copy_indices.size();++level)
     {
-      os << "Level " << level << std::endl;
       for (unsigned int i=0;i<copy_indices[level].size();++i)
-	os << copy_indices[level][i].first << '\t' << copy_indices[level][i].second << std::endl;
-      os << std::endl;
+  	os << "copy_indices[" << level
+	   << "]\t" << copy_indices[level][i].first << '\t' << copy_indices[level][i].second << std::endl;
+    }
+  
+  for (unsigned int level = 0;level<copy_indices_from_me.size();++level)
+    {
+      for (unsigned int i=0;i<copy_indices_from_me[level].size();++i)
+  	os << "copy_ifrom  [" << level
+	   << "]\t" << copy_indices_from_me[level][i].first << '\t' << copy_indices_from_me[level][i].second << std::endl;
+    }
+  for (unsigned int level = 0;level<copy_indices_to_me.size();++level)
+    {
+      for (unsigned int i=0;i<copy_indices_to_me[level].size();++i)
+  	os << "copy_ito    [" << level
+	   << "]\t" << copy_indices_to_me[level][i].first << '\t' << copy_indices_to_me[level][i].second << std::endl;
     }
 }
 
