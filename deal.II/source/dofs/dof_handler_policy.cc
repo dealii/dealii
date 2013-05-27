@@ -917,8 +917,12 @@ namespace internal
 
             number_caches[level].n_global_dofs = next_free_dof;
             number_caches[level].n_locally_owned_dofs = next_free_dof;
+            number_caches[level].locally_owned_dofs = complete_index_set(next_free_dof);
+            number_caches[level].locally_owned_dofs_per_processor.resize(1);
+            number_caches[level].locally_owned_dofs_per_processor[0] = complete_index_set(next_free_dof);
+            number_caches[level].n_locally_owned_dofs_per_processor.resize(1);
+            number_caches[level].n_locally_owned_dofs_per_processor[0] = next_free_dof;
           }
-
         const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler.get_tria()).load_user_flags (user_flags);
       }
 
