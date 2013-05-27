@@ -137,6 +137,8 @@ namespace Step50
 
     matrix_t system_matrix;
 
+    IndexSet locally_relevant_set;
+
     // We need an additional object for the
     // hanging nodes constraints. They are
     // handed to the transfer object in the
@@ -332,6 +334,9 @@ namespace Step50
               << mg_dof_handler.n_dofs(l);
     deallog  << std::endl;
 
+    DoFTools::extract_locally_relevant_dofs (mg_dof_handler,
+        locally_relevant_set);
+
 
     //solution.reinit (mg_dof_handler.n_dofs());
     //system_rhs.reinit (mg_dof_handler.n_dofs());
@@ -358,15 +363,15 @@ namespace Step50
     // correctly into the global linear system
     // right away, without the need for a later
     // clean-up stage:
-    constraints.clear ();
-    hanging_node_constraints.clear ();
+    constraints.reinit (locally_relevant_set);
+    hanging_node_constraints.reinit (locally_relevant_set);
     DoFTools::make_hanging_node_constraints (mg_dof_handler, hanging_node_constraints);
     DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
 
     typename FunctionMap<dim>::type      dirichlet_boundary;
     ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-    VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(mg_dof_handler),
+    VectorTools::interpolate_boundary_values (mg_dof_handler,
                                               dirichlet_boundary,
                                               constraints);
     constraints.close ();
@@ -951,10 +956,7 @@ namespace Step50
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
     TrilinosWrappers::MPI::Vector temp_solution;
-    IndexSet idx;
-    DoFTools::extract_locally_relevant_dofs (mg_dof_handler,
-                                             idx);
-    temp_solution.reinit(idx, MPI_COMM_WORLD);
+    temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
     temp_solution = solution;
     
     KellyErrorEstimator<dim>::estimate (static_cast<DoFHandler<dim>&>(mg_dof_handler),
@@ -976,23 +978,57 @@ namespace Step50
     DataOut<dim> data_out;
 
     TrilinosWrappers::MPI::Vector temp_solution;
-    IndexSet idx;
-    DoFTools::extract_locally_relevant_dofs (mg_dof_handler,
-                                             idx);
-    temp_solution.reinit(idx, MPI_COMM_WORLD);
+    temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
     temp_solution = solution;
+
+
+    TrilinosWrappers::MPI::Vector temp = solution;
+    system_matrix.residual(temp,solution,system_rhs);
+    TrilinosWrappers::MPI::Vector res_ghosted = temp_solution;
+    res_ghosted = temp;
 
     data_out.attach_dof_handler (mg_dof_handler);
     data_out.add_data_vector (temp_solution, "solution");
-    data_out.build_patches ();
+    data_out.add_data_vector (res_ghosted, "res");
+    Vector<float> subdomain (triangulation.n_active_cells());
+    for (unsigned int i=0; i<subdomain.size(); ++i)
+      subdomain(i) = triangulation.locally_owned_subdomain();
+    data_out.add_data_vector (subdomain, "subdomain");
 
-    std::ostringstream filename;
-    filename << "solution-"
-             << cycle
-             << ".vtk";
+    data_out.build_patches (3);
 
-    std::ofstream output (filename.str().c_str());
-    data_out.write_vtk (output);
+    const std::string filename = ("solution-" +
+                                  Utilities::int_to_string (cycle, 5) +
+                                  "." +
+                                  Utilities::int_to_string
+                                  (triangulation.locally_owned_subdomain(), 4) +
+                                  ".vtu");
+    std::ofstream output (filename.c_str());
+    data_out.write_vtu (output);
+
+    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+      {
+        std::vector<std::string> filenames;
+        for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+          filenames.push_back (std::string("solution-") +
+                               Utilities::int_to_string (cycle, 5) +
+                               "." +
+                               Utilities::int_to_string(i, 4) +
+                               ".vtu");
+        const std::string
+        pvtu_master_filename = ("solution-" +
+                                Utilities::int_to_string (cycle, 5) +
+                                ".pvtu");
+        std::ofstream pvtu_master (pvtu_master_filename.c_str());
+        data_out.write_pvtu_record (pvtu_master, filenames);
+
+        const std::string
+        visit_master_filename = ("solution-" +
+                                 Utilities::int_to_string (cycle, 5) +
+                                 ".visit");
+        std::ofstream visit_master (visit_master_filename.c_str());
+        data_out.write_visit_record (visit_master, filenames);
+      }
   }
 
 
@@ -1020,11 +1056,8 @@ namespace Step50
             // static const HyperBallBoundary<dim> boundary;
             // triangulation.set_boundary (0, boundary);
 
-            triangulation.refine_global (1);
           }
         else
-          triangulation.refine_global (1);
-	   //refine_grid ();
 
 
         deallog << "   Number of active cells:       "
@@ -1065,7 +1098,6 @@ int main (int argc, char *argv[])
       using namespace dealii;
       using namespace Step50;
 
-      LaplaceProblem<2> laplace_problem(1);
       laplace_problem.run ();
     }
   catch (std::exception &exc)
