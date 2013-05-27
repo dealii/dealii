@@ -161,15 +161,12 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
            i != copy_indices[level].end(); ++i)
         dst_level(i->second) = src(i->first);
 
+      for (IT i= copy_indices_to_me[level].begin();
+           i != copy_indices_to_me[level].end(); ++i)
+        dst_level(i->second) = src(i->first);
+
       dst_level.compress(VectorOperation::insert);
 
-      // For non-DG: degrees of
-      // freedom in the refinement
-      // face may need special
-      // attention, since they belong
-      // to the coarse level, but
-      // have fine level basis
-      // functions
       if (!first)
         restrict_and_add (level+1, dst[level], dst[level+1]);
 
@@ -199,14 +196,16 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
     {
       typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
 
-      if (constraints == 0)
-        for (IT i= copy_indices[level].begin();
-             i != copy_indices[level].end(); ++i)
-          dst(i->first) = src[level](i->second);
-      else
-        for (IT i= copy_indices[level].begin();
-             i != copy_indices[level].end(); ++i)
-          constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
+      // First copy all indices local to this process
+      for (IT i= copy_indices[level].begin();
+	   i != copy_indices[level].end(); ++i)
+	dst(i->first) = src[level](i->second);
+      
+      // Do the same for the indices where the level index is local,
+      // but the global index is not
+      for (IT i= copy_indices_from_me[level].begin();
+	   i != copy_indices_from_me[level].end(); ++i)
+	dst(i->first) = src[level](i->second);
     }
 }
 
@@ -233,6 +232,12 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
       for (IT i= copy_indices[level].begin();
            i != copy_indices[level].end(); ++i)
         dst(i->first) += src[level](i->second);
+
+      // Do the same for the indices where the level index is local,
+      // but the global index is not
+      for (IT i= copy_indices_from_me[level].begin();
+	   i != copy_indices_from_me[level].end(); ++i)
+	dst(i->first) += src[level](i->second);
     }
 }
 
