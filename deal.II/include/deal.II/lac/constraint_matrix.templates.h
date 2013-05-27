@@ -980,9 +980,25 @@ ConstraintMatrix::distribute (VectorType &vec) const
   Assert (sorted==true, ExcMatrixIsClosed());
 
   // if the vector type supports parallel storage and if the
-  // vector actually does it, we need to be a bit more
-  // careful about how we do things
-  if (vec.supports_distributed_data == true)
+  // vector actually does store only part of the vector, distributing
+  // is slightly more complicated. we can skip the complicated part
+  // if the local processor stores the *entire* vector and pretend
+  // that this is a sequential vector but we need to pay attention that
+  // in that case the other processors don't actually do anything (in
+  // particular that they do not call compress because the processor
+  // that owns everything doesn't do so either); this is the first if
+  // case here, the second is for the complicated case, the last else
+  // is for the simple case (sequential vector or distributed vector
+  // where the current processor stores everything)
+  if ((vec.supports_distributed_data == true)
+      &&
+      (vec.locally_owned_elements().n_elements() == 0))
+    {
+      // do nothing, in particular don't call compress()
+    }
+  else if ((vec.supports_distributed_data == true)
+           &&
+           (vec.locally_owned_elements() != complete_index_set(vec.size())))
     {
       const IndexSet vec_owned_elements = vec.locally_owned_elements();
 
