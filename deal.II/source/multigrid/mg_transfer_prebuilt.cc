@@ -290,10 +290,10 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
               if (global_mine && level_mine)
                 copy_indices[level].push_back(
                     std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
-              else if (!global_mine)
+              else if (level_mine)
                 copy_indices_from_me[level].push_back(
                     std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
-              else
+              else if (global_mine)
                 copy_indices_to_me[level].push_back(
                     std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
             }
