@@ -282,7 +282,6 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
               //skip if we did this global dof already (on this or a coarser level)
               if (dof_touched[global_idx])
                 continue;
-              dof_touched[global_idx] = true;
 
               bool global_mine = mg_dof.locally_owned_dofs().is_element(global_dof_indices[i]);
               bool level_mine = mg_dof.locally_owned_mg_dofs(level).is_element(level_dof_indices[i]);
@@ -296,6 +295,10 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
               else if (global_mine)
                 copy_indices_to_me[level].push_back(
                     std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+              else
+                continue;
+
+              dof_touched[global_idx] = true;
             }
         }
     }

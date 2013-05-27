@@ -911,7 +911,7 @@ namespace Step50
                             mg_transfer,
                             mg_smoother,
                             mg_smoother);
-    //mg.set_debug(6);
+    mg.set_debug(6);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t> >
@@ -925,8 +925,20 @@ namespace Step50
 
     solution = 0;
 
+    try
+    {
     cg.solve (system_matrix, solution, system_rhs,
               preconditioner);
+    }
+    catch (...)
+    {
+        output_results(42);
+        constraints.distribute (solution);
+        output_results(43);
+        MPI_Barrier(MPI_COMM_WORLD);
+        exit(0);
+    }
+
     constraints.distribute (solution);
   }
 
@@ -967,6 +979,7 @@ namespace Step50
     GridRefinement::refine_and_coarsen_fixed_number (triangulation,
                                                      estimated_error_per_cell,
                                                      0.3, 0.03);
+
     triangulation.execute_coarsening_and_refinement ();
   }
 
@@ -986,6 +999,7 @@ namespace Step50
     system_matrix.residual(temp,solution,system_rhs);
     TrilinosWrappers::MPI::Vector res_ghosted = temp_solution;
     res_ghosted = temp;
+
 
     data_out.attach_dof_handler (mg_dof_handler);
     data_out.add_data_vector (temp_solution, "solution");
@@ -1056,8 +1070,11 @@ namespace Step50
             // static const HyperBallBoundary<dim> boundary;
             // triangulation.set_boundary (0, boundary);
 
+            triangulation.refine_global (2);
           }
         else
+          //triangulation.refine_global (1);
+	   refine_grid ();
 
 
         deallog << "   Number of active cells:       "
@@ -1098,6 +1115,7 @@ int main (int argc, char *argv[])
       using namespace dealii;
       using namespace Step50;
 
+      LaplaceProblem<2> laplace_problem(3);
       laplace_problem.run ();
     }
   catch (std::exception &exc)
