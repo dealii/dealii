@@ -1248,11 +1248,27 @@ namespace TrilinosWrappers
   {
     IndexSet is (size());
 
-    // TODO: Trilinos does allow non-contiguous ranges for locally
-    // owned elements. if that is the case for the current
-    // vector, local_range() will throw an exception. Fix this.
-    const std::pair<unsigned int, unsigned int> x = local_range();
-    is.add_range (x.first, x.second);
+    // easy case: local range is contiguous
+    if (vector->Map().LinearMap())
+      {
+        const std::pair<unsigned int, unsigned int> x = local_range();
+        is.add_range (x.first, x.second);
+      }
+    else if (vector->Map().NumMyElements() > 0)
+      {
+        const unsigned int n_indices = vector->Map().NumMyElements();
+        int * vector_indices = vector->Map().MyGlobalElements();
+        unsigned int range_start = vector_indices[0];
+        unsigned int range_end = range_start+1;
+        for (unsigned int i=1; i<n_indices; ++i, ++range_end)
+          if (static_cast<unsigned int>(vector_indices[i]) != range_end)
+            {
+              is.add_range(range_start, range_end);
+              range_end = range_start = vector_indices[i];
+            }
+        is.add_range(range_start, range_end);
+        is.compress();
+      }
 
     return is;
   }

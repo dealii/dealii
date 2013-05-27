@@ -745,6 +745,16 @@ namespace internal
             vec(i) = 0;
       }
 
+      // TODO: in general we should iterate over the constraints and not over all DoFs
+      // for performance reasons
+      template<typename Number>
+      void set_zero_parallel(const dealii::ConstraintMatrix &cm, parallel::distributed::Vector<Number> &vec, unsigned int shift = 0)
+      {
+        for (unsigned int i=0; i<vec.local_size(); ++i)
+          if (cm.is_constrained (shift + vec.local_range().first+i))
+            vec.local_element(i) = 0;
+      }
+
       template<class VEC>
       void set_zero_in_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, internal::bool2type<false>)
       {
@@ -793,21 +803,6 @@ namespace internal
       void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::BlockVector<T> &vec)
       {
         set_zero_serial(cm, vec);
-      }
-
-
-      template<class T>
-      void set_zero_all(const dealii::ConstraintMatrix &, dealii::parallel::distributed::Vector<T> &)
-      {
-        // should use the general template above, but requires that
-        // some member functions are added to parallel::distributed::Vector
-        Assert (false, ExcNotImplemented());
-      }
-
-      template<class T>
-      void set_zero_all(const dealii::ConstraintMatrix &, dealii::parallel::distributed::BlockVector<T> &)
-      {
-        Assert (false, ExcNotImplemented());
       }
     }
   }
