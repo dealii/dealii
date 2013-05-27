@@ -66,6 +66,7 @@ void check_simple(const FiniteElement<dim>& fe)
   transfer.build_matrices(mgdof);
   
   transfer.print_matrices(deallog.get_file_stream());
+  transfer.print_indices(deallog.get_file_stream());
 }
 
 
