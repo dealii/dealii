@@ -1822,9 +1822,9 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
       min_eigenvalue = data.max_eigenvalue/data.smoothing_range;
     }
 
-  const double alpha = (data.smoothing_range > 0 ?
+  const double alpha = (data.smoothing_range > 1. ?
                         max_eigenvalue / data.smoothing_range :
-                        max_eigenvalue / min_eigenvalue);
+                        std::min(0.9*max_eigenvalue, min_eigenvalue));
   delta = (max_eigenvalue-alpha)*0.5;
   theta = (max_eigenvalue+alpha)*0.5;
 
