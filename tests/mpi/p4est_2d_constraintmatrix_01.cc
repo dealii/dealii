@@ -58,7 +58,7 @@ void test()
   dofh.distribute_dofs (fe);
 
   IndexSet dof_set;
-  DoFTools::extract_locally_active_dofs (dofh, dof_set);
+  DoFTools::extract_locally_relevant_dofs (dofh, dof_set);
 
   ConstraintMatrix cm;
   DoFTools::make_hanging_node_constraints (dofh, cm);
