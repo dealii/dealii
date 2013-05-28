@@ -634,15 +634,27 @@ public:
   operator () (const TableIndices<N> &indices) const;
 
   /**
-   * Determine an estimate for the
-   * memory consumption (in bytes)
-   * of this object.
+   * Swap the contents of this table and the other table @p v. One could do
+   * this operation with a temporary variable and copying over the data
+   * elements, but this function is significantly more efficient since it only
+   * swaps the pointers to the data of the two vectors and therefore does not
+   * need to allocate temporary storage and move data around.
+   *
+   * This function is analog to the the @p swap function of all C++ standard
+   * containers. Also, there is a global function <tt>swap(u,v)</tt> that
+   * simply calls <tt>u.swap(v)</tt>, again in analogy to standard functions.
+   */
+  void swap (TableBase<N,T> &v);
+
+  /**
+   * Determine an estimate for the memory consumption (in bytes) of this
+   * object.
    */
   std::size_t memory_consumption () const;
 
   /**
-   * Write or read the data of this object to or
-   * from a stream for the purpose of serialization.
+   * Write or read the data of this object to or from a stream for the purpose
+   * of serialization.
    */
   template <class Archive>
   void serialize (Archive &ar, const unsigned int version);
@@ -2079,6 +2091,17 @@ TableBase<N,T>::fill (const T2 *entries)
 
 template <int N, typename T>
 inline
+void
+TableBase<N,T>::swap (TableBase<N,T> &v)
+{
+  values.swap(v.values);
+  std::swap (table_size, v.table_size);
+}
+
+
+
+template <int N, typename T>
+inline
 std::size_t
 TableBase<N,T>::memory_consumption () const
 {
@@ -3168,6 +3191,23 @@ Table<7,T>::operator () (const TableIndices<7> &indices)
 
 
 #endif // DOXYGEN
+
+
+
+/**
+ * Global function @p swap which overloads the default implementation
+ * of the C++ standard library which uses a temporary object. The
+ * function simply exchanges the data of the two tables.
+ *
+ * @author Martin Kronbichler, 2013
+ */
+template <int N, typename T>
+inline
+void swap (TableBase<N,T> &u, TableBase<N,T> &v)
+{
+  u.swap (v);
+}
+
 DEAL_II_NAMESPACE_CLOSE
 
 #endif

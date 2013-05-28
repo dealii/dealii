@@ -47,49 +47,35 @@ class FE_FaceQ : public FE_PolyFace<TensorProductPolynomials<dim-1>, dim, spaced
 {
 public:
   /**
-   * Constructor for tensor product
-   * polynomials of degree
-   * <tt>p</tt>. The shape
-   * functions created using this
-   * constructor correspond to
-   * Legendre polynomials in each
-   * coordinate direction.
+   * Constructor for tensor product polynomials of degree <tt>p</tt>. The
+   * shape functions created using this constructor correspond to Lagrange
+   * polynomials in each coordinate direction.
    */
   FE_FaceQ(unsigned int p);
 
   virtual FiniteElement<dim,spacedim> *clone() const;
 
   /**
-   * Return a string that uniquely
-   * identifies a finite
-   * element. This class returns
-   * <tt>FE_FaceQ<dim>(degree)</tt>, with
-   * <tt>dim</tt> and <tt>degree</tt>
-   * replaced by appropriate
-   * values.
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_FaceQ<dim>(degree)</tt>, with <tt>dim</tt> and
+   * <tt>degree</tt> replaced by appropriate values.
    */
   virtual std::string get_name () const;
 
   /**
    * Check for non-zero values on a face.
    *
-   * This function returns
-   * @p true, if the shape
-   * function @p shape_index has
-   * non-zero values on the face
-   * @p face_index.
+   * This function returns @p true, if the shape function @p shape_index has
+   * non-zero values on the face @p face_index.
    *
-   * Implementation of the
-   * interface in
-   * FiniteElement
+   * Implementation of the interface in FiniteElement
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
                                     const unsigned int face_index) const;
 
 private:
   /**
-   * Return vector with dofs per
-   * vertex, line, quad, hex.
+   * Return vector with dofs per vertex, line, quad, hex.
    */
   static std::vector<unsigned int> get_dpo_vector (const unsigned int deg);
 };

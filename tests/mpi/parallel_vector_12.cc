@@ -28,7 +28,7 @@ DeclException2 (ExcNonEqual,
 void test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 

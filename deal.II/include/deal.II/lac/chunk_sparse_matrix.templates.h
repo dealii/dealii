@@ -192,26 +192,28 @@ namespace internal
                                 const unsigned int  end_row,
                                 const number       *values,
                                 const std::size_t  *rowstart,
-                                const unsigned int *colnums,
+                                const size_type    *colnums,
                                 const InVector     &src,
                                 OutVector          &dst)
     {
-      const unsigned int m = cols.n_rows();
-      const unsigned int n = cols.n_cols();
-      const unsigned int chunk_size = cols.get_chunk_size();
+      const size_type m = cols.n_rows();
+      const size_type n = cols.n_cols();
+      const size_type chunk_size = cols.get_chunk_size();
 
       // loop over all chunks. note that we need to treat the last chunk row
       // and column differently if they have padding elements
-      const unsigned int n_filled_last_rows = m % chunk_size;
-      const unsigned int n_filled_last_cols = n % chunk_size;
+      const size_type n_filled_last_rows = m % chunk_size;
+      const size_type n_filled_last_cols = n % chunk_size;
 
-      const unsigned int last_regular_row = n_filled_last_rows > 0 ?
-                                            std::min(m/chunk_size, end_row) : end_row;
-      const unsigned int irregular_col = n/chunk_size;
+      const size_type last_regular_row = n_filled_last_rows > 0 ?
+                                            std::min(m/chunk_size, 
+                                                static_cast<size_type>(end_row)) : 
+                                            end_row;
+      const size_type irregular_col = n/chunk_size;
 
       typename OutVector::iterator dst_ptr = dst.begin()+chunk_size*begin_row;
       const number *val_ptr= &values[rowstart[begin_row]*chunk_size*chunk_size];
-      const unsigned int *colnum_ptr = &colnums[rowstart[begin_row]];
+      const size_type *colnum_ptr = &colnums[rowstart[begin_row]];
       for (unsigned int chunk_row=begin_row; chunk_row<last_regular_row;
            ++chunk_row)
         {
@@ -226,8 +228,8 @@ namespace internal
                                  dst_ptr);
               else
                 // we're at a chunk column that has padding
-                for (unsigned int r=0; r<chunk_size; ++r)
-                  for (unsigned int c=0; c<n_filled_last_cols; ++c)
+                for (size_type r=0; r<chunk_size; ++r)
+                  for (size_type c=0; c<n_filled_last_cols; ++c)
                     dst_ptr[r] += (val_ptr[r*chunk_size + c] *
                                    src(*colnum_ptr * chunk_size + c));
 
@@ -241,7 +243,7 @@ namespace internal
       // now deal with last chunk row if necessary
       if (n_filled_last_rows > 0 && end_row == (m/chunk_size+1))
         {
-          const unsigned int chunk_row = last_regular_row;
+          const size_type chunk_row = last_regular_row;
 
           const number *const val_end_of_row = &values[rowstart[chunk_row+1] *
                                                        chunk_size * chunk_size];
@@ -250,16 +252,16 @@ namespace internal
               if (*colnum_ptr != irregular_col)
                 {
                   // we're at a chunk row but not column that has padding
-                  for (unsigned int r=0; r<n_filled_last_rows; ++r)
-                    for (unsigned int c=0; c<chunk_size; ++c)
+                  for (size_type r=0; r<n_filled_last_rows; ++r)
+                    for (size_type c=0; c<chunk_size; ++c)
                       dst_ptr[r]
                       += (val_ptr[r*chunk_size + c] *
                           src(*colnum_ptr * chunk_size + c));
                 }
               else
                 // we're at a chunk row and column that has padding
-                for (unsigned int r=0; r<n_filled_last_rows; ++r)
-                  for (unsigned int c=0; c<n_filled_last_cols; ++c)
+                for (size_type r=0; r<n_filled_last_rows; ++r)
+                  for (size_type c=0; c<n_filled_last_cols; ++c)
                     dst_ptr[r]
                     += (val_ptr[r*chunk_size + c] *
                         src(*colnum_ptr * chunk_size + c));

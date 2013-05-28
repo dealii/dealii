@@ -954,21 +954,20 @@ namespace DoFTools
    *
    * Otherwise, if @p face_1 and @p face_2 are not active faces, this
    * function loops recursively over the children of @p face_1 and @p face_2.
-   *
-   * For this to work @p face_1 and @p face_2 must have the same
-   * refinement history, i.e. either @p face_1 and @p face_2 must be active
-   * faces or must be isotropically refined and have the same number of
-   * child faces that recursively obey this rule. (The anisotropic case
-   * is not yet implemented.)
+   * If only one of the two faces is active, then we recursively iterate
+   * over the children of the non-active ones and make sure that the
+   * solution function on the refined side equals that on the non-refined
+   * face in much the same way as we enforce hanging node constraints
+   * at places where differently refined cells come together. (However,
+   * unlike hanging nodes, we do not enforce the requirement that there
+   * be only a difference of one refinement level between the two sides
+   * of the domain you would like to be periodic).
    *
    * This routine only constrains DoFs that are not already constrained.
    * If this routine encounters a DoF that already is constrained (for
    * instance by Dirichlet boundary conditions), the old setting of the
    * constraint (dofs the entry is constrained to, inhomogeneities) is
    * kept and nothing happens.
-   *
-   * Furthermore, no DoFs belonging to (or belonging to any descendant
-   * of) @p face_2 get constrained or get marked as being constrained.
    *
    * The flags in the @p component_mask (see @ref GlossComponentMask)
    * denote which components of the finite element space shall be
@@ -1107,7 +1106,7 @@ namespace DoFTools
    * boundary with faces belonging to the second boundary with the help
    * of @p orthogonal_equality.
    *
-   * If this matching is successfull it constrains all DoFs associated
+   * If this matching is successful it constrains all DoFs associated
    * with the 'first' boundary to the respective DoFs of the 'second'
    * boundary respecting the relative orientation of the two faces.
    *
@@ -1116,9 +1115,6 @@ namespace DoFTools
    * instance by Dirichlet boundary conditions), the old setting of the
    * constraint (dofs the entry is constrained to, inhomogeneities) is
    * kept and nothing happens.
-   *
-   * Furthermore, no DoFs belonging to the 'second' boundary get
-   * constrained or get marked as being constrained.
    *
    * The flags in the last parameter, @p component_mask (see @ref
    * GlossComponentMask) denote which components of the finite element space

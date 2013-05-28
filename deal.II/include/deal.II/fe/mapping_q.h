@@ -20,7 +20,7 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-template <int dim> class TensorProductPolynomials;
+template <int dim, typename POLY> class TensorProductPolynomials;
 
 
 /*!@addtogroup mapping */

@@ -2733,11 +2733,7 @@ public:
    *
    * See the @ref GlossSubdomainId
    * "glossary" for more
-   * information. This function
-   * should not be called if you
-   * use a
-   * parallel::distributed::Triangulation
-   * object.
+   * information.
    */
   types::subdomain_id subdomain_id () const;
 

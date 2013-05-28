@@ -109,7 +109,7 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::solve (const size_type  n_eigenvectors, 
+  SolverBase::solve (const size_type  n_eigenpairs, 
 		     size_type *n_converged)
   {
     int ierr;
@@ -163,7 +163,7 @@ namespace SLEPcWrappers
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     // set number of eigenvectors to compute
-    ierr = EPSSetDimensions (solver_data->eps, n_eigenvectors,
+    ierr = EPSSetDimensions (solver_data->eps, n_eigenpairs,
                              PETSC_DECIDE, PETSC_DECIDE);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
@@ -186,8 +186,7 @@ namespace SLEPcWrappers
 
     // get number of converged eigenstates
     ierr = EPSGetConverged (solver_data->eps,
-                            reinterpret_cast<PetscInt *>(n_converged)
-                           );
+                            reinterpret_cast<PetscInt *>(n_converged));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
     PetscInt n_iterations = 0;
@@ -220,14 +219,31 @@ namespace SLEPcWrappers
 
   void
   SolverBase::get_eigenpair (const size_type            index,
-                             double                    &kr,
-                             PETScWrappers::VectorBase &vr)
+                             double                    &eigenvalues,
+                             PETScWrappers::VectorBase &eigenvectors)
   {
     AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());
 
     // get converged eigenpair
     int ierr = EPSGetEigenpair (solver_data->eps, index,
-                                &kr, PETSC_NULL, vr, PETSC_NULL);
+                                &eigenvalues, PETSC_NULL, 
+				eigenvectors, PETSC_NULL);
+    AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+  }
+
+  void
+  SolverBase::get_eigenpair (const unsigned int         index,
+                             double                    &real_eigenvalues,
+                             double                    &imag_eigenvalues,
+                             PETScWrappers::VectorBase &real_eigenvectors,
+                             PETScWrappers::VectorBase &imag_eigenvectors)
+  {
+    AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());
+    
+    // get converged eigenpair
+    int ierr = EPSGetEigenpair (solver_data->eps, index,
+				&real_eigenvalues, &imag_eigenvalues, 
+				real_eigenvectors, imag_eigenvectors);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
@@ -283,8 +299,8 @@ namespace SLEPcWrappers
 
   int
   SolverBase::convergence_test (EPS          /*eps             */,
-                                PetscScalar  /*kr              */,
-                                PetscScalar  /*ki              */,
+                                PetscScalar  /*real_eigenvalue */,
+                                PetscScalar  /*imag_eigenvalue */,
                                 PetscReal    /*residual_norm   */,
                                 PetscReal   */*estimated_error */,
                                 void        */*solver_control_x*/)

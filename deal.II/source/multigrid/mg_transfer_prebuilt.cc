@@ -34,6 +34,8 @@
 #include <deal.II/multigrid/mg_transfer.h>
 #include <deal.II/multigrid/mg_transfer.templates.h>
 
+#include <algorithm>
+
 DEAL_II_NAMESPACE_OPEN
 
 
@@ -85,7 +87,7 @@ template <int dim, int spacedim>
 void MGTransferPrebuilt<VECTOR>::build_matrices (
   const DoFHandler<dim,spacedim>  &mg_dof)
 {
-  const unsigned int n_levels      = mg_dof.get_tria().n_levels();
+  const unsigned int n_levels      = mg_dof.get_tria().n_global_levels();
   const unsigned int dofs_per_cell = mg_dof.get_fe().dofs_per_cell;
 
   sizes.resize(n_levels);
@@ -142,7 +144,10 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       std::vector<types::global_dof_index> entries (dofs_per_cell);
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
-        if (cell->has_children())
+        if (cell->has_children() &&
+            ( mg_dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
+                || cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain()
+                ))
           {
             cell->get_mg_dof_indices (dof_indices_parent);
 
@@ -175,15 +180,23 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                   }
               }
           }
-
-      prolongation_sparsities[level]->copy_from (csp);
+      
+      internal::MatrixSelector<VECTOR>::reinit(*prolongation_matrices[level],
+					       *prolongation_sparsities[level],
+					       level,
+					       csp,
+					       mg_dof);
       csp.reinit(0,0);
-      prolongation_matrices[level]->reinit (*prolongation_sparsities[level]);
-
+      
+      FullMatrix<double> prolongation;
+      
       // now actually build the matrices
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
-        if (cell->has_children())
+        if (cell->has_children() &&
+            (mg_dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
+             || cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain())
+             )
           {
             cell->get_mg_dof_indices (dof_indices_parent);
 
@@ -194,9 +207,15 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                 // set an alias to the
                 // prolongation matrix for
                 // this child
-                const FullMatrix<double> &prolongation
+                prolongation
                   = mg_dof.get_fe().get_prolongation_matrix (child,
                                                              cell->refinement_case());
+		
+		if (mg_constrained_dofs != 0 && mg_constrained_dofs->set_boundary_values())
+		  for (unsigned int j=0;j<dofs_per_cell; ++j)
+		    if (mg_constrained_dofs->is_boundary_index(level, dof_indices_parent[j]))
+		      for (unsigned int i=0; i<dofs_per_cell; ++i)
+			prolongation(i,j) = 0.;
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
@@ -210,119 +229,133 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                                                      true);
               }
           }
+      prolongation_matrices[level]->compress(VectorOperation::insert);
     }
 
-
-  // impose boundary conditions
-  // but only in the column of
-  // the prolongation matrix
-  if (mg_constrained_dofs != 0)
-    if (mg_constrained_dofs->set_boundary_values())
-      {
-        std::vector<types::global_dof_index> constrain_indices;
-        for (int level=n_levels-2; level>=0; --level)
-          {
-            if (mg_constrained_dofs->get_boundary_indices()[level].size() == 0)
-              continue;
-
-            // need to delete all the columns in the
-            // matrix that are on the boundary. to achieve
-            // this, create an array as long as there are
-            // matrix columns, and find which columns we
-            // need to filter away.
-            constrain_indices.resize (0);
-            constrain_indices.resize (prolongation_matrices[level]->n(), 0);
-            std::set<types::global_dof_index>::const_iterator dof
-            = mg_constrained_dofs->get_boundary_indices()[level].begin(),
-            endd = mg_constrained_dofs->get_boundary_indices()[level].end();
-            for (; dof != endd; ++dof)
-              constrain_indices[*dof] = 1;
-
-            const types::global_dof_index n_dofs = prolongation_matrices[level]->m();
-            for (types::global_dof_index i=0; i<n_dofs; ++i)
-              {
-                typename internal::MatrixSelector<VECTOR>::Matrix::iterator
-                start_row = prolongation_matrices[level]->begin(i),
-                end_row   = prolongation_matrices[level]->end(i);
-                for (; start_row != end_row; ++start_row)
-                  {
-                    if (constrain_indices[start_row->column()] == 1)
-                      start_row->value() = 0;
-                  }
-              }
-          }
-      }
-
-  // to find the indices that describe the
-  // relation between global dofs and local
-  // numbering on the individual level, first
-  // create a temp vector where the ith level
-  // entry contains the respective global
-  // entry. this gives a neat way to find those
-  // indices. in a second step, actually build
-  // the std::vector<std::pair<uint,uint> > that
-  // only contains the active dofs on the
-  // levels.
+  // Now we are filling the variables copy_indices*, which are essentially
+  // maps from global to mg dof for each level stored as a std::vector of
+  // pairs. We need to split this map on each level depending on the ownership
+  // of the global and mg dof, so that we later not access non-local elements
+  // in copy_to/from_mg.
+  // Here we keep track in the bitfield dof_touched which global dof has
+  // been processed already (otherwise we would get dublicates on each level
+  // and on different levels). Note that it is important that we iterate
+  // the levels starting from 0, so that mg dofs on coarser levels "win".
 
   copy_indices.resize(n_levels);
-  std::vector<types::global_dof_index> temp_copy_indices;
+  copy_indices_from_me.resize(n_levels);
+  copy_indices_to_me.resize(n_levels);
+  IndexSet globally_relevant;
+  DoFTools::extract_locally_relevant_dofs(mg_dof, globally_relevant);
+  std::vector<bool> dof_touched(globally_relevant.n_elements(), false);
+
   std::vector<types::global_dof_index> global_dof_indices (dofs_per_cell);
   std::vector<types::global_dof_index> level_dof_indices  (dofs_per_cell);
-  for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
+  //  for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
+  for (unsigned int level=0; level<mg_dof.get_tria().n_levels(); ++level)
     {
       copy_indices[level].clear();
+      copy_indices_from_me[level].clear();
+      copy_indices_to_me[level].clear();
+
       typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_cell = mg_dof.begin_active(level);
       const typename DoFHandler<dim,spacedim>::active_cell_iterator
       level_end  = mg_dof.end_active(level);
 
-      temp_copy_indices.resize (0);
-      temp_copy_indices.resize (mg_dof.n_dofs(level), numbers::invalid_dof_index);
-
-      // Compute coarse level right hand side
-      // by restricting from fine level.
       for (; level_cell!=level_end; ++level_cell)
         {
-          // get the dof numbers of
-          // this cell for the global
-          // and the level-wise
+          if (mg_dof.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+              &&  level_cell->level_subdomain_id()!=mg_dof.get_tria().locally_owned_subdomain())
+            continue;
+
+          // get the dof numbers of this cell for the global and the level-wise
           // numbering
-          level_cell->get_dof_indices(global_dof_indices);
+          level_cell->get_dof_indices (global_dof_indices);
           level_cell->get_mg_dof_indices (level_dof_indices);
 
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             {
-              if (mg_constrained_dofs != 0)
-                {
-                  if (!mg_constrained_dofs->at_refinement_edge(level,level_dof_indices[i]))
-                    temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
-                }
+              // we need to ignore if the DoF is on a refinement edge (hanging node)
+              if (mg_constrained_dofs != 0
+                  && mg_constrained_dofs->at_refinement_edge(level, level_dof_indices[i]))
+                continue;
+
+              unsigned int global_idx = globally_relevant.index_within_set(global_dof_indices[i]);
+              //skip if we did this global dof already (on this or a coarser level)
+              if (dof_touched[global_idx])
+                continue;
+
+              bool global_mine = mg_dof.locally_owned_dofs().is_element(global_dof_indices[i]);
+              bool level_mine = mg_dof.locally_owned_mg_dofs(level).is_element(level_dof_indices[i]);
+
+              if (global_mine && level_mine)
+                copy_indices[level].push_back(
+                    std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+              else if (level_mine)
+                copy_indices_from_me[level].push_back(
+                    std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+              else if (global_mine)
+                copy_indices_to_me[level].push_back(
+                    std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
               else
-                temp_copy_indices[level_dof_indices[i]] = global_dof_indices[i];
+                continue;
+
+              dof_touched[global_idx] = true;
             }
         }
-
-      // now all the active dofs got a valid entry,
-      // the other ones have an invalid entry. Count
-      // the invalid entries and then resize the
-      // copy_indices object. Then, insert the pairs
-      // of global index and level index into
-      // copy_indices.
-      const types::global_dof_index n_active_dofs =
-        std::count_if (temp_copy_indices.begin(), temp_copy_indices.end(),
-                       std::bind2nd(std::not_equal_to<types::global_dof_index>(),
-                                    numbers::invalid_dof_index));
-      copy_indices[level].resize (n_active_dofs);
-      types::global_dof_index counter = 0;
-      for (types::global_dof_index i=0; i<temp_copy_indices.size(); ++i)
-        if (temp_copy_indices[i] != numbers::invalid_dof_index)
-          copy_indices[level][counter++] =
-            std::pair<types::global_dof_index, unsigned int> (temp_copy_indices[i], i);
-      Assert (counter == n_active_dofs, ExcInternalError());
     }
+
+  // If we are in debugging mode, we order the copy indices, so we get
+  // more reliable output for regression texts
+#ifdef DEBUG
+  std::less<std::pair<types::global_dof_index, unsigned int> > compare;
+  for (unsigned int level=0;level<copy_indices.size();++level)
+    std::sort(copy_indices[level].begin(), copy_indices[level].end(), compare);
+  for (unsigned int level=0;level<copy_indices_from_me.size();++level)
+    std::sort(copy_indices_from_me[level].begin(), copy_indices_from_me[level].end(), compare);
+  for (unsigned int level=0;level<copy_indices_to_me.size();++level)
+    std::sort(copy_indices_to_me[level].begin(), copy_indices_to_me[level].end(), compare);
+#endif
 }
 
 
+template <class VECTOR>
+void
+MGTransferPrebuilt<VECTOR>::print_matrices (std::ostream& os) const
+{
+  for (unsigned int level = 0;level<prolongation_matrices.size();++level)
+    {
+      os << "Level " << level << std::endl;
+      prolongation_matrices[level]->print(os);
+      os << std::endl;
+    }
+}
+
+template <class VECTOR>
+void
+MGTransferPrebuilt<VECTOR>::print_indices (std::ostream& os) const
+{
+  for (unsigned int level = 0;level<copy_indices.size();++level)
+    {
+      for (unsigned int i=0;i<copy_indices[level].size();++i)
+  	os << "copy_indices[" << level
+	   << "]\t" << copy_indices[level][i].first << '\t' << copy_indices[level][i].second << std::endl;
+    }
+  
+  for (unsigned int level = 0;level<copy_indices_from_me.size();++level)
+    {
+      for (unsigned int i=0;i<copy_indices_from_me[level].size();++i)
+  	os << "copy_ifrom  [" << level
+	   << "]\t" << copy_indices_from_me[level][i].first << '\t' << copy_indices_from_me[level][i].second << std::endl;
+    }
+  for (unsigned int level = 0;level<copy_indices_to_me.size();++level)
+    {
+      for (unsigned int i=0;i<copy_indices_to_me[level].size();++i)
+  	os << "copy_ito    [" << level
+	   << "]\t" << copy_indices_to_me[level][i].first << '\t' << copy_indices_to_me[level][i].second << std::endl;
+    }
+}
 
 
 // explicit instantiation

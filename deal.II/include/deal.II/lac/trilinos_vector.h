@@ -194,9 +194,22 @@ namespace TrilinosWrappers
       typedef dealii::types::global_dof_index size_type;
 
       /**
+       * A variable that indicates whether this vector
+       * supports distributed data storage. If true, then
+       * this vector also needs an appropriate compress()
+       * function that allows communicating recent set or
+       * add operations to individual elements to be communicated
+       * to other processors.
+       *
+       * For the current class, the variable equals
+       * true, since it does support parallel data storage.
+       */
+      static const bool supports_distributed_data = true;
+
+      /**
        * @name Basic constructors and initalization.
        */
-//@{
+      //@{
       /**
        * Default constructor that
        * generates an empty (zero size)
@@ -602,6 +615,21 @@ namespace TrilinosWrappers
      * Declare type for container size.
      */
     typedef dealii::types::global_dof_index size_type;
+
+    /**
+     * A variable that indicates whether this vector
+     * supports distributed data storage. If true, then
+     * this vector also needs an appropriate compress()
+     * function that allows communicating recent set or
+     * add operations to individual elements to be communicated
+     * to other processors.
+     *
+     * For the current class, the variable equals
+     * false, since it does not support parallel data storage.
+     * If you do need parallel data storage, use
+     * TrilinosWrappers::MPI::Vector.
+     */
+    static const bool supports_distributed_data = false;
 
     /**
      * Default constructor that

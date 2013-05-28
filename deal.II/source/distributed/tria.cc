@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -2553,7 +2553,8 @@ namespace parallel
       Assert (ghostlayer, ExcInternalError());
 
 
-      //set all cells to artificial
+      // set all cells to artificial. we will later set it to the correct
+      // subdomain in match_tree_recursively
       for (typename Triangulation<dim,spacedim>::cell_iterator
            cell = this->begin(0);
            cell != this->end(0);
@@ -2607,7 +2608,7 @@ namespace parallel
             }
 
           // check mesh for ghostcells,
-          // refine as neccessary.
+          // refine as necessary.
           // iterate over every ghostquadrant,
           // find corresponding deal coarsecell
           // and recurse.

@@ -33,7 +33,7 @@
 #  include <Epetra_FECrsMatrix.h>
 #  include <Epetra_Map.h>
 #  include <Epetra_CrsGraph.h>
-#  include <Epetra_Vector.h>
+#  include <Epetra_MultiVector.h>
 #  ifdef DEAL_II_WITH_MPI
 #    include <Epetra_MpiComm.h>
 #    include "mpi.h"
@@ -2968,7 +2968,7 @@ namespace TrilinosWrappers
     Epetra_CombineMode mode = last_action;
     if (last_action == Zero)
     {
-      if ((operation==::dealii::VectorOperation::add) &&
+      if ((operation==::dealii::VectorOperation::add) ||
           (operation==::dealii::VectorOperation::unknown))
         mode = Add;
       else if (operation==::dealii::VectorOperation::insert)
@@ -3121,9 +3121,9 @@ namespace TrilinosWrappers
     TrilinosWrappers::types::int_type n_columns;
 
     TrilinosScalar short_val_array[100];
-    int short_index_array[100];
+    TrilinosWrappers::types::int_type short_index_array[100];
     std::vector<TrilinosScalar> long_val_array;
-    std::vector<int> long_index_array;
+    std::vector<TrilinosWrappers::types::int_type> long_index_array;
 
 
     // If we don't elide zeros, the pointers are already available... need to
@@ -3347,9 +3347,9 @@ namespace TrilinosWrappers
     TrilinosWrappers::types::int_type n_columns;
 
     double short_val_array[100];
-    int short_index_array[100];
+    TrilinosWrappers::types::int_type short_index_array[100];
     std::vector<TrilinosScalar> long_val_array;
-    std::vector<int> long_index_array;
+    std::vector<TrilinosWrappers::types::int_type> long_index_array;
 
     // If we don't elide zeros, the pointers are already available... need to
     // cast to non-const pointers as that is the format taken by Trilinos (but
@@ -3689,9 +3689,11 @@ namespace TrilinosWrappers
     const size_type src_local_size = src.end() - src.begin();
     AssertDimension (src_local_size, static_cast<size_type>(matrix->DomainMap().NumMyElements()));
 
-    Epetra_Vector tril_dst (View, matrix->RangeMap(), dst.begin());
-    Epetra_Vector tril_src (View, matrix->DomainMap(),
-                            const_cast<TrilinosScalar *>(src.begin()));
+    Epetra_MultiVector tril_dst (View, matrix->RangeMap(), dst.begin(),
+                                 matrix->DomainMap().NumMyPoints(), 1);
+    Epetra_MultiVector tril_src (View, matrix->DomainMap(),
+                                 const_cast<TrilinosScalar *>(src.begin()),
+                                 matrix->DomainMap().NumMyPoints(), 1);
 
     const int ierr = matrix->Multiply (false, tril_src, tril_dst);
     Assert (ierr == 0, ExcTrilinosError(ierr));
@@ -3715,9 +3717,11 @@ namespace TrilinosWrappers
     const size_type src_local_size = src.end() - src.begin();
     AssertDimension (src_local_size, static_cast<size_type>(matrix->RangeMap().NumMyElements()));
 
-    Epetra_Vector tril_dst (View, matrix->DomainMap(), dst.begin());
-    Epetra_Vector tril_src (View, matrix->RangeMap(),
-                            const_cast<double *>(src.begin()));
+    Epetra_MultiVector tril_dst (View, matrix->DomainMap(), dst.begin(),
+                                 matrix->DomainMap().NumMyPoints(), 1);
+    Epetra_MultiVector tril_src (View, matrix->RangeMap(),
+                                 const_cast<double *>(src.begin()),
+                                 matrix->DomainMap().NumMyPoints(), 1);
 
     const int ierr = matrix->Multiply (true, tril_src, tril_dst);
     Assert (ierr == 0, ExcTrilinosError(ierr));

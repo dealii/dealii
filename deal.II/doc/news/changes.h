@@ -64,10 +64,24 @@ this function.
 
 
 <ol>
-  <li> Fixed: setting values in TrilinosWrappers::SparseMatrix
-  in parallel was adding the values instead.
+
+  <li> New: All vector classes now have a member function
+  <code>locally_owned_elements</code> that returns an index
+  set indicating which elements of this vector the current
+  processor owns.
   <br>
-  (Bruno Turcksin, Timo Heister, 2013/05/03)
+  (Wolfgang Bangerth, 2013/05/24)
+  </li>
+
+
+  <li> New: A new element FE_Q_iso_Q1 has been implemented that is defined by
+  a subdivision of the element into smaller Q1 elements. An element of order
+  @p p is similar to FE_Q of degree @p p with the same numbering of degrees of
+  freedom. The element is useful e.g. for defining a sparser preconditioner
+  matrix for AMG at higher order FE_Q elements or for representing a component
+  of a system of PDEs where higher resolution is preferred over high order.
+  <br>
+  (Martin Kronbichler, 2013/05/14)
   </li>
 
   <li> New: The step-49 tutorial program now also has a discussion on
@@ -117,11 +131,101 @@ this function.
 
 <ol>
 
+<li> Improved: Triangulation::begin(level) and Triangulation::end(level) now return an
+empty iterator range if the level is larger than the maximal locally owned level,
+but still in the global level range of a distributed Triangulation.
+<br>
+(Timo Heister and Guido Kanschat, 2013/05/26)
+</li>
+
+<li> New: The IndexSet::add_indices function that takes another IndexSet
+object now has an additional argument <code>offset</code> that can be used
+to offset the indices of first argument.
+<br>
+(Wolfgang Bangerth, 2013/05/25)
+</li>
+
+<li> New: ConstraintMatrix::distribute is now also implemented for
+arguments of type PETScWrappers::MPI::BlockVector.
+<br>
+(Wolfgang Bangerth, 2013/05/25)
+</li>
+
+<li> Fixed: IndexSet::operator== returned the wrong results
+in some cases.
+<br>
+(Wolfgang Bangerth, 2013/05/25)
+</li>
+
+<li> New: The global function <code>complete_index_set()</code>
+creates and returns an index set of given size that contains
+every single index with this range.
+<br>
+(Wolfgang Bangerth, 2013/05/24)
+</li>
+
+<li> New: All vector classes now have a static member variable
+<code>supports_distributed_data</code> that indicates whether the
+vector class supports data that is distributed across multiple
+processors. This variable is provided as a <i>traits variable</i>
+to allow generic algorithms working on general vector types to
+query the capabilities of the vector class at compile time.
+<br>
+(Wolfgang Bangerth, 2013/05/23)
+</li>
+
+<li> Fixed: FETools::back_interpolate has been revised to work correctly
+also with parallel::distributed::Vector.
+<br>
+(Martin Steigemann, 2013/05/23)
+</li>
+
+<li> Removed: The file <code>mesh_worker/vector_info.h</code> was unused and
+untested. It has thus been removed.
+<br>
+(Wolfgang Bangerth, Guido Kanschat, 2013/05/21)
+</li>
+
+<li> Fixed: The method parallel::distributed::Vector::compress
+(VectorOperation::insert) previously set the elements of ghost elements
+unconditionally on the owning processor, even if they had not been touched.
+This led to a problem in certain library functions where vector entries became
+zero in a spurious way. This is now fixed by discarding the elements in ghost
+entries for the VectorOperation::insert operation. This is legitimate since we
+assume consistency of set elements across processors, so the owning processor
+sets the element already.
+<br>
+(Martin Kronbichler, 2013/05/21)
+</li>
+
+<li> Improved: DoFTools::make_periodicity_constraints now also works
+for meshes where the refinement level of the two sides of the domain
+is not the same, i.e., one side is more refined than the other.
+<br>
+(Wolfgang Bangerth, 2013/05/20)
+</li>
+
+<li> Improved: Through the fields DataOutBase::VtkFlags::time and
+DataOutBase::VtkFlags::cycle, it is now possible to encode the time and/or
+cycle within a nonlinear or other iteration in VTK and VTU files written
+via DataOutBase::write_vtk and DataOutBase::write_vtu.
+<br>
+(Wolfgang Bangerth, 2013/05/12)
+</li>
+
+<li> Fixed: The method ConvergenceTable::evaluate_convergence_rates with
+ reference column did not take the dimension of the reference column into
+ account, leading to wrong logarithmic rates for dim!=2. This can now be fixed
+ by specifying the dimension as a last argument.
+<br>
+(Martin Kronbichler, 2013/05/10)
+</li>
+
 <li> Improved: The functions MatrixTools::create_mass_matrix and
 MatrixTools::create_laplace_matrix take now an optional ConstraintMatrix
 argument that allows to directly apply the constraints. This also helps
 VectorTools::project. Note that not providing constraints remains the default
-and recommended way to ensure consistency when several matrices are added.
+and recommended way to ensure consistency when several matrices are combined.
 <br>
 (Martin Kronbichler, 2013/05/08)
 </li>
@@ -141,8 +245,8 @@ parallel in shared memory.
 </li>
 
 <li> New: The class ChunkSparseMatrix and the associated
-ChunkSparsityPattern now offer iterator classes to iterate over rows or the
-whole matrix in an STL-like way.
+ChunkSparsityPattern now offer iterator classes to iterate over rows of the
+matrix in an STL-like way.
 <br>
 (Martin Kronbichler, 2013/05/07)
 </li>
@@ -158,8 +262,8 @@ is now fixed.
 iterations of the modified Gram&ndash;Schmidt algorithm for
 orthogonalization. In many situations one iteration is enough. The algorithm
 can now detect loss of orthogonality and enables re-orthogonalization only if
-necessary. The second iteration can be forced by the flag
-SolverGMRES::AdditionalData::force_re_orthogonalization, though.
+necessary. The second iteration (and, hence, old behavior) can be forced by
+the flag SolverGMRES::AdditionalData::force_re_orthogonalization.
 <br>
 (Martin Kronbichler, 2013/05/06)
 </li>
@@ -170,7 +274,13 @@ vector types, not just dealii::Vector and dealii::BlockVector.
 (Wolfgang Bangerth, 2013/05/06)
 </li>
 
-<li> Fixed: Generate an error if the users tries to refine a cell
+<li> Fixed: setting values in TrilinosWrappers::SparseMatrix
+in parallel was adding the values instead.
+<br>
+(Bruno Turcksin, Timo Heister, 2013/05/03)
+</li>
+
+<li> Fixed: Generate an error if the user tries to refine a cell
 that is already on the maximum level in a distributed triangulation.
 <br>
 (Timo Heister, 2013/05/01)
@@ -332,13 +442,17 @@ sense.
 (Guido Kanschat, 2013/03/21)
 </li>
 
-<li> Added GridOut::write_svg to allow for the output of two-dimensional
-triangulations in two space dimensions in the SVG format (Scalable Vector
-Graphics, an XML-based vector image format recommended by the World
-Wide Web Consortium W3C). This function also provides cell coloring
-and cell labeling for the visualization of basic cell properties.
+<li> Added GridOut::write_svg() to allow for the output of 
+two-dimensional triangulations in two space dimensions in the SVG 
+format (Scalable Vector Graphics, an generic XML-based vector image 
+format developed and maintained by the World Wide Web Consortium W3C). 
+This function also provides cell coloring and cell labeling for the 
+visualization of basic cell properties. Pespective view is further 
+possible and the cell level number may be converted into altitude, 
+revealing the inactive cells lying below. 
 <br>
 (Christian Wülker, 2013/03/21)
+</li>
 
 <li> Added TimerOutput::reset to remove the collected information so far and
 added a new frequency TimerOutput::never to only output information if
@@ -361,6 +475,16 @@ values, but can of course not be used in any useful way.
 This is now fixed.
 <br>
 (Timo Heister, 2013/03/01)
+</li>
+
+<li> Added DataOutBase::write_svg() to allow for the output of a given 
+list of patches in two space dimensions in the SVG format (Scalable Vector
+Graphics, an generic XML-based vector image format developed and maintained 
+by the World Wide Web Consortium W3C). An additional dimension (z-direction) 
+is employed for the visualization of data values taken from a data vector.
+This function also provides patch coloring for the visual enhancement.  
+<br>
+(Christian Wülker, 2013/05/10)
 </li>
 
 </ol>

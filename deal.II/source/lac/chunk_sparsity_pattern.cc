@@ -727,7 +727,7 @@ ChunkSparsityPattern::memory_consumption () const
 // explicit instantiations
 template
 void ChunkSparsityPattern::copy_from<SparsityPattern> (const SparsityPattern &,
-                                                       const unsigned int,
+                                                       const size_type,
                                                        const bool);
 template
 void ChunkSparsityPattern::copy_from<CompressedSparsityPattern> (const CompressedSparsityPattern &,

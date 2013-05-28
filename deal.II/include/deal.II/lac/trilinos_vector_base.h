@@ -527,6 +527,22 @@ namespace TrilinosWrappers
     bool in_local_range (const size_type index) const;
 
     /**
+     * Return an index set that describes which elements of this vector
+     * are owned by the current processor. Note that this index set does
+     * not include elements this vector may store locally as ghost
+     * elements but that are in fact owned by another processor.
+     * As a consequence, the index sets returned on different
+     * processors if this is a distributed vector will form disjoint
+     * sets that add up to the complete index set.
+     * Obviously, if a vector is created on only one processor, then
+     * the result would satisfy
+     * @code
+     *   vec.locally_owned_elements() == complete_index_set (vec.size())
+     * @endcode
+     */
+    IndexSet locally_owned_elements () const;
+
+    /**
      * Return if the vector contains ghost
      * elements. This answer is true if there
      * are ghost elements on at least one
@@ -1232,6 +1248,39 @@ namespace TrilinosWrappers
 
 
   inline
+  IndexSet
+  VectorBase::locally_owned_elements() const
+  {
+    IndexSet is (size());
+
+    // easy case: local range is contiguous
+    if (vector->Map().LinearMap())
+      {
+        const std::pair<unsigned int, unsigned int> x = local_range();
+        is.add_range (x.first, x.second);
+      }
+    else if (vector->Map().NumMyElements() > 0)
+      {
+        const unsigned int n_indices = vector->Map().NumMyElements();
+        int * vector_indices = vector->Map().MyGlobalElements();
+        unsigned int range_start = vector_indices[0];
+        unsigned int range_end = range_start+1;
+        for (unsigned int i=1; i<n_indices; ++i, ++range_end)
+          if (static_cast<unsigned int>(vector_indices[i]) != range_end)
+            {
+              is.add_range(range_start, range_end);
+              range_end = range_start = vector_indices[i];
+            }
+        is.add_range(range_start, range_end);
+        is.compress();
+      }
+
+    return is;
+  }
+
+
+
+  inline
   bool
   VectorBase::has_ghost_elements() const
   {
@@ -1267,7 +1316,7 @@ namespace TrilinosWrappers
 
 
   inline
-  typename VectorBase::iterator
+  VectorBase::iterator
   VectorBase::begin()
   {
     return (*vector)[0];
@@ -1276,7 +1325,7 @@ namespace TrilinosWrappers
 
 
   inline
-  typename VectorBase::iterator
+  VectorBase::iterator
   VectorBase::end()
   {
     return (*vector)[0]+local_size();
@@ -1285,7 +1334,7 @@ namespace TrilinosWrappers
 
 
   inline
-  typename VectorBase::const_iterator
+  VectorBase::const_iterator
   VectorBase::begin() const
   {
     return (*vector)[0];
@@ -1294,7 +1343,7 @@ namespace TrilinosWrappers
 
 
   inline
-  typename VectorBase::const_iterator
+  VectorBase::const_iterator
   VectorBase::end() const
   {
     return (*vector)[0]+local_size();

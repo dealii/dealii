@@ -917,8 +917,12 @@ namespace internal
 
             number_caches[level].n_global_dofs = next_free_dof;
             number_caches[level].n_locally_owned_dofs = next_free_dof;
+            number_caches[level].locally_owned_dofs = complete_index_set(next_free_dof);
+            number_caches[level].locally_owned_dofs_per_processor.resize(1);
+            number_caches[level].locally_owned_dofs_per_processor[0] = complete_index_set(next_free_dof);
+            number_caches[level].n_locally_owned_dofs_per_processor.resize(1);
+            number_caches[level].n_locally_owned_dofs_per_processor[0] = next_free_dof;
           }
-
         const_cast<dealii::Triangulation<dim, spacedim>&>(dof_handler.get_tria()).load_user_flags (user_flags);
       }
 
@@ -1745,7 +1749,6 @@ namespace internal
               MPI_Isend(&(*buffer)[0], buffer->size(),
                         MPI_BYTE, it->first,
                         123, tr->get_communicator(), &requests[idx]);
-              std::cout << "send ghostdata: " << tr->locally_owned_subdomain() << "->" << it->first << std::endl;
             }
 
 
@@ -1799,8 +1802,6 @@ namespace internal
               MPI_Probe(MPI_ANY_SOURCE, 123, tr->get_communicator(), &status);
               MPI_Get_count(&status, MPI_BYTE, &len);
               receive.resize(len);
-
-              std::cout << "receive ghostdata: " << status.MPI_SOURCE << "->" << tr->locally_owned_subdomain() << std::endl;
 
               char *ptr = &receive[0];
               MPI_Recv(ptr, len, MPI_BYTE, status.MPI_SOURCE, status.MPI_TAG,
@@ -1856,8 +1857,6 @@ namespace internal
             unsigned int sum_recv=0;
             unsigned int sent=needs_to_get_cells.size();
             unsigned int recv=senders.size();
-
-            std::cout << tr->locally_owned_subdomain() << " " << sent << " " << recv << std::endl;
 
             MPI_Reduce(&sent, &sum_send, 1, MPI_UNSIGNED, MPI_SUM, 0, tr->get_communicator());
             MPI_Reduce(&recv, &sum_recv, 1, MPI_UNSIGNED, MPI_SUM, 0, tr->get_communicator());
@@ -2159,7 +2158,6 @@ namespace internal
 
         for (unsigned int level = 0; level < n_levels; ++level)
           {
-            std::cout << tr->locally_owned_subdomain() << ": on level " << level << std::endl;
             NumberCache &number_cache = number_caches[level];
 
             //* 1. distribute on own
@@ -2183,7 +2181,7 @@ namespace internal
                 endc = dof_handler.end(level);
 
                 for (; cell != endc; ++cell)
-                  if (!cell->is_artificial() &&
+                  if (cell->level_subdomain_id()!=numbers::artificial_subdomain_id &&
                       (cell->level_subdomain_id() < tr->locally_owned_subdomain()))
                     {
                       // we found a

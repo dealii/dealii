@@ -11,6 +11,8 @@
 /*    to the file deal.II/doc/license.html for the  text  and     */
 /*    further information on this license.                        */
 
+// parallel geometric multi-grid. work in progress!
+
 // As discussed in the introduction, most of
 // this program is copied almost verbatim
 // from step-6, which itself is only a slight
@@ -47,6 +49,7 @@
 #include <deal.II/grid/tria_accessor.h>
 #include <deal.II/grid/tria_iterator.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/grid_out.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_boundary_lib.h>
 
@@ -132,8 +135,9 @@ namespace Step50
     typedef TrilinosWrappers::SparseMatrix matrix_t;
     typedef TrilinosWrappers::MPI::Vector vector_t;
 
-    SparsityPattern      sparsity_pattern;
     matrix_t system_matrix;
+
+    IndexSet locally_relevant_set;
 
     // We need an additional object for the
     // hanging nodes constraints. They are
@@ -188,7 +192,6 @@ namespace Step50
     // transpose of the other, and so we only
     // have to build one; we choose the one
     // from coarse to fine.
-    MGLevelObject<SparsityPattern>       mg_sparsity_patterns;
     MGLevelObject<matrix_t> mg_matrices;
     MGLevelObject<matrix_t> mg_interface_matrices;
     MGConstrainedDoFs                    mg_constrained_dofs;
@@ -279,11 +282,15 @@ namespace Step50
   LaplaceProblem<dim>::LaplaceProblem (const unsigned int degree)
     :
     triangulation (MPI_COMM_WORLD,Triangulation<dim>::
-                   limit_level_difference_at_vertices),
+                   limit_level_difference_at_vertices,
+                   parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
     fe (degree),
     mg_dof_handler (triangulation),
     degree(degree)
-  {}
+  {
+    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD)!=0)
+      deallog.depth_console(0);
+  }
 
 
 
@@ -296,6 +303,21 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::setup_system ()
   {
+    std::string filename = "grid-"
+      + Utilities::int_to_string(triangulation.n_levels(), 2)
+      + "-"
+      + Utilities::int_to_string (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD), 3)
+      + ".svg";
+    
+    std::ofstream out (filename.c_str());
+    GridOut grid_out;
+    GridOutFlags::Svg svg_flags;
+    svg_flags.polar_angle = 60;
+    svg_flags.label_level_subdomain_id = true;
+    svg_flags.convert_level_number_to_height = true;
+    grid_out.set_flags(svg_flags);
+    grid_out.write_svg (triangulation, out);
+    
     mg_dof_handler.distribute_dofs (fe);
     mg_dof_handler.distribute_mg_dofs (fe);
 
@@ -312,10 +334,8 @@ namespace Step50
               << mg_dof_handler.n_dofs(l);
     deallog  << std::endl;
 
-    sparsity_pattern.reinit (mg_dof_handler.n_dofs(),
-                             mg_dof_handler.n_dofs(),
-                             mg_dof_handler.max_couplings_between_dofs());
-    DoFTools::make_sparsity_pattern (mg_dof_handler, sparsity_pattern);
+    DoFTools::extract_locally_relevant_dofs (mg_dof_handler,
+        locally_relevant_set);
 
 
     //solution.reinit (mg_dof_handler.n_dofs());
@@ -343,22 +363,23 @@ namespace Step50
     // correctly into the global linear system
     // right away, without the need for a later
     // clean-up stage:
-    constraints.clear ();
-    hanging_node_constraints.clear ();
+    constraints.reinit (locally_relevant_set);
+    hanging_node_constraints.reinit (locally_relevant_set);
     DoFTools::make_hanging_node_constraints (mg_dof_handler, hanging_node_constraints);
     DoFTools::make_hanging_node_constraints (mg_dof_handler, constraints);
 
     typename FunctionMap<dim>::type      dirichlet_boundary;
     ZeroFunction<dim>                    homogeneous_dirichlet_bc (1);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-    VectorTools::interpolate_boundary_values (static_cast<const DoFHandler<dim>&>(mg_dof_handler),
+    VectorTools::interpolate_boundary_values (mg_dof_handler,
                                               dirichlet_boundary,
                                               constraints);
     constraints.close ();
     hanging_node_constraints.close ();
-    constraints.condense (sparsity_pattern);
-    sparsity_pattern.compress();
-    system_matrix.reinit (sparsity_pattern);
+
+    CompressedSimpleSparsityPattern csp(mg_dof_handler.n_dofs(), mg_dof_handler.n_dofs());
+    DoFTools::make_sparsity_pattern (mg_dof_handler, csp, constraints);
+    system_matrix.reinit (mg_dof_handler.locally_owned_dofs(), csp, MPI_COMM_WORLD, true);
 
     // The multigrid constraints have to be
     // initialized. They need to know about
@@ -384,13 +405,12 @@ namespace Step50
     // SparseMatrix classes, since they have to
     // release their SparsityPattern before the
     // can be destroyed upon resizing.
-    const unsigned int n_levels = triangulation.n_levels();
+    const unsigned int n_levels = triangulation.n_global_levels();
 
     mg_interface_matrices.resize(0, n_levels-1);
     mg_interface_matrices.clear ();
     mg_matrices.resize(0, n_levels-1);
     mg_matrices.clear ();
-    mg_sparsity_patterns.resize(0, n_levels-1);
 
     // Now, we have to provide a matrix on each
     // level. To this end, we first use the
@@ -425,10 +445,15 @@ namespace Step50
                    mg_dof_handler.n_dofs(level));
         MGTools::make_sparsity_pattern(mg_dof_handler, csp, level);
 
-        mg_sparsity_patterns[level].copy_from (csp);
+        mg_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
+            mg_dof_handler.locally_owned_mg_dofs(level),
+            csp,
+            MPI_COMM_WORLD, true);
 
-        mg_matrices[level].reinit(mg_sparsity_patterns[level]);
-        mg_interface_matrices[level].reinit(mg_sparsity_patterns[level]);
+        mg_interface_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
+            mg_dof_handler.locally_owned_mg_dofs(level),
+            csp,
+            MPI_COMM_WORLD, true);
       }
   }
 
@@ -504,6 +529,9 @@ namespace Step50
                                                   local_dof_indices,
                                                   system_matrix, system_rhs);
         }
+
+    system_matrix.compress(VectorOperation::add);
+    system_rhs.compress(VectorOperation::add);
   }
 
 
@@ -738,6 +766,12 @@ namespace Step50
                                        local_dof_indices,
                                        mg_interface_matrices[cell->level()]);
         }
+
+    for (unsigned int i=0;i<triangulation.n_global_levels();++i)
+      {
+        mg_matrices[i].compress(VectorOperation::add);
+        mg_interface_matrices[i].compress(VectorOperation::add);
+      }
   }
 
 
@@ -791,8 +825,8 @@ namespace Step50
     // pass it as an argument.
     mg_transfer.build_matrices(mg_dof_handler);
 
-    matrix_t coarse_matrix;
-    coarse_matrix.copy_from (mg_matrices[0]);
+    matrix_t & coarse_matrix = mg_matrices[0];
+    //coarse_matrix.copy_from (mg_matrices[0]);
     //MGCoarseGridHouseholder<double,vector_t> coarse_grid_solver;
     //coarse_grid_solver.initialize (coarse_matrix);
 
@@ -845,11 +879,11 @@ namespace Step50
     // preconditioner make sure that we get a
     // symmetric operator even for nonsymmetric
     // smoothers:
-    typedef TrilinosWrappers::PreconditionSOR Smoother;
+    typedef TrilinosWrappers::PreconditionJacobi Smoother;
     MGSmootherPrecondition<matrix_t, Smoother, vector_t> mg_smoother;
     mg_smoother.initialize(mg_matrices);
     mg_smoother.set_steps(2);
-    mg_smoother.set_symmetric(true);
+    //mg_smoother.set_symmetric(false);
 
     // The next preparatory step is that we
     // must wrap our level and interface
@@ -877,6 +911,7 @@ namespace Step50
                             mg_transfer,
                             mg_smoother,
                             mg_smoother);
+    mg.set_debug(6);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t> >
@@ -885,13 +920,25 @@ namespace Step50
     // With all this together, we can finally
     // get about solving the linear system in
     // the usual way:
-    SolverControl solver_control (1000, 1e-12);
+    SolverControl solver_control (50, 1e-12, false);
     SolverCG<vector_t>    cg (solver_control);
 
     solution = 0;
 
+    try
+    {
     cg.solve (system_matrix, solution, system_rhs,
               preconditioner);
+    }
+    catch (...)
+    {
+        output_results(42);
+        constraints.distribute (solution);
+        output_results(43);
+        MPI_Barrier(MPI_COMM_WORLD);
+        exit(0);
+    }
+
     constraints.distribute (solution);
   }
 
@@ -920,14 +967,19 @@ namespace Step50
   {
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
+    TrilinosWrappers::MPI::Vector temp_solution;
+    temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
+    temp_solution = solution;
+    
     KellyErrorEstimator<dim>::estimate (static_cast<DoFHandler<dim>&>(mg_dof_handler),
                                         QGauss<dim-1>(3),
                                         typename FunctionMap<dim>::type(),
-                                        solution,
+                                        temp_solution,
                                         estimated_error_per_cell);
     GridRefinement::refine_and_coarsen_fixed_number (triangulation,
                                                      estimated_error_per_cell,
                                                      0.3, 0.03);
+
     triangulation.execute_coarsening_and_refinement ();
   }
 
@@ -938,17 +990,59 @@ namespace Step50
   {
     DataOut<dim> data_out;
 
+    TrilinosWrappers::MPI::Vector temp_solution;
+    temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
+    temp_solution = solution;
+
+
+    TrilinosWrappers::MPI::Vector temp = solution;
+    system_matrix.residual(temp,solution,system_rhs);
+    TrilinosWrappers::MPI::Vector res_ghosted = temp_solution;
+    res_ghosted = temp;
+
+
     data_out.attach_dof_handler (mg_dof_handler);
-    data_out.add_data_vector (solution, "solution");
-    data_out.build_patches ();
+    data_out.add_data_vector (temp_solution, "solution");
+    data_out.add_data_vector (res_ghosted, "res");
+    Vector<float> subdomain (triangulation.n_active_cells());
+    for (unsigned int i=0; i<subdomain.size(); ++i)
+      subdomain(i) = triangulation.locally_owned_subdomain();
+    data_out.add_data_vector (subdomain, "subdomain");
 
-    std::ostringstream filename;
-    filename << "solution-"
-             << cycle
-             << ".vtk";
+    data_out.build_patches (3);
 
-    std::ofstream output (filename.str().c_str());
-    data_out.write_vtk (output);
+    const std::string filename = ("solution-" +
+                                  Utilities::int_to_string (cycle, 5) +
+                                  "." +
+                                  Utilities::int_to_string
+                                  (triangulation.locally_owned_subdomain(), 4) +
+                                  ".vtu");
+    std::ofstream output (filename.c_str());
+    data_out.write_vtu (output);
+
+    if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)
+      {
+        std::vector<std::string> filenames;
+        for (unsigned int i=0; i<Utilities::MPI::n_mpi_processes(MPI_COMM_WORLD); ++i)
+          filenames.push_back (std::string("solution-") +
+                               Utilities::int_to_string (cycle, 5) +
+                               "." +
+                               Utilities::int_to_string(i, 4) +
+                               ".vtu");
+        const std::string
+        pvtu_master_filename = ("solution-" +
+                                Utilities::int_to_string (cycle, 5) +
+                                ".pvtu");
+        std::ofstream pvtu_master (pvtu_master_filename.c_str());
+        data_out.write_pvtu_record (pvtu_master, filenames);
+
+        const std::string
+        visit_master_filename = ("solution-" +
+                                 Utilities::int_to_string (cycle, 5) +
+                                 ".visit");
+        std::ofstream visit_master (visit_master_filename.c_str());
+        data_out.write_visit_record (visit_master, filenames);
+      }
   }
 
 
@@ -971,19 +1065,20 @@ namespace Step50
 
         if (cycle == 0)
           {
-            GridGenerator::hyper_ball (triangulation);
+            GridGenerator::hyper_cube (triangulation);
 
-            static const HyperBallBoundary<dim> boundary;
-            triangulation.set_boundary (0, boundary);
+            // static const HyperBallBoundary<dim> boundary;
+            // triangulation.set_boundary (0, boundary);
 
-            triangulation.refine_global (1);
+            triangulation.refine_global (2);
           }
         else
-          refine_grid ();
+          //triangulation.refine_global (1);
+	   refine_grid ();
 
 
         deallog << "   Number of active cells:       "
-                << triangulation.n_active_cells()
+                << triangulation.n_global_active_cells()
                 << std::endl;
 
         setup_system ();
@@ -1020,7 +1115,7 @@ int main (int argc, char *argv[])
       using namespace dealii;
       using namespace Step50;
 
-      LaplaceProblem<2> laplace_problem(1);
+      LaplaceProblem<2> laplace_problem(3);
       laplace_problem.run ();
     }
   catch (std::exception &exc)

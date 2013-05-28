@@ -2,7 +2,7 @@
 //    transfer.cc,v 1.13 2005/12/30 16:07:03 guido Exp
 //    Version:
 //
-//    Copyright (C) 2000 - 2007, 2009, 2010 by the deal.II authors
+//    Copyright (C) 2000 - 2007, 2009, 2010, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -45,8 +45,8 @@ void
 reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
 	       MGLevelObject<dealii::Vector<number> > &v)
 {
-  for (unsigned int level=v.get_minlevel();
-       level<=v.get_maxlevel();++level)
+  for (unsigned int level=v.min_level();
+       level<=v.max_leve();++level)
     {
       unsigned int n = mg_dof.n_dofs (level);
       v[level].reinit(n);

@@ -1851,7 +1851,7 @@ namespace internal
   inline
   void compress_finish (parallel::distributed::Vector<Number> &vec)
   {
-    vec.compress_finish();
+    vec.compress_finish(::dealii::VectorOperation::add);
   }
 
 

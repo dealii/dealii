@@ -19,6 +19,8 @@
 #include <deal.II/lac/sparsity_pattern.h>
 #include <deal.II/lac/identity_matrix.h>
 #include <deal.II/lac/exceptions.h>
+// Included for VectorOperation
+#include <deal.II/lac/vector.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -26,7 +28,6 @@ template <typename number> class Vector;
 template <typename number> class FullMatrix;
 template <typename Matrix> class BlockMatrixBase;
 template <typename number> class SparseILU;
-
 
 #ifdef DEAL_II_WITH_TRILINOS
 namespace TrilinosWrappers
@@ -475,8 +476,9 @@ namespace SparseMatrixIterators
  * @<double@></tt>; others can be generated in application programs (see the
  * section on @ref Instantiations in the manual).
  *
+ * @ingroup Matrix1
  * @author Essentially everyone who has ever worked on deal.II
- * @date 1994-2010
+ * @date 1994-2013
  */
 template <typename number>
 class SparseMatrix : public virtual Subscriptor
@@ -706,6 +708,11 @@ public:
    * object. See MemoryConsumption.
    */
   std::size_t memory_consumption () const;
+  
+  /**
+   * Dummy function for compatibility with distributed, parallel matrices.
+   */
+  void compress (::dealii::VectorOperation::values);
 
 //@}
   /**

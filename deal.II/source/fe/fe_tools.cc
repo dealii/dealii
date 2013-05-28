@@ -1630,6 +1630,79 @@ namespace FETools
 
 
 
+  namespace internal
+  {
+    namespace
+    {
+      template <int dim, int spacedim, class InVector>
+      void back_interpolate (const DoFHandler<dim,spacedim> &dof1,
+                             const ConstraintMatrix &constraints1,
+                             const InVector &u1,
+                             const DoFHandler<dim,spacedim> &dof2,
+                             const ConstraintMatrix &constraints2,
+                             InVector &u1_interpolated)
+      {
+        Vector<typename InVector::value_type> u2(dof2.n_dofs());
+        interpolate(dof1, u1, dof2, constraints2, u2);
+        interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
+      }
+
+      // special version for PETSc
+#ifdef DEAL_II_WITH_PETSC
+      template <int dim, int spacedim>
+      void back_interpolate (const DoFHandler<dim,spacedim> &dof1,
+                             const ConstraintMatrix &constraints1,
+                             const PETScWrappers::MPI::Vector &u1,
+                             const DoFHandler<dim,spacedim> &dof2,
+                             const ConstraintMatrix &constraints2,
+                             PETScWrappers::MPI::Vector &u1_interpolated)
+      {
+        // if u1 is a parallel distributed PETSc vector, we create a
+        // vector u2 with based on the sets of locally owned and relevant
+        // dofs of dof2
+        IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
+        IndexSet  dof2_locally_relevant_dofs;
+        DoFTools::extract_locally_relevant_dofs (dof2,
+                                                 dof2_locally_relevant_dofs);
+
+        PETScWrappers::MPI::Vector  u2_out (u1.get_mpi_communicator(),
+                                            dof2_locally_owned_dofs);
+        interpolate(dof1, u1, dof2, constraints2, u2_out);
+        PETScWrappers::MPI::Vector  u2 (u1.get_mpi_communicator(),
+                                        dof2_locally_owned_dofs,
+                                        dof2_locally_relevant_dofs);
+        u2 = u2_out;
+        interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
+      }
+#endif
+
+      // special version for parallel::distributed::Vector
+      template <int dim, int spacedim, typename Number>
+      void back_interpolate (const DoFHandler<dim,spacedim> &dof1,
+                             const ConstraintMatrix &constraints1,
+                             const parallel::distributed::Vector<Number> &u1,
+                             const DoFHandler<dim,spacedim> &dof2,
+                             const ConstraintMatrix &constraints2,
+                             parallel::distributed::Vector<Number> &u1_interpolated)
+      {
+        IndexSet dof2_locally_owned_dofs = dof2.locally_owned_dofs();
+        IndexSet dof2_locally_relevant_dofs;
+        DoFTools::extract_locally_relevant_dofs (dof2,
+                                                 dof2_locally_relevant_dofs);
+
+        parallel::distributed::Vector<Number> 
+          u2 (dof2_locally_owned_dofs,
+              dof2_locally_relevant_dofs,
+              u1.get_mpi_communicator());
+
+        interpolate(dof1, u1, dof2, constraints2, u2);
+        u2.update_ghost_values ();
+        interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
+      }
+    }
+  }
+
+
   template <int dim, class InVector, class OutVector, int spacedim>
   void back_interpolate(const DoFHandler<dim,spacedim> &dof1,
                         const ConstraintMatrix &constraints1,
@@ -1638,10 +1711,8 @@ namespace FETools
                         const ConstraintMatrix &constraints2,
                         OutVector &u1_interpolated)
   {
-    // For discontinuous elements
-    // without constraints take the
-    // simpler version of the
-    // back_interpolate function.
+    // For discontinuous elements without constraints take the simpler version
+    // of the back_interpolate function.
     if (dof1.get_fe().dofs_per_vertex==0 && dof2.get_fe().dofs_per_vertex==0
         && constraints1.n_constraints()==0 && constraints2.n_constraints()==0)
       back_interpolate(dof1, u1, dof2.get_fe(), u1_interpolated);
@@ -1653,44 +1724,11 @@ namespace FETools
         Assert(u1_interpolated.size()==dof1.n_dofs(),
                ExcDimensionMismatch(u1_interpolated.size(), dof1.n_dofs()));
 
-        // For continuous elements
-        // first interpolate to dof2,
-        // taking into account
-        // constraints2, and then
-        // interpolate back to dof1
-        // taking into account
-        // constraints1
-#ifdef DEAL_II_WITH_PETSC
-        if (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1) != 0)
-          {
-            AssertThrow (dynamic_cast<const PETScWrappers::MPI::Vector *>(&u1_interpolated) != 0,
-                         ExcMessage("Interpolation can only be done between vectors of same type!"));
-
-            // if u1 is a parallel distributed
-            // PETSc vector, we create a vector u2
-            // with based on the sets of locally owned
-            // and relevant dofs of dof2
-            IndexSet  dof2_locally_owned_dofs = dof2.locally_owned_dofs();
-            IndexSet  dof2_locally_relevant_dofs;
-            DoFTools::extract_locally_relevant_dofs (dof2,
-                                                     dof2_locally_relevant_dofs);
-
-            PETScWrappers::MPI::Vector  u2_out (dynamic_cast<const PETScWrappers::MPI::Vector *> (&u1)->get_mpi_communicator(),
-                dof2_locally_owned_dofs);
-            interpolate(dof1, u1, dof2, constraints2, u2_out);
-            PETScWrappers::MPI::Vector  u2 (dynamic_cast<const PETScWrappers::MPI::Vector *> (&u1)->get_mpi_communicator(),
-                                            dof2_locally_owned_dofs,
-                                            dof2_locally_relevant_dofs);
-            u2 = u2_out;
-            interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
-          }
-        else
-#endif
-          {
-            Vector<typename OutVector::value_type> u2(dof2.n_dofs());
-            interpolate(dof1, u1, dof2, constraints2, u2);
-            interpolate(dof2, u2, dof1, constraints1, u1_interpolated);
-          }
+        // For continuous elements first interpolate to dof2, taking into
+        // account constraints2, and then interpolate back to dof1 taking into
+        // account constraints1
+        internal::back_interpolate(dof1, constraints1, u1, dof2, constraints2,
+                                   u1_interpolated);
       }
   }
 
@@ -2630,22 +2668,15 @@ namespace FETools
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
     // polynomial degree
     const unsigned int degree = fe.dofs_per_line+1;
-    // number of grid points in each
-    // direction
+    // number of grid points in each direction
     const unsigned int n = degree+1;
 
-    // the following lines of code are
-    // somewhat odd, due to the way the
-    // hierarchic numbering is
-    // organized. if someone would
-    // really want to understand these
-    // lines, you better draw some
-    // pictures where you indicate the
-    // indices and orders of vertices,
-    // lines, etc, along with the
-    // numbers of the degrees of
-    // freedom in hierarchical and
-    // lexicographical order
+    // the following lines of code are somewhat odd, due to the way the
+    // hierarchic numbering is organized. if someone would really want to
+    // understand these lines, you better draw some pictures where you
+    // indicate the indices and orders of vertices, lines, etc, along with the
+    // numbers of the degrees of freedom in hierarchical and lexicographical
+    // order
     switch (dim)
       {
       case 1:

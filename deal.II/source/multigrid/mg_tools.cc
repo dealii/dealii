@@ -554,7 +554,8 @@ namespace MGTools
     typename DH::cell_iterator cell = dof.begin(level),
                                endc = dof.end(level);
     for (; cell!=endc; ++cell)
-      if (dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id || cell->level_subdomain_id()==dof.get_tria().locally_owned_subdomain())
+      if (dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
+          || cell->level_subdomain_id()==dof.get_tria().locally_owned_subdomain())
         {
           cell->get_mg_dof_indices (dofs_on_this_cell);
           // make sparsity pattern for this cell
@@ -1201,6 +1202,9 @@ namespace MGTools
         endc = dof.end();
         for (; cell!=endc; ++cell)
           {
+            if (dof.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+                && cell->level_subdomain_id()!=dof.get_tria().locally_owned_subdomain())
+              continue;
             const FiniteElement<dim> &fe = cell->get_fe();
             const unsigned int level = cell->level();
             local_dofs.resize(fe.dofs_per_face);
@@ -1232,6 +1236,8 @@ namespace MGTools
         cell = dof.begin(),
         endc = dof.end();
         for (; cell!=endc; ++cell)
+          if (dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
+              || cell->level_subdomain_id()==dof.get_tria().locally_owned_subdomain())
           for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
                ++face_no)
             {
@@ -1430,6 +1436,10 @@ namespace MGTools
 
     for (; cell!=endc; ++cell)
       {
+        if (mg_dof_handler.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+            && cell->level_subdomain_id()!=mg_dof_handler.get_tria().locally_owned_subdomain())
+          continue;
+
         std::fill (cell_dofs.begin(), cell_dofs.end(), false);
 
         for (unsigned int face_nr=0; face_nr<GeometryInfo<dim>::faces_per_cell; ++face_nr)
@@ -1484,6 +1494,10 @@ namespace MGTools
 
     for (; cell!=endc; ++cell)
       {
+        if (mg_dof_handler.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+            && cell->level_subdomain_id()!=mg_dof_handler.get_tria().locally_owned_subdomain())
+          continue;
+
         std::fill (cell_dofs.begin(), cell_dofs.end(), false);
         std::fill (cell_dofs_interface.begin(), cell_dofs_interface.end(), false);
 
@@ -1571,6 +1585,10 @@ namespace MGTools
 
     for (; cell!=endc; ++cell)
       {
+        if (mg_dof_handler.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
+            && cell->level_subdomain_id()!=mg_dof_handler.get_tria().locally_owned_subdomain())
+          continue;
+
         bool has_coarser_neighbor = false;
 
         std::fill (cell_dofs.begin(), cell_dofs.end(), false);

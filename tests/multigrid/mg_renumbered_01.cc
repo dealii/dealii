@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010 by the deal.II authors
+//    Copyright (C) 2010, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -64,8 +64,8 @@ void
 reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
 	       MGLevelObject<dealii::Vector<number> > &v)
 {
-  for (unsigned int level=v.get_minlevel();
-       level<=v.get_maxlevel();++level)
+  for (unsigned int level=v.min_level();
+       level<=v.max_level();++level)
     {
       unsigned int n = mg_dof.n_dofs (level);
       v[level].reinit(n);
@@ -322,16 +322,13 @@ void LaplaceProblem<dim>::test ()
   ZeroFunction<dim>                    dirichlet_bc(fe.n_components());
   dirichlet_boundary[0] =             &dirichlet_bc;
 
-  const unsigned int min_l = mg_matrices.get_minlevel();
-  const unsigned int max_l = mg_matrices.get_maxlevel();
+  const unsigned int min_l = mg_matrices.min_level();
+  const unsigned int max_l = mg_matrices.max_level();
   for(unsigned int l=min_l; l<max_l; ++l)
   {
     mg_matrices[l] = IdentityMatrix(mg_dof_handler.n_dofs(l));
     mg_matrices_renumbered[l] = IdentityMatrix(mg_dof_handler.n_dofs(l));
   }
-
-  GrowingVectorMemory<>   vector_memory;
-  GrowingVectorMemory<>   vector_memory_renumbered;
 
   MGConstrainedDoFs mg_constrained_dofs;
   mg_constrained_dofs.initialize(mg_dof_handler, dirichlet_boundary);
@@ -358,10 +355,10 @@ void LaplaceProblem<dim>::test ()
 
   typedef PreconditionIdentity RELAXATION;
   MGSmootherPrecondition<SparseMatrix<double>, RELAXATION, Vector<double> >
-    mg_smoother(vector_memory);
+    mg_smoother;
 
   MGSmootherPrecondition<SparseMatrix<double>, RELAXATION, Vector<double> >
-    mg_smoother_renumbered(vector_memory_renumbered);
+    mg_smoother_renumbered;
 
   RELAXATION::AdditionalData smoother_data;
   mg_smoother.initialize(mg_matrices, smoother_data);

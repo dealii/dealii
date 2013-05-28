@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2011 by the deal.II authors
+//    Copyright (C) 2011, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/polynomial.h>
 #include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/fe/fe_poly.h>
 
 #include <deal.II/matrix_free/shape_info.h>
@@ -59,8 +60,14 @@ namespace internal
       {
         const FE_Poly<TensorProductPolynomials<dim>,dim,dim> *fe_poly =
           dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>(&fe);
-        Assert (fe_poly != 0, ExcNotImplemented());
-        lexicographic = fe_poly->get_poly_space_numbering_inverse();
+        const FE_Poly<TensorProductPolynomials<dim,Polynomials::
+          PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
+          dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
+          Polynomials::PiecewisePolynomial<double> >,dim,dim>*> (&fe);
+        Assert (fe_poly != 0 || fe_poly_piece, ExcNotImplemented());
+        lexicographic = fe_poly != 0 ?
+          fe_poly->get_poly_space_numbering_inverse() :
+          fe_poly_piece->get_poly_space_numbering_inverse();
 
         // to evaluate 1D polynomials, evaluate along the line where y=z=0,
         // assuming that shape_value(0,Point<dim>()) == 1. otherwise, need

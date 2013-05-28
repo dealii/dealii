@@ -287,7 +287,7 @@ MGSmootherBlock<MATRIX, RELAX, number>::smooth(
 {
   deallog.push("Smooth");
 
-  unsigned int maxlevel = matrices.get_maxlevel();
+  unsigned int maxlevel = matrices.max_level();
   unsigned int steps2 = steps;
 
   if (variable)

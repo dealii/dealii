@@ -602,7 +602,7 @@ namespace MatrixCreator
  * respect for fixed degrees of freedom, and in a second step eliminate them
  * again from the linear system. The inclusion into the assembly process is as
  * follows: when the matrix and vectors are set up, a list of nodes subject to
- * dirichlet bc is made and matrix and vectors are modified accordingly. This
+ * Dirichlet bc is made and matrix and vectors are modified accordingly. This
  * is done by deleting all entries in the matrix in the line of this degree of
  * freedom, setting the main diagonal entry to a suitable positive value and
  * the right hand side element to a value so that the solution of the linear
@@ -791,7 +791,7 @@ namespace MatrixTools
   using namespace MatrixCreator;
 
   /**
-   * Apply dirichlet boundary conditions
+   * Apply Dirichlet boundary conditions
    * to the system matrix and vectors
    * as described in the general
    * documentation.
@@ -805,7 +805,7 @@ namespace MatrixTools
                          const bool             eliminate_columns = true);
 
   /**
-   * Apply dirichlet boundary
+   * Apply Dirichlet boundary
    * conditions to the system
    * matrix and vectors as
    * described in the general
@@ -823,7 +823,7 @@ namespace MatrixTools
 
 #ifdef DEAL_II_WITH_PETSC
   /**
-   * Apply dirichlet boundary conditions to
+   * Apply Dirichlet boundary conditions to
    * the system matrix and vectors as
    * described in the general
    * documentation. This function works on
@@ -923,7 +923,7 @@ namespace MatrixTools
 
 #ifdef DEAL_II_WITH_TRILINOS
   /**
-   * Apply dirichlet boundary
+   * Apply Dirichlet boundary
    * conditions to the system matrix
    * and vectors as described in the
    * general documentation. This
@@ -980,7 +980,7 @@ namespace MatrixTools
                          const bool                eliminate_columns = true);
 
   /**
-   * Apply dirichlet boundary
+   * Apply Dirichlet boundary
    * conditions to the system matrix
    * and vectors as described in the
    * general documentation. This

@@ -1555,15 +1555,15 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
   // the local nodes and all the nodes that the constraints indicate.
   IndexSet my_indices (vec.size());
   {
-    const std::pair<size_type, size_type>
+    const std::pair<unsigned int, unsigned int>
     local_range = vec.local_range();
 
     my_indices.add_range (local_range.first, local_range.second);
 
-    std::set<size_type> individual_indices;
+    std::set<unsigned int> individual_indices;
     for (constraint_iterator it = begin_my_constraints;
          it != end_my_constraints; ++it)
-      for (size_type i=0; i<it->entries.size(); ++i)
+      for (unsigned int i=0; i<it->entries.size(); ++i)
         if ((it->entries[i].first < local_range.first)
             ||
             (it->entries[i].first >= local_range.second))
@@ -1595,7 +1595,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::Vector &vec) const
       // fill entry in line next_constraint.line by adding the different
       // contributions
       double new_value = it->inhomogeneity;
-      for (size_type i=0; i<it->entries.size(); ++i)
+      for (unsigned int i=0; i<it->entries.size(); ++i)
         new_value += (vec_distribute(it->entries[i].first) *
                       it->entries[i].second);
       vec(it->line) = new_value;
@@ -1615,7 +1615,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
   Assert (sorted==true, ExcMatrixIsClosed());
 
   IndexSet my_indices (vec.size());
-  for (size_type block=0; block<vec.n_blocks(); ++block)
+  for (unsigned int block=0; block<vec.n_blocks(); ++block)
     {
       typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
       ConstraintLine index_comparison;
@@ -1634,15 +1634,15 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
       // - the local nodes and all the nodes that the constraints indicate.
       // No caching done yet. would need some more clever data structures
       // for doing that.
-      const std::pair<size_type, size_type>
+      const std::pair<unsigned int, unsigned int>
       local_range = vec.block(block).local_range();
 
       my_indices.add_range (local_range.first, local_range.second);
 
-      std::set<size_type> individual_indices;
+      std::set<unsigned int> individual_indices;
       for (constraint_iterator it = begin_my_constraints;
            it != end_my_constraints; ++it)
-        for (size_type i=0; i<it->entries.size(); ++i)
+        for (unsigned int i=0; i<it->entries.size(); ++i)
           if ((it->entries[i].first < local_range.first)
               ||
               (it->entries[i].first >= local_range.second))
@@ -1668,7 +1668,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
   // here we import the data
   vec_distribute.reinit(vec,true);
 
-  for (size_type block=0; block<vec.n_blocks(); ++block)
+  for (unsigned int block=0; block<vec.n_blocks(); ++block)
     {
       typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
       ConstraintLine index_comparison;
@@ -1689,7 +1689,7 @@ ConstraintMatrix::distribute (TrilinosWrappers::MPI::BlockVector &vec) const
           // fill entry in line next_constraint.line by adding the
           // different contributions
           double new_value = it->inhomogeneity;
-          for (size_type i=0; i<it->entries.size(); ++i)
+          for (unsigned int i=0; i<it->entries.size(); ++i)
             new_value += (vec_distribute(it->entries[i].first) *
                           it->entries[i].second);
           vec(it->line) = new_value;
@@ -1711,6 +1711,8 @@ void
 ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
 {
   Assert (sorted==true, ExcMatrixIsClosed());
+  Assert (vec.has_ghost_elements() == false,
+          ExcMessage ("This operation can only be performed on vectors without ghost elements."));
 
   typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
   ConstraintLine index_comparison;
@@ -1725,15 +1727,15 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
   // all indices we need to read from
   IndexSet my_indices (vec.size());
 
-  const std::pair<size_type, size_type>
+  const std::pair<unsigned int, unsigned int>
   local_range = vec.local_range();
 
   my_indices.add_range (local_range.first, local_range.second);
 
-  std::set<size_type> individual_indices;
+  std::set<unsigned int> individual_indices;
   for (constraint_iterator it = begin_my_constraints;
        it != end_my_constraints; ++it)
-    for (size_type i=0; i<it->entries.size(); ++i)
+    for (unsigned int i=0; i<it->entries.size(); ++i)
       if ((it->entries[i].first < local_range.first)
           ||
           (it->entries[i].first >= local_range.second))
@@ -1760,7 +1762,7 @@ ConstraintMatrix::distribute (PETScWrappers::MPI::Vector &vec) const
       // fill entry in line next_constraint.line by adding the different
       // contributions
       PetscScalar new_value = it->inhomogeneity;
-      for (size_type i=0; i<it->entries.size(); ++i)
+      for (unsigned int i=0; i<it->entries.size(); ++i)
         new_value += (PetscScalar(ghost_vec(it->entries[i].first)) *
                       it->entries[i].second);
       vec(it->line) = new_value;

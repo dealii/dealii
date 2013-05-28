@@ -340,7 +340,7 @@ namespace internal
     void copy_subrange (const size_type         begin,
                         const size_type         end,
                         const dealii::Vector<T> &src,
-                        dealii::Vector<T>      &dst)
+                        dealii::Vector<T>       &dst)
     {
       memcpy(&*(dst.begin()+begin), &*(src.begin()+begin),
              (end-begin)*sizeof(T));
@@ -350,7 +350,7 @@ namespace internal
     void copy_subrange (const size_type         begin,
                         const size_type         end,
                         const dealii::Vector<T> &src,
-                        dealii::Vector<U>      &dst)
+                        dealii::Vector<U>       &dst)
     {
       const T *q = src.begin()+begin;
       const T *const end_q = src.begin()+end;
@@ -363,15 +363,18 @@ namespace internal
     void copy_subrange_wrap (const size_type         begin,
                              const size_type         end,
                              const dealii::Vector<T> &src,
-                             dealii::Vector<U>      &dst)
+                             dealii::Vector<U>       &dst)
     {
       copy_subrange (begin, end, src, dst);
     }
 
     template <typename T, typename U>
     void copy_vector (const dealii::Vector<T> &src,
-                      dealii::Vector<U>      &dst)
+                      dealii::Vector<U>       &dst)
     {
+      if (PointerComparison::equal(&src, &dst))
+        return;
+
       const size_type vec_size = src.size();
       const size_type dst_size = dst.size();
       if (dst_size != vec_size)
@@ -1433,6 +1436,15 @@ void Vector<Number>::block_read (std::istream &in)
   //  in >> c;
   in.read (&c, 1);
   AssertThrow (c==']', ExcIO());
+}
+
+
+
+template <typename Number>
+IndexSet
+Vector<Number>::locally_owned_elements() const
+{
+  return complete_index_set(size());
 }
 
 

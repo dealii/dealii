@@ -1,3 +1,16 @@
+//----------------------------  dof_tools_21_b.cc  ---------------------------
+//    $Id: dof_tools_10.cc 23710 2011-05-17 04:50:10Z bangerth $
+//    Version: $Name$
+//
+//    Copyright (C) 2003, 2004, 2013 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------  dof_tools_21_b.cc  ---------------------------
+
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/dofs/dof_handler.h>

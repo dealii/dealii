@@ -4,36 +4,44 @@ DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 4
 DEAL::Solution norm          0
 DEAL::Residual on      level 4
+DEAL::Residual norm          0
 DEAL::V-cycle entering level 3
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 3
 DEAL::Solution norm          0
 DEAL::Residual on      level 3
+DEAL::Residual norm          0
 DEAL::V-cycle entering level 2
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 2
 DEAL::Solution norm          0
 DEAL::Residual on      level 2
+DEAL::Residual norm          0
 DEAL::V-cycle entering level 1
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 1
 DEAL::Solution norm          0
 DEAL::Residual on      level 1
+DEAL::Residual norm          0
 DEAL::V-cycle entering level 0
 DEAL::V-cycle  Defect norm   0
 DEAL::Coarse level           0
+DEAL::Prolongate norm        0
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 1
 DEAL::Solution norm          0
 DEAL::V-cycle leaving  level 1
+DEAL::Prolongate norm        0
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 2
 DEAL::Solution norm          0
 DEAL::V-cycle leaving  level 2
+DEAL::Prolongate norm        0
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 3
 DEAL::Solution norm          0
 DEAL::V-cycle leaving  level 3
+DEAL::Prolongate norm        0
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 4
 DEAL::Solution norm          0
@@ -281,27 +289,33 @@ DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 5
 DEAL::Solution norm          0
 DEAL::Residual on      level 5
+DEAL::Residual norm          0
 DEAL::V-cycle entering level 4
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 4
 DEAL::Solution norm          0
 DEAL::Residual on      level 4
+DEAL::Residual norm          0
 DEAL::V-cycle entering level 3
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 3
 DEAL::Solution norm          0
 DEAL::Residual on      level 3
+DEAL::Residual norm          0
 DEAL::V-cycle entering level 2
 DEAL::V-cycle  Defect norm   0
 DEAL::Coarse level           2
+DEAL::Prolongate norm        0
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 3
 DEAL::Solution norm          0
 DEAL::V-cycle leaving  level 3
+DEAL::Prolongate norm        0
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 4
 DEAL::Solution norm          0
 DEAL::V-cycle leaving  level 4
+DEAL::Prolongate norm        0
 DEAL::V-cycle  Defect norm   0
 DEAL::Smoothing on     level 5
 DEAL::Solution norm          0

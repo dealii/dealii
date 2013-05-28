@@ -26,7 +26,7 @@
 void test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
@@ -64,7 +64,6 @@ void test ()
   for (unsigned i=0; i<local_size; ++i)
     w.local_element(i) = 2.0 * (i + my_start);
 
-  v.compress();
   v.copy_from(w);
   v.update_ghost_values();
 

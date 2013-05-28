@@ -401,6 +401,22 @@ namespace PETScWrappers
     bool in_local_range (const size_type index) const;
 
     /**
+     * Return an index set that describes which elements of this vector
+     * are owned by the current processor. Note that this index set does
+     * not include elements this vector may store locally as ghost
+     * elements but that are in fact owned by another processor.
+     * As a consequence, the index sets returned on different
+     * processors if this is a distributed vector will form disjoint
+     * sets that add up to the complete index set.
+     * Obviously, if a vector is created on only one processor, then
+     * the result would satisfy
+     * @code
+     *   vec.locally_owned_elements() == complete_index_set (vec.size())
+     * @endcode
+     */
+    IndexSet locally_owned_elements () const;
+
+    /**
      * Return if the vector contains ghost
      * elements.
      */
@@ -1134,6 +1150,21 @@ namespace PETScWrappers
     return ((index >= static_cast<size_type>(begin)) &&
             (index < static_cast<size_type>(end)));
   }
+
+
+  inline
+  IndexSet
+  VectorBase::locally_owned_elements() const
+  {
+    IndexSet is (size());
+
+    // PETSc only allows for contiguous local ranges, so this is simple
+    const std::pair<unsigned int, unsigned int> x = local_range();
+    is.add_range (x.first, x.second);
+    return is;
+  }
+
+
 
   inline
   bool

@@ -12,8 +12,8 @@
 //-----------------------------------------------------------------------------
 
 #include "../tests.h"
-#include <deal.II/numerics/operator.h>
-#include <deal.II/numerics/newton.h>
+#include <deal.II/algorithms/operator.h>
+#include <deal.II/algorithms/newton.h>
 #include <deal.II/numerics/vector_tools.h>
 #include <deal.II/base/named_data.h>
 

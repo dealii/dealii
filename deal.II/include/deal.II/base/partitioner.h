@@ -272,7 +272,7 @@ namespace Utilities
        * Returns the MPI communicator underlying the
        * partitioner object.
        */
-      MPI_Comm get_communicator() const;
+      const MPI_Comm& get_communicator() const;
 
       /**
        * Computes the memory consumption of this
@@ -569,7 +569,7 @@ namespace Utilities
 
 
     inline
-    MPI_Comm
+    const MPI_Comm&
     Partitioner::get_communicator() const
     {
       return communicator;
