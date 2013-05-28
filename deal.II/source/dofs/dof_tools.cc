@@ -2335,21 +2335,10 @@ namespace DoFTools
                     // Now create constraint matrix for the subfaces and
                     // assemble it. ignore all interfaces with artificial
                     // cells because we can only get to such interfaces if
-                    // the current cell is a ghost cell. also ignore the
-                    // interface if the neighboring cell is a ghost cell in
-                    // 2d: what we would compute here are the constraints
-                    // on the ghost cell's DoFs, but we are not interested
-                    // in those: we only want constraints on *locally
-                    // active* DoFs, not on *locally relevant* DoFs.
-                    // However, in 3d we must still compute those
-                    // constraints because it might happen that a
-                    // constraint is related to an edge where the hanging
-                    // node is only detected if we also look between ghosts
+                    // the current cell is a ghost cell
                     for (unsigned int c=0; c<cell->face(face)->n_children(); ++c)
                       {
-                        if (cell->neighbor_child_on_subface (face, c)->is_artificial()
-                            ||
-                            (dim == 2 && cell->neighbor_child_on_subface (face, c)->is_ghost()))
+                        if (cell->neighbor_child_on_subface (face, c)->is_artificial())
                           continue;
 
                         const typename DH::active_face_iterator
