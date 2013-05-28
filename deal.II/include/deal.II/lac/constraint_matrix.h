@@ -1507,24 +1507,6 @@ public:
                   << " should not be stored by this object, but a constraint "
                   << "is being added.");
 
-  /**
-   * Exception
-   *
-   * @ingroup Exceptions
-   */
-  DeclException2 (ExcIncorrectConstraint,
-		  int, int,
-                  << "While distributing the constraint for DoF "
-                  << arg1 << ", it turns out that one of the processors "
-                  << "who own the " << arg2
-                  << " degrees of freedom that x_" << arg1
-                  << " is constrained against does not know about "
-                  << "the constraint on x_" << arg1
-                  << ". Did you not initialize the ConstraintMatrix "
-                  << "with the appropriate locally_relevant set so "
-                  << "that every processor who owns a DoF that constrains "
-                  << "another DoF also knows about this constraint?");
-  
 private:
 
   /**
