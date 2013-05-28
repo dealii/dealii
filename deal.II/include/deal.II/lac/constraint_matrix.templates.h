@@ -753,6 +753,7 @@ namespace internal
         for (unsigned int i=0; i<vec.local_size(); ++i)
           if (cm.is_constrained (shift + vec.local_range().first+i))
             vec.local_element(i) = 0;
+        vec.zero_out_ghosts();
       }
 
       template<class VEC>

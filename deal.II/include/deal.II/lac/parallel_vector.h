@@ -480,6 +480,13 @@ namespace parallel
       unsigned int n_ghost_entries () const;
 
       /**
+       * Return an index set that describes which elements of this vector are
+       * not owned by the current processor but can be written into or read
+       * from locally (ghost elements).
+       */
+      const IndexSet& ghost_elements() const;
+
+      /**
        * Returns whether the given global index is a ghost index on the
        * present processor. Returns false for indices that are owned locally
        * and for indices not present at all.
@@ -1445,6 +1452,7 @@ namespace parallel
     }
 
 
+
     template <typename Number>
     inline
     IndexSet
@@ -1466,6 +1474,16 @@ namespace parallel
     Vector<Number>::n_ghost_entries () const
     {
       return partitioner->n_ghost_indices();
+    }
+
+
+
+    template <typename Number>
+    inline
+    const IndexSet&
+    Vector<Number>::ghost_elements() const
+    {
+      return partitioner->ghost_indices();
     }
 
 
