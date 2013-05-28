@@ -24,25 +24,16 @@ Level 2
 (3,3) 0.00000
 (3,0) 1.00000
 
-Copy indices
-Level 0
-
-Level 1
-0	1
-1	2
-2	3
-
-Level 2
-3	1
-4	2
-5	3
-
-Level 3
-6	0
-7	1
-8	2
-9	3
-
+copy_indices[1]	0	1
+copy_indices[1]	1	2
+copy_indices[1]	2	3
+copy_indices[2]	3	1
+copy_indices[2]	4	2
+copy_indices[2]	5	3
+copy_indices[3]	6	0
+copy_indices[3]	7	1
+copy_indices[3]	8	2
+copy_indices[3]	9	3
 DEAL::FE_DGP<2>(1)
 Level 0
 (0,0) 1.00000
@@ -128,45 +119,36 @@ Level 2
 (11,11) 0.00000
 (11,2) 0.500000
 
-Copy indices
-Level 0
-
-Level 1
-0	3
-1	4
-2	5
-3	6
-4	7
-5	8
-6	9
-7	10
-8	11
-
-Level 2
-9	3
-10	4
-11	5
-12	6
-13	7
-14	8
-15	9
-16	10
-17	11
-
-Level 3
-18	0
-19	1
-20	2
-21	3
-22	4
-23	5
-24	6
-25	7
-26	8
-27	9
-28	10
-29	11
-
+copy_indices[1]	0	3
+copy_indices[1]	1	4
+copy_indices[1]	2	5
+copy_indices[1]	3	6
+copy_indices[1]	4	7
+copy_indices[1]	5	8
+copy_indices[1]	6	9
+copy_indices[1]	7	10
+copy_indices[1]	8	11
+copy_indices[2]	9	3
+copy_indices[2]	10	4
+copy_indices[2]	11	5
+copy_indices[2]	12	6
+copy_indices[2]	13	7
+copy_indices[2]	14	8
+copy_indices[2]	15	9
+copy_indices[2]	16	10
+copy_indices[2]	17	11
+copy_indices[3]	18	0
+copy_indices[3]	19	1
+copy_indices[3]	20	2
+copy_indices[3]	21	3
+copy_indices[3]	22	4
+copy_indices[3]	23	5
+copy_indices[3]	24	6
+copy_indices[3]	25	7
+copy_indices[3]	26	8
+copy_indices[3]	27	9
+copy_indices[3]	28	10
+copy_indices[3]	29	11
 DEAL::FE_DGQ<2>(1)
 Level 0
 (0,0) 1.00000
@@ -306,55 +288,46 @@ Level 2
 (15,15) 0.00000
 (15,3) 1.00000
 
-Copy indices
-Level 0
-
-Level 1
-0	4
-1	5
-2	6
-3	7
-4	8
-5	9
-6	10
-7	11
-8	12
-9	13
-10	14
-11	15
-
-Level 2
-12	4
-13	5
-14	6
-15	7
-16	8
-17	9
-18	10
-19	11
-20	12
-21	13
-22	14
-23	15
-
-Level 3
-24	0
-25	1
-26	2
-27	3
-28	4
-29	5
-30	6
-31	7
-32	8
-33	9
-34	10
-35	11
-36	12
-37	13
-38	14
-39	15
-
+copy_indices[1]	0	4
+copy_indices[1]	1	5
+copy_indices[1]	2	6
+copy_indices[1]	3	7
+copy_indices[1]	4	8
+copy_indices[1]	5	9
+copy_indices[1]	6	10
+copy_indices[1]	7	11
+copy_indices[1]	8	12
+copy_indices[1]	9	13
+copy_indices[1]	10	14
+copy_indices[1]	11	15
+copy_indices[2]	12	4
+copy_indices[2]	13	5
+copy_indices[2]	14	6
+copy_indices[2]	15	7
+copy_indices[2]	16	8
+copy_indices[2]	17	9
+copy_indices[2]	18	10
+copy_indices[2]	19	11
+copy_indices[2]	20	12
+copy_indices[2]	21	13
+copy_indices[2]	22	14
+copy_indices[2]	23	15
+copy_indices[3]	24	0
+copy_indices[3]	25	1
+copy_indices[3]	26	2
+copy_indices[3]	27	3
+copy_indices[3]	28	4
+copy_indices[3]	29	5
+copy_indices[3]	30	6
+copy_indices[3]	31	7
+copy_indices[3]	32	8
+copy_indices[3]	33	9
+copy_indices[3]	34	10
+copy_indices[3]	35	11
+copy_indices[3]	36	12
+copy_indices[3]	37	13
+copy_indices[3]	38	14
+copy_indices[3]	39	15
 DEAL::FE_Q<2>(1)
 Level 0
 (0,0) 1.00000
@@ -420,40 +393,25 @@ Level 2
 (8,8) 0.00000
 (8,3) 1.00000
 
-Copy indices
-Level 0
-
-Level 1
-0	1
-4	2
-2	3
-1	4
-3	5
-5	6
-6	7
-7	8
-
-Level 2
-8	1
-11	2
-9	3
-0	4
-10	5
-4	6
-12	7
-2	8
-
-Level 3
-13	0
-14	1
-15	2
-16	3
-8	4
-17	5
-11	6
-18	7
-9	8
-
+copy_indices[1]	0	1
+copy_indices[1]	1	4
+copy_indices[1]	2	3
+copy_indices[1]	3	5
+copy_indices[1]	4	2
+copy_indices[1]	5	6
+copy_indices[1]	6	7
+copy_indices[1]	7	8
+copy_indices[2]	8	1
+copy_indices[2]	9	3
+copy_indices[2]	10	5
+copy_indices[2]	11	2
+copy_indices[2]	12	7
+copy_indices[3]	13	0
+copy_indices[3]	14	1
+copy_indices[3]	15	2
+copy_indices[3]	16	3
+copy_indices[3]	17	5
+copy_indices[3]	18	7
 DEAL::FE_Q<2>(2)
 Level 0
 (0,0) 1.00000
@@ -746,82 +704,67 @@ Level 2
 (24,7) 0.281250
 (24,8) 0.562500
 
-Copy indices
-Level 0
-
-Level 1
-0	1
-9	2
-2	3
-4	5
-14	7
-1	9
-3	10
-5	11
-6	12
-7	13
-8	14
-10	15
-11	16
-12	17
-13	18
-15	19
-16	20
-17	21
-18	22
-19	23
-20	24
-
-Level 2
-21	1
-29	2
-22	3
-24	5
-33	7
-0	9
-23	10
-25	11
-26	12
-27	13
-28	14
-9	15
-30	16
-31	17
-32	18
-34	19
-35	20
-2	21
-36	22
-37	23
-38	24
-
-Level 3
-39	0
-40	1
-41	2
-42	3
-43	4
-44	5
-45	6
-46	7
-47	8
-21	9
-48	10
-49	11
-50	12
-51	13
-52	14
-29	15
-53	16
-54	17
-55	18
-56	19
-57	20
-22	21
-58	22
-59	23
-60	24
-
+copy_indices[1]	0	1
+copy_indices[1]	1	9
+copy_indices[1]	2	3
+copy_indices[1]	3	10
+copy_indices[1]	4	5
+copy_indices[1]	5	11
+copy_indices[1]	6	12
+copy_indices[1]	7	13
+copy_indices[1]	8	14
+copy_indices[1]	9	2
+copy_indices[1]	10	15
+copy_indices[1]	11	16
+copy_indices[1]	12	17
+copy_indices[1]	13	18
+copy_indices[1]	14	7
+copy_indices[1]	15	19
+copy_indices[1]	16	20
+copy_indices[1]	17	21
+copy_indices[1]	18	22
+copy_indices[1]	19	23
+copy_indices[1]	20	24
+copy_indices[2]	21	1
+copy_indices[2]	22	3
+copy_indices[2]	23	10
+copy_indices[2]	24	5
+copy_indices[2]	25	11
+copy_indices[2]	26	12
+copy_indices[2]	27	13
+copy_indices[2]	28	14
+copy_indices[2]	29	2
+copy_indices[2]	30	16
+copy_indices[2]	31	17
+copy_indices[2]	32	18
+copy_indices[2]	33	7
+copy_indices[2]	34	19
+copy_indices[2]	35	20
+copy_indices[2]	36	22
+copy_indices[2]	37	23
+copy_indices[2]	38	24
+copy_indices[3]	39	0
+copy_indices[3]	40	1
+copy_indices[3]	41	2
+copy_indices[3]	42	3
+copy_indices[3]	43	4
+copy_indices[3]	44	5
+copy_indices[3]	45	6
+copy_indices[3]	46	7
+copy_indices[3]	47	8
+copy_indices[3]	48	10
+copy_indices[3]	49	11
+copy_indices[3]	50	12
+copy_indices[3]	51	13
+copy_indices[3]	52	14
+copy_indices[3]	53	16
+copy_indices[3]	54	17
+copy_indices[3]	55	18
+copy_indices[3]	56	19
+copy_indices[3]	57	20
+copy_indices[3]	58	22
+copy_indices[3]	59	23
+copy_indices[3]	60	24
 DEAL::FESystem<2>[FE_DGQ<2>(1)^2]
 Level 0
 (0,0) 1.00000
@@ -1093,95 +1036,86 @@ Level 2
 (31,31) 0.00000
 (31,7) 1.00000
 
-Copy indices
-Level 0
-
-Level 1
-0	8
-1	9
-2	10
-3	11
-4	12
-5	13
-6	14
-7	15
-8	16
-9	17
-10	18
-11	19
-12	20
-13	21
-14	22
-15	23
-16	24
-17	25
-18	26
-19	27
-20	28
-21	29
-22	30
-23	31
-
-Level 2
-24	8
-25	9
-26	10
-27	11
-28	12
-29	13
-30	14
-31	15
-32	16
-33	17
-34	18
-35	19
-36	20
-37	21
-38	22
-39	23
-40	24
-41	25
-42	26
-43	27
-44	28
-45	29
-46	30
-47	31
-
-Level 3
-48	0
-49	1
-50	2
-51	3
-52	4
-53	5
-54	6
-55	7
-56	8
-57	9
-58	10
-59	11
-60	12
-61	13
-62	14
-63	15
-64	16
-65	17
-66	18
-67	19
-68	20
-69	21
-70	22
-71	23
-72	24
-73	25
-74	26
-75	27
-76	28
-77	29
-78	30
-79	31
-
+copy_indices[1]	0	8
+copy_indices[1]	1	9
+copy_indices[1]	2	10
+copy_indices[1]	3	11
+copy_indices[1]	4	12
+copy_indices[1]	5	13
+copy_indices[1]	6	14
+copy_indices[1]	7	15
+copy_indices[1]	8	16
+copy_indices[1]	9	17
+copy_indices[1]	10	18
+copy_indices[1]	11	19
+copy_indices[1]	12	20
+copy_indices[1]	13	21
+copy_indices[1]	14	22
+copy_indices[1]	15	23
+copy_indices[1]	16	24
+copy_indices[1]	17	25
+copy_indices[1]	18	26
+copy_indices[1]	19	27
+copy_indices[1]	20	28
+copy_indices[1]	21	29
+copy_indices[1]	22	30
+copy_indices[1]	23	31
+copy_indices[2]	24	8
+copy_indices[2]	25	9
+copy_indices[2]	26	10
+copy_indices[2]	27	11
+copy_indices[2]	28	12
+copy_indices[2]	29	13
+copy_indices[2]	30	14
+copy_indices[2]	31	15
+copy_indices[2]	32	16
+copy_indices[2]	33	17
+copy_indices[2]	34	18
+copy_indices[2]	35	19
+copy_indices[2]	36	20
+copy_indices[2]	37	21
+copy_indices[2]	38	22
+copy_indices[2]	39	23
+copy_indices[2]	40	24
+copy_indices[2]	41	25
+copy_indices[2]	42	26
+copy_indices[2]	43	27
+copy_indices[2]	44	28
+copy_indices[2]	45	29
+copy_indices[2]	46	30
+copy_indices[2]	47	31
+copy_indices[3]	48	0
+copy_indices[3]	49	1
+copy_indices[3]	50	2
+copy_indices[3]	51	3
+copy_indices[3]	52	4
+copy_indices[3]	53	5
+copy_indices[3]	54	6
+copy_indices[3]	55	7
+copy_indices[3]	56	8
+copy_indices[3]	57	9
+copy_indices[3]	58	10
+copy_indices[3]	59	11
+copy_indices[3]	60	12
+copy_indices[3]	61	13
+copy_indices[3]	62	14
+copy_indices[3]	63	15
+copy_indices[3]	64	16
+copy_indices[3]	65	17
+copy_indices[3]	66	18
+copy_indices[3]	67	19
+copy_indices[3]	68	20
+copy_indices[3]	69	21
+copy_indices[3]	70	22
+copy_indices[3]	71	23
+copy_indices[3]	72	24
+copy_indices[3]	73	25
+copy_indices[3]	74	26
+copy_indices[3]	75	27
+copy_indices[3]	76	28
+copy_indices[3]	77	29
+copy_indices[3]	78	30
+copy_indices[3]	79	31
 DEAL::FE_RaviartThomas<2>(1)
 Level 0
 (0,0) 0.500000
@@ -1641,119 +1575,110 @@ Level 2
 (39,7) 0.0625000
 (39,11) 0.250000
 
-Copy indices
-Level 0
-
-Level 1
-0	2
-1	3
-16	6
-17	7
-2	12
-3	13
-4	14
-5	15
-6	16
-7	17
-8	18
-9	19
-10	20
-11	21
-12	22
-13	23
-14	24
-15	25
-18	26
-19	27
-20	28
-21	29
-22	30
-23	31
-24	32
-25	33
-26	34
-27	35
-28	36
-29	37
-30	38
-31	39
-
-Level 2
-32	2
-33	3
-48	6
-49	7
-34	12
-35	13
-36	14
-37	15
-38	16
-39	17
-40	18
-41	19
-42	20
-43	21
-44	22
-45	23
-46	24
-47	25
-50	26
-51	27
-52	28
-53	29
-54	30
-55	31
-56	32
-57	33
-58	34
-59	35
-60	36
-61	37
-62	38
-63	39
-
-Level 3
-64	0
-65	1
-66	2
-67	3
-68	4
-69	5
-70	6
-71	7
-72	8
-73	9
-74	10
-75	11
-76	12
-77	13
-78	14
-79	15
-80	16
-81	17
-82	18
-83	19
-84	20
-85	21
-86	22
-87	23
-88	24
-89	25
-90	26
-91	27
-92	28
-93	29
-94	30
-95	31
-96	32
-97	33
-98	34
-99	35
-100	36
-101	37
-102	38
-103	39
-
+copy_indices[1]	0	2
+copy_indices[1]	1	3
+copy_indices[1]	2	12
+copy_indices[1]	3	13
+copy_indices[1]	4	14
+copy_indices[1]	5	15
+copy_indices[1]	6	16
+copy_indices[1]	7	17
+copy_indices[1]	8	18
+copy_indices[1]	9	19
+copy_indices[1]	10	20
+copy_indices[1]	11	21
+copy_indices[1]	12	22
+copy_indices[1]	13	23
+copy_indices[1]	14	24
+copy_indices[1]	15	25
+copy_indices[1]	16	6
+copy_indices[1]	17	7
+copy_indices[1]	18	26
+copy_indices[1]	19	27
+copy_indices[1]	20	28
+copy_indices[1]	21	29
+copy_indices[1]	22	30
+copy_indices[1]	23	31
+copy_indices[1]	24	32
+copy_indices[1]	25	33
+copy_indices[1]	26	34
+copy_indices[1]	27	35
+copy_indices[1]	28	36
+copy_indices[1]	29	37
+copy_indices[1]	30	38
+copy_indices[1]	31	39
+copy_indices[2]	32	2
+copy_indices[2]	33	3
+copy_indices[2]	34	12
+copy_indices[2]	35	13
+copy_indices[2]	36	14
+copy_indices[2]	37	15
+copy_indices[2]	38	16
+copy_indices[2]	39	17
+copy_indices[2]	40	18
+copy_indices[2]	41	19
+copy_indices[2]	42	20
+copy_indices[2]	43	21
+copy_indices[2]	44	22
+copy_indices[2]	45	23
+copy_indices[2]	46	24
+copy_indices[2]	47	25
+copy_indices[2]	48	6
+copy_indices[2]	49	7
+copy_indices[2]	50	26
+copy_indices[2]	51	27
+copy_indices[2]	52	28
+copy_indices[2]	53	29
+copy_indices[2]	54	30
+copy_indices[2]	55	31
+copy_indices[2]	56	32
+copy_indices[2]	57	33
+copy_indices[2]	58	34
+copy_indices[2]	59	35
+copy_indices[2]	60	36
+copy_indices[2]	61	37
+copy_indices[2]	62	38
+copy_indices[2]	63	39
+copy_indices[3]	64	0
+copy_indices[3]	65	1
+copy_indices[3]	66	2
+copy_indices[3]	67	3
+copy_indices[3]	68	4
+copy_indices[3]	69	5
+copy_indices[3]	70	6
+copy_indices[3]	71	7
+copy_indices[3]	72	8
+copy_indices[3]	73	9
+copy_indices[3]	74	10
+copy_indices[3]	75	11
+copy_indices[3]	76	12
+copy_indices[3]	77	13
+copy_indices[3]	78	14
+copy_indices[3]	79	15
+copy_indices[3]	80	16
+copy_indices[3]	81	17
+copy_indices[3]	82	18
+copy_indices[3]	83	19
+copy_indices[3]	84	20
+copy_indices[3]	85	21
+copy_indices[3]	86	22
+copy_indices[3]	87	23
+copy_indices[3]	88	24
+copy_indices[3]	89	25
+copy_indices[3]	90	26
+copy_indices[3]	91	27
+copy_indices[3]	92	28
+copy_indices[3]	93	29
+copy_indices[3]	94	30
+copy_indices[3]	95	31
+copy_indices[3]	96	32
+copy_indices[3]	97	33
+copy_indices[3]	98	34
+copy_indices[3]	99	35
+copy_indices[3]	100	36
+copy_indices[3]	101	37
+copy_indices[3]	102	38
+copy_indices[3]	103	39
 DEAL::FESystem<2>[FE_RaviartThomas<2>(1)-FE_DGQ<2>(1)]
 Level 0
 (0,0) 0.500000
@@ -2345,159 +2270,150 @@ Level 2
 (55,55) 0.00000
 (55,15) 1.00000
 
-Copy indices
-Level 0
-
-Level 1
-0	2
-1	3
-20	6
-21	7
-2	16
-3	17
-4	18
-5	19
-6	20
-7	21
-8	22
-9	23
-10	24
-11	25
-12	26
-13	27
-14	28
-15	29
-16	30
-17	31
-18	32
-19	33
-22	34
-23	35
-24	36
-25	37
-26	38
-27	39
-28	40
-29	41
-30	42
-31	43
-32	44
-33	45
-34	46
-35	47
-36	48
-37	49
-38	50
-39	51
-40	52
-41	53
-42	54
-43	55
-
-Level 2
-44	2
-45	3
-64	6
-65	7
-46	16
-47	17
-48	18
-49	19
-50	20
-51	21
-52	22
-53	23
-54	24
-55	25
-56	26
-57	27
-58	28
-59	29
-60	30
-61	31
-62	32
-63	33
-66	34
-67	35
-68	36
-69	37
-70	38
-71	39
-72	40
-73	41
-74	42
-75	43
-76	44
-77	45
-78	46
-79	47
-80	48
-81	49
-82	50
-83	51
-84	52
-85	53
-86	54
-87	55
-
-Level 3
-88	0
-89	1
-90	2
-91	3
-92	4
-93	5
-94	6
-95	7
-96	8
-97	9
-98	10
-99	11
-100	12
-101	13
-102	14
-103	15
-104	16
-105	17
-106	18
-107	19
-108	20
-109	21
-110	22
-111	23
-112	24
-113	25
-114	26
-115	27
-116	28
-117	29
-118	30
-119	31
-120	32
-121	33
-122	34
-123	35
-124	36
-125	37
-126	38
-127	39
-128	40
-129	41
-130	42
-131	43
-132	44
-133	45
-134	46
-135	47
-136	48
-137	49
-138	50
-139	51
-140	52
-141	53
-142	54
-143	55
-
+copy_indices[1]	0	2
+copy_indices[1]	1	3
+copy_indices[1]	2	16
+copy_indices[1]	3	17
+copy_indices[1]	4	18
+copy_indices[1]	5	19
+copy_indices[1]	6	20
+copy_indices[1]	7	21
+copy_indices[1]	8	22
+copy_indices[1]	9	23
+copy_indices[1]	10	24
+copy_indices[1]	11	25
+copy_indices[1]	12	26
+copy_indices[1]	13	27
+copy_indices[1]	14	28
+copy_indices[1]	15	29
+copy_indices[1]	16	30
+copy_indices[1]	17	31
+copy_indices[1]	18	32
+copy_indices[1]	19	33
+copy_indices[1]	20	6
+copy_indices[1]	21	7
+copy_indices[1]	22	34
+copy_indices[1]	23	35
+copy_indices[1]	24	36
+copy_indices[1]	25	37
+copy_indices[1]	26	38
+copy_indices[1]	27	39
+copy_indices[1]	28	40
+copy_indices[1]	29	41
+copy_indices[1]	30	42
+copy_indices[1]	31	43
+copy_indices[1]	32	44
+copy_indices[1]	33	45
+copy_indices[1]	34	46
+copy_indices[1]	35	47
+copy_indices[1]	36	48
+copy_indices[1]	37	49
+copy_indices[1]	38	50
+copy_indices[1]	39	51
+copy_indices[1]	40	52
+copy_indices[1]	41	53
+copy_indices[1]	42	54
+copy_indices[1]	43	55
+copy_indices[2]	44	2
+copy_indices[2]	45	3
+copy_indices[2]	46	16
+copy_indices[2]	47	17
+copy_indices[2]	48	18
+copy_indices[2]	49	19
+copy_indices[2]	50	20
+copy_indices[2]	51	21
+copy_indices[2]	52	22
+copy_indices[2]	53	23
+copy_indices[2]	54	24
+copy_indices[2]	55	25
+copy_indices[2]	56	26
+copy_indices[2]	57	27
+copy_indices[2]	58	28
+copy_indices[2]	59	29
+copy_indices[2]	60	30
+copy_indices[2]	61	31
+copy_indices[2]	62	32
+copy_indices[2]	63	33
+copy_indices[2]	64	6
+copy_indices[2]	65	7
+copy_indices[2]	66	34
+copy_indices[2]	67	35
+copy_indices[2]	68	36
+copy_indices[2]	69	37
+copy_indices[2]	70	38
+copy_indices[2]	71	39
+copy_indices[2]	72	40
+copy_indices[2]	73	41
+copy_indices[2]	74	42
+copy_indices[2]	75	43
+copy_indices[2]	76	44
+copy_indices[2]	77	45
+copy_indices[2]	78	46
+copy_indices[2]	79	47
+copy_indices[2]	80	48
+copy_indices[2]	81	49
+copy_indices[2]	82	50
+copy_indices[2]	83	51
+copy_indices[2]	84	52
+copy_indices[2]	85	53
+copy_indices[2]	86	54
+copy_indices[2]	87	55
+copy_indices[3]	88	0
+copy_indices[3]	89	1
+copy_indices[3]	90	2
+copy_indices[3]	91	3
+copy_indices[3]	92	4
+copy_indices[3]	93	5
+copy_indices[3]	94	6
+copy_indices[3]	95	7
+copy_indices[3]	96	8
+copy_indices[3]	97	9
+copy_indices[3]	98	10
+copy_indices[3]	99	11
+copy_indices[3]	100	12
+copy_indices[3]	101	13
+copy_indices[3]	102	14
+copy_indices[3]	103	15
+copy_indices[3]	104	16
+copy_indices[3]	105	17
+copy_indices[3]	106	18
+copy_indices[3]	107	19
+copy_indices[3]	108	20
+copy_indices[3]	109	21
+copy_indices[3]	110	22
+copy_indices[3]	111	23
+copy_indices[3]	112	24
+copy_indices[3]	113	25
+copy_indices[3]	114	26
+copy_indices[3]	115	27
+copy_indices[3]	116	28
+copy_indices[3]	117	29
+copy_indices[3]	118	30
+copy_indices[3]	119	31
+copy_indices[3]	120	32
+copy_indices[3]	121	33
+copy_indices[3]	122	34
+copy_indices[3]	123	35
+copy_indices[3]	124	36
+copy_indices[3]	125	37
+copy_indices[3]	126	38
+copy_indices[3]	127	39
+copy_indices[3]	128	40
+copy_indices[3]	129	41
+copy_indices[3]	130	42
+copy_indices[3]	131	43
+copy_indices[3]	132	44
+copy_indices[3]	133	45
+copy_indices[3]	134	46
+copy_indices[3]	135	47
+copy_indices[3]	136	48
+copy_indices[3]	137	49
+copy_indices[3]	138	50
+copy_indices[3]	139	51
+copy_indices[3]	140	52
+copy_indices[3]	141	53
+copy_indices[3]	142	54
+copy_indices[3]	143	55
 DEAL::FE_DGQ<3>(1)
 Level 0
 (0,0) 1.00000
@@ -3265,191 +3181,182 @@ Level 2
 (63,63) 0.00000
 (63,7) 1.00000
 
-Copy indices
-Level 0
-
-Level 1
-0	8
-1	9
-2	10
-3	11
-4	12
-5	13
-6	14
-7	15
-8	16
-9	17
-10	18
-11	19
-12	20
-13	21
-14	22
-15	23
-16	24
-17	25
-18	26
-19	27
-20	28
-21	29
-22	30
-23	31
-24	32
-25	33
-26	34
-27	35
-28	36
-29	37
-30	38
-31	39
-32	40
-33	41
-34	42
-35	43
-36	44
-37	45
-38	46
-39	47
-40	48
-41	49
-42	50
-43	51
-44	52
-45	53
-46	54
-47	55
-48	56
-49	57
-50	58
-51	59
-52	60
-53	61
-54	62
-55	63
-
-Level 2
-56	8
-57	9
-58	10
-59	11
-60	12
-61	13
-62	14
-63	15
-64	16
-65	17
-66	18
-67	19
-68	20
-69	21
-70	22
-71	23
-72	24
-73	25
-74	26
-75	27
-76	28
-77	29
-78	30
-79	31
-80	32
-81	33
-82	34
-83	35
-84	36
-85	37
-86	38
-87	39
-88	40
-89	41
-90	42
-91	43
-92	44
-93	45
-94	46
-95	47
-96	48
-97	49
-98	50
-99	51
-100	52
-101	53
-102	54
-103	55
-104	56
-105	57
-106	58
-107	59
-108	60
-109	61
-110	62
-111	63
-
-Level 3
-112	0
-113	1
-114	2
-115	3
-116	4
-117	5
-118	6
-119	7
-120	8
-121	9
-122	10
-123	11
-124	12
-125	13
-126	14
-127	15
-128	16
-129	17
-130	18
-131	19
-132	20
-133	21
-134	22
-135	23
-136	24
-137	25
-138	26
-139	27
-140	28
-141	29
-142	30
-143	31
-144	32
-145	33
-146	34
-147	35
-148	36
-149	37
-150	38
-151	39
-152	40
-153	41
-154	42
-155	43
-156	44
-157	45
-158	46
-159	47
-160	48
-161	49
-162	50
-163	51
-164	52
-165	53
-166	54
-167	55
-168	56
-169	57
-170	58
-171	59
-172	60
-173	61
-174	62
-175	63
-
+copy_indices[1]	0	8
+copy_indices[1]	1	9
+copy_indices[1]	2	10
+copy_indices[1]	3	11
+copy_indices[1]	4	12
+copy_indices[1]	5	13
+copy_indices[1]	6	14
+copy_indices[1]	7	15
+copy_indices[1]	8	16
+copy_indices[1]	9	17
+copy_indices[1]	10	18
+copy_indices[1]	11	19
+copy_indices[1]	12	20
+copy_indices[1]	13	21
+copy_indices[1]	14	22
+copy_indices[1]	15	23
+copy_indices[1]	16	24
+copy_indices[1]	17	25
+copy_indices[1]	18	26
+copy_indices[1]	19	27
+copy_indices[1]	20	28
+copy_indices[1]	21	29
+copy_indices[1]	22	30
+copy_indices[1]	23	31
+copy_indices[1]	24	32
+copy_indices[1]	25	33
+copy_indices[1]	26	34
+copy_indices[1]	27	35
+copy_indices[1]	28	36
+copy_indices[1]	29	37
+copy_indices[1]	30	38
+copy_indices[1]	31	39
+copy_indices[1]	32	40
+copy_indices[1]	33	41
+copy_indices[1]	34	42
+copy_indices[1]	35	43
+copy_indices[1]	36	44
+copy_indices[1]	37	45
+copy_indices[1]	38	46
+copy_indices[1]	39	47
+copy_indices[1]	40	48
+copy_indices[1]	41	49
+copy_indices[1]	42	50
+copy_indices[1]	43	51
+copy_indices[1]	44	52
+copy_indices[1]	45	53
+copy_indices[1]	46	54
+copy_indices[1]	47	55
+copy_indices[1]	48	56
+copy_indices[1]	49	57
+copy_indices[1]	50	58
+copy_indices[1]	51	59
+copy_indices[1]	52	60
+copy_indices[1]	53	61
+copy_indices[1]	54	62
+copy_indices[1]	55	63
+copy_indices[2]	56	8
+copy_indices[2]	57	9
+copy_indices[2]	58	10
+copy_indices[2]	59	11
+copy_indices[2]	60	12
+copy_indices[2]	61	13
+copy_indices[2]	62	14
+copy_indices[2]	63	15
+copy_indices[2]	64	16
+copy_indices[2]	65	17
+copy_indices[2]	66	18
+copy_indices[2]	67	19
+copy_indices[2]	68	20
+copy_indices[2]	69	21
+copy_indices[2]	70	22
+copy_indices[2]	71	23
+copy_indices[2]	72	24
+copy_indices[2]	73	25
+copy_indices[2]	74	26
+copy_indices[2]	75	27
+copy_indices[2]	76	28
+copy_indices[2]	77	29
+copy_indices[2]	78	30
+copy_indices[2]	79	31
+copy_indices[2]	80	32
+copy_indices[2]	81	33
+copy_indices[2]	82	34
+copy_indices[2]	83	35
+copy_indices[2]	84	36
+copy_indices[2]	85	37
+copy_indices[2]	86	38
+copy_indices[2]	87	39
+copy_indices[2]	88	40
+copy_indices[2]	89	41
+copy_indices[2]	90	42
+copy_indices[2]	91	43
+copy_indices[2]	92	44
+copy_indices[2]	93	45
+copy_indices[2]	94	46
+copy_indices[2]	95	47
+copy_indices[2]	96	48
+copy_indices[2]	97	49
+copy_indices[2]	98	50
+copy_indices[2]	99	51
+copy_indices[2]	100	52
+copy_indices[2]	101	53
+copy_indices[2]	102	54
+copy_indices[2]	103	55
+copy_indices[2]	104	56
+copy_indices[2]	105	57
+copy_indices[2]	106	58
+copy_indices[2]	107	59
+copy_indices[2]	108	60
+copy_indices[2]	109	61
+copy_indices[2]	110	62
+copy_indices[2]	111	63
+copy_indices[3]	112	0
+copy_indices[3]	113	1
+copy_indices[3]	114	2
+copy_indices[3]	115	3
+copy_indices[3]	116	4
+copy_indices[3]	117	5
+copy_indices[3]	118	6
+copy_indices[3]	119	7
+copy_indices[3]	120	8
+copy_indices[3]	121	9
+copy_indices[3]	122	10
+copy_indices[3]	123	11
+copy_indices[3]	124	12
+copy_indices[3]	125	13
+copy_indices[3]	126	14
+copy_indices[3]	127	15
+copy_indices[3]	128	16
+copy_indices[3]	129	17
+copy_indices[3]	130	18
+copy_indices[3]	131	19
+copy_indices[3]	132	20
+copy_indices[3]	133	21
+copy_indices[3]	134	22
+copy_indices[3]	135	23
+copy_indices[3]	136	24
+copy_indices[3]	137	25
+copy_indices[3]	138	26
+copy_indices[3]	139	27
+copy_indices[3]	140	28
+copy_indices[3]	141	29
+copy_indices[3]	142	30
+copy_indices[3]	143	31
+copy_indices[3]	144	32
+copy_indices[3]	145	33
+copy_indices[3]	146	34
+copy_indices[3]	147	35
+copy_indices[3]	148	36
+copy_indices[3]	149	37
+copy_indices[3]	150	38
+copy_indices[3]	151	39
+copy_indices[3]	152	40
+copy_indices[3]	153	41
+copy_indices[3]	154	42
+copy_indices[3]	155	43
+copy_indices[3]	156	44
+copy_indices[3]	157	45
+copy_indices[3]	158	46
+copy_indices[3]	159	47
+copy_indices[3]	160	48
+copy_indices[3]	161	49
+copy_indices[3]	162	50
+copy_indices[3]	163	51
+copy_indices[3]	164	52
+copy_indices[3]	165	53
+copy_indices[3]	166	54
+copy_indices[3]	167	55
+copy_indices[3]	168	56
+copy_indices[3]	169	57
+copy_indices[3]	170	58
+copy_indices[3]	171	59
+copy_indices[3]	172	60
+copy_indices[3]	173	61
+copy_indices[3]	174	62
+copy_indices[3]	175	63
 DEAL::FE_Q<3>(2)
 Level 0
 (0,0) 1.00000
@@ -5878,371 +5785,348 @@ Level 2
 (124,25) 0.210938
 (124,26) 0.421875
 
-Copy indices
-Level 0
-
-Level 1
-0	1
-27	2
-2	3
-63	4
-4	5
-30	6
-6	7
-8	9
-35	11
-68	12
-12	13
-69	14
-39	15
-16	17
-41	18
-18	19
-20	21
-46	23
-82	25
-1	27
-3	28
-5	29
-7	30
-9	31
-10	32
-11	33
-13	34
-14	35
-15	36
-17	37
-19	38
-21	39
-22	40
-23	41
-24	42
-25	43
-26	44
-28	45
-29	46
-31	47
-32	48
-33	49
-34	50
-36	51
-37	52
-38	53
-40	54
-42	55
-43	56
-44	57
-45	58
-47	59
-48	60
-49	61
-50	62
-51	63
-52	64
-53	65
-54	66
-55	67
-56	68
-57	69
-58	70
-59	71
-60	72
-61	73
-62	74
-64	75
-65	76
-66	77
-67	78
-70	79
-71	80
-72	81
-73	82
-74	83
-75	84
-76	85
-77	86
-78	87
-79	88
-80	89
-81	90
-83	91
-84	92
-85	93
-86	94
-87	95
-88	96
-89	97
-90	98
-91	99
-92	100
-93	101
-94	102
-95	103
-96	104
-97	105
-98	106
-99	107
-100	108
-101	109
-102	110
-103	111
-104	112
-105	113
-106	114
-107	115
-108	116
-109	117
-110	118
-111	119
-112	120
-113	121
-114	122
-115	123
-116	124
-
-Level 2
-117	1
-143	2
-118	3
-177	4
-120	5
-145	6
-122	7
-124	9
-150	11
-181	12
-128	13
-182	14
-154	15
-132	17
-156	18
-134	19
-136	21
-161	23
-195	25
-0	27
-119	28
-121	29
-123	30
-125	31
-126	32
-127	33
-129	34
-130	35
-131	36
-133	37
-135	38
-137	39
-138	40
-139	41
-140	42
-141	43
-142	44
-27	45
-144	46
-146	47
-147	48
-148	49
-149	50
-151	51
-152	52
-153	53
-155	54
-157	55
-158	56
-159	57
-160	58
-162	59
-163	60
-164	61
-165	62
-2	63
-166	64
-167	65
-168	66
-169	67
-170	68
-171	69
-172	70
-173	71
-174	72
-175	73
-176	74
-63	75
-178	76
-179	77
-180	78
-183	79
-184	80
-185	81
-186	82
-187	83
-188	84
-189	85
-190	86
-191	87
-192	88
-193	89
-194	90
-196	91
-197	92
-4	93
-198	94
-199	95
-200	96
-201	97
-202	98
-203	99
-204	100
-205	101
-206	102
-207	103
-208	104
-30	105
-209	106
-210	107
-211	108
-212	109
-213	110
-214	111
-215	112
-216	113
-217	114
-218	115
-219	116
-6	117
-220	118
-221	119
-222	120
-223	121
-224	122
-225	123
-226	124
-
-Level 3
-227	0
-228	1
-229	2
-230	3
-231	4
-232	5
-233	6
-234	7
-235	8
-236	9
-237	10
-238	11
-239	12
-240	13
-241	14
-242	15
-243	16
-244	17
-245	18
-246	19
-247	20
-248	21
-249	22
-250	23
-251	24
-252	25
-253	26
-117	27
-254	28
-255	29
-256	30
-257	31
-258	32
-259	33
-260	34
-261	35
-262	36
-263	37
-264	38
-265	39
-266	40
-267	41
-268	42
-269	43
-270	44
-143	45
-271	46
-272	47
-273	48
-274	49
-275	50
-276	51
-277	52
-278	53
-279	54
-280	55
-281	56
-282	57
-283	58
-284	59
-285	60
-286	61
-287	62
-118	63
-288	64
-289	65
-290	66
-291	67
-292	68
-293	69
-294	70
-295	71
-296	72
-297	73
-298	74
-177	75
-299	76
-300	77
-301	78
-302	79
-303	80
-304	81
-305	82
-306	83
-307	84
-308	85
-309	86
-310	87
-311	88
-312	89
-313	90
-314	91
-315	92
-120	93
-316	94
-317	95
-318	96
-319	97
-320	98
-321	99
-322	100
-323	101
-324	102
-325	103
-326	104
-145	105
-327	106
-328	107
-329	108
-330	109
-331	110
-332	111
-333	112
-334	113
-335	114
-336	115
-337	116
-122	117
-338	118
-339	119
-340	120
-341	121
-342	122
-343	123
-344	124
-
+copy_indices[1]	0	1
+copy_indices[1]	1	27
+copy_indices[1]	2	3
+copy_indices[1]	3	28
+copy_indices[1]	4	5
+copy_indices[1]	5	29
+copy_indices[1]	6	7
+copy_indices[1]	7	30
+copy_indices[1]	8	9
+copy_indices[1]	9	31
+copy_indices[1]	10	32
+copy_indices[1]	11	33
+copy_indices[1]	12	13
+copy_indices[1]	13	34
+copy_indices[1]	14	35
+copy_indices[1]	15	36
+copy_indices[1]	16	17
+copy_indices[1]	17	37
+copy_indices[1]	18	19
+copy_indices[1]	19	38
+copy_indices[1]	20	21
+copy_indices[1]	21	39
+copy_indices[1]	22	40
+copy_indices[1]	23	41
+copy_indices[1]	24	42
+copy_indices[1]	25	43
+copy_indices[1]	26	44
+copy_indices[1]	27	2
+copy_indices[1]	28	45
+copy_indices[1]	29	46
+copy_indices[1]	30	6
+copy_indices[1]	31	47
+copy_indices[1]	32	48
+copy_indices[1]	33	49
+copy_indices[1]	34	50
+copy_indices[1]	35	11
+copy_indices[1]	36	51
+copy_indices[1]	37	52
+copy_indices[1]	38	53
+copy_indices[1]	39	15
+copy_indices[1]	40	54
+copy_indices[1]	41	18
+copy_indices[1]	42	55
+copy_indices[1]	43	56
+copy_indices[1]	44	57
+copy_indices[1]	45	58
+copy_indices[1]	46	23
+copy_indices[1]	47	59
+copy_indices[1]	48	60
+copy_indices[1]	49	61
+copy_indices[1]	50	62
+copy_indices[1]	51	63
+copy_indices[1]	52	64
+copy_indices[1]	53	65
+copy_indices[1]	54	66
+copy_indices[1]	55	67
+copy_indices[1]	56	68
+copy_indices[1]	57	69
+copy_indices[1]	58	70
+copy_indices[1]	59	71
+copy_indices[1]	60	72
+copy_indices[1]	61	73
+copy_indices[1]	62	74
+copy_indices[1]	63	4
+copy_indices[1]	64	75
+copy_indices[1]	65	76
+copy_indices[1]	66	77
+copy_indices[1]	67	78
+copy_indices[1]	68	12
+copy_indices[1]	69	14
+copy_indices[1]	70	79
+copy_indices[1]	71	80
+copy_indices[1]	72	81
+copy_indices[1]	73	82
+copy_indices[1]	74	83
+copy_indices[1]	75	84
+copy_indices[1]	76	85
+copy_indices[1]	77	86
+copy_indices[1]	78	87
+copy_indices[1]	79	88
+copy_indices[1]	80	89
+copy_indices[1]	81	90
+copy_indices[1]	82	25
+copy_indices[1]	83	91
+copy_indices[1]	84	92
+copy_indices[1]	85	93
+copy_indices[1]	86	94
+copy_indices[1]	87	95
+copy_indices[1]	88	96
+copy_indices[1]	89	97
+copy_indices[1]	90	98
+copy_indices[1]	91	99
+copy_indices[1]	92	100
+copy_indices[1]	93	101
+copy_indices[1]	94	102
+copy_indices[1]	95	103
+copy_indices[1]	96	104
+copy_indices[1]	97	105
+copy_indices[1]	98	106
+copy_indices[1]	99	107
+copy_indices[1]	100	108
+copy_indices[1]	101	109
+copy_indices[1]	102	110
+copy_indices[1]	103	111
+copy_indices[1]	104	112
+copy_indices[1]	105	113
+copy_indices[1]	106	114
+copy_indices[1]	107	115
+copy_indices[1]	108	116
+copy_indices[1]	109	117
+copy_indices[1]	110	118
+copy_indices[1]	111	119
+copy_indices[1]	112	120
+copy_indices[1]	113	121
+copy_indices[1]	114	122
+copy_indices[1]	115	123
+copy_indices[1]	116	124
+copy_indices[2]	117	1
+copy_indices[2]	118	3
+copy_indices[2]	119	28
+copy_indices[2]	120	5
+copy_indices[2]	121	29
+copy_indices[2]	122	7
+copy_indices[2]	123	30
+copy_indices[2]	124	9
+copy_indices[2]	125	31
+copy_indices[2]	126	32
+copy_indices[2]	127	33
+copy_indices[2]	128	13
+copy_indices[2]	129	34
+copy_indices[2]	130	35
+copy_indices[2]	131	36
+copy_indices[2]	132	17
+copy_indices[2]	133	37
+copy_indices[2]	134	19
+copy_indices[2]	135	38
+copy_indices[2]	136	21
+copy_indices[2]	137	39
+copy_indices[2]	138	40
+copy_indices[2]	139	41
+copy_indices[2]	140	42
+copy_indices[2]	141	43
+copy_indices[2]	142	44
+copy_indices[2]	143	2
+copy_indices[2]	144	46
+copy_indices[2]	145	6
+copy_indices[2]	146	47
+copy_indices[2]	147	48
+copy_indices[2]	148	49
+copy_indices[2]	149	50
+copy_indices[2]	150	11
+copy_indices[2]	151	51
+copy_indices[2]	152	52
+copy_indices[2]	153	53
+copy_indices[2]	154	15
+copy_indices[2]	155	54
+copy_indices[2]	156	18
+copy_indices[2]	157	55
+copy_indices[2]	158	56
+copy_indices[2]	159	57
+copy_indices[2]	160	58
+copy_indices[2]	161	23
+copy_indices[2]	162	59
+copy_indices[2]	163	60
+copy_indices[2]	164	61
+copy_indices[2]	165	62
+copy_indices[2]	166	64
+copy_indices[2]	167	65
+copy_indices[2]	168	66
+copy_indices[2]	169	67
+copy_indices[2]	170	68
+copy_indices[2]	171	69
+copy_indices[2]	172	70
+copy_indices[2]	173	71
+copy_indices[2]	174	72
+copy_indices[2]	175	73
+copy_indices[2]	176	74
+copy_indices[2]	177	4
+copy_indices[2]	178	76
+copy_indices[2]	179	77
+copy_indices[2]	180	78
+copy_indices[2]	181	12
+copy_indices[2]	182	14
+copy_indices[2]	183	79
+copy_indices[2]	184	80
+copy_indices[2]	185	81
+copy_indices[2]	186	82
+copy_indices[2]	187	83
+copy_indices[2]	188	84
+copy_indices[2]	189	85
+copy_indices[2]	190	86
+copy_indices[2]	191	87
+copy_indices[2]	192	88
+copy_indices[2]	193	89
+copy_indices[2]	194	90
+copy_indices[2]	195	25
+copy_indices[2]	196	91
+copy_indices[2]	197	92
+copy_indices[2]	198	94
+copy_indices[2]	199	95
+copy_indices[2]	200	96
+copy_indices[2]	201	97
+copy_indices[2]	202	98
+copy_indices[2]	203	99
+copy_indices[2]	204	100
+copy_indices[2]	205	101
+copy_indices[2]	206	102
+copy_indices[2]	207	103
+copy_indices[2]	208	104
+copy_indices[2]	209	106
+copy_indices[2]	210	107
+copy_indices[2]	211	108
+copy_indices[2]	212	109
+copy_indices[2]	213	110
+copy_indices[2]	214	111
+copy_indices[2]	215	112
+copy_indices[2]	216	113
+copy_indices[2]	217	114
+copy_indices[2]	218	115
+copy_indices[2]	219	116
+copy_indices[2]	220	118
+copy_indices[2]	221	119
+copy_indices[2]	222	120
+copy_indices[2]	223	121
+copy_indices[2]	224	122
+copy_indices[2]	225	123
+copy_indices[2]	226	124
+copy_indices[3]	227	0
+copy_indices[3]	228	1
+copy_indices[3]	229	2
+copy_indices[3]	230	3
+copy_indices[3]	231	4
+copy_indices[3]	232	5
+copy_indices[3]	233	6
+copy_indices[3]	234	7
+copy_indices[3]	235	8
+copy_indices[3]	236	9
+copy_indices[3]	237	10
+copy_indices[3]	238	11
+copy_indices[3]	239	12
+copy_indices[3]	240	13
+copy_indices[3]	241	14
+copy_indices[3]	242	15
+copy_indices[3]	243	16
+copy_indices[3]	244	17
+copy_indices[3]	245	18
+copy_indices[3]	246	19
+copy_indices[3]	247	20
+copy_indices[3]	248	21
+copy_indices[3]	249	22
+copy_indices[3]	250	23
+copy_indices[3]	251	24
+copy_indices[3]	252	25
+copy_indices[3]	253	26
+copy_indices[3]	254	28
+copy_indices[3]	255	29
+copy_indices[3]	256	30
+copy_indices[3]	257	31
+copy_indices[3]	258	32
+copy_indices[3]	259	33
+copy_indices[3]	260	34
+copy_indices[3]	261	35
+copy_indices[3]	262	36
+copy_indices[3]	263	37
+copy_indices[3]	264	38
+copy_indices[3]	265	39
+copy_indices[3]	266	40
+copy_indices[3]	267	41
+copy_indices[3]	268	42
+copy_indices[3]	269	43
+copy_indices[3]	270	44
+copy_indices[3]	271	46
+copy_indices[3]	272	47
+copy_indices[3]	273	48
+copy_indices[3]	274	49
+copy_indices[3]	275	50
+copy_indices[3]	276	51
+copy_indices[3]	277	52
+copy_indices[3]	278	53
+copy_indices[3]	279	54
+copy_indices[3]	280	55
+copy_indices[3]	281	56
+copy_indices[3]	282	57
+copy_indices[3]	283	58
+copy_indices[3]	284	59
+copy_indices[3]	285	60
+copy_indices[3]	286	61
+copy_indices[3]	287	62
+copy_indices[3]	288	64
+copy_indices[3]	289	65
+copy_indices[3]	290	66
+copy_indices[3]	291	67
+copy_indices[3]	292	68
+copy_indices[3]	293	69
+copy_indices[3]	294	70
+copy_indices[3]	295	71
+copy_indices[3]	296	72
+copy_indices[3]	297	73
+copy_indices[3]	298	74
+copy_indices[3]	299	76
+copy_indices[3]	300	77
+copy_indices[3]	301	78
+copy_indices[3]	302	79
+copy_indices[3]	303	80
+copy_indices[3]	304	81
+copy_indices[3]	305	82
+copy_indices[3]	306	83
+copy_indices[3]	307	84
+copy_indices[3]	308	85
+copy_indices[3]	309	86
+copy_indices[3]	310	87
+copy_indices[3]	311	88
+copy_indices[3]	312	89
+copy_indices[3]	313	90
+copy_indices[3]	314	91
+copy_indices[3]	315	92
+copy_indices[3]	316	94
+copy_indices[3]	317	95
+copy_indices[3]	318	96
+copy_indices[3]	319	97
+copy_indices[3]	320	98
+copy_indices[3]	321	99
+copy_indices[3]	322	100
+copy_indices[3]	323	101
+copy_indices[3]	324	102
+copy_indices[3]	325	103
+copy_indices[3]	326	104
+copy_indices[3]	327	106
+copy_indices[3]	328	107
+copy_indices[3]	329	108
+copy_indices[3]	330	109
+copy_indices[3]	331	110
+copy_indices[3]	332	111
+copy_indices[3]	333	112
+copy_indices[3]	334	113
+copy_indices[3]	335	114
+copy_indices[3]	336	115
+copy_indices[3]	337	116
+copy_indices[3]	338	118
+copy_indices[3]	339	119
+copy_indices[3]	340	120
+copy_indices[3]	341	121
+copy_indices[3]	342	122
+copy_indices[3]	343	123
+copy_indices[3]	344	124
