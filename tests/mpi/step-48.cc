@@ -308,6 +308,7 @@ namespace Step48
                                       locally_relevant_dofs,
                                       MPI_COMM_WORLD);
     locally_relevant_solution.copy_from (solution);
+    locally_relevant_solution.update_ghost_values();
     constraints.distribute (locally_relevant_solution);
 
     Vector<float> norm_per_cell (triangulation.n_active_cells());
