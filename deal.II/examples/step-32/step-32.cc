@@ -1866,7 +1866,8 @@ namespace Step32
                                      Utilities::MPI::
                                      this_mpi_process(MPI_COMM_WORLD));
 
-    //    distribute_sp();
+
+#ifdef USE_PETSC_LA
     IndexSet relevant;
     
     DoFTools::extract_locally_relevant_dofs (stokes_dof_handler,
@@ -1878,7 +1879,12 @@ namespace Step32
     
     sp.compress();
 
-    stokes_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
+     stokes_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
+#else
+     sp.compress();
+    stokes_matrix.reinit (sp);
+
+     #endif
   }
 
 
@@ -1912,17 +1918,24 @@ namespace Step32
                                      stokes_constraints, false,
                                      Utilities::MPI::
                                      this_mpi_process(MPI_COMM_WORLD));
+#ifdef USE_PETSC_LA
     IndexSet relevant;
     
     DoFTools::extract_locally_relevant_dofs (stokes_dof_handler,
                                                relevant);
 
     SparsityTools::distribute_sparsity_pattern(sp,
-					       stokes_dof_handler.n_locally_owned_dofs_per_processor(),
-					       MPI_COMM_WORLD, relevant);
+                                               stokes_dof_handler.n_locally_owned_dofs_per_processor(),
+                                               MPI_COMM_WORLD, relevant);
+
     sp.compress();
 
-    stokes_preconditioner_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
+     stokes_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
+#else
+     sp.compress();
+
+    stokes_preconditioner_matrix.reinit (sp);
+#endif
   }
 
 
@@ -1946,6 +1959,7 @@ namespace Step32
                                      temperature_constraints, false,
                                      Utilities::MPI::
                                      this_mpi_process(MPI_COMM_WORLD));
+#ifdef USE_PETSC_LA
     IndexSet relevant;
     
     DoFTools::extract_locally_relevant_dofs (temperature_dof_handler,
@@ -1959,7 +1973,15 @@ namespace Step32
     temperature_matrix.reinit (temperature_partitioner, temperature_partitioner, sp, MPI_COMM_WORLD);
     temperature_mass_matrix.reinit (temperature_partitioner, temperature_partitioner, sp, MPI_COMM_WORLD);
     temperature_stiffness_matrix.reinit (temperature_partitioner, temperature_partitioner, sp, MPI_COMM_WORLD);
-  }
+#else
+    sp.compress();
+
+    temperature_matrix.reinit (sp);
+    temperature_mass_matrix.reinit (sp);
+    temperature_stiffness_matrix.reinit (sp);
+
+#endif
+    }
 
 
 
@@ -2844,26 +2866,21 @@ namespace Step32
 
     if (use_bdf2_scheme == true)
       {
-#ifdef USE_PETSC_LA
-        temperature_matrix = temperature_mass_matrix; // TODO: fast?
-        temperature_matrix *= (2*time_step + old_time_step) /
-                              (time_step + old_time_step);
-        temperature_matrix.add (temperature_stiffness_matrix, time_step);
-	
-#else
         temperature_matrix.copy_from (temperature_mass_matrix);
         temperature_matrix *= (2*time_step + old_time_step) /
                               (time_step + old_time_step);
+#ifdef USE_PETSC_LA
+        temperature_matrix.add (temperature_stiffness_matrix, time_step);
+#else
         temperature_matrix.add (time_step, temperature_stiffness_matrix);
 #endif
       }
     else
       {
+        temperature_matrix.copy_from (temperature_mass_matrix);
 #ifdef USE_PETSC_LA
-        temperature_matrix = temperature_mass_matrix;
         temperature_matrix.add (temperature_stiffness_matrix, time_step);
 #else
-        temperature_matrix.copy_from (temperature_mass_matrix);
         temperature_matrix.add (time_step, temperature_stiffness_matrix);
 #endif
       }
