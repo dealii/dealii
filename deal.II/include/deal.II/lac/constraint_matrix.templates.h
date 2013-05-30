@@ -24,6 +24,9 @@
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/parallel_vector.h>
 #include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 #include <iomanip>
 
@@ -973,27 +976,205 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 }
 
 
+namespace internal
+{
+  namespace
+  {
+    // create an output vector that consists of the input vector's locally owned
+    // elements plus some ghost elements that need to be imported from elsewhere
+    //
+    // this is an operation that is different for all vector types and so we
+    // need a few overloads
+#ifdef DEAL_II_WITH_TRILINOS
+    void
+    import_vector_with_ghost_elements (const TrilinosWrappers::MPI::Vector &vec,
+                                       const IndexSet       &/*locally_owned_elements*/,
+                                       const IndexSet       &needed_elements,
+                                       TrilinosWrappers::MPI::Vector       &output)
+    {
+      output.reinit (needed_elements,
+                     dynamic_cast<const Epetra_MpiComm *>(&vec.vector_partitioner().Comm())->GetMpiComm());
+      output = vec;
+    }
 
-template<class VectorType>
+
+    void
+    import_vector_with_ghost_elements (const TrilinosWrappers::Vector &vec,
+                                       const IndexSet       &,
+                                       const IndexSet       &,
+                                       TrilinosWrappers::Vector       &output)
+    {
+      output.reinit (vec.size());
+      output = vec;
+    }
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+    void
+    import_vector_with_ghost_elements (const PETScWrappers::MPI::Vector &vec,
+                                       const IndexSet       &locally_owned_elements,
+                                       const IndexSet       &needed_elements,
+                                       PETScWrappers::MPI::Vector       &output)
+    {
+      output.reinit (vec.get_mpi_communicator(), locally_owned_elements, needed_elements);
+      output = vec;
+    }
+
+
+
+    void
+    import_vector_with_ghost_elements (const PETScWrappers::Vector &vec,
+                                       const IndexSet       &,
+                                       const IndexSet       &,
+                                       PETScWrappers::Vector       &output)
+    {
+      output.reinit (vec.size());
+      output = vec;
+    }
+#endif
+
+    template <typename number>
+    void
+    import_vector_with_ghost_elements (const parallel::distributed::Vector<number> &vec,
+                                       const IndexSet       &locally_owned_elements,
+                                       const IndexSet       &needed_elements,
+                                       parallel::distributed::Vector<number>       &output)
+    {
+      output.reinit (locally_owned_elements, needed_elements, vec.get_mpi_communicator());
+      output = vec;
+    }
+
+
+    template <typename number>
+    void
+    import_vector_with_ghost_elements (const dealii::Vector<number> &vec,
+                                       const IndexSet   &locally_owned_elements,
+                                       const IndexSet   &needed_elements,
+                                       dealii::Vector<number>       &output)
+    {
+      Assert (false, ExcMessage ("We shouldn't even get here!"));
+    }
+
+
+    // for block vectors, simply dispatch to the individual blocks
+    template <class VectorType>
+    void
+    import_vector_with_ghost_elements (const BlockVectorBase<VectorType> &vec,
+                                       const IndexSet   &locally_owned_elements,
+                                       const IndexSet   &needed_elements,
+                                       BlockVectorBase<VectorType>       &output)
+    {
+      types::global_dof_index block_start = 0;
+      for (unsigned int b=0; b<vec.n_blocks(); ++b)
+        {
+          import_vector_with_ghost_elements (vec.block(b),
+                                             locally_owned_elements.get_view (block_start, block_start+vec.block(b).size()),
+                                             needed_elements.get_view (block_start, block_start+vec.block(b).size()),
+                                             output.block(b));
+          block_start += vec.block(b).size();
+        }
+    }
+  }
+}
+
+
+template <class VectorType>
 void
 ConstraintMatrix::distribute (VectorType &vec) const
 {
-  Assert (sorted == true, ExcMatrixNotClosed());
+  Assert (sorted==true, ExcMatrixIsClosed());
 
-  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  for (; next_constraint != lines.end(); ++next_constraint)
+  // if the vector type supports parallel storage and if the
+  // vector actually does store only part of the vector, distributing
+  // is slightly more complicated. we can skip the complicated part
+  // if the local processor stores the *entire* vector and pretend
+  // that this is a sequential vector but we need to pay attention that
+  // in that case the other processors don't actually do anything (in
+  // particular that they do not call compress because the processor
+  // that owns everything doesn't do so either); this is the first if
+  // case here, the second is for the complicated case, the last else
+  // is for the simple case (sequential vector or distributed vector
+  // where the current processor stores everything)
+  if ((vec.supports_distributed_data == true)
+      &&
+      (vec.locally_owned_elements().n_elements() == 0))
     {
-      // fill entry in line
-      // next_constraint.line by adding the
-      // different contributions
-      typename VectorType::value_type
-      new_value = next_constraint->inhomogeneity;
-      for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
-        new_value += (static_cast<typename VectorType::value_type>
-                      (vec(next_constraint->entries[i].first)) *
-                      next_constraint->entries[i].second);
-      Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
-      vec(next_constraint->line) = new_value;
+      // do nothing, in particular don't call compress()
+    }
+  else if ((vec.supports_distributed_data == true)
+           &&
+           (vec.locally_owned_elements() != complete_index_set(vec.size())))
+    {
+      // This processor owns only part of the vector. one may think that
+      // every processor should be able to simply communicate those elements
+      // it owns and for which it knows that they act as sources to constrained
+      // DoFs to the owner of these DoFs. This would lead to a scheme where all
+      // we need to do is to add some local elements to (possibly non-local) ones
+      // and then call compress().
+      //
+      // Alas, this scheme does not work as evidenced by the disaster of bug #51,
+      // see http://code.google.com/p/dealii/issues/detail?id=51 and the
+      // reversion of one attempt that implements this in r29662. Rather, we
+      // need to get a vector that has all the *sources* or constraints we
+      // own locally, possibly as ghost vector elements, then read from them,
+      // and finally throw away the ghosted vector. Implement this in the following.
+      const IndexSet vec_owned_elements = vec.locally_owned_elements();
+      IndexSet needed_elements = vec_owned_elements;
+
+      typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
+      for (constraint_iterator it = lines.begin();
+          it != lines.end(); ++it)
+        if (vec_owned_elements.is_element(it->line))
+          for (unsigned int i=0; i<it->entries.size(); ++i)
+            needed_elements.add_index(it->entries[i].first);
+
+      VectorType ghosted_vector;
+      internal::import_vector_with_ghost_elements (vec,
+                                                   vec_owned_elements, needed_elements,
+                                                   ghosted_vector);
+
+      for (constraint_iterator it = lines.begin();
+          it != lines.end(); ++it)
+        if (vec_owned_elements.is_element(it->line))
+          for (unsigned int i=0; i<it->entries.size(); ++i)
+            {
+              typename VectorType::value_type
+              new_value = it->inhomogeneity;
+              for (unsigned int i=0; i<it->entries.size(); ++i)
+                new_value += (static_cast<typename VectorType::value_type>
+                              (ghosted_vector(it->entries[i].first)) *
+                               it->entries[i].second);
+              Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
+              vec(it->line) = new_value;
+            }
+
+      // now compress to communicate the entries that we added to
+      // and that weren't to local processors to the owner
+      //
+      // this shouldn't be strictly necessary but it probably doesn't
+      // hurt either
+      vec.compress (VectorOperation::insert);
+    }
+  else
+    // purely sequential vector (either because the type doesn't
+    // support anything else or because it's completely stored
+    // locally
+    {
+      std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
+      for (; next_constraint != lines.end(); ++next_constraint)
+        {
+          // fill entry in line
+          // next_constraint.line by adding the
+          // different contributions
+          typename VectorType::value_type
+          new_value = next_constraint->inhomogeneity;
+          for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
+            new_value += (static_cast<typename VectorType::value_type>
+                          (vec(next_constraint->entries[i].first)) *
+                           next_constraint->entries[i].second);
+          Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
+          vec(next_constraint->line) = new_value;
+        }
     }
 }
 
