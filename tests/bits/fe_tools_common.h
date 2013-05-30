@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2010 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2010, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -83,7 +83,7 @@ output_vector (const VECTOR &v)
 
                                    // write out at most 20 equispaced
                                    // elements of the vector
-  for (unsigned int i=0; i<v.size(); i+=std::max(static_cast<std::size_t>(1),
+  for (unsigned int i=0; i<v.size(); i+=std::max(static_cast<typename VECTOR::size_type>(1),
         v.size()/20))
     deallog << v(i) << ' ';
   deallog << std::endl;
