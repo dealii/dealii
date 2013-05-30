@@ -294,6 +294,13 @@ namespace PETScWrappers
        */
       SparseMatrix &operator = (const value_type d);
 
+
+      /**
+       * Make a copy of the PETSc matrix @p other. It is assumed that both matrices have
+       * the same SparsityPattern.
+       */
+      void copy_from(const SparseMatrix & other);
+
       /**
        * Throw away the present matrix and
        * generate one that has the same

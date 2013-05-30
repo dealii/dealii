@@ -99,7 +99,17 @@ namespace PETScWrappers
       return *this;
     }
 
+    void
+    SparseMatrix::copy_from (const SparseMatrix &other)
+    {
+      if (&other == this)
+        return;
 
+      this->communicator = other.communicator;
+
+      int ierr = MatCopy(other.matrix, matrix, SAME_NONZERO_PATTERN);
+      AssertThrow (ierr == 0, ExcPETScError(ierr));
+    }
 
     void
     SparseMatrix::reinit (const MPI_Comm    &communicator,
