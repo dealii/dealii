@@ -925,20 +925,8 @@ namespace Step50
 
     solution = 0;
 
-    try
-    {
     cg.solve (system_matrix, solution, system_rhs,
               preconditioner);
-    }
-    catch (...)
-    {
-        output_results(42);
-        constraints.distribute (solution);
-        output_results(43);
-        MPI_Barrier(MPI_COMM_WORLD);
-        exit(0);
-    }
-
     constraints.distribute (solution);
   }
 
@@ -979,7 +967,6 @@ namespace Step50
     GridRefinement::refine_and_coarsen_fixed_number (triangulation,
                                                      estimated_error_per_cell,
                                                      0.3, 0.03);
-
     triangulation.execute_coarsening_and_refinement ();
   }
 
@@ -999,7 +986,6 @@ namespace Step50
     system_matrix.residual(temp,solution,system_rhs);
     TrilinosWrappers::MPI::Vector res_ghosted = temp_solution;
     res_ghosted = temp;
-
 
     data_out.attach_dof_handler (mg_dof_handler);
     data_out.add_data_vector (temp_solution, "solution");
@@ -1115,7 +1101,7 @@ int main (int argc, char *argv[])
       using namespace dealii;
       using namespace Step50;
 
-      LaplaceProblem<2> laplace_problem(3);
+      LaplaceProblem<2> laplace_problem(1);
       laplace_problem.run ();
     }
   catch (std::exception &exc)
