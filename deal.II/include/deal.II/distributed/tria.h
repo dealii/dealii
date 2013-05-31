@@ -732,6 +732,8 @@ namespace parallel
         std::vector<unsigned int> n_locally_owned_active_cells;
         unsigned int              n_global_active_cells;
         unsigned int              n_global_levels;
+
+        NumberCache();
       };
 
       NumberCache number_cache;
