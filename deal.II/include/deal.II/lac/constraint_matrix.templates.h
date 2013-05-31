@@ -988,23 +988,13 @@ namespace internal
 #ifdef DEAL_II_WITH_TRILINOS
     void
     import_vector_with_ghost_elements (const TrilinosWrappers::MPI::Vector &vec,
-                                       const IndexSet       &/*locally_owned_elements*/,
-                                       const IndexSet       &needed_elements,
-                                       TrilinosWrappers::MPI::Vector       &output)
+                                       const IndexSet                      &/*locally_owned_elements*/,
+                                       const IndexSet                      &needed_elements,
+                                       TrilinosWrappers::MPI::Vector       &output,
+                                       const internal::bool2type<false>     /*is_block_vector*/)
     {
       output.reinit (needed_elements,
                      dynamic_cast<const Epetra_MpiComm *>(&vec.vector_partitioner().Comm())->GetMpiComm());
-      output = vec;
-    }
-
-
-    void
-    import_vector_with_ghost_elements (const TrilinosWrappers::Vector &vec,
-                                       const IndexSet       &,
-                                       const IndexSet       &,
-                                       TrilinosWrappers::Vector       &output)
-    {
-      output.reinit (vec.size());
       output = vec;
     }
 #endif
@@ -1012,23 +1002,12 @@ namespace internal
 #ifdef DEAL_II_WITH_PETSC
     void
     import_vector_with_ghost_elements (const PETScWrappers::MPI::Vector &vec,
-                                       const IndexSet       &locally_owned_elements,
-                                       const IndexSet       &needed_elements,
-                                       PETScWrappers::MPI::Vector       &output)
+                                       const IndexSet                   &locally_owned_elements,
+                                       const IndexSet                   &needed_elements,
+                                       PETScWrappers::MPI::Vector       &output,
+                                       const internal::bool2type<false>  /*is_block_vector*/)
     {
       output.reinit (vec.get_mpi_communicator(), locally_owned_elements, needed_elements);
-      output = vec;
-    }
-
-
-
-    void
-    import_vector_with_ghost_elements (const PETScWrappers::Vector &vec,
-                                       const IndexSet       &,
-                                       const IndexSet       &,
-                                       PETScWrappers::Vector       &output)
-    {
-      output.reinit (vec.size());
       output = vec;
     }
 #endif
@@ -1036,21 +1015,25 @@ namespace internal
     template <typename number>
     void
     import_vector_with_ghost_elements (const parallel::distributed::Vector<number> &vec,
-                                       const IndexSet       &locally_owned_elements,
-                                       const IndexSet       &needed_elements,
-                                       parallel::distributed::Vector<number>       &output)
+                                       const IndexSet                              &locally_owned_elements,
+                                       const IndexSet                              &needed_elements,
+                                       parallel::distributed::Vector<number>       &output,
+                                       const internal::bool2type<false>             /*is_block_vector*/)
     {
       output.reinit (locally_owned_elements, needed_elements, vec.get_mpi_communicator());
       output = vec;
     }
 
 
-    template <typename number>
+    // all other vector non-block vector types are sequential and we should
+    // not have this function called at all -- so throw an exception
+    template <typename Vector>
     void
-    import_vector_with_ghost_elements (const dealii::Vector<number> &vec,
-                                       const IndexSet   &locally_owned_elements,
-                                       const IndexSet   &needed_elements,
-                                       dealii::Vector<number>       &output)
+    import_vector_with_ghost_elements (const Vector                     &/*vec*/,
+                                       const IndexSet                   &/*locally_owned_elements*/,
+                                       const IndexSet                   &/*needed_elements*/,
+                                       Vector                           &/*output*/,
+                                       const internal::bool2type<false>  /*is_block_vector*/)
     {
       Assert (false, ExcMessage ("We shouldn't even get here!"));
     }
@@ -1059,20 +1042,26 @@ namespace internal
     // for block vectors, simply dispatch to the individual blocks
     template <class VectorType>
     void
-    import_vector_with_ghost_elements (const BlockVectorBase<VectorType> &vec,
-                                       const IndexSet   &locally_owned_elements,
-                                       const IndexSet   &needed_elements,
-                                       BlockVectorBase<VectorType>       &output)
+    import_vector_with_ghost_elements (const VectorType                &vec,
+                                       const IndexSet                  &locally_owned_elements,
+                                       const IndexSet                  &needed_elements,
+                                       VectorType                      &output,
+                                       const internal::bool2type<true>  /*is_block_vector*/)
     {
+      output.reinit (vec.n_blocks());
+
       types::global_dof_index block_start = 0;
       for (unsigned int b=0; b<vec.n_blocks(); ++b)
         {
           import_vector_with_ghost_elements (vec.block(b),
                                              locally_owned_elements.get_view (block_start, block_start+vec.block(b).size()),
                                              needed_elements.get_view (block_start, block_start+vec.block(b).size()),
-                                             output.block(b));
+                                             output.block(b),
+                                             internal::bool2type<false>());
           block_start += vec.block(b).size();
         }
+
+      output.collect_sizes ();
     }
   }
 }
@@ -1131,7 +1120,8 @@ ConstraintMatrix::distribute (VectorType &vec) const
       VectorType ghosted_vector;
       internal::import_vector_with_ghost_elements (vec,
                                                    vec_owned_elements, needed_elements,
-                                                   ghosted_vector);
+                                                   ghosted_vector,
+                                                   internal::bool2type<IsBlockVector<VectorType>::value>());
 
       for (constraint_iterator it = lines.begin();
           it != lines.end(); ++it)
