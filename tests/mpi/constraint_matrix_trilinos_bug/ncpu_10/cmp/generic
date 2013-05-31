@@ -6,7 +6,7 @@ An error occurred in file <constraint_matrix.templates.h> in function
 The violated condition was: 
     !vec.has_ghost_elements()
 The name and call sequence of the exception was:
-    typename TrilinosWrappers::VectorBase::ExcGhostsPresent()
+    TrilinosWrappers::VectorBase::ExcGhostsPresent()
 Additional Information: 
 (none)
 --------------------------------------------------------
