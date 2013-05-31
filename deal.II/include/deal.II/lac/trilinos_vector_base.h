@@ -1257,16 +1257,8 @@ namespace TrilinosWrappers
     else if (vector->Map().NumMyElements() > 0)
       {
         const unsigned int n_indices = vector->Map().NumMyElements();
-        int * vector_indices = vector->Map().MyGlobalElements();
-        unsigned int range_start = vector_indices[0];
-        unsigned int range_end = range_start+1;
-        for (unsigned int i=1; i<n_indices; ++i, ++range_end)
-          if (static_cast<unsigned int>(vector_indices[i]) != range_end)
-            {
-              is.add_range(range_start, range_end);
-              range_end = range_start = vector_indices[i];
-            }
-        is.add_range(range_start, range_end);
+        unsigned int * vector_indices = (unsigned int*)vector->Map().MyGlobalElements();
+        is.add_indices(vector_indices, vector_indices+n_indices);
         is.compress();
       }
 
