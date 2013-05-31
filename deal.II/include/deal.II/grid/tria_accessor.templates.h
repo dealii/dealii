@@ -2891,11 +2891,11 @@ inline
 bool
 CellAccessor<dim,spacedim>::is_locally_owned () const
 {
+  Assert (this->active(), ExcMessage("is_locally_owned() only works on active cells!"));
 #ifndef DEAL_II_WITH_P4EST
   return true;
 #else
-  const types::subdomain_id subdomain = this->subdomain_id();
-  if (subdomain == numbers::artificial_subdomain_id)
+  if (is_artificial())
     return false;
 
   const parallel::distributed::Triangulation<dim,spacedim> *pdt
@@ -2904,7 +2904,7 @@ CellAccessor<dim,spacedim>::is_locally_owned () const
   if (pdt == 0)
     return true;
   else
-    return (subdomain == pdt->locally_owned_subdomain());
+    return (this->subdomain_id() == pdt->locally_owned_subdomain());
 #endif
 }
 
@@ -2914,11 +2914,11 @@ inline
 bool
 CellAccessor<dim,spacedim>::is_ghost () const
 {
+  Assert (this->active(), ExcMessage("is_ghost() only works on active cells!"));
 #ifndef DEAL_II_WITH_P4EST
   return false;
 #else
-  const types::subdomain_id subdomain = this->subdomain_id();
-  if (subdomain == numbers::artificial_subdomain_id)
+  if (is_artificial() || this->has_children())
     return false;
 
   const parallel::distributed::Triangulation<dim,spacedim> *pdt
@@ -2927,7 +2927,7 @@ CellAccessor<dim,spacedim>::is_ghost () const
   if (pdt == 0)
     return false;
   else
-    return (subdomain != pdt->locally_owned_subdomain());
+    return (this->subdomain_id() != pdt->locally_owned_subdomain());
 #endif
 }
 
@@ -2938,10 +2938,11 @@ inline
 bool
 CellAccessor<dim,spacedim>::is_artificial () const
 {
+  Assert (this->active(), ExcMessage("is_artificial() only works on active cells!"));
 #ifndef DEAL_II_WITH_P4EST
   return false;
 #else
-  return (this->subdomain_id() == numbers::artificial_subdomain_id);
+  return this->subdomain_id() == numbers::artificial_subdomain_id;
 #endif
 }
 

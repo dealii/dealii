@@ -4230,6 +4230,7 @@ namespace internal
                                             new_lines[5]->index()));
           }
 
+        types::subdomain_id subdomainid = cell->subdomain_id();
 
         for (unsigned int i=0; i<n_children; ++i)
           {
@@ -4241,7 +4242,7 @@ namespace internal
             // inherit material
             // properties
             subcells[i]->set_material_id (cell->material_id());
-            subcells[i]->set_subdomain_id (cell->subdomain_id());
+            subcells[i]->set_subdomain_id (subdomainid);
 
             if (i%2==0)
               subcells[i]->set_parent (cell->index ());
@@ -4437,6 +4438,8 @@ namespace internal
                   second_child->set_used_flag ();
                   second_child->clear_user_data ();
 
+                  types::subdomain_id subdomainid = cell->subdomain_id();
+
                   // insert first child
                   cell->set_children (0, first_child->index());
                   first_child->clear_children ();
@@ -4444,7 +4447,7 @@ namespace internal
                                     ::TriaObject<1> (cell->vertex_index(0),
                                                      next_unused_vertex));
                   first_child->set_material_id (cell->material_id());
-                  first_child->set_subdomain_id (cell->subdomain_id());
+                  first_child->set_subdomain_id (subdomainid);
                   first_child->set_direction_flag (cell->direction_flag());
 
                   first_child->set_parent (cell->index ());
@@ -4504,7 +4507,7 @@ namespace internal
                                                      cell->vertex_index(1)));
                   second_child->set_neighbor (0, first_child);
                   second_child->set_material_id (cell->material_id());
-                  second_child->set_subdomain_id (cell->subdomain_id());
+                  second_child->set_subdomain_id (subdomainid);
                   second_child->set_direction_flag (cell->direction_flag());
 
                   if (cell->neighbor(1).state() != IteratorState::valid)
@@ -6417,6 +6420,8 @@ namespace internal
                         new_quads[i]->set_line_orientation(j,true);
                     }
 
+                  types::subdomain_id subdomainid = hex->subdomain_id();
+
                   // find some space for the newly to
                   // be created hexes and initialize
                   // them.
@@ -6440,7 +6445,7 @@ namespace internal
                       // inherit material
                       // properties
                       new_hexes[i]->set_material_id (hex->material_id());
-                      new_hexes[i]->set_subdomain_id (hex->subdomain_id());
+                      new_hexes[i]->set_subdomain_id (subdomainid);
 
                       if (i%2)
                         new_hexes[i]->set_parent (hex->index ());

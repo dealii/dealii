@@ -29,6 +29,23 @@
 
 #include <fstream>
 
+template <class TRIA>
+void check (TRIA & tr)
+{
+  typename TRIA::cell_iterator cell = tr.begin(),
+        endc = tr.end();
+  
+  for (; cell!=endc; ++cell)
+    {
+      deallog << "cell level=" << cell->level() << " index=" << cell->index();
+      if (!cell->has_children())
+	deallog << " subdomain: " << cell->subdomain_id();
+      deallog << std::endl;
+    }
+  
+  deallog << "OK" << std::endl;
+}
+
 
 template<int dim>
 void test()
@@ -57,7 +74,10 @@ void test()
       deallog << "Checksum: "
 	      << checksum
 	      << std::endl;
-    }
+
+      check(tr); 
+      }
+
 
 
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
@@ -68,24 +88,10 @@ void test()
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll log(__FILE__);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-
-
-  deallog.push(Utilities::int_to_string(myid));
-
-  if (myid == 0)
-    {
-      std::ofstream logfile(output_file_for_mpi("p4est_2d_refine_02").c_str());
-      deallog.attach(logfile);
-      deallog.depth_console(0);
-      deallog.threshold_double(1.e-10);
-
-      deallog.push("2d");
-      test<2>();
-      deallog.pop();
-    }
-  else
-    test<2>();
+  deallog.push("2d");
+  test<2>();
+  deallog.pop();
 
 }
