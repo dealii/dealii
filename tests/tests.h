@@ -90,6 +90,68 @@ mpi_initlog(const char* filename, bool console=false)
       deallog.threshold_float(1.e-8);
     }
 }
+  
+
+
+/* helper class to include the deallogs of all processors
+   on proc 0 */
+class MPILogInitAll
+{
+  public:
+    MPILogInitAll(const char* filename, bool console=false)
+		    : m_filename(filename)
+      {
+	unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+	deallogname = output_file_for_mpi(JobIdentifier::base_name(filename));
+	if (myid != 0)
+	  deallogname = deallogname + Utilities::int_to_string(myid);
+	deallogfile.open(deallogname.c_str());
+	deallog.attach(deallogfile);
+	if (!console)
+	  deallog.depth_console(0);
+
+//TODO: Remove this line and replace by test_mode()
+	deallog.threshold_float(1.e-8);
+	deallog.push(Utilities::int_to_string(myid));
+      }
+
+    ~MPILogInitAll()
+      {
+	deallog.pop();
+	MPI_Barrier(MPI_COMM_WORLD);
+	
+	unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+	unsigned int nproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+
+	if (myid==0)
+	  {	
+	    for (unsigned int i=1;i<nproc;++i)
+	      {
+		std::string filename = output_file_for_mpi(JobIdentifier::base_name(m_filename.c_str()))
+				       + Utilities::int_to_string(i);
+		std::ifstream in(filename.c_str());
+		Assert (in, ExcIO());
+		
+		while (in)
+		  {
+		    std::string s;
+		    std::getline(in, s);
+		    deallog.get_file_stream() << s << "\n";
+		  }
+		in.close();	    
+		std::remove (filename.c_str());
+	      }
+	  }
+      }
+  private:
+
+    std::string m_filename;
+    
+};
+
+
+
+
 
 
 #ifndef DEAL_II_STACKTRACE_SWITCH

@@ -1,13 +1,13 @@
 
 DEAL:0:2d::Exception: 
 --------------------------------------------------------
-An error occurred in file <constraint_matrix.cc> in function
-    void dealii::ConstraintMatrix::distribute(VectorType&) const [with VectorType = dealii::TrilinosWrappers::MPI::Vector]
+An error occurred in file <constraint_matrix.templates.h> in function
+    void dealii::internal::{anonymous}::import_vector_with_ghost_elements(const dealii::TrilinosWrappers::MPI::Vector&, const dealii::IndexSet&, const dealii::IndexSet&, dealii::TrilinosWrappers::MPI::Vector&, dealii::internal::bool2type<false>)
 The violated condition was: 
-    vec.vector_partitioner().IsOneToOne()
+    !vec.has_ghost_elements()
 The name and call sequence of the exception was:
-    ExcMessage ("Distribute does not work on vectors with overlapping parallel partitioning.")
+    typename TrilinosWrappers::VectorBase::ExcGhostsPresent()
 Additional Information: 
-Distribute does not work on vectors with overlapping parallel partitioning.
+(none)
 --------------------------------------------------------
 

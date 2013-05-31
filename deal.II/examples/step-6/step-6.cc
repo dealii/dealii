@@ -35,10 +35,6 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
-#include <deal.II/base/timer.h>
-
-#include <deal.II/lac/sparse_direct.h>
-
 #include <fstream>
 #include <iostream>
 
@@ -113,7 +109,6 @@ private:
   // a list of constraints to hold the hanging nodes and the boundary
   // conditions.
   ConstraintMatrix     constraints;
-    TimerOutput                               computing_timer;
 
   SparsityPattern      sparsity_pattern;
   SparseMatrix<double> system_matrix;
@@ -191,10 +186,7 @@ template <int dim>
 Step6<dim>::Step6 ()
   :
   dof_handler (triangulation),
-		computing_timer (std::cout,
-                     TimerOutput::summary,
-				 TimerOutput::wall_times),
-  fe (1)
+  fe (2)
 {}
 
 
@@ -289,9 +281,7 @@ Step6<dim>::~Step6 ()
 template <int dim>
 void Step6<dim>::setup_system ()
 {
-    computing_timer.enter_section ("distribute");
   dof_handler.distribute_dofs (fe);
-    computing_timer.exit_section ("distribute");
 
   solution.reinit (dof_handler.n_dofs());
   system_rhs.reinit (dof_handler.n_dofs());
@@ -308,10 +298,8 @@ void Step6<dim>::setup_system ()
   // from computations on the previous mesh before the last adaptive
   // refinement):
   constraints.clear ();
-    computing_timer.enter_section ("hanging");
   DoFTools::make_hanging_node_constraints (dof_handler,
                                            constraints);
-    computing_timer.exit_section ("hanging");
 
 
   // Now we are ready to interpolate the ZeroFunction to our boundary with
@@ -350,12 +338,10 @@ void Step6<dim>::setup_system ()
   // instead because then we would first write into these locations only to
   // later set them to zero again during condensation.
   CompressedSparsityPattern c_sparsity(dof_handler.n_dofs());
-    computing_timer.enter_section ("makesp");
   DoFTools::make_sparsity_pattern(dof_handler,
                                   c_sparsity,
                                   constraints,
                                   /*keep_constrained_dofs = */ false);
-    computing_timer.exit_section ("makesp");
 
   // Now all non-zero entries of the matrix are known (i.e. those from
   // regularly assembling the matrix and those that were introduced by
@@ -399,7 +385,7 @@ void Step6<dim>::setup_system ()
 template <int dim>
 void Step6<dim>::assemble_system ()
 {
-  const QGauss<dim>  quadrature_formula(2);
+  const QGauss<dim>  quadrature_formula(3);
 
   FEValues<dim> fe_values (fe, quadrature_formula,
                            update_values    |  update_gradients |
@@ -479,9 +465,14 @@ void Step6<dim>::assemble_system ()
 template <int dim>
 void Step6<dim>::solve ()
 {
-    SparseDirectUMFPACK u;
-  u.initialize(system_matrix);
-  u.vmult(solution, system_rhs);
+  SolverControl           solver_control (1000, 1e-12);
+  SolverCG<>              solver (solver_control);
+
+  PreconditionSSOR<> preconditioner;
+  preconditioner.initialize(system_matrix, 1.2);
+
+  solver.solve (system_matrix, solution, system_rhs,
+                preconditioner);
 
   constraints.distribute (solution);
 }
@@ -667,7 +658,7 @@ void Step6<dim>::output_results (const unsigned int cycle) const
 template <int dim>
 void Step6<dim>::run ()
 {
-  for (unsigned int cycle=0; cycle<17; ++cycle)
+  for (unsigned int cycle=0; cycle<8; ++cycle)
     {
       std::cout << "Cycle " << cycle << ':' << std::endl;
 
@@ -687,20 +678,16 @@ void Step6<dim>::run ()
       std::cout << "   Number of active cells:       "
                 << triangulation.n_active_cells()
                 << std::endl;
-    computing_timer.enter_section ("setup");
+
       setup_system ();
-    computing_timer.exit_section ("setup");
 
       std::cout << "   Number of degrees of freedom: "
                 << dof_handler.n_dofs()
                 << std::endl;
 
-    computing_timer.enter_section ("ass");
-
       assemble_system ();
-      computing_timer.exit_section ("ass");
       solve ();
-      //output_results (cycle);
+      output_results (cycle);
     }
 
   // After we have finished computing the solution on the finest mesh, and
@@ -708,7 +695,6 @@ void Step6<dim>::run ()
   // on this final mesh to a file. As already done in one of the previous
   // examples, we use the EPS format for output, and to obtain a reasonable
   // view on the solution, we rescale the z-axis by a factor of four.
-  /*
   DataOutBase::EpsFlags eps_flags;
   eps_flags.z_scaling = 4;
 
@@ -720,7 +706,7 @@ void Step6<dim>::run ()
   data_out.build_patches ();
 
   std::ofstream output ("final-solution.eps");
-  data_out.write_eps (output);*/
+  data_out.write_eps (output);
 }
 
 

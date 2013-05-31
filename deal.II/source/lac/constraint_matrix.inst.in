@@ -5,7 +5,6 @@ for (S: REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
     template void ConstraintMatrix::distribute_local_to_global<T<S> > (
       const Vector<double>&, const std::vector<types::global_dof_index> &, T<S> &, const FullMatrix<double>&) const;
     template void ConstraintMatrix::distribute<T<S> >(const T<S> &, T<S> &) const;
-    template void ConstraintMatrix::distribute<T<S> >(T<S> &) const;
     template void ConstraintMatrix::set_zero<T<S> >(T<S> &) const;
   }
 
@@ -17,7 +16,6 @@ for (S: REAL_SCALARS; T : DEAL_II_VEC_TEMPLATES)
     template void ConstraintMatrix::distribute_local_to_global<parallel::distributed::T<S> > (
       const Vector<double>&, const std::vector<types::global_dof_index> &, parallel::distributed::T<S> &, const FullMatrix<double>&) const;
     template void ConstraintMatrix::distribute<parallel::distributed::T<S> >(const parallel::distributed::T<S> &, parallel::distributed::T<S> &) const;
-    template void ConstraintMatrix::distribute<parallel::distributed::T<S> >(parallel::distributed::T<S> &) const;
     template void ConstraintMatrix::set_zero<parallel::distributed::T<S> >(parallel::distributed::T<S> &) const;
   }
 
@@ -29,7 +27,6 @@ for (V: EXTERNAL_SEQUENTIAL_VECTORS)
     template void ConstraintMatrix::distribute_local_to_global<V > (
       const Vector<double>&, const std::vector<types::global_dof_index> &, V&, const FullMatrix<double>&) const;
     template void ConstraintMatrix::distribute<V >(const V&, V&) const;
-    template void ConstraintMatrix::distribute<V >(V&) const;
     template void ConstraintMatrix::set_zero<V >(V&) const;
   }
 
@@ -56,4 +53,10 @@ for (S1 : REAL_SCALARS; S2 : REAL_SCALARS)
         const SparseMatrix<S1>&, const Vector<S2>&, SparseMatrix<S1> &, Vector<S2>&) const;
     template void ConstraintMatrix::condense<S1,BlockVector<S2> >(
         const SparseMatrix<S1>&, const BlockVector<S2>&, SparseMatrix<S1> &, BlockVector<S2>&) const;
+  }
+
+
+for (Vec : SERIAL_VECTORS)
+  {
+    template void ConstraintMatrix::distribute<Vec>(Vec &) const;
   }

@@ -280,7 +280,7 @@ namespace Step48
     void make_grid_and_dofs ();
     void oldstyle_operation ();
     void assemble_system ();
-    void output_results (const unsigned int timestep_number) const;
+    void output_results (const unsigned int timestep_number);
 
 #ifdef DEAL_II_WITH_P4EST
     parallel::distributed::Triangulation<dim>   triangulation;
@@ -422,32 +422,34 @@ namespace Step48
   // This function prints the norm of the solution and writes the solution
   // vector to a file. The norm is standard (except for the fact that we need
   // to be sure to only count norms on locally owned cells), and the second is
-  // similar to what we did in step-40. However, we first need to generate an
-  // appropriate vector for output: The ones we used during time stepping
-  // contained information about ghosts dofs that one needs write access to
-  // during the loops over cell. However, that is not the same as needed when
-  // outputting. So we first initialize a vector with locally relevant degrees
-  // of freedom by copying the solution (note how we use the function @p
-  // copy_from to transfer data between vectors with the same local range, but
-  // different layouts of ghosts). Then, we import the values on the ghost
-  // DoFs and then distribute the constraints (as constraints are zero in the
-  // vectors during loop over all cells).
+  // similar to what we did in step-40. Note that we can use the same vector
+  // for output as we used for computation: The vectors in the matrix-free
+  // framework always provide full information on all locally owned cells
+  // (this is what is needed in the local evaluations, too), including ghost
+  // vector entries on these cells. This is the only data that is needed in
+  // the integrate_difference function as well as in DataOut. We only need to
+  // make sure that we tell the vector to update its ghost values before we
+  // read them. This is a feature present only in the
+  // parallel::distributed::Vector class. Distributed vectors with PETSc and
+  // Trilinos, on the other hand, need to be copied to special vectors
+  // including ghost values (see the relevant section in step-40). If we
+  // wanted to access all degrees of freedom on ghost cells, too (e.g. when
+  // computing error estimators that use the jump of solution over cell
+  // boundaries), we would need more information and create a vector
+  // initialized with locally relevant dofs just as in step-40. Observe also
+  // that we need to distribute constraints for output - they are not filled
+  // during computations (rather, they are distributed on the fly in the
+  // matrix-free method read_dof_values).
   template <int dim>
   void
-  SineGordonProblem<dim>::output_results (const unsigned int timestep_number) const
+  SineGordonProblem<dim>::output_results (const unsigned int timestep_number)
   {
-    parallel::distributed::Vector<double> locally_relevant_solution;
-    locally_relevant_solution.reinit (dof_handler.locally_owned_dofs(),
-                                      locally_relevant_dofs,
-                                      MPI_COMM_WORLD);
-    locally_relevant_solution.copy_from (solution);
-    locally_relevant_solution.update_ghost_values();
-    constraints.distribute (locally_relevant_solution);
+    constraints.distribute (solution);
 
     Vector<float> norm_per_cell (triangulation.n_active_cells());
-    locally_relevant_solution.update_ghost_values();
+    solution.update_ghost_values();
     VectorTools::integrate_difference (dof_handler,
-                                       locally_relevant_solution,
+                                       solution,
                                        ZeroFunction<dim>(),
                                        norm_per_cell,
                                        QGauss<dim>(fe_degree+1),
@@ -464,7 +466,7 @@ namespace Step48
     DataOut<dim> data_out;
 
     data_out.attach_dof_handler (dof_handler);
-    data_out.add_data_vector (locally_relevant_solution, "solution");
+    data_out.add_data_vector (solution, "solution");
     data_out.build_patches ();
 
     const std::string filename =
@@ -502,10 +504,10 @@ namespace Step48
   // the finest mesh size. The finest mesh size is computed as the diameter of
   // the last cell in the triangulation, which is the last cell on the finest
   // level of the mesh. This is only possible for Cartesian meshes, otherwise,
-  // one needs to loop over all cells). Note that we need to query all the
+  // one needs to loop over all cells. Note that we need to query all the
   // processors for their finest cell since the not all processors might hold
   // a region where the mesh is at the finest level. Then, we readjust the
-  // time step a little to hit the final time exactly if necessary.
+  // time step a little to hit the final time exactly.
   template <int dim>
   void
   SineGordonProblem<dim>::run ()
@@ -556,15 +558,15 @@ namespace Step48
     //
     // Note how this shift is implemented: We simply call the swap method on
     // the two vectors which swaps only some pointers without the need to copy
-    // data around. Obviously, this is a more efficient way to move data
-    // around. Let us see what happens in more detail: First, we exchange
-    // <code>old_solution</code> with <code>old_old_solution</code>, which
-    // means that <code>old_old_solution</code> gets
-    // <code>old_solution</code>, which is what we expect. Similarly,
-    // <code>old_solution</code> gets the content from <code>solution</code>
-    // in the next step. Afterward, <code>solution</code> holds
-    // <code>old_old_solution</code>, but that will be overwritten during this
-    // step.
+    // data around. Obviously, this is a more efficient way to update the
+    // vectors during time stepping. Let us see what happens in more detail:
+    // First, we exchange <code>old_solution</code> with
+    // <code>old_old_solution</code>, which means that
+    // <code>old_old_solution</code> gets <code>old_solution</code>, which is
+    // what we expect. Similarly, <code>old_solution</code> gets the content
+    // from <code>solution</code> in the next step. Afterward,
+    // <code>solution</code> holds <code>old_old_solution</code>, but that
+    // will be overwritten during this step.
     unsigned int timestep_number = 1;
 
     Timer timer;

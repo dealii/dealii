@@ -1897,6 +1897,16 @@ namespace parallel
     /* ---------------------- class Triangulation<dim,spacedim> ------------------------------ */
 
 
+
+    template <int dim, int spacedim>
+    Triangulation<dim,spacedim>::NumberCache::NumberCache()
+      :
+      n_global_active_cells(0),
+      n_global_levels(0)
+    {}
+
+
+
     template <int dim, int spacedim>
     Triangulation<dim,spacedim>::
     Triangulation (MPI_Comm mpi_communicator,

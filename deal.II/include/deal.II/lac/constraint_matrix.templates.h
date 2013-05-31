@@ -24,6 +24,9 @@
 #include <deal.II/lac/block_sparse_matrix.h>
 #include <deal.II/lac/parallel_vector.h>
 #include <deal.II/lac/parallel_block_vector.h>
+#include <deal.II/lac/petsc_parallel_vector.h>
+#include <deal.II/lac/petsc_vector.h>
+#include <deal.II/lac/trilinos_vector.h>
 
 #include <iomanip>
 
@@ -732,41 +735,36 @@ namespace internal
     {
       typedef types::global_dof_index size_type;
 
-      // TODO: in general we should iterate over the constraints and not over all DoFs
-      // for performance reasons
       template<class VEC>
-      void set_zero_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, size_type shift = 0)
+      void set_zero_parallel(const std::vector<size_type> &cm, VEC &vec, size_type shift = 0)
       {
         Assert(!vec.has_ghost_elements(), ExcInternalError());//ExcGhostsPresent());
-
-        const size_type 
-        start = vec.local_range().first,
-        end   = vec.local_range().second;
-        for (size_type i=start; i<end; ++i)
-          if (cm.is_constrained (shift + i))
-            vec(i) = 0;
+        IndexSet locally_owned = vec.locally_owned_elements();
+        for (typename std::vector<size_type>::const_iterator it = cm.begin();
+             it != cm.end(); ++it)
+          if (locally_owned.is_element(*it))
+            vec(*it) = 0.;
       }
 
-      // TODO: in general we should iterate over the constraints and not over all DoFs
-      // for performance reasons
       template<typename Number>
-      void set_zero_parallel(const dealii::ConstraintMatrix &cm, parallel::distributed::Vector<Number> &vec, size_type shift = 0)
+      void set_zero_parallel(const std::vector<size_type> &cm, parallel::distributed::Vector<Number> &vec, size_type shift = 0)
       {
-        for (unsigned int i=0; i<vec.local_size(); ++i)
-          if (cm.is_constrained (shift + vec.local_range().first+i))
-            vec.local_element(i) = 0;
+        for (typename std::vector<size_type>::const_iterator it = cm.begin();
+             it != cm.end(); ++it)
+          if (vec.in_local_range(*it))
+            vec(*it) = 0.;
         vec.zero_out_ghosts();
       }
 
       template<class VEC>
-      void set_zero_in_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, internal::bool2type<false>)
+      void set_zero_in_parallel(const std::vector<size_type> &cm, VEC &vec, internal::bool2type<false>)
       {
         set_zero_parallel(cm, vec, 0);
       }
 
       // in parallel for BlockVectors
       template<class VEC>
-      void set_zero_in_parallel(const dealii::ConstraintMatrix &cm, VEC &vec, internal::bool2type<true>)
+      void set_zero_in_parallel(const std::vector<size_type> &cm, VEC &vec, internal::bool2type<true>)
       {
         size_type start_shift = 0;
         for (size_type j=0; j<vec.n_blocks(); ++j)
@@ -777,19 +775,15 @@ namespace internal
       }
 
       template<class VEC>
-      void set_zero_serial(const dealii::ConstraintMatrix &cm, VEC &vec)
+      void set_zero_serial(const std::vector<size_type> &cm, VEC &vec)
       {
-        // TODO would be faster:
-        /* std::vector<dealii::ConstraintMatrix::ConstraintLine>::const_iterator constraint_line = cm.lines.begin();
-           for (; constraint_line!=cm.lines.end(); ++constraint_line)
-           vec(constraint_line->line) = 0.;*/
-        for (size_type i=0; i<vec.size(); ++i)
-          if (cm.is_constrained (i))
-            vec(i) = 0;
+        for (typename std::vector<size_type>::const_iterator it = cm.begin();
+             it != cm.end(); ++it)
+           vec(*it) = 0.;
       }
 
       template<class VEC>
-      void set_zero_all(const dealii::ConstraintMatrix &cm, VEC &vec)
+      void set_zero_all(const std::vector<size_type> &cm, VEC &vec)
       {
         set_zero_in_parallel<VEC>(cm, vec, internal::bool2type<IsBlockVector<VEC>::value>());
         vec.compress(VectorOperation::insert);
@@ -797,13 +791,13 @@ namespace internal
 
 
       template<class T>
-      void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::Vector<T> &vec)
+      void set_zero_all(const std::vector<size_type> &cm, dealii::Vector<T> &vec)
       {
         set_zero_serial(cm, vec);
       }
 
       template<class T>
-      void set_zero_all(const dealii::ConstraintMatrix &cm, dealii::BlockVector<T> &vec)
+      void set_zero_all(const std::vector<size_type> &cm, dealii::BlockVector<T> &vec)
       {
         set_zero_serial(cm, vec);
       }
@@ -816,7 +810,12 @@ template <class VectorType>
 void
 ConstraintMatrix::set_zero (VectorType &vec) const
 {
-  internal::ConstraintMatrix::set_zero_all(*this, vec);
+  // since we lines is a private member, we cannot pass it to the functions
+  // above. therefore, copy the content which is cheap
+  std::vector<size_type> constrained_lines(lines.size());
+  for (unsigned int i=0; i<lines.size(); ++i)
+    constrained_lines[i] = lines[i].line;
+  internal::ConstraintMatrix::set_zero_all(constrained_lines, vec);
 }
 
 
@@ -942,7 +941,7 @@ ConstraintMatrix::distribute (const VectorType &condensed,
               for (size_type i=row+1; i<n_rows; ++i)
                 old_line.push_back (i-shift);
               break;
-            };
+            }
         }
       else
         old_line.push_back (row-shift);
@@ -975,27 +974,198 @@ ConstraintMatrix::distribute (const VectorType &condensed,
 }
 
 
+namespace internal
+{
+  namespace
+  {
+    // create an output vector that consists of the input vector's locally owned
+    // elements plus some ghost elements that need to be imported from elsewhere
+    //
+    // this is an operation that is different for all vector types and so we
+    // need a few overloads
+#ifdef DEAL_II_WITH_TRILINOS
+    void
+    import_vector_with_ghost_elements (const TrilinosWrappers::MPI::Vector &vec,
+                                       const IndexSet                      &/*locally_owned_elements*/,
+                                       const IndexSet                      &needed_elements,
+                                       TrilinosWrappers::MPI::Vector       &output,
+                                       const internal::bool2type<false>     /*is_block_vector*/)
+    {
+      Assert(!vec.has_ghost_elements(),
+             TrilinosWrappers::VectorBase::ExcGhostsPresent());
+#ifdef DEAL_II_WITH_MPI
+      const Epetra_MpiComm *mpi_comm
+        = dynamic_cast<const Epetra_MpiComm *>(&vec.trilinos_vector().Comm());
 
-template<class VectorType>
+      Assert (mpi_comm != 0, ExcInternalError());
+      output.reinit (needed_elements, mpi_comm->GetMpiComm());
+#else
+      output.reinit (needed_elements, MPI_COMM_WORLD);
+#endif
+      output = vec;
+    }
+#endif
+
+#ifdef DEAL_II_WITH_PETSC
+    void
+    import_vector_with_ghost_elements (const PETScWrappers::MPI::Vector &vec,
+                                       const IndexSet                   &locally_owned_elements,
+                                       const IndexSet                   &needed_elements,
+                                       PETScWrappers::MPI::Vector       &output,
+                                       const internal::bool2type<false>  /*is_block_vector*/)
+    {
+      output.reinit (vec.get_mpi_communicator(), locally_owned_elements, needed_elements);
+      output = vec;
+    }
+#endif
+
+    template <typename number>
+    void
+    import_vector_with_ghost_elements (const parallel::distributed::Vector<number> &vec,
+                                       const IndexSet                              &locally_owned_elements,
+                                       const IndexSet                              &needed_elements,
+                                       parallel::distributed::Vector<number>       &output,
+                                       const internal::bool2type<false>             /*is_block_vector*/)
+    {
+      // TODO: the in vector might already have all elements. need to find a
+      // way to efficiently avoid the copy then
+      const_cast<parallel::distributed::Vector<number>&>(vec).zero_out_ghosts();
+      output.reinit (locally_owned_elements, needed_elements, vec.get_mpi_communicator());
+      output = vec;
+      output.update_ghost_values();
+    }
+
+
+    // all other vector non-block vector types are sequential and we should
+    // not have this function called at all -- so throw an exception
+    template <typename Vector>
+    void
+    import_vector_with_ghost_elements (const Vector                     &/*vec*/,
+                                       const IndexSet                   &/*locally_owned_elements*/,
+                                       const IndexSet                   &/*needed_elements*/,
+                                       Vector                           &/*output*/,
+                                       const internal::bool2type<false>  /*is_block_vector*/)
+    {
+      Assert (false, ExcMessage ("We shouldn't even get here!"));
+    }
+
+
+    // for block vectors, simply dispatch to the individual blocks
+    template <class VectorType>
+    void
+    import_vector_with_ghost_elements (const VectorType                &vec,
+                                       const IndexSet                  &locally_owned_elements,
+                                       const IndexSet                  &needed_elements,
+                                       VectorType                      &output,
+                                       const internal::bool2type<true>  /*is_block_vector*/)
+    {
+      output.reinit (vec.n_blocks());
+
+      types::global_dof_index block_start = 0;
+      for (unsigned int b=0; b<vec.n_blocks(); ++b)
+        {
+          import_vector_with_ghost_elements (vec.block(b),
+                                             locally_owned_elements.get_view (block_start, block_start+vec.block(b).size()),
+                                             needed_elements.get_view (block_start, block_start+vec.block(b).size()),
+                                             output.block(b),
+                                             internal::bool2type<false>());
+          block_start += vec.block(b).size();
+        }
+
+      output.collect_sizes ();
+    }
+  }
+}
+
+
+template <class VectorType>
 void
 ConstraintMatrix::distribute (VectorType &vec) const
 {
-  Assert (sorted == true, ExcMatrixNotClosed());
+  Assert (sorted==true, ExcMatrixNotClosed());
 
-  std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
-  for (; next_constraint != lines.end(); ++next_constraint)
+  // if the vector type supports parallel storage and if the vector actually
+  // does store only part of the vector, distributing is slightly more
+  // complicated. we might be able to skip the complicated part if one
+  // processor owns everything and pretend that this is a sequential vector,
+  // but it is difficult for the other processors to know whether they should
+  // not do anything or if other processors will create a temporary vector,
+  // exchange data (requiring communication, maybe even with the processors
+  // that do not own anything because of that particular parallel model), and
+  // call compress() finally. the first case here is for the complicated case,
+  // the last else is for the simple case (sequential vector)
+  const IndexSet vec_owned_elements = vec.locally_owned_elements();
+  if (vec.supports_distributed_data == true)
     {
-      // fill entry in line
-      // next_constraint.line by adding the
-      // different contributions
-      typename VectorType::value_type
-      new_value = next_constraint->inhomogeneity;
-      for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
-        new_value += (static_cast<typename VectorType::value_type>
-                      (vec(next_constraint->entries[i].first)) *
-                      next_constraint->entries[i].second);
-      Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
-      vec(next_constraint->line) = new_value;
+      // This processor owns only part of the vector. one may think that
+      // every processor should be able to simply communicate those elements
+      // it owns and for which it knows that they act as sources to constrained
+      // DoFs to the owner of these DoFs. This would lead to a scheme where all
+      // we need to do is to add some local elements to (possibly non-local) ones
+      // and then call compress().
+      //
+      // Alas, this scheme does not work as evidenced by the disaster of bug #51,
+      // see http://code.google.com/p/dealii/issues/detail?id=51 and the
+      // reversion of one attempt that implements this in r29662. Rather, we
+      // need to get a vector that has all the *sources* or constraints we
+      // own locally, possibly as ghost vector elements, then read from them,
+      // and finally throw away the ghosted vector. Implement this in the following.
+      IndexSet needed_elements = vec_owned_elements;
+
+      typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
+      for (constraint_iterator it = lines.begin();
+          it != lines.end(); ++it)
+        if (vec_owned_elements.is_element(it->line))
+          for (unsigned int i=0; i<it->entries.size(); ++i)
+            needed_elements.add_index(it->entries[i].first);
+
+      VectorType ghosted_vector;
+      internal::import_vector_with_ghost_elements (vec,
+                                                   vec_owned_elements, needed_elements,
+                                                   ghosted_vector,
+                                                   internal::bool2type<IsBlockVector<VectorType>::value>());
+
+      for (constraint_iterator it = lines.begin();
+          it != lines.end(); ++it)
+        if (vec_owned_elements.is_element(it->line))
+          {
+            typename VectorType::value_type
+              new_value = it->inhomogeneity;
+            for (unsigned int i=0; i<it->entries.size(); ++i)
+              new_value += (static_cast<typename VectorType::value_type>
+                            (ghosted_vector(it->entries[i].first)) *
+                            it->entries[i].second);
+            Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
+            vec(it->line) = new_value;
+          }
+
+      // now compress to communicate the entries that we added to
+      // and that weren't to local processors to the owner
+      //
+      // this shouldn't be strictly necessary but it probably doesn't
+      // hurt either
+      vec.compress (VectorOperation::insert);
+    }
+  else
+    // purely sequential vector (either because the type doesn't
+    // support anything else or because it's completely stored
+    // locally)
+    {
+      std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
+      for (; next_constraint != lines.end(); ++next_constraint)
+        {
+          // fill entry in line
+          // next_constraint.line by adding the
+          // different contributions
+          typename VectorType::value_type
+          new_value = next_constraint->inhomogeneity;
+          for (unsigned int i=0; i<next_constraint->entries.size(); ++i)
+            new_value += (static_cast<typename VectorType::value_type>
+                          (vec(next_constraint->entries[i].first)) *
+                           next_constraint->entries[i].second);
+          Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
+          vec(next_constraint->line) = new_value;
+        }
     }
 }
 

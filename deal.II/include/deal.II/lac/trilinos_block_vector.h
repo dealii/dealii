@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -312,10 +312,8 @@ namespace TrilinosWrappers
                  const bool                    fast=false);
 
     /**
-     * Reinit the function
-     * according to a distributed
-     * block vector. The elements
-     * will be copied in this
+     * Reinitialize the vector in the same way as the given to a
+     * distributed block vector. The elements will be copied in this
      * process.
      */
     void reinit (const MPI::BlockVector &V);

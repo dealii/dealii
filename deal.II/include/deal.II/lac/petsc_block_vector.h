@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -260,6 +260,19 @@ namespace PETScWrappers
                  const bool         fast=false);
 
     /**
+     * Change the number of blocks to
+     * <tt>num_blocks</tt>. The individual
+     * blocks will get initialized with
+     * zero size, so it is assumed that
+     * the user resizes the
+     * individual blocks by herself
+     * in an appropriate way, and
+     * calls <tt>collect_sizes</tt>
+     * afterwards.
+     */
+    void reinit (const unsigned int num_blocks);
+
+    /**
      * Swap the contents of this
      * vector and the other vector
      * <tt>v</tt>. One could do this
@@ -454,6 +467,15 @@ namespace PETScWrappers
 
     for (unsigned int i=0; i<this->n_blocks(); ++i)
       block(i).reinit(v.block(i), fast);
+  }
+
+
+
+  inline
+  void
+  BlockVector::reinit (const unsigned int num_blocks)
+  {
+    reinit (num_blocks, 0, true);
   }
 
 

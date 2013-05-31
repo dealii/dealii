@@ -51,12 +51,13 @@ void test()
   
   deallog << "begin(1)==end(1)? " << (tr.begin(1)==tr.end(1)) << std::endl;
 
-  if (myid!=0)
-    Assert(tr.begin(1)==tr.end(1), ExcInternalError());  
   
   deallog << "subdomainid = "
 	  << tr.begin_active()->subdomain_id()
 	  << std::endl;
+
+  //if (myid!=0)
+    //   Assert(tr.begin(1)==tr.end(1), ExcInternalError());  
   
   const unsigned int checksum = tr.get_checksum ();
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
@@ -72,24 +73,9 @@ void test()
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
-
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-
-
-  deallog.push(Utilities::int_to_string(myid));
-
-  if (myid == 0)
-    {
-      std::ofstream logfile(output_file_for_mpi("tria_01").c_str());
-      deallog.attach(logfile);
-      deallog.depth_console(0);
-      deallog.threshold_double(1.e-10);
-
-      deallog.push("2d");
-      test<2>();
-      deallog.pop();
-    }
-  else
-    test<2>();
-
+  MPILogInitAll log(__FILE__);
+  
+  deallog.push("2d");
+  test<2>();
+  deallog.pop();
 }
