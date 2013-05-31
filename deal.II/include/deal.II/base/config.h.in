@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2012 by the deal.II authors
+//    Copyright (C) 2012, 2013 by the deal.II authors
 //
 //    TODO: Header
 //
@@ -409,7 +409,8 @@
 #  define DEAL_II_USE_MT
 #endif
 
-/* Defined if multi-threading is to be achieved by using the POSIX functions
+/**
+ * Defined if multi-threading is to be achieved by using the POSIX functions
  */
 #cmakedefine DEAL_II_USE_MT_POSIX
 
