@@ -1077,7 +1077,8 @@ namespace
       {
         // yes, cell found in local part of p4est
         delete_all_children<dim,spacedim> (dealii_cell);
-        dealii_cell->set_subdomain_id(my_subdomain);
+        if (!dealii_cell->has_children())
+          dealii_cell->set_subdomain_id(my_subdomain);
       }
     else
       {
@@ -1171,12 +1172,14 @@ namespace
     if (internal::p4est::functions<dim>::quadrant_is_equal(&this_quadrant, &ghost_quadrant))
       {
         // this is the ghostcell
-        dealii_cell->set_subdomain_id(ghost_owner);
 
         if (dealii_cell->has_children())
           delete_all_children<dim,spacedim> (dealii_cell);
         else
-          dealii_cell->clear_coarsen_flag();
+          {
+            dealii_cell->clear_coarsen_flag();
+            dealii_cell->set_subdomain_id(ghost_owner);
+          }
         return;
       }
 
@@ -2591,7 +2594,8 @@ namespace parallel
                   == false)
                 {
                   delete_all_children<dim,spacedim> (cell);
-                  cell->set_subdomain_id (numbers::artificial_subdomain_id);
+                  if (!cell->has_children())
+                    cell->set_subdomain_id (numbers::artificial_subdomain_id);
                 }
 
               else
@@ -2771,21 +2775,19 @@ namespace parallel
               --lvl;
               for (typename Triangulation<dim,spacedim>::cell_iterator cell = this->begin(lvl); cell!=this->end(lvl); ++cell)
                 {
-                  if (cell->has_children() && cell->subdomain_id()!=this->locally_owned_subdomain())
-                    {
-                      //not our cell
-                      for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
-                        {
-                          if (cell->child(c)->level_subdomain_id()==this->locally_owned_subdomain())
-                            {
-                              types::subdomain_id mark = numbers::artificial_subdomain_id;
-                              mark = cell->child(0)->level_subdomain_id();
-                              Assert(mark != numbers::artificial_subdomain_id, ExcInternalError()); //we should know the child(0)
-                              cell->set_level_subdomain_id(mark);
-                              break;
-                            }
-                        }
-                    }
+                  if (cell->has_children())
+                    for (unsigned int c=0; c<GeometryInfo<dim>::max_children_per_cell; ++c)
+                      {
+                        if (cell->child(c)->level_subdomain_id()==this->locally_owned_subdomain())
+                          {
+                            //at least one of the children belongs to us, so make sure we set the level subdomain id
+                            types::subdomain_id mark = numbers::artificial_subdomain_id;
+                            mark = cell->child(0)->level_subdomain_id();
+                            Assert(mark != numbers::artificial_subdomain_id, ExcInternalError()); //we should know the child(0)
+                            cell->set_level_subdomain_id(mark);
+                            break;
+                          }
+                      }
                 }
             }
 
