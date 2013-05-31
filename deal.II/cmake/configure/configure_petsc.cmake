@@ -45,7 +45,7 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
     # Petsc has to be configured with the same MPI configuration as
     # deal.II.
     #
-    # petscconf.h should export PETSC_HAVE_MPIUNI 1 in case  mpi support is
+    # petscconf.h should export PETSC_HAVE_MPIUNI 1 in case mpi support is
     # _NOT_ enabled.
     # So we check for this:
     #
@@ -61,6 +61,33 @@ MACRO(FEATURE_PETSC_FIND_EXTERNAL var)
         "PETSc has to be configured with the same MPI configuration as deal.II, but found:\n"
         "  DEAL_II_WITH_MPI = ${DEAL_II_WITH_MPI}\n"
         "  PETSC_WITH_MPI   = (NOT ${PETSC_WITH_MPIUNI})\n"
+        )
+      SET(${var} FALSE)
+    ENDIF()
+
+
+    #
+    # Petsc has to be configured with the same number of bits for indices as
+    # deal.II.
+    #
+    # petscconf.h should export PETSC_WITH_64BIT_INDICES 1 in case 64bits
+    # indices support is enabled.
+    # So we check for this:
+    #
+    IF( (NOT PETSC_WITH_64BIT_INDICES AND DEAL_II_WITH_64BIT_INDICES)
+         OR
+         (PETSC_WITH_64BIT_INDICES AND NOT DEAL_II_WITH_64BIT_INDICES))
+      MESSAGE(STATUS "Could not find a sufficient PETSc installation: "
+        "PETSc has to be configured to use the same number of bits for the "
+        "global indices as deal.II."
+        )
+      SET(PETSC_ADDITIONAL_ERROR_STRING
+        ${PETSC_ADDITIONAL_ERROR_STRING}
+        "Could not find a sufficient PETSc installation:\n"
+        "PETSc has to be configured to use the same number of bits for the "
+        "global indices as deal.II, but found:\n"
+        "  DEAL_II_WITH_64BIT_INDICES = ${DEAL_II_WITH_64BIT_INDICES}\n"
+        "  PETSC_WITH_64BIT_INDICES = (${PETSC_WITH_64BIT_INDICES})\n"
         )
       SET(${var} FALSE)
     ENDIF()

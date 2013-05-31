@@ -461,6 +461,16 @@
 #endif
 
 
+/********************************************************************
+ * Configured in configure_trilinos.cmake or configure_petsc.cmake: *
+ ********************************************************************/
+
+#cmakedefine DEAL_II_WITH_64BIT_INDICES
+#ifdef DEAL_II_WITH_64BIT_INDICES
+#  define DEAL_II_USE_LARGE_INDEX_TYPE
+#endif
+
+
 #include <deal.II/base/numbers.h>
 #include <deal.II/base/types.h>
 

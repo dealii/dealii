@@ -52,7 +52,6 @@ namespace types
    */
   const unsigned int artificial_subdomain_id DEAL_II_DEPRECATED = static_cast<subdomain_id>(-2);
 
-#define DEAL_II_USE_LARGE_INDEX_TYPE
 #ifdef DEAL_II_USE_LARGE_INDEX_TYPE
   /**
    * The type used for global indices of
