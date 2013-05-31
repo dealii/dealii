@@ -990,7 +990,7 @@ namespace internal
                                        const internal::bool2type<false>     /*is_block_vector*/)
     {
       Assert(!vec.has_ghost_elements(),
-             typename TrilinosWrappers::VectorBase::ExcGhostsPresent());
+             TrilinosWrappers::VectorBase::ExcGhostsPresent());
 #ifdef DEAL_II_WITH_MPI
       const Epetra_MpiComm *mpi_comm
         = dynamic_cast<const Epetra_MpiComm *>(&vec.trilinos_vector().Comm());
