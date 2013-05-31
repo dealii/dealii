@@ -1256,13 +1256,17 @@ namespace TrilinosWrappers
     // easy case: local range is contiguous
     if (vector->Map().LinearMap())
       {
-        const std::pair<unsigned int, unsigned int> x = local_range();
+        const std::pair<size_type, size_type> x = local_range();
         is.add_range (x.first, x.second);
       }
     else if (vector->Map().NumMyElements() > 0)
       {
-        const unsigned int n_indices = vector->Map().NumMyElements();
+        const size_type n_indices = vector->Map().NumMyElements();
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
         unsigned int * vector_indices = (unsigned int*)vector->Map().MyGlobalElements();
+#else
+        size_type * vector_indices = (size_type*)vector->Map().MyGlobalElements64();
+#endif
         is.add_indices(vector_indices, vector_indices+n_indices);
         is.compress();
       }
