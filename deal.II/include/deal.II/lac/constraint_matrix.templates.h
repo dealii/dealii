@@ -1016,6 +1016,8 @@ namespace internal
                                        parallel::distributed::Vector<number>       &output,
                                        const internal::bool2type<false>             /*is_block_vector*/)
     {
+      // TODO: the in vector might already have all elements. need to find a
+      // way to efficiently avoid the copy then
       const_cast<parallel::distributed::Vector<number>&>(vec).zero_out_ghosts();
       output.reinit (locally_owned_elements, needed_elements, vec.get_mpi_communicator());
       output = vec;
@@ -1069,28 +1071,20 @@ template <class VectorType>
 void
 ConstraintMatrix::distribute (VectorType &vec) const
 {
-  Assert (sorted==true, ExcMatrixIsClosed());
+  Assert (sorted==true, ExcMatrixNotClosed());
 
-  // if the vector type supports parallel storage and if the
-  // vector actually does store only part of the vector, distributing
-  // is slightly more complicated. we can skip the complicated part
-  // if the local processor stores the *entire* vector and pretend
-  // that this is a sequential vector but we need to pay attention that
-  // in that case the other processors don't actually do anything (in
-  // particular that they do not call compress because the processor
-  // that owns everything doesn't do so either); this is the first if
-  // case here, the second is for the complicated case, the last else
-  // is for the simple case (sequential vector or distributed vector
-  // where the current processor stores everything)
-  if ((vec.supports_distributed_data == true)
-      &&
-      (vec.locally_owned_elements().n_elements() == 0))
-    {
-      // do nothing, in particular don't call compress()
-    }
-  else if ((vec.supports_distributed_data == true)
-           &&
-           (vec.locally_owned_elements() != complete_index_set(vec.size())))
+  // if the vector type supports parallel storage and if the vector actually
+  // does store only part of the vector, distributing is slightly more
+  // complicated. we might be able to skip the complicated part if one
+  // processor owns everything and pretend that this is a sequential vector,
+  // but it is difficult for the other processors to know whether they should
+  // not do anything or if other processors will create a temporary vector,
+  // exchange data (requiring communication, maybe even with the processors
+  // that do not own anything because of that particular parallel model), and
+  // call compress() finally. the first case here is for the complicated case,
+  // the last else is for the simple case (sequential vector)
+  const IndexSet vec_owned_elements = vec.locally_owned_elements();
+  if (vec.supports_distributed_data == true)
     {
       // This processor owns only part of the vector. one may think that
       // every processor should be able to simply communicate those elements
@@ -1105,7 +1099,6 @@ ConstraintMatrix::distribute (VectorType &vec) const
       // need to get a vector that has all the *sources* or constraints we
       // own locally, possibly as ghost vector elements, then read from them,
       // and finally throw away the ghosted vector. Implement this in the following.
-      const IndexSet vec_owned_elements = vec.locally_owned_elements();
       IndexSet needed_elements = vec_owned_elements;
 
       typedef std::vector<ConstraintLine>::const_iterator constraint_iterator;
@@ -1124,17 +1117,16 @@ ConstraintMatrix::distribute (VectorType &vec) const
       for (constraint_iterator it = lines.begin();
           it != lines.end(); ++it)
         if (vec_owned_elements.is_element(it->line))
-          for (unsigned int i=0; i<it->entries.size(); ++i)
-            {
-              typename VectorType::value_type
+          {
+            typename VectorType::value_type
               new_value = it->inhomogeneity;
-              for (unsigned int i=0; i<it->entries.size(); ++i)
-                new_value += (static_cast<typename VectorType::value_type>
-                              (ghosted_vector(it->entries[i].first)) *
-                               it->entries[i].second);
-              Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
-              vec(it->line) = new_value;
-            }
+            for (unsigned int i=0; i<it->entries.size(); ++i)
+              new_value += (static_cast<typename VectorType::value_type>
+                            (ghosted_vector(it->entries[i].first)) *
+                            it->entries[i].second);
+            Assert(numbers::is_finite(new_value), ExcNumberNotFinite());
+            vec(it->line) = new_value;
+          }
 
       // now compress to communicate the entries that we added to
       // and that weren't to local processors to the owner
@@ -1146,7 +1138,7 @@ ConstraintMatrix::distribute (VectorType &vec) const
   else
     // purely sequential vector (either because the type doesn't
     // support anything else or because it's completely stored
-    // locally
+    // locally)
     {
       std::vector<ConstraintLine>::const_iterator next_constraint = lines.begin();
       for (; next_constraint != lines.end(); ++next_constraint)
