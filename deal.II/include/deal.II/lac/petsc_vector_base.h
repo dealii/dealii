@@ -1159,7 +1159,7 @@ namespace PETScWrappers
     IndexSet is (size());
 
     // PETSc only allows for contiguous local ranges, so this is simple
-    const std::pair<unsigned int, unsigned int> x = local_range();
+    const std::pair<size_type, size_type> x = local_range();
     is.add_range (x.first, x.second);
     return is;
   }
