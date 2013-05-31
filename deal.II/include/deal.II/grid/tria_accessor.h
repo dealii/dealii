@@ -2734,6 +2734,11 @@ public:
    * See the @ref GlossSubdomainId
    * "glossary" for more
    * information.
+   *
+   * @note The subdomain of a cell is a property only defined
+   * for active cells, i.e., cells that are not further
+   * refined. Consequently, you can only call this function if
+   * the cell it refers to has no children.
    */
   types::subdomain_id subdomain_id () const;
 
@@ -2841,7 +2846,13 @@ public:
    *
    * @post The returned value is equal to <code>!is_ghost() &&
    * !is_artificial()</code>.
-   **/
+   *
+   * @note Whether a cell is a ghost cell, artificial, or is
+   * locally owned or is a property that only pertains to cells
+   * that are active. Consequently,
+   * you can only call this function if the cell it refers to has
+   * no children.
+   */
   bool is_locally_owned () const;
 
   /**
@@ -2870,6 +2881,12 @@ public:
    * @post The returned value is equal to
    * <code>!is_locally_owned() &&
    * !is_artificial()</code>.
+   *
+   * @note Whether a cell is a ghost cell, artificial, or is
+   * locally owned or is a property that only pertains to cells
+   * that are active. Consequently,
+   * you can only call this function if the cell it refers to has
+   * no children.
    */
   bool is_ghost () const;
 
@@ -2908,6 +2925,12 @@ public:
    * @post The returned value is equal to
    * <code>!is_ghost() &&
    * !is_artificial()</code>.
+   *
+   * @note Whether a cell is a ghost cell, artificial, or is
+   * locally owned or is a property that only pertains to cells
+   * that are active. Consequently,
+   * you can only call this function if the cell it refers to has
+   * no children.
    */
   bool is_artificial () const;
 
