@@ -1975,7 +1975,7 @@ namespace VectorTools
    *                                       NormType::L2_norm);
    *    const double total_local_error = local_errors.l2_norm();
    *    const double total_global_error
-   *      = std::sqrt (Utilities::MPI::sum (total_local_error * total_local_error));
+   *      = std::sqrt (Utilities::MPI::sum (total_local_error * total_local_error, MPI_COMM_WORLD));
    * @endcode
    * The squaring and taking the square root is necessary in order to
    * compute the sum of squares of norms over all all cells in the definition
@@ -1988,7 +1988,7 @@ namespace VectorTools
    * @code
    *    const double total_local_error = local_errors.l1_norm();
    *    const double total_global_error
-   *      = Utilities::MPI::sum (total_local_error);
+   *      = Utilities::MPI::sum (total_local_error, MPI_COMM_WORLD);
    * @endcode
    * instead, and similar considerations hold when computing the $L_\infty$
    * norm of the error.

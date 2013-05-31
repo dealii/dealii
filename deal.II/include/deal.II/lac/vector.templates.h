@@ -335,20 +335,20 @@ namespace internal
     }
 
     template<typename T>
-    void copy_subrange (const unsigned int      begin,
-                        const unsigned int      end,
+    void copy_subrange (const unsigned int       begin,
+                        const unsigned int       end,
                         const dealii::Vector<T> &src,
-                        dealii::Vector<T>      &dst)
+                        dealii::Vector<T>       &dst)
     {
       memcpy(&*(dst.begin()+begin), &*(src.begin()+begin),
              (end-begin)*sizeof(T));
     }
 
     template<typename T, typename U>
-    void copy_subrange (const unsigned int      begin,
-                        const unsigned int      end,
+    void copy_subrange (const unsigned int       begin,
+                        const unsigned int       end,
                         const dealii::Vector<T> &src,
-                        dealii::Vector<U>      &dst)
+                        dealii::Vector<U>       &dst)
     {
       const T *q = src.begin()+begin;
       const T *const end_q = src.begin()+end;
@@ -358,18 +358,21 @@ namespace internal
     }
 
     template<typename T, typename U>
-    void copy_subrange_wrap (const unsigned int      begin,
-                             const unsigned int      end,
+    void copy_subrange_wrap (const unsigned int       begin,
+                             const unsigned int       end,
                              const dealii::Vector<T> &src,
-                             dealii::Vector<U>      &dst)
+                             dealii::Vector<U>       &dst)
     {
       copy_subrange (begin, end, src, dst);
     }
 
     template <typename T, typename U>
     void copy_vector (const dealii::Vector<T> &src,
-                      dealii::Vector<U>      &dst)
+                      dealii::Vector<U>       &dst)
     {
+      if (PointerComparison::equal(&src, &dst))
+        return;
+
       const unsigned int vec_size = src.size();
       const unsigned int dst_size = dst.size();
       if (dst_size != vec_size)
@@ -1427,6 +1430,15 @@ void Vector<Number>::block_read (std::istream &in)
   //  in >> c;
   in.read (&c, 1);
   AssertThrow (c==']', ExcIO());
+}
+
+
+
+template <typename Number>
+IndexSet
+Vector<Number>::locally_owned_elements() const
+{
+  return complete_index_set(size());
 }
 
 

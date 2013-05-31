@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -1208,8 +1208,8 @@ struct GeometryInfo<0>
  * from one cell, whereas it is according to the standard looking at it from the
  * neighboring cell sharing that particular face. In order to cope with this,
  * two flags <tt>face_flip</tt> and <tt>face_rotation</tt> are available, to
- * represent rotations by 90 and 180 degree, respectively. Setting both flags
- * accumulates to a rotation of 270 degrees (all counterclockwise). You can ask
+ * represent rotations by 180 and 90 degree, respectively. Setting both flags
+ * amounts to a rotation of 270 degrees (all counterclockwise). You can ask
  * the cell for these flags like for the <tt>face_orientation</tt>. In order to
  * enable rotated faces, even lines can deviate from their standard direction in
  * 3d. This information is available as the <tt>line_orientation</tt> flag for

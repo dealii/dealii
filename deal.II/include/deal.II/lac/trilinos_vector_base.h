@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -267,10 +267,12 @@ namespace TrilinosWrappers
      * <tt>C</tt> standard libraries
      * <tt>vector<...></tt> class.
      */
-    typedef TrilinosScalar            value_type;
-    typedef TrilinosScalar            real_type;
-    typedef std::size_t               size_type;
-    typedef internal::VectorReference reference;
+    typedef TrilinosScalar                  value_type;
+    typedef TrilinosScalar                  real_type;
+    typedef std::size_t                     size_type;
+    typedef value_type                     *iterator;
+    typedef const value_type               *const_iterator;
+    typedef internal::VectorReference       reference;
     typedef const internal::VectorReference const_reference;
 
     /**
@@ -520,6 +522,22 @@ namespace TrilinosWrappers
     bool in_local_range (const unsigned int index) const;
 
     /**
+     * Return an index set that describes which elements of this vector
+     * are owned by the current processor. Note that this index set does
+     * not include elements this vector may store locally as ghost
+     * elements but that are in fact owned by another processor.
+     * As a consequence, the index sets returned on different
+     * processors if this is a distributed vector will form disjoint
+     * sets that add up to the complete index set.
+     * Obviously, if a vector is created on only one processor, then
+     * the result would satisfy
+     * @code
+     *   vec.locally_owned_elements() == complete_index_set (vec.size())
+     * @endcode
+     */
+    IndexSet locally_owned_elements () const;
+
+    /**
      * Return if the vector contains ghost
      * elements. This answer is true if there
      * are ghost elements on at least one
@@ -658,6 +676,33 @@ namespace TrilinosWrappers
      * process.
      */
     TrilinosScalar el (const unsigned int index) const;
+
+    /**
+     * Make the Vector class a bit like the <tt>vector<></tt> class of
+     * the C++ standard library by returning iterators to the start and end
+     * of the locally owned elements of this vector. The ordering of local elements corresponds to the one given 
+     *
+     * It holds that end() - begin() == local_size().
+     */
+    iterator begin ();
+
+    /**
+     * Return constant iterator to the start of the locally owned elements
+     * of the vector.
+     */
+    const_iterator begin () const;
+
+    /**
+     * Return an iterator pointing to the element past the end of the array
+     * of locally owned entries.
+     */
+    iterator end ();
+
+    /**
+     * Return a constant iterator pointing to the element past the end of
+     * the array of the locally owned entries.
+     */
+    const_iterator end () const;
 
     /**
      * A collective set operation:
@@ -1207,6 +1252,39 @@ namespace TrilinosWrappers
 
 
   inline
+  IndexSet
+  VectorBase::locally_owned_elements() const
+  {
+    IndexSet is (size());
+
+    // easy case: local range is contiguous
+    if (vector->Map().LinearMap())
+      {
+        const std::pair<unsigned int, unsigned int> x = local_range();
+        is.add_range (x.first, x.second);
+      }
+    else if (vector->Map().NumMyElements() > 0)
+      {
+        const unsigned int n_indices = vector->Map().NumMyElements();
+        int * vector_indices = vector->Map().MyGlobalElements();
+        unsigned int range_start = vector_indices[0];
+        unsigned int range_end = range_start+1;
+        for (unsigned int i=1; i<n_indices; ++i, ++range_end)
+          if (static_cast<unsigned int>(vector_indices[i]) != range_end)
+            {
+              is.add_range(range_start, range_end);
+              range_end = range_start = vector_indices[i];
+            }
+        is.add_range(range_start, range_end);
+        is.compress();
+      }
+
+    return is;
+  }
+
+
+
+  inline
   bool
   VectorBase::has_ghost_elements() const
   {
@@ -1237,6 +1315,42 @@ namespace TrilinosWrappers
   VectorBase::operator [] (const unsigned int index) const
   {
     return operator() (index);
+  }
+
+
+
+  inline
+  VectorBase::iterator
+  VectorBase::begin()
+  {
+    return (*vector)[0];
+  }
+
+
+
+  inline
+  VectorBase::iterator
+  VectorBase::end()
+  {
+    return (*vector)[0]+local_size();
+  }
+
+
+
+  inline
+  VectorBase::const_iterator
+  VectorBase::begin() const
+  {
+    return (*vector)[0];
+  }
+
+
+
+  inline
+  VectorBase::const_iterator
+  VectorBase::end() const
+  {
+    return (*vector)[0]+local_size();
   }
 
 

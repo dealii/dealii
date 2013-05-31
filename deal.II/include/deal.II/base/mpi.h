@@ -151,6 +151,14 @@ namespace Utilities
      * <code>MPI_Allreduce</code> function, i.e. all processors receive
      * the result of this operation.
      *
+     * @note Sometimes, not all processors need a results and in that case
+     * one would call the <code>MPI_Reduce</code> function instead of the
+     * <code>MPI_Allreduce</code> function. The latter is at most twice as
+     * expensive, so if you are concerned about performance, it may be
+     * worthwhile investigating whether your algorithm indeed needs the
+     * result everywhere or whether you could get away with calling the
+     * current function and getting the result everywhere.
+     *
      * @note This function is only implemented for certain template
      * arguments <code>T</code>, namely <code>float, double, int,
      * unsigned int</code>.
@@ -197,6 +205,14 @@ namespace Utilities
      * returns the value of @p t. This function corresponds to the
      * <code>MPI_Allreduce</code> function, i.e. all processors receive
      * the result of this operation.
+     *
+     * @note Sometimes, not all processors need a results and in that case
+     * one would call the <code>MPI_Reduce</code> function instead of the
+     * <code>MPI_Allreduce</code> function. The latter is at most twice as
+     * expensive, so if you are concerned about performance, it may be
+     * worthwhile investigating whether your algorithm indeed needs the
+     * result everywhere or whether you could get away with calling the
+     * current function and getting the result everywhere.
      *
      * @note This function is only implemented for certain template
      * arguments <code>T</code>, namely <code>float, double, int,
@@ -255,12 +271,20 @@ namespace Utilities
      * Returns sum, average, minimum,
      * maximum, processor id of minimum and
      * maximum as a collective operation of
-     * on the given MPI communicator @param
+     * on the given MPI communicator @p
      * mpi_communicator . Each processor's
-     * value is given in @param my_value and
-     * the result will be returned in @p
-     * result . The result is available on all
+     * value is given in @p my_value and
+     * the result will be returned.
+     * The result is available on all
      * machines.
+     *
+     * @note Sometimes, not all processors need a results and in that case
+     * one would call the <code>MPI_Reduce</code> function instead of the
+     * <code>MPI_Allreduce</code> function. The latter is at most twice as
+     * expensive, so if you are concerned about performance, it may be
+     * worthwhile investigating whether your algorithm indeed needs the
+     * result everywhere or whether you could get away with calling the
+     * current function and getting the result everywhere.
      */
     MinMaxAvg
     min_max_avg (const double my_value,

@@ -30,8 +30,8 @@ DEAL_II_NAMESPACE_OPEN
  */
 
 /**
- * A namespace in which classes relating to the description of
- * 1d polynomial spaces are declared.
+ * A namespace in which classes relating to the description of 1d polynomial
+ * spaces are declared.
  */
 namespace Polynomials
 {
@@ -50,145 +50,97 @@ namespace Polynomials
   {
   public:
     /**
-     * Constructor. The
-     * coefficients of the
-     * polynomial are passed as
-     * arguments, and denote the
-     * polynomial $\sum_i a[i]
-     * x^i$, i.e. the first element
-     * of the array denotes the
-     * constant term, the second
-     * the linear one, and so
-     * on. The degree of the
-     * polynomial represented by
-     * this object is thus the
-     * number of elements in the
-     * <tt>coefficient</tt> array
-     * minus one.
+     * Constructor. The coefficients of the polynomial are passed as
+     * arguments, and denote the polynomial $\sum_i a[i] x^i$, i.e. the first
+     * element of the array denotes the constant term, the second the linear
+     * one, and so on. The degree of the polynomial represented by this object
+     * is thus the number of elements in the <tt>coefficient</tt> array minus
+     * one.
      */
     Polynomial (const std::vector<number> &coefficients);
 
     /**
-     * Constructor creating a zero
-     * polynomial of degree @p n.
+     * Constructor creating a zero polynomial of degree @p n.
      */
     Polynomial (const unsigned int n);
 
     /**
-     * Constructor for Lagrange polynomial and its
-     * point of evaluation. The idea is to
-     * construct $\prod_{i\neq j}
-     * \frac{x-x_i}{x_j-x_i}$, where j is the
-     * evaluation point specified as argument and
-     * the support points contain all points
-     * (including x_j, which will internally not
-     * be stored).
+     * Constructor for Lagrange polynomial and its point of evaluation. The
+     * idea is to construct $\prod_{i\neq j} \frac{x-x_i}{x_j-x_i}$, where j
+     * is the evaluation point specified as argument and the support points
+     * contain all points (including x_j, which will internally not be
+     * stored).
      */
     Polynomial (const std::vector<Point<1> > &lagrange_support_points,
                 const unsigned int            evaluation_point);
 
     /**
-     * Default constructor creating
-     * an illegal object.
+     * Default constructor creating an illegal object.
      */
     Polynomial ();
 
     /**
-     * Return the value of this
-     * polynomial at the given point.
+     * Return the value of this polynomial at the given point.
      *
-     * This function uses the Horner
-     * scheme for numerical stability
-     * of the evaluation.
+     * This function uses the Horner scheme for numerical stability of the
+     * evaluation.
      */
     number value (const number x) const;
 
     /**
-     * Return the values and the
-     * derivatives of the
-     * Polynomial at point <tt>x</tt>.
-     * <tt>values[i],
-     * i=0,...,values.size()-1</tt>
-     * includes the <tt>i</tt>th
-     * derivative. The number of
-     * derivatives to be computed is
-     * thus determined by the size of
-     * the array passed.
+     * Return the values and the derivatives of the Polynomial at point
+     * <tt>x</tt>.  <tt>values[i], i=0,...,values.size()-1</tt> includes the
+     * <tt>i</tt>th derivative. The number of derivatives to be computed is
+     * thus determined by the size of the array passed.
      *
-     * This function uses the Horner
-     * scheme for numerical stability
-     * of the evaluation.
+     * This function uses the Horner scheme for numerical stability of the
+     * evaluation.
      */
     void value (const number         x,
                 std::vector<number> &values) const;
 
     /**
-     * Degree of the polynomial. This
-     * is the degree reflected by the
-     * number of coefficients
-     * provided by the
-     * constructor. Leading non-zero
-     * coefficients are not treated
-     * separately.
+     * Degree of the polynomial. This is the degree reflected by the number of
+     * coefficients provided by the constructor. Leading non-zero coefficients
+     * are not treated separately.
      */
     unsigned int degree () const;
 
     /**
-     * Scale the abscissa of the
-     * polynomial.  Given the
-     * polynomial <i>p(t)</i> and the
-     * scaling <i>t = ax</i>, then the
-     * result of this operation is
-     * the polynomial <i>q</i>, such that
-     * <i>q(x) = p(t)</i>.
+     * Scale the abscissa of the polynomial.  Given the polynomial <i>p(t)</i>
+     * and the scaling <i>t = ax</i>, then the result of this operation is the
+     * polynomial <i>q</i>, such that <i>q(x) = p(t)</i>.
      *
-     * The operation is performed in
-     * place.
+     * The operation is performed in place.
      */
     void scale (const number factor);
 
     /**
-     * Shift the abscissa oft the
-     * polynomial.  Given the
-     * polynomial <i>p(t)</i> and the
-     * shift <i>t = x + a</i>, then the
-     * result of this operation is
-     * the polynomial <i>q</i>, such that
-     * <i>q(x) = p(t)</i>.
+     * Shift the abscissa oft the polynomial.  Given the polynomial
+     * <i>p(t)</i> and the shift <i>t = x + a</i>, then the result of this
+     * operation is the polynomial <i>q</i>, such that <i>q(x) = p(t)</i>.
      *
-     * The template parameter allows
-     * to compute the new
-     * coefficients with higher
-     * accuracy, since all
-     * computations are performed
-     * with type <tt>number2</tt>. This
-     * may be necessary, since this
-     * operation involves a big
-     * number of additions. On a Sun
-     * Sparc Ultra with Solaris 2.8,
-     * the difference between
-     * <tt>double</tt> and <tt>long double</tt>
-     * was not significant, though.
+     * The template parameter allows to compute the new coefficients with
+     * higher accuracy, since all computations are performed with type
+     * <tt>number2</tt>. This may be necessary, since this operation involves
+     * a big number of additions. On a Sun Sparc Ultra with Solaris 2.8, the
+     * difference between <tt>double</tt> and <tt>long double</tt> was not
+     * significant, though.
      *
-     * The operation is performed in
-     * place, i.e. the coefficients
-     * of the present object are
-     * changed.
+     * The operation is performed in place, i.e. the coefficients of the
+     * present object are changed.
      */
     template <typename number2>
     void shift (const number2 offset);
 
     /**
-     * Compute the derivative of a
-     * polynomial.
+     * Compute the derivative of a polynomial.
      */
     Polynomial<number> derivative () const;
 
     /**
-     * Compute the primitive of a
-     * polynomial. the coefficient
-     * of the zero order term of
-     * the polynomial is zero.
+     * Compute the primitive of a polynomial. the coefficient of the zero
+     * order term of the polynomial is zero.
      */
     Polynomial<number> primitive () const;
 
@@ -213,8 +165,8 @@ namespace Polynomials
     Polynomial<number> &operator -= (const Polynomial<number> &p);
 
     /**
-         *  Test for equality of two polynomials.
-         */
+     *  Test for equality of two polynomials.
+     */
     bool operator == (const Polynomial<number> &p)  const;
 
     /**
@@ -223,8 +175,8 @@ namespace Polynomials
     void print(std::ostream &out) const;
 
     /**
-     * Write or read the data of this object to or
-     * from a stream for the purpose of serialization.
+     * Write or read the data of this object to or from a stream for the
+     * purpose of serialization.
      */
     template <class Archive>
     void serialize (Archive &ar, const unsigned int version);
@@ -232,15 +184,13 @@ namespace Polynomials
   protected:
 
     /**
-     * This function performs the
-     * actual scaling.
+     * This function performs the actual scaling.
      */
     static void scale (std::vector<number> &coefficients,
                        const number         factor);
 
     /**
-     * This function performs the
-     * actual shift
+     * This function performs the actual shift
      */
     template <typename number2>
     static void shift (std::vector<number> &coefficients,
@@ -253,49 +203,37 @@ namespace Polynomials
                           const number factor);
 
     /**
-     * Transforms polynomial form of
-     * product of linear factors into
-     * standard form, $\sum_i a_i
-     * x^i$. Deletes all data structures
-     * related to the product form.
+     * Transforms polynomial form of product of linear factors into standard
+     * form, $\sum_i a_i x^i$. Deletes all data structures related to the
+     * product form.
      */
     void transform_into_standard_form ();
 
     /**
-     * Coefficients of the polynomial
-     * $\sum_i a_i x^i$. This vector
-     * is filled by the constructor
-     * of this class and may be
-     * passed down by derived
+     * Coefficients of the polynomial $\sum_i a_i x^i$. This vector is filled
+     * by the constructor of this class and may be passed down by derived
      * classes.
      *
-     * This vector cannot be constant
-     * since we want to allow copying
-     * of polynomials.
+     * This vector cannot be constant since we want to allow copying of
+     * polynomials.
      */
     std::vector<number> coefficients;
 
     /**
-     * Stores whether the polynomial is in
-     * Lagrange product form, i.e.,
-     * constructed as a product $(x-x_0)
-     * (x-x_1) \ldots (x-x_n)/c$, or not.
+     * Stores whether the polynomial is in Lagrange product form, i.e.,
+     * constructed as a product $(x-x_0) (x-x_1) \ldots (x-x_n)/c$, or not.
      */
     bool in_lagrange_product_form;
 
     /**
-     * If the polynomial is in Lagrange
-     * product form, i.e., constructed as a
-     * product $(x-x_0) (x-x_1) \ldots
-     * (x-x_n)/c$, store the shifts $x_i$.
+     * If the polynomial is in Lagrange product form, i.e., constructed as a
+     * product $(x-x_0) (x-x_1) \ldots (x-x_n)/c$, store the shifts $x_i$.
      */
     std::vector<number> lagrange_support_points;
 
     /**
-     * If the polynomial is in Lagrange
-     * product form, i.e., constructed as a
-     * product $(x-x_0) (x-x_1) \ldots
-     * (x-x_n)/c$, store the weight c.
+     * If the polynomial is in Lagrange product form, i.e., constructed as a
+     * product $(x-x_0) (x-x_1) \ldots (x-x_n)/c$, store the weight c.
      */
     number lagrange_weight;
   };
@@ -367,32 +305,20 @@ namespace Polynomials
   {
   public:
     /**
-     * Constructor. Takes the degree
-     * <tt>n</tt> of the Lagrangian
-     * polynom and the index
-     * <tt>support_point</tt> of the
-     * support point. Fills the
-     * <tt>coefficients</tt> of the base
-     * class Polynomial.
+     * Constructor. Takes the degree <tt>n</tt> of the Lagrangian polynom and
+     * the index <tt>support_point</tt> of the support point. Fills the
+     * <tt>coefficients</tt> of the base class Polynomial.
      */
     LagrangeEquidistant (const unsigned int n,
                          const unsigned int support_point);
 
     /**
-     * Return a vector of polynomial
-     * objects of degree <tt>degree</tt>,
-     * which then spans the full
-     * space of polynomials up to the
-     * given degree. The polynomials
-     * are generated by calling the
-     * constructor of this class with
-     * the same degree but support
-     * point running from zero to
-     * <tt>degree</tt>. This function may
-     * be used to initialize the
-     * TensorProductPolynomials
-     * and PolynomialSpace
-     * classes.
+     * Return a vector of polynomial objects of degree <tt>degree</tt>, which
+     * then spans the full space of polynomials up to the given degree. The
+     * polynomials are generated by calling the constructor of this class with
+     * the same degree but support point running from zero to
+     * <tt>degree</tt>. This function may be used to initialize the
+     * TensorProductPolynomials and PolynomialSpace classes.
      */
     static
     std::vector<Polynomial<double> >
@@ -401,12 +327,8 @@ namespace Polynomials
   private:
 
     /**
-     * Computes the <tt>coefficients</tt>
-     * of the base class
-     * Polynomial. This function
-     * is <tt>static</tt> to allow to be
-     * called in the
-     * constructor.
+     * Computes the <tt>coefficients</tt> of the base class Polynomial. This
+     * function is <tt>static</tt> to allow to be called in the constructor.
      */
     static
     void
@@ -416,15 +338,12 @@ namespace Polynomials
   };
 
 
+
   /**
-   * Given a set of points along the
-   * real axis, this function returns
-   * all Lagrange polynomials for
-   * interpolation of these
-   * points. The number of
-   * polynomials is equal to the
-   * number of points and the maximum
-   * degree is one less.
+   * Given a set of points along the real axis, this function returns all
+   * Lagrange polynomials for interpolation of these points. The number of
+   * polynomials is equal to the number of points and the maximum degree is
+   * one less.
    */
   std::vector<Polynomial<double> >
   generate_complete_Lagrange_basis (const std::vector<Point<1> > &points);
@@ -801,8 +720,7 @@ namespace Polynomials
   void
   Polynomial<number>::serialize (Archive &ar, const unsigned int)
   {
-    // forward to serialization
-    // function in the base class.
+    // forward to serialization function in the base class.
     ar &static_cast<Subscriptor &>(*this);
     ar &coefficients;
     ar &in_lagrange_product_form;

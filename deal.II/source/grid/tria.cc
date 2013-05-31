@@ -10999,9 +10999,9 @@ template <int dim, int spacedim>
 typename Triangulation<dim,spacedim>::cell_iterator
 Triangulation<dim,spacedim>::last (const unsigned int level) const
 {
-  Assert (level<levels.size(), ExcInvalidLevel(level));
-  Assert (levels[level]->cells.cells.size() != 0,
-          ExcEmptyLevel (level));
+  Assert (level<n_global_levels() || level<levels.size(), ExcInvalidLevel(level));
+  if (levels[level]->cells.cells.size() ==0)
+    return end(level);
 
   // find the last raw iterator on
   // this level
@@ -11026,13 +11026,16 @@ Triangulation<dim,spacedim>::last_active () const
 {
   // get the last used cell
   cell_iterator cell = last();
-
-  // then move to the last active one
-  if (cell->active()==true)
-    return cell;
-  while ((--cell).state() == IteratorState::valid)
-    if (cell->active()==true)
-      return cell;
+  
+  if (cell != end())
+    {
+      // then move to the last active one
+      if (cell->active()==true)
+	return cell;
+      while ((--cell).state() == IteratorState::valid)
+	if (cell->active()==true)
+	  return cell;
+    }
   return cell;
 }
 
@@ -11045,12 +11048,15 @@ Triangulation<dim,spacedim>::last_active (const unsigned int level) const
   // get the last used cell on this level
   cell_iterator cell = last(level);
 
-  // then move to the last active one
-  if (cell->active()==true)
-    return cell;
-  while ((--cell).state() == IteratorState::valid)
-    if (cell->active()==true)
-      return cell;
+ if (cell != end(level))
+   {
+     // then move to the last active one
+     if (cell->active()==true)
+       return cell;
+     while ((--cell).state() == IteratorState::valid)
+       if (cell->active()==true)
+	 return cell;
+   }
   return cell;
 }
 
@@ -11071,9 +11077,11 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::raw_cell_iterator
 Triangulation<dim, spacedim>::end_raw (const unsigned int level) const
 {
-  return (level == levels.size()-1 ?
-          end() :
-          begin_raw (level+1));
+  Assert (level<n_global_levels(), ExcInvalidLevel(level));
+  if (level < levels.size()-1)
+    return begin_raw (level+1);
+  else
+    return end();
 }
 
 
@@ -11081,9 +11089,10 @@ template <int dim, int spacedim>
 typename Triangulation<dim, spacedim>::cell_iterator
 Triangulation<dim, spacedim>::end (const unsigned int level) const
 {
-  return (level == levels.size()-1 ?
-          cell_iterator(end()) :
-          begin (level+1));
+  if (level < levels.size()-1)
+    return begin (level+1);
+  Assert (level<n_global_levels() || level<levels.size(), ExcInvalidLevel(level));
+  return end();
 }
 
 
@@ -11175,10 +11184,10 @@ Triangulation<dim, spacedim>::begin_raw_line (const unsigned int level) const
   switch (dim)
     {
     case 1:
-      Assert (level<levels.size(), ExcInvalidLevel(level));
-
-      if (levels[level]->cells.cells.size() == 0)
-        return end_line ();
+      Assert (level<n_global_levels() || level<levels.size(), ExcInvalidLevel(level));
+      
+      if (level >= levels.size() || levels[level]->cells.cells.size() == 0)
+        return end_line();
 
       return raw_line_iterator (const_cast<Triangulation<dim,spacedim>*>(this),
                                 level,
@@ -11250,9 +11259,9 @@ Triangulation<dim,spacedim>::begin_raw_quad (const unsigned int level) const
       return raw_hex_iterator();
     case 2:
     {
-      Assert (level<levels.size(), ExcInvalidLevel(level));
+      Assert (level<n_global_levels() || level<levels.size(), ExcInvalidLevel(level));
 
-      if (levels[level]->cells.cells.size() == 0)
+      if (level >= levels.size() || levels[level]->cells.cells.size() == 0)
         return end_quad();
 
       return raw_quad_iterator (const_cast<Triangulation<dim,spacedim>*>(this),
@@ -11335,11 +11344,11 @@ Triangulation<dim,spacedim>::begin_raw_hex (const unsigned int level) const
       return raw_hex_iterator();
     case 3:
     {
-      Assert (level<levels.size(), ExcInvalidLevel(level));
-
-      if (levels[level]->cells.cells.size() == 0)
+      Assert (level<n_global_levels() || level<levels.size(), ExcInvalidLevel(level));
+      
+      if (level >= levels.size() || levels[level]->cells.cells.size() == 0)
         return end_hex();
-
+      
       return raw_hex_iterator (const_cast<Triangulation<dim,spacedim>*>(this),
                                level,
                                0);

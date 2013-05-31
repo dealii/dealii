@@ -128,8 +128,23 @@ public:
    * Add the given IndexSet @p other to the
    * current one, constructing the union of
    * *this and @p other.
+   *
+   * If the @p offset argument is nonzero, then every
+   * index in @p other is shifted by @p offset before being
+   * added to the current index set. This allows to construct,
+   * for example, one index set from several others that are
+   * supposed to represent index sets corresponding to
+   * different ranges (e.g., when constructing the set of
+   * nonzero entries of a block vector from the sets of nonzero
+   * elements of the individual blocks of a vector).
+   *
+   * This function will generate an exception if any of the
+   * (possibly shifted) indices of the @p other index set
+   * lie outside the range <code>[0,size())</code> represented
+   * by the current object.
    */
-  void add_indices(const IndexSet &other);
+  void add_indices(const IndexSet &other,
+                   const unsigned int offset = 0);
 
   /**
    * Return whether the specified
@@ -490,8 +505,8 @@ private:
                             const Range &range_2)
     {
       return ((range_1.begin == range_2.begin)
-              ||
-              (range_1.begin == range_2.begin));
+              &&
+              (range_1.end == range_2.end));
     }
 
     std::size_t memory_consumption () const
@@ -570,6 +585,32 @@ private:
   void do_compress() const;
 };
 
+
+/**
+ * Create and return an index set of size $N$ that contains every
+ * single index within this range. In essence, this function
+ * returns an index set created by
+ * @code
+ *  IndexSet is (N);
+ *  is.add_range(0, N);
+ * @endcode
+ * This function exists so that one can create and initialize
+ * index sets that are complete in one step, or so one can write
+ * code like
+ * @code
+ *   if (my_index_set == complete_index_set(my_index_set.size())
+ *     ...
+ * @endcode
+ *
+ * @relates IndexSet
+ */
+inline
+IndexSet complete_index_set (const unsigned int N)
+{
+  IndexSet is (N);
+  is.add_range(0, N);
+  return is;
+}
 
 /* ------------------ inline functions ------------------ */
 
@@ -741,16 +782,17 @@ IndexSet::add_indices (const ForwardIterator &begin,
 
 inline
 void
-IndexSet::add_indices(const IndexSet &other)
+IndexSet::add_indices(const IndexSet &other,
+                      const unsigned int offset)
 {
-  if (this == &other)
+  if ((this == &other) && (offset == 0))
     return;
 
   for (std::vector<Range>::iterator range = other.ranges.begin();
        range != other.ranges.end();
        ++range)
     {
-      add_range(range->begin, range->end);
+      add_range(range->begin+offset, range->end+offset);
     }
 
   compress();

@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -157,11 +157,12 @@ void test()
     x_test=x;
 
     bool throwing=false;
+    deal_II_exceptions::disable_abort_on_exception();
     try
       {
 	cm.distribute(x_test);
       }
-    catch (ExcMessage e)
+    catch (const ExceptionBase &e)
       {
 	if (myid==0)
 	  deallog << "Exception: " << e.what() << std::endl;

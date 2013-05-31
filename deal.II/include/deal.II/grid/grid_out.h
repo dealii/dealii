@@ -634,7 +634,14 @@ namespace GridOutFlags
     Background background;
 
     // View angles for the perspective view of the grid; Default is 0, 0 (top view).
-    int azimuth_angle, polar_angle;
+    /**
+     * The azimuth angle measured from ??? in degrees. Default is 0.
+     */
+    int azimuth_angle;
+    /**
+     * The angle from vertically above the xy-plane. Default is 0.
+     */
+    int polar_angle;
 
     /**
      * Cell coloring.
@@ -647,11 +654,13 @@ namespace GridOutFlags
         /// Convert the level number into the cell color
         level_number, 
         /// Convert the subdomain id into the cell color
-        subdomain_id}; 
+        subdomain_id, 
+        /// Convert the level subdomain id into the cell color
+        level_subdomain_id}; 
  
     Coloring coloring;
 
-    // Interpret the level number of the cells as altitude over the x-y-plane (may be useful in the perpspective view).
+    /// Interpret the level number of the cells as altitude over the x-y-plane (useful in the perpspective view).
     bool convert_level_number_to_height;
 
     /**
@@ -660,11 +669,11 @@ namespace GridOutFlags
      * The following booleans determine which properties of the cell
      * shall be displayed as text in the middle of each cell.
      */
-    bool label_level_number;    /// default: true
-    bool label_cell_index;      /// default: true
-    bool label_material_id;     /// default: false
-    bool label_subdomain_id;    /// default: false
-    //bool label_level_subdomain_id;  // TODO [CW]: not yet implemented ...
+    bool label_level_number;    // default: true
+    bool label_cell_index;      // default: true
+    bool label_material_id;     // default: false
+    bool label_subdomain_id;    // default: false
+    bool label_level_subdomain_id;  // default: false
 
     /// Draw a colorbar next to the plotted grid with respect to the chosen coloring of the cells
     bool draw_colorbar;
@@ -674,13 +683,13 @@ namespace GridOutFlags
     /**
      * Constructor.
      */
-    Svg(const unsigned int line_thickness = 3,
-        const unsigned int boundary_line_thickness = 7,
+    Svg(const unsigned int line_thickness = 2,
+        const unsigned int boundary_line_thickness = 4,
         bool margin = true,
-        const Background background = dealii,
+        const Background background = white,
         const int azimuth_angle = 0,
         const int polar_angle = 0,
-        const Coloring coloring = material_id,
+        const Coloring coloring = level_number,
         const bool convert_level_number_to_height = false,
         const bool label_level_number = true,
         const bool label_cell_index = true,
@@ -1494,26 +1503,20 @@ private:
 
 
   /**
-   * This function projects a three-dimensional 
-   * point (Point<3> point) onto a two-dimensional 
-   * image plane, specified by the position of 
-   * the camera viewing system 
-   * (Point<3> camera_position), 
-   * camera direction
-   * (Point<3> camera_position),
-   * camera horizontal 
-   * (Point<3> camera_horizontal, necessary for 
-   * the correct alignment of the later images),
-   * and the focus of the camera 
-   * (float camera_focus).
+   * This function projects a three-dimensional point (Point<3> point) 
+   * onto a two-dimensional image plane, specified by the position of 
+   * the camera viewing system (Point<3> camera_position), camera 
+   * direction (Point<3> camera_position), camera horizontal (Point<3> 
+   * camera_horizontal, necessary for the correct alignment of the 
+   * later images), and the focus of the camera (float camera_focus).
    *
    * For SVG output of grids.
    */
-  Point<2> svg_project_point(Point<3> point, 
-                             Point<3> camera_position, 
-                             Point<3> camera_direction, 
-                             Point<3> camera_horizontal, 
-                             float  camera_focus) const;
+  static Point<2> svg_project_point(Point<3> point, 
+                                    Point<3> camera_position, 
+                                    Point<3> camera_direction, 
+                                    Point<3> camera_horizontal, 
+                                    float camera_focus);
 
   /**
    * Return the number of faces in the triangulation which have a

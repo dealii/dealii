@@ -1,0 +1,8 @@
+
+DEAL:0::numproc=10
+DEAL:0::0:1.000
+DEAL:0::1:7.000
+DEAL:0::0:1.000
+DEAL:0::1:-7.000
+DEAL:0::L2 norm: 103.4
+DEAL:0::OK

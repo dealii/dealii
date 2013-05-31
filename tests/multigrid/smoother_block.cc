@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2000 - 2006 by the deal.II authors
+//    Copyright (C) 2000 - 2006, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -127,7 +127,7 @@ void check_smoother(const MGLevelObject<MATRIX>& m,
   
   smoother.initialize(m, r);
 
-  for (unsigned int l=m.get_minlevel(); l<= m.get_maxlevel();++l)
+  for (unsigned int l=m.min_level(); l<= m.max_level();++l)
     {
       deallog << "Level " << l << std::endl;
       
@@ -187,10 +187,10 @@ void check()
   MGLevelObject<BlockMatrixArray<double> > A (2,4);
   MGLevelObject<BlockTrianglePrecondition<double> > P(2,4);
   
-  for (unsigned int l=A.get_minlevel(); l<= A.get_maxlevel();++l)
+  for (unsigned int l=A.min_level(); l<= A.max_level();++l)
     {
-      A[l].initialize(3, 3, mem);
-      P[l].initialize(3, mem);
+      A[l].initialize(3, 3);
+      P[l].reinit(3);
       for (unsigned int b=0;b<A[l].n_block_rows();++b)
 	{
 	  P[l].enter(s2, b, b, A[l].n_block_rows()-b);

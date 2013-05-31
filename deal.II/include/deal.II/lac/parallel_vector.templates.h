@@ -1,7 +1,7 @@
 //----------%-----------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2011, 2012 by the deal.II authors
+//    Copyright (C) 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -123,12 +123,10 @@ namespace parallel
         {
           delete [] import_data;
 
-          // do not reallocate import_data directly, but
-          // only upon request. It is only used as
-          // temporary storage for compress() and
-          // update_ghost_values, and we might have vectors where
-          // we never call these methods and hence do
-          // not need to have the storage.
+          // do not reallocate import_data directly, but only upon request. It
+          // is only used as temporary storage for compress() and
+          // update_ghost_values, and we might have vectors where we never
+          // call these methods and hence do not need to have the storage.
           import_data = 0;
         }
     }
@@ -171,12 +169,10 @@ namespace parallel
         {
           delete [] import_data;
 
-          // do not reallocate import_data directly, but
-          // only upon request. It is only used as
-          // temporary storage for compress() and
-          // update_ghost_values, and we might have vectors where
-          // we never call these methods and hence do
-          // not need to have the storage.
+          // do not reallocate import_data directly, but only upon request. It
+          // is only used as temporary storage for compress() and
+          // update_ghost_values, and we might have vectors where we never
+          // call these methods and hence do not need to have the storage.
           import_data = 0;
         }
     }
@@ -200,9 +196,20 @@ namespace parallel
 
     template <typename Number>
     void
-    Vector<Number>::compress_start (const unsigned int counter)
+    Vector<Number>::compress_start (const unsigned int counter,
+                                    ::dealii::VectorOperation::values operation)
     {
 #ifdef DEAL_II_WITH_MPI
+
+      // nothing to do for insert (only need to zero ghost entries in
+      // compress_finish(). in debug mode we still want to check consistency
+      // of the inserted data, therefore the communication is still
+      // initialized
+#ifndef DEBUG
+      if (operation == VectorOperation::insert)
+        return;
+#endif
+
       const Utilities::MPI::Partitioner &part = *partitioner;
 
       // nothing to do when we neither have import
@@ -272,18 +279,22 @@ namespace parallel
           ierr = MPI_Startall(compress_requests.size(),&compress_requests[0]);
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
         }
-#else
+
+#else // ifdef DEAL_II_WITH_MPI
       (void)counter;
+      (void)operation;
 #endif
+
     }
 
 
 
     template <typename Number>
     void
-    Vector<Number>::compress_finish (const bool add_ghost_data)
+    Vector<Number>::compress_finish (::dealii::VectorOperation::values operation)
     {
 #ifdef DEAL_II_WITH_MPI
+
       const Utilities::MPI::Partitioner &part = *partitioner;
 
       // nothing to do when we neither have import
@@ -297,11 +308,12 @@ namespace parallel
       const unsigned int n_import_targets = part.import_targets().size();
       const unsigned int n_ghost_targets  = part.ghost_targets().size();
 
-      AssertDimension (n_ghost_targets+n_import_targets,
-                       compress_requests.size());
+      if (operation != dealii::VectorOperation::insert)
+        AssertDimension (n_ghost_targets+n_import_targets,
+                         compress_requests.size());
 
       // first wait for the receive to complete
-      if (n_import_targets > 0)
+      if (compress_requests.size() > 0 && n_import_targets > 0)
         {
           int ierr;
           ierr = MPI_Waitall (n_import_targets, &compress_requests[0],
@@ -312,33 +324,40 @@ namespace parallel
           std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
           my_imports = part.import_indices().begin();
 
-          // If add_ghost_data is set, add the imported
-          // data to the local values. If not, set the
-          // vector entries.
-          if (add_ghost_data == true)
+          // If the operation is no insertion, add the imported data to the
+          // local values. For insert, nothing is done here (but in debug mode
+          // we assert that the specified value is either zero or matches with
+          // the ones already present
+          if (operation != dealii::VectorOperation::insert)
             for ( ; my_imports!=part.import_indices().end(); ++my_imports)
               for (unsigned int j=my_imports->first; j<my_imports->second; j++)
                 local_element(j) += *read_position++;
           else
             for ( ; my_imports!=part.import_indices().end(); ++my_imports)
-              for (unsigned int j=my_imports->first; j<my_imports->second; j++)
-                local_element(j) = *read_position++;
+              for (unsigned int j=my_imports->first; j<my_imports->second;
+                   j++, read_position++)
+                Assert(*read_position == 0. ||
+                       std::abs(local_element(j) - *read_position) <
+                       std::abs(local_element(j)) * 100. *
+                       std::numeric_limits<Number>::epsilon(),
+                       ExcMessage("Inserted elements do not match."));
           AssertDimension(read_position-import_data,part.n_import_indices());
         }
 
-      if (n_ghost_targets > 0)
+      if (compress_requests.size() > 0 && n_ghost_targets > 0)
         {
           int ierr;
           ierr = MPI_Waitall (n_ghost_targets,
                               &compress_requests[n_import_targets],
                               MPI_STATUSES_IGNORE);
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
-          zero_out_ghosts ();
         }
       else
         AssertDimension (part.n_ghost_indices(), 0);
+
+      zero_out_ghosts ();
 #else
-      (void)add_ghost_data;
+      (void)operation;
 #endif
     }
 
@@ -542,8 +561,9 @@ namespace parallel
       // as there are processors and start writing
       // when it's our turn
 #ifdef DEAL_II_WITH_MPI
-      for (unsigned int i=0; i<partitioner->this_mpi_process(); i++)
-        MPI_Barrier (partitioner->get_communicator());
+      if (partitioner->n_mpi_processes() > 1)
+        for (unsigned int i=0; i<partitioner->this_mpi_process(); i++)
+          MPI_Barrier (partitioner->get_communicator());
 #endif
 
       out << "Process #" << partitioner->this_mpi_process() << std::endl
@@ -571,11 +591,14 @@ namespace parallel
       out << std::endl << std::flush;
 
 #ifdef DEAL_II_WITH_MPI
-      MPI_Barrier (partitioner->get_communicator());
+      if (partitioner->n_mpi_processes() > 1)
+        {
+          MPI_Barrier (partitioner->get_communicator());
 
-      for (unsigned int i=partitioner->this_mpi_process()+1;
-           i<partitioner->n_mpi_processes(); i++)
-        MPI_Barrier (partitioner->get_communicator());
+          for (unsigned int i=partitioner->this_mpi_process()+1;
+               i<partitioner->n_mpi_processes(); i++)
+            MPI_Barrier (partitioner->get_communicator());
+        }
 #endif
 
       AssertThrow (out, ExcIO());

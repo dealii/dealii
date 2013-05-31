@@ -1,0 +1,10 @@
+
+DEAL::n_active_cells: 4
+DEAL::n_active_cells: 5
+DEAL::OK for 1d
+DEAL::n_active_cells: 16
+DEAL::n_active_cells: 28
+DEAL::OK for 2d
+DEAL::n_active_cells: 64
+DEAL::n_active_cells: 176
+DEAL::OK for 3d

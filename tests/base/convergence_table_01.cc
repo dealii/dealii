@@ -22,7 +22,8 @@
 #include <fstream>
 #include <string>
 
-// test the method evaluate_convergence_rates with argument reference_column_key, 
+// test the method evaluate_convergence_rates with argument
+// reference_column_key, assuming data coming from 2d
 
 int main ()
 {

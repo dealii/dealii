@@ -602,8 +602,6 @@ VectorFunctionFromTensorFunction<dim>::VectorFunctionFromTensorFunction (const T
 
   // Verify that the Tensor<1,dim> will fit in the given length selected_components
   // and not hang over the end of the vector.
-  Assert (0 <= selected_component,
-          ExcIndexRange (selected_component,0,0));
   Assert (selected_component + dim - 1 < this->n_components,
           ExcIndexRange (selected_component, 0, this->n_components));
 }

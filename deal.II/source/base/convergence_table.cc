@@ -23,7 +23,8 @@ ConvergenceTable::ConvergenceTable()
 
 void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
                                                   const std::string &reference_column_key,
-                                                  const RateMode     rate_mode)
+                                                  const RateMode     rate_mode,
+                                                  const unsigned int dim)
 {
   Assert(columns.count(data_column_key),
          ExcColumnNotExistent(data_column_key));
@@ -39,7 +40,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
 
   std::vector<internal::TableEntry> &entries=columns[data_column_key].entries;
   std::vector<internal::TableEntry> &ref_entries=columns[reference_column_key].entries;
-  std::string rate_key = data_column_key;
+  std::string rate_key = data_column_key+"...";
 
   const unsigned int n = entries.size();
   const unsigned int n_ref = ref_entries.size();
@@ -79,7 +80,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
         }
       break;
     case reduction_rate_log2:
-      rate_key += "red.rate";
+      rate_key += "red.rate.log2";
       no_rate_entries = columns[rate_key].entries.size();
       // Calculate all missing rate values:
       for (unsigned int i = no_rate_entries; i<n; ++i)
@@ -91,7 +92,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
             }
           else
             {
-              add_value(rate_key, 2*std::log(std::fabs(values[i-1]/values[i])) /
+              add_value(rate_key, dim*std::log(std::fabs(values[i-1]/values[i])) /
                         std::log(std::fabs(ref_values[i]/ref_values[i-1])));
             }
         }

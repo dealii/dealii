@@ -56,8 +56,8 @@ void
 reinit_vector (const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
 	       MGLevelObject<dealii::Vector<number> > &v)
 {
-  for (unsigned int level=v.get_minlevel();
-       level<=v.get_maxlevel();++level)
+  for (unsigned int level=v.min_level();
+       level<=v.max_level();++level)
     {
       unsigned int n = mg_dof.n_dofs (level);
       v[level].reinit(n);
@@ -246,7 +246,7 @@ LaplaceProblem<dim>::output_gpl(const MGDoFHandler<dim> &dof,
   for(unsigned int l=0; l<triangulation.n_levels(); ++l)
   {
     OutputCreator<dim> matrix_integrator;
-    MeshWorker::integration_loop<dim, dim> (
+    MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> > (
       dof.begin(l), dof.end(l),
       dof_info, info_box,
       std_cxx1x::bind(&OutputCreator<dim>::cell, &matrix_integrator, std_cxx1x::_1, std_cxx1x::_2),

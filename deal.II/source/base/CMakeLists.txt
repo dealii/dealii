@@ -51,6 +51,7 @@ SET(_src
   polynomials_adini.cc
   polynomials_bdm.cc
   polynomials_nedelec.cc
+  polynomials_piecewise.cc
   polynomial_space.cc
   polynomials_p.cc
   polynomials_raviart_thomas.cc

@@ -24,8 +24,8 @@
 #include <base/utilities.h>
 #include <base/quadrature_lib.h>
 
-#include <numerics/vectors.h>
-#include <numerics/matrices.h>
+#include <numerics/vector_tools.h>
+#include <numerics/matrix_tools.h>
 #include <numerics/data_out.h>
 
 #include <lac/vector.h>

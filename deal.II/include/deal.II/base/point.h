@@ -53,21 +53,22 @@ class Point : public Tensor<1,dim,Number>
 public:
   /**
    * Standard constructor. Creates
-   * an origin.
+   * an object that corresponds to the origin, i.e., all coordinates
+   * are set to zero.
    */
   Point ();
 
   /**
    * Constructor. Initialize all
    * entries to zero if
-   * <tt>initialize==true</tt>.
+   * <tt>initialize==true</tt> (in which case it is equivalent to the default
+   * constructor) or leaves the elements uninitialized if
+   * <tt>initialize==false</tt>.
    */
   explicit Point (const bool initialize);
 
   /**
-   * Convert a tensor to a point. Since no
-   * additional data is inside a point,
-   * this is ok.
+   * Convert a tensor to a point.
    */
   Point (const Tensor<1,dim,Number> &);
 
@@ -76,7 +77,8 @@ public:
    *  points. This function is only
    *  implemented for <tt>dim==1</tt> since
    *  the usage is considered unsafe for
-   *  points with <tt>dim!=1</tt>.
+   *  points with <tt>dim!=1</tt> as it would leave some components
+   *  of the point coordinates uninitialized.
    */
   explicit Point (const Number x);
 
@@ -85,18 +87,25 @@ public:
    *  points. This function is only
    *  implemented for <tt>dim==2</tt> since
    *  the usage is considered unsafe for
-   *  points with <tt>dim!=2</tt>.
+   *  points with <tt>dim!=2</tt> as it would leave some components
+   *  of the point coordinates uninitialized (if dim>2) or would
+   *  not use some arguments (if dim<2).
    */
-  Point (const Number x, const Number y);
+  Point (const Number x,
+         const Number y);
 
   /**
    *  Constructor for three dimensional
    *  points. This function is only
    *  implemented for <tt>dim==3</tt> since
    *  the usage is considered unsafe for
-   *  points with <tt>dim!=3</tt>.
+   *  points with <tt>dim!=3</tt> as it would leave some components
+   *  of the point coordinates uninitialized (if dim>3) or would
+   *  not use some arguments (if dim<3).
    */
-  Point (const Number x, const Number y, const Number z);
+  Point (const Number x,
+         const Number y,
+         const Number z);
 
   /**
    * Return a unit vector in

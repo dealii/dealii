@@ -460,18 +460,18 @@ namespace internal
     return std::vector<unsigned int>();
   }
 
-  template <int dim>
+  template <int dim, typename POLY>
   inline
   std::vector<unsigned int>
-  get_poly_space_numbering (const TensorProductPolynomials<dim> &poly)
+  get_poly_space_numbering (const TensorProductPolynomials<dim,POLY> &poly)
   {
     return poly.get_numbering();
   }
 
-  template <int dim>
+  template <int dim, typename POLY>
   inline
   std::vector<unsigned int>
-  get_poly_space_numbering_inverse (const TensorProductPolynomials<dim> &poly)
+  get_poly_space_numbering_inverse (const TensorProductPolynomials<dim,POLY> &poly)
   {
     return poly.get_numbering_inverse();
   }

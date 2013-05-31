@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -43,6 +43,13 @@ namespace internal
   {
     typedef ::dealii::SparsityPattern Sparsity;
     typedef ::dealii::SparseMatrix<typename VECTOR::value_type> Matrix;
+    
+    template <class CSP, class DH>
+    static void reinit(Matrix& matrix, Sparsity& sparsity, int level, const CSP& csp, const DH&)
+    {
+      sparsity.copy_from (csp);
+      matrix.reinit (sparsity);
+    }
   };
 
 #ifdef DEAL_II_WITH_TRILINOS
@@ -51,6 +58,15 @@ namespace internal
   {
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
+    
+    template <class CSP, class DH>
+    static void reinit(Matrix& matrix, Sparsity& sparsity, int level, const CSP& csp, DH& dh)
+    {
+      matrix.reinit(dh.locally_owned_mg_dofs(level+1),
+		    dh.locally_owned_mg_dofs(level),
+		    csp, MPI_COMM_WORLD, true);
+    }
+    
   };
 
   template <>
@@ -58,6 +74,11 @@ namespace internal
   {
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
+    
+    template <class CSP, class DH>
+    static void reinit(Matrix& matrix, Sparsity& sparsity, int level, const CSP& csp, DH& dh)
+    {
+    }
   };
 #endif
 }
@@ -196,14 +217,12 @@ public:
   set_component_to_block_map (const std::vector<unsigned int> &map);
 
   /**
-   * Finite element does not
-   * provide prolongation matrices.
+   * Finite element does not provide prolongation matrices.
    */
   DeclException0(ExcNoProlongation);
 
   /**
-   * Call @p build_matrices
-   * function first.
+   * You have to call build_matrices() before using this object.
    */
   DeclException0(ExcMatricesNotBuilt);
 
@@ -211,8 +230,17 @@ public:
    * Memory used by this object.
    */
   std::size_t memory_consumption () const;
+  
+  /**
+   * Print all the matrices for debugging purposes.
+   */
+  void print_matrices(std::ostream& os) const;
 
-
+  /**
+   * Print the copy index fields for debugging purposes.
+   */
+  void print_indices(std::ostream& os) const;
+  
 private:
 
   /**
@@ -221,29 +249,48 @@ private:
   std::vector<unsigned int> sizes;
 
   /**
-   * Sparsity patterns for transfer
-   * matrices.
+   * Sparsity patterns for transfer matrices.
    */
   std::vector<std_cxx1x::shared_ptr<typename internal::MatrixSelector<VECTOR>::Sparsity> >   prolongation_sparsities;
 
   /**
-   * The actual prolongation matrix.
-   * column indices belong to the
-   * dof indices of the mother cell,
-   * i.e. the coarse level.
-   * while row indices belong to the
-   * child cell, i.e. the fine level.
+   * The actual prolongation matrix.  column indices belong to the dof
+   * indices of the mother cell, i.e. the coarse level.  while row
+   * indices belong to the child cell, i.e. the fine level.
    */
   std::vector<std_cxx1x::shared_ptr<typename internal::MatrixSelector<VECTOR>::Matrix> > prolongation_matrices;
 
   /**
-   * Mapping for the
-   * <tt>copy_to/from_mg</tt>-functions.
-   * The data is first the global
-   * index, then the level index.
+   * Mapping for the copy_to_mg() and copy_from_mg() functions. Here only
+   * index pairs locally owned
+   * 
+   * The data is organized as follows: one vector per level. Each
+   * element of these vectors contains first the global index, then
+   * the level index.
    */
   std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
   copy_indices;
+
+  /**
+   * Additional degrees of freedom for the copy_to_mg()
+   * function. These are the ones where the global degree of freedom
+   * is locally owned and the level degree of freedom is not.
+   *
+   * Organization of the data is like for #copy_indices_mine.
+   */
+  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  copy_indices_to_me;
+
+  /**
+   * Additional degrees of freedom for the copy_from_mg()
+   * function. These are the ones where the level degree of freedom
+   * is locally owned and the global degree of freedom is not.
+   *
+   * Organization of the data is like for #copy_indices_mine.
+   */
+  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  copy_indices_from_me;
+  
 
   /**
    * The vector that stores what

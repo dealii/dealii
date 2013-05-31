@@ -759,6 +759,19 @@ public:
   typedef typename BlockType::real_type real_type;
 
   /**
+   * A variable that indicates whether this vector
+   * supports distributed data storage. If true, then
+   * this vector also needs an appropriate compress()
+   * function that allows communicating recent set or
+   * add operations to individual elements to be communicated
+   * to other processors.
+   *
+   * For the current class, the variable equals the
+   * value declared for the type of the individual blocks.
+   */
+  static const bool supports_distributed_data = BlockType::supports_distributed_data;
+
+  /**
    * Default constructor.
    */
   BlockVectorBase ();
@@ -832,6 +845,26 @@ public:
    * components.
    */
   unsigned int size () const;
+
+  /**
+   * Return an index set that describes which elements of this vector
+   * are owned by the current processor. Note that this index set does
+   * not include elements this vector may store locally as ghost
+   * elements but that are in fact owned by another processor.
+   * As a consequence, the index sets returned on different
+   * processors if this is a distributed vector will form disjoint
+   * sets that add up to the complete index set.
+   * Obviously, if a vector is created on only one processor, then
+   * the result would satisfy
+   * @code
+   *   vec.locally_owned_elements() == complete_index_set (vec.size())
+   * @endcode
+   *
+   * For block vectors, this function returns the union of the
+   * locally owned elements of the individual blocks, shifted by
+   * their respective index offsets.
+   */
+  IndexSet locally_owned_elements () const;
 
   /**
    * Return an iterator pointing to
@@ -1766,6 +1799,28 @@ unsigned int
 BlockVectorBase<VectorType>::size () const
 {
   return block_indices.total_size();
+}
+
+
+
+template <class VectorType>
+inline
+IndexSet
+BlockVectorBase<VectorType>::locally_owned_elements () const
+{
+  IndexSet is (size());
+
+  // copy index sets from blocks into the global one, shifted
+  // by the appropriate amount for each block
+  for (unsigned int b=0; b<n_blocks(); ++b)
+    {
+      IndexSet x = block(b).locally_owned_elements();
+      is.add_indices(x, block_indices.block_start(b));
+    }
+
+  is.compress();
+
+  return is;
 }
 
 

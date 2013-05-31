@@ -1,0 +1,18 @@
+
+DEAL:0:2d::#cells = 4
+DEAL:0:2d::proc 0, n levels 2
+DEAL:0:2d::proc 0, n gobal levels 2
+DEAL:0:2d::begin().cell_index 0
+DEAL:0:2d::begin(0).cell_index 0
+DEAL:0:2d::begin(1)==end(1)? 0
+DEAL:0:2d::subdomainid = 0
+DEAL:0:2d::Checksum: 167510149
+DEAL:0:2d::OK
+
+DEAL:1:2d::proc 1, n levels 1
+DEAL:1:2d::proc 1, n gobal levels 2
+DEAL:1:2d::begin().cell_index 0
+DEAL:1:2d::begin(0).cell_index 0
+DEAL:1:2d::begin(1)==end(1)? 1
+DEAL:1:2d::subdomainid = 4294967294
+

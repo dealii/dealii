@@ -72,7 +72,7 @@ int main(int argc, char **argv)
 
   
   {
-    SolverControl control(200, 1.e-3);
+    SolverControl control(200, 1.e-10);
 
     const unsigned int size = 32;
     unsigned int dim = (size-1)*(size-1);

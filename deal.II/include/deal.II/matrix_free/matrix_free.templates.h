@@ -14,6 +14,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/memory_consumption.h>
 #include <deal.II/base/tensor_product_polynomials.h>
+#include <deal.II/base/polynomials_piecewise.h>
 #include <deal.II/base/mpi.h>
 #include <deal.II/dofs/dof_accessor.h>
 #include <deal.II/fe/fe_poly.h>
@@ -524,15 +525,25 @@ void MatrixFree<dim,Number>::initialize_indices
           const FE_Poly<TensorProductPolynomials<dim>,dim,dim> *fe_poly =
             dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>
             (&fe.base_element(0));
+          const FE_Poly<TensorProductPolynomials<dim,Polynomials::
+            PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
+            dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
+            Polynomials::PiecewisePolynomial<double> >,dim,dim>*>
+            (&fe.base_element(0));
 
           // This class currently only works for elements derived from
-          // FE_Poly<TensorProductPolynomials<dim>,dim,dim>.  For any other
-          // element, the dynamic cast above will fail and give fe_poly == 0.
-          Assert (fe_poly != 0, ExcNotImplemented());
+          // FE_Poly<TensorProductPolynomials<dim>,dim,dim> or piecewise
+          // polynomials. For any other element, the dynamic casts above will
+          // fail and give fe_poly == 0.
+          Assert (fe_poly != 0 || fe_poly_piece != 0, ExcNotImplemented());
           if (n_fe_components == 1)
             {
-              lexicographic_inv[no][fe_index] =
-                fe_poly->get_poly_space_numbering_inverse();
+              if (fe_poly != 0)
+                lexicographic_inv[no][fe_index] =
+                  fe_poly->get_poly_space_numbering_inverse();
+              else
+                lexicographic_inv[no][fe_index] =
+                  fe_poly_piece->get_poly_space_numbering_inverse();
               AssertDimension (lexicographic_inv[no][fe_index].size(),
                                dof_info[no].dofs_per_cell[fe_index]);
             }
@@ -541,7 +552,8 @@ void MatrixFree<dim,Number>::initialize_indices
               // ok, we have more than one component
               Assert (n_fe_components > 1, ExcInternalError());
               std::vector<unsigned int> scalar_lex =
-                fe_poly->get_poly_space_numbering();
+                fe_poly != 0 ? fe_poly->get_poly_space_numbering() :
+                fe_poly_piece->get_poly_space_numbering();
               AssertDimension (scalar_lex.size() * n_fe_components,
                                dof_info[no].dofs_per_cell[fe_index]);
               std::vector<unsigned int> lexicographic (dof_info[no].dofs_per_cell[fe_index]);
@@ -781,6 +793,8 @@ void MatrixFree<dim,Number>::clear()
   cell_level_index.clear();
   size_info.clear();
   task_info.clear();
+  dof_handlers.dof_handler.clear();
+  dof_handlers.hp_dof_handler.clear();
   indices_are_initialized = false;
   mapping_is_initialized  = false;
 }

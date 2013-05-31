@@ -1,6 +1,6 @@
 ############################################################
 # $Id: Makefile 17098 2008-10-03 19:27:13Z bangerth $
-# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2011 by the deal.II authors
+# Copyright (C) 2000, 2001, 2002, 2003, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2013 by the deal.II authors
 ############################################################
 
 ############################################################
@@ -14,22 +14,27 @@ default: run-tests
 
 ############################################################
 
-# all .cc-files are tests by default.
+# all .cc-files are tests by default. After that, find out which tests
+# require unconfigured prerequisites and eliminate those.
 
-ifeq ($(USE_CONTRIB_TRILINOS),no)
-  tests_x_1 = $(shell for i in *.cc ; do \
-			if grep -q TrilinosWrappers $$i ; then \
-				 : ; \
-			else \
-				 echo $$i ; \
-			fi ; done)
+tests_all = $(wildcard *.cc)
+ifeq ($(USE_CONTRIB_PETSC),no)
+  tests1 = $(foreach file, $(tests_all), $(shell grep -L PETScWrappers $(file)))
 else
-  tests_x_1 = $(wildcard *.cc)
+  tests1 = $(tests_all)
 endif
 
-tests   = $(shell echo $(addsuffix /ncpu_*, $(basename $(tests_x_1))))
+ifeq ($(USE_CONTRIB_TRILINOS),no)
+  tests2 = $(foreach file, $(tests1), $(shell grep -L TrilinosWrappers $(file)))
+else
+  tests2 = $(tests1)
+endif
 
-
+tests_cc = $(tests2)
+tests_base = $(basename $(tests2))
+tests = $(foreach file, $(tests_base), $(wildcard $(file)/ncpu_*))
+test:
+	@echo $(tests)
 ############################################################
 
 
@@ -38,12 +43,12 @@ include ../Makefile.rules
 -include Makefile.depend
 
 
-Makefile.mpi.tests: Makefile $(shell echo *.cc) $(shell echo */*/cmp/generic)
+Makefile.mpi.tests: Makefile $(wildcard *.cc) $(shell echo */*/cmp/generic)
 	@echo =====Targets======= $@
-	@(for i in $(basename $(wildcard *.cc)) ; do \
+	@(for i in $(tests_base) ; do \
 		echo "$$i/exe : $$i/obj.g.\$$(OBJEXT) \$$(libraries)"; \
 	 done ; \
-	 for i in $(basename $(wildcard *.cc)) ; do \
+	 for i in $(tests_base) ; do \
 		for j in $$i/ncpu_*; do \
 			echo "$$j/output : $$i/exe" ; \
 		done ; \
@@ -62,6 +67,6 @@ get_exe = $(shell echo $(1) | $(PERL) -pi -e 's/ncpu_.*/exe/g;')
 	@echo Running > $(dir $@)/status
 	@$(ULIMIT) -t 2400 ; \
 		mpirun -np $(call get_ncpus, $@) ./$(call get_exe, $@) ; \
-		if test ! $$? = 0 ; then rm $@ ; false ; fi
+		if test ! $$? = 0 ; then rm -f $@ ; false ; fi
 	@perl -pi $(normalize)  $@
 

@@ -1,0 +1,24 @@
+//---------------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2013 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS)
+  {
+#if deal_II_dimension <= deal_II_space_dimension 	
+    template class FE_Q_Base<TensorProductPolynomials<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
+    template class FE_Q_Base<TensorProductPolynomialsConst<deal_II_dimension>, deal_II_dimension, deal_II_space_dimension>;
+    template class FE_Q_Base<TensorProductPolynomials<deal_II_dimension,Polynomials::PiecewisePolynomial<double> >, deal_II_dimension, deal_II_space_dimension>;
+#endif
+  }
+
+

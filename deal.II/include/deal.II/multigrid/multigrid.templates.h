@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -153,6 +153,10 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
     deallog << "Residual on      level " << level << std::endl;
   // t = A*solution[level]
   matrix->vmult(level, t[level], solution[level]);
+
+  if (debug>2)
+    deallog << "Residual norm          " << t[level].l2_norm()
+            << std::endl;
 //  std::cout<<std::endl;
 //  t[level].print(std::cout, 2,false);
 
@@ -168,7 +172,7 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
         {
           edge_out->vmult_add(level, t[level], solution[level]);
           if (debug>2)
-            deallog << "Norm t[" << level << "] " << t[level].l2_norm() << std::endl;
+            deallog << "Norm     t[" << level << "] " << t[level].l2_norm() << std::endl;
         }
 
       if (l==level && edge_down != 0)
@@ -179,7 +183,7 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
         deallog << "restrict t[" << l-1 << "] " << t[l-1].l2_norm() << std::endl;
       defect[l-1] -= t[l-1];
       if (debug>3)
-        deallog << "defect d[" << l-1 << "] " << defect[l-1].l2_norm() << std::endl;
+        deallog << "defect   d[" << l-1 << "] " << defect[l-1].l2_norm() << std::endl;
     }
 
   // do recursion
@@ -194,6 +198,8 @@ Multigrid<VECTOR>::level_v_step(const unsigned int level)
 
   // do coarse grid correction
   transfer->prolongate(level, t[level], solution[level-1]);
+  if (debug>2)
+    deallog << "Prolongate norm        " << t[level].l2_norm() << std::endl;
 
   solution[level] += t[level];
 

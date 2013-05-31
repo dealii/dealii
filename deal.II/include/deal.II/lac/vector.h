@@ -17,6 +17,7 @@
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/subscriptor.h>
+#include <deal.II/base/index_set.h>
 #include <boost/serialization/array.hpp>
 #include <boost/serialization/split_member.hpp>
 
@@ -139,6 +140,19 @@ public:
    * norms.
    */
   typedef typename numbers::NumberTraits<Number>::real_type real_type;
+
+  /**
+   * A variable that indicates whether this vector
+   * supports distributed data storage. If true, then
+   * this vector also needs an appropriate compress()
+   * function that allows communicating recent set or
+   * add operations to individual elements to be communicated
+   * to other processors.
+   *
+   * For the current class, the variable equals
+   * false, since it does not support parallel data storage.
+   */
+  static const bool supports_distributed_data = false;
 
 public:
 
@@ -586,6 +600,26 @@ public:
    * vector the method always returns true.
    */
   bool in_local_range (const types::global_dof_index global_index) const;
+
+  /**
+   * Return an index set that describes which elements of this vector
+   * are owned by the current processor. Note that this index set does
+   * not include elements this vector may store locally as ghost
+   * elements but that are in fact owned by another processor.
+   * As a consequence, the index sets returned on different
+   * processors if this is a distributed vector will form disjoint
+   * sets that add up to the complete index set.
+   * Obviously, if a vector is created on only one processor, then
+   * the result would satisfy
+   * @code
+   *   vec.locally_owned_elements() == complete_index_set (vec.size())
+   * @endcode
+   *
+   * Since the current data type does not support parallel data storage
+   * across different processors, the returned index set is the
+   * complete index set.
+   */
+  IndexSet locally_owned_elements () const;
 
   /**
    * Return dimension of the vector.

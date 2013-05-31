@@ -26,7 +26,7 @@
 void test ()
 {
   unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-  unsigned int numproc = Utilities::System::get_n_mpi_processes (MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
 
   if (myid==0) deallog << "numproc=" << numproc << std::endl;
 
@@ -45,13 +45,13 @@ void test ()
   v(myid*2)=myid*2.0;
   v(myid*2+1)=myid*2.0+1.0;
 
-  v.compress();
+  v.compress(VectorOperation::insert);
   v*=2.0;
 
   Assert(v(myid*2) == myid*4.0, ExcInternalError());
   Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
 
-                                // set ghost dof on remote processors, no
+                                // set ghost dof on remote process, no
                                 // compress called
   if (myid > 0)
     v(1) = 7;
@@ -70,7 +70,7 @@ void test ()
 
                                 // check that everything remains zero also
                                 // after compress
-  v.compress();
+  v.compress(VectorOperation::add);
 
   Assert(v(myid*2) == 0., ExcInternalError());
   Assert(v(myid*2+1) == 0., ExcInternalError());

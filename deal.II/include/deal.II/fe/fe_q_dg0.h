@@ -1,9 +1,21 @@
+//---------------------------------------------------------------------------
+//    $Id: fe_q.h 29043 2013-03-26 19:51:19Z bangerth $
+//
+//    Copyright (C) 2012, 2013 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
 #ifndef __deal2__fe_q_dg0_h
 #define __deal2__fe_q_dg0_h
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/tensor_product_polynomials_const.h>
-#include <deal.II/fe/fe_poly.h>
+#include <deal.II/fe/fe_q_base.h>
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -218,87 +230,66 @@ DEAL_II_NAMESPACE_OPEN
  *
  */
 template <int dim, int spacedim=dim>
-class FE_Q_DG0 : public FE_Poly<TensorProductPolynomialsConst<dim>,dim,spacedim>
+class FE_Q_DG0 : public FE_Q_Base<TensorProductPolynomialsConst<dim>,dim,spacedim>
 {
 public:
   /**
-   * Constructor for tensor product
-   * polynomials of degree @p p plus locally
+   * Constructor for tensor product polynomials of degree @p p plus locally
    * constant functions.
    */
   FE_Q_DG0 (const unsigned int p);
 
   /**
-   * Constructor for tensor product
-   * polynomials with support
-   * points @p points plus locally constant
-   * functions based on a one-dimensional
-   * quadrature formula. The degree of the
-   * finite element is
-   * <tt>points.size()-1</tt>.
-   * Note that the first point has
-   * to be 0 and the last one 1.
+   * Constructor for tensor product polynomials with support points @p points
+   * plus locally constant functions based on a one-dimensional quadrature
+   * formula. The degree of the finite element is <tt>points.size()-1</tt>.
+   * Note that the first point has to be 0 and the last one 1.
    */
   FE_Q_DG0 (const Quadrature<1> &points);
 
   /**
-   * Return a string that uniquely
-   * identifies a finite
-   * element. This class returns
-   * <tt>FE_Q_DG0<dim>(degree)</tt>, with
-   * @p dim and @p degree
-   * replaced by appropriate
-   * values.
+   * Return a string that uniquely identifies a finite element. This class
+   * returns <tt>FE_Q_DG0<dim>(degree)</tt>, with @p dim and @p degree
+   * replaced by appropriate values.
    */
   virtual std::string get_name () const;
 
   /**
-   * Interpolate a set of scalar
-   * values, computed in the
-   * generalized support points.
+   * Interpolate a set of scalar values, computed in the generalized support
+   * points.
    */
   virtual void interpolate(std::vector<double>       &local_dofs,
                            const std::vector<double> &values) const;
 
   /**
-   * Interpolate a set of vector
-   * values, computed in the
-   * generalized support points.
+   * Interpolate a set of vector values, computed in the generalized support
+   * points.
    *
-   * Since a finite element often
-   * only interpolates part of a
-   * vector, <tt>offset</tt> is
-   * used to determine the first
-   * component of the vector to be
-   * interpolated. Maybe consider
-   * changing your data structures
-   * to use the next function.
+   * Since a finite element often only interpolates part of a vector,
+   * <tt>offset</tt> is used to determine the first component of the vector to
+   * be interpolated. Maybe consider changing your data structures to use the
+   * next function.
    */
   virtual void interpolate(std::vector<double>                &local_dofs,
                            const std::vector<Vector<double> > &values,
                            unsigned int offset = 0) const;
 
   /**
-   * Interpolate a set of vector
-   * values, computed in the
-   * generalized support points.
+   * Interpolate a set of vector values, computed in the generalized support
+   * points.
    */
   virtual void interpolate(
     std::vector<double>          &local_dofs,
     const VectorSlice<const std::vector<std::vector<double> > > &values) const;
 
   /**
-   * Return the matrix interpolating from the
-   * given finite element to the present one.
-   * The size of the matrix is then @p
-   * dofs_per_cell times
+   * Return the matrix interpolating from the given finite element to the
+   * present one.  The size of the matrix is then @p dofs_per_cell times
    * <tt>source.dofs_per_cell</tt>.
    *
-   * These matrices are only available if the
-   * source element is also a @p FE_Q_DG0
-   * element. Otherwise, an exception of type
-   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented
-   * is thrown.
+   * These matrices are only available if the source element is also a @p
+   * FE_Q_DG0 element. Otherwise, an exception of type
+   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented is thrown.
    */
   virtual void
   get_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
@@ -306,176 +297,26 @@ public:
 
 
   /**
-   * Return the matrix
-   * interpolating from a face of
-   * of one element to the face of
-   * the neighboring element.
-   * The size of the matrix is
-   * then <tt>source.dofs_per_face</tt> times
-   * <tt>this->dofs_per_face</tt>.
-   *
-   * Derived elements will have to
-   * implement this function. They
-   * may only provide interpolation
-   * matrices for certain source
-   * finite elements, for example
-   * those from the same family. If
-   * they don't implement
-   * interpolation from a given
-   * element, then they must throw
-   * an exception of type
-   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
-   */
-  virtual void
-  get_face_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                 FullMatrix<double>       &matrix) const;
-
-  /**
-   * Return the matrix
-   * interpolating from a face of
-   * of one element to the face of
-   * the neighboring element.
-   * The size of the matrix is
-   * then <tt>source.dofs_per_face</tt> times
-   * <tt>this->dofs_per_face</tt>.
-   *
-   * Derived elements will have to
-   * implement this function. They
-   * may only provide interpolation
-   * matrices for certain source
-   * finite elements, for example
-   * those from the same family. If
-   * they don't implement
-   * interpolation from a given
-   * element, then they must throw
-   * an exception of type
-   * FiniteElement<dim,spacedim>::ExcInterpolationNotImplemented.
-   */
-  virtual void
-  get_subface_interpolation_matrix (const FiniteElement<dim,spacedim> &source,
-                                    const unsigned int        subface,
-                                    FullMatrix<double>       &matrix) const;
-
-  /**
    * Check for non-zero values on a face.
    *
-   * This function returns
-   * @p true, if the shape
-   * function @p shape_index has
-   * non-zero values on the face
-   * @p face_index.
+   * This function returns @p true, if the shape function @p shape_index has
+   * non-zero values on the face @p face_index.
    *
-   * Implementation of the
-   * interface in
-   * FiniteElement
+   * Implementation of the interface in FiniteElement
    */
   virtual bool has_support_on_face (const unsigned int shape_index,
                                     const unsigned int face_index) const;
 
-  /**
-   * @name Functions to support hp
-   * @{
-   */
-
-  /**
-   * Return whether this element
-   * implements its hanging node
-   * constraints in the new way,
-   * which has to be used to make
-   * elements "hp compatible".
-   *
-   * For the FE_Q_DG0 class the result is
-   * always true (independent of the degree
-   * of the element), as it implements the
-   * complete set of functions necessary
-   * for hp capability.
-   */
-  virtual bool hp_constraints_are_implemented () const;
-
-  /**
-   * If, on a vertex, several finite elements are active, the hp code
-   * first assigns the degrees of freedom of each of these FEs
-   * different global indices. It then calls this function to find out
-   * which of them should get identical values, and consequently can
-   * receive the same global DoF index. This function therefore
-   * returns a list of identities between DoFs of the present finite
-   * element object with the DoFs of @p fe_other, which is a reference
-   * to a finite element object representing one of the other finite
-   * elements active on this particular vertex. The function computes
-   * which of the degrees of freedom of the two finite element objects
-   * are equivalent, both numbered between zero and the corresponding
-   * value of dofs_per_vertex of the two finite elements. The first
-   * index of each pair denotes one of the vertex dofs of the present
-   * element, whereas the second is the corresponding index of the
-   * other finite element.
-   */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_vertex_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
-
-  /**
-   * Same as
-   * hp_vertex_dof_indices(),
-   * except that the function
-   * treats degrees of freedom on
-   * lines.
-   */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_line_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
-
-  /**
-   * Same as
-   * hp_vertex_dof_indices(),
-   * except that the function
-   * treats degrees of freedom on
-   * quads.
-   */
-  virtual
-  std::vector<std::pair<unsigned int, unsigned int> >
-  hp_quad_dof_identities (const FiniteElement<dim,spacedim> &fe_other) const;
-
-  /**
-   * Return whether this element dominates
-   * the one given as argument when they
-   * meet at a common face,
-   * whether it is the other way around,
-   * whether neither dominates, or if
-   * either could dominate.
-   *
-   * For a definition of domination, see
-   * FiniteElementBase::Domination and in
-   * particular the @ref hp_paper "hp paper".
-   */
-  virtual
-  FiniteElementDomination::Domination
-  compare_for_face_domination (const FiniteElement<dim,spacedim> &fe_other) const;
-  //@}
-
-  /**
-   * Determine an estimate for the
-   * memory consumption (in bytes)
-   * of this object.
-   *
-   * This function is made virtual,
-   * since finite element objects
-   * are usually accessed through
-   * pointers to their base class,
-   * rather than the class itself.
-   */
-  virtual std::size_t memory_consumption () const;
-
 protected:
   /**
-   * @p clone function instead of
-   * a copy constructor.
+   * @p clone function instead of a copy constructor.
    *
-   * This function is needed by the
-   * constructors of @p FESystem.
+   * This function is needed by the constructors of @p FESystem.
    */
   virtual FiniteElement<dim,spacedim> *clone() const;
 
 private:
+
   /**
    * Returns the restriction_is_additive flags.
    * Only the last component is true.
@@ -483,168 +324,18 @@ private:
   static std::vector<bool> get_riaf_vector(const unsigned int degree);
 
   /**
-   * Only for internal use. Its
-   * full name is
-   * @p get_dofs_per_object_vector
-   * function and it creates the
-   * @p dofs_per_object vector that is
-   * needed within the constructor to
-   * be passed to the constructor of
-   * @p FiniteElementData.
+   * Only for internal use. Its full name is @p get_dofs_per_object_vector
+   * function and it creates the @p dofs_per_object vector that is needed
+   * within the constructor to be passed to the constructor of @p
+   * FiniteElementData.
    */
   static std::vector<unsigned int> get_dpo_vector(const unsigned int degree);
-
-  /**
-   * Only for internal use. Its
-   * full name is
-   * @p get_dofs_per_object_vector_q
-   * function and it creates the
-   * @p dofs_per_object vector that is
-   * needed within the constructor to
-   * be passed to the constructor of
-   * @p FiniteElementData for FE_Q_DG0
-   * objects.
-   */
-  static std::vector<unsigned int> get_dpo_vector_q(const unsigned int degree);
-
-  /**
-   * This is an analogon to the
-   * FETools::lexicographic_to_hierarchic_numbering
-   * function, but working on
-   * faces. Called from the
-   * constructor.
-   */
-  static
-  std::vector<unsigned int>
-  face_lexicographic_to_hierarchic_numbering (const unsigned int degree);
-
-  /**
-   * Initialize the hanging node
-   * constraints matrices. Called
-   * from the constructor.
-   */
-  void initialize_constraints ();
-
-  /**
-   * Initialize the embedding
-   * matrices. Called from the
-   * constructor.
-   */
-  void initialize_embedding ();
-
-  /**
-   * Initialize the restriction
-   * matrices. Called from the
-   * constructor.
-   */
-  void initialize_restriction ();
-
-  /**
-   * Initialize the
-   * @p unit_support_points field
-   * of the FiniteElement
-   * class. Called from the
-   * constructor.
-   */
-  void initialize_unit_support_points ();
-
-  /**
-   * Initialize the @p unit_support_points
-   * field of the FiniteElement
-   * class. Called from the constructor in
-   * case the finite element is based on
-   * quadrature points.
-   */
-  void initialize_unit_support_points (const Quadrature<1> &points);
-
-  /**
-   * Initialize the
-   * @p unit_face_support_points field
-   * of the FiniteElement
-   * class. Called from the
-   * constructor.
-   */
-  void initialize_unit_face_support_points ();
-
-  /**
-   * Initialize the @p
-   * unit_face_support_points field of the
-   * FiniteElement class. Called from the
-   * constructor in case the finite element
-   * is based on quadrature points.
-   */
-  void initialize_unit_face_support_points (const Quadrature<1> &points);
-
-  /**
-   * Initialize the
-   * @p adjust_quad_dof_index_for_face_orientation_table field
-   * of the FiniteElement
-   * class. Called from the
-   * constructor.
-   */
-  void initialize_quad_dof_index_permutation ();
-
-  /**
-   * Mapping from hierarchic to
-   * lexicographic numbering on
-   * first face. Hierarchic is the
-   * numbering of the shape
-   * functions.
-   */
-  const std::vector<unsigned int> face_index_map;
-
-
-  /**
-   * Forward declaration of a class
-   * into which we put significant
-   * parts of the implementation.
-   *
-   * See the .cc file for more
-   * information.
-   */
-  struct Implementation;
-
-  /**
-   * Allow access from other
-   * dimensions. We need this since
-   * we want to call the functions
-   * @p get_dpo_vector and
-   * @p lexicographic_to_hierarchic_numbering
-   * for the faces of the finite
-   * element of dimension dim+1.
-   */
-  template <int, int> friend class FE_Q_DG0;
-
-  friend struct FE_Q_DG0<dim,spacedim>::Implementation;
 };
 
 
 
 /*@}*/
 
-/* -------------- declaration of explicit specializations ------------- */
-
-template <>
-void FE_Q_DG0<1>::initialize_unit_face_support_points ();
-
-template <>
-std::vector<unsigned int>
-FE_Q_DG0<1>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
-
-
-template <>
-void FE_Q_DG0<1,2>::initialize_unit_face_support_points ();
-
-template <>
-std::vector<unsigned int>
-FE_Q_DG0<1,2>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
-
-template <>
-void FE_Q_DG0<1,3>::initialize_unit_face_support_points ();
-
-template <>
-std::vector<unsigned int>
-FE_Q_DG0<1,3>::face_lexicographic_to_hierarchic_numbering (const unsigned int);
 
 DEAL_II_NAMESPACE_CLOSE
 

@@ -1,0 +1,82 @@
+
+DEAL:0:2d::#cells = 4
+DEAL:0:2d::proc 0, n levels 1
+DEAL:0:2d::proc 0, n gobal levels 2
+DEAL:0:2d::begin().cell_index 0
+DEAL:0:2d::begin(0).cell_index 0
+DEAL:0:2d::begin(1)==end(1)? 1
+DEAL:0:2d::subdomainid = 4294967294
+DEAL:0:2d::Checksum: 167510149
+DEAL:0:2d::OK
+
+DEAL:1:2d::proc 1, n levels 1
+DEAL:1:2d::proc 1, n gobal levels 2
+DEAL:1:2d::begin().cell_index 0
+DEAL:1:2d::begin(0).cell_index 0
+DEAL:1:2d::begin(1)==end(1)? 1
+DEAL:1:2d::subdomainid = 4294967294
+
+
+DEAL:2:2d::proc 2, n levels 2
+DEAL:2:2d::proc 2, n gobal levels 2
+DEAL:2:2d::begin().cell_index 0
+DEAL:2:2d::begin(0).cell_index 0
+DEAL:2:2d::begin(1)==end(1)? 0
+DEAL:2:2d::subdomainid = 2
+
+
+DEAL:3:2d::proc 3, n levels 1
+DEAL:3:2d::proc 3, n gobal levels 2
+DEAL:3:2d::begin().cell_index 0
+DEAL:3:2d::begin(0).cell_index 0
+DEAL:3:2d::begin(1)==end(1)? 1
+DEAL:3:2d::subdomainid = 4294967294
+
+
+DEAL:4:2d::proc 4, n levels 1
+DEAL:4:2d::proc 4, n gobal levels 2
+DEAL:4:2d::begin().cell_index 0
+DEAL:4:2d::begin(0).cell_index 0
+DEAL:4:2d::begin(1)==end(1)? 1
+DEAL:4:2d::subdomainid = 4294967294
+
+
+DEAL:5:2d::proc 5, n levels 1
+DEAL:5:2d::proc 5, n gobal levels 2
+DEAL:5:2d::begin().cell_index 0
+DEAL:5:2d::begin(0).cell_index 0
+DEAL:5:2d::begin(1)==end(1)? 1
+DEAL:5:2d::subdomainid = 4294967294
+
+
+DEAL:6:2d::proc 6, n levels 1
+DEAL:6:2d::proc 6, n gobal levels 2
+DEAL:6:2d::begin().cell_index 0
+DEAL:6:2d::begin(0).cell_index 0
+DEAL:6:2d::begin(1)==end(1)? 1
+DEAL:6:2d::subdomainid = 4294967294
+
+
+DEAL:7:2d::proc 7, n levels 1
+DEAL:7:2d::proc 7, n gobal levels 2
+DEAL:7:2d::begin().cell_index 0
+DEAL:7:2d::begin(0).cell_index 0
+DEAL:7:2d::begin(1)==end(1)? 1
+DEAL:7:2d::subdomainid = 4294967294
+
+
+DEAL:8:2d::proc 8, n levels 1
+DEAL:8:2d::proc 8, n gobal levels 2
+DEAL:8:2d::begin().cell_index 0
+DEAL:8:2d::begin(0).cell_index 0
+DEAL:8:2d::begin(1)==end(1)? 1
+DEAL:8:2d::subdomainid = 4294967294
+
+
+DEAL:9:2d::proc 9, n levels 1
+DEAL:9:2d::proc 9, n gobal levels 2
+DEAL:9:2d::begin().cell_index 0
+DEAL:9:2d::begin(0).cell_index 0
+DEAL:9:2d::begin(1)==end(1)? 1
+DEAL:9:2d::subdomainid = 4294967294
+

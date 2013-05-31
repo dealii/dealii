@@ -21,6 +21,8 @@
 #include <deal.II/base/symmetric_tensor.h>
 
 #include <vector>
+#include <string>
+
 
 DEAL_II_NAMESPACE_OPEN
 
@@ -35,19 +37,8 @@ namespace hp
 }
 template <int dim> class FiniteElementData;
 class ConstraintMatrix;
-namespace PETScWrappers
-{
-  namespace MPI
-  {
-    class Vector;
-  }
-}
 
 
-#include <deal.II/base/config.h>
-#include <deal.II/base/exceptions.h>
-#include <vector>
-#include <string>
 
 /*!@addtogroup feall */
 /*@{*/
@@ -546,7 +537,7 @@ namespace FETools
    * course Q1 on each cell.
    *
    * For this case (continuous elements on grids with hanging nodes), please
-   * use the @p interpolate function with an additional @p ConstraintMatrix
+   * use the @p interpolate() function with an additional ConstraintMatrix
    * argument, see below, or make the field conforming yourself by calling the
    * @p distribute function of your hanging node constraints object.
    */
@@ -573,8 +564,8 @@ namespace FETools
    * interpolation. The same is true if @p fe1 is a continuous and @p fe2 is a
    * discontinuous finite element. For the case that @p fe1 is a discontinuous
    * and @p fe2 is a continuous finite element there is no point interpolation
-   * defined at the discontinuities.  Therefore the meanvalue is taken at the
-   * DoF values on the discontinuities.
+   * defined at the discontinuities.  Therefore the mean value is taken at the
+   * DoF values at the discontinuities.
    */
   template <int dim, int spacedim,
            template <int, int> class DH1,

@@ -154,6 +154,19 @@ namespace PETScWrappers
     {
     public:
       /**
+       * A variable that indicates whether this vector
+       * supports distributed data storage. If true, then
+       * this vector also needs an appropriate compress()
+       * function that allows communicating recent set or
+       * add operations to individual elements to be communicated
+       * to other processors.
+       *
+       * For the current class, the variable equals
+       * true, since it does support parallel data storage.
+       */
+      static const bool supports_distributed_data = true;
+
+         /**
        * Default constructor. Initialize the
        * vector as empty.
        */

@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -54,7 +54,7 @@ void check()
   Point<dim> a;
   a(0)=1;
   for (unsigned int level=0; level<tria.n_levels(); ++level)
-    DoFRenumbering::downstream_dg(mg_dof_handler, level, a);
+    DoFRenumbering::downstream(mg_dof_handler, level, a);
 }
 
 

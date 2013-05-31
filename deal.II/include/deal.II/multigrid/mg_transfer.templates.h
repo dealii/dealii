@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -151,7 +151,7 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
 {
   reinit_vector(mg_dof_handler, component_to_block_map, dst);
   bool first = true;
-  for (unsigned int level=mg_dof_handler.get_tria().n_levels(); level != 0;)
+  for (unsigned int level=mg_dof_handler.get_tria().n_global_levels(); level != 0;)
     {
       --level;
       VECTOR &dst_level = dst[level];
@@ -161,13 +161,12 @@ MGTransferPrebuilt<VECTOR>::copy_to_mg (
            i != copy_indices[level].end(); ++i)
         dst_level(i->second) = src(i->first);
 
-      // For non-DG: degrees of
-      // freedom in the refinement
-      // face may need special
-      // attention, since they belong
-      // to the coarse level, but
-      // have fine level basis
-      // functions
+      // for (IT i= copy_indices_to_me[level].begin();
+      //      i != copy_indices_to_me[level].end(); ++i)
+      //   dst_level(i->second) = src(i->first);
+
+      dst_level.compress(VectorOperation::insert);
+
       if (!first)
         restrict_and_add (level+1, dst[level], dst[level+1]);
 
@@ -193,18 +192,30 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
   // have fine level basis
   // functions
   dst = 0;
-  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_global_levels(); ++level)
     {
       typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
 
-      if (constraints == 0)
-        for (IT i= copy_indices[level].begin();
-             i != copy_indices[level].end(); ++i)
-          dst(i->first) = src[level](i->second);
+      // First copy all indices local to this process
+      if (constraints==0)
+	for (IT i= copy_indices[level].begin();
+	     i != copy_indices[level].end(); ++i)
+	  dst(i->first) = src[level](i->second);
       else
-        for (IT i= copy_indices[level].begin();
-             i != copy_indices[level].end(); ++i)
-          constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
+	for (IT i= copy_indices[level].begin();
+	     i != copy_indices[level].end(); ++i)
+	  constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
+	
+      // Do the same for the indices where the level index is local,
+      // but the global index is not
+      if (constraints==0)
+	for (IT i= copy_indices_from_me[level].begin();
+	     i != copy_indices_from_me[level].end(); ++i)
+	  dst(i->first) = src[level](i->second);
+      else
+	for (IT i= copy_indices_from_me[level].begin();
+	     i != copy_indices_from_me[level].end(); ++i)
+	  constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
     }
 }
 
@@ -225,12 +236,28 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
   // to the coarse level, but
   // have fine level basis
   // functions
-  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_levels(); ++level)
+  for (unsigned int level=0; level<mg_dof_handler.get_tria().n_global_levels(); ++level)
     {
       typedef std::vector<std::pair<unsigned int, unsigned int> >::const_iterator IT;
-      for (IT i= copy_indices[level].begin();
-           i != copy_indices[level].end(); ++i)
-        dst(i->first) += src[level](i->second);
+      if (constraints==0)
+	for (IT i= copy_indices[level].begin();
+	     i != copy_indices[level].end(); ++i)
+	  dst(i->first) += src[level](i->second);
+      else
+	for (IT i= copy_indices[level].begin();
+	     i != copy_indices[level].end(); ++i)
+	  constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
+      
+      // Do the same for the indices where the level index is local,
+      // but the global index is not
+      if (constraints==0)
+	for (IT i= copy_indices_from_me[level].begin();
+	     i != copy_indices_from_me[level].end(); ++i)
+	  dst(i->first) += src[level](i->second);
+      else
+	for (IT i= copy_indices_from_me[level].begin();
+	     i != copy_indices_from_me[level].end(); ++i)
+	  constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
     }
 }
 
