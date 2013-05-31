@@ -252,9 +252,8 @@ namespace internal
                                                            next_free_dof);
 
           // update the cache used for cell dof indices
-          for (typename DoFHandler<dim,spacedim>::level_cell_iterator
-               cell = dof_handler.begin(); cell != dof_handler.end(); ++cell)
-            if (cell->subdomain_id() != numbers::artificial_subdomain_id)
+          for (cell = dof_handler.begin_active(); cell != endc; ++cell)
+            if (!cell->is_artificial())
               cell->update_cell_dof_indices_cache ();
 
           // finally restore the user flags
