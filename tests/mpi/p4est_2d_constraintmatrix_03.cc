@@ -143,11 +143,9 @@ void test()
   TrilinosWrappers::MPI::Vector x;
   x.reinit(owned_set, MPI_COMM_WORLD);
   x=2.0;
-  x.compress();
 
   TrilinosWrappers::MPI::Vector x_rel;
   x_rel.reinit(relevant_set, MPI_COMM_WORLD);
-  x_rel.compress();
 
   ConstraintMatrix cm(relevant_set);
   DoFTools::make_hanging_node_constraints (dofh, cm);

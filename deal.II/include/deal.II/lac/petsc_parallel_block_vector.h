@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2006, 2007, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -294,6 +294,20 @@ namespace PETScWrappers
       void reinit (const std::vector<IndexSet> &parallel_partitioning,
                    const std::vector<IndexSet> &ghost_entries,
                    const MPI_Comm              &communicator);
+	
+      /**
+       * Change the number of blocks to
+       * <tt>num_blocks</tt>. The individual
+       * blocks will get initialized with
+       * zero size, so it is assumed that
+       * the user resizes the
+       * individual blocks by herself
+       * in an appropriate way, and
+       * calls <tt>collect_sizes</tt>
+       * afterwards.
+       */
+      void reinit (const unsigned int num_blocks);
+
       /**
        * Return a reference to the MPI
        * communicator object in use with

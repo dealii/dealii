@@ -205,7 +205,7 @@ namespace Step48
     void make_grid_and_dofs ();
     void oldstyle_operation ();
     void assemble_system ();
-    void output_results (const unsigned int timestep_number) const;
+    void output_results (const unsigned int timestep_number);
 
     parallel::distributed::Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -301,20 +301,14 @@ namespace Step48
 
   template <int dim>
   void
-  SineGordonProblem<dim>::output_results (const unsigned int timestep_number) const
+  SineGordonProblem<dim>::output_results (const unsigned int timestep_number)
   {
-    parallel::distributed::Vector<double> locally_relevant_solution;
-    locally_relevant_solution.reinit (dof_handler.locally_owned_dofs(),
-                                      locally_relevant_dofs,
-                                      MPI_COMM_WORLD);
-    locally_relevant_solution.copy_from (solution);
-    locally_relevant_solution.update_ghost_values();
-    constraints.distribute (locally_relevant_solution);
+    constraints.distribute (solution);
+    solution.update_ghost_values();
 
     Vector<float> norm_per_cell (triangulation.n_active_cells());
-    locally_relevant_solution.update_ghost_values();
     VectorTools::integrate_difference (dof_handler,
-                                       locally_relevant_solution,
+                                       solution,
                                        ZeroFunction<dim>(),
                                        norm_per_cell,
                                        QGauss<dim>(fe_degree+1),
