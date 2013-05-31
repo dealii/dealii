@@ -116,7 +116,7 @@ void test()
     catch (const ExceptionBase &e)
       {
 	if (myid==0)
-	  deallog << "Exception: " << e.what() << std::endl;
+	  deallog << "Exception: " << e.get_exc_name() << std::endl;
 	throwing=true;
       }
     Assert(throwing, ExcInternalError());

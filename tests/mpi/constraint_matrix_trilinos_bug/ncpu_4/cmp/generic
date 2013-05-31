@@ -1,13 +1,2 @@
 
-DEAL:0:2d::Exception: 
---------------------------------------------------------
-An error occurred in file <constraint_matrix.templates.h> in function
-    void dealii::internal::{anonymous}::import_vector_with_ghost_elements(const dealii::TrilinosWrappers::MPI::Vector&, const dealii::IndexSet&, const dealii::IndexSet&, dealii::TrilinosWrappers::MPI::Vector&, dealii::internal::bool2type<false>)
-The violated condition was: 
-    !vec.has_ghost_elements()
-The name and call sequence of the exception was:
-    TrilinosWrappers::VectorBase::ExcGhostsPresent()
-Additional Information: 
-(none)
---------------------------------------------------------
-
+DEAL:0:2d::Exception: TrilinosWrappers::VectorBase::ExcGhostsPresent()
