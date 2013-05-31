@@ -118,6 +118,8 @@ class MPILogInitAll
     ~MPILogInitAll()
       {
 	deallog.pop();
+	deallog.detach();
+	deallogfile.close();
 	MPI_Barrier(MPI_COMM_WORLD);
 	
 	unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
