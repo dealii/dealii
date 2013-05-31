@@ -2738,7 +2738,10 @@ public:
    * @note The subdomain of a cell is a property only defined
    * for active cells, i.e., cells that are not further
    * refined. Consequently, you can only call this function if
-   * the cell it refers to has no children.
+   * the cell it refers to has no children. For multigrid
+   * methods in parallel, it is also important to know which
+   * processor owns non-active cells, and for this you can call
+   * level_subdomain_id().
    */
   types::subdomain_id subdomain_id () const;
 
@@ -2753,6 +2756,14 @@ public:
    * use a
    * parallel::distributed::Triangulation
    * object.
+   *
+   * @note The subdomain of a cell is a property only defined
+   * for active cells, i.e., cells that are not further
+   * refined. Consequently, you can only call this function if
+   * the cell it refers to has no children. For multigrid
+   * methods in parallel, it is also important to know which
+   * processor owns non-active cells, and for this you can call
+   * level_subdomain_id().
    */
   void set_subdomain_id (const types::subdomain_id new_subdomain_id) const;
 
@@ -2768,10 +2779,13 @@ public:
 
 
   /**
-   * Set the subdomain id of this
-   * cell and all its children (and
-   * grand-children, and so on) to
-   * the given value.
+   * Set the subdomain id of this cell (if it is active) or all its terminal
+   * children (and grand-children, and so on, as long as they have no children
+   * of their own) to the given value. Since the subdomain id is a concept
+   * that is only defined for cells that are active (i.e., have no children
+   * of their own), this function only sets the subdomain ids for all
+   * children and grand children of this cell that are actually active,
+   * skipping intermediate child cells.
    *
    * See the @ref GlossSubdomainId
    * "glossary" for more
@@ -2779,7 +2793,8 @@ public:
    * should not be called if you
    * use a
    * parallel::distributed::Triangulation
-   * object.
+   * object since there the subdomain id is implicitly defined by which
+   * processor you're on.
    */
   void recursively_set_subdomain_id (const types::subdomain_id new_subdomain_id) const;
   /**
