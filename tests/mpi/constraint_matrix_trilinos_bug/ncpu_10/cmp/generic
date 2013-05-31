@@ -1,12 +1,12 @@
 
 DEAL:0:2d::Exception: 
 --------------------------------------------------------
-An error occurred in file <trilinos_vector_base.h> in function
-    void dealii::TrilinosWrappers::VectorBase::set(unsigned int, const unsigned int*, const double*)
+An error occurred in file <constraint_matrix.templates.h> in function
+    void dealii::internal::{anonymous}::import_vector_with_ghost_elements(const dealii::TrilinosWrappers::MPI::Vector&, const dealii::IndexSet&, const dealii::IndexSet&, dealii::TrilinosWrappers::MPI::Vector&, dealii::internal::bool2type<false>)
 The violated condition was: 
-    !has_ghost_elements()
+    !vec.has_ghost_elements()
 The name and call sequence of the exception was:
-    ExcGhostsPresent()
+    typename TrilinosWrappers::VectorBase::ExcGhostsPresent()
 Additional Information: 
 (none)
 --------------------------------------------------------

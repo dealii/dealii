@@ -78,9 +78,6 @@ void test()
 
   IndexSet owned_set = dofh.locally_owned_dofs();
 
-  IndexSet dof_set;
-  DoFTools::extract_locally_active_dofs (dofh, dof_set);
-
   IndexSet relevant_set;
   DoFTools::extract_locally_relevant_dofs (dofh, relevant_set);
 

@@ -989,8 +989,17 @@ namespace internal
                                        TrilinosWrappers::MPI::Vector       &output,
                                        const internal::bool2type<false>     /*is_block_vector*/)
     {
-      output.reinit (needed_elements,
-                     dynamic_cast<const Epetra_MpiComm *>(&vec.vector_partitioner().Comm())->GetMpiComm());
+      Assert(!vec.has_ghost_elements(),
+             typename TrilinosWrappers::VectorBase::ExcGhostsPresent());
+#ifdef DEAL_II_WITH_MPI
+      const Epetra_MpiComm *mpi_comm
+        = dynamic_cast<const Epetra_MpiComm *>(&vec.trilinos_vector().Comm());
+
+      Assert (mpi_comm != 0, ExcInternalError());
+      output.reinit (needed_elements, mpi_comm->GetMpiComm());
+#else
+      output.reinit (needed_elements, MPI_COMM_WORLD);
+#endif
       output = vec;
     }
 #endif
