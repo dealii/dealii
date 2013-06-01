@@ -1,0 +1,74 @@
+
+DEAL::Element: FE_DGQ<2>(2)
+DEAL::Step 0
+DEAL::Triangulation 16 cells, 2 levels
+DEAL::DoFHandler 144 dofs, level dofs 36 144
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 23.0730
+DEAL:cg::Convergence step 11 value 5.78162e-14
+DEAL::energy-error: 0.439211
+DEAL::L2-error:     0.0109342
+DEAL::Estimate 0.979555
+DEAL::Step 1
+DEAL::Triangulation 25 cells, 3 levels
+DEAL::DoFHandler 225 dofs, level dofs 36 144 108
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 23.0730
+DEAL:cg::Convergence step 11 value 9.37499e-13
+DEAL::energy-error: 0.332582
+DEAL::L2-error:     0.00548996
+DEAL::Estimate 0.838060
+DEAL::Step 2
+DEAL::Triangulation 37 cells, 4 levels
+DEAL::DoFHandler 333 dofs, level dofs 36 144 144 108
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 23.0730
+DEAL:cg::Convergence step 12 value 3.41649e-13
+DEAL::energy-error: 0.237705
+DEAL::L2-error:     0.00250869
+DEAL::Estimate 0.611449
+DEAL::Step 3
+DEAL::Triangulation 58 cells, 5 levels
+DEAL::DoFHandler 522 dofs, level dofs 36 144 180 180 144
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 23.4898
+DEAL:cg::Convergence step 12 value 5.58516e-13
+DEAL::energy-error: 0.170860
+DEAL::L2-error:     0.00120805
+DEAL::Estimate 0.452418
+DEAL::Step 4
+DEAL::Triangulation 85 cells, 6 levels
+DEAL::DoFHandler 765 dofs, level dofs 36 144 360 180 180 108
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 25.9490
+DEAL:cg::Convergence step 13 value 2.71720e-13
+DEAL::energy-error: 0.122755
+DEAL::L2-error:     0.000602816
+DEAL::Estimate 0.332525
+DEAL::Step 5
+DEAL::Triangulation 130 cells, 7 levels
+DEAL::DoFHandler 1170 dofs, level dofs 36 144 432 432 180 180 144
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 27.1421
+DEAL:cg::Convergence step 13 value 2.50045e-13
+DEAL::energy-error: 0.0869445
+DEAL::L2-error:     0.000292783
+DEAL::Estimate 0.236647

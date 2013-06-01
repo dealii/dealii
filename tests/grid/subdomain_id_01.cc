@@ -39,8 +39,17 @@ void check (TRIA & tr)
   
   for (; cell!=endc; ++cell)
     {
-      deallog << cell->level_subdomain_id()
-	      << " " << cell->subdomain_id() << std::endl;
+      deallog << cell->level_subdomain_id() << " ";
+      try
+	{
+	  deallog << cell->subdomain_id();
+	}
+      catch (...)
+	{
+	  deallog << ".";
+	  
+	}
+      deallog << std::endl;
     }
   
   deallog << "OK" << std::endl;
@@ -49,6 +58,8 @@ void check (TRIA & tr)
 
 int main (int argc, char *argv[]) 
 {
+  deal_II_exceptions::disable_abort_on_exception();
+
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
   std::ofstream logfile("subdomain_id_01/output");
   deallog.attach(logfile);

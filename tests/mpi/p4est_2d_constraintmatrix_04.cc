@@ -220,17 +220,11 @@ void test()
 	  if (coarsen_me)
 	    for (unsigned int i=0;i<cell->n_children();++i)
 	      {
-		if (cell->child(i)->is_artificial())
-		  ;
-		else if (cell->child(i)->is_ghost())
-		  ;
-		else
+		if (cell->child(i)->active() && cell->child(i)->is_locally_owned())
 		  {
 		    cell->child(i)->clear_refine_flag();
 		    cell->child(i)->set_coarsen_flag();
 		  }
-
-
 	      }
 
 	}

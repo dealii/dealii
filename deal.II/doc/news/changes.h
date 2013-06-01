@@ -131,6 +131,13 @@ this function.
 
 <ol>
 
+<li> Changed: subdomainids can now only be queried/set on active cells.
+Consequently, is_artificial(), is_ghost(), and is_locally_owned() is
+now restricted to active cells.
+<br>
+(Timo Heister, 2013/05/31)
+</li>
+
 <li> Improved: Triangulation::begin(level) and Triangulation::end(level) now return an
 empty iterator range if the level is larger than the maximal locally owned level,
 but still in the global level range of a distributed Triangulation.

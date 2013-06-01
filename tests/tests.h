@@ -117,11 +117,17 @@ class MPILogInitAll
 
     ~MPILogInitAll()
       {
-	deallog.pop();
-	MPI_Barrier(MPI_COMM_WORLD);
-	
 	unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
 	unsigned int nproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+	
+	deallog.pop();
+	if (myid!=0)
+	  {
+	    deallog.detach();
+	    deallogfile.close();
+	  }
+	
+	MPI_Barrier(MPI_COMM_WORLD);
 
 	if (myid==0)
 	  {	

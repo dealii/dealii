@@ -1460,7 +1460,8 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
       materials[(unsigned int)cell->material_id()] = 1;      
       levels[(unsigned int)cell->level()] = 1;
-      subdomains[cell->subdomain_id()+2] = 1;
+      if (cell->active())
+	subdomains[cell->subdomain_id()+2] = 1;
       level_subdomains[cell->level_subdomain_id()+2] = 1;
     }
 

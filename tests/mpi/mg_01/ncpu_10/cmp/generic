@@ -4,3 +4,56 @@ DEAL:0:2d::ID = 0
 DEAL:0:2d::-
 DEAL:0:2d::
 DEAL:0:2d::my levels: 1<= global levels:3
+
+DEAL:1:2d::ID = 1
+DEAL:1:2d::1
+DEAL:1:2d::1368
+DEAL:1:2d::11113-3-66--8---
+DEAL:1:2d::
+
+
+DEAL:2:2d::ID = 2
+DEAL:2:2d::-
+DEAL:2:2d::
+
+
+DEAL:3:2d::ID = 3
+DEAL:3:2d::1
+DEAL:3:2d::1368
+DEAL:3:2d::-1-13333-6--88--
+DEAL:3:2d::
+
+
+DEAL:4:2d::ID = 4
+DEAL:4:2d::-
+DEAL:4:2d::
+
+
+DEAL:5:2d::ID = 5
+DEAL:5:2d::-
+DEAL:5:2d::
+
+
+DEAL:6:2d::ID = 6
+DEAL:6:2d::1
+DEAL:6:2d::1368
+DEAL:6:2d::--11--3-66668-8-
+DEAL:6:2d::
+
+
+DEAL:7:2d::ID = 7
+DEAL:7:2d::-
+DEAL:7:2d::
+
+
+DEAL:8:2d::ID = 8
+DEAL:8:2d::1
+DEAL:8:2d::1368
+DEAL:8:2d::---1--33-6-68888
+DEAL:8:2d::
+
+
+DEAL:9:2d::ID = 9
+DEAL:9:2d::-
+DEAL:9:2d::
+

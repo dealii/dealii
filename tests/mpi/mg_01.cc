@@ -99,50 +99,15 @@ void test()
     deallog << "my levels: " << tr.n_levels() << "<= global levels:" << tr.n_global_levels() << std::endl;
   
 
-//  static const FE_DGP<dim> fe(0);
-//  dofh.distribute_dofs (fe);
-
-//  DataOut<dim> data_out;
-//  data_out.attach_dof_handler (dofh);
-//
-//  TrilinosWrappers::MPI::Vector x;
-//
-//  x.reinit(dofh.locally_owned_dofs(), MPI_COMM_WORLD);
-//  x=2.0;
-//
-//  data_out.add_data_vector (x, "x");
-//  data_out.build_patches ();
-//
-//  if (myid==0)
-//    {
-//      for (unsigned int i=0; i<dofh.n_locally_owned_dofs_per_processor().size(); ++i)
-//	deallog << dofh.n_locally_owned_dofs_per_processor()[i] << std::endl;
-//      data_out.write_vtu (deallog.get_file_stream());
-//    }
 }
 
 
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll log(__FILE__);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-
-
-  deallog.push(Utilities::int_to_string(myid));
-
-  if (myid == 0)
-    {
-      std::ofstream logfile(output_file_for_mpi("mg_01").c_str());
-      deallog.attach(logfile);
-      deallog.depth_console(0);
-      deallog.threshold_double(1.e-10);
-
-      deallog.push("2d");
-      test<2>();
-      deallog.pop();
-    }
-  else
-    test<2>();
-
+  deallog.push("2d");
+  test<2>();
+  deallog.pop();
 }

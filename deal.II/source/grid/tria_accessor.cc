@@ -1332,6 +1332,7 @@ template <int dim, int spacedim>
 types::subdomain_id CellAccessor<dim, spacedim>::subdomain_id () const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert (this->active(), ExcMessage("subdomains only work on active cells!"));
   return this->tria->levels[this->present_level]->subdomain_ids[this->present_index];
 }
 
@@ -1342,6 +1343,7 @@ void
 CellAccessor<dim, spacedim>::set_subdomain_id (const types::subdomain_id new_subdomain_id) const
 {
   Assert (this->used(), TriaAccessorExceptions::ExcCellNotUsed());
+  Assert (this->active(), ExcMessage("subdomains only work on active cells!"));
   this->tria->levels[this->present_level]->subdomain_ids[this->present_index]
     = new_subdomain_id;
 }
@@ -1412,11 +1414,11 @@ void
 CellAccessor<dim, spacedim>::
 recursively_set_subdomain_id (const types::subdomain_id new_subdomain_id) const
 {
-  set_subdomain_id (new_subdomain_id);
-
   if (this->has_children())
     for (unsigned int c=0; c<this->n_children(); ++c)
       this->child(c)->recursively_set_subdomain_id (new_subdomain_id);
+  else
+    set_subdomain_id (new_subdomain_id);
 }
 
 
