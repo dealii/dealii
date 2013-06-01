@@ -665,7 +665,9 @@ namespace DoFRenumbering
         if (is_level_operation)
           {
             //we are dealing with mg dofs, skip foreign level cells:
-            if (cell->level_subdomain_id()!=start->get_dof_handler().get_tria().locally_owned_subdomain())
+            if ((start->get_dof_handler().get_tria().locally_owned_subdomain() != numbers::invalid_subdomain_id)
+                &&
+                (cell->level_subdomain_id()!=start->get_dof_handler().get_tria().locally_owned_subdomain()))
               continue;
           }
         else
