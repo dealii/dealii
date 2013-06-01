@@ -53,11 +53,9 @@ void test()
   DoFHandler<dim> dofh(tr);
 
     {
-      std::ofstream file((JobIdentifier::base_name(__FILE__)+"/ncpu_" + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
-    file << "**** proc " << myid << std::endl;
           for (unsigned int lvl=0;lvl<tr.n_levels();++lvl)
             {
-              file << "level " << lvl << ": ";
+              deallog << "level " << lvl << ": ";
               typename DoFHandler<dim>::cell_iterator
               cell = dofh.begin(lvl),
               endc = dofh.end(lvl);
@@ -65,24 +63,13 @@ void test()
               for (;cell!=endc;++cell)
                 {
                 if (cell->level_subdomain_id()!=4294967294)
-                  file << cell->level_subdomain_id();
+                  deallog << cell->level_subdomain_id();
                 else
-                  file << "-";
+                  deallog << "-";
                 }
-              file << std::endl;
+              deallog << std::endl;
             }
     }
-
-
-    MPI_Barrier(MPI_COMM_WORLD);
-    
-  if (myid==0)
-    {
-      for (unsigned int i=0;i<Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);++i)
-        {
-          cat_file((JobIdentifier::base_name(__FILE__)+"/ncpu_" + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
-        }
-    }      
 
   static const FE_DGP<dim> fe(0);
   Assert(dofh.has_active_dofs()==false, ExcInternalError());
@@ -97,7 +84,6 @@ void test()
 
   Assert(dofh.has_active_dofs()==true, ExcInternalError());
   Assert(dofh.has_level_dofs()==true, ExcInternalError());
-  if (myid==0)
     {
       deallog << "Levels: " << tr.n_global_levels() << std::endl;
       std::cout << "Levels: " << tr.n_global_levels() << std::endl;
@@ -116,8 +102,6 @@ void test()
 	  for (unsigned int i=0; i<vec.size(); ++i)
 	    deallog << vec[i].n_elements() << std::endl;
 	}
-      
-      
     }
 }
 
@@ -125,24 +109,9 @@ void test()
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll log(__FILE__);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-
-
-  deallog.push(Utilities::int_to_string(myid));
-
-  if (myid == 0)
-    {
-      std::ofstream logfile(output_file_for_mpi(JobIdentifier::base_name(__FILE__)).c_str());
-      deallog.attach(logfile);
-      deallog.depth_console(0);
-      deallog.threshold_double(1.e-10);
-
-      deallog.push("2d");
-      test<2>();
-      deallog.pop();
-    }
-  else
-    test<2>();
-
+  deallog.push("2d");
+  test<2>();
+  deallog.pop();
 }
