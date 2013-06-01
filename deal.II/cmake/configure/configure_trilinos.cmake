@@ -119,6 +119,10 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
     # Trilinos has to be configured with 32bit indices if deal.II uses unsigned long
     # long int.
     #
+    IF("${DEAL_II_WITH_64BIT_INDICES}" STREQUAL "")
+      SET(DEAL_II_WITH_64BIT_INDICES "OFF")
+    ENDIF()
+
     IF(TRILINOS_WITH_NO_32BIT_INDICES AND NOT DEAL_II_WITH_64BIT_INDICES)
       MESSAGE(STATUS "deal.II was configured to use 32bit global indices but "
         "Trilinos was not."
