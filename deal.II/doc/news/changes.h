@@ -130,8 +130,15 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: If an exception was generated on a task created by
+Threads::new_task, the program would terminate with a segmentation
+fault, leaving little trace of what had happened. This is now handled
+more gracefully.
+<br>
+(Wolfgang Bangerth, 2013/06/02)
+</li>
 
-<li> Changed: subdomainids can now only be queried/set on active cells.
+<li> Changed: subdomain ids can now only be queried/set on active cells.
 Consequently, is_artificial(), is_ghost(), and is_locally_owned() is
 now restricted to active cells.
 <br>
