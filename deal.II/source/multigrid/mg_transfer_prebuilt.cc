@@ -233,27 +233,27 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
     }
 
   // Now we are filling the variables copy_indices*, which are essentially
-  // maps from global to mg dof for each level stored as a std::vector of
+  // maps from global to mgdof for each level stored as a std::vector of
   // pairs. We need to split this map on each level depending on the ownership
-  // of the global and mg dof, so that we later not access non-local elements
+  // of the global and mgdof, so that we later not access non-local elements
   // in copy_to/from_mg.
-  // Here we keep track in the bitfield dof_touched which global dof has
-  // been processed already (otherwise we would get dublicates on each level
-  // and on different levels). Note that it is important that we iterate
-  // the levels starting from 0, so that mg dofs on coarser levels "win".
+  // We keep track in the bitfield dof_touched which global dof has
+  // been processed already (on the current level). This is the same as 
+  // the multigrid running in serial.
+  // Only entering on the finest level gives wrong results (why?) 
 
   copy_indices.resize(n_levels);
   copy_indices_from_me.resize(n_levels);
   copy_indices_to_me.resize(n_levels);
   IndexSet globally_relevant;
   DoFTools::extract_locally_relevant_dofs(mg_dof, globally_relevant);
-  std::vector<bool> dof_touched(globally_relevant.n_elements(), false);
 
   std::vector<unsigned int> global_dof_indices (dofs_per_cell);
   std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
   //  for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
   for (unsigned int level=0; level<mg_dof.get_tria().n_levels(); ++level)
     {
+      std::vector<bool> dof_touched(globally_relevant.n_elements(), false);
       copy_indices[level].clear();
       copy_indices_from_me[level].clear();
       copy_indices_to_me[level].clear();
@@ -266,7 +266,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       for (; level_cell!=level_end; ++level_cell)
         {
           if (mg_dof.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
-              &&  level_cell->level_subdomain_id()!=mg_dof.get_tria().locally_owned_subdomain())
+              &&  (level_cell->level_subdomain_id()==numbers::artificial_subdomain_id
+              ||  level_cell->subdomain_id()==numbers::artificial_subdomain_id)
+              )
             continue;
 
           // get the dof numbers of this cell for the global and the level-wise
@@ -280,12 +282,10 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
               if (mg_constrained_dofs != 0
                   && mg_constrained_dofs->at_refinement_edge(level, level_dof_indices[i]))
                 continue;
-
               unsigned int global_idx = globally_relevant.index_within_set(global_dof_indices[i]);
               //skip if we did this global dof already (on this or a coarser level)
               if (dof_touched[global_idx])
                 continue;
-
               bool global_mine = mg_dof.locally_owned_dofs().is_element(global_dof_indices[i]);
               bool level_mine = mg_dof.locally_owned_mg_dofs(level).is_element(level_dof_indices[i]);
 
