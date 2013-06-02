@@ -372,20 +372,11 @@ public:
    * ordering: dofs on vertex 0, dofs on vertex 1, etc, dofs on line
    * 0, dofs on line 1, etc, dofs on quad 0, etc.
    *
+   * The cells needs to be an active cell (and not artificial in a
+   * parallel distributed computation).
+   *
    * The vector has to have the right size before being passed to this
    * function.
-   *
-   * @note The behavior descibed below for non-active cells will
-   * be removed in a future release. It is not very intuitive and its
-   * use is limited to FE_Q elements of degree 1.
-   *
-   * This function is most often used on active objects (edges, faces,
-   * cells). It can be used on non-active objects as well
-   * (i.e. objects that have children), but only if the finite element
-   * under consideration has degrees of freedom exclusively on
-   * vertices. Otherwise, the function doesn't make much sense, since
-   * for example inactive edges do not have degrees of freedom
-   * associated with them at all.
    *
    * The last argument denotes the finite element index. For the
    * standard ::DoFHandler class, this value must be equal to its
@@ -1085,25 +1076,12 @@ public:
    * dofs on line 0, dofs on line 1, etc,
    * dofs on quad 0, etc.
    *
+   * The cells needs to be an active cell (and not artificial in a
+   * parallel distributed computation).
+   *
    * The vector has to have the
    * right size before being passed
    * to this function.
-   *
-   * This function is most often
-   * used on active objects (edges,
-   * faces, cells). It can be used
-   * on non-active objects as well
-   * (i.e. objects that have
-   * children), but only if the
-   * finite element under
-   * consideration has degrees of
-   * freedom exclusively on
-   * vertices. Otherwise, the
-   * function doesn't make much
-   * sense, since for example
-   * inactive edges do not have
-   * degrees of freedom associated
-   * with them at all.
    *
    * The last argument denotes the
    * finite element index. For the
@@ -2107,11 +2085,9 @@ public:
    * function overwrites the one in
    * the base class.
    *
-   * This is a function which requires that the cell be active.
+   * This is a function which requires that the cell is active.
    *
    * Also see get_active_or_mg_dof_indices().
-   *
-   * @deprecated Currently, this function can also be called for non-active cells, if all degrees of freedom of the FiniteElement are located in vertices. This functionality will vanish in a future release.
    */
   void get_dof_indices (std::vector<unsigned int> &dof_indices) const;
 

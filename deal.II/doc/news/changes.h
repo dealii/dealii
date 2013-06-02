@@ -25,6 +25,13 @@ inconvenience this causes.
 
 <ol>
 
+<li> Removed: it was possible to call get_dof_indices(), get_dof_values(),
+set_dof_values(), and distribute_local_to_global() for cells that were not
+active, if the finite element only had DoFs on vertices (i.e. Q1). This is
+no longer allowed.
+<br>
+(Timo Heister, 2013/06/02)
+
 <li> Changed: Internal structures of ExceptionBase are now thread safe. The
 Assert macro does not print an exception to deallog any more prior to
 throwing if deal_II_exceptions::abort_on_exception==false. Removed: A

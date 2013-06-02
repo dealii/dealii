@@ -2738,14 +2738,8 @@ namespace internal
       {
         AssertDimension (dof_indices.size(), accessor.get_fe().dofs_per_cell);
 
-        // check as in documentation that
-        // cell is either active, or dofs
-        // are only in vertices
-        Assert (!accessor.has_children()
-                ||
-                (accessor.get_fe().dofs_per_cell ==
-                 accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
-                ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+        Assert (!accessor.has_children(),
+                ExcMessage ("Cell must be active."));
 
         unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
                               ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell];
@@ -2800,14 +2794,8 @@ namespace internal
         Assert (values.size() == accessor.get_dof_handler().n_dofs(),
                 typename BaseClass::ExcVectorDoesNotMatch());
 
-        // check as in documentation that
-        // cell is either active, or dofs
-        // are only in vertices
-        Assert (!accessor.has_children()
-                ||
-                (accessor.get_fe().dofs_per_cell ==
-                 accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
-                ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+        Assert (!accessor.has_children(),
+                ExcMessage ("Cell must be active."));
 
         unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
                               ->cell_dof_indices_cache[accessor.present_index *
@@ -2873,14 +2861,8 @@ namespace internal
         Assert (values.size() == accessor.get_dof_handler().n_dofs(),
                 typename BaseClass::ExcVectorDoesNotMatch());
 
-        // check as in documentation that
-        // cell is either active, or dofs
-        // are only in vertices
-        Assert (!accessor.has_children()
-                ||
-                (accessor.get_fe().dofs_per_cell ==
-                 accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
-                ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+        Assert (!accessor.has_children(),
+                ExcMessage ("Cell must be active."));
 
         unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
                               ->cell_dof_indices_cache[accessor.present_index *
@@ -2939,14 +2921,8 @@ namespace internal
         Assert (values.size() == accessor.get_dof_handler().n_dofs(),
                 typename BaseClass::ExcVectorDoesNotMatch());
 
-        // check as in documentation that
-        // cell is either active, or dofs
-        // are only in vertices
-        Assert (!accessor.has_children()
-                ||
-                (accessor.get_fe().dofs_per_cell ==
-                 accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
-                ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+        Assert (!accessor.has_children(),
+                ExcMessage ("Cell must be active."));
 
         unsigned int *cache = &accessor.dof_handler->levels[accessor.level()]
                               ->cell_dof_indices_cache[accessor.present_index * accessor.get_fe().dofs_per_cell];
@@ -3073,14 +3049,8 @@ namespace internal
         Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
                 typename BaseClass::ExcVectorDoesNotMatch());
 
-        // check as in documentation that
-        // cell is either active, or dofs
-        // are only in vertices
-        Assert (!accessor.has_children()
-                ||
-                (accessor.get_fe().dofs_per_cell ==
-                 accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
-                ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+        Assert (!accessor.has_children(),
+                ExcMessage ("Cell must be active"));
 
         const unsigned int n_dofs = local_source_end - local_source_begin;
 
@@ -3144,14 +3114,8 @@ namespace internal
         Assert (accessor.dof_handler->n_dofs() == global_destination.size(),
                 typename BaseClass::ExcVectorDoesNotMatch());
 
-        // check as in documentation that
-        // cell is either active, or dofs
-        // are only in vertices
-        Assert (!accessor.has_children()
-                ||
-                (accessor.get_fe().dofs_per_cell ==
-                 accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
-                ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+        Assert (!accessor.has_children(),
+                ExcMessage ("Cell must be active."));
 
         const unsigned int n_dofs = local_source_end - local_source_begin;
 
@@ -3220,14 +3184,8 @@ namespace internal
         Assert (accessor.dof_handler->n_dofs() == global_destination.n(),
                 typename BaseClass::ExcMatrixDoesNotMatch());
 
-        // check as in documentation that
-        // cell is either active, or dofs
-        // are only in vertices
-        Assert (!accessor.has_children()
-                ||
-                (accessor.get_fe().dofs_per_cell ==
-                 accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
-                ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+        Assert (!accessor.has_children(),
+                ExcMessage ("Cell must be active."));
 
         const unsigned int n_dofs = local_source.m();
 
@@ -3305,14 +3263,8 @@ namespace internal
         Assert (accessor.dof_handler->n_dofs() == global_vector.size(),
                 typename BaseClass::ExcVectorDoesNotMatch());
 
-        // check as in documentation that
-        // cell is either active, or dofs
-        // are only in vertices
-        Assert (!accessor.has_children()
-                ||
-                (accessor.get_fe().dofs_per_cell ==
-                 accessor.get_fe().dofs_per_vertex * GeometryInfo<dim>::vertices_per_cell),
-                ExcMessage ("Cell must either be active, or all DoFs must be in vertices"));
+        Assert (!accessor.has_children(),
+                ExcMessage ("Cell must be active."));
 
         const unsigned int n_dofs = accessor.get_fe().dofs_per_cell;
         unsigned int *dofs = &accessor.dof_handler->levels[accessor.level()]
@@ -3531,6 +3483,7 @@ inline
 void
 DoFCellAccessor<DH,lda>::get_dof_indices (std::vector<unsigned int> &dof_indices) const
 {
+  Assert (this->active(), ExcMessage ("get_dof_indices() only works on active cells."));
   Assert (this->is_artificial() == false,
           ExcMessage ("Can't ask for DoF indices on artificial cells."));
   AssertDimension (dof_indices.size(), this->get_fe().dofs_per_cell);
