@@ -704,7 +704,7 @@ namespace internal
                 (i->get_finest_level() >= level))
               for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
                 {
-                  unsigned int idx =i->get_index (level, d/*,                    dof_handler.get_fe().dofs_per_vertex*/);
+                  dealii::types::global_dof_index idx =i->get_index (level, d/*,                    dof_handler.get_fe().dofs_per_vertex*/);
                   if (idx != DoFHandler<1>::invalid_dof_index)
                     i->set_index (level, d/*, dof_handler.get_fe().dofs_per_vertex*/,
                                   ((indices.n_elements() == 0) ?
@@ -2222,7 +2222,7 @@ namespace internal
                             1, DEAL_II_DOF_INDEX_MPI_TYPE,
                             tr->get_communicator());
 
-            const unsigned int
+            const dealii::types::global_dof_index
             shift = std::accumulate (number_cache
                                      .n_locally_owned_dofs_per_processor.begin(),
                                      number_cache
@@ -2260,7 +2260,7 @@ namespace internal
             // fill global_dof_indexsets
             number_cache.locally_owned_dofs_per_processor.resize(n_cpus);
             {
-              unsigned int lshift = 0;
+              dealii::types::global_dof_index lshift = 0;
               for (unsigned int i=0; i<n_cpus; ++i)
                 {
                   number_cache.locally_owned_dofs_per_processor[i]
