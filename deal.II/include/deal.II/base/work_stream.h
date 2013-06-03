@@ -15,6 +15,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/std_cxx1x/function.h>
 #include <deal.II/base/std_cxx1x/bind.h>
@@ -358,14 +359,14 @@ namespace WorkStream
 	      }
 	    catch (const std::exception &exc)
 	      {
-		internal::handle_std_exception (exc);
+		Threads::internal::handle_std_exception (exc);
 	      }
 	    catch (...)
 	      {
-		internal::handle_unknown_exception ();
+		Threads::internal::handle_unknown_exception ();
 	      }
 	  }
-	
+
         // then return the original pointer
         // to the now modified object
         return item;
@@ -440,14 +441,14 @@ namespace WorkStream
 	      }
 	    catch (const std::exception &exc)
 	      {
-		internal::handle_std_exception (exc);
+		Threads::internal::handle_std_exception (exc);
 	      }
 	    catch (...)
 	      {
-		internal::handle_unknown_exception ();
+		Threads::internal::handle_unknown_exception ();
 	      }
 	  }
-	
+
 
         // return an invalid
         // item since we are at
