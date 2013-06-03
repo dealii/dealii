@@ -219,7 +219,7 @@ namespace SLEPcWrappers
 
   void
   SolverBase::get_eigenpair (const unsigned int         index,
-                             double                    &eigenvalues,
+                             PetscScalar               &eigenvalues,
                              PETScWrappers::VectorBase &eigenvectors)
   {
     AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());
@@ -231,6 +231,7 @@ namespace SLEPcWrappers
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
+
   void
   SolverBase::get_eigenpair (const unsigned int         index,
                              double                    &real_eigenvalues,
@@ -238,6 +239,7 @@ namespace SLEPcWrappers
                              PETScWrappers::VectorBase &real_eigenvectors,
                              PETScWrappers::VectorBase &imag_eigenvectors)
   {
+#ifndef PETSC_USE_COMPLEX
     AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());
     
     // get converged eigenpair
@@ -245,7 +247,13 @@ namespace SLEPcWrappers
 				&real_eigenvalues, &imag_eigenvalues, 
 				real_eigenvectors, imag_eigenvectors);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+#else
+    Assert ((false),
+            ExcMessage ("Your PETSc/SLEPc installation was configured with scalar-type complex "
+                        "but this function is not defined for complex types."));
+#endif
   }
+
 
   void
   SolverBase::reset ()
