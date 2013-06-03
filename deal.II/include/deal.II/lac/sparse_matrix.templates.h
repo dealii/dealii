@@ -380,7 +380,7 @@ SparseMatrix<number>::copy_from (const TrilinosWrappers::SparseMatrix &matrix)
 	= matrix.trilinos_matrix().ExtractGlobalRowCopy
 	(row, matrix.row_length(row), ncols,
 	 &(value_cache[0]),
-	 reinterpret_cast<int*>(&(colnum_cache[0])));
+	 reinterpret_cast<TrilinosWrappers::types::int_type*>(&(colnum_cache[0])));
       Assert (ierr==0, ExcTrilinosError(ierr));
 
       // resize arrays to the size actually used
