@@ -504,12 +504,10 @@ namespace PETScWrappers
      */
     real_type norm_sqr () const;
 
-#ifndef PETSC_USE_COMPLEX
     /**
      * Return the mean value of the elements of this vector.
      */
     PetscScalar mean_value () const;
-#endif
 
     /**
      * $l_1$-norm of the vector.
