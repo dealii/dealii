@@ -452,7 +452,7 @@ namespace SLEPcWrappers
     (void) eps;
 
     // PETSc/SLEPc version must be > 3.1.0.
-    Assert (false,
+    Assert ((false),
             ExcMessage ("Your SLEPc installation does not include a copy of the "
                         "Generalized Davidson solver. A SLEPc version > 3.1.0 is required."));
 #endif
