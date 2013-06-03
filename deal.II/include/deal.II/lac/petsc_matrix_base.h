@@ -916,7 +916,7 @@ namespace PETScWrappers
      * diagonal entries in the
      * matrix.
      */
-    PetscReal trace () const;
+    PetscScalar trace () const;
 #endif
 
     /**

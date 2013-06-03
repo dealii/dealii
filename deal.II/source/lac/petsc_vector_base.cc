@@ -409,18 +409,20 @@ namespace PETScWrappers
     return d*d;
   }
 
-
-
+  // @todo does not build with PETSc complex scalar types.
+  // :425:25: error: no match for ‘operator/’ in ‘sum / dealii::PETScWrappers::VectorBase::size()’
+#ifndef PETSC_USE_COMPLEX
   PetscScalar
   VectorBase::mean_value () const
   {
     int ierr;
+
     // We can only use our more efficient
     // routine in the serial case.
     if (dynamic_cast<const PETScWrappers::MPI::Vector *>(this) != 0)
       {
         PetscScalar sum;
-        ierr = VecSum( vector, &sum);
+        ierr = VecSum(vector, &sum);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
         return sum/size();
       }
@@ -464,7 +466,7 @@ namespace PETScWrappers
 
     return mean;
   }
-
+#endif
 
 
   VectorBase::real_type

@@ -428,10 +428,10 @@ namespace PETScWrappers
 
 
 #if DEAL_II_PETSC_VERSION_GTE(3,1,0)
-  PetscReal
+  PetscScalar
   MatrixBase::trace () const
   {
-    PetscReal result;
+    PetscScalar result;
 
     const int ierr
       = MatGetTrace (matrix, &result);
