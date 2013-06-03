@@ -250,7 +250,8 @@ namespace MeshWorker
                                             typename INFOBOX::CellInfo &,
                                             typename INFOBOX::CellInfo &)>& face_worker,
             ASSEMBLER &assembler,
-            bool cells_first = true)
+            bool cells_first = true,
+            bool unique_faces_only = true)
   {
     DoFInfoBox<dim, DOFINFO> dof_info(dinfo);
 
@@ -266,7 +267,7 @@ namespace MeshWorker
     WorkStream::run(begin, end,
                     std_cxx1x::bind(&cell_action<INFOBOX, DOFINFO, dim, spacedim, ITERATOR>,
                                     std_cxx1x::_1, std_cxx1x::_3, std_cxx1x::_2,
-                                    cell_worker, boundary_worker, face_worker, cells_first, true),
+                                    cell_worker, boundary_worker, face_worker, cells_first, unique_faces_only),
                     std_cxx1x::bind(&internal::assemble<dim,DOFINFO,ASSEMBLER>, std_cxx1x::_1, &assembler),
                     info, dof_info);
 #else
@@ -276,7 +277,7 @@ namespace MeshWorker
                                                   info, cell_worker,
                                                   boundary_worker, face_worker,
                                                   cells_first,
-                                                  true);
+                                                  unique_faces_only);
         dof_info.assemble(assembler);
       }
 #endif
