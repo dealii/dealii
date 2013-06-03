@@ -1,25 +1,8 @@
 
 DEAL:0:2d::hyper_cube
-**** proc 0
-level 0: 0
-level 1: 0123
-level 2: 00001-1-22--3---
-
-**** proc 1
-level 0: 0
-level 1: 0123
-level 2: -0-01111-2--33--
-
-**** proc 2
-level 0: 0
-level 1: 0123
-level 2: --00--1-22223-3-
-
-**** proc 3
-level 0: 0
-level 1: 0123
-level 2: ---0--11-2-23333
-
+DEAL:0:2d::level 0: 0
+DEAL:0:2d::level 1: 0123
+DEAL:0:2d::level 2: 00001-1-22--3---
 DEAL:0:2d::Levels: 3
 DEAL:0:2d::n_locally_owned_dofs_per_processor:
 DEAL:0:2d::4
@@ -42,3 +25,84 @@ DEAL:0:2d::4
 DEAL:0:2d::4
 DEAL:0:2d::4
 DEAL:0:2d::4
+
+DEAL:1:2d::level 0: 0
+DEAL:1:2d::level 1: 0123
+DEAL:1:2d::level 2: -0-01111-2--33--
+DEAL:1:2d::Levels: 3
+DEAL:1:2d::n_locally_owned_dofs_per_processor:
+DEAL:1:2d::4
+DEAL:1:2d::4
+DEAL:1:2d::4
+DEAL:1:2d::4
+DEAL:1:2d::locally_owned_mg_dofs_per_processor:
+DEAL:1:2d::level 0:
+DEAL:1:2d::1
+DEAL:1:2d::0
+DEAL:1:2d::0
+DEAL:1:2d::0
+DEAL:1:2d::level 1:
+DEAL:1:2d::1
+DEAL:1:2d::1
+DEAL:1:2d::1
+DEAL:1:2d::1
+DEAL:1:2d::level 2:
+DEAL:1:2d::4
+DEAL:1:2d::4
+DEAL:1:2d::4
+DEAL:1:2d::4
+
+
+DEAL:2:2d::level 0: 0
+DEAL:2:2d::level 1: 0123
+DEAL:2:2d::level 2: --00--1-22223-3-
+DEAL:2:2d::Levels: 3
+DEAL:2:2d::n_locally_owned_dofs_per_processor:
+DEAL:2:2d::4
+DEAL:2:2d::4
+DEAL:2:2d::4
+DEAL:2:2d::4
+DEAL:2:2d::locally_owned_mg_dofs_per_processor:
+DEAL:2:2d::level 0:
+DEAL:2:2d::1
+DEAL:2:2d::0
+DEAL:2:2d::0
+DEAL:2:2d::0
+DEAL:2:2d::level 1:
+DEAL:2:2d::1
+DEAL:2:2d::1
+DEAL:2:2d::1
+DEAL:2:2d::1
+DEAL:2:2d::level 2:
+DEAL:2:2d::4
+DEAL:2:2d::4
+DEAL:2:2d::4
+DEAL:2:2d::4
+
+
+DEAL:3:2d::level 0: 0
+DEAL:3:2d::level 1: 0123
+DEAL:3:2d::level 2: ---0--11-2-23333
+DEAL:3:2d::Levels: 3
+DEAL:3:2d::n_locally_owned_dofs_per_processor:
+DEAL:3:2d::4
+DEAL:3:2d::4
+DEAL:3:2d::4
+DEAL:3:2d::4
+DEAL:3:2d::locally_owned_mg_dofs_per_processor:
+DEAL:3:2d::level 0:
+DEAL:3:2d::1
+DEAL:3:2d::0
+DEAL:3:2d::0
+DEAL:3:2d::0
+DEAL:3:2d::level 1:
+DEAL:3:2d::1
+DEAL:3:2d::1
+DEAL:3:2d::1
+DEAL:3:2d::1
+DEAL:3:2d::level 2:
+DEAL:3:2d::4
+DEAL:3:2d::4
+DEAL:3:2d::4
+DEAL:3:2d::4
+

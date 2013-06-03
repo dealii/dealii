@@ -25,6 +25,13 @@ inconvenience this causes.
 
 <ol>
 
+<li> Removed: it was possible to call get_dof_indices(), get_dof_values(),
+set_dof_values(), and distribute_local_to_global() for cells that were not
+active, if the finite element only had DoFs on vertices (i.e. Q1). This is
+no longer allowed.
+<br>
+(Timo Heister, 2013/06/02)
+
 <li> Changed: Internal structures of ExceptionBase are now thread safe. The
 Assert macro does not print an exception to deallog any more prior to
 throwing if deal_II_exceptions::abort_on_exception==false. Removed: A
@@ -130,8 +137,15 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: If an exception was generated on a task created by
+Threads::new_task, the program would terminate with a segmentation
+fault, leaving little trace of what had happened. This is now handled
+more gracefully.
+<br>
+(Wolfgang Bangerth, 2013/06/02)
+</li>
 
-<li> Changed: subdomainids can now only be queried/set on active cells.
+<li> Changed: subdomain ids can now only be queried/set on active cells.
 Consequently, is_artificial(), is_ghost(), and is_locally_owned() is
 now restricted to active cells.
 <br>

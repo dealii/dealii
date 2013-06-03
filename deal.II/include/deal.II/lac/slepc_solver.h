@@ -309,7 +309,7 @@ namespace SLEPcWrappers
      */
     void
     get_eigenpair (const unsigned int         index,
-                   double                    &eigenvalues,
+                   PetscScalar               &eigenvalues,
                    PETScWrappers::VectorBase &eigenvectors);
 
     /**

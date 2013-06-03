@@ -609,8 +609,10 @@ namespace DoFTools
                       // is not locally owned - otherwise, we touch each
                       // face twice and hence put the indices the other way
                       // around
-                      if (cell->neighbor(face)->subdomain_id() !=
-                          cell->subdomain_id())
+                      if (!cell->neighbor(face)->active()
+                          ||
+                          (cell->neighbor(face)->subdomain_id() !=
+                          cell->subdomain_id()))
                         constraints.add_entries_local_to_global
                         (dofs_on_other_cell, dofs_on_this_cell,
                          sparsity, keep_constrained_dofs);

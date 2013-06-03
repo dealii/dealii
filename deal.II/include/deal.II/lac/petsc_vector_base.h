@@ -513,8 +513,7 @@ namespace PETScWrappers
     real_type norm_sqr () const;
 
     /**
-     * Mean value of the elements of
-     * this vector.
+     * Return the mean value of the elements of this vector.
      */
     PetscScalar mean_value () const;
 

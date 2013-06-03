@@ -821,7 +821,8 @@ namespace DoFRenumbering
   compute_component_wise (std::vector<types::global_dof_index> &new_dof_indices,
                           const ITERATOR &start,
                           const ENDITERATOR &end,
-                          const std::vector<unsigned int> &target_component);
+                          const std::vector<unsigned int> &target_component,
+                          bool is_level_operation);
 
   /**
    * @}

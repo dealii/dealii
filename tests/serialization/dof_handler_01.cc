@@ -65,7 +65,8 @@ namespace dealii
 	      }
 	  }
 
-	if (c1->subdomain_id() != c2->subdomain_id())
+	if (c1->active() && c2->active()
+	    && (c1->subdomain_id() != c2->subdomain_id()))
 	  return false;
 
 	if (c1->material_id() != c2->material_id())

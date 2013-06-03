@@ -476,7 +476,7 @@ namespace DoFRenumbering
       compute_component_wise<dim,spacedim,
       typename DoFHandler<dim,spacedim>::active_cell_iterator,
       typename DoFHandler<dim,spacedim>::level_cell_iterator>
-      (renumbering, start, end, component_order_arg);
+      (renumbering, start, end, component_order_arg, false);
     if (result == 0)
       return;
 
@@ -532,7 +532,7 @@ namespace DoFRenumbering
       compute_component_wise<hp::DoFHandler<dim>::dimension,hp::DoFHandler<dim>::space_dimension,
       typename hp::DoFHandler<dim>::active_cell_iterator,
       typename hp::DoFHandler<dim>::level_cell_iterator>
-      (renumbering, start, end, component_order_arg);
+      (renumbering, start, end, component_order_arg, false);
 
     if (result == 0) return;
 
@@ -562,7 +562,7 @@ namespace DoFRenumbering
     const types::global_dof_index result =
       compute_component_wise<DH::dimension, DH::space_dimension,
       typename DH::level_cell_iterator, typename DH::level_cell_iterator>
-      (renumbering, start, end, component_order_arg);
+      (renumbering, start, end, component_order_arg, true);
 
     if (result == 0) return;
 
@@ -580,7 +580,8 @@ namespace DoFRenumbering
   compute_component_wise (std::vector<types::global_dof_index> &new_indices,
                           const ITERATOR    &start,
                           const ENDITERATOR &end,
-                          const std::vector<unsigned int> &component_order_arg)
+                          const std::vector<unsigned int> &component_order_arg,
+                          bool is_level_operation)
   {
     const hp::FECollection<dim,spacedim>
     fe_collection (start->get_dof_handler().get_fe ());
@@ -661,20 +662,34 @@ namespace DoFRenumbering
     std::vector<std::vector<types::global_dof_index> >
     component_to_dof_map (fe_collection.n_components());
     for (ITERATOR cell=start; cell!=end; ++cell)
-      if (cell->is_locally_owned())
-        {
-          // on each cell: get dof indices
-          // and insert them into the global
-          // list using their component
-          const unsigned int fe_index = cell->active_fe_index();
-          const unsigned int dofs_per_cell = fe_collection[fe_index].dofs_per_cell;
-          local_dof_indices.resize (dofs_per_cell);
-          cell->get_active_or_mg_dof_indices (local_dof_indices);
-          for (unsigned int i=0; i<dofs_per_cell; ++i)
-            if (start->get_dof_handler().locally_owned_dofs().is_element(local_dof_indices[i]))
-              component_to_dof_map[component_list[fe_index][i]].
-              push_back (local_dof_indices[i]);
-        }
+      {
+        if (is_level_operation)
+          {
+            //we are dealing with mg dofs, skip foreign level cells:
+            if ((start->get_dof_handler().get_tria().locally_owned_subdomain() != numbers::invalid_subdomain_id)
+                &&
+                (cell->level_subdomain_id()!=start->get_dof_handler().get_tria().locally_owned_subdomain()))
+              continue;
+          }
+        else
+          {
+            //we are dealing with active dofs, skip the loop if not locally
+            // owned:
+            if (!cell->active() || !cell->is_locally_owned())
+              continue;
+          }
+        // on each cell: get dof indices
+        // and insert them into the global
+        // list using their component
+        const unsigned int fe_index = cell->active_fe_index();
+        const unsigned int dofs_per_cell = fe_collection[fe_index].dofs_per_cell;
+        local_dof_indices.resize (dofs_per_cell);
+        cell->get_active_or_mg_dof_indices (local_dof_indices);
+        for (unsigned int i=0; i<dofs_per_cell; ++i)
+          if (start->get_dof_handler().locally_owned_dofs().is_element(local_dof_indices[i]))
+            component_to_dof_map[component_list[fe_index][i]].
+            push_back (local_dof_indices[i]);
+      }
 
     // now we've got all indices sorted
     // into buckets labeled by their

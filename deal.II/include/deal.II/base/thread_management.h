@@ -4059,7 +4059,18 @@ namespace Threads
         // call the function object
         // and put the return value
         // into the proper place
-        call (task_descriptor.function, task_descriptor.ret_val);
+        try
+          {
+            call (task_descriptor.function, task_descriptor.ret_val);
+          }
+        catch (const std::exception &exc)
+          {
+            internal::handle_std_exception (exc);
+          }
+        catch (...)
+          {
+            internal::handle_unknown_exception ();
+          }
         return 0;
       }
 
@@ -4234,7 +4245,7 @@ namespace Threads
       // the TBB book on pages
       // 230/231 ("Start a large task
       // in parallel with the main
-      // program)
+      // program")
       task = new (tbb::task::allocate_root()) tbb::empty_task;
       task->set_ref_count (2);
 
@@ -4349,6 +4360,7 @@ namespace Threads
       {
         call (function, ret_val);
       }
+
       /**
        * Wait for the task to
        * return. Since we are in

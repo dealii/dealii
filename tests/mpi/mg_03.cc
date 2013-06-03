@@ -83,40 +83,28 @@ void test()
   dofh.distribute_mg_dofs (fe);
 
   {
-   std::ofstream file((std::string("mg_03/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(myid)).c_str());
-    file << "**** proc " << myid << std::endl;
-          for (unsigned int lvl=0;lvl<tr.n_levels();++lvl)
-            {
-              file << "level " << lvl << ": ";
-              typename DoFHandler<dim>::cell_iterator
-              cell = dofh.begin(lvl),
-              endc = dofh.end(lvl);
-
-              for (;cell!=endc;++cell)
-                {
-              std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
-              cell->get_mg_dof_indices(dofs);
-
-              for (unsigned int i=0;i<dofs.size();++i)
-                if (dofs[i]==numbers::invalid_dof_index)
-                  file << "- ";
-                else
-                  file << dofs[i] << " ";
-              file << " | ";
-                }
-              file << std::endl;
-            }
+    for (unsigned int lvl=0;lvl<tr.n_levels();++lvl)
+      {
+	deallog << "level " << lvl << ": ";
+	typename DoFHandler<dim>::cell_iterator
+	  cell = dofh.begin(lvl),
+	  endc = dofh.end(lvl);
+	
+	for (;cell!=endc;++cell)
+	  {
+	    std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
+	    cell->get_mg_dof_indices(dofs);
+	    
+	    for (unsigned int i=0;i<dofs.size();++i)
+	      if (dofs[i]==numbers::invalid_dof_index)
+		deallog << "- ";
+	      else
+		deallog << dofs[i] << " ";
+	    deallog << " | ";
+	  }
+	deallog << std::endl;
+      }
   }
-
-  MPI_Barrier(MPI_COMM_WORLD);
-
-  if (myid==0)
-    {
-      for (unsigned int i=0;i<Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);++i)
-        {
-          cat_file((std::string("mg_03/ncpu_") + Utilities::int_to_string(Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD)) + "/dat." + Utilities::int_to_string(i)).c_str());
-        }
-    }      
 
   if (myid==0)
     deallog << "OK" << std::endl;
@@ -126,24 +114,9 @@ void test()
 int main(int argc, char *argv[])
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll log(__FILE__);
 
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-
-
-  deallog.push(Utilities::int_to_string(myid));
-
-  if (myid == 0)
-    {
-      std::ofstream logfile(output_file_for_mpi("mg_03").c_str());
-      deallog.attach(logfile);
-      deallog.depth_console(0);
-      deallog.threshold_double(1.e-10);
-
-      deallog.push("2d");
-      test<2>();
-      deallog.pop();
-    }
-  else
-    test<2>();
-
+  deallog.push("2d");
+  test<2>();
+  deallog.pop();
 }

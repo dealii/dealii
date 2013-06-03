@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2008, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 2008, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -15,6 +15,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/multithread_info.h>
+#include <deal.II/base/thread_management.h>
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/std_cxx1x/function.h>
 #include <deal.II/base/std_cxx1x/bind.h>
@@ -344,13 +345,27 @@ namespace WorkStream
 
         ItemType *current_item = static_cast<ItemType *> (item);
 
-        // then call the worker function on
-        // each element of the chunk we
-        // were given
+        // then call the worker function on each element of the chunk we were
+        // given. since these worker functions are called on separate threads,
+        // nothing good can happen if they throw an exception and we are best
+        // off catching it and showing an error message
         for (unsigned int i=0; i<std_cxx1x::get<3>(*current_item); ++i)
-          worker (std_cxx1x::get<0>(*current_item)[i],
-                  *std_cxx1x::get<1>(*current_item),
-                  std_cxx1x::get<2>(*current_item)[i]);
+	  {
+	    try
+	      {
+		worker (std_cxx1x::get<0>(*current_item)[i],
+			*std_cxx1x::get<1>(*current_item),
+			std_cxx1x::get<2>(*current_item)[i]);
+	      }
+	    catch (const std::exception &exc)
+	      {
+		Threads::internal::handle_std_exception (exc);
+	      }
+	    catch (...)
+	      {
+		Threads::internal::handle_unknown_exception ();
+	      }
+	  }
 
         // then return the original pointer
         // to the now modified object
@@ -415,9 +430,25 @@ namespace WorkStream
 
         ItemType *current_item = static_cast<ItemType *> (item);
 
-        // initiate copying data
+        // initiate copying data. for the same reasons as in the worker class
+        // above, catch exceptions rather than letting it propagate into
+        // unknown territories
         for (unsigned int i=0; i<std_cxx1x::get<3>(*current_item); ++i)
-          copier (std_cxx1x::get<2>(*current_item)[i]);
+	  {
+	    try
+	      {
+		copier (std_cxx1x::get<2>(*current_item)[i]);
+	      }
+	    catch (const std::exception &exc)
+	      {
+		Threads::internal::handle_std_exception (exc);
+	      }
+	    catch (...)
+	      {
+		Threads::internal::handle_unknown_exception ();
+	      }
+	  }
+
 
         // return an invalid
         // item since we are at
