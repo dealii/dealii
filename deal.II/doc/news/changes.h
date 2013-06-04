@@ -137,6 +137,13 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The stabilization parameter for the artificial diffusion
+in the step-31 tutorial program has been increased slightly to avoid
+instabilities at later times (<i>t</i> > 60).
+<br>
+(Martin Kronbichler, 2013/06/04)
+</li>
+
 <li> Fixed: If an exception was generated on a task created by
 Threads::new_task, the program would terminate with a segmentation
 fault, leaving little trace of what had happened. This is now handled
