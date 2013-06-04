@@ -452,7 +452,11 @@ namespace SparsityTools
       for (map_vec_t::iterator it=send_data.begin(); it!=send_data.end(); ++it, ++idx)
         MPI_Isend(&(it->second[0]),
                   it->second.size(),
+#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
                   MPI_UNSIGNED_LONG_LONG,
+#else
+                  MPI_UNSIGNED,
+#endif
                   it->first,
                   124,
                   mpi_comm,
