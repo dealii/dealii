@@ -552,17 +552,17 @@ As a consequence, a formula that reconciles 2d, 3d, and variable polynomial
 degree and takes all factors in account reads as follows:
 @f{eqnarray*}
   k =
-  \frac 1{2 \cdot 1.6} \frac 1{\sqrt{d}}
+  \frac 1{2 \cdot 1.7} \frac 1{\sqrt{d}}
   \frac 2d
   \frac 1{q_T}
   \frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}
   =
-  \frac 1{1.6 d\sqrt{d}}
+  \frac 1{1.7 d\sqrt{d}}
   \frac 1{q_T}
   \frac{h_K}{\|\mathbf{u}\|_{L^\infty(K)}}.
 @f}
 In the first form (in the center of the equation), $\frac
-1{2 \cdot 1.6}$ is a universal constant, $\frac 1{\sqrt{d}}$
+1{2 \cdot 1.7}$ is a universal constant, $\frac 1{\sqrt{d}}$
 is the factor that accounts for the difference between cell diameter
 and grid point separation,
 $\frac 2d$ accounts for the increase in $\beta$ with space dimension,
