@@ -386,7 +386,9 @@ namespace PETScWrappers
             // read the documentation of this
             // class.
             //if (preset_nonzero_locations == true)
+            if (local_rows.n_elements()>0)
               {
+                Assert(local_columns.n_elements()>0, ExcInternalError());
                 // MatMPIAIJSetPreallocationCSR
                 // can be used to allocate the sparsity
                 // pattern of a matrix
@@ -443,8 +445,20 @@ namespace PETScWrappers
                                               &rowstart_in_window[0],
                                               &colnums_in_window[0],
                                               0);
-                compress ();
+              }
+            else
+              {
+                PetscInt i=0;
+                MatMPIAIJSetPreallocationCSR (matrix,
+                                              &i,
+                                              &i,
+                                              0);
 
+
+              }
+            compress (dealii::VectorOperation::insert);
+
+            {
 
                 // Tell PETSc that we are not
                 // planning on adding new entries
