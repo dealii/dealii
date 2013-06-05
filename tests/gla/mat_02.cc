@@ -14,7 +14,7 @@
 
 // create LA::MPI::SparseMatrix where one CPU has no DoFs
 
-// this is a bug in PETScWrappers right now!
+// this bug got fixed in PETScWrappers in r29776
 
 #include "../tests.h"
 #include <deal.II/lac/generic_linear_algebra.h>
@@ -59,6 +59,8 @@ void test ()
 
   mat.set(0,0,0.1);
   mat.set(1,1,0.1);  
+
+  MPI_Barrier(MPI_COMM_WORLD);
   
   mat.compress(VectorOperation::insert);
 
