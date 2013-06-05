@@ -15,7 +15,7 @@
 // creation and size and ghost elements of LA::MPI::Vector
 
 #include "../tests.h"
-#include <deal.II/lac/abstract_linear_algebra.h>
+#include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/base/index_set.h>
 #include <fstream>
 #include <iostream>

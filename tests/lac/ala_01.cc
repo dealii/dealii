@@ -16,7 +16,7 @@
 
 #include "../tests.h" 
 #include <deal.II/base/utilities.h>
-#include <deal.II/lac/abstract_linear_algebra.h>
+#include <deal.II/lac/generic_linear_algebra.h>
 #include <fstream>
 #include <iostream>
 

@@ -15,7 +15,7 @@
 // create, size, and reinit of LA::MPI::SparseMatrix
 
 #include "../tests.h"
-#include <deal.II/lac/abstract_linear_algebra.h>
+#include <deal.II/lac/generic_linear_algebra.h>
 #include <deal.II/base/index_set.h>
 #include <fstream>
 #include <iostream>

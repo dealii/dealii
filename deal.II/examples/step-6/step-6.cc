@@ -35,7 +35,7 @@
 #include <deal.II/numerics/matrix_tools.h>
 #include <deal.II/numerics/data_out.h>
 
-#include <deal.II/lac/abstract_linear_algebra.h>
+#include <deal.II/lac/generic_linear_algebra.h>
 
 #define USE_PETSC_LA
 

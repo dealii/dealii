@@ -62,7 +62,7 @@
 #include <deal.II/numerics/error_estimator.h>
 #include <deal.II/numerics/solution_transfer.h>
 
-#include <deal.II/lac/abstract_linear_algebra.h>
+#include <deal.II/lac/generic_linear_algebra.h>
 
 #define USE_PETSC_LA
 

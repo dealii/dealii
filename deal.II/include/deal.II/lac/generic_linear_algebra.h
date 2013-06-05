@@ -9,8 +9,8 @@
 //    further information on this license.
 //
 //---------------------------------------------------------------------------
-#ifndef __deal2__abstract_linear_algebra_h
-#define __deal2__abstract_linear_algebra_h
+#ifndef __deal2__generic_linear_algebra_h
+#define __deal2__generic_linear_algebra_h
 
 #include <deal.II/base/config.h>
 

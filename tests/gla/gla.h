@@ -1,5 +1,5 @@
 
-#include <deal.II/lac/abstract_linear_algebra.h>
+#include <deal.II/lac/generic_linear_algebra.h>
 
 class LA_PETSc
 {
