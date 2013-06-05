@@ -71,7 +71,6 @@ namespace LA
 #ifdef USE_PETSC_LA
   using namespace dealii::LinearAlgebraPETSc;
 #else
-//using namespace dealii::LinearAlgebraDealII;
   using namespace dealii::LinearAlgebraTrilinos;
 #endif
 }
@@ -1879,7 +1878,7 @@ namespace Step32
     
     sp.compress();
 
-     stokes_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
+    stokes_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
 #else
      sp.compress();
     stokes_matrix.reinit (sp);
@@ -1930,7 +1929,7 @@ namespace Step32
 
     sp.compress();
 
-     stokes_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
+    stokes_preconditioner_matrix.reinit (stokes_partitioning, sp, MPI_COMM_WORLD);
 #else
      sp.compress();
 
@@ -2136,13 +2135,13 @@ namespace Step32
     setup_temperature_matrices (temperature_partitioning);
 
     stokes_rhs.reinit (stokes_partitioning, MPI_COMM_WORLD);
-    stokes_solution.reinit (stokes_relevant_partitioning, MPI_COMM_WORLD);
+    stokes_solution.reinit (stokes_partitioning, stokes_relevant_partitioning, MPI_COMM_WORLD);
     old_stokes_solution.reinit (stokes_solution);
 
     temperature_rhs.reinit (temperature_partitioning, MPI_COMM_WORLD);
-    temperature_solution.reinit (temperature_relevant_partitioning, MPI_COMM_WORLD);
-    old_temperature_solution.reinit (temperature_solution);
-    old_old_temperature_solution.reinit (temperature_solution);
+    temperature_solution.reinit (temperature_partitioning, temperature_relevant_partitioning, MPI_COMM_WORLD);
+    old_temperature_solution.reinit (temperature_partitioning, temperature_relevant_partitioning, MPI_COMM_WORLD);
+    old_old_temperature_solution.reinit (temperature_partitioning, temperature_relevant_partitioning, MPI_COMM_WORLD);
 
     rebuild_stokes_matrix              = true;
     rebuild_stokes_preconditioner      = true;
