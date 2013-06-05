@@ -225,6 +225,14 @@ namespace TrilinosWrappers
       void reinit (const std::vector<IndexSet> &parallel_partitioning,
                    const MPI_Comm              &communicator = MPI_COMM_WORLD,
                    const bool                   fast = false);
+      /**
+       * like above, but with a second set of indices for
+       * ghost entries.
+       */
+      void reinit (const std::vector<IndexSet> &partitioning,
+                   const std::vector<IndexSet> &ghost_values,
+                   const MPI_Comm              &communicator = MPI_COMM_WORLD);
+
 
       /**
        * Change the dimension to that
