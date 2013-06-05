@@ -70,9 +70,9 @@ boundary_q (const DoFHandler<1> &)
 }
 
 
-void write_map (const std::map<unsigned int,double> &bv)
+void write_map (const std::map<types::global_dof_index,double> &bv)
 {
-  for (std::map<unsigned int,double>::const_iterator
+  for (std::map<types::global_dof_index,double>::const_iterator
 	 i=bv.begin(); i!=bv.end(); ++i)
     deallog << i->first << ' ' << i->second <<std::endl;
 }
@@ -137,7 +137,7 @@ check ()
 
 				       // interpolate boundary values
       deallog << "Interpolated boundary values" << std::endl;
-      std::map<unsigned int,double> interpolated_bv;
+      std::map<types::global_dof_index,double> interpolated_bv;
       VectorTools::interpolate_boundary_values (mapping, dof, function_map,
 						interpolated_bv, std::vector<bool>());
       write_map (interpolated_bv);
@@ -148,7 +148,7 @@ check ()
       if (dim != 3)
 	{
 	  deallog << "Projected boundary values" << std::endl;
-	  std::map<unsigned int,double> projected_bv;
+	  std::map<types::global_dof_index,double> projected_bv;
 	  VectorTools::project_boundary_values (mapping, dof, function_map,
 						boundary_q(dof), projected_bv);
 	  write_map (projected_bv);

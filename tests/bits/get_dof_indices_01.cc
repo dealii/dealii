@@ -53,7 +53,7 @@ void test ()
 
 				   // loop over all cells, active or
 				   // not
-  std::vector<unsigned int> local_dof_indices (fe.dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
   for (typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin();
        cell != dof_handler.end(); ++cell)
     {

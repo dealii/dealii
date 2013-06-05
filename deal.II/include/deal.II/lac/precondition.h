@@ -69,7 +69,6 @@ template <typename> class SolverCG;
 class PreconditionIdentity : public Subscriptor
 {
 public:
-
   /**
    * This function is only
    * present to
@@ -574,6 +573,10 @@ template <class MATRIX = SparseMatrix<double> >
 class PreconditionSSOR : public PreconditionRelaxation<MATRIX>
 {
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
 
   /**
    * A typedef to the base class.
@@ -673,6 +676,11 @@ class PreconditionPSOR : public PreconditionRelaxation<MATRIX>
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Initialize matrix and
    * relaxation parameter. The
    * matrix is just stored in the
@@ -692,8 +700,8 @@ public:
    * reasons. It defaults to 1.
    */
   void initialize (const MATRIX &A,
-                   const std::vector<unsigned int> &permutation,
-                   const std::vector<unsigned int> &inverse_permutation,
+                   const std::vector<size_type> &permutation,
+                   const std::vector<size_type> &inverse_permutation,
                    const typename PreconditionRelaxation<MATRIX>::AdditionalData &
                    parameters = typename PreconditionRelaxation<MATRIX>::AdditionalData());
 
@@ -713,12 +721,12 @@ private:
   /**
    * Storage for the permutation vector.
    */
-  const std::vector<unsigned int> *permutation;
+  const std::vector<size_type> *permutation;
   /**
    * Storage for the inverse
    * permutation vector.
    */
-  const std::vector<unsigned int> *inverse_permutation;
+  const std::vector<size_type> *inverse_permutation;
 };
 
 
@@ -898,6 +906,11 @@ template <class MATRIX=SparseMatrix<double>, class VECTOR=Vector<double> >
 class PreconditionChebyshev : public Subscriptor
 {
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
   /**
    * Standardized data struct to pipe additional parameters to the
    * preconditioner.
@@ -1294,9 +1307,9 @@ PreconditionSSOR<MATRIX>::initialize (const MATRIX &rA,
   // calculate the positions first after the diagonal.
   if (mat != 0)
     {
-      const unsigned int n = this->A->n();
+      const size_type n = this->A->n();
       pos_right_of_diagonal.resize(n, static_cast<std::size_t>(-1));
-      for (unsigned int row=0; row<n; ++row)
+      for (size_type row=0; row<n; ++row)
         {
           // find the first element in this line which is on the right of the
           // diagonal.  we need to precondition with the elements on the left
@@ -1362,8 +1375,8 @@ template <class MATRIX>
 inline void
 PreconditionPSOR<MATRIX>::initialize (
   const MATRIX &rA,
-  const std::vector<unsigned int> &p,
-  const std::vector<unsigned int> &ip,
+  const std::vector<size_type> &p,
+  const std::vector<size_type> &ip,
   const typename PreconditionRelaxation<MATRIX>::AdditionalData &parameters)
 {
   permutation = &p;
@@ -1569,6 +1582,8 @@ namespace internal
     template <typename Number>
     struct VectorUpdatesRange : public parallel::ParallelForInteger
     {
+      typedef types::global_dof_index size_type;
+
       VectorUpdatesRange (const size_t  size,
                           const Number *src,
                           const Number *matrix_diagonal_inverse,
@@ -1605,13 +1620,13 @@ namespace internal
         if (factor1 == Number())
           {
             if (start_zero)
-              for (unsigned int i=begin; i<end; ++i)
+              for (size_type i=begin; i<end; ++i)
                 {
                   dst[i] = factor2 * src[i] * matrix_diagonal_inverse[i];
                   update1[i] = -dst[i];
                 }
             else
-              for (unsigned int i=begin; i<end; ++i)
+              for (size_type i=begin; i<end; ++i)
                 {
                   update1[i] = ((update2[i]-src[i]) *
                                 factor2*matrix_diagonal_inverse[i]);
@@ -1619,7 +1634,7 @@ namespace internal
                 }
           }
         else
-          for (unsigned int i=begin; i<end; ++i)
+          for (size_type i=begin; i<end; ++i)
             {
               const Number update2i = ((update2[i] - src[i]) *
                                        matrix_diagonal_inverse[i]);

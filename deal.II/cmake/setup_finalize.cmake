@@ -189,6 +189,8 @@ FOREACH(_var ${_features})
       ELSE()
         _both("#        ${_var} set up with bundled packages\n")
       ENDIF()
+    ELSE()
+     _both("#        ${_var} = ${${_var}}\n")
     ENDIF()
   ELSE()
     # FEATURE is disabled

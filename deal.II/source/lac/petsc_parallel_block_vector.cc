@@ -24,6 +24,8 @@ namespace PETScWrappers
 {
   namespace MPI
   {
+    typedef types::global_dof_index size_type;
+
     BlockVector &
     BlockVector::operator = (const PETScWrappers::BlockVector &v)
     {
@@ -40,7 +42,7 @@ namespace PETScWrappers
     void
     BlockVector::reinit (const unsigned int num_blocks)
     {
-      std::vector<unsigned int> block_sizes (num_blocks, 0);
+      std::vector<size_type> block_sizes (num_blocks, 0);
       this->block_indices.reinit (block_sizes);
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());

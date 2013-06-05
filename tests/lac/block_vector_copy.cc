@@ -27,7 +27,7 @@ void test ()
   for (unsigned int i = 0; i < v.size(); ++i)
     v[i] = double(i+1);
 
-  std::vector<unsigned int>	partition(3);
+  std::vector<types::global_dof_index>	partition(3);
   for (unsigned int i = 0; i < partition.size(); ++i)
     partition[i] = 3;
 

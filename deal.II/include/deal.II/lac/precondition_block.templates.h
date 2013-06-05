@@ -27,7 +27,7 @@ DEAL_II_NAMESPACE_OPEN
 
 template<class MATRIX, typename inverse_type>
 PreconditionBlock<MATRIX, inverse_type>::AdditionalData::
-AdditionalData (const unsigned int block_size,
+AdditionalData (const size_type block_size,
                 const double relaxation,
                 const bool invert_diagonal,
                 const bool same_diagonal)
@@ -73,7 +73,7 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
   const MATRIX &M,
   const AdditionalData parameters)
 {
-  const unsigned int bsize = parameters.block_size;
+  const size_type bsize = parameters.block_size;
 
   clear();
   Assert (M.m() == M.n(), ExcNotQuadratic());
@@ -99,8 +99,8 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
 template <class MATRIX, typename inverse_type>
 void PreconditionBlock<MATRIX,inverse_type>::initialize (
   const MATRIX &M,
-  const std::vector<unsigned int> &permutation,
-  const std::vector<unsigned int> &inverse_permutation,
+  const std::vector<size_type> &permutation,
+  const std::vector<size_type> &inverse_permutation,
   const AdditionalData parameters)
 {
   set_permutation(permutation, inverse_permutation);
@@ -109,8 +109,8 @@ void PreconditionBlock<MATRIX,inverse_type>::initialize (
 
 template <class MATRIX, typename inverse_type>
 void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
-  const std::vector<unsigned int> &permutation,
-  const std::vector<unsigned int> &inverse_permutation)
+  const std::vector<size_type> &permutation,
+  const std::vector<size_type> &inverse_permutation)
 {
   Assert (A!=0, ExcNotInitialized());
   Assert (blocksize!=0, ExcNotInitialized());
@@ -126,7 +126,7 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
     {
       deallog << "PreconditionBlock uses only one diagonal block" << std::endl;
 
-      for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
+      for (size_type row_cell=0; row_cell<blocksize; ++row_cell)
         {
           typename MATRIX::const_iterator entry = M.begin(row_cell);
           const typename MATRIX::const_iterator row_end = M.end(row_cell);
@@ -169,12 +169,12 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
 
       for (unsigned int cell=0; cell<this->size(); ++cell)
         {
-          const unsigned int cell_start = cell*blocksize;
-          for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
+          const size_type cell_start = cell*blocksize;
+          for (size_type row_cell=0; row_cell<blocksize; ++row_cell)
             {
-              const unsigned int urow = row_cell + cell_start;
+              const size_type urow = row_cell + cell_start;
 
-              const unsigned int row = permutation[urow];
+              const size_type row = permutation[urow];
 
               typename MATRIX::const_iterator entry = M.begin(row);
               const typename MATRIX::const_iterator row_end = M.end(row);
@@ -185,7 +185,7 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_permuted_diagblocks(
                   if (inverse_permutation[entry->column()]<cell_start)
                     continue;
 
-                  const unsigned int column_cell = inverse_permutation[entry->column()]-cell_start;
+                  const size_type column_cell = inverse_permutation[entry->column()]-cell_start;
                   if (column_cell >= blocksize)
                     continue;
                   M_cell(row_cell, column_cell) = entry->value();
@@ -250,7 +250,7 @@ void PreconditionBlock<MATRIX,inverse_type>::forward_step (
   // blocks.
   // row, column are the global numbering
   // of the unkowns.
-  unsigned int row, row_cell;
+  size_type row, row_cell;
   number2 b_cell_row;
   // The diagonal block if the
   // inverses were not precomputed
@@ -260,10 +260,10 @@ void PreconditionBlock<MATRIX,inverse_type>::forward_step (
   for (unsigned int rawcell=0; rawcell < this->size(); ++rawcell)
     {
       const unsigned int cell = cell_permuted ? permutation[rawcell] : rawcell;
-      const unsigned int block_start = cell*this->blocksize;
-      const unsigned int permuted_block_start = permuted
-                                                ? permutation[block_start]
-                                                : block_start;
+      const size_type block_start = cell*this->blocksize;
+      const size_type permuted_block_start = permuted
+                                             ? permutation[block_start]
+                                             : block_start;
 
 //       deallog << std::endl << cell << '-' << block_start
 //            << '-' << permuted_block_start << (permuted ? 't' : 'f') << '\t';
@@ -279,17 +279,17 @@ void PreconditionBlock<MATRIX,inverse_type>::forward_step (
           b_cell_row=src(row);
           for (; entry != row_end; ++entry)
             {
-              const unsigned int column = entry->column();
-              const unsigned int inverse_permuted_column = permuted
-                                                           ? inverse_permutation[column]
-                                                           : column;
+              const size_type column = entry->column();
+              const size_type inverse_permuted_column = permuted
+                                                        ? inverse_permutation[column]
+                                                        : column;
               b_cell_row -= entry->value() * prev(column);
 //TODO:[GK] Find out if this is really once column and once permuted
               if (!this->inverses_ready()
                   && inverse_permuted_column >= block_start
                   && inverse_permuted_column < block_start + this->blocksize)
                 {
-                  const unsigned int column_cell = column - block_start;
+                  const size_type column_cell = column - block_start;
                   if (transpose_diagonal)
                     M_cell(column_cell, row_cell) = entry->value();
                   else
@@ -348,7 +348,7 @@ void PreconditionBlock<MATRIX,inverse_type>::backward_step (
   // blocks.
   // row, column are the global numbering
   // of the unkowns.
-  unsigned int row, row_cell;
+  size_type row, row_cell;
   number2 b_cell_row;
 
   FullMatrix<number> M_cell(this->blocksize);
@@ -356,11 +356,11 @@ void PreconditionBlock<MATRIX,inverse_type>::backward_step (
     {
       --rawcell;
       const unsigned int cell = cell_permuted ? permutation[rawcell] : rawcell;
-      const unsigned int block_start = cell*this->blocksize;
-      const unsigned int block_end = block_start + this->blocksize;
-      const unsigned int permuted_block_start = permuted
-                                                ? permutation[block_start]
-                                                : block_start;
+      const size_type block_start = cell*this->blocksize;
+      const size_type block_end = block_start + this->blocksize;
+      const size_type permuted_block_start = permuted
+                                             ? permutation[block_start]
+                                             : block_start;
       for (row = permuted_block_start, row_cell = 0;
            row_cell<this->blocksize;
            ++row_cell, ++row)
@@ -371,16 +371,16 @@ void PreconditionBlock<MATRIX,inverse_type>::backward_step (
           b_cell_row=src(row);
           for (; entry != row_end; ++entry)
             {
-              const unsigned int column = entry->column();
-              const unsigned int inverse_permuted_column = permuted
-                                                           ? inverse_permutation[column]
-                                                           : column;
+              const size_type column = entry->column();
+              const size_type inverse_permuted_column = permuted
+                                                        ? inverse_permutation[column]
+                                                        : column;
               b_cell_row -= entry->value() * prev(column);
               if (!this->inverses_ready()
                   && inverse_permuted_column < block_end
                   && column >= block_start)
                 {
-                  const unsigned int column_cell = column - block_start;
+                  const size_type column_cell = column - block_start;
                   // We need the
                   // transpose of the
                   // diagonal block,
@@ -419,7 +419,8 @@ void PreconditionBlock<MATRIX,inverse_type>::backward_step (
 
 
 template <class MATRIX, typename inverse_type>
-unsigned int PreconditionBlock<MATRIX,inverse_type>::block_size() const
+typename PreconditionBlock<MATRIX,inverse_type>::size_type
+PreconditionBlock<MATRIX,inverse_type>::block_size() const
 {
   return blocksize;
 }
@@ -439,7 +440,7 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
   if (this->same_diagonal())
     {
       deallog << "PreconditionBlock uses only one diagonal block" << std::endl;
-      for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
+      for (size_type row_cell=0; row_cell<blocksize; ++row_cell)
         {
           typename MATRIX::const_iterator entry = M.begin(row_cell);
           const typename MATRIX::const_iterator row_end = M.end(row_cell);
@@ -474,10 +475,10 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
 
       for (unsigned int cell=0; cell<this->size(); ++cell)
         {
-          const unsigned int cell_start = cell*blocksize;
-          for (unsigned int row_cell=0; row_cell<blocksize; ++row_cell)
+          const size_type cell_start = cell*blocksize;
+          for (size_type row_cell=0; row_cell<blocksize; ++row_cell)
             {
-              const unsigned int row = row_cell + cell_start;
+              const size_type row = row_cell + cell_start;
               typename MATRIX::const_iterator entry = M.begin(row);
               const typename MATRIX::const_iterator row_end = M.end(row);
 
@@ -486,7 +487,7 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
                   if (entry->column()<cell_start)
                     continue;
 
-                  const unsigned int column_cell = entry->column()-cell_start;
+                  const size_type column_cell = entry->column()-cell_start;
                   if (column_cell >= blocksize)
                     continue;
                   M_cell(row_cell, column_cell) = entry->value();
@@ -519,8 +520,8 @@ void PreconditionBlock<MATRIX,inverse_type>::invert_diagblocks()
 
 template <class MATRIX, typename inverse_type>
 void PreconditionBlock<MATRIX,inverse_type>::set_permutation (
-  const std::vector<unsigned int> &p,
-  const std::vector<unsigned int> &i)
+  const std::vector<size_type> &p,
+  const std::vector<size_type> &i)
 {
   Assert (p.size() == i.size(), ExcDimensionMismatch(p.size(), i.size()));
 
@@ -574,7 +575,7 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
   // blocks.
   // row, column are the global numbering
   // of the unkowns.
-  unsigned int row, row_cell, begin_diag_block=0;
+  size_type row, row_cell, begin_diag_block=0;
 
   if (!this->inverses_ready())
     {
@@ -586,7 +587,7 @@ void PreconditionBlockJacobi<MATRIX,inverse_type>
                ++row_cell, ++row)
             {
               b_cell(row_cell)=src(row);
-              for (unsigned int column_cell=0, column=cell*this->blocksize;
+              for (size_type column_cell=0, column=cell*this->blocksize;
                    column_cell<this->blocksize; ++column_cell, ++column)
                 M_cell(row_cell,column_cell)=M(row,column);
             }
@@ -742,7 +743,7 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::forward (
   // blocks.
   // row, column are the global numbering
   // of the unkowns.
-  unsigned int row, row_cell, block_start=0;
+  size_type row, row_cell, block_start=0;
   number2 b_cell_row;
   // The diagonal block if the
   // inverses were not precomputed
@@ -750,9 +751,9 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::forward (
 
   for (unsigned int cell=0; cell < this->size(); ++cell)
     {
-      const unsigned int permuted_block_start = permuted
-                                                ? this->permutation[block_start]
-                                                :block_start;
+      const size_type permuted_block_start = permuted
+                                             ? this->permutation[block_start]
+                                             :block_start;
 
       for (row = permuted_block_start, row_cell = 0;
            row_cell < this->blocksize;
@@ -764,16 +765,16 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::forward (
           b_cell_row=src(row);
           for (; entry != row_end; ++entry)
             {
-              const unsigned int column = entry->column();
-              const unsigned int inverse_permuted_column = permuted
-                                                           ? this->inverse_permutation[column]
-                                                           : column;
+              const size_type column = entry->column();
+              const size_type inverse_permuted_column = permuted
+                                                        ? this->inverse_permutation[column]
+                                                        : column;
 
               if (inverse_permuted_column < block_start)
                 b_cell_row -= entry->value() * dst(column);
               else if (!this->inverses_ready() && column < block_start + this->blocksize)
                 {
-                  const unsigned int column_cell = column - block_start;
+                  const size_type column_cell = column - block_start;
                   if (transpose_diagonal)
                     M_cell(column_cell, row_cell) = entry->value();
                   else
@@ -832,19 +833,19 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::backward (
   // blocks.
   // row, column are the global numbering
   // of the unkowns.
-  unsigned int row, row_cell;
-  unsigned int block_end=this->blocksize * this->size();
+  size_type row, row_cell;
+  size_type block_end=this->blocksize * this->size();
   number2 b_cell_row;
 
   FullMatrix<number> M_cell(this->blocksize);
   for (unsigned int cell=this->size(); cell!=0 ;)
     {
       --cell;
-      const unsigned int block_start = block_end - this->blocksize;
+      const size_type block_start = block_end - this->blocksize;
       // Collect upper triangle
-      const unsigned int permuted_block_start = (this->permutation.size() != 0)
-                                                ? this->permutation[block_start]
-                                                :block_start;
+      const size_type permuted_block_start = (this->permutation.size() != 0)
+                                             ? this->permutation[block_start]
+                                             : block_start;
       for (row = permuted_block_start, row_cell = 0;
            row_cell<this->blocksize;
            ++row_cell, ++row)
@@ -855,15 +856,15 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::backward (
           b_cell_row=src(row);
           for (; entry != row_end; ++entry)
             {
-              const unsigned int column = entry->column();
-              const unsigned int inverse_permuted_column = permuted
+              const size_type column = entry->column();
+              const size_type inverse_permuted_column = permuted
                                                            ? this->inverse_permutation[column]
                                                            : column;
               if (inverse_permuted_column >= block_end)
                 b_cell_row -= entry->value() * dst(column);
               else if (!this->inverses_ready() && column >= block_start)
                 {
-                  const unsigned int column_cell = column - block_start;
+                  const size_type column_cell = column - block_start;
                   // We need the
                   // transpose of the
                   // diagonal block,
@@ -993,14 +994,14 @@ void PreconditionBlockSSOR<MATRIX,inverse_type>::vmult (Vector<number2>       &d
   // Multiply with diagonal blocks
   for (unsigned int cell=0; cell < this->size(); ++cell)
     {
-      unsigned int row = cell*this->blocksize;
+      size_type row = cell*this->blocksize;
 
-      for (unsigned int row_cell=0; row_cell<this->blocksize; ++row_cell)
+      for (size_type row_cell=0; row_cell<this->blocksize; ++row_cell)
         cell_src(row_cell)=help(row+row_cell);
 
       this->diagonal(cell).vmult(cell_dst, cell_src);
 
-      for (unsigned int row_cell=0; row_cell<this->blocksize; ++row_cell)
+      for (size_type row_cell=0; row_cell<this->blocksize; ++row_cell)
         help(row+row_cell) = scaling * cell_dst(row_cell);
     }
 
@@ -1024,14 +1025,14 @@ void PreconditionBlockSSOR<MATRIX,inverse_type>::Tvmult (Vector<number2>       &
   // Multiply with diagonal blocks
   for (unsigned int cell=0; cell < this->size(); ++cell)
     {
-      unsigned int row = cell*this->blocksize;
+      size_type row = cell*this->blocksize;
 
-      for (unsigned int row_cell=0; row_cell<this->blocksize; ++row_cell)
+      for (size_type row_cell=0; row_cell<this->blocksize; ++row_cell)
         cell_src(row_cell)=help(row+row_cell);
 
       this->diagonal(cell).Tvmult(cell_dst, cell_src);
 
-      for (unsigned int row_cell=0; row_cell<this->blocksize; ++row_cell)
+      for (size_type row_cell=0; row_cell<this->blocksize; ++row_cell)
         help(row+row_cell) = scaling * cell_dst(row_cell);
     }
 

@@ -481,7 +481,7 @@ namespace Step22
     // <code>DoFTools::count_dofs_per_block</code> does the same as
     // <code>DoFTools::count_dofs_per_component</code>, but now grouped as
     // velocity and pressure block via <code>block_component</code>.
-    std::vector<unsigned int> dofs_per_block (2);
+    std::vector<types::global_dof_index> dofs_per_block (2);
     DoFTools::count_dofs_per_block (dof_handler, dofs_per_block, block_component);
     const unsigned int n_u = dofs_per_block[0],
                        n_p = dofs_per_block[1];
@@ -593,7 +593,7 @@ namespace Step22
     FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       local_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     const RightHandSide<dim>          right_hand_side;
     std::vector<Vector<double> >      rhs_values (n_q_points,

@@ -83,6 +83,11 @@ class BlockSparsityPatternBase : public Subscriptor
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Define a value which is used
    * to indicate that a certain
    * value in the @p colnums array
@@ -94,7 +99,7 @@ public:
    * the respective value of the
    * SparsityPattern class.
    */
-  static const unsigned int invalid_entry = SparsityPattern::invalid_entry;
+  static const size_type invalid_entry = SparsityPattern::invalid_entry;
 
   /**
    * Initialize the matrix empty,
@@ -116,8 +121,8 @@ public:
    * to call collect_sizes() after
    * you assign them sizes.
    */
-  BlockSparsityPatternBase (const unsigned int n_block_rows,
-                            const unsigned int n_block_columns);
+  BlockSparsityPatternBase (const size_type n_block_rows,
+                            const size_type n_block_columns);
 
   /**
    * Copy constructor. This
@@ -163,8 +168,8 @@ public:
    * user call whatever function
    * she desires.
    */
-  void reinit (const unsigned int n_block_rows,
-               const unsigned int n_block_columns);
+  void reinit (const size_type n_block_rows,
+               const size_type n_block_columns);
 
   /**
    * Copy operator. For this the
@@ -195,8 +200,8 @@ public:
    * given coordinates.
    */
   SparsityPatternBase &
-  block (const unsigned int row,
-         const unsigned int column);
+  block (const size_type row,
+         const size_type column);
 
 
   /**
@@ -205,8 +210,8 @@ public:
    * constant objects.
    */
   const SparsityPatternBase &
-  block (const unsigned int row,
-         const unsigned int column) const;
+  block (const size_type row,
+         const size_type column) const;
 
   /**
    * Grant access to the object
@@ -239,13 +244,13 @@ public:
    * Return the number of blocks in a
    * column.
    */
-  unsigned int n_block_rows () const;
+  size_type n_block_rows () const;
 
   /**
    * Return the number of blocks in a
    * row.
    */
-  unsigned int n_block_cols () const;
+  size_type n_block_cols () const;
 
   /**
    * Return whether the object is
@@ -268,7 +273,7 @@ public:
    * blocks in a row, and the
    * maximum over all rows.
    */
-  unsigned int max_entries_per_row () const;
+  size_type max_entries_per_row () const;
 
   /**
    * Add a nonzero entry to the matrix.
@@ -282,7 +287,7 @@ public:
    * to which block <tt>(i,j)</tt> belongs
    * and then relays to that block.
    */
-  void add (const unsigned int i, const unsigned int j);
+  void add (const size_type i, const size_type j);
 
   /**
    * Add several nonzero entries to the
@@ -300,10 +305,10 @@ public:
    * blocks.
    */
   template <typename ForwardIterator>
-  void add_entries (const unsigned int row,
-                    ForwardIterator    begin,
-                    ForwardIterator    end,
-                    const bool         indices_are_sorted = false);
+  void add_entries (const size_type  row,
+                    ForwardIterator  begin,
+                    ForwardIterator  end,
+                    const bool       indices_are_sorted = false);
 
   /**
    * Return number of rows of this
@@ -313,7 +318,7 @@ public:
    * of the (block-)rows of
    * sub-matrices.
    */
-  unsigned int n_rows () const;
+  size_type n_rows () const;
 
   /**
    * Return number of columns of
@@ -323,13 +328,13 @@ public:
    * columns of the (block-)columns
    * of sub-matrices.
    */
-  unsigned int n_cols () const;
+  size_type n_cols () const;
 
   /**
    * Check if a value at a certain
    * position may be non-zero.
    */
-  bool exists (const unsigned int i, const unsigned int j) const;
+  bool exists (const size_type i, const size_type j) const;
 
   /**
    * Number of entries in a
@@ -337,7 +342,7 @@ public:
    * all the blocks that form this
    * row.
    */
-  unsigned int row_length (const unsigned int row) const;
+  unsigned int row_length (const size_type row) const;
 
   /**
    * Return the number of nonzero
@@ -358,7 +363,7 @@ public:
    * the sum of the values as
    * returned by the sub-objects.
    */
-  unsigned int n_nonzero_elements () const;
+  size_type n_nonzero_elements () const;
 
   /**
    * Print the sparsity of the
@@ -410,12 +415,12 @@ protected:
   /**
    * Number of block rows.
    */
-  unsigned int rows;
+  size_type rows;
 
   /**
    * Number of block columns.
    */
-  unsigned int columns;
+  size_type columns;
 
   /**
    * Array of sparsity patterns.
@@ -445,7 +450,7 @@ private:
    * individual blocks when doing a
    * collective add or set.
    */
-  std::vector<unsigned int> counter_within_block;
+  std::vector<size_type > counter_within_block;
 
   /**
    * Temporary vector for column
@@ -453,7 +458,7 @@ private:
    * local to global data on each
    * sparse matrix.
    */
-  std::vector<std::vector<unsigned int> > block_column_indices;
+  std::vector<std::vector<size_type > > block_column_indices;
 
   /**
    * Make the block sparse matrix a
@@ -501,15 +506,15 @@ public:
    * to call collect_sizes() after
    * you assign them sizes.
    */
-  BlockSparsityPattern (const unsigned int n_rows,
-                        const unsigned int n_columns);
+  BlockSparsityPattern (const size_type n_rows,
+                        const size_type n_columns);
 
   /**
    * Forwarding to
    * BlockSparsityPatternBase::reinit().
    */
-  void reinit (const unsigned int n_block_rows,
-               const unsigned int n_block_columns);
+  void reinit (const size_type n_block_rows,
+               const size_type n_block_columns);
 
   /**
    * Initialize the pattern with
@@ -672,8 +677,8 @@ public:
    * to call collect_sizes() after
    * you assign them sizes.
    */
-  BlockCompressedSparsityPattern (const unsigned int n_rows,
-                                  const unsigned int n_columns);
+  BlockCompressedSparsityPattern (const size_type n_rows,
+                                  const size_type n_columns);
 
   /**
    * Initialize the pattern with
@@ -686,8 +691,8 @@ public:
    * and then entering the index
    * values.
    */
-  BlockCompressedSparsityPattern (const std::vector<unsigned int> &row_block_sizes,
-                                  const std::vector<unsigned int> &col_block_sizes);
+  BlockCompressedSparsityPattern (const std::vector<size_type> &row_block_sizes,
+                                  const std::vector<size_type> &col_block_sizes);
 
   /**
    * Initialize the pattern with
@@ -713,8 +718,8 @@ public:
    * <tt>row_block_sizes[i]</tt>
    * times <tt>col_block_sizes[j]</tt>.
    */
-  void reinit (const std::vector< unsigned int > &row_block_sizes,
-               const std::vector< unsigned int > &col_block_sizes);
+  void reinit (const std::vector<size_type> &row_block_sizes,
+               const std::vector<size_type> &col_block_sizes);
 
   /**
    * Resize the matrix to a tensor
@@ -789,8 +794,8 @@ public:
    * to call collect_sizes() after
    * you assign them sizes.
    */
-  BlockCompressedSetSparsityPattern (const unsigned int n_rows,
-                                     const unsigned int n_columns);
+  BlockCompressedSetSparsityPattern (const size_type n_rows,
+                                     const size_type n_columns);
 
   /**
    * Initialize the pattern with
@@ -803,8 +808,8 @@ public:
    * and then entering the index
    * values.
    */
-  BlockCompressedSetSparsityPattern (const std::vector<unsigned int> &row_block_sizes,
-                                     const std::vector<unsigned int> &col_block_sizes);
+  BlockCompressedSetSparsityPattern (const std::vector<size_type> &row_block_sizes,
+                                     const std::vector<size_type> &col_block_sizes);
 
   /**
    * Initialize the pattern with
@@ -830,8 +835,8 @@ public:
    * <tt>row_block_sizes[i]</tt>
    * times <tt>col_block_sizes[j]</tt>.
    */
-  void reinit (const std::vector< unsigned int > &row_block_sizes,
-               const std::vector< unsigned int > &col_block_sizes);
+  void reinit (const std::vector<size_type> &row_block_sizes,
+               const std::vector<size_type> &col_block_sizes);
 
   /**
    * Resize the matrix to a tensor
@@ -899,8 +904,8 @@ public:
    * to call collect_sizes() after
    * you assign them sizes.
    */
-  BlockCompressedSimpleSparsityPattern (const unsigned int n_rows,
-                                        const unsigned int n_columns);
+  BlockCompressedSimpleSparsityPattern (const size_type n_rows,
+                                        const size_type n_columns);
 
   /**
    * Initialize the pattern with
@@ -913,8 +918,8 @@ public:
    * and then entering the index
    * values.
    */
-  BlockCompressedSimpleSparsityPattern (const std::vector<unsigned int> &row_block_sizes,
-                                        const std::vector<unsigned int> &col_block_sizes);
+  BlockCompressedSimpleSparsityPattern (const std::vector<size_type> &row_block_sizes,
+                                        const std::vector<size_type> &col_block_sizes);
 
   /**
    * Initialize the pattern with symmetric
@@ -945,8 +950,8 @@ public:
    * <tt>row_block_sizes[i]</tt>
    * times <tt>col_block_sizes[j]</tt>.
    */
-  void reinit (const std::vector< unsigned int > &row_block_sizes,
-               const std::vector< unsigned int > &col_block_sizes);
+  void reinit (const std::vector<size_type> &row_block_sizes,
+               const std::vector<size_type> &col_block_sizes);
 
   /**
    * Resize the pattern with symmetric
@@ -962,8 +967,8 @@ public:
    * Return the column number of
    * the @p index th entry in row @p row.
    */
-  unsigned int column_number (const unsigned int row,
-                              const unsigned int index) const;
+  size_type column_number (const size_type row,
+                           const unsigned int index) const;
 
   /**
    * Allow the use of the reinit
@@ -1025,8 +1030,8 @@ namespace TrilinosWrappers
      * to call collect_sizes() after
      * you assign them sizes.
      */
-    BlockSparsityPattern (const unsigned int n_rows,
-                          const unsigned int n_columns);
+    BlockSparsityPattern (const size_type n_rows,
+                          const size_type n_columns);
 
     /**
      * Initialize the pattern with
@@ -1039,8 +1044,8 @@ namespace TrilinosWrappers
      * and then entering the index
      * values.
      */
-    BlockSparsityPattern (const std::vector<unsigned int> &row_block_sizes,
-                          const std::vector<unsigned int> &col_block_sizes);
+    BlockSparsityPattern (const std::vector<size_type> &row_block_sizes,
+                          const std::vector<size_type> &col_block_sizes);
 
     /**
      * Initialize the pattern with an array
@@ -1087,8 +1092,8 @@ namespace TrilinosWrappers
      * <tt>row_block_sizes[i]</tt>
      * times <tt>col_block_sizes[j]</tt>.
      */
-    void reinit (const std::vector< unsigned int > &row_block_sizes,
-                 const std::vector< unsigned int > &col_block_sizes);
+    void reinit (const std::vector<size_type> &row_block_sizes,
+                 const std::vector<size_type> &col_block_sizes);
 
     /**
      * Resize the matrix to a square tensor
@@ -1129,8 +1134,8 @@ namespace TrilinosWrappers
 template <class SparsityPatternBase>
 inline
 SparsityPatternBase &
-BlockSparsityPatternBase<SparsityPatternBase>::block (const unsigned int row,
-                                                      const unsigned int column)
+BlockSparsityPatternBase<SparsityPatternBase>::block (const size_type row,
+                                                      const size_type column)
 {
   Assert (row<rows, ExcIndexRange(row,0,rows));
   Assert (column<columns, ExcIndexRange(column,0,columns));
@@ -1142,8 +1147,8 @@ BlockSparsityPatternBase<SparsityPatternBase>::block (const unsigned int row,
 template <class SparsityPatternBase>
 inline
 const SparsityPatternBase &
-BlockSparsityPatternBase<SparsityPatternBase>::block (const unsigned int row,
-                                                      const unsigned int column) const
+BlockSparsityPatternBase<SparsityPatternBase>::block (const size_type row,
+                                                      const size_type column) const
 {
   Assert (row<rows, ExcIndexRange(row,0,rows));
   Assert (column<columns, ExcIndexRange(column,0,columns));
@@ -1175,13 +1180,13 @@ BlockSparsityPatternBase<SparsityPatternBase>::get_column_indices () const
 template <class SparsityPatternBase>
 inline
 void
-BlockSparsityPatternBase<SparsityPatternBase>::add (const unsigned int i,
-                                                    const unsigned int j)
+BlockSparsityPatternBase<SparsityPatternBase>::add (const size_type i,
+                                                    const size_type j)
 {
   // if you get an error here, are
   // you sure you called
   // <tt>collect_sizes()</tt> before?
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<size_type,size_type>
   row_index = row_indices.global_to_local (i),
   col_index = column_indices.global_to_local (j);
   sub_objects[row_index.first][col_index.first]->add (row_index.second,
@@ -1193,10 +1198,10 @@ BlockSparsityPatternBase<SparsityPatternBase>::add (const unsigned int i,
 template <class SparsityPatternBase>
 template <typename ForwardIterator>
 void
-BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const unsigned int row,
-                                                            ForwardIterator    begin,
-                                                            ForwardIterator    end,
-                                                            const bool         indices_are_sorted)
+BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const size_type row,
+                                                            ForwardIterator begin,
+                                                            ForwardIterator end,
+                                                            const bool      indices_are_sorted)
 {
   // Resize scratch arrays
   if (block_column_indices.size() < this->n_block_cols())
@@ -1205,7 +1210,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const unsigned int r
       counter_within_block.resize (this->n_block_cols());
     }
 
-  const unsigned int n_cols = static_cast<unsigned int>(end - begin);
+  const size_type n_cols = static_cast<size_type>(end - begin);
 
   // Resize sub-arrays to n_cols. This
   // is a bit wasteful, but we resize
@@ -1218,12 +1223,12 @@ BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const unsigned int r
   // enough before actually going
   // through all of them.
   if (block_column_indices[0].size() < n_cols)
-    for (unsigned int i=0; i<this->n_block_cols(); ++i)
+    for (size_type i=0; i<this->n_block_cols(); ++i)
       block_column_indices[i].resize(n_cols);
 
   // Reset the number of added elements
   // in each block to zero.
-  for (unsigned int i=0; i<this->n_block_cols(); ++i)
+  for (size_type i=0; i<this->n_block_cols(); ++i)
     counter_within_block[i] = 0;
 
   // Go through the column indices to
@@ -1237,12 +1242,12 @@ BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const unsigned int r
   // comes from an element matrix).
   for (ForwardIterator it = begin; it != end; ++it)
     {
-      const unsigned int col = *it;
+      const size_type col = *it;
 
-      const std::pair<unsigned int, unsigned int>
+      const std::pair<size_type , size_type>
       col_index = this->column_indices.global_to_local(col);
 
-      const unsigned int local_index = counter_within_block[col_index.first]++;
+      const size_type local_index = counter_within_block[col_index.first]++;
 
       block_column_indices[col_index.first][local_index] = col_index.second;
     }
@@ -1250,8 +1255,8 @@ BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const unsigned int r
 #ifdef DEBUG
   // If in debug mode, do a check whether
   // the right length has been obtained.
-  unsigned int length = 0;
-  for (unsigned int i=0; i<this->n_block_cols(); ++i)
+  size_type length = 0;
+  for (size_type i=0; i<this->n_block_cols(); ++i)
     length += counter_within_block[i];
   Assert (length == n_cols, ExcInternalError());
 #endif
@@ -1261,9 +1266,9 @@ BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const unsigned int r
   // where we should start reading out
   // data. Now let's write the data into
   // the individual blocks!
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<size_type , size_type>
   row_index = this->row_indices.global_to_local (row);
-  for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
+  for (size_type block_col=0; block_col<n_block_cols(); ++block_col)
     {
       if (counter_within_block[block_col] == 0)
         continue;
@@ -1280,13 +1285,13 @@ BlockSparsityPatternBase<SparsityPatternBase>::add_entries (const unsigned int r
 template <class SparsityPatternBase>
 inline
 bool
-BlockSparsityPatternBase<SparsityPatternBase>::exists (const unsigned int i,
-                                                       const unsigned int j) const
+BlockSparsityPatternBase<SparsityPatternBase>::exists (const size_type i,
+                                                       const size_type j) const
 {
   // if you get an error here, are
   // you sure you called
   // <tt>collect_sizes()</tt> before?
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<size_type , size_type>
   row_index = row_indices.global_to_local (i),
   col_index = column_indices.global_to_local (j);
   return sub_objects[row_index.first][col_index.first]->exists (row_index.second,
@@ -1299,14 +1304,14 @@ template <class SparsityPatternBase>
 inline
 unsigned int
 BlockSparsityPatternBase<SparsityPatternBase>::
-row_length (const unsigned int row) const
+row_length (const size_type row) const
 {
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<size_type , size_type>
   row_index = row_indices.global_to_local (row);
 
   unsigned int c = 0;
 
-  for (unsigned int b=0; b<rows; ++b)
+  for (size_type b=0; b<rows; ++b)
     c += sub_objects[row_index.first][b]->row_length (row_index.second);
 
   return c;
@@ -1316,7 +1321,7 @@ row_length (const unsigned int row) const
 
 template <class SparsityPatternBase>
 inline
-unsigned int
+typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
 BlockSparsityPatternBase<SparsityPatternBase>::n_block_cols () const
 {
   return columns;
@@ -1326,7 +1331,7 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_block_cols () const
 
 template <class SparsityPatternBase>
 inline
-unsigned int
+typename BlockSparsityPatternBase<SparsityPatternBase>::size_type
 BlockSparsityPatternBase<SparsityPatternBase>::n_block_rows () const
 {
   return rows;
@@ -1334,17 +1339,17 @@ BlockSparsityPatternBase<SparsityPatternBase>::n_block_rows () const
 
 
 inline
-unsigned int
-BlockCompressedSimpleSparsityPattern::column_number (const unsigned int row,
+BlockCompressedSimpleSparsityPattern::size_type
+BlockCompressedSimpleSparsityPattern::column_number (const size_type row,
                                                      const unsigned int index) const
 {
   // .first= ith block, .second = jth row in that block
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<size_type ,size_type >
   row_index = row_indices.global_to_local (row);
 
   Assert(index<row_length(row), ExcIndexRange(index, 0, row_length(row)));
 
-  unsigned int c = 0;
+  size_type c = 0;
   for (unsigned int b=0; b<columns; ++b)
     {
       unsigned int rowlen = sub_objects[row_index.first][b]->row_length (row_index.second);
@@ -1361,8 +1366,8 @@ BlockCompressedSimpleSparsityPattern::column_number (const unsigned int row,
 inline
 void
 BlockSparsityPattern::reinit (
-  const unsigned int n_block_rows,
-  const unsigned int n_block_columns)
+  const size_type n_block_rows,
+  const size_type n_block_columns)
 {
   BlockSparsityPatternBase<SparsityPattern>::reinit (
     n_block_rows, n_block_columns);

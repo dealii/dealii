@@ -42,6 +42,7 @@
 #     DEAL_II_SHARED_LINKER_FLAGS_DEBUG
 #     DEAL_II_CXX_FLAGS_RELEASE
 #     DEAL_II_SHARED_LINKER_FLAGS_RELEASE
+#     DEAL_II_WITH_64BIT_INDICES
 #
 # *)  May also be set via environment variable (CFLAGS, CXXFLAGS, LDFLAGS)
 #     (nonempty cached variable has precedence will not be overwritten by
@@ -236,6 +237,22 @@ FOREACH(_flag ${DEAL_II_USED_FLAGS})
   MARK_AS_ADVANCED(${_flag})
 ENDFOREACH()
 
+
+# 
+# Define the variable that defines whether we should use 32- or 64-bit
+# global DoF indices.
+#
+SET(DEAL_II_WITH_64BIT_INDICES "${DEAL_II_WITH_64BIT_INDICES}" CACHE BOOL
+    "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
+   )
+
+MARK_AS_ADVANCED(DEAL_II_WITH_64BIT_INDICES)
+
+SET_IF_EMPTY(DEAL_II_WITH_64BIT_INDICES "OFF")
+
+
+
+
 #
 # Finally, read in CFLAGS, CXXFLAGS and LDFLAGS from environment and
 # prepend them to the saved variables:
@@ -250,7 +267,7 @@ UNSET(ENV{LDFLAGS})
 
 ###########################################################################
 #                                                                         #
-#                          Miscellanious setup:                           #
+#                          Miscellaneous setup:                           #
 #                                                                         #
 ###########################################################################
 

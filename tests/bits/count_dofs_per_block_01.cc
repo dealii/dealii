@@ -42,7 +42,7 @@ std::string output_file_name = "count_dofs_per_block_01/output";
 
 
 
-void print (const std::vector<unsigned int> &v)
+void print (const std::vector<types::global_dof_index> &v)
 {  
   deallog << v.size();
   for (unsigned int i=0; i<v.size(); ++i)
@@ -75,13 +75,13 @@ check ()
 
 				   // no grouping
   {
-    std::vector<unsigned int> dpc(dim+1);
+    std::vector<types::global_dof_index> dpc(dim+1);
     DoFTools::count_dofs_per_component (dof_handler, dpc);
     print (dpc);
   }
 
   {
-    std::vector<unsigned int> dpc(dim+1);
+    std::vector<types::global_dof_index> dpc(dim+1);
     DoFTools::count_dofs_per_block (dof_handler, dpc);
     print (dpc);
   }
@@ -92,7 +92,7 @@ check ()
   {
     std::vector<unsigned int> group(dim+1, 0);
     group[dim] = 1;
-    std::vector<unsigned int> dpc(2);
+    std::vector<types::global_dof_index> dpc(2);
     DoFTools::count_dofs_per_component (dof_handler, dpc, false, group);
     Assert (dpc.size() == 2, ExcInternalError());
     print (dpc);
@@ -101,7 +101,7 @@ check ()
   {
     std::vector<unsigned int> group(dim+1, 0);
     group[dim] = 1;
-    std::vector<unsigned int> dpc(2);
+    std::vector<types::global_dof_index> dpc(2);
     DoFTools::count_dofs_per_block (dof_handler, dpc, group);
     Assert (dpc.size() == 2, ExcInternalError());
     print (dpc);
@@ -112,7 +112,7 @@ check ()
   {
     std::vector<unsigned int> group(dim+1, 2*dim);
     group[dim] = 0;
-    std::vector<unsigned int> dpc(2*dim+1);
+    std::vector<types::global_dof_index> dpc(2*dim+1);
     DoFTools::count_dofs_per_component (dof_handler, dpc, false, group);
     Assert (dpc.size() == 2*dim+1, ExcInternalError());
     print (dpc);
@@ -121,7 +121,7 @@ check ()
   {
     std::vector<unsigned int> group(dim+1, 2*dim);
     group[dim] = 0;
-    std::vector<unsigned int> dpc(2*dim+1);
+    std::vector<types::global_dof_index> dpc(2*dim+1);
     DoFTools::count_dofs_per_block (dof_handler, dpc, group);
     Assert (dpc.size() == 2*dim+1, ExcInternalError());
     print (dpc);

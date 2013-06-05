@@ -32,16 +32,16 @@ for (S1, S2 : REAL_SCALARS)
     template void SparseMatrix<S1>::add<S2> (const S1,
 					     const SparseMatrix<S2> &);
 
-    template void SparseMatrix<S1>::add<S2> (const unsigned int,
-					     const unsigned int,
-					     const unsigned int *,
+    template void SparseMatrix<S1>::add<S2> (const size_type,
+					     const size_type,
+					     const size_type *,
 					     const S2 *,
 					     const bool,
 					     const bool);
 
-    template void SparseMatrix<S1>::set<S2> (const unsigned int,
-					     const unsigned int,
-					     const unsigned int *,
+    template void SparseMatrix<S1>::set<S2> (const size_type,
+					     const size_type,
+					     const size_type *,
 					     const S2 *,
 					     const bool);
   }
@@ -95,13 +95,13 @@ for (S1, S2 : REAL_SCALARS)
 		const S1) const;
     template void SparseMatrix<S1>::
       PSOR<S2> (Vector<S2> &,
-		const std::vector<unsigned int>&,
-		const std::vector<unsigned int>&,
+		const std::vector<size_type>&,
+		const std::vector<size_type>&,
 		const S1) const;
     template void SparseMatrix<S1>::
       TPSOR<S2> (Vector<S2> &,
-		 const std::vector<unsigned int>&,
-		 const std::vector<unsigned int>&,
+		 const std::vector<size_type>&,
+		 const std::vector<size_type>&,
 		 const S1) const;
     template void SparseMatrix<S1>::
       Jacobi_step<S2> (Vector<S2> &,
@@ -215,13 +215,13 @@ for (S1, S2, S3: REAL_SCALARS)
 // 		const S1) const;
 //     template void SparseMatrix<S1>::
 //       PSOR<S2> (Vector<S2> &,
-// 		const std::vector<unsigned int>&,
-// 		const std::vector<unsigned int>&,
+// 		const std::vector<size_type>&,
+// 		const std::vector<size_type>&,
 // 		const S1) const;
 //     template void SparseMatrix<S1>::
 //       TPSOR<S2> (Vector<S2> &,
-// 		 const std::vector<unsigned int>&,
-// 		 const std::vector<unsigned int>&,
+// 		 const std::vector<size_type>&,
+// 		 const std::vector<size_type>&,
 // 		 const S1) const;
 //     template void SparseMatrix<S1>::
 //       SOR_step<S2> (Vector<S2> &,

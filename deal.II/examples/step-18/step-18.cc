@@ -512,12 +512,12 @@ namespace Step18
 
     // Here is a vector where each entry denotes the numbers of degrees of
     // freedom that are stored on the processor with that particular number:
-    std::vector<unsigned int> local_dofs_per_process;
+    std::vector<types::global_dof_index> local_dofs_per_process;
 
     // Next, how many degrees of freedom the present processor stores. This
     // is, of course, an abbreviation to
     // <code>local_dofs_per_process[this_mpi_process]</code>.
-    unsigned int         n_local_dofs;
+    types::global_dof_index n_local_dofs;
 
     // In the same direction, also cache how many cells the present processor
     // owns. Note that the cells that belong to a processor are not
@@ -1050,7 +1050,7 @@ namespace Step18
     FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       cell_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     BodyForce<dim>      body_force;
     std::vector<Vector<double> > body_force_values (n_q_points,
@@ -1182,7 +1182,7 @@ namespace Step18
     // for each vector component and because we only want to restrict vertical
     // motion, it has only its last component set:
     FEValuesExtractors::Scalar z_component (dim-1);
-    std::map<unsigned int,double> boundary_values;
+    std::map<types::global_dof_index,double> boundary_values;
     VectorTools::
     interpolate_boundary_values (dof_handler,
                                  0,

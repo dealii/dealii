@@ -28,7 +28,7 @@
 
 void test (TrilinosWrappers::BlockVector &v)
 {
-  std::vector<unsigned int> sizes (2, 3);
+  std::vector<types::global_dof_index> sizes (2, 3);
   dealii::BlockVector<TrilinosScalar> w (sizes);
 
   for (unsigned int i=0; i<w.size(); ++i)
@@ -72,7 +72,7 @@ int main (int argc,char **argv)
   try
     {
       {
-	std::vector<unsigned int> sizes (2, 3);
+	std::vector<types::global_dof_index> sizes (2, 3);
         TrilinosWrappers::BlockVector v (sizes);
         test (v);
       }

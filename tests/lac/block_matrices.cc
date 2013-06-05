@@ -158,13 +158,13 @@ void test ()
 				   // and see what we can get after
 				   // vmults:
   BlockVector<double> src;
-  std::vector<unsigned int> src_sizes (2);
+  std::vector<types::global_dof_index> src_sizes (2);
   src_sizes[0] = 10;
   src_sizes[1] = 19;
   src.reinit (src_sizes);
 
   BlockVector<double> dst;
-  std::vector<unsigned int> dst_sizes (3);
+  std::vector<types::global_dof_index> dst_sizes (3);
   dst_sizes[0] = 2;
   dst_sizes[1] = 7;
   dst_sizes[2] = 10;

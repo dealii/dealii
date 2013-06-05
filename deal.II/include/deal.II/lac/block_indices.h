@@ -17,6 +17,7 @@
 #include <deal.II/base/subscriptor.h>
 #include <deal.II/base/exceptions.h>
 #include <deal.II/base/logstream.h>
+#include <cstddef>
 #include <vector>
 
 DEAL_II_NAMESPACE_OPEN
@@ -49,6 +50,10 @@ DEAL_II_NAMESPACE_OPEN
 class BlockIndices : public Subscriptor
 {
 public:
+  /**
+   * Declare the type for container size.
+   */
+  typedef types::global_dof_index size_type;
 
   /**
    * Default
@@ -64,13 +69,13 @@ public:
    * number of blocks will be the
    * size of the vector
    */
-  BlockIndices (const std::vector<unsigned int> &n);
+  BlockIndices (const std::vector<size_type> &n);
 
   /**
    * Specialized constructor for a
    * structure with blocks of equal size.
    */
-  explicit BlockIndices(const unsigned int n_blocks, const unsigned int block_size = 0);
+  explicit BlockIndices(const unsigned int n_blocks, const size_type block_size = 0);
 
   /**
    * Reinitialize the number of
@@ -78,7 +83,7 @@ public:
    * the same number of elements.
    */
   void reinit (const unsigned int n_blocks,
-               const unsigned int n_elements_per_block);
+               const size_type n_elements_per_block);
 
   /**
    * Reinitialize the number of
@@ -89,14 +94,14 @@ public:
    * of block @p i is set to
    * <tt>n[i]</tt>.
    */
-  void reinit (const std::vector<unsigned int> &n);
+  void reinit (const std::vector<size_type> &n);
 
   /**
    * Add another block of given
    * size to the end of the block
    * structure.
    */
-  void push_back(const unsigned int size);
+  void push_back(const size_type size);
 
   /**
    * @name Size information
@@ -115,12 +120,12 @@ public:
    * of the vector space of the
    * block vector.
    */
-  unsigned int total_size () const;
+  size_type total_size () const;
 
   /**
    * The size of the @p ith block.
    */
-  unsigned int block_size (const unsigned int i) const;
+  size_type block_size (const unsigned int i) const;
 
   //@}
 
@@ -147,20 +152,20 @@ public:
    * the block, the second the
    * index within it.
    */
-  std::pair<unsigned int,unsigned int>
-  global_to_local (const unsigned int i) const;
+  std::pair<unsigned int,size_type>
+  global_to_local (const size_type i) const;
 
   /**
    * Return the global index of
    * @p index in block @p block.
    */
-  unsigned int local_to_global (const unsigned int block,
-                                const unsigned int index) const;
+  size_type local_to_global (const unsigned int block,
+                             const size_type index) const;
 
   /**
    * The start index of the ith block.
    */
-  unsigned int block_start (const unsigned int i) const;
+  size_type block_start (const unsigned int i) const;
   //@}
 
   /**
@@ -206,7 +211,7 @@ private:
    * value is the total number of
    * entries.
    */
-  std::vector<unsigned int> start_indices;
+  std::vector<size_type> start_indices;
 };
 
 
@@ -329,11 +334,11 @@ const bool IsBlockMatrix<MatrixType>::value;
 inline
 void
 BlockIndices::reinit (const unsigned int nb,
-                      const unsigned int block_size)
+                      const size_type block_size)
 {
   n_blocks = nb;
   start_indices.resize(n_blocks+1);
-  for (unsigned int i=0; i<=n_blocks; ++i)
+  for (size_type i=0; i<=n_blocks; ++i)
     start_indices[i] = i * block_size;
 }
 
@@ -341,15 +346,15 @@ BlockIndices::reinit (const unsigned int nb,
 
 inline
 void
-BlockIndices::reinit (const std::vector<unsigned int> &n)
+BlockIndices::reinit (const std::vector<size_type> &n)
 {
   if (start_indices.size() != n.size()+1)
     {
-      n_blocks = n.size();
+      n_blocks = static_cast<unsigned int>(n.size());
       start_indices.resize(n_blocks+1);
     }
   start_indices[0] = 0;
-  for (unsigned int i=1; i<=n_blocks; ++i)
+  for (size_type i=1; i<=n_blocks; ++i)
     start_indices[i] = start_indices[i-1] + n[i-1];
 }
 
@@ -366,21 +371,21 @@ BlockIndices::BlockIndices ()
 inline
 BlockIndices::BlockIndices (
   const unsigned int n_blocks,
-  const unsigned int block_size)
+  const size_type block_size)
   :
   n_blocks(n_blocks),
   start_indices(n_blocks+1)
 {
-  for (unsigned int i=0; i<=n_blocks; ++i)
+  for (size_type i=0; i<=n_blocks; ++i)
     start_indices[i] = i * block_size;
 }
 
 
 
 inline
-BlockIndices::BlockIndices (const std::vector<unsigned int> &n)
+BlockIndices::BlockIndices (const std::vector<size_type> &n)
   :
-  n_blocks(n.size()),
+  n_blocks(static_cast<unsigned int>(n.size())),
   start_indices(n.size()+1)
 {
   reinit (n);
@@ -389,7 +394,7 @@ BlockIndices::BlockIndices (const std::vector<unsigned int> &n)
 
 inline
 void
-BlockIndices::push_back(const unsigned int sz)
+BlockIndices::push_back(const size_type sz)
 {
   start_indices.push_back(start_indices[n_blocks]+sz);
   ++n_blocks;
@@ -398,29 +403,29 @@ BlockIndices::push_back(const unsigned int sz)
 
 
 inline
-std::pair<unsigned int,unsigned int>
-BlockIndices::global_to_local (const unsigned int i) const
+std::pair<unsigned int,BlockIndices::size_type>
+BlockIndices::global_to_local (const size_type i) const
 {
-  Assert (i<total_size(), ExcIndexRange(i, 0, total_size()));
-  Assert (n_blocks > 0, ExcLowerRange(i, 1));
+  Assert (i<total_size(), ExcIndexRangeType<size_type>(i, 0, total_size()));
+  Assert (n_blocks > 0, ExcLowerRangeType<size_type>(i, size_type(1)));
 
   unsigned int block = n_blocks-1;
   while (i < start_indices[block])
     --block;
 
-  return std::pair<unsigned int,unsigned int>(block,
+  return std::pair<size_type,size_type>(block,
                                               i-start_indices[block]);
 }
 
 
 inline
-unsigned int
+BlockIndices::size_type
 BlockIndices::local_to_global (const unsigned int block,
-                               const unsigned int index) const
+                               const size_type index) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
   Assert (index < start_indices[block+1]-start_indices[block],
-          ExcIndexRange (index, 0, start_indices[block+1]-start_indices[block]));
+          ExcIndexRangeType<size_type> (index, 0, start_indices[block+1]-start_indices[block]));
 
   return start_indices[block]+index;
 }
@@ -436,7 +441,7 @@ BlockIndices::size () const
 
 
 inline
-unsigned int
+BlockIndices::size_type
 BlockIndices::total_size () const
 {
   if (n_blocks == 0) return 0;
@@ -446,7 +451,7 @@ BlockIndices::total_size () const
 
 
 inline
-unsigned int
+BlockIndices::size_type
 BlockIndices::block_size (const unsigned int block) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
@@ -456,7 +461,7 @@ BlockIndices::block_size (const unsigned int block) const
 
 
 inline
-unsigned int
+BlockIndices::size_type
 BlockIndices::block_start (const unsigned int block) const
 {
   Assert (block < n_blocks, ExcIndexRange(block, 0, n_blocks));
@@ -483,7 +488,7 @@ BlockIndices::operator == (const BlockIndices &b) const
   if (n_blocks != b.n_blocks)
     return false;
 
-  for (unsigned int i=0; i<=n_blocks; ++i)
+  for (size_type i=0; i<=n_blocks; ++i)
     if (start_indices[i] != b.start_indices[i])
       return false;
 
@@ -499,7 +504,7 @@ BlockIndices::swap (BlockIndices &b)
   Assert (n_blocks == b.n_blocks,
           ExcDimensionMismatch(n_blocks, b.n_blocks));
 
-  for (unsigned int i=0; i<=n_blocks; ++i)
+  for (size_type i=0; i<=n_blocks; ++i)
     std::swap (start_indices[i], b.start_indices[i]);
 }
 

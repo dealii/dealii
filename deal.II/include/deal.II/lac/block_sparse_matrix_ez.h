@@ -48,6 +48,11 @@ class BlockSparseMatrixEZ : public Subscriptor
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Default constructor. The
    * result is an empty object with
    * zero dimensions.
@@ -189,7 +194,7 @@ public:
    * space. It is the sum of rows
    * of the rows of sub-matrices.
    */
-  unsigned int n_rows () const;
+  size_type n_rows () const;
 
   /**
    * Return number of columns of
@@ -199,7 +204,7 @@ public:
    * columns of the columns of
    * sub-matrices.
    */
-  unsigned int n_cols () const;
+  size_type n_cols () const;
 
   /**
    * Return the dimension of the
@@ -207,7 +212,7 @@ public:
    * matrix is of dimension
    * $m \times n$.
    */
-  unsigned int m () const;
+  size_type m () const;
 
   /**
    * Return the dimension of the
@@ -215,7 +220,7 @@ public:
    * matrix is of dimension
    * $m \times n$.
    */
-  unsigned int n () const;
+  size_type n () const;
 
   /**
    * Set the element <tt>(i,j)</tt>
@@ -226,8 +231,8 @@ public:
    * allowed to store zero values
    * in non-existent fields.
    */
-  void set (const unsigned int i,
-            const unsigned int j,
+  void set (const size_type i,
+            const size_type j,
             const Number value);
 
   /**
@@ -239,7 +244,7 @@ public:
    * is allowed to store zero
    * values in non-existent fields.
    */
-  void add (const unsigned int i, const unsigned int j,
+  void add (const size_type i, const size_type j,
             const Number value);
 
 
@@ -338,7 +343,7 @@ BlockSparseMatrixEZ<Number>::n_block_rows () const
 
 template <typename Number>
 inline
-unsigned int
+typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::n_rows () const
 {
   return row_indices.total_size();
@@ -358,7 +363,7 @@ BlockSparseMatrixEZ<Number>::n_block_cols () const
 
 template <typename Number>
 inline
-unsigned int
+typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::n_cols () const
 {
   return column_indices.total_size();
@@ -396,7 +401,7 @@ BlockSparseMatrixEZ<Number>::block (const unsigned int row,
 
 template <typename Number>
 inline
-unsigned int
+typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::m () const
 {
   return n_rows();
@@ -406,7 +411,7 @@ BlockSparseMatrixEZ<Number>::m () const
 
 template <typename Number>
 inline
-unsigned int
+typename BlockSparseMatrixEZ<Number>::size_type
 BlockSparseMatrixEZ<Number>::n () const
 {
   return n_cols();
@@ -417,14 +422,14 @@ BlockSparseMatrixEZ<Number>::n () const
 template <typename Number>
 inline
 void
-BlockSparseMatrixEZ<Number>::set (const unsigned int i,
-                                  const unsigned int j,
+BlockSparseMatrixEZ<Number>::set (const size_type i,
+                                  const size_type j,
                                   const Number value)
 {
 
   Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<size_type,size_type>
   row_index = row_indices.global_to_local (i),
   col_index = column_indices.global_to_local (j);
   block(row_index.first,col_index.first).set (row_index.second,
@@ -437,14 +442,14 @@ BlockSparseMatrixEZ<Number>::set (const unsigned int i,
 template <typename Number>
 inline
 void
-BlockSparseMatrixEZ<Number>::add (const unsigned int i,
-                                  const unsigned int j,
+BlockSparseMatrixEZ<Number>::add (const size_type i,
+                                  const size_type j,
                                   const Number value)
 {
 
   Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,size_type>
   row_index = row_indices.global_to_local (i),
   col_index = column_indices.global_to_local (j);
   block(row_index.first,col_index.first).add (row_index.second,
@@ -530,11 +535,9 @@ Tvmult_add (BlockVector<somenumber>       &dst,
           ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
   for (unsigned int row=0; row<n_block_rows(); ++row)
-    {
       for (unsigned int col=0; col<n_block_cols(); ++col)
         block(row,col).Tvmult_add (dst.block(col),
                                    src.block(row));
-    };
 }
 
 
@@ -544,18 +547,18 @@ inline
 void
 BlockSparseMatrixEZ<number>::print_statistics (STREAM &out, bool full)
 {
-  unsigned int used_total = 0;
-  unsigned int allocated_total = 0;
-  unsigned int reserved_total = 0;
-  std::vector<unsigned int> used_by_line_total;
+  size_type used_total = 0;
+  size_type allocated_total = 0;
+  size_type reserved_total = 0;
+  std::vector<size_type> used_by_line_total;
 
-  unsigned int used;
-  unsigned int allocated;
-  unsigned int reserved;
-  std::vector<unsigned int> used_by_line;
+  size_type used;
+  size_type allocated;
+  size_type reserved;
+  std::vector<size_type> used_by_line;
 
-  for (unsigned int i=0; i<n_block_rows(); ++i)
-    for (unsigned int j=0; j<n_block_cols(); ++j)
+  for (size_type i=0; i<n_block_rows(); ++i)
+    for (size_type j=0; j<n_block_cols(); ++j)
       {
         used_by_line.clear();
         out << "block:\t" << i << '\t' << j << std::endl;
@@ -573,7 +576,7 @@ BlockSparseMatrixEZ<number>::print_statistics (STREAM &out, bool full)
         if (full)
           {
             used_by_line_total.resize(used_by_line.size());
-            for (unsigned int i=0; i< used_by_line.size(); ++i)
+            for (size_type i=0; i< used_by_line.size(); ++i)
               if (used_by_line[i] != 0)
                 {
                   out << "row-entries\t" << i
@@ -587,7 +590,7 @@ BlockSparseMatrixEZ<number>::print_statistics (STREAM &out, bool full)
       << "used:" << used_total << std::endl
       << "allocated:" << allocated_total << std::endl
       << "reserved:" << reserved_total << std::endl;
-  for (unsigned int i=0; i< used_by_line_total.size(); ++i)
+  for (size_type i=0; i< used_by_line_total.size(); ++i)
     if (used_by_line_total[i] != 0)
       {
         out << "row-entries\t" << i

@@ -158,7 +158,7 @@ void LaplaceProblem::assemble_system ()
   FullMatrix<double>   cell_matrix (max_dofs_per_cell, max_dofs_per_cell);
   Vector<double>       cell_rhs (max_dofs_per_cell);
 
-  std::vector<unsigned int> local_dof_indices (max_dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (max_dofs_per_cell);
 
   hp::DoFHandler<2>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -204,7 +204,7 @@ void LaplaceProblem::assemble_system ()
   hanging_node_constraints.condense (system_matrix);
   hanging_node_constraints.condense (system_rhs);
   
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<2>(),

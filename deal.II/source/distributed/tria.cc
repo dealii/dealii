@@ -732,7 +732,7 @@ namespace
                             const std::vector<std::list<
                             std::pair<typename Triangulation<dim,spacedim>::active_cell_iterator,unsigned int> > >
                             & vertex_to_cell,
-                            const std::vector<unsigned int> &coarse_cell_to_p4est_tree_permutation,
+                            const std::vector<types::global_dof_index> &coarse_cell_to_p4est_tree_permutation,
                             const bool set_vertex_info,
                             typename internal::p4est::types<dim>::connectivity *connectivity)
   {
@@ -1500,7 +1500,7 @@ namespace
   {
   public:
     RefineAndCoarsenList (const Triangulation<dim,spacedim> &triangulation,
-                          const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
+                          const std::vector<types::global_dof_index> &p4est_tree_to_coarse_cell_permutation,
                           const types::subdomain_id                   my_subdomain,
                           typename internal::p4est::types<dim>::forest &forest);
 
@@ -1574,7 +1574,7 @@ namespace
   template <int dim, int spacedim>
   RefineAndCoarsenList<dim,spacedim>::
   RefineAndCoarsenList (const Triangulation<dim,spacedim>            &triangulation,
-                        const std::vector<unsigned int> &p4est_tree_to_coarse_cell_permutation,
+                        const std::vector<types::global_dof_index> &p4est_tree_to_coarse_cell_permutation,
                         const types::subdomain_id                   my_subdomain,
                         typename internal::p4est::types<dim>::forest &forest)
     :
@@ -3033,7 +3033,11 @@ namespace parallel
       number_cache.n_global_active_cells
         = std::accumulate (number_cache.n_locally_owned_active_cells.begin(),
                            number_cache.n_locally_owned_active_cells.end(),
-                           0);
+                           /* ensure sum is
+                              computed with
+                              correct data
+                              type:*/
+                           static_cast<types::global_dof_index>(0));
       number_cache.n_global_levels = Utilities::MPI::max(this->n_levels(), mpi_communicator);
     }
 
@@ -3059,7 +3063,7 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    unsigned int
+    types::global_dof_index
     Triangulation<dim,spacedim>::n_global_active_cells () const
     {
       return number_cache.n_global_active_cells;
@@ -3177,7 +3181,7 @@ namespace parallel
 
 
     template <int dim, int spacedim>
-    const std::vector<unsigned int> &
+    const std::vector<types::global_dof_index> &
     Triangulation<dim, spacedim>::get_p4est_tree_to_coarse_cell_permutation() const
     {
       return p4est_tree_to_coarse_cell_permutation;
@@ -3320,7 +3324,7 @@ namespace parallel
 
 
     template <>
-    unsigned int
+    types::global_dof_index
     Triangulation<1,1>::n_global_active_cells () const
     {
       Assert (false, ExcNotImplemented());
@@ -3378,7 +3382,7 @@ namespace parallel
 
 
     template <>
-    unsigned int
+    types::global_dof_index
     Triangulation<1,2>::n_global_active_cells () const
     {
       Assert (false, ExcNotImplemented());
@@ -3428,7 +3432,7 @@ namespace parallel
 
 
     template <>
-    unsigned int
+    types::global_dof_index
     Triangulation<1,3>::n_global_active_cells () const
     {
       Assert (false, ExcNotImplemented());

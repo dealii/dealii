@@ -54,6 +54,11 @@ namespace BlockMatrixIterators
   {
   public:
     /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
+    /**
      * Typedef the value type of the
      * matrix we point into.
      */
@@ -121,6 +126,11 @@ namespace BlockMatrixIterators
   {
   public:
     /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
+    /**
      * Type of the matrix used in
      * this accessor.
      */
@@ -145,22 +155,22 @@ namespace BlockMatrixIterators
      * of rows in the matrix.
      */
     Accessor (BlockMatrix *m,
-              const unsigned int row,
-              const unsigned int col);
+              const size_type row,
+              const size_type col);
 
     /**
      * Row number of the element
      * represented by this
      * object.
      */
-    unsigned int row() const;
+    size_type row() const;
 
     /**
      * Column number of the
      * element represented by
      * this object.
      */
-    unsigned int column() const;
+    size_type column() const;
 
     /**
      * Value of the entry at the
@@ -212,7 +222,12 @@ namespace BlockMatrixIterators
   {
   public:
     /**
-     * Thype of the matrix used in
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
+    /**
+     * Type of the matrix used in
      * this accessor.
      */
     typedef const BlockMatrix MatrixType;
@@ -236,8 +251,8 @@ namespace BlockMatrixIterators
      * of rows in the matrix.
      */
     Accessor (const BlockMatrix *m,
-              const unsigned int row,
-              const unsigned int col);
+              const size_type row,
+              const size_type col);
 
     /**
      * Initalize const accessor
@@ -250,14 +265,14 @@ namespace BlockMatrixIterators
      * represented by this
      * object.
      */
-    unsigned int row() const;
+    size_type row() const;
 
     /**
      * Column number of the
      * element represented by
      * this object.
      */
-    unsigned int column() const;
+    size_type column() const;
 
     /**
      * Value of the entry at the
@@ -376,7 +391,7 @@ public:
   typedef const value_type       *const_pointer;
   typedef value_type             &reference;
   typedef const value_type       &const_reference;
-  typedef std::size_t             size_type;
+  typedef types::global_dof_index size_type;
 
   typedef
   MatrixIterator<BlockMatrixIterators::Accessor<BlockMatrixBase, false> >
@@ -447,7 +462,7 @@ public:
    * matrix is of dimension
    * $m \times n$.
    */
-  unsigned int m () const;
+  size_type m () const;
 
   /**
    * Return the dimension of the
@@ -455,7 +470,7 @@ public:
    * matrix is of dimension
    * $m \times n$.
    */
-  unsigned int n () const;
+  size_type n () const;
 
 
   /**
@@ -483,8 +498,8 @@ public:
    * is allowed to store zero
    * values in non-existent fields.
    */
-  void set (const unsigned int i,
-            const unsigned int j,
+  void set (const size_type i,
+            const size_type j,
             const value_type value);
 
   /**
@@ -515,9 +530,9 @@ public:
    * values are treated.
    */
   template <typename number>
-  void set (const std::vector<unsigned int> &indices,
-            const FullMatrix<number>        &full_matrix,
-            const bool                       elide_zero_values = false);
+  void set (const std::vector<size_type> &indices,
+            const FullMatrix<number>     &full_matrix,
+            const bool                    elide_zero_values = false);
 
   /**
    * Same function as before, but now
@@ -527,10 +542,10 @@ public:
    * on rows and columns, respectively.
    */
   template <typename number>
-  void set (const std::vector<unsigned int> &row_indices,
-            const std::vector<unsigned int> &col_indices,
-            const FullMatrix<number>        &full_matrix,
-            const bool                       elide_zero_values = false);
+  void set (const std::vector<size_type> &row_indices,
+            const std::vector<size_type> &col_indices,
+            const FullMatrix<number>     &full_matrix,
+            const bool                    elide_zero_values = false);
 
   /**
    * Set several elements in the
@@ -551,10 +566,10 @@ public:
    * values are treated.
    */
   template <typename number>
-  void set (const unsigned int               row,
-            const std::vector<unsigned int> &col_indices,
-            const std::vector<number>       &values,
-            const bool                       elide_zero_values = false);
+  void set (const size_type row,
+            const std::vector<size_type> &col_indices,
+            const std::vector<number>    &values,
+            const bool                    elide_zero_values = false);
 
   /**
    * Set several elements to values
@@ -573,11 +588,11 @@ public:
    * values are inserted/replaced.
    */
   template <typename number>
-  void set (const unsigned int  row,
-            const unsigned int  n_cols,
-            const unsigned int *col_indices,
-            const number       *values,
-            const bool          elide_zero_values = false);
+  void set (const size_type  row,
+            const size_type  n_cols,
+            const size_type *col_indices,
+            const number    *values,
+            const bool       elide_zero_values = false);
 
   /**
    * Add <tt>value</tt> to the
@@ -588,8 +603,8 @@ public:
    * is allowed to store zero
    * values in non-existent fields.
    */
-  void add (const unsigned int i,
-            const unsigned int j,
+  void add (const size_type i,
+            const size_type j,
             const value_type value);
 
   /**
@@ -620,9 +635,9 @@ public:
    * into the matrix.
    */
   template <typename number>
-  void add (const std::vector<unsigned int> &indices,
-            const FullMatrix<number>        &full_matrix,
-            const bool                       elide_zero_values = true);
+  void add (const std::vector<size_type> &indices,
+            const FullMatrix<number>     &full_matrix,
+            const bool                    elide_zero_values = true);
 
   /**
    * Same function as before, but now
@@ -632,10 +647,10 @@ public:
    * on rows and columns, respectively.
    */
   template <typename number>
-  void add (const std::vector<unsigned int> &row_indices,
-            const std::vector<unsigned int> &col_indices,
-            const FullMatrix<number>        &full_matrix,
-            const bool                       elide_zero_values = true);
+  void add (const std::vector<size_type> &row_indices,
+            const std::vector<size_type> &col_indices,
+            const FullMatrix<number>     &full_matrix,
+            const bool                    elide_zero_values = true);
 
   /**
    * Set several elements in the
@@ -655,10 +670,10 @@ public:
    * into the matrix.
    */
   template <typename number>
-  void add (const unsigned int               row,
-            const std::vector<unsigned int> &col_indices,
-            const std::vector<number>       &values,
-            const bool                       elide_zero_values = true);
+  void add (const size_type row,
+            const std::vector<size_type> &col_indices,
+            const std::vector<number>    &values,
+            const bool                    elide_zero_values = true);
 
   /**
    * Add an array of values given by
@@ -678,12 +693,12 @@ public:
    * into the matrix.
    */
   template <typename number>
-  void add (const unsigned int  row,
-            const unsigned int  n_cols,
-            const unsigned int *col_indices,
-            const number       *values,
-            const bool          elide_zero_values = true,
-            const bool          col_indices_are_sorted = false);
+  void add (const size_type  row,
+            const size_type  n_cols,
+            const size_type *col_indices,
+            const number    *values,
+            const bool       elide_zero_values = true,
+            const bool       col_indices_are_sorted = false);
 
   /**
    * Add <tt>matrix</tt> scaled by
@@ -711,8 +726,8 @@ public:
    * if the wanted element does not
    * exist in the matrix.
    */
-  value_type operator () (const unsigned int i,
-                          const unsigned int j) const;
+  value_type operator () (const size_type i,
+                          const size_type j) const;
 
   /**
    * This function is mostly like
@@ -731,8 +746,8 @@ public:
    * solution, since the sparsity
    * of the matrix is not used.
    */
-  value_type el (const unsigned int i,
-                 const unsigned int j) const;
+  value_type el (const size_type i,
+                 const size_type j) const;
 
   /**
    * Return the main diagonal element in
@@ -751,7 +766,7 @@ public:
    * involve searching for the
    * right column number.
    */
-  value_type diag_element (const unsigned int i) const;
+  value_type diag_element (const size_type i) const;
 
   /**
    * Call the compress() function on all
@@ -880,12 +895,12 @@ public:
    * STL-like iterator with the
    * first entry of row <tt>r</tt>.
    */
-  iterator begin (const unsigned int r);
+  iterator begin (const size_type r);
 
   /**
    * Final iterator of row <tt>r</tt>.
    */
-  iterator end (const unsigned int r);
+  iterator end (const size_type r);
   /**
    * STL-like iterator with the
    * first entry.
@@ -901,12 +916,12 @@ public:
    * STL-like iterator with the
    * first entry of row <tt>r</tt>.
    */
-  const_iterator begin (const unsigned int r) const;
+  const_iterator begin (const size_type r) const;
 
   /**
    * Final iterator of row <tt>r</tt>.
    */
-  const_iterator end (const unsigned int r) const;
+  const_iterator end (const size_type r) const;
 
   /**
    * Return a reference to the underlying
@@ -1227,7 +1242,7 @@ private:
    * individual blocks when doing a
    * collective add or set.
    */
-  std::vector<unsigned int> counter_within_block;
+  std::vector<size_type> counter_within_block;
 
   /**
    * Temporary vector for column
@@ -1235,7 +1250,7 @@ private:
    * local to global data on each
    * sparse matrix.
    */
-  std::vector<std::vector<unsigned int> > column_indices;
+  std::vector<std::vector<size_type> > column_indices;
 
   /**
    * Temporary vector for storing the
@@ -1304,8 +1319,8 @@ namespace BlockMatrixIterators
   inline
   Accessor<BlockMatrix, true>::Accessor (
     const BlockMatrix  *matrix,
-    const unsigned int  row,
-    const unsigned int  col)
+    const size_type     row,
+    const size_type     col)
     :
     matrix(matrix),
     base_iterator(matrix->block(0,0).begin())
@@ -1316,7 +1331,7 @@ namespace BlockMatrixIterators
     // the end of the matrix
     if (row < matrix->m())
       {
-        const std::pair<unsigned int,unsigned int> indices
+        const std::pair<unsigned int,size_type> indices
           = matrix->row_block_indices.global_to_local(row);
 
         // find the first block that does
@@ -1378,7 +1393,7 @@ namespace BlockMatrixIterators
 
   template <class BlockMatrix>
   inline
-  unsigned int
+  typename Accessor<BlockMatrix, true>::size_type
   Accessor<BlockMatrix, true>::row() const
   {
     Assert (this->row_block != numbers::invalid_unsigned_int,
@@ -1391,7 +1406,7 @@ namespace BlockMatrixIterators
 
   template <class BlockMatrix>
   inline
-  unsigned int
+  typename Accessor<BlockMatrix, true>::size_type
   Accessor<BlockMatrix, true>::column() const
   {
     Assert (this->col_block != numbers::invalid_unsigned_int,
@@ -1428,7 +1443,7 @@ namespace BlockMatrixIterators
             ExcIteratorPastEnd());
 
     // Remember current row inside block
-    unsigned int local_row = base_iterator->row();
+    size_type local_row = base_iterator->row();
 
     // Advance one element inside the
     // current block
@@ -1513,8 +1528,8 @@ namespace BlockMatrixIterators
   inline
   Accessor<BlockMatrix, false>::Accessor (
     BlockMatrix  *matrix,
-    const unsigned int  row,
-    const unsigned int  col)
+    const size_type row,
+    const size_type col)
     :
     matrix(matrix),
     base_iterator(matrix->block(0,0).begin())
@@ -1524,12 +1539,12 @@ namespace BlockMatrixIterators
     // the end of the matrix
     if (row < matrix->m())
       {
-        const std::pair<unsigned int,unsigned int> indices
+        const std::pair<unsigned int,size_type> indices
           = matrix->row_block_indices.global_to_local(row);
 
         // find the first block that does
         // have an entry in this row
-        for (unsigned int bc=0; bc<matrix->n_block_cols(); ++bc)
+        for (size_type bc=0; bc<matrix->n_block_cols(); ++bc)
           {
             base_iterator
               = matrix->block(indices.first, bc).begin(indices.second);
@@ -1554,18 +1569,18 @@ namespace BlockMatrixIterators
       {
         // we were asked to create the end
         // iterator for this matrix
-        this->row_block = numbers::invalid_unsigned_int;
-        this->col_block = numbers::invalid_unsigned_int;
+        this->row_block = numbers::invalid_size_type;
+        this->col_block = numbers::invalid_size_type;
       }
   }
 
 
   template <class BlockMatrix>
   inline
-  unsigned int
+  typename Accessor<BlockMatrix, false>::size_type
   Accessor<BlockMatrix, false>::row() const
   {
-    Assert (this->row_block != numbers::invalid_unsigned_int,
+    Assert (this->row_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
 
     return (matrix->row_block_indices.local_to_global(this->row_block, 0) +
@@ -1575,10 +1590,10 @@ namespace BlockMatrixIterators
 
   template <class BlockMatrix>
   inline
-  unsigned int
+  typename Accessor<BlockMatrix, false>::size_type
   Accessor<BlockMatrix, false>::column() const
   {
-    Assert (this->col_block != numbers::invalid_unsigned_int,
+    Assert (this->col_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
 
     return (matrix->column_block_indices.local_to_global(this->col_block,0) +
@@ -1591,9 +1606,9 @@ namespace BlockMatrixIterators
   typename Accessor<BlockMatrix, false>::value_type
   Accessor<BlockMatrix, false>::value () const
   {
-    Assert (this->row_block != numbers::invalid_unsigned_int,
+    Assert (this->row_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
-    Assert (this->col_block != numbers::invalid_unsigned_int,
+    Assert (this->col_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
 
     return base_iterator->value();
@@ -1606,9 +1621,9 @@ namespace BlockMatrixIterators
   void
   Accessor<BlockMatrix, false>::set_value (typename Accessor<BlockMatrix, false>::value_type newval) const
   {
-    Assert (this->row_block != numbers::invalid_unsigned_int,
+    Assert (this->row_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
-    Assert (this->col_block != numbers::invalid_unsigned_int,
+    Assert (this->col_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
 
     base_iterator->value() = newval;
@@ -1621,13 +1636,13 @@ namespace BlockMatrixIterators
   void
   Accessor<BlockMatrix, false>::advance ()
   {
-    Assert (this->row_block != numbers::invalid_unsigned_int,
+    Assert (this->row_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
-    Assert (this->col_block != numbers::invalid_unsigned_int,
+    Assert (this->col_block != numbers::invalid_size_type,
             ExcIteratorPastEnd());
 
     // Remember current row inside block
-    unsigned int local_row = base_iterator->row();
+    size_type local_row = base_iterator->row();
 
     // Advance one element inside the
     // current block
@@ -1669,8 +1684,8 @@ namespace BlockMatrixIterators
                 ++this->row_block;
                 if (this->row_block == matrix->n_block_rows())
                   {
-                    this->row_block = numbers::invalid_unsigned_int;
-                    this->col_block = numbers::invalid_unsigned_int;
+                    this->row_block = numbers::invalid_size_type;
+                    this->col_block = numbers::invalid_size_type;
                     return;
                   }
               }
@@ -1697,9 +1712,9 @@ namespace BlockMatrixIterators
       // have to have the same
       // base_iterator representation, but
       // valid iterators have to
-      return (((this->row_block == numbers::invalid_unsigned_int)
+      return (((this->row_block == numbers::invalid_size_type)
                &&
-               (this->col_block == numbers::invalid_unsigned_int))
+               (this->col_block == numbers::invalid_size_type))
               ||
               (base_iterator == a.base_iterator));
 
@@ -1810,7 +1825,7 @@ BlockMatrixBase<MatrixType>::block (const unsigned int row,
 
 template <class MatrixType>
 inline
-unsigned int
+typename BlockMatrixBase<MatrixType>::size_type
 BlockMatrixBase<MatrixType>::m () const
 {
   return row_block_indices.total_size();
@@ -1820,7 +1835,7 @@ BlockMatrixBase<MatrixType>::m () const
 
 template <class MatrixType>
 inline
-unsigned int
+typename BlockMatrixBase<MatrixType>::size_type
 BlockMatrixBase<MatrixType>::n () const
 {
   return column_block_indices.total_size();
@@ -1854,15 +1869,15 @@ BlockMatrixBase<MatrixType>::n_block_rows () const
 template <class MatrixType>
 inline
 void
-BlockMatrixBase<MatrixType>::set (const unsigned int i,
-                                  const unsigned int j,
+BlockMatrixBase<MatrixType>::set (const size_type i,
+                                  const size_type j,
                                   const value_type value)
 {
   prepare_set_operation();
 
   Assert (numbers::is_finite(value), ExcNumberNotFinite());
 
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,size_type>
   row_index = row_block_indices.global_to_local (i),
   col_index = column_block_indices.global_to_local (j);
   block(row_index.first,col_index.first).set (row_index.second,
@@ -1876,8 +1891,8 @@ template <class MatrixType>
 template <typename number>
 inline
 void
-BlockMatrixBase<MatrixType>::set (const std::vector<unsigned int> &row_indices,
-                                  const std::vector<unsigned int> &col_indices,
+BlockMatrixBase<MatrixType>::set (const std::vector<size_type> &row_indices,
+                                  const std::vector<size_type> &col_indices,
                                   const FullMatrix<number>        &values,
                                   const bool                       elide_zero_values)
 {
@@ -1886,7 +1901,7 @@ BlockMatrixBase<MatrixType>::set (const std::vector<unsigned int> &row_indices,
   Assert (col_indices.size() == values.n(),
           ExcDimensionMismatch(col_indices.size(), values.n()));
 
-  for (unsigned int i=0; i<row_indices.size(); ++i)
+  for (size_type i=0; i<row_indices.size(); ++i)
     set (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
          elide_zero_values);
 }
@@ -1897,7 +1912,7 @@ template <class MatrixType>
 template <typename number>
 inline
 void
-BlockMatrixBase<MatrixType>::set (const std::vector<unsigned int> &indices,
+BlockMatrixBase<MatrixType>::set (const std::vector<size_type> &indices,
                                   const FullMatrix<number>        &values,
                                   const bool                       elide_zero_values)
 {
@@ -1905,7 +1920,7 @@ BlockMatrixBase<MatrixType>::set (const std::vector<unsigned int> &indices,
           ExcDimensionMismatch(indices.size(), values.m()));
   Assert (values.n() == values.m(), ExcNotQuadratic());
 
-  for (unsigned int i=0; i<indices.size(); ++i)
+  for (size_type i=0; i<indices.size(); ++i)
     set (indices[i], indices.size(), &indices[0], &values(i,0),
          elide_zero_values);
 }
@@ -1916,10 +1931,10 @@ template <class MatrixType>
 template <typename number>
 inline
 void
-BlockMatrixBase<MatrixType>::set (const unsigned int               row,
-                                  const std::vector<unsigned int> &col_indices,
-                                  const std::vector<number>       &values,
-                                  const bool                       elide_zero_values)
+BlockMatrixBase<MatrixType>::set (const size_type               row,
+                                  const std::vector<size_type> &col_indices,
+                                  const std::vector<number>    &values,
+                                  const bool                    elide_zero_values)
 {
   Assert (col_indices.size() == values.size(),
           ExcDimensionMismatch(col_indices.size(), values.size()));
@@ -1937,11 +1952,11 @@ template <class MatrixType>
 template <typename number>
 inline
 void
-BlockMatrixBase<MatrixType>::set (const unsigned int  row,
-                                  const unsigned int  n_cols,
-                                  const unsigned int *col_indices,
-                                  const number       *values,
-                                  const bool          elide_zero_values)
+BlockMatrixBase<MatrixType>::set (const size_type  row,
+                                  const size_type  n_cols,
+                                  const size_type *col_indices,
+                                  const number    *values,
+                                  const bool       elide_zero_values)
 {
   prepare_set_operation();
 
@@ -1986,17 +2001,17 @@ BlockMatrixBase<MatrixType>::set (const unsigned int  row,
   // is stored contiguously (in fact,
   // indices will be intermixed when it
   // comes from an element matrix).
-  for (unsigned int j=0; j<n_cols; ++j)
+  for (size_type j=0; j<n_cols; ++j)
     {
       double value = values[j];
 
       if (value == 0 && elide_zero_values == true)
         continue;
 
-      const std::pair<unsigned int, unsigned int>
+      const std::pair<unsigned int, size_type>
       col_index = this->column_block_indices.global_to_local(col_indices[j]);
 
-      const unsigned int local_index = counter_within_block[col_index.first]++;
+      const size_type local_index = counter_within_block[col_index.first]++;
 
       column_indices[col_index.first][local_index] = col_index.second;
       column_values[col_index.first][local_index] = value;
@@ -2005,7 +2020,7 @@ BlockMatrixBase<MatrixType>::set (const unsigned int  row,
 #ifdef DEBUG
   // If in debug mode, do a check whether
   // the right length has been obtained.
-  unsigned int length = 0;
+  size_type length = 0;
   for (unsigned int i=0; i<this->n_block_cols(); ++i)
     length += counter_within_block[i];
   Assert (length <= n_cols, ExcInternalError());
@@ -2016,7 +2031,7 @@ BlockMatrixBase<MatrixType>::set (const unsigned int  row,
   // where we should start reading out
   // data. Now let's write the data into
   // the individual blocks!
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,size_type>
   row_index = this->row_block_indices.global_to_local (row);
   for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
     {
@@ -2037,8 +2052,8 @@ BlockMatrixBase<MatrixType>::set (const unsigned int  row,
 template <class MatrixType>
 inline
 void
-BlockMatrixBase<MatrixType>::add (const unsigned int i,
-                                  const unsigned int j,
+BlockMatrixBase<MatrixType>::add (const size_type  i,
+                                  const size_type  j,
                                   const value_type value)
 {
 
@@ -2055,7 +2070,7 @@ BlockMatrixBase<MatrixType>::add (const unsigned int i,
       (value == value_type()))
     return;
 
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,size_type>
   row_index = row_block_indices.global_to_local (i),
   col_index = column_block_indices.global_to_local (j);
   block(row_index.first,col_index.first).add (row_index.second,
@@ -2069,17 +2084,17 @@ template <class MatrixType>
 template <typename number>
 inline
 void
-BlockMatrixBase<MatrixType>::add (const std::vector<unsigned int> &row_indices,
-                                  const std::vector<unsigned int> &col_indices,
-                                  const FullMatrix<number>        &values,
-                                  const bool                       elide_zero_values)
+BlockMatrixBase<MatrixType>::add (const std::vector<size_type> &row_indices,
+                                  const std::vector<size_type> &col_indices,
+                                  const FullMatrix<number>     &values,
+                                  const bool                    elide_zero_values)
 {
   Assert (row_indices.size() == values.m(),
           ExcDimensionMismatch(row_indices.size(), values.m()));
   Assert (col_indices.size() == values.n(),
           ExcDimensionMismatch(col_indices.size(), values.n()));
 
-  for (unsigned int i=0; i<row_indices.size(); ++i)
+  for (size_type i=0; i<row_indices.size(); ++i)
     add (row_indices[i], col_indices.size(), &col_indices[0], &values(i,0),
          elide_zero_values);
 }
@@ -2090,15 +2105,15 @@ template <class MatrixType>
 template <typename number>
 inline
 void
-BlockMatrixBase<MatrixType>::add (const std::vector<unsigned int> &indices,
-                                  const FullMatrix<number>        &values,
-                                  const bool                       elide_zero_values)
+BlockMatrixBase<MatrixType>::add (const std::vector<size_type> &indices,
+                                  const FullMatrix<number>     &values,
+                                  const bool                    elide_zero_values)
 {
   Assert (indices.size() == values.m(),
           ExcDimensionMismatch(indices.size(), values.m()));
   Assert (values.n() == values.m(), ExcNotQuadratic());
 
-  for (unsigned int i=0; i<indices.size(); ++i)
+  for (size_type i=0; i<indices.size(); ++i)
     add (indices[i], indices.size(), &indices[0], &values(i,0),
          elide_zero_values);
 }
@@ -2109,10 +2124,10 @@ template <class MatrixType>
 template <typename number>
 inline
 void
-BlockMatrixBase<MatrixType>::add (const unsigned int               row,
-                                  const std::vector<unsigned int> &col_indices,
-                                  const std::vector<number>       &values,
-                                  const bool                       elide_zero_values)
+BlockMatrixBase<MatrixType>::add (const size_type               row,
+                                  const std::vector<size_type> &col_indices,
+                                  const std::vector<number>    &values,
+                                  const bool                    elide_zero_values)
 {
   Assert (col_indices.size() == values.size(),
           ExcDimensionMismatch(col_indices.size(), values.size()));
@@ -2130,12 +2145,12 @@ template <class MatrixType>
 template <typename number>
 inline
 void
-BlockMatrixBase<MatrixType>::add (const unsigned int   row,
-                                  const unsigned int   n_cols,
-                                  const unsigned int  *col_indices,
-                                  const number        *values,
-                                  const bool           elide_zero_values,
-                                  const bool           col_indices_are_sorted)
+BlockMatrixBase<MatrixType>::add (const size_type  row,
+                                  const size_type  n_cols,
+                                  const size_type *col_indices,
+                                  const number    *values,
+                                  const bool       elide_zero_values,
+                                  const bool       col_indices_are_sorted)
 {
   prepare_add_operation();
 
@@ -2147,24 +2162,24 @@ BlockMatrixBase<MatrixType>::add (const unsigned int   row,
 #ifdef DEBUG
       // check whether indices really are
       // sorted.
-      unsigned int before = col_indices[0];
-      for (unsigned int i=1; i<n_cols; ++i)
+      size_type before = col_indices[0];
+      for (size_type i=1; i<n_cols; ++i)
         if (col_indices[i] <= before)
           Assert (false, ExcMessage ("Flag col_indices_are_sorted is set, but "
                                      "indices appear to not be sorted."))
           else
             before = col_indices[i];
 #endif
-      const std::pair<unsigned int,unsigned int>
+      const std::pair<unsigned int,size_type>
       row_index = this->row_block_indices.global_to_local (row);
 
       if (this->n_block_cols() > 1)
         {
-          const unsigned int *first_block = Utilities::lower_bound (col_indices,
-                                                                    col_indices+n_cols,
-                                                                    this->column_block_indices.block_start(1));
+          const size_type *first_block = Utilities::lower_bound (col_indices,
+                                                                 col_indices+n_cols,
+                                                                 this->column_block_indices.block_start(1));
 
-          const unsigned int n_zero_block_indices = first_block - col_indices;
+          const size_type n_zero_block_indices = first_block - col_indices;
           block(row_index.first, 0).add (row_index.second,
                                          n_zero_block_indices,
                                          col_indices,
@@ -2231,17 +2246,17 @@ BlockMatrixBase<MatrixType>::add (const unsigned int   row,
   // block is stored contiguously (in
   // fact, data will be intermixed when
   // it comes from an element matrix).
-  for (unsigned int j=0; j<n_cols; ++j)
+  for (size_type j=0; j<n_cols; ++j)
     {
       double value = values[j];
 
       if (value == 0 && elide_zero_values == true)
         continue;
 
-      const std::pair<unsigned int, unsigned int>
+      const std::pair<unsigned int, size_type>
       col_index = this->column_block_indices.global_to_local(col_indices[j]);
 
-      const unsigned int local_index = counter_within_block[col_index.first]++;
+      const size_type local_index = counter_within_block[col_index.first]++;
 
       column_indices[col_index.first][local_index] = col_index.second;
       column_values[col_index.first][local_index] = value;
@@ -2250,7 +2265,7 @@ BlockMatrixBase<MatrixType>::add (const unsigned int   row,
 #ifdef DEBUG
   // If in debug mode, do a check whether
   // the right length has been obtained.
-  unsigned int length = 0;
+  size_type length = 0;
   for (unsigned int i=0; i<this->n_block_cols(); ++i)
     length += counter_within_block[i];
   Assert (length <= n_cols, ExcInternalError());
@@ -2261,7 +2276,7 @@ BlockMatrixBase<MatrixType>::add (const unsigned int   row,
   // where we should start reading out
   // data. Now let's write the data into
   // the individual blocks!
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,size_type>
   row_index = this->row_block_indices.global_to_local (row);
   for (unsigned int block_col=0; block_col<n_block_cols(); ++block_col)
     {
@@ -2311,10 +2326,10 @@ BlockMatrixBase<MatrixType>::add (const value_type                   factor,
 template <class MatrixType>
 inline
 typename BlockMatrixBase<MatrixType>::value_type
-BlockMatrixBase<MatrixType>::operator () (const unsigned int i,
-                                          const unsigned int j) const
+BlockMatrixBase<MatrixType>::operator () (const size_type i,
+                                          const size_type j) const
 {
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,size_type>
   row_index = row_block_indices.global_to_local (i),
   col_index = column_block_indices.global_to_local (j);
   return block(row_index.first,col_index.first) (row_index.second,
@@ -2326,10 +2341,10 @@ BlockMatrixBase<MatrixType>::operator () (const unsigned int i,
 template <class MatrixType>
 inline
 typename BlockMatrixBase<MatrixType>::value_type
-BlockMatrixBase<MatrixType>::el (const unsigned int i,
-                                 const unsigned int j) const
+BlockMatrixBase<MatrixType>::el (const size_type i,
+                                 const size_type j) const
 {
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,size_type>
   row_index = row_block_indices.global_to_local (i),
   col_index = column_block_indices.global_to_local (j);
   return block(row_index.first,col_index.first).el (row_index.second,
@@ -2341,12 +2356,12 @@ BlockMatrixBase<MatrixType>::el (const unsigned int i,
 template <class MatrixType>
 inline
 typename BlockMatrixBase<MatrixType>::value_type
-BlockMatrixBase<MatrixType>::diag_element (const unsigned int i) const
+BlockMatrixBase<MatrixType>::diag_element (const size_type i) const
 {
   Assert (n_block_rows() == n_block_cols(),
           ExcNotQuadratic());
 
-  const std::pair<unsigned int,unsigned int>
+  const std::pair<unsigned int,size_type>
   index = row_block_indices.global_to_local (i);
   return block(index.first,index.first).diag_element(index.second);
 }
@@ -2440,11 +2455,11 @@ vmult_block_block (BlockVectorType       &dst,
   Assert (src.n_blocks() == n_block_cols(),
           ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
-  for (unsigned int row=0; row<n_block_rows(); ++row)
+  for (size_type row=0; row<n_block_rows(); ++row)
     {
       block(row,0).vmult (dst.block(row),
                           src.block(0));
-      for (unsigned int col=1; col<n_block_cols(); ++col)
+      for (size_type col=1; col<n_block_cols(); ++col)
         block(row,col).vmult_add (dst.block(row),
                                   src.block(col));
     };
@@ -2466,7 +2481,7 @@ vmult_nonblock_block (VectorType    &dst,
           ExcDimensionMismatch(src.n_blocks(), n_block_cols()));
 
   block(0,0).vmult (dst, src.block(0));
-  for (unsigned int col=1; col<n_block_cols(); ++col)
+  for (size_type col=1; col<n_block_cols(); ++col)
     block(0,col).vmult_add (dst, src.block(col));
 }
 
@@ -2485,7 +2500,7 @@ vmult_block_nonblock (BlockVectorType  &dst,
   Assert (1 == n_block_cols(),
           ExcDimensionMismatch(1, n_block_cols()));
 
-  for (unsigned int row=0; row<n_block_rows(); ++row)
+  for (size_type row=0; row<n_block_rows(); ++row)
     block(row,0).vmult (dst.block(row),
                         src);
 }
@@ -2543,7 +2558,7 @@ Tvmult_block_block (BlockVectorType       &dst,
 
   dst = 0.;
 
-  for (unsigned int row=0; row<n_block_rows(); ++row)
+  for (unsigned int  row=0; row<n_block_rows(); ++row)
     {
       for (unsigned int col=0; col<n_block_cols(); ++col)
         block(row,col).Tvmult_add (dst.block(col),
@@ -2589,7 +2604,7 @@ Tvmult_nonblock_block (VectorType    &dst,
 
   block(0,0).Tvmult (dst, src.block(0));
 
-  for (unsigned int row=1; row<n_block_rows(); ++row)
+  for (size_type row=1; row<n_block_rows(); ++row)
     block(row,0).Tvmult_add (dst, src.block(row));
 }
 
@@ -2709,19 +2724,19 @@ residual (BlockVectorType          &dst,
                              x.block(0),
                              b.block(row));
 
-      for (unsigned int i=0; i<dst.block(row).size(); ++i)
+      for (size_type i=0; i<dst.block(row).size(); ++i)
         dst.block(row)(i) = -dst.block(row)(i);
 
       for (unsigned int col=1; col<n_block_cols(); ++col)
         block(row,col).vmult_add (dst.block(row),
                                   x.block(col));
 
-      for (unsigned int i=0; i<dst.block(row).size(); ++i)
+      for (size_type i=0; i<dst.block(row).size(); ++i)
         dst.block(row)(i) = -dst.block(row)(i);
     };
 
   value_type res = 0;
-  for (unsigned int row=0; row<n_block_rows(); ++row)
+  for (size_type row=0; row<n_block_rows(); ++row)
     res += dst.block(row).norm_sqr ();
   return std::sqrt(res);
 }
@@ -2769,7 +2784,7 @@ BlockMatrixBase<MatrixType>::end () const
 template <class MatrixType>
 inline
 typename BlockMatrixBase<MatrixType>::const_iterator
-BlockMatrixBase<MatrixType>::begin (const unsigned int r) const
+BlockMatrixBase<MatrixType>::begin (const size_type r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return const_iterator(this, r);
@@ -2780,7 +2795,7 @@ BlockMatrixBase<MatrixType>::begin (const unsigned int r) const
 template <class MatrixType>
 inline
 typename BlockMatrixBase<MatrixType>::const_iterator
-BlockMatrixBase<MatrixType>::end (const unsigned int r) const
+BlockMatrixBase<MatrixType>::end (const size_type r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return const_iterator(this, r+1);
@@ -2811,7 +2826,7 @@ BlockMatrixBase<MatrixType>::end ()
 template <class MatrixType>
 inline
 typename BlockMatrixBase<MatrixType>::iterator
-BlockMatrixBase<MatrixType>::begin (const unsigned int r)
+BlockMatrixBase<MatrixType>::begin (const size_type r)
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return iterator(this, r);
@@ -2822,7 +2837,7 @@ BlockMatrixBase<MatrixType>::begin (const unsigned int r)
 template <class MatrixType>
 inline
 typename BlockMatrixBase<MatrixType>::iterator
-BlockMatrixBase<MatrixType>::end (const unsigned int r)
+BlockMatrixBase<MatrixType>::end (const size_type r)
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   return iterator(this, r+1);
@@ -2834,8 +2849,8 @@ template <class MatrixType>
 void
 BlockMatrixBase<MatrixType>::collect_sizes ()
 {
-  std::vector<unsigned int> row_sizes (this->n_block_rows());
-  std::vector<unsigned int> col_sizes (this->n_block_cols());
+  std::vector<size_type> row_sizes (this->n_block_rows());
+  std::vector<size_type> col_sizes (this->n_block_cols());
 
   // first find out the row sizes
   // from the first block column

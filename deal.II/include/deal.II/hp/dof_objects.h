@@ -101,7 +101,7 @@ namespace internal
        * the degrees of freedom of each
        * hex in the @p hex_dofs array.
        */
-      std::vector<unsigned int> dof_offsets;
+      std::vector<types::global_dof_index> dof_offsets;
 
       /**
        * Store the global indices of
@@ -109,7 +109,7 @@ namespace internal
        * DoFLevel() for detailed
        * information.
        */
-      std::vector<unsigned int> dofs;
+      std::vector<types::global_dof_index > dofs;
 
       /**
        * Set the global index of
@@ -142,7 +142,7 @@ namespace internal
                      const unsigned int               obj_index,
                      const unsigned int               fe_index,
                      const unsigned int               local_index,
-                     const unsigned int               global_index,
+                     const types::global_dof_index    global_index,
                      const unsigned int               obj_level);
 
       /**
@@ -169,7 +169,7 @@ namespace internal
        * information.
        */
       template <int dimm, int spacedim>
-      unsigned int
+      types::global_dof_index
       get_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                      const unsigned int               obj_index,
                      const unsigned int               fe_index,
@@ -210,7 +210,7 @@ namespace internal
        * on this object.
        */
       template <int dimm, int spacedim>
-      unsigned int
+      types::global_dof_index
       nth_active_fe_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                            const unsigned int               obj_level,
                            const unsigned int               obj_index,
@@ -243,7 +243,7 @@ namespace internal
     template <int dim>
     template <int dimm, int spacedim>
     inline
-    unsigned int
+    types::global_dof_index
     DoFObjects<dim>::
     get_dof_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                    const unsigned int                obj_index,
@@ -272,7 +272,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert (dof_offsets[obj_index] != numbers::invalid_unsigned_int,
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -304,17 +304,18 @@ namespace internal
           // an exception if we can't
           // find a set for this
           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
+          const types::global_dof_index starting_offset = dof_offsets[obj_index];
+          const types::global_dof_index *pointer        = &dofs[starting_offset];
           while (true)
             {
-              Assert (*pointer != numbers::invalid_unsigned_int,
+              Assert (*pointer != numbers::invalid_dof_index,
                       ExcInternalError());
               if (*pointer == fe_index)
                 return *(pointer + 1 + local_index);
               else
-                pointer += dof_handler.get_fe()[*pointer]
-                           .template n_dofs_per_object<dim>() + 1;
+                pointer += static_cast<types::global_dof_index>(
+                    dof_handler.get_fe()[*pointer]
+                    .template n_dofs_per_object<dim>() + 1);
             }
         }
     }
@@ -330,7 +331,7 @@ namespace internal
                    const unsigned int                obj_index,
                    const unsigned int                fe_index,
                    const unsigned int                local_index,
-                   const unsigned int                global_index,
+                   const types::global_dof_index     global_index,
                    const unsigned int                obj_level)
     {
       Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
@@ -354,7 +355,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert (dof_offsets[obj_index] != numbers::invalid_unsigned_int,
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -386,11 +387,11 @@ namespace internal
           // an exception if we can't
           // find a set for this
           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          unsigned int      *pointer         = &dofs[starting_offset];
+          const types::global_dof_index starting_offset = dof_offsets[obj_index];
+          types::global_dof_index      *pointer         = &dofs[starting_offset];
           while (true)
             {
-              Assert (*pointer != numbers::invalid_unsigned_int,
+              Assert (*pointer != numbers::invalid_dof_index,
                       ExcInternalError());
               if (*pointer == fe_index)
                 {
@@ -426,7 +427,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      if (dof_offsets[obj_index] == numbers::invalid_unsigned_int)
+      if (dof_offsets[obj_index] == numbers::invalid_dof_index)
         return 0;
 
       // if we are on a cell, then the
@@ -450,11 +451,11 @@ namespace internal
           // find a set for this
           // particular fe_index
           const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
+          const types::global_dof_index *pointer        = &dofs[starting_offset];
           unsigned int counter = 0;
           while (true)
             {
-              if (*pointer == numbers::invalid_unsigned_int)
+              if (*pointer == numbers::invalid_dof_index)
                 // end of list reached
                 return counter;
               else
@@ -472,7 +473,7 @@ namespace internal
     template <int dim>
     template <int dimm, int spacedim>
     inline
-    unsigned int
+    types::global_dof_index
     DoFObjects<dim>::
     nth_active_fe_index (const dealii::hp::DoFHandler<dimm,spacedim> &dof_handler,
                          const unsigned int                obj_level,
@@ -491,7 +492,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert (dof_offsets[obj_index] != numbers::invalid_unsigned_int,
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -525,11 +526,11 @@ namespace internal
           // find a set for this
           // particular fe_index
           const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
+          const types::global_dof_index *pointer = &dofs[starting_offset];
           unsigned int counter = 0;
           while (true)
             {
-              Assert (*pointer != numbers::invalid_unsigned_int,
+              Assert (*pointer != numbers::invalid_dof_index,
                       ExcInternalError());
 
               const unsigned int fe_index = *pointer;
@@ -565,7 +566,7 @@ namespace internal
               ExcMessage ("No finite element collection is associated with "
                           "this DoFHandler"));
       Assert (obj_index < dof_offsets.size(),
-              ExcIndexRange (obj_index, 0, dof_offsets.size()));
+              ExcIndexRange (obj_index, 0, static_cast<unsigned int>(dof_offsets.size())));
       Assert ((fe_index != dealii::hp::DoFHandler<dimm,spacedim>::default_fe_index),
               ExcMessage ("You need to specify a FE index when working "
                           "with hp DoFHandlers"));
@@ -575,7 +576,7 @@ namespace internal
       // make sure we are on an
       // object for which DoFs have
       // been allocated at all
-      Assert (dof_offsets[obj_index] != numbers::invalid_unsigned_int,
+      Assert (dof_offsets[obj_index] != numbers::invalid_dof_index,
               ExcMessage ("You are trying to access degree of freedom "
                           "information for an object on which no such "
                           "information is available"));
@@ -606,18 +607,19 @@ namespace internal
           // an exception if we can't
           // find a set for this
           // particular fe_index
-          const unsigned int starting_offset = dof_offsets[obj_index];
-          const unsigned int *pointer        = &dofs[starting_offset];
+          const types::global_dof_index starting_offset = dof_offsets[obj_index];
+          const types::global_dof_index *pointer = &dofs[starting_offset];
           while (true)
             {
-              if (*pointer == numbers::invalid_unsigned_int)
+              if (*pointer == numbers::invalid_dof_index)
                 // end of list reached
                 return false;
               else if (*pointer == fe_index)
                 return true;
               else
-                pointer += dof_handler.get_fe()[*pointer]
-                           .template n_dofs_per_object<dim>() + 1;
+                pointer += static_cast<types::global_dof_index>(
+                    dof_handler.get_fe()[*pointer]
+                    .template n_dofs_per_object<dim>()+1);
             }
         }
     }

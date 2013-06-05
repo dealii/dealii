@@ -108,7 +108,7 @@ sort_arrays (const SparseMatrix<number> &matrix)
   // column index of the second entry in a row
   //
   // ignore rows with only one or no entry
-  for (unsigned int row=0; row<matrix.m(); ++row)
+  for (size_type row=0; row<matrix.m(); ++row)
     {
       // we may have to move some elements that are left of the diagonal
       // but presently after the diagonal entry to the left, whereas the
@@ -140,7 +140,7 @@ SparseDirectUMFPACK::
 sort_arrays (const SparseMatrixEZ<number> &matrix)
 {
   //same thing for SparseMatrixEZ
-  for (unsigned int row=0; row<matrix.m(); ++row)
+  for (size_type row=0; row<matrix.m(); ++row)
     {
       long int cursor = Ap[row];
       while ((cursor < Ap[row+1]-1) &&
@@ -165,10 +165,10 @@ sort_arrays (const BlockSparseMatrix<number> &matrix)
   // first. however, that means that there may be as many entries per row
   // in the wrong place as there are block columns. we can do the same
   // thing as above, but we have to do it multiple times
-  for (unsigned int row=0; row<matrix.m(); ++row)
+  for (size_type row=0; row<matrix.m(); ++row)
     {
       long int cursor = Ap[row];
-      for (unsigned int block=0; block<matrix.n_block_cols(); ++block)
+      for (size_type block=0; block<matrix.n_block_cols(); ++block)
         {
           // find the next out-of-order element
           while ((cursor < Ap[row+1]-1) &&
@@ -204,7 +204,7 @@ factorize (const Matrix &matrix)
 
   clear ();
 
-  const unsigned int N = matrix.m();
+  const size_type N = matrix.m();
 
   // copy over the data from the matrix to the data structures UMFPACK
   // wants. note two things: first, UMFPACK wants compressed column storage
@@ -230,9 +230,9 @@ factorize (const Matrix &matrix)
 
   // first fill row lengths array
   Ap[0] = 0;
-  for (unsigned int row=1; row<=N; ++row)
+  for (size_type row=1; row<=N; ++row)
     Ap[row] = Ap[row-1] + matrix.get_row_length(row-1);
-  Assert (static_cast<unsigned int>(Ap.back()) == Ai.size(),
+  Assert (static_cast<size_type>(Ap.back()) == Ai.size(),
           ExcInternalError());
 
   // then copy over matrix elements. note that for sparse matrices,
@@ -246,7 +246,7 @@ factorize (const Matrix &matrix)
 
     // loop over the elements of the matrix row by row, as suggested in the
     // documentation of the sparse matrix iterator class
-    for (unsigned int row = 0; row < matrix.m(); ++row)
+    for (size_type row = 0; row < matrix.m(); ++row)
       {
         for (typename Matrix::const_iterator p=matrix.begin(row);
             p!=matrix.end(row); ++p)
@@ -261,7 +261,7 @@ factorize (const Matrix &matrix)
       }
 
     // at the end, we should have written all rows completely
-    for (unsigned int i=0; i<Ap.size()-1; ++i)
+    for (size_type i=0; i<Ap.size()-1; ++i)
       Assert (row_pointers[i] == Ap[i+1], ExcInternalError());
   }
 
@@ -521,11 +521,11 @@ void SparseDirectMUMPS::initialize_matrix (const Matrix &matrix)
       irn = new int[nz];
       jcn = new int[nz];
 
-      unsigned int index = 0;
+      size_type index = 0;
 
       // loop over the elements of the matrix row by row, as suggested in
       // the documentation of the sparse matrix iterator class
-      for (unsigned int row = 0; row < matrix.m(); ++row)
+      for (size_type row = 0; row < matrix.m(); ++row)
         {
           for (typename Matrix::const_iterator ptr = matrix.begin (row);
               ptr != matrix.end (row); ++ptr)
@@ -567,7 +567,7 @@ void SparseDirectMUMPS::initialize (const Matrix &matrix,
       // Object denoting a MUMPS data structure
       rhs = new double[n];
 
-      for (unsigned int i = 0; i < n; ++i)
+      for (size_type i = 0; i < n; ++i)
         rhs[i] = vector (i);
 
       id.rhs = rhs;
@@ -579,7 +579,7 @@ void SparseDirectMUMPS::copy_solution (Vector<double> &vector)
   // Copy solution into the given vector
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-      for (unsigned int i=0; i<n; ++i)
+      for (size_type i=0; i<n; ++i)
         vector(i) = rhs[i];
 
       delete[] rhs;
@@ -625,7 +625,7 @@ void SparseDirectMUMPS::vmult (Vector<double>       &dst,
       // Object denoting a MUMPS data structure:
       rhs = new double[n];
 
-      for (unsigned int i = 0; i < n; ++i)
+      for (size_type i = 0; i < n; ++i)
         rhs[i] = src (i);
 
       id.rhs = rhs;

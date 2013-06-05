@@ -70,7 +70,7 @@ void test ()
   dof_handler.distribute_dofs (fe);
   deallog << dof_handler.n_dofs() << std::endl;
 
-  std::vector<unsigned int> new_indices (dof_handler.n_dofs());
+  std::vector<types::global_dof_index> new_indices (dof_handler.n_dofs());
   DoFRenumbering::compute_subdomain_wise (new_indices, dof_handler);
 
   for (unsigned int i=0; i<new_indices.size(); ++i)

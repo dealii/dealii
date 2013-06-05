@@ -48,7 +48,7 @@ int main ()
   sp.compress ();
 
 				   // now find permutation
-  std::vector<unsigned int> permutation(4);
+  std::vector<types::global_dof_index> permutation(4);
   SparsityTools::reorder_Cuthill_McKee (sp, permutation);
 
   for (unsigned int i=0; i<permutation.size(); ++i)

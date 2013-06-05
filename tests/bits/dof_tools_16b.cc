@@ -34,7 +34,7 @@ check_this (const DoFHandler<dim> &dof_handler)
   if (dof_handler.get_fe().dofs_per_face == 0)
     return;
   
-  std::vector<unsigned int> map (dof_handler.n_dofs());
+  std::vector<types::global_dof_index> map (dof_handler.n_dofs());
   std::set<types::boundary_id> set;
   set.insert (0);
   DoFTools::map_dof_to_boundary_indices (dof_handler, set, map);

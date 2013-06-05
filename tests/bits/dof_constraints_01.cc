@@ -81,7 +81,7 @@ void test ()
                                    // them into the matrix and condensing away
                                    // hanging node constraints later on, or
                                    // (2) distributing them right away
-  std::vector<unsigned int> local_dofs (fe.dofs_per_cell);
+  std::vector<types::global_dof_index> local_dofs (fe.dofs_per_cell);
   FullMatrix<double> local_matrix (fe.dofs_per_cell, fe.dofs_per_cell);
   for (typename DoFHandler<dim>::active_cell_iterator
          cell = dof_handler.begin_active();

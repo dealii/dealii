@@ -94,8 +94,8 @@ operator () (const MatrixFree<dim,Number> &data,
   AlignedVector<VectorizedArray<Number> > gradients0 (dim*n_q_points0);
   AlignedVector<VectorizedArray<Number> > values1 (n_q_points1);
   AlignedVector<VectorizedArray<Number> > gradients1 (dim*n_q_points1);
-  std::vector<unsigned int> dof_indices0 (dofs_per_cell0);
-  std::vector<unsigned int> dof_indices1 (dofs_per_cell1);
+  std::vector<types::global_dof_index> dof_indices0 (dofs_per_cell0);
+  std::vector<types::global_dof_index> dof_indices1 (dofs_per_cell1);
   for(unsigned int cell=cell_range.first;cell<cell_range.second;++cell)
     {
       fe_eval0.reinit(cell);

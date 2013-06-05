@@ -98,7 +98,7 @@ void initialize (const MGDoFHandler<dim> &dof,
 {
   unsigned int counter=0;
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-  std::vector<unsigned int> dof_indices(dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
   for (typename MGDoFHandler<dim>::active_cell_iterator
       cell = dof.begin_active();
       cell != dof.end(); ++cell)
@@ -115,7 +115,7 @@ void initialize (const MGDoFHandler<dim> &dof,
 {
   unsigned int counter=0;
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-  std::vector<unsigned int> dof_indices(dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
   typename MGDoFHandler<dim>::cell_iterator
       cell = dof.begin(0);
     cell->get_mg_dof_indices(dof_indices);
@@ -128,7 +128,7 @@ void print (const MGDoFHandler<dim> &dof,
     MGLevelObject<Vector<double> > &u)
 {
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-  std::vector<unsigned int> dof_indices(dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
   for(unsigned int l=0; l<dof.get_tria().n_levels(); ++l)
   {
     deallog << std::endl;
@@ -151,8 +151,8 @@ void print_diff (const MGDoFHandler<dim> &dof_1, const MGDoFHandler<dim> &dof_2,
   Vector<double> diff;
   diff.reinit (u);
   const unsigned int dofs_per_cell = dof_1.get_fe().dofs_per_cell;
-  std::vector<unsigned int> dof_indices_1(dofs_per_cell);
-  std::vector<unsigned int> dof_indices_2(dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices_1(dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices_2(dofs_per_cell);
   for (typename MGDoFHandler<dim>::active_cell_iterator
       cell_1 = dof_1.begin_active(), cell_2 = dof_2.begin_active();
       cell_1 != dof_1.end(); ++cell_1, ++cell_2)

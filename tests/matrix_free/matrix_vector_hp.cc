@@ -168,7 +168,7 @@ void test ()
                                     update_values    |  update_gradients |
                                     update_JxW_values);
     FullMatrix<double>   cell_matrix;
-    std::vector<unsigned int> local_dof_indices;
+    std::vector<types::global_dof_index> local_dof_indices;
 
     typename hp::DoFHandler<dim>::active_cell_iterator
       cell = dof.begin_active(),

@@ -34,6 +34,11 @@ class MatrixIterator
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Typedef for the matrix type
    * (including constness) we are to
    * operate on.
@@ -47,9 +52,9 @@ public:
    * <tt>row</tt> and the
    * <tt>index</tt> within it.
    */
-  MatrixIterator (MatrixType        *matrix,
-                  const unsigned int row = 0,
-                  const unsigned int index = 0);
+  MatrixIterator (MatrixType      *matrix,
+                  const size_type  row = 0,
+                  const size_type  index = 0);
 
   /**
    * Copy from another matrix
@@ -136,9 +141,9 @@ private:
 template <class ACCESSOR>
 inline
 MatrixIterator<ACCESSOR>::
-MatrixIterator (MatrixType        *matrix,
-                const unsigned int r,
-                const unsigned int i)
+MatrixIterator (MatrixType      *matrix,
+                const size_type  r,
+                const size_type  i)
   :
   accessor(matrix, r, i)
 {}

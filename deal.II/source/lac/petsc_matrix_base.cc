@@ -63,8 +63,7 @@ namespace PETScWrappers
       // iterator for an empty line (what
       // would it point to?)
       Assert (ncols != 0, ExcInternalError());
-      colnum_cache.reset (new std::vector<unsigned int> (colnums,
-                                                         colnums+ncols));
+      colnum_cache.reset (new std::vector<size_type> (colnums, colnums+ncols));
       value_cache.reset (new std::vector<PetscScalar> (values, values+ncols));
 
       // and finally restore the matrix
@@ -134,8 +133,8 @@ namespace PETScWrappers
 
 
   void
-  MatrixBase::clear_row (const unsigned int row,
-                         const PetscScalar  new_diag_value)
+  MatrixBase::clear_row (const size_type   row,
+                         const PetscScalar new_diag_value)
   {
     compress ();
 
@@ -171,8 +170,8 @@ namespace PETScWrappers
 
 
   void
-  MatrixBase::clear_rows (const std::vector<unsigned int> &rows,
-                          const PetscScalar                new_diag_value)
+  MatrixBase::clear_rows (const std::vector<size_type> &rows,
+                          const PetscScalar             new_diag_value)
   {
     compress ();
 
@@ -214,8 +213,8 @@ namespace PETScWrappers
 
 
   PetscScalar
-  MatrixBase::el (const unsigned int i,
-                  const unsigned int j) const
+  MatrixBase::el (const size_type i,
+                  const size_type j) const
   {
     PetscInt petsc_i = i, petsc_j = j;
 
@@ -232,7 +231,7 @@ namespace PETScWrappers
 
 
   PetscScalar
-  MatrixBase::diag_element (const unsigned int i) const
+  MatrixBase::diag_element (const size_type i) const
   {
     Assert (m() == n(), ExcNotQuadratic());
 
@@ -267,7 +266,7 @@ namespace PETScWrappers
 
 
 
-  unsigned int
+  MatrixBase::size_type
   MatrixBase::m () const
   {
     PetscInt n_rows, n_cols;
@@ -280,7 +279,7 @@ namespace PETScWrappers
 
 
 
-  unsigned int
+  MatrixBase::size_type 
   MatrixBase::n () const
   {
     PetscInt n_rows, n_cols;
@@ -293,7 +292,7 @@ namespace PETScWrappers
 
 
 
-  unsigned int
+  MatrixBase::size_type 
   MatrixBase::local_size () const
   {
     PetscInt n_rows, n_cols;
@@ -306,7 +305,7 @@ namespace PETScWrappers
 
 
 
-  std::pair<unsigned int, unsigned int>
+  std::pair<MatrixBase::size_type, MatrixBase::size_type>
   MatrixBase::local_range () const
   {
     PetscInt begin, end;
@@ -320,7 +319,7 @@ namespace PETScWrappers
 
 
 
-  unsigned int
+  MatrixBase::size_type 
   MatrixBase::n_nonzero_elements () const
   {
     MatInfo mat_info;
@@ -328,14 +327,14 @@ namespace PETScWrappers
       = MatGetInfo (matrix, MAT_GLOBAL_SUM, &mat_info);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
-    return static_cast<unsigned int>(mat_info.nz_used);
+    return static_cast<size_type>(mat_info.nz_used);
   }
 
 
 
-  unsigned int
+  MatrixBase::size_type 
   MatrixBase::
-  row_length (const unsigned int row) const
+  row_length (const size_type row) const
   {
 //TODO: this function will probably only work if compress() was called on the
 //matrix previously. however, we can't do this here, since it would impose
@@ -617,7 +616,7 @@ namespace PETScWrappers
     MatInfo info;
     MatGetInfo(matrix, MAT_LOCAL, &info);
 
-    return sizeof(*this) + static_cast<unsigned int>(info.memory);
+    return sizeof(*this) + static_cast<size_type>(info.memory);
   }
 
 }

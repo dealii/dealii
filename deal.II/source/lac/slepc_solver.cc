@@ -109,8 +109,8 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::solve (const unsigned int  n_eigenpairs, 
-		     unsigned int       *n_converged)
+  SolverBase::solve (const size_type  n_eigenpairs, 
+		     size_type *n_converged)
   {
     int ierr;
 
@@ -189,7 +189,7 @@ namespace SLEPcWrappers
                             reinterpret_cast<PetscInt *>(n_converged));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    int n_iterations     = 0;
+    PetscInt n_iterations = 0;
     double residual_norm = 1e300;
 
     // @todo Investigate elaborating on some of this to act on the
@@ -218,7 +218,7 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::get_eigenpair (const unsigned int         index,
+  SolverBase::get_eigenpair (const size_type            index,
                              PetscScalar               &eigenvalues,
                              PETScWrappers::VectorBase &eigenvectors)
   {

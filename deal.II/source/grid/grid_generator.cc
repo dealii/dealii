@@ -182,7 +182,7 @@ void GridGenerator::hyper_cube (Triangulation<dim,spacedim> &tria,
 void
 GridGenerator::moebius (
   Triangulation<3>  &tria,
-  const unsigned int   n_cells,
+  const size_type      n_cells,
   const unsigned int   n_rotations,
   const double         R,
   const double         r)
@@ -197,7 +197,7 @@ GridGenerator::moebius (
   double beta_step=n_rotations*numbers::PI/2.0/n_cells;
   double alpha_step=2.0*numbers::PI/n_cells;
 
-  for (unsigned int i=0; i<n_cells; ++i)
+  for (size_type i=0; i<n_cells; ++i)
     for (unsigned int j=0; j<4; ++j)
       {
         vertices[4*i+j][0]=R*std::cos(i*alpha_step)+r*std::cos(i*beta_step+j*numbers::PI/2.0)*std::cos(i*alpha_step);
@@ -205,10 +205,10 @@ GridGenerator::moebius (
         vertices[4*i+j][2]=r*std::sin(i*beta_step+j*numbers::PI/2.0);
       }
 
-  unsigned int offset=0;
+  size_type offset=0;
 
   std::vector<CellData<dim> > cells (n_cells);
-  for (unsigned int i=0; i<n_cells; ++i)
+  for (size_type i=0; i<n_cells; ++i)
     {
       for (unsigned int j=0; j<2; ++j)
         {
@@ -482,13 +482,13 @@ GridGenerator::parallelepiped (Triangulation<dim>  &tria,
 template<int dim>
 void
 GridGenerator::subdivided_parallelepiped (Triangulation<dim>  &tria,
-                                          const unsigned int   n_subdivisions,
+                                          const size_type      n_subdivisions,
                                           const Point<dim>   (&corners) [dim],
                                           const bool           colorize)
 {
   // Equalise number of subdivisions in each dim-direction, heir
   // validity will be checked later
-  unsigned int (n_subdivisions_) [dim];
+  size_type (n_subdivisions_) [dim];
   for (unsigned int i=0; i<dim; ++i)
     n_subdivisions_[i] = n_subdivisions;
 
@@ -501,7 +501,7 @@ GridGenerator::subdivided_parallelepiped (Triangulation<dim>  &tria,
 template<int dim>
 void
 GridGenerator::subdivided_parallelepiped (Triangulation<dim>  &tria,
-                                          const unsigned int ( n_subdivisions) [dim],
+                                          const size_type    ( n_subdivisions) [dim],
                                           const Point<dim>   (&corners) [dim],
                                           const bool           colorize)
 {
@@ -525,20 +525,20 @@ GridGenerator::subdivided_parallelepiped (Triangulation<dim>  &tria,
   switch (dim)
     {
     case 1:
-      for (unsigned int x=0; x<=n_subdivisions[0]; ++x)
+      for (size_type x=0; x<=n_subdivisions[0]; ++x)
         points.push_back (Point<dim> (x*delta[0]));
       break;
 
     case 2:
-      for (unsigned int y=0; y<=n_subdivisions[1]; ++y)
-        for (unsigned int x=0; x<=n_subdivisions[0]; ++x)
+      for (size_type y=0; y<=n_subdivisions[1]; ++y)
+        for (size_type x=0; x<=n_subdivisions[0]; ++x)
           points.push_back (Point<dim> (x*delta[0] + y*delta[1]));
       break;
 
     case 3:
-      for (unsigned int z=0; z<=n_subdivisions[2]; ++z)
-        for (unsigned int y=0; y<=n_subdivisions[1]; ++y)
-          for (unsigned int x=0; x<=n_subdivisions[0]; ++x)
+      for (size_type z=0; z<=n_subdivisions[2]; ++z)
+        for (size_type y=0; y<=n_subdivisions[1]; ++y)
+          for (size_type x=0; x<=n_subdivisions[0]; ++x)
             points.push_back (Point<dim> (x*delta[0] + y*delta[1] + z*delta[2]));
       break;
 
@@ -547,7 +547,7 @@ GridGenerator::subdivided_parallelepiped (Triangulation<dim>  &tria,
     }
 
   // Prepare cell data
-  unsigned int n_cells = 1;
+  size_type n_cells = 1;
   for (unsigned int i=0; i<dim; ++i)
     n_cells *= n_subdivisions[i];
   std::vector<CellData<dim> > cells (n_cells);
@@ -556,7 +556,7 @@ GridGenerator::subdivided_parallelepiped (Triangulation<dim>  &tria,
   switch (dim)
     {
     case 1:
-      for (unsigned int x=0; x<n_subdivisions[0]; ++x)
+      for (size_type x=0; x<n_subdivisions[0]; ++x)
         {
           cells[x].vertices[0] = x;
           cells[x].vertices[1] = x+1;
@@ -569,13 +569,13 @@ GridGenerator::subdivided_parallelepiped (Triangulation<dim>  &tria,
     case 2:
     {
       // Shorthand
-      const unsigned int n_dy = n_subdivisions[1];
-      const unsigned int n_dx = n_subdivisions[0];
+      const size_type n_dy = n_subdivisions[1];
+      const size_type n_dx = n_subdivisions[0];
 
-      for (unsigned int y=0; y<n_dy; ++y)
-        for (unsigned int x=0; x<n_dx; ++x)
+      for (size_type y=0; y<n_dy; ++y)
+        for (size_type x=0; x<n_dx; ++x)
           {
-            const unsigned int c = y*n_dx         + x;
+            const size_type    c = y*n_dx         + x;
             cells[c].vertices[0] = y*(n_dx+1)     + x;
             cells[c].vertices[1] = y*(n_dx+1)     + x+1;
             cells[c].vertices[2] = (y+1)*(n_dx+1) + x;
@@ -590,15 +590,15 @@ GridGenerator::subdivided_parallelepiped (Triangulation<dim>  &tria,
     case 3:
     {
       // Shorthand
-      const unsigned int n_dz = n_subdivisions[2];
-      const unsigned int n_dy = n_subdivisions[1];
-      const unsigned int n_dx = n_subdivisions[0];
+      const size_type n_dz = n_subdivisions[2];
+      const size_type n_dy = n_subdivisions[1];
+      const size_type n_dx = n_subdivisions[0];
 
-      for (unsigned int z=0; z<n_dz; ++z)
-        for (unsigned int y=0; y<n_dy; ++y)
-          for (unsigned int x=0; x<n_dx; ++x)
+      for (size_type z=0; z<n_dz; ++z)
+        for (size_type y=0; y<n_dy; ++y)
+          for (size_type x=0; x<n_dx; ++x)
             {
-              const unsigned int c = z*n_dy*n_dx             + y*n_dx         + x;
+              const size_type    c = z*n_dy*n_dx             + y*n_dx         + x;
 
               cells[c].vertices[0] = z*(n_dy+1)*(n_dx+1)     + y*(n_dx+1)     + x;
               cells[c].vertices[1] = z*(n_dy+1)*(n_dx+1)     + y*(n_dx+1)     + x+1;
@@ -932,7 +932,7 @@ GridGenerator::subdivided_hyper_rectangle(
         }
 
       double x = 0;
-      for (unsigned int j=0; j<step_sizes.at(i).size(); j++)
+      for (size_type j=0; j<step_sizes.at(i).size(); j++)
         x += step_sizes[i][j];
       Assert(std::fabs(x - (p2(i)-p1(i))) <= 1e-12*std::fabs(x),
              ExcInvalidRepetitions (i) );
@@ -947,7 +947,7 @@ GridGenerator::subdivided_hyper_rectangle(
     case 1:
     {
       double x=0;
-      for (unsigned int i=0; ; ++i)
+      for (size_type i=0; ; ++i)
         {
           points.push_back (Point<dim> (p1[0]+x));
 
@@ -967,10 +967,10 @@ GridGenerator::subdivided_hyper_rectangle(
     case 2:
     {
       double y=0;
-      for (unsigned int j=0; ; ++j)
+      for (size_type j=0; ; ++j)
         {
           double x=0;
-          for (unsigned int i=0; ; ++i)
+          for (size_type i=0; ; ++i)
             {
               points.push_back (Point<dim> (p1[0]+x,
                                             p1[1]+y));
@@ -991,13 +991,13 @@ GridGenerator::subdivided_hyper_rectangle(
     case 3:
     {
       double z=0;
-      for (unsigned int k=0; ; ++k)
+      for (size_type k=0; ; ++k)
         {
           double y=0;
-          for (unsigned int j=0; ; ++j)
+          for (size_type j=0; ; ++j)
             {
               double x=0;
-              for (unsigned int i=0; ; ++i)
+              for (size_type i=0; ; ++i)
                 {
                   points.push_back (Point<dim> (p1[0]+x,
                                                 p1[1]+y,
@@ -1034,7 +1034,7 @@ GridGenerator::subdivided_hyper_rectangle(
     case 1:
     {
       cells.resize (step_sizes[0].size());
-      for (unsigned int x=0; x<step_sizes[0].size(); ++x)
+      for (size_type x=0; x<step_sizes[0].size(); ++x)
         {
           cells[x].vertices[0] = x;
           cells[x].vertices[1] = x+1;
@@ -1046,10 +1046,10 @@ GridGenerator::subdivided_hyper_rectangle(
     case 2:
     {
       cells.resize (step_sizes[1].size()*step_sizes[0].size());
-      for (unsigned int y=0; y<step_sizes[1].size(); ++y)
-        for (unsigned int x=0; x<step_sizes[0].size(); ++x)
+      for (size_type y=0; y<step_sizes[1].size(); ++y)
+        for (size_type x=0; x<step_sizes[0].size(); ++x)
           {
-            const unsigned int c = x+y*step_sizes[0].size();
+            const size_type c = x+y*step_sizes[0].size();
             cells[c].vertices[0] = y*(step_sizes[0].size()+1)+x;
             cells[c].vertices[1] = y*(step_sizes[0].size()+1)+x+1;
             cells[c].vertices[2] = (y+1)*(step_sizes[0].size()+1)+x;
@@ -1061,15 +1061,15 @@ GridGenerator::subdivided_hyper_rectangle(
 
     case 3:
     {
-      const unsigned int n_x  = (step_sizes[0].size()+1);
-      const unsigned int n_xy = (step_sizes[0].size()+1)*(step_sizes[1].size()+1);
+      const size_type n_x  = (step_sizes[0].size()+1);
+      const size_type n_xy = (step_sizes[0].size()+1)*(step_sizes[1].size()+1);
 
       cells.resize (step_sizes[2].size()*step_sizes[1].size()*step_sizes[0].size());
-      for (unsigned int z=0; z<step_sizes[2].size(); ++z)
-        for (unsigned int y=0; y<step_sizes[1].size(); ++y)
-          for (unsigned int x=0; x<step_sizes[0].size(); ++x)
+      for (size_type z=0; z<step_sizes[2].size(); ++z)
+        for (size_type y=0; y<step_sizes[1].size(); ++y)
+          for (size_type x=0; x<step_sizes[0].size(); ++x)
             {
-              const unsigned int c = x+y*step_sizes[0].size() +
+              const size_type    c = x+y*step_sizes[0].size() +
                                      z*step_sizes[0].size()*step_sizes[1].size();
               cells[c].vertices[0] = z*n_xy + y*n_x + x;
               cells[c].vertices[1] = z*n_xy + y*n_x + x+1;
@@ -1130,13 +1130,13 @@ GridGenerator::subdivided_hyper_rectangle (
   Assert(spacing.size() == 1,
          ExcInvalidRepetitionsDimension(1));
 
-  const unsigned int n_cells = material_id.size(0);
+  const size_type n_cells = material_id.size(0);
 
   Assert(spacing[0].size() == n_cells,
          ExcInvalidRepetitionsDimension(1));
 
   double delta = std::numeric_limits<double>::max();
-  for (unsigned int i=0; i<n_cells; i++)
+  for (size_type i=0; i<n_cells; i++)
     {
       Assert (spacing[0][i] >= 0, ExcInvalidRepetitions(-1));
       delta = std::min (delta, spacing[0][i]);
@@ -1145,20 +1145,20 @@ GridGenerator::subdivided_hyper_rectangle (
   // generate the necessary points
   std::vector<Point<1> > points;
   double ax = p[0];
-  for (unsigned int x=0; x<=n_cells; ++x)
+  for (size_type x=0; x<=n_cells; ++x)
     {
       points.push_back (Point<1> (ax));
       if (x<n_cells)
         ax += spacing[0][x];
     }
   // create the cells
-  unsigned int n_val_cells = 0;
-  for (unsigned int i=0; i<n_cells; i++)
+  size_type n_val_cells = 0;
+  for (size_type i=0; i<n_cells; i++)
     if (material_id[i]!=numbers::invalid_material_id) n_val_cells++;
 
   std::vector<CellData<1> > cells(n_val_cells);
-  unsigned int id = 0;
-  for (unsigned int x=0; x<n_cells; ++x)
+  size_type id = 0;
+  for (size_type x=0; x<n_cells; ++x)
     if (material_id[x] != numbers::invalid_material_id)
       {
         cells[id].vertices[0] = x;
@@ -1191,14 +1191,14 @@ GridGenerator::subdivided_hyper_rectangle (
   Assert(spacing.size() == 2,
          ExcInvalidRepetitionsDimension(2));
 
-  std::vector<unsigned int> repetitions(2);
-  unsigned int n_cells = 1;
+  std::vector<size_type> repetitions(2);
+  size_type n_cells = 1;
   double delta = std::numeric_limits<double>::max();
   for (unsigned int i=0; i<2; i++)
     {
       repetitions[i] = spacing[i].size();
       n_cells *= repetitions[i];
-      for (unsigned int j=0; j<repetitions[i]; j++)
+      for (size_type j=0; j<repetitions[i]; j++)
         {
           Assert (spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
           delta = std::min (delta, spacing[i][j]);
@@ -1210,10 +1210,10 @@ GridGenerator::subdivided_hyper_rectangle (
   // generate the necessary points
   std::vector<Point<2> > points;
   double ay = p[1];
-  for (unsigned int y=0; y<=repetitions[1]; ++y)
+  for (size_type y=0; y<=repetitions[1]; ++y)
     {
       double ax = p[0];
-      for (unsigned int x=0; x<=repetitions[0]; ++x)
+      for (size_type x=0; x<=repetitions[0]; ++x)
         {
           points.push_back (Point<2> (ax,ay));
           if (x<repetitions[0])
@@ -1224,16 +1224,16 @@ GridGenerator::subdivided_hyper_rectangle (
     }
 
   // create the cells
-  unsigned int n_val_cells = 0;
-  for (unsigned int i=0; i<material_id.size(0); i++)
-    for (unsigned int j=0; j<material_id.size(1); j++)
+  size_type n_val_cells = 0;
+  for (size_type i=0; i<material_id.size(0); i++)
+    for (size_type j=0; j<material_id.size(1); j++)
       if (material_id[i][j] != numbers::invalid_material_id)
         n_val_cells++;
 
   std::vector<CellData<2> > cells(n_val_cells);
-  unsigned int id = 0;
-  for (unsigned int y=0; y<repetitions[1]; ++y)
-    for (unsigned int x=0; x<repetitions[0]; ++x)
+  size_type id = 0;
+  for (size_type y=0; y<repetitions[1]; ++y)
+    for (size_type x=0; x<repetitions[0]; ++x)
       if (material_id[x][y]!=numbers::invalid_material_id)
         {
           cells[id].vertices[0] = y*(repetitions[0]+1)+x;
@@ -1291,14 +1291,14 @@ GridGenerator::subdivided_hyper_rectangle (
   Assert(spacing.size() == dim,
          ExcInvalidRepetitionsDimension(dim));
 
-  std::vector<unsigned int> repetitions(dim);
-  unsigned int n_cells = 1;
+  std::vector<size_type > repetitions(dim);
+  size_type n_cells = 1;
   double delta = std::numeric_limits<double>::max();
   for (unsigned int i=0; i<dim; i++)
     {
       repetitions[i] = spacing[i].size();
       n_cells *= repetitions[i];
-      for (unsigned int j=0; j<repetitions[i]; j++)
+      for (size_type j=0; j<repetitions[i]; j++)
         {
           Assert (spacing[i][j] >= 0, ExcInvalidRepetitions(-1));
           delta = std::min (delta, spacing[i][j]);
@@ -1310,13 +1310,13 @@ GridGenerator::subdivided_hyper_rectangle (
   // generate the necessary points
   std::vector<Point<dim> > points;
   double az = p[2];
-  for (unsigned int z=0; z<=repetitions[2]; ++z)
+  for (size_type z=0; z<=repetitions[2]; ++z)
     {
       double ay = p[1];
-      for (unsigned int y=0; y<=repetitions[1]; ++y)
+      for (size_type y=0; y<=repetitions[1]; ++y)
         {
           double ax = p[0];
-          for (unsigned int x=0; x<=repetitions[0]; ++x)
+          for (size_type x=0; x<=repetitions[0]; ++x)
             {
               points.push_back (Point<dim> (ax,ay,az));
               if (x<repetitions[0])
@@ -1330,20 +1330,20 @@ GridGenerator::subdivided_hyper_rectangle (
     }
 
   // create the cells
-  unsigned int n_val_cells = 0;
-  for (unsigned int i=0; i<material_id.size(0); i++)
-    for (unsigned int j=0; j<material_id.size(1); j++)
-      for (unsigned int k=0; k<material_id.size(2); k++)
+  size_type n_val_cells = 0;
+  for (size_type i=0; i<material_id.size(0); i++)
+    for (size_type j=0; j<material_id.size(1); j++)
+      for (size_type k=0; k<material_id.size(2); k++)
         if (material_id[i][j][k]!=numbers::invalid_material_id)
           n_val_cells++;
 
   std::vector<CellData<dim> > cells(n_val_cells);
-  unsigned int id = 0;
-  const unsigned int n_x  = (repetitions[0]+1);
-  const unsigned int n_xy = (repetitions[0]+1)*(repetitions[1]+1);
-  for (unsigned int z=0; z<repetitions[2]; ++z)
-    for (unsigned int y=0; y<repetitions[1]; ++y)
-      for (unsigned int x=0; x<repetitions[0]; ++x)
+  size_type id = 0;
+  const size_type n_x  = (repetitions[0]+1);
+  const size_type n_xy = (repetitions[0]+1)*(repetitions[1]+1);
+  for (size_type z=0; z<repetitions[2]; ++z)
+    for (size_type y=0; y<repetitions[1]; ++y)
+      for (size_type x=0; x<repetitions[0]; ++x)
         if (material_id[x][y][z]!=numbers::invalid_material_id)
           {
             cells[id].vertices[0] = z*n_xy + y*n_x + x;
@@ -1532,7 +1532,7 @@ void GridGenerator::hyper_shell (Triangulation<1> &,
                                  const Point<1> &,
                                  const double,
                                  const double,
-                                 const unsigned int,
+                                 const size_type ,
                                  const bool)
 {
   Assert (false, ExcNotImplemented());
@@ -1554,8 +1554,8 @@ void GridGenerator::cylinder_shell (Triangulation<1> &,
                                     const double,
                                     const double,
                                     const double,
-                                    const unsigned int,
-                                    const unsigned int)
+                                    const size_type ,
+                                    const size_type )
 {
   Assert (false, ExcNotImplemented());
 }
@@ -1577,7 +1577,7 @@ GridGenerator::half_hyper_shell (Triangulation<1> &,
                                  const Point<1> &,
                                  const double,
                                  const double,
-                                 const unsigned int,
+                                 const size_type ,
                                  const bool)
 {
   Assert (false, ExcNotImplemented());
@@ -1588,7 +1588,7 @@ void GridGenerator::quarter_hyper_shell (Triangulation<1> &,
                                          const Point<1> &,
                                          const double,
                                          const double,
-                                         const unsigned int,
+                                         const size_type ,
                                          const bool)
 {
   Assert (false, ExcNotImplemented());
@@ -1834,11 +1834,11 @@ GridGenerator::colorize_hyper_shell (
 
 
 template <>
-void GridGenerator::hyper_shell (Triangulation<2>   &tria,
-                                 const Point<2>     &center,
-                                 const double        inner_radius,
-                                 const double        outer_radius,
-                                 const unsigned int  n_cells,
+void GridGenerator::hyper_shell (Triangulation<2> &tria,
+                                 const Point<2>   &center,
+                                 const double      inner_radius,
+                                 const double      outer_radius,
+                                 const size_type   n_cells,
                                  const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
@@ -1855,11 +1855,11 @@ void GridGenerator::hyper_shell (Triangulation<2>   &tria,
   // radial extent (which is the
   // difference between the two
   // radii)
-  const unsigned int N = (n_cells == 0 ?
-                          static_cast<unsigned int>
-                          (std::ceil((2*pi* (outer_radius + inner_radius)/2) /
-                                     (outer_radius - inner_radius))) :
-                          n_cells);
+  const size_type N = (n_cells == 0 ?
+                       static_cast<size_type>
+                       (std::ceil((2*pi* (outer_radius + inner_radius)/2) /
+                                  (outer_radius - inner_radius))) :
+                       n_cells);
 
   // set up N vertices on the
   // outer and N vertices on
@@ -1868,7 +1868,7 @@ void GridGenerator::hyper_shell (Triangulation<2>   &tria,
   // outer one, and all are
   // numbered counter-clockwise
   std::vector<Point<2> > vertices(2*N);
-  for (unsigned int i=0; i<N; ++i)
+  for (size_type i=0; i<N; ++i)
     {
       vertices[i] = Point<2>( std::cos(2*pi * i/N),
                               std::sin(2*pi * i/N)) * outer_radius;
@@ -1880,7 +1880,7 @@ void GridGenerator::hyper_shell (Triangulation<2>   &tria,
 
   std::vector<CellData<2> > cells (N, CellData<2>());
 
-  for (unsigned int i=0; i<N; ++i)
+  for (size_type i=0; i<N; ++i)
     {
       cells[i].vertices[0] = i;
       cells[i].vertices[1] = (i+1)%N;
@@ -1938,8 +1938,8 @@ void GridGenerator::cylinder_shell (Triangulation<2> &,
                                     const double,
                                     const double,
                                     const double,
-                                    const unsigned int,
-                                    const unsigned int)
+                                    const size_type,
+                                    const size_type)
 {
   Assert (false, ExcNotImplemented());
 }
@@ -2009,11 +2009,11 @@ GridGenerator::half_hyper_ball (Triangulation<2> &tria,
 // Implementation for 2D only
 template <>
 void
-GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
-                                 const Point<2>     &center,
-                                 const double        inner_radius,
-                                 const double        outer_radius,
-                                 const unsigned int  n_cells,
+GridGenerator::half_hyper_shell (Triangulation<2> &tria,
+                                 const Point<2>   &center,
+                                 const double      inner_radius,
+                                 const double      outer_radius,
+                                 const size_type   n_cells,
                                  const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
@@ -2029,11 +2029,11 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
   // radial extent (which is the
   // difference between the two
   // radii)
-  const unsigned int N = (n_cells == 0 ?
-                          static_cast<unsigned int>
-                          (std::ceil((pi* (outer_radius + inner_radius)/2) /
-                                     (outer_radius - inner_radius))) :
-                          n_cells);
+  const size_type N = (n_cells == 0 ?
+                       static_cast<size_type>
+                       (std::ceil((pi* (outer_radius + inner_radius)/2) /
+                                  (outer_radius - inner_radius))) :
+                       n_cells);
 
   // set up N+1 vertices on the
   // outer and N+1 vertices on
@@ -2042,7 +2042,7 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
   // outer one, and all are
   // numbered counter-clockwise
   std::vector<Point<2> > vertices(2*(N+1));
-  for (unsigned int i=0; i<=N; ++i)
+  for (size_type i=0; i<=N; ++i)
     {
       // enforce that the x-coordinates
       // of the first and last point of
@@ -2063,7 +2063,7 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
 
   std::vector<CellData<2> > cells (N, CellData<2>());
 
-  for (unsigned int i=0; i<N; ++i)
+  for (size_type i=0; i<N; ++i)
     {
       cells[i].vertices[0] = i;
       cells[i].vertices[1] = (i+1)%(N+1);
@@ -2090,11 +2090,11 @@ GridGenerator::half_hyper_shell (Triangulation<2>   &tria,
 
 
 template <>
-void GridGenerator::quarter_hyper_shell (Triangulation<2>   &tria,
-                                         const Point<2>     &center,
-                                         const double        inner_radius,
-                                         const double        outer_radius,
-                                         const unsigned int  n_cells,
+void GridGenerator::quarter_hyper_shell (Triangulation<2> &tria,
+                                         const Point<2>   &center,
+                                         const double      inner_radius,
+                                         const double      outer_radius,
+                                         const size_type   n_cells,
                                          const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
@@ -2110,11 +2110,11 @@ void GridGenerator::quarter_hyper_shell (Triangulation<2>   &tria,
   // radial extent (which is the
   // difference between the two
   // radii)
-  const unsigned int N = (n_cells == 0 ?
-                          static_cast<unsigned int>
-                          (std::ceil((pi* (outer_radius + inner_radius)/4) /
-                                     (outer_radius - inner_radius))) :
-                          n_cells);
+  const size_type N = (n_cells == 0 ?
+                       static_cast<size_type>
+                       (std::ceil((pi* (outer_radius + inner_radius)/4) /
+                                  (outer_radius - inner_radius))) :
+                       n_cells);
 
   // set up N+1 vertices on the
   // outer and N+1 vertices on
@@ -2123,7 +2123,7 @@ void GridGenerator::quarter_hyper_shell (Triangulation<2>   &tria,
   // outer one, and all are
   // numbered counter-clockwise
   std::vector<Point<2> > vertices(2*(N+1));
-  for (unsigned int i=0; i<=N; ++i)
+  for (size_type i=0; i<=N; ++i)
     {
       // enforce that the x-coordinates
       // of the last point is exactly
@@ -2143,7 +2143,7 @@ void GridGenerator::quarter_hyper_shell (Triangulation<2>   &tria,
 
   std::vector<CellData<2> > cells (N, CellData<2>());
 
-  for (unsigned int i=0; i<N; ++i)
+  for (size_type i=0; i<N; ++i)
     {
       cells[i].vertices[0] = i;
       cells[i].vertices[1] = (i+1)%(N+1);
@@ -2302,12 +2302,12 @@ void GridGenerator::truncated_cone (Triangulation<3> &triangulation,
                                     const double half_length)
 {
   // Determine number of cells and vertices
-  const unsigned int
-  n_cells = static_cast<unsigned int>(std::floor (half_length /
+  const size_type 
+  n_cells = static_cast<size_type>(std::floor (half_length /
                                                   std::max (radius_0,
                                                             radius_1) +
                                                   0.5));
-  const unsigned int n_vertices = 4 * (n_cells + 1);
+  const size_type n_vertices = 4 * (n_cells + 1);
   std::vector<Point<3> > vertices_tmp(n_vertices);
 
   vertices_tmp[0] = Point<3> (-half_length, 0, -radius_0);
@@ -2317,7 +2317,7 @@ void GridGenerator::truncated_cone (Triangulation<3> &triangulation,
 
   const double dx = 2 * half_length / n_cells;
 
-  for (unsigned int i = 0; i < n_cells; ++i)
+  for (size_type i = 0; i < n_cells; ++i)
     {
       vertices_tmp[4 * (i + 1)]
         = vertices_tmp[4 * i] +
@@ -2337,13 +2337,13 @@ void GridGenerator::truncated_cone (Triangulation<3> &triangulation,
                                          vertices_tmp.end());
   Table<2,unsigned int> cell_vertices(n_cells,GeometryInfo<3>::vertices_per_cell);
 
-  for (unsigned int i = 0; i < n_cells; ++i)
+  for (size_type i = 0; i < n_cells; ++i)
     for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
       cell_vertices[i][j] = 4 * i + j;
 
   std::vector<CellData<3> > cells (n_cells, CellData<3> ());
 
-  for (unsigned int i = 0; i < n_cells; ++i)
+  for (size_type i = 0; i < n_cells; ++i)
     {
       for (unsigned int j = 0; j < GeometryInfo<3>::vertices_per_cell; ++j)
         cells[i].vertices[j] = cell_vertices[i][j];
@@ -2810,7 +2810,7 @@ GridGenerator::hyper_shell (Triangulation<3> &tria,
                             const Point<3> &p,
                             const double inner_radius,
                             const double outer_radius,
-                            const unsigned int n,
+                            const size_type n,
                             const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
@@ -3039,7 +3039,7 @@ GridGenerator::half_hyper_shell (Triangulation<3> &tria,
                                  const Point<3> &center,
                                  const double inner_radius,
                                  const double outer_radius,
-                                 const unsigned int n,
+                                 const size_type n,
                                  const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
@@ -3185,7 +3185,7 @@ void GridGenerator::quarter_hyper_shell (Triangulation<3> &tria,
                                          const Point<3> &center,
                                          const double inner_radius,
                                          const double outer_radius,
-                                         const unsigned int n,
+                                         const size_type n,
                                          const bool colorize)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
@@ -3245,12 +3245,12 @@ void GridGenerator::quarter_hyper_shell (Triangulation<3> &tria,
 
 // Implementation for 3D only
 template <>
-void GridGenerator::cylinder_shell (Triangulation<3>   &tria,
-                                    const double        length,
-                                    const double        inner_radius,
-                                    const double        outer_radius,
-                                    const unsigned int  n_radial_cells,
-                                    const unsigned int  n_axial_cells)
+void GridGenerator::cylinder_shell (Triangulation<3> &tria,
+                                    const double      length,
+                                    const double      inner_radius,
+                                    const double      outer_radius,
+                                    const size_type   n_radial_cells,
+                                    const size_type   n_axial_cells)
 {
   Assert ((inner_radius > 0) && (inner_radius < outer_radius),
           ExcInvalidRadii ());
@@ -3266,16 +3266,16 @@ void GridGenerator::cylinder_shell (Triangulation<3>   &tria,
   // radial extent (which is the
   // difference between the two
   // radii)
-  const unsigned int N_r = (n_radial_cells == 0 ?
-                            static_cast<unsigned int>
-                            (std::ceil((2*pi* (outer_radius + inner_radius)/2) /
-                                       (outer_radius - inner_radius))) :
-                            n_radial_cells);
-  const unsigned int N_z = (n_axial_cells == 0 ?
-                            static_cast<unsigned int>
-                            (std::ceil (length /
-                                        (2*pi*(outer_radius + inner_radius)/2/N_r))) :
-                            n_axial_cells);
+  const size_type N_r = (n_radial_cells == 0 ?
+                         static_cast<size_type>
+                         (std::ceil((2*pi* (outer_radius + inner_radius)/2) /
+                                    (outer_radius - inner_radius))) :
+                         n_radial_cells);
+  const size_type N_z = (n_axial_cells == 0 ?
+                         static_cast<size_type>
+                         (std::ceil (length /
+                                     (2*pi*(outer_radius + inner_radius)/2/N_r))) :
+                         n_axial_cells);
 
   // set up N vertices on the
   // outer and N vertices on
@@ -3284,7 +3284,7 @@ void GridGenerator::cylinder_shell (Triangulation<3>   &tria,
   // outer one, and all are
   // numbered counter-clockwise
   std::vector<Point<2> > vertices_2d(2*N_r);
-  for (unsigned int i=0; i<N_r; ++i)
+  for (size_type i=0; i<N_r; ++i)
     {
       vertices_2d[i] = Point<2>( std::cos(2*pi * i/N_r),
                                  std::sin(2*pi * i/N_r)) * outer_radius;
@@ -3293,8 +3293,8 @@ void GridGenerator::cylinder_shell (Triangulation<3>   &tria,
 
   std::vector<Point<3> > vertices_3d;
   vertices_3d.reserve (2*N_r*(N_z+1));
-  for (unsigned int j=0; j<=N_z; ++j)
-    for (unsigned int i=0; i<2*N_r; ++i)
+  for (size_type j=0; j<=N_z; ++j)
+    for (size_type i=0; i<2*N_r; ++i)
       {
         const Point<3> v (vertices_2d[i][0],
                           vertices_2d[i][1],
@@ -3304,8 +3304,8 @@ void GridGenerator::cylinder_shell (Triangulation<3>   &tria,
 
   std::vector<CellData<3> > cells (N_r*N_z, CellData<3>());
 
-  for (unsigned int j=0; j<N_z; ++j)
-    for (unsigned int i=0; i<N_r; ++i)
+  for (size_type j=0; j<N_z; ++j)
+    for (size_type i=0; i<N_r; ++i)
       {
         cells[i+j*N_r].vertices[0] = i + (j+1)*2*N_r;
         cells[i+j*N_r].vertices[1] = (i+1)%N_r + (j+1)*2*N_r;
@@ -3381,7 +3381,7 @@ merge_triangulations (const Triangulation<dim, spacedim> &triangulation_1,
 void
 GridGenerator::
 extrude_triangulation(const Triangulation<2, 2> &input,
-                      const unsigned int n_slices,
+                      const size_type n_slices,
                       const double height,
                       Triangulation<3,3> &result)
 {
@@ -3395,9 +3395,9 @@ extrude_triangulation(const Triangulation<2, 2> &input,
   std::vector<CellData<3> > cells;
   cells.reserve((n_slices-1)*input.n_active_cells());
 
-  for (unsigned int slice=0; slice<n_slices; ++slice)
+  for (size_type slice=0; slice<n_slices; ++slice)
     {
-      for (unsigned int i=0; i<input.n_vertices(); ++i)
+      for (size_type i=0; i<input.n_vertices(); ++i)
 
         {
           const Point<2> &v = input.get_vertices()[i];
@@ -3410,7 +3410,7 @@ extrude_triangulation(const Triangulation<2, 2> &input,
   for (Triangulation<2,2>::cell_iterator
        cell = input.begin(); cell != input.end(); ++cell)
     {
-      for (unsigned int slice=0; slice<n_slices-1; ++slice)
+      for (size_type slice=0; slice<n_slices-1; ++slice)
         {
           CellData<3> this_cell;
           for (unsigned int v=0; v<GeometryInfo<2>::vertices_per_cell; ++v)
@@ -3438,14 +3438,14 @@ extrude_triangulation(const Triangulation<2, 2> &input,
           {
             quad.boundary_id = cell->face(f)->boundary_indicator();
             bid = std::max(bid, quad.boundary_id);
-            for (unsigned int slice=0; slice<n_slices-1; ++slice)
-              {
-                quad.vertices[0] = cell->face(f)->vertex_index(0)+slice*input.n_vertices();
-                quad.vertices[1] = cell->face(f)->vertex_index(1)+slice*input.n_vertices();
-                quad.vertices[2] = cell->face(f)->vertex_index(0)+(slice+1)*input.n_vertices();
-                quad.vertices[3] = cell->face(f)->vertex_index(1)+(slice+1)*input.n_vertices();
-                s.boundary_quads.push_back(quad);
-              }
+          for (size_type slice=0; slice<n_slices-1; ++slice)
+            {
+              quad.vertices[0] = cell->face(f)->vertex_index(0)+slice*input.n_vertices();
+              quad.vertices[1] = cell->face(f)->vertex_index(1)+slice*input.n_vertices();
+              quad.vertices[2] = cell->face(f)->vertex_index(0)+(slice+1)*input.n_vertices();
+              quad.vertices[3] = cell->face(f)->vertex_index(1)+(slice+1)*input.n_vertices();
+              s.boundary_quads.push_back(quad);
+            }
           }
     }
 
@@ -3482,10 +3482,10 @@ extrude_triangulation(const Triangulation<2, 2> &input,
 // this is not necessary here as this is an internal only function.
 inline
 void GridGenerator::laplace_solve (const SparseMatrix<double> &S,
-                                   const std::map<unsigned int,double> &m,
+                                   const std::map<size_type,double> &m,
                                    Vector<double> &u)
 {
-  const unsigned int n_dofs=S.n();
+  const size_type n_dofs=S.n();
   FilteredMatrix<Vector<double> > SF (S);
   PreconditionJacobi<SparseMatrix<double> > prec;
   prec.initialize(S, 1.2);
@@ -3506,7 +3506,7 @@ void GridGenerator::laplace_solve (const SparseMatrix<double> &S,
 // Implementation for 1D only
 template <>
 void GridGenerator::laplace_transformation (Triangulation<1> &,
-                                            const std::map<unsigned int,Point<1> > &)
+                                            const std::map<size_type,Point<1> > &)
 {
   Assert(false, ExcNotImplemented());
 }
@@ -3515,7 +3515,7 @@ void GridGenerator::laplace_transformation (Triangulation<1> &,
 // Implementation for dimensions except 1
 template <int dim>
 void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
-                                            const std::map<unsigned int,Point<dim> > &new_points)
+                                            const std::map<size_type,Point<dim> > &new_points)
 {
   // first provide everything that is
   // needed for solving a Laplace
@@ -3543,9 +3543,9 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
 
   // set up the boundary values for
   // the laplace problem
-  std::vector<std::map<unsigned int,double> > m(dim);
-  typename std::map<unsigned int,Point<dim> >::const_iterator map_iter;
-  typename std::map<unsigned int,Point<dim> >::const_iterator map_end=new_points.end();
+  std::vector<std::map<size_type,double> > m(dim);
+  typename std::map<size_type,Point<dim> >::const_iterator map_iter;
+  typename std::map<size_type,Point<dim> >::const_iterator map_end=new_points.end();
 
   // fill these maps using the data
   // given by new_points
@@ -3562,12 +3562,12 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
               for (unsigned int vertex_no=0;
                    vertex_no<GeometryInfo<dim>::vertices_per_face; ++vertex_no)
                 {
-                  const unsigned int vertex_index=face->vertex_index(vertex_no);
+                  const size_type vertex_index=face->vertex_index(vertex_no);
                   map_iter=new_points.find(vertex_index);
 
                   if (map_iter!=map_end)
                     for (unsigned int i=0; i<dim; ++i)
-                      m[i].insert(std::pair<unsigned int,double> (
+                      m[i].insert(std::pair<size_type,double> (
                                     face->vertex_dof_index(vertex_no, 0), map_iter->second(i)));
                 }
           }
@@ -3590,11 +3590,11 @@ void GridGenerator::laplace_transformation (Triangulation<dim> &tria,
   // points of the triangulation
   // according to the computed values
   for (cell=dof_handler.begin_active(); cell!=endc; ++cell)
-    for (unsigned int vertex_no=0;
+    for (size_type vertex_no=0;
          vertex_no<GeometryInfo<dim>::vertices_per_cell; ++vertex_no)
       {
         Point<dim> &v=cell->vertex(vertex_no);
-        const unsigned int dof_index=cell->vertex_dof_index(vertex_no, 0);
+        const size_type dof_index=cell->vertex_dof_index(vertex_no, 0);
         for (unsigned int i=0; i<dim; ++i)
           v(i)=us[i](dof_index);
       }
@@ -3607,7 +3607,7 @@ void GridGenerator::hyper_cube_with_cylindrical_hole (Triangulation<1> &,
                                                       const double,
                                                       const double,
                                                       const double,
-                                                      const unsigned int,
+                                                      const size_type,
                                                       bool)
 {
   Assert(false, ExcNotImplemented());
@@ -3621,7 +3621,7 @@ GridGenerator::hyper_cube_with_cylindrical_hole (Triangulation<2> &triangulation
                                                  const double inner_radius,
                                                  const double outer_radius,
                                                  const double, // width,
-                                                 const unsigned int, // width_repetition,
+                                                 const size_type, // width_repetition,
                                                  bool colorize)
 {
   const int dim = 2;
@@ -3645,7 +3645,7 @@ GridGenerator::hyper_cube_with_cylindrical_hole (Triangulation<2> &triangulation
           {
             for (unsigned int v=0; v < GeometryInfo<dim>::vertices_per_face; ++v)
               {
-                unsigned int vv = cell->face(f)->vertex_index(v);
+                size_type vv = cell->face(f)->vertex_index(v);
                 if (treated_vertices[vv] == false)
                   {
                     treated_vertices[vv] = true;
@@ -3708,7 +3708,7 @@ void GridGenerator::hyper_cube_with_cylindrical_hole(Triangulation<3> &triangula
                                                      const double inner_radius,
                                                      const double outer_radius,
                                                      const double L,
-                                                     const unsigned int Nz,
+                                                     const size_type Nz,
                                                      bool colorize)
 {
   const int dim = 3;
@@ -3735,11 +3735,11 @@ void GridGenerator::hyper_cube_with_cylindrical_hole(Triangulation<3> &triangula
           {
             for (unsigned int v=0; v < GeometryInfo<dim>::vertices_per_face; ++v)
               {
-                unsigned int vv = cell->face(f)->vertex_index(v);
+                size_type vv = cell->face(f)->vertex_index(v);
                 if (treated_vertices[vv] == false)
                   {
                     treated_vertices[vv] = true;
-                    for (unsigned int i=0; i<=Nz; ++i)
+                    for (size_type i=0; i<=Nz; ++i)
                       {
                         double d = ((double) i)*L/((double) Nz);
                         switch (vv-i*16)

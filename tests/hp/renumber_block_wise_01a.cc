@@ -39,11 +39,11 @@
 
 
 template <int dim>
-std::vector<unsigned int>
+std::vector<types::global_dof_index>
 get_dofs (const hp::DoFHandler<dim> &dof)
 {
-  std::vector<unsigned int> local;
-  std::vector<unsigned int> global;
+  std::vector<types::global_dof_index> local;
+  std::vector<types::global_dof_index> global;
   for (typename hp::DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
        cell != dof.end(); ++cell)
     {
@@ -65,7 +65,7 @@ check_renumbering(hp::DoFHandler<dim>& dof)
 				   // do component-wise and save the
 				   // results
   DoFRenumbering::component_wise (dof);
-  const std::vector<unsigned int> vc = get_dofs (dof);
+  const std::vector<types::global_dof_index> vc = get_dofs (dof);
 
   deallog << "OK" << std::endl;
 }

@@ -126,7 +126,7 @@ void test(std::string filename)
   std::vector<double> shape_directional_derivative(dofs_per_cell);
   Vector<double> projected_directional_derivative(triangulation.n_cells());
 
-  std::vector<unsigned int> local_dof_indices (fe.dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
 
   typename DoFHandler<dim, spacedim>::active_cell_iterator
       cell = dof_handler.begin_active(),

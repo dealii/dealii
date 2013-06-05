@@ -46,11 +46,16 @@ namespace PETScWrappers
   {
   public:
     /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
+    /**
      * Create a full matrix of dimensions
      * @p m times @p n.
      */
-    FullMatrix (const unsigned int m,
-                const unsigned int n);
+    FullMatrix (const size_type m,
+                const size_type n);
 
     /**
      * Return a reference to the MPI

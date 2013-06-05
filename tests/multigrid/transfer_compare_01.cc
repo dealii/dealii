@@ -47,7 +47,7 @@ reinit_vector_by_blocks (
   const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
   MGLevelObject<dealii::Vector<number> > &v,
   const unsigned int selected_block,
-  std::vector<std::vector<unsigned int> >& ndofs)
+  std::vector<std::vector<types::global_dof_index> >& ndofs)
 {
   const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
   Assert(selected_block < n_blocks, ExcIndexRange(selected_block, 0, n_blocks));
@@ -57,9 +57,9 @@ reinit_vector_by_blocks (
 
   if (ndofs.size() == 0)
     {
-      std::vector<std::vector<unsigned int> >
+      std::vector<std::vector<types::global_dof_index> >
 	new_dofs(mg_dof.get_tria().n_levels(),
-		 std::vector<unsigned int>(selected.size()));
+		 std::vector<types::global_dof_index>(selected.size()));
       std::swap(ndofs, new_dofs);
       MGTools::count_dofs_per_block (mg_dof, ndofs);
     }
@@ -78,7 +78,7 @@ reinit_vector_by_blocks (
   const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
   MGLevelObject<BlockVector<number> > &v,
   const std::vector<bool> &sel,
-  std::vector<std::vector<unsigned int> >& ndofs)
+  std::vector<std::vector<types::global_dof_index> >& ndofs)
 {
   std::vector<bool> selected=sel;
 				   // Compute the number of blocks needed
@@ -89,9 +89,9 @@ reinit_vector_by_blocks (
 
   if (ndofs.size() == 0)
     {
-      std::vector<std::vector<unsigned int> >
+      std::vector<std::vector<types::global_dof_index> >
 	new_dofs(mg_dof.get_tria().n_levels(),
-		 std::vector<unsigned int>(selected.size()));
+		 std::vector<types::global_dof_index>(selected.size()));
       std::swap(ndofs, new_dofs);
       MGTools::count_dofs_per_block (mg_dof, ndofs);
     }
@@ -143,10 +143,10 @@ void check_block(const FiniteElement<dim>& fe)
     }
 
 				   // Store sizes
-  vector<unsigned int> ndofs(fe.n_blocks());
+  vector<types::global_dof_index> ndofs(fe.n_blocks());
   DoFTools::count_dofs_per_block(mgdof, ndofs);
-  std::vector<std::vector<unsigned int> > mg_ndofs(mgdof.get_tria().n_levels(),
-						   std::vector<unsigned int>(fe.n_blocks()));
+  std::vector<std::vector<types::global_dof_index> > mg_ndofs(mgdof.get_tria().n_levels(),
+						   std::vector<types::global_dof_index>(fe.n_blocks()));
   MGTools::count_dofs_per_block(mgdof, mg_ndofs);
 
   MGTransferPrebuilt<BlockVector<double> > transfer;
@@ -224,7 +224,7 @@ void check_block(const FiniteElement<dim>& fe)
   for (unsigned int i=0;i<u.size();++i)
     u(i) = i+1;
 
-  std::vector<std::vector<unsigned int> > cached_sizes;
+  std::vector<std::vector<types::global_dof_index> > cached_sizes;
   MGLevelObject<BlockVector<double> > v;
   MGLevelObject<BlockVector<double> > wb;
   MGLevelObject<Vector<double> > ws;

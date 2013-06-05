@@ -29,10 +29,10 @@ namespace parallel
     Vector<Number>::clear_mpi_requests ()
     {
 #ifdef DEAL_II_WITH_MPI
-      for (unsigned int j=0; j<compress_requests.size(); j++)
+      for (size_type j=0; j<compress_requests.size(); j++)
         MPI_Request_free(&compress_requests[j]);
       compress_requests.clear();
-      for (unsigned int j=0; j<update_ghost_values_requests.size(); j++)
+      for (size_type j=0; j<update_ghost_values_requests.size(); j++)
         MPI_Request_free(&update_ghost_values_requests[j]);
       update_ghost_values_requests.clear();
 #endif
@@ -42,7 +42,7 @@ namespace parallel
 
     template <typename Number>
     void
-    Vector<Number>::resize_val (const unsigned int new_alloc_size)
+    Vector<Number>::resize_val (const size_type new_alloc_size)
     {
       if (new_alloc_size > allocated_size)
         {
@@ -66,8 +66,8 @@ namespace parallel
 
     template <typename Number>
     void
-    Vector<Number>::reinit (const unsigned int size,
-                            const bool         fast)
+    Vector<Number>::reinit (const size_type size,
+                            const bool      fast)
     {
       clear_mpi_requests();
       // check whether we need to reallocate
@@ -107,8 +107,8 @@ namespace parallel
       if (partitioner.get() != v.partitioner.get())
         {
           partitioner = v.partitioner;
-          const unsigned int new_allocated_size = partitioner->local_size() +
-                                                  partitioner->n_ghost_indices();
+          const size_type new_allocated_size = partitioner->local_size() +
+                                               partitioner->n_ghost_indices();
           resize_val (new_allocated_size);
           vector_view.reinit (partitioner->local_size(), val);
         }
@@ -157,8 +157,8 @@ namespace parallel
       partitioner = partitioner_in;
 
       // set vector size and allocate memory
-      const unsigned int new_allocated_size = partitioner->local_size() +
-                                              partitioner->n_ghost_indices();
+      const size_type new_allocated_size = partitioner->local_size() +
+                                           partitioner->n_ghost_indices();
       resize_val (new_allocated_size);
       vector_view.reinit (partitioner->local_size(), val);
 
@@ -220,8 +220,8 @@ namespace parallel
       // make this function thread safe
       Threads::Mutex::ScopedLock lock (mutex);
 
-      const unsigned int n_import_targets = part.import_targets().size();
-      const unsigned int n_ghost_targets  = part.ghost_targets().size();
+      const size_type n_import_targets = part.import_targets().size();
+      const size_type n_ghost_targets  = part.ghost_targets().size();
 
       // Need to send and receive the data. Use
       // non-blocking communication, where it is
@@ -239,7 +239,7 @@ namespace parallel
           // up yet
           if (import_data == 0)
             import_data = new Number[part.n_import_indices()];
-          for (unsigned int i=0; i<n_import_targets; i++)
+          for (size_type i=0; i<n_import_targets; i++)
             {
               MPI_Recv_init (&import_data[current_index_start],
                              part.import_targets()[i].second*sizeof(Number),
@@ -255,7 +255,7 @@ namespace parallel
 
           Assert (part.local_size() == vector_view.size(), ExcInternalError());
           current_index_start = part.local_size();
-          for (unsigned int i=0; i<n_ghost_targets; i++)
+          for (size_type i=0; i<n_ghost_targets; i++)
             {
               MPI_Send_init (&this->val[current_index_start],
                              part.ghost_targets()[i].second*sizeof(Number),
@@ -305,8 +305,8 @@ namespace parallel
       // make this function thread safe
       Threads::Mutex::ScopedLock lock (mutex);
 
-      const unsigned int n_import_targets = part.import_targets().size();
-      const unsigned int n_ghost_targets  = part.ghost_targets().size();
+      const size_type n_import_targets = part.import_targets().size();
+      const size_type n_ghost_targets  = part.ghost_targets().size();
 
       if (operation != dealii::VectorOperation::insert)
         AssertDimension (n_ghost_targets+n_import_targets,
@@ -321,7 +321,7 @@ namespace parallel
           Assert (ierr == MPI_SUCCESS, ExcInternalError());
 
           Number *read_position = import_data;
-          std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
+          std::vector<std::pair<size_type, size_type> >::const_iterator
           my_imports = part.import_indices().begin();
 
           // If the operation is no insertion, add the imported data to the
@@ -330,11 +330,11 @@ namespace parallel
           // the ones already present
           if (operation != dealii::VectorOperation::insert)
             for ( ; my_imports!=part.import_indices().end(); ++my_imports)
-              for (unsigned int j=my_imports->first; j<my_imports->second; j++)
+              for (size_type j=my_imports->first; j<my_imports->second; j++)
                 local_element(j) += *read_position++;
           else
             for ( ; my_imports!=part.import_indices().end(); ++my_imports)
-              for (unsigned int j=my_imports->first; j<my_imports->second;
+              for (size_type j=my_imports->first; j<my_imports->second;
                    j++, read_position++)
                 Assert(*read_position == 0. ||
                        std::abs(local_element(j) - *read_position) <
@@ -378,8 +378,8 @@ namespace parallel
       // make this function thread safe
       Threads::Mutex::ScopedLock lock (mutex);
 
-      const unsigned int n_import_targets = part.import_targets().size();
-      const unsigned int n_ghost_targets = part.ghost_targets().size();
+      const size_type n_import_targets = part.import_targets().size();
+      const size_type n_ghost_targets = part.ghost_targets().size();
 
       // Need to send and receive the data. Use
       // non-blocking communication, where it is
@@ -389,9 +389,9 @@ namespace parallel
         {
           Assert (part.local_size() == vector_view.size(),
                   ExcInternalError());
-          unsigned int current_index_start = part.local_size();
+          size_type current_index_start = part.local_size();
           update_ghost_values_requests.resize (n_import_targets+n_ghost_targets);
-          for (unsigned int i=0; i<n_ghost_targets; i++)
+          for (size_type i=0; i<n_ghost_targets; i++)
             {
               // allow writing into ghost indices even
               // though we are in a const function
@@ -413,7 +413,7 @@ namespace parallel
           if (import_data == 0 && part.n_import_indices() > 0)
             import_data = new Number[part.n_import_indices()];
           current_index_start = 0;
-          for (unsigned int i=0; i<n_import_targets; i++)
+          for (size_type i=0; i<n_import_targets; i++)
             {
               MPI_Send_init (&import_data[current_index_start],
                              part.import_targets()[i].second*sizeof(Number),
@@ -433,10 +433,10 @@ namespace parallel
         {
           Assert (import_data != 0, ExcInternalError());
           Number *write_position = import_data;
-          std::vector<std::pair<unsigned int, unsigned int> >::const_iterator
+          std::vector<std::pair<size_type, size_type> >::const_iterator
           my_imports = part.import_indices().begin();
           for ( ; my_imports!=part.import_indices().end(); ++my_imports)
-            for (unsigned int j=my_imports->first; j<my_imports->second; j++)
+            for (size_type j=my_imports->first; j<my_imports->second; j++)
               *write_position++ = local_element(j);
         }
 
@@ -572,19 +572,19 @@ namespace parallel
           << partitioner->size() << std::endl
           << "Vector data:" << std::endl;
       if (across)
-        for (unsigned int i=0; i<partitioner->local_size(); ++i)
+        for (size_type i=0; i<partitioner->local_size(); ++i)
           out << local_element(i) << ' ';
       else
-        for (unsigned int i=0; i<partitioner->local_size(); ++i)
+        for (size_type i=0; i<partitioner->local_size(); ++i)
           out << local_element(i) << std::endl;
       out << std::endl;
       out << "Ghost entries (global index / value):" << std::endl;
       if (across)
-        for (unsigned int i=0; i<partitioner->n_ghost_indices(); ++i)
+        for (size_type i=0; i<partitioner->n_ghost_indices(); ++i)
           out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
               << '/' << local_element(partitioner->local_size()+i) << ") ";
       else
-        for (unsigned int i=0; i<partitioner->n_ghost_indices(); ++i)
+        for (size_type i=0; i<partitioner->n_ghost_indices(); ++i)
           out << '(' << partitioner->ghost_indices().nth_index_in_set(i)
               << '/' << local_element(partitioner->local_size()+i) << ")"
               << std::endl;

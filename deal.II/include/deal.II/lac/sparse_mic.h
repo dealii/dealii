@@ -42,6 +42,11 @@ class SparseMIC : public SparseLUDecomposition<number>
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Constructor. Does nothing, so
    * you have to call @p decompose
    * sometimes afterwards.
@@ -197,7 +202,7 @@ private:
    * Compute the row-th "inner
    * sum".
    */
-  number get_rowsum (const unsigned int row) const;
+  number get_rowsum (const size_type row) const;
 };
 
 /*@}*/

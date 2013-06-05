@@ -21,7 +21,7 @@ void MGTransferSelect<float>::build_matrices<deal_II_dimension>
  unsigned int, unsigned int,
  const std::vector<unsigned int>&,
  const std::vector<unsigned int>&,
- const std::vector<std::set<unsigned int> >&);
+ const std::vector<std::set<types::global_dof_index> >&);
 
 template
 void MGTransferSelect<double>::build_matrices<deal_II_dimension>
@@ -30,7 +30,7 @@ void MGTransferSelect<double>::build_matrices<deal_II_dimension>
  unsigned int, unsigned int,
  const std::vector<unsigned int>&,
  const std::vector<unsigned int>&,
- const std::vector<std::set<unsigned int> >&);
+ const std::vector<std::set<types::global_dof_index> >&);
 
 template void
 MGTransferSelect<float>::copy_to_mg (

@@ -60,7 +60,7 @@ template <int dim>
 void
 check_boundary (const DoFHandler<dim> &dof)
 {
-  std::vector<unsigned int> dof_to_boundary_mapping;
+  std::vector<types::global_dof_index> dof_to_boundary_mapping;
   DoFTools::map_dof_to_boundary_indices (dof,
 					 dof_to_boundary_mapping);
 

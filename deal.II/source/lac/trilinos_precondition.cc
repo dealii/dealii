@@ -32,6 +32,30 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
+  namespace
+  {
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    int global_length (const Epetra_MultiVector &vector)
+    {
+      return vector.GlobalLength();
+    }
+
+    int gid(const Epetra_Map &map, unsigned int i)
+    {
+      return map.GID(i);
+    }
+#else
+    long long int global_length (const Epetra_MultiVector &vector)
+    {
+      return vector.GlobalLength64();
+    }
+
+    long long int gid(const Epetra_Map &map, dealii::types::global_dof_index i)
+    {
+      return map.GID64(i);
+    }
+#endif
+  }
 
   PreconditionBase::PreconditionBase()
 #ifdef DEAL_II_WITH_MPI
@@ -509,7 +533,7 @@ namespace TrilinosWrappers
   PreconditionAMG:: initialize (const SparseMatrix   &matrix,
                                 const AdditionalData &additional_data)
   {
-    const unsigned int n_rows = matrix.m();
+    const size_type n_rows = matrix.m();
 
     // Build the AMG preconditioner.
     Teuchos::ParameterList parameter_list;
@@ -575,7 +599,7 @@ namespace TrilinosWrappers
 
     const Epetra_Map &domain_map = matrix.domain_partitioner();
 
-    const unsigned int constant_modes_dimension =
+    const size_type constant_modes_dimension =
       additional_data.constant_modes.size();
     Epetra_MultiVector distributed_constant_modes (domain_map,
                                                    constant_modes_dimension);
@@ -585,25 +609,26 @@ namespace TrilinosWrappers
       {
         const bool constant_modes_are_global =
           additional_data.constant_modes[0].size() == n_rows;
-        const unsigned int n_relevant_rows =
+        const size_type n_relevant_rows =
           constant_modes_are_global ? n_rows : additional_data.constant_modes[0].size();
-        const unsigned int my_size = domain_map.NumMyElements();
+        const size_type my_size = domain_map.NumMyElements();
         if (constant_modes_are_global == false)
           Assert (n_relevant_rows == my_size,
                   ExcDimensionMismatch(n_relevant_rows, my_size));
         Assert (n_rows ==
-                static_cast<unsigned int>(distributed_constant_modes.GlobalLength()),
+                static_cast<size_type>(global_length(distributed_constant_modes)),
                 ExcDimensionMismatch(n_rows,
-                                     distributed_constant_modes.GlobalLength()));
+                                     global_length(distributed_constant_modes)));
 
         // Reshape null space as a
         // contiguous vector of
         // doubles so that Trilinos
         // can read from it.
-        for (unsigned int d=0; d<constant_modes_dimension; ++d)
-          for (unsigned int row=0; row<my_size; ++row)
+        for (size_type d=0; d<constant_modes_dimension; ++d)
+          for (size_type row=0; row<my_size; ++row)
             {
-              int global_row_id = constant_modes_are_global ? domain_map.GID(row) : row;
+              TrilinosWrappers::types::int_type global_row_id = 
+                constant_modes_are_global ? gid(domain_map,row) : row;
               distributed_constant_modes[d][row] =
                 additional_data.constant_modes[d][global_row_id];
             }
@@ -657,13 +682,14 @@ namespace TrilinosWrappers
               const ::dealii::SparsityPattern      *use_this_sparsity)
   {
     preconditioner.reset();
-    const unsigned int n_rows = deal_ii_sparse_matrix.m();
+    const size_type n_rows = deal_ii_sparse_matrix.m();
 
     // Init Epetra Matrix using an
     // equidistributed map; avoid
     // storing the nonzero
     // elements.
-    vector_distributor.reset (new Epetra_Map(static_cast<int>(n_rows), 0, communicator));
+    vector_distributor.reset (new Epetra_Map(static_cast<TrilinosWrappers::types::int_type>(n_rows), 
+          0, communicator));
 
     if (trilinos_matrix.get() == 0)
       trilinos_matrix.reset (new SparseMatrix());
@@ -694,7 +720,7 @@ namespace TrilinosWrappers
 
 
 
-  std::size_t
+  PreconditionAMG::size_type
   PreconditionAMG::memory_consumption() const
   {
     unsigned int memory = sizeof(this);

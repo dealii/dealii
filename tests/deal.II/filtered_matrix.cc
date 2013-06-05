@@ -45,7 +45,7 @@
 
   
 void
-solve_filtered (std::map<unsigned int,double> &bv,
+solve_filtered (std::map<types::global_dof_index,double> &bv,
 		SparseMatrix<double>          &A,
 		Vector<double>                &u,
 		Vector<double>                &f)
@@ -67,7 +67,7 @@ solve_filtered (std::map<unsigned int,double> &bv,
   
   solver.solve (A1, u, f1, fprec);
 
-  for (std::map<unsigned int,double>::const_iterator i=bv.begin();
+  for (std::map<types::global_dof_index,double>::const_iterator i=bv.begin();
        i!=bv.end(); ++i)
     Assert (std::fabs(u(i->first) - i->second) < 1e-8,
 	    ExcInternalError());
@@ -77,7 +77,7 @@ solve_filtered (std::map<unsigned int,double> &bv,
 
 template <int dim>
 void
-solve_eliminated (std::map<unsigned int,double> &bv,
+solve_eliminated (std::map<types::global_dof_index,double> &bv,
 		  SparseMatrix<double>          &A,
 		  Vector<double>                &u,
 		  Vector<double>                &f)
@@ -121,7 +121,7 @@ check ()
 		    update_values | update_gradients
 		    | update_q_points | update_JxW_values);
 
-  std::vector <unsigned int> global_dofs (element.dofs_per_cell);
+  std::vector <types::global_dof_index> global_dofs (element.dofs_per_cell);
   std::vector <double> function (quadrature.size());
 
   Vector<double> f (dof.n_dofs ());
@@ -165,13 +165,13 @@ check ()
     }
 
 				   // interpolate boundary values
-  std::map<unsigned int,double> bv;
+  std::map<types::global_dof_index,double> bv;
   VectorTools::interpolate_boundary_values (mapping, dof, 0, cosine, bv, std::vector<bool>());
 				   // the cosine has too many zero
 				   // values on the boundary of the
 				   // domain, so reset the elements to
 				   // some other value
-  for (typename std::map<unsigned int,double>::iterator i=bv.begin();
+  for (typename std::map<types::global_dof_index,double>::iterator i=bv.begin();
        i!=bv.end(); ++i)
     i->second = std::sin(i->second+0.5)+1.0;
 

@@ -98,7 +98,8 @@ void SystemTest<dim>::check ()
           deallog << "  DoF " << i << std::endl;
     };
 
-  std::vector<unsigned int> dofs_per_component (fe.n_components(), 0U);
+  std::vector<types::global_dof_index> dofs_per_component (fe.n_components(), 
+      static_cast<types::global_dof_index>(0));
   DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
   deallog << "DoFs per component: ";
   for (unsigned int i=0; i<fe.n_components(); ++i)

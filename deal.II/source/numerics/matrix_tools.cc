@@ -206,7 +206,7 @@ namespace MatrixCreator
 
       struct CopyData
       {
-        std::vector<unsigned int> dof_indices;
+        std::vector<types::global_dof_index> dof_indices;
         FullMatrix<double>        cell_matrix;
         dealii::Vector<double>    cell_rhs;
         const ConstraintMatrix   *constraints;
@@ -840,7 +840,7 @@ namespace MatrixCreator
                                    SparseMatrix<double>      &matrix,
                                    const typename FunctionMap<spacedim>::type &boundary_functions,
                                    Vector<double>            &rhs_vector,
-                                   std::vector<unsigned int> &dof_to_boundary_mapping,
+                                   std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                    const Function<spacedim> *const coefficient,
                                    const std::vector<unsigned int> &component_mapping,
                                    const MatrixCreator::internal::IteratorRange<DoFHandler<dim,spacedim> >   range,
@@ -885,8 +885,8 @@ namespace MatrixCreator
       std::vector<Vector<double> > rhs_values_system (fe_values.n_quadrature_points,
                                                       Vector<double>(n_function_components));
 
-      std::vector<unsigned int> dofs (dofs_per_cell);
-      std::vector<unsigned int> dofs_on_face_vector (dofs_per_face);
+      std::vector<types::global_dof_index> dofs (dofs_per_cell);
+      std::vector<types::global_dof_index> dofs_on_face_vector (dofs_per_face);
 
       // for each dof on the cell, have a
       // flag whether it is on the face
@@ -1082,10 +1082,10 @@ namespace MatrixCreator
               Threads::Mutex::ScopedLock lock (mutex);
               for (unsigned int i=0; i<dofs_per_cell; ++i)
                 {
-                  if (dof_is_on_face[i] && dof_to_boundary_mapping[dofs[i]] != numbers::invalid_unsigned_int)
+                  if (dof_is_on_face[i] && dof_to_boundary_mapping[dofs[i]] != numbers::invalid_dof_index)
                     {
                       for (unsigned int j=0; j<dofs_per_cell; ++j)
-                        if (dof_is_on_face[j] && dof_to_boundary_mapping[dofs[j]] != numbers::invalid_unsigned_int)
+                        if (dof_is_on_face[j] && dof_to_boundary_mapping[dofs[j]] != numbers::invalid_dof_index)
                           {
                             Assert(numbers::is_finite(cell_matrix(i,j)), ExcNumberNotFinite());
                             matrix.add(dof_to_boundary_mapping[dofs[i]],
@@ -1108,7 +1108,7 @@ namespace MatrixCreator
                                         SparseMatrix<double> &,
                                         const FunctionMap<3>::type &,
                                         Vector<double> &,
-                                        std::vector<unsigned int> &,
+                                        std::vector<types::global_dof_index> &,
                                         const Function<3> *const ,
                                         const std::vector<unsigned int> &,
                                         const MatrixCreator::internal::IteratorRange<DoFHandler<2,3> > ,
@@ -1127,7 +1127,7 @@ namespace MatrixCreator
                                         SparseMatrix<double> &,
                                         const FunctionMap<3>::type &,
                                         Vector<double> &,
-                                        std::vector<unsigned int> &,
+                                        std::vector<types::global_dof_index> &,
                                         const Function<3> *const ,
                                         const std::vector<unsigned int> &,
                                         const MatrixCreator::internal::IteratorRange<DoFHandler<1,3> > ,
@@ -1148,7 +1148,7 @@ namespace MatrixCreator
                                SparseMatrix<double>  &matrix,
                                const typename FunctionMap<spacedim>::type  &boundary_functions,
                                Vector<double>            &rhs_vector,
-                               std::vector<unsigned int> &dof_to_boundary_mapping,
+                               std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                const Function<spacedim> *const coefficient,
                                std::vector<unsigned int> component_mapping)
   {
@@ -1208,7 +1208,7 @@ namespace MatrixCreator
      SparseMatrix<double>      &matrix,
      const typename FunctionMap<spacedim>::type &boundary_functions,
      Vector<double>            &rhs_vector,
-     std::vector<unsigned int> &dof_to_boundary_mapping,
+     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
      const Function<spacedim> *const coefficient,
      const std::vector<unsigned int> &component_mapping,
      const MatrixCreator::internal::IteratorRange<DoFHandler<dim,spacedim> >   range,
@@ -1240,7 +1240,7 @@ namespace MatrixCreator
                                    SparseMatrix<double>      &matrix,
                                    const typename FunctionMap<spacedim>::type &boundary_functions,
                                    Vector<double>            &rhs_vector,
-                                   std::vector<unsigned int> &dof_to_boundary_mapping,
+                                   std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                    const Function<spacedim> *const coefficient,
                                    const std::vector<unsigned int> &component_mapping,
                                    const MatrixCreator::internal::IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
@@ -1256,8 +1256,8 @@ namespace MatrixCreator
 #ifdef DEBUG
       if (true)
         {
-          unsigned int max_element = 0;
-          for (std::vector<unsigned int>::const_iterator i=dof_to_boundary_mapping.begin();
+          types::global_dof_index max_element = static_cast<types::global_dof_index>(0);
+          for (std::vector<types::global_dof_index>::const_iterator i=dof_to_boundary_mapping.begin();
                i!=dof_to_boundary_mapping.end(); ++i)
             if ((*i != hp::DoFHandler<dim,spacedim>::invalid_dof_index) &&
                 (*i > max_element))
@@ -1287,8 +1287,8 @@ namespace MatrixCreator
       std::vector<double>          rhs_values_scalar;
       std::vector<Vector<double> > rhs_values_system;
 
-      std::vector<unsigned int> dofs (max_dofs_per_cell);
-      std::vector<unsigned int> dofs_on_face_vector (max_dofs_per_face);
+      std::vector<types::global_dof_index> dofs (max_dofs_per_cell);
+      std::vector<types::global_dof_index> dofs_on_face_vector (max_dofs_per_face);
 
       // for each dof on the cell, have a
       // flag whether it is on the face
@@ -1606,7 +1606,7 @@ namespace MatrixCreator
                                     SparseMatrix<double>      &matrix,
                                     const typename FunctionMap<spacedim>::type &rhs,
                                     Vector<double>            &rhs_vector,
-                                    std::vector<unsigned int> &dof_to_boundary_mapping,
+                                    std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                     const Function<spacedim> *const a,
                                     std::vector<unsigned int> component_mapping)
   {
@@ -1624,7 +1624,7 @@ namespace MatrixCreator
                                SparseMatrix<double>      &matrix,
                                const typename FunctionMap<spacedim>::type         &boundary_functions,
                                Vector<double>            &rhs_vector,
-                               std::vector<unsigned int> &dof_to_boundary_mapping,
+                               std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                const Function<spacedim> *const coefficient,
                                std::vector<unsigned int> component_mapping)
   {
@@ -1684,7 +1684,7 @@ namespace MatrixCreator
      SparseMatrix<double>      &matrix,
      const typename FunctionMap<spacedim>::type &boundary_functions,
      Vector<double>            &rhs_vector,
-     std::vector<unsigned int> &dof_to_boundary_mapping,
+     std::vector<types::global_dof_index> &dof_to_boundary_mapping,
      const Function<spacedim> *const coefficient,
      const std::vector<unsigned int> &component_mapping,
      const MatrixCreator::internal::IteratorRange<hp::DoFHandler<dim,spacedim> >   range,
@@ -1711,7 +1711,7 @@ namespace MatrixCreator
                                     SparseMatrix<double>      &matrix,
                                     const typename FunctionMap<spacedim>::type &rhs,
                                     Vector<double>            &rhs_vector,
-                                    std::vector<unsigned int> &dof_to_boundary_mapping,
+                                    std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                     const Function<spacedim> *const a,
                                     std::vector<unsigned int> component_mapping)
   {
@@ -1973,7 +1973,7 @@ namespace MatrixTools
 //TODO:[WB] I don't think that the optimized storage of diagonals is needed (GK)
   template <typename number>
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          SparseMatrix<number>  &matrix,
                          Vector<number>   &solution,
                          Vector<number>   &right_hand_side,
@@ -1992,7 +1992,7 @@ namespace MatrixTools
       return;
 
 
-    const unsigned int n_dofs = matrix.m();
+    const types::global_dof_index n_dofs = matrix.m();
 
     // if a diagonal entry is zero
     // later, then we use another
@@ -2009,13 +2009,13 @@ namespace MatrixTools
         }
 
 
-    std::map<unsigned int,double>::const_iterator dof  = boundary_values.begin(),
-                                                  endd = boundary_values.end();
+    std::map<types::global_dof_index,double>::const_iterator dof  = boundary_values.begin(),
+							     endd = boundary_values.end();
     for (; dof != endd; ++dof)
       {
         Assert (dof->first < n_dofs, ExcInternalError());
 
-        const unsigned int dof_number = dof->first;
+        const types::global_dof_index dof_number = dof->first;
         // for each boundary dof:
 
         // set entries of this line to zero except for the diagonal
@@ -2080,7 +2080,7 @@ namespace MatrixTools
                  q = matrix.begin(dof_number)+1;
                  q != matrix.end(dof_number); ++q)
               {
-                const unsigned int row = q->column();
+                const types::global_dof_index row = q->column();
 
                 // find the position of
                 // element
@@ -2127,7 +2127,7 @@ namespace MatrixTools
 
   template <typename number>
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          BlockSparseMatrix<number>  &matrix,
                          BlockVector<number>   &solution,
                          BlockVector<number>   &right_hand_side,
@@ -2157,7 +2157,7 @@ namespace MatrixTools
       return;
 
 
-    const unsigned int n_dofs = matrix.m();
+    const types::global_dof_index n_dofs = matrix.m();
 
     // if a diagonal entry is zero
     // later, then we use another
@@ -2187,8 +2187,8 @@ namespace MatrixTools
       first_nonzero_diagonal_entry = 1;
 
 
-    std::map<unsigned int,double>::const_iterator dof  = boundary_values.begin(),
-                                                  endd = boundary_values.end();
+    std::map<types::global_dof_index,double>::const_iterator dof  = boundary_values.begin(),
+                                                             endd = boundary_values.end();
     const BlockSparsityPattern &
     sparsity_pattern = matrix.get_sparsity_pattern();
 
@@ -2208,8 +2208,8 @@ namespace MatrixTools
         // get global index and index
         // in the block in which this
         // dof is located
-        const unsigned int dof_number = dof->first;
-        const std::pair<unsigned int,unsigned int>
+        const types::global_dof_index dof_number = dof->first;
+        const std::pair<unsigned int,types::global_dof_index>
         block_index = index_mapping.global_to_local (dof_number);
 
         // for each boundary dof:
@@ -2322,7 +2322,7 @@ namespace MatrixTools
                     // get the number of the column in this row in which a
                     // nonzero entry is. this is also the row of the transpose
                     // block which has an entry in the interesting row
-                    const unsigned int row = q->column();
+                    const types::global_dof_index row = q->column();
 
                     // find the position of element (row,dof_number) in this
                     // block (not in the transpose one). note that we have to
@@ -2391,7 +2391,7 @@ namespace MatrixTools
     {
       template <typename PETScMatrix, typename PETScVector>
       void
-      apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+      apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                              PETScMatrix      &matrix,
                              PETScVector      &solution,
                              PETScVector      &right_hand_side,
@@ -2409,7 +2409,7 @@ namespace MatrixTools
         if (boundary_values.size() == 0)
           return;
 
-        const std::pair<unsigned int, unsigned int> local_range
+        const std::pair<types::global_dof_index, types::global_dof_index> local_range
           = matrix.local_range();
         Assert (local_range == right_hand_side.local_range(),
                 ExcInternalError());
@@ -2421,7 +2421,7 @@ namespace MatrixTools
         // matrix that we can see. if we can't
         // find such an entry, take one
         PetscScalar average_nonzero_diagonal_entry = 1;
-        for (unsigned int i=local_range.first; i<local_range.second; ++i)
+        for (types::global_dof_index i=local_range.first; i<local_range.second; ++i)
           if (matrix.diag_element(i) != 0)
             {
               average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
@@ -2430,8 +2430,8 @@ namespace MatrixTools
 
         // figure out which rows of the matrix we
         // have to eliminate on this processor
-        std::vector<unsigned int> constrained_rows;
-        for (std::map<unsigned int,double>::const_iterator
+        std::vector<types::global_dof_index> constrained_rows;
+        for (std::map<types::global_dof_index,double>::const_iterator
              dof  = boundary_values.begin();
              dof != boundary_values.end();
              ++dof)
@@ -2452,9 +2452,9 @@ namespace MatrixTools
         // treated in the other functions.
         matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
 
-        std::vector<unsigned int> indices;
+        std::vector<types::global_dof_index> indices;
         std::vector<PetscScalar>  solution_values;
-        for (std::map<unsigned int,double>::const_iterator
+        for (std::map<types::global_dof_index,double>::const_iterator
              dof  = boundary_values.begin();
              dof != boundary_values.end();
              ++dof)
@@ -2484,7 +2484,7 @@ namespace MatrixTools
 
 
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          PETScWrappers::SparseMatrix   &matrix,
                          PETScWrappers::Vector   &solution,
                          PETScWrappers::Vector   &right_hand_side,
@@ -2499,7 +2499,7 @@ namespace MatrixTools
 
 
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          PETScWrappers::MPI::SparseMatrix   &matrix,
                          PETScWrappers::MPI::Vector   &solution,
                          PETScWrappers::MPI::Vector   &right_hand_side,
@@ -2516,8 +2516,8 @@ namespace MatrixTools
 
 
   void
-  apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
-                         PETScWrappers::MPI::BlockSparseMatrix  &matrix,
+  apply_boundary_values (const std::map<types::global_dof_index,double>  &boundary_values,
+                         PETScWrappers::MPI::BlockSparseMatrix &matrix,
                          PETScWrappers::MPI::BlockVector        &solution,
                          PETScWrappers::MPI::BlockVector        &right_hand_side,
                          const bool                            eliminate_columns)
@@ -2537,10 +2537,11 @@ namespace MatrixTools
     // into blocks for the boundary values.
     // To this end, generate a vector of
     // maps with the respective indices.
-    std::vector<std::map<unsigned int,double> > block_boundary_values(n_blocks);
+    std::vector<std::map<dealii::types::global_dof_index,double> > block_boundary_values(n_blocks);
     {
-      int offset = 0, block=0;
-      for (std::map<unsigned int,double>::const_iterator
+      int block = 0;
+      dealii::types::global_dof_index offset = 0;
+      for (std::map<types::global_dof_index,double>::const_iterator
            dof  = boundary_values.begin();
            dof != boundary_values.end();
            ++dof)
@@ -2550,8 +2551,8 @@ namespace MatrixTools
               offset += matrix.block(block,0).m();
               block++;
             }
-          const unsigned int index = dof->first - offset;
-          block_boundary_values[block].insert(std::pair<unsigned int, double> (index,dof->second));
+          const types::global_dof_index index = dof->first - offset;
+          block_boundary_values[block].insert(std::pair<types::global_dof_index, double> (index,dof->second));
         }
     }
 
@@ -2571,11 +2572,11 @@ namespace MatrixTools
     // the whole row.
     for (unsigned int block_m=0; block_m<n_blocks; ++block_m)
       {
-        const std::pair<unsigned int, unsigned int> local_range
+        const std::pair<types::global_dof_index, types::global_dof_index> local_range
           = matrix.block(block_m,0).local_range();
 
-        std::vector<unsigned int> constrained_rows;
-        for (std::map<unsigned int,double>::const_iterator
+        std::vector<types::global_dof_index> constrained_rows;
+        for (std::map<types::global_dof_index,double>::const_iterator
              dof  = block_boundary_values[block_m].begin();
              dof != block_boundary_values[block_m].end();
              ++dof)
@@ -2601,7 +2602,7 @@ namespace MatrixTools
     {
       template <typename TrilinosMatrix, typename TrilinosVector>
       void
-      apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+      apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                              TrilinosMatrix      &matrix,
                              TrilinosVector      &solution,
                              TrilinosVector      &right_hand_side,
@@ -2619,7 +2620,7 @@ namespace MatrixTools
         if (boundary_values.size() == 0)
           return;
 
-        const std::pair<unsigned int, unsigned int> local_range
+        const std::pair<types::global_dof_index, types::global_dof_index> local_range
           = matrix.local_range();
         Assert (local_range == right_hand_side.local_range(),
                 ExcInternalError());
@@ -2637,7 +2638,7 @@ namespace MatrixTools
         // matrix that we can see. if we can't
         // find such an entry, take one
         TrilinosScalar average_nonzero_diagonal_entry = 1;
-        for (unsigned int i=local_range.first; i<local_range.second; ++i)
+        for (types::global_dof_index i=local_range.first; i<local_range.second; ++i)
           if (matrix.diag_element(i) != 0)
             {
               average_nonzero_diagonal_entry = std::fabs(matrix.diag_element(i));
@@ -2646,8 +2647,8 @@ namespace MatrixTools
 
         // figure out which rows of the matrix we
         // have to eliminate on this processor
-        std::vector<unsigned int> constrained_rows;
-        for (std::map<unsigned int,double>::const_iterator
+        std::vector<types::global_dof_index> constrained_rows;
+        for (std::map<types::global_dof_index,double>::const_iterator
              dof  = boundary_values.begin();
              dof != boundary_values.end();
              ++dof)
@@ -2664,9 +2665,9 @@ namespace MatrixTools
         // matrix classes in deal.II.
         matrix.clear_rows (constrained_rows, average_nonzero_diagonal_entry);
 
-        std::vector<unsigned int> indices;
+        std::vector<types::global_dof_index> indices;
         std::vector<TrilinosScalar>  solution_values;
-        for (std::map<unsigned int,double>::const_iterator
+        for (std::map<types::global_dof_index,double>::const_iterator
              dof  = boundary_values.begin();
              dof != boundary_values.end();
              ++dof)
@@ -2695,7 +2696,7 @@ namespace MatrixTools
 
       template <typename TrilinosMatrix, typename TrilinosBlockVector>
       void
-      apply_block_boundary_values (const std::map<unsigned int,double> &boundary_values,
+      apply_block_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                                    TrilinosMatrix      &matrix,
                                    TrilinosBlockVector &solution,
                                    TrilinosBlockVector &right_hand_side,
@@ -2718,10 +2719,11 @@ namespace MatrixTools
         // into blocks for the boundary values.
         // To this end, generate a vector of
         // maps with the respective indices.
-        std::vector<std::map<unsigned int,double> > block_boundary_values(n_blocks);
+        std::vector<std::map<types::global_dof_index,double> > block_boundary_values(n_blocks);
         {
-          int offset = 0, block=0;
-          for (std::map<unsigned int,double>::const_iterator
+          int block=0;
+          types::global_dof_index offset = 0;
+          for (std::map<types::global_dof_index,double>::const_iterator
                dof  = boundary_values.begin();
                dof != boundary_values.end();
                ++dof)
@@ -2731,9 +2733,9 @@ namespace MatrixTools
                   offset += matrix.block(block,0).m();
                   block++;
                 }
-              const unsigned int index = dof->first - offset;
+              const types::global_dof_index index = dof->first - offset;
               block_boundary_values[block].insert(
-                std::pair<unsigned int, double> (index,dof->second));
+                std::pair<types::global_dof_index, double> (index,dof->second));
             }
         }
 
@@ -2753,11 +2755,11 @@ namespace MatrixTools
         // the whole row.
         for (unsigned int block_m=0; block_m<n_blocks; ++block_m)
           {
-            const std::pair<unsigned int, unsigned int> local_range
+            const std::pair<types::global_dof_index, types::global_dof_index> local_range
               = matrix.block(block_m,0).local_range();
 
-            std::vector<unsigned int> constrained_rows;
-            for (std::map<unsigned int,double>::const_iterator
+            std::vector<types::global_dof_index> constrained_rows;
+            for (std::map<types::global_dof_index,double>::const_iterator
                  dof  = block_boundary_values[block_m].begin();
                  dof != block_boundary_values[block_m].end();
                  ++dof)
@@ -2777,7 +2779,7 @@ namespace MatrixTools
 
 
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          TrilinosWrappers::SparseMatrix   &matrix,
                          TrilinosWrappers::Vector         &solution,
                          TrilinosWrappers::Vector         &right_hand_side,
@@ -2792,7 +2794,7 @@ namespace MatrixTools
 
 
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          TrilinosWrappers::SparseMatrix   &matrix,
                          TrilinosWrappers::MPI::Vector    &solution,
                          TrilinosWrappers::MPI::Vector    &right_hand_side,
@@ -2807,8 +2809,8 @@ namespace MatrixTools
 
 
   void
-  apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
-                         TrilinosWrappers::BlockSparseMatrix  &matrix,
+  apply_boundary_values (const std::map<types::global_dof_index,double>  &boundary_values,
+                         TrilinosWrappers::BlockSparseMatrix &matrix,
                          TrilinosWrappers::BlockVector        &solution,
                          TrilinosWrappers::BlockVector        &right_hand_side,
                          const bool                            eliminate_columns)
@@ -2821,8 +2823,8 @@ namespace MatrixTools
 
 
   void
-  apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
-                         TrilinosWrappers::BlockSparseMatrix  &matrix,
+  apply_boundary_values (const std::map<types::global_dof_index,double>  &boundary_values,
+                         TrilinosWrappers::BlockSparseMatrix &matrix,
                          TrilinosWrappers::MPI::BlockVector   &solution,
                          TrilinosWrappers::MPI::BlockVector   &right_hand_side,
                          const bool                            eliminate_columns)
@@ -2837,8 +2839,8 @@ namespace MatrixTools
 
 
   void
-  local_apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-                               const std::vector<unsigned int> &local_dof_indices,
+  local_apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
+                               const std::vector<types::global_dof_index> &local_dof_indices,
                                FullMatrix<double> &local_matrix,
                                Vector<double>     &local_rhs,
                                const bool          eliminate_columns)
@@ -2885,7 +2887,7 @@ namespace MatrixTools
     const unsigned int n_local_dofs = local_dof_indices.size();
     for (unsigned int i=0; i<n_local_dofs; ++i)
       {
-        const std::map<unsigned int, double>::const_iterator
+        const std::map<types::global_dof_index, double>::const_iterator
         boundary_value = boundary_values.find (local_dof_indices[i]);
         if (boundary_value != boundary_values.end())
           {
@@ -2959,14 +2961,14 @@ namespace MatrixTools
 {
   template
   void
-  apply_boundary_values<double> (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values<double> (const std::map<types::global_dof_index,double> &boundary_values,
                                  SparseMatrix<double>  &matrix,
                                  Vector<double>   &solution,
                                  Vector<double>   &right_hand_side,
                                  const bool        eliminate_columns);
   template
   void
-  apply_boundary_values<float> (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values<float> (const std::map<types::global_dof_index,double> &boundary_values,
                                 SparseMatrix<float>  &matrix,
                                 Vector<float>   &solution,
                                 Vector<float>   &right_hand_side,
@@ -2974,14 +2976,14 @@ namespace MatrixTools
 
   template
   void
-  apply_boundary_values<double> (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values<double> (const std::map<types::global_dof_index,double> &boundary_values,
                                  BlockSparseMatrix<double>  &matrix,
                                  BlockVector<double>   &solution,
                                  BlockVector<double>   &right_hand_side,
                                  const bool        eliminate_columns);
   template
   void
-  apply_boundary_values<float> (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values<float> (const std::map<types::global_dof_index,double> &boundary_values,
                                 BlockSparseMatrix<float>  &matrix,
                                 BlockVector<float>   &solution,
                                 BlockVector<float>   &right_hand_side,

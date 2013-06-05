@@ -295,7 +295,7 @@ Vector<Number>::all_zero () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  for (unsigned int i=0; i<vec_size; ++i)
+  for (size_type i=0; i<vec_size; ++i)
     if (val[i] != Number(0))
       return false;
   return true;
@@ -309,7 +309,7 @@ Vector<Number>::is_non_negative () const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  for (unsigned int i=0; i<vec_size; ++i)
+  for (size_type i=0; i<vec_size; ++i)
     if ( ! internal::is_non_negative (val[i]))
       return false;
 
@@ -322,10 +322,12 @@ namespace internal
 {
   namespace Vector
   {
+    typedef types::global_dof_index size_type;
+
     template<typename T>
     void set_subrange (const T            s,
-                       const unsigned int begin,
-                       const unsigned int end,
+                       const size_type begin,
+                       const size_type end,
                        dealii::Vector<T> &dst)
     {
       if (s == T())
@@ -335,8 +337,8 @@ namespace internal
     }
 
     template<typename T>
-    void copy_subrange (const unsigned int       begin,
-                        const unsigned int       end,
+    void copy_subrange (const size_type         begin,
+                        const size_type         end,
                         const dealii::Vector<T> &src,
                         dealii::Vector<T>       &dst)
     {
@@ -345,8 +347,8 @@ namespace internal
     }
 
     template<typename T, typename U>
-    void copy_subrange (const unsigned int       begin,
-                        const unsigned int       end,
+    void copy_subrange (const size_type         begin,
+                        const size_type         end,
                         const dealii::Vector<T> &src,
                         dealii::Vector<U>       &dst)
     {
@@ -358,8 +360,8 @@ namespace internal
     }
 
     template<typename T, typename U>
-    void copy_subrange_wrap (const unsigned int       begin,
-                             const unsigned int       end,
+    void copy_subrange_wrap (const size_type         begin,
+                             const size_type         end,
                              const dealii::Vector<T> &src,
                              dealii::Vector<U>       &dst)
     {
@@ -373,8 +375,8 @@ namespace internal
       if (PointerComparison::equal(&src, &dst))
         return;
 
-      const unsigned int vec_size = src.size();
-      const unsigned int dst_size = dst.size();
+      const size_type vec_size = src.size();
+      const size_type dst_size = dst.size();
       if (dst_size != vec_size)
         dst.reinit (vec_size, true);
       if (vec_size>internal::Vector::minimum_parallel_grain_size)
@@ -576,7 +578,7 @@ namespace internal
                      const Number      *X,
                      const Number2     *Y,
                      const ResultType   power,
-                     const unsigned int vec_size,
+                     const size_type    vec_size,
                      ResultType        &result)
     {
       if (vec_size <= 4096)
@@ -586,24 +588,24 @@ namespace internal
           // order to obtain known loop bounds for most of the work.
           const Number *X_original = X;
           ResultType outer_results [128];
-          unsigned int n_chunks = vec_size / 32;
-          const unsigned int remainder = vec_size % 32;
+          size_type n_chunks = vec_size / 32;
+          const size_type remainder = vec_size % 32;
           Assert (remainder == 0 || n_chunks < 128, ExcInternalError());
 
-          for (unsigned int i=0; i<n_chunks; ++i)
+          for (size_type i=0; i<n_chunks; ++i)
             {
               ResultType r0 = op(X, Y, power);
-              for (unsigned int j=1; j<8; ++j)
+              for (size_type j=1; j<8; ++j)
                 r0 += op(X, Y, power);
               ResultType r1 = op(X, Y, power);
-              for (unsigned int j=1; j<8; ++j)
+              for (size_type j=1; j<8; ++j)
                 r1 += op(X, Y, power);
               r0 += r1;
               r1 = op(X, Y, power);
-              for (unsigned int j=1; j<8; ++j)
+              for (size_type j=1; j<8; ++j)
                 r1 += op(X, Y, power);
               ResultType r2 = op(X, Y, power);
-              for (unsigned int j=1; j<8; ++j)
+              for (size_type j=1; j<8; ++j)
                 r2 += op(X, Y, power);
               r1 += r2;
               r0 += r1;
@@ -615,31 +617,31 @@ namespace internal
           // fall-through to work on these values.
           if (remainder > 0)
             {
-              const unsigned int inner_chunks = remainder / 8;
+              const size_type inner_chunks = remainder / 8;
               Assert (inner_chunks <= 3, ExcInternalError());
-              const unsigned int remainder_inner = remainder % 8;
+              const size_type remainder_inner = remainder % 8;
               ResultType r0 = ResultType(), r1 = ResultType(),
                          r2 = ResultType();
               switch (inner_chunks)
                 {
                 case 3:
                   r2 = op(X, Y, power);
-                  for (unsigned int j=1; j<8; ++j)
+                  for (size_type j=1; j<8; ++j)
                     r2 += op(X, Y, power);
                   // no break
                 case 2:
                   r1 = op(X, Y, power);
-                  for (unsigned int j=1; j<8; ++j)
+                  for (size_type j=1; j<8; ++j)
                     r1 += op(X, Y, power);
                   r1 += r2;
                   // no break
                 case 1:
                   r2 = op(X, Y, power);
-                  for (unsigned int j=1; j<8; ++j)
+                  for (size_type j=1; j<8; ++j)
                     r2 += op(X, Y, power);
                   // no break
                 default:
-                  for (unsigned int j=0; j<remainder_inner; ++j)
+                  for (size_type j=0; j<remainder_inner; ++j)
                     r0 += op(X, Y, power);
                   r0 += r2;
                   r0 += r1;
@@ -648,7 +650,7 @@ namespace internal
                 }
               n_chunks++;
             }
-          AssertDimension(static_cast<unsigned int>(X - X_original), vec_size);
+          AssertDimension(static_cast<size_type> (X - X_original), vec_size);
 
           // now sum the results from the chunks
           // recursively
@@ -656,7 +658,7 @@ namespace internal
             {
               if (n_chunks % 2 == 1)
                 outer_results[n_chunks++] = ResultType();
-              for (unsigned int i=0; i<n_chunks; i+=2)
+              for (size_type i=0; i<n_chunks; i+=2)
                 outer_results[i/2] = outer_results[i] + outer_results[i+1];
               n_chunks /= 2;
             }
@@ -668,7 +670,7 @@ namespace internal
           // split the vector into smaller pieces to be
           // worked on recursively and create tasks for
           // them. Make pieces divisible by 1024.
-          const unsigned int new_size = (vec_size / 4096) * 1024;
+          const size_type new_size = (vec_size / 4096) * 1024;
           ResultType r0, r1, r2, r3;
           Threads::TaskGroup<> task_group;
           task_group += Threads::new_task(&accumulate<Operation,Number,Number2,
@@ -697,7 +699,7 @@ namespace internal
           // split vector into four pieces and work on
           // the pieces recursively. Make pieces (except last)
           // divisible by 1024.
-          const unsigned int new_size = (vec_size / 4096) * 1024;
+          const size_type new_size = (vec_size / 4096) * 1024;
           ResultType r0, r1, r2, r3;
           accumulate (op, X, Y, power, new_size, r0);
           accumulate (op, X+new_size, Y+new_size, power, new_size, r1);
@@ -800,7 +802,7 @@ Vector<Number>::l2_norm () const
     {
       real_type scale = 0.;
       real_type sum = 1.;
-      for (unsigned int i=0; i<vec_size; ++i)
+      for (size_type i=0; i<vec_size; ++i)
         {
           if (val[i] != Number())
             {
@@ -843,7 +845,7 @@ Vector<Number>::lp_norm (const real_type p) const
     {
       real_type scale = 0.;
       real_type sum = 1.;
-      for (unsigned int i=0; i<vec_size; ++i)
+      for (size_type i=0; i<vec_size; ++i)
         {
           if (val[i] != Number())
             {
@@ -872,7 +874,7 @@ Vector<Number>::linfty_norm () const
 
   real_type max = 0.;
 
-  for (unsigned int i=0; i<vec_size; ++i)
+  for (size_type i=0; i<vec_size; ++i)
     max = std::max (numbers::NumberTraits<Number>::abs(val[i]), max);
 
   return max;
@@ -903,7 +905,7 @@ Vector<Number> &Vector<Number>::operator -= (const Vector<Number> &v)
                          (boost::lambda::_1 - boost::lambda::_2),
                          internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    for (unsigned int i=0; i<vec_size; ++i)
+    for (size_type i=0; i<vec_size; ++i)
       val[i] -= v.val[i];
 
   return *this;
@@ -922,7 +924,7 @@ void Vector<Number>::add (const Number v)
                          (boost::lambda::_1 + v),
                          internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    for (unsigned int i=0; i<vec_size; ++i)
+    for (size_type i=0; i<vec_size; ++i)
       val[i] += v;
 }
 
@@ -941,7 +943,7 @@ void Vector<Number>::add (const Vector<Number> &v)
                          (boost::lambda::_1 + boost::lambda::_2),
                          internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    for (unsigned int i=0; i<vec_size; ++i)
+    for (size_type i=0; i<vec_size; ++i)
       val[i] += v.val[i];
 }
 
@@ -966,7 +968,7 @@ void Vector<Number>::add (const Number a, const Vector<Number> &v,
                          (boost::lambda::_1 + a*boost::lambda::_2 + b*boost::lambda::_3),
                          internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    for (unsigned int i=0; i<vec_size; ++i)
+    for (size_type i=0; i<vec_size; ++i)
       val[i] += a * v.val[i] + b * w.val[i];
 }
 
@@ -988,7 +990,7 @@ void Vector<Number>::sadd (const Number x,
                          (x*boost::lambda::_1 + boost::lambda::_2),
                          internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    for (unsigned int i=0; i<vec_size; ++i)
+    for (size_type i=0; i<vec_size; ++i)
       val[i] = x * val[i] + v.val[i];
 }
 
@@ -1016,7 +1018,7 @@ void Vector<Number>::sadd (const Number x, const Number a,
                          (x*boost::lambda::_1 + a*boost::lambda::_2 + b*boost::lambda::_3),
                          internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    for (unsigned int i=0; i<vec_size; ++i)
+    for (size_type i=0; i<vec_size; ++i)
       val[i] = x*val[i] + a * v.val[i] + b * w.val[i];
 }
 
@@ -1047,7 +1049,7 @@ void Vector<Number>::scale (const Vector<Number> &s)
                          (boost::lambda::_1*boost::lambda::_2),
                          internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    for (unsigned int i=0; i<vec_size; ++i)
+    for (size_type i=0; i<vec_size; ++i)
       val[i] *= s.val[i];
 }
 
@@ -1060,7 +1062,7 @@ void Vector<Number>::scale (const Vector<Number2> &s)
   Assert (vec_size!=0, ExcEmptyObject());
   Assert (vec_size == s.vec_size, ExcDimensionMismatch(vec_size, s.vec_size));
 
-  for (unsigned int i=0; i<vec_size; ++i)
+  for (size_type i=0; i<vec_size; ++i)
     val[i] *= s.val[i];
 }
 
@@ -1082,7 +1084,7 @@ void Vector<Number>::equ (const Number a,
                          (a*boost::lambda::_1),
                          internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    for (unsigned int i=0; i<vec_size; ++i)
+    for (size_type i=0; i<vec_size; ++i)
       val[i] = a * u.val[i];
 }
 
@@ -1104,7 +1106,7 @@ void Vector<Number>::equ (const Number a,
   // because
   // operator*(complex<float>,complex<double>)
   // is not defined by default
-  for (unsigned int i=0; i<vec_size; ++i)
+  for (size_type i=0; i<vec_size; ++i)
     val[i] = a * Number(u.val[i]);
 }
 
@@ -1129,7 +1131,7 @@ void Vector<Number>::equ (const Number a, const Vector<Number> &u,
                          (a*boost::lambda::_1 + b*boost::lambda::_2),
                          internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    for (unsigned int i=0; i<vec_size; ++i)
+    for (size_type i=0; i<vec_size; ++i)
       val[i] = a * u.val[i] + b * v.val[i];
 }
 
@@ -1153,7 +1155,7 @@ void Vector<Number>::equ (const Number a, const Vector<Number> &u,
                          (a*boost::lambda::_1 + b*boost::lambda::_2 + c*boost::lambda::_3),
                          internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    for (unsigned int i=0; i<vec_size; ++i)
+    for (size_type i=0; i<vec_size; ++i)
       val[i] = a * u.val[i] + b * v.val[i] + c * w.val[i];
 }
 
@@ -1178,7 +1180,7 @@ void Vector<Number>::ratio (const Vector<Number> &a,
                          (boost::lambda::_1 / boost::lambda::_2),
                          internal::Vector::minimum_parallel_grain_size);
   else if (vec_size > 0)
-    for (unsigned int i=0; i<vec_size; ++i)
+    for (size_type i=0; i<vec_size; ++i)
       val[i] = a.val[i]/b.val[i];
 }
 
@@ -1191,9 +1193,9 @@ Vector<Number>::operator = (const BlockVector<Number> &v)
   if (v.size() != vec_size)
     reinit (v.size(), true);
 
-  unsigned int this_index = 0;
-  for (unsigned int b=0; b<v.n_blocks(); ++b)
-    for (unsigned int i=0; i<v.block(b).size(); ++i, ++this_index)
+  size_type this_index = 0;
+  for (size_type b=0; b<v.n_blocks(); ++b)
+    for (size_type i=0; i<v.block(b).size(); ++i, ++this_index)
       val[this_index] = v.block(b)(i);
 
   return *this;
@@ -1299,7 +1301,7 @@ Vector<Number>::operator == (const Vector<Number2> &v) const
   // because
   // operator==(complex<float>,complex<double>)
   // is not defined by default
-  for (unsigned int i=0; i<vec_size; ++i)
+  for (size_type i=0; i<vec_size; ++i)
     if (val[i] != Number(v.val[i]))
       return false;
 
@@ -1313,7 +1315,7 @@ void Vector<Number>::print (const char *format) const
 {
   Assert (vec_size!=0, ExcEmptyObject());
 
-  for (unsigned int j=0; j<size(); ++j)
+  for (size_type j=0; j<size(); ++j)
     internal::print (val[j], format);
   std::printf ("\n");
 }
@@ -1339,10 +1341,10 @@ void Vector<Number>::print (std::ostream      &out,
     out.setf (std::ios::fixed, std::ios::floatfield);
 
   if (across)
-    for (unsigned int i=0; i<size(); ++i)
+    for (size_type i=0; i<size(); ++i)
       out << val[i] << ' ';
   else
-    for (unsigned int i=0; i<size(); ++i)
+    for (size_type i=0; i<size(); ++i)
       out << val[i] << std::endl;
   out << std::endl;
 
@@ -1361,10 +1363,10 @@ Vector<Number>::print (LogStream &out, const unsigned int width, const bool acro
   Assert (vec_size!=0, ExcEmptyObject());
 
   if (across)
-    for (unsigned int i=0; i<size(); ++i)
+    for (size_type i=0; i<size(); ++i)
       out << std::setw(width) << val[i] << ' ';
   else
-    for (unsigned int i=0; i<size(); ++i)
+    for (size_type i=0; i<size(); ++i)
       out << val[i] << std::endl;
   out << std::endl;
 }
@@ -1381,10 +1383,14 @@ void Vector<Number>::block_write (std::ostream &out) const
   // some resources that lead to
   // problems in a multithreaded
   // environment
-  const unsigned int sz = size();
+  const size_type sz = size();
   char buf[16];
 
-  std::sprintf(buf, "%d", sz);
+#ifdef DEAL_II_USE_LARGE_INDEX_TYPE
+  std::sprintf(buf, "%llu", sz);
+#else
+  std::sprintf(buf, "%u", sz);
+#endif
   std::strcat(buf, "\n[");
 
   out.write(buf, std::strlen(buf));
@@ -1406,7 +1412,7 @@ void Vector<Number>::block_read (std::istream &in)
 {
   AssertThrow (in, ExcIO());
 
-  unsigned int sz;
+  size_type sz;
 
   char buf[16];
 

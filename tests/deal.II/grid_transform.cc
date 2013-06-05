@@ -42,7 +42,7 @@ int main ()
 				   // build up a map of vertex indices
 				   // of boundary vertices to the new
 				   // boundary points
-  std::map<unsigned int,Point<dim> > new_points;
+  std::map<types::global_dof_index,Point<dim> > new_points;
   
 				   // new center and new radius
 				   // of the inner circle.
@@ -68,7 +68,7 @@ int main ()
 						       // leave the
 						       // point, where
 						       // they are.
-		      new_points.insert(std::pair<unsigned int, Point<dim> > (
+		      new_points.insert(std::pair<types::global_dof_index, Point<dim> > (
 			face->vertex_index(vertex_no), v));
 		    }
 		  else if (std::fabs(std::sqrt(v.square())-inner_radius)<1e-12)
@@ -82,7 +82,7 @@ int main ()
 						       // the radius
 						       // of the
 						       // circle.
-		      new_points.insert(std::pair<unsigned int, Point<dim> > (
+		      new_points.insert(std::pair<types::global_dof_index, Point<dim> > (
 			face->vertex_index(vertex_no), n_radius/inner_radius*v+n_center));
 		      face->set_boundary_indicator(1);
 		    }

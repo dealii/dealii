@@ -2033,7 +2033,7 @@ public:
    */
   template <class InputVector, typename number>
   void get_function_values (const InputVector &fe_function,
-                            const VectorSlice<const std::vector<unsigned int> > &indices,
+                            const VectorSlice<const std::vector<types::global_dof_index> > &indices,
                             std::vector<number> &values) const;
 
   /**
@@ -2076,7 +2076,7 @@ public:
    */
   template <class InputVector, typename number>
   void get_function_values (const InputVector &fe_function,
-                            const VectorSlice<const std::vector<unsigned int> > &indices,
+                            const VectorSlice<const std::vector<types::global_dof_index> > &indices,
                             std::vector<Vector<number> > &values) const;
 
 
@@ -2140,7 +2140,7 @@ public:
    */
   template <class InputVector>
   void get_function_values (const InputVector &fe_function,
-                            const VectorSlice<const std::vector<unsigned int> > &indices,
+                            const VectorSlice<const std::vector<types::global_dof_index> > &indices,
                             VectorSlice<std::vector<std::vector<double> > > values,
                             const bool quadrature_points_fastest) const;
 
@@ -2264,7 +2264,7 @@ public:
    */
   template <class InputVector>
   void get_function_gradients (const InputVector &fe_function,
-                               const VectorSlice<const std::vector<unsigned int> > &indices,
+                               const VectorSlice<const std::vector<types::global_dof_index> > &indices,
                                std::vector<Tensor<1,spacedim> > &gradients) const;
 
   /**
@@ -2275,7 +2275,7 @@ public:
    */
   template <class InputVector>
   void get_function_gradients (const InputVector &fe_function,
-                               const VectorSlice<const std::vector<unsigned int> > &indices,
+                               const VectorSlice<const std::vector<types::global_dof_index> > &indices,
                                VectorSlice<std::vector<std::vector<Tensor<1,spacedim> > > > gradients,
                                bool quadrature_points_fastest = false) const;
 
@@ -2301,7 +2301,7 @@ public:
    */
   template <class InputVector>
   void get_function_grads (const InputVector &fe_function,
-                           const VectorSlice<const std::vector<unsigned int> > &indices,
+                           const VectorSlice<const std::vector<types::global_dof_index> > &indices,
                            std::vector<Tensor<1,spacedim> > &gradients) const DEAL_II_DEPRECATED;
 
   /**
@@ -2310,7 +2310,7 @@ public:
    */
   template <class InputVector>
   void get_function_grads (const InputVector &fe_function,
-                           const VectorSlice<const std::vector<unsigned int> > &indices,
+                           const VectorSlice<const std::vector<types::global_dof_index> > &indices,
                            std::vector<std::vector<Tensor<1,spacedim> > > &gradients,
                            bool quadrature_points_fastest = false) const DEAL_II_DEPRECATED;
 
@@ -2441,7 +2441,7 @@ public:
   template <class InputVector>
   void get_function_hessians (
     const InputVector &fe_function,
-    const VectorSlice<const std::vector<unsigned int> > &indices,
+    const VectorSlice<const std::vector<types::global_dof_index> > &indices,
     std::vector<Tensor<2,spacedim> > &hessians) const;
 
   /**
@@ -2454,7 +2454,7 @@ public:
   template <class InputVector>
   void get_function_hessians (
     const InputVector &fe_function,
-    const VectorSlice<const std::vector<unsigned int> > &indices,
+    const VectorSlice<const std::vector<types::global_dof_index> > &indices,
     VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > > hessians,
     bool quadrature_points_fastest = false) const;
 
@@ -2606,7 +2606,7 @@ public:
   template <class InputVector, typename number>
   void get_function_laplacians (
     const InputVector &fe_function,
-    const VectorSlice<const std::vector<unsigned int> > &indices,
+    const VectorSlice<const std::vector<types::global_dof_index> > &indices,
     std::vector<number> &laplacians) const;
 
   /**
@@ -2619,7 +2619,7 @@ public:
   template <class InputVector, typename number>
   void get_function_laplacians (
     const InputVector &fe_function,
-    const VectorSlice<const std::vector<unsigned int> > &indices,
+    const VectorSlice<const std::vector<types::global_dof_index> > &indices,
     std::vector<Vector<number> > &laplacians) const;
 
   /**
@@ -2632,7 +2632,7 @@ public:
   template <class InputVector, typename number>
   void get_function_laplacians (
     const InputVector &fe_function,
-    const VectorSlice<const std::vector<unsigned int> > &indices,
+    const VectorSlice<const std::vector<types::global_dof_index> > &indices,
     std::vector<std::vector<number> > &laplacians,
     bool quadrature_points_fastest = false) const;
   //@}
@@ -4783,7 +4783,7 @@ inline
 void
 FEValuesBase<dim,spacedim>::get_function_grads (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Tensor<1,spacedim> > &values) const
 {
   get_function_gradients(fe_function, indices, values);
@@ -4810,7 +4810,7 @@ inline
 void
 FEValuesBase<dim,spacedim>::get_function_grads (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<std::vector<Tensor<1,spacedim> > > &values,
   bool q_points_fastest) const
 {

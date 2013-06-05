@@ -65,12 +65,12 @@ void test ()
   dof_handler.distribute_dofs (fe_collection);
   deallog << dof_handler.n_dofs() << " dofs" << std::endl;
 
-  std::map<unsigned int, double> bv;
+  std::map<types::global_dof_index, double> bv;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<dim>(1),
 					    bv);
-  for (std::map<unsigned int, double>::iterator
+  for (std::map<types::global_dof_index, double>::iterator
 	 p = bv.begin(); p!=bv.end(); ++p)
     deallog << p->first << ' ' << p->second << std::endl;
 }

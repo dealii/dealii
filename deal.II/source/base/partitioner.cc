@@ -208,8 +208,8 @@ namespace Utilities
           unsigned int current_index = expanded_ghost_indices[0];
           while (current_index >= first_index[current_proc+1])
             current_proc++;
-          std::vector<std::pair<unsigned int,unsigned int> > ghost_targets_temp
-          (1, std::pair<unsigned int, unsigned int>(current_proc, 0));
+          std::vector<std::pair<unsigned int,types::global_dof_index> > ghost_targets_temp
+          (1, std::pair<unsigned int, types::global_dof_index>(current_proc, 0));
           n_ghost_targets++;
 
           for (unsigned int iterator=1; iterator<n_ghost_indices_data; ++iterator)
@@ -223,7 +223,7 @@ namespace Utilities
                   ghost_targets_temp[n_ghost_targets-1].second =
                     iterator - ghost_targets_temp[n_ghost_targets-1].second;
                   ghost_targets_temp.push_back(std::pair<unsigned int,
-                                               unsigned int>(current_proc,iterator));
+                                               types::global_dof_index>(current_proc,iterator));
                   n_ghost_targets++;
                 }
             }
@@ -243,14 +243,14 @@ namespace Utilities
                       MPI_INT, communicator);
 
         // allocate memory for import data
-        std::vector<std::pair<unsigned int,unsigned int> > import_targets_temp;
+        std::vector<std::pair<unsigned int,types::global_dof_index> > import_targets_temp;
         n_import_indices_data = 0;
         for (unsigned int i=0; i<n_procs; i++)
           if (receive_buffer[i] > 0)
             {
               n_import_indices_data += receive_buffer[i];
               import_targets_temp.push_back(std::pair<unsigned int,
-                                            unsigned int> (i, receive_buffer[i]));
+                                            types::global_dof_index> (i, receive_buffer[i]));
             }
         import_targets_data = import_targets_temp;
       }
@@ -292,22 +292,22 @@ namespace Utilities
         // space and compress contiguous indices in
         // form of ranges
         {
-          unsigned int last_index = numbers::invalid_unsigned_int-1;
-          std::vector<std::pair<unsigned int,unsigned int> > compressed_import_indices;
+          types::global_dof_index last_index = numbers::invalid_dof_index-1;
+          std::vector<std::pair<types::global_dof_index,types::global_dof_index> > compressed_import_indices;
           for (unsigned int i=0; i<n_import_indices_data; i++)
             {
               Assert (expanded_import_indices[i] >= local_range_data.first &&
                       expanded_import_indices[i] < local_range_data.second,
                       ExcIndexRange(expanded_import_indices[i], local_range_data.first,
                                     local_range_data.second));
-              unsigned int new_index = (expanded_import_indices[i] -
+              types::global_dof_index new_index = (expanded_import_indices[i] -
                                         local_range_data.first);
               if (new_index == last_index+1)
                 compressed_import_indices.back().second++;
               else
                 {
                   compressed_import_indices.push_back
-                  (std::pair<unsigned int,unsigned int>(new_index,new_index+1));
+                  (std::pair<types::global_dof_index,types::global_dof_index>(new_index,new_index+1));
                 }
               last_index = new_index;
             }
@@ -315,7 +315,7 @@ namespace Utilities
 
           // sanity check
 #ifdef DEBUG
-          const unsigned int n_local_dofs = local_range_data.second-local_range_data.first;
+          const types::global_dof_index n_local_dofs = local_range_data.second-local_range_data.first;
           for (unsigned int i=0; i<import_indices_data.size(); ++i)
             {
               AssertIndexRange (import_indices_data[i].first, n_local_dofs);

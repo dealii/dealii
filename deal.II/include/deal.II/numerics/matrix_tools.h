@@ -366,7 +366,7 @@ namespace MatrixCreator
                                     SparseMatrix<double>     &matrix,
                                     const typename FunctionMap<spacedim>::type &boundary_functions,
                                     Vector<double>           &rhs_vector,
-                                    std::vector<unsigned int> &dof_to_boundary_mapping,
+                                    std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                     const Function<spacedim> *const weight = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
@@ -379,7 +379,7 @@ namespace MatrixCreator
 //                                    SparseMatrix<double>   &matrix,
 //                                    const FunctionMap<1>::type &boundary_functions,
 //                                    Vector<double>         &rhs_vector,
-//                                    std::vector<unsigned int>&dof_to_boundary_mapping,
+//                                    std::vector<types::global_dof_index>&dof_to_boundary_mapping,
 //                                    const Function<1> * const a = 0);
 // //codimension 1
 //
@@ -389,7 +389,7 @@ namespace MatrixCreator
 //                                    SparseMatrix<double>   &matrix,
 //                                    const FunctionMap<2>::type &boundary_functions,
 //                                    Vector<double>         &rhs_vector,
-//                                    std::vector<unsigned int>&dof_to_boundary_mapping,
+//                                    std::vector<types::global_dof_index>&dof_to_boundary_mapping,
 //                                    const Function<2> * const a = 0);
 
 
@@ -405,7 +405,7 @@ namespace MatrixCreator
                                     SparseMatrix<double>     &matrix,
                                     const typename FunctionMap<spacedim>::type        &boundary_functions,
                                     Vector<double>           &rhs_vector,
-                                    std::vector<unsigned int> &dof_to_boundary_mapping,
+                                    std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                     const Function<spacedim> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
@@ -420,7 +420,7 @@ namespace MatrixCreator
                                     SparseMatrix<double>     &matrix,
                                     const typename FunctionMap<spacedim>::type &boundary_functions,
                                     Vector<double>           &rhs_vector,
-                                    std::vector<unsigned int> &dof_to_boundary_mapping,
+                                    std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                     const Function<spacedim> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
@@ -434,7 +434,7 @@ namespace MatrixCreator
 //                                    SparseMatrix<double>   &matrix,
 //                                    const FunctionMap<1>::type &boundary_functions,
 //                                    Vector<double>         &rhs_vector,
-//                                    std::vector<unsigned int>&dof_to_boundary_mapping,
+//                                    std::vector<types::global_dof_index>&dof_to_boundary_mapping,
 //                                    const Function<1> * const a = 0);
 
   /**
@@ -447,7 +447,7 @@ namespace MatrixCreator
                                     SparseMatrix<double>     &matrix,
                                     const typename FunctionMap<spacedim>::type        &boundary_functions,
                                     Vector<double>           &rhs_vector,
-                                    std::vector<unsigned int> &dof_to_boundary_mapping,
+                                    std::vector<types::global_dof_index> &dof_to_boundary_mapping,
                                     const Function<spacedim> *const a = 0,
                                     std::vector<unsigned int> component_mapping = std::vector<unsigned int>());
 
@@ -798,7 +798,7 @@ namespace MatrixTools
    */
   template <typename number>
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          SparseMatrix<number>  &matrix,
                          Vector<number>        &solution,
                          Vector<number>        &right_hand_side,
@@ -815,7 +815,7 @@ namespace MatrixTools
    */
   template <typename number>
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          BlockSparseMatrix<number>           &matrix,
                          BlockVector<number>                 &solution,
                          BlockVector<number>                 &right_hand_side,
@@ -860,7 +860,7 @@ namespace MatrixTools
    * step-18.
    */
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          PETScWrappers::SparseMatrix  &matrix,
                          PETScWrappers::Vector  &solution,
                          PETScWrappers::Vector  &right_hand_side,
@@ -871,7 +871,7 @@ namespace MatrixTools
    * matrices.
    */
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          PETScWrappers::MPI::SparseMatrix  &matrix,
                          PETScWrappers::MPI::Vector  &solution,
                          PETScWrappers::MPI::Vector  &right_hand_side,
@@ -903,7 +903,7 @@ namespace MatrixTools
    * to this function is the same.
    */
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          PETScWrappers::MPI::SparseMatrix  &matrix,
                          PETScWrappers::Vector       &solution,
                          PETScWrappers::MPI::Vector  &right_hand_side,
@@ -913,8 +913,8 @@ namespace MatrixTools
    * Same as above but for BlockSparseMatrix.
    */
   void
-  apply_boundary_values (const std::map<unsigned int,double>  &boundary_values,
-                         PETScWrappers::MPI::BlockSparseMatrix  &matrix,
+  apply_boundary_values (const std::map<types::global_dof_index,double>  &boundary_values,
+                         PETScWrappers::MPI::BlockSparseMatrix &matrix,
                          PETScWrappers::MPI::BlockVector        &solution,
                          PETScWrappers::MPI::BlockVector        &right_hand_side,
                          const bool       eliminate_columns = true);
@@ -961,7 +961,7 @@ namespace MatrixTools
    * across an MPI system.
    */
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          TrilinosWrappers::SparseMatrix  &matrix,
                          TrilinosWrappers::Vector        &solution,
                          TrilinosWrappers::Vector        &right_hand_side,
@@ -973,7 +973,7 @@ namespace MatrixTools
    * working on block structures.
    */
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          TrilinosWrappers::BlockSparseMatrix  &matrix,
                          TrilinosWrappers::BlockVector        &solution,
                          TrilinosWrappers::BlockVector        &right_hand_side,
@@ -1016,7 +1016,7 @@ namespace MatrixTools
    * types.
    */
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          TrilinosWrappers::SparseMatrix  &matrix,
                          TrilinosWrappers::MPI::Vector   &solution,
                          TrilinosWrappers::MPI::Vector   &right_hand_side,
@@ -1028,7 +1028,7 @@ namespace MatrixTools
    * on block structures.
    */
   void
-  apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
+  apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
                          TrilinosWrappers::BlockSparseMatrix  &matrix,
                          TrilinosWrappers::MPI::BlockVector   &solution,
                          TrilinosWrappers::MPI::BlockVector   &right_hand_side,
@@ -1072,8 +1072,8 @@ namespace MatrixTools
    * documentation of this class.
    */
   void
-  local_apply_boundary_values (const std::map<unsigned int,double> &boundary_values,
-                               const std::vector<unsigned int> &local_dof_indices,
+  local_apply_boundary_values (const std::map<types::global_dof_index,double> &boundary_values,
+                               const std::vector<types::global_dof_index> &local_dof_indices,
                                FullMatrix<double> &local_matrix,
                                Vector<double>     &local_rhs,
                                const bool          eliminate_columns);

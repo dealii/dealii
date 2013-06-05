@@ -50,6 +50,11 @@ class LAPACKFullMatrix : public TransposeTable<number>
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Constructor. Initialize the
    * matrix as a square matrix with
    * dimension <tt>n</tt>.
@@ -63,15 +68,15 @@ public:
    * By default, no memory is
    * allocated.
    */
-  explicit LAPACKFullMatrix (const unsigned int n = 0);
+  explicit LAPACKFullMatrix (const size_type n = 0);
 
   /**
    * Constructor. Initialize the
    * matrix as a rectangular
    * matrix.
    */
-  LAPACKFullMatrix (const unsigned int rows,
-                    const unsigned int cols);
+  LAPACKFullMatrix (const size_type rows,
+                    const size_type cols);
 
   /**
    * Copy constructor. This
@@ -158,10 +163,10 @@ public:
    */
   template<class MATRIX>
   void fill (const MATRIX &src,
-             const unsigned int dst_offset_i = 0,
-             const unsigned int dst_offset_j = 0,
-             const unsigned int src_offset_i = 0,
-             const unsigned int src_offset_j = 0,
+             const size_type dst_offset_i = 0,
+             const size_type dst_offset_j = 0,
+             const size_type src_offset_i = 0,
+             const size_type src_offset_j = 0,
              const number factor = 1.,
              const bool transpose = false);
 
@@ -526,7 +531,7 @@ public:
    * called.
    */
   std::complex<number>
-  eigenvalue (const unsigned int i) const;
+  eigenvalue (const size_type i) const;
 
   /**
    * Retrieve singular values after
@@ -535,7 +540,7 @@ public:
    * called.
    */
   number
-  singular_value (const unsigned int i) const;
+  singular_value (const size_type i) const;
 
   /**
    * Print the matrix and allow
@@ -709,7 +714,7 @@ LAPACKFullMatrix<number>::copy_from (const MATRIX &M)
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class, and
   // copy them into the current object
-  for (unsigned int row = 0; row < M.m(); ++row)
+  for (size_type row = 0; row < M.m(); ++row)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
@@ -727,26 +732,26 @@ template <class MATRIX>
 inline void
 LAPACKFullMatrix<number>::fill (
   const MATRIX &M,
-  const unsigned int dst_offset_i,
-  const unsigned int dst_offset_j,
-  const unsigned int src_offset_i,
-  const unsigned int src_offset_j,
+  const size_type dst_offset_i,
+  const size_type dst_offset_j,
+  const size_type src_offset_i,
+  const size_type src_offset_j,
   const number factor,
   const bool transpose)
 {
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class
-  for (unsigned int row = src_offset_i; row < M.m(); ++row)
+  for (size_type row = src_offset_i; row < M.m(); ++row)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
           entry != end_row; ++entry)
         {
-          const unsigned int i = transpose ? entry->column() : row;
-          const unsigned int j = transpose ? row : entry->column();
+          const size_type i = transpose ? entry->column() : row;
+          const size_type j = transpose ? row : entry->column();
 
-          const unsigned int dst_i=dst_offset_i+i-src_offset_i;
-          const unsigned int dst_j=dst_offset_j+j-src_offset_j;
+          const size_type dst_i=dst_offset_i+i-src_offset_i;
+          const size_type dst_j=dst_offset_j+j-src_offset_j;
           if (dst_i<this->n_rows() && dst_j<this->n_cols())
             (*this)(dst_i, dst_j) = factor * entry->value();
         }
@@ -794,7 +799,7 @@ LAPACKFullMatrix<number>::Tvmult_add(VECTOR &, const VECTOR &) const
 
 template <typename number>
 inline std::complex<number>
-LAPACKFullMatrix<number>::eigenvalue (const unsigned int i) const
+LAPACKFullMatrix<number>::eigenvalue (const size_type i) const
 {
   Assert (state & LAPACKSupport::eigenvalues, ExcInvalidState());
   Assert (wr.size() == this->n_rows(), ExcInternalError());
@@ -807,7 +812,7 @@ LAPACKFullMatrix<number>::eigenvalue (const unsigned int i) const
 
 template <typename number>
 inline number
-LAPACKFullMatrix<number>::singular_value (const unsigned int i) const
+LAPACKFullMatrix<number>::singular_value (const size_type i) const
 {
   Assert (state == LAPACKSupport::svd || state == LAPACKSupport::inverse_svd, LAPACKSupport::ExcState(state));
   AssertIndexRange(i,wr.size());

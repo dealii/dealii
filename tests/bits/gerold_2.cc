@@ -56,7 +56,7 @@ void LaplaceProblem<dim>::run ()
   SparsityPattern cell_connectivity;
   GridTools::get_face_connectivity_of_cells (triangulation,
 					     cell_connectivity);
-  std::vector<unsigned int> permutation(triangulation.n_active_cells());
+  std::vector<types::global_dof_index> permutation(triangulation.n_active_cells());
   SparsityTools::reorder_Cuthill_McKee (cell_connectivity, permutation);
 
   for (unsigned int i=0; i<permutation.size(); ++i)

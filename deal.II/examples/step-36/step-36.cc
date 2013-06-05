@@ -223,7 +223,7 @@ namespace Step36
     FullMatrix<double> cell_stiffness_matrix (dofs_per_cell, dofs_per_cell);
     FullMatrix<double> cell_mass_matrix (dofs_per_cell, dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     FunctionParser<dim> potential;
     potential.initialize (FunctionParser<dim>::default_variable_names (),

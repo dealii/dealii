@@ -45,14 +45,14 @@ void test(std::string filename) {
 
     deallog << dof_handler.n_dofs() << " degrees of freedom" << std::endl;
 
-    std::map<unsigned int, double> bv;
+    std::map<types::global_dof_index, double> bv;
     VectorTools::interpolate_boundary_values (dof_handler,
 					      0,
 					      Functions::SquareFunction<spacedim>(),
 					      bv);
     deallog << bv.size() << " boundary degrees of freedom" << std::endl;
 
-    for (std::map<unsigned int, double>::const_iterator i = bv.begin();
+    for (std::map<types::global_dof_index, double>::const_iterator i = bv.begin();
 	 i != bv.end(); ++i)
       deallog << i->first << ' ' << i->second << std::endl;
 

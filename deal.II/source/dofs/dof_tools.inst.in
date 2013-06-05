@@ -80,27 +80,27 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
     (const DoFHandler<deal_II_dimension>& dof,
-     const std::vector<unsigned int>  &,
+     const std::vector<types::global_dof_index>  &,
      SP    &);
 
     template void
     DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
     (const hp::DoFHandler<deal_II_dimension>& dof,
-     const std::vector<unsigned int>  &,
+     const std::vector<types::global_dof_index>  &,
      SP    &);
 
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension>,SP>
     (const DoFHandler<deal_II_dimension>& dof,
      const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
-     const std::vector<unsigned int>  &dof_to_boundary_mapping,
+     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
 
     template void
     DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension>,SP>
     (const hp::DoFHandler<deal_II_dimension>& dof,
      const FunctionMap<deal_II_dimension>::type  &boundary_indicators,
-     const std::vector<unsigned int>  &dof_to_boundary_mapping,
+     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
 
     template void
@@ -115,11 +115,11 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
 
     template void
       DoFTools::make_cell_patches<DoFHandler<deal_II_dimension>,SP>
-      (SP&, const DoFHandler<deal_II_dimension>&, unsigned int, const std::vector<bool>&, unsigned int);
+      (SP&, const DoFHandler<deal_II_dimension>&, const unsigned int, const std::vector<bool>&, types::global_dof_index);
 
     template void
       DoFTools::make_cell_patches<MGDoFHandler<deal_II_dimension>,SP>
-      (SP&, const MGDoFHandler<deal_II_dimension>&, unsigned int, const std::vector<bool>&, unsigned int);
+      (SP&, const MGDoFHandler<deal_II_dimension>&, const unsigned int, const std::vector<bool>&, types::global_dof_index);
 
 #if deal_II_dimension > 1
 
@@ -203,27 +203,27 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP>
     (const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-     const std::vector<unsigned int>  &,
+     const std::vector<types::global_dof_index>  &,
      SP    &);
 
     //template void
     //DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP>
     //(const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
-    // const std::vector<unsigned int>  &,
+    // const std::vector<types::global_dof_index>  &,
     // SP    &);
 
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP>
     (const DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
      const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
-     const std::vector<unsigned int>  &dof_to_boundary_mapping,
+     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
 
     //template void
     //DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>,SP>
     //(const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>& dof,
     // const FunctionMap<deal_II_dimension+1>::type  &boundary_indicators,
-    // const std::vector<unsigned int>  &dof_to_boundary_mapping,
+    // const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
     // SP    &sparsity);
 
 #endif
@@ -280,27 +280,27 @@ for (SP : SPARSITY_PATTERNS; deal_II_dimension : DIMENSIONS)
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<1,3>,SP>
     (const DoFHandler<1,3>& dof,
-     const std::vector<unsigned int>  &,
+     const std::vector<types::global_dof_index>  &,
      SP    &);
 
     //template void
     //DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<1,3>,SP>
     //(const hp::DoFHandler<1,3>& dof,
-    // const std::vector<unsigned int>  &,
+    // const std::vector<types::global_dof_index>  &,
     // SP    &);
 
     template void
     DoFTools::make_boundary_sparsity_pattern<DoFHandler<1,3>,SP>
     (const DoFHandler<1,3>& dof,
      const FunctionMap<3>::type  &boundary_indicators,
-     const std::vector<unsigned int>  &dof_to_boundary_mapping,
+     const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
      SP    &sparsity);
 
     //template void
     //DoFTools::make_boundary_sparsity_pattern<hp::DoFHandler<1,3>,SP>
     //(const hp::DoFHandler<1,3>& dof,
     // const FunctionMap<3>::type  &boundary_indicators,
-    // const std::vector<unsigned int>  &dof_to_boundary_mapping,
+    // const std::vector<types::global_dof_index>  &dof_to_boundary_mapping,
     // SP    &sparsity);
 
 #endif
@@ -799,13 +799,13 @@ template
 void
 DoFTools::count_dofs_per_component<DoFHandler<deal_II_dimension> > (
   const DoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+  std::vector<types::global_dof_index>&, bool, std::vector<unsigned int>);
 
 template
 void
 DoFTools::count_dofs_per_component<hp::DoFHandler<deal_II_dimension> > (
   const hp::DoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+  std::vector<types::global_dof_index>&, bool, std::vector<unsigned int>);
 
 
 #if deal_II_dimension < 3
@@ -813,13 +813,13 @@ template
 void
 DoFTools::count_dofs_per_component<DoFHandler<deal_II_dimension, deal_II_dimension+1> > (
   const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
-  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+  std::vector<types::global_dof_index>&, bool, std::vector<unsigned int>);
 
 template
 void
 DoFTools::count_dofs_per_component<hp::DoFHandler<deal_II_dimension, deal_II_dimension+1> > (
   const hp::DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
-  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+  std::vector<types::global_dof_index>&, bool, std::vector<unsigned int>);
 
 template
 void
@@ -845,13 +845,13 @@ template
 void
 DoFTools::count_dofs_per_component<DoFHandler<1,3> > (
   const DoFHandler<1,3>&,
-  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+  std::vector<types::global_dof_index>&, bool, std::vector<unsigned int>);
 
 template
 void
 DoFTools::count_dofs_per_component<hp::DoFHandler<1,3> > (
   const hp::DoFHandler<1,3>&,
-  std::vector<unsigned int>&, bool, std::vector<unsigned int>);
+  std::vector<types::global_dof_index>&, bool, std::vector<unsigned int>);
 
 template
 void
@@ -876,28 +876,28 @@ template
 void
 DoFTools::count_dofs_per_block<DoFHandler<deal_II_dimension> > (
   const DoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&,
+  std::vector<types::global_dof_index>&,
   const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_block<hp::DoFHandler<deal_II_dimension> > (
   const hp::DoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&,
+  std::vector<types::global_dof_index>&,
   const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_block<MGDoFHandler<deal_II_dimension> > (
   const MGDoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&,
+  std::vector<types::global_dof_index>&,
   const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_component<deal_II_dimension> (
   const DoFHandler<deal_II_dimension>&,
-  std::vector<unsigned int>&, std::vector<unsigned int>);
+  std::vector<types::global_dof_index>&, std::vector<unsigned int>);
 
 template
 void
@@ -913,7 +913,7 @@ DoFTools::compute_intergrid_transfer_representation<deal_II_dimension>
 (const DoFHandler<deal_II_dimension> &, const unsigned int,
  const DoFHandler<deal_II_dimension> &, const unsigned int,
  const InterGridMap<DoFHandler<deal_II_dimension> > &,
- std::vector<std::map<unsigned int, float> > &);
+ std::vector<std::map<types::global_dof_index, float> > &);
 
 
 template
@@ -921,13 +921,13 @@ void
 DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &,
  const std::set<types::boundary_id> &,
- std::vector<unsigned int> &);
+ std::vector<types::global_dof_index> &);
 
 template
 void
 DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension> >
 (const DoFHandler<deal_II_dimension> &,
- std::vector<unsigned int> &);
+ std::vector<types::global_dof_index> &);
 
 
 
@@ -936,13 +936,13 @@ void
 DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension> >
 (const hp::DoFHandler<deal_II_dimension> &,
  const std::set<types::boundary_id> &,
- std::vector<unsigned int> &);
+ std::vector<types::global_dof_index> &);
 
 template
 void
 DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension> >
 (const hp::DoFHandler<deal_II_dimension> &,
- std::vector<unsigned int> &);
+ std::vector<types::global_dof_index> &);
 
 
 
@@ -967,7 +967,7 @@ void
 DoFTools::map_dofs_to_support_points<deal_II_dimension>
 (const Mapping<deal_II_dimension,deal_II_dimension>&,
  const DoFHandler<deal_II_dimension>&,
- std::map<unsigned int, Point<deal_II_dimension> >&);
+ std::map<types::global_dof_index, Point<deal_II_dimension> >&);
 
 
 template
@@ -975,7 +975,7 @@ void
 DoFTools::map_dofs_to_support_points<deal_II_dimension>
 (const hp::MappingCollection<deal_II_dimension,deal_II_dimension>&,
  const hp::DoFHandler<deal_II_dimension>&,
- std::map<unsigned int, Point<deal_II_dimension> >&);
+ std::map<types::global_dof_index, Point<deal_II_dimension> >&);
 
 #if deal_II_dimension < 3
 
@@ -998,35 +998,35 @@ void
 DoFTools::map_dofs_to_support_points<deal_II_dimension,deal_II_dimension+1>
 (const Mapping<deal_II_dimension,deal_II_dimension+1>&,
  const DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
- std::map<unsigned int, Point<deal_II_dimension+1> >&);
+ std::map<types::global_dof_index, Point<deal_II_dimension+1> >&);
 
 template
 void
 DoFTools::map_dofs_to_support_points<deal_II_dimension,deal_II_dimension+1>
 (const hp::MappingCollection<deal_II_dimension,deal_II_dimension+1>&,
  const hp::DoFHandler<deal_II_dimension, deal_II_dimension+1>&,
- std::map<unsigned int, Point<deal_II_dimension+1> >&);
+ std::map<types::global_dof_index, Point<deal_II_dimension+1> >&);
 
 
 template
 void
 DoFTools::count_dofs_per_block<DoFHandler<deal_II_dimension,deal_II_dimension+1> > (
   const DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-  std::vector<unsigned int>&,
+  std::vector<types::global_dof_index>&,
   const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_block<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> > (
   const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-  std::vector<unsigned int>&,
+  std::vector<types::global_dof_index>&,
   const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_block<MGDoFHandler<deal_II_dimension,deal_II_dimension+1> > (
   const MGDoFHandler<deal_II_dimension,deal_II_dimension+1>&,
-  std::vector<unsigned int>&,
+  std::vector<types::global_dof_index>&,
   const std::vector<unsigned int> &);
 
 #endif
@@ -1045,21 +1045,21 @@ template
 void
 DoFTools::count_dofs_per_block<DoFHandler<1,3> > (
   const DoFHandler<1,3>&,
-  std::vector<unsigned int>&,
+  std::vector<types::global_dof_index>&,
   const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_block<hp::DoFHandler<1,3> > (
   const hp::DoFHandler<1,3>&,
-  std::vector<unsigned int>&,
+  std::vector<types::global_dof_index>&,
   const std::vector<unsigned int> &);
 
 template
 void
 DoFTools::count_dofs_per_block<MGDoFHandler<1,3> > (
   const MGDoFHandler<1,3>&,
-  std::vector<unsigned int>&,
+  std::vector<types::global_dof_index>&,
   const std::vector<unsigned int> &);
 
 #endif
@@ -1114,13 +1114,13 @@ void
 DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
 (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
  const std::set<types::boundary_id> &,
- std::vector<unsigned int> &);
+ std::vector<types::global_dof_index> &);
 
 template
 void
 DoFTools::map_dof_to_boundary_indices<DoFHandler<deal_II_dimension,deal_II_dimension+1> >
 (const DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
- std::vector<unsigned int> &);
+ std::vector<types::global_dof_index> &);
 
 
 template
@@ -1134,13 +1134,13 @@ DoFTools::extract_hanging_node_dofs
  DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
  (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
   const std::set<types::boundary_id> &,
-  std::vector<unsigned int> &);
+  std::vector<types::global_dof_index> &);
 
  template
  void
  DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> >
  (const hp::DoFHandler<deal_II_dimension,deal_II_dimension+1> &,
-  std::vector<unsigned int> &);
+  std::vector<types::global_dof_index> &);
 
 #endif
 
@@ -1151,13 +1151,13 @@ void
 DoFTools::map_dof_to_boundary_indices<DoFHandler<1,3> >
 (const DoFHandler<1,3> &,
  const std::set<types::boundary_id> &,
- std::vector<unsigned int> &);
+ std::vector<types::global_dof_index> &);
 
 template
 void
 DoFTools::map_dof_to_boundary_indices<DoFHandler<1,3> >
 (const DoFHandler<1,3> &,
- std::vector<unsigned int> &);
+ std::vector<types::global_dof_index> &);
 
 
 template
@@ -1171,13 +1171,13 @@ DoFTools::extract_hanging_node_dofs
 // DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<1,3> >
 // (const hp::DoFHandler<1,3> &,
 //  const std::set<unsigned char> &,
-//  std::vector<unsigned int> &);
+//  std::vector<types::global_dof_index> &);
 
 // template
 // void
 // DoFTools::map_dof_to_boundary_indices<hp::DoFHandler<1,3> >
 // (const hp::DoFHandler<1,3> &,
-//  std::vector<unsigned int> &);
+//  std::vector<types::global_dof_index> &);
 
 #endif
 

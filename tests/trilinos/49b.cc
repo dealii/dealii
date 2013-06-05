@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2008, 2009 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2008, 2009, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -28,7 +28,7 @@
 
 void test (TrilinosWrappers::MPI::BlockVector &v)
 {
-  std::vector<unsigned int> sizes (2, 3);
+  std::vector<types::global_dof_index> sizes (2, 3);
   dealii::BlockVector<TrilinosScalar> w (sizes);
 
   for (unsigned int i=0; i<w.size(); ++i)
@@ -73,7 +73,10 @@ int main (int argc,char **argv)
     {
       {
 	std::vector<Epetra_Map> sizes;
-	Epetra_Map map(3, 3, 0, Utilities::Trilinos::comm_world());
+	Epetra_Map map(TrilinosWrappers::types::int_type(3),
+		       TrilinosWrappers::types::int_type(3),
+		       0,
+		       Utilities::Trilinos::comm_world());
 	sizes.push_back (map);
 	sizes.push_back (map);
 

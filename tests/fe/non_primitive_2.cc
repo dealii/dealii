@@ -57,7 +57,7 @@ create_stokes_matrix_2 (const DoFHandler<dim> &dof_handler,
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
   FullMatrix<double> local_matrix (dofs_per_cell, dofs_per_cell);
 
   QGauss<dim> quadrature (3);
@@ -133,7 +133,7 @@ create_stokes_matrix_3 (const DoFHandler<dim> &dof_handler,
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
   
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
   FullMatrix<double> local_matrix (dofs_per_cell, dofs_per_cell);
 
   QGauss<dim> quadrature (3);

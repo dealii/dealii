@@ -46,8 +46,8 @@ CompressedSetSparsityPattern (const CompressedSetSparsityPattern &s)
 
 
 
-CompressedSetSparsityPattern::CompressedSetSparsityPattern (const unsigned int m,
-                                                            const unsigned int n)
+CompressedSetSparsityPattern::CompressedSetSparsityPattern (const size_type m,
+                                                            const size_type n)
   :
   rows(0),
   cols(0)
@@ -57,7 +57,7 @@ CompressedSetSparsityPattern::CompressedSetSparsityPattern (const unsigned int m
 
 
 
-CompressedSetSparsityPattern::CompressedSetSparsityPattern (const unsigned int n)
+CompressedSetSparsityPattern::CompressedSetSparsityPattern (const size_type n)
   :
   rows(0),
   cols(0)
@@ -82,8 +82,8 @@ CompressedSetSparsityPattern::operator = (const CompressedSetSparsityPattern &s)
 
 
 void
-CompressedSetSparsityPattern::reinit (const unsigned int m,
-                                      const unsigned int n)
+CompressedSetSparsityPattern::reinit (const size_type m,
+                                      const size_type n)
 {
   rows = m;
   cols = n;
@@ -108,13 +108,13 @@ CompressedSetSparsityPattern::empty () const
 
 
 
-unsigned int
+CompressedSetSparsityPattern::size_type 
 CompressedSetSparsityPattern::max_entries_per_row () const
 {
-  unsigned int m = 0;
-  for (unsigned int i=0; i<rows; ++i)
+  size_type m = 0;
+  for (size_type i=0; i<rows; ++i)
     {
-      m = std::max (m, static_cast<unsigned int>(lines[i].entries.size()));
+      m = std::max (m, static_cast<size_type>(lines[i].entries.size()));
     }
 
   return m;
@@ -123,8 +123,8 @@ CompressedSetSparsityPattern::max_entries_per_row () const
 
 
 bool
-CompressedSetSparsityPattern::exists (const unsigned int i,
-                                      const unsigned int j) const
+CompressedSetSparsityPattern::exists (const size_type i,
+                                      const size_type j) const
 {
   Assert (i<rows, ExcIndexRange(i, 0, rows));
   Assert (j<cols, ExcIndexRange(j, 0, cols));
@@ -150,9 +150,9 @@ CompressedSetSparsityPattern::symmetrize ()
   // 2. that the @p{add} function can
   // be called on elements that
   // already exist without any harm
-  for (unsigned int row=0; row<rows; ++row)
+  for (size_type row=0; row<rows; ++row)
     {
-      for (std::set<unsigned int>::const_iterator
+      for (std::set<size_type>::const_iterator
            j=lines[row].entries.begin();
            j != lines[row].entries.end();
            ++j)
@@ -170,11 +170,11 @@ CompressedSetSparsityPattern::print (std::ostream &out) const
 {
   AssertThrow (out, ExcIO());
 
-  for (unsigned int row=0; row<rows; ++row)
+  for (size_type row=0; row<rows; ++row)
     {
       out << '[' << row;
 
-      for (std::set<unsigned int>::const_iterator
+      for (std::set<size_type >::const_iterator
            j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
         out << ',' << *j;
@@ -192,9 +192,9 @@ CompressedSetSparsityPattern::print_gnuplot (std::ostream &out) const
 {
   AssertThrow (out, ExcIO());
 
-  for (unsigned int row=0; row<rows; ++row)
+  for (size_type row=0; row<rows; ++row)
     {
-      for (std::set<unsigned int>::const_iterator
+      for (std::set<size_type>::const_iterator
            j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
         // while matrix entries are usually
@@ -211,16 +211,16 @@ CompressedSetSparsityPattern::print_gnuplot (std::ostream &out) const
 
 
 
-unsigned int
+CompressedSetSparsityPattern::size_type 
 CompressedSetSparsityPattern::bandwidth () const
 {
-  unsigned int b=0;
-  for (unsigned int row=0; row<rows; ++row)
+  size_type b=0;
+  for (size_type row=0; row<rows; ++row)
     {
-      for (std::set<unsigned int>::const_iterator
+      for (std::set<size_type>::const_iterator
            j=lines[row].entries.begin();
            j != lines[row].entries.end(); ++j)
-        if (static_cast<unsigned int>(std::abs(static_cast<int>(row-*j))) > b)
+        if (static_cast<size_type>(std::abs(static_cast<int>(row-*j))) > b)
           b = std::abs(static_cast<signed int>(row-*j));
     }
 
@@ -229,11 +229,11 @@ CompressedSetSparsityPattern::bandwidth () const
 
 
 
-unsigned int
+CompressedSetSparsityPattern::size_type 
 CompressedSetSparsityPattern::n_nonzero_elements () const
 {
-  unsigned int n=0;
-  for (unsigned int i=0; i<rows; ++i)
+  size_type n=0;
+  for (size_type i=0; i<rows; ++i)
     {
       n += lines[i].entries.size();
     }

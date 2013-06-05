@@ -71,7 +71,7 @@ check_boundary (const hp::DoFHandler<dim> &dof,
   for (unsigned int i=1; i<7-dim; ++i)
     face_quadrature.push_back (QGauss<dim-1>(3+i));
   
-  std::vector<unsigned int> dof_to_boundary_mapping;
+  std::vector<types::global_dof_index> dof_to_boundary_mapping;
   DoFTools::map_dof_to_boundary_indices (dof,
 					 dof_to_boundary_mapping);
 

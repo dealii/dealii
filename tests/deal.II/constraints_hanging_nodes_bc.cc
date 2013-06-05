@@ -74,12 +74,12 @@ void test ()
   library_constraints.merge (correct_constraints);
 
   {
-    std::map<unsigned int,double> boundary_values;
+    std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof,
 					      0,
 					      ConstantFunction<dim>(1.),
 					      boundary_values);
-    std::map<unsigned int,double>::const_iterator boundary_value = 
+    std::map<types::global_dof_index,double>::const_iterator boundary_value = 
       boundary_values.begin();
     for ( ; boundary_value !=boundary_values.end(); ++boundary_value)
       {
@@ -110,7 +110,7 @@ void test ()
     {
       Assert (correct_constraints.is_constrained(i) ==
 	      library_constraints.is_constrained(i), ExcInternalError());
-      typedef const std::vector<std::pair<unsigned int, double> >& constraint_format;
+      typedef const std::vector<std::pair<types::global_dof_index, double> >& constraint_format;
       if (correct_constraints.is_constrained(i))
 	{
 	  constraint_format correct = *correct_constraints.get_constraint_entries(i);

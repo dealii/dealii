@@ -42,13 +42,13 @@ namespace PETScWrappers
 
 
 
-    SparseMatrix::SparseMatrix (const MPI_Comm    &communicator,
-                                const unsigned int m,
-                                const unsigned int n,
-                                const unsigned int local_rows,
-                                const unsigned int local_columns,
-                                const unsigned int n_nonzero_per_row,
-                                const bool         is_symmetric)
+    SparseMatrix::SparseMatrix (const MPI_Comm  &communicator,
+                                const size_type  m,
+                                const size_type  n,
+                                const size_type  local_rows,
+                                const size_type  local_columns,
+                                const size_type  n_nonzero_per_row,
+                                const bool       is_symmetric)
       :
       communicator (communicator)
     {
@@ -58,13 +58,13 @@ namespace PETScWrappers
 
 
 
-    SparseMatrix::SparseMatrix (const MPI_Comm    &communicator,
-                                const unsigned int m,
-                                const unsigned int n,
-                                const unsigned int local_rows,
-                                const unsigned int local_columns,
-                                const std::vector<unsigned int> &row_lengths,
-                                const bool         is_symmetric)
+    SparseMatrix::SparseMatrix (const MPI_Comm               &communicator,
+                                const size_type               m,
+                                const size_type               n,
+                                const size_type               local_rows,
+                                const size_type               local_columns,
+                                const std::vector<size_type> &row_lengths,
+                                const bool                    is_symmetric)
       :
       communicator (communicator)
     {
@@ -76,12 +76,12 @@ namespace PETScWrappers
 
     template <typename SparsityType>
     SparseMatrix::
-    SparseMatrix (const MPI_Comm                  &communicator,
-                  const SparsityType              &sparsity_pattern,
-                  const std::vector<unsigned int> &local_rows_per_process,
-                  const std::vector<unsigned int> &local_columns_per_process,
-                  const unsigned int               this_process,
-                  const bool                       preset_nonzero_locations)
+    SparseMatrix (const MPI_Comm               &communicator,
+                  const SparsityType           &sparsity_pattern,
+                  const std::vector<size_type> &local_rows_per_process,
+                  const std::vector<size_type> &local_columns_per_process,
+                  const unsigned int            this_process,
+                  const bool                    preset_nonzero_locations)
       :
       communicator (communicator)
     {
@@ -102,13 +102,13 @@ namespace PETScWrappers
 
 
     void
-    SparseMatrix::reinit (const MPI_Comm    &communicator,
-                          const unsigned int m,
-                          const unsigned int n,
-                          const unsigned int local_rows,
-                          const unsigned int local_columns,
-                          const unsigned int n_nonzero_per_row,
-                          const bool         is_symmetric)
+    SparseMatrix::reinit (const MPI_Comm  &communicator,
+                          const size_type  m,
+                          const size_type  n,
+                          const size_type  local_rows,
+                          const size_type  local_columns,
+                          const size_type  n_nonzero_per_row,
+                          const bool       is_symmetric)
     {
       this->communicator = communicator;
 
@@ -128,13 +128,13 @@ namespace PETScWrappers
 
 
     void
-    SparseMatrix::reinit (const MPI_Comm    &communicator,
-                          const unsigned int m,
-                          const unsigned int n,
-                          const unsigned int local_rows,
-                          const unsigned int local_columns,
-                          const std::vector<unsigned int> &row_lengths,
-                          const bool         is_symmetric)
+    SparseMatrix::reinit (const MPI_Comm               &communicator,
+                          const size_type               m,
+                          const size_type               n,
+                          const size_type               local_rows,
+                          const size_type               local_columns,
+                          const std::vector<size_type> &row_lengths,
+                          const bool                    is_symmetric)
     {
       this->communicator = communicator;
 
@@ -155,12 +155,12 @@ namespace PETScWrappers
     template <typename SparsityType>
     void
     SparseMatrix::
-    reinit (const MPI_Comm                  &communicator,
-            const SparsityType              &sparsity_pattern,
-            const std::vector<unsigned int> &local_rows_per_process,
-            const std::vector<unsigned int> &local_columns_per_process,
-            const unsigned int               this_process,
-            const bool                       preset_nonzero_locations)
+    reinit (const MPI_Comm               &communicator,
+            const SparsityType           &sparsity_pattern,
+            const std::vector<size_type> &local_rows_per_process,
+            const std::vector<size_type> &local_columns_per_process,
+            const unsigned int            this_process,
+            const bool                    preset_nonzero_locations)
     {
       this->communicator = communicator;
 
@@ -181,12 +181,12 @@ namespace PETScWrappers
 
 
     void
-    SparseMatrix::do_reinit (const unsigned int m,
-                             const unsigned int n,
-                             const unsigned int local_rows,
-                             const unsigned int local_columns,
-                             const unsigned int n_nonzero_per_row,
-                             const bool         is_symmetric)
+    SparseMatrix::do_reinit (const size_type m,
+                             const size_type n,
+                             const size_type local_rows,
+                             const size_type local_columns,
+                             const size_type n_nonzero_per_row,
+                             const bool      is_symmetric)
     {
       Assert (local_rows <= m, ExcLocalRowsTooLarge (local_rows, m));
 
@@ -233,12 +233,12 @@ namespace PETScWrappers
 
 
     void
-    SparseMatrix::do_reinit (const unsigned int m,
-                             const unsigned int n,
-                             const unsigned int local_rows,
-                             const unsigned int local_columns,
-                             const std::vector<unsigned int> &row_lengths,
-                             const bool         is_symmetric)
+    SparseMatrix::do_reinit (const size_type m,
+                             const size_type n,
+                             const size_type local_rows,
+                             const size_type local_columns,
+                             const std::vector<size_type> &row_lengths,
+                             const bool      is_symmetric)
     {
       Assert (local_rows <= m, ExcLocalRowsTooLarge (local_rows, m));
 
@@ -251,7 +251,7 @@ namespace PETScWrappers
       // MatCreateMPIAIJ throws an
       // error. In this case use a
       // PETScWrappers::SparseMatrix
-      for (unsigned int i=0; i<row_lengths.size(); ++i)
+      for (size_type i=0; i<row_lengths.size(); ++i)
         Assert(row_lengths[i]<=local_columns,
                ExcIndexRange(row_lengths[i], 1, local_columns+1));
 
@@ -312,11 +312,11 @@ namespace PETScWrappers
     template <typename SparsityType>
     void
     SparseMatrix::
-    do_reinit (const SparsityType              &sparsity_pattern,
-               const std::vector<unsigned int> &local_rows_per_process,
-               const std::vector<unsigned int> &local_columns_per_process,
-               const unsigned int               this_process,
-               const bool                       preset_nonzero_locations)
+    do_reinit (const SparsityType           &sparsity_pattern,
+               const std::vector<size_type> &local_rows_per_process,
+               const std::vector<size_type> &local_columns_per_process,
+               const unsigned int            this_process,
+               const bool                    preset_nonzero_locations)
     {
       Assert (local_rows_per_process.size() == local_columns_per_process.size(),
               ExcDimensionMismatch (local_rows_per_process.size(),
@@ -330,14 +330,14 @@ namespace PETScWrappers
       // and how many arent. for this, we
       // first have to know which areas are
       // ours
-      unsigned int local_row_start = 0;
-      unsigned int local_col_start = 0;
+      size_type local_row_start = 0;
+      size_type local_col_start = 0;
       for (unsigned int p=0; p<this_process; ++p)
         {
           local_row_start += local_rows_per_process[p];
           local_col_start += local_columns_per_process[p];
         }
-      const unsigned int
+      const size_type 
       local_row_end = local_row_start + local_rows_per_process[this_process];
 
 #if DEAL_II_PETSC_VERSION_LT(2,3,3)
@@ -346,7 +346,7 @@ namespace PETScWrappers
       //at least starting from 2.3.3 (tested,
       //see below)
 
-      const unsigned int
+      const size_type 
       local_col_end = local_col_start + local_columns_per_process[this_process];
 
       // then count the elements in- and
@@ -355,10 +355,10 @@ namespace PETScWrappers
 
       row_lengths_in_window (local_row_end - local_row_start),
                             row_lengths_out_of_window (local_row_end - local_row_start);
-      for (unsigned int row = local_row_start; row<local_row_end; ++row)
-        for (unsigned int c=0; c<sparsity_pattern.row_length(row); ++c)
+      for (size_type row = local_row_start; row<local_row_end; ++row)
+        for (size_type c=0; c<sparsity_pattern.row_length(row); ++c)
           {
-            const unsigned int column = sparsity_pattern.column_number(row,c);
+            const size_type column = sparsity_pattern.column_number(row,c);
 
             if ((column >= local_col_start) &&
                 (column < local_col_end))
@@ -438,10 +438,10 @@ namespace PETScWrappers
           rowstart_in_window (local_row_end - local_row_start + 1, 0),
                              colnums_in_window;
           {
-            unsigned int n_cols = 0;
-            for (unsigned int i=local_row_start; i<local_row_end; ++i)
+            size_type n_cols = 0;
+            for (size_type i=local_row_start; i<local_row_end; ++i)
               {
-                const unsigned int row_length = sparsity_pattern.row_length(i);
+                const size_type row_length = sparsity_pattern.row_length(i);
                 rowstart_in_window[i+1-local_row_start]
                   = rowstart_in_window[i-local_row_start] + row_length;
                 n_cols += row_length;
@@ -454,7 +454,7 @@ namespace PETScWrappers
           {
             PetscInt* ptr = & colnums_in_window[0];
 
-            for (unsigned int i=local_row_start; i<local_row_end; ++i)
+            for (size_type i=local_row_start; i<local_row_end; ++i)
               {
                 typename SparsityType::row_iterator
                 row_start = sparsity_pattern.row_begin(i),
@@ -499,7 +499,7 @@ namespace PETScWrappers
             values (sparsity_pattern.max_entries_per_row(),
                     1.);
 
-            for (unsigned int i=local_row_start; i<local_row_end; ++i)
+            for (size_type i=local_row_start; i<local_row_end; ++i)
               {
                 PetscInt petsc_i = i;
                 MatSetValues (matrix, 1, &petsc_i,
@@ -567,63 +567,63 @@ namespace PETScWrappers
     template
     SparseMatrix::SparseMatrix (const MPI_Comm &,
                                 const SparsityPattern &,
-                                const std::vector<unsigned int> &,
-                                const std::vector<unsigned int> &,
+                                const std::vector<size_type> &,
+                                const std::vector<size_type> &,
                                 const unsigned int,
                                 const bool);
     template
     SparseMatrix::SparseMatrix (const MPI_Comm &,
                                 const CompressedSparsityPattern &,
-                                const std::vector<unsigned int> &,
-                                const std::vector<unsigned int> &,
+                                const std::vector<size_type> &,
+                                const std::vector<size_type> &,
                                 const unsigned int,
                                 const bool);
     template
     SparseMatrix::SparseMatrix (const MPI_Comm &,
                                 const CompressedSimpleSparsityPattern &,
-                                const std::vector<unsigned int> &,
-                                const std::vector<unsigned int> &,
+                                const std::vector<size_type> &,
+                                const std::vector<size_type> &,
                                 const unsigned int,
                                 const bool);
 
     template void
     SparseMatrix::reinit (const MPI_Comm &,
                           const SparsityPattern &,
-                          const std::vector<unsigned int> &,
-                          const std::vector<unsigned int> &,
+                          const std::vector<size_type> &,
+                          const std::vector<size_type> &,
                           const unsigned int,
                           const bool);
     template void
     SparseMatrix::reinit (const MPI_Comm &,
                           const CompressedSparsityPattern &,
-                          const std::vector<unsigned int> &,
-                          const std::vector<unsigned int> &,
+                          const std::vector<size_type> &,
+                          const std::vector<size_type> &,
                           const unsigned int,
                           const bool);
     template void
     SparseMatrix::reinit (const MPI_Comm &,
                           const CompressedSimpleSparsityPattern &,
-                          const std::vector<unsigned int> &,
-                          const std::vector<unsigned int> &,
+                          const std::vector<size_type> &,
+                          const std::vector<size_type> &,
                           const unsigned int,
                           const bool);
 
     template void
     SparseMatrix::do_reinit (const SparsityPattern &,
-                             const std::vector<unsigned int> &,
-                             const std::vector<unsigned int> &,
+                             const std::vector<size_type> &,
+                             const std::vector<size_type> &,
                              const unsigned int ,
                              const bool);
     template void
     SparseMatrix::do_reinit (const CompressedSparsityPattern &,
-                             const std::vector<unsigned int> &,
-                             const std::vector<unsigned int> &,
+                             const std::vector<size_type> &,
+                             const std::vector<size_type> &,
                              const unsigned int ,
                              const bool);
     template void
     SparseMatrix::do_reinit (const CompressedSimpleSparsityPattern &,
-                             const std::vector<unsigned int> &,
-                             const std::vector<unsigned int> &,
+                             const std::vector<size_type> &,
+                             const std::vector<size_type> &,
                              const unsigned int ,
                              const bool);
 

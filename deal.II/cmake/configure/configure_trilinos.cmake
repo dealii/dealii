@@ -115,9 +115,47 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
       SET(${var} FALSE)
     ENDIF()
 
+    #
+    # Trilinos has to be configured with 32bit indices if deal.II uses unsigned long
+    # long int.
+    #
+    IF(TRILINOS_WITH_NO_32BIT_INDICES AND NOT DEAL_II_WITH_64BIT_INDICES)
+      MESSAGE(STATUS "deal.II was configured to use 32bit global indices but "
+        "Trilinos was not."
+        ) 
+      SET(TRILINOS_ADDITIONAL_ERROR_STRING
+        ${TRILINOS_ADDITIONAL_ERROR_STRING}
+        "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
+        "has to be configured to use the same number of bits as deal.II, but "
+        "found:\n"
+        "  DEAL_II_WITH_64BIT_INDICES = ${DEAL_II_WITH_64BIT_INDICES}\n"
+        "  TRILINOS_WITH_NO_32BIT_INDICES = ${TRILINOS_WITH_NO_32_BIT_INDICES}\n" 
+        )
+      SET(${var} FALSE)
+    ENDIF()  
 
     #
-    # Some verions of Sacado_cmath.hpp does things that aren't compatible
+    # Trilinos has to be configured with 64bit indices if deal.II uses unsigned long
+    # long int.
+    #
+    IF(TRILINOS_WITH_NO_64BIT_INDICES AND DEAL_II_WITH_64BIT_INDICES)
+      MESSAGE(STATUS "deal.II was configured to use 64bit global indices but "
+        "Trilinos was not."
+        ) 
+      SET(TRILINOS_ADDITIONAL_ERROR_STRING
+        ${TRILINOS_ADDITIONAL_ERROR_STRING}
+        "The Trilinos installation (found at \"${TRILINOS_DIR}\")\n"
+        "has to be configured to use the same number of bits as deal.II, but "
+        "found:\n"
+        "  DEAL_II_WITH_64BIT_INDICES = ${DEAL_II_WITH_64BIT_INDICES}\n"
+        "  TRILINOS_WITH_NO_64BIT_INDICES = ${TRILINOS_WITH_NO_64_BIT_INDICES}\n" 
+        )
+      SET(${var} FALSE)
+    ENDIF()  
+
+
+    #
+    # Some versions of Sacado_cmath.hpp do things that aren't compatible
     # with the -std=c++0x flag of GCC, see deal.II FAQ.
     # Test whether that is indeed the case
     #

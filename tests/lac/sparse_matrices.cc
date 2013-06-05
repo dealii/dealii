@@ -54,13 +54,13 @@ check_vmult_quadratic(std::vector<double>& residuals,
   SolverRichardson<> rich(control, mem, .01);
   SolverRichardson<> prich(control, mem, 1.);
 
-  const unsigned int block_size = (unsigned int) std::sqrt(A.n()+.3);
+  const types::global_dof_index block_size = (types::global_dof_index) std::sqrt(A.n()+.3);
   const unsigned int n_blocks = A.n()/block_size;
   
   typename PreconditionBlock<MATRIX, float>::AdditionalData
     data(block_size, 1.2);
-  std::vector<unsigned int> perm(A.n());
-  std::vector<unsigned int> iperm(A.n());
+  std::vector<types::global_dof_index> perm(A.n());
+  std::vector<types::global_dof_index> iperm(A.n());
   for (unsigned int i=0;i<n_blocks;++i)
     for (unsigned int j=0;j<block_size;++j)
       {

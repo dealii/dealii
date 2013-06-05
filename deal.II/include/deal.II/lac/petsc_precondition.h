@@ -899,13 +899,8 @@ namespace PETScWrappers
       unsigned int symmetric;
 
       /**
-       * Patterns of powers of sparsified
-       * matrices can be approximate the
-       * pattern of large entries in the
-       * inverse of a matrix. Powers of a
-       *
        * The sparsity pattern used for the
-       * apprximate inverse is the pattern
+       * approximate inverse is the pattern
        * of a power <tt>B^m</tt> where <tt>B</tt>
        * has been sparsified from the given
        * matrix <tt>A</tt>, <tt>n_level</tt>

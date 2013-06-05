@@ -115,6 +115,10 @@ namespace SLEPcWrappers
   class SolverBase
   {
   public:
+    /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
 
     /**
      * Constructor. Takes the MPI communicator over which parallel
@@ -153,7 +157,7 @@ namespace SLEPcWrappers
     solve (const PETScWrappers::MatrixBase &A,
            std::vector<double>             &eigenvalues,
            std::vector<OutputVector>       &eigenvectors,
-           const unsigned int               n_eigenpairs = 1);
+           const size_type                  n_eigenpairs = 1);
 
     /**
      * Same as above, but here a composite method for solving the
@@ -166,7 +170,7 @@ namespace SLEPcWrappers
            const PETScWrappers::MatrixBase &B,
            std::vector<double>             &eigenvalues,
            std::vector<OutputVector>       &eigenvectors,
-           const unsigned int               n_eigenpairs = 1);
+           const size_type                  n_eigenpairs = 1);
 
     /**
      * Same as above, but here a composite method for solving the
@@ -746,7 +750,7 @@ namespace SLEPcWrappers
     SolverBase::solve (const PETScWrappers::MatrixBase &A,
 		       std::vector<double>             &eigenvalues,
 		       std::vector<OutputVector>       &eigenvectors,
-		       const unsigned int               n_eigenpairs)
+		       const size_type                  n_eigenpairs)
     {
       // Panic if the number of eigenpairs wanted is out of bounds.
       AssertThrow ((n_eigenpairs > 0) && (n_eigenpairs <= A.m ()), 
@@ -756,7 +760,7 @@ namespace SLEPcWrappers
       set_matrices (A);  
       
       // and solve
-      unsigned int n_converged = 0; 
+      size_type n_converged = 0; 
       solve (n_eigenpairs, &n_converged); 
       
       if (n_converged > n_eigenpairs) 
@@ -768,7 +772,7 @@ namespace SLEPcWrappers
       eigenvectors.resize (n_converged, eigenvectors.front()); 
       eigenvalues.resize (n_converged); 
       
-      for (unsigned int index=0; index<n_converged; ++index) 
+      for (size_type index=0; index<n_converged; ++index) 
 	get_eigenpair (index, eigenvalues[index], eigenvectors[index]); 
     }
   
@@ -778,7 +782,7 @@ namespace SLEPcWrappers
 		       const PETScWrappers::MatrixBase &B,
 		       std::vector<double>             &eigenvalues,
 		       std::vector<OutputVector>       &eigenvectors,
-		       const unsigned int               n_eigenpairs)
+		       const size_type                  n_eigenpairs)
     { 
       // Guard against incompatible matrix sizes:
       AssertThrow (A.m() == B.m (), ExcDimensionMismatch(A.m(), B.m()));
@@ -792,7 +796,7 @@ namespace SLEPcWrappers
       set_matrices (A, B);
       
       // and solve
-      unsigned int n_converged = 0;
+      size_type n_converged = 0;
       solve (n_eigenpairs, &n_converged);
       
       if (n_converged>=n_eigenpairs)
@@ -805,7 +809,7 @@ namespace SLEPcWrappers
       eigenvectors.resize (n_converged, eigenvectors.front());
       eigenvalues.resize (n_converged);
       
-      for (unsigned int index=0; index<n_converged; ++index)
+      for (size_type index=0; index<n_converged; ++index)
 	get_eigenpair (index, eigenvalues[index], eigenvectors[index]);
     }
 
@@ -817,7 +821,7 @@ namespace SLEPcWrappers
 		       std::vector<double>             &imag_eigenvalues,
 		       std::vector<OutputVector>       &real_eigenvectors,
 		       std::vector<OutputVector>       &imag_eigenvectors,
-		       const unsigned int               n_eigenpairs)
+		       const size_type                  n_eigenpairs)
     { 
       // Guard against incompatible matrix sizes:
       AssertThrow (A.m() == B.m (), ExcDimensionMismatch(A.m(), B.m()));
@@ -837,7 +841,7 @@ namespace SLEPcWrappers
       set_matrices (A, B);
       
       // and solve
-      unsigned int n_converged = 0;
+      size_type n_converged = 0;
       solve (n_eigenpairs, &n_converged);
       
       if (n_converged>=n_eigenpairs)
@@ -853,7 +857,7 @@ namespace SLEPcWrappers
       real_eigenvalues.resize (n_converged);
       imag_eigenvalues.resize (n_converged);
       
-      for (unsigned int index=0; index<n_converged; ++index)
+      for (size_type index=0; index<n_converged; ++index)
 	get_eigenpair (index, 
 		       real_eigenvalues[index], imag_eigenvalues[index], 
 		       real_eigenvectors[index], imag_eigenvectors[index]);

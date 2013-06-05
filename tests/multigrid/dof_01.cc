@@ -45,7 +45,7 @@ void dofs(const MGDoFHandler<dim>& dof)
   typename MGDoFHandler<dim>::cell_iterator cell;
   const typename MGDoFHandler<dim>::cell_iterator end = dof.end();
 
-  std::vector<unsigned int> indices;
+  std::vector<types::global_dof_index> indices;
   
   for (cell = dof.begin(); cell != end; ++cell)
     {

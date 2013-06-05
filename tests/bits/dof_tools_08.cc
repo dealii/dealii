@@ -26,7 +26,7 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
-  std::vector<unsigned int> map(dof_handler.n_dofs());
+  std::vector<types::global_dof_index> map(dof_handler.n_dofs());
   DoFTools::map_dof_to_boundary_indices (dof_handler, map);
   for (unsigned int i=0; i<map.size(); ++i)
     deallog << map[i] << " ";

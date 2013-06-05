@@ -93,7 +93,7 @@ void EvaluateNormal2 (DoFHandler<2> *dof_handler,
     DoFHandler<2>::active_cell_iterator cell = dof_handler->begin_active(),
 	endc = dof_handler->end();
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     for (; cell!=endc; ++cell)
     {
@@ -199,7 +199,7 @@ void EvaluateNormal (DoFHandler<2> *dof_handler,
     DoFHandler<2>::active_cell_iterator cell = dof_handler->begin_active(),
 	endc = dof_handler->end();
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     for (; cell!=endc; ++cell)
     {

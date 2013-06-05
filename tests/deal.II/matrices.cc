@@ -67,7 +67,7 @@ check_boundary (const DoFHandler<dim> &dof,
 
   QGauss<dim-1> face_quadrature(6);
   
-  std::vector<unsigned int> dof_to_boundary_mapping;
+  std::vector<types::global_dof_index> dof_to_boundary_mapping;
   DoFTools::map_dof_to_boundary_indices (dof,
 					 dof_to_boundary_mapping);
 

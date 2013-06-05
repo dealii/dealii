@@ -320,7 +320,7 @@ void Step4<dim>::assemble_system ()
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
   // Next, we again have to loop over all cells and assemble local
   // contributions.  Note, that a cell is a quadrilateral in two space
@@ -400,7 +400,7 @@ void Step4<dim>::assemble_system ()
   // task, we only have to replace the ZeroFunction used there by an object of
   // the class which describes the boundary values we would like to use
   // (i.e. the <code>BoundaryValues</code> class declared above):
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
                                             BoundaryValues<dim>(),

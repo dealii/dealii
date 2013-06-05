@@ -62,10 +62,10 @@ namespace internal
     {
     public:
       PointGeometryData(const Point <dim> &new_requested_location, const std::vector <Point <dim> > &new_locations,
-                        const std::vector <int> &new_sol_indices);
+                        const std::vector <types::global_dof_index> &new_sol_indices);
       Point <dim> requested_location;
       std::vector <Point <dim> > support_point_locations;
-      std::vector <int> solution_indices;
+      std::vector <types::global_dof_index> solution_indices;
     };
   }
 }

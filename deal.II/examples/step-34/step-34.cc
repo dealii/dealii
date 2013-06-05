@@ -553,7 +553,7 @@ namespace Step34
 
     const unsigned int n_q_points = fe_v.n_quadrature_points;
 
-    std::vector<unsigned int> local_dof_indices(fe.dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices(fe.dofs_per_cell);
 
     std::vector<Vector<double> > cell_wind(n_q_points, Vector<double>(dim) );
     double normal_wind;
@@ -932,7 +932,7 @@ namespace Step34
 
     const unsigned int n_q_points = fe_v.n_quadrature_points;
 
-    std::vector<unsigned int> dofs(fe.dofs_per_cell);
+    std::vector<types::global_dof_index> dofs(fe.dofs_per_cell);
 
     std::vector<double> local_phi(n_q_points);
     std::vector<double> normal_wind(n_q_points);

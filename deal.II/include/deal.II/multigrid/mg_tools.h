@@ -176,7 +176,7 @@ namespace MGTools
   template <class DH>
   void
   count_dofs_per_block (const DH     &dof_handler,
-                        std::vector<std::vector<unsigned int> > &dofs_per_block,
+                        std::vector<std::vector<types::global_dof_index> > &dofs_per_block,
                         std::vector<unsigned int>  target_block = std::vector<unsigned int>());
 
   /**
@@ -192,7 +192,7 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   count_dofs_per_component (const DoFHandler<dim,spacedim> &mg_dof,
-                            std::vector<std::vector<unsigned int> > &result,
+                            std::vector<std::vector<types::global_dof_index> > &result,
                             const bool only_once = false,
                             std::vector<unsigned int> target_component = std::vector<unsigned int>());
 
@@ -204,7 +204,7 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   count_dofs_per_component (const DoFHandler<dim,spacedim> &mg_dof,
-                            std::vector<std::vector<unsigned int> > &result,
+                            std::vector<std::vector<types::global_dof_index> > &result,
                             std::vector<unsigned int> target_component) DEAL_II_DEPRECATED;
 
   /**
@@ -233,7 +233,7 @@ namespace MGTools
   void
   make_boundary_list (const DoFHandler<dim,spacedim>      &mg_dof,
                       const typename FunctionMap<dim>::type &function_map,
-                      std::vector<std::set<unsigned int> >  &boundary_indices,
+                      std::vector<std::set<types::global_dof_index> > &boundary_indices,
                       const ComponentMask                   &component_mask = ComponentMask());
 
   /**
@@ -253,7 +253,7 @@ namespace MGTools
    */
   template <typename number>
   void
-  apply_boundary_values (const std::set<unsigned int> &boundary_dofs,
+  apply_boundary_values (const std::set<types::global_dof_index> &boundary_dofs,
                          SparseMatrix<number> &matrix,
                          const bool preserve_symmetry,
                          const bool ignore_zeros = false) DEAL_II_DEPRECATED;
@@ -263,7 +263,7 @@ namespace MGTools
    */
   template <typename number>
   void
-  apply_boundary_values (const std::set<unsigned int> &boundary_dofs,
+  apply_boundary_values (const std::set<types::global_dof_index> &boundary_dofs,
                          BlockSparseMatrix<number> &matrix,
                          const bool preserve_symmetry) DEAL_II_DEPRECATED;
 
@@ -302,7 +302,7 @@ namespace MGTools
   template <int dim, int spacedim>
   void
   extract_non_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
-                              std::vector<std::set<unsigned int> >  &non_interface_dofs);
+                              std::vector<std::set<types::global_dof_index> > &non_interface_dofs);
 }
 
 /* @} */

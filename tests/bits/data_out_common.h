@@ -53,7 +53,7 @@ void
 make_block_vector (const Vector<double> &in,
                    BlockVector<double>  &out)
 {
-  std::vector<unsigned int> block_sizes(2);
+  std::vector<types::global_dof_index> block_sizes(2);
   block_sizes[0] = in.size() / 2;
   block_sizes[1] = in.size() - block_sizes[0];
 

@@ -40,7 +40,7 @@ void test ()
   DoFHandler<1,spacedim> dof_handler (tria);
   dof_handler.distribute_dofs (fe);
 
-  std::vector<unsigned int> dof_indices(fe.dofs_per_face);
+  std::vector<types::global_dof_index> dof_indices(fe.dofs_per_face);
 
   deallog << "Coarse mesh:" << std::endl;
   dof_handler.begin_active()->face(0)->get_dof_indices (dof_indices);

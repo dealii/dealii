@@ -48,14 +48,14 @@ check_this (const DoFHandler<dim> &dof_handler)
   if (dof_handler.get_fe().get_unit_support_points().size() == 0)
     return;
 
-  std::map<Point<dim>, unsigned int, Comp> map;
+  std::map<Point<dim>, types::global_dof_index, Comp> map;
   MappingQ<dim> mapping(2);
 
   DoFTools::map_support_points_to_dofs (mapping, dof_handler, map);
 
                                    // output every second element
   unsigned int j=0;
-  for (typename std::map<Point<dim>, unsigned int, Comp>::const_iterator
+  for (typename std::map<Point<dim>, types::global_dof_index, Comp>::const_iterator
          i=map.begin(); i!=map.end(); ++i,++j)
     if (j%2 == 0)
       deallog << i->first << " " << i->second << std::endl;

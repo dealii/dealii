@@ -118,8 +118,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // two fields which will store the
   // indices of the multigrid dofs
   // for a cell and one of its children
-  std::vector<unsigned int> dof_indices_parent (dofs_per_cell);
-  std::vector<unsigned int> dof_indices_child (dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices_parent (dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices_child (dofs_per_cell);
 
   // for each level: first build the sparsity
   // pattern of the matrices and then build the
@@ -141,7 +141,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
       // element will be stored
       CompressedSimpleSparsityPattern csp (sizes[level+1],
                                            sizes[level]);
-      std::vector<unsigned int> entries (dofs_per_cell);
+      std::vector<types::global_dof_index> entries (dofs_per_cell);
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children() &&
@@ -248,8 +248,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   IndexSet globally_relevant;
   DoFTools::extract_locally_relevant_dofs(mg_dof, globally_relevant);
 
-  std::vector<unsigned int> global_dof_indices (dofs_per_cell);
-  std::vector<unsigned int> level_dof_indices  (dofs_per_cell);
+  std::vector<types::global_dof_index> global_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> level_dof_indices  (dofs_per_cell);
   //  for (int level=mg_dof.get_tria().n_levels()-1; level>=0; --level)
   for (unsigned int level=0; level<mg_dof.get_tria().n_levels(); ++level)
     {
@@ -309,7 +309,7 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // If we are in debugging mode, we order the copy indices, so we get
   // more reliable output for regression texts
 #ifdef DEBUG
-  std::less<std::pair<unsigned int, unsigned int> > compare;
+  std::less<std::pair<types::global_dof_index, unsigned int> > compare;
   for (unsigned int level=0;level<copy_indices.size();++level)
     std::sort(copy_indices[level].begin(), copy_indices[level].end(), compare);
   for (unsigned int level=0;level<copy_indices_from_me.size();++level)

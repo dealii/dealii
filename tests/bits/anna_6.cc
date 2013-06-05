@@ -155,7 +155,7 @@ template <int dim>
 void ImposeBC<dim>::get_ready () 
 {  
   dof_handler.distribute_dofs (fe);
-  std::vector<unsigned int>	dofs_per_comp (fe.n_components());
+  std::vector<types::global_dof_index>	dofs_per_comp (fe.n_components());
   DoFTools::count_dofs_per_component(dof_handler, dofs_per_comp);
 	
                                    // For an FESystem with Nedelec-elements as
@@ -173,7 +173,7 @@ template <int dim>
 void ImposeBC<dim>::test_extract_boundary_DoFs () 
 {  	
 	
-  std::map<unsigned int, double> boundary_values;	
+  std::map<types::global_dof_index,double> boundary_values;	
   std::vector<bool> 	bc_component_select(dim + 1);
   	 
                                    // extract boundary DoFs for the Nedelec-component
@@ -202,7 +202,7 @@ template <int dim>
 void ImposeBC<dim>::test_interpolate_BC () 
 {  	
 	
-  std::map<unsigned int, double> boundary_values;	
+  std::map<types::global_dof_index,double> boundary_values;	
   std::vector<bool> 	bc_component_select(dim + 1, false);
   
 	  

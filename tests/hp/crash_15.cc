@@ -65,9 +65,9 @@ void test ()
   
   dof_handler.distribute_dofs(fe_collection);
 
-  std::vector<unsigned int> line_dof_indices_1 (fe_collection[0].dofs_per_line +
+  std::vector<types::global_dof_index> line_dof_indices_1 (fe_collection[0].dofs_per_line +
 						2 * fe_collection[0].dofs_per_vertex);
-  std::vector<unsigned int> line_dof_indices_2 (fe_collection[0].dofs_per_line +
+  std::vector<types::global_dof_index> line_dof_indices_2 (fe_collection[0].dofs_per_line +
 						2 * fe_collection[0].dofs_per_vertex);
 
   for (typename hp::DoFHandler<dim>::active_cell_iterator

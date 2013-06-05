@@ -76,7 +76,7 @@ int main()
   bi1.push_back(4);
   test(bi1);
   
-  std::vector<unsigned int> v(4);
+  std::vector<types::global_dof_index> v(4);
   for (unsigned int i=0;i<v.size();++i)
     v[i] = 4-i;
   

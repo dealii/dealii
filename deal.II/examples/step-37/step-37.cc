@@ -587,7 +587,7 @@ namespace Step37
   {
     data.cell_loop (&LaplaceOperator::local_apply, this, dst, src);
 
-    const std::vector<unsigned int> &
+    const std::vector<types::global_dof_index> &
     constrained_dofs = data.get_constrained_dofs();
     for (unsigned int i=0; i<constrained_dofs.size(); ++i)
       dst(constrained_dofs[i]) += src(constrained_dofs[i]);
@@ -628,7 +628,7 @@ namespace Step37
 
     diagonal_values = diagonal;
 
-    const std::vector<unsigned int> &
+    const std::vector<types::global_dof_index> &
     constrained_dofs = data.get_constrained_dofs();
     for (unsigned int i=0; i<constrained_dofs.size(); ++i)
       diagonal_values(constrained_dofs[i]) = 1.0;
@@ -794,13 +794,13 @@ namespace Step37
     typename FunctionMap<dim>::type dirichlet_boundary;
     ZeroFunction<dim>               homogeneous_dirichlet_bc (1);
     dirichlet_boundary[0] = &homogeneous_dirichlet_bc;
-    std::vector<std::set<unsigned int> > boundary_indices(triangulation.n_levels());
+    std::vector<std::set<types::global_dof_index> > boundary_indices(triangulation.n_levels());
     MGTools::make_boundary_list (dof_handler,
                                  dirichlet_boundary,
                                  boundary_indices);
     for (unsigned int level=0; level<nlevels; ++level)
       {
-        std::set<unsigned int>::iterator bc_it = boundary_indices[level].begin();
+        std::set<types::global_dof_index>::iterator bc_it = boundary_indices[level].begin();
         for ( ; bc_it != boundary_indices[level].end(); ++bc_it)
           mg_constraints[level].add_line(*bc_it);
 
@@ -835,7 +835,7 @@ namespace Step37
     const unsigned int   dofs_per_cell = fe.dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     const Coefficient<dim> coefficient;
     std::vector<double>    coefficient_values (n_q_points);
 
@@ -881,7 +881,7 @@ namespace Step37
     const unsigned int   dofs_per_cell = fe.dofs_per_cell;
     const unsigned int   n_q_points    = quadrature_formula.size();
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     const Coefficient<dim>    coefficient;
     std::vector<double>       coefficient_values (n_q_points);
     FullMatrix<double>        local_matrix (dofs_per_cell, dofs_per_cell);

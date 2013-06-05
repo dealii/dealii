@@ -3765,7 +3765,7 @@ Triangulation<dim,spacedim>::load (Archive &ar,
 
   // as discussed in the documentation, do
   // not store the signals as well as
-  // boundary and manifold descrption
+  // boundary and manifold description
   // but everything else
   ar &smooth_grid;
   ar &levels;

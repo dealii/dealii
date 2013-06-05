@@ -99,8 +99,8 @@ namespace PETScWrappers
        */
       explicit BlockVector (const unsigned int  n_blocks,
                             const MPI_Comm     &communicator,
-                            const unsigned int  block_size,
-                            const unsigned int  local_size);
+                            const size_type     block_size,
+                            const size_type     local_size);
 
       /**
        * Copy-Constructor. Set all the
@@ -122,9 +122,9 @@ namespace PETScWrappers
        * <tt>local_elements[i]</tt>
        * elements on the present process.
        */
-      BlockVector (const std::vector<unsigned int> &block_sizes,
-                   const MPI_Comm                  &communicator,
-                   const std::vector<unsigned int> &local_elements);
+      BlockVector (const std::vector<size_type> &block_sizes,
+                   const MPI_Comm               &communicator,
+                   const std::vector<size_type> &local_elements);
 
       /**
        * Create a BlockVector with parallel_partitioning.size() blocks,
@@ -199,8 +199,8 @@ namespace PETScWrappers
        */
       void reinit (const unsigned int  n_blocks,
                    const MPI_Comm     &communicator,
-                   const unsigned int  block_size,
-                   const unsigned int  local_size,
+                   const size_type     block_size,
+                   const size_type     local_size,
                    const bool fast = false);
 
       /**
@@ -238,10 +238,10 @@ namespace PETScWrappers
        * since they may be routed to
        * the wrong block.
        */
-      void reinit (const std::vector<unsigned int> &block_sizes,
-                   const MPI_Comm                  &communicator,
-                   const std::vector<unsigned int> &local_sizes,
-                   const bool                       fast=false);
+      void reinit (const std::vector<size_type> &block_sizes,
+                   const MPI_Comm               &communicator,
+                   const std::vector<size_type> &local_sizes,
+                   const bool                    fast=false);
 
       /**
        * Change the dimension to that
@@ -363,8 +363,8 @@ namespace PETScWrappers
     inline
     BlockVector::BlockVector (const unsigned int  n_blocks,
                               const MPI_Comm     &communicator,
-                              const unsigned int  block_size,
-                              const unsigned int  local_size)
+                              const size_type     block_size,
+                              const size_type     local_size)
     {
       reinit (n_blocks, communicator, block_size, local_size);
     }
@@ -372,9 +372,9 @@ namespace PETScWrappers
 
 
     inline
-    BlockVector::BlockVector (const std::vector<unsigned int> &block_sizes,
+    BlockVector::BlockVector (const std::vector<size_type> &block_sizes,
                               const MPI_Comm     &communicator,
-                              const std::vector<unsigned int> &local_elements)
+                              const std::vector<size_type> &local_elements)
     {
       reinit (block_sizes, communicator, local_elements, false);
     }
@@ -429,13 +429,13 @@ namespace PETScWrappers
     void
     BlockVector::reinit (const unsigned int  n_blocks,
                          const MPI_Comm     &communicator,
-                         const unsigned int  block_size,
-                         const unsigned int  local_size,
+                         const size_type     block_size,
+                         const size_type     local_size,
                          const bool fast)
     {
-      reinit(std::vector<unsigned int>(n_blocks, block_size),
+      reinit(std::vector<size_type>(n_blocks, block_size),
              communicator,
-             std::vector<unsigned int>(n_blocks, local_size),
+             std::vector<size_type>(n_blocks, local_size),
              fast);
     }
 
@@ -443,10 +443,10 @@ namespace PETScWrappers
 
     inline
     void
-    BlockVector::reinit (const std::vector<unsigned int> &block_sizes,
-                         const MPI_Comm                  &communicator,
-                         const std::vector<unsigned int> &local_sizes,
-                         const bool                       fast)
+    BlockVector::reinit (const std::vector<size_type> &block_sizes,
+                         const MPI_Comm               &communicator,
+                         const std::vector<size_type> &local_sizes,
+                         const bool                    fast)
     {
       this->block_indices.reinit (block_sizes);
       if (this->components.size() != this->n_blocks())
@@ -476,7 +476,7 @@ namespace PETScWrappers
     BlockVector::reinit (const std::vector<IndexSet> &parallel_partitioning,
                  const MPI_Comm              &communicator)
     {
-      std::vector<unsigned int> sizes(parallel_partitioning.size());
+      std::vector<size_type> sizes(parallel_partitioning.size());
       for (unsigned int i=0; i<parallel_partitioning.size(); ++i)
         sizes[i] = parallel_partitioning[i].size();
 

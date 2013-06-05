@@ -685,7 +685,7 @@ namespace Step9
 
     // ... an array to hold the global indices of the degrees of freedom of
     // the cell on which we are presently working...
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     // ... and array in which the values of right hand side, advection
     // direction, and boundary values will be stored, for cell and face

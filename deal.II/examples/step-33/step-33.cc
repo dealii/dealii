@@ -1290,12 +1290,12 @@ namespace Step33
 
     void assemble_system ();
     void assemble_cell_term (const FEValues<dim>             &fe_v,
-                             const std::vector<unsigned int> &dofs);
+                             const std::vector<types::global_dof_index> &dofs);
     void assemble_face_term (const unsigned int               face_no,
                              const FEFaceValuesBase<dim>     &fe_v,
                              const FEFaceValuesBase<dim>     &fe_v_neighbor,
-                             const std::vector<unsigned int> &dofs,
-                             const std::vector<unsigned int> &dofs_neighbor,
+                             const std::vector<types::global_dof_index> &dofs,
+                             const std::vector<types::global_dof_index> &dofs_neighbor,
                              const bool                       external_face,
                              const unsigned int               boundary_id,
                              const double                     face_diameter);
@@ -1430,8 +1430,8 @@ namespace Step33
   {
     const unsigned int dofs_per_cell = dof_handler.get_fe().dofs_per_cell;
 
-    std::vector<unsigned int> dof_indices (dofs_per_cell);
-    std::vector<unsigned int> dof_indices_neighbor (dofs_per_cell);
+    std::vector<types::global_dof_index> dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> dof_indices_neighbor (dofs_per_cell);
 
     const UpdateFlags update_flags               = update_values
                                                    | update_gradients
@@ -1481,7 +1481,7 @@ namespace Step33
               assemble_face_term (face_no, fe_v_face,
                                   fe_v_face,
                                   dof_indices,
-                                  std::vector<unsigned int>(),
+                                  std::vector<types::global_dof_index>(),
                                   true,
                                   cell->face(face_no)->boundary_indicator(),
                                   cell->face(face_no)->diameter());
@@ -1661,7 +1661,7 @@ namespace Step33
   void
   ConservationLaw<dim>::
   assemble_cell_term (const FEValues<dim>             &fe_v,
-                      const std::vector<unsigned int> &dof_indices)
+                      const std::vector<types::global_dof_index> &dof_indices)
   {
     const unsigned int dofs_per_cell = fe_v.dofs_per_cell;
     const unsigned int n_q_points    = fe_v.n_quadrature_points;
@@ -1862,8 +1862,8 @@ namespace Step33
   ConservationLaw<dim>::assemble_face_term(const unsigned int           face_no,
                                            const FEFaceValuesBase<dim> &fe_v,
                                            const FEFaceValuesBase<dim> &fe_v_neighbor,
-                                           const std::vector<unsigned int>   &dof_indices,
-                                           const std::vector<unsigned int>   &dof_indices_neighbor,
+                                           const std::vector<types::global_dof_index>   &dof_indices,
+                                           const std::vector<types::global_dof_index>   &dof_indices_neighbor,
                                            const bool                   external_face,
                                            const unsigned int           boundary_id,
                                            const double                 face_diameter)

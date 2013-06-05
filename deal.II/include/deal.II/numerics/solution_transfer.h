@@ -377,7 +377,7 @@ private:
    * Stores the number of DoFs before the
    * refinement and/or coarsening.
    */
-  unsigned int n_dofs_old;
+  types::global_dof_index n_dofs_old;
 
   /**
    * Declaration of
@@ -408,7 +408,7 @@ private:
    * and stores all dof indices
    * of the cells that'll be refined
    */
-  std::vector<std::vector<unsigned int> > indices_on_cell;
+  std::vector<std::vector<types::global_dof_index> > indices_on_cell;
 
   /**
    * All cell data (the dof indices and
@@ -432,7 +432,7 @@ private:
   struct Pointerstruct
   {
     Pointerstruct() : indices_ptr(0), dof_values_ptr(0), active_fe_index(0) {};
-    Pointerstruct(std::vector<unsigned int> *indices_ptr_in,
+    Pointerstruct(std::vector<types::global_dof_index> *indices_ptr_in,
                   const unsigned int active_fe_index_in = 0)
       :
       indices_ptr(indices_ptr_in),
@@ -445,7 +445,7 @@ private:
       active_fe_index(active_fe_index_in) {};
     std::size_t memory_consumption () const;
 
-    std::vector<unsigned int>    *indices_ptr;
+    std::vector<types::global_dof_index>    *indices_ptr;
     std::vector<Vector<typename VECTOR::value_type> > *dof_values_ptr;
     unsigned int active_fe_index;
   };

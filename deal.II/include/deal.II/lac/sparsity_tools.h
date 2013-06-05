@@ -42,6 +42,11 @@ class SparsityPattern;
 namespace SparsityTools
 {
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Use the METIS partitioner to generate
    * a partitioning of the degrees of
    * freedom represented by this sparsity
@@ -191,8 +196,8 @@ namespace SparsityTools
    */
   void
   reorder_Cuthill_McKee (const SparsityPattern     &sparsity,
-                         std::vector<unsigned int> &new_indices,
-                         const std::vector<unsigned int> &starting_indices = std::vector<unsigned int>());
+                         std::vector<size_type> &new_indices,
+                         const std::vector<size_type> &starting_indices = std::vector<size_type>());
 
 
 #ifdef DEAL_II_WITH_MPI
@@ -237,7 +242,7 @@ namespace SparsityTools
    */
   template <class CSP_t>
   void distribute_sparsity_pattern(CSP_t &csp,
-                                   const std::vector<unsigned int> &rows_per_cpu,
+                                   const std::vector<size_type> &rows_per_cpu,
                                    const MPI_Comm &mpi_comm,
                                    const IndexSet &myrange);
 #endif

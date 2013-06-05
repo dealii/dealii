@@ -146,7 +146,7 @@ void LaplaceProblem<dim>::assemble_system ()
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
   typename DoFHandler<dim>::active_cell_iterator cell = mg_dof_handler.begin_active(),
 						 endc = mg_dof_handler.end();
@@ -202,7 +202,7 @@ void LaplaceProblem<dim>::assemble_multigrid ()
 
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
   typename MGDoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
 					    endc = mg_dof_handler.end();

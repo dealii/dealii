@@ -78,7 +78,7 @@ void test ()
 	deallog << "cell=" << cell << ", face=" << f
 		<< ", fe_index=" << cell->active_fe_index()
 		<< ", dofs=";
-	std::vector<unsigned int> dofs (fe[cell->active_fe_index()].dofs_per_face);
+	std::vector<types::global_dof_index> dofs (fe[cell->active_fe_index()].dofs_per_face);
 	cell->face(f)->get_dof_indices (dofs,
 					cell->active_fe_index());
 	for (unsigned int i=0; i<dofs.size(); ++i)

@@ -217,8 +217,8 @@ void print_matching(DoFHandler<dim> &dof_handler, bool constrain_only_velocity =
 
   // Determine the orientation of the two faces:
 
-  std::vector<unsigned int> dofs_1(fe.dofs_per_face);
-  std::vector<unsigned int> dofs_2(fe.dofs_per_face);
+  std::vector<types::global_dof_index> dofs_1(fe.dofs_per_face);
+  std::vector<types::global_dof_index> dofs_2(fe.dofs_per_face);
   const unsigned int face_1_index = face_1->nth_active_fe_index(0);
   const unsigned int face_2_index = face_2->nth_active_fe_index(0);
   face_1->get_dof_indices(dofs_1, face_1_index);

@@ -67,11 +67,11 @@ void test(bool use_constraint_matrix)
 
   // "assemble":
 
-  std::vector<unsigned int> local_dofs1;
+  std::vector<types::global_dof_index> local_dofs1;
   for (unsigned int i=0;i<5;++i)
     local_dofs1.push_back(i);
 
-  std::vector<unsigned int> local_dofs2;
+  std::vector<types::global_dof_index> local_dofs2;
   local_dofs2.push_back(1);
   for (unsigned int i=1;i<5;++i)
     local_dofs2.push_back(3+i);
@@ -114,10 +114,10 @@ void test(bool use_constraint_matrix)
 	  rhs (local_dofs2[i]) += local_vec (i);
 	}
 
-      std::map<unsigned int, double>     boundary_values;
-      boundary_values.insert (std::pair<unsigned int,double>(1, -5.0));
-      boundary_values.insert (std::pair<unsigned int,double>(3, 2.0));
-      boundary_values.insert (std::pair<unsigned int,double>(4, 0.0));
+      std::map<types::global_dof_index,double> boundary_values;
+      boundary_values.insert (std::pair<types::global_dof_index,double>(1, -5.0));
+      boundary_values.insert (std::pair<types::global_dof_index,double>(3, 2.0));
+      boundary_values.insert (std::pair<types::global_dof_index,double>(4, 0.0));
       MatrixTools::apply_boundary_values (boundary_values,
 					  mat,
 					  solution,

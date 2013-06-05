@@ -403,6 +403,11 @@ class ChunkSparseMatrix : public virtual Subscriptor
 {
 public:
   /**
+   * Declare the type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Type of matrix entries. In analogy to
    * the STL container classes.
    */
@@ -576,20 +581,20 @@ public:
    * Return the dimension of the image space.  To remember: the matrix is of
    * dimension $m \times n$.
    */
-  unsigned int m () const;
+  size_type m () const;
 
   /**
    * Return the dimension of the range space.  To remember: the matrix is of
    * dimension $m \times n$.
    */
-  unsigned int n () const;
+  size_type n () const;
 
   /**
    * Return the number of nonzero elements of this matrix. Actually, it
    * returns the number of entries in the sparsity pattern; if any of the
    * entries should happen to be zero, it is counted anyway.
    */
-  unsigned int n_nonzero_elements () const;
+  size_type n_nonzero_elements () const;
 
   /**
    * Return the number of actually nonzero elements of this matrix.
@@ -598,7 +603,7 @@ public:
    * count all entries of the sparsity pattern but only the ones that are
    * nonzero.
    */
-  unsigned int n_actually_nonzero_elements () const;
+  size_type n_actually_nonzero_elements () const;
 
   /**
    * Return a (constant) reference to the underlying sparsity pattern of this
@@ -626,8 +631,8 @@ public:
    * entry does not exist or if <tt>value</tt> is not a finite number. Still,
    * it is allowed to store zero values in non-existent fields.
    */
-  void set (const unsigned int i,
-            const unsigned int j,
+  void set (const size_type i,
+            const size_type j,
             const number value);
 
   /**
@@ -635,8 +640,8 @@ public:
    * entry does not exist or if <tt>value</tt> is not a finite number. Still,
    * it is allowed to store zero values in non-existent fields.
    */
-  void add (const unsigned int i,
-            const unsigned int j,
+  void add (const size_type i,
+            const size_type j,
             const number value);
 
   /**
@@ -649,12 +654,12 @@ public:
    * i.e., zero values won't be added into the matrix.
    */
   template <typename number2>
-  void add (const unsigned int  row,
-            const unsigned int  n_cols,
-            const unsigned int *col_indices,
-            const number2      *values,
-            const bool          elide_zero_values = true,
-            const bool          col_indices_are_sorted = false);
+  void add (const size_type  row,
+            const size_type  n_cols,
+            const size_type *col_indices,
+            const number2   *values,
+            const bool       elide_zero_values = true,
+            const bool       col_indices_are_sorted = false);
 
   /**
    * Multiply the entire matrix by a fixed factor.
@@ -760,8 +765,8 @@ public:
    * classes instead, since they are tailored better to a sparse matrix
    * structure.
    */
-  number operator () (const unsigned int i,
-                      const unsigned int j) const;
+  number operator () (const size_type i,
+                      const size_type j) const;
 
   /**
    * This function is mostly like operator()() in that it returns the value of
@@ -775,8 +780,8 @@ public:
    * classes instead, since they are tailored better to a sparse matrix
    * structure.
    */
-  number el (const unsigned int i,
-             const unsigned int j) const;
+  number el (const size_type i,
+             const size_type j) const;
 
   /**
    * Return the main diagonal
@@ -790,13 +795,13 @@ public:
    * each row and access therefore does not involve searching for the right
    * column number.
    */
-  number diag_element (const unsigned int i) const;
+  number diag_element (const size_type i) const;
 
   /**
    * Same as above, but return a writeable reference. You're sure you know
    * what you do?
    */
-  number &diag_element (const unsigned int i);
+  number &diag_element (const size_type i);
 
 //@}
   /**
@@ -1015,8 +1020,8 @@ public:
    */
   template <typename somenumber>
   void PSOR (Vector<somenumber> &v,
-             const std::vector<unsigned int> &permutation,
-             const std::vector<unsigned int> &inverse_permutation,
+             const std::vector<size_type> &permutation,
+             const std::vector<size_type> &inverse_permutation,
              const number        om = 1.) const;
 
   /**
@@ -1031,8 +1036,8 @@ public:
    */
   template <typename somenumber>
   void TPSOR (Vector<somenumber> &v,
-              const std::vector<unsigned int> &permutation,
-              const std::vector<unsigned int> &inverse_permutation,
+              const std::vector<size_type> &permutation,
+              const std::vector<size_type> &inverse_permutation,
               const number        om = 1.) const;
 
   /**
@@ -1303,13 +1308,13 @@ private:
    * sparsity pattern with a smaller size to this object, using the reinit()
    * function.
    */
-  unsigned int max_len;
+  size_type max_len;
 
   /**
    * Return the location of entry $(i,j)$ within the val array.
    */
-  unsigned int compute_location (const unsigned int i,
-                                 const unsigned int j) const;
+  size_type compute_location (const size_type i,
+                              const size_type j) const;
 
   // make all other sparse matrices friends
   template <typename somenumber> friend class ChunkSparseMatrix;
@@ -1331,7 +1336,8 @@ private:
 
 template <typename number>
 inline
-unsigned int ChunkSparseMatrix<number>::m () const
+typename ChunkSparseMatrix<number>::size_type
+ChunkSparseMatrix<number>::m () const
 {
   Assert (cols != 0, ExcNotInitialized());
   return cols->rows;
@@ -1340,7 +1346,8 @@ unsigned int ChunkSparseMatrix<number>::m () const
 
 template <typename number>
 inline
-unsigned int ChunkSparseMatrix<number>::n () const
+typename ChunkSparseMatrix<number>::size_type 
+ChunkSparseMatrix<number>::n () const
 {
   Assert (cols != 0, ExcNotInitialized());
   return cols->cols;
@@ -1361,12 +1368,12 @@ ChunkSparseMatrix<number>::get_sparsity_pattern () const
 
 template <typename number>
 inline
-unsigned int
-ChunkSparseMatrix<number>::compute_location (const unsigned int i,
-                                             const unsigned int j) const
+typename ChunkSparseMatrix<number>::size_type 
+ChunkSparseMatrix<number>::compute_location (const size_type i,
+                                             const size_type j) const
 {
-  const unsigned int chunk_size = cols->get_chunk_size();
-  const unsigned int chunk_index
+  const size_type chunk_size = cols->get_chunk_size();
+  const size_type chunk_index
   = cols->sparsity_pattern(i/chunk_size, j/chunk_size);
 
   if (chunk_index == ChunkSparsityPattern::invalid_entry)
@@ -1384,8 +1391,8 @@ ChunkSparseMatrix<number>::compute_location (const unsigned int i,
 
 template <typename number>
 inline
-void ChunkSparseMatrix<number>::set (const unsigned int i,
-                                     const unsigned int j,
+void ChunkSparseMatrix<number>::set (const size_type i,
+                                     const size_type j,
                                      const number value)
 {
 
@@ -1394,7 +1401,7 @@ void ChunkSparseMatrix<number>::set (const unsigned int i,
   Assert (cols != 0, ExcNotInitialized());
   // it is allowed to set elements of the matrix that are not part of the
   // sparsity pattern, if the value to which we set it is zero
-  const unsigned int index = compute_location(i,j);
+  const size_type index = compute_location(i,j);
   Assert ((index != SparsityPattern::invalid_entry) ||
           (value == 0.),
           ExcInvalidIndex(i,j));
@@ -1407,8 +1414,8 @@ void ChunkSparseMatrix<number>::set (const unsigned int i,
 
 template <typename number>
 inline
-void ChunkSparseMatrix<number>::add (const unsigned int i,
-                                     const unsigned int j,
+void ChunkSparseMatrix<number>::add (const size_type i,
+                                     const size_type j,
                                      const number value)
 {
 
@@ -1418,7 +1425,7 @@ void ChunkSparseMatrix<number>::add (const unsigned int i,
 
   if (value != 0.)
     {
-      const unsigned int index = compute_location(i,j);
+      const size_type index = compute_location(i,j);
       Assert ((index != ChunkSparsityPattern::invalid_entry),
               ExcInvalidIndex(i,j));
 
@@ -1431,15 +1438,15 @@ void ChunkSparseMatrix<number>::add (const unsigned int i,
 template <typename number>
 template <typename number2>
 inline
-void ChunkSparseMatrix<number>::add (const unsigned int row,
-                                     const unsigned int n_cols,
-                                     const unsigned int *col_indices,
-                                     const number2      *values,
-                                     const bool          /*elide_zero_values*/,
-                                     const bool          /*col_indices_are_sorted*/)
+void ChunkSparseMatrix<number>::add (const size_type  row,
+                                     const size_type  n_cols,
+                                     const size_type *col_indices,
+                                     const number2   *values,
+                                     const bool       /*elide_zero_values*/,
+                                     const bool       /*col_indices_are_sorted*/)
 {
   // TODO: could be done more efficiently...
-  for (unsigned int col=0; col<n_cols; ++col)
+  for (size_type col=0; col<n_cols; ++col)
     add(row, col_indices[col], static_cast<number>(values[col]));
 }
 
@@ -1453,7 +1460,7 @@ ChunkSparseMatrix<number>::operator *= (const number factor)
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
 
-  const unsigned int chunk_size = cols->get_chunk_size();
+  const size_type chunk_size = cols->get_chunk_size();
 
   // multiply all elements of the matrix with the given factor. this includes
   // the padding elements in chunks that overlap the boundaries of the actual
@@ -1483,7 +1490,7 @@ ChunkSparseMatrix<number>::operator /= (const number factor)
 
   const number factor_inv = 1. / factor;
 
-  const unsigned int chunk_size = cols->get_chunk_size();
+  const size_type chunk_size = cols->get_chunk_size();
 
   // multiply all elements of the matrix with the given factor. this includes
   // the padding elements in chunks that overlap the boundaries of the actual
@@ -1505,8 +1512,8 @@ ChunkSparseMatrix<number>::operator /= (const number factor)
 
 template <typename number>
 inline
-number ChunkSparseMatrix<number>::operator () (const unsigned int i,
-                                               const unsigned int j) const
+number ChunkSparseMatrix<number>::operator () (const size_type i,
+                                               const size_type j) const
 {
   Assert (cols != 0, ExcNotInitialized());
   AssertThrow (compute_location(i,j) != SparsityPattern::invalid_entry,
@@ -1518,11 +1525,11 @@ number ChunkSparseMatrix<number>::operator () (const unsigned int i,
 
 template <typename number>
 inline
-number ChunkSparseMatrix<number>::el (const unsigned int i,
-                                      const unsigned int j) const
+number ChunkSparseMatrix<number>::el (const size_type i,
+                                      const size_type j) const
 {
   Assert (cols != 0, ExcNotInitialized());
-  const unsigned int index = compute_location(i,j);
+  const size_type index = compute_location(i,j);
 
   if (index != ChunkSparsityPattern::invalid_entry)
     return val[index];
@@ -1534,7 +1541,7 @@ number ChunkSparseMatrix<number>::el (const unsigned int i,
 
 template <typename number>
 inline
-number ChunkSparseMatrix<number>::diag_element (const unsigned int i) const
+number ChunkSparseMatrix<number>::diag_element (const size_type i) const
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (m() == n(),  ExcNotQuadratic());
@@ -1542,7 +1549,7 @@ number ChunkSparseMatrix<number>::diag_element (const unsigned int i) const
 
   // Use that the first element in each row of a quadratic matrix is the main
   // diagonal of the chunk sparsity pattern
-  const unsigned int chunk_size = cols->get_chunk_size();
+  const size_type chunk_size = cols->get_chunk_size();
   return val[cols->sparsity_pattern.rowstart[i/chunk_size]
              *
              chunk_size * chunk_size
@@ -1561,13 +1568,13 @@ void
 ChunkSparseMatrix<number>::copy_from (const ForwardIterator begin,
                                       const ForwardIterator end)
 {
-  Assert (static_cast<unsigned int>(std::distance (begin, end)) == m(),
+  Assert (static_cast<size_type >(std::distance (begin, end)) == m(),
           ExcIteratorRange (std::distance (begin, end), m()));
 
   // for use in the inner loop, we define a typedef to the type of the inner
   // iterators
   typedef typename std::iterator_traits<ForwardIterator>::value_type::const_iterator inner_iterator;
-  unsigned int row=0;
+  size_type row=0;
   for (ForwardIterator i=begin; i!=end; ++i, ++row)
     {
       const inner_iterator end_of_row = i->end();

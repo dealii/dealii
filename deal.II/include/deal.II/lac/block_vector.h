@@ -102,7 +102,7 @@ public:
    *  sizes.
    */
   explicit BlockVector (const unsigned int num_blocks = 0,
-                        const unsigned int block_size = 0);
+                        const size_type block_size = 0);
 
   /**
    * Copy-Constructor. Dimension set to
@@ -157,7 +157,7 @@ public:
    * <tt>block_sizes[i]</tt> zero
    * elements.
    */
-  BlockVector (const std::vector<unsigned int> &block_sizes);
+  BlockVector (const std::vector<size_type> &block_sizes);
 
   /**
    * Constructor. Initialize vector
@@ -185,7 +185,7 @@ public:
    * different blocks.
    */
   template <typename InputIterator>
-  BlockVector (const std::vector<unsigned int> &n,
+  BlockVector (const std::vector<size_type>    &n,
                const InputIterator              first,
                const InputIterator              end);
 
@@ -271,7 +271,7 @@ public:
    * is filled with zeros.
    */
   void reinit (const unsigned int num_blocks,
-               const unsigned int block_size = 0,
+               const size_type block_size = 0,
                const bool fast = false);
 
   /**
@@ -305,8 +305,8 @@ public:
    * since they may be routed to
    * the wrong block.
    */
-  void reinit (const std::vector<unsigned int> &N,
-               const bool                       fast=false);
+  void reinit (const std::vector<size_type> &N,
+               const bool                    fast=false);
 
   /**
    * Reinitialize the BlockVector
@@ -470,7 +470,7 @@ public:
 
 template <typename Number>
 template <typename InputIterator>
-BlockVector<Number>::BlockVector (const std::vector<unsigned int> &n,
+BlockVector<Number>::BlockVector (const std::vector<size_type>    &n,
                                   const InputIterator              first,
                                   const InputIterator              end)
 {
@@ -479,7 +479,7 @@ BlockVector<Number>::BlockVector (const std::vector<unsigned int> &n,
   // copy elements soon
   reinit (n, true);
   InputIterator start = first;
-  for (unsigned int b=0; b<n.size(); ++b)
+  for (size_type b=0; b<n.size(); ++b)
     {
       InputIterator end = start;
       std::advance (end, static_cast<signed int>(n[b]));
@@ -543,7 +543,7 @@ template <typename Number>
 inline
 void BlockVector<Number>::compress (::dealii::VectorOperation::values operation)
 {
-  for (unsigned int i=0; i<this->n_blocks(); ++i)
+  for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i].compress(operation);
 }
 
@@ -555,7 +555,7 @@ void BlockVector<Number>::scale (const value_type factor)
 
   Assert (numbers::is_finite(factor), ExcNumberNotFinite());
 
-  for (unsigned int i=0; i<this->n_blocks(); ++i)
+  for (size_type i=0; i<this->n_blocks(); ++i)
     this->components[i] *= factor;
 }
 

@@ -33,7 +33,7 @@ void test ()
   for (unsigned int i=0; i<9*is1.size()/10; ++i)
     is1.add_index (rand() % is1.size());
 
-  std::vector<unsigned int> indices;
+  std::vector<types::global_dof_index> indices;
   is1.fill_index_vector (indices);
 
   deallog << "Original index set: " << std::endl;

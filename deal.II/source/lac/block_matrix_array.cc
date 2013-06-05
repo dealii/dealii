@@ -320,7 +320,7 @@ template <typename number>
 void
 BlockTrianglePrecondition<number>::do_row (
   BlockVector<number> &dst,
-  unsigned int row_num) const
+  size_type row_num) const
 {
   GrowingVectorMemory<Vector<number> > mem;
   typename std::vector<typename BlockMatrixArray<number>::Entry>::const_iterator
@@ -339,12 +339,12 @@ BlockTrianglePrecondition<number>::do_row (
   // they are not ordered by rows.
   for (; m != end ; ++m)
     {
-      const unsigned int i=m->row;
+      const size_type i=m->row;
       // Ignore everything not in
       // this row
       if (i != row_num)
         continue;
-      const unsigned int j=m->col;
+      const size_type j=m->col;
       // Only use the lower (upper)
       // triangle for forward
       // (backward) substitution
@@ -379,7 +379,7 @@ BlockTrianglePrecondition<number>::do_row (
   else
     {
       aux = 0.;
-      for (unsigned int i=0; i<diagonals.size(); ++i)
+      for (size_type i=0; i<diagonals.size(); ++i)
         {
           m = diagonals[i];
           // First, divide by the current

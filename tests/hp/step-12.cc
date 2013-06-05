@@ -405,8 +405,8 @@ template <int dim>
 void DGMethod<dim>::assemble_system1 () 
 {
   const unsigned int dofs_per_cell = dof_handler.get_fe()[0].dofs_per_cell;
-  std::vector<unsigned int> dofs (dofs_per_cell);
-  std::vector<unsigned int> dofs_neighbor (dofs_per_cell);
+  std::vector<types::global_dof_index> dofs (dofs_per_cell);
+  std::vector<types::global_dof_index> dofs_neighbor (dofs_per_cell);
 
   const UpdateFlags update_flags = update_values
                                    | update_gradients
@@ -571,8 +571,8 @@ template <int dim>
 void DGMethod<dim>::assemble_system2 () 
 {
   const unsigned int dofs_per_cell = dof_handler.get_fe()[0].dofs_per_cell;
-  std::vector<unsigned int> dofs (dofs_per_cell);
-  std::vector<unsigned int> dofs_neighbor (dofs_per_cell);
+  std::vector<types::global_dof_index> dofs (dofs_per_cell);
+  std::vector<types::global_dof_index> dofs_neighbor (dofs_per_cell);
 
   const UpdateFlags update_flags = update_values
                                    | update_gradients

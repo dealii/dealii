@@ -90,7 +90,7 @@ void test()
       Assert (dof_handler.locally_owned_dofs() == all,
 	      ExcInternalError());
       Assert (dof_handler.n_locally_owned_dofs_per_processor() ==
-	      std::vector<unsigned int> (1,N),
+	      std::vector<types::global_dof_index> (1,N),
 	      ExcInternalError());
       Assert (dof_handler.locally_owned_dofs_per_processor() ==
 	      std::vector<IndexSet>(1,all),

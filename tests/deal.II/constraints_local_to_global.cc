@@ -70,7 +70,7 @@ void test ()
   FullMatrix<double> full (dof.n_dofs(), dof.n_dofs());
 
   FullMatrix<double> local_mat (fe.dofs_per_cell, fe.dofs_per_cell);
-  std::vector<unsigned int> local_dof_indices (fe.dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
 
 				// loop over cells, fill local matrix with
 				// random values, insert both into sparse and

@@ -49,7 +49,7 @@ void test_cell(const FEValuesBase<dim>& fev, const FEValuesBase<dim>& fes)
   std::vector<std::vector<Tensor<1,dim> > >
     ugrad(dim,std::vector<Tensor<1,dim> >(fev.n_quadrature_points));
   
-  std::vector<unsigned int> indices(nv);
+  std::vector<types::global_dof_index> indices(nv);
   for (unsigned int i=0;i<nv;++i)
     indices[i] = i;
   
@@ -105,7 +105,7 @@ void test_boundary(const FEValuesBase<dim>& fev, const FEValuesBase<dim>& fes)
   std::vector<std::vector<double> >
     uval    (dim,std::vector<double>(fev.n_quadrature_points));
   
-  std::vector<unsigned int> indices(nv);
+  std::vector<types::global_dof_index> indices(nv);
   for (unsigned int i=0;i<nv;++i)
     indices[i] = i;
   

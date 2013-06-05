@@ -1,8 +1,8 @@
 //----------------------------  trilinos_sparse_matrix_01.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2004, 2005, 2008 by the deal.II authors
+//    Copyright (C) 2004, 2005, 2008, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -23,7 +23,7 @@
 // and with the option -log_info. All the output should say that no additional
 // malloc calls have been performed
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/compressed_sparsity_pattern.h>
@@ -37,12 +37,12 @@ void test ()
                                    // process has 10 rows, the second one 20,
                                    // the third one 30, and so on
   unsigned int N = 0;
-  std::vector<unsigned int> local_rows_per_process 
+  std::vector<unsigned int> local_rows_per_process
     (Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()));
-  std::vector<unsigned int> start_row 
+  std::vector<unsigned int> start_row
     (Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()));
-  for (unsigned int i=0; 
-       i<Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world()); 
+  for (unsigned int i=0;
+       i<Utilities::Trilinos::get_n_mpi_processes(Utilities::Trilinos::comm_world());
        ++i)
     {
       N += (i+1)*10;
@@ -75,12 +75,14 @@ void test ()
 //           csp.add (start_row[bi] + i,
 //                    start_row[bj] + (i+2*k) % local_rows_per_process[bj]);
 
-  
-  
+
+
                                    // now create a matrix with this sparsity
                                    // pattern
-  Epetra_Map map (-1, local_rows_per_process[Utilities::Trilinos::get_this_mpi_process
-					     (Utilities::Trilinos::comm_world())], 
+  Epetra_Map map (TrilinosWrappers::types::int_type(-1),
+		  TrilinosWrappers::types::int_type
+		  (local_rows_per_process[Utilities::Trilinos::get_this_mpi_process
+					  (Utilities::Trilinos::comm_world())]),
 		  0, Utilities::Trilinos::comm_world());
 
   TrilinosWrappers::SparseMatrix m;
@@ -99,12 +101,12 @@ void test ()
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("parallel_sparse_matrix_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);
-  deallog.threshold_double(1.e-10); 
+  deallog.threshold_double(1.e-10);
 
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
 
@@ -123,10 +125,10 @@ int main (int argc,char **argv)
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"

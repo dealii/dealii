@@ -90,7 +90,7 @@ void test()
     if (myid==0)
       {
 
-	std::vector<unsigned int> local_dof_indices;
+	std::vector<types::global_dof_index> local_dof_indices;
 	typename DoFHandler<dim>::active_cell_iterator
 	  cell, endc = dofh.end();
 

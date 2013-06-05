@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2006, 2010 by the deal.II authors
+//    Copyright (C) 2006, 2010, 2011 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,7 +21,7 @@ for (deal_II_dimension : DIMENSIONS)
 for (deal_II_dimension, structdim : DIMENSIONS)
   {
     template
-    unsigned int
+    types::global_dof_index
     DoFObjects<structdim>::
     get_dof_index (const dealii::DoFHandler<deal_II_dimension> &dof_handler,
 		   const unsigned int       obj_index,
@@ -35,12 +35,12 @@ for (deal_II_dimension, structdim : DIMENSIONS)
 		   const unsigned int       obj_index,
 		   const unsigned int       fe_index,
 		   const unsigned int       local_index,
-		   const unsigned int       global_index);
+		   const types::global_dof_index       global_index);
 
 #if (deal_II_dimension < 3) && (structdim < 3)
 
     template
-    unsigned int
+    types::global_dof_index
     DoFObjects<structdim>::
     get_dof_index (const dealii::DoFHandler<deal_II_dimension,deal_II_dimension+1> &dof_handler,
 		   const unsigned int       obj_index,
@@ -54,14 +54,14 @@ for (deal_II_dimension, structdim : DIMENSIONS)
 		   const unsigned int       obj_index,
 		   const unsigned int       fe_index,
 		   const unsigned int       local_index,
-		   const unsigned int       global_index);
+		   const types::global_dof_index global_index);
 #endif
 
 
 #if (deal_II_dimension == 3) && (structdim < 3)
 
     template
-    unsigned int
+    types::global_dof_index
     DoFObjects<structdim>::
     get_dof_index (const dealii::DoFHandler<1,3> &dof_handler,
 		   const unsigned int       obj_index,
@@ -75,7 +75,7 @@ for (deal_II_dimension, structdim : DIMENSIONS)
 		   const unsigned int       obj_index,
 		   const unsigned int       fe_index,
 		   const unsigned int       local_index,
-		   const unsigned int       global_index);
+		   const types::global_dof_index       global_index);
 #endif
   }
 

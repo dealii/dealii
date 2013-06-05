@@ -41,9 +41,9 @@ namespace PETScWrappers
 
 
 
-    Vector::Vector (const MPI_Comm    &communicator,
-                    const unsigned int n,
-                    const unsigned int local_size)
+    Vector::Vector (const MPI_Comm &communicator,
+                    const size_type n,
+                    const size_type local_size)
       :
       communicator (communicator)
     {
@@ -52,9 +52,9 @@ namespace PETScWrappers
 
 
 
-    Vector::Vector (const MPI_Comm    &communicator,
+    Vector::Vector (const MPI_Comm   &communicator,
                     const VectorBase  &v,
-                    const unsigned int local_size)
+                    const size_type   local_size)
       :
       communicator (communicator)
     {
@@ -89,10 +89,10 @@ namespace PETScWrappers
     }
 
     void
-    Vector::reinit (const MPI_Comm    &comm,
-                    const unsigned int n,
-                    const unsigned int local_sz,
-                    const bool         fast)
+    Vector::reinit (const MPI_Comm  &comm,
+                    const size_type  n,
+                    const size_type  local_sz,
+                    const bool       fast)
     {
       communicator = comm;
 
@@ -194,7 +194,7 @@ namespace PETScWrappers
       AssertThrow (ierr == 0, ExcPETScError(ierr));
 
       // then copy:
-      const std::pair<unsigned int, unsigned int>
+      const std::pair<size_type, size_type>
       local_elements = local_range ();
       std::copy (src_array + local_elements.first,
                  src_array + local_elements.second,
@@ -214,8 +214,8 @@ namespace PETScWrappers
 
 
     void
-    Vector::create_vector (const unsigned int  n,
-                           const unsigned int  local_size)
+    Vector::create_vector (const size_type n,
+                           const size_type local_size)
     {
       Assert (local_size <= n, ExcIndexRange (local_size, 0, n));
       ghosted = false;
@@ -232,18 +232,15 @@ namespace PETScWrappers
 
 
     void
-    Vector::create_vector (const unsigned int  n,
-                           const unsigned int  local_size,
+    Vector::create_vector (const size_type n,
+                           const size_type local_size,
                            const IndexSet &ghostnodes)
     {
       Assert (local_size <= n, ExcIndexRange (local_size, 0, n));
       ghosted = true;
       ghost_indices = ghostnodes;
 
-      //64bit indices won't work yet:
-      Assert (sizeof(unsigned int)==sizeof(PetscInt), ExcInternalError());
-
-      std::vector<unsigned int> ghostindices;
+      std::vector<size_type> ghostindices;
       ghostnodes.fill_index_vector(ghostindices);
 
       const PetscInt *ptr
@@ -272,7 +269,7 @@ namespace PETScWrappers
 
       ierr = VecGetOwnershipRange (vector, &begin, &end);
 
-      Assert(local_size==(unsigned int)(end-begin), ExcInternalError());
+      Assert(local_size==(size_type)(end-begin), ExcInternalError());
 
       Vec l;
       ierr = VecGhostGetLocalForm(vector, &l);

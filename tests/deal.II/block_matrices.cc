@@ -182,8 +182,8 @@ void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityP
     {
       case 2:
       {
-	const unsigned int n_dofs = dof_handler.n_dofs();
-	const unsigned int block_size[2] = { n_dofs/3, n_dofs - n_dofs/3 };
+	const types::global_dof_index n_dofs = dof_handler.n_dofs();
+	const types::global_dof_index block_size[2] = { n_dofs/3, n_dofs - n_dofs/3 };
 	
 	for (unsigned int i=0; i<2; ++i)
 	  for (unsigned int j=0; j<2; ++j)
@@ -196,8 +196,8 @@ void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityP
 
       case 3:
       {
-	const unsigned int n_dofs = dof_handler.n_dofs();
-	const unsigned int block_size[3] = { n_dofs/5, n_dofs/7, n_dofs - n_dofs/5 - n_dofs/7 };
+	const types::global_dof_index n_dofs = dof_handler.n_dofs();
+	const types::global_dof_index block_size[3] = { n_dofs/5, n_dofs/7, n_dofs - n_dofs/5 - n_dofs/7 };
 	
 	for (unsigned int i=0; i<3; ++i)
 	  for (unsigned int j=0; j<3; ++j)
@@ -222,9 +222,9 @@ void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityP
     {
       case 2:
       {
-	const unsigned int n_dofs = dof_handler.n_dofs();
-	const unsigned int block_size_[2] = { n_dofs/3, n_dofs - n_dofs/3 };
-	const std::vector<unsigned int> block_size (&block_size_[0],
+	const types::global_dof_index n_dofs = dof_handler.n_dofs();
+	const types::global_dof_index block_size_[2] = { n_dofs/3, n_dofs - n_dofs/3 };
+	const std::vector<types::global_dof_index> block_size (&block_size_[0],
 					       &block_size_[2]);
 	
 	solution.reinit (block_size);
@@ -235,9 +235,9 @@ void LaplaceProblem<BlockVector<double>,BlockSparseMatrix<double>,BlockSparsityP
        
       case 3:
       {
-	const unsigned int n_dofs = dof_handler.n_dofs();
-	const unsigned int block_size_[3] = { n_dofs/5, n_dofs/7, n_dofs - n_dofs/5 - n_dofs/7 };
-	const std::vector<unsigned int> block_size (&block_size_[0],
+	const types::global_dof_index n_dofs = dof_handler.n_dofs();
+	const types::global_dof_index block_size_[3] = { n_dofs/5, n_dofs/7, n_dofs - n_dofs/5 - n_dofs/7 };
+	const std::vector<types::global_dof_index> block_size (&block_size_[0],
 					       &block_size_[3]);
 	
 	solution.reinit (block_size);
@@ -268,7 +268,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::assemble_system ()
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   ::Vector<double>     cell_rhs (dofs_per_cell);
 
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
   DoFHandler<2>::active_cell_iterator cell = dof_handler.begin_active(),
 				      endc = dof_handler.end();
@@ -305,7 +305,7 @@ void LaplaceProblem<Vector,Matrix,Sparsity>::assemble_system ()
     };
 
 
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<2>(),

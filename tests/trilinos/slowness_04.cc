@@ -1,8 +1,8 @@
 //----------------------------  trilinos_slowness_03.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -25,7 +25,7 @@
 // matrix in a consecutive fashion, but rather according to the order of
 // degrees of freedom in the sequence of cells that we traverse
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
@@ -52,23 +52,24 @@ void test ()
                                          // unused indices
         const unsigned int k = rand() % (N-i);
         permutation[i] = unused_indices[k];
-        
+
                                          // then swap this used element to the
                                          // end where we won't consider it any
                                          // more
         std::swap (unused_indices[k], unused_indices[N-i-1]);
-      }    
+      }
   }
-  
-                                   // build the sparse matrix 
-  Epetra_Map map (static_cast<int>(N*N), 0, Utilities::Trilinos::comm_world());
+
+                                   // build the sparse matrix
+  Epetra_Map map (TrilinosWrappers::types::int_type(N*N), 0,
+		  Utilities::Trilinos::comm_world());
   TrilinosWrappers::SparseMatrix matrix (map, 5);
   for(unsigned int i_=0; i_<N; i_++)
     for(unsigned int j_=0; j_<N; j_++)
       {
         const unsigned int i=permutation[i_];
         const unsigned int j=permutation[j_];
-        
+
         const unsigned int global = i*N+j;
         matrix.set(global, global, rand());
         if (j>0)
@@ -93,7 +94,7 @@ void test ()
           }
       }
   matrix.compress (VectorOperation::insert);
-  
+
                                    // then do a single matrix-vector
                                    // multiplication with subsequent formation
                                    // of the matrix norm
@@ -102,13 +103,13 @@ void test ()
   for (unsigned int i=0; i<N*N; ++i)
     v1(i) = i;
   matrix.vmult (v2, v1);
-  
+
   deallog << v1*v2 << std::endl;
 }
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("slowness_04/output");
   deallog.attach(logfile);
@@ -132,10 +133,10 @@ int main (int argc,char **argv)
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"

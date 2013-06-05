@@ -25,6 +25,27 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace TrilinosWrappers
 {
+  namespace
+  {
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    // define a helper function that queries the global vector length of an
+    // Epetra_FEVector object  by calling either the 32- or 64-bit 
+    // function necessary.
+    int global_length(const Epetra_FEVector &vector)
+    {
+      return vector.GlobalLength();
+    }
+#else
+    // define a helper function that queries the global vector length of an
+    // Epetra_FEVector object  by calling either the 32- or 64-bit 
+    // function necessary.
+    long long int global_length(const Epetra_FEVector &vector)
+    {
+      return vector.GlobalLength64();
+    }
+#endif
+  }
+
   namespace internal
   {
     VectorReference::operator TrilinosScalar () const
@@ -40,7 +61,8 @@ namespace TrilinosWrappers
       // we can use []. Note that we
       // can only get local values.
 
-      const int local_index = vector.vector->Map().LID(static_cast<int>(index));
+      const TrilinosWrappers::types::int_type local_index = 
+        vector.vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
       Assert (local_index >= 0,
               ExcAccessToNonLocalElement (index,
                                           vector.vector->Map().MinMyGID(),
@@ -152,9 +174,9 @@ namespace TrilinosWrappers
     //
     // let's hope this isn't a
     // particularly frequent operation
-    std::pair<unsigned int, unsigned int>
+    std::pair<size_type, size_type>
     local_range = this->local_range ();
-    for (unsigned int i=local_range.first; i<local_range.second; ++i)
+    for (size_type i=local_range.first; i<local_range.second; ++i)
       (*vector)[0][i-local_range.first] = v(i);
 
     return *this;
@@ -163,11 +185,12 @@ namespace TrilinosWrappers
 
 
   TrilinosScalar
-  VectorBase::el (const unsigned int index) const
+  VectorBase::el (const size_type index) const
   {
     // Extract local indices in
     // the vector.
-    int trilinos_i = vector->Map().LID(static_cast<int>(index));
+    TrilinosWrappers::types::int_type trilinos_i = 
+      vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
     TrilinosScalar value = 0.;
 
     // If the element is not
@@ -191,11 +214,12 @@ namespace TrilinosWrappers
 
 
   TrilinosScalar
-  VectorBase::operator () (const unsigned int index) const
+  VectorBase::operator () (const size_type index) const
   {
     // Extract local indices in
     // the vector.
-    int trilinos_i = vector->Map().LID(static_cast<int>(index));
+    TrilinosWrappers::types::int_type trilinos_i = 
+      vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
     TrilinosScalar value = 0.;
 
     // If the element is not present
@@ -246,7 +270,7 @@ namespace TrilinosWrappers
     if (local_size() != v.local_size())
       return false;
 
-    unsigned int i;
+    size_type i;
     for (i=0; i<local_size(); i++)
       if ((*(v.vector))[0][i]!=(*vector)[0][i]) return false;
 
@@ -347,9 +371,9 @@ namespace TrilinosWrappers
   void
   VectorBase::print (const char *format) const
   {
-    Assert (vector->GlobalLength()!=0, ExcEmptyObject());
+    Assert (global_length(*vector)!=0, ExcEmptyObject());
 
-    for (unsigned int j=0; j<size(); ++j)
+    for (size_type j=0; j<size(); ++j)
       {
         double t = (*vector)[0][j];
 
@@ -389,10 +413,10 @@ namespace TrilinosWrappers
       out.setf (std::ios::fixed, std::ios::floatfield);
 
     if (across)
-      for (unsigned int i=0; i<size(); ++i)
+      for (size_type i=0; i<size(); ++i)
         out << static_cast<double>(val[i]) << ' ';
     else
-      for (unsigned int i=0; i<size(); ++i)
+      for (size_type i=0; i<size(); ++i)
         out << static_cast<double>(val[i]) << std::endl;
     out << std::endl;
 
@@ -422,7 +446,8 @@ namespace TrilinosWrappers
     //one index and the value per local
     //entry.
     return sizeof(*this)
-           + this->local_size()*( sizeof(double)+sizeof(int) );
+           + this->local_size()*( sizeof(double)+
+               sizeof(TrilinosWrappers::types::int_type) );
   }
 
 } /* end of namespace TrilinosWrappers */
