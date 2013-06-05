@@ -402,6 +402,11 @@ namespace TrilinosWrappers
   BlockSparseMatrix::reinit (const std::vector<Epetra_Map> &,
                              const dealii::BlockCompressedSimpleSparsityPattern &);
 
+  template void
+  BlockSparseMatrix::reinit (const std::vector<IndexSet> &,
+                             const dealii::BlockCompressedSimpleSparsityPattern &,
+                             const MPI_Comm &);
+
 }
 
 
