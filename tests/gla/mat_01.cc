@@ -84,39 +84,17 @@ void test ()
 
 int main (int argc, char **argv)
 {
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
-  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
-
-  deallog.push(Utilities::int_to_string(myid));
-
-  if (myid == 0)
-    {
-      std::ofstream logfile(output_file_for_mpi("mat_01").c_str());
-      deallog.attach(logfile);
-      deallog << std::setprecision(4);
-      deallog.depth_console(0);
-      deallog.threshold_double(1.e-10);
-
-      {	
-	deallog.push("PETSc");
-	test<LA_PETSc>();
-	deallog.pop();	
-	deallog.push("Trilinos");
-	test<LA_Trilinos>();
-	deallog.pop();	
-      }
-      
-    }
-  else
-      {	
-	deallog.push("PETSc");
-	test<LA_PETSc>();
-	deallog.pop();	
-	deallog.push("Trilinos");
-	test<LA_Trilinos>();
-	deallog.pop();	
-      }
-
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll log(__FILE__);
+  {	
+    deallog.push("PETSc");
+    test<LA_PETSc>();
+    deallog.pop();	
+    deallog.push("Trilinos");
+    test<LA_Trilinos>();
+    deallog.pop();	
+  }
+  
   // compile, don't run
   //if (myid==9999)
     //  test<LA_Dummy>();
