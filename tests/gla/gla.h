@@ -9,6 +9,7 @@ class LA_PETSc
       public:
 	typedef LinearAlgebraPETSc::MPI::Vector Vector;
 	typedef LinearAlgebraPETSc::MPI::SparseMatrix SparseMatrix;
+	typedef LinearAlgebraPETSc::MPI::BlockSparseMatrix BlockSparseMatrix;
     };
 };
 
@@ -20,6 +21,7 @@ class LA_Trilinos
       public:
 	typedef LinearAlgebraTrilinos::MPI::Vector Vector;
 	typedef LinearAlgebraTrilinos::MPI::SparseMatrix SparseMatrix;
+	typedef LinearAlgebraTrilinos::MPI::BlockSparseMatrix BlockSparseMatrix;
     };
 };
 
