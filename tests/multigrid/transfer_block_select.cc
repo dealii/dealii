@@ -44,7 +44,7 @@ reinit_vector_by_blocks (
   const dealii::MGDoFHandler<dim,spacedim> &mg_dof,
   MGLevelObject<dealii::Vector<number> > &v,
   const unsigned int selected_block,
-  std::vector<std::vector<unsigned int> >& ndofs)
+  std::vector<std::vector<types::global_dof_index> >& ndofs)
 {
   const unsigned int n_blocks = mg_dof.get_fe().n_blocks();
   Assert(selected_block < n_blocks, ExcIndexRange(selected_block, 0, n_blocks));
@@ -54,9 +54,9 @@ reinit_vector_by_blocks (
 
   if (ndofs.size() == 0)
     {
-      std::vector<std::vector<unsigned int> >
+      std::vector<std::vector<types::global_dof_index> >
 	new_dofs(mg_dof.get_tria().n_levels(),
-		 std::vector<unsigned int>(selected.size()));
+		 std::vector<types::global_dof_index>(selected.size()));
       std::swap(ndofs, new_dofs);
       MGTools::count_dofs_per_block (mg_dof, ndofs);
     }
@@ -83,13 +83,13 @@ void check_select(const FiniteElement<dim>& fe, unsigned int selected)
   DoFHandler<dim>& dof=mgdof;
   mgdof.distribute_dofs(fe);
   DoFRenumbering::component_wise(mgdof);
-  vector<unsigned int> ndofs(fe.n_blocks());
+  vector<types::global_dof_index> ndofs(fe.n_blocks());
   DoFTools::count_dofs_per_block(mgdof, ndofs);
 
   for (unsigned int l=0;l<tr.n_levels();++l)
     DoFRenumbering::component_wise(mgdof, l);
-  std::vector<std::vector<unsigned int> > mg_ndofs(mgdof.get_tria().n_levels(),
-						   std::vector<unsigned int>(fe.n_blocks()));
+  std::vector<std::vector<types::global_dof_index> > mg_ndofs(mgdof.get_tria().n_levels(),
+						   std::vector<types::global_dof_index>(fe.n_blocks()));
   MGTools::count_dofs_per_block(mgdof, mg_ndofs);
 
   deallog << "Global  dofs:";

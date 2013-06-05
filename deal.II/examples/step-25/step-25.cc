@@ -413,7 +413,7 @@ namespace Step25
     const unsigned int n_q_points    = quadrature_formula.size();
 
     Vector<double> local_nl_term (dofs_per_cell);
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     std::vector<double> old_data_values (n_q_points);
     std::vector<double> new_data_values (n_q_points);
 
@@ -475,7 +475,7 @@ namespace Step25
     const unsigned int n_q_points    = quadrature_formula.size();
 
     FullMatrix<double> local_nl_matrix (dofs_per_cell, dofs_per_cell);
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     std::vector<double> old_data_values (n_q_points);
     std::vector<double> new_data_values (n_q_points);
 

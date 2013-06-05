@@ -109,7 +109,7 @@ void TestPointValueHistory<dim>::run()
         QGauss<dim> quadrature_formula(2);
         FEValues<dim> fe_values(finite_element, quadrature_formula, update_values | update_quadrature_points); // just need local_dof_indices and quadrature_points
 
-        std::vector<unsigned int> local_dof_indices(finite_element.dofs_per_cell);
+        std::vector<types::global_dof_index> local_dof_indices(finite_element.dofs_per_cell);
         std::vector<Point<dim> > dof_locations(finite_element.dofs_per_cell);
         Vector<double> cell_pole(finite_element.dofs_per_cell);
 

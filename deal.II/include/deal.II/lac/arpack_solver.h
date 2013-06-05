@@ -78,6 +78,12 @@ class ArpackSolver : public Subscriptor
 {
 public:
   /**
+   * Declare the type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+
+  /**
    * An enum that lists the possible
    * choices for which eigenvalues to
    * compute in the solve() function.
@@ -373,7 +379,7 @@ void ArpackSolver::solve (
               tmp.reinit(src);
 
 
-              for (unsigned int i=0; i<src.size(); ++i)
+              for (size_type i=0; i<src.size(); ++i)
                 src(i) = *(workd+ipntr[0]-1+i);
 
               // multiplication with mass matrix M
@@ -381,7 +387,7 @@ void ArpackSolver::solve (
               // solving linear system
               inverse.vmult(dst,tmp);
 
-              for (unsigned int i=0; i<dst.size(); ++i)
+              for (size_type i=0; i<dst.size(); ++i)
                 *(workd+ipntr[1]-1+i) = dst(i);
             }
             break;
@@ -395,7 +401,7 @@ void ArpackSolver::solve (
               tmp.reinit(src);
               tmp2.reinit(src);
 
-              for (unsigned int i=0; i<src.size(); ++i)
+              for (size_type i=0; i<src.size(); ++i)
                 {
                   src(i) = *(workd+ipntr[2]-1+i);
                   tmp(i) = *(workd+ipntr[0]-1+i);
@@ -403,7 +409,7 @@ void ArpackSolver::solve (
               // solving linear system
               inverse.vmult(dst,src);
 
-              for (unsigned int i=0; i<dst.size(); ++i)
+              for (size_type i=0; i<dst.size(); ++i)
                 *(workd+ipntr[1]-1+i) = dst(i);
             }
             break;
@@ -415,13 +421,13 @@ void ArpackSolver::solve (
               src.reinit(eigenvectors[0]);
               dst.reinit(src);
 
-              for (unsigned int i=0; i<src.size(); ++i)
+              for (size_type i=0; i<src.size(); ++i)
                 src(i) = *(workd+ipntr[0]-1+i);
 
               // Multiplication with mass matrix M
               mass_matrix.vmult(dst, src);
 
-              for (unsigned int i=0; i<dst.size(); ++i)
+              for (size_type i=0; i<dst.size(); ++i)
                 *(workd+ipntr[1]-1+i) = dst(i);
 
             }
@@ -488,7 +494,7 @@ void ArpackSolver::solve (
           Assert (false, ExcArpackInfodneupd(info));
         }
 
-      for (unsigned int i=0; i<eigenvectors.size(); ++i)
+      for (size_type i=0; i<eigenvectors.size(); ++i)
         for (unsigned int j=0; j<n; ++j)
           eigenvectors[i](j) = v[i*n+j];
 
@@ -497,7 +503,7 @@ void ArpackSolver::solve (
       AssertDimension (eigenvalues.size(), eigenvalues_real.size());
       AssertDimension (eigenvalues.size(), eigenvalues_im.size());
 
-      for (unsigned int i=0; i<eigenvalues.size(); ++i)
+      for (size_type i=0; i<eigenvalues.size(); ++i)
 	eigenvalues[i] = std::complex<double> (eigenvalues_real[i],
 					       eigenvalues_im[i]);
     }

@@ -41,8 +41,8 @@ namespace PETScWrappers
 
   void
   BlockSparseMatrix::
-  reinit (const unsigned int n_block_rows,
-          const unsigned int n_block_columns)
+  reinit (const size_type n_block_rows,
+          const size_type n_block_columns)
   {
     // first delete previous content of
     // the subobjects array
@@ -57,8 +57,8 @@ namespace PETScWrappers
     this->column_block_indices.reinit (n_block_columns, 0);
 
     // and reinitialize the blocks
-    for (unsigned int r=0; r<this->n_block_rows(); ++r)
-      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+    for (size_type r=0; r<this->n_block_rows(); ++r)
+      for (size_type c=0; c<this->n_block_cols(); ++c)
         {
           BlockType *p = new BlockType();
           this->sub_objects[r][c] = p;

@@ -196,7 +196,7 @@ void MinimizationProblem<dim>::assemble_step ()
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
   std::vector<double>         local_solution_values (n_q_points);
   std::vector<Tensor<1,dim> > local_solution_grads (n_q_points);
@@ -266,7 +266,7 @@ void MinimizationProblem<dim>::assemble_step ()
   hanging_node_constraints.condense (matrix);
   hanging_node_constraints.condense (residual);
 
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ZeroFunction<dim>(),

@@ -66,7 +66,7 @@ void test()
   // owned range by 50 on each side
   IndexSet locally_relevant_range (vec.size());
   locally_relevant_range.add_range (std::max<int> (100*myid-50, 0),
-				    std::min (100*myid+150, vec.size()));
+				    std::min (static_cast<types::global_dof_index>(100*myid+150), vec.size()));
   ConstraintMatrix cm (locally_relevant_range);
 
   // add constraints that constrain an element in the middle of the

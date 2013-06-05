@@ -176,7 +176,7 @@ void test()
   vector.reinit (dofh.locally_owned_dofs(), MPI_COMM_WORLD);
   {
     const unsigned int dofs_per_cell = fe.dofs_per_cell;
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     Vector<double> local_vector (dofs_per_cell);
     for (unsigned int i=0; i<dofs_per_cell; ++i)
       local_vector(i) = 1.;

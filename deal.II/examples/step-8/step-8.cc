@@ -380,7 +380,7 @@ namespace Step8
     FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       cell_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     // As was shown in previous examples as well, we need a place where to
     // store the values of the coefficients at all the quadrature points on a
@@ -548,7 +548,7 @@ namespace Step8
     // object would represent a scalar function. Since the solution vector has
     // <code>dim</code> components, we need to pass <code>dim</code> as number
     // of components to the zero function as well.
-    std::map<unsigned int,double> boundary_values;
+    std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
                                               ZeroFunction<dim>(dim),

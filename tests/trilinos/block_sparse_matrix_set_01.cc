@@ -83,8 +83,8 @@ void test ()
 	  full_matrix(block_row*2+1,block_col*2) = -1.;
 	}
 
-    std::vector<unsigned int> local_row_indices (2*m.n_block_rows());
-    std::vector<unsigned int> local_col_indices (2*m.n_block_cols());
+    std::vector<types::global_dof_index> local_row_indices (2*m.n_block_rows());
+    std::vector<types::global_dof_index> local_col_indices (2*m.n_block_cols());
 
     for (unsigned int i=0; i<block_size-1; ++i)
       {

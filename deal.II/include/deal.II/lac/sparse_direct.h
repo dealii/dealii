@@ -30,8 +30,6 @@
 
 DEAL_II_NAMESPACE_OPEN
 
-
-
 /**
  * This class provides an interface to the sparse direct solver
  * UMFPACK (see <a
@@ -80,6 +78,11 @@ DEAL_II_NAMESPACE_OPEN
 class SparseDirectUMFPACK : public Subscriptor
 {
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
   /**
    * Dummy class needed for the usual initalization interface of
    * preconditioners.
@@ -324,12 +327,12 @@ private:
   DMUMPS_STRUC_C id;
 #endif // DEAL_II_WITH_MUMPS
 
-  double       *a;
-  double       *rhs;
-  int          *irn;
-  int          *jcn;
-  unsigned int  n;
-  unsigned int  nz;
+  double   *a;
+  double   *rhs;
+  int      *irn;
+  int      *jcn;
+  types::global_dof_index n;
+  types::global_dof_index nz;
 
   /**
    * This function initializes a MUMPS instance and hands over the system's
@@ -350,6 +353,10 @@ private:
   bool initialize_called;
 
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
 
   /**
    * Constructor

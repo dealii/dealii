@@ -69,7 +69,7 @@ void initialize (const MGDoFHandler<dim> &dof,
     Vector<double> &u)
 {
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-  std::vector<unsigned int> dof_indices(dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
   for (typename MGDoFHandler<dim>::active_cell_iterator
       cell = dof.begin_active();
       cell != dof.end(); ++cell)
@@ -90,7 +90,7 @@ void initialize (const MGDoFHandler<dim> &dof,
 {
   unsigned int counter=0;
   const unsigned int dofs_per_cell = dof.get_fe().dofs_per_cell;
-  std::vector<unsigned int> dof_indices(dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices(dofs_per_cell);
   typename MGDoFHandler<dim>::cell_iterator
       cell = dof.begin(0);
     cell->get_mg_dof_indices(dof_indices);
@@ -179,7 +179,7 @@ class LaplaceProblem
     MGDoFHandler<dim>    mg_dof_handler_renumbered;
 
     const unsigned int degree;
-    std::vector<std::set<unsigned int> >
+    std::vector<std::set<types::global_dof_index> >
       boundary_indices_renumbered;
 
 };
@@ -273,7 +273,7 @@ void LaplaceProblem<dim>::test_boundary ()
     u[l].reinit(mg_dof_handler_renumbered.n_dofs(l));
     u[l] = 1.;
 
-    for(std::set<unsigned int>::const_iterator i = boundary_indices_renumbered[l].begin();
+    for(std::set<types::global_dof_index>::const_iterator i = boundary_indices_renumbered[l].begin();
       i!=boundary_indices_renumbered[l].end(); ++i)
     {
       u[l](*i) = 0;

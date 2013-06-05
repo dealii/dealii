@@ -542,7 +542,7 @@ namespace Step23
           BoundaryValuesU<dim> boundary_values_u_function;
           boundary_values_u_function.set_time (time);
 
-          std::map<unsigned int,double> boundary_values;
+          std::map<types::global_dof_index,double> boundary_values;
           VectorTools::interpolate_boundary_values (dof_handler,
                                                     0,
                                                     boundary_values_u_function,
@@ -588,7 +588,7 @@ namespace Step23
           BoundaryValuesV<dim> boundary_values_v_function;
           boundary_values_v_function.set_time (time);
 
-          std::map<unsigned int,double> boundary_values;
+          std::map<types::global_dof_index,double> boundary_values;
           VectorTools::interpolate_boundary_values (dof_handler,
                                                     0,
                                                     boundary_values_v_function,

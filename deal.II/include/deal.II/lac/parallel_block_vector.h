@@ -86,8 +86,8 @@ namespace parallel
        *  Confer the other constructor further down if you intend to use
        *  blocks of different sizes.
        */
-      explicit BlockVector (const unsigned int num_blocks = 0,
-                            const unsigned int block_size = 0);
+      explicit BlockVector (const size_type num_blocks = 0,
+                            const size_type block_size = 0);
 
       /**
        * Copy-Constructor. Dimension set to that of V, all components are
@@ -118,7 +118,7 @@ namespace parallel
        * Constructor. Set the number of blocks to <tt>block_sizes.size()</tt>
        * and initialize each block with <tt>block_sizes[i]</tt> zero elements.
        */
-      BlockVector (const std::vector<unsigned int> &block_sizes);
+      BlockVector (const std::vector<size_type> &block_sizes);
 
       /**
        * Destructor. Clears memory.
@@ -164,8 +164,8 @@ namespace parallel
        *
        * If <tt>fast==false</tt>, the vector is filled with zeros.
        */
-      void reinit (const unsigned int num_blocks,
-                   const unsigned int block_size = 0,
+      void reinit (const size_type num_blocks,
+                   const size_type block_size = 0,
                    const bool fast = false);
 
       /**
@@ -186,8 +186,8 @@ namespace parallel
        * actions on this object may yield unpredictable results since they may
        * be routed to the wrong block.
        */
-      void reinit (const std::vector<unsigned int> &N,
-                   const bool                       fast=false);
+      void reinit (const std::vector<size_type> &N,
+                   const bool                    fast=false);
 
       /**
        * Change the dimension to that of the vector <tt>V</tt>. The same
@@ -335,8 +335,8 @@ namespace parallel
 
     template <typename Number>
     inline
-    BlockVector<Number>::BlockVector (const unsigned int n_blocks,
-                                      const unsigned int block_size)
+    BlockVector<Number>::BlockVector (const size_type n_blocks,
+                                      const size_type block_size)
     {
       reinit (n_blocks, block_size);
     }
@@ -345,7 +345,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    BlockVector<Number>::BlockVector (const std::vector<unsigned int> &n)
+    BlockVector<Number>::BlockVector (const std::vector<size_type> &n)
     {
       reinit (n, false);
     }
@@ -361,7 +361,7 @@ namespace parallel
       this->components.resize (v.n_blocks());
       this->block_indices = v.block_indices;
 
-      for (unsigned int i=0; i<this->n_blocks(); ++i)
+      for (size_type i=0; i<this->n_blocks(); ++i)
         this->components[i] = v.components[i];
     }
 
@@ -383,25 +383,25 @@ namespace parallel
 
     template <typename Number>
     inline
-    void BlockVector<Number>::reinit (const unsigned int n_bl,
-                                      const unsigned int bl_sz,
+    void BlockVector<Number>::reinit (const size_type n_bl,
+                                      const size_type bl_sz,
                                       const bool         fast)
     {
-      std::vector<unsigned int> n(n_bl, bl_sz);
+      std::vector<size_type> n(n_bl, bl_sz);
       reinit(n, fast);
     }
 
 
     template <typename Number>
     inline
-    void BlockVector<Number>::reinit (const std::vector<unsigned int> &n,
-                                      const bool                       fast)
+    void BlockVector<Number>::reinit (const std::vector<size_type> &n,
+                                      const bool                    fast)
     {
       this->block_indices.reinit (n);
       if (this->components.size() != this->n_blocks())
         this->components.resize(this->n_blocks());
 
-      for (unsigned int i=0; i<this->n_blocks(); ++i)
+      for (size_type i=0; i<this->n_blocks(); ++i)
         this->components[i].reinit(n[i], fast);
     }
 
@@ -702,7 +702,7 @@ namespace parallel
       Assert (this->n_blocks() == v.n_blocks(),
               ExcDimensionMismatch(this->n_blocks(), v.n_blocks()));
 
-      for (unsigned int i=0; i<this->n_blocks(); ++i)
+      for (size_type i=0; i<this->n_blocks(); ++i)
         dealii::swap (this->components[i], v.components[i]);
       dealii::swap (this->block_indices, v.block_indices);
     }
@@ -715,7 +715,7 @@ namespace parallel
 
       Assert (numbers::is_finite(factor), ExcNumberNotFinite());
 
-      for (unsigned int i=0; i<this->n_blocks(); ++i)
+      for (size_type i=0; i<this->n_blocks(); ++i)
         this->components[i].scale(factor);
     }
 

@@ -256,7 +256,7 @@ CHECK_CXX_SOURCE_COMPILES(
     explicit X(T) {}
   };
   void f(X) {}
-  int main() { f(1) };
+  int main() { f(1); }
   "
   DEAL_II_EXPLICIT_CONSTRUCTOR_BUG
   )

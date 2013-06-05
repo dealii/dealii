@@ -605,7 +605,7 @@ namespace GridTools
 
   template <int dim>
   void
-  laplace_transform (const std::map<unsigned int,Point<dim> > &new_points,
+  laplace_transform (const std::map<types::global_dof_index,Point<dim> > &new_points,
                      Triangulation<dim> &triangulation)
   {
     //TODO: Move implementation of this function into the current
@@ -1245,7 +1245,6 @@ next_cell:
 
     // finally loop over all cells and set the
     // subdomain ids
-    std::vector<unsigned int> dof_indices(1);
     unsigned int index = 0;
     for (typename Triangulation<dim,spacedim>::active_cell_iterator
          cell = triangulation.begin_active();

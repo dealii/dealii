@@ -129,7 +129,7 @@ void FindBug<dim>::make_grid_and_dofs ()
 template <int dim>
 void FindBug<dim>::dirichlet_conditions ()
 {
-  std::map<unsigned int,double> dirichlet_dofs;
+  std::map<types::global_dof_index,double> dirichlet_dofs;
   std::vector<bool> component_mask(dim+1, false);
   component_mask[dim] = true;
 

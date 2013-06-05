@@ -22,22 +22,22 @@ for (S : REAL_SCALARS)
       std::ostream&, const unsigned int, const unsigned int) const;    
 
     template void FullMatrix<S>::copy_from<1>(
-      const Tensor<2,1>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+      const Tensor<2,1>&, const size_type, const size_type, const size_type, const size_type, const size_type, const size_type);
 
     template void FullMatrix<S>::copy_from<2>(
-      const Tensor<2,2>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+      const Tensor<2,2>&, const size_type, const size_type, const size_type, const size_type, const size_type, const size_type);
 
     template void FullMatrix<S>::copy_from<3>(
-      const Tensor<2,3>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned);
+      const Tensor<2,3>&, const size_type, const size_type, const size_type, const size_type, const size_type, const size_type);
 
     template void FullMatrix<S>::copy_to<1>(
-      Tensor<2,1>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned) const;
+      Tensor<2,1>&, const size_type, const size_type, const size_type, const size_type, const size_type, const size_type) const;
 
     template void FullMatrix<S>::copy_to<2>(
-      Tensor<2,2>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned) const;
+      Tensor<2,2>&, const size_type, const size_type, const size_type, const size_type, const size_type, const size_type) const;
 
     template void FullMatrix<S>::copy_to<3>(
-      Tensor<2,3>&, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned, const unsigned) const;
+      Tensor<2,3>&, const size_type, const size_type, const size_type, const size_type, const size_type, const size_type) const;
   }
 
 for (S1, S2 : REAL_SCALARS)
@@ -47,7 +47,7 @@ for (S1, S2 : REAL_SCALARS)
 
     template
       void FullMatrix<S1>::fill<S2> (
-	const FullMatrix<S2>&, unsigned, unsigned, unsigned, unsigned);
+	const FullMatrix<S2>&, types::global_dof_index, types::global_dof_index, types::global_dof_index, types::global_dof_index);
     template
       void FullMatrix<S1>::add<S2> (const S1, const FullMatrix<S2>&);
     template
@@ -59,12 +59,12 @@ for (S1, S2 : REAL_SCALARS)
 				    const S1, const FullMatrix<S2>&);
     template
       void FullMatrix<S1>::add<S2> (
-	const FullMatrix<S2>&, S1, unsigned, unsigned,unsigned, unsigned);
+	const FullMatrix<S2>&, S1, types::global_dof_index, types::global_dof_index, types::global_dof_index, types::global_dof_index);
     template
       void FullMatrix<S1>::Tadd<S2> (const S1, const FullMatrix<S2>&);
     template
       void FullMatrix<S1>::Tadd<S2> (
-	const FullMatrix<S2>&, S1, unsigned, unsigned, unsigned, unsigned);
+	const FullMatrix<S2>&, S1, types::global_dof_index, types::global_dof_index, types::global_dof_index, types::global_dof_index);
     template
       void FullMatrix<S1>::equ<S2> (const S1, const FullMatrix<S2>&);
     template
@@ -93,8 +93,8 @@ for (S1, S2 : REAL_SCALARS)
     template
       void FullMatrix<S1>::fill_permutation<S2> (
 	const FullMatrix<S2>&,
-	const std::vector<unsigned int>&,
-	const std::vector<unsigned int>&);
+	const std::vector<size_type>&,
+	const std::vector<size_type>&);
     template
       void FullMatrix<S1>::vmult<S2>(
       Vector<S2>&, const Vector<S2>&, bool) const;
@@ -155,7 +155,7 @@ for (S1, S2 : COMPLEX_SCALARS)
   {
     template
       void FullMatrix<S1>::fill<S2> (
-	const FullMatrix<S2>&, unsigned, unsigned, unsigned, unsigned);
+	const FullMatrix<S2>&, types::global_dof_index, types::global_dof_index, types::global_dof_index, types::global_dof_index);
     template
       void FullMatrix<S1>::add<S2> (const S1, const FullMatrix<S2>&);
     template
@@ -167,12 +167,13 @@ for (S1, S2 : COMPLEX_SCALARS)
 				    const S1, const FullMatrix<S2>&);
     template
       void FullMatrix<S1>::add<S2> (
-	const FullMatrix<S2>&, S1, unsigned, unsigned,unsigned, unsigned);
+	const FullMatrix<S2>&, S1, types::global_dof_index, types::global_dof_index, types::global_dof_index, types::global_dof_index);
     template
       void FullMatrix<S1>::Tadd<S2> (const S1, const FullMatrix<S2>&);
     template
       void FullMatrix<S1>::Tadd<S2> (
-	const FullMatrix<S2>&, S1, unsigned, unsigned, unsigned, unsigned);
+	const FullMatrix<S2>&, S1, types::global_dof_index, types::global_dof_index,
+  types::global_dof_index, types::global_dof_index);
     template
       void FullMatrix<S1>::equ<S2> (const S1, const FullMatrix<S2>&);
     template
@@ -197,8 +198,8 @@ for (S1, S2 : COMPLEX_SCALARS)
     template
       void FullMatrix<S1>::fill_permutation<S2> (
 	const FullMatrix<S2>&,
-	const std::vector<unsigned int>&,
-	const std::vector<unsigned int>&);
+	const std::vector<size_type>&,
+	const std::vector<size_type>&);
     template
       void FullMatrix<S1>::vmult<S2>(
       Vector<S2>&, const Vector<S2>&, bool) const;

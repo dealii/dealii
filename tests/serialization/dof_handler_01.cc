@@ -87,8 +87,8 @@ namespace dealii
 					 // compare dofs on this cell and then on the faces
 	if (c1->has_children() == false)
 	  {
-	    std::vector<unsigned int> local_dofs_1 (c1->get_fe().dofs_per_cell);
-	    std::vector<unsigned int> local_dofs_2 (c2->get_fe().dofs_per_cell);
+	    std::vector<types::global_dof_index> local_dofs_1 (c1->get_fe().dofs_per_cell);
+	    std::vector<types::global_dof_index> local_dofs_2 (c2->get_fe().dofs_per_cell);
 
 	    c1->get_dof_indices (local_dofs_1);
 	    c2->get_dof_indices (local_dofs_2);
@@ -97,8 +97,8 @@ namespace dealii
 
 	    for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 	      {
-		std::vector<unsigned int> local_dofs_1 (c1->get_fe().dofs_per_face);
-		std::vector<unsigned int> local_dofs_2 (c2->get_fe().dofs_per_face);
+		std::vector<types::global_dof_index> local_dofs_1 (c1->get_fe().dofs_per_face);
+		std::vector<types::global_dof_index> local_dofs_2 (c2->get_fe().dofs_per_face);
 
 		c1->face(f)->get_dof_indices (local_dofs_1);
 		c2->face(f)->get_dof_indices (local_dofs_2);

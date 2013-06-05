@@ -246,7 +246,7 @@ private:
   /**
    * Sizes of the multi-level vectors.
    */
-  std::vector<unsigned int> sizes;
+  std::vector<types::global_dof_index> sizes;
 
   /**
    * Sparsity patterns for transfer matrices.
@@ -268,7 +268,7 @@ private:
    * element of these vectors contains first the global index, then
    * the level index.
    */
-  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
   copy_indices;
 
   /**
@@ -278,7 +278,7 @@ private:
    *
    * Organization of the data is like for #copy_indices_mine.
    */
-  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
   copy_indices_to_me;
 
   /**
@@ -288,7 +288,7 @@ private:
    *
    * Organization of the data is like for #copy_indices_mine.
    */
-  std::vector<std::vector<std::pair<unsigned int, unsigned int> > >
+  std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
   copy_indices_from_me;
   
 

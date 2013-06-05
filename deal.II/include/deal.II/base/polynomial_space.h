@@ -44,7 +44,7 @@ DEAL_II_NAMESPACE_OPEN
  * set_numbering() function.
  *
  * The standard ordering of polynomials is that indices for the first
- * space dimension vasry fastest and the last space dimension is
+ * space dimension vary fastest and the last space dimension is
  * slowest. In particular, if we take for simplicity the vector of
  * monomials <i>x<sup>0</sup>, x<sup>1</sup>, x<sup>2</sup>,...,
  * x<sup>n</sup></i>, we get

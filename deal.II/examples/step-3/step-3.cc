@@ -334,7 +334,7 @@ void Step3::assemble_system ()
   // global matrix, we have to know the global numbers of the degrees of
   // freedom. When we query them, we need a scratch (temporary) array for
   // these numbers:
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
   // Now for the loop over all cells. We have seen before how this works, so
   // this should be familiar including the conventional names for these
@@ -458,7 +458,7 @@ void Step3::assemble_system ()
   // their boundary values (which are zero here for all entries). This mapping
   // of DoF numbers to boundary values is done by the <code>std::map</code>
   // class.
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
                                             ZeroFunction<2>(),

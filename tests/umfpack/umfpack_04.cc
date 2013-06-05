@@ -54,7 +54,7 @@ void assemble_laplace (MATRIX &B, VECTOR &bb, DoFHandler<dim> &dof_handler, Fini
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
   
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
   
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -122,7 +122,7 @@ void test ()
   
   deallog << "Number of dofs = " << dof_handler.n_dofs() << std::endl;
   
-  std::vector<unsigned int> size (dim);
+  std::vector<types::global_dof_index> size (dim);
   DoFTools::count_dofs_per_component(dof_handler, size);
   
   BlockSparsityPattern b_sparsity_pattern;
@@ -157,7 +157,7 @@ void test ()
   assemble_laplace(Bb, bb, dof_handler, fe);
   assemble_laplace(B, b, dof_handler, fe);
   
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
                                             ZeroFunction<dim>(size.size()),

@@ -465,8 +465,8 @@ void MatrixFree<dim,Number>::initialize_indices
   AssertDimension (n_fe, locally_owned_set.size());
   AssertDimension (n_fe, constraint.size());
 
-  std::vector<unsigned int> local_dof_indices;
-  std::vector<std::vector<unsigned int> > ghost_dofs(n_fe);
+  std::vector<types::global_dof_index> local_dof_indices;
+  std::vector<std::vector<types::global_dof_index> > ghost_dofs(n_fe);
   std::vector<std::vector<std::vector<unsigned int> > > lexicographic_inv(n_fe);
 
   internal::MatrixFreeFunctions::ConstraintValues<double> constraint_values;
@@ -584,10 +584,10 @@ void MatrixFree<dim,Number>::initialize_indices
 
       // cache the constrained indices for use in matrix-vector products
       {
-        const unsigned int
+        const types::global_dof_index
         start_index = dof_info[no].vector_partitioner->local_range().first,
         end_index   = dof_info[no].vector_partitioner->local_range().second;
-        for (unsigned int i=start_index; i<end_index; ++i)
+        for (types::global_dof_index i=start_index; i<end_index; ++i)
           if (constraint[no]->is_constrained(i)==true)
             dof_info[no].constrained_dofs.push_back(i-start_index);
       }
@@ -685,7 +685,7 @@ void MatrixFree<dim,Number>::initialize_indices
   // reorganize the indices in order to overlap communication in MPI with
   // computations: Place all cells with ghost indices into one chunk. Also
   // reorder cells so that we can parallelize by threads
-  std::vector<unsigned int> renumbering;
+  std::vector<types::global_dof_index> renumbering;
   if (task_info.use_multithreading == true)
     {
       dof_info[0].compute_renumber_parallel (boundary_cells, size_info,
@@ -715,7 +715,7 @@ void MatrixFree<dim,Number>::initialize_indices
   // operations will then be done simultaneously).
 #ifdef DEBUG
   {
-    std::vector<unsigned int> sorted_renumbering (renumbering);
+    std::vector<types::global_dof_index> sorted_renumbering (renumbering);
     std::sort (sorted_renumbering.begin(), sorted_renumbering.end());
     for (unsigned int i=0; i<sorted_renumbering.size(); ++i)
       Assert (sorted_renumbering[i] == i, ExcInternalError());
@@ -749,7 +749,7 @@ void MatrixFree<dim,Number>::initialize_indices
   }
 
   // set constraint pool from the std::map and reorder the indices
-  typename std::map<std::vector<double>, unsigned int,
+  typename std::map<std::vector<double>, types::global_dof_index,
            internal::MatrixFreeFunctions::FPArrayComparator<double> >::iterator
            it = constraint_values.constraints.begin(),
            end = constraint_values.constraints.end();

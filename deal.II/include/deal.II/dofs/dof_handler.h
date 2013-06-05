@@ -135,7 +135,7 @@ namespace internal
  * respective degree of freedom shall be assigned. This number may, for
  * example, be obtained by sorting the support points of the degrees of
  * freedom in downwind direction.  Then call the
- * <tt>renumber_dofs(vector<unsigned int>)</tt> function with the array, which
+ * <tt>renumber_dofs(vector<types::global_dof_index>)</tt> function with the array, which
  * converts old into new degree of freedom indices.
  *
  *
@@ -232,7 +232,7 @@ public:
    * certain value, but rather take
    * its symbolic name.
    */
-  static const unsigned int invalid_dof_index = numbers::invalid_unsigned_int;
+  static const types::global_dof_index invalid_dof_index = numbers::invalid_dof_index;
 
   /**
    * The default index of the
@@ -425,7 +425,7 @@ public:
    * case that only one processor
    * participates in the mesh.
    */
-  void renumber_dofs (const std::vector<unsigned int> &new_numbers);
+  void renumber_dofs (const std::vector<types::global_dof_index> &new_numbers);
 
   /**
    * The same function as above, but
@@ -433,7 +433,7 @@ public:
    * single level of a multigrid hierarchy.
    */
   void renumber_dofs (const unsigned int level,
-                      const std::vector<unsigned int> &new_numbers);
+                      const std::vector<types::global_dof_index> &new_numbers);
 
   /**
    * Return the maximum number of
@@ -603,7 +603,7 @@ public:
    * DoFs which are constrained by
    * hanging nodes, see @ref constraints.
    */
-  unsigned int n_dofs () const;
+  types::global_dof_index n_dofs () const;
 
   /**
    * The (global) number of multilevel
@@ -613,17 +613,17 @@ public:
    * If no level degrees of
    * freedom have been assigned
    * to this level, returns
-   * numbers::invalid_unsigned_int. Else
+   * numbers::invalid_dof_index. Else
    * returns the number of
    * degrees of freedom on this level.
    */
-  unsigned int n_dofs (const unsigned int level) const;
+  types::global_dof_index n_dofs (const unsigned int level) const;
 
   /**
    * Return the number of degrees of freedom
    * located on the boundary.
    */
-  unsigned int n_boundary_dofs () const;
+  types::global_dof_index n_boundary_dofs () const;
 
   /**
    * Return the number of degrees
@@ -638,7 +638,7 @@ public:
    * @p make_boundary_sparsity_pattern
    * function.
    */
-  unsigned int
+  types::global_dof_index
   n_boundary_dofs (const FunctionMap &boundary_indicators) const;
 
   /**
@@ -649,7 +649,7 @@ public:
    * indicators under
    * consideration.
    */
-  unsigned int
+  types::global_dof_index
   n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const;
 
   /**
@@ -779,7 +779,7 @@ public:
    * then the vector has a single
    * element equal to n_dofs().
    */
-  const std::vector<unsigned int> &
+  const std::vector<types::global_dof_index> &
   n_locally_owned_dofs_per_processor () const;
 
   /**
@@ -852,7 +852,7 @@ public:
    * @ingroup Exceptions
    */
   DeclException1 (ExcNewNumbersNotConsecutive,
-                  int,
+                  types::global_dof_index,
                   << "The given list of new dof indices is not consecutive: "
                   << "the index " << arg1 << " does not exist.");
   /**
@@ -891,7 +891,7 @@ protected:
    * degrees of freedom located at
    * vertices.
    */
-  std::vector<unsigned int>      vertex_dofs;
+  std::vector<types::global_dof_index>      vertex_dofs;
 
 
 
@@ -966,23 +966,93 @@ private:
    */
   DoFHandler &operator = (const DoFHandler &);
 
+  /**
+   * A data structure that is used to store the DoF indices associated with
+   * a particular vertex. Unlike cells, vertices live on several levels of
+   * a multigrid hierarchy; consequently, we need to store DoF indices for
+   * each vertex for each of the levels it lives on. This class does
+   * this.
+   */
   class MGVertexDoFs
   {
-  private:
-    unsigned int coarsest_level;
-    unsigned int finest_level;
-    unsigned int *indices;
-    unsigned int *indices_offset;
-
   public:
-    DeclException0 (ExcNoMemory);
+    /**
+     * Constructor.
+     */
     MGVertexDoFs ();
+
+    /**
+     * Destructor.
+     */
     ~MGVertexDoFs ();
+
+    /**
+     * A function that is called to allocate the necessary amount of memory
+     * to store the indices of the DoFs that live on this vertex for the
+     * given (inclusive) range of levels.
+     */
+    void init (const unsigned int coarsest_level,
+	       const unsigned int finest_level,
+	       const unsigned int dofs_per_vertex);
+
+    /**
+     * Return the coarsest level for which this structure
+     * stores data.
+     */
     unsigned int get_coarsest_level () const;
+
+    /**
+     * Return the finest level for which this structure
+     * stores data.
+     */
     unsigned int get_finest_level () const;
-    unsigned int get_index (const unsigned int level, const unsigned int dof_number) const;
-    void init (const unsigned int coarsest_level, const unsigned int finest_level, const unsigned int dofs_per_vertex);
-    void set_index (const unsigned int level, const unsigned int dof_number, const unsigned int index);
+
+    /**
+     * Return the index of the <code>dof_number</code>th degree of
+     * freedom for the given level stored for the current vertex.
+     */
+    types::global_dof_index
+    get_index (const unsigned int level,
+	       const unsigned int dof_number) const;
+
+    /**
+     * Set the index of the <code>dof_number</code>th degree of
+     * freedom for the given level stored for the current vertex
+     * to <code>index</code>.
+     */
+    void set_index (const unsigned int level,
+		    const unsigned int dof_number,
+		    const types::global_dof_index index);
+
+    /**
+     * Exception.
+     */
+    DeclException0 (ExcNoMemory);
+
+  private:
+    /**
+     * Coarsest level for which this object stores DoF indices.
+     */
+    unsigned int coarsest_level;
+
+    /**
+     * Finest level for which this object stores DoF indices.
+     */
+    unsigned int finest_level;
+
+    /**
+     * A pointer to an array where we store the indices of the
+     * DoFs that live on the various levels this vertex exists
+     * on.
+     */
+    types::global_dof_index *indices;
+
+    /**
+     * This array stores, for each level starting with coarsest_level,
+     * the offset in the <code>indices</code> array where the DoF
+     * indices for each level are stored.
+     */
+    types::global_dof_index *indices_offset;
   };
 
   void clear_mg_space ();
@@ -995,10 +1065,10 @@ private:
   void reserve_space ();
 
   template <int structdim>
-  unsigned int get_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index) const;
+  types::global_dof_index get_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index) const;
 
   template<int structdim>
-  void set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const unsigned int global_index) const;
+  void set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index) const;
 
   /**
    * Space to store the DoF numbers
@@ -1044,13 +1114,13 @@ private:
 
 #ifndef DOXYGEN
 
-template <> unsigned int DoFHandler<1>::n_boundary_dofs () const;
-template <> unsigned int DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
-template <> unsigned int DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &) const;
+template <> types::global_dof_index DoFHandler<1>::n_boundary_dofs () const;
+template <> types::global_dof_index DoFHandler<1>::n_boundary_dofs (const FunctionMap &) const;
+template <> types::global_dof_index DoFHandler<1>::n_boundary_dofs (const std::set<types::boundary_id> &) const;
 
-template <> void DoFHandler<1>::renumber_dofs(unsigned int,const std::vector<unsigned int>  &new_numbers);
-template <> void DoFHandler<2>::renumber_dofs(unsigned int,const std::vector<unsigned int>  &new_numbers);
-template <> void DoFHandler<3>::renumber_dofs(unsigned int,const std::vector<unsigned int>  &new_numbers);
+template <> void DoFHandler<1>::renumber_dofs(unsigned int,const std::vector<types::global_dof_index>  &new_numbers);
+template <> void DoFHandler<2>::renumber_dofs(unsigned int,const std::vector<types::global_dof_index>  &new_numbers);
+template <> void DoFHandler<3>::renumber_dofs(unsigned int,const std::vector<types::global_dof_index>  &new_numbers);
 
 
 /* ----------------------- Inline functions ---------------------------------- */
@@ -1074,7 +1144,7 @@ DoFHandler<dim,spacedim>::has_active_dofs() const
 
 template <int dim, int spacedim>
 inline
-unsigned int
+types::global_dof_index
 DoFHandler<dim,spacedim>::n_dofs () const
 {
   return number_cache.n_global_dofs;
@@ -1082,7 +1152,7 @@ DoFHandler<dim,spacedim>::n_dofs () const
 
 template<int dim, int spacedim>
 inline
-unsigned int DoFHandler<dim, spacedim>::n_dofs (const unsigned int level) const
+types::global_dof_index DoFHandler<dim, spacedim>::n_dofs (const unsigned int level) const
 {
   Assert(has_level_dofs(), ExcMessage("n_dofs(level) can only be called after distribute_mg_dofs()"));
   Assert (level < mg_number_cache.size (), ExcInvalidLevel (level));
@@ -1114,7 +1184,7 @@ DoFHandler<dim, spacedim>::locally_owned_mg_dofs(const unsigned int level) const
 }
 
 template <int dim, int spacedim>
-const std::vector<unsigned int> &
+const std::vector<types::global_dof_index> &
 DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
 {
   return number_cache.n_locally_owned_dofs_per_processor;
@@ -1231,7 +1301,7 @@ void DoFHandler<dim,spacedim>::load (Archive &ar,
 
 template<int dim, int spacedim>
 inline
-unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (
+types::global_dof_index DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (
   const unsigned int level,
   const unsigned int dof_number) const
 {
@@ -1245,7 +1315,7 @@ inline
 void DoFHandler<dim, spacedim>::MGVertexDoFs::set_index (
   const unsigned int level,
   const unsigned int dof_number,
-  const unsigned int index)
+  const types::global_dof_index index)
 {
   Assert ((level >= coarsest_level) && (level <= finest_level), ExcInvalidLevel (level));
   indices[indices_offset[level - coarsest_level] + dof_number] = index;

@@ -38,12 +38,12 @@
 
 using namespace std;
 
-void log_vector (const std::vector<std::set<unsigned int> >& count)
+void log_vector (const std::vector<std::set<types::global_dof_index> >& count)
 {
   for (unsigned int l=0;l<count.size();++l)
     {
       deallog << "Level " << l << ':';
-      for (std::set<unsigned int>::const_iterator c=count[l].begin();
+      for (std::set<types::global_dof_index>::const_iterator c=count[l].begin();
 	   c != count[l].end();++c)
 	deallog << ' ' << *c;
       deallog << std::endl;
@@ -66,7 +66,7 @@ void check_fe(FiniteElement<dim>& fe)
   MGDoFHandler<dim> mgdof(tr);
   mgdof.distribute_dofs(fe);
   
-  std::vector<std::set<unsigned int> > boundary_indices(tr.n_levels());
+  std::vector<std::set<types::global_dof_index> > boundary_indices(tr.n_levels());
   MGTools::make_boundary_list(mgdof, fmap, boundary_indices);
   log_vector(boundary_indices);
 }

@@ -56,7 +56,7 @@ void test ()
   
   dof_handler.distribute_dofs(fe_collection);
 
-  std::vector<unsigned int> local_dof_indices;
+  std::vector<types::global_dof_index> local_dof_indices;
   for (typename hp::DoFHandler<dim>::active_cell_iterator
          cell=dof_handler.begin_active();
        cell!=dof_handler.end(); ++cell)

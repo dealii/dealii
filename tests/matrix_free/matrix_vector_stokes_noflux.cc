@@ -170,7 +170,7 @@ void test ()
                                            constraints_p);
   constraints_p.close ();
 
-  std::vector<unsigned int> dofs_per_block (2);
+  std::vector<types::global_dof_index> dofs_per_block (2);
   DoFTools::count_dofs_per_block (dof_handler, dofs_per_block,
                                   stokes_sub_blocks);
 
@@ -211,7 +211,7 @@ void test ()
 
     FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     const FEValuesExtractors::Vector velocities (0);
     const FEValuesExtractors::Scalar pressure (dim);

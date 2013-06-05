@@ -330,7 +330,7 @@ namespace Step20
     // of pressure variables equals the number of shape functions that are
     // nonzero in the dim-th component. Let us compute these numbers and then
     // create some nice output with that:
-    std::vector<unsigned int> dofs_per_component (dim+1);
+    std::vector<types::global_dof_index> dofs_per_component (dim+1);
     DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
     const unsigned int n_u = dofs_per_component[0],
                        n_p = dofs_per_component[dim];
@@ -422,7 +422,7 @@ namespace Step20
     FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       local_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     // The next step is to declare objects that represent the source term,
     // pressure boundary value, and coefficient in the equation. In addition

@@ -36,7 +36,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
 
 				   // now set the same elements row-wise
    {
-    std::vector<unsigned int> col_indices (m.n()/3+1);
+    std::vector<types::global_dof_index> col_indices (m.n()/3+1);
     std::vector<double> col_values (m.n()/3+1);
     for (unsigned int i=0; i<m.m(); ++i)
       {

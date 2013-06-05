@@ -27,7 +27,7 @@ template <int dim>
 void
 check_this (const DoFHandler<dim> &dof_handler)
 {
-  std::vector<unsigned int> map(dof_handler.n_dofs());
+  std::vector<types::global_dof_index> map(dof_handler.n_dofs());
   std::set<types::boundary_id> boundary_ids;
 
                                    // check for boundary id 0 alone

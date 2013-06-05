@@ -40,7 +40,7 @@ template <int dim>
 void
 print_dofs (const DoFHandler<dim> &dof)
 {
-  std::vector<unsigned int> v (dof.get_fe().dofs_per_cell);
+  std::vector<types::global_dof_index> v (dof.get_fe().dofs_per_cell);
 
   for (typename DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
        cell != dof.end(); ++cell)
@@ -66,7 +66,7 @@ check ()
   DoFHandler<dim> dof(tr);
   
   dof.distribute_dofs(fe);
-  std::vector<unsigned int> new_dofs (dof.n_dofs());
+  std::vector<types::global_dof_index> new_dofs (dof.n_dofs());
   DoFRenumbering::boost::compute_Cuthill_McKee(new_dofs, dof);
 
   for (unsigned int i=0; i<new_dofs.size(); ++i)

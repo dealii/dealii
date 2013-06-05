@@ -154,6 +154,14 @@ namespace MemoryConsumption
 
   /**
    * Determine the amount of memory
+   * in bytes consumed by a <tt>unsigned long long int</tt>
+   * variable.
+   */
+  inline
+  std::size_t memory_consumption (const unsigned long long int);
+
+  /**
+   * Determine the amount of memory
    * in bytes consumed by a <tt>float</tt>
    * variable.
    */
@@ -459,13 +467,21 @@ namespace MemoryConsumption
   {
     return sizeof(int);
   }
-
+  
 
 
   inline
   std::size_t memory_consumption (const unsigned int)
   {
     return sizeof(unsigned int);
+  }
+
+  
+
+  inline
+  std::size_t memory_consumption (const unsigned long long int)
+  {
+    return sizeof(unsigned long long int);
   }
 
 
@@ -514,7 +530,7 @@ namespace MemoryConsumption
   std::size_t memory_consumption (const std::vector<T> &v)
   {
     std::size_t mem = sizeof(std::vector<T>);
-    const unsigned int n = v.size();
+    const unsigned int n = static_cast<unsigned int>(v.size());
     for (unsigned int i=0; i<n; ++i)
       mem += memory_consumption(v[i]);
     mem += (v.capacity() - n)*sizeof(T);

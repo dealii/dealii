@@ -25,6 +25,13 @@ inconvenience this causes.
 
 <ol>
 
+<li> Removed: it was possible to call get_dof_indices(), get_dof_values(),
+set_dof_values(), and distribute_local_to_global() for cells that were not
+active, if the finite element only had DoFs on vertices (i.e. Q1). This is
+no longer allowed.
+<br>
+(Timo Heister, 2013/06/02)
+
 <li> Changed: Internal structures of ExceptionBase are now thread safe. The
 Assert macro does not print an exception to deallog any more prior to
 throwing if deal_II_exceptions::abort_on_exception==false. Removed: A
@@ -64,6 +71,15 @@ this function.
 
 
 <ol>
+  <li> New: deal.II can now be compiled to 64-bit global dof indices. To turn 
+  this feature on, use the cmake option -DDEAL_II_WITH_64BIT_INDICES=ON. If 
+  PETSc and/or Trilinos are used, they must be compiled to support 64-bit
+  indices. To write a code that can use 32-bit and 64-bit indices depending on
+  deal.II compilation option, use types::global_dof_index for all the global 
+  dof indices.
+  <br>
+  (Kainan Wang and Bruno Turcksin, 2013/06/05)
+  </li>
 
   <li> New: All vector classes now have a member function
   <code>locally_owned_elements</code> that returns an index
@@ -130,8 +146,22 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: The stabilization parameter for the artificial diffusion
+in the step-31 tutorial program has been increased slightly to avoid
+instabilities at later times (<i>t</i> > 60).
+<br>
+(Martin Kronbichler, 2013/06/04)
+</li>
 
-<li> Changed: subdomainids can now only be queried/set on active cells.
+<li> Fixed: If an exception was generated on a task created by
+Threads::new_task, the program would terminate with a segmentation
+fault, leaving little trace of what had happened. This is now handled
+more gracefully.
+<br>
+(Wolfgang Bangerth, 2013/06/02)
+</li>
+
+<li> Changed: subdomain ids can now only be queried/set on active cells.
 Consequently, is_artificial(), is_ghost(), and is_locally_owned() is
 now restricted to active cells.
 <br>

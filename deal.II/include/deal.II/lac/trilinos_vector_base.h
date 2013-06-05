@@ -52,7 +52,6 @@ namespace TrilinosWrappers
   // forward declaration
   class VectorBase;
 
-
   /**
    * @cond internal
    */
@@ -65,6 +64,11 @@ namespace TrilinosWrappers
    */
   namespace internal
   {
+    /**
+     * Declare type for container size.
+     */
+    typedef dealii::types::global_dof_index size_type;
+
     /**
      * This class implements a
      * wrapper for accessing the
@@ -90,10 +94,11 @@ namespace TrilinosWrappers
        * the actual vector class to
        * create it.
        */
-      VectorReference (VectorBase        &vector,
-                       const unsigned int index);
+      VectorReference (VectorBase     &vector,
+                       const size_type  index);
 
     public:
+
       /**
        * This looks like a copy
        * operator, but does something
@@ -187,7 +192,7 @@ namespace TrilinosWrappers
        * Exception
        */
       DeclException3 (ExcAccessToNonLocalElement,
-                      int, int, int,
+                      size_type, size_type, size_type,
                       << "You tried to access element " << arg1
                       << " of a distributed vector, but it is not stored on "
                       << "the current processor. Note: the elements stored "
@@ -208,7 +213,7 @@ namespace TrilinosWrappers
        * Index of the referenced element
        * of the vector.
        */
-      const unsigned int  index;
+      const size_type  index;
 
       /**
        * Make the vector class a
@@ -269,7 +274,7 @@ namespace TrilinosWrappers
      */
     typedef TrilinosScalar                  value_type;
     typedef TrilinosScalar                  real_type;
-    typedef std::size_t                     size_type;
+    typedef dealii::types::global_dof_index size_type;
     typedef value_type                     *iterator;
     typedef const value_type               *const_iterator;
     typedef internal::VectorReference       reference;
@@ -457,7 +462,7 @@ namespace TrilinosWrappers
      * Return the global dimension of
      * the vector.
      */
-    unsigned int size () const;
+    size_type size () const;
 
     /**
      * Return the local dimension of
@@ -477,7 +482,7 @@ namespace TrilinosWrappers
      * elements, they are included in
      * this number.
      */
-    unsigned int local_size () const;
+    size_type local_size () const;
 
     /**
      * Return a pair of indices
@@ -509,7 +514,7 @@ namespace TrilinosWrappers
      * trigger an assertion if the local portion of the vector
      * is not contiguous.
      */
-    std::pair<unsigned int, unsigned int> local_range () const;
+    std::pair<size_type, size_type> local_range () const;
 
     /**
      * Return whether @p index is in
@@ -519,7 +524,7 @@ namespace TrilinosWrappers
      * @note The same limitation for the applicability of this
      * function applies as listed in the documentation of local_range().
      */
-    bool in_local_range (const unsigned int index) const;
+    bool in_local_range (const size_type index) const;
 
     /**
      * Return an index set that describes which elements of this vector
@@ -635,7 +640,7 @@ namespace TrilinosWrappers
      * element, both read and write.
      */
     reference
-    operator () (const unsigned int index);
+    operator () (const size_type index);
 
     /**
      * Provide read-only access to an
@@ -643,7 +648,7 @@ namespace TrilinosWrappers
      * the <code>el()</code> command.
      */
     TrilinosScalar
-    operator () (const unsigned int index) const;
+    operator () (const size_type index) const;
 
     /**
      * Provide access to a given
@@ -652,7 +657,7 @@ namespace TrilinosWrappers
      * Exactly the same as operator().
      */
     reference
-    operator [] (const unsigned int index);
+    operator [] (const size_type index);
 
     /**
      * Provide read-only access to an
@@ -662,7 +667,7 @@ namespace TrilinosWrappers
      * Exactly the same as operator().
      */
     TrilinosScalar
-    operator [] (const unsigned int index) const;
+    operator [] (const size_type index) const;
 
     /**
      * Return the value of the vector
@@ -675,7 +680,7 @@ namespace TrilinosWrappers
      * elements sits on another
      * process.
      */
-    TrilinosScalar el (const unsigned int index) const;
+    TrilinosScalar el (const size_type index) const;
 
     /**
      * Make the Vector class a bit like the <tt>vector<></tt> class of
@@ -715,7 +720,7 @@ namespace TrilinosWrappers
      * argument, the corresponding
      * values in the second.
      */
-    void set (const std::vector<unsigned int>    &indices,
+    void set (const std::vector<size_type>    &indices,
               const std::vector<TrilinosScalar>  &values);
 
     /**
@@ -725,7 +730,7 @@ namespace TrilinosWrappers
      * takes a deal.II vector of
      * values.
      */
-    void set (const std::vector<unsigned int>        &indices,
+    void set (const std::vector<size_type>        &indices,
               const ::dealii::Vector<TrilinosScalar> &values);
     //@}
 
@@ -745,8 +750,8 @@ namespace TrilinosWrappers
      * the number of elements to be
      * set.
      */
-    void set (const unsigned int    n_elements,
-              const unsigned int   *indices,
+    void set (const size_type       n_elements,
+              const size_type      *indices,
               const TrilinosScalar *values);
 
     /**
@@ -757,7 +762,7 @@ namespace TrilinosWrappers
      * components specified by @p
      * indices.
      */
-    void add (const std::vector<unsigned int>   &indices,
+    void add (const std::vector<size_type>      &indices,
               const std::vector<TrilinosScalar> &values);
 
     /**
@@ -767,7 +772,7 @@ namespace TrilinosWrappers
      * takes a deal.II vector of
      * values.
      */
-    void add (const std::vector<unsigned int>        &indices,
+    void add (const std::vector<size_type>           &indices,
               const ::dealii::Vector<TrilinosScalar> &values);
 
     /**
@@ -779,8 +784,8 @@ namespace TrilinosWrappers
      * other two <tt>add()</tt>
      * functions above.
      */
-    void add (const unsigned int    n_elements,
-              const unsigned int   *indices,
+    void add (const size_type       n_elements,
+              const size_type      *indices,
               const TrilinosScalar *values);
 
     /**
@@ -1052,7 +1057,7 @@ namespace TrilinosWrappers
      * Exception
      */
     DeclException3 (ExcAccessToNonlocalElement,
-                    int, int, int,
+                    size_type, size_type, size_type,
                     << "You tried to access element " << arg1
                     << " of a distributed vector, but only entries "
                     << arg2 << " through " << arg3
@@ -1143,8 +1148,8 @@ namespace TrilinosWrappers
   namespace internal
   {
     inline
-    VectorReference::VectorReference (VectorBase        &vector,
-                                      const unsigned int index)
+    VectorReference::VectorReference (VectorBase      &vector,
+                                      const size_type  index)
       :
       vector (vector),
       index (index)
@@ -1242,9 +1247,9 @@ namespace TrilinosWrappers
 
   inline
   bool
-  VectorBase::in_local_range (const unsigned int index) const
+  VectorBase::in_local_range (const size_type index) const
   {
-    const std::pair<unsigned int, unsigned int> range = local_range();
+    std::pair<size_type, size_type> range = local_range();
 
     return ((index >= range.first) && (index <  range.second));
   }
@@ -1260,13 +1265,17 @@ namespace TrilinosWrappers
     // easy case: local range is contiguous
     if (vector->Map().LinearMap())
       {
-        const std::pair<unsigned int, unsigned int> x = local_range();
+        const std::pair<size_type, size_type> x = local_range();
         is.add_range (x.first, x.second);
       }
     else if (vector->Map().NumMyElements() > 0)
       {
-        const unsigned int n_indices = vector->Map().NumMyElements();
+        const size_type n_indices = vector->Map().NumMyElements();
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
         unsigned int * vector_indices = (unsigned int*)vector->Map().MyGlobalElements();
+#else
+        size_type * vector_indices = (size_type*)vector->Map().MyGlobalElements64();
+#endif
         is.add_indices(vector_indices, vector_indices+n_indices);
         is.compress();
       }
@@ -1287,7 +1296,7 @@ namespace TrilinosWrappers
 
   inline
   internal::VectorReference
-  VectorBase::operator () (const unsigned int index)
+  VectorBase::operator () (const size_type index)
   {
     return internal::VectorReference (*this, index);
   }
@@ -1296,7 +1305,7 @@ namespace TrilinosWrappers
 
   inline
   internal::VectorReference
-  VectorBase::operator [] (const unsigned int index)
+  VectorBase::operator [] (const size_type index)
   {
     return operator() (index);
   }
@@ -1304,7 +1313,7 @@ namespace TrilinosWrappers
 
   inline
   TrilinosScalar
-  VectorBase::operator [] (const unsigned int index) const
+  VectorBase::operator [] (const size_type index) const
   {
     return operator() (index);
   }
@@ -1462,7 +1471,7 @@ namespace TrilinosWrappers
 
   inline
   void
-  VectorBase::set (const std::vector<unsigned int>    &indices,
+  VectorBase::set (const std::vector<size_type>      &indices,
                    const std::vector<TrilinosScalar>  &values)
   {
     // if we have ghost values, do not allow
@@ -1479,7 +1488,7 @@ namespace TrilinosWrappers
 
   inline
   void
-  VectorBase::set (const std::vector<unsigned int>        &indices,
+  VectorBase::set (const std::vector<size_type>           &indices,
                    const ::dealii::Vector<TrilinosScalar> &values)
   {
     // if we have ghost values, do not allow
@@ -1496,8 +1505,8 @@ namespace TrilinosWrappers
 
   inline
   void
-  VectorBase::set (const unsigned int    n_elements,
-                   const unsigned int   *indices,
+  VectorBase::set (const size_type       n_elements,
+                   const size_type      *indices,
                    const TrilinosScalar *values)
   {
     // if we have ghost values, do not allow
@@ -1510,14 +1519,14 @@ namespace TrilinosWrappers
     if (last_action != Insert)
       last_action = Insert;
 
-    for (unsigned int i=0; i<n_elements; ++i)
+    for (size_type i=0; i<n_elements; ++i)
       {
-        const unsigned int row = indices[i];
-        const int local_row = vector->Map().LID(static_cast<int>(row));
+        const size_type row = indices[i];
+        const TrilinosWrappers::types::int_type local_row = vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(row));
         if (local_row == -1)
           {
             const int ierr = vector->ReplaceGlobalValues (1,
-                                                          (const int *)(&row),
+                                                          (const TrilinosWrappers::types::int_type *)(&row),
                                                           &values[i]);
             AssertThrow (ierr == 0, ExcTrilinosError(ierr));
             compressed = false;
@@ -1531,7 +1540,7 @@ namespace TrilinosWrappers
 
   inline
   void
-  VectorBase::add (const std::vector<unsigned int>    &indices,
+  VectorBase::add (const std::vector<size_type>      &indices,
                    const std::vector<TrilinosScalar>  &values)
   {
     // if we have ghost values, do not allow
@@ -1547,7 +1556,7 @@ namespace TrilinosWrappers
 
   inline
   void
-  VectorBase::add (const std::vector<unsigned int>        &indices,
+  VectorBase::add (const std::vector<size_type>           &indices,
                    const ::dealii::Vector<TrilinosScalar> &values)
   {
     // if we have ghost values, do not allow
@@ -1563,8 +1572,8 @@ namespace TrilinosWrappers
 
   inline
   void
-  VectorBase::add (const unsigned int    n_elements,
-                   const unsigned int   *indices,
+  VectorBase::add (const size_type       n_elements,
+                   const size_type      *indices,
                    const TrilinosScalar *values)
   {
     // if we have ghost values, do not allow
@@ -1578,14 +1587,14 @@ namespace TrilinosWrappers
         last_action = Add;
       }
 
-    for (unsigned int i=0; i<n_elements; ++i)
+    for (size_type i=0; i<n_elements; ++i)
       {
-        const unsigned int row = indices[i];
-        const int local_row = vector->Map().LID(static_cast<int>(row));
+        const size_type row = indices[i];
+        const TrilinosWrappers::types::int_type local_row = vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(row));
         if (local_row == -1)
           {
             const int ierr = vector->SumIntoGlobalValues (1,
-                                                          (const int *)(&row),
+                                                          (const TrilinosWrappers::types::int_type *)(&row),
                                                           &values[i]);
             AssertThrow (ierr == 0, ExcTrilinosError(ierr));
             compressed = false;
@@ -1598,31 +1607,38 @@ namespace TrilinosWrappers
 
 
   inline
-  unsigned int
+  VectorBase::size_type
   VectorBase::size () const
   {
-    return (unsigned int) (vector->Map().MaxAllGID() + 1 -
-                           vector->Map().MinAllGID());
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    return (size_type) (vector->Map().MaxAllGID() + 1 - vector->Map().MinAllGID());
+#else
+    return (size_type) (vector->Map().MaxAllGID64() + 1 - vector->Map().MinAllGID64());
+#endif
   }
 
 
 
   inline
-  unsigned int
+  VectorBase::size_type
   VectorBase::local_size () const
   {
-    return (unsigned int) vector->Map().NumMyElements();
+    return (size_type) vector->Map().NumMyElements();
   }
 
 
 
   inline
-  std::pair<unsigned int, unsigned int>
+  std::pair<VectorBase::size_type, VectorBase::size_type>
   VectorBase::local_range () const
   {
-    int begin, end;
-    begin = vector->Map().MinMyGID();
-    end = vector->Map().MaxMyGID()+1;
+#ifndef DEAL_II_USE_LARGE_INDEX_TYPE
+    const TrilinosWrappers::types::int_type begin = vector->Map().MinMyGID();
+    const TrilinosWrappers::types::int_type end = vector->Map().MaxMyGID()+1;
+#else
+    const TrilinosWrappers::types::int_type begin = vector->Map().MinMyGID64();
+    const TrilinosWrappers::types::int_type end = vector->Map().MaxMyGID64()+1;
+#endif
 
     Assert (end-begin == vector->Map().NumMyElements(),
             ExcMessage ("This function only makes sense if the elements that this "
@@ -1728,11 +1744,11 @@ namespace TrilinosWrappers
 
     TrilinosScalar norm = 0;
     TrilinosScalar sum=0;
-    const unsigned int n_local = local_size();
+    const size_type n_local = local_size();
 
     // loop over all the elements because
     // Trilinos does not support lp norms
-    for (unsigned int i=0; i<n_local; i++)
+    for (size_type i=0; i<n_local; i++)
       sum += std::pow(std::fabs((*vector)[0][i]), p);
 
     norm = std::pow(sum, static_cast<TrilinosScalar>(1./p));
@@ -1840,8 +1856,8 @@ namespace TrilinosWrappers
     Assert (!has_ghost_elements(), ExcGhostsPresent());
     Assert (numbers::is_finite(s), ExcNumberNotFinite());
 
-    unsigned int n_local = local_size();
-    for (unsigned int i=0; i<n_local; i++)
+    size_type n_local = local_size();
+    for (size_type i=0; i<n_local; i++)
       (*vector)[0][i] += s;
   }
 

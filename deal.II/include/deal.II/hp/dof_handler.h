@@ -136,7 +136,7 @@ namespace hp
      * certain value, but rather take
      * its symbolic name.
      */
-    static const unsigned int invalid_dof_index = numbers::invalid_unsigned_int;
+    static const types::global_dof_index invalid_dof_index = numbers::invalid_dof_index;
 
     /**
      * The default index of the
@@ -254,7 +254,7 @@ namespace hp
      * number of the degree of
      * freedom referenced.
      */
-    void renumber_dofs (const std::vector<unsigned int> &new_numbers);
+    void renumber_dofs (const std::vector<types::global_dof_index> &new_numbers);
 
     /**
      * Return the maximum number of
@@ -378,7 +378,7 @@ namespace hp
      * DoFs which are constrained by
      * hanging nodes, see @ref constraints.
      */
-    unsigned int n_dofs () const;
+   types::global_dof_index n_dofs () const;
 
     /**
     * The number of multilevel
@@ -389,13 +389,13 @@ namespace hp
     * numbers::invalid_unsigned
     * int independent of its argument.
     */
-    unsigned int n_dofs(const unsigned int level) const;
+    types::global_dof_index n_dofs(const unsigned int level) const;
 
     /**
      * Return the number of degrees of freedom
      * located on the boundary.
      */
-    unsigned int n_boundary_dofs () const;
+    types::global_dof_index n_boundary_dofs () const;
 
     /**
      * Return the number of degrees
@@ -410,7 +410,7 @@ namespace hp
      * @p make_boundary_sparsity_pattern
      * function.
      */
-    unsigned int
+    types::global_dof_index
     n_boundary_dofs (const FunctionMap &boundary_indicators) const;
 
     /**
@@ -421,7 +421,7 @@ namespace hp
      * indicators under
      * consideration.
      */
-    unsigned int
+    types::global_dof_index
     n_boundary_dofs (const std::set<types::boundary_id> &boundary_indicators) const;
 
     /**
@@ -454,7 +454,7 @@ namespace hp
      * cells are also not necessarily
      * included.
      */
-    unsigned int n_locally_owned_dofs() const;
+    types::global_dof_index n_locally_owned_dofs() const;
 
     /**
      * Return an IndexSet describing
@@ -512,7 +512,7 @@ namespace hp
      * then the vector has a single
      * element equal to n_dofs().
      */
-    const std::vector<unsigned int> &
+    const std::vector<types::global_dof_index> &
     n_locally_owned_dofs_per_processor () const;
 
     /**
@@ -577,7 +577,7 @@ namespace hp
      * Exception
      */
     DeclException1 (ExcNewNumbersNotConsecutive,
-                    int,
+                    types::global_dof_index,
                     << "The given list of new dof indices is not consecutive: "
                     << "the index " << arg1 << " does not exist.");
     /**
@@ -662,8 +662,8 @@ namespace hp
     public:
       MGVertexDoFs ();
       ~MGVertexDoFs ();
-      unsigned int get_index (const unsigned int level, const unsigned int dof_number) const;
-      void set_index (const unsigned int level, const unsigned int dof_number, const unsigned int index);
+      types::global_dof_index get_index (const unsigned int level, const unsigned int dof_number) const;
+      void set_index (const unsigned int level, const unsigned int dof_number, const types::global_dof_index index);
     };
 
     /**
@@ -672,10 +672,10 @@ namespace hp
     void clear_space ();
 
     template<int structdim>
-    unsigned int get_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index) const;
+    types::global_dof_index get_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index) const;
 
     template<int structdim>
-    void set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const unsigned int global_index) const;
+    void set_dof_index (const unsigned int obj_level, const unsigned int obj_index, const unsigned int fe_index, const unsigned int local_index, const types::global_dof_index global_index) const;
 
     /**
      *  Create default tables for
@@ -716,7 +716,7 @@ namespace hp
      * distribute_dofs().
      */
     void
-    compute_vertex_dof_identities (std::vector<unsigned int> &new_dof_indices) const;
+    compute_vertex_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const;
 
     /**
      * Compute identities between
@@ -725,7 +725,7 @@ namespace hp
      * distribute_dofs().
      */
     void
-    compute_line_dof_identities (std::vector<unsigned int> &new_dof_indices) const;
+    compute_line_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const;
 
     /**
      * Compute identities between
@@ -734,7 +734,7 @@ namespace hp
      * distribute_dofs().
      */
     void
-    compute_quad_dof_identities (std::vector<unsigned int> &new_dof_indices) const;
+    compute_quad_dof_identities (std::vector<types::global_dof_index> &new_dof_indices) const;
 
     /**
      * Renumber the objects with
@@ -761,16 +761,16 @@ namespace hp
      * co-located on the same
      * entity.
      */
-    void renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+    void renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
                                  dealii::internal::int2type<0>);
 
-    void renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+    void renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
                                  dealii::internal::int2type<1>);
 
-    void renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+    void renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
                                  dealii::internal::int2type<2>);
 
-    void renumber_dofs_internal (const std::vector<unsigned int> &new_numbers,
+    void renumber_dofs_internal (const std::vector<types::global_dof_index> &new_numbers,
                                  dealii::internal::int2type<3>);
 
     /**
@@ -826,7 +826,7 @@ namespace hp
      * actual data format used to
      * the present class.
      */
-    std::vector<unsigned int>      vertex_dofs;
+    std::vector<types::global_dof_index>      vertex_dofs;
 
     /**
      * For each vertex in the
@@ -849,7 +849,7 @@ namespace hp
      * actual data format used to
      * the present class.
      */
-    std::vector<unsigned int>      vertex_dofs_offsets;
+    std::vector<types::global_dof_index>      vertex_dofs_offsets;
 
     std::vector<MGVertexDoFs> mg_vertex_dofs;
 
@@ -903,7 +903,7 @@ namespace hp
 
   template <int dim, int spacedim>
   inline
-  unsigned int
+  types::global_dof_index
   DoFHandler<dim,spacedim>::n_dofs () const
   {
     return number_cache.n_global_dofs;
@@ -912,15 +912,15 @@ namespace hp
 
   template <int dim, int spacedim>
   inline
-  unsigned int
+  types::global_dof_index
   DoFHandler<dim,spacedim>::n_dofs (const unsigned int) const
   {
-    return numbers::invalid_unsigned_int;
+    return numbers::invalid_dof_index;
   }
 
 
   template <int dim, int spacedim>
-  unsigned int
+  types::global_dof_index
   DoFHandler<dim, spacedim>::n_locally_owned_dofs() const
   {
     return number_cache.n_locally_owned_dofs;
@@ -936,7 +936,7 @@ namespace hp
 
 
   template <int dim, int spacedim>
-  const std::vector<unsigned int> &
+  const std::vector<types::global_dof_index> &
   DoFHandler<dim, spacedim>::n_locally_owned_dofs_per_processor() const
   {
     return number_cache.n_locally_owned_dofs_per_processor;
@@ -988,7 +988,7 @@ namespace hp
 
   template<int dim, int spacedim>
   inline
-  unsigned int DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (const unsigned int,
+  types::global_dof_index DoFHandler<dim, spacedim>::MGVertexDoFs::get_index (const unsigned int,
       const unsigned int) const
   {
     Assert (false, ExcNotImplemented ());
@@ -999,7 +999,7 @@ namespace hp
   inline
   void DoFHandler<dim, spacedim>::MGVertexDoFs::set_index (const unsigned int,
                                                            const unsigned int,
-                                                           const unsigned int)
+                                                           types::global_dof_index)
   {
     Assert (false, ExcNotImplemented ());
   }
@@ -1012,5 +1012,3 @@ namespace hp
 DEAL_II_NAMESPACE_CLOSE
 
 #endif
-
-

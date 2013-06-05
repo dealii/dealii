@@ -109,8 +109,8 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::solve (const unsigned int  n_eigenpairs, 
-		     unsigned int       *n_converged)
+  SolverBase::solve (const size_type  n_eigenpairs, 
+		     size_type *n_converged)
   {
     int ierr;
 
@@ -189,7 +189,7 @@ namespace SLEPcWrappers
                             reinterpret_cast<PetscInt *>(n_converged));
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 
-    int n_iterations     = 0;
+    PetscInt n_iterations = 0;
     double residual_norm = 1e300;
 
     // @todo Investigate elaborating on some of this to act on the
@@ -218,8 +218,8 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::get_eigenpair (const unsigned int         index,
-                             double                    &eigenvalues,
+  SolverBase::get_eigenpair (const size_type            index,
+                             PetscScalar               &eigenvalues,
                              PETScWrappers::VectorBase &eigenvectors)
   {
     AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());
@@ -231,6 +231,7 @@ namespace SLEPcWrappers
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
+
   void
   SolverBase::get_eigenpair (const unsigned int         index,
                              double                    &real_eigenvalues,
@@ -238,6 +239,7 @@ namespace SLEPcWrappers
                              PETScWrappers::VectorBase &real_eigenvectors,
                              PETScWrappers::VectorBase &imag_eigenvectors)
   {
+#ifndef PETSC_USE_COMPLEX
     AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());
     
     // get converged eigenpair
@@ -245,7 +247,13 @@ namespace SLEPcWrappers
 				&real_eigenvalues, &imag_eigenvalues, 
 				real_eigenvectors, imag_eigenvectors);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
+#else
+    Assert ((false),
+            ExcMessage ("Your PETSc/SLEPc installation was configured with scalar-type complex "
+                        "but this function is not defined for complex types."));
+#endif
   }
+
 
   void
   SolverBase::reset ()
@@ -444,7 +452,7 @@ namespace SLEPcWrappers
     (void) eps;
 
     // PETSc/SLEPc version must be > 3.1.0.
-    Assert (false,
+    Assert ((false),
             ExcMessage ("Your SLEPc installation does not include a copy of the "
                         "Generalized Davidson solver. A SLEPc version > 3.1.0 is required."));
 #endif

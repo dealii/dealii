@@ -83,7 +83,7 @@ main ()
   for (unsigned int row=0; row<sp3.n_rows(); ++row)
     {
       sparsity.push_back (std::set<unsigned int,std::greater<unsigned int> >());
-      for (const unsigned int *p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
+      for (const types::global_dof_index *p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
 	   p != sp3.get_column_numbers()+sp3.get_rowstart_indices()[row+1]; ++p)
 	sparsity.back().insert (*p);
     };
@@ -94,9 +94,9 @@ main ()
 				   // now check for equivalence of sp3 and sp4
   for (unsigned int row=0; row<sp3.n_rows(); ++row)
     {
-      const unsigned int
+      const types::global_dof_index
         *sp3_p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
-      const unsigned int
+      const types::global_dof_index
         *sp4_p=sp4.get_column_numbers()+sp4.get_rowstart_indices()[row];
       for (; sp3_p != (sp3.get_column_numbers() +
                        sp3.get_rowstart_indices()[row+1]);
@@ -121,8 +121,8 @@ main ()
 	Assert (sp(sp.matrix_position(i).first,
 		    sp.matrix_position(i).second) == i,
 		ExcInternalError());
-      for (unsigned int row=0; row<sp.n_rows(); ++row)
-	for (unsigned int col=0; col<sp.n_cols(); ++col)
+      for (types::global_dof_index row=0; row<sp.n_rows(); ++row)
+	for (types::global_dof_index col=0; col<sp.n_cols(); ++col)
 	  if (sp(row,col) != SparsityPattern::invalid_entry)
 	    Assert (sp.matrix_position(sp(row,col)) ==
 		    std::make_pair(row,col),
@@ -156,9 +156,9 @@ main ()
   
   for (unsigned int row=0; row<sp3.n_rows(); ++row)
     {
-      const unsigned int
+      const types::global_dof_index
         *sp3_p=sp3.get_column_numbers()+sp3.get_rowstart_indices()[row];
-      const unsigned int
+      const types::global_dof_index
         *sp5_p=sp5.get_column_numbers()+sp5.get_rowstart_indices()[row];
       for (; sp3_p != (sp3.get_column_numbers() +
                        sp3.get_rowstart_indices()[row+1]);

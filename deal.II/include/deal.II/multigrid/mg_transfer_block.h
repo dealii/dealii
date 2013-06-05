@@ -123,18 +123,18 @@ protected:
   /**
    * Sizes of the multi-level vectors.
    */
-  mutable std::vector<std::vector<unsigned int> > sizes;
+  mutable std::vector<std::vector<types::global_dof_index> > sizes;
 
   /**
    * Start index of each block.
    */
-  std::vector<unsigned int> block_start;
+  std::vector<types::global_dof_index> block_start;
 
   /**
    * Start index of each block on
    * all levels.
    */
-  std::vector<std::vector<unsigned int> > mg_block_start;
+  std::vector<std::vector<types::global_dof_index> > mg_block_start;
 
   /**
    * Call build_matrices()
@@ -520,7 +520,7 @@ private:
 
 /*@}*/
 
-//---------------------------------------------------------------------------
+//----------inline function definition--------------------------------------------------
 template <typename number>
 inline void
 MGTransferBlockSelect<number>::select(const unsigned int block)

@@ -132,7 +132,7 @@ void test_projection (const Triangulation<dim>& tr,
   MappingQ1<dim> mapping;
 
   TestFunction<dim> f(degree-1);
-  std::map<unsigned int, double> boundary_constraints;
+  std::map<types::global_dof_index, double> boundary_constraints;
   typename FunctionMap<dim>::type boundary_map;
   for (types::boundary_id i=0;i<255;++i)
     boundary_map[i] = &f;
@@ -145,7 +145,7 @@ void test_projection (const Triangulation<dim>& tr,
 				   // boundary values
   Vector<double> u(dof.n_dofs());
   u = -1.;
-  for (typename std::map<unsigned int, double>::const_iterator
+  for (typename std::map<types::global_dof_index, double>::const_iterator
 	 i = boundary_constraints.begin(); i != boundary_constraints.end(); ++i)
     u(i->first) = i->second;
   

@@ -22,6 +22,16 @@
 #define DEAL_II_NAMESPACE_CLOSE }
 
 
+/***********************************************
+ * Configured in setup_cached_variables.cmake: *
+ ***********************************************/
+
+#cmakedefine DEAL_II_WITH_64BIT_INDICES
+#ifdef DEAL_II_WITH_64BIT_INDICES
+#  define DEAL_II_USE_LARGE_INDEX_TYPE
+#endif
+
+
 /**************************************
  * Configured in setup_deal_ii.cmake: *
  **************************************/

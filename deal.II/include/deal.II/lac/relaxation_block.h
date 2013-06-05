@@ -64,6 +64,11 @@ private:
 
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Parameters for block relaxation methods.
    */
   class AdditionalData : public Subscriptor
@@ -176,8 +181,8 @@ public:
    * Read-only access to entries.  This function is only possible if
    * the inverse diagonal blocks are stored.
    */
-  value_type el(unsigned int i,
-                unsigned int j) const;
+  value_type el(size_type i,
+                size_type j) const;
 
   /**
    * Stores the inverse of the diagonal blocks in @p inverse. This

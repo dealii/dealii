@@ -57,7 +57,7 @@ void test (TrilinosWrappers::SparseMatrix &m)
     FullMatrix<double> full_matrix(2,2);
     full_matrix(0,0) = full_matrix(1,1) = 1.;
     full_matrix(0,1) = full_matrix(1,0) = -1.;
-    std::vector<unsigned int> local_indices (2);
+    std::vector<types::global_dof_index> local_indices (2);
 
     for (unsigned int i=0; i<m.m()-1; ++i)
       {

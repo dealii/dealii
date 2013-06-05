@@ -38,13 +38,13 @@ void test()
   DoFHandler<dim> dofh(tr);
   dofh.distribute_dofs (fe);
 
-  std::map<unsigned int, Point<dim> > points;
+  std::map<types::global_dof_index, Point<dim> > points;
   DoFTools::map_dofs_to_support_points (MappingQ1<dim>(),
 					dofh,
 					points);
   if (Utilities::MPI::this_mpi_process (MPI_COMM_WORLD) == 0)
     {
-      for (typename std::map<unsigned int, Point<dim> >::const_iterator
+      for (typename std::map<types::global_dof_index, Point<dim> >::const_iterator
 	     p = points.begin();
 	   p != points.end();
 	   ++p)

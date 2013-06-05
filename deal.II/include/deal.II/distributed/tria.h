@@ -538,7 +538,7 @@ namespace parallel
        * of active cells in the
        * distributed triangulation.
        */
-      unsigned int n_global_active_cells () const;
+      types::global_dof_index n_global_active_cells () const;
 
       /**
        * Returns the global maximum level. This may be bigger than n_levels.
@@ -689,7 +689,7 @@ namespace parallel
        * in hierarchical ordering is the ith deal cell starting
        * from begin(0).
        */
-      const std::vector<unsigned int> &
+      const std::vector<types::global_dof_index> &
       get_p4est_tree_to_coarse_cell_permutation() const;
 
     private:
@@ -730,7 +730,7 @@ namespace parallel
       struct NumberCache
       {
         std::vector<unsigned int> n_locally_owned_active_cells;
-        unsigned int              n_global_active_cells;
+        types::global_dof_index   n_global_active_cells;
         unsigned int              n_global_levels;
 
         NumberCache();
@@ -834,8 +834,8 @@ namespace parallel
        * by p4est is located on geometrically
        * close coarse grid cells.
        */
-      std::vector<unsigned int> coarse_cell_to_p4est_tree_permutation;
-      std::vector<unsigned int> p4est_tree_to_coarse_cell_permutation;
+      std::vector<types::global_dof_index> coarse_cell_to_p4est_tree_permutation;
+      std::vector<types::global_dof_index> p4est_tree_to_coarse_cell_permutation;
 
       /**
        * Return a pointer to the p4est
@@ -931,7 +931,7 @@ namespace parallel
        * of active cells in the
        * distributed triangulation.
        */
-      unsigned int n_global_active_cells () const;
+      types::global_dof_index n_global_active_cells () const;
       virtual unsigned int n_global_levels () const;
 
       /**
@@ -965,8 +965,8 @@ namespace parallel
        * these variables at a
        * couple places anyway.
        */
-      std::vector<unsigned int> coarse_cell_to_p4est_tree_permutation;
-      std::vector<unsigned int> p4est_tree_to_coarse_cell_permutation;
+      std::vector<types::global_dof_index> coarse_cell_to_p4est_tree_permutation;
+      std::vector<types::global_dof_index> p4est_tree_to_coarse_cell_permutation;
 
       /**
        * dummy settings

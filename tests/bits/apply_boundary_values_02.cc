@@ -80,13 +80,13 @@ void test ()
                                    // (1) writing them into the matrix and
                                    // applying boundary values later on, or
                                    // (2) applying them right away
-  std::map<unsigned int, double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ConstantFunction<dim>(1.),
 					    boundary_values);
   
-  std::vector<unsigned int> local_dofs (fe.dofs_per_cell);
+  std::vector<types::global_dof_index> local_dofs (fe.dofs_per_cell);
   FullMatrix<double> local_matrix (fe.dofs_per_cell, fe.dofs_per_cell);
   Vector<double> local_vector (fe.dofs_per_cell);
   for (typename DoFHandler<dim>::active_cell_iterator

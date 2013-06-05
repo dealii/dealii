@@ -94,7 +94,7 @@ void test()
  	= dofh.begin_active();
 
       const unsigned int dofs_per_cell = dofh.get_fe().dofs_per_cell;
-      std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+      std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
       for (; cell != dofh.end(); ++cell)
 	if (cell->is_ghost())
@@ -103,7 +103,7 @@ void test()
 	    std::sort(local_dof_indices.begin(), local_dof_indices.end());
 
 					     //macros are evil...
-	    unsigned int invalid_dofindex = DoFHandler<dim,dim>::invalid_dof_index;
+      types::global_dof_index invalid_dofindex = DoFHandler<dim,dim>::invalid_dof_index;
 	    Assert((*local_dof_indices.rbegin())!=invalid_dofindex, ExcInternalError());
 
 	  }

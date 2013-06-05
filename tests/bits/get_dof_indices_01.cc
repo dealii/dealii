@@ -12,8 +12,8 @@
 //----------------------------  get_dof_indices_01.cc  ---------------------------
 
 
-// make sure we can call DoFCellAccessor::get_dof_indices also for
-// inactive cells
+// we used to be able to call DoFCellAccessor::get_dof_indices also for
+// inactive cells, check that this is now forbidden.
 
 #include "../tests.h"
 #include <deal.II/base/function.h>
@@ -53,12 +53,21 @@ void test ()
 
 				   // loop over all cells, active or
 				   // not
-  std::vector<unsigned int> local_dof_indices (fe.dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
   for (typename DoFHandler<dim>::cell_iterator cell=dof_handler.begin();
        cell != dof_handler.end(); ++cell)
     {
-      cell->get_dof_indices (local_dof_indices);
-
+      try
+	{	  
+	  cell->get_dof_indices (local_dof_indices);
+	}
+      catch(...)
+	{
+	  deallog << "Assertion: cell not active." << std::endl;
+	  continue;
+	}
+      
+      
       deallog << "Cell = " << cell
 	      << ", DoFs=";
       for (unsigned int i=0; i<fe.dofs_per_cell; ++i)
@@ -76,6 +85,7 @@ void test ()
 
 int main ()
 {
+  deal_II_exceptions::disable_abort_on_exception();
   std::ofstream logfile("get_dof_indices_01/output");
   deallog.attach(logfile);
   deallog.depth_console(0);

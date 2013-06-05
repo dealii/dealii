@@ -98,15 +98,15 @@ void test()
  	= dofh.begin_active();
 
        const unsigned int dofs_per_cell = dofh.get_fe().dofs_per_cell;
-       std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+       std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
        for (; cell != dofh.end(); ++cell)
 	 if (!cell->is_artificial())
 	 {
 	   cell->get_dof_indices (local_dof_indices);
-	   for (std::vector<unsigned int>::iterator it=local_dof_indices.begin(); it!= local_dof_indices.end(); ++it)
+	   for (std::vector<types::global_dof_index>::iterator it=local_dof_indices.begin(); it!= local_dof_indices.end(); ++it)
 	     {
-	       unsigned int invalid_dofindex = DoFHandler<dim,dim>::invalid_dof_index;
+         types::global_dof_index invalid_dofindex = DoFHandler<dim,dim>::invalid_dof_index;
 	       Assert(*it!=invalid_dofindex, ExcInternalError());
 	       control_dof_set.insert(*it);
 	     }

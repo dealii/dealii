@@ -130,6 +130,11 @@ class SparseVanka
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Constructor. Gets the matrix
    * for preconditioning and a bit
    * vector with entries @p true for
@@ -309,8 +314,8 @@ private:
    * mode, several copies of this
    * function are spawned.
    */
-  void compute_inverses (const unsigned int begin,
-                         const unsigned int end);
+  void compute_inverses (const size_type begin,
+                         const size_type end);
 
   /**
    * Compute the inverse of the
@@ -326,8 +331,8 @@ private:
    * the case where this function
    * re-creates it each time.
    */
-  void compute_inverse (const unsigned int         row,
-                        std::vector<unsigned int> &local_indices);
+  void compute_inverse (const size_type         row,
+                        std::vector<size_type> &local_indices);
 
   /**
    * Make the derived class a
@@ -510,6 +515,11 @@ template<typename number>
 class SparseBlockVanka : public SparseVanka<number>
 {
 public:
+  /**
+   * Declate type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
   /**
    * Enumeration of the different
    * methods by which the DoFs are

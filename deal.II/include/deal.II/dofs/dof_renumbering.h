@@ -445,8 +445,8 @@ namespace DoFRenumbering
     /**
      * Return true if c1 less c2.
      */
-    bool operator () (const std::pair<Point<dim>,unsigned int> &c1,
-                      const std::pair<Point<dim>,unsigned int> &c2) const
+    bool operator () (const std::pair<Point<dim>,types::global_dof_index> &c1,
+                      const std::pair<Point<dim>,types::global_dof_index> &c2) const
     {
       const Point<dim> diff = c2.first-c1.first;
       return (diff*dir > 0 || (diff*dir==0 && c1.second<c2.second));
@@ -521,7 +521,7 @@ namespace DoFRenumbering
      */
     template <class DH>
     void
-    compute_Cuthill_McKee (std::vector<unsigned int> &new_dof_indices,
+    compute_Cuthill_McKee (std::vector<types::global_dof_index> &new_dof_indices,
                            const DH &,
                            const bool reversed_numbering = false,
                            const bool use_constraints    = false);
@@ -566,7 +566,7 @@ namespace DoFRenumbering
      */
     template <class DH>
     void
-    compute_king_ordering (std::vector<unsigned int> &new_dof_indices,
+    compute_king_ordering (std::vector<types::global_dof_index> &new_dof_indices,
                            const DH &,
                            const bool reversed_numbering = false,
                            const bool use_constraints    = false);
@@ -612,7 +612,7 @@ namespace DoFRenumbering
      */
     template <class DH>
     void
-    compute_minimum_degree (std::vector<unsigned int> &new_dof_indices,
+    compute_minimum_degree (std::vector<types::global_dof_index> &new_dof_indices,
                             const DH &,
                             const bool reversed_numbering = false,
                             const bool use_constraints    = false);
@@ -641,7 +641,7 @@ namespace DoFRenumbering
   Cuthill_McKee (DH                              &dof_handler,
                  const bool                       reversed_numbering = false,
                  const bool                       use_constraints    = false,
-                 const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int>());
+                 const std::vector<types::global_dof_index> &starting_indices   = std::vector<types::global_dof_index>());
 
   /**
    * Computes the renumbering
@@ -654,11 +654,11 @@ namespace DoFRenumbering
    */
   template <class DH>
   void
-  compute_Cuthill_McKee (std::vector<unsigned int> &new_dof_indices,
+  compute_Cuthill_McKee (std::vector<types::global_dof_index> &new_dof_indices,
                          const DH &,
                          const bool reversed_numbering = false,
                          const bool use_constraints    = false,
-                         const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int>());
+                         const std::vector<types::global_dof_index> &starting_indices   = std::vector<types::global_dof_index>());
 
   /**
    * Renumber the degrees of
@@ -688,7 +688,7 @@ namespace DoFRenumbering
   Cuthill_McKee (DH &dof_handler,
                  const unsigned int          level,
                  const bool                  reversed_numbering = false,
-                 const std::vector<unsigned int> &starting_indices   = std::vector<unsigned int> ());
+                 const std::vector<types::global_dof_index> &starting_indices   = std::vector<types::global_dof_index> ());
 
   /**
    * @name Component-wise numberings
@@ -817,8 +817,8 @@ namespace DoFRenumbering
    * the renumbering vector.
    */
   template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
-  unsigned int
-  compute_component_wise (std::vector<unsigned int> &new_dof_indices,
+  types::global_dof_index
+  compute_component_wise (std::vector<types::global_dof_index> &new_dof_indices,
                           const ITERATOR &start,
                           const ENDITERATOR &end,
                           const std::vector<unsigned int> &target_component,
@@ -920,8 +920,8 @@ namespace DoFRenumbering
    * the renumbering vector.
    */
   template <int dim, int spacedim, class ITERATOR, class ENDITERATOR>
-  unsigned int
-  compute_block_wise (std::vector<unsigned int> &new_dof_indices,
+  types::global_dof_index
+  compute_block_wise (std::vector<types::global_dof_index> &new_dof_indices,
                       const ITERATOR &start,
                       const ENDITERATOR &end);
 
@@ -973,8 +973,8 @@ namespace DoFRenumbering
    */
   template <class DH>
   void
-  compute_cell_wise (std::vector<unsigned int> &renumbering,
-                     std::vector<unsigned int> &inverse_renumbering,
+  compute_cell_wise (std::vector<types::global_dof_index> &renumbering,
+                     std::vector<types::global_dof_index> &inverse_renumbering,
                      const DH &dof_handler,
                      const std::vector<typename DH::active_cell_iterator> &cell_order);
 
@@ -1000,8 +1000,8 @@ namespace DoFRenumbering
    */
   template <class DH>
   void
-  compute_cell_wise (std::vector<unsigned int> &renumbering,
-                     std::vector<unsigned int> &inverse_renumbering,
+  compute_cell_wise (std::vector<types::global_dof_index> &renumbering,
+                     std::vector<types::global_dof_index> &inverse_renumbering,
                      const DH   &dof_handler,
                      const unsigned int         level,
                      const std::vector<typename DH::level_cell_iterator> &cell_order);
@@ -1139,8 +1139,8 @@ namespace DoFRenumbering
    */
   template <class DH>
   void
-  compute_downstream (std::vector<unsigned int> &new_dof_indices,
-                      std::vector<unsigned int> &reverse,
+  compute_downstream (std::vector<types::global_dof_index> &new_dof_indices,
+                      std::vector<types::global_dof_index> &reverse,
                       const DH                  &dof_handler,
                       const Point<DH::space_dimension>          &direction,
                       const bool                 dof_wise_renumbering);
@@ -1156,8 +1156,8 @@ namespace DoFRenumbering
    */
   template <class DH>
   void
-  compute_downstream (std::vector<unsigned int> &new_dof_indices,
-                      std::vector<unsigned int> &reverse,
+  compute_downstream (std::vector<types::global_dof_index> &new_dof_indices,
+                      std::vector<types::global_dof_index> &reverse,
                       const DH &dof_handler,
                       const unsigned int         level,
                       const Point<DH::space_dimension>          &direction,
@@ -1206,7 +1206,7 @@ namespace DoFRenumbering
    */
   template <class DH>
   void
-  compute_clockwise_dg (std::vector<unsigned int> &new_dof_indices,
+  compute_clockwise_dg (std::vector<types::global_dof_index> &new_dof_indices,
                         const DH                  &dof_handler,
                         const Point<DH::space_dimension>          &center,
                         const bool                 counter);
@@ -1275,7 +1275,7 @@ namespace DoFRenumbering
    */
   template <class DH>
   void
-  compute_sort_selected_dofs_back (std::vector<unsigned int> &new_dof_indices,
+  compute_sort_selected_dofs_back (std::vector<types::global_dof_index> &new_dof_indices,
                                    const DH                  &dof_handler,
                                    const std::vector<bool>   &selected_dofs);
 
@@ -1296,7 +1296,7 @@ namespace DoFRenumbering
    */
   template <class DH>
   void
-  compute_sort_selected_dofs_back (std::vector<unsigned int> &new_dof_indices,
+  compute_sort_selected_dofs_back (std::vector<types::global_dof_index> &new_dof_indices,
                                    const DH                  &dof_handler,
                                    const std::vector<bool>   &selected_dofs,
                                    const unsigned int         level);
@@ -1319,7 +1319,7 @@ namespace DoFRenumbering
    */
   template <class DH>
   void
-  compute_random (std::vector<unsigned int> &new_dof_indices,
+  compute_random (std::vector<types::global_dof_index> &new_dof_indices,
                   const DH &dof_handler);
 
   /**
@@ -1381,7 +1381,7 @@ namespace DoFRenumbering
    */
   template <class DH>
   void
-  compute_subdomain_wise (std::vector<unsigned int> &new_dof_indices,
+  compute_subdomain_wise (std::vector<types::global_dof_index> &new_dof_indices,
                           const DH                  &dof_handler);
 
   /**

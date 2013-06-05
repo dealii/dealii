@@ -84,7 +84,7 @@ void EvaluateDerivative (DoFHandler<2> *dof_handler,
     double err_l2 = 0,
       err_hdiv = 0;
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     for (; cell!=endc; ++cell)
     {
@@ -163,7 +163,7 @@ void create_mass_matrix (const Mapping<dim>       &mapping,
   std::vector<Vector<double> > coefficient_vector_values (n_q_points,
 							  Vector<double> (n_components));
 
-  std::vector<unsigned int> dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices (dofs_per_cell);
 
   std::vector<Vector<double> > rhs_values(n_q_points, Vector<double>(n_components));
 
@@ -436,7 +436,7 @@ void project (const Mapping<dim>       &mapping,
   const FiniteElement<dim> &fe = dof.get_fe();
 
 				   // make up boundary values
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
 
   if (enforce_zero_boundary == true)
 				     // no need to project boundary
@@ -467,7 +467,7 @@ void project (const Mapping<dim>       &mapping,
 				       // one line or one vertex
       typename DoFHandler<dim>::active_cell_iterator cell = dof.begin_active(),
 						     endc = dof.end();
-      std::vector<unsigned int> face_dof_indices (fe.dofs_per_face);
+      std::vector<types::global_dof_index> face_dof_indices (fe.dofs_per_face);
       for (; cell!=endc; ++cell)
 	for (unsigned int f=0; f<GeometryInfo<dim>::faces_per_cell; ++f)
 	  if (cell->face(f)->at_boundary())

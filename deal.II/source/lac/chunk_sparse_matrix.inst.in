@@ -81,13 +81,13 @@ for (S1, S2 : REAL_SCALARS)
 		const S1) const;
     template void ChunkSparseMatrix<S1>::
       PSOR<S2> (Vector<S2> &,
-		const std::vector<unsigned int>&,
-		const std::vector<unsigned int>&,
+		const std::vector<types::global_dof_index>&,
+		const std::vector<types::global_dof_index>&,
 		const S1) const;
     template void ChunkSparseMatrix<S1>::
       TPSOR<S2> (Vector<S2> &,
-		 const std::vector<unsigned int>&,
-		 const std::vector<unsigned int>&,
+		 const std::vector<types::global_dof_index>&,
+		 const std::vector<types::global_dof_index>&,
 		 const S1) const;
     template void ChunkSparseMatrix<S1>::
       SOR_step<S2> (Vector<S2> &,
@@ -188,13 +188,13 @@ for (S1, S2, S3 : REAL_SCALARS;
 // 		const S1) const;
 //     template void ChunkSparseMatrix<S1>::
 //       PSOR<S2> (Vector<S2> &,
-// 		const std::vector<unsigned int>&,
-// 		const std::vector<unsigned int>&,
+// 		const std::vector<types::global_dof_index>&,
+// 		const std::vector<types::global_dof_index>&,
 // 		const S1) const;
 //     template void ChunkSparseMatrix<S1>::
 //       TPSOR<S2> (Vector<S2> &,
-// 		 const std::vector<unsigned int>&,
-// 		 const std::vector<unsigned int>&,
+// 		 const std::vector<types::global_dof_index>&,
+// 		 const std::vector<types::global_dof_index>&,
 // 		 const S1) const;
 //     template void ChunkSparseMatrix<S1>::
 //       SOR_step<S2> (Vector<S2> &,

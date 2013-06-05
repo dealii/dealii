@@ -40,7 +40,7 @@ template <int dim>
 void
 print_dofs (const DoFHandler<dim> &dof)
 {
-  std::vector<unsigned int> v (dof.get_fe().dofs_per_cell);
+  std::vector<types::global_dof_index> v (dof.get_fe().dofs_per_cell);
   for (typename DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
        cell != dof.end(); ++cell)
     {
@@ -58,7 +58,7 @@ template <int dim>
 void
 print_dofs (const MGDoFHandler<dim> &dof, unsigned int level)
 {
-  std::vector<unsigned int> v (dof.get_fe().dofs_per_cell);
+  std::vector<types::global_dof_index> v (dof.get_fe().dofs_per_cell);
   for (typename MGDoFHandler<dim>::cell_iterator cell=dof.begin(level);
        cell != dof.end(level); ++cell)
     {

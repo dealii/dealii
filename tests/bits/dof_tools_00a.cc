@@ -29,7 +29,7 @@ check_this (const DoFHandler<dim> &dof_handler)
 
   deallog << "n_dofs:" << dof_handler.n_dofs() << std::endl;
   
-  std::vector<unsigned int> dofs_per_component(n_components);
+  std::vector<types::global_dof_index> dofs_per_component(n_components);
   DoFTools::count_dofs_per_component (dof_handler,
 				      dofs_per_component);
 

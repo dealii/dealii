@@ -39,7 +39,7 @@ template <int dim>
 void
 print_dofs (const hp::DoFHandler<dim> &dof)
 {
-  std::vector<unsigned int> v;
+  std::vector<types::global_dof_index> v;
   for (typename hp::DoFHandler<dim>::active_cell_iterator cell=dof.begin_active();
        cell != dof.end(); ++cell)
     {

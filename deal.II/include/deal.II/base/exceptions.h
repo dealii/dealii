@@ -678,10 +678,29 @@ namespace StandardExceptions
                   << arg3 << "[");
 
   /**
+   * This generic exception will allow(enforce) the user to specify
+   * the type of indices which adds type safety to the program.
+   */
+  template<typename T>
+  DeclException3 (ExcIndexRangeType,
+                  T,T,T,
+                  << "Index " << arg1 << " is not in [" << arg2 << ","
+                  << arg3 << "[");
+
+  /**
    * A number is too small.
    */
   DeclException2 (ExcLowerRange,
                   int, int,
+                  << "Number " << arg1 << " must be larger or equal "
+                  << arg2);
+
+  /**
+   * A generic exception definition for the ExcLowerRange above.
+   */
+  template<typename T>
+  DeclException2 (ExcLowerRangeType,
+                  T, T,
                   << "Number " << arg1 << " must be larger or equal "
                   << arg2);
 
@@ -804,6 +823,9 @@ namespace StandardExceptions
  */
 #define AssertIndexRange(index,range) Assert((index) < (range), \
                                              ExcIndexRange((index),0,(range)))
+
+#define AssertGlobalIndexRange(index,range) Assert((index) < (range), \
+						   ExcIndexRange<types::global_dof_index>((index),0,(range)))
 
 using namespace StandardExceptions;
 

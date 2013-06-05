@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 2011, 2012 by deal.II authors
+//    Copyright (C) 2011, 2012, 2013 by deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -20,6 +20,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/memory_consumption.h>
 
+#include <limits>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -204,7 +205,7 @@ namespace Utilities
        * the individual processor on the ghost
        * elements present (second entry).
        */
-      const std::vector<std::pair<unsigned int,unsigned int> > &
+      const std::vector<std::pair<unsigned int, types::global_dof_index> > &
       ghost_targets() const;
 
       /**
@@ -215,7 +216,7 @@ namespace Utilities
        * but tailored to be iterated over, and some
        * indices may be duplicates.
        */
-      const std::vector<std::pair<unsigned int, unsigned int> > &
+      const std::vector<std::pair<types::global_dof_index, types::global_dof_index> > &
       import_indices() const;
 
       /**
@@ -233,7 +234,7 @@ namespace Utilities
        * indices that are ghosts on other
        * processors.
        */
-      const std::vector<std::pair<unsigned int,unsigned int> > &
+      const std::vector<std::pair<unsigned int, types::global_dof_index> > &
       import_targets() const;
 
       /**
@@ -284,7 +285,8 @@ namespace Utilities
        * Exception
        */
       DeclException2 (ExcIndexNotPresent,
-                      unsigned int, unsigned int,
+                      types::global_dof_index,
+		      unsigned int,
                       << "Global index " << arg1
                       << " neither owned nor ghost on proc " << arg2);
 
@@ -325,7 +327,7 @@ namespace Utilities
        * ghost indices belong to and how many those
        * indices are
        */
-      std::vector<std::pair<unsigned int,unsigned int> > ghost_targets_data;
+      std::vector<std::pair<unsigned int, types::global_dof_index> > ghost_targets_data;
 
       /**
        * The set of (local) indices that we are
@@ -335,7 +337,7 @@ namespace Utilities
        * but tailored to be iterated over, and some
        * indices may be duplicates.
        */
-      std::vector<std::pair<unsigned int, unsigned int> > import_indices_data;
+      std::vector<std::pair<types::global_dof_index, types::global_dof_index> > import_indices_data;
 
       /**
        * Caches the number of ghost indices. It
@@ -349,7 +351,7 @@ namespace Utilities
        * The set of processors and length of data
        * field which send us their ghost data
        */
-      std::vector<std::pair<unsigned int,unsigned int> > import_targets_data;
+      std::vector<std::pair<unsigned int,types::global_dof_index> > import_targets_data;
 
       /**
        * The ID of the current processor in the MPI
@@ -405,7 +407,10 @@ namespace Utilities
     unsigned int
     Partitioner::local_size () const
     {
-      return local_range_data.second - local_range_data.first;
+      types::global_dof_index size= local_range_data.second - local_range_data.first;
+      Assert(size<=std::numeric_limits<unsigned int>::max(),
+	     ExcNotImplemented());
+      return static_cast<unsigned int>(size);
     }
 
 
@@ -441,10 +446,10 @@ namespace Utilities
       Assert(in_local_range(global_index) || is_ghost_entry (global_index),
              ExcIndexNotPresent(global_index, my_pid));
       if (in_local_range(global_index))
-        return global_index - local_range_data.first;
+        return static_cast<unsigned int>(global_index - local_range_data.first);
       else if (is_ghost_entry (global_index))
         return (local_size() +
-                ghost_indices_data.index_within_set (global_index));
+                static_cast<unsigned int>(ghost_indices_data.index_within_set (global_index)));
       else
         // should only end up here in
         // optimized mode, when we use this
@@ -487,7 +492,7 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<unsigned int,unsigned int> > &
+    const std::vector<std::pair<unsigned int, types::global_dof_index> > &
     Partitioner::ghost_targets() const
     {
       return ghost_targets_data;
@@ -495,7 +500,7 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<unsigned int, unsigned int> > &
+    const std::vector<std::pair<types::global_dof_index, types::global_dof_index> > &
     Partitioner::import_indices() const
     {
       return import_indices_data;
@@ -513,7 +518,7 @@ namespace Utilities
 
 
     inline
-    const std::vector<std::pair<unsigned int,unsigned int> > &
+    const std::vector<std::pair<unsigned int,types::global_dof_index> > &
     Partitioner::import_targets() const
     {
       return import_targets_data;

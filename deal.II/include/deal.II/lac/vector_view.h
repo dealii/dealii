@@ -132,6 +132,12 @@ template<typename Number>
 class VectorView : public Vector<Number>
 {
 public:
+
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
   /**
    * Read write constructor. Takes the size
    * of the vector, just like the standard
@@ -139,7 +145,7 @@ public:
    * from the location of the pointer @p
    * ptr.
    */
-  VectorView(const unsigned int new_size, Number *ptr);
+  VectorView(const size_type new_size, Number *ptr);
 
   /**
    * The constant constructor is the same
@@ -154,7 +160,7 @@ public:
    * construct it as a non const object or
    * attempt to write on it.
    */
-  VectorView(const unsigned int new_size, const Number *ptr);
+  VectorView(const size_type new_size, const Number *ptr);
 
   /**
    * This desctructor will only reset the
@@ -221,7 +227,7 @@ public:
    * call this reinit function if you
    * really know what you are doing.
    */
-  virtual void reinit (const unsigned int N,
+  virtual void reinit (const size_type N,
                        const bool         fast=false);
 
   /** This reinit function is
@@ -229,7 +235,7 @@ public:
       new object with the given
       size, starting from the
       pointer ptr. */
-  void reinit(const unsigned int N, Number *ptr);
+  void reinit(const size_type N, Number *ptr);
 
   /** This reinit function is
       equivalent to constructing a
@@ -238,7 +244,7 @@ public:
       pointer ptr. The same
       considerations made for the
       constructor apply here. */
-  void reinit(const unsigned int N, const Number *ptr);
+  void reinit(const size_type N, const Number *ptr);
 
   /**
    * This function is here to prevent
@@ -257,7 +263,7 @@ public:
 
 template<typename Number>
 inline
-VectorView<Number>::VectorView(const unsigned int new_size, Number *ptr)
+VectorView<Number>::VectorView(const size_type new_size, Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
@@ -268,7 +274,7 @@ VectorView<Number>::VectorView(const unsigned int new_size, Number *ptr)
 
 template<typename Number>
 inline
-VectorView<Number>::VectorView(const unsigned int new_size, const Number *ptr)
+VectorView<Number>::VectorView(const size_type new_size, const Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
@@ -291,7 +297,7 @@ VectorView<Number>::~VectorView()
 
 template<typename Number>
 inline
-void VectorView<Number>::reinit(const unsigned int N, const bool fast)
+void VectorView<Number>::reinit(const size_type N, const bool fast)
 {
   this->vec_size = N;
   this->max_vec_size = N;
@@ -302,7 +308,7 @@ void VectorView<Number>::reinit(const unsigned int N, const bool fast)
 
 template<typename Number>
 inline
-void VectorView<Number>::reinit(const unsigned int new_size, Number *ptr)
+void VectorView<Number>::reinit(const size_type new_size, Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;
@@ -312,7 +318,7 @@ void VectorView<Number>::reinit(const unsigned int new_size, Number *ptr)
 
 template<typename Number>
 inline
-void VectorView<Number>::reinit(const unsigned int new_size, const Number *ptr)
+void VectorView<Number>::reinit(const size_type new_size, const Number *ptr)
 {
   this->vec_size      = new_size;
   this->max_vec_size  = new_size;

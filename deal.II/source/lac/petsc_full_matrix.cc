@@ -22,8 +22,8 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace PETScWrappers
 {
-  FullMatrix::FullMatrix (const unsigned int m,
-                          const unsigned int n)
+  FullMatrix::FullMatrix (const size_type m,
+                          const size_type n)
   {
     const int ierr
       = MatCreateSeqDense(PETSC_COMM_SELF, m, n, PETSC_NULL,

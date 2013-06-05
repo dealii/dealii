@@ -636,7 +636,7 @@ namespace Step32
         StokesPreconditioner (const StokesPreconditioner &data);
 
         FullMatrix<double>          local_matrix;
-        std::vector<unsigned int>   local_dof_indices;
+        std::vector<types::global_dof_index> local_dof_indices;
       };
 
       template <int dim>
@@ -693,7 +693,7 @@ namespace Step32
 
         FullMatrix<double>          local_mass_matrix;
         FullMatrix<double>          local_stiffness_matrix;
-        std::vector<unsigned int>   local_dof_indices;
+        std::vector<types::global_dof_index>   local_dof_indices;
       };
 
       template <int dim>
@@ -725,7 +725,7 @@ namespace Step32
         TemperatureRHS (const TemperatureRHS &data);
 
         Vector<double>              local_rhs;
-        std::vector<unsigned int>   local_dof_indices;
+        std::vector<types::global_dof_index> local_dof_indices;
         FullMatrix<double>          matrix_for_bc;
       };
 
@@ -1711,7 +1711,7 @@ namespace Step32
     const unsigned int dofs_per_cell = fe_values.dofs_per_cell,
                        n_q_points    = fe_values.n_quadrature_points;
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
     Vector<double> cell_vector (dofs_per_cell);
     FullMatrix<double> matrix_for_bc (dofs_per_cell, dofs_per_cell);
 
@@ -2029,7 +2029,7 @@ namespace Step32
 
     temperature_dof_handler.distribute_dofs (temperature_fe);
 
-    std::vector<unsigned int> stokes_dofs_per_block (2);
+    std::vector<types::global_dof_index> stokes_dofs_per_block (2);
     DoFTools::count_dofs_per_block (stokes_dof_handler, stokes_dofs_per_block,
                                     stokes_sub_blocks);
 
@@ -3358,9 +3358,9 @@ namespace Step32
     joint_solution.reinit (joint_dof_handler.locally_owned_dofs(), MPI_COMM_WORLD);
 
     {
-      std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
-      std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
-      std::vector<unsigned int> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
+      std::vector<types::global_dof_index> local_joint_dof_indices (joint_fe.dofs_per_cell);
+      std::vector<types::global_dof_index> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
+      std::vector<types::global_dof_index> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
 
       typename DoFHandler<dim>::active_cell_iterator
       joint_cell       = joint_dof_handler.begin_active(),

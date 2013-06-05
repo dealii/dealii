@@ -43,14 +43,14 @@ void test ()
   TrilinosWrappers::MPI::Vector test1(locally_owned);
   if (myid==0)
   {
-    unsigned int idx[]={0,1,2,3,4,5,6,7,8};
+    types::global_dof_index idx[]={0,1,2,3,4,5,6,7,8};
     double val[]={0,1,2,3,4,5,6,7,8};
     test1.add(9,idx,val);
   }
   else
   {
    {
-      unsigned int idx[]={1,9,3,10,5,11,12,13,14};
+    types::global_dof_index idx[]={1,9,3,10,5,11,12,13,14};
     double val[]={1,9,3,10,5,11,12,13,14};
     test1.add(9,idx,val);
     }

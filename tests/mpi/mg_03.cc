@@ -92,7 +92,7 @@ void test()
 	
 	for (;cell!=endc;++cell)
 	  {
-	    std::vector<unsigned int> dofs(fe.n_dofs_per_cell());
+	    std::vector<types::global_dof_index> dofs(fe.n_dofs_per_cell());
 	    cell->get_mg_dof_indices(dofs);
 	    
 	    for (unsigned int i=0;i<dofs.size();++i)

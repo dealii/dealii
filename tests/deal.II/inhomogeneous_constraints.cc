@@ -199,12 +199,12 @@ void LaplaceProblem<dim>::setup_system ()
 				   // function.
   {
     test_all_constraints.merge (hanging_nodes_only);
-    std::map<unsigned int,double> boundary_values;
+    std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
 					      0,
 					      BoundaryValues<dim>(),
 					      boundary_values);
-    std::map<unsigned int,double>::const_iterator boundary_value = boundary_values.begin();
+    std::map<types::global_dof_index,double>::const_iterator boundary_value = boundary_values.begin();
     for ( ; boundary_value !=boundary_values.end(); ++boundary_value)
       {
 	if (!test_all_constraints.is_constrained(boundary_value->first))
@@ -290,7 +290,7 @@ void LaplaceProblem<dim>::assemble_reference ()
   FullMatrix<double>   cell_matrix;
   Vector<double>       cell_rhs;
 
-  std::vector<unsigned int> local_dof_indices;
+  std::vector<types::global_dof_index> local_dof_indices;
   
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -337,7 +337,7 @@ void LaplaceProblem<dim>::assemble_reference ()
     }
 
   hanging_nodes_only.condense (reference_matrix, reference_rhs);
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    BoundaryValues<dim>(),
@@ -370,7 +370,7 @@ void LaplaceProblem<dim>::assemble_test_1 ()
   FullMatrix<double>   cell_matrix;
   Vector<double>       cell_rhs;
 
-  std::vector<unsigned int> local_dof_indices;
+  std::vector<types::global_dof_index> local_dof_indices;
   
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -443,7 +443,7 @@ void LaplaceProblem<dim>::assemble_test_2 ()
   FullMatrix<double>   cell_matrix;
   Vector<double>       cell_rhs;
 
-  std::vector<unsigned int> local_dof_indices;
+  std::vector<types::global_dof_index> local_dof_indices;
   
   typename hp::DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),

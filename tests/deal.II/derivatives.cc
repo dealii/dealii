@@ -74,7 +74,7 @@ check (const unsigned int level,
 		    update_values
 		    | update_q_points | update_JxW_values);
 
-  std::vector <unsigned int> global_dofs (element.dofs_per_cell);
+  std::vector <types::global_dof_index> global_dofs (element.dofs_per_cell);
   std::vector <double> function (quadrature.size());
 
   Vector<double> u (dof.n_dofs ());

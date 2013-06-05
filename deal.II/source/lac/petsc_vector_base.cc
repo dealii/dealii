@@ -87,8 +87,8 @@ namespace PETScWrappers
 
               PetscScalar value;
 
-              if ( index>=static_cast<unsigned int>(begin)
-                   && index<static_cast<unsigned int>(end) )
+              if ( index>=static_cast<size_type>(begin)
+                   && index<static_cast<size_type>(end) )
                 {
                   //local entry
                   value = *(ptr+index-begin);
@@ -96,10 +96,10 @@ namespace PETScWrappers
               else
                 {
                   //ghost entry
-                  const unsigned int ghostidx
+                  const size_type ghostidx
                     = vector.ghost_indices.index_within_set(index);
 
-                  Assert(ghostidx+end-begin<(unsigned int)lsize, ExcInternalError());
+                  Assert(ghostidx+end-begin<(size_type)lsize, ExcInternalError());
                   value = *(ptr+ghostidx+end-begin);
                 }
 
@@ -123,8 +123,8 @@ namespace PETScWrappers
 
 
 
-          AssertThrow ((index >= static_cast<unsigned int>(begin)) &&
-                       (index < static_cast<unsigned int>(end)),
+          AssertThrow ((index >= static_cast<size_type>(begin)) &&
+                       (index < static_cast<size_type>(end)),
                        ExcAccessToNonlocalElement (index, begin, end-1));
 
           // old version which only work with
@@ -267,7 +267,7 @@ namespace PETScWrappers
 
 
 
-  unsigned int
+  VectorBase::size_type 
   VectorBase::size () const
   {
     PetscInt sz;
@@ -279,7 +279,7 @@ namespace PETScWrappers
 
 
 
-  unsigned int
+  VectorBase::size_type 
   VectorBase::local_size () const
   {
     PetscInt sz;
@@ -291,7 +291,7 @@ namespace PETScWrappers
 
 
 
-  std::pair<unsigned int, unsigned int>
+  std::pair<VectorBase::size_type, VectorBase::size_type>
   VectorBase::local_range () const
   {
     PetscInt begin, end;
@@ -305,7 +305,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::set (const std::vector<unsigned int> &indices,
+  VectorBase::set (const std::vector<size_type> &indices,
                    const std::vector<PetscScalar>  &values)
   {
     Assert (indices.size() == values.size(),
@@ -316,7 +316,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::add (const std::vector<unsigned int> &indices,
+  VectorBase::add (const std::vector<size_type> &indices,
                    const std::vector<PetscScalar>  &values)
   {
     Assert (indices.size() == values.size(),
@@ -327,7 +327,7 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::add (const std::vector<unsigned int>    &indices,
+  VectorBase::add (const std::vector<size_type>    &indices,
                    const ::dealii::Vector<PetscScalar> &values)
   {
     Assert (indices.size() == values.size(),
@@ -338,9 +338,9 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::add (const unsigned int  n_elements,
-                   const unsigned int *indices,
-                   const PetscScalar  *values)
+  VectorBase::add (const size_type    n_elements,
+                   const size_type   *indices,
+                   const PetscScalar *values)
   {
     do_set_add_operation(n_elements, indices, values, true);
   }
@@ -409,18 +409,20 @@ namespace PETScWrappers
     return d*d;
   }
 
-
-
+  // @todo does not build with PETSc complex scalar types.
+  // :425:25: error: no match for ‘operator/’ in ‘sum / dealii::PETScWrappers::VectorBase::size()’
   PetscScalar
   VectorBase::mean_value () const
   {
+#ifndef PETSC_USE_COMPLEX
     int ierr;
+
     // We can only use our more efficient
     // routine in the serial case.
     if (dynamic_cast<const PETScWrappers::MPI::Vector *>(this) != 0)
       {
         PetscScalar sum;
-        ierr = VecSum( vector, &sum);
+        ierr = VecSum(vector, &sum);
         AssertThrow (ierr == 0, ExcPETScError(ierr));
         return sum/size();
       }
@@ -463,8 +465,17 @@ namespace PETScWrappers
     AssertThrow (ierr == 0, ExcPETScError(ierr));
 
     return mean;
-  }
 
+#else // PETSC_USE_COMPLEX
+  Assert ((false),
+	  ExcMessage ("Your PETSc/SLEPc installation was configured with scalar-type complex "
+		      "but this function is not defined for complex types."));
+
+  // Prevent compiler warning about no return value
+  PetscScalar dummy;
+  return dummy;
+#endif
+  }
 
 
   VectorBase::real_type
@@ -1034,10 +1045,10 @@ namespace PETScWrappers
       out.setf (std::ios::fixed, std::ios::floatfield);
 
     if (across)
-      for (unsigned int i=0; i<size(); ++i)
+      for (size_type i=0; i<size(); ++i)
         out << val[i] << ' ';
     else
-      for (unsigned int i=0; i<size(); ++i)
+      for (size_type i=0; i<size(); ++i)
         out << val[i] << std::endl;
     out << std::endl;
 
@@ -1093,10 +1104,10 @@ namespace PETScWrappers
 
 
   void
-  VectorBase::do_set_add_operation (const unsigned int  n_elements,
-                                    const unsigned int *indices,
-                                    const PetscScalar  *values,
-                                    const bool          add_values)
+  VectorBase::do_set_add_operation (const size_type    n_elements,
+                                    const size_type   *indices,
+                                    const PetscScalar *values,
+                                    const bool         add_values)
   {
     ::dealii::VectorOperation::values action = (add_values ?
                                                 ::dealii::VectorOperation::add :
@@ -1117,7 +1128,7 @@ namespace PETScWrappers
       {
 #ifdef PETSC_USE_64BIT_INDICES
         std::vector<PetscInt> petsc_ind (n_elements);
-        for (unsigned int i=0; i<n_elements; ++i)
+        for (size_type i=0; i<n_elements; ++i)
           petsc_ind[i] = indices[i];
         const PetscInt *petsc_indices = &petsc_ind[0];
 #else

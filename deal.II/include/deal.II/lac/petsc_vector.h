@@ -48,6 +48,11 @@ namespace PETScWrappers
   {
   public:
     /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
+
+    /**
      * A variable that indicates whether this vector
      * supports distributed data storage. If true, then
      * this vector also needs an appropriate compress()
@@ -82,7 +87,7 @@ namespace PETScWrappers
      * i.e. the vector is replaced by one of
      * length zero.
      */
-    explicit Vector (const unsigned int n);
+    explicit Vector (const size_type n);
 
     /**
      * Copy-constructor from deal.II
@@ -195,8 +200,8 @@ namespace PETScWrappers
      * elements are left an unspecified
      * state.
      */
-    void reinit (const unsigned int N,
-                 const bool         fast = false);
+    void reinit (const size_type N,
+                 const bool      fast = false);
 
     /**
      * Change the dimension to that of the
@@ -219,7 +224,7 @@ namespace PETScWrappers
      * size of the vector to be
      * created.
      */
-    void create_vector (const unsigned int n);
+    void create_vector (const size_type n);
   };
 
   /*@}*/
@@ -411,7 +416,7 @@ namespace PETScWrappers
     // that would take a pointer to an array
     // of PetscScalar values and simply copy
     // n elements verbatim into the vector...
-    for (unsigned int i=0; i<v.size(); ++i)
+    for (size_type i=0; i<v.size(); ++i)
       (*this)(i) = v(i);
 
     compress (::dealii::VectorOperation::insert);

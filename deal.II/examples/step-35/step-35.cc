@@ -402,7 +402,7 @@ namespace Step35
     const double       t_0, T, Re;
 
     EquationData::Velocity<dim>       vel_exact;
-    std::map<unsigned int, double>    boundary_values;
+    std::map<types::global_dof_index, double>    boundary_values;
     std::vector<types::boundary_id> boundary_indicators;
 
     Triangulation<dim> triangulation;
@@ -516,8 +516,8 @@ namespace Step35
       unsigned int              vel_dpc;
       unsigned int              pres_dpc;
       FullMatrix<double>        local_grad;
-      std::vector<unsigned int> vel_local_dof_indices;
-      std::vector<unsigned int> pres_local_dof_indices;
+      std::vector<types::global_dof_index> vel_local_dof_indices;
+      std::vector<types::global_dof_index> pres_local_dof_indices;
 
       InitGradPerTaskData (const unsigned int dd,
                            const unsigned int vdpc,
@@ -572,7 +572,7 @@ namespace Step35
     struct AdvectionPerTaskData
     {
       FullMatrix<double>        local_advection;
-      std::vector<unsigned int> local_dof_indices;
+      std::vector<types::global_dof_index> local_dof_indices;
       AdvectionPerTaskData (const unsigned int dpc)
         :
         local_advection (dpc, dpc),
@@ -1192,7 +1192,7 @@ namespace Step35
 
     phi_n_minus_1 = phi_n;
 
-    static std::map<unsigned int, double> bval;
+    static std::map<types::global_dof_index, double> bval;
     if (reinit_prec)
       VectorTools::interpolate_boundary_values (dof_handler_pressure, 3,
                                                 ZeroFunction<dim>(), bval);
@@ -1276,7 +1276,7 @@ namespace Step35
              dof_handler_pressure.n_dofs()),
             ExcInternalError());
     static Vector<double> joint_solution (joint_dof_handler.n_dofs());
-    std::vector<unsigned int> loc_joint_dof_indices (joint_fe.dofs_per_cell),
+    std::vector<types::global_dof_index> loc_joint_dof_indices (joint_fe.dofs_per_cell),
         loc_vel_dof_indices (fe_velocity.dofs_per_cell),
         loc_pres_dof_indices (fe_pressure.dofs_per_cell);
     typename DoFHandler<dim>::active_cell_iterator
@@ -1361,7 +1361,7 @@ namespace Step35
                               update_values);
     const unsigned int dpc = fe_velocity.dofs_per_cell,
                        nqp = quadrature_velocity.size();
-    std::vector<unsigned int> ldi (dpc);
+    std::vector<types::global_dof_index> ldi (dpc);
     Vector<double> loc_rot (dpc);
 
     std::vector< Tensor<1,dim> > grad_u1 (nqp), grad_u2 (nqp);

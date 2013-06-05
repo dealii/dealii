@@ -500,10 +500,10 @@ namespace Step43
                                             const FEValues<dim>             &darcy_fe_values,
                                             const double                     global_max_u_F_prime,
                                             const double                     global_S_variation,
-                                            const std::vector<unsigned int> &local_dof_indices);
+                                            const std::vector<types::global_dof_index> &local_dof_indices);
     void assemble_saturation_rhs_boundary_term (const FEFaceValues<dim>             &saturation_fe_face_values,
                                                 const FEFaceValues<dim>             &darcy_fe_face_values,
-                                                const std::vector<unsigned int>     &local_dof_indices);
+                                                const std::vector<types::global_dof_index>     &local_dof_indices);
     void solve ();
     void refine_mesh (const unsigned int              min_grid_level,
                       const unsigned int              max_grid_level);
@@ -709,7 +709,7 @@ namespace Step43
     }
 
 
-    std::vector<unsigned int> darcy_dofs_per_block (2);
+    std::vector<types::global_dof_index> darcy_dofs_per_block (2);
     DoFTools::count_dofs_per_block (darcy_dof_handler, darcy_dofs_per_block, darcy_block_component);
     const unsigned int n_u = darcy_dofs_per_block[0],
                        n_p = darcy_dofs_per_block[1],
@@ -893,7 +893,7 @@ namespace Step43
     std::vector<double>               old_saturation_values (n_q_points);
 
     FullMatrix<double>                local_matrix (dofs_per_cell, dofs_per_cell);
-    std::vector<unsigned int>         local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index>         local_dof_indices (dofs_per_cell);
 
     std::vector<Tensor<1,dim> > phi_u   (dofs_per_cell);
     std::vector<Tensor<1,dim> > grad_phi_p (dofs_per_cell);
@@ -1038,7 +1038,7 @@ namespace Step43
     FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       local_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     const PressureRightHandSide<dim>  pressure_right_hand_side;
     const PressureBoundaryValues<dim> pressure_boundary_values;
@@ -1235,7 +1235,7 @@ namespace Step43
     FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       local_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = saturation_dof_handler.begin_active(),
@@ -1310,7 +1310,7 @@ namespace Step43
                                                           update_values);
 
     const unsigned int dofs_per_cell = saturation_dof_handler.get_fe().dofs_per_cell;
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     const double                   global_max_u_F_prime = get_max_u_F_prime ();
     const std::pair<double,double> global_S_range       = get_extrapolated_saturation_range ();
@@ -1367,7 +1367,7 @@ namespace Step43
                                      const FEValues<dim>             &darcy_fe_values,
                                      const double                     global_max_u_F_prime,
                                      const double                     global_S_variation,
-                                     const std::vector<unsigned int> &local_dof_indices)
+                                     const std::vector<types::global_dof_index> &local_dof_indices)
   {
     const unsigned int dofs_per_cell = saturation_fe_values.dofs_per_cell;
     const unsigned int n_q_points    = saturation_fe_values.n_quadrature_points;
@@ -1440,7 +1440,7 @@ namespace Step43
   TwoPhaseFlowProblem<dim>::
   assemble_saturation_rhs_boundary_term (const FEFaceValues<dim>             &saturation_fe_face_values,
                                          const FEFaceValues<dim>             &darcy_fe_face_values,
-                                         const std::vector<unsigned int>     &local_dof_indices)
+                                         const std::vector<types::global_dof_index>     &local_dof_indices)
   {
     const unsigned int dofs_per_cell      = saturation_fe_face_values.dofs_per_cell;
     const unsigned int n_face_q_points    = saturation_fe_face_values.n_quadrature_points;
@@ -1771,9 +1771,9 @@ namespace Step43
     Vector<double> joint_solution (joint_dof_handler.n_dofs());
 
     {
-      std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
-      std::vector<unsigned int> local_darcy_dof_indices (darcy_fe.dofs_per_cell);
-      std::vector<unsigned int> local_saturation_dof_indices (saturation_fe.dofs_per_cell);
+      std::vector<types::global_dof_index> local_joint_dof_indices (joint_fe.dofs_per_cell);
+      std::vector<types::global_dof_index> local_darcy_dof_indices (darcy_fe.dofs_per_cell);
+      std::vector<types::global_dof_index> local_saturation_dof_indices (saturation_fe.dofs_per_cell);
 
       typename DoFHandler<dim>::active_cell_iterator
       joint_cell      = joint_dof_handler.begin_active(),

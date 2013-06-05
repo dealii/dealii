@@ -104,7 +104,7 @@ void MixedElastoPlasticity<dim>::make_grid_and_dofs()
   DoFRenumbering::component_wise(dof_handler);
 
 				   // total number of dof per block component
-  std::vector<unsigned int> dofs_per_block(2);
+  std::vector<types::global_dof_index> dofs_per_block(2);
   DoFTools::count_dofs_per_block(dof_handler, dofs_per_block, block_component);
 
   const unsigned int n_stress_dof = dofs_per_block[0];
@@ -169,7 +169,7 @@ void MixedElastoPlasticity<dim>::assemble_system()
   FullMatrix<double> local_matrix(dofs_per_cell, dofs_per_cell);
   Vector<double> local_rhs(dofs_per_cell);
 
-  std::vector<unsigned int> local_dof_indices(dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices(dofs_per_cell);
 
 
   const FEValuesExtractors::SymmetricTensor<2> stress(0);

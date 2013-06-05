@@ -146,7 +146,7 @@ int main ()
 	block_component[comp] = 2;
     }//comp
 
-  std::vector<unsigned int> dofs_per_block(3,0);//3 blocks, count dofs:
+  std::vector<types::global_dof_index> dofs_per_block(3,0);//3 blocks, count dofs:
   DoFTools::count_dofs_per_component (dh, dofs_per_block, false, block_component);
 
   DoFRenumbering::component_wise(dh, block_component);
@@ -219,8 +219,8 @@ int main ()
 
   const unsigned int   dofs_per_fl_msh_face = fluid_fe->dofs_per_face;
   const unsigned int   dofs_per_solid_face  = solid_fe->dofs_per_face;
-  std::vector<unsigned int> fl_msh_face_dof_indices (dofs_per_fl_msh_face);
-  std::vector<unsigned int> solid_face_dof_indices  (dofs_per_solid_face );
+  std::vector<types::global_dof_index> fl_msh_face_dof_indices (dofs_per_fl_msh_face);
+  std::vector<types::global_dof_index> solid_face_dof_indices  (dofs_per_solid_face );
 
   std::vector<std::pair<unsigned int, unsigned int> > solid_fluid_pairs;
   std::vector<std::pair<unsigned int, unsigned int> > solid_mesh_pairs;
@@ -313,7 +313,7 @@ int main ()
     FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       cell_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     for (hp::DoFHandler<dim>::active_cell_iterator
 	   cell = dh.begin_active();

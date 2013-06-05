@@ -400,7 +400,7 @@ namespace Step46
     // solid. The following piece of code was already presented in the
     // introduction:
     {
-      std::vector<unsigned int> local_face_dof_indices (stokes_fe.dofs_per_face);
+      std::vector<types::global_dof_index> local_face_dof_indices (stokes_fe.dofs_per_face);
       for (typename hp::DoFHandler<dim>::active_cell_iterator
            cell = dof_handler.begin_active();
            cell != dof_handler.end(); ++cell)
@@ -544,8 +544,8 @@ namespace Step46
                                                       stokes_dofs_per_cell);
     Vector<double>            local_rhs;
 
-    std::vector<unsigned int> local_dof_indices;
-    std::vector<unsigned int> neighbor_dof_indices (stokes_dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices;
+    std::vector<types::global_dof_index> neighbor_dof_indices (stokes_dofs_per_cell);
 
     const RightHandSide<dim>  right_hand_side;
 

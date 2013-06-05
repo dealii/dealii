@@ -38,7 +38,7 @@ void test_mpi()
 
   unsigned int num_local=10;
   unsigned int n=numprocs*num_local;
-  std::vector<unsigned int> rows_per_cpu;
+  std::vector<types::global_dof_index> rows_per_cpu;
   for (unsigned int i=0;i<numprocs;++i)
     rows_per_cpu.push_back(num_local);
 

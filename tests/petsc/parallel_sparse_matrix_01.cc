@@ -53,12 +53,14 @@ get_this_mpi_process ()
 
 void test ()
 {
+  typedef PETScWrappers::MPI::SparseMatrix::size_type size_type;
+
                                    // create a parallel matrix where the first
                                    // process has 10 rows, the second one 20,
                                    // the third one 30, and so on
   unsigned int N = 0;
-  std::vector<unsigned int> local_rows_per_process (get_n_mpi_processes());
-  std::vector<unsigned int> start_row (get_n_mpi_processes());
+  std::vector<size_type> local_rows_per_process (get_n_mpi_processes());
+  std::vector<size_type> start_row (get_n_mpi_processes());
   for (unsigned int i=0; i<get_n_mpi_processes(); ++i)
     {
       N += (i+1)*10;

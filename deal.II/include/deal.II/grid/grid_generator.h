@@ -52,6 +52,11 @@ class GridGenerator
 {
 public:
   /**
+   * Declare type for number of cell.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Initialize the given triangulation with a hypercube (line in 1D, square
    * in 2D, etc) consisting of exactly one cell. The hypercube volume is the
    * tensor product interval <i>[left,right]<sup>dim</sup></i> in the present
@@ -261,7 +266,7 @@ public:
   static
   void
   subdivided_parallelepiped (Triangulation<dim>  &tria,
-                             const unsigned int   n_subdivisions,
+                             const size_type     n_subdivisions,
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize = false);
 
@@ -277,7 +282,7 @@ public:
   static
   void
   subdivided_parallelepiped (Triangulation<dim>  &tria,
-                             const unsigned int ( n_subdivisions) [dim],
+                             const size_type    ( n_subdivisions) [dim],
                              const Point<dim>   (&corners) [dim],
                              const bool           colorize = false);
 
@@ -485,7 +490,7 @@ public:
                            const Point<dim>     &center,
                            const double        inner_radius,
                            const double        outer_radius,
-                           const unsigned int  n_cells = 0,
+                           const size_type     n_cells = 0,
                            bool colorize = false);
 
   /**
@@ -514,7 +519,7 @@ public:
                                 const Point<dim>     &center,
                                 const double        inner_radius,
                                 const double        outer_radius,
-                                const unsigned int  n_cells = 0,
+                                const size_type     n_cells = 0,
                                 const bool colorize = false);
 
 
@@ -543,7 +548,7 @@ public:
                                    const Point<dim>     &center,
                                    const double        inner_radius,
                                    const double        outer_radius,
-                                   const unsigned int  n_cells = 0,
+                                   const size_type     n_cells = 0,
                                    const bool colorize = false);
 
   /**
@@ -563,8 +568,8 @@ public:
                               const double        length,
                               const double        inner_radius,
                               const double        outer_radius,
-                              const unsigned int  n_radial_cells = 0,
-                              const unsigned int  n_axial_cells = 0);
+                              const size_type     n_radial_cells = 0,
+                              const size_type     n_axial_cells = 0);
 
 
 
@@ -616,7 +621,7 @@ public:
                                                 const double inner_radius = .25,
                                                 const double outer_radius = .5,
                                                 const double L = .5,
-                                                const unsigned int repetition = 1,
+                                                const size_type repetition = 1,
                                                 const bool colorize = false);
 
   /**
@@ -630,7 +635,7 @@ public:
    * @param r           The radius of the cylinder bend together as loop.
    */
   static void moebius (Triangulation<3,3>  &tria,
-                       const unsigned int   n_cells,
+                       const size_type      n_cells,
                        const unsigned int   n_rotations,
                        const double         R,
                        const double         r);
@@ -683,7 +688,7 @@ public:
   static
   void
   extrude_triangulation(const Triangulation<2, 2> & input,
-                        const unsigned int n_slices,
+                        const size_type n_slices,
                         const double height,
                         Triangulation<3,3> &result);
 
@@ -704,7 +709,7 @@ public:
   template <int dim>
   static
   void laplace_transformation (Triangulation<dim> &tria,
-                               const std::map<unsigned int,Point<dim> > &new_points) DEAL_II_DEPRECATED;
+                               const std::map<size_type,Point<dim> > &new_points) DEAL_II_DEPRECATED;
 
   /**
    * Exception
@@ -782,7 +787,7 @@ private:
   static
   void
   laplace_solve (const SparseMatrix<double>          &S,
-                 const std::map<unsigned int,double> &m,
+                 const std::map<size_type,double> &m,
                  Vector<double>                      &u);
 };
 

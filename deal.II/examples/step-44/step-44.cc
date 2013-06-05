@@ -996,10 +996,10 @@ namespace Step44
       J_dof = 2
     };
 
-    std::vector<unsigned int>        dofs_per_block;
-    std::vector<unsigned int>        element_indices_u;
-    std::vector<unsigned int>        element_indices_p;
-    std::vector<unsigned int>        element_indices_J;
+    std::vector<types::global_dof_index>  dofs_per_block;
+    std::vector<types::global_dof_index>        element_indices_u;
+    std::vector<types::global_dof_index>        element_indices_p;
+    std::vector<types::global_dof_index>        element_indices_J;
 
     // Rules for Gauss-quadrature on both the cell and faces. The number of
     // quadrature points on both cells and faces is recorded.
@@ -1209,7 +1209,7 @@ namespace Step44
   struct Solid<dim>::PerTaskData_K
   {
     FullMatrix<double>        cell_matrix;
-    std::vector<unsigned int> local_dof_indices;
+    std::vector<types::global_dof_index> local_dof_indices;
 
     PerTaskData_K(const unsigned int dofs_per_cell)
       :
@@ -1290,7 +1290,7 @@ namespace Step44
   struct Solid<dim>::PerTaskData_RHS
   {
     Vector<double>            cell_rhs;
-    std::vector<unsigned int> local_dof_indices;
+    std::vector<types::global_dof_index> local_dof_indices;
 
     PerTaskData_RHS(const unsigned int dofs_per_cell)
       :
@@ -1372,7 +1372,7 @@ namespace Step44
   struct Solid<dim>::PerTaskData_SC
   {
     FullMatrix<double>        cell_matrix;
-    std::vector<unsigned int> local_dof_indices;
+    std::vector<types::global_dof_index> local_dof_indices;
 
     FullMatrix<double>        k_orig;
     FullMatrix<double>        k_pu;
@@ -1567,9 +1567,9 @@ namespace Step44
     // Setup the sparsity pattern and tangent matrix
     tangent_matrix.clear();
     {
-      const unsigned int n_dofs_u = dofs_per_block[u_dof];
-      const unsigned int n_dofs_p = dofs_per_block[p_dof];
-      const unsigned int n_dofs_J = dofs_per_block[J_dof];
+      const types::global_dof_index n_dofs_u = dofs_per_block[u_dof];
+      const types::global_dof_index n_dofs_p = dofs_per_block[p_dof];
+      const types::global_dof_index n_dofs_J = dofs_per_block[J_dof];
 
       BlockCompressedSimpleSparsityPattern csp(n_blocks, n_blocks);
 

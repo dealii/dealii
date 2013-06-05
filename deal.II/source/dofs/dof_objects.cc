@@ -41,7 +41,7 @@ namespace internal
                    const unsigned int       obj_index,
                    const unsigned int       fe_index,
                    const unsigned int       local_index,
-                   const unsigned int       global_index)
+                   const types::global_dof_index       global_index)
     {
       Assert ((fe_index == dealii::DoFHandler<dh_dim, spacedim>::default_fe_index),
               ExcMessage ("Only the default FE index is allowed for non-hp DoFHandler objects"));

@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2007-2012 by the deal.II authors */
+/*    Copyright (C) 2007-2013 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -492,7 +492,7 @@ namespace Step31
     DoFHandler<dim>                     stokes_dof_handler;
     ConstraintMatrix                    stokes_constraints;
 
-    std::vector<unsigned int>           stokes_block_sizes;
+    std::vector<types::global_dof_index> stokes_block_sizes;
     TrilinosWrappers::BlockSparseMatrix stokes_matrix;
     TrilinosWrappers::BlockSparseMatrix stokes_preconditioner_matrix;
 
@@ -750,7 +750,7 @@ namespace Step31
   // introduction.
   //
   // There are some universal constants worth mentioning here. First, we need
-  // to fix $\beta$; we choose $\beta=0.015\cdot dim$, a choice discussed in
+  // to fix $\beta$; we choose $\beta=0.017\cdot dim$, a choice discussed in
   // detail in the results section of this tutorial program. The second is the
   // exponent $\alpha$; $\alpha=1$ appears to work fine for the current
   // program, even though some additional benefit might be expected from
@@ -779,7 +779,7 @@ namespace Step31
                      const double                        global_T_variation,
                      const double                        cell_diameter) const
   {
-    const double beta = 0.015 * dim;
+    const double beta = 0.017 * dim;
     const double alpha = 1;
 
     if (global_u_infty == 0)
@@ -886,7 +886,7 @@ namespace Step31
       temperature_constraints.close ();
     }
 
-    std::vector<unsigned int> stokes_dofs_per_block (2);
+    std::vector<types::global_dof_index> stokes_dofs_per_block (2);
     DoFTools::count_dofs_per_block (stokes_dof_handler, stokes_dofs_per_block,
                                     stokes_sub_blocks);
 
@@ -1076,7 +1076,7 @@ namespace Step31
     const unsigned int   n_q_points      = quadrature_formula.size();
 
     FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     std::vector<Tensor<2,dim> > grad_phi_u (dofs_per_cell);
     std::vector<double>         phi_p      (dofs_per_cell);
@@ -1293,7 +1293,7 @@ namespace Step31
     FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       local_rhs    (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     // Next we need a vector that will contain the values of the temperature
     // solution at the previous time level at the quadrature points to
@@ -1459,7 +1459,7 @@ namespace Step31
     FullMatrix<double>   local_mass_matrix (dofs_per_cell, dofs_per_cell);
     FullMatrix<double>   local_stiffness_matrix (dofs_per_cell, dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     std::vector<double>         phi_T       (dofs_per_cell);
     std::vector<Tensor<1,dim> > grad_phi_T  (dofs_per_cell);
@@ -1571,7 +1571,7 @@ namespace Step31
 
     Vector<double>       local_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     // Next comes the declaration of vectors to hold the old and older
     // solution values (as a notation for time levels <i>n-1</i> and
@@ -1828,12 +1828,12 @@ namespace Step31
     const double maximal_velocity = get_maximal_velocity();
 
     if (maximal_velocity >= 0.01)
-      time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
+      time_step = 1./(1.7*dim*std::sqrt(1.*dim)) /
                   temperature_degree *
                   GridTools::minimal_cell_diameter(triangulation) /
                   maximal_velocity;
     else
-      time_step = 1./(1.6*dim*std::sqrt(1.*dim)) /
+      time_step = 1./(1.7*dim*std::sqrt(1.*dim)) /
                   temperature_degree *
                   GridTools::minimal_cell_diameter(triangulation) /
                   .01;
@@ -1967,9 +1967,9 @@ namespace Step31
     // output as only a qualititative means to understand a solution, we
     // ignore this $\mathcal{O}(h)$ error.
     {
-      std::vector<unsigned int> local_joint_dof_indices (joint_fe.dofs_per_cell);
-      std::vector<unsigned int> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
-      std::vector<unsigned int> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
+      std::vector<types::global_dof_index> local_joint_dof_indices (joint_fe.dofs_per_cell);
+      std::vector<types::global_dof_index> local_stokes_dof_indices (stokes_fe.dofs_per_cell);
+      std::vector<types::global_dof_index> local_temperature_dof_indices (temperature_fe.dofs_per_cell);
 
       typename DoFHandler<dim>::active_cell_iterator
       joint_cell       = joint_dof_handler.begin_active(),

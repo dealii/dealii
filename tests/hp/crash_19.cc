@@ -89,7 +89,7 @@ void test ()
 	  << std::endl;
 
   ExactSolution<dim> exact_solution;
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
                                             0,
                                             exact_solution,
@@ -100,7 +100,7 @@ void test ()
 					      exact_solution,
 					      boundary_values);
 
-  for (std::map<unsigned int,double>::iterator i=boundary_values.begin();
+  for (std::map<types::global_dof_index,double>::iterator i=boundary_values.begin();
        i != boundary_values.end(); ++i)
     deallog << i->first << ' ' << i->second << std::endl;
 }

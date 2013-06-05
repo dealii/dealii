@@ -477,7 +477,7 @@ namespace Step21
   void InverseMatrix<Matrix>::vmult (Vector<double>       &dst,
                                      const Vector<double> &src) const
   {
-    SolverControl solver_control (std::max(src.size(), 200U),
+    SolverControl solver_control (std::max(src.size(), static_cast<std::size_t> (200)),
                                   1e-8*src.l2_norm());
     SolverCG<>    cg (solver_control);
 
@@ -606,7 +606,7 @@ namespace Step21
     dof_handler.distribute_dofs (fe);
     DoFRenumbering::component_wise (dof_handler);
 
-    std::vector<unsigned int> dofs_per_component (dim+2);
+    std::vector<types::global_dof_index> dofs_per_component (dim+2);
     DoFTools::count_dofs_per_component (dof_handler, dofs_per_component);
     const unsigned int n_u = dofs_per_component[0],
                        n_p = dofs_per_component[dim],
@@ -704,7 +704,7 @@ namespace Step21
     FullMatrix<double>   local_matrix (dofs_per_cell, dofs_per_cell);
     Vector<double>       local_rhs (dofs_per_cell);
 
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     const PressureRightHandSide<dim>  pressure_right_hand_side;
     const PressureBoundaryValues<dim> pressure_boundary_values;
@@ -863,7 +863,7 @@ namespace Step21
     std::vector<Vector<double> > present_solution_values_face(n_face_q_points, Vector<double>(dim+2));
 
     std::vector<double> neighbor_saturation (n_face_q_points);
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     SaturationBoundaryValues<dim> saturation_boundary_values;
 

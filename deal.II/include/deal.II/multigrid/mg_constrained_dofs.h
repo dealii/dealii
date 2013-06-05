@@ -35,6 +35,8 @@ template <int dim> struct FunctionMap;
 class MGConstrainedDoFs : public Subscriptor
 {
 public:
+	
+  typedef std::vector<std::set<types::global_dof_index> >::size_type size_dof;
   /**
    * Fill the internal data
    * structures with values
@@ -72,7 +74,7 @@ public:
    * constraint.
    */
   bool is_boundary_index (const unsigned int level,
-                          const unsigned int index) const;
+                          const types::global_dof_index index) const;
 
   /**
    * Determine whether a dof index
@@ -80,14 +82,14 @@ public:
    * a refinement edge.
    */
   bool non_refinement_edge_index (const unsigned int level,
-                                  const unsigned int index) const;
+                                  const types::global_dof_index index) const;
 
   /**
    * Determine whether a dof index
    * is at the refinement edge.
    */
   bool at_refinement_edge (const unsigned int level,
-                           const unsigned int index) const;
+                           const types::global_dof_index index) const;
 
   /**
    * Determine whether a dof index
@@ -96,14 +98,14 @@ public:
    * constraint .
    */
   bool at_refinement_edge_boundary (const unsigned int level,
-                                    const unsigned int index) const;
+                                    const types::global_dof_index index) const;
 
   /**
    * Return the indices of dofs for each
    * level that lie on the boundary of the
    * domain.
    */
-  const std::vector<std::set<unsigned int> > &
+  const std::vector<std::set<types::global_dof_index> > &
   get_boundary_indices () const;
 
   /**
@@ -111,7 +113,7 @@ public:
    * level that lie on the boundary of the
    * domain.
    */
-  const std::vector<std::set<unsigned int> > &
+  const std::vector<std::set<types::global_dof_index> > &
   get_non_refinement_edge_indices () const;
 
   /**
@@ -152,7 +154,7 @@ private:
    * The indices of boundary dofs
    * for each level.
    */
-  std::vector<std::set<unsigned int> > boundary_indices;
+  std::vector<std::set<types::global_dof_index> > boundary_indices;
 
   /**
    * The degrees of freedom on egdges
@@ -160,7 +162,7 @@ private:
    * refinement edge between a
    * level and coarser cells.
    */
-  std::vector<std::set<unsigned int> > non_refinement_edge_indices;
+  std::vector<std::set<types::global_dof_index> > non_refinement_edge_indices;
 
   /**
    * The degrees of freedom on the
@@ -252,7 +254,7 @@ MGConstrainedDoFs::clear()
 inline
 bool
 MGConstrainedDoFs::is_boundary_index (const unsigned int level,
-                                      const unsigned int index) const
+                                      const types::global_dof_index index) const
 {
   AssertIndexRange(level, boundary_indices.size());
   if (boundary_indices[level].find(index) != boundary_indices[level].end())
@@ -264,7 +266,7 @@ MGConstrainedDoFs::is_boundary_index (const unsigned int level,
 inline
 bool
 MGConstrainedDoFs::non_refinement_edge_index (const unsigned int level,
-                                              const unsigned int index) const
+                                              const types::global_dof_index index) const
 {
   AssertIndexRange(level, non_refinement_edge_indices.size());
 
@@ -277,7 +279,7 @@ MGConstrainedDoFs::non_refinement_edge_index (const unsigned int level,
 inline
 bool
 MGConstrainedDoFs::at_refinement_edge (const unsigned int level,
-                                       const unsigned int index) const
+                                       const types::global_dof_index index) const
 {
   AssertIndexRange(level, refinement_edge_indices.size());
   AssertIndexRange(index, refinement_edge_indices[level].size());
@@ -289,7 +291,7 @@ MGConstrainedDoFs::at_refinement_edge (const unsigned int level,
 inline
 bool
 MGConstrainedDoFs::at_refinement_edge_boundary (const unsigned int level,
-                                                const unsigned int index) const
+                                                const types::global_dof_index index) const
 {
   AssertIndexRange(level, refinement_edge_boundary_indices.size());
   AssertIndexRange(index, refinement_edge_boundary_indices[level].size());
@@ -298,14 +300,14 @@ MGConstrainedDoFs::at_refinement_edge_boundary (const unsigned int level,
 }
 
 inline
-const std::vector<std::set<unsigned int> > &
+const std::vector<std::set<types::global_dof_index> > &
 MGConstrainedDoFs::get_boundary_indices () const
 {
   return boundary_indices;
 }
 
 inline
-const std::vector<std::set<unsigned int> > &
+const std::vector<std::set<types::global_dof_index> > &
 MGConstrainedDoFs::get_non_refinement_edge_indices () const
 {
   return non_refinement_edge_indices;

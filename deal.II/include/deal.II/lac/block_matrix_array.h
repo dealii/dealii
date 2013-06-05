@@ -124,6 +124,11 @@ class BlockMatrixArray : public Subscriptor
 {
 public:
   /**
+   * Declare the type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Default constructor creating a
    * useless object. initialize()
    * must be called before using
@@ -200,11 +205,11 @@ public:
    * the multiplication functions.
    */
   template <class MATRIX>
-  void enter (const MATRIX      &matrix,
-              const unsigned int row,
-              const unsigned int col,
-              const double       prefix = 1.,
-              const bool         transpose = false);
+  void enter (const MATRIX       &matrix,
+              const unsigned int  row,
+              const unsigned int  col,
+              const double        prefix = 1.,
+              const bool          transpose = false);
 
   /**
    * Add an entry like with enter,
@@ -218,11 +223,11 @@ public:
    */
   template <class MATRIX>
   void enter_aux (VectorMemory<Vector<number> > &mem,
-                  const MATRIX      &matrix,
-                  const unsigned int row,
-                  const unsigned int col,
-                  const double       prefix = 1.,
-                  const bool         transpose = false) DEAL_II_DEPRECATED;
+                  const MATRIX       &matrix,
+                  const unsigned int  row,
+                  const unsigned int  col,
+                  const double        prefix = 1.,
+                  const bool          transpose = false) DEAL_II_DEPRECATED;
 
 
   /**
@@ -332,7 +337,7 @@ protected:
      */
     template<class MATRIX>
     Entry (const MATRIX &matrix,
-           unsigned row, unsigned int col,
+           size_type row, size_type col,
            double prefix, bool transpose);
 
     /**
@@ -362,13 +367,13 @@ protected:
      * Row number in the block
      * matrix.
      */
-    unsigned int row;
+    size_type row;
 
     /**
      * Column number in the block
      * matrix.
      */
-    unsigned int col;
+    size_type col;
 
     /**
      * Factor in front of the matrix
@@ -472,6 +477,11 @@ class BlockTrianglePrecondition
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Default constructor creating a
    * useless object. initialize()
    * must be called before using
@@ -529,11 +539,11 @@ public:
    * matrices or preconditioners.
    */
   template <class MATRIX>
-  void enter (const MATRIX      &matrix,
-              const unsigned int row,
-              const unsigned int col,
-              const double       prefix = 1.,
-              const bool         transpose = false);
+  void enter (const MATRIX   &matrix,
+              const size_type row,
+              const size_type col,
+              const double    prefix = 1.,
+              const bool      transpose = false);
 
   /**
    * Enter a block. This calls
@@ -548,11 +558,11 @@ public:
    */
   template <class MATRIX>
   void enter_aux (VectorMemory<Vector<double> > &mem,
-                  const MATRIX      &matrix,
-                  const unsigned int row,
-                  const unsigned int col,
-                  const double       prefix = 1.,
-                  const bool         transpose = false) DEAL_II_DEPRECATED;
+                  const MATRIX   &matrix,
+                  const size_type row,
+                  const size_type col,
+                  const double    prefix = 1.,
+                  const bool      transpose = false) DEAL_II_DEPRECATED;
 
   /**
    * Preconditioning.
@@ -609,7 +619,7 @@ public:
    * matrix here.
    */
   DeclException1(ExcNoDiagonal,
-                 unsigned int,
+                 size_type,
                  << "No diagonal entry was added for block " << arg1);
 
   /**
@@ -620,7 +630,7 @@ public:
    * matrix here.
    */
   DeclException1(ExcMultipleDiagonal,
-                 unsigned int,
+                 size_type,
                  << "Inverse diagonal entries may not be added in block "
                  << arg1);
   //@}
@@ -632,7 +642,7 @@ private:
    * for one row.
    */
   void do_row (BlockVector<number> &dst,
-               unsigned int row_num) const;
+               size_type row_num) const;
 
   /**
    * Flag for backward insertion.
@@ -649,8 +659,8 @@ template <class MATRIX>
 inline
 BlockMatrixArray<number>::Entry::Entry (
   const MATRIX &m,
-  unsigned int row,
-  unsigned int col,
+  size_type row,
+  size_type col,
   double prefix,
   bool transpose)
   :
@@ -728,7 +738,7 @@ BlockMatrixArray<number>::print_latex (STREAM &out) const
   typename std::vector<Entry>::const_iterator m = entries.begin();
   typename std::vector<Entry>::const_iterator end = entries.end();
 
-  unsigned int matrix_number = 0;
+  size_type matrix_number = 0;
   for (; m != end ; ++m)
     {
       if (matrix_names.find(m->matrix) == matrix_names.end())
@@ -773,7 +783,7 @@ template <class MATRIX>
 inline
 void
 BlockTrianglePrecondition<number>::enter (const MATRIX &matrix,
-                                          unsigned row, unsigned int col,
+                                          size_type row, size_type col,
                                           double prefix, bool transpose)
 {
   BlockMatrixArray<number>::enter(matrix, row, col, prefix, transpose);
@@ -788,8 +798,8 @@ void
 BlockTrianglePrecondition<number>::enter_aux (
   VectorMemory<Vector<double> > &mem,
   const MATRIX &matrix,
-  unsigned int row,
-  unsigned int col,
+  size_type row,
+  size_type col,
   double prefix,
   bool transpose)
 {

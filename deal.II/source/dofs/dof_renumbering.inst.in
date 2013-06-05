@@ -28,16 +28,16 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 	  (DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
 	   const bool,
 	   const bool,
-	   const std::vector<unsigned int>&);
+	   const std::vector<types::global_dof_index>&);
 
 	template
 	  void
 	  compute_Cuthill_McKee<DoFHandler<deal_II_dimension,deal_II_space_dimension> >
-	  (std::vector<unsigned int>&,
+	  (std::vector<types::global_dof_index>&,
 	   const DoFHandler<deal_II_dimension,deal_II_space_dimension>&,
 	   const bool,
 	   const bool,
-	   const std::vector<unsigned int>&);
+	   const std::vector<types::global_dof_index>&);
 
 	template
 	  void component_wise<deal_II_dimension,deal_II_space_dimension>
@@ -72,7 +72,7 @@ namespace DoFRenumbering
 
     template
     void
-    compute_Cuthill_McKee (std::vector<unsigned int> &,
+    compute_Cuthill_McKee (std::vector<dealii::types::global_dof_index> &,
 			   const DoFHandler<deal_II_dimension> &, bool, bool);
 
     template
@@ -81,7 +81,7 @@ namespace DoFRenumbering
 
     template
     void
-    compute_king_ordering (std::vector<unsigned int> &,
+    compute_king_ordering (std::vector<dealii::types::global_dof_index> &,
 			   const DoFHandler<deal_II_dimension> &, bool, bool);
 
     template
@@ -90,7 +90,7 @@ namespace DoFRenumbering
 
     template
     void
-    compute_minimum_degree (std::vector<unsigned int> &,
+    compute_minimum_degree (std::vector<dealii::types::global_dof_index> &,
 			    const DoFHandler<deal_II_dimension> &, bool, bool);
 
 
@@ -100,7 +100,7 @@ namespace DoFRenumbering
 
     template
     void
-    compute_Cuthill_McKee (std::vector<unsigned int> &,
+    compute_Cuthill_McKee (std::vector<dealii::types::global_dof_index> &,
 			   const hp::DoFHandler<deal_II_dimension> &, bool, bool);
 
     template
@@ -109,7 +109,7 @@ namespace DoFRenumbering
 
     template
     void
-    compute_king_ordering (std::vector<unsigned int> &,
+    compute_king_ordering (std::vector<dealii::types::global_dof_index> &,
 			   const hp::DoFHandler<deal_II_dimension> &, bool, bool);
 
     template
@@ -118,7 +118,7 @@ namespace DoFRenumbering
 
     template
     void
-    compute_minimum_degree (std::vector<unsigned int> &,
+    compute_minimum_degree (std::vector<dealii::types::global_dof_index> &,
 			    const hp::DoFHandler<deal_II_dimension> &, bool, bool);
     \}
     
@@ -130,16 +130,16 @@ namespace DoFRenumbering
       (hp::DoFHandler<deal_II_dimension>&,
        const bool,
        const bool,
-       const std::vector<unsigned int>&);
+       const std::vector<types::global_dof_index>&);
 
     template
       void
       compute_Cuthill_McKee<hp::DoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&,
+      (std::vector<types::global_dof_index>&,
        const hp::DoFHandler<deal_II_dimension>&,
        const bool,
        const bool,
-       const std::vector<unsigned int>&);
+       const std::vector<types::global_dof_index>&);
 
     template
       void component_wise
@@ -183,7 +183,7 @@ namespace DoFRenumbering
 
     template void
       compute_cell_wise<DoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&, std::vector<unsigned int>&,
+      (std::vector<types::global_dof_index>&, std::vector<types::global_dof_index>&,
        const DoFHandler<deal_II_dimension>&,
        const std::vector<DoFHandler<deal_II_dimension>::active_cell_iterator>&);
 
@@ -194,7 +194,7 @@ namespace DoFRenumbering
 
     template void
       compute_cell_wise<DoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&, std::vector<unsigned int>&,
+      (std::vector<types::global_dof_index>&, std::vector<types::global_dof_index>&,
        const DoFHandler<deal_II_dimension>&, unsigned int,
        const std::vector<DoFHandler<deal_II_dimension>::level_cell_iterator>&);
 
@@ -205,7 +205,7 @@ namespace DoFRenumbering
 
     template void
       compute_downstream<DoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&,std::vector<unsigned int>&,
+      (std::vector<types::global_dof_index>&,std::vector<types::global_dof_index>&,
        const DoFHandler<deal_II_dimension>&, const Point<deal_II_dimension>&,
        const bool);
 
@@ -217,7 +217,7 @@ namespace DoFRenumbering
     template
       void
       compute_clockwise_dg<DoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&, const DoFHandler<deal_II_dimension>&,
+      (std::vector<types::global_dof_index>&, const DoFHandler<deal_II_dimension>&,
        const Point<deal_II_dimension>&, const bool);
 
 // Renumbering for hp::DoFHandler
@@ -229,7 +229,7 @@ namespace DoFRenumbering
 
     template void
       compute_cell_wise<hp::DoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&, std::vector<unsigned int>&,
+      (std::vector<types::global_dof_index>&, std::vector<types::global_dof_index>&,
        const hp::DoFHandler<deal_II_dimension>&,
        const std::vector<hp::DoFHandler<deal_II_dimension>::active_cell_iterator>&);
 
@@ -254,7 +254,7 @@ namespace DoFRenumbering
 
     template void
       compute_downstream<hp::DoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&,std::vector<unsigned int>&,
+      (std::vector<types::global_dof_index>&,std::vector<types::global_dof_index>&,
        const hp::DoFHandler<deal_II_dimension>&,
        const Point<deal_II_dimension>&,
        const bool);
@@ -268,7 +268,7 @@ namespace DoFRenumbering
     template
       void
       compute_clockwise_dg<hp::DoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&,
+      (std::vector<types::global_dof_index>&,
        const hp::DoFHandler<deal_II_dimension>&,
        const Point<deal_II_dimension>&,
        const bool);
@@ -296,7 +296,7 @@ namespace DoFRenumbering
     template
       void
       compute_random<DoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&,
+      (std::vector<types::global_dof_index>&,
        const DoFHandler<deal_II_dimension> &);
 
     template
@@ -313,14 +313,14 @@ namespace DoFRenumbering
     template
       void
       compute_sort_selected_dofs_back<DoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&,
+      (std::vector<types::global_dof_index>&,
        const DoFHandler<deal_II_dimension> &,
        const std::vector<bool> &);
 
     template
       void
       compute_sort_selected_dofs_back<MGDoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&,
+      (std::vector<types::global_dof_index>&,
        const MGDoFHandler<deal_II_dimension> &,
        const std::vector<bool> &,
        const unsigned int);
@@ -332,7 +332,7 @@ namespace DoFRenumbering
     template
       void
       compute_random<hp::DoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&,
+      (std::vector<types::global_dof_index>&,
        const hp::DoFHandler<deal_II_dimension> &);
 
     template
@@ -343,7 +343,7 @@ namespace DoFRenumbering
     template
       void
       compute_sort_selected_dofs_back<hp::DoFHandler<deal_II_dimension> >
-      (std::vector<unsigned int>&,
+      (std::vector<types::global_dof_index>&,
        const hp::DoFHandler<deal_II_dimension> &,
        const std::vector<bool> &);
 
@@ -357,14 +357,14 @@ namespace DoFRenumbering
       (DoFHandler<deal_II_dimension>&,
        const unsigned int,
        const bool,
-       const std::vector<unsigned int>&);
+       const std::vector<types::global_dof_index>&);
 
     template
       void Cuthill_McKee<MGDoFHandler<deal_II_dimension> >
       (MGDoFHandler<deal_II_dimension>&,
        const unsigned int,
        const bool,
-       const std::vector<unsigned int>&);
+       const std::vector<types::global_dof_index>&);
 
     \}  // namespace DoFRenumbering
 #endif

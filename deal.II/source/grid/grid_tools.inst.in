@@ -157,7 +157,7 @@ for (deal_II_dimension : DIMENSIONS; deal_II_space_dimension :  SPACE_DIMENSIONS
 #if deal_II_dimension == deal_II_space_dimension  
     template
     void
-    laplace_transform (const std::map<unsigned int,Point<deal_II_dimension> > &new_points,
+    laplace_transform (const std::map<types::global_dof_index,Point<deal_II_dimension> > &new_points,
                        Triangulation<deal_II_dimension> &triangulation);
 
     template

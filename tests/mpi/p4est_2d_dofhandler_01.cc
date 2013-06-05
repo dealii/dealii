@@ -62,7 +62,7 @@ void test()
      = dofh.begin_active();
 
    const unsigned int dofs_per_cell = dofh.get_fe().dofs_per_cell;
-   std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
 
    if (myid==0)

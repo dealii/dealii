@@ -40,7 +40,7 @@ namespace
   template <class VectorType>
   double
   get_vector_element (const VectorType &vector,
-                      const unsigned int cell_number)
+                      const types::global_dof_index cell_number)
   {
     return vector[cell_number];
   }
@@ -48,7 +48,7 @@ namespace
 
   double
   get_vector_element (const IndexSet &is,
-                      const unsigned int cell_number)
+                      const types::global_dof_index cell_number)
   {
     return (is.is_element(cell_number) ? 1 : 0);
   }
@@ -1474,7 +1474,7 @@ public:
    * to.
    */
   virtual
-  unsigned int
+  types::global_dof_index
   n_dofs_for_dof_handler () const = 0;
 
 #include "fe_values.decl.1.inst"
@@ -1543,7 +1543,7 @@ public:
    * to.
    */
   virtual
-  unsigned int
+  types::global_dof_index
   n_dofs_for_dof_handler () const;
 
 #include "fe_values.decl.2.inst"
@@ -1646,7 +1646,7 @@ public:
    * error.
    */
   virtual
-  unsigned int
+  types::global_dof_index
   n_dofs_for_dof_handler () const;
 
 #include "fe_values.decl.2.inst"
@@ -1706,7 +1706,7 @@ operator typename Triangulation<dim,spacedim>::cell_iterator () const
 
 template <int dim, int spacedim>
 template <typename CI>
-unsigned int
+types::global_dof_index
 FEValuesBase<dim,spacedim>::CellIterator<CI>::n_dofs_for_dof_handler () const
 {
   return cell->get_dof_handler().n_dofs();
@@ -1726,7 +1726,7 @@ get_interpolated_dof_values (const IndexSet &in,
 {
   Assert (cell->has_children() == false, ExcNotImplemented());
 
-  std::vector<unsigned int> dof_indices (cell->get_fe().dofs_per_cell);
+  std::vector<types::global_dof_index> dof_indices (cell->get_fe().dofs_per_cell);
   cell->get_dof_indices (dof_indices);
 
   for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
@@ -1767,7 +1767,7 @@ operator typename Triangulation<dim,spacedim>::cell_iterator () const
 
 
 template <int dim, int spacedim>
-unsigned int
+types::global_dof_index
 FEValuesBase<dim,spacedim>::TriaCellIterator::n_dofs_for_dof_handler () const
 {
   Assert (false, ExcMessage (message_string));
@@ -2318,7 +2318,7 @@ template <int dim, int spacedim>
 template <class InputVector, typename number>
 void FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<number> &values) const
 {
   Assert (this->update_flags & update_values, ExcAccessToUninitializedField());
@@ -2371,7 +2371,7 @@ template <int dim, int spacedim>
 template <class InputVector, typename number>
 void FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Vector<number> > &values) const
 {
   // Size of indices must be a multiple of dofs_per_cell such that an integer
@@ -2407,7 +2407,7 @@ template <int dim, int spacedim>
 template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_values (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   VectorSlice<std::vector<std::vector<double> > > values,
   bool quadrature_points_fastest) const
 {
@@ -2468,7 +2468,7 @@ template <int dim, int spacedim>
 template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_gradients (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Tensor<1,spacedim> > &gradients) const
 {
   Assert (this->update_flags & update_gradients, ExcAccessToUninitializedField());
@@ -2522,7 +2522,7 @@ template <int dim, int spacedim>
 template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_gradients (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   VectorSlice<std::vector<std::vector<Tensor<1,spacedim> > > > gradients,
   bool quadrature_points_fastest) const
 {
@@ -2581,7 +2581,7 @@ template <int dim, int spacedim>
 template <class InputVector>
 void FEValuesBase<dim,spacedim>::get_function_hessians (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Tensor<2,spacedim> > &hessians) const
 {
   Assert (this->update_flags & update_second_derivatives,
@@ -2637,7 +2637,7 @@ template <int dim, int spacedim>
 template <class InputVector>
 void FEValuesBase<dim, spacedim>::get_function_hessians (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   VectorSlice<std::vector<std::vector<Tensor<2,spacedim> > > > hessians,
   bool quadrature_points_fastest) const
 {
@@ -2694,7 +2694,7 @@ template <int dim, int spacedim>
 template <class InputVector, typename number>
 void FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<number> &laplacians) const
 {
   Assert (this->update_flags & update_hessians, ExcAccessToUninitializedField());
@@ -2745,7 +2745,7 @@ template <int dim, int spacedim>
 template <class InputVector, typename number>
 void FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<Vector<number> > &laplacians) const
 {
   // Size of indices must be a multiple of dofs_per_cell such that an integer
@@ -2781,7 +2781,7 @@ template <int dim, int spacedim>
 template <class InputVector, typename number>
 void FEValuesBase<dim,spacedim>::get_function_laplacians (
   const InputVector &fe_function,
-  const VectorSlice<const std::vector<unsigned int> > &indices,
+  const VectorSlice<const std::vector<types::global_dof_index> > &indices,
   std::vector<std::vector<number> > &laplacians,
   bool quadrature_points_fastest) const
 {

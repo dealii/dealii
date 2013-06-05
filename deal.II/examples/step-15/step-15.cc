@@ -243,7 +243,7 @@ namespace Step15
 
     std::vector<Tensor<1, dim> > old_solution_gradients(n_q_points);
 
-    std::vector<unsigned int>    local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index>    local_dof_indices (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
@@ -323,7 +323,7 @@ namespace Step15
     hanging_node_constraints.condense (system_matrix);
     hanging_node_constraints.condense (system_rhs);
 
-    std::map<unsigned int,double> boundary_values;
+    std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
                                               ZeroFunction<dim>(),
@@ -464,12 +464,12 @@ namespace Step15
   template <int dim>
   void MinimalSurfaceProblem<dim>::set_boundary_values ()
   {
-    std::map<unsigned int, double> boundary_values;
+    std::map<types::global_dof_index, double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
                                               0,
                                               BoundaryValues<dim>(),
                                               boundary_values);
-    for (std::map<unsigned int, double>::const_iterator
+    for (std::map<types::global_dof_index, double>::const_iterator
          p = boundary_values.begin();
          p != boundary_values.end(); ++p)
       present_solution(p->first) = p->second;
@@ -514,7 +514,7 @@ namespace Step15
     Vector<double>               cell_rhs (dofs_per_cell);
     std::vector<Tensor<1, dim> > gradients(n_q_points);
 
-    std::vector<unsigned int>    local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index>    local_dof_indices (dofs_per_cell);
 
     typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),

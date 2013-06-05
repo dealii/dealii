@@ -112,6 +112,10 @@ namespace PETScWrappers
     class SparseMatrix : public MatrixBase
     {
     public:
+      /**
+       * Declare type for container size.
+       */
+      typedef types::global_dof_index size_type;
 
       /**
        * A structure that describes some of
@@ -179,13 +183,13 @@ namespace PETScWrappers
        * ICC. The default value of this flag
        * is @p false.
        */
-      SparseMatrix (const MPI_Comm     &communicator,
-                    const unsigned int  m,
-                    const unsigned int  n,
-                    const unsigned int  local_rows,
-                    const unsigned int  local_columns,
-                    const unsigned int  n_nonzero_per_row,
-                    const bool          is_symmetric = false);
+      SparseMatrix (const MPI_Comm  &communicator,
+                    const size_type  m,
+                    const size_type  n,
+                    const size_type  local_rows,
+                    const size_type  local_columns,
+                    const size_type  n_nonzero_per_row,
+                    const bool       is_symmetric = false);
 
       /**
        * Initialize a rectangular matrix
@@ -220,13 +224,13 @@ namespace PETScWrappers
        * true, only an ICC. The default
        * value of this flag is @p false.
        */
-      SparseMatrix (const MPI_Comm                  &communicator,
-                    const unsigned int               m,
-                    const unsigned int               n,
-                    const unsigned int               local_rows,
-                    const unsigned int               local_columns,
-                    const std::vector<unsigned int> &row_lengths,
-                    const bool                       is_symmetric = false);
+      SparseMatrix (const MPI_Comm               &communicator,
+                    const size_type               m,
+                    const size_type               n,
+                    const size_type               local_rows,
+                    const size_type               local_columns,
+                    const std::vector<size_type> &row_lengths,
+                    const bool                    is_symmetric = false);
 
       /**
        * Initialize using the given
@@ -269,12 +273,12 @@ namespace PETScWrappers
        * the start.
        */
       template <typename SparsityType>
-      SparseMatrix (const MPI_Comm                  &communicator,
-                    const SparsityType              &sparsity_pattern,
-                    const std::vector<unsigned int> &local_rows_per_process,
-                    const std::vector<unsigned int> &local_columns_per_process,
-                    const unsigned int               this_process,
-                    const bool                       preset_nonzero_locations = true);
+      SparseMatrix (const MPI_Comm               &communicator,
+                    const SparsityType           &sparsity_pattern,
+                    const std::vector<size_type> &local_rows_per_process,
+                    const std::vector<size_type> &local_columns_per_process,
+                    const unsigned int            this_process,
+                    const bool                    preset_nonzero_locations = true);
 
       /**
        * This operator assigns a scalar to
@@ -310,12 +314,12 @@ namespace PETScWrappers
        * present function.
        */
       void reinit (const MPI_Comm     &communicator,
-                   const unsigned int  m,
-                   const unsigned int  n,
-                   const unsigned int  local_rows,
-                   const unsigned int  local_columns,
-                   const unsigned int  n_nonzero_per_row,
-                   const bool          is_symmetric = false);
+                   const size_type m,
+                   const size_type n,
+                   const size_type local_rows,
+                   const size_type local_columns,
+                   const size_type n_nonzero_per_row,
+                   const bool      is_symmetric = false);
 
       /**
        * Throw away the present matrix and
@@ -325,13 +329,13 @@ namespace PETScWrappers
        * the same argument list as the
        * present function.
        */
-      void reinit (const MPI_Comm                  &communicator,
-                   const unsigned int               m,
-                   const unsigned int               n,
-                   const unsigned int               local_rows,
-                   const unsigned int               local_columns,
-                   const std::vector<unsigned int> &row_lengths,
-                   const bool                       is_symmetric = false);
+      void reinit (const MPI_Comm               &communicator,
+                   const size_type               m,
+                   const size_type               n,
+                   const size_type               local_rows,
+                   const size_type               local_columns,
+                   const std::vector<size_type> &row_lengths,
+                   const bool                    is_symmetric = false);
 
       /**
        * Initialize using the given
@@ -368,12 +372,12 @@ namespace PETScWrappers
        * the start.
        */
       template <typename SparsityType>
-      void reinit (const MPI_Comm                  &communicator,
-                   const SparsityType              &sparsity_pattern,
-                   const std::vector<unsigned int> &local_rows_per_process,
-                   const std::vector<unsigned int> &local_columns_per_process,
-                   const unsigned int               this_process,
-                   const bool                       preset_nonzero_locations = true);
+      void reinit (const MPI_Comm               &communicator,
+                   const SparsityType           &sparsity_pattern,
+                   const std::vector<size_type> &local_rows_per_process,
+                   const std::vector<size_type> &local_columns_per_process,
+                   const unsigned int            this_process,
+                   const bool                    preset_nonzero_locations = true);
 
       /**
        * Create a matrix where the size() of the IndexSets determine the global
@@ -464,32 +468,32 @@ namespace PETScWrappers
        * of the previous matrix is left to
        * the caller.
        */
-      void do_reinit (const unsigned int m,
-                      const unsigned int n,
-                      const unsigned int local_rows,
-                      const unsigned int local_columns,
-                      const unsigned int n_nonzero_per_row,
-                      const bool         is_symmetric = false);
+      void do_reinit (const size_type m,
+                      const size_type n,
+                      const size_type local_rows,
+                      const size_type local_columns,
+                      const size_type n_nonzero_per_row,
+                      const bool      is_symmetric = false);
 
       /**
        * Same as previous function.
        */
-      void do_reinit (const unsigned int               m,
-                      const unsigned int               n,
-                      const unsigned int               local_rows,
-                      const unsigned int               local_columns,
-                      const std::vector<unsigned int> &row_lengths,
-                      const bool                       is_symmetric = false);
+      void do_reinit (const size_type               m,
+                      const size_type               n,
+                      const size_type               local_rows,
+                      const size_type               local_columns,
+                      const std::vector<size_type> &row_lengths,
+                      const bool                    is_symmetric = false);
 
       /**
        * Same as previous functions.
        */
       template <typename SparsityType>
-      void do_reinit (const SparsityType              &sparsity_pattern,
-                      const std::vector<unsigned int> &local_rows_per_process,
-                      const std::vector<unsigned int> &local_columns_per_process,
-                      const unsigned int               this_process,
-                      const bool                       preset_nonzero_locations);
+      void do_reinit (const SparsityType           &sparsity_pattern,
+                      const std::vector<size_type> &local_rows_per_process,
+                      const std::vector<size_type> &local_columns_per_process,
+                      const unsigned int            this_process,
+                      const bool                    preset_nonzero_locations);
 
       /**
        * Same as previous functions.

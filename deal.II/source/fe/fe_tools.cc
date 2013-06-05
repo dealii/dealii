@@ -362,8 +362,8 @@ namespace FETools
   template<int dim, int spacedim>
   void compute_block_renumbering (
     const FiniteElement<dim,spacedim> &element,
-    std::vector<unsigned int> &renumbering,
-    std::vector<unsigned int> &block_data,
+    std::vector<types::global_dof_index> &renumbering,
+    std::vector<types::global_dof_index> &block_data,
     bool return_start_indices)
   {
     Assert(renumbering.size() == element.dofs_per_cell,
@@ -373,7 +373,7 @@ namespace FETools
            ExcDimensionMismatch(block_data.size(),
                                 element.n_blocks()));
 
-    unsigned int k=0;
+    types::global_dof_index k=0;
     unsigned int i=0;
     for (unsigned int b=0; b<element.n_base_elements(); ++b)
       for (unsigned int m=0; m<element.element_multiplicity(b); ++m)
@@ -385,7 +385,7 @@ namespace FETools
         }
     Assert (i == element.n_blocks(), ExcInternalError());
 
-    std::vector<unsigned int> start_indices(block_data.size());
+    std::vector<types::global_dof_index> start_indices(block_data.size());
     k = 0;
     for (unsigned int i=0; i<block_data.size(); ++i)
       if (return_start_indices)
@@ -399,7 +399,7 @@ namespace FETools
 //TODO:[GK] This does not work for a single RT
     for (unsigned int i=0; i<element.dofs_per_cell; ++i)
       {
-        std::pair<unsigned int, unsigned int>
+        std::pair<unsigned int, types::global_dof_index>
         indices = element.system_to_block_index(i);
         renumbering[i] = start_indices[indices.first]
                          +indices.second;
@@ -1341,7 +1341,7 @@ namespace FETools
     typename DH2<dim,spacedim>::active_cell_iterator cell2 = dof2.begin_active(),
                                                      endc2 = dof2.end();
 
-    std::vector<unsigned int> dofs;
+    std::vector<types::global_dof_index> dofs;
     dofs.reserve (DoFTools::max_dofs_per_cell (dof2));
 
     u2 = 0;
@@ -1435,7 +1435,7 @@ namespace FETools
     // for parallel vectors check,
     // if this component is owned by
     // this processor.
-    for (unsigned int i=0; i<dof2.n_dofs(); ++i)
+    for (types::global_dof_index i=0; i<dof2.n_dofs(); ++i)
       if (locally_owned_dofs.is_element(i))
         {
           Assert(touch_count(i)!=0, ExcInternalError());
@@ -1859,7 +1859,7 @@ namespace FETools
 
     Vector<double> u1_local(n1);
     Vector<double> u2_local(n2);
-    std::vector<unsigned int> dofs(n2);
+    std::vector<types::global_dof_index> dofs(n2);
 
     FullMatrix<double> matrix(n2,n1);
     get_projection_matrix(dof1.get_fe(), dof2.get_fe(), matrix);

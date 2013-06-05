@@ -47,7 +47,7 @@ check_this (const DoFHandler<dim> &dof_handler)
                                    // create sparsity pattern
   BlockCompressedSetSparsityPattern sp (n_components,
                                      n_components);
-  std::vector<unsigned int> dofs_per_component(n_components);
+  std::vector<types::global_dof_index> dofs_per_component(n_components);
   DoFTools::count_dofs_per_component (dof_handler,
                                       dofs_per_component);
   for (unsigned int i=0; i<n_components; ++i)

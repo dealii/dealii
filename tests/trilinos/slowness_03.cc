@@ -1,8 +1,8 @@
 //----------------------------  trilinos_slowness_03.cc  ---------------------------
 //    $Id$
-//    Version: $Name$ 
+//    Version: $Name$
 //
-//    Copyright (C) 2005 by the deal.II authors
+//    Copyright (C) 2005, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -19,7 +19,7 @@
 //
 // the tests build the 5-point stencil matrix for a uniform grid of size N*N
 
-#include "../tests.h" 
+#include "../tests.h"
 #include <deal.II/base/utilities.h>
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
@@ -32,8 +32,9 @@ void test ()
 {
   const unsigned int N = 200;
 
-                                   // build the sparse matrix 
-  Epetra_Map map (static_cast<int>(N*N), 0, Utilities::Trilinos::comm_world());
+                                   // build the sparse matrix
+  Epetra_Map map (TrilinosWrappers::types::int_type(N*N), 0,
+		  Utilities::Trilinos::comm_world());
   TrilinosWrappers::SparseMatrix matrix (map, 5);
   for(unsigned int i=0; i<N; i++)
     for(unsigned int j=0; j<N; j++)
@@ -62,7 +63,7 @@ void test ()
           }
       }
   matrix.compress ();
-  
+
                                    // then do a single matrix-vector
                                    // multiplication with subsequent formation
                                    // of the matrix norm
@@ -71,13 +72,13 @@ void test ()
   for (unsigned int i=0; i<N*N; ++i)
     v1(i) = i;
   matrix.vmult (v2, v1);
-  
+
   deallog << v1*v2 << std::endl;
 }
 
 
 
-int main (int argc,char **argv) 
+int main (int argc,char **argv)
 {
   std::ofstream logfile("slowness_03/output");
   deallog.attach(logfile);
@@ -101,10 +102,10 @@ int main (int argc,char **argv)
 		<< "Aborting!" << std::endl
 		<< "----------------------------------------------------"
 		<< std::endl;
-      
+
       return 1;
     }
-  catch (...) 
+  catch (...)
     {
       std::cerr << std::endl << std::endl
 		<< "----------------------------------------------------"

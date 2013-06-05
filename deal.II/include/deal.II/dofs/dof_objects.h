@@ -63,7 +63,7 @@ namespace internal
        * Store the global indices of
        * the degrees of freedom.
        */
-      std::vector<unsigned int> dofs;
+      std::vector<types::global_dof_index> dofs;
 
     public:
       /**
@@ -99,7 +99,7 @@ namespace internal
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
                      const unsigned int       local_index,
-                     const unsigned int       global_index);
+                     const types::global_dof_index       global_index);
 
       /**
        * Return the global index of
@@ -127,7 +127,7 @@ namespace internal
        * and non-hp classes.
        */
       template <int dh_dim, int spacedim>
-      unsigned int
+      types::global_dof_index
       get_dof_index (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
                      const unsigned int       obj_index,
                      const unsigned int       fe_index,
@@ -144,7 +144,7 @@ namespace internal
       template <int dh_dim, int spacedim>
       unsigned int
       n_active_fe_indices (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
-                           const unsigned int       index) const;
+                           const types::global_dof_index       index) const;
 
       /**
        * Similar to the function
@@ -155,7 +155,7 @@ namespace internal
       template <int dh_dim, int spacedim>
       bool
       fe_index_is_active (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
-                          const unsigned int       index,
+                          const types::global_dof_index       index,
                           const unsigned int       fe_index) const;
 
       /**
@@ -192,7 +192,7 @@ namespace internal
     inline
     unsigned int
     DoFObjects<dim>::n_active_fe_indices (const dealii::DoFHandler<dh_dim,spacedim> &,
-                                          const unsigned) const
+                                          const types::global_dof_index) const
     {
       return 1;
     }
@@ -204,7 +204,7 @@ namespace internal
     inline
     bool
     DoFObjects<dim>::fe_index_is_active (const dealii::DoFHandler<dh_dim,spacedim> &,
-                                         const unsigned int,
+                                         const types::global_dof_index,
                                          const unsigned int fe_index) const
     {
       Assert (fe_index == 0,
@@ -218,7 +218,7 @@ namespace internal
     template <int dim>
     template <int dh_dim, int spacedim>
     inline
-    unsigned int
+    types::global_dof_index
     DoFObjects<dim>::
     get_dof_index (const dealii::DoFHandler<dh_dim,spacedim> &dof_handler,
                    const unsigned int       obj_index,

@@ -765,7 +765,7 @@ namespace Step13
       // And while we're already computing things in parallel, interpolating
       // boundary values is one more thing that can be done independently, so
       // we do it here:
-      std::map<unsigned int,double> boundary_value_map;
+      std::map<types::global_dof_index,double> boundary_value_map;
       VectorTools::interpolate_boundary_values (dof_handler,
                                                 0,
                                                 *boundary_values,
@@ -807,7 +807,7 @@ namespace Step13
 
       FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
 
-      std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+      std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
       for (typename DoFHandler<dim>::active_cell_iterator cell=begin_cell;
            cell!=end_cell; ++cell)
@@ -1026,7 +1026,7 @@ namespace Step13
 
       Vector<double>       cell_rhs (dofs_per_cell);
       std::vector<double>  rhs_values (n_q_points);
-      std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+      std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
       typename DoFHandler<dim>::active_cell_iterator
       cell = this->dof_handler.begin_active(),

@@ -61,7 +61,7 @@ void test ()
   constraints.close ();
   deallog << "Number of constraints: " << constraints.n_constraints() << std::endl;
 
-  std::vector<unsigned int> block_sizes(2);
+  std::vector<types::global_dof_index> block_sizes(2);
   block_sizes[0] = dof_handler.n_dofs()/3;
   block_sizes[1] = dof_handler.n_dofs() - block_sizes[0];
   BlockVector<double> b(block_sizes);

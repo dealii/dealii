@@ -158,7 +158,7 @@ public:
    * in the standard local
    * numbering of DoFAccessor.
    */
-  unsigned int renumber (const unsigned int i) const;
+  types::global_dof_index renumber (const unsigned int i) const;
 
   /**
    * The number of base elements.
@@ -226,7 +226,7 @@ private:
    * ordering. Filled by
    * initialize().
    */
-  std::vector<unsigned int> local_renumbering;
+  std::vector<types::global_dof_index> local_renumbering;
 };
 
 
@@ -259,9 +259,9 @@ BlockInfo::level (const unsigned int l) const
 
 
 inline
-unsigned int BlockInfo::renumber (const unsigned int i) const
+types::global_dof_index BlockInfo::renumber (const unsigned int i) const
 {
-  AssertIndexRange(i, local_renumbering.size());
+  AssertIndexRange(i, static_cast<unsigned int>(local_renumbering.size()));
   return local_renumbering[i];
 }
 

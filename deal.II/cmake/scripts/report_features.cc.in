@@ -166,4 +166,7 @@ std::cout << "dealii-feature: BOOST="
   std::cout << "dealii-feature: LibZ=yes" << std::endl;
 #endif
 
+#ifdef DEAL_II_WITH_64BIT_INDICES
+  std::cout << "dealii-feature: 64bit_indices=yes" <<std::endl;
+#endif  
 }

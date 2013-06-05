@@ -303,21 +303,6 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::setup_system ()
   {
-    std::string filename = "grid-"
-      + Utilities::int_to_string(triangulation.n_levels(), 2)
-      + "-"
-      + Utilities::int_to_string (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD), 3)
-      + ".svg";
-    
-    std::ofstream out (filename.c_str());
-    GridOut grid_out;
-    GridOutFlags::Svg svg_flags;
-    svg_flags.polar_angle = 60;
-    svg_flags.label_level_subdomain_id = true;
-    svg_flags.convert_level_number_to_height = true;
-    grid_out.set_flags(svg_flags);
-    grid_out.write_svg (triangulation, out);
-    
     mg_dof_handler.distribute_dofs (fe);
     mg_dof_handler.distribute_mg_dofs (fe);
 
@@ -911,7 +896,7 @@ namespace Step50
                             mg_transfer,
                             mg_smoother,
                             mg_smoother);
-    mg.set_debug(6);
+    //mg.set_debug(6);
     mg.set_edge_matrices(mg_interface_down, mg_interface_up);
 
     PreconditionMG<dim, vector_t, MGTransferPrebuilt<vector_t> >
@@ -920,13 +905,35 @@ namespace Step50
     // With all this together, we can finally
     // get about solving the linear system in
     // the usual way:
-    SolverControl solver_control (50, 1e-12, false);
+    SolverControl solver_control (500, 1e-12, false);
     SolverCG<vector_t>    cg (solver_control);
 
     solution = 0;
 
+    if (false)
+      {
+	// code to optionally compare to Trilinos ML
+	TrilinosWrappers::PreconditionAMG prec;
+	
+    TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
+    //    Amg_data.constant_modes = constant_modes;
+    Amg_data.elliptic = true;
+    Amg_data.higher_order_elements = true;
+    Amg_data.smoother_sweeps = 2;
+    Amg_data.aggregation_threshold = 0.02;
+    // Amg_data.symmetric = true;
+
+    prec.initialize (system_matrix,
+                                    Amg_data);
+    cg.solve (system_matrix, solution, system_rhs,
+              prec);
+      }
+    else
+      {
     cg.solve (system_matrix, solution, system_rhs,
               preconditioner);
+      }
+    
     constraints.distribute (solution);
   }
 
@@ -1045,7 +1052,7 @@ namespace Step50
   template <int dim>
   void LaplaceProblem<dim>::run ()
   {
-    for (unsigned int cycle=0; cycle<8; ++cycle)
+    for (unsigned int cycle=0; cycle<13; ++cycle)
       {
         deallog << "Cycle " << cycle << ':' << std::endl;
 
@@ -1053,15 +1060,10 @@ namespace Step50
           {
             GridGenerator::hyper_cube (triangulation);
 
-            // static const HyperBallBoundary<dim> boundary;
-            // triangulation.set_boundary (0, boundary);
-
-            triangulation.refine_global (2);
+            triangulation.refine_global (3);
           }
         else
-          //triangulation.refine_global (1);
 	   refine_grid ();
-
 
         deallog << "   Number of active cells:       "
                 << triangulation.n_global_active_cells()

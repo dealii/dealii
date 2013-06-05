@@ -81,11 +81,11 @@ void test(bool use_inhomogeneity_for_rhs)
 
   // "assemble":
 
-  std::vector<unsigned int> local_dofs1;
+  std::vector<types::global_dof_index> local_dofs1;
   for (unsigned int i=0;i<5;++i)
     local_dofs1.push_back(i);
 
-  std::vector<unsigned int> local_dofs2;
+  std::vector<types::global_dof_index> local_dofs2;
   local_dofs2.push_back(1);
   for (unsigned int i=1;i<5;++i)
     local_dofs2.push_back(3+i);

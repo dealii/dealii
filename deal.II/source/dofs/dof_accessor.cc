@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -68,7 +68,7 @@ DoFCellAccessor<DH,lda>::update_cell_dof_indices_cache () const
 
 template <class DH, bool lda>
 void
-DoFCellAccessor<DH,lda>::set_dof_indices (const std::vector<unsigned int> &local_dof_indices)
+DoFCellAccessor<DH,lda>::set_dof_indices (const std::vector<types::global_dof_index> &local_dof_indices)
 {
   Assert (static_cast<unsigned int>(this->present_level) < this->dof_handler->levels.size(),
           ExcMessage ("DoFHandler not initialized"));

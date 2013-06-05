@@ -374,7 +374,7 @@ namespace Step38
     Vector<double>            cell_rhs (dofs_per_cell);
 
     std::vector<double>       rhs_values(n_q_points);
-    std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+    std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
     const RightHandSide<spacedim> rhs;
 
@@ -415,7 +415,7 @@ namespace Step38
           }
       }
 
-    std::map<unsigned int,double> boundary_values;
+    std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (mapping,
                                               dof_handler,
                                               0,

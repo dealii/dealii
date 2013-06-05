@@ -130,12 +130,12 @@ void AdvectionProblem<dim>::setup_system ()
 				   // add boundary conditions as
 				   // inhomogeneous constraints here.
   {
-    std::map<unsigned int,double> boundary_values;
+    std::map<types::global_dof_index,double> boundary_values;
     VectorTools::interpolate_boundary_values (dof_handler,
 					      0,
 					      ConstantFunction<dim>(1.,2),
 					      boundary_values);
-    std::map<unsigned int,double>::const_iterator boundary_value =
+    std::map<types::global_dof_index,double>::const_iterator boundary_value =
       boundary_values.begin();
     for ( ; boundary_value !=boundary_values.end(); ++boundary_value)
       {
@@ -261,7 +261,7 @@ void AdvectionProblem<dim>::assemble_reference ()
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
   std::vector<double>  rhs_values (n_q_points);
 
   typename DoFHandler<dim>::active_cell_iterator
@@ -312,7 +312,7 @@ void AdvectionProblem<dim>::assemble_reference ()
 
 				   // use some other rhs vector as dummy for
 				   // application of Dirichlet conditions
-  std::map<unsigned int,double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   VectorTools::interpolate_boundary_values (dof_handler,
 					    0,
 					    ConstantFunction<dim>(1.,2),
@@ -348,7 +348,7 @@ void AdvectionProblem<dim>::assemble_test_1 ()
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
   std::vector<double>  rhs_values (n_q_points);
 
   typename DoFHandler<dim>::active_cell_iterator
@@ -424,7 +424,7 @@ void AdvectionProblem<dim>::assemble_test_2 ()
   FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
   Vector<double>       cell_rhs (dofs_per_cell);
 
-  std::vector<unsigned int> local_dof_indices (dofs_per_cell);
+  std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
   std::vector<double>  rhs_values (n_q_points);
 
   typename DoFHandler<dim>::active_cell_iterator

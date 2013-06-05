@@ -59,8 +59,9 @@ int main (int argc,char **argv)
 
 
   // now copy everything into a Trilinos matrix
-  Epetra_Map rowmap(4,4,0,Utilities::Trilinos::comm_world());
-  Epetra_Map colmap(5,5,0,Utilities::Trilinos::comm_world());
+  Epetra_Map rowmap(TrilinosWrappers::types::int_type(4),4,0,Utilities::Trilinos::comm_world());
+  Epetra_Map colmap(TrilinosWrappers::types::int_type(5),5,0,Utilities::Trilinos::comm_world());
+
   TrilinosWrappers::SparseMatrix tmatrix;
   tmatrix.reinit (rowmap, colmap, matrix, 0, true, &xsparsity);
 

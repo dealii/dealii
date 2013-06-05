@@ -96,6 +96,11 @@ private:
 
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Parameters for block preconditioners.
    */
   class AdditionalData
@@ -107,7 +112,7 @@ public:
      * is no reasonable default
      * parameter.
      */
-    AdditionalData (const unsigned int block_size,
+    AdditionalData (const size_type block_size,
                     const double relaxation = 1.,
                     const bool invert_diagonal = true,
                     const bool same_diagonal = false);
@@ -120,7 +125,7 @@ public:
     /**
      * Block size.
      */
-    unsigned int block_size;
+    size_type block_size;
 
     /**
      * Invert diagonal during initialization.
@@ -200,8 +205,8 @@ protected:
    * may be provided.
    */
   void initialize (const MATRIX &A,
-                   const std::vector<unsigned int> &permutation,
-                   const std::vector<unsigned int> &inverse_permutation,
+                   const std::vector<size_type> &permutation,
+                   const std::vector<size_type> &inverse_permutation,
                    const AdditionalData parameters);
 
   /**
@@ -250,8 +255,8 @@ protected:
    * order is only admissible for
    * block permutation.
    */
-  void set_permutation(const std::vector<unsigned int> &permutation,
-                       const std::vector<unsigned int> &inverse_permutation);
+  void set_permutation(const std::vector<size_type> &permutation,
+                       const std::vector<size_type> &inverse_permutation);
 
   /**
    * Replacement of
@@ -259,8 +264,8 @@ protected:
    * permuted preconditioning.
    */
   void invert_permuted_diagblocks(
-    const std::vector<unsigned int> &permutation,
-    const std::vector<unsigned int> &inverse_permutation);
+    const std::vector<size_type> &permutation,
+    const std::vector<size_type> &inverse_permutation);
 public:
   /**
    * Deletes the inverse diagonal
@@ -283,8 +288,8 @@ public:
    * if the inverse diagonal blocks
    * are stored.
    */
-  value_type el(unsigned int i,
-                unsigned int j) const;
+  value_type el(size_type i,
+                size_type j) const;
 
   /**
    * Stores the inverse of the
@@ -367,7 +372,7 @@ public:
   /**
    * Return the size of the blocks.
    */
-  unsigned int block_size () const;
+  size_type block_size () const;
 
   /**
    * @deprecated Use size()
@@ -414,7 +419,7 @@ protected:
    * diagonal block is assumed to
    * be of the same size.
    */
-  unsigned int blocksize;
+  size_type blocksize;
 
   /**
    * Pointer to the matrix. Make
@@ -438,12 +443,12 @@ protected:
   /**
    * The permutation vector
    */
-  std::vector<unsigned int> permutation;
+  std::vector<size_type> permutation;
 
   /**
    * The inverse permutation vector
    */
-  std::vector<unsigned int> inverse_permutation;
+  std::vector<size_type> inverse_permutation;
 
   /**
    * Flag for diagonal compression.
@@ -475,6 +480,11 @@ private:
 
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * STL conforming iterator.
    */
   class const_iterator
@@ -493,21 +503,21 @@ public:
        * pointer is sufficient.
        */
       Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
-                const unsigned int row);
+                const size_type row);
 
       /**
        * Row number of the element
        * represented by this
        * object.
        */
-      unsigned int row() const;
+      size_type row() const;
 
       /**
        * Column number of the
        * element represented by
        * this object.
        */
-      unsigned int column() const;
+      size_type column() const;
 
       /**
        * Value of this matrix entry.
@@ -524,12 +534,12 @@ public:
        * Save block size here
        * for further reference.
        */
-      unsigned int bs;
+      size_type bs;
 
       /**
        * Current block number.
        */
-      unsigned int a_block;
+      size_type a_block;
 
       /**
        * Iterator inside block.
@@ -553,7 +563,7 @@ public:
      * Constructor.
      */
     const_iterator(const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
-                   const unsigned int row);
+                   const size_type row);
 
     /**
      * Prefix increment.
@@ -698,12 +708,12 @@ public:
    * STL-like iterator with the
    * first entry of row @p r.
    */
-  const_iterator begin (const unsigned int r) const;
+  const_iterator begin (const size_type r) const;
 
   /**
    * Final iterator of row @p r.
    */
-  const_iterator end (const unsigned int r) const;
+  const_iterator end (const size_type r) const;
 
 
 private:
@@ -767,6 +777,11 @@ class PreconditionBlockSOR : public virtual Subscriptor,
   protected PreconditionBlock<MATRIX, inverse_type>
 {
 public:
+  /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
   /**
    * Default constructor.
    */
@@ -956,6 +971,11 @@ class PreconditionBlockSSOR : public virtual Subscriptor,
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Define number type of matrix.
    */
   typedef typename MATRIX::value_type number;
@@ -1051,16 +1071,16 @@ PreconditionBlock<MATRIX, inverse_type>::n_blocks () const
 template<class MATRIX, typename inverse_type>
 inline inverse_type
 PreconditionBlock<MATRIX, inverse_type>::el (
-  unsigned int i,
-  unsigned int j) const
+  size_type i,
+  size_type j) const
 {
-  const unsigned int bs = blocksize;
+  const size_type bs = blocksize;
   const unsigned int nb = i/bs;
 
   const FullMatrix<inverse_type> &B = this->inverse(nb);
 
-  const unsigned int ib = i % bs;
-  const unsigned int jb = j % bs;
+  const size_type ib = i % bs;
+  const size_type jb = j % bs;
 
   if (jb + nb*bs != j)
     {
@@ -1076,7 +1096,7 @@ template<class MATRIX, typename inverse_type>
 inline
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::
 Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
-          const unsigned int row)
+          const size_type row)
   :
   matrix(matrix),
   b_iterator(&matrix->inverse(0), 0, 0),
@@ -1090,7 +1110,7 @@ Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
   if (a_block == matrix->size())
     return;
 
-  const unsigned int r = row % bs;
+  const size_type r = row % bs;
 
   b_iterator = matrix->inverse(a_block).begin(r);
   b_end = matrix->inverse(a_block).end();
@@ -1102,7 +1122,7 @@ Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
 
 template<class MATRIX, typename inverse_type>
 inline
-unsigned int
+typename PreconditionBlockJacobi<MATRIX, inverse_type>::size_type 
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::row() const
 {
   Assert (a_block < matrix->size(),
@@ -1114,7 +1134,7 @@ PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::row() c
 
 template<class MATRIX, typename inverse_type>
 inline
-unsigned int
+typename PreconditionBlockJacobi<MATRIX, inverse_type>::size_type
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::column() const
 {
   Assert (a_block < matrix->size(),
@@ -1140,7 +1160,7 @@ template<class MATRIX, typename inverse_type>
 inline
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::
 const_iterator(const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
-               const unsigned int row)
+               const size_type row)
   :
   accessor(matrix, row)
 {}
@@ -1248,7 +1268,7 @@ template<class MATRIX, typename inverse_type>
 inline
 typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator
 PreconditionBlockJacobi<MATRIX, inverse_type>::begin (
-  const unsigned int r) const
+  const size_type r) const
 {
   Assert (r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
   return const_iterator(this, r);
@@ -1260,7 +1280,7 @@ template<class MATRIX, typename inverse_type>
 inline
 typename PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator
 PreconditionBlockJacobi<MATRIX, inverse_type>::end (
-  const unsigned int r) const
+  const size_type r) const
 {
   Assert (r < this->A->m(), ExcIndexRange(r, 0, this->A->m()));
   return const_iterator(this, r+1);

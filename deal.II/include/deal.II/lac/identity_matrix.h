@@ -70,6 +70,11 @@ class IdentityMatrix
 {
 public:
   /**
+   * Declate type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * Default constructor. Creates a
    * zero-sized matrix that should
    * be resized later on using the
@@ -81,13 +86,13 @@ public:
    * Constructor. Creates a
    * identity matrix of size #n.
    */
-  IdentityMatrix (const unsigned int n);
+  IdentityMatrix (const size_type n);
 
   /**
    * Resize the matrix to be of
    * size #n by #n.
    */
-  void reinit (const unsigned int n);
+  void reinit (const size_type n);
 
   /**
    * Number of rows of this
@@ -95,7 +100,7 @@ public:
    * matrix, the number of rows and
    * columns are equal, of course.
    */
-  unsigned int m () const;
+  size_type m () const;
 
   /**
    * Number of columns of this
@@ -103,7 +108,7 @@ public:
    * matrix, the number of rows and
    * columns are equal, of course.
    */
-  unsigned int n () const;
+  size_type n () const;
 
   /**
    * Matrix-vector
@@ -160,7 +165,7 @@ private:
    * Number of rows and columns of
    * this matrix.
    */
-  unsigned int size;
+  size_type size;
 };
 
 
@@ -179,7 +184,7 @@ IdentityMatrix::IdentityMatrix ()
 
 
 inline
-IdentityMatrix::IdentityMatrix (const unsigned int n)
+IdentityMatrix::IdentityMatrix (const size_type n)
   :
   size (n)
 {}
@@ -188,7 +193,7 @@ IdentityMatrix::IdentityMatrix (const unsigned int n)
 
 inline
 void
-IdentityMatrix::reinit (const unsigned int n)
+IdentityMatrix::reinit (const size_type n)
 {
   size = n;
 }
@@ -196,7 +201,7 @@ IdentityMatrix::reinit (const unsigned int n)
 
 
 inline
-unsigned int
+IdentityMatrix::size_type 
 IdentityMatrix::m () const
 {
   return size;
@@ -205,7 +210,7 @@ IdentityMatrix::m () const
 
 
 inline
-unsigned int
+IdentityMatrix::size_type 
 IdentityMatrix::n () const
 {
   return size;

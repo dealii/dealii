@@ -160,8 +160,8 @@ namespace FETools
   template<int dim, int spacedim>
   void compute_block_renumbering (
     const FiniteElement<dim,spacedim>  &fe,
-    std::vector<unsigned int> &renumbering,
-    std::vector<unsigned int> &block_data,
+    std::vector<types::global_dof_index> &renumbering,
+    std::vector<types::global_dof_index> &block_data,
     bool return_start_indices = true);
 
   /**

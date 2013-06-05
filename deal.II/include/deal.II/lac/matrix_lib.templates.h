@@ -24,7 +24,7 @@ MeanValueFilter::filter(Vector<number> &v) const
 {
   number mean = v.mean_value();
 
-  for (unsigned int i=0; i<v.size(); ++i)
+  for (size_type i=0; i<v.size(); ++i)
     v(i) -= mean;
 }
 
@@ -40,7 +40,7 @@ MeanValueFilter::vmult(Vector<number> &dst,
 
   number mean = src.mean_value();
 
-  for (unsigned int i=0; i<dst.size(); ++i)
+  for (size_type i=0; i<dst.size(); ++i)
     dst(i) = src(i) - mean;
 }
 
@@ -56,7 +56,7 @@ MeanValueFilter::vmult_add(Vector<number> &dst,
 
   number mean = src.mean_value();
 
-  for (unsigned int i=0; i<dst.size(); ++i)
+  for (size_type i=0; i<dst.size(); ++i)
     dst(i) += src(i) - mean;
 }
 

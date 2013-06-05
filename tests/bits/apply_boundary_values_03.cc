@@ -52,11 +52,11 @@ void test ()
                                    // (1) writing them into the matrix and
                                    // applying boundary values later on, or
                                    // (2) applying them right away
-  std::map<unsigned int, double> boundary_values;
+  std::map<types::global_dof_index,double> boundary_values;
   boundary_values[N/2] = 42;
 
   // then fill the matrices
-  std::vector<unsigned int> local_dofs (N);
+  std::vector<types::global_dof_index> local_dofs (N);
   FullMatrix<double> local_matrix (N,N);
   Vector<double> local_vector (N);
     {

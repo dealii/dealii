@@ -98,6 +98,11 @@ class SparseMatrixEZ : public Subscriptor
 {
 public:
   /**
+   * Declare type for container size.
+   */
+  typedef types::global_dof_index size_type;
+
+  /**
    * The class for storing the
    * column number of an entry
    * together with its value.
@@ -115,13 +120,13 @@ public:
      * Constructor. Fills column
      * and value.
      */
-    Entry (const unsigned int column,
+    Entry (const size_type column,
            const number &value);
 
     /**
      * The column number.
      */
-    unsigned int column;
+    size_type column;
 
     /**
      * The value there.
@@ -131,7 +136,7 @@ public:
     /**
      * Non-existent column number.
      */
-    static const unsigned int invalid = numbers::invalid_unsigned_int;
+    static const size_type invalid = numbers::invalid_size_type;
   };
 
   /**
@@ -145,13 +150,13 @@ public:
     /**
      * Constructor.
      */
-    RowInfo (unsigned int start = Entry::invalid);
+    RowInfo (size_type start = Entry::invalid);
 
     /**
      * Index of first entry of
      * the row in the data field.
      */
-    unsigned int start;
+    size_type start;
     /**
      * Number of entries in this
      * row.
@@ -191,7 +196,7 @@ public:
        * pointer is sufficient.
        */
       Accessor (const SparseMatrixEZ<number> *matrix,
-                const unsigned int            row,
+                const size_type               row,
                 const unsigned short          index);
 
       /**
@@ -199,7 +204,7 @@ public:
        * represented by this
        * object.
        */
-      unsigned int row() const;
+      size_type row() const;
 
       /**
        * Index in row of the element
@@ -213,7 +218,7 @@ public:
        * element represented by
        * this object.
        */
-      unsigned int column() const;
+      size_type column() const;
 
       /**
        * Value of this matrix entry.
@@ -229,7 +234,7 @@ public:
       /**
        * Current row number.
        */
-      unsigned int a_row;
+      size_type a_row;
 
       /**
        * Current index in row.
@@ -248,7 +253,7 @@ public:
      * Constructor.
      */
     const_iterator(const SparseMatrixEZ<number> *matrix,
-                   const unsigned int            row,
+                   const size_type               row,
                    const unsigned short          index);
 
     /**
@@ -364,9 +369,9 @@ public:
    * efficient assembling of the
    * matrix.
    */
-  explicit SparseMatrixEZ (const unsigned int n_rows,
-                           const unsigned int n_columns,
-                           const unsigned int default_row_length = 0,
+  explicit SparseMatrixEZ (const size_type n_rows,
+                           const size_type n_columns,
+                           const size_type default_row_length = 0,
                            const unsigned int default_increment = 1);
 
   /**
@@ -415,11 +420,11 @@ public:
    * efficient assembling of the
    * matrix.
    */
-  void reinit (const unsigned int n_rows,
-               const unsigned int n_columns,
-               unsigned int default_row_length = 0,
+  void reinit (const size_type n_rows,
+               const size_type n_columns,
+               size_type default_row_length = 0,
                unsigned int default_increment = 1,
-               unsigned int reserve = 0);
+               size_type reserve = 0);
 
   /**
    * Release all memory and return
@@ -447,7 +452,7 @@ public:
    * matrix is of dimension
    * $m \times n$.
    */
-  unsigned int m () const;
+  size_type m () const;
 
   /**
    * Return the dimension of the
@@ -455,19 +460,19 @@ public:
    * matrix is of dimension
    * $m \times n$.
    */
-  unsigned int n () const;
+  size_type n () const;
 
   /**
    * Return the number of entries
    * in a specific row.
    */
-  unsigned int get_row_length (const unsigned int row) const;
+  size_type get_row_length (const size_type row) const;
 
   /**
    * Return the number of nonzero
    * elements of this matrix.
    */
-  unsigned int n_nonzero_elements () const;
+  size_type n_nonzero_elements () const;
 
   /**
    * Determine an estimate for the
@@ -501,10 +506,10 @@ public:
    * the number of entries in each
    * line is printed as well.
    */
-  void compute_statistics (unsigned int &used,
-                           unsigned int &allocated,
-                           unsigned int &reserved,
-                           std::vector<unsigned int> &used_by_line,
+  void compute_statistics (size_type &used,
+                           size_type &allocated,
+                           size_type &reserved,
+                           std::vector<size_type> &used_by_line,
                            const bool compute_by_line) const;
 //@}
   /**
@@ -520,7 +525,7 @@ public:
                    * finite number an exception
                    * is thrown.
                    */
-  void set (const unsigned int i, const unsigned int j,
+  void set (const size_type i, const size_type j,
             const number value);
 
   /**
@@ -532,8 +537,8 @@ public:
    * finite number an exception
    * is thrown.
    */
-  void add (const unsigned int i,
-            const unsigned int j,
+  void add (const size_type i,
+            const size_type j,
             const number value);
 
   /**
@@ -564,9 +569,9 @@ public:
    * into the matrix.
    */
   template <typename number2>
-  void add (const std::vector<unsigned int> &indices,
-            const FullMatrix<number2>       &full_matrix,
-            const bool                       elide_zero_values = true);
+  void add (const std::vector<size_type> &indices,
+            const FullMatrix<number2>    &full_matrix,
+            const bool                    elide_zero_values = true);
 
   /**
    * Same function as before, but now
@@ -576,8 +581,8 @@ public:
    * on rows and columns, respectively.
    */
   template <typename number2>
-  void add (const std::vector<unsigned int> &row_indices,
-            const std::vector<unsigned int> &col_indices,
+  void add (const std::vector<size_type> &row_indices,
+            const std::vector<size_type> &col_indices,
             const FullMatrix<number2>       &full_matrix,
             const bool                       elide_zero_values = true);
 
@@ -599,10 +604,10 @@ public:
    * into the matrix.
    */
   template <typename number2>
-  void add (const unsigned int               row,
-            const std::vector<unsigned int> &col_indices,
-            const std::vector<number2>      &values,
-            const bool                       elide_zero_values = true);
+  void add (const size_type               row,
+            const std::vector<size_type> &col_indices,
+            const std::vector<number2>   &values,
+            const bool                    elide_zero_values = true);
 
   /**
    * Add an array of values given by
@@ -622,12 +627,12 @@ public:
    * into the matrix.
    */
   template <typename number2>
-  void add (const unsigned int  row,
-            const unsigned int  n_cols,
-            const unsigned int *col_indices,
-            const number2      *values,
-            const bool          elide_zero_values = true,
-            const bool          col_indices_are_sorted = false);
+  void add (const size_type  row,
+            const size_type  n_cols,
+            const size_type *col_indices,
+            const number2   *values,
+            const bool       elide_zero_values = true,
+            const bool       col_indices_are_sorted = false);
 
   /**
    * Copy the given matrix to this
@@ -696,16 +701,16 @@ public:
    * matrix), use the @p el
    * function.
    */
-  number operator () (const unsigned int i,
-                      const unsigned int j) const;
+  number operator () (const size_type i,
+                      const size_type j) const;
 
   /**
    * Return the value of the entry
    * (i,j). Returns zero for all
    * non-existing entries.
    */
-  number el (const unsigned int i,
-             const unsigned int j) const;
+  number el (const size_type i,
+             const size_type j) const;
 //@}
   /**
    * @name Multiplications
@@ -853,14 +858,14 @@ public:
    * is <tt>end(r)</tt>, which does NOT
    * point into row @p r..
    */
-  const_iterator begin (const unsigned int r) const;
+  const_iterator begin (const size_type r) const;
 
   /**
    * Final iterator of row
    * @p r. The result may be
    * different from <tt>end()</tt>!
    */
-  const_iterator end (const unsigned int r) const;
+  const_iterator end (const size_type r) const;
 //@}
   /**
    * @name Input/Output
@@ -978,8 +983,8 @@ private:
    * zero-pointer if the entry does
    * not exist.
    */
-  const Entry *locate (const unsigned int row,
-                       const unsigned int col) const;
+  const Entry *locate (const size_type row,
+                       const size_type col) const;
 
   /**
    * Find an entry and return a
@@ -987,14 +992,14 @@ private:
    * zero-pointer if the entry does
    * not exist.
    */
-  Entry *locate (const unsigned int row,
-                 const unsigned int col);
+  Entry *locate (const size_type row,
+                 const size_type col);
 
   /**
    * Find an entry or generate it.
    */
-  Entry *allocate (const unsigned int row,
-                   const unsigned int col);
+  Entry *allocate (const size_type row,
+                   const size_type col);
 
   /**
    * Version of @p vmult which only
@@ -1008,8 +1013,8 @@ private:
   template <typename somenumber>
   void threaded_vmult (Vector<somenumber>       &dst,
                        const Vector<somenumber> &src,
-                       const unsigned int        begin_row,
-                       const unsigned int        end_row) const;
+                       const size_type           begin_row,
+                       const size_type           end_row) const;
 
   /**
    * Version of
@@ -1024,8 +1029,8 @@ private:
    */
   template <typename somenumber>
   void threaded_matrix_norm_square (const Vector<somenumber> &v,
-                                    const unsigned int        begin_row,
-                                    const unsigned int        end_row,
+                                    const size_type           begin_row,
+                                    const size_type           end_row,
                                     somenumber               *partial_sum) const;
 
   /**
@@ -1042,8 +1047,8 @@ private:
   template <typename somenumber>
   void threaded_matrix_scalar_product (const Vector<somenumber> &u,
                                        const Vector<somenumber> &v,
-                                       const unsigned int        begin_row,
-                                       const unsigned int        end_row,
+                                       const size_type           begin_row,
+                                       const size_type           end_row,
                                        somenumber               *partial_sum) const;
 
   /**
@@ -1051,7 +1056,7 @@ private:
    * used to check vector
    * dimensions only.
    */
-  unsigned int n_columns;
+  size_type n_columns;
 
   /**
    * Info structure for each row.
@@ -1084,7 +1089,7 @@ private:
 
 template <typename number>
 inline
-SparseMatrixEZ<number>::Entry::Entry(unsigned int column,
+SparseMatrixEZ<number>::Entry::Entry(size_type column,
                                      const number &value)
   :
   column(column),
@@ -1104,7 +1109,7 @@ SparseMatrixEZ<number>::Entry::Entry()
 
 template <typename number>
 inline
-SparseMatrixEZ<number>::RowInfo::RowInfo(unsigned int start)
+SparseMatrixEZ<number>::RowInfo::RowInfo(size_type start)
   :
   start(start),
   length(0),
@@ -1117,7 +1122,7 @@ template <typename number>
 inline
 SparseMatrixEZ<number>::const_iterator::Accessor::
 Accessor (const SparseMatrixEZ<number> *matrix,
-          const unsigned int            r,
+          const size_type               r,
           const unsigned short          i)
   :
   matrix(matrix),
@@ -1128,7 +1133,7 @@ Accessor (const SparseMatrixEZ<number> *matrix,
 
 template <typename number>
 inline
-unsigned int
+typename SparseMatrixEZ<number>::size_type 
 SparseMatrixEZ<number>::const_iterator::Accessor::row() const
 {
   return a_row;
@@ -1137,7 +1142,7 @@ SparseMatrixEZ<number>::const_iterator::Accessor::row() const
 
 template <typename number>
 inline
-unsigned int
+typename SparseMatrixEZ<number>::size_type 
 SparseMatrixEZ<number>::const_iterator::Accessor::column() const
 {
   return matrix->data[matrix->row_info[a_row].start+a_index].column;
@@ -1167,7 +1172,7 @@ template <typename number>
 inline
 SparseMatrixEZ<number>::const_iterator::
 const_iterator(const SparseMatrixEZ<number> *matrix,
-               const unsigned int            r,
+               const size_type               r,
                const unsigned short          i)
   :
   accessor(matrix, r, i)
@@ -1280,7 +1285,7 @@ operator < (const const_iterator &other) const
 //---------------------------------------------------------------------------
 template <typename number>
 inline
-unsigned int SparseMatrixEZ<number>::m () const
+typename SparseMatrixEZ<number>::size_type SparseMatrixEZ<number>::m () const
 {
   return row_info.size();
 }
@@ -1288,7 +1293,7 @@ unsigned int SparseMatrixEZ<number>::m () const
 
 template <typename number>
 inline
-unsigned int SparseMatrixEZ<number>::n () const
+typename SparseMatrixEZ<number>::size_type SparseMatrixEZ<number>::n () const
 {
   return n_columns;
 }
@@ -1297,15 +1302,15 @@ unsigned int SparseMatrixEZ<number>::n () const
 template <typename number>
 inline
 typename SparseMatrixEZ<number>::Entry *
-SparseMatrixEZ<number>::locate (const unsigned int row,
-                                const unsigned int col)
+SparseMatrixEZ<number>::locate (const size_type row,
+                                const size_type col)
 {
   Assert (row<m(), ExcIndexRange(row,0,m()));
   Assert (col<n(), ExcIndexRange(col,0,n()));
 
   const RowInfo &r = row_info[row];
-  const unsigned int end = r.start + r.length;
-  for (unsigned int i=r.start; i<end; ++i)
+  const size_type end = r.start + r.length;
+  for (size_type i=r.start; i<end; ++i)
     {
       Entry *const entry = &data[i];
       if (entry->column == col)
@@ -1321,8 +1326,8 @@ SparseMatrixEZ<number>::locate (const unsigned int row,
 template <typename number>
 inline
 const typename SparseMatrixEZ<number>::Entry *
-SparseMatrixEZ<number>::locate (const unsigned int row,
-                                const unsigned int col) const
+SparseMatrixEZ<number>::locate (const size_type row,
+                                const size_type col) const
 {
   SparseMatrixEZ<number> *t = const_cast<SparseMatrixEZ<number>*> (this);
   return t->locate(row,col);
@@ -1332,16 +1337,16 @@ SparseMatrixEZ<number>::locate (const unsigned int row,
 template <typename number>
 inline
 typename SparseMatrixEZ<number>::Entry *
-SparseMatrixEZ<number>::allocate (const unsigned int row,
-                                  const unsigned int col)
+SparseMatrixEZ<number>::allocate (const size_type row,
+                                  const size_type col)
 {
   Assert (row<m(), ExcIndexRange(row,0,m()));
   Assert (col<n(), ExcIndexRange(col,0,n()));
 
   RowInfo &r = row_info[row];
-  const unsigned int end = r.start + r.length;
+  const size_type end = r.start + r.length;
 
-  unsigned int i = r.start;
+  size_type i = r.start;
   // If diagonal exists and this
   // column is higher, start only
   // after diagonal.
@@ -1373,7 +1378,7 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
           data.insert(data.begin()+end, increment, Entry());
           // Update starts of
           // following rows
-          for (unsigned int rn=row+1; rn<row_info.size(); ++rn)
+          for (size_type rn=row+1; rn<row_info.size(); ++rn)
             row_info[rn].start += increment;
         }
     }
@@ -1409,7 +1414,7 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
 
   // Move all entries in this
   // row up by one
-  for (unsigned int j = i+1; j < end; ++j)
+  for (size_type j = i+1; j < end; ++j)
     {
       // There should be no invalid
       // entry below end
@@ -1429,8 +1434,8 @@ SparseMatrixEZ<number>::allocate (const unsigned int row,
 
 template <typename number>
 inline
-void SparseMatrixEZ<number>::set (const unsigned int i,
-                                  const unsigned int j,
+void SparseMatrixEZ<number>::set (const size_type i,
+                                  const size_type j,
                                   const number value)
 {
 
@@ -1456,8 +1461,8 @@ void SparseMatrixEZ<number>::set (const unsigned int i,
 
 template <typename number>
 inline
-void SparseMatrixEZ<number>::add (const unsigned int i,
-                                  const unsigned int j,
+void SparseMatrixEZ<number>::add (const size_type i,
+                                  const size_type j,
                                   const number value)
 {
 
@@ -1477,13 +1482,13 @@ void SparseMatrixEZ<number>::add (const unsigned int i,
 
 template <typename number>
 template <typename number2>
-void SparseMatrixEZ<number>::add (const std::vector<unsigned int> &indices,
-                                  const FullMatrix<number2>       &full_matrix,
-                                  const bool                       elide_zero_values)
+void SparseMatrixEZ<number>::add (const std::vector<size_type> &indices,
+                                  const FullMatrix<number2>    &full_matrix,
+                                  const bool                    elide_zero_values)
 {
 //TODO: This function can surely be made more efficient
-  for (unsigned int i=0; i<indices.size(); ++i)
-    for (unsigned int j=0; j<indices.size(); ++j)
+  for (size_type i=0; i<indices.size(); ++i)
+    for (size_type j=0; j<indices.size(); ++j)
       if ((full_matrix(i,j) != 0) || (elide_zero_values == false))
         add (indices[i], indices[j], full_matrix(i,j));
 }
@@ -1492,14 +1497,14 @@ void SparseMatrixEZ<number>::add (const std::vector<unsigned int> &indices,
 
 template <typename number>
 template <typename number2>
-void SparseMatrixEZ<number>::add (const std::vector<unsigned int> &row_indices,
-                                  const std::vector<unsigned int> &col_indices,
-                                  const FullMatrix<number2>       &full_matrix,
-                                  const bool                       elide_zero_values)
+void SparseMatrixEZ<number>::add (const std::vector<size_type> &row_indices,
+                                  const std::vector<size_type> &col_indices,
+                                  const FullMatrix<number2>    &full_matrix,
+                                  const bool                    elide_zero_values)
 {
 //TODO: This function can surely be made more efficient
-  for (unsigned int i=0; i<row_indices.size(); ++i)
-    for (unsigned int j=0; j<col_indices.size(); ++j)
+  for (size_type i=0; i<row_indices.size(); ++i)
+    for (size_type j=0; j<col_indices.size(); ++j)
       if ((full_matrix(i,j) != 0) || (elide_zero_values == false))
         add (row_indices[i], col_indices[j], full_matrix(i,j));
 }
@@ -1509,13 +1514,13 @@ void SparseMatrixEZ<number>::add (const std::vector<unsigned int> &row_indices,
 
 template <typename number>
 template <typename number2>
-void SparseMatrixEZ<number>::add (const unsigned int               row,
-                                  const std::vector<unsigned int> &col_indices,
-                                  const std::vector<number2>      &values,
-                                  const bool                       elide_zero_values)
+void SparseMatrixEZ<number>::add (const size_type               row,
+                                  const std::vector<size_type> &col_indices,
+                                  const std::vector<number2>   &values,
+                                  const bool                    elide_zero_values)
 {
 //TODO: This function can surely be made more efficient
-  for (unsigned int j=0; j<col_indices.size(); ++j)
+  for (size_type j=0; j<col_indices.size(); ++j)
     if ((values[j] != 0) || (elide_zero_values == false))
       add (row, col_indices[j], values[j]);
 }
@@ -1524,15 +1529,15 @@ void SparseMatrixEZ<number>::add (const unsigned int               row,
 
 template <typename number>
 template <typename number2>
-void SparseMatrixEZ<number>::add (const unsigned int  row,
-                                  const unsigned int  n_cols,
-                                  const unsigned int *col_indices,
-                                  const number2      *values,
-                                  const bool          elide_zero_values,
-                                  const bool          /*col_indices_are_sorted*/)
+void SparseMatrixEZ<number>::add (const size_type  row,
+                                  const size_type  n_cols,
+                                  const size_type *col_indices,
+                                  const number2   *values,
+                                  const bool       elide_zero_values,
+                                  const bool      /*col_indices_are_sorted*/)
 {
 //TODO: This function can surely be made more efficient
-  for (unsigned int j=0; j<n_cols; ++j)
+  for (size_type j=0; j<n_cols; ++j)
     if ((values[j] != 0) || (elide_zero_values == false))
       add (row, col_indices[j], values[j]);
 }
@@ -1542,8 +1547,8 @@ void SparseMatrixEZ<number>::add (const unsigned int  row,
 
 template <typename number>
 inline
-number SparseMatrixEZ<number>::el (const unsigned int i,
-                                   const unsigned int j) const
+number SparseMatrixEZ<number>::el (const size_type i,
+                                   const size_type j) const
 {
   const Entry *entry = locate(i,j);
   if (entry)
@@ -1555,8 +1560,8 @@ number SparseMatrixEZ<number>::el (const unsigned int i,
 
 template <typename number>
 inline
-number SparseMatrixEZ<number>::operator() (const unsigned int i,
-                                           const unsigned int j) const
+number SparseMatrixEZ<number>::operator() (const size_type i,
+                                           const size_type j) const
 {
   const Entry *entry = locate(i,j);
   if (entry)
@@ -1586,7 +1591,7 @@ SparseMatrixEZ<number>::end () const
 template <typename number>
 inline
 typename SparseMatrixEZ<number>::const_iterator
-SparseMatrixEZ<number>::begin (const unsigned int r) const
+SparseMatrixEZ<number>::begin (const size_type r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   const_iterator result (this, r, 0);
@@ -1596,7 +1601,7 @@ SparseMatrixEZ<number>::begin (const unsigned int r) const
 template <typename number>
 inline
 typename SparseMatrixEZ<number>::const_iterator
-SparseMatrixEZ<number>::end (const unsigned int r) const
+SparseMatrixEZ<number>::end (const size_type r) const
 {
   Assert (r<m(), ExcIndexRange(r,0,m()));
   const_iterator result(this, r+1, 0);
@@ -1614,7 +1619,7 @@ SparseMatrixEZ<number>::copy_from (const MATRIX &M)
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class, and
   // copy them into the current object
-  for (unsigned int row = 0; row < M.m(); ++row)
+  for (size_type row = 0; row < M.m(); ++row)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
@@ -1642,7 +1647,7 @@ SparseMatrixEZ<number>::add (const number factor,
   // loop over the elements of the argument matrix row by row, as suggested
   // in the documentation of the sparse matrix iterator class, and
   // add them into the current object
-  for (unsigned int row = 0; row < M.m(); ++row)
+  for (size_type row = 0; row < M.m(); ++row)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
@@ -1682,13 +1687,13 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA &A,
   if (transpose)
     while (b1 != b_final)
       {
-        const unsigned int i = b1->column();
-        const unsigned int k = b1->row();
+        const size_type i = b1->column();
+        const size_type k = b1->row();
         typename MATRIXB::const_iterator b2 = B.begin();
         while (b2 != b_final)
           {
-            const unsigned int j = b2->column();
-            const unsigned int l = b2->row();
+            const size_type j = b2->column();
+            const size_type l = b2->row();
 
             const typename MATRIXA::value_type a = A.el(k,l);
 
@@ -1704,11 +1709,11 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA &A,
       // maximal row for a column in
       // advance.
 
-      std::vector<unsigned int> minrow(B.n(), B.m());
-      std::vector<unsigned int> maxrow(B.n(), 0);
+      std::vector<size_type> minrow(B.n(), B.m());
+      std::vector<size_type> maxrow(B.n(), 0);
       while (b1 != b_final)
         {
-          const unsigned int r = b1->row();
+          const size_type r = b1->row();
           if (r < minrow[b1->column()])
             minrow[b1->column()] = r;
           if (r > maxrow[b1->column()])
@@ -1745,7 +1750,7 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA &A,
               // the work
               if (b1->column() == ai->row() && (b1v != 0.))
                 {
-                  const unsigned int i = b1->row();
+                  const size_type i = b1->row();
 
                   typename MATRIXB::const_iterator
                   b2 = B.begin(minrow[ai->column()]);
@@ -1753,7 +1758,7 @@ SparseMatrixEZ<number>::conjugate_add (const MATRIXA &A,
                     {
                       if (b2->column() == ai->column())
                         {
-                          const unsigned int j = b2->row();
+                          const size_type j = b2->row();
                           add (i, j, a * b1v * b2->value());
                         }
                       ++b2;
@@ -1773,10 +1778,10 @@ inline
 void
 SparseMatrixEZ<number>::print_statistics(STREAM &out, bool full)
 {
-  unsigned int used;
-  unsigned int allocated;
-  unsigned int reserved;
-  std::vector<unsigned int> used_by_line;
+  size_type used;
+  size_type allocated;
+  size_type reserved;
+  std::vector<size_type> used_by_line;
 
   compute_statistics (used, allocated, reserved, used_by_line, full);
 
@@ -1786,7 +1791,7 @@ SparseMatrixEZ<number>::print_statistics(STREAM &out, bool full)
 
   if (full)
     {
-      for (unsigned int i=0; i< used_by_line.size(); ++i)
+      for (size_type i=0; i< used_by_line.size(); ++i)
         if (used_by_line[i] != 0)
           out << "SparseMatrixEZ:entries\t" << i
               << "\trows\t" << used_by_line[i]

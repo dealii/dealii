@@ -105,7 +105,7 @@ void SystemTest<dim>::check_numbering ()
   typename DoFHandler<dim>::active_cell_iterator
     cell = dof_handler.begin_active(),
     endc = dof_handler.end();
-  std::vector<unsigned int>	local_dof_indices(fe.dofs_per_cell);
+  std::vector<types::global_dof_index>	local_dof_indices(fe.dofs_per_cell);
 	
   for (; cell!=endc; ++cell)
     {

@@ -49,8 +49,8 @@ namespace TrilinosWrappers
 
   void
   BlockSparseMatrix::
-  reinit (const unsigned int n_block_rows,
-          const unsigned int n_block_columns)
+  reinit (const size_type n_block_rows,
+          const size_type n_block_columns)
   {
     // first delete previous content of
     // the subobjects array
@@ -65,8 +65,8 @@ namespace TrilinosWrappers
     this->column_block_indices.reinit (n_block_columns, 0);
 
     // and reinitialize the blocks
-    for (unsigned int r=0; r<this->n_block_rows(); ++r)
-      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+    for (size_type r=0; r<this->n_block_rows(); ++r)
+      for (size_type c=0; c<this->n_block_cols(); ++c)
         {
           BlockType *p = new BlockType();
 
@@ -91,7 +91,7 @@ namespace TrilinosWrappers
             ExcDimensionMismatch (parallel_partitioning.size(),
                                   block_sparsity_pattern.n_block_cols()));
 
-    const unsigned int n_block_rows = parallel_partitioning.size();
+    const size_type n_block_rows = parallel_partitioning.size();
 
     Assert (n_block_rows == block_sparsity_pattern.n_block_rows(),
             ExcDimensionMismatch (n_block_rows,
@@ -111,8 +111,8 @@ namespace TrilinosWrappers
 
     // ... and then assign the correct
     // data to the blocks.
-    for (unsigned int r=0; r<this->n_block_rows(); ++r)
-      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+    for (size_type r=0; r<this->n_block_rows(); ++r)
+      for (size_type c=0; c<this->n_block_cols(); ++c)
         {
           this->sub_objects[r][c]->reinit (parallel_partitioning[r],
                                            parallel_partitioning[c],
@@ -130,7 +130,7 @@ namespace TrilinosWrappers
           const MPI_Comm              &communicator)
   {
     std::vector<Epetra_Map> epetra_maps;
-    for (unsigned int i=0; i<block_sparsity_pattern.n_block_rows(); ++i)
+    for (size_type i=0; i<block_sparsity_pattern.n_block_rows(); ++i)
       epetra_maps.push_back
       (parallel_partitioning[i].make_trilinos_map(communicator, false));
 
@@ -146,9 +146,9 @@ namespace TrilinosWrappers
   reinit (const BlockSparsityType &block_sparsity_pattern)
   {
     std::vector<Epetra_Map> parallel_partitioning;
-    for (unsigned int i=0; i<block_sparsity_pattern.n_block_rows(); ++i)
+    for (size_type i=0; i<block_sparsity_pattern.n_block_rows(); ++i)
       parallel_partitioning.push_back
-      (Epetra_Map(static_cast<int>(block_sparsity_pattern.block(i,0).n_rows()),
+      (Epetra_Map(static_cast<TrilinosWrappers::types::int_type>(block_sparsity_pattern.block(i,0).n_rows()),
                   0,
                   Utilities::Trilinos::comm_self()));
 
@@ -173,8 +173,8 @@ namespace TrilinosWrappers
 
     // ... and then assign the correct
     // data to the blocks.
-    for (unsigned int r=0; r<this->n_block_rows(); ++r)
-      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+    for (size_type r=0; r<this->n_block_rows(); ++r)
+      for (size_type c=0; c<this->n_block_cols(); ++c)
         {
           this->sub_objects[r][c]->reinit (block_sparsity_pattern.block(r,c));
         }
@@ -188,7 +188,7 @@ namespace TrilinosWrappers
           const ::dealii::BlockSparseMatrix<double> &dealii_block_sparse_matrix,
           const double                               drop_tolerance)
   {
-    const unsigned int n_block_rows = parallel_partitioning.size();
+    const size_type n_block_rows = parallel_partitioning.size();
 
     Assert (n_block_rows == dealii_block_sparse_matrix.n_block_rows(),
             ExcDimensionMismatch (n_block_rows,
@@ -202,8 +202,8 @@ namespace TrilinosWrappers
 
     // ... and then assign the correct
     // data to the blocks.
-    for (unsigned int r=0; r<this->n_block_rows(); ++r)
-      for (unsigned int c=0; c<this->n_block_cols(); ++c)
+    for (size_type r=0; r<this->n_block_rows(); ++r)
+      for (size_type c=0; c<this->n_block_cols(); ++c)
         {
           this->sub_objects[r][c]->reinit(parallel_partitioning[r],
                                           parallel_partitioning[c],
@@ -239,8 +239,8 @@ namespace TrilinosWrappers
 #endif
 
     std::vector<Epetra_Map> parallel_partitioning;
-    for (unsigned int i=0; i<dealii_block_sparse_matrix.n_block_rows(); ++i)
-      parallel_partitioning.push_back (Epetra_Map(static_cast<int>(dealii_block_sparse_matrix.block(i,0).m()),
+    for (size_type i=0; i<dealii_block_sparse_matrix.n_block_rows(); ++i)
+      parallel_partitioning.push_back (Epetra_Map(static_cast<TrilinosWrappers::types::int_type>(dealii_block_sparse_matrix.block(i,0).m()),
                                                   0,
                                                   trilinos_communicator));
 
@@ -260,12 +260,12 @@ namespace TrilinosWrappers
 
 
 
-  unsigned int
+  BlockSparseMatrix::size_type
   BlockSparseMatrix::n_nonzero_elements () const
   {
-    unsigned int n_nonzero = 0;
-    for (unsigned int rows = 0; rows<this->n_block_rows(); ++rows)
-      for (unsigned int cols = 0; cols<this->n_block_cols(); ++cols)
+    size_type n_nonzero = 0;
+    for (size_type rows = 0; rows<this->n_block_rows(); ++rows)
+      for (size_type cols = 0; cols<this->n_block_cols(); ++cols)
         n_nonzero += this->block(rows,cols).n_nonzero_elements();
 
     return n_nonzero;
