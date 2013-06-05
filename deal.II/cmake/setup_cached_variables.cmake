@@ -163,6 +163,17 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
 MARK_AS_ADVANCED(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
 
 #
+# Define the variable that defines whether we should use 32- or 64-bit
+# global DoF indices.
+#
+OPTION(DEAL_II_WITH_64BIT_INDICES
+  "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
+  OFF
+  )
+
+
+
+#
 # Tell the user very prominently, that we're doing things differently w.r.t
 # CMAKE_(C|CXX)_FLAGS_(DEBUG|RELEASE)
 #
@@ -239,17 +250,6 @@ ENDFOREACH()
 
 
 #
-# Define the variable that defines whether we should use 32- or 64-bit
-# global DoF indices.
-#
-OPTION(DEAL_II_WITH_64BIT_INDICES
-  "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
-  OFF
-  )
-MARK_AS_ADVANCED(DEAL_II_WITH_64BIT_INDICES)
-
-
-#
 # Finally, read in CFLAGS, CXXFLAGS and LDFLAGS from environment and
 # prepend them to the saved variables:
 #
@@ -293,7 +293,9 @@ FOREACH(_var ${_res})
   # If DEAL_II_FORCE_AUTODETECTION is set undefine all feature toggles
   # DEAL_II_WITH_* prior to configure:
   #
-  IF(DEAL_II_FORCE_AUTODETECTION AND _var MATCHES "^DEAL_II_WITH_")
+  IF(DEAL_II_FORCE_AUTODETECTION AND _var MATCHES "^DEAL_II_WITH_"
+     # Exclude FEATURES that do not represent external libraries:
+     AND NOT _var MATCHES "^DEAL_II_WITH_64BIT_INDICES" )
     UNSET(${_var} CACHE)
   ENDIF()
 ENDFOREACH()
