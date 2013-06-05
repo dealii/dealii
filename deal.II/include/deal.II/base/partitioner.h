@@ -20,6 +20,7 @@
 #include <deal.II/base/utilities.h>
 #include <deal.II/base/memory_consumption.h>
 
+#include <limits>
 
 
 DEAL_II_NAMESPACE_OPEN
