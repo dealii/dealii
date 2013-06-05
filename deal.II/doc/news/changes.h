@@ -71,6 +71,15 @@ this function.
 
 
 <ol>
+  <li> New: deal.II can now be compiled to 64-bit global dof indices. To turn 
+  this feature on, use the cmake option -DDEAL_II_WITH_64BIT_INDICES=ON. If 
+  PETSc and/or Trilinos are used, they must be compiled to support 64-bit
+  indices. To write a code that can use 32-bit and 64-bit indices depending on
+  deal.II compilation option, use types::global_dof_index for all the global 
+  dof indices.
+  <br>
+  (Kainan Wang and Bruno Turcksin, 2013/06/05)
+  </li>
 
   <li> New: All vector classes now have a member function
   <code>locally_owned_elements</code> that returns an index

@@ -38,6 +38,17 @@
 
     <dl>
       <dt>
+          <strong>2013/06/05: 64-bit version of deal.II</strong>
+      </dt>
+      <dd>
+          Because the global dof index variables in deal.II were of type
+    unsigned int, it was not possible to create a dof_handler with more than
+    4.3 billions of unknowns. The 64-bit version of deal.II uses unsigned long
+    long int and thus, allows for 18e18 unknowns.
+      </dd>
+
+
+      <dt>
           <strong>2013/03/07: Build system switched to CMake</strong>
       </dt>
       <dd>
