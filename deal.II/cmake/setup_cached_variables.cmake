@@ -238,19 +238,15 @@ FOREACH(_flag ${DEAL_II_USED_FLAGS})
 ENDFOREACH()
 
 
-# 
+#
 # Define the variable that defines whether we should use 32- or 64-bit
 # global DoF indices.
 #
-SET(DEAL_II_WITH_64BIT_INDICES "${DEAL_II_WITH_64BIT_INDICES}" CACHE BOOL
-    "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
-   )
-
+OPTION(DEAL_II_WITH_64BIT_INDICES
+  "If set to ON, then use 64-bit data types to represent global degree of freedom indices. The default is to OFF. You only want to set this to ON if you will solve problems with more than 2^31 (approximately 2 billion) unknowns. If set to ON, you also need to ensure that both Trilinos and/or PETSc support 64-bit indices."
+  OFF
+  )
 MARK_AS_ADVANCED(DEAL_II_WITH_64BIT_INDICES)
-
-SET_IF_EMPTY(DEAL_II_WITH_64BIT_INDICES "OFF")
-
-
 
 
 #
