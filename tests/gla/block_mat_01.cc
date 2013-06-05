@@ -12,7 +12,7 @@
 //---------------------------------------------------------------------------
 
 
-// LA::MPI::BlockSparseMatrix
+// test LA::MPI::BlockSparseMatrix
 
 #include "../tests.h"
 #include <deal.II/lac/generic_linear_algebra.h>
@@ -72,6 +72,11 @@ void test ()
 
   matrix.compress();
 
+  if (myid==0)
+    {
+      deallog << "(0,0) = " << matrix(0,0) << std::endl;
+      deallog << "(1,1) = " << matrix(1,1) << std::endl;
+    }
  
 				   // done
   if (myid==0)
