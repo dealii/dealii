@@ -86,6 +86,8 @@ namespace LinearAlgebraPETSc
   typedef PETScWrappers::SparseMatrix SparseMatrix;
   typedef PETScWrappers::PreconditionSSOR PreconditionSSOR;
 
+  typedef PETScWrappers::SolverCG SolverCG;
+
 
   namespace MPI
   {
@@ -164,6 +166,8 @@ namespace LinearAlgebraTrilinos
 
   typedef TrilinosWrappers::Vector Vector;
 
+  typedef TrilinosWrappers::SolverCG SolverCG;
+
   namespace MPI
   {
 
@@ -215,7 +219,7 @@ namespace LinearAlgebraTrilinos
      */
     typedef TrilinosWrappers::PreconditionJacobi PreconditionJacobi;
 
-    typedef TrilinosWrappers::SolverCG	SolverCG;
+
   }
 
 }
