@@ -1,0 +1,104 @@
+//---------------------------------------------------------------------------
+//    $Id: ghost_01.cc 28440 2013-02-17 14:35:08Z heister $
+//    Version: $Name$ 
+//
+//    Copyright (C) 2004, 2005, 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//---------------------------------------------------------------------------
+
+
+// assignment of ghost vectors
+
+#include "../tests.h"
+#include <deal.II/lac/generic_linear_algebra.h>
+#include <deal.II/base/index_set.h>
+#include <deal.II/lac/constraint_matrix.h>
+#include <fstream>
+#include <iostream>
+#include <iomanip>
+#include <vector>
+
+#include "gla.h"
+
+template <class LA> 
+void test ()
+{
+  unsigned int myid = Utilities::MPI::this_mpi_process (MPI_COMM_WORLD);
+  unsigned int numproc = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  
+  if (myid==0)
+    deallog << "numproc=" << numproc << std::endl;
+
+				   // each processor owns 2 indices and all
+				   // are ghosting Element 1 (the second)
+
+  IndexSet local_active(numproc*2);
+  local_active.add_range(myid*2,myid*2+2);
+  IndexSet local_relevant(numproc*2);
+  local_relevant.add_range(1,2);
+
+  typename LA::MPI::Vector vb(local_active);
+  typename LA::MPI::Vector v(local_active, local_relevant);
+
+  vb = 1.0;
+
+				   // set local values
+  vb(myid*2)=myid*2.0;
+  vb(myid*2+1)=myid*2.0+1.0;
+
+  vb.compress(VectorOperation::insert);
+  vb*=2.0;
+  v=vb;
+
+  Assert(vb.size() == numproc*2, ExcInternalError());
+  Assert(v.size() == numproc*2, ExcInternalError());
+
+  Assert(!vb.has_ghost_elements(), ExcInternalError());
+  Assert(v.has_ghost_elements(), ExcInternalError());
+  
+				   // check local values
+    {
+      deallog << myid*2 << ": " << v(myid*2) << std::endl;
+      deallog << myid*2+1 << ": " << v(myid*2+1) << std::endl;
+    }
+  
+  Assert(v(myid*2) == myid*4.0, ExcInternalError());
+  Assert(v(myid*2+1) == myid*4.0+2.0, ExcInternalError());
+
+  ConstraintMatrix cm;
+  cm.add_line(1);
+  cm.add_entry(1 ,2, 3.0);
+  cm.close();
+  
+  if (myid==0)
+    deallog << "before: " << vb(1) << std::endl;
+  cm.distribute(vb); // this should set x(1)= 3.0 * x(2) = 12.0
+  if (myid==0)
+    deallog << "after: " << vb(1) << std::endl;
+  
+				   // done
+  if (myid==0)
+    deallog << "OK" << std::endl;
+}
+
+
+
+int main (int argc, char **argv)
+{
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, 1);
+  MPILogInitAll log(__FILE__);
+  {
+    deallog.push("PETSc");
+    test<LA_PETSc>();
+    deallog.pop();
+    deallog.push("Trilinos");
+    test<LA_Trilinos>();
+    deallog.pop();
+  }
+
+}
