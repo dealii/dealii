@@ -2481,7 +2481,7 @@ int main (int argc, char *argv[])
           std::exit(1);
         }
 
-      Utilities::System::MPI_InitFinalize mpi_initialization (argc, argv);
+      Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, dealii::numbers::invalid_unsigned_int);
 
       ConservationLaw<2> cons (argv[1]);
       cons.run ();
