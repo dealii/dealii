@@ -48,7 +48,7 @@ namespace PETScWrappers
         this->components.resize(this->n_blocks());
 
       for (unsigned int i=0; i<this->n_blocks(); ++i)
-        components[i].reinit (MPI_Comm(), 0, 0);
+        components[i].reinit (MPI_COMM_SELF, 0, 0);
 
       collect_sizes();
     }
