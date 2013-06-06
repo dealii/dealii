@@ -594,7 +594,7 @@ namespace internal
                 (i->get_finest_level() >= level))
               for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_vertex; ++d)
                 {
-                  unsigned int idx = i->get_index (level, d);
+                  dealii::types::global_dof_index idx = i->get_index (level, d);
                   if (idx != DoFHandler<1>::invalid_dof_index)
                     i->set_index (level, d,
                                   (indices.n_elements() == 0)?
@@ -739,7 +739,7 @@ namespace internal
                     {
                       for (unsigned int d=0; d<dof_handler.get_fe().dofs_per_line; ++d)
                         {
-                          unsigned int idx = cell->line(l)->mg_dof_index(level, d);
+                          dealii::types::global_dof_index idx = cell->line(l)->mg_dof_index(level, d);
                           if (idx != DoFHandler<1>::invalid_dof_index)
                             cell->line(l)->set_mg_dof_index (level, d, ((indices.n_elements() == 0) ?
                                                                         new_numbers[idx] :
