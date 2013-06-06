@@ -3161,7 +3161,7 @@ int main (int argc, char *argv[])
   using namespace dealii;
   using namespace Step44;
 
-  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv);
+  Utilities::MPI::MPI_InitFinalize mpi_initialization(argc, argv, dealii::numbers::invalid_unsigned_int);
 
   try
     {
