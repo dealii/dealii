@@ -59,8 +59,6 @@ void test ()
   typename LA::MPI::BlockVector v(partitioning, MPI_COMM_WORLD);
   v = 0.1;
 
-  deallog << v.l2_norm() << std::endl;
-
   v(myid) = myid;
   v.compress(VectorOperation::insert);
 
@@ -72,15 +70,15 @@ void test ()
 
 
   ConstraintMatrix cm;
-  cm.add_line(1);
-  cm.add_entry(1 ,2, 3.0);
+  cm.add_line(0);
+  cm.add_entry(0, 1, 3.0);
   cm.close();
   
   if (myid==0)
-    deallog << "before: " << v(1) << std::endl;
-  cm.distribute(v); // this should set x(1)= 3.0 * x(2) = 12.0
+    deallog << "before: " << v(0) << std::endl;
+  cm.distribute(v); // this should set x(0)= 3.0 * x(1) = 3.0
   if (myid==0)
-    deallog << "after: " << v(1) << std::endl;
+    deallog << "after: " << v(0) << std::endl;
   
 				   // done
   if (myid==0)
