@@ -394,7 +394,6 @@ namespace PETScWrappers
                 // pattern of a matrix
 
               const PetscInt local_row_start = local_rows.nth_index_in_set(0);
-              const PetscInt local_col_start = local_columns.nth_index_in_set(0);
               const PetscInt
                 local_row_end = local_row_start + local_rows.n_elements();
 
