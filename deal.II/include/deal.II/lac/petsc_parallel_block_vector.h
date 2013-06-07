@@ -517,7 +517,7 @@ namespace PETScWrappers
                  const std::vector<IndexSet> &ghost_entries,
                  const MPI_Comm              &communicator)
     {
-      std::vector<unsigned int> sizes(parallel_partitioning.size());
+      std::vector<types::global_dof_index> sizes(parallel_partitioning.size());
       for (unsigned int i=0; i<parallel_partitioning.size(); ++i)
         sizes[i] = parallel_partitioning[i].size();
 
