@@ -88,15 +88,23 @@ void test ()
 
   if (myid==0)
     {
-      unsigned int v[]={0, 1, 2, 3, 4, 5, 6, 7, 8};
-      local_dofs.assign(v,v+9);
+//      unsigned int v[]={0, 1, 2, 3, 4, 5, 6, 7, 8};
+//      local_dofs.assign(v,v+9);
+      //cm.distribute_local_to_global (local_mat, local_dofs, matrix);
     }
   else
     {
-      unsigned int v[]={21, 39, 22, 40, 23, 41, 42, 43, 44};
-      local_dofs.assign(v,v+9);
+      //unsigned int v[]={21, 39, 22, 40, 23, 41, 42, 43, 44};
+      //local_dofs.assign(v,v+9);
+      //cm.distribute_local_to_global (local_mat, local_dofs, matrix);
+
+      unsigned int row = 21;
+      unsigned int n_values = 4;
+      unsigned int cols[] = {21, 22, 23, 39};
+      double vals[] = {1, 201, 401, 101};
+      matrix.add(row, n_values, cols, vals, false, true);
     }
-  cm.distribute_local_to_global (local_mat, local_dofs, matrix);
+
   matrix.compress(VectorOperation::add);
 
 				   // done
