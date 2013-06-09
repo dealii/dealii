@@ -1846,7 +1846,7 @@ namespace Step32
     stokes_matrix.clear ();
 
 #ifdef USE_PETSC_LA
-    LA::MPI::CompressedBlockSparsityPattern sp(stokes_partitioning);
+    LA::MPI::CompressedBlockSparsityPattern sp(stokes_relevant_partitioning);
 #else
     LA::MPI::CompressedBlockSparsityPattern sp(stokes_partitioning, MPI_COMM_WORLD);    
 #endif
@@ -1898,7 +1898,7 @@ namespace Step32
     stokes_preconditioner_matrix.clear ();
 
 #ifdef USE_PETSC_LA
-    LA::MPI::CompressedBlockSparsityPattern sp (stokes_partitioning);
+    LA::MPI::CompressedBlockSparsityPattern sp (stokes_relevant_partitioning);
 #else
     TrilinosWrappers::BlockSparsityPattern sp(stokes_partitioning,
                                               MPI_COMM_WORLD);
@@ -1948,8 +1948,12 @@ namespace Step32
     temperature_matrix.clear ();
 
 #ifdef USE_PETSC_LA
+    IndexSet relevant;
+
+    DoFTools::extract_locally_relevant_dofs (temperature_dof_handler,
+                                               relevant);
     // TODO:    LA::MPI::CompressedSparsityPattern
-    CompressedSimpleSparsityPattern sp (temperature_partitioner);
+    CompressedSimpleSparsityPattern sp (relevant);
 #else
     TrilinosWrappers::SparsityPattern sp(temperature_partitioner,
                                          MPI_COMM_WORLD);
@@ -1959,10 +1963,6 @@ namespace Step32
                                      Utilities::MPI::
                                      this_mpi_process(MPI_COMM_WORLD));
 #ifdef USE_PETSC_LA
-    IndexSet relevant;
-    
-    DoFTools::extract_locally_relevant_dofs (temperature_dof_handler,
-                                               relevant);
 
     SparsityTools::distribute_sparsity_pattern(sp,
 					       temperature_dof_handler.n_locally_owned_dofs_per_processor(),
@@ -2059,7 +2059,7 @@ namespace Step32
     // various vectors we keep around in this program.
     stokes_partitioning.clear();
     stokes_relevant_partitioning.clear();   
-    IndexSet temperature_partitioning (n_T), temperature_relevant_partitioning (n_T);
+    IndexSet temperature_partitioning , temperature_relevant_partitioning;
     IndexSet stokes_relevant_set;
     {
       IndexSet stokes_index_set = stokes_dof_handler.locally_owned_dofs();
