@@ -37,9 +37,9 @@ namespace
    * given cell.
    */
   void
-  get_face_sign_change (const Triangulation<1>::cell_iterator &,
-                        const unsigned int                     ,
-                        std::vector<double>                   &face_sign)
+  get_face_sign_change_rt (const Triangulation<1>::cell_iterator &,
+                           const unsigned int                     ,
+                           std::vector<double>                   &face_sign)
   {
     // nothing to do in 1d
     std::fill (face_sign.begin (), face_sign.end (), 1.0);
@@ -48,9 +48,9 @@ namespace
 
 
   void
-  get_face_sign_change (const Triangulation<2>::cell_iterator &cell,
-                        const unsigned int                     dofs_per_face,
-                        std::vector<double>                   &face_sign)
+  get_face_sign_change_rt (const Triangulation<2>::cell_iterator &cell,
+                           const unsigned int                     dofs_per_face,
+                           std::vector<double>                   &face_sign)
   {
     const unsigned int dim = 2;
     const unsigned int spacedim = 2;
@@ -83,12 +83,71 @@ namespace
 
 
   void
-  get_face_sign_change (const Triangulation<3>::cell_iterator &/*cell*/,
-                        const unsigned int                     /*dofs_per_face*/,
-                        std::vector<double>                   &face_sign)
+  get_face_sign_change_rt (const Triangulation<3>::cell_iterator & cell,
+                           const unsigned int                      dofs_per_face,
+                           std::vector<double>                   &face_sign)
   {
     std::fill (face_sign.begin (), face_sign.end (), 1.0);
 //TODO: think about what it would take here
+  }
+  
+  void
+  get_face_sign_change_nedelec (const Triangulation<1>::cell_iterator &,
+                                const unsigned int                     ,
+                                std::vector<double>                   &face_sign)
+  {
+    // nothing to do in 1d
+    std::fill (face_sign.begin (), face_sign.end (), 1.0);
+  }
+
+
+
+  void
+  get_face_sign_change_nedelec (const Triangulation<2>::cell_iterator &cell,
+                                const unsigned int                     dofs_per_face,
+                                std::vector<double>                   &face_sign)
+  {
+    std::fill (face_sign.begin (), face_sign.end (), 1.0);
+//TODO: think about what it would take here
+  }
+
+
+  void
+  get_face_sign_change_nedelec (const Triangulation<3>::cell_iterator & cell,
+                                const unsigned int                      dofs_per_face,
+                                std::vector<double>                   &face_sign)
+  {
+    const unsigned int dim = 3;
+    std::fill (face_sign.begin (), face_sign.end (), 1.0);
+    
+    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
+    {
+      if (!(cell->face (f)->at_boundary ()))
+      {
+        const bool face_orientation = cell->face_orientation (f);
+        const bool face_flip = cell->face_flip (f);
+        const bool face_rotation = cell->face_rotation (f);
+//TODO: This is probably only going to work for those elements for which all dofs are face dofs
+        if (face_flip)
+        {
+          face_sign[GeometryInfo<dim>::face_to_cell_lines (f, 2, face_orientation, face_flip, face_rotation)] = -1.0;
+          face_sign[GeometryInfo<dim>::face_to_cell_lines (f, 3, face_orientation, face_flip, face_rotation)] = -1.0;
+          
+          if (!face_rotation)
+          {
+            face_sign[GeometryInfo<dim>::face_to_cell_lines (f, 0, face_orientation, face_flip, face_rotation)] = -1.0;
+            face_sign[GeometryInfo<dim>::face_to_cell_lines (f, 1, face_orientation, face_flip, face_rotation)] = -1.0;
+          }
+        }
+        
+        else
+          if (face_rotation)
+          {
+            face_sign[GeometryInfo<dim>::face_to_cell_lines (f, 0, face_orientation, face_flip, face_rotation)] = -1.0;
+            face_sign[GeometryInfo<dim>::face_to_cell_lines (f, 1, face_orientation, face_flip, face_rotation)] = -1.0;
+          }
+      }
+    }
   }
 }
 
@@ -383,13 +442,19 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
   // Compute eventual sign changes depending on the neighborhood
   // between two faces.
   std::vector<double> sign_change (this->dofs_per_cell, 1.0);
-  get_face_sign_change (cell, this->dofs_per_face, sign_change);
-
+  
+  if (mapping_type == mapping_raviart_thomas)
+    get_face_sign_change_rt (cell, this->dofs_per_face, sign_change);
+  
+  else
+    if (mapping_type == mapping_nedelec)
+      get_face_sign_change_nedelec (cell, this->dofs_per_face, sign_change);
   // for Piola mapping, the similarity
   // concept cannot be used because of
   // possible sign changes from one cell to
   // the next.
-  if ( (mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas) )
+  if ( (mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
+                                       || (mapping_type == mapping_nedelec))
     if (cell_similarity == CellSimilarity::translation)
       cell_similarity = CellSimilarity::none;
 
@@ -444,7 +509,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 
             for (unsigned int k = 0; k < n_q_points; ++k)
               for (unsigned int d = 0; d < dim; ++d)
-                data.shape_values(first+d,k) = shape_values[k][d];
+                data.shape_values(first+d,k) = sign_change[i] * shape_values[k][d];
 
             break;
           }
@@ -530,8 +595,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
-                  data.shape_gradients[first + d][k] = shape_grads1[k][d];
-              // then copy over to target:
+                  data.shape_gradients[first + d][k] = sign_change[i] * shape_grads1[k][d];
 
               break;
             }
@@ -591,7 +655,13 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
   // Compute eventual sign changes depending
   // on the neighborhood between two faces.
   std::vector<double> sign_change (this->dofs_per_cell, 1.0);
-  get_face_sign_change (cell, this->dofs_per_face, sign_change);
+  
+  if (mapping_type == mapping_raviart_thomas)
+    get_face_sign_change_rt (cell, this->dofs_per_face, sign_change);
+  
+  else
+    if (mapping_type == mapping_nedelec)
+      get_face_sign_change_nedelec (cell, this->dofs_per_face, sign_change);
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
@@ -646,7 +716,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
-                  data.shape_values(first+d,k) = shape_values[k][d];
+                  data.shape_values(first+d,k) = sign_change[i] * shape_values[k][d];
 
               break;
             }
@@ -732,8 +802,8 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
-                  data.shape_gradients[first + d][k] = shape_grads1[k][d];
-              // then copy over to target:
+                  data.shape_gradients[first + d][k] = sign_change[i] * shape_grads1[k][d];
+              
               break;
             }
 
@@ -795,7 +865,13 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
   // Compute eventual sign changes depending
   // on the neighborhood between two faces.
   std::vector<double> sign_change (this->dofs_per_cell, 1.0);
-  get_face_sign_change (cell, this->dofs_per_face, sign_change);
+  
+  if (mapping_type == mapping_raviart_thomas)
+    get_face_sign_change_rt (cell, this->dofs_per_face, sign_change);
+  
+  else
+    if (mapping_type == mapping_nedelec)
+      get_face_sign_change_nedelec (cell, this->dofs_per_face, sign_change);
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
@@ -849,7 +925,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
 
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
-                  data.shape_values(first+d,k) = shape_values[k][d];
+                  data.shape_values(first+d,k) = sign_change[i] * shape_values[k][d];
 
               break;
             }
