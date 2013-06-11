@@ -13,6 +13,7 @@
 
 
 // document that SparseMatrix::operator= is broken
+// now forbidden
 
 #include "../tests.h"
 #include <deal.II/lac/petsc_vector.h>
@@ -40,14 +41,15 @@ void test ()
   Mat mm=m;
   Mat m2m=m2;
   
-  deallog << &mm << " " << &m2m << std::endl;
+  //deallog << mm << " " << m2m << std::endl;
 
-  m2 = m;
+  //forbidden:  m2 = m;
   {
+    //forbidden: PETScWrappers::SparseMatrix m3=m2;
 
     Mat mm=m;
     Mat m2m=m2;
-  deallog << &mm << " " << &m2m << std::endl;
+    //deallog << mm << " " << m2m << std::endl;
       
   }
   
