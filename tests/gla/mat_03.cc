@@ -13,6 +13,7 @@
 
 
 // document bug in assembling a LA::MPI::SparseMatrix
+// this was due to handing a wrong IndexSet to the ConstraintMatrix
 
 #include "../tests.h"
 #include <deal.II/lac/generic_linear_algebra.h>
@@ -68,7 +69,9 @@ void test ()
   IndexSet relevant;
   DoFTools::extract_locally_relevant_dofs (dof_handler, relevant);
 
-  CompressedSimpleSparsityPattern sp (owned);
+  // this causes a crash in PETSc, but is ignored in Trilinos:
+  //CompressedSimpleSparsityPattern sp (owned);
+  CompressedSimpleSparsityPattern sp (relevant);
   typename LA::MPI::SparseMatrix matrix;
   DoFTools::make_sparsity_pattern (dof_handler, sp,
                                        cm, false,
@@ -106,6 +109,11 @@ void test ()
     }
 
   matrix.compress(VectorOperation::add);
+
+  if (myid==0)
+    {
+      deallog << matrix(21,39) << std::endl;
+    }
 
 				   // done
   if (myid==0)
