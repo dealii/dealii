@@ -168,7 +168,7 @@ namespace PETScWrappers
      * the start.
      */
     template <typename SparsityType>
-    SparseMatrix (const SparsityType &sparsity_pattern,
+    explicit SparseMatrix (const SparsityType &sparsity_pattern,
                   const bool          preset_nonzero_locations = true);
 
     /**
