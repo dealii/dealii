@@ -374,7 +374,7 @@ parallel benchmark timings.
 <li> Improved and Fixed: LogStream (and deallog) now respect std::flush in
 addition to std::endl to write out content to the console/file.
 Furthermore, LogStream::push(...) and LogStream::pop() now work in a thread
-safe manner.
+safe manner. Also allow to pop() the prefix "DEAL".
 <br>
 (Matthias Maier, 2013/04/18)
 </li>
