@@ -1292,6 +1292,16 @@ namespace PETScWrappers
 
 
   private:
+
+    /**
+     * purposefully not implemented
+     */
+    MatrixBase(const MatrixBase &);
+    /**
+     * purposefully not implemented
+     */
+    MatrixBase& operator=(const MatrixBase &);
+
     /**
      * An internal array of integer
      * values that is used to store the

@@ -322,6 +322,15 @@ namespace PETScWrappers
   private:
 
     /**
+     * Purposefully not implemented
+     */
+    SparseMatrix(const SparseMatrix &);
+    /**
+     * Purposefully not implemented
+     */
+    SparseMatrix& operator= (const SparseMatrix &);
+
+    /**
      * Do the actual work for the
      * respective reinit() function and the
      * matching constructor, i.e. create a
