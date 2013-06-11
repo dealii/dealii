@@ -42,8 +42,6 @@ void test ()
 
   SolverGMRES<Vector<number> > solver(control, data);
   solver.solve(matrix, sol, rhs, PreconditionIdentity());
-
-  deallog.pop();
 }
 
 int main()
