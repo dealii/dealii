@@ -418,13 +418,18 @@
       <li>
   <p>
     <i>64bit indices</i>: By default, deal.II use unsigned int (32bit)
-    indices. This limits the number of unknowns to approximately four
+    indices for degrees of freedom, using
+    the <code>types::global_dof_index</code> type. This limits the number of
+    unknowns to approximately four 
     billions. If larger problem must be solved, pass the
     <code>-DDEAL_II_WITH_64BIT_INDICES=ON</code> argument to
-    <code>cmake</code>. To use this option with PETSc, PESTc must be compiled
+    <code>cmake</code>. You will not be able to solve problems of this size on
+    a single machine, but only when using clusters of computers and linear
+    algebra packages PETSc or Trilinos.
+    To use this option with PETSc, PESTc must be compiled
     with the option <code>--with-64-bit-indices</code>. To use this option
     with Trilinos, Trilinos 11.2 or later is needed (there is a bug in
-    Trilinos 11.0 that prevent the use of 64bit indices).
+    Trilinos 11.0 that prevents the use of 64bit indices).
   </p>
 
     </ul>
