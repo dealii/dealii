@@ -414,6 +414,19 @@
           <code>-DDEAL_II_COMPONENT_PARAMETER_GUI=ON</code>. Beware of the
           fact that <code>parameter_gui</code> needs development packages for Qt.
 	</p>
+
+      <li>
+  <p>
+    <i>64bit indices</i>: By default, deal.II use unsigned int (32bit)
+    indices. This limits the number of unknowns to approximately four
+    billions. If larger problem must be solved, pass the
+    <code>-DDEAL_II_WITH_64BIT_INDICES=ON</code> argument to
+    <code>cmake</code>. To use this option with PETSc, PESTc must be compiled
+    with the option <code>--with-64-bit-indices</code>. To use this option
+    with Trilinos, Trilinos 11.2 or later is needed (there is a bug in
+    Trilinos 11.0 that prevent the use of 64bit indices).
+  </p>
+
     </ul>
 
 
