@@ -34,7 +34,7 @@ namespace PETScWrappers
    * Implementation of a parallel matrix class based on PETSc <tt>MatShell</tt> matrix-type.
    * This base class implements only the interface to the PETSc matrix object,
    * while all the functionality is contained in the matrix-vector
-   * multiplication which must be reimplmented in derived classes.
+   * multiplication which must be reimplemented in derived classes.
    *
    * This interface is an addition to the dealii::MatrixFree class to realize
    * user-defined matrix-classes together with PETSc solvers and functionalities.
