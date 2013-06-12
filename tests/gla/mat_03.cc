@@ -101,19 +101,17 @@ void test ()
       //local_dofs.assign(v,v+9);
       //cm.distribute_local_to_global (local_mat, local_dofs, matrix);
 
-      unsigned int row = 21;
+      types::global_dof_index row = 21;
       unsigned int n_values = 4;
-      unsigned int cols[] = {21, 22, 23, 39};
+      types::global_dof_index cols[] = {21, 22, 23, 39};
       double vals[] = {1, 201, 401, 101};
       matrix.add(row, n_values, cols, vals, false, true);
     }
 
   matrix.compress(VectorOperation::add);
 
-  if (myid==0)
-    {
-      deallog << matrix(21,39) << std::endl;
-    }
+  matrix.print(deallog.get_file_stream());
+  
 
 				   // done
   if (myid==0)
