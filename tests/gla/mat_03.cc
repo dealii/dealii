@@ -83,24 +83,8 @@ void test ()
   sp.compress();
   matrix.reinit (owned, owned, sp, MPI_COMM_WORLD);
 
-  FullMatrix<double> local_mat(9,9);
-  for (unsigned int i=0;i<9;++i)
-    for (unsigned int j=0;j<9;++j)
-      local_mat(i,j)=1 + i + 100*j;
-  std::vector<unsigned int> local_dofs;
-
-  if (myid==0)
+  if (myid!=0)
     {
-//      unsigned int v[]={0, 1, 2, 3, 4, 5, 6, 7, 8};
-//      local_dofs.assign(v,v+9);
-      //cm.distribute_local_to_global (local_mat, local_dofs, matrix);
-    }
-  else
-    {
-      //unsigned int v[]={21, 39, 22, 40, 23, 41, 42, 43, 44};
-      //local_dofs.assign(v,v+9);
-      //cm.distribute_local_to_global (local_mat, local_dofs, matrix);
-
       types::global_dof_index row = 21;
       unsigned int n_values = 4;
       types::global_dof_index cols[] = {21, 22, 23, 39};
