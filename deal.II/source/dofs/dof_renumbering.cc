@@ -442,8 +442,8 @@ namespace DoFRenumbering
     SparsityPattern sparsity;
     if (DH::dimension < 2)
       {
-        sparsity.reinit (dof_handler.n_dofs(),
-                         dof_handler.n_dofs(),
+        sparsity.reinit (dof_handler.n_dofs(level),
+                         dof_handler.n_dofs(level),
                          dof_handler.max_couplings_between_dofs());
         MGTools::make_sparsity_pattern (dof_handler, sparsity, level);
         sparsity.compress();
