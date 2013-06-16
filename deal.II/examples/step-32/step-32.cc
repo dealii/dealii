@@ -3028,7 +3028,7 @@ namespace Step32
       const double solver_tolerance = 1e-8 * stokes_rhs.l2_norm();
       SolverControl solver_control (30, solver_tolerance);
 
-      try
+   /*   try
         {
           const LinearSolvers::BlockSchurPreconditioner<LA::MPI::PreconditionAMG,
                 LA::MPI::PreconditionJacobi>
@@ -3046,7 +3046,7 @@ namespace Step32
           n_iterations = solver_control.last_step();
         }
 
-      catch (SolverControl::NoConvergence)
+      catch (SolverControl::NoConvergence)*/
         {
           const LinearSolvers::BlockSchurPreconditioner<LA::MPI::PreconditionAMG,
                 LA::MPI::PreconditionJacobi>
