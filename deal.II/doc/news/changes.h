@@ -146,6 +146,12 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: BlockSparsityPattern::column_number was returning
+wrong values.
+<br>
+(Timo Heister, 2013/06/16)
+</li>
+
 <li> Fixed: The stabilization parameter for the artificial diffusion
 in the step-31 tutorial program has been increased slightly to avoid
 instabilities at later times (<i>t</i> > 60).
