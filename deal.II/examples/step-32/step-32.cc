@@ -278,7 +278,7 @@ namespace Step32
           {
             SolverControl solver_control(5000, utmp.l2_norm()*1e-2);
 #ifdef USE_PETSC_LA
-            PETScWrappers::SolverCG solver(solver_control);
+            PETScWrappers::SolverCG solver(solver_control, MPI_COMM_WORLD);
 #else
             TrilinosWrappers::SolverCG solver(solver_control);
 #endif
