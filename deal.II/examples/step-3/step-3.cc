@@ -2,7 +2,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 1999-2004, 2006-2008, 2010-2012 by the deal.II authors */
+/*    Copyright (C) 1999-2004, 2006-2008, 2010-2013 by the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -333,7 +333,8 @@ void Step3::assemble_system ()
   // through dofs_per_cell-1). However, when we transfer the result into the
   // global matrix, we have to know the global numbers of the degrees of
   // freedom. When we query them, we need a scratch (temporary) array for
-  // these numbers:
+  // these numbers (see the discussion at the end of the introduction for
+  // the type, types::global_dof_index, used here):
   std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
   // Now for the loop over all cells. We have seen before how this works, so
