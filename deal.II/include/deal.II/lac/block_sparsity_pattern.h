@@ -1350,12 +1350,14 @@ BlockCompressedSimpleSparsityPattern::column_number (const size_type row,
   Assert(index<row_length(row), ExcIndexRange(index, 0, row_length(row)));
 
   size_type c = 0;
+  size_type block_columns = 0; //sum of n_cols for all blocks to the left
   for (unsigned int b=0; b<columns; ++b)
     {
       unsigned int rowlen = sub_objects[row_index.first][b]->row_length (row_index.second);
       if (index<c+rowlen)
-        return c+sub_objects[row_index.first][b]->column_number(row_index.second, index-c);
+        return block_columns+sub_objects[row_index.first][b]->column_number(row_index.second, index-c);
       c += rowlen;
+      block_columns += sub_objects[row_index.first][b]->n_cols();
     }
 
   Assert(false, ExcInternalError());
