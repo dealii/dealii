@@ -608,6 +608,36 @@ namespace PETScWrappers
     MatView (matrix, PETSC_VIEWER_STDOUT_WORLD);
   }
 
+  void
+  MatrixBase::print (std::ostream &out,
+              const bool    alternative_output) const
+  {
+    std::pair<MatrixBase::size_type, MatrixBase::size_type>
+    loc_range = local_range();
+
+    PetscInt ncols;
+    const PetscInt    *colnums;
+    const PetscScalar *values;
+
+    MatrixBase::size_type row;
+    for (row = loc_range.first; row < loc_range.second; ++row)
+      {
+        int ierr;
+        ierr = MatGetRow(*this, row, &ncols, &colnums, &values);
+        AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
+
+        for (PetscInt col = 0; col < ncols; ++col)
+          {
+            out << "(" << row << "," << colnums[col] << ") " << values[col] << std::endl;
+          }
+
+        ierr = MatRestoreRow(*this, row, &ncols, &colnums, &values);
+        AssertThrow (ierr == 0, MatrixBase::ExcPETScError(ierr));
+      }
+
+    AssertThrow (out, ExcIO());
+  }
+
 
 
   std::size_t
