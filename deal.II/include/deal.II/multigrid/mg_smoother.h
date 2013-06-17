@@ -1230,8 +1230,13 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::smooth(
         {
           if (this->debug > 0)
             deallog << 'T';
-          matrices[level].Tvmult(*r,u);
-          r->sadd(-1.,1.,rhs);
+          if (i == 0 && u.all_zero())
+            *r = rhs;
+          else
+            {
+              matrices[level].Tvmult(*r,u);
+              r->sadd(-1.,1.,rhs);
+            }
           if (this->debug > 2)
             deallog << ' ' << r->l2_norm() << ' ';
           smoothers[level].Tvmult(*d, *r);
@@ -1242,8 +1247,13 @@ MGSmootherPrecondition<MATRIX, PRECONDITIONER, VECTOR>::smooth(
         {
           if (this->debug > 0)
             deallog << 'N';
-          matrices[level].vmult(*r,u);
-          r->sadd(-1.,rhs);
+          if (i == 0 && u.all_zero())
+            *r = rhs;
+          else
+            {
+              matrices[level].vmult(*r,u);
+              r->sadd(-1.,rhs);
+            }
           if (this->debug > 2)
             deallog << ' ' << r->l2_norm() << ' ';
           smoothers[level].vmult(*d, *r);

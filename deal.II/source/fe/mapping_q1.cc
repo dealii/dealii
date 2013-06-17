@@ -961,7 +961,7 @@ namespace internal
                   case 1:
                     // in 1d, we don't have access to any of the data.aux
                     // fields (because it has only dim-1 components), but we
-                    // can still compute the boundary form simply by simply
+                    // can still compute the boundary form by simply
                     // looking at the number of the face
                     boundary_forms[i][0] = (face_no == 0 ?
                                             -1 : +1);

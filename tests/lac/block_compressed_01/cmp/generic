@@ -8,4 +8,4 @@ DEAL::size block(1,0):1x2
 DEAL::
 DEAL::row 0: 0 
 DEAL::row 1: 0 1 2 
-DEAL::row 2: 0 
+DEAL::row 2: 2 

@@ -157,6 +157,26 @@ namespace TrilinosWrappers
 
     /**
      * Solve the linear system
+     * <tt>Ax=b</tt> where <tt>A</tt> 
+     * is an operator. This function 
+     * can be used for matrix free 
+     * computation. Depending on
+     * the information provided by
+     * derived classes and the
+     * object passed as a
+     * preconditioner, one of the
+     * linear solvers and
+     * preconditioners of Trilinos
+     * is chosen.
+     */
+    void
+    solve (Epetra_Operator        &A,
+           VectorBase             &x,
+           const VectorBase       &b,
+           const PreconditionBase &preconditioner);
+
+    /**
+     * Solve the linear system
      * <tt>Ax=b</tt>. Depending on the
      * information provided by derived
      * classes and the object passed as a
@@ -175,6 +195,32 @@ namespace TrilinosWrappers
      */
     void
     solve (const SparseMatrix           &A,
+           dealii::Vector<double>       &x,
+           const dealii::Vector<double> &b,
+           const PreconditionBase       &preconditioner);
+
+    /**
+     * Solve the linear system
+     * <tt>Ax=b</tt> where <tt>A</tt>
+     * is an operator. This function can 
+     * be used for matric free. Depending on the
+     * information provided by derived
+     * classes and the object passed as a
+     * preconditioner, one of the linear
+     * solvers and preconditioners of
+     * Trilinos is chosen. This class
+     * works with matrices according to
+     * the TrilinosWrappers format, but
+     * can take deal.II vectors as
+     * argument. Since deal.II are serial
+     * vectors (not distributed), this
+     * function does only what you expect
+     * in case the matrix is locally
+     * owned. Otherwise, an exception
+     * will be thrown.
+     */
+    void
+    solve (Epetra_Operator              &A,
            dealii::Vector<double>       &x,
            const dealii::Vector<double> &b,
            const PreconditionBase       &preconditioner);
@@ -210,6 +256,12 @@ namespace TrilinosWrappers
     SolverControl &solver_control;
 
   private:
+
+    /**
+     * The solve function is used to set properly the Epetra_LinearProblem,
+     * once it is done this function solves the linear problem.
+     */
+    void execute_solve(const PreconditionBase &preconditioner);
 
     /**
      * A structure that collects

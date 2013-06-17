@@ -437,12 +437,24 @@ namespace DoFRenumbering
   {
     Assert(dof_handler.n_dofs(level) != numbers::invalid_dof_index,
            ExcNotInitialized());
-//TODO: we should be doing the same here as in the other compute_CMK function to preserve some memory
 
     // make the connection graph
-    SparsityPattern sparsity (dof_handler.n_dofs(level),
-                              dof_handler.max_couplings_between_dofs());
-    MGTools::make_sparsity_pattern (dof_handler, sparsity, level);
+    SparsityPattern sparsity;
+    if (DH::dimension < 2)
+      {
+        sparsity.reinit (dof_handler.n_dofs(level),
+                         dof_handler.n_dofs(level),
+                         dof_handler.max_couplings_between_dofs());
+        MGTools::make_sparsity_pattern (dof_handler, sparsity, level);
+        sparsity.compress();
+      }
+    else
+      {
+        CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(level),
+                                             dof_handler.n_dofs(level));
+        MGTools::make_sparsity_pattern (dof_handler, csp, level);
+        sparsity.copy_from (csp);
+      }
 
     std::vector<types::global_dof_index> new_indices(sparsity.n_rows());
     SparsityTools::reorder_Cuthill_McKee (sparsity, new_indices,

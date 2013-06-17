@@ -315,4 +315,72 @@ separation of functionality &mdash; again in many of the
 following tutorial programs.
 
 
+<h3> A note on types </h3>
+
+deal.II defines a number of integral %types via <code>typedef</code>s in
+namespace types. In particular, in this program you will see
+types::global_dof_index in a couple of places: an integer type that is used to
+denote the <i>global</i> index of a degree of freedom, i.e., the index of a
+particular degree of freedom within the DoFHandler object that is defined on
+top of a triangulation (as opposed to the index of a particular degree of
+freedom within a particular cell). For the current program
+(as well as almost all of the tutorial programs), you will have a few thousand
+to maybe a few million unknowns globally (and, for $Q_1$ elements, you will
+have 4 <i>locally on each cell</i> in 2d and 8 in 3d). Consequently, a data
+type that allows to store sufficiently large numbers for global DoF indices is
+<code>unsigned int</code> given that it allows to store numbers between 0 and
+slightly more than 4 billion (on most systems, where integers are 32-bit). In
+fact, this is what types::global_dof_index is.
+
+So, why not just use <code>unsigned int</code> right away? deal.II used to do
+this until version 7.3. However, deal.II supports very large computations (via
+the framework discussed in step-40) that may have more than 4 billion unknowns
+when spread across a few thousand processors. Consequently, there are
+situations where <code>unsigned int</code> is not sufficiently large and we
+need a 64-bit unsigned integral type. To make this possible, we introduced
+types::global_dof_index which by default is defined as simply <code>unsigned
+int</code> whereas it is possible to define it as <code>unsigned long long
+int</code> if necessary, by passing a particular flag during configuration
+(see the ReadMe file).
+
+This covers the technical aspect. But there is also a documentation purpose:
+everywhere in the library and codes that are built on it, if you see a place
+using the data type types::global_dof_index, you immediately know that the
+quantity that is being referenced is, in fact, a global dof index. No such
+meaning would be apparent if we had just used <code>unsigned int</code> (which
+may also be a local index, a boundary indicator, a material id,
+etc.). Immediately knowing what a variable refers to also helps avoid errors:
+it's quite clear that there must be a bug if you see an object of type
+types::global_dof_index being assigned to variable of type
+types::subdomain_id, even though they are both represented by unsigned
+integers and the compiler will, consequently, not complain.
+
+In more practical terms what the presence of this type means is that during
+assembly, we create a $4\times 4$ matrix (in 2d, using a $Q_1$ element) of the
+contributions of the cell we are currently sitting on, and then we need to add
+the elements of this matrix to the appropriate elements of the global (system)
+matrix. For this, we need to get at the global indices of the degrees of
+freedom that are local to the current cell, for which we will always use the
+following piece of the code:
+@code
+  cell->get_dof_indices (local_dof_indices);
+@endcode
+where <code>local_dof_indices</code> is declared as
+@code
+  std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
+@endcode
+The name of this variable might be a bit of a misnomer -- it stands for "the
+global indices of those degrees of freedom locally defined on the current
+cell" -- but variables that hold this information are universally named this
+way throughout the library.
+
+@note types::global_dof_index is not the only type defined in this
+namespace. Rather, there is a whole family, including types::subdomain_id,
+types::boundary_id, and types::material_id. All of these are
+<code>typedef</code>s for integer data types but, as explained above, they are
+used throughout the library so that (i) the intent of a variable becomes more
+easily discerned, and (ii) so that it becomes possible to change the actual
+type to a larger one if necessary without having to go through the entire
+library and figure out whether a particular use of <code>unsigned int</code>
+corresponds to, say, a material indicator.
 

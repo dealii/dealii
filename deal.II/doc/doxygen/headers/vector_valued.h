@@ -294,7 +294,7 @@
   -
   (q, \mathrm{div}\ \mathbf u)
   =
-  (q,f) + (\mathbf n\cdot\mathbf v, p)_{\partial\Omega}.
+  (q,f) - (\mathbf n\cdot\mathbf v, p)_{\partial\Omega}.
 @f}
  *
  * It is this form that we will later use in assembling the discrete weak form
@@ -455,9 +455,9 @@
                                     fe_values[velocities].divergence (j, q)) *
                                     fe_values.JxW(q);
 
-            local_rhs(i) += - fe_values[pressure].value (i, q)
-                              rhs_values[q] *
-                              fe_values.JxW(q);
+            local_rhs(i) += fe_values[pressure].value (i, q)
+                            rhs_values[q] *
+                            fe_values.JxW(q);
           }
  * @endcode
  *
@@ -528,7 +528,7 @@
  *        extractor. For example, <code>fe_values[pressure].gradient(i,q)</code>
  *        would represent the gradient of the scalar pressure component, which
  *        is of type <code>Tensor@<1,dim@></code>, whereas the gradient of the
- *        velocities components, <code>fe_values[velocities].value(i,q)</code>
+ *        velocities components, <code>fe_values[velocities].gradient(i,q)</code>
  *        is a <code>Tensor@<2,dim@></code>, i.e. a matrix $G_{ij}$ that consits
  *        of entries $G_{ij}=\frac{\partial\phi_i}{\partial x_j}$. Finally,
  *        both scalar and vector views can be asked for the second derivatives

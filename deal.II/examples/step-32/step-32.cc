@@ -261,9 +261,11 @@ namespace Step32
 
           SolverCG<LA::MPI::Vector> solver(solver_control);
 
+          std::cout << "begin S"<< src.block(1).l2_norm() << std::endl;
           solver.solve(stokes_preconditioner_matrix->block(1,1),
                        dst.block(1), src.block(1),
                        mp_preconditioner);
+          std::cout << "end S"<< dst.block(1).l2_norm() << std::endl;
 
           dst.block(1) *= -1.0;
         }
@@ -282,11 +284,16 @@ namespace Step32
 #else
             TrilinosWrappers::SolverCG solver(solver_control);
 #endif
+std::cout << "begin A "<< dst.block(0).l2_norm() << " " << utmp.l2_norm() << std::endl;
             solver.solve(stokes_matrix->block(0, 0), dst.block(0), utmp,
                          a_preconditioner);
+
+std::cout << "end A " <<  dst.block(0).l2_norm() << " " << solver_control.last_step() << std::endl;
           }
         else
           a_preconditioner.vmult (dst.block(0), utmp);
+
+        std::cout << "** " << dst.l2_norm() << " " << dst.block(0).l2_norm() << std::endl;
       }
 
     private:

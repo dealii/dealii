@@ -146,6 +146,12 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+<li> Fixed: BlockSparsityPattern::column_number was returning
+wrong values.
+<br>
+(Timo Heister, 2013/06/16)
+</li>
+
 <li> Fixed: The stabilization parameter for the artificial diffusion
 in the step-31 tutorial program has been increased slightly to avoid
 instabilities at later times (<i>t</i> > 60).
@@ -374,7 +380,7 @@ parallel benchmark timings.
 <li> Improved and Fixed: LogStream (and deallog) now respect std::flush in
 addition to std::endl to write out content to the console/file.
 Furthermore, LogStream::push(...) and LogStream::pop() now work in a thread
-safe manner.
+safe manner. Also allow to pop() the prefix "DEAL".
 <br>
 (Matthias Maier, 2013/04/18)
 </li>

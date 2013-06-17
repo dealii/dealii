@@ -135,3 +135,15 @@ same number of lines of code (though step-6 spends more space on dealing with
 coefficients and output). In either case, the comments below will only be on
 the things that set step-40 apart from step-6 and that aren't already covered
 in the @ref distributed documentation module.
+
+
+@note This program will be able to compute on as many processors as you want
+to throw at it, and for as large a problem as you have the memory and patience
+to solve. However, there <i>is</i> a limit: the number of unknowns can not
+exceed the largest number that can be stored with an object of type
+types::global_dof_index. By default, this is a typedef for <code>unsigned
+int</code>, which on most machines today is a 32-bit integer, limiting you to
+some 4 billion (in reality, since this program uses PETSc, you will be limited
+to half that as PETSc uses signed integers). However, this can be changed
+during configuration to use 64-bit integers, see the ReadMe file. This will
+give problem sizes you are unlikely to exceed anytime soon.
