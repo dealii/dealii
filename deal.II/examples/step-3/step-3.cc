@@ -265,7 +265,7 @@ void Step3::assemble_system ()
   // mentioned, we use the implied Q1 mapping, rather than specifying one
   // ourselves explicitly. Finally, we have to tell it what we want it to
   // compute on each cell: we need the values of the shape functions at the
-  // quadrature points (for the right hand side $(\varphi,f)$), their
+  // quadrature points (for the right hand side $(\varphi_i,f)$), their
   // gradients (for the matrix entries $(\nabla \varphi_i, \nabla
   // \varphi_j)$), and also the weights of the quadrature points and the
   // determinants of the Jacobian transformations from the reference cell to
@@ -286,12 +286,12 @@ void Step3::assemble_system ()
                          update_values | update_gradients | update_JxW_values);
   // The advantage of this approach is that we can specify what kind of
   // information we actually need on each cell. It is easily understandable
-  // that this approach can significant speed up finite element computations,
+  // that this approach can significantly speed up finite element computations,
   // compared to approaches where everything, including second derivatives,
-  // normal vectors to cells, etc are computed on each cell, regardless
+  // normal vectors to cells, etc are computed on each cell, regardless of
   // whether they are needed or not.
 
-  // For use further down below, we define two short cuts for values that will
+  // For use further down below, we define two shortcuts for values that will
   // be used very frequently. First, an abbreviation for the number of degrees
   // of freedom on each cell (since we are in 2D and degrees of freedom are
   // associated with vertices only, this number is four, but we rather want to
@@ -302,7 +302,7 @@ void Step3::assemble_system ()
   //
   // Secondly, we also define an abbreviation for the number of quadrature
   // points (here that should be four). In general, it is a good idea to use
-  // their symbolic names instead of hard-coding these number even if you know
+  // their symbolic names instead of hard-coding these numbers even if you know
   // them, since you may want to change the quadrature formula and/or finite
   // element at some time; the program will just work with these changes,
   // without the need to change anything in this function.

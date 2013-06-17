@@ -187,7 +187,7 @@ suggestions:
   <code>LaplaceProblem::LaplaceProblem</code>.
 
   <li>Convergence of the mean: A different way to see that the solution
-  actually converges (to something &mdash we can't tell whether it's really
+  actually converges (to something &mdash; we can't tell whether it's really
   the correct value!) is to compute the mean of the solution. To this end, add
   the following code to <code>LaplaceProblem::output_results</code>:
   @code
