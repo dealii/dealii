@@ -1117,7 +1117,8 @@ ConstraintMatrix::distribute (VectorType &vec) const
           it != lines.end(); ++it)
         if (vec_owned_elements.is_element(it->line))
           for (unsigned int i=0; i<it->entries.size(); ++i)
-            needed_elements.add_index(it->entries[i].first);
+            if (!vec_owned_elements.is_element(it->entries[i].first))
+              needed_elements.add_index(it->entries[i].first);
 
       VectorType ghosted_vector;
       internal::import_vector_with_ghost_elements (vec,
