@@ -253,8 +253,8 @@ public:
   DeclException2 (ExcUMFPACKError, char *, int,
                   << "UMFPACK routine " << arg1
                   << " returned error status " << arg2
-                  << ". See the file <contrib/umfpack/UMFPACK/Include/umfpack.h>"
-                  << " for a description of error codes.");
+                  << ". See the file <bundled/umfpack/UMFPACK/Include/umfpack.h>"
+                  << " for a description of 'status codes'.");
 
 private:
   /**
