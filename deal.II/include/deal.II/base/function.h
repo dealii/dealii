@@ -853,7 +853,7 @@ private:
    * The TensorFunction object which we call when this class's
    * vector_value() or vector_value_list() functions are called.
    **/
-  const TensorFunction<1,dim> & tensor_function;
+  const TensorFunction<1,dim> &tensor_function;
 
   /**
    * The first vector component whose value is to be filled by the given
