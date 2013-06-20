@@ -146,6 +146,13 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> New: added ConstantTensorFunction<rank, dim> and ZeroTensorFunction<rank, dim> to provide
+a tensor valued analogue to ConstantFunction and ZeroFunction.
+<br>
+(Matthias Maier, 2013/06/20)
+</li>
+
 <li> Fixed: BlockSparsityPattern::column_number was returning
 wrong values.
 <br>

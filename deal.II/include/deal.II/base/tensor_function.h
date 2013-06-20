@@ -53,66 +53,51 @@ DEAL_II_NAMESPACE_OPEN
  */
 template <int rank, int dim>
 class TensorFunction : public FunctionTime,
-  public Subscriptor
+                       public Subscriptor
 {
 public:
   /**
-   * Define typedefs for the return
-   * types of the <tt>value</tt>
-   * functions.
+   * Define typedefs for the return types of the <tt>value</tt> functions.
    */
   typedef Tensor<rank,dim> value_type;
 
   typedef Tensor<rank+1,dim> gradient_type;
 
   /**
-   * Constructor. May take an
-   * initial value for the time
-   * variable, which defaults to
-   * zero.
+   * Constructor. May take an initial value for the time variable, which
+   * defaults to zero.
    */
   TensorFunction (const double initial_time = 0.0);
 
   /**
-   * Virtual destructor; absolutely
-   * necessary in this case, as
-   * classes are usually not used
-   * by their true type, but rather
-   * through pointers to this base
-   * class.
+   * Virtual destructor; absolutely necessary in this case, as classes are
+   * usually not used by their true type, but rather through pointers to
+   * this base class.
    */
   virtual ~TensorFunction ();
 
   /**
-   * Return the value of the function
-   * at the given point.
+   * Return the value of the function at the given point.
    */
   virtual value_type value (const Point<dim> &p) const;
 
   /**
-   * Set <tt>values</tt> to the point
-   * values of the function at the
-   * <tt>points</tt>.  It is assumed
-   * that <tt>values</tt> already has
-   * the right size, i.e.  the same
-   * size as the <tt>points</tt> array.
+   * Set <tt>values</tt> to the point values of the function at the
+   * <tt>points</tt>.  It is assumed that <tt>values</tt> already has the
+   * right size, i.e.  the same size as the <tt>points</tt> array.
    */
   virtual void value_list (const std::vector<Point<dim> > &points,
                            std::vector<value_type> &values) const;
 
   /**
-   * Return the gradient of the
-   * function at the given point.
+   * Return the gradient of the function at the given point.
    */
   virtual gradient_type gradient (const Point<dim> &p) const;
 
   /**
-   * Set <tt>gradients</tt> to the
-   * gradients of the function at
-   * the <tt>points</tt>.  It is assumed
-   * that <tt>values</tt> already has
-   * the right size, i.e.  the same
-   * size as the <tt>points</tt> array.
+   * Set <tt>gradients</tt> to the gradients of the function at the
+   * <tt>points</tt>.  It is assumed that <tt>values</tt> already has the
+   * right size, i.e.  the same size as the <tt>points</tt> array.
    */
   virtual void gradient_list (const std::vector<Point<dim> >   &points,
                               std::vector<gradient_type> &gradients) const;
@@ -130,6 +115,89 @@ public:
                   << arg2 << " elements.");
 
 };
+
+
+
+/*
+ * Provide a tensor valued function which always returns a constant tensor
+ * value. Obviously, all derivates of this function are zero.
+ *
+ * @ingroup functions
+ * @author Matthias Maier, 2013
+ */
+template <int rank, int dim>
+class ConstantTensorFunction : public TensorFunction<rank, dim>
+{
+public:
+  /**
+   * Constructor; takes the constant tensor value as an argument.
+   * The reference value is copied internally.
+   *
+   * An initial value for the time variable may be specified, otherwise it
+   * defaults to zero.
+   */
+  ConstantTensorFunction (const dealii::Tensor<rank, dim> &value,
+                          const double initial_time = 0.0);
+
+  /**
+   * Virtual destructor; absolutely necessary in this case, as classes are
+   * usually not used by their true type, but rather through pointers to
+   * this base class.
+   */
+  virtual ~ConstantTensorFunction ();
+
+  /**
+   * Return the value of the function at the given point.
+   */
+  virtual typename dealii::TensorFunction<rank, dim>::value_type value (const Point<dim> &p) const;
+
+  /**
+   * Set <tt>values</tt> to the point values of the function at the
+   * <tt>points</tt>.  It is assumed that <tt>values</tt> already has the
+   * right size, i.e.  the same size as the <tt>points</tt> array.
+   */
+  virtual void value_list (const std::vector<Point<dim> > &points,
+                           std::vector<typename dealii::TensorFunction<rank, dim>::value_type> &values) const;
+
+  /**
+   * Return the gradient of the function at the given point.
+   */
+  virtual typename dealii::TensorFunction<rank, dim>::gradient_type gradient (const Point<dim> &p) const;
+
+  /**
+   * Set <tt>gradients</tt> to the gradients of the function at the
+   * <tt>points</tt>.  It is assumed that <tt>values</tt> already has the
+   * right size, i.e.  the same size as the <tt>points</tt> array.
+   */
+  virtual void gradient_list (const std::vector<Point<dim> > &points,
+                              std::vector<typename dealii::TensorFunction<rank, dim>::gradient_type> &gradients) const;
+
+private:
+  const dealii::Tensor<rank, dim> _value;
+};
+
+
+
+/*
+ * Provide a tensor valued function which always returns zero.
+ * Obviously, all derivates of this function are zero.
+ *
+ * @ingroup functions
+ * @author Matthias Maier, 2013
+ */
+template <int rank, int dim>
+class ZeroTensorFunction : public ConstantTensorFunction<rank, dim>
+{
+public:
+  /**
+   * Constructor.
+   *
+   * An initial value for the time variable may be specified, otherwise it
+   * defaults to zero.
+   */
+  ZeroTensorFunction (const double initial_time = 0.0);
+};
+
 
 DEAL_II_NAMESPACE_CLOSE
 
