@@ -328,74 +328,33 @@ public:
 
   /**
    * Virtual destructor; absolutely necessary in this case.
+   *
    */
   virtual ~ZeroFunction ();
 
-  /**
-   * Return the value of the function at the given point for one component.
-   */
   virtual double value (const Point<dim>   &p,
                         const unsigned int  component) const;
 
-  /**
-   * Return the value of the function at the given point for all
-   * components.
-   */
   virtual void vector_value (const Point<dim> &p,
                              Vector<double>   &return_value) const;
 
-  /**
-   * Set <tt>values</tt> to the point values of the function at the
-   * <tt>points</tt>, for the given component. It is assumed that
-   * <tt>values</tt> already has the right size, i.e. the same size as the
-   * <tt>points</tt> array.
-   */
   virtual void value_list (const std::vector<Point<dim> > &points,
                            std::vector<double>            &values,
                            const unsigned int              component = 0) const;
 
-  /**
-   * Set <tt>values</tt> to the point values of the function at the
-   * <tt>points</tt>, for all components. It is assumed that
-   * <tt>values</tt> already has the right size, i.e. the same size as the
-   * <tt>points</tt> array.
-   */
   virtual void vector_value_list (const std::vector<Point<dim> > &points,
                                   std::vector<Vector<double> >   &values) const;
 
-  /**
-   * Return the gradient of the function at the given point, for the given
-   * component.
-   */
   virtual Tensor<1,dim> gradient (const Point<dim> &p,
                                   const unsigned int component = 0) const;
 
-  /**
-   * Return the gradient of the specified component of the function at the
-   * given point, for all components.
-   */
   virtual void vector_gradient (const Point<dim>            &p,
                                 std::vector<Tensor<1,dim> > &gradients) const;
 
-  /**
-   * Set <tt>gradients</tt> to the gradients of the function at the
-   * <tt>points</tt>, for the given component. It is assumed that
-   * <tt>values</tt> already has the right size, i.e. the same size as the
-   * <tt>points</tt> array.
-   */
   virtual void gradient_list (const std::vector<Point<dim> > &points,
                               std::vector<Tensor<1,dim> >    &gradients,
                               const unsigned int              component = 0) const;
 
-  /**
-   * Set <tt>gradients</tt> to the gradients of the function at the
-   * <tt>points</tt>, for all components. It is assumed that
-   * <tt>gradients</tt> already has the right size, i.e. the same size as
-   * the <tt>points</tt> array.
-   *
-   * The outer loop over <tt>gradients</tt> is over the points in the list,
-   * the inner loop over the different components of the function.
-   */
   virtual void vector_gradient_list (const std::vector<Point<dim> >            &points,
                                      std::vector<std::vector<Tensor<1,dim> > > &gradients) const;
 };
@@ -441,45 +400,19 @@ public:
    */
   virtual ~ConstantFunction ();
 
-  /**
-   * Return the value of the function at the given point for one component.
-   */
   virtual double value (const Point<dim>   &p,
                         const unsigned int  component) const;
 
-  /**
-   * Return the value of the function at the given point for all
-   * components.
-   */
   virtual void   vector_value (const Point<dim> &p,
                                Vector<double>   &return_value) const;
 
-  /**
-   * Set <tt>values</tt> to the point values of the function at the
-   * <tt>points</tt>, for the given component. It is assumed that
-   * <tt>values</tt> already has the right size, i.e. the same size as the
-   * <tt>points</tt> array.
-   */
   virtual void value_list (const std::vector<Point<dim> > &points,
                            std::vector<double>            &values,
                            const unsigned int              component = 0) const;
 
-  /**
-   * Set <tt>values</tt> to the point values of the function at the
-   * <tt>points</tt>, for all components. It is assumed that
-   * <tt>values</tt> already has the right size, i.e. the same size as the
-   * <tt>points</tt> array.
-   */
   virtual void vector_value_list (const std::vector<Point<dim> > &points,
                                   std::vector<Vector<double> >   &values) const;
 
-  /**
-   * Determine an estimate for the memory consumption (in bytes) of this
-   * object. Since sometimes the size of objects can not be determined
-   * exactly (for example: what is the memory consumption of an STL
-   * <tt>std::map</tt> type with a certain number of elements?), this is
-   * only an estimate. however often quite close to the true value.
-   */
   std::size_t memory_consumption () const;
 
 protected:

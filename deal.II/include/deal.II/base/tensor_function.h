@@ -139,36 +139,15 @@ public:
   ConstantTensorFunction (const dealii::Tensor<rank, dim> &value,
                           const double initial_time = 0.0);
 
-  /**
-   * Virtual destructor; absolutely necessary in this case, as classes are
-   * usually not used by their true type, but rather through pointers to
-   * this base class.
-   */
   virtual ~ConstantTensorFunction ();
 
-  /**
-   * Return the value of the function at the given point.
-   */
   virtual typename dealii::TensorFunction<rank, dim>::value_type value (const Point<dim> &p) const;
 
-  /**
-   * Set <tt>values</tt> to the point values of the function at the
-   * <tt>points</tt>.  It is assumed that <tt>values</tt> already has the
-   * right size, i.e.  the same size as the <tt>points</tt> array.
-   */
   virtual void value_list (const std::vector<Point<dim> > &points,
                            std::vector<typename dealii::TensorFunction<rank, dim>::value_type> &values) const;
 
-  /**
-   * Return the gradient of the function at the given point.
-   */
   virtual typename dealii::TensorFunction<rank, dim>::gradient_type gradient (const Point<dim> &p) const;
 
-  /**
-   * Set <tt>gradients</tt> to the gradients of the function at the
-   * <tt>points</tt>.  It is assumed that <tt>values</tt> already has the
-   * right size, i.e.  the same size as the <tt>points</tt> array.
-   */
   virtual void gradient_list (const std::vector<Point<dim> > &points,
                               std::vector<typename dealii::TensorFunction<rank, dim>::gradient_type> &gradients) const;
 
