@@ -46,6 +46,12 @@ namespace internal
     return true;
   }
 
+  template <class ACCESSOR>
+  inline bool is_active_iterator(const FilteredIterator<TriaActiveIterator<ACCESSOR> > &)
+  {
+    return true;
+  }
+
   template<int dim, class DOFINFO, class A>
   void assemble(const MeshWorker::DoFInfoBox<dim, DOFINFO> &dinfo, A *assembler)
   {
