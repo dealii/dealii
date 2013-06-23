@@ -257,11 +257,25 @@ report+mail:
 	  done
 
 ############################################################
-# by default, all .cc-files are tests. individual Makefiles
-# may overrule this:
-ifeq ($(tests),)
-tests = $(basename $(wildcard *.cc))
+# all .cc-files are tests by default. After that, find out which tests
+# require unconfigured prerequisites and eliminate those.
+
+tests_all = $(wildcard *.cc)
+ifeq ($(USE_CONTRIB_PETSC),no)
+  tests1 = $(foreach file, $(tests_all), $(shell grep -L PETScWrappers $(file)))
+else
+  tests1 = $(tests_all)
 endif
+
+ifeq ($(USE_CONTRIB_TRILINOS),no)
+  tests2 = $(foreach file, $(tests1), $(shell grep -L TrilinosWrappers $(file)))
+else
+  tests2 = $(tests1)
+endif
+
+tests_cc = $(tests2)
+tests_base = $(basename $(tests2))
+tests = $(foreach file, $(tests_base), $(wildcard $(file)/ncpu_*))
 
 ############################################################
 # link with all libraries:
