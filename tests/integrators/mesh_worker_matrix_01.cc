@@ -142,7 +142,7 @@ test_simple(MGDoFHandler<dim>& mgdofs, bool faces)
   info_box.initialize_update_flags();
   info_box.initialize(fe, mapping);
   
-  MeshWorker::DoFInfo<dim> dof_info(dofs);
+  MeshWorker::DoFInfo<dim> dof_info(dofs.block_info());
   
   MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> > assembler;
   assembler.initialize(matrix);
@@ -156,7 +156,7 @@ test_simple(MGDoFHandler<dim>& mgdofs, bool faces)
      assembler, true);
   
   deallog << std::setprecision(1);
-  //  matrix.print_formatted(deallog.get_file_stream(), 0, false, 4);
+  //matrix.print_formatted(deallog.get_file_stream(), 0, false, 4);
   matrix.print(deallog, false);
 }
 
@@ -185,6 +185,7 @@ test(const FiniteElement<dim>& fe)
 
   MGDoFHandler<dim> dofs(tr);
   dofs.distribute_dofs(fe);
+  dofs.initialize_local_block_info();
   deallog << "DoFHandler " << dofs.n_dofs() << " levels";
   for (unsigned int l=0;l<tr.n_levels();++l)
     deallog << ' ' << l << ':' << dofs.n_dofs(l);
