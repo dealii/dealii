@@ -18,7 +18,7 @@
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/full_matrix.h>
-#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -75,11 +75,11 @@ void test(FiniteElement<dim>& fe)
   
   CompressedSparsityPattern csp(dof.n_dofs(),dof.n_dofs());
   DoFTools::make_flux_sparsity_pattern(dof, csp);
-  SparsityPattern sparsity;
+  TrilinosWrappers::SparsityPattern sparsity;
   sparsity.copy_from(csp);
-  SparseMatrix<double> M(sparsity);
+  TrilinosWrappers::SparseMatrix M(sparsity);
   
-  MeshWorker::Assembler::MatrixSimple<SparseMatrix<double> > ass;
+  MeshWorker::Assembler::MatrixSimple<TrilinosWrappers::SparseMatrix> ass;
   ass.initialize(M);
   ass.initialize_local_blocks(dof.block_info().local());
   MeshWorker::DoFInfo<dim> info(dof.block_info());
@@ -91,7 +91,7 @@ void test(FiniteElement<dim>& fe)
   info.reinit(cell);
   fill_matrices(info, false);
   ass.assemble(info);
-  M.print_formatted(deallog.get_file_stream(), 0, false, 6);
+  M.print(deallog.get_file_stream());
   M = 0.;
   
   deallog << "face" << std::endl;
@@ -101,13 +101,14 @@ void test(FiniteElement<dim>& fe)
   fill_matrices(info, true);
   fill_matrices(infon, true);
   ass.assemble(info, infon);
-  M.print_formatted(deallog.get_file_stream(), 0, false, 6);
+  M.print(deallog.get_file_stream());
 }
 
-int main()
+int main(int argc, char** argv)
 {
+  Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
   initlog(__FILE__);
-
+  
   FE_DGP<2> p0(0);
   FE_DGP<2> p1(1);
   FE_RaviartThomas<2> rt0(0);

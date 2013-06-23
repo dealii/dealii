@@ -278,8 +278,6 @@ ifeq ($(tests),)
   tests = $(basename $(tests2))
 endif
 
-show-tests:
-	@echo $(tests)
 ############################################################
 # link with all libraries:
 libraries = $(lib-deal2.g)
