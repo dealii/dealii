@@ -155,9 +155,8 @@ test_simple(MGDoFHandler<dim>& mgdofs, bool faces)
      std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
      assembler, true);
   
-  deallog << std::setprecision(1);
   //matrix.print_formatted(deallog.get_file_stream(), 0, false, 4);
-  matrix.print(deallog, false);
+  matrix.print(deallog.get_file_stream());
 }
 
 
