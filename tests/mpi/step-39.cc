@@ -20,7 +20,7 @@
 #include <deal.II/lac/trilinos_precondition.h>
 
 #include <deal.II/grid/grid_generator.h>
-#include <deal.II/grid/grid_refinement.h>
+#include <deal.II/distributed/grid_refinement.h>
 #include <deal.II/grid/filtered_iterator.h>
 
 #include <deal.II/fe/fe_q.h>
@@ -576,50 +576,59 @@ namespace Step39
   }
 
 
-  // template <int dim>
-  // double
-  // InteriorPenaltyProblem<dim>::estimate()
-  // {
-  //   std::vector<unsigned int> old_user_indices;
-  //   triangulation.save_user_indices(old_user_indices);
+  template <int dim>
+  double
+  InteriorPenaltyProblem<dim>::estimate()
+  {
+    TrilinosWrappers::MPI::Vector ghost;
+    ghost.reinit(locally_relevant_set, MPI_COMM_WORLD);
+    ghost = solution;
+    
+    std::vector<unsigned int> old_user_indices;
+    triangulation.save_user_indices(old_user_indices);
 
-  //   estimates.block(0).reinit(triangulation.n_active_cells());
-  //   unsigned int i=0;
-  //   for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
-  //        cell != triangulation.end(); ++cell,++i)
-  //     cell->set_user_index(i);
+    estimates.block(0).reinit(triangulation.n_active_cells());
+    unsigned int i=0;
+    for (typename Triangulation<dim>::active_cell_iterator cell = triangulation.begin_active();
+         cell != triangulation.end(); ++cell,++i)
+      cell->set_user_index(i);
 
-  //   MeshWorker::IntegrationInfoBox<dim> info_box;
-  //   const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
-  //   info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
+    MeshWorker::IntegrationInfoBox<dim> info_box;
+    const unsigned int n_gauss_points = dof_handler.get_fe().tensor_degree()+1;
+    info_box.initialize_gauss_quadrature(n_gauss_points, n_gauss_points+1, n_gauss_points);
 
-  //   NamedData<TrilinosWrappers::MPI::Vector* > solution_data;
-  //   solution_data.add(&solution, "solution");
+    NamedData<TrilinosWrappers::MPI::Vector* > solution_data;
+    solution_data.add(&ghost, "solution");
 
-  //   info_box.cell_selector.add("solution", false, false, true);
-  //   info_box.boundary_selector.add("solution", true, true, false);
-  //   info_box.face_selector.add("solution", true, true, false);
+    info_box.cell_selector.add("solution", false, false, true);
+    info_box.boundary_selector.add("solution", true, true, false);
+    info_box.face_selector.add("solution", true, true, false);
 
-  //   info_box.add_update_flags_boundary(update_quadrature_points);
-  //   info_box.initialize(fe, mapping, solution_data);
+    info_box.add_update_flags_boundary(update_quadrature_points);
+    info_box.initialize(fe, mapping, solution_data);
 
-  //   MeshWorker::DoFInfo<dim> dof_info(dof_handler);
+    MeshWorker::DoFInfo<dim> dof_info(dof_handler);
 
-  //   MeshWorker::Assembler::CellsAndFaces<double> assembler;
-  //   NamedData<BlockTrilinosWrappers::MPI::Vector* > out_data;
-  //   BlockTrilinosWrappers::MPI::Vector *est = &estimates;
-  //   out_data.add(est, "cells");
-  //   assembler.initialize(out_data, false);
+    MeshWorker::Assembler::CellsAndFaces<double> assembler;
+    NamedData<BlockVector<double>* > out_data;
+    BlockVector<double> *est = &estimates;
+    out_data.add(est, "cells");
+    assembler.initialize(out_data, false);
+    
+    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
+      begin(IteratorFilters::LocallyOwnedCell(), dof_handler.begin_active());
+    FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
+      end(IteratorFilters::LocallyOwnedCell(), dof_handler.end());
+    
+    Estimator<dim> integrator;
+    MeshWorker::integration_loop<dim, dim> (
+					    begin, end,
+					    dof_info, info_box,
+					    integrator, assembler);
 
-  //   Estimator<dim> integrator;
-  //   MeshWorker::integration_loop<dim, dim> (
-  //     dof_handler.begin_active(), dof_handler.end(),
-  //     dof_info, info_box,
-  //     integrator, assembler);
-
-  //   triangulation.load_user_indices(old_user_indices);
-  //   return estimates.block(0).l2_norm();
-  // }
+    triangulation.load_user_indices(old_user_indices);
+    return estimates.block(0).l2_norm();
+  }
 
 
   // template <int dim>
@@ -673,20 +682,20 @@ namespace Step39
   // {
   //   char *fn = new char[100];
   //   sprintf(fn, "step-39/sol-%02d", cycle);
-
+    
   //   std::string filename(fn);
   //   filename += ".gnuplot";
   //   deallog << "Writing solution to <" << filename << ">..."
   //           << std::endl << std::endl;
   //   std::ofstream gnuplot_output (filename.c_str());
-
+    
   //   DataOut<dim> data_out;
   //   data_out.attach_dof_handler (dof_handler);
   //   data_out.add_data_vector (solution, "u");
   //   data_out.add_data_vector (estimates.block(0), "est");
-
+    
   //   data_out.build_patches ();
-
+    
   //   data_out.write_gnuplot(gnuplot_output);
   // }
 
@@ -698,15 +707,15 @@ namespace Step39
     for (unsigned int s=0; s<n_steps; ++s)
       {
         deallog << "Step " << s << std::endl;
-        //if (estimates.block(0).size() == 0)
+        if (estimates.block(0).size() == 0)
           triangulation.refine_global(1);
-	  //else
-          //{
-	  // GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
-	  //                                                   estimates.block(0),
-	  //                                                   0.5, 0.0);
-	  //triangulation.execute_coarsening_and_refinement ();
-          //}
+	else
+        {
+	  parallel::distributed::GridRefinement::refine_and_coarsen_fixed_fraction (triangulation,
+										    estimates.block(0),
+										    0.5, 0.0);
+	  triangulation.execute_coarsening_and_refinement ();
+        }
 
         deallog << "Triangulation "
                 << triangulation.n_active_cells() << " cells, "
@@ -727,7 +736,7 @@ namespace Step39
         deallog << "Solve" << std::endl;
         solve();
 	//error();
-        //deallog << "Estimate " << estimate() << std::endl;
+        deallog << "Estimate " << estimate() << std::endl;
         //output_results(s);
       }
   }
