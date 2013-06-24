@@ -19,6 +19,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/grid/tria_iterator_base.h>
 #include <deal.II/grid/tria_iterator_selector.h>
+#include <deal.II/grid/cell_id.h>
 
 
 namespace std
@@ -2821,7 +2822,8 @@ public:
 
   /**
    *  Return an iterator to the
-   *  parent.
+   *  parent. Throws an exception if this cell has no parent, i.e. has
+   *  level 0.
    */
   TriaIterator<CellAccessor<dim,spacedim> >
   parent () const;
@@ -2989,6 +2991,15 @@ public:
    */
   void set_neighbor (const unsigned int i,
                      const TriaIterator<CellAccessor<dim, spacedim> > &pointer) const;
+
+  /**
+   * Return a unique ID for the current cell. This ID is constructed from the
+   * path in the hierarchy from the coarse father cell and works correctly
+   * in parallel computations.
+   *
+   * Note: This operation takes O(log(level)) time.
+   */
+  CellId id() const;
 
   /**
    * @}
@@ -3168,6 +3179,39 @@ CellAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
                       "only exists to make certain template constructs "
                       "easier to write as dimension independent code but "
                       "the conversion is not valid in the current context."));
+}
+
+template <int dim, int spacedim>
+CellId
+CellAccessor<dim,spacedim>::id() const
+{
+  std::vector<unsigned char> id(this->level(), -1);
+  unsigned int coarse_index;
+
+  CellAccessor<dim,spacedim> ptr = *this;
+  while (ptr.level()>0)
+    {
+      // find the 'v'st child of our parent we are
+      unsigned char v=-1;
+      for (unsigned int c=0;c<ptr.parent()->n_children();++c)
+        {
+          if (ptr.parent()->child_index(c)==ptr.index())
+            {
+              v = c;
+              break;
+            }
+        }
+
+      Assert(v!=-1, ExcInternalError());
+      id[ptr.level()-1] = v;
+
+      ptr.copy_from( *(ptr.parent()));
+    }
+
+  Assert(ptr.level()==0, ExcInternalError());
+  coarse_index = ptr.index();
+
+  return CellId(coarse_index, id);
 }
 
 

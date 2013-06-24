@@ -147,6 +147,13 @@ this function.
 
 <ol>
 
+<li> New: CellAccessor::id() that returns a unique CellId that
+also works in parallel computations (where level and index is not
+useful).
+<br>
+(Timo Heister, 2013/06/24)
+</li>
+
 <li> New: added ConstantTensorFunction<rank, dim> and ZeroTensorFunction<rank, dim> to provide
 a tensor valued analogue to ConstantFunction and ZeroFunction.
 <br>
