@@ -157,7 +157,7 @@ test_simple(DoFHandler<dim>& dofs, bool faces)
      std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
      assembler, true);
 
-  matrix.compress();
+  matrix.compress(VectorOperation::add);
   matrix.print(deallog.get_file_stream());
 }
 
