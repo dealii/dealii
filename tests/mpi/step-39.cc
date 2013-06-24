@@ -462,6 +462,8 @@ namespace Step39
       begin, end,
       dof_info, info_box,
       integrator, assembler);
+    
+    matrix.compress(VectorOperation::add);
   }
 
 
@@ -487,9 +489,19 @@ namespace Step39
 
     MatrixIntegrator<dim> integrator;
     MeshWorker::integration_loop<dim, dim> (
-					    begin, end,
+      begin, end,
       dof_info, info_box,
       integrator, assembler);
+    
+    for (unsigned int level=mg_matrix.min_level(); level <= mg_matrix.max_level();++level)
+      {
+	mg_matrix[level].compress(VectorOperation::add);
+	if (level > mg_matrix.min_level())
+	  {
+	    mg_matrix_dg_up[level].compress(VectorOperation::add);
+	    mg_matrix_dg_down[level].compress(VectorOperation::add);
+	  }
+      }
   }
 
 
@@ -521,6 +533,7 @@ namespace Step39
       dof_info, info_box,
       integrator, assembler);
 
+    right_hand_side.compress(VectorOperation::add);
     right_hand_side *= -1.;
   }
 
