@@ -117,12 +117,11 @@ Local<dim>::face(MeshWorker::DoFInfo<dim>& info1, MeshWorker::DoFInfo<dim>& info
 
 template <int dim>
 void
-test_simple(MGDoFHandler<dim>& mgdofs, bool faces)
+test_simple(DoFHandler<dim>& dofs, bool faces)
 {
   SparsityPattern pattern;
   SparseMatrix<double> matrix;
 
-  const DoFHandler<dim>& dofs = mgdofs;
   const FiniteElement<dim>& fe = dofs.get_fe();
   pattern.reinit (dofs.n_dofs(), dofs.n_dofs(),
 		  (GeometryInfo<dim>::faces_per_cell
@@ -182,15 +181,13 @@ test(const FiniteElement<dim>& fe)
        cell != tr.end(); ++cell, ++cn)
     cell->set_user_index(cn);
 
-  MGDoFHandler<dim> dofs(tr);
+  DoFHandler<dim> dofs(tr);
   dofs.distribute_dofs(fe);
   dofs.initialize_local_block_info();
-  deallog << "DoFHandler " << dofs.n_dofs() << " levels";
-  for (unsigned int l=0;l<tr.n_levels();++l)
-    deallog << ' ' << l << ':' << dofs.n_dofs(l);
-  deallog << std::endl;
+  deallog << "DoFHandler " << dofs.n_dofs() << std::endl;
 
   test_simple(dofs, false);
+  deallog << "now with jump terms" << std::endl;
   test_simple(dofs, true);
 }
 
