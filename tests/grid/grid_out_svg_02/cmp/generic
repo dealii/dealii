@@ -1,0 +1,334 @@
+
+<svg width="7850" height="4000" xmlns="http://www.w3.org/2000/svg" version="1.1">
+
+
+<!-- internal style sheet -->
+<style type="text/css"><![CDATA[
+ rect.background{fill:none}
+ rect{fill:none; stroke:rgb(25,25,25); stroke-width:2}
+ text{font-family:Helvetica; text-anchor:middle; fill:rgb(25,25,25)}
+ line{stroke:rgb(25,25,25); stroke-width:4}
+ path{fill:none; stroke:rgb(25,25,25); stroke-width:2}
+
+ path.p0{fill:rgb(0,102,255); stroke:rgb(25,25,25); stroke-width:2}
+ path.ps0{fill:rgb(0,77,191); stroke:rgb(20,20,20); stroke-width:2}
+ rect.r0{fill:rgb(0,102,255); stroke:rgb(25,25,25); stroke-width:2}
+ path.p1{fill:rgb(51,255,0); stroke:rgb(25,25,25); stroke-width:2}
+ path.ps1{fill:rgb(38,191,0); stroke:rgb(20,20,20); stroke-width:2}
+ rect.r1{fill:rgb(51,255,0); stroke:rgb(25,25,25); stroke-width:2}
+ path.p2{fill:rgb(255,0,0); stroke:rgb(25,25,25); stroke-width:2}
+ path.ps2{fill:rgb(191,0,0); stroke:rgb(20,20,20); stroke-width:2}
+ rect.r2{fill:rgb(255,0,0); stroke:rgb(25,25,25); stroke-width:2}
+]]></style>
+
+ <rect class="background" width="7850" height="4000"/>
+  <!-- cells -->
+  <path class="ps0" d="M 5193 1904 L 4882 661 L 3813 1417 L 4159 1904 L 5193 1904"/>
+  <text x="4517" y="1437" style="font-size:222">0,0,0,X,0</text>
+  <line x1="5193" y1="1904" x2="4882" y2="661"/>
+  <line x1="4159" y1="1904" x2="3813" y2="1417"/>
+  <path class="ps0" d="M 4882 661 L 3125 661 L 3125 1232 L 3813 1417 L 4882 661"/>
+  <text x="3746" y="977" style="font-size:192">0,1,0,X,0</text>
+  <line x1="4882" y1="661" x2="3125" y2="661"/>
+  <line x1="3813" y1="1417" x2="3125" y2="1232"/>
+  <path class="ps0" d="M 3125 661 L 1368 661 L 2437 1417 L 3125 1232 L 3125 661"/>
+  <text x="2504" y="977" style="font-size:192">0,2,0,X,0</text>
+  <line x1="3125" y1="661" x2="1368" y2="661"/>
+  <line x1="3125" y1="1232" x2="2437" y2="1417"/>
+  <path class="ps0" d="M 1368 661 L 1057 1904 L 2091 1904 L 2437 1417 L 1368 661"/>
+  <text x="1733" y="1437" style="font-size:222">0,3,0,X,0</text>
+  <line x1="1368" y1="661" x2="1057" y2="1904"/>
+  <line x1="2437" y1="1417" x2="2091" y2="1904"/>
+  <path class="ps0" d="M 1057 1904 L 613 3680 L 2345 2455 L 2091 1904 L 1057 1904"/>
+  <text x="1556" y="2430" style="font-size:295">0,4,0,X,0</text>
+  <line x1="1057" y1="1904" x2="613" y2="3680"/>
+  <line x1="2091" y1="1904" x2="2345" y2="2455"/>
+  <path class="ps0" d="M 613 3680 L 3125 3680 L 3125 2706 L 2345 2455 L 613 3680"/>
+  <text x="2324" y="3097" style="font-size:352">0,5,0,X,0</text>
+  <line x1="613" y1="3680" x2="3125" y2="3680"/>
+  <line x1="2345" y1="2455" x2="3125" y2="2706"/>
+  <path class="ps0" d="M 3125 3680 L 5637 3680 L 3905 2455 L 3125 2706 L 3125 3680"/>
+  <text x="3926" y="3097" style="font-size:352">0,6,0,X,0</text>
+  <line x1="3125" y1="3680" x2="5637" y2="3680"/>
+  <line x1="3125" y1="2706" x2="3905" y2="2455"/>
+  <path class="ps0" d="M 5637 3680 L 5193 1904 L 4159 1904 L 3905 2455 L 5637 3680"/>
+  <text x="4694" y="2430" style="font-size:295">0,7,0,X,0</text>
+  <line x1="5637" y1="3680" x2="5193" y2="1904"/>
+  <line x1="3905" y1="2455" x2="4159" y2="1904"/>
+  <path class="p1" d="M 5269 1600 L 5089 932 L 4565 1135 L 4733 1600 L 5269 1600"/>
+  <text x="4913" y="1306" style="font-size:125">1,0,0,0,0</text>
+  <line x1="5269" y1="1600" x2="5089" y2="932"/>
+  <path class="p1" d="M 5089 932 L 4937 366 L 4416 721 L 4565 1135 L 5089 932"/>
+  <text x="4754" y="777" style="font-size:103">1,1,0,0,0</text>
+  <line x1="5089" y1="932" x2="4937" y2="366"/>
+  <path class="ps1" d="M 4733 1600 L 4565 1135 L 4011 1350 L 4197 1600 L 4733 1600"/>
+  <text x="4377" y="1417" style="font-size:134">1,2,0,X,0</text>
+  <line x1="4197" y1="1600" x2="4011" y2="1350"/>
+  <path class="ps1" d="M 4565 1135 L 4416 721 L 3837 1116 L 4011 1350 L 4565 1135"/>
+  <text x="4211" y="1074" style="font-size:119">1,3,0,X,0</text>
+  <line x1="4011" y1="1350" x2="3837" y2="1116"/>
+  <path class="p1" d="M 4937 366 L 4031 366 L 3767 679 L 4416 721 L 4937 366"/>
+  <text x="4292" y="529" style="font-size:95">1,4,0,0,0</text>
+  <line x1="4937" y1="366" x2="4031" y2="366"/>
+  <path class="p1" d="M 4031 366 L 3125 366 L 3125 638 L 3767 679 L 4031 366"/>
+  <text x="3513" y="509" style="font-size:96">1,5,0,0,0</text>
+  <line x1="4031" y1="366" x2="3125" y2="366"/>
+  <path class="ps1" d="M 4416 721 L 3767 679 L 3477 1022 L 3837 1116 L 4416 721"/>
+  <text x="3878" y="880" style="font-size:112">1,6,0,X,0</text>
+  <line x1="3837" y1="1116" x2="3477" y2="1022"/>
+  <path class="ps1" d="M 3767 679 L 3125 638 L 3125 932 L 3477 1022 L 3767 679"/>
+  <text x="3374" y="814" style="font-size:110">1,7,0,X,0</text>
+  <line x1="3477" y1="1022" x2="3125" y2="932"/>
+  <path class="p1" d="M 3125 366 L 2219 366 L 2483 679 L 3125 638 L 3125 366"/>
+  <text x="2737" y="509" style="font-size:96">1,8,0,0,0</text>
+  <line x1="3125" y1="366" x2="2219" y2="366"/>
+  <path class="p1" d="M 2219 366 L 1313 366 L 1834 721 L 2483 679 L 2219 366"/>
+  <text x="1958" y="529" style="font-size:95">1,9,0,0,0</text>
+  <line x1="2219" y1="366" x2="1313" y2="366"/>
+  <path class="ps1" d="M 3125 638 L 2483 679 L 2773 1022 L 3125 932 L 3125 638"/>
+  <text x="2876" y="814" style="font-size:110">1,10,0,X,0</text>
+  <line x1="3125" y1="932" x2="2773" y2="1022"/>
+  <path class="ps1" d="M 2483 679 L 1834 721 L 2413 1116 L 2773 1022 L 2483 679"/>
+  <text x="2372" y="880" style="font-size:112">1,11,0,X,0</text>
+  <line x1="2773" y1="1022" x2="2413" y2="1116"/>
+  <path class="p1" d="M 1313 366 L 1161 932 L 1685 1135 L 1834 721 L 1313 366"/>
+  <text x="1496" y="777" style="font-size:103">1,12,0,0,0</text>
+  <line x1="1313" y1="366" x2="1161" y2="932"/>
+  <path class="p1" d="M 1161 932 L 981 1600 L 1517 1600 L 1685 1135 L 1161 932"/>
+  <text x="1337" y="1306" style="font-size:125">1,13,0,0,0</text>
+  <line x1="1161" y1="932" x2="981" y2="1600"/>
+  <path class="ps1" d="M 1834 721 L 1685 1135 L 2239 1350 L 2413 1116 L 1834 721"/>
+  <text x="2039" y="1074" style="font-size:119">1,14,0,X,0</text>
+  <line x1="2413" y1="1116" x2="2239" y2="1350"/>
+  <path class="ps1" d="M 1685 1135 L 1517 1600 L 2053 1600 L 2239 1350 L 1685 1135"/>
+  <text x="1873" y="1417" style="font-size:134">1,15,0,X,0</text>
+  <line x1="2239" y1="1350" x2="2053" y2="1600"/>
+  <path class="p1" d="M 981 1600 L 765 2404 L 1494 2127 L 1517 1600 L 981 1600"/>
+  <text x="1195" y="1919" style="font-size:150">1,16,0,0,0</text>
+  <line x1="981" y1="1600" x2="765" y2="2404"/>
+  <path class="p1" d="M 765 2404 L 500 3389 L 1469 2729 L 1494 2127 L 765 2404"/>
+  <text x="1071" y="2638" style="font-size:178">1,17,0,0,0</text>
+  <line x1="765" y1="2404" x2="500" y2="3389"/>
+  <path class="ps1" d="M 1517 1600 L 1494 2127 L 2179 1867 L 2053 1600 L 1517 1600"/>
+  <text x="1813" y="1793" style="font-size:150">1,18,0,X,0</text>
+  <line x1="2053" y1="1600" x2="2179" y2="1867"/>
+  <path class="ps1" d="M 1494 2127 L 1469 2729 L 2314 2153 L 2179 1867 L 1494 2127"/>
+  <text x="1873" y="2208" style="font-size:167">1,19,0,X,0</text>
+  <line x1="2179" y1="1867" x2="2314" y2="2153"/>
+  <path class="p1" d="M 500 3389 L 1812 3389 L 2290 2799 L 1469 2729 L 500 3389"/>
+  <text x="1529" y="3066" style="font-size:198">1,20,0,0,0</text>
+  <line x1="500" y1="3389" x2="1812" y2="3389"/>
+  <path class="p1" d="M 1812 3389 L 3125 3389 L 3125 2870 L 2290 2799 L 1812 3389"/>
+  <text x="2591" y="3103" style="font-size:206">1,21,0,0,0</text>
+  <line x1="1812" y1="3389" x2="3125" y2="3389"/>
+  <path class="ps1" d="M 1469 2729 L 2290 2799 L 2714 2277 L 2314 2153 L 1469 2729"/>
+  <text x="2205" y="2480" style="font-size:180">1,22,0,X,0</text>
+  <line x1="2314" y1="2153" x2="2714" y2="2277"/>
+  <path class="ps1" d="M 2290 2799 L 3125 2870 L 3125 2404 L 2714 2277 L 2290 2799"/>
+  <text x="2815" y="2580" style="font-size:187">1,23,0,X,0</text>
+  <line x1="2714" y1="2277" x2="3125" y2="2404"/>
+  <path class="p1" d="M 3125 3389 L 4438 3389 L 3960 2799 L 3125 2870 L 3125 3389"/>
+  <text x="3659" y="3103" style="font-size:206">1,24,0,0,0</text>
+  <line x1="3125" y1="3389" x2="4438" y2="3389"/>
+  <path class="p1" d="M 4438 3389 L 5750 3389 L 4781 2729 L 3960 2799 L 4438 3389"/>
+  <text x="4721" y="3066" style="font-size:198">1,25,0,0,0</text>
+  <line x1="4438" y1="3389" x2="5750" y2="3389"/>
+  <path class="ps1" d="M 3125 2870 L 3960 2799 L 3536 2277 L 3125 2404 L 3125 2870"/>
+  <text x="3435" y="2580" style="font-size:187">1,26,0,X,0</text>
+  <line x1="3125" y1="2404" x2="3536" y2="2277"/>
+  <path class="ps1" d="M 3960 2799 L 4781 2729 L 3936 2153 L 3536 2277 L 3960 2799"/>
+  <text x="4045" y="2480" style="font-size:180">1,27,0,X,0</text>
+  <line x1="3536" y1="2277" x2="3936" y2="2153"/>
+  <path class="p1" d="M 5750 3389 L 5485 2404 L 4756 2127 L 4781 2729 L 5750 3389"/>
+  <text x="5179" y="2638" style="font-size:178">1,28,0,0,0</text>
+  <line x1="5750" y1="3389" x2="5485" y2="2404"/>
+  <path class="p1" d="M 5485 2404 L 5269 1600 L 4733 1600 L 4756 2127 L 5485 2404"/>
+  <text x="5055" y="1919" style="font-size:150">1,29,0,0,0</text>
+  <line x1="5485" y1="2404" x2="5269" y2="1600"/>
+  <path class="ps1" d="M 4781 2729 L 4756 2127 L 4071 1867 L 3936 2153 L 4781 2729"/>
+  <text x="4377" y="2208" style="font-size:167">1,30,0,X,0</text>
+  <line x1="3936" y1="2153" x2="4071" y2="1867"/>
+  <path class="ps1" d="M 4756 2127 L 4733 1600 L 4197 1600 L 4071 1867 L 4756 2127"/>
+  <text x="4437" y="1793" style="font-size:150">1,31,0,X,0</text>
+  <line x1="4071" y1="1867" x2="4197" y2="1600"/>
+  <path class="p2" d="M 4794 1274 L 4703 1036 L 4423 1091 L 4516 1274 L 4794 1274"/>
+  <text x="4609" y="1167" style="font-size:73">2,0,0,0,0</text>
+  <path class="p2" d="M 4703 1036 L 4617 812 L 4334 917 L 4423 1091 L 4703 1036"/>
+  <text x="4519" y="963" style="font-size:69">2,1,0,0,0</text>
+  <path class="p2" d="M 4516 1274 L 4423 1091 L 4139 1148 L 4238 1274 L 4516 1274"/>
+  <text x="4329" y="1196" style="font-size:75">2,2,0,0,0</text>
+  <line x1="4238" y1="1274" x2="4139" y2="1148"/>
+  <path class="p2" d="M 4423 1091 L 4334 917 L 4044 1026 L 4139 1148 L 4423 1091"/>
+  <text x="4236" y="1045" style="font-size:72">2,3,0,0,0</text>
+  <line x1="4139" y1="1148" x2="4044" y2="1026"/>
+  <path class="p2" d="M 4617 812 L 4536 601 L 4250 751 L 4334 917 L 4617 812"/>
+  <text x="4435" y="769" style="font-size:64">2,4,0,0,0</text>
+  <path class="p2" d="M 4536 601 L 4459 403 L 4169 592 L 4250 751 L 4536 601"/>
+  <text x="4355" y="585" style="font-size:60">2,5,0,0,0</text>
+  <path class="p2" d="M 4334 917 L 4250 751 L 3952 907 L 4044 1026 L 4334 917"/>
+  <text x="4146" y="899" style="font-size:68">2,6,0,0,0</text>
+  <line x1="4044" y1="1026" x2="3952" y2="907"/>
+  <path class="p2" d="M 4250 751 L 4169 592 L 3862 793 L 3952 907 L 4250 751"/>
+  <text x="4060" y="759" style="font-size:65">2,7,0,0,0</text>
+  <line x1="3952" y1="907" x2="3862" y2="793"/>
+  <path class="p2" d="M 4459 403 L 4123 382 L 3904 559 L 4169 592 L 4459 403"/>
+  <text x="4165" y="483" style="font-size:58">2,8,0,0,0</text>
+  <path class="p2" d="M 4123 382 L 3788 361 L 3642 527 L 3904 559 L 4123 382"/>
+  <text x="3865" y="456" style="font-size:58">2,9,0,0,0</text>
+  <path class="p2" d="M 4169 592 L 3904 559 L 3674 746 L 3862 793 L 4169 592"/>
+  <text x="3904" y="671" style="font-size:63">2,10,0,0,0</text>
+  <line x1="3862" y1="793" x2="3674" y2="746"/>
+  <path class="p2" d="M 3904 559 L 3642 527 L 3489 700 L 3674 746 L 3904 559"/>
+  <text x="3678" y="632" style="font-size:62">2,11,0,0,0</text>
+  <line x1="3674" y1="746" x2="3489" y2="700"/>
+  <path class="p2" d="M 3788 361 L 3456 340 L 3382 494 L 3642 527 L 3788 361"/>
+  <text x="3567" y="430" style="font-size:57">2,12,0,0,0</text>
+  <path class="p2" d="M 3456 340 L 3125 320 L 3125 462 L 3382 494 L 3456 340"/>
+  <text x="3272" y="403" style="font-size:57">2,13,0,0,0</text>
+  <path class="p2" d="M 3642 527 L 3382 494 L 3306 655 L 3489 700 L 3642 527"/>
+  <text x="3455" y="593" style="font-size:62">2,14,0,0,0</text>
+  <line x1="3489" y1="700" x2="3306" y2="655"/>
+  <path class="p2" d="M 3382 494 L 3125 462 L 3125 610 L 3306 655 L 3382 494"/>
+  <text x="3234" y="555" style="font-size:61">2,15,0,0,0</text>
+  <line x1="3306" y1="655" x2="3125" y2="610"/>
+  <path class="p2" d="M 3125 320 L 2794 340 L 2868 494 L 3125 462 L 3125 320"/>
+  <text x="2978" y="403" style="font-size:57">2,16,0,0,0</text>
+  <path class="p2" d="M 2794 340 L 2462 361 L 2608 527 L 2868 494 L 2794 340"/>
+  <text x="2683" y="430" style="font-size:57">2,17,0,0,0</text>
+  <path class="p2" d="M 3125 462 L 2868 494 L 2944 655 L 3125 610 L 3125 462"/>
+  <text x="3016" y="555" style="font-size:61">2,18,0,0,0</text>
+  <line x1="3125" y1="610" x2="2944" y2="655"/>
+  <path class="p2" d="M 2868 494 L 2608 527 L 2761 700 L 2944 655 L 2868 494"/>
+  <text x="2795" y="593" style="font-size:62">2,19,0,0,0</text>
+  <line x1="2944" y1="655" x2="2761" y2="700"/>
+  <path class="p2" d="M 2462 361 L 2127 382 L 2346 559 L 2608 527 L 2462 361"/>
+  <text x="2385" y="456" style="font-size:58">2,20,0,0,0</text>
+  <path class="p2" d="M 2127 382 L 1791 403 L 2081 592 L 2346 559 L 2127 382"/>
+  <text x="2085" y="483" style="font-size:58">2,21,0,0,0</text>
+  <path class="p2" d="M 2608 527 L 2346 559 L 2576 746 L 2761 700 L 2608 527"/>
+  <text x="2572" y="632" style="font-size:62">2,22,0,0,0</text>
+  <line x1="2761" y1="700" x2="2576" y2="746"/>
+  <path class="p2" d="M 2346 559 L 2081 592 L 2388 793 L 2576 746 L 2346 559"/>
+  <text x="2346" y="671" style="font-size:63">2,23,0,0,0</text>
+  <line x1="2576" y1="746" x2="2388" y2="793"/>
+  <path class="p2" d="M 1791 403 L 1714 601 L 2000 751 L 2081 592 L 1791 403"/>
+  <text x="1895" y="585" style="font-size:60">2,24,0,0,0</text>
+  <path class="p2" d="M 1714 601 L 1633 812 L 1916 917 L 2000 751 L 1714 601"/>
+  <text x="1815" y="769" style="font-size:64">2,25,0,0,0</text>
+  <path class="p2" d="M 2081 592 L 2000 751 L 2298 907 L 2388 793 L 2081 592"/>
+  <text x="2190" y="759" style="font-size:65">2,26,0,0,0</text>
+  <line x1="2388" y1="793" x2="2298" y2="907"/>
+  <path class="p2" d="M 2000 751 L 1916 917 L 2206 1026 L 2298 907 L 2000 751"/>
+  <text x="2104" y="899" style="font-size:68">2,27,0,0,0</text>
+  <line x1="2298" y1="907" x2="2206" y2="1026"/>
+  <path class="p2" d="M 1633 812 L 1547 1036 L 1827 1091 L 1916 917 L 1633 812"/>
+  <text x="1731" y="963" style="font-size:69">2,28,0,0,0</text>
+  <path class="p2" d="M 1547 1036 L 1456 1274 L 1734 1274 L 1827 1091 L 1547 1036"/>
+  <text x="1641" y="1167" style="font-size:73">2,29,0,0,0</text>
+  <path class="p2" d="M 1916 917 L 1827 1091 L 2111 1148 L 2206 1026 L 1916 917"/>
+  <text x="2014" y="1045" style="font-size:72">2,30,0,0,0</text>
+  <line x1="2206" y1="1026" x2="2111" y2="1148"/>
+  <path class="p2" d="M 1827 1091 L 1734 1274 L 2012 1274 L 2111 1148 L 1827 1091"/>
+  <text x="1921" y="1196" style="font-size:75">2,31,0,0,0</text>
+  <line x1="2111" y1="1148" x2="2012" y2="1274"/>
+  <path class="p2" d="M 1456 1274 L 1442 1528 L 1762 1466 L 1734 1274 L 1456 1274"/>
+  <text x="1599" y="1384" style="font-size:79">2,32,0,0,0</text>
+  <path class="p2" d="M 1442 1528 L 1428 1800 L 1791 1668 L 1762 1466 L 1442 1528"/>
+  <text x="1607" y="1614" style="font-size:84">2,33,0,0,0</text>
+  <path class="p2" d="M 1734 1274 L 1762 1466 L 2076 1405 L 2012 1274 L 1734 1274"/>
+  <text x="1896" y="1354" style="font-size:79">2,34,0,0,0</text>
+  <line x1="2012" y1="1274" x2="2076" y2="1405"/>
+  <path class="p2" d="M 1762 1466 L 1791 1668 L 2142 1540 L 2076 1405 L 1762 1466"/>
+  <text x="1943" y="1519" style="font-size:83">2,35,0,0,0</text>
+  <line x1="2076" y1="1405" x2="2142" y2="1540"/>
+  <path class="p2" d="M 1428 1800 L 1413 2091 L 1822 1881 L 1791 1668 L 1428 1800"/>
+  <text x="1615" y="1857" style="font-size:90">2,36,0,0,0</text>
+  <path class="p2" d="M 1413 2091 L 1396 2404 L 1854 2105 L 1822 1881 L 1413 2091"/>
+  <text x="1624" y="2116" style="font-size:96">2,37,0,0,0</text>
+  <path class="p2" d="M 1791 1668 L 1822 1881 L 2211 1680 L 2142 1540 L 1791 1668"/>
+  <text x="1993" y="1690" style="font-size:87">2,38,0,0,0</text>
+  <line x1="2142" y1="1540" x2="2211" y2="1680"/>
+  <path class="p2" d="M 1822 1881 L 1854 2105 L 2281 1825 L 2211 1680 L 1822 1881"/>
+  <text x="2045" y="1870" style="font-size:92">2,39,0,0,0</text>
+  <line x1="2211" y1="1680" x2="2281" y2="1825"/>
+  <path class="p2" d="M 1396 2404 L 1823 2439 L 2166 2154 L 1854 2105 L 1396 2404"/>
+  <text x="1813" y="2273" style="font-size:100">2,40,0,0,0</text>
+  <path class="p2" d="M 1823 2439 L 2254 2474 L 2482 2204 L 2166 2154 L 1823 2439"/>
+  <text x="2183" y="2315" style="font-size:102">2,41,0,0,0</text>
+  <path class="p2" d="M 1854 2105 L 2166 2154 L 2488 1887 L 2281 1825 L 1854 2105"/>
+  <text x="2200" y="1990" style="font-size:95">2,42,0,0,0</text>
+  <line x1="2281" y1="1825" x2="2488" y2="1887"/>
+  <path class="p2" d="M 2166 2154 L 2482 2204 L 2697 1950 L 2488 1887 L 2166 2154"/>
+  <text x="2460" y="2046" style="font-size:97">2,43,0,0,0</text>
+  <line x1="2488" y1="1887" x2="2697" y2="1950"/>
+  <path class="p2" d="M 2254 2474 L 2688 2510 L 2802 2254 L 2482 2204 L 2254 2474"/>
+  <text x="2557" y="2359" style="font-size:104">2,44,0,0,0</text>
+  <path class="p2" d="M 2688 2510 L 3125 2546 L 3125 2306 L 2802 2254 L 2688 2510"/>
+  <text x="2935" y="2402" style="font-size:106">2,45,0,0,0</text>
+  <path class="p2" d="M 2482 2204 L 2802 2254 L 2909 2013 L 2697 1950 L 2482 2204"/>
+  <text x="2723" y="2103" style="font-size:99">2,46,0,0,0</text>
+  <line x1="2697" y1="1950" x2="2909" y2="2013"/>
+  <path class="p2" d="M 2802 2254 L 3125 2306 L 3125 2078 L 2909 2013 L 2802 2254"/>
+  <text x="2990" y="2161" style="font-size:100">2,47,0,0,0</text>
+  <line x1="2909" y1="2013" x2="3125" y2="2078"/>
+  <path class="p2" d="M 3125 2546 L 3562 2510 L 3448 2254 L 3125 2306 L 3125 2546"/>
+  <text x="3315" y="2402" style="font-size:106">2,48,0,0,0</text>
+  <path class="p2" d="M 3562 2510 L 3996 2474 L 3768 2204 L 3448 2254 L 3562 2510"/>
+  <text x="3693" y="2359" style="font-size:104">2,49,0,0,0</text>
+  <path class="p2" d="M 3125 2306 L 3448 2254 L 3341 2013 L 3125 2078 L 3125 2306"/>
+  <text x="3260" y="2161" style="font-size:100">2,50,0,0,0</text>
+  <line x1="3125" y1="2078" x2="3341" y2="2013"/>
+  <path class="p2" d="M 3448 2254 L 3768 2204 L 3553 1950 L 3341 2013 L 3448 2254"/>
+  <text x="3527" y="2103" style="font-size:99">2,51,0,0,0</text>
+  <line x1="3341" y1="2013" x2="3553" y2="1950"/>
+  <path class="p2" d="M 3996 2474 L 4427 2439 L 4084 2154 L 3768 2204 L 3996 2474"/>
+  <text x="4067" y="2315" style="font-size:102">2,52,0,0,0</text>
+  <path class="p2" d="M 4427 2439 L 4854 2404 L 4396 2105 L 4084 2154 L 4427 2439"/>
+  <text x="4437" y="2273" style="font-size:100">2,53,0,0,0</text>
+  <path class="p2" d="M 3768 2204 L 4084 2154 L 3762 1887 L 3553 1950 L 3768 2204"/>
+  <text x="3790" y="2046" style="font-size:97">2,54,0,0,0</text>
+  <line x1="3553" y1="1950" x2="3762" y2="1887"/>
+  <path class="p2" d="M 4084 2154 L 4396 2105 L 3969 1825 L 3762 1887 L 4084 2154"/>
+  <text x="4050" y="1990" style="font-size:95">2,55,0,0,0</text>
+  <line x1="3762" y1="1887" x2="3969" y2="1825"/>
+  <path class="p2" d="M 4854 2404 L 4837 2091 L 4428 1881 L 4396 2105 L 4854 2404"/>
+  <text x="4626" y="2116" style="font-size:96">2,56,0,0,0</text>
+  <path class="p2" d="M 4837 2091 L 4822 1800 L 4459 1668 L 4428 1881 L 4837 2091"/>
+  <text x="4635" y="1857" style="font-size:90">2,57,0,0,0</text>
+  <path class="p2" d="M 4396 2105 L 4428 1881 L 4039 1680 L 3969 1825 L 4396 2105"/>
+  <text x="4205" y="1870" style="font-size:92">2,58,0,0,0</text>
+  <line x1="3969" y1="1825" x2="4039" y2="1680"/>
+  <path class="p2" d="M 4428 1881 L 4459 1668 L 4108 1540 L 4039 1680 L 4428 1881"/>
+  <text x="4257" y="1690" style="font-size:87">2,59,0,0,0</text>
+  <line x1="4039" y1="1680" x2="4108" y2="1540"/>
+  <path class="p2" d="M 4822 1800 L 4808 1528 L 4488 1466 L 4459 1668 L 4822 1800"/>
+  <text x="4643" y="1614" style="font-size:84">2,60,0,0,0</text>
+  <path class="p2" d="M 4808 1528 L 4794 1274 L 4516 1274 L 4488 1466 L 4808 1528"/>
+  <text x="4651" y="1384" style="font-size:79">2,61,0,0,0</text>
+  <path class="p2" d="M 4459 1668 L 4488 1466 L 4174 1405 L 4108 1540 L 4459 1668"/>
+  <text x="4307" y="1519" style="font-size:83">2,62,0,0,0</text>
+  <line x1="4108" y1="1540" x2="4174" y2="1405"/>
+  <path class="p2" d="M 4488 1466 L 4516 1274 L 4238 1274 L 4174 1405 L 4488 1466"/>
+  <text x="4354" y="1354" style="font-size:79">2,63,0,0,0</text>
+  <line x1="4174" y1="1405" x2="4238" y2="1274"/>
+
+ <!-- legend -->
+ <rect x="6250" y="320" width="1280" height="660"/>
+ <text x="6300" y="425" style="text-anchor:start; font-weight:bold; font-size:70">cell label</text>
+  <text x="6330" y="530" style="text-anchor:start; font-style:oblique; font-size:70">level_number,</text>
+  <text x="6330" y="635" style="text-anchor:start; font-style:oblique; font-size:70">cell_index,</text>
+  <text x="6330" y="740" style="text-anchor:start; font-style:oblique; font-size:70">material_id,</text>
+  <text x= "6330" y="845" style="text-anchor:start; font-style:oblique; font-size:70">subdomain_id,</text>
+  <text x= "6330" y="950" style="text-anchor:start; font-style:oblique; font-size:70">level_subdomain_id</text>
+  <text x="6250" y="1073" style="text-anchor:start; font-size:70">azimuth: 0°, polar: 45°</text>
+
+ <!-- colorbar -->
+ <text x="6250" y="1424" style="text-anchor:start; font-weight:bold; font-size:70">level_number</text>
+  <rect class="r0" x="6250" y="2946" width="100" height="733"/>
+  <text x="6400.00" y="3337.50" style="text-anchor:start; font-size:70; font-weight:bold">0 min</text>
+  <rect class="r1" x="6250" y="2213" width="100" height="733"/>
+  <text x="6400.00" y="2604.50" style="text-anchor:start; font-size:70">1</text>
+  <rect class="r2" x="6250" y="1480" width="100" height="733"/>
+  <text x="6400.00" y="1871.50" style="text-anchor:start; font-size:70; font-weight:bold">2 max</text>
+
+</svg>
