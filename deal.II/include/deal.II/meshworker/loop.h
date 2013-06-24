@@ -28,6 +28,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <typename> class TriaActiveIterator;
+template <typename> class FilteredIterator;
 
 namespace internal
 {
