@@ -634,8 +634,8 @@ namespace MGTools
     SparsityPattern       &sparsity,
     const unsigned int level)
   {
-    Assert ((level>=1) && (level<dof.get_tria().n_levels()),
-            ExcIndexRange(level, 1, dof.get_tria().n_levels()));
+    Assert ((level>=1) && (level<dof.get_tria().n_global_levels()),
+            ExcIndexRange(level, 1, dof.get_tria().n_global_levels()));
 
     const types::global_dof_index fine_dofs = dof.n_dofs(level);
     const types::global_dof_index coarse_dofs = dof.n_dofs(level-1);
@@ -878,8 +878,8 @@ namespace MGTools
     const FiniteElement<dim> &fe = dof.get_fe();
     const unsigned int n_comp = fe.n_components();
 
-    Assert ((level>=1) && (level<dof.get_tria().n_levels()),
-            ExcIndexRange(level, 1, dof.get_tria().n_levels()));
+    Assert ((level>=1) && (level<dof.get_tria().n_global_levels()),
+            ExcIndexRange(level, 1, dof.get_tria().n_global_levels()));
 
     const types::global_dof_index fine_dofs = dof.n_dofs(level);
     const types::global_dof_index coarse_dofs = dof.n_dofs(level-1);
