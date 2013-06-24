@@ -695,51 +695,35 @@ namespace Step50
                                        local_dof_indices,
                                        mg_matrices[cell->level()]);
 
-          // The next step is again slightly more
-          // obscure (but explained in the @ref
-          // mg_paper): We need the remainder of
-          // the operator that we just copied
-          // into the <code>mg_matrices</code>
-          // object, namely the part on the
-          // interface between cells at the
-          // current level and cells one level
-          // coarser. This matrix exists in two
-          // directions: for interior DoFs (index
-          // $i$) of the current level to those
-          // sitting on the interface (index
-          // $j$), and the other way around. Of
-          // course, since we have a symmetric
-          // operator, one of these matrices is
-          // the transpose of the other.
+          // The next step is again slightly more obscure (but
+          // explained in the @ref mg_paper): We need the remainder of
+          // the operator that we just copied into the
+          // <code>mg_matrices</code> object, namely the part on the
+          // interface between cells at the current level and cells
+          // one level coarser. This matrix exists in two directions:
+          // for interior DoFs (index $i$) of the current level to
+          // those sitting on the interface (index $j$), and the other
+          // way around. Of course, since we have a symmetric
+          // operator, one of these matrices is the transpose of the
+          // other.
           //
-          // The way we assemble these matrices
-          // is as follows: since the are formed
-          // from parts of the local
-          // contributions, we first delete all
-          // those parts of the local
-          // contributions that we are not
-          // interested in, namely all those
-          // elements of the local matrix for
-          // which not $i$ is an interface DoF
-          // and $j$ is not. The result is one of
-          // the two matrices that we are
-          // interested in, and we then copy it
-          // into the
-          // <code>mg_interface_matrices</code>
-          // object. The
-          // <code>boundary_interface_constraints</code>
-          // object at the same time makes sure
-          // that we delete contributions from
-          // all degrees of freedom that are not
-          // only on the interface but also on
-          // the external boundary of the domain.
+          // The way we assemble these matrices is as follows: since
+          // the are formed from parts of the local contributions, we
+          // first delete all those parts of the local contributions
+          // that we are not interested in, namely all those elements
+          // of the local matrix for which not $i$ is an interface DoF
+          // and $j$ is not. The result is one of the two matrices
+          // that we are interested in, and we then copy it into the
+          // <code>mg_interface_matrices</code> object. The
+          // <code>boundary_interface_constraints</code> object at the
+          // same time makes sure that we delete contributions from
+          // all degrees of freedom that are not only on the interface
+          // but also on the external boundary of the domain.
           //
-          // The last part to remember is how to
-          // get the other matrix. Since it is
-          // only the transpose, we will later
-          // (in the <code>solve()</code>
-          // function) be able to just pass the
-          // transpose matrix where necessary.
+          // The last part to remember is how to get the other
+          // matrix. Since it is only the transpose, we will later (in
+          // the <code>solve()</code> function) be able to just pass
+          // the transpose matrix where necessary.
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             for (unsigned int j=0; j<dofs_per_cell; ++j)
               if ( !(interface_dofs[cell->level()][local_dof_indices[i]]==true &&
@@ -763,51 +747,40 @@ namespace Step50
 
   // @sect4{LaplaceProblem::solve}
 
-  // This is the other function that is
-  // significantly different in support of the
-  // multigrid solver (or, in fact, the
-  // preconditioner for which we use the
-  // multigrid method).
+  // This is the other function that is significantly different in
+  // support of the multigrid solver (or, in fact, the preconditioner
+  // for which we use the multigrid method).
   //
-  // Let us start out by setting up two of the
-  // components of multilevel methods: transfer
-  // operators between levels, and a solver on
-  // the coarsest level. In finite element
-  // methods, the transfer operators are
-  // derived from the finite element function
-  // spaces involved and can often be computed
-  // in a generic way independent of the
-  // problem under consideration. In that case,
-  // we can use the MGTransferPrebuilt class
-  // that, given the constraints on the global
-  // level and an MGDoFHandler object computes
-  // the matrices corresponding to these
-  // transfer operators.
+  // Let us start out by setting up two of the components of
+  // multilevel methods: transfer operators between levels, and a
+  // solver on the coarsest level. In finite element methods, the
+  // transfer operators are derived from the finite element function
+  // spaces involved and can often be computed in a generic way
+  // independent of the problem under consideration. In that case, we
+  // can use the MGTransferPrebuilt class that, given the constraints
+  // on the global level and an MGDoFHandler object computes the
+  // matrices corresponding to these transfer operators.
   //
-  // The second part of the following lines
-  // deals with the coarse grid solver. Since
-  // our coarse grid is very coarse indeed, we
-  // decide for a direct solver (a Householder
-  // decomposition of the coarsest level
-  // matrix), even if its implementation is not
-  // particularly sophisticated. If our coarse
-  // mesh had many more cells than the five we
-  // have here, something better suited would
-  // obviously be necessary here.
+  // The second part of the following lines deals with the coarse grid
+  // solver. Since our coarse grid is very coarse indeed, we decide
+  // for a direct solver (a Householder decomposition of the coarsest
+  // level matrix), even if its implementation is not particularly
+  // sophisticated. If our coarse mesh had many more cells than the
+  // five we have here, something better suited would obviously be
+  // necessary here.
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
 
-    // Create the object that deals with the transfer
-    // between different refinement levels. We need to
-    // pass it the hanging node constraints.
+    // Create the object that deals with the transfer between
+    // different refinement levels. We need to pass it the hanging
+    // node constraints.
     MGTransferPrebuilt<vector_t> mg_transfer(hanging_node_constraints, mg_constrained_dofs);
-    // Now the prolongation matrix has to be built.
-    // This matrix needs to take the boundary values on
-    // each level into account and needs to know about
-    // the indices at the refinement egdes. The
-    // <code>MGConstraints</code> knows about that so
-    // pass it as an argument.
+    // Now the prolongation matrix has to be built.  This matrix needs
+    // to take the boundary values on each level into account and
+    // needs to know about the indices at the refinement egdes. The
+    // <code>MGConstraints</code> knows about that so pass it as an
+    // argument.
     mg_transfer.build_matrices(mg_dof_handler);
 
     matrix_t & coarse_matrix = mg_matrices[0];
@@ -822,38 +795,27 @@ namespace Step50
         coarse_matrix,
         id);
 
-    // The next component of a multilevel
-    // solver or preconditioner is that we need
-    // a smoother on each level. A common
-    // choice for this is to use the
-    // application of a relaxation method (such
-    // as the SOR, Jacobi or Richardson method). The
-    // MGSmootherPrecondition class provides
-    // support for this kind of
-    // smoother. Here, we opt for the
-    // application of a single SOR
-    // iteration. To this end, we define an
-    // appropriate <code>typedef</code> and
-    // then setup a smoother object.
+    // The next component of a multilevel solver or preconditioner is
+    // that we need a smoother on each level. A common choice for this
+    // is to use the application of a relaxation method (such as the
+    // SOR, Jacobi or Richardson method). The MGSmootherPrecondition
+    // class provides support for this kind of smoother. Here, we opt
+    // for the application of a single SOR iteration. To this end, we
+    // define an appropriate <code>typedef</code> and then setup a
+    // smoother object.
     //
-    // The last step is to initialize the
-    // smoother object with our level matrices
-    // and to set some smoothing parameters.
-    // The <code>initialize()</code> function
-    // can optionally take additional arguments
-    // that will be passed to the smoother
-    // object on each level. In the current
-    // case for the SOR smoother, this could,
-    // for example, include a relaxation
-    // parameter. However, we here leave these
-    // at their default values. The call to
-    // <code>set_steps()</code> indicates that
-    // we will use two pre- and two
-    // post-smoothing steps on each level; to
-    // use a variable number of smoother steps
-    // on different levels, more options can be
-    // set in the constructor call to the
-    // <code>mg_smoother</code> object.
+    // The last step is to initialize the smoother object with our
+    // level matrices and to set some smoothing parameters.  The
+    // <code>initialize()</code> function can optionally take
+    // additional arguments that will be passed to the smoother object
+    // on each level. In the current case for the SOR smoother, this
+    // could, for example, include a relaxation parameter. However, we
+    // here leave these at their default values. The call to
+    // <code>set_steps()</code> indicates that we will use two pre-
+    // and two post-smoothing steps on each level; to use a variable
+    // number of smoother steps on different levels, more options can
+    // be set in the constructor call to the <code>mg_smoother</code>
+    // object.
     //
     // The last step results from the fact that
     // we use the SOR method as a smoother -

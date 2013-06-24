@@ -2928,6 +2928,25 @@ CellAccessor<dim,spacedim>::is_locally_owned () const
 template <int dim, int spacedim>
 inline
 bool
+CellAccessor<dim,spacedim>::is_locally_owned_on_level () const
+{
+#ifndef DEAL_II_WITH_P4EST
+  return true;
+#else
+  const parallel::distributed::Triangulation<dim,spacedim> *pdt
+    = dynamic_cast<const parallel::distributed::Triangulation<dim,spacedim> *>(this->tria);
+
+  if (pdt == 0)
+    return true;
+  else
+    return (this->level_subdomain_id() == pdt->locally_owned_subdomain());
+#endif
+}
+
+
+template <int dim, int spacedim>
+inline
+bool
 CellAccessor<dim,spacedim>::is_ghost () const
 {
   Assert (this->active(), ExcMessage("is_ghost() only works on active cells!"));

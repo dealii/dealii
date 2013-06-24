@@ -2891,6 +2891,12 @@ public:
   bool is_locally_owned () const;
 
   /**
+   * Return true if either the Triangulation is not distributed or if
+   * level_subdomain_id() is equal to the id of the current processor.
+   */
+  bool is_locally_owned_on_level () const;
+
+  /**
    * Return whether this cell
    * exists in the global mesh but
    * (i) is owned by another
