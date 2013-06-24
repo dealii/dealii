@@ -2478,29 +2478,39 @@ void SparseMatrix<number>::print (STREAM &out, bool across, bool diagonal_first)
   number diagonal;
   
   for (size_type i=0; i<cols->rows; ++i)
-    for (size_type j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
-      {
-	if (!diagonal_first && i == cols->colnums[j])
-	  {
-	    diagonal = val[j];
-	    hanging_diagonal = true;
-	  }
-	else
-	  {
-	    if (hanging_diagonal && cols->colnums[j]>i)
-	      {
-		if (across)
-		  out << ' ' << i << ',' << i << ':' << diagonal;
-		else
-		  out << '(' << i << ',' << i << ") " << diagonal << std::endl;
-		hanging_diagonal = false;
-	      }
-	    if (across)
-	      out << ' ' << i << ',' << cols->colnums[j] << ':' << val[j];
-	    else
-	      out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << std::endl;
-	  }
-      }
+    {
+      for (size_type j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
+	{
+	  if (!diagonal_first && i == cols->colnums[j])
+	    {
+	      diagonal = val[j];
+	      hanging_diagonal = true;
+	    }
+	  else
+	    {
+	      if (hanging_diagonal && cols->colnums[j]>i)
+		{
+		  if (across)
+		    out << ' ' << i << ',' << i << ':' << diagonal;
+		  else
+		    out << '(' << i << ',' << i << ") " << diagonal << std::endl;
+		  hanging_diagonal = false;
+		}
+	      if (across)
+		out << ' ' << i << ',' << cols->colnums[j] << ':' << val[j];
+	      else
+		out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << std::endl;
+	    }
+	}
+      if (hanging_diagonal)
+	{
+	  if (across)
+	    out << ' ' << i << ',' << i << ':' << diagonal;
+	  else
+	    out << '(' << i << ',' << i << ") " << diagonal << std::endl;
+	  hanging_diagonal = false;
+	}
+    }
   if (across)
     out << std::endl;
 }
