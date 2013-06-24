@@ -1,6 +1,6 @@
 
-DEAL::Triangulation levels 0:1 1:4 2:16
-DEAL::DoFHandler 16 levels 0:1 1:4 2:16
+DEAL:0::Triangulation levels 0:1 1:4 2:16
+DEAL:0::DoFHandler 16
 (0,0) 10.0000
 (0,1) 0.00000
 (0,2) 0.00000
@@ -65,7 +65,7 @@ DEAL::DoFHandler 16 levels 0:1 1:4 2:16
 (15,13) 0.00000
 (15,14) 0.00000
 (15,15) 10.0000
-DEAL::now with jump terms
+DEAL:0::now with jump terms
 (0,0) 14.0000
 (0,1) -1.00000
 (0,2) -1.00000
@@ -130,8 +130,8 @@ DEAL::now with jump terms
 (15,13) -1.00000
 (15,14) -1.00000
 (15,15) 14.0000
-DEAL::Triangulation levels 0:1 1:4 2:16
-DEAL::DoFHandler 25 levels 0:4 1:9 2:25
+DEAL:0::Triangulation levels 0:1 1:4 2:16
+DEAL:0::DoFHandler 25
 (0,0) 10.0000
 (0,1) 10.0000
 (0,2) 10.0000
@@ -457,7 +457,7 @@ DEAL::DoFHandler 25 levels 0:4 1:9 2:25
 (24,22) 10.0000
 (24,23) 10.0000
 (24,24) 10.0000
-DEAL::now with jump terms
+DEAL:0::now with jump terms
 (0,0) 14.0000
 (0,1) 13.0000
 (0,2) 13.0000
@@ -783,8 +783,8 @@ DEAL::now with jump terms
 (24,22) 13.0000
 (24,23) 13.0000
 (24,24) 14.0000
-DEAL::Triangulation levels 0:1 1:4 2:16
-DEAL::DoFHandler 41 levels 0:5 1:13 2:41
+DEAL:0::Triangulation levels 0:1 1:4 2:16
+DEAL:0::DoFHandler 41
 (0,0) 10.0000
 (0,1) 10.0000
 (0,2) 10.0000
@@ -1494,7 +1494,7 @@ DEAL::DoFHandler 41 levels 0:5 1:13 2:41
 (40,38) 0.00000
 (40,39) 0.00000
 (40,40) 10.0000
-DEAL::now with jump terms
+DEAL:0::now with jump terms
 (0,0) 14.0000
 (0,1) 13.0000
 (0,2) 13.0000

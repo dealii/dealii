@@ -120,12 +120,11 @@ Local<dim>::face(MeshWorker::DoFInfo<dim>& info1, MeshWorker::DoFInfo<dim>& info
 
 template <int dim>
 void
-test_simple(MGDoFHandler<dim>& mgdofs, bool faces)
+test_simple(DoFHandler<dim>& dofs, bool faces)
 {
   TrilinosWrappers::SparsityPattern pattern;
   TrilinosWrappers::SparseMatrix matrix;
 
-  const DoFHandler<dim>& dofs = mgdofs;
   const FiniteElement<dim>& fe = dofs.get_fe();
   pattern.reinit (dofs.n_dofs(), dofs.n_dofs(),
 		  (GeometryInfo<dim>::faces_per_cell
@@ -157,7 +156,8 @@ test_simple(MGDoFHandler<dim>& mgdofs, bool faces)
      std_cxx1x::bind (&Local<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
      std_cxx1x::bind (&Local<dim>::face, local, std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::_3, std_cxx1x::_4),
      assembler, true);
-  
+
+  matrix.compress();
   matrix.print(deallog.get_file_stream());
 }
 
@@ -166,14 +166,14 @@ template<int dim>
 void
 test(const FiniteElement<dim>& fe)
 {
-  Triangulation<dim> tr;
+  parallel::distributed::Triangulation<dim> tr(MPI_COMM_WORLD,
+					       Triangulation<dim>::none/*,
+									 parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy*/);
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
-  // tr.begin(1)->set_refine_flag();
-  // tr.execute_coarsening_and_refinement();
-  // tr.begin(2)->set_refine_flag();
-  // tr.execute_coarsening_and_refinement();
-//  tr.refine_global(1);
+  //tr.begin_active()->set_refine_flag();
+  //tr.execute_coarsening_and_refinement();
+
   deallog << "Triangulation levels";
   for (unsigned int l=0;l<tr.n_levels();++l)
     deallog << ' ' << l << ':' << tr.n_cells(l);
@@ -184,13 +184,10 @@ test(const FiniteElement<dim>& fe)
        cell != tr.end(); ++cell, ++cn)
     cell->set_user_index(cn);
 
-  MGDoFHandler<dim> dofs(tr);
+  DoFHandler<dim> dofs(tr);
   dofs.distribute_dofs(fe);
   dofs.initialize_local_block_info();
-  deallog << "DoFHandler " << dofs.n_dofs() << " levels";
-  for (unsigned int l=0;l<tr.n_levels();++l)
-    deallog << ' ' << l << ':' << dofs.n_dofs(l);
-  deallog << std::endl;
+  deallog << "DoFHandler " << dofs.n_dofs() << std::endl;
 
   test_simple(dofs, false);
   deallog << "now with jump terms" << std::endl;
@@ -201,7 +198,7 @@ test(const FiniteElement<dim>& fe)
 int main (int argc, char** argv)
 {
   Utilities::MPI::MPI_InitFinalize mpi_initialization (argc, argv);
-  mpi_initlog(__FILE__);
+  MPILogInitAll i(__FILE__);
   
   FE_DGP<2> p0(0);
   FE_Q<2>   q1(1);
