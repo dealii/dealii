@@ -163,6 +163,13 @@ test_simple(DoFHandler<dim>& dofs, bool faces)
   matrix.print(deallog.get_file_stream());
 }
 
+std::string id_to_string(const CellId & id)
+{
+  std::ostringstream ss;
+  ss << id;
+  return ss.str();
+}
+
 
 template<int dim>
 void
@@ -173,8 +180,10 @@ test(const FiniteElement<dim>& fe)
 									 parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy*/);
   GridGenerator::hyper_cube(tr);
   tr.refine_global(2);
-  //tr.begin_active()->set_refine_flag();
-  //tr.execute_coarsening_and_refinement();
+  unsigned int myid=Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+  if (myid==0)
+    tr.begin_active()->set_refine_flag();
+  tr.execute_coarsening_and_refinement();
 
   deallog << "Triangulation levels";
   for (unsigned int l=0;l<tr.n_levels();++l)
@@ -188,6 +197,73 @@ test(const FiniteElement<dim>& fe)
 
   DoFHandler<dim> dofs(tr);
   dofs.distribute_dofs(fe);
+
+
+  
+  unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+  if (numprocs==1) // renumber DoFs
+    {
+      std::map<std::string,std::vector<types::global_dof_index> > dofmap;
+      std::ifstream f("mesh_worker_matrix_01/ordering.2");
+      while (!f.eof())
+	{
+	  CellId id;
+	  f >> id;
+	  if (f.eof())
+	    break;
+	  std::vector<types::global_dof_index> & d = dofmap[id_to_string(id)];
+	  d.reserve(fe.dofs_per_cell);
+	  for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+	    {
+	      unsigned int temp;
+	      f >> temp;
+	      d.push_back(temp);
+	    }
+	}
+
+      for (typename DoFHandler<dim>::active_cell_iterator cell = dofs.begin_active();
+	   cell != dofs.end(); ++cell)
+	{
+	  if (!cell->is_locally_owned())
+	    continue;
+	  
+	  std::vector<types::global_dof_index>  & renumbered = dofmap[id_to_string(cell->id())];
+	  cell->set_dof_indices(renumbered);
+	  cell->update_cell_dof_indices_cache();
+	  
+	}      
+    }
+  
+  if (0)
+    {
+      unsigned int myid=Utilities::MPI::this_mpi_process(MPI_COMM_WORLD);
+      unsigned int numprocs = Utilities::MPI::n_mpi_processes (MPI_COMM_WORLD);
+     
+      for (unsigned int i=0;i<numprocs;++i)
+	{
+	  MPI_Barrier(MPI_COMM_WORLD);
+	  if (myid==i)
+	    {    
+	      std::ofstream f("ordering", (myid>0)?std::ofstream::app:std::ofstream::out);
+	      std::vector<types::global_dof_index> local_dof_indices (fe.dofs_per_cell);
+	      for (typename DoFHandler<dim>::active_cell_iterator cell = dofs.begin_active();
+		   cell != dofs.end(); ++cell)
+		{
+		  if (!cell->is_locally_owned())
+		    continue;
+		  
+		  f << cell->id() << ' ';
+		  cell->get_dof_indices(local_dof_indices);
+		  for (unsigned int i=0;i<fe.dofs_per_cell;++i)
+		    f << local_dof_indices[i] << ' ';
+		  f << std::endl;
+		}
+	      f.close();
+	    }
+	}
+    }    
+  
+  
   dofs.initialize_local_block_info();
   deallog << "DoFHandler " << dofs.n_dofs() << std::endl;
 
@@ -207,8 +283,8 @@ int main (int argc, char** argv)
   FESystem<2,2> sys1(p0,1,q1,1);
   std::vector<FiniteElement<2>*> fe2;
   fe2.push_back(&p0);
-  fe2.push_back(&q1);
-  fe2.push_back(&sys1);
+  //  fe2.push_back(&q1);
+  //fe2.push_back(&sys1);
   
   for (unsigned int i=0;i<fe2.size();++i)
     test(*fe2[i]);
