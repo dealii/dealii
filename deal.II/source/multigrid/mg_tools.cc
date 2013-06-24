@@ -654,6 +654,8 @@ namespace MGTools
                                                      endc = dof.end(level);
     for (; cell!=endc; ++cell)
       {
+	if (!cell->is_locally_owned_on_level()) continue;
+	
         cell->get_mg_dof_indices (dofs_on_this_cell);
         // Loop over all interior neighbors
         for (unsigned int face = 0;
@@ -742,7 +744,9 @@ namespace MGTools
 
     for (; cell!=endc; ++cell)
       {
-        cell->get_mg_dof_indices (dofs_on_this_cell);
+	if (!cell->is_locally_owned_on_level()) continue;
+	
+	cell->get_mg_dof_indices (dofs_on_this_cell);
         // make sparsity pattern for this cell
         for (unsigned int i=0; i<total_dofs; ++i)
           for (unsigned int j=0; j<total_dofs; ++j)
@@ -908,6 +912,8 @@ namespace MGTools
 
     for (; cell!=endc; ++cell)
       {
+	if (!cell->is_locally_owned_on_level()) continue;
+	
         cell->get_mg_dof_indices (dofs_on_this_cell);
         // Loop over all interior neighbors
         for (unsigned int face = 0;
