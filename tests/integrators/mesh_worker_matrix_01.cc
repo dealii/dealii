@@ -156,7 +156,7 @@ test_simple(MGDoFHandler<dim>& mgdofs, bool faces)
      assembler, true);
   
   //matrix.print_formatted(deallog.get_file_stream(), 0, false, 4);
-  matrix.print(deallog.get_file_stream());
+  matrix.print(deallog.get_file_stream(), false, false);
 }
 
 
