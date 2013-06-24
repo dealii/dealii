@@ -2490,9 +2490,9 @@ void SparseMatrix<number>::print (STREAM &out, bool across, bool diagonal_first)
 	    if (hanging_diagonal && cols->colnums[j]>i)
 	      {
 		if (across)
-		  out << '(' << i << ',' << i << ") " << diagonal << std::endl;
-		else
 		  out << ' ' << i << ',' << i << ':' << diagonal;
+		else
+		  out << '(' << i << ',' << i << ") " << diagonal << std::endl;
 		hanging_diagonal = false;
 	      }
 	    if (across)
