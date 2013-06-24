@@ -933,9 +933,10 @@ namespace Step50
                                         typename FunctionMap<dim>::type(),
                                         temp_solution,
                                         estimated_error_per_cell);
-    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                     estimated_error_per_cell,
-                                                     0.3, 0.03);
+    parallel::distributed::GridRefinement::
+      refine_and_coarsen_fixed_fraction (triangulation,
+					 estimated_error_per_cell,
+					 0.3, 0.03);
     triangulation.execute_coarsening_and_refinement ();
   }
 
