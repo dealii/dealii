@@ -123,16 +123,12 @@ template <int dim>
 void
 test_simple(DoFHandler<dim>& dofs, bool faces)
 {
-  TrilinosWrappers::SparsityPattern pattern;
   TrilinosWrappers::SparseMatrix matrix;
 
   const FiniteElement<dim>& fe = dofs.get_fe();
-  pattern.reinit (dofs.n_dofs(), dofs.n_dofs(),
-		  (GeometryInfo<dim>::faces_per_cell
-		   *GeometryInfo<dim>::max_children_per_face+1)*fe.dofs_per_cell);
-  DoFTools::make_flux_sparsity_pattern (dofs, pattern);
-  pattern.compress();
-  matrix.reinit (pattern);
+  CompressedSimpleSparsityPattern csp(dofs.n_dofs(), dofs.n_dofs());
+  DoFTools::make_flux_sparsity_pattern (dofs, csp);
+  matrix.reinit (dofs.locally_owned_dofs(), csp, MPI_COMM_WORLD, true);
   
   Local<dim> local;
   local.cells = true;
