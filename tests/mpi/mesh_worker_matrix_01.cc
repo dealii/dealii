@@ -25,6 +25,7 @@
 #include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/trilinos_sparse_matrix.h>
 #include <deal.II/grid/grid_generator.h>
+#include <deal.II/grid/filtered_iterator.h>
 #include <deal.II/dofs/dof_tools.h>
 #include <deal.II/fe/mapping_q1.h>
 #include <deal.II/fe/fe_q.h>
@@ -149,8 +150,13 @@ test_simple(DoFHandler<dim>& dofs, bool faces)
   MeshWorker::Assembler::MatrixSimple<TrilinosWrappers::SparseMatrix> assembler;
   assembler.initialize(matrix);
   
+  FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
+    cell(IteratorFilters::LocallyOwnedCell(), dofs.begin_active());
+  FilteredIterator<typename DoFHandler<dim>::active_cell_iterator>
+    end(IteratorFilters::LocallyOwnedCell(), dofs.end());
+
   MeshWorker::loop<dim, dim, MeshWorker::DoFInfo<dim>, MeshWorker::IntegrationInfoBox<dim> >
-    (dofs.begin_active(), dofs.end(),
+    (cell, end,
      dof_info, info_box,
      std_cxx1x::bind (&Local<dim>::cell, local, std_cxx1x::_1, std_cxx1x::_2),
      std_cxx1x::bind (&Local<dim>::bdry, local, std_cxx1x::_1, std_cxx1x::_2),
