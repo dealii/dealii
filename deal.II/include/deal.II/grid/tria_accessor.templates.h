@@ -138,6 +138,22 @@ TriaAccessorBase<structdim,dim,spacedim>::operator != (const TriaAccessorBase<st
 
 template <int structdim, int dim, int spacedim>
 inline
+bool
+TriaAccessorBase<structdim,dim,spacedim>::operator < (const TriaAccessorBase<structdim,dim,spacedim> &other) const
+{
+  Assert (tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
+  
+  if (present_level != other.present_level)
+    return (present_level < other.present_level);
+  
+  return (present_index < other.present_index);
+
+}
+
+
+
+template <int structdim, int dim, int spacedim>
+inline
 int
 TriaAccessorBase<structdim,dim,spacedim>::level () const
 {
@@ -2962,6 +2978,26 @@ CellAccessor<dim,spacedim>::neighbor_face_no (const unsigned int neighbor) const
     // the neighbor is coarser
     return neighbor_of_coarser_neighbor(neighbor).first;
 }
+
+
+template <int dim, int spacedim>
+inline
+bool
+CellAccessor<dim,spacedim>::operator < (const CellAccessor<dim,spacedim> &other) const
+{
+  Assert (this->tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
+  
+  if (level_subdomain_id() != other.level_subdomain_id())
+    return (level_subdomain_id() < other.level_subdomain_id());
+  
+  if (active() && other.active() &&
+      (subdomain_id() != other.subdomain_id()))
+    return (subdomain_id() < other.subdomain_id());
+  
+  return TriaAccessorBase<dim,dim,spacedim>::operator < (other);
+}
+
+
 
 DEAL_II_NAMESPACE_CLOSE
 

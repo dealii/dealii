@@ -345,6 +345,14 @@ protected:
    *  object with exactly the same data.
    */
   TriaAccessorBase &operator = (const TriaAccessorBase &);
+  
+  /**
+   * Ordering of accessors. If #structure_dimension is less than
+   * #dimension, we simply compare the index of such an object. If
+   * #structure_dimension equals #dimension, we compare the level()
+   * first, and the index() only if levels are equal.
+   */
+  bool operator < (const TriaAccessorBase& other) const;
 
 protected:
   /**
@@ -2848,6 +2856,16 @@ public:
    * for more information.
    */
   bool active () const;
+  
+  /**
+   * Ordering of accessors. This function implements a total ordering
+   * of cells even on a parallel::distributed::Triangulation. This
+   * function first compares level_subdomain_id(). If these are equal,
+   * and both cells are active, it compares subdomain_id(). If this is
+   * inconclusive, TriaAccessorBase::operator < () is called.
+   */
+  bool operator < (const CellAccessor<dim, spacedim>& other) const;
+
 
   /**
    * Return whether this cell is owned by the current processor

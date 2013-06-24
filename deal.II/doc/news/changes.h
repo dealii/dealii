@@ -147,6 +147,13 @@ this function.
 
 <ol>
 
+<li> New: TriaRawIterator::operator < (TriaRawIterator&) now implements a total ordering
+relation for cells even on distributed::parallel::Triangulation across processors.
+Additionally, TriaRawAccessor and CellAccessor now have an ordering relation.
+<br>
+(Guido Kanschat, 2013/06/24)
+</li>
+
 <li> New: CellAccessor::id() that returns a unique CellId that
 also works in parallel computations (where level and index is not
 useful).
