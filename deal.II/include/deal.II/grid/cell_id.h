@@ -77,7 +77,12 @@ inline std::ostream& operator<< (std::ostream& os, const CellId& cid)
  */
 inline std::istream& operator>> (std::istream& is, CellId& cid)
 {
-  is >> cid.coarse_cell_id;
+  unsigned int cellid;
+  is >> cellid;
+  if (is.eof())
+    return is;
+
+  cid.coarse_cell_id = cellid;
   char dummy;
   is >> dummy;
   Assert(dummy=='_', ExcMessage("invalid CellId"));
