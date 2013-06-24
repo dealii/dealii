@@ -193,6 +193,7 @@ test(const FiniteElement<dim>& fe)
   deallog << std::endl;
 
   test_simple(dofs, false);
+  deallog << "now with jump terms" << std::endl;
   test_simple(dofs, true);
 }
 
