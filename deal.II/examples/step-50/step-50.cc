@@ -834,7 +834,7 @@ namespace Step50
     // With all this together, we can finally
     // get about solving the linear system in
     // the usual way:
-    SolverControl solver_control (500, 1e-12, false);
+    SolverControl solver_control (500, 1e-8*system_rhs.l2_norm(), false);
     SolverCG<vector_t>    cg (solver_control);
 
     solution = 0;
