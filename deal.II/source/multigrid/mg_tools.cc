@@ -958,7 +958,7 @@ namespace MGTools
   {
     const FiniteElement<dim> &fe = dof_handler.get_fe();
     const unsigned int n_components = fe.n_components();
-    const unsigned int nlevels = dof_handler.get_tria().n_levels();
+    const unsigned int nlevels = dof_handler.get_tria().n_global_levels();
 
     Assert (result.size() == nlevels,
             ExcDimensionMismatch(result.size(), nlevels));
@@ -1072,7 +1072,7 @@ namespace MGTools
   {
     const FiniteElement<DH::dimension,DH::space_dimension> &fe = dof_handler.get_fe();
     const unsigned int n_blocks = fe.n_blocks();
-    const unsigned int n_levels = dof_handler.get_tria().n_levels();
+    const unsigned int n_levels = dof_handler.get_tria().n_global_levels();
 
     AssertDimension (dofs_per_block.size(), n_levels);
 
@@ -1185,7 +1185,7 @@ namespace MGTools
     if (function_map.size() == 0)
       return;
 
-    const unsigned int n_levels = dof.get_tria().n_levels();
+    const unsigned int n_levels = dof.get_tria().n_global_levels();
 
 
 
@@ -1393,14 +1393,14 @@ namespace MGTools
                      std::vector<IndexSet> &boundary_indices,
                      const ComponentMask &component_mask)
 {
-    Assert (boundary_indices.size() == dof.get_tria().n_levels(),
+    Assert (boundary_indices.size() == dof.get_tria().n_global_levels(),
             ExcDimensionMismatch (boundary_indices.size(),
-                                  dof.get_tria().n_levels()));
+                                  dof.get_tria().n_global_levels()));
 
     std::vector<std::set<types::global_dof_index> >
-    my_boundary_indices (dof.get_tria().n_levels());
+    my_boundary_indices (dof.get_tria().n_global_levels());
     make_boundary_list (dof, function_map, my_boundary_indices, component_mask);
-    for (unsigned int i=0; i<dof.get_tria().n_levels(); ++i)
+    for (unsigned int i=0; i<dof.get_tria().n_global_levels(); ++i)
       {
         boundary_indices[i] = IndexSet (dof.n_dofs(i));
         boundary_indices[i].add_indices (my_boundary_indices[i].begin(),
@@ -1416,11 +1416,11 @@ namespace MGTools
   extract_inner_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
                                 std::vector<std::vector<bool> >  &interface_dofs)
   {
-    Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_levels(),
+    Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
             ExcDimensionMismatch (interface_dofs.size(),
-                                  mg_dof_handler.get_tria().n_levels()));
+                                  mg_dof_handler.get_tria().n_global_levels()));
 
-    for (unsigned int l=0; l<mg_dof_handler.get_tria().n_levels(); ++l)
+    for (unsigned int l=0; l<mg_dof_handler.get_tria().n_global_levels(); ++l)
       {
         Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
                 ExcDimensionMismatch (interface_dofs[l].size(),
@@ -1483,9 +1483,9 @@ namespace MGTools
   extract_non_interface_dofs (const DoFHandler<dim,spacedim> &mg_dof_handler,
                               std::vector<std::set<types::global_dof_index> >  &non_interface_dofs)
   {
-    Assert (non_interface_dofs.size() == mg_dof_handler.get_tria().n_levels(),
+    Assert (non_interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
             ExcDimensionMismatch (non_interface_dofs.size(),
-                                  mg_dof_handler.get_tria().n_levels()));
+                                  mg_dof_handler.get_tria().n_global_levels()));
 
     const FiniteElement<dim,spacedim> &fe = mg_dof_handler.get_fe();
 
@@ -1553,14 +1553,14 @@ namespace MGTools
                                 std::vector<std::vector<bool> >  &interface_dofs,
                                 std::vector<std::vector<bool> >  &boundary_interface_dofs)
   {
-    Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_levels(),
+    Assert (interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
             ExcDimensionMismatch (interface_dofs.size(),
-                                  mg_dof_handler.get_tria().n_levels()));
-    Assert (boundary_interface_dofs.size() == mg_dof_handler.get_tria().n_levels(),
+                                  mg_dof_handler.get_tria().n_global_levels()));
+    Assert (boundary_interface_dofs.size() == mg_dof_handler.get_tria().n_global_levels(),
             ExcDimensionMismatch (boundary_interface_dofs.size(),
-                                  mg_dof_handler.get_tria().n_levels()));
+                                  mg_dof_handler.get_tria().n_global_levels()));
 
-    for (unsigned int l=0; l<mg_dof_handler.get_tria().n_levels(); ++l)
+    for (unsigned int l=0; l<mg_dof_handler.get_tria().n_global_levels(); ++l)
       {
         Assert (interface_dofs[l].size() == mg_dof_handler.n_dofs(l),
                 ExcDimensionMismatch (interface_dofs[l].size(),
