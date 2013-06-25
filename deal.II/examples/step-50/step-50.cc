@@ -556,63 +556,45 @@ namespace Step50
     const Coefficient<dim> coefficient;
     std::vector<double>    coefficient_values (n_q_points);
 
-    // Next a few things that are specific to
-    // building the multigrid data structures
-    // (since we only need them in the current
-    // function, rather than also elsewhere, we
-    // build them here instead of the
-    // <code>setup_system</code>
-    // function). Some of the following may be
-    // a bit obscure if you're not familiar
-    // with the algorithm actually implemented
-    // in deal.II to support multilevel
-    // algorithms on adaptive meshes; if some
-    // of the things below seem strange, take a
-    // look at the @ref mg_paper.
+    // Next a few things that are specific to building the multigrid
+    // data structures (since we only need them in the current
+    // function, rather than also elsewhere, we build them here
+    // instead of the <code>setup_system</code> function). Some of the
+    // following may be a bit obscure if you're not familiar with the
+    // algorithm actually implemented in deal.II to support multilevel
+    // algorithms on adaptive meshes; if some of the things below seem
+    // strange, take a look at the @ref mg_paper.
     //
-    // Our first job is to identify those
-    // degrees of freedom on each level that
-    // are located on interfaces between
-    // adaptively refined levels, and those
-    // that lie on the interface but also on
-    // the exterior boundary of the domain. As
-    // in many other parts of the library, we
-    // do this by using boolean masks,
-    // i.e. vectors of booleans each element of
-    // which indicates whether the
-    // corresponding degree of freedom index is
-    // an interface DoF or not. The <code>MGConstraints</code>
-    // already computed the information for us
-    // when we called initialize in <code>setup_system()</code>.
+    // Our first job is to identify those degrees of freedom on each
+    // level that are located on interfaces between adaptively refined
+    // levels, and those that lie on the interface but also on the
+    // exterior boundary of the domain. As in many other parts of the
+    // library, we do this by using boolean masks, i.e. vectors of
+    // booleans each element of which indicates whether the
+    // corresponding degree of freedom index is an interface DoF or
+    // not. The <code>MGConstraints</code> already computed the
+    // information for us when we called initialize in
+    // <code>setup_system()</code>.
     std::vector<std::vector<bool> > interface_dofs
       = mg_constrained_dofs.get_refinement_edge_indices ();
     std::vector<std::vector<bool> > boundary_interface_dofs
       = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
 
-    // The indices just identified will later
-    // be used to decide where the assembled value
-    // has to be added into on each level.
-    // On the other hand,
-    // we also have to impose zero boundary
-    // conditions on the external boundary of
-    // each level. But this the <code>MGConstraints</code>
-    // knows it. So we simply ask for them by calling
-    // <code>get_boundary_indices ()</code>.
-    // The third step is to construct
-    // constraints on all those degrees of
-    // freedom: their value should be zero
-    // after each application of the level
-    // operators. To this end, we construct
-    // ConstraintMatrix objects for each level,
-    // and add to each of these constraints for
-    // each degree of freedom. Due to the way
-    // the ConstraintMatrix stores its data,
-    // the function to add a constraint on a
-    // single degree of freedom and force it to
-    // be zero is called
-    // Constraintmatrix::add_line(); doing so
-    // for several degrees of freedom at once
-    // can be done using
+    // The indices just identified will later be used to decide where
+    // the assembled value has to be added into on each level.  On the
+    // other hand, we also have to impose zero boundary conditions on
+    // the external boundary of each level. But this the
+    // <code>MGConstraints</code> knows it. So we simply ask for them
+    // by calling <code>get_boundary_indices ()</code>.  The third
+    // step is to construct constraints on all those degrees of
+    // freedom: their value should be zero after each application of
+    // the level operators. To this end, we construct ConstraintMatrix
+    // objects for each level, and add to each of these constraints
+    // for each degree of freedom. Due to the way the ConstraintMatrix
+    // stores its data, the function to add a constraint on a single
+    // degree of freedom and force it to be zero is called
+    // Constraintmatrix::add_line(); doing so for several degrees of
+    // freedom at once can be done using
     // Constraintmatrix::add_lines():
     std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_global_levels());
     std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_global_levels());
@@ -627,20 +609,14 @@ namespace Step50
         boundary_interface_constraints[level].close ();
       }
 
-    // Now that we're done with most of our
-    // preliminaries, let's start the
-    // integration loop. It looks mostly like
-    // the loop in
-    // <code>assemble_system</code>, with two
-    // exceptions: (i) we don't need a right
-    // hand side, and more significantly (ii) we
-    // don't just loop over all active cells,
-    // but in fact all cells, active or
-    // not. Consequently, the correct iterator
-    // to use is MGDoFHandler::cell_iterator
-    // rather than
-    // MGDoFHandler::active_cell_iterator. Let's
-    // go about it:
+    // Now that we're done with most of our preliminaries, let's start
+    // the integration loop. It looks mostly like the loop in
+    // <code>assemble_system</code>, with two exceptions: (i) we don't
+    // need a right hand side, and more significantly (ii) we don't
+    // just loop over all active cells, but in fact all cells, active
+    // or not. Consequently, the correct iterator to use is
+    // MGDoFHandler::cell_iterator rather than
+    // MGDoFHandler::active_cell_iterator. Let's go about it:
     typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
                                             endc = mg_dof_handler.end();
 
@@ -661,34 +637,25 @@ namespace Step50
                                      fe_values.shape_grad(j,q_point) *
                                      fe_values.JxW(q_point));
 
-          // The rest of the assembly is again
-          // slightly different. This starts with
-          // a gotcha that is easily forgotten:
-          // The indices of global degrees of
-          // freedom we want here are the ones
-          // for current level, not for the
-          // global matrix. We therefore need the
-          // function
-          // MGDoFAccessorLLget_mg_dof_indices,
-          // not MGDoFAccessor::get_dof_indices
-          // as used in the assembly of the
-          // global system:
+          // The rest of the assembly is again slightly
+          // different. This starts with a gotcha that is easily
+          // forgotten: The indices of global degrees of freedom we
+          // want here are the ones for current level, not for the
+          // global matrix. We therefore need the function
+          // MGDoFAccessorLLget_mg_dof_indices, not
+          // MGDoFAccessor::get_dof_indices as used in the assembly of
+          // the global system:
           cell->get_mg_dof_indices (local_dof_indices);
 
-          // Next, we need to copy local
-          // contributions into the level
-          // objects. We can do this in the same
-          // way as in the global assembly, using
-          // a constraint object that takes care
-          // of constrained degrees (which here
-          // are only boundary nodes, as the
-          // individual levels have no hanging
-          // node constraints). Note that the
-          // <code>boundary_constraints</code>
-          // object makes sure that the level
-          // matrices contains no contributions
-          // from degrees of freedom at the
-          // interface between cells of different
+          // Next, we need to copy local contributions into the level
+          // objects. We can do this in the same way as in the global
+          // assembly, using a constraint object that takes care of
+          // constrained degrees (which here are only boundary nodes,
+          // as the individual levels have no hanging node
+          // constraints). Note that the
+          // <code>boundary_constraints</code> object makes sure that
+          // the level matrices contains no contributions from degrees
+          // of freedom at the interface between cells of different
           // refinement level.
           boundary_constraints[cell->level()]
           .distribute_local_to_global (cell_matrix,
