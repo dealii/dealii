@@ -3669,6 +3669,9 @@ namespace TrilinosWrappers
                 ExcMessage ("Column map of matrix does not fit with vector map!"));
         Assert (out.vector_partitioner().SameAs(m.RangeMap()) == true,
                 ExcMessage ("Row map of matrix does not fit with vector map!"));
+		(void)m;
+		(void)in;
+		(void)out;
       }
     }
   }
@@ -3682,12 +3685,16 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
+	(void)src;
+	(void)dst;
 
     internal::SparseMatrix::check_vector_map_equality(*matrix, src, dst);
     const size_type dst_local_size = dst.end() - dst.begin();
     AssertDimension (dst_local_size, static_cast<size_type>(matrix->RangeMap().NumMyElements()));
+	(void)dst_local_size;
     const size_type src_local_size = src.end() - src.begin();
     AssertDimension (src_local_size, static_cast<size_type>(matrix->DomainMap().NumMyElements()));
+	(void)src_local_size;
 
     Epetra_MultiVector tril_dst (View, matrix->RangeMap(), dst.begin(),
                                  matrix->DomainMap().NumMyPoints(), 1);
