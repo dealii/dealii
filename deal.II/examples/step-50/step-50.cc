@@ -314,7 +314,7 @@ namespace Step50
     deallog << "Number of degrees of freedom: "
             << mg_dof_handler.n_dofs();
 
-    for (unsigned int l=0; l<triangulation.n_levels(); ++l)
+    for (unsigned int l=0; l<triangulation.n_global_levels(); ++l)
       deallog << "   " << 'L' << l << ": "
               << mg_dof_handler.n_dofs(l);
     deallog  << std::endl;
@@ -614,9 +614,9 @@ namespace Step50
     // for several degrees of freedom at once
     // can be done using
     // Constraintmatrix::add_lines():
-    std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_levels());
-    std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_levels());
-    for (unsigned int level=0; level<triangulation.n_levels(); ++level)
+    std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_global_levels());
+    std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_global_levels());
+    for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
       {
         boundary_constraints[level].add_lines (interface_dofs[level]);
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
@@ -1037,9 +1037,9 @@ namespace Step50
         deallog << "   Number of degrees of freedom: "
                 << mg_dof_handler.n_dofs()
                 << " (by level: ";
-        for (unsigned int level=0; level<triangulation.n_levels(); ++level)
+        for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
           deallog << mg_dof_handler.n_dofs(level)
-                  << (level == triangulation.n_levels()-1
+                  << (level == triangulation.n_global_levels()-1
                       ? ")" : ", ");
         deallog << std::endl;
 
