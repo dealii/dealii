@@ -2073,7 +2073,7 @@ public:
    * section on signals in the general
    * documentation of this class.
    */
-  void refine_global (const unsigned int times);
+  void refine_global (const unsigned int times = 1);
 
   /**
    * Execute both refinement and
