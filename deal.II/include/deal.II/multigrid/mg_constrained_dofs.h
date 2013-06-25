@@ -189,7 +189,7 @@ inline
 void
 MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof)
 {
-  const unsigned int nlevels = dof.get_tria().n_levels();
+  const unsigned int nlevels = dof.get_tria().n_global_levels();
   refinement_edge_indices.resize(nlevels);
   refinement_edge_boundary_indices.resize(nlevels);
   non_refinement_edge_indices.resize(nlevels);
@@ -213,7 +213,7 @@ MGConstrainedDoFs::initialize(
   const typename FunctionMap<dim>::type &function_map,
   const ComponentMask &component_mask)
 {
-  const unsigned int nlevels = dof.get_tria().n_levels();
+  const unsigned int nlevels = dof.get_tria().n_global_levels();
   boundary_indices.resize(nlevels);
   refinement_edge_indices.resize(nlevels);
   refinement_edge_boundary_indices.resize(nlevels);
