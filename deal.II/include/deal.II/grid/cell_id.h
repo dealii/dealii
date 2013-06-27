@@ -12,6 +12,8 @@
 #ifndef __deal2__cell_id_h
 #define __deal2__cell_id_h
 
+#include <base/config.h>
+
 DEAL_II_NAMESPACE_OPEN
 
 
