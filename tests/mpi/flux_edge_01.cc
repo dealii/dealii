@@ -95,8 +95,7 @@ namespace Step39
                    parallel::distributed::Triangulation<dim>::construct_multigrid_hierarchy),
     mapping(),
     fe(fe),
-    dof_handler(triangulation),
-    estimates(1)
+    dof_handler(triangulation)
   {
     GridGenerator::hyper_cube_slit(triangulation, -1, 1);
   }
