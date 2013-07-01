@@ -1,561 +1,62 @@
 
-DEAL::Cycle 0:
-DEAL::   Number of active cells:       16
-DEAL::Number of degrees of freedom: 25   L0: 4   L1: 9   L2: 25
-DEAL::   Number of degrees of freedom: 25 (by level: 4, 9, 25)
-DEAL:cg::Starting value 0.187500
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Convergence step 5 value 1.65910e-17
-DEAL::Cycle 1:
-DEAL::   Number of active cells:       31
-DEAL::Number of degrees of freedom: 46   L0: 4   L1: 9   L2: 25   L3: 33
-DEAL::   Number of degrees of freedom: 46 (by level: 4, 9, 25, 33)
-DEAL:cg::Starting value 0.156543
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Convergence step 6 value 2.33288e-13
-DEAL::Cycle 2:
-DEAL::   Number of active cells:       61
-DEAL::Number of degrees of freedom: 82   L0: 4   L1: 9   L2: 25   L3: 69   L4: 18
-DEAL::   Number of degrees of freedom: 82 (by level: 4, 9, 25, 69, 18)
-DEAL:cg::Starting value 0.121377
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::Convergence step 7 value 5.60747e-15
-DEAL::Cycle 3:
-DEAL::   Number of active cells:       118
-DEAL::Number of degrees of freedom: 151   L0: 4   L1: 9   L2: 25   L3: 77   L4: 109
-DEAL::   Number of degrees of freedom: 151 (by level: 4, 9, 25, 77, 109)
-DEAL:cg::Starting value 0.0945704
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::V-cycle entering level 4
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::Residual on      level 4
-DEAL:cg::V-cycle entering level 3
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::Residual on      level 3
-DEAL:cg::V-cycle entering level 2
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::Residual on      level 2
-DEAL:cg::V-cycle entering level 1
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::Residual on      level 1
-DEAL:cg::V-cycle entering level 0
-DEAL:cg::Coarse level           0
-DEAL:cg::Smoothing on     level 1
-DEAL:cg::V-cycle leaving  level 1
-DEAL:cg::Smoothing on     level 2
-DEAL:cg::V-cycle leaving  level 2
-DEAL:cg::Smoothing on     level 3
-DEAL:cg::V-cycle leaving  level 3
-DEAL:cg::Smoothing on     level 4
-DEAL:cg::V-cycle leaving  level 4
-DEAL:cg::Convergence step 10 value 8.61989e-14
+DEAL::Element: FE_DGQ<2>(2)
+DEAL::Step 0
+DEAL::Triangulation 16 cells, 2 levels
+DEAL::DoFHandler 144 dofs, level dofs 36 144
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 23.0730
+DEAL:cg::Convergence step 16 value 5.18815e-13
+DEAL::Estimate 0.979555
+DEAL::Step 1
+DEAL::Triangulation 28 cells, 3 levels
+DEAL::DoFHandler 252 dofs, level dofs 36 144 144
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 23.0730
+DEAL:cg::Convergence step 17 value 4.44617e-13
+DEAL::Estimate 0.710329
+DEAL::Step 2
+DEAL::Triangulation 40 cells, 4 levels
+DEAL::DoFHandler 360 dofs, level dofs 36 144 144 144
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 23.0730
+DEAL:cg::Convergence step 16 value 7.54139e-13
+DEAL::Estimate 0.524083
+DEAL::Step 3
+DEAL::Triangulation 64 cells, 5 levels
+DEAL::DoFHandler 576 dofs, level dofs 36 144 288 144 144
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 23.9440
+DEAL:cg::Convergence step 17 value 6.11741e-13
+DEAL::Estimate 0.387537
+DEAL::Step 4
+DEAL::Triangulation 94 cells, 6 levels
+DEAL::DoFHandler 846 dofs, level dofs 36 144 432 216 144 144
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 27.1421
+DEAL:cg::Convergence step 17 value 3.38126e-13
+DEAL::Estimate 0.283616
+DEAL::Step 5
+DEAL::Triangulation 142 cells, 7 levels
+DEAL::DoFHandler 1278 dofs, level dofs 36 144 432 432 360 144 144
+DEAL::Assemble matrix
+DEAL::Assemble multilevel matrix
+DEAL::Assemble right hand side
+DEAL::Solve
+DEAL:cg::Starting value 27.1421
+DEAL:cg::Convergence step 16 value 8.83778e-13
+DEAL::Estimate 0.202860
