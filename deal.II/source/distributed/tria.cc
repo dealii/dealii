@@ -3238,9 +3238,68 @@ namespace parallel
     template <int dim, int spacedim>
     void
     Triangulation<dim,spacedim>::
-    copy_triangulation (const dealii::Triangulation<dim, spacedim> &)
+    copy_triangulation (const dealii::Triangulation<dim, spacedim> &old_tria)
     {
-      Assert (false, ExcNotImplemented());
+      try
+        {
+          dealii::Triangulation<dim,spacedim>::
+            copy_triangulation (old_tria);
+	}
+      catch (const typename dealii::Triangulation<dim,spacedim>::DistortedCellList &)
+        {
+          // the underlying
+          // triangulation should not
+          // be checking for
+          // distorted cells
+          AssertThrow (false, ExcInternalError());
+        }
+
+      // note that now we have some content in
+      // the p4est objects and call the
+      // functions that do the actual work
+      // (which are dimension dependent, so
+      // separate)
+      triangulation_has_content = true;
+
+      Assert (old_tria.n_levels() == 1,
+              ExcMessage ("Parallel distributed triangulations can only be copied, "
+                          "if they are not refined!"));
+
+      if (const dealii::parallel::distributed::Triangulation<dim,spacedim> *
+	  old_tria_x = dynamic_cast<const dealii::parallel::distributed::Triangulation<dim,spacedim> *>(&old_tria))
+        {
+          Assert (!old_tria_x->refinement_in_progress),
+                  ExcMessage ("Parallel distributed triangulations can only "
+                              "be copied, if no refinement is in progress!"));
+
+          mpi_communicator = Utilities::MPI::duplicate_communicator (old_tria_x->get_communicator ());
+
+          coarse_cell_to_p4est_tree_permutation = old_tria_x->coarse_cell_to_p4est_tree_permutation;
+          p4est_tree_to_coarse_cell_permutation = old_tria_x->p4est_tree_to_coarse_cell_permutation;
+          attached_data_size = old_tria_x->attached_data_size;
+          n_attached_datas   = old_tria_x->n_attached_datas;
+        }
+      else
+        {
+          setup_coarse_cell_to_p4est_tree_permutation ();
+        }
+
+      copy_new_triangulation_to_p4est (dealii::internal::int2type<dim>());
+
+      try
+        {
+          copy_local_forest_to_triangulation ();
+        }
+      catch (const typename Triangulation<dim>::DistortedCellList &)
+        {
+          // the underlying
+          // triangulation should not
+          // be checking for
+          // distorted cells
+          AssertThrow (false, ExcInternalError());
+        }
+
+      update_number_cache ();
     }
 
 
