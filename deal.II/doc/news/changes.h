@@ -147,6 +147,14 @@ this function.
 
 <ol>
 
+<li> New: In addition to the FEValuesExtractors::Scalar,
+FEValuesExtractors::Vector, and FEValuesExtractors::SymmetricTensor classes,
+there are now also fully featured FEValuesExtractors::Tensor extractors
+for non-symmetric tensors of rank 2.
+<br>
+(Denis Davydov, 2013/07/02)
+</li>
+
 <li> New: There are now functions Tensor::component_to_unrolled_index()
 and Tensor::unrolled_to_component_indices() in the same way as they
 already exist for the SymmetricTensor class.
