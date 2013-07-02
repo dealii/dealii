@@ -147,6 +147,11 @@ this function.
 
 <ol>
 
+<li> New: There is now a read-write version of TableIndices::operator[].
+<br>
+(Denis Davydov, 2013/07/02)
+</li>
+
 <li> New: The function parallel::distributed::Triangulation::copy_triangulation() is
 now implemented.
 <br>
