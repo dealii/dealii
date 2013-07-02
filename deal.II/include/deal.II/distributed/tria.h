@@ -977,6 +977,9 @@ namespace parallel
         mesh_reconstruction_after_repartitioning = 0x1,
         construct_multigrid_hierarchy = 0x2
       };
+
+
+    private:
       /**
        * dummy settings object
        */
