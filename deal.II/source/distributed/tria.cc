@@ -3268,7 +3268,7 @@ namespace parallel
       if (const dealii::parallel::distributed::Triangulation<dim,spacedim> *
 	  old_tria_x = dynamic_cast<const dealii::parallel::distributed::Triangulation<dim,spacedim> *>(&old_tria))
         {
-          Assert (!old_tria_x->refinement_in_progress),
+          Assert (!old_tria_x->refinement_in_progress,
                   ExcMessage ("Parallel distributed triangulations can only "
                               "be copied, if no refinement is in progress!"));
 
@@ -3278,6 +3278,8 @@ namespace parallel
           p4est_tree_to_coarse_cell_permutation = old_tria_x->p4est_tree_to_coarse_cell_permutation;
           attached_data_size = old_tria_x->attached_data_size;
           n_attached_datas   = old_tria_x->n_attached_datas;
+
+          settings           = old_tria_x->settings;
         }
       else
         {
