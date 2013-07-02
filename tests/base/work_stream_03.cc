@@ -19,7 +19,7 @@
 // the failing tests (deal.II/project_q_01) multiple times and
 // verifying that it indeed works
 
-#include "../tests.h"
+//#include "../tests.h"
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -49,6 +49,8 @@
 
 #include <fstream>
 #include <vector>
+
+using namespace dealii;
 
 
 char logname[] = "work_stream_03/output";
@@ -130,7 +132,7 @@ void test ()
 {
   Triangulation<dim>     triangulation;
   GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (3);
+  triangulation.refine_global (2);
 
   Threads::TaskGroup<> g;
   for (unsigned int p=1; p<4; ++p)
@@ -148,9 +150,15 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test<1>();
-  test<2>();
-  test<3>();
+
+  Threads::TaskGroup<> g;
+  for (unsigned int i=0; i<2; ++i)
+    {
+      g += Threads::new_task (&test<1>);
+      g += Threads::new_task (&test<2>);
+      g += Threads::new_task (&test<3>);
+    }
+  g.join_all ();
 
   deallog << "OK" << std::endl;
 }
