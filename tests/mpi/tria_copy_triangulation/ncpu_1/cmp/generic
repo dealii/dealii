@@ -1,0 +1,97 @@
+
+DEAL:0:2d::triangulation::cell     0.0: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.0: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.1: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.1: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.2: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.2: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.3: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.3: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.4: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.4: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.5: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.5: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.6: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.6: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.7: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.7: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.8: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.8: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.9: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.9: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.10: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.10: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.11: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.11: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.12: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.12: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.13: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.13: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.14: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.14: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
+DEAL:0:2d::triangulation::cell     0.15: locally owned, subdomain_id = 0
+DEAL:0:2d::new_triangulation::cell 0.15: locally owned, subdomain_id = 0
+DEAL:0:2d::  vertices 0 coincide
+DEAL:0:2d::  vertices 1 coincide
+DEAL:0:2d::  vertices 2 coincide
+DEAL:0:2d::  vertices 3 coincide
