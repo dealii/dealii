@@ -979,7 +979,7 @@ namespace parallel
       };
 
 
-    private:
+//TODO: The following variable should really be private, but it is used in dof_handler_policy.cc ...
       /**
        * dummy settings object
        */
