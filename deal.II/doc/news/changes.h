@@ -147,6 +147,13 @@ this function.
 
 <ol>
 
+<li> New: There are now functions Tensor::component_to_unrolled_index()
+and Tensor::unrolled_to_component_indices() in the same way as they
+already exist for the SymmetricTensor class.
+<br>
+(Denis Davydov, 2013/07/02)
+</li>
+
 <li> New: There is now a read-write version of TableIndices::operator[].
 <br>
 (Denis Davydov, 2013/07/02)
