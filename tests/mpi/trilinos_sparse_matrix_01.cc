@@ -1,5 +1,5 @@
 //----------------------  trilinos_matvec_01.cc  ---------------------------
-//    $Id: trilinos_matvec_01.cc 28697 2013-03-01 16:48:48Z heister $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2004, 2005, 2008, 2010, 2011 by the deal.II authors

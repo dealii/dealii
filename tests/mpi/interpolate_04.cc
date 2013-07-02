@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: integrate_difference.cc 24418 2011-09-26 12:52:19Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009, 2010, 2011 by the deal.II authors

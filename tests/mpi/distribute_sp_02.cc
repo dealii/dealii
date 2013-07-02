@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: distribute_sp_01.cc 24425 2011-09-26 13:53:32Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009, 2010 by the deal.II authors

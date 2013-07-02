@@ -1,5 +1,5 @@
 //----------------------------  trilinos_vector_equality_4.cc  ---------------------------
-//    $Id: trilinos_ghost_01.cc 24924 2012-01-25 12:35:17Z kormann $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2004, 2005, 2008, 2010 by the deal.II authors

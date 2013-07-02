@@ -1,6 +1,6 @@
 /* Author: Guido Kanschat, Texas A&M University, 2009 */
 
-/*    $Id: step-39.cc 28552 2013-02-25 15:18:15Z kanschat $       */
+/*    $Id$       */
 /*                                                                */
 /*    Copyright (C) 2010-2013 by the deal.II authors */
 /*                                                                */
