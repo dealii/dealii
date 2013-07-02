@@ -605,14 +605,13 @@ inline
 unsigned int
 Tensor<rank_, dim, Number>::component_to_unrolled_index(const TableIndices<rank_> &indices)
 {
-   TableIndices<rank_-1> indices1;
-   for (unsigned int i = 0; i < rank_-1;i++)
-   	 indices1[i] = indices[i];
+  TableIndices<rank_-1> indices1;
+  for (unsigned int i = 0; i < rank_-1;i++)
+    indices1[i] = indices[i];
 
-   Assert (indices[rank_-1] < dim,
-	   ExcIndexRange (indices[rank_-1], 0, dim));
-   return ( Tensor<rank_-1,dim,Number>::component_to_unrolled_index(indices1) * dim + indices[rank_-1]);
-
+  Assert (indices[rank_-1] < dim,
+	  ExcIndexRange (indices[rank_-1], 0, dim));
+  return ( Tensor<rank_-1,dim,Number>::component_to_unrolled_index(indices1) * dim + indices[rank_-1]);
 }
 
 template <int rank_, int dim, typename Number>
@@ -620,16 +619,18 @@ inline
 TableIndices<rank_>
 Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
 {
-  TableIndices<rank_-1> indices1;
+  Assert (i < n_independent_components,
+	  ExcIndexRange (i, 0, n_independent_components));
+
   TableIndices<rank_>   indices;
 
-  indices[rank_-1] = (i % dim);
-  const unsigned int i1 = i / dim;
-
-  indices1 = Tensor<rank_-1,dim,Number>::unrolled_to_component_indices(i1);
-
-  for (unsigned int i = 0; i < rank-1;i++)
-    indices[i] = indices1[i];
+  unsigned int remainder = i;
+  for (int r=rank_-1; r>=0; ++r)
+    {
+      indices[r] = (remainder % dim);
+      remainder /= dim;
+    }
+  Assert (remainder == 0, ExcInternalError());
 
   return indices;
 }
