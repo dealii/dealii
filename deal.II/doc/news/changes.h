@@ -147,6 +147,11 @@ this function.
 
 <ol>
 
+<li> New: The function SparseDirectUMFPACK::Tvmult is now implemented.
+<br>
+(Matthias Maier, 2013/07/03)
+</li>
+
 <li> New: In addition to the FEValuesExtractors::Scalar,
 FEValuesExtractors::Vector, and FEValuesExtractors::SymmetricTensor classes,
 there are now also fully featured FEValuesExtractors::Tensor extractors
