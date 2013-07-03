@@ -119,35 +119,10 @@ namespace
   {
     const unsigned int dim = 3;
     std::fill (face_sign.begin (), face_sign.end (), 1.0);
-    
-    for (unsigned int f = 0; f < GeometryInfo<dim>::faces_per_cell; ++f)
-    {
-      if (!(cell->face (f)->at_boundary ()))
-      {
-        const bool face_orientation = cell->face_orientation (f);
-        const bool face_flip = cell->face_flip (f);
-        const bool face_rotation = cell->face_rotation (f);
 //TODO: This is probably only going to work for those elements for which all dofs are face dofs
-        if (face_flip)
-        {
-          face_sign[GeometryInfo<dim>::face_to_cell_lines (f, 2, face_orientation, face_flip, face_rotation)] = -1.0;
-          face_sign[GeometryInfo<dim>::face_to_cell_lines (f, 3, face_orientation, face_flip, face_rotation)] = -1.0;
-          
-          if (!face_rotation)
-          {
-            face_sign[GeometryInfo<dim>::face_to_cell_lines (f, 0, face_orientation, face_flip, face_rotation)] = -1.0;
-            face_sign[GeometryInfo<dim>::face_to_cell_lines (f, 1, face_orientation, face_flip, face_rotation)] = -1.0;
-          }
-        }
-        
-        else
-          if (face_rotation)
-          {
-            face_sign[GeometryInfo<dim>::face_to_cell_lines (f, 0, face_orientation, face_flip, face_rotation)] = -1.0;
-            face_sign[GeometryInfo<dim>::face_to_cell_lines (f, 1, face_orientation, face_flip, face_rotation)] = -1.0;
-          }
-      }
-    }
+    for (unsigned int l = 0; l < GeometryInfo<dim>::lines_per_cell; ++l)
+      if (!(cell->line_orientation (l)))
+        face_sign[l] = -1.0;
   }
 }
 
