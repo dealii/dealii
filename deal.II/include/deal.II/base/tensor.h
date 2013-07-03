@@ -625,7 +625,7 @@ Tensor<rank_, dim, Number>::unrolled_to_component_indices(const unsigned int i)
   TableIndices<rank_>   indices;
 
   unsigned int remainder = i;
-  for (int r=rank_-1; r>=0; ++r)
+  for (int r=rank_-1; r>=0; --r)
     {
       indices[r] = (remainder % dim);
       remainder /= dim;
