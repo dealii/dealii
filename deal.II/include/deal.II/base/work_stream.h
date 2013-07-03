@@ -19,6 +19,7 @@
 #include <deal.II/base/template_constraints.h>
 #include <deal.II/base/std_cxx1x/function.h>
 #include <deal.II/base/std_cxx1x/bind.h>
+#include <deal.II/base/thread_local_storage.h>
 
 #ifdef DEAL_II_WITH_THREADS
 #  include <deal.II/base/thread_management.h>
@@ -27,6 +28,7 @@
 
 #include <vector>
 #include <utility>
+#include <memory>
 
 
 DEAL_II_NAMESPACE_OPEN
@@ -153,11 +155,16 @@ namespace WorkStream
        * on. This last argument is an integer
        * between one and chunk_size. The
        * arrays have a length of chunk_size.
+       *
+       * The pointer stored by the thread local object must
+       * be so that it's deleted on all threads when the thread
+       * local object is destroyed. Thus, use auto_ptr.
        */
       typedef
       std_cxx1x::tuple<std::vector<Iterator>,
-                ScratchData *,
-                std::vector<CopyData>,
+                Threads::ThreadLocalStorage<std::auto_ptr<ScratchData> >*,
+                const ScratchData *,
+		std::vector<CopyData>,
                 unsigned int>
                 ItemType;
 
@@ -180,6 +187,7 @@ namespace WorkStream
         tbb::filter (/*is_serial=*/true),
         remaining_iterator_range (begin, end),
         ring_buffer (buffer_size),
+	sample_scratch_data (sample_scratch_data),
         n_emitted_items (0),
         chunk_size (chunk_size)
       {
@@ -194,18 +202,8 @@ namespace WorkStream
           tasks += Threads::new_task (&IteratorRangeToItemStream::init_buffer_elements,
                                       *this,
                                       i,
-                                      std_cxx1x::cref(sample_scratch_data),
                                       std_cxx1x::cref(sample_copy_data));
         tasks.join_all ();
-      }
-
-      /**
-       * Destructor.
-       */
-      ~IteratorRangeToItemStream ()
-      {
-        for (unsigned int i=0; i<ring_buffer.size(); ++i)
-          delete std_cxx1x::get<1>(ring_buffer[i]);
       }
 
       /**
@@ -222,20 +220,20 @@ namespace WorkStream
         // initialize the next item. it may
         // consist of at most chunk_size
         // elements
-        std_cxx1x::get<3>(*current_item) = 0;
+        std_cxx1x::get<4>(*current_item) = 0;
         while ((remaining_iterator_range.first !=
                 remaining_iterator_range.second)
                &&
-               (std_cxx1x::get<3>(*current_item) < chunk_size))
+               (std_cxx1x::get<4>(*current_item) < chunk_size))
           {
-            std_cxx1x::get<0>(*current_item)[std_cxx1x::get<3>(*current_item)]
+            std_cxx1x::get<0>(*current_item)[std_cxx1x::get<4>(*current_item)]
               = remaining_iterator_range.first;
 
             ++remaining_iterator_range.first;
-            ++std_cxx1x::get<3>(*current_item);
+            ++std_cxx1x::get<4>(*current_item);
           }
 
-        if (std_cxx1x::get<3>(*current_item) == 0)
+        if (std_cxx1x::get<4>(*current_item) == 0)
           // there were no items
           // left. terminate the pipeline
           return 0;
@@ -258,6 +256,32 @@ namespace WorkStream
        * A ring buffer that will store items.
        */
       std::vector<ItemType>        ring_buffer;
+
+      /**
+       * Scratch data object. Each thread will
+       * have its own local copy of the scratch object. However, since
+       * some operations on the *elements* of the scratch object may
+       * be in parallel (e.g., setting a vector of the scratch object
+       * may also be parallelized (something we have no control over
+       * from WorkStream, we need to pay attention that the scratch
+       * object itself exists once per thread but the elements of the
+       * scratch object are not thread-local themselves -- in other
+       * words, the scratch object exists once per thread, but
+       * lives in global memory space rather than thread-local memory
+       * space.
+       *
+       * The pointer stored by the thread local object must
+       * be so that it's deleted on all threads when the thread
+       * local object is destroyed. Thus, use auto_ptr.
+       */
+      Threads::ThreadLocalStorage<std::auto_ptr<ScratchData> > thread_local_scratch;
+
+      /**
+       * A reference to a sample scratch data that will be used to
+       * initialize the thread-local pointers to a scratch data object
+       * each of the worker tasks uses.
+       */
+      const ScratchData &sample_scratch_data;
 
       /**
        * Counter for the number of emitted
@@ -286,7 +310,6 @@ namespace WorkStream
        * the ring buffer.
        */
       void init_buffer_elements (const unsigned int element,
-                                 const ScratchData &sample_scratch_data,
                                  const CopyData    &sample_copy_data)
       {
         Assert (std_cxx1x::get<1>(ring_buffer[element]) == 0,
@@ -295,8 +318,10 @@ namespace WorkStream
         std_cxx1x::get<0>(ring_buffer[element])
         .resize (chunk_size, remaining_iterator_range.second);
         std_cxx1x::get<1>(ring_buffer[element])
-          = new ScratchData(sample_scratch_data);
+	        = &thread_local_scratch;
         std_cxx1x::get<2>(ring_buffer[element])
+                = &sample_scratch_data;
+        std_cxx1x::get<3>(ring_buffer[element])
         .resize (chunk_size, sample_copy_data);
       }
     };
@@ -345,17 +370,31 @@ namespace WorkStream
 
         ItemType *current_item = static_cast<ItemType *> (item);
 
+        Threads::ThreadLocalStorage<std::auto_ptr<ScratchData> > *
+        thread_local_scratch_pointer = std_cxx1x::get<1>(*current_item);
+
+        std::auto_ptr<ScratchData> &scratch_pointer
+        = thread_local_scratch_pointer->get();
+
+        // see if this is the first time we encounter
+        // the current scratch object (which is thread-local).
+        // if so, initialize the pointer
+        if (!scratch_pointer.get())
+          scratch_pointer.reset
+          (new ScratchData(*std_cxx1x::get<2>(*current_item)));
+
+
         // then call the worker function on each element of the chunk we were
         // given. since these worker functions are called on separate threads,
         // nothing good can happen if they throw an exception and we are best
         // off catching it and showing an error message
-        for (unsigned int i=0; i<std_cxx1x::get<3>(*current_item); ++i)
+        for (unsigned int i=0; i<std_cxx1x::get<4>(*current_item); ++i)
 	  {
 	    try
 	      {
 		worker (std_cxx1x::get<0>(*current_item)[i],
-			*std_cxx1x::get<1>(*current_item),
-			std_cxx1x::get<2>(*current_item)[i]);
+		        *scratch_pointer.get(),
+			std_cxx1x::get<3>(*current_item)[i]);
 	      }
 	    catch (const std::exception &exc)
 	      {
@@ -433,11 +472,11 @@ namespace WorkStream
         // initiate copying data. for the same reasons as in the worker class
         // above, catch exceptions rather than letting it propagate into
         // unknown territories
-        for (unsigned int i=0; i<std_cxx1x::get<3>(*current_item); ++i)
+        for (unsigned int i=0; i<std_cxx1x::get<4>(*current_item); ++i)
 	  {
 	    try
 	      {
-		copier (std_cxx1x::get<2>(*current_item)[i]);
+		copier (std_cxx1x::get<3>(*current_item)[i]);
 	      }
 	    catch (const std::exception &exc)
 	      {
