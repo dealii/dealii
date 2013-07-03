@@ -404,7 +404,7 @@ namespace TrilinosWrappers
        * this is all we need to
        * generate a parallel vector.
        */
-      Vector (const Epetra_Map &parallel_partitioning);
+      explicit Vector (const Epetra_Map &parallel_partitioning);
 
       /**
        * Copy constructor from the
@@ -417,7 +417,7 @@ namespace TrilinosWrappers
        * that sets the partitioning
        * details.
        */
-      explicit Vector (const Epetra_Map &parallel_partitioning,
+      Vector (const Epetra_Map &parallel_partitioning,
                        const VectorBase &v);
 
       /**
@@ -446,7 +446,7 @@ namespace TrilinosWrappers
        * elements.
        */
       template <typename Number>
-      explicit Vector (const Epetra_Map             &parallel_partitioning,
+      Vector (const Epetra_Map             &parallel_partitioning,
                        const dealii::Vector<Number> &v);
 //@}
       /**
@@ -463,7 +463,7 @@ namespace TrilinosWrappers
        * need to generate a %parallel
        * vector.
        */
-      Vector (const IndexSet &parallel_partitioning,
+      explicit Vector (const IndexSet &parallel_partitioning,
               const MPI_Comm &communicator = MPI_COMM_WORLD);
 
       /**
@@ -484,7 +484,7 @@ namespace TrilinosWrappers
        * communicator that set the
        * partitioning details.
        */
-      explicit Vector (const IndexSet   &parallel_partitioning,
+      Vector (const IndexSet   &parallel_partitioning,
                        const VectorBase &v,
                        const MPI_Comm   &communicator = MPI_COMM_WORLD);
 
@@ -495,7 +495,7 @@ namespace TrilinosWrappers
        * copies all the elements.
        */
       template <typename Number>
-      explicit Vector (const IndexSet               &parallel_partitioning,
+      Vector (const IndexSet               &parallel_partitioning,
                        const dealii::Vector<Number> &v,
                        const MPI_Comm               &communicator = MPI_COMM_WORLD);
 
@@ -663,7 +663,7 @@ namespace TrilinosWrappers
      * input the number of elements
      * in the vector.
      */
-    Vector (const size_type n);
+    explicit Vector (const size_type n);
 
     /**
      * This constructor takes as
@@ -677,7 +677,7 @@ namespace TrilinosWrappers
      * map will be generated
      * internally.
      */
-    Vector (const Epetra_Map &partitioning);
+    explicit Vector (const Epetra_Map &partitioning);
 
     /**
      * This constructor takes as input
@@ -690,18 +690,8 @@ namespace TrilinosWrappers
      * taken and a localized version will
      * be generated internally.
      */
-    Vector (const IndexSet &partitioning,
+    explicit Vector (const IndexSet &partitioning,
             const MPI_Comm &communicator = MPI_COMM_WORLD);
-
-    /**
-     * This constructor creates a vector
-     * using the IndexSet local as our
-     * own unknowns, add optional ghost
-     * values ghost.
-     */
-    Vector (const MPI_Comm &communicator,
-            const IndexSet &local,
-            const IndexSet &ghost);
 
     /**
      * This constructor takes a
@@ -768,8 +758,6 @@ namespace TrilinosWrappers
                  const MPI_Comm   &communicator = MPI_COMM_WORLD,
                  const bool        fast = false);
 
-
-
     /**
      * Reinit function. Takes the
      * information of a Vector and copies
@@ -779,7 +767,6 @@ namespace TrilinosWrappers
     void reinit (const VectorBase &V,
                  const bool        fast = false,
                  const bool        allow_different_maps = false);
-
 
     /**
      * Set all components of the

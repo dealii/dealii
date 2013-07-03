@@ -450,11 +450,6 @@ namespace TrilinosWrappers
                sizeof(TrilinosWrappers::types::int_type) );
   }
 
-  void
-  VectorBase::update_ghost_values() const
-  {
-  }
-
 } /* end of namespace TrilinosWrappers */
 
 

@@ -935,14 +935,6 @@ namespace TrilinosWrappers
      */
     void ratio (const VectorBase &a,
                 const VectorBase &b);
-
-
-    /**
-     * Empty function; added to allow
-     * PETSc and Trilinos Vectors to
-     * be used interchangeably
-     */
-    void update_ghost_values() const;
     //@}
 
 
@@ -1033,7 +1025,6 @@ namespace TrilinosWrappers
      */
     std::size_t memory_consumption () const;
     //@}
-
 
     /**
      * Exception
