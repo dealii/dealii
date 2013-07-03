@@ -189,7 +189,7 @@ void evaluate (const FE_Nedelec<3>& fe, const DoFHandler<3>& dof_handler_ref, co
     fe_values.reinit (cell);
     fe_values[component].get_function_values (u_ref, values_ref);
     fe_field_function.vector_value_list (fe_values.get_quadrature_points (), values);
-    std::vector<unsigned int> dof_indices (fe.dofs_per_cell);cell->get_dof_indices (dof_indices);
+    
     for (unsigned int q_point = 0; q_point < n_q_points; ++q_point)
     {
       for (unsigned int d = 0; d < 3; ++d)
