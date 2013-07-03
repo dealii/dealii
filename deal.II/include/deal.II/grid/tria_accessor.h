@@ -3226,7 +3226,7 @@ CellAccessor<dim,spacedim>::id() const
             }
         }
 
-      Assert(v!=-1, ExcInternalError());
+      Assert(v != (unsigned char)-1, ExcInternalError());
       id[ptr.level()-1] = v;
 
       ptr.copy_from( *(ptr.parent()));
