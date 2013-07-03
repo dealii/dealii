@@ -28,6 +28,7 @@
 DEAL_II_NAMESPACE_OPEN
 
 template <typename> class TriaActiveIterator;
+template <typename> class FilteredIterator;
 
 namespace internal
 {
@@ -42,6 +43,12 @@ namespace internal
 
   template <class ACCESSOR>
   inline bool is_active_iterator(const TriaActiveIterator<ACCESSOR> &)
+  {
+    return true;
+  }
+
+  template <class ACCESSOR>
+  inline bool is_active_iterator(const FilteredIterator<TriaActiveIterator<ACCESSOR> > &)
   {
     return true;
   }

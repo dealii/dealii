@@ -977,6 +977,9 @@ namespace parallel
         mesh_reconstruction_after_repartitioning = 0x1,
         construct_multigrid_hierarchy = 0x2
       };
+
+
+//TODO: The following variable should really be private, but it is used in dof_handler_policy.cc ...
       /**
        * dummy settings object
        */

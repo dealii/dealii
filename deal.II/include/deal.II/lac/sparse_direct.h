@@ -108,7 +108,7 @@ public:
   /**
    * @{
    */
-   
+
   /**
    * This function does nothing. It is only here to provide a interface
    * consistent with other sparse direct solvers.
@@ -153,10 +153,10 @@ public:
   /**
    * @{
    */
-  
+
   /**
    * Preconditioner interface function. Usually, given the source vector,
-   * this method returns an approximated solution of <i>Ax = b</i>. As this
+   * this method returns an approximate solution of <i>Ax = b</i>. As this
    * class provides a wrapper to a direct solver, here it is actually the
    * exact solution (exact within the range of numerical accuracy of
    * course).
@@ -174,10 +174,17 @@ public:
 	      const BlockVector<double> &src) const;
 
   /**
-   * Not implemented but necessary for compiling certain other classes.
+   * Same as before, but uses the transpose of the matrix, i.e. this
+   * function multiplies with $A^{-T}$.
    */
   void Tvmult (Vector<double> &dst,
 	       const Vector<double> &src) const;
+
+  /**
+   * Same as before, but for block vectors
+   */
+  void Tvmult (BlockVector<double> &dst,
+	       const BlockVector<double> &src) const;
 
   /**
    * Same as vmult(), but adding to the previous solution. Not implemented
@@ -187,11 +194,12 @@ public:
 		  const Vector<double> &src) const;
 
   /**
-   * Not implemented but necessary for compiling certain other classes.
+   * Same as before, but uses the transpose of the matrix, i.e. this
+   * function multiplies with $A^{-T}$.
    */
   void Tvmult_add (Vector<double> &dst,
 		   const Vector<double> &src) const;
-  
+
   /**
    * @}
    */
@@ -216,14 +224,17 @@ public:
    * happen. Note that we can't actually call the factorize() function from
    * here if it has not yet been called, since we have no access to the
    * actual matrix.
+   *
+   * If @p transpose is set to true this function solves for the transpose
+   * of the matrix, i.e. $x=A^{-T}b$.
    */
-  void solve (Vector<double> &rhs_and_solution) const;
+  void solve (Vector<double> &rhs_and_solution, bool transpose = false) const;
 
   /**
    * Same as before, but for block vectors.
    */
-  void solve (BlockVector<double> &rhs_and_solution) const;
-  
+  void solve (BlockVector<double> &rhs_and_solution, bool transpose = false) const;
+
   /**
    * Call the two functions factorize() and solve() in that order, i.e. perform
    * the whole solution process for the given right hand side vector.
@@ -232,14 +243,16 @@ public:
    */
   template <class Matrix>
   void solve (const Matrix   &matrix,
-              Vector<double> &rhs_and_solution);
+              Vector<double> &rhs_and_solution,
+              bool            transpose = false);
 
   /**
    * Same as before, but for block vectors.
    */
   template <class Matrix>
   void solve (const Matrix        &matrix,
-              BlockVector<double> &rhs_and_solution);
+              BlockVector<double> &rhs_and_solution,
+              bool                 transpose = false);
 
   /**
    * @}
@@ -253,8 +266,8 @@ public:
   DeclException2 (ExcUMFPACKError, char *, int,
                   << "UMFPACK routine " << arg1
                   << " returned error status " << arg2
-                  << ". See the file <contrib/umfpack/UMFPACK/Include/umfpack.h>"
-                  << " for a description of error codes.");
+                  << ". See the file <bundled/umfpack/UMFPACK/Include/umfpack.h>"
+                  << " for a description of 'status codes'.");
 
 private:
   /**

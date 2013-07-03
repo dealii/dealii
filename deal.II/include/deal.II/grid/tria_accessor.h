@@ -19,6 +19,7 @@
 #include <deal.II/base/point.h>
 #include <deal.II/grid/tria_iterator_base.h>
 #include <deal.II/grid/tria_iterator_selector.h>
+#include <deal.II/grid/cell_id.h>
 
 
 namespace std
@@ -344,6 +345,14 @@ protected:
    *  object with exactly the same data.
    */
   TriaAccessorBase &operator = (const TriaAccessorBase &);
+  
+  /**
+   * Ordering of accessors. If #structure_dimension is less than
+   * #dimension, we simply compare the index of such an object. If
+   * #structure_dimension equals #dimension, we compare the level()
+   * first, and the index() only if levels are equal.
+   */
+  bool operator < (const TriaAccessorBase& other) const;
 
 protected:
   /**
@@ -2821,7 +2830,8 @@ public:
 
   /**
    *  Return an iterator to the
-   *  parent.
+   *  parent. Throws an exception if this cell has no parent, i.e. has
+   *  level 0.
    */
   TriaIterator<CellAccessor<dim,spacedim> >
   parent () const;
@@ -2846,6 +2856,16 @@ public:
    * for more information.
    */
   bool active () const;
+  
+  /**
+   * Ordering of accessors. This function implements a total ordering
+   * of cells even on a parallel::distributed::Triangulation. This
+   * function first compares level_subdomain_id(). If these are equal,
+   * and both cells are active, it compares subdomain_id(). If this is
+   * inconclusive, TriaAccessorBase::operator < () is called.
+   */
+  bool operator < (const CellAccessor<dim, spacedim>& other) const;
+
 
   /**
    * Return whether this cell is owned by the current processor
@@ -2869,6 +2889,12 @@ public:
    * no children.
    */
   bool is_locally_owned () const;
+
+  /**
+   * Return true if either the Triangulation is not distributed or if
+   * level_subdomain_id() is equal to the id of the current processor.
+   */
+  bool is_locally_owned_on_level () const;
 
   /**
    * Return whether this cell
@@ -2989,6 +3015,15 @@ public:
    */
   void set_neighbor (const unsigned int i,
                      const TriaIterator<CellAccessor<dim, spacedim> > &pointer) const;
+
+  /**
+   * Return a unique ID for the current cell. This ID is constructed from the
+   * path in the hierarchy from the coarse father cell and works correctly
+   * in parallel computations.
+   *
+   * Note: This operation takes O(log(level)) time.
+   */
+  CellId id() const;
 
   /**
    * @}
@@ -3168,6 +3203,39 @@ CellAccessor (const TriaAccessor<structdim2,dim2,spacedim2> &)
                       "only exists to make certain template constructs "
                       "easier to write as dimension independent code but "
                       "the conversion is not valid in the current context."));
+}
+
+template <int dim, int spacedim>
+CellId
+CellAccessor<dim,spacedim>::id() const
+{
+  std::vector<unsigned char> id(this->level(), -1);
+  unsigned int coarse_index;
+
+  CellAccessor<dim,spacedim> ptr = *this;
+  while (ptr.level()>0)
+    {
+      // find the 'v'st child of our parent we are
+      unsigned char v=-1;
+      for (unsigned int c=0;c<ptr.parent()->n_children();++c)
+        {
+          if (ptr.parent()->child_index(c)==ptr.index())
+            {
+              v = c;
+              break;
+            }
+        }
+
+      Assert(v != (unsigned char)-1, ExcInternalError());
+      id[ptr.level()-1] = v;
+
+      ptr.copy_from( *(ptr.parent()));
+    }
+
+  Assert(ptr.level()==0, ExcInternalError());
+  coarse_index = ptr.index();
+
+  return CellId(coarse_index, id);
 }
 
 

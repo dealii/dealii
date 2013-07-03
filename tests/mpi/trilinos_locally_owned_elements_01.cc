@@ -1,5 +1,5 @@
 //---------------------------------------------------------------------------
-//    $Id: trilinos_distribute_02.cc 29593 2013-05-25 12:29:14Z bangerth $
+//    $Id$
 //    Version: $Name$
 //
 //    Copyright (C) 2009, 2010, 2012, 2013 by the deal.II authors

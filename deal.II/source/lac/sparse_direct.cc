@@ -291,7 +291,8 @@ factorize (const Matrix &matrix)
 
 
 void
-SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution) const
+SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution,
+                            bool            transpose /*=false*/) const
 {
   // make sure that some kind of factorize() call has happened before
   Assert (Ap.size() != 0, ExcNotInitialized());
@@ -304,8 +305,11 @@ SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution) const
   // solve the system. note that since UMFPACK wants compressed column
   // storage instead of the compressed row storage format we use in
   // deal.II's SparsityPattern classes, we solve for UMFPACK's A^T instead
+
+  // Conversely, if we solve for the transpose, we have to use UMFPACK_A
+  // instead.
   const int status
-    = umfpack_dl_solve (UMFPACK_At,
+    = umfpack_dl_solve (transpose ? UMFPACK_A : UMFPACK_At,
                         &Ap[0], &Ai[0], &Ax[0],
                         rhs_and_solution.begin(), rhs.begin(),
                         numeric_decomposition,
@@ -315,14 +319,15 @@ SparseDirectUMFPACK::solve (Vector<double> &rhs_and_solution) const
 
 
 void
-SparseDirectUMFPACK::solve (BlockVector<double> &rhs_and_solution) const
+SparseDirectUMFPACK::solve (BlockVector<double> &rhs_and_solution,
+                            bool                 transpose /*=false*/) const
 {
   // the UMFPACK functions want a contiguous array of elements, so
   // there is no way around copying data around. thus, just copy the
   // data into a regular vector and back
   Vector<double> tmp (rhs_and_solution.size());
   tmp = rhs_and_solution;
-  solve (tmp);
+  solve (tmp, transpose);
   rhs_and_solution = tmp;
 }
 
@@ -331,20 +336,22 @@ SparseDirectUMFPACK::solve (BlockVector<double> &rhs_and_solution) const
 template <class Matrix>
 void
 SparseDirectUMFPACK::solve (const Matrix   &matrix,
-                            Vector<double> &rhs_and_solution)
+                            Vector<double> &rhs_and_solution,
+                            bool            transpose /*=false*/)
 {
   factorize (matrix);
-  solve (rhs_and_solution);
+  solve (rhs_and_solution, transpose);
 }
 
 
 template <class Matrix>
 void
-SparseDirectUMFPACK::solve (const Matrix   &matrix,
-                            BlockVector<double> &rhs_and_solution)
+SparseDirectUMFPACK::solve (const Matrix        &matrix,
+                            BlockVector<double> &rhs_and_solution,
+                            bool                 transpose /*=false*/)
 {
   factorize (matrix);
-  solve (rhs_and_solution);
+  solve (rhs_and_solution, transpose);
 }
 
 
@@ -439,10 +446,22 @@ SparseDirectUMFPACK::vmult (
 
 void
 SparseDirectUMFPACK::Tvmult (
-  Vector<double> &,
-  const Vector<double> &) const
+  Vector<double> &dst,
+  const Vector<double> &src) const
 {
-  Assert(false, ExcNotImplemented());
+  dst = src;
+  this->solve(dst, /*transpose=*/ true);
+}
+
+
+
+void
+SparseDirectUMFPACK::Tvmult (
+  BlockVector<double>       &dst,
+  const BlockVector<double> &src) const
+{
+  dst = src;
+  this->solve(dst, /*transpose=*/ true);
 }
 
 
@@ -462,6 +481,7 @@ SparseDirectUMFPACK::Tvmult_add (
 {
   Assert(false, ExcNotImplemented());
 }
+
 
 
 
@@ -641,17 +661,19 @@ void SparseDirectMUMPS::vmult (Vector<double>       &dst,
 
 
 // explicit instantiations for SparseMatrixUMFPACK
-#define InstantiateUMFPACK(MATRIX) \
-  template    \
-  void SparseDirectUMFPACK::factorize (const MATRIX &);    \
-  template    \
-  void SparseDirectUMFPACK::solve (const MATRIX   &,    \
-                                   Vector<double> &);    \
-  template    \
-  void SparseDirectUMFPACK::solve (const MATRIX   &,    \
-                                   BlockVector<double> &);    \
-  template    \
-  void SparseDirectUMFPACK::initialize (const MATRIX &,    \
+#define InstantiateUMFPACK(MATRIX)                        \
+  template                                                \
+  void SparseDirectUMFPACK::factorize (const MATRIX &);   \
+  template                                                \
+  void SparseDirectUMFPACK::solve (const MATRIX   &,      \
+                                   Vector<double> &,      \
+                                   bool);                 \
+  template                                                \
+  void SparseDirectUMFPACK::solve (const MATRIX   &,      \
+                                   BlockVector<double> &, \
+                                   bool);                 \
+  template                                                \
+  void SparseDirectUMFPACK::initialize (const MATRIX &,   \
                                         const AdditionalData);
 
 InstantiateUMFPACK(SparseMatrix<double>)
@@ -663,8 +685,8 @@ InstantiateUMFPACK(BlockSparseMatrix<float>)
 
 // explicit instantiations for SparseDirectMUMPS
 #ifdef DEAL_II_WITH_MUMPS
-#define InstantiateMUMPS(MATRIX) \
-  template \
+#define InstantiateMUMPS(MATRIX)                          \
+  template                                                \
   void SparseDirectMUMPS::initialize (const MATRIX &, const Vector<double> &);
 
 InstantiateMUMPS(SparseMatrix<double>)

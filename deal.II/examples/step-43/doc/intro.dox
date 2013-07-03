@@ -9,7 +9,7 @@ following publications (in particular in the second one):
   media. Computers &amp; Fluids, 39:1585-1596, 2010
 - Chih-Che Chueh, Ned Djilali, Wolfgang Bangerth. An h-adaptive operator
   splitting method for two-phase flow in 3D heterogeneous porous
-  media. Submitted.
+  media. SIAM Journal on Scientific Computing, 35:B149-B175, 2013.
 
 The implementation discussed here uses and extends
 parts of the step-21 and step-31 tutorial programs.
@@ -548,13 +548,13 @@ cases are listed in the following table:
 CC Chueh, N Djilali and W Bangerth.
 <br> An h-adaptive operator splitting method for two-phase flow in 3D
   heterogeneous porous media.
-<br> <i>Submitted</i>, 2012.
+<br> SIAM Journal on Scientific Computing, vol. 35 (2013), pp. B149-B175
 
 <li>
 M. Kronbichler, T. Heister, and W. Bangerth
 <br> High Accuracy Mantle Convection Simulation through Modern Numerical
 Methods.
-<br> <i>Submitted to Geophysics Journal International</i>, 2011.
+<br> Geophysics Journal International, vol. 191 (2012), pp. 12-29
 
 <li>
 F Brezzi and M Fortin.

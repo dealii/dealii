@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -21,6 +21,7 @@
 
 #include <deal.II/base/config.h>
 #include <deal.II/base/exceptions.h>
+#include <deal.II/base/table_indices.h>
 #include <vector>
 
 #include <cmath>
@@ -349,6 +350,13 @@ public:
   static const unsigned int rank      = 1;
 
   /**
+   * Number of independent components of a
+   * tensor of rank 1.
+   */
+  static const unsigned int
+  n_independent_components = dim;
+
+  /**
    * Type of stored objects. This
    * is a Number for a rank 1 tensor.
    */
@@ -567,6 +575,31 @@ public:
    */
   template <typename Number2>
   void unroll (Vector<Number2> &result) const;
+
+  /**
+   * Returns an unrolled index in
+   * the range [0,dim-1] for the element of the tensor indexed by
+   * the argument to the function.
+   *
+   * Given that this is a rank-1 object, the returned value
+   * is simply the value of the only index stored by the argument.
+   */
+  static
+  unsigned int
+  component_to_unrolled_index(const TableIndices<1> &indices);
+
+  /**
+   * Opposite of  component_to_unrolled_index: For an index in the
+   * range [0,dim-1], return which set of indices it would
+   * correspond to.
+   *
+   * Given that this is a rank-1 object, the returned set of indices
+   * consists of only a single element with value equal to the argument
+   * to this function.
+   */
+  static
+  TableIndices<1> unrolled_to_component_indices(const unsigned int i);
+
 
   /**
    * Determine an estimate for
@@ -1184,6 +1217,23 @@ Tensor<1,dim,Number>::unroll_recursion (Vector<Number2> &result,
 {
   for (unsigned int i=0; i<dim; ++i)
     result(index++) = operator[](i);
+}
+
+
+template <int dim, typename Number>
+inline
+unsigned int
+Tensor<1, dim, Number>::component_to_unrolled_index (const TableIndices<1> &indices)
+{
+  return indices[0];
+}
+
+template <int dim, typename Number>
+inline
+TableIndices<1>
+Tensor<1, dim, Number>::unrolled_to_component_indices (const unsigned int i)
+{
+  return TableIndices<1>(i);
 }
 
 

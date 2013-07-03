@@ -71,11 +71,11 @@ this function.
 
 
 <ol>
-  <li> New: deal.II can now be compiled to 64-bit global dof indices. To turn 
-  this feature on, use the cmake option -DDEAL_II_WITH_64BIT_INDICES=ON. If 
+  <li> New: deal.II can now be compiled to 64-bit global dof indices. To turn
+  this feature on, use the cmake option -DDEAL_II_WITH_64BIT_INDICES=ON. If
   PETSc and/or Trilinos are used, they must be compiled to support 64-bit
   indices. To write a code that can use 32-bit and 64-bit indices depending on
-  deal.II compilation option, use types::global_dof_index for all the global 
+  deal.II compilation option, use types::global_dof_index for all the global
   dof indices.
   <br>
   (Kainan Wang and Bruno Turcksin, 2013/06/05)
@@ -146,6 +146,58 @@ this function.
 <h3>Specific improvements</h3>
 
 <ol>
+
+<li> New: The function SparseDirectUMFPACK::Tvmult is now implemented.
+<br>
+(Matthias Maier, 2013/07/03)
+</li>
+
+<li> New: In addition to the FEValuesExtractors::Scalar,
+FEValuesExtractors::Vector, and FEValuesExtractors::SymmetricTensor classes,
+there are now also fully featured FEValuesExtractors::Tensor extractors
+for non-symmetric tensors of rank 2.
+<br>
+(Denis Davydov, 2013/07/02)
+</li>
+
+<li> New: There are now functions Tensor::component_to_unrolled_index()
+and Tensor::unrolled_to_component_indices() in the same way as they
+already exist for the SymmetricTensor class.
+<br>
+(Denis Davydov, 2013/07/02)
+</li>
+
+<li> New: There is now a read-write version of TableIndices::operator[].
+<br>
+(Denis Davydov, 2013/07/02)
+</li>
+
+<li> New: The function parallel::distributed::Triangulation::copy_triangulation() is
+now implemented.
+<br>
+(Martin Steigemann, 2013/07/02)
+</li>
+
+<li> New: TriaRawIterator::operator < (TriaRawIterator&) now implements a total ordering
+relation for cells even on distributed::parallel::Triangulation across processors.
+Additionally, TriaRawAccessor and CellAccessor now have an ordering relation.
+<br>
+(Guido Kanschat, 2013/06/24)
+</li>
+
+<li> New: CellAccessor::id() that returns a unique CellId that
+also works in parallel computations (where level and index is not
+useful).
+<br>
+(Timo Heister, 2013/06/24)
+</li>
+
+<li> New: added ConstantTensorFunction<rank, dim> and ZeroTensorFunction<rank, dim> to provide
+a tensor valued analogue to ConstantFunction and ZeroFunction.
+<br>
+(Matthias Maier, 2013/06/20)
+</li>
+
 <li> Fixed: BlockSparsityPattern::column_number was returning
 wrong values.
 <br>
@@ -485,14 +537,14 @@ sense.
 (Guido Kanschat, 2013/03/21)
 </li>
 
-<li> Added GridOut::write_svg() to allow for the output of 
-two-dimensional triangulations in two space dimensions in the SVG 
-format (Scalable Vector Graphics, an generic XML-based vector image 
-format developed and maintained by the World Wide Web Consortium W3C). 
-This function also provides cell coloring and cell labeling for the 
-visualization of basic cell properties. Pespective view is further 
-possible and the cell level number may be converted into altitude, 
-revealing the inactive cells lying below. 
+<li> Added GridOut::write_svg() to allow for the output of
+two-dimensional triangulations in two space dimensions in the SVG
+format (Scalable Vector Graphics, an generic XML-based vector image
+format developed and maintained by the World Wide Web Consortium W3C).
+This function also provides cell coloring and cell labeling for the
+visualization of basic cell properties. Pespective view is further
+possible and the cell level number may be converted into altitude,
+revealing the inactive cells lying below.
 <br>
 (Christian Wülker, 2013/03/21)
 </li>
@@ -520,12 +572,12 @@ This is now fixed.
 (Timo Heister, 2013/03/01)
 </li>
 
-<li> Added DataOutBase::write_svg() to allow for the output of a given 
+<li> Added DataOutBase::write_svg() to allow for the output of a given
 list of patches in two space dimensions in the SVG format (Scalable Vector
-Graphics, an generic XML-based vector image format developed and maintained 
-by the World Wide Web Consortium W3C). An additional dimension (z-direction) 
+Graphics, an generic XML-based vector image format developed and maintained
+by the World Wide Web Consortium W3C). An additional dimension (z-direction)
 is employed for the visualization of data values taken from a data vector.
-This function also provides patch coloring for the visual enhancement.  
+This function also provides patch coloring for the visual enhancement.
 <br>
 (Christian Wülker, 2013/05/10)
 </li>

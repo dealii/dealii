@@ -591,7 +591,7 @@ vector_value (const Point<dim>   &p,
  * to be size <tt>n_components</tt>.
  */
 template <int dim>
-VectorFunctionFromTensorFunction<dim>::VectorFunctionFromTensorFunction (const TensorFunction<1,dim>& tensor_function,
+VectorFunctionFromTensorFunction<dim>::VectorFunctionFromTensorFunction (const TensorFunction<1,dim> &tensor_function,
     const unsigned int selected_component,
     const unsigned int n_components)
   :

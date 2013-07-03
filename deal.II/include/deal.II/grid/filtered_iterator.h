@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2002, 2003, 2004, 2005, 2006, 2007, 2009, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -22,17 +22,16 @@ DEAL_II_NAMESPACE_OPEN
 
 /**
  * In this namespace a number of classes is declared that may be used
- * as filters in the FilteredIterator class. The filters either
- * check for binary information (for example, the IteratorFilters::Active filter
- * class checks whether the object pointed to is active), or for
- * valued information by comparison with prescribed values (for
- * example, the LevelEqualTo filter class checks whether the
- * level of the object pointed to by the iterator under consideration
- * is equal to a value that was given to the filter upon construction.
+ * as filters in the FilteredIterator class. The filters either check
+ * for binary information (for example, the IteratorFilters::Active
+ * filter class checks whether the object pointed to is active), or
+ * for valued information by comparison with prescribed values (for
+ * example, the LevelEqualTo filter class checks whether the level of
+ * the object pointed to by the iterator under consideration is equal
+ * to a value that was given to the filter upon construction.
  *
  * For examples of use of these classes as well as requirements on
- * filters see the general description of the FilteredIterator
- * class.
+ * filters see the general description of the FilteredIterator class.
  *
  * @ingroup Iterators
  * @author Wolfgang Bangerth, 2002
@@ -40,10 +39,8 @@ DEAL_II_NAMESPACE_OPEN
 namespace IteratorFilters
 {
   /**
-   * Filter that evaluates to true if
-   * either the iterator points to an
-   * active object or an iterator
-   * past the end.
+   * Filter that evaluates to true if either the iterator points to an
+   * active object or an iterator past the end.
    *
    * @ingroup Iterators
    */
@@ -51,21 +48,17 @@ namespace IteratorFilters
   {
   public:
     /**
-     * Evaluate the iterator and
-     * return true if the object is
-     * active or past the end.
+     * Evaluate the iterator and return true if the object is active
+     * or past the end.
      */
     template <class Iterator>
     bool operator () (const Iterator &i) const;
   };
 
   /**
-   * Filter that evaluates to true if
-   * either the iterator points to an
-   * object for which the user flag
-   * is set or an iterator past the
-   * end. See @ref GlossUserFlags
-  * for information about user flags.
+   * Filter that evaluates to true if either the iterator points to an
+   * object for which the user flag is set or an iterator past the
+   * end. See @ref GlossUserFlags for information about user flags.
    *
    * @ingroup Iterators
    */
@@ -73,10 +66,8 @@ namespace IteratorFilters
   {
   public:
     /**
-     * Evaluate the iterator and
-     * return true if the object
-     * has a set user flag or past
-     * the end.
+     * Evaluate the iterator and return true if the object has a set
+     * user flag or past the end.
      */
     template <class Iterator>
     bool operator () (const Iterator &i) const;
@@ -84,12 +75,9 @@ namespace IteratorFilters
 
 
   /**
-   * Filter that evaluates to true if
-   * either the iterator points to an
-   * object for which the user flag
-   * is not set or an iterator past
-   * the end. Inverse filter to the
-   * previous class.
+   * Filter that evaluates to true if either the iterator points to an
+   * object for which the user flag is not set or an iterator past the
+   * end. Inverse filter to the previous class.
    *
    * @ingroup Iterators
    */
@@ -97,10 +85,8 @@ namespace IteratorFilters
   {
   public:
     /**
-     * Evaluate the iterator and
-     * return true if the object
-     * has an unset user flag or
-     * past the end.
+     * Evaluate the iterator and return true if the object has an
+     * unset user flag or past the end.
      */
     template <class Iterator>
     bool operator () (const Iterator &i) const;
@@ -108,12 +94,9 @@ namespace IteratorFilters
 
 
   /**
-   * Filter for iterators that
-   * evaluates to true if either the
-   * iterator is past the end or the
-   * level of the object pointed to
-   * is equal to a value given to the
-   * constructor.
+   * Filter for iterators that evaluates to true if either the
+   * iterator is past the end or the level of the object pointed to is
+   * equal to a value given to the constructor.
    *
    * @ingroup Iterators
    */
@@ -121,27 +104,22 @@ namespace IteratorFilters
   {
   public:
     /**
-     * Constructor. Store the level
-     * which iterators shall have
-     * to be evaluated to true.
+     * Constructor. Store the level which iterators shall have to be
+     * evaluated to true.
      */
     LevelEqualTo (const unsigned int level);
 
     /**
-     * Evaluation operator. Returns
-     * true if either the level of
-     * the object pointed to is
-     * equal to the stored value or
-     * the iterator is past the
-     * end.
+     * Evaluation operator. Returns true if either the level of the
+     * object pointed to is equal to the stored value or the iterator
+     * is past the end.
      */
     template <class Iterator>
     bool operator () (const Iterator &i) const;
 
   protected:
     /**
-     * Stored value to compare the
-     * level with.
+     * Stored value to compare the level with.
      */
     const unsigned int level;
   };
@@ -149,15 +127,10 @@ namespace IteratorFilters
 
 
   /**
-   * Filter for iterators that
-   * evaluates to true if either the
-   * iterator is past the end or the
-   * subdomain id of the object
-   * pointed to is equal to a value
-   * given to the constructor,
-   * assuming that the iterator
-   * allows querying for a subdomain
-   * id).
+   * Filter for iterators that evaluates to true if either the
+   * iterator is past the end or the subdomain id of the object
+   * pointed to is equal to a value given to the constructor, assuming
+   * that the iterator allows querying for a subdomain id).
    *
    * @ingroup Iterators
    */
@@ -165,28 +138,22 @@ namespace IteratorFilters
   {
   public:
     /**
-     * Constructor. Store the
-     * subdomain which iterators
-     * shall have to be evaluated
-     * to true.
+     * Constructor. Store the subdomain which iterators shall have to
+     * be evaluated to true.
      */
     SubdomainEqualTo (const types::subdomain_id subdomain_id);
 
     /**
-     * Evaluation operator. Returns
-     * true if either the subdomain
-     * of the object pointed to is
-     * equal to the stored value or
-     * the iterator is past the
-     * end.
+     * Evaluation operator. Returns true if either the subdomain of
+     * the object pointed to is equal to the stored value or the
+     * iterator is past the end.
      */
     template <class Iterator>
     bool operator () (const Iterator &i) const;
 
   protected:
     /**
-     * Stored value to compare the
-     * subdomain with.
+     * Stored value to compare the subdomain with.
      */
     const types::subdomain_id subdomain_id;
   };
@@ -194,14 +161,12 @@ namespace IteratorFilters
 
 
   /**
-   * Filter for iterators that evaluates to
-   * true if a cell is owned by the current
-   * processor, i.e., if it is a
-   * @ref GlossLocallyOwnedCell "locally owned cell".
+   * Filter for iterators that evaluates to true if a cell is owned by
+   * the current processor, i.e., if it is a @ref
+   * GlossLocallyOwnedCell "locally owned cell".
    *
-   * This class is used in step-32, in
-   * connection with the methods of the @ref
-   * distributed module.
+   * This class is used in step-32, in connection with the methods of
+   * the @ref distributed module.
    *
    * @ingroup Iterators
    */
@@ -209,8 +174,26 @@ namespace IteratorFilters
   {
   public:
     /**
-     * Evaluation operator. Returns true if
-     * the cell is locally owned.
+     * Evaluation operator. Returns true if the cell is locally owned.
+     */
+    template <class Iterator>
+    bool operator () (const Iterator &i) const;
+  };
+
+
+
+  /**
+   * Filter for iterators that evaluates to true if th level subdomain
+   * id of a cell is equal to the current processor id.
+   *
+   * @ingroup Iterators
+   */
+  class LocallyOwnedLevelCell
+  {
+  public:
+    /**
+     * Evaluation operator. Returns true if the level subdomain id of
+     * the cell is equal to the current processor id.
      */
     template <class Iterator>
     bool operator () (const Iterator &i) const;
@@ -1141,6 +1124,17 @@ namespace IteratorFilters
   LocallyOwnedCell::operator () (const Iterator &i) const
   {
     return (i->is_locally_owned());
+  }
+
+
+// ---------------- IteratorFilters::LocallyOwnedLevelCell ---------
+
+  template <class Iterator>
+  inline
+  bool
+  LocallyOwnedLevelCell::operator () (const Iterator &i) const
+  {
+    return (i->is_locally_owned_on_level());
   }
 }
 

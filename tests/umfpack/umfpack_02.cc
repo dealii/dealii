@@ -41,7 +41,7 @@
 
 
 template <int dim>
-void test ()
+void test (bool transpose = false)
 {
   deallog << dim << 'd' << std::endl;
   
@@ -90,9 +90,13 @@ void test ()
       for (unsigned int j=0; j<dof_handler.n_dofs(); ++j)
         solution(j) = j+j*(i+1)*(i+1);
 
-      B.vmult (b, solution);
+      if (transpose)
+        B.Tvmult (b, solution);
+      else
+        B.vmult (b, solution);
+
       x = b;
-      Binv.solve (x);
+      Binv.solve (x, transpose);
 
       x -= solution;
       deallog << "relative norm distance = "
@@ -117,4 +121,8 @@ int main ()
   test<1> ();
   test<2> ();
   test<3> ();
+
+  test<1> (/*transpose =*/ true);
+  test<2> (/*transpose =*/ true);
+  test<3> (/*transpose =*/ true);
 }

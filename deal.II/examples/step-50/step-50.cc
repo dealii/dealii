@@ -314,7 +314,7 @@ namespace Step50
     deallog << "Number of degrees of freedom: "
             << mg_dof_handler.n_dofs();
 
-    for (unsigned int l=0; l<triangulation.n_levels(); ++l)
+    for (unsigned int l=0; l<triangulation.n_global_levels(); ++l)
       deallog << "   " << 'L' << l << ": "
               << mg_dof_handler.n_dofs(l);
     deallog  << std::endl;
@@ -556,67 +556,49 @@ namespace Step50
     const Coefficient<dim> coefficient;
     std::vector<double>    coefficient_values (n_q_points);
 
-    // Next a few things that are specific to
-    // building the multigrid data structures
-    // (since we only need them in the current
-    // function, rather than also elsewhere, we
-    // build them here instead of the
-    // <code>setup_system</code>
-    // function). Some of the following may be
-    // a bit obscure if you're not familiar
-    // with the algorithm actually implemented
-    // in deal.II to support multilevel
-    // algorithms on adaptive meshes; if some
-    // of the things below seem strange, take a
-    // look at the @ref mg_paper.
+    // Next a few things that are specific to building the multigrid
+    // data structures (since we only need them in the current
+    // function, rather than also elsewhere, we build them here
+    // instead of the <code>setup_system</code> function). Some of the
+    // following may be a bit obscure if you're not familiar with the
+    // algorithm actually implemented in deal.II to support multilevel
+    // algorithms on adaptive meshes; if some of the things below seem
+    // strange, take a look at the @ref mg_paper.
     //
-    // Our first job is to identify those
-    // degrees of freedom on each level that
-    // are located on interfaces between
-    // adaptively refined levels, and those
-    // that lie on the interface but also on
-    // the exterior boundary of the domain. As
-    // in many other parts of the library, we
-    // do this by using boolean masks,
-    // i.e. vectors of booleans each element of
-    // which indicates whether the
-    // corresponding degree of freedom index is
-    // an interface DoF or not. The <code>MGConstraints</code>
-    // already computed the information for us
-    // when we called initialize in <code>setup_system()</code>.
+    // Our first job is to identify those degrees of freedom on each
+    // level that are located on interfaces between adaptively refined
+    // levels, and those that lie on the interface but also on the
+    // exterior boundary of the domain. As in many other parts of the
+    // library, we do this by using boolean masks, i.e. vectors of
+    // booleans each element of which indicates whether the
+    // corresponding degree of freedom index is an interface DoF or
+    // not. The <code>MGConstraints</code> already computed the
+    // information for us when we called initialize in
+    // <code>setup_system()</code>.
     std::vector<std::vector<bool> > interface_dofs
       = mg_constrained_dofs.get_refinement_edge_indices ();
     std::vector<std::vector<bool> > boundary_interface_dofs
       = mg_constrained_dofs.get_refinement_edge_boundary_indices ();
 
-    // The indices just identified will later
-    // be used to decide where the assembled value
-    // has to be added into on each level.
-    // On the other hand,
-    // we also have to impose zero boundary
-    // conditions on the external boundary of
-    // each level. But this the <code>MGConstraints</code>
-    // knows it. So we simply ask for them by calling
-    // <code>get_boundary_indices ()</code>.
-    // The third step is to construct
-    // constraints on all those degrees of
-    // freedom: their value should be zero
-    // after each application of the level
-    // operators. To this end, we construct
-    // ConstraintMatrix objects for each level,
-    // and add to each of these constraints for
-    // each degree of freedom. Due to the way
-    // the ConstraintMatrix stores its data,
-    // the function to add a constraint on a
-    // single degree of freedom and force it to
-    // be zero is called
-    // Constraintmatrix::add_line(); doing so
-    // for several degrees of freedom at once
-    // can be done using
+    // The indices just identified will later be used to decide where
+    // the assembled value has to be added into on each level.  On the
+    // other hand, we also have to impose zero boundary conditions on
+    // the external boundary of each level. But this the
+    // <code>MGConstraints</code> knows it. So we simply ask for them
+    // by calling <code>get_boundary_indices ()</code>.  The third
+    // step is to construct constraints on all those degrees of
+    // freedom: their value should be zero after each application of
+    // the level operators. To this end, we construct ConstraintMatrix
+    // objects for each level, and add to each of these constraints
+    // for each degree of freedom. Due to the way the ConstraintMatrix
+    // stores its data, the function to add a constraint on a single
+    // degree of freedom and force it to be zero is called
+    // Constraintmatrix::add_line(); doing so for several degrees of
+    // freedom at once can be done using
     // Constraintmatrix::add_lines():
-    std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_levels());
-    std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_levels());
-    for (unsigned int level=0; level<triangulation.n_levels(); ++level)
+    std::vector<ConstraintMatrix> boundary_constraints (triangulation.n_global_levels());
+    std::vector<ConstraintMatrix> boundary_interface_constraints (triangulation.n_global_levels());
+    for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
       {
         boundary_constraints[level].add_lines (interface_dofs[level]);
         boundary_constraints[level].add_lines (mg_constrained_dofs.get_boundary_indices()[level]);
@@ -627,20 +609,14 @@ namespace Step50
         boundary_interface_constraints[level].close ();
       }
 
-    // Now that we're done with most of our
-    // preliminaries, let's start the
-    // integration loop. It looks mostly like
-    // the loop in
-    // <code>assemble_system</code>, with two
-    // exceptions: (i) we don't need a right
-    // hand side, and more significantly (ii) we
-    // don't just loop over all active cells,
-    // but in fact all cells, active or
-    // not. Consequently, the correct iterator
-    // to use is MGDoFHandler::cell_iterator
-    // rather than
-    // MGDoFHandler::active_cell_iterator. Let's
-    // go about it:
+    // Now that we're done with most of our preliminaries, let's start
+    // the integration loop. It looks mostly like the loop in
+    // <code>assemble_system</code>, with two exceptions: (i) we don't
+    // need a right hand side, and more significantly (ii) we don't
+    // just loop over all active cells, but in fact all cells, active
+    // or not. Consequently, the correct iterator to use is
+    // MGDoFHandler::cell_iterator rather than
+    // MGDoFHandler::active_cell_iterator. Let's go about it:
     typename DoFHandler<dim>::cell_iterator cell = mg_dof_handler.begin(),
                                             endc = mg_dof_handler.end();
 
@@ -661,85 +637,60 @@ namespace Step50
                                      fe_values.shape_grad(j,q_point) *
                                      fe_values.JxW(q_point));
 
-          // The rest of the assembly is again
-          // slightly different. This starts with
-          // a gotcha that is easily forgotten:
-          // The indices of global degrees of
-          // freedom we want here are the ones
-          // for current level, not for the
-          // global matrix. We therefore need the
-          // function
-          // MGDoFAccessorLLget_mg_dof_indices,
-          // not MGDoFAccessor::get_dof_indices
-          // as used in the assembly of the
-          // global system:
+          // The rest of the assembly is again slightly
+          // different. This starts with a gotcha that is easily
+          // forgotten: The indices of global degrees of freedom we
+          // want here are the ones for current level, not for the
+          // global matrix. We therefore need the function
+          // MGDoFAccessorLLget_mg_dof_indices, not
+          // MGDoFAccessor::get_dof_indices as used in the assembly of
+          // the global system:
           cell->get_mg_dof_indices (local_dof_indices);
 
-          // Next, we need to copy local
-          // contributions into the level
-          // objects. We can do this in the same
-          // way as in the global assembly, using
-          // a constraint object that takes care
-          // of constrained degrees (which here
-          // are only boundary nodes, as the
-          // individual levels have no hanging
-          // node constraints). Note that the
-          // <code>boundary_constraints</code>
-          // object makes sure that the level
-          // matrices contains no contributions
-          // from degrees of freedom at the
-          // interface between cells of different
+          // Next, we need to copy local contributions into the level
+          // objects. We can do this in the same way as in the global
+          // assembly, using a constraint object that takes care of
+          // constrained degrees (which here are only boundary nodes,
+          // as the individual levels have no hanging node
+          // constraints). Note that the
+          // <code>boundary_constraints</code> object makes sure that
+          // the level matrices contains no contributions from degrees
+          // of freedom at the interface between cells of different
           // refinement level.
           boundary_constraints[cell->level()]
           .distribute_local_to_global (cell_matrix,
                                        local_dof_indices,
                                        mg_matrices[cell->level()]);
 
-          // The next step is again slightly more
-          // obscure (but explained in the @ref
-          // mg_paper): We need the remainder of
-          // the operator that we just copied
-          // into the <code>mg_matrices</code>
-          // object, namely the part on the
-          // interface between cells at the
-          // current level and cells one level
-          // coarser. This matrix exists in two
-          // directions: for interior DoFs (index
-          // $i$) of the current level to those
-          // sitting on the interface (index
-          // $j$), and the other way around. Of
-          // course, since we have a symmetric
-          // operator, one of these matrices is
-          // the transpose of the other.
+          // The next step is again slightly more obscure (but
+          // explained in the @ref mg_paper): We need the remainder of
+          // the operator that we just copied into the
+          // <code>mg_matrices</code> object, namely the part on the
+          // interface between cells at the current level and cells
+          // one level coarser. This matrix exists in two directions:
+          // for interior DoFs (index $i$) of the current level to
+          // those sitting on the interface (index $j$), and the other
+          // way around. Of course, since we have a symmetric
+          // operator, one of these matrices is the transpose of the
+          // other.
           //
-          // The way we assemble these matrices
-          // is as follows: since the are formed
-          // from parts of the local
-          // contributions, we first delete all
-          // those parts of the local
-          // contributions that we are not
-          // interested in, namely all those
-          // elements of the local matrix for
-          // which not $i$ is an interface DoF
-          // and $j$ is not. The result is one of
-          // the two matrices that we are
-          // interested in, and we then copy it
-          // into the
-          // <code>mg_interface_matrices</code>
-          // object. The
-          // <code>boundary_interface_constraints</code>
-          // object at the same time makes sure
-          // that we delete contributions from
-          // all degrees of freedom that are not
-          // only on the interface but also on
-          // the external boundary of the domain.
+          // The way we assemble these matrices is as follows: since
+          // the are formed from parts of the local contributions, we
+          // first delete all those parts of the local contributions
+          // that we are not interested in, namely all those elements
+          // of the local matrix for which not $i$ is an interface DoF
+          // and $j$ is not. The result is one of the two matrices
+          // that we are interested in, and we then copy it into the
+          // <code>mg_interface_matrices</code> object. The
+          // <code>boundary_interface_constraints</code> object at the
+          // same time makes sure that we delete contributions from
+          // all degrees of freedom that are not only on the interface
+          // but also on the external boundary of the domain.
           //
-          // The last part to remember is how to
-          // get the other matrix. Since it is
-          // only the transpose, we will later
-          // (in the <code>solve()</code>
-          // function) be able to just pass the
-          // transpose matrix where necessary.
+          // The last part to remember is how to get the other
+          // matrix. Since it is only the transpose, we will later (in
+          // the <code>solve()</code> function) be able to just pass
+          // the transpose matrix where necessary.
           for (unsigned int i=0; i<dofs_per_cell; ++i)
             for (unsigned int j=0; j<dofs_per_cell; ++j)
               if ( !(interface_dofs[cell->level()][local_dof_indices[i]]==true &&
@@ -763,51 +714,40 @@ namespace Step50
 
   // @sect4{LaplaceProblem::solve}
 
-  // This is the other function that is
-  // significantly different in support of the
-  // multigrid solver (or, in fact, the
-  // preconditioner for which we use the
-  // multigrid method).
+  // This is the other function that is significantly different in
+  // support of the multigrid solver (or, in fact, the preconditioner
+  // for which we use the multigrid method).
   //
-  // Let us start out by setting up two of the
-  // components of multilevel methods: transfer
-  // operators between levels, and a solver on
-  // the coarsest level. In finite element
-  // methods, the transfer operators are
-  // derived from the finite element function
-  // spaces involved and can often be computed
-  // in a generic way independent of the
-  // problem under consideration. In that case,
-  // we can use the MGTransferPrebuilt class
-  // that, given the constraints on the global
-  // level and an MGDoFHandler object computes
-  // the matrices corresponding to these
-  // transfer operators.
+  // Let us start out by setting up two of the components of
+  // multilevel methods: transfer operators between levels, and a
+  // solver on the coarsest level. In finite element methods, the
+  // transfer operators are derived from the finite element function
+  // spaces involved and can often be computed in a generic way
+  // independent of the problem under consideration. In that case, we
+  // can use the MGTransferPrebuilt class that, given the constraints
+  // on the global level and an MGDoFHandler object computes the
+  // matrices corresponding to these transfer operators.
   //
-  // The second part of the following lines
-  // deals with the coarse grid solver. Since
-  // our coarse grid is very coarse indeed, we
-  // decide for a direct solver (a Householder
-  // decomposition of the coarsest level
-  // matrix), even if its implementation is not
-  // particularly sophisticated. If our coarse
-  // mesh had many more cells than the five we
-  // have here, something better suited would
-  // obviously be necessary here.
+  // The second part of the following lines deals with the coarse grid
+  // solver. Since our coarse grid is very coarse indeed, we decide
+  // for a direct solver (a Householder decomposition of the coarsest
+  // level matrix), even if its implementation is not particularly
+  // sophisticated. If our coarse mesh had many more cells than the
+  // five we have here, something better suited would obviously be
+  // necessary here.
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
 
-    // Create the object that deals with the transfer
-    // between different refinement levels. We need to
-    // pass it the hanging node constraints.
+    // Create the object that deals with the transfer between
+    // different refinement levels. We need to pass it the hanging
+    // node constraints.
     MGTransferPrebuilt<vector_t> mg_transfer(hanging_node_constraints, mg_constrained_dofs);
-    // Now the prolongation matrix has to be built.
-    // This matrix needs to take the boundary values on
-    // each level into account and needs to know about
-    // the indices at the refinement egdes. The
-    // <code>MGConstraints</code> knows about that so
-    // pass it as an argument.
+    // Now the prolongation matrix has to be built.  This matrix needs
+    // to take the boundary values on each level into account and
+    // needs to know about the indices at the refinement egdes. The
+    // <code>MGConstraints</code> knows about that so pass it as an
+    // argument.
     mg_transfer.build_matrices(mg_dof_handler);
 
     matrix_t & coarse_matrix = mg_matrices[0];
@@ -822,38 +762,27 @@ namespace Step50
         coarse_matrix,
         id);
 
-    // The next component of a multilevel
-    // solver or preconditioner is that we need
-    // a smoother on each level. A common
-    // choice for this is to use the
-    // application of a relaxation method (such
-    // as the SOR, Jacobi or Richardson method). The
-    // MGSmootherPrecondition class provides
-    // support for this kind of
-    // smoother. Here, we opt for the
-    // application of a single SOR
-    // iteration. To this end, we define an
-    // appropriate <code>typedef</code> and
-    // then setup a smoother object.
+    // The next component of a multilevel solver or preconditioner is
+    // that we need a smoother on each level. A common choice for this
+    // is to use the application of a relaxation method (such as the
+    // SOR, Jacobi or Richardson method). The MGSmootherPrecondition
+    // class provides support for this kind of smoother. Here, we opt
+    // for the application of a single SOR iteration. To this end, we
+    // define an appropriate <code>typedef</code> and then setup a
+    // smoother object.
     //
-    // The last step is to initialize the
-    // smoother object with our level matrices
-    // and to set some smoothing parameters.
-    // The <code>initialize()</code> function
-    // can optionally take additional arguments
-    // that will be passed to the smoother
-    // object on each level. In the current
-    // case for the SOR smoother, this could,
-    // for example, include a relaxation
-    // parameter. However, we here leave these
-    // at their default values. The call to
-    // <code>set_steps()</code> indicates that
-    // we will use two pre- and two
-    // post-smoothing steps on each level; to
-    // use a variable number of smoother steps
-    // on different levels, more options can be
-    // set in the constructor call to the
-    // <code>mg_smoother</code> object.
+    // The last step is to initialize the smoother object with our
+    // level matrices and to set some smoothing parameters.  The
+    // <code>initialize()</code> function can optionally take
+    // additional arguments that will be passed to the smoother object
+    // on each level. In the current case for the SOR smoother, this
+    // could, for example, include a relaxation parameter. However, we
+    // here leave these at their default values. The call to
+    // <code>set_steps()</code> indicates that we will use two pre-
+    // and two post-smoothing steps on each level; to use a variable
+    // number of smoother steps on different levels, more options can
+    // be set in the constructor call to the <code>mg_smoother</code>
+    // object.
     //
     // The last step results from the fact that
     // we use the SOR method as a smoother -
@@ -905,7 +834,7 @@ namespace Step50
     // With all this together, we can finally
     // get about solving the linear system in
     // the usual way:
-    SolverControl solver_control (500, 1e-12, false);
+    SolverControl solver_control (500, 1e-8*system_rhs.l2_norm(), false);
     SolverCG<vector_t>    cg (solver_control);
 
     solution = 0;
@@ -971,9 +900,10 @@ namespace Step50
                                         typename FunctionMap<dim>::type(),
                                         temp_solution,
                                         estimated_error_per_cell);
-    GridRefinement::refine_and_coarsen_fixed_number (triangulation,
-                                                     estimated_error_per_cell,
-                                                     0.3, 0.03);
+    parallel::distributed::GridRefinement::
+      refine_and_coarsen_fixed_fraction (triangulation,
+					 estimated_error_per_cell,
+					 0.3, 0.03);
     triangulation.execute_coarsening_and_refinement ();
   }
 
@@ -1074,9 +1004,9 @@ namespace Step50
         deallog << "   Number of degrees of freedom: "
                 << mg_dof_handler.n_dofs()
                 << " (by level: ";
-        for (unsigned int level=0; level<triangulation.n_levels(); ++level)
+        for (unsigned int level=0; level<triangulation.n_global_levels(); ++level)
           deallog << mg_dof_handler.n_dofs(level)
-                  << (level == triangulation.n_levels()-1
+                  << (level == triangulation.n_global_levels()-1
                       ? ")" : ", ");
         deallog << std::endl;
 

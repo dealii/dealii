@@ -1847,7 +1847,10 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
                   out << (unsigned int)cell->level();
                   break;
                 case GridOutFlags::Svg::subdomain_id:
-                  out << cell->subdomain_id() + 2;
+		  if (cell->active())
+		    out << cell->subdomain_id() + 2;
+		  else
+		    out << 'X';
                   break;
 		case GridOutFlags::Svg::level_subdomain_id:
 		  out << cell->level_subdomain_id() + 2;
@@ -1959,8 +1962,14 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
 
               if (svg_flags.label_subdomain_id)
                 {
-                  if (svg_flags.label_level_number || svg_flags.label_cell_index || svg_flags.label_material_id) out << ',';
-                  out << static_cast<int>(cell->subdomain_id());
+                  if (svg_flags.label_level_number
+		      || svg_flags.label_cell_index
+		      || svg_flags.label_material_id)
+		    out << ',';
+		  if (cell->active())
+		    out << static_cast<int>(cell->subdomain_id());
+		  else
+		    out << 'X';
                 }
 
 	      if(svg_flags.label_level_subdomain_id)

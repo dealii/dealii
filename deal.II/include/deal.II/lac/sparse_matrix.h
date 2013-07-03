@@ -1476,13 +1476,18 @@ public:
 //@{
 
   /**
-   * Print the matrix to the given stream, using the format <tt>(row,column)
-   * value</tt>, i.e. one nonzero entry of the matrix per line. If @p across
-   * is true, print all entries on a single line, using the format
-   * row,column:value
+   * Print the matrix to the given stream, using the format
+   * <tt>(row,column) value</tt>, i.e. one nonzero entry of the matrix
+   * per line. If <tt>across</tt> is true, print all entries on a
+   * single line, using the format row,column:value.
+   *
+   * If the argument <tt>diagonal_first</tt> is true, diagonal
+   * elements of quadratic matrices are printed first in their row,
+   * corresponding to the internal storage scheme. If it is false, the
+   * elements in a row are written in ascending column order.
    */
   template <class STREAM>
-  void print (STREAM &out, bool across=false) const;
+  void print (STREAM &out, bool across=false, bool diagonal_first=true) const;
 
   /**
    * Print the matrix in the usual format, i.e. as a matrix and not as a list
@@ -2464,22 +2469,50 @@ SparseMatrix<number>::end (const size_type r)
 template <typename number>
 template <class STREAM>
 inline
-void SparseMatrix<number>::print (STREAM &out, bool across) const
+void SparseMatrix<number>::print (STREAM &out, bool across, bool diagonal_first) const
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-
-  if (across)
+  
+  bool hanging_diagonal = false;
+  number diagonal;
+  
+  for (size_type i=0; i<cols->rows; ++i)
     {
-      for (size_type i=0; i<cols->rows; ++i)
-        for (size_type j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
-          out << ' ' << i << ',' << cols->colnums[j] << ':' << val[j];
-      out << std::endl;
-    }
-  else
-    for (size_type i=0; i<cols->rows; ++i)
       for (size_type j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
-        out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << std::endl;
+	{
+	  if (!diagonal_first && i == cols->colnums[j])
+	    {
+	      diagonal = val[j];
+	      hanging_diagonal = true;
+	    }
+	  else
+	    {
+	      if (hanging_diagonal && cols->colnums[j]>i)
+		{
+		  if (across)
+		    out << ' ' << i << ',' << i << ':' << diagonal;
+		  else
+		    out << '(' << i << ',' << i << ") " << diagonal << std::endl;
+		  hanging_diagonal = false;
+		}
+	      if (across)
+		out << ' ' << i << ',' << cols->colnums[j] << ':' << val[j];
+	      else
+		out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << std::endl;
+	    }
+	}
+      if (hanging_diagonal)
+	{
+	  if (across)
+	    out << ' ' << i << ',' << i << ':' << diagonal;
+	  else
+	    out << '(' << i << ',' << i << ") " << diagonal << std::endl;
+	  hanging_diagonal = false;
+	}
+    }
+  if (across)
+    out << std::endl;
 }
 
 

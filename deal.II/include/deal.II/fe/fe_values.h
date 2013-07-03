@@ -166,7 +166,7 @@ namespace FEValuesViews
      * gradient is a
      * <code>Tensor@<1,dim@></code>.
      */
-    typedef Tensor<1,spacedim> gradient_type;
+    typedef dealii::Tensor<1,spacedim> gradient_type;
 
     /**
      * A typedef for the type of second
@@ -176,7 +176,7 @@ namespace FEValuesViews
      * Hessian is a
      * <code>Tensor@<2,dim@></code>.
      */
-    typedef Tensor<2,spacedim> hessian_type;
+    typedef dealii::Tensor<2,spacedim> hessian_type;
 
     /**
      * A structure where for each shape
@@ -453,7 +453,7 @@ namespace FEValuesViews
      * of <code>dim</code> components, the
      * value type is a Tensor<1,spacedim>.
      */
-    typedef Tensor<1,spacedim>          value_type;
+    typedef dealii::Tensor<1,spacedim>          value_type;
 
     /**
      * A typedef for the type of gradients
@@ -463,7 +463,7 @@ namespace FEValuesViews
      * finite element, the gradient is a
      * <code>Tensor@<2,spacedim@></code>.
      */
-    typedef Tensor<2,spacedim>          gradient_type;
+    typedef dealii::Tensor<2,spacedim>          gradient_type;
 
     /**
      * A typedef for the type of
@@ -512,7 +512,7 @@ namespace FEValuesViews
      * finite element, the Hessian is a
      * <code>Tensor@<3,dim@></code>.
      */
-    typedef Tensor<3,spacedim>          hessian_type;
+    typedef dealii::Tensor<3,spacedim>          hessian_type;
 
     /**
      * A structure where for each shape
@@ -985,7 +985,7 @@ namespace FEValuesViews
      * definition of the
      * divergence.
      */
-    typedef Tensor<1, spacedim> divergence_type;
+    typedef dealii::Tensor<1, spacedim> divergence_type;
 
     /**
      * A structure where for each shape
@@ -1198,6 +1198,270 @@ namespace FEValuesViews
      */
     std::vector<ShapeFunctionData> shape_function_data;
   };
+
+
+  template <int rank, int dim, int spacedim = dim>
+  class Tensor;
+
+  /**
+   * A class representing a view to a set of
+   * <code>dim*dim</code> components forming a
+   * second-order tensor from a
+   * vector-valued finite
+   * element. Views are discussed in the
+   * @ref vector_valued module.
+   *
+   * This class allows to query the
+   * value and divergence of
+   * (components of) shape functions
+   * and solutions representing
+   * tensors. The
+   * divergence of a tensor
+   * $T_{ij}, 0\le i,j<\text{dim}$ is
+   * defined as
+   * $d_i = \sum_j \frac{\partial T_{ji}}{\partial x_j},
+   * 0\le i<\text{dim}$.
+   *
+   * You get an object of this type if you
+   * apply a
+   * FEValuesExtractors::Tensor to
+   * an FEValues, FEFaceValues or
+   * FESubfaceValues object.
+   *
+   * @ingroup feaccess vector_valued
+   *
+   * @author Denis Davydov, 2013
+   */
+  template <int dim, int spacedim>
+  class Tensor<2,dim,spacedim>
+  {
+  public:
+
+    /**
+     * Data type for what you get when you apply an extractor
+     * of this kind to a vector-valued finite element.
+     */
+    typedef dealii::Tensor<2, spacedim> value_type;
+
+    /**
+     * Data type for taking the divergence of a tensor: a vector.
+     */
+    typedef dealii::Tensor<1, spacedim> divergence_type;
+
+      /**
+       * A structure where for each shape
+       * function we pre-compute a bunch of
+       * data that will make later accesses
+       * much cheaper.
+       */
+      struct ShapeFunctionData
+      {
+      /**
+       * For each pair (shape
+       * function,component within
+       * vector), store whether the
+       * selected vector component may be
+       * nonzero. For primitive shape
+       * functions we know for sure
+       * whether a certain scalar
+       * component of a given shape
+       * function is nonzero, whereas for
+       * non-primitive shape functions
+       * this may not be entirely clear
+       * (e.g. for RT elements it depends
+       * on the shape of a cell).
+       */
+        bool is_nonzero_shape_function_component[value_type::n_independent_components];
+
+      /**
+       * For each pair (shape function,
+       * component within vector), store
+       * the row index within the
+       * shape_values, shape_gradients,
+       * and shape_hessians tables (the
+       * column index is the quadrature
+       * point index). If the shape
+       * function is primitive, then we
+       * can get this information from
+       * the shape_function_to_row_table
+       * of the FEValues object;
+       * otherwise, we have to work a bit
+       * harder to compute this
+       * information.
+       */
+        unsigned int row_index[value_type::n_independent_components];
+
+      /**
+       * For each shape function say the
+       * following: if only a single
+       * entry in
+       * is_nonzero_shape_function_component
+       * for this shape function is
+       * nonzero, then store the
+       * corresponding value of row_index
+       * and
+       * single_nonzero_component_index
+       * represents the index between 0
+       * and (dim^2) for which it is
+       * attained. If multiple components
+       * are nonzero, then store -1. If
+       * no components are nonzero then
+       * store -2.
+       */
+        int single_nonzero_component;
+        unsigned int single_nonzero_component_index;
+      };
+
+    /**
+     * Default constructor. Creates an
+     * invalid object.
+     */
+      Tensor();
+
+
+    /**
+     * Constructor for an object that
+     * represents <code>(dim*dim)</code>
+     * components of a
+     * FEValuesBase object (or of one of
+     * the classes derived from
+     * FEValuesBase), representing the unique
+     * components comprising a second-order
+     * tensor valued variable.
+     *
+     * The second argument denotes the
+     * index of the first component of the
+     * selected symmetric second order tensor.
+     */
+      Tensor(const FEValuesBase<dim, spacedim> &fe_values_base,
+	     const unsigned int first_tensor_component);
+
+
+    /**
+     * Copy operator. This is not a
+     * lightweight object so we don't allow
+     * copying and generate an exception if
+     * this function is called.
+     */
+      Tensor &operator=(const Tensor<2, dim, spacedim> &);
+
+    /**
+     * Return the value of the vector
+     * components selected by this view,
+     * for the shape function and
+     * quadrature point selected by the
+     * arguments. Here, since the view
+     * represents a vector-valued part of
+     * the FEValues object with
+     * <code>(dim*dim)</code> components
+     * (the unique components of a second-order tensor),
+     * the return type is a tensor of rank 2.
+     *
+     * @param shape_function Number
+     * of the shape function to be
+     * evaluated. Note that this
+     * number runs from zero to
+     * dofs_per_cell, even in the
+     * case of an FEFaceValues or
+     * FESubfaceValues object.
+     *
+     * @param q_point Number of
+     * the quadrature point at which
+     * function is to be evaluated
+     */
+      value_type
+      value (const unsigned int shape_function,
+             const unsigned int q_point) const;
+
+    /**
+     * Return the vector divergence of
+     * the vector components selected by
+     * this view, for the shape function
+     * and quadrature point selected by the
+     * arguments.
+     *
+     * See the general discussion
+     * of this class for a
+     * definition of the
+     * divergence.
+     *
+     * @note The meaning of the arguments
+     * is as documented for the value()
+     * function.
+     */
+      divergence_type
+      divergence (const unsigned int shape_function,
+                  const unsigned int q_point) const;
+
+    /**
+     * Return the values of the selected
+     * vector components of the finite
+     * element function characterized by
+     * <tt>fe_function</tt> at the
+     * quadrature points of the cell, face
+     * or subface selected the last time
+     * the <tt>reinit</tt> function of the
+     * FEValues object was called.
+     *
+     * This function is the equivalent of
+     * the
+     * FEValuesBase::get_function_values
+     * function but it only works on the
+     * selected vector components.
+     */
+      template <class InputVector>
+      void get_function_values (const InputVector &fe_function,
+                                std::vector<value_type> &values) const;
+
+
+    /**
+     * Return the divergence of the selected
+     * vector components of the finite
+     * element function characterized by
+     * <tt>fe_function</tt> at the
+     * quadrature points of the cell, face
+     * or subface selected the last time
+     * the <tt>reinit</tt> function of the
+     * FEValues object was called.
+     *
+     * There is no equivalent function such
+     * as
+     * FEValuesBase::get_function_divergences
+     * in the FEValues classes but the
+     * information can be obtained from
+     * FEValuesBase::get_function_gradients,
+     * of course.
+     *
+     * See the general discussion
+     * of this class for a
+     * definition of the
+     * divergence.
+     */
+      template <class InputVector>
+      void get_function_divergences (const InputVector &fe_function,
+                                     std::vector<divergence_type> &divergences) const;
+
+    private:
+      /**
+       * A reference to the FEValuesBase object
+       * we operate on.
+       */
+      const FEValuesBase<dim, spacedim> &fe_values;
+
+      /**
+       * The first component of the vector
+       * this view represents of the
+       * FEValuesBase object.
+       */
+      const unsigned int first_tensor_component;
+
+      /**
+       * Store the data about shape
+       * functions.
+       */
+      std::vector<ShapeFunctionData> shape_function_data;
+    };
+
 }
 
 
@@ -1229,6 +1493,8 @@ namespace internal
       std::vector<dealii::FEValuesViews::Vector<dim,spacedim> > vectors;
       std::vector<dealii::FEValuesViews::SymmetricTensor<2,dim,spacedim> >
       symmetric_second_order_tensors;
+      std::vector<dealii::FEValuesViews::Tensor<2,dim,spacedim> >
+      second_order_tensors;
 
       /**
        * Constructor.
@@ -2832,6 +3098,21 @@ public:
   const FEValuesViews::SymmetricTensor<2,dim,spacedim> &
   operator[] (const FEValuesExtractors::SymmetricTensor<2> &tensor) const;
 
+
+  /**
+   * Create a view of the current FEValues
+   * object that represents a set of
+   * <code>(dim*dim)</code> scalar components
+   * (i.e. a 2nd order tensor)
+   * of the vector-valued
+   * finite element. The concept of views
+   * is explained in the documentation of
+   * the namespace FEValuesViews and in particular
+   * in the @ref vector_valued module.
+   */
+  const FEValuesViews::Tensor<2,dim,spacedim> &
+  operator[] (const FEValuesExtractors::Tensor<2> &tensor) const;
+
   //@}
 
   /// @name Access to the raw data
@@ -3134,6 +3415,7 @@ private:
   template <int, int> friend class FEValuesViews::Scalar;
   template <int, int> friend class FEValuesViews::Vector;
   template <int, int, int> friend class FEValuesViews::SymmetricTensor;
+  template <int, int, int> friend class FEValuesViews::Tensor;
 };
 
 
@@ -4098,7 +4380,7 @@ namespace FEValuesViews
     inline
     dealii::SymmetricTensor<2,1>
     symmetrize_single_row (const unsigned int n,
-                           const Tensor<1,1> &t)
+                           const dealii::Tensor<1,1> &t)
     {
       Assert (n < 1, ExcIndexRange (n, 0, 1));
       (void)n; // removes -Wunused-parameter warning in optimized mode
@@ -4111,7 +4393,7 @@ namespace FEValuesViews
     inline
     dealii::SymmetricTensor<2,2>
     symmetrize_single_row (const unsigned int n,
-                           const Tensor<1,2> &t)
+                           const dealii::Tensor<1,2> &t)
     {
       switch (n)
         {
@@ -4137,7 +4419,7 @@ namespace FEValuesViews
     inline
     dealii::SymmetricTensor<2,3>
     symmetrize_single_row (const unsigned int n,
-                           const Tensor<1,3> &t)
+                           const dealii::Tensor<1,3> &t)
     {
       switch (n)
         {
@@ -4318,7 +4600,7 @@ namespace FEValuesViews
         // b_jj := \dfrac{\partial phi_{ii,jj}}{\partial x_jj}.
         // again, all other entries of 'b' are
         // zero
-        const Tensor<1, spacedim> phi_grad = fe_values.shape_gradients[snc][q_point];
+        const dealii::Tensor<1, spacedim> phi_grad = fe_values.shape_gradients[snc][q_point];
 
         divergence_type return_value;
         return_value[ii] = phi_grad[jj];
@@ -4387,6 +4669,21 @@ operator[] (const FEValuesExtractors::SymmetricTensor<2> &tensor) const
 
   return fe_values_views_cache.symmetric_second_order_tensors[tensor.first_tensor_component];
 }
+
+template <int dim, int spacedim>
+inline
+const FEValuesViews::Tensor<2,dim,spacedim> &
+FEValuesBase<dim,spacedim>::
+operator[] (const FEValuesExtractors::Tensor<2> &tensor) const
+{
+  Assert (tensor.first_tensor_component <
+          fe_values_views_cache.second_order_tensors.size(),
+          ExcIndexRange (tensor.first_tensor_component,
+                         0, fe_values_views_cache.second_order_tensors.size()));
+
+  return fe_values_views_cache.second_order_tensors[tensor.first_tensor_component];
+}
+
 
 
 

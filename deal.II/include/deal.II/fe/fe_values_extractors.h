@@ -200,6 +200,61 @@ namespace FEValuesExtractors
      */
     SymmetricTensor (const unsigned int first_tensor_component);
   };
+
+
+  /**
+   * Extractor for a (possible non-)symmetric tensor of a
+   * rank specified by the template
+   * argument. For a second order
+   * tensor, this represents a collection of
+   * <code>(dim*dim)</code>
+   * components of a vector-valued
+   * element. The value of <code>dim</code>
+   * is defined by the FEValues object the
+   * extractor is applied to. The result of
+   * applying an object of this type to an
+   * FEValues, FEFaceValues or
+   * FESubfaceValues object is of type
+   * FEValuesViews::Tensor.
+   *
+   * The concept of
+   * extractors is defined in the
+   * documentation of the namespace
+   * FEValuesExtractors and in the @ref
+   * vector_valued module.
+   *
+   * @ingroup feaccess vector_valued
+   *
+   * @author Denis Davydov, 2013
+   */
+  template <int rank>
+  struct Tensor
+  {
+    /**
+     * The first component of the tensor
+     * view.
+     */
+    unsigned int first_tensor_component;
+
+    /**
+     * Default constructor. Initialize the
+     * object with an invalid component. This leads to
+     * an object that can not be used, but it allows
+     * objects of this kind to be put into arrays that
+     * require a default constructor upon resizing the
+     * array, and then later assigning a suitable
+     * object to each element of the array.
+     */
+    Tensor ();
+
+    /**
+     * Constructor. Take the first
+     * component of the selected tensor
+     * inside the FEValues object as
+     * argument.
+     */
+    Tensor (const unsigned int first_tensor_component);
+  };
 }
 
 
@@ -248,6 +303,22 @@ namespace FEValuesExtractors
   template <int rank>
   inline
   SymmetricTensor<rank>::SymmetricTensor (const unsigned int first_tensor_component)
+    :
+    first_tensor_component (first_tensor_component)
+  {}
+
+
+  template <int rank>
+  inline
+  Tensor<rank>::Tensor ()
+    :
+    first_tensor_component(numbers::invalid_unsigned_int)
+  {}
+
+
+  template <int rank>
+  inline
+  Tensor<rank>::Tensor (const unsigned int first_tensor_component)
     :
     first_tensor_component (first_tensor_component)
   {}

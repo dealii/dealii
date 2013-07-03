@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -69,116 +69,97 @@ public:
   void clear();
 
   /**
-   * Determine whether a dof index
-   * is subject to a boundary
+   * Determine whether a dof index is subject to a boundary
    * constraint.
    */
   bool is_boundary_index (const unsigned int level,
                           const types::global_dof_index index) const;
 
   /**
-   * Determine whether a dof index
-   * is at an edge that is not
-   * a refinement edge.
+   * Determine whether a dof index is at an edge that is not a
+   * refinement edge.
    */
   bool non_refinement_edge_index (const unsigned int level,
                                   const types::global_dof_index index) const;
 
   /**
-   * Determine whether a dof index
-   * is at the refinement edge.
+   * Determine whether a dof index is at the refinement edge.
    */
   bool at_refinement_edge (const unsigned int level,
                            const types::global_dof_index index) const;
 
   /**
-   * Determine whether a dof index
-   * is at the refinement edge and
-   * subject to a boundary
-   * constraint .
+   * Determine whether a dof index is at the refinement edge and
+   * subject to a boundary constraint .
    */
   bool at_refinement_edge_boundary (const unsigned int level,
                                     const types::global_dof_index index) const;
 
   /**
-   * Return the indices of dofs for each
-   * level that lie on the boundary of the
-   * domain.
+   * Return the indices of dofs for each level that lie on the
+   * boundary of the domain.
    */
   const std::vector<std::set<types::global_dof_index> > &
   get_boundary_indices () const;
 
   /**
-   * Return the indices of dofs for each
-   * level that lie on the boundary of the
-   * domain.
+   * Return the indices of dofs for each level that lie on the
+   * boundary of the domain.
    */
   const std::vector<std::set<types::global_dof_index> > &
   get_non_refinement_edge_indices () const;
 
   /**
-   * Return the indices of dofs for each
-   * level that lie on the refinement edge
-   * (i.e. are on faces between cells of
-   * this level and cells on the level
-   * below).
+   * Return the indices of dofs for each level that lie on the
+   * refinement edge (i.e. are on faces between cells of this level
+   * and cells on the level below).
    */
   const std::vector<std::vector<bool> > &
   get_refinement_edge_indices () const;
 
   /**
-   * Return the indices of dofs for each
-   * level that are in the intersection of
-   * the sets returned by
-   * get_boundary_indices() and
+   * Return the indices of dofs for each level that are in the
+   * intersection of the sets returned by get_boundary_indices() and
    * get_refinement_edge_indices().
    */
   const std::vector<std::vector<bool> > &
   get_refinement_edge_boundary_indices () const;
 
   /**
-   * Return if boundary_indices need to
-   * be set or not.
+   * Return if boundary_indices need to be set or not.
    */
 
   bool set_boundary_values () const;
 
   /**
-   * Return if the finite element requires
-   * continuity across refinement edges.
+   * Return if the finite element requires continuity across
+   * refinement edges.
    */
   bool continuity_across_refinement_edges () const;
 private:
 
   /**
-   * The indices of boundary dofs
-   * for each level.
+   * The indices of boundary dofs for each level.
    */
   std::vector<std::set<types::global_dof_index> > boundary_indices;
 
   /**
-   * The degrees of freedom on egdges
-   * that are not a
-   * refinement edge between a
-   * level and coarser cells.
+   * The degrees of freedom on egdges that are not a refinement edge
+   * between a level and coarser cells.
    */
   std::vector<std::set<types::global_dof_index> > non_refinement_edge_indices;
 
   /**
-   * The degrees of freedom on the
-   * refinement edge between a
-   * level and coarser cells.
+   * The degrees of freedom on the refinement edge between a level and
+   * coarser cells.
    */
   std::vector<std::vector<bool> > refinement_edge_indices;
 
   /**
-   * The degrees of freedom on the
-   * refinement edge between a
-   * level and coarser cells, which
-   * are also on the boundary.
+   * The degrees of freedom on the refinement edge between a level and
+   * coarser cells, which are also on the boundary.
    *
-   * This is a subset of
-   * #refinement_edge_indices.
+   * This is a subset of #refinement_edge_indices.
    */
   std::vector<std::vector<bool> > refinement_edge_boundary_indices;
 };
@@ -189,7 +170,7 @@ inline
 void
 MGConstrainedDoFs::initialize(const DoFHandler<dim,spacedim> &dof)
 {
-  const unsigned int nlevels = dof.get_tria().n_levels();
+  const unsigned int nlevels = dof.get_tria().n_global_levels();
   refinement_edge_indices.resize(nlevels);
   refinement_edge_boundary_indices.resize(nlevels);
   non_refinement_edge_indices.resize(nlevels);
@@ -213,7 +194,7 @@ MGConstrainedDoFs::initialize(
   const typename FunctionMap<dim>::type &function_map,
   const ComponentMask &component_mask)
 {
-  const unsigned int nlevels = dof.get_tria().n_levels();
+  const unsigned int nlevels = dof.get_tria().n_global_levels();
   boundary_indices.resize(nlevels);
   refinement_edge_indices.resize(nlevels);
   refinement_edge_boundary_indices.resize(nlevels);

@@ -865,15 +865,8 @@ namespace MeshWorker
                   {
                     if (mg_constrained_dofs->set_boundary_values())
                       {
-                        // At the
-                        // boundary,
-                        // only enter
-                        // the term
-                        // on the
-                        // diagonal,
-                        // but not
-                        // the
-                        // coupling terms
+                        // At the boundary, only enter the term on the
+                        // diagonal, but not the coupling terms
                         if ((!mg_constrained_dofs->is_boundary_index(level, i1[j]) &&
                              !mg_constrained_dofs->is_boundary_index(level, i2[k]))
                             ||
@@ -973,6 +966,17 @@ namespace MeshWorker
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
               if (std::fabs(M(j,k)) >= threshold)
+		// Enter values into matrix only if j corresponds to a
+		// degree of freedom on the refinemenent edge, k does
+		// not, and both are not on the boundary. This is part
+		// the difference between the complete matrix with no
+		// boundary condition at the refinement edge and and
+		// the matrix assembled above by assemble().
+		
+		// Thus the logic is: enter the row if it is
+		// constrained by hanging node constraints (actually,
+		// the whole refinement edge), but not if it is
+		// constrained by a boundary constraint.
                 if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
                     !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
                   {

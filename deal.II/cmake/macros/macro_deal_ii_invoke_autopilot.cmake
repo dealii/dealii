@@ -81,22 +81,22 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
     ENDIF()
 
     # Define custom targets to easily switch the build type:
-    IF(${DEAL_II_BUILD_TYPE} MATCHES "Debug")
-      ADD_CUSTOM_TARGET(debug
-        COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
-        COMMENT "Switch CMAKE_BUILD_TYPE to Debug"
-        )
+    ADD_CUSTOM_TARGET(debug
+      COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Debug ${CMAKE_SOURCE_DIR}
+      COMMENT "Switch CMAKE_BUILD_TYPE to Debug"
+      )
+
+    ADD_CUSTOM_TARGET(release
+      COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
+      COMMENT "Switch CMAKE_BUILD_TYPE to Release"
+      )
+
+    # Only mention release and debug targets if its actuallay possible to
+    # switch between them:
+    IF(${DEAL_II_BUILD_TYPE} MATCHES "DebugRelease")
       SET(_switch_targets
-        "#      $ make debug          - to switch the build type to \"Debug\"\n"
-        )
-    ENDIF()
-    IF(${DEAL_II_BUILD_TYPE} MATCHES "Release")
-      ADD_CUSTOM_TARGET(release
-        COMMAND ${CMAKE_COMMAND} -DCMAKE_BUILD_TYPE=Release ${CMAKE_SOURCE_DIR}
-        COMMENT "Switch CMAKE_BUILD_TYPE to Release"
-        )
-      SET(_switch_targets
-        "${_switch_targets}#      $ make release        - to switch the build type to \"Release\"\n"
+"#      $ make debug          - to switch the build type to \"Debug\"
+#      $ make release        - to switch the build type to \"Release\"\n"
         )
     ENDIF()
 

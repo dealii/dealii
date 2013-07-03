@@ -1,7 +1,7 @@
 //----------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2012 by the deal.II authors
+//    Copyright (C) 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -18,7 +18,7 @@
 #include "../tests.h"
 #include <deal.II/base/logstream.h>
 #include <deal.II/lac/full_matrix.h>
-#include <lac/sparse_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
 #include <deal.II/lac/block_indices.h>
 #include <deal.II/grid/tria.h>
 #include <deal.II/grid/grid_generator.h>
@@ -106,10 +106,7 @@ void test(FiniteElement<dim>& fe)
 
 int main()
 {
-  const std::string logname = JobIdentifier::base_name(__FILE__) + std::string("/output");
-  std::ofstream logfile(logname.c_str());
-  deallog.attach(logfile);
-  deallog.depth_console (0);
+  initlog(__FILE__);
 
   FE_DGP<2> p0(0);
   FE_DGP<2> p1(1);
