@@ -49,6 +49,7 @@
 
 #include <fstream>
 #include <vector>
+#include <iomanip>
 
 using namespace dealii;
 
@@ -61,9 +62,9 @@ template <int dim>
 class F :  public Function<dim>
 {
   public:
-    F (const unsigned int q)
+    F ()
 		    :
-		    q(q)
+		    q(1)
       {}
 
     virtual double value (const Point<dim> &p,
@@ -83,45 +84,35 @@ class F :  public Function<dim>
 
 
 template <int dim>
-void do_project (const Triangulation<dim> &triangulation,
-		 const unsigned int        p)
+void do_project (const unsigned int        p)
 {
+  Triangulation<dim>     triangulation;
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (3);
+
   std::cout << "Start: " << __PRETTY_FUNCTION__ << ' ' << p << std::endl;
   FE_Q<dim> fe(p);
   DoFHandler<dim>        dof_handler(triangulation);
   dof_handler.distribute_dofs (fe);
 
   ConstraintMatrix constraints;
-  DoFTools::make_hanging_node_constraints (dof_handler,
-					   constraints);
   constraints.close ();
 
   Vector<double> projection (dof_handler.n_dofs());
   Vector<float>  error (triangulation.n_active_cells());
-  for (unsigned int q=0; q<=p; ++q)
+  for (unsigned int q=0; q<4; ++q)
     {
 				       // project the function
       VectorTools::project (dof_handler,
 			    constraints,
 			    QGauss<dim>(p+2),
-			    F<dim> (q),
+			    F<dim> (),
 			    projection);
-				       // just to make sure it doesn't get
-				       // forgotten: handle hanging node
-				       // constraints
-      constraints.distribute (projection);
-
-				       // then compute the interpolation error
-      VectorTools::integrate_difference (dof_handler,
-					 projection,
-					 F<dim> (q),
-					 error,
-					 QGauss<dim>(std::max(p,q)+1),
-					 VectorTools::L2_norm);
-      Assert (error.l2_norm() <= 1e-12*projection.l2_norm(),
-	      ExcInternalError());
+      Assert (std::fabs(projection.l1_norm() - 3750.000000000079) < 1e-10,
+      	      ExcInternalError());
     }
-  std::cout << "Done: " << __PRETTY_FUNCTION__ << ' ' << p << std::endl;
+  std::cout << "Done: " << __PRETTY_FUNCTION__ << ' ' << p
+	    << std::endl;
 }
 
 
@@ -130,13 +121,11 @@ void do_project (const Triangulation<dim> &triangulation,
 template <int dim>
 void test ()
 {
-  Triangulation<dim>     triangulation;
-  GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (2);
-
+  std::cout.precision(16);
+  
   Threads::TaskGroup<> g;
-  for (unsigned int p=1; p<4; ++p)
-    g += Threads::new_task (&do_project<dim>, triangulation, p);
+  for (unsigned int p=1; p<12; ++p)
+    g += Threads::new_task (&do_project<dim>, 3);
   g.join_all ();
 }
 
@@ -150,6 +139,7 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
+  test<2>();
 
   Threads::TaskGroup<> g;
   for (unsigned int i=0; i<2; ++i)
