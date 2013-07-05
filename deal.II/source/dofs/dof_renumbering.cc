@@ -1559,7 +1559,7 @@ namespace DoFRenumbering
         typename DH::active_cell_iterator begin = dof.begin_active();
         typename DH::active_cell_iterator end = dof.end();
 
-        copy (begin, end, ordered_cells.begin());
+        std::copy (begin, end, ordered_cells.begin());
         std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
         compute_cell_wise(new_indices, reverse, dof, ordered_cells);
