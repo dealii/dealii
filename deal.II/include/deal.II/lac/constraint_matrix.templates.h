@@ -761,8 +761,18 @@ namespace internal
       {
         for (typename std::vector<size_type>::const_iterator it = cm.begin();
              it != cm.end(); ++it)
-          if (vec.in_local_range(*it))
-            vec(*it) = 0.;
+          {
+            // If shift>0 then we are working on a part of a BlockVector
+            // so vec(i) is actually the global entry i+shift.
+            // We first make sure the line falls into the range of vec,
+            // then check if is part of the local part of the vector, before
+            // finally setting it to 0.
+            if ((*it)<shift)
+              continue;
+            size_type idx = *it - shift;
+            if (vec.in_local_range(idx))
+              vec(idx) = 0.;
+          }
         vec.zero_out_ghosts();
       }
 
