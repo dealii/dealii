@@ -57,11 +57,9 @@ template <int dim>
 class F :  public Function<dim>
 {
   public:
-    F (const unsigned int q,
-       const unsigned int n_components)
+    F ()
                     :
-                    Function<dim>(n_components),
-                    q(q)
+                    q(1)
       {}
 
     virtual double value (const Point<dim> &p,
@@ -76,19 +74,6 @@ class F :  public Function<dim>
         return val;
       }
 
-
-    virtual void vector_value (const Point<dim> &p,
-                               Vector<double>   &v) const
-      {
-        for (unsigned int c=0; c<v.size(); ++c)
-          {
-            v(c) = 0;
-            for (unsigned int d=0; d<dim; ++d)
-              for (unsigned int i=0; i<=q; ++i)
-                v(c) += (d+1)*(i+1)*std::pow (p[d], 1.*i)+c;
-          }
-      }
-
   private:
     const unsigned int q;
 };
@@ -96,14 +81,10 @@ class F :  public Function<dim>
 
 template <int dim>
 void do_project (const Triangulation<dim> &triangulation,
-                 const FiniteElement<dim> &fe,
-                 const unsigned int        p,
-                 const unsigned int        order_difference)
+                 const FiniteElement<dim> &fe)
 {
   DoFHandler<dim>        dof_handler(triangulation);
   dof_handler.distribute_dofs (fe);
-
-  std::cout << "n_dofs=" << dof_handler.n_dofs() << std::endl;
 
   ConstraintMatrix constraints;
   DoFTools::make_hanging_node_constraints (dof_handler,
@@ -111,40 +92,22 @@ void do_project (const Triangulation<dim> &triangulation,
   constraints.close ();
 
   Vector<double> projection (dof_handler.n_dofs());
-  Vector<float>  error (triangulation.n_active_cells());
-  for (unsigned int q=0; q<=p+2-order_difference; ++q)
-    {
-                                       // project the function
+
+  // project the function
       VectorTools::project (dof_handler,
                             constraints,
-                            QGauss<dim>(p+2),
-                            F<dim> (q, fe.n_components()),
+                            QGauss<dim>(3),
+                            F<dim> (),
                             projection);
                                        // just to make sure it doesn't get
                                        // forgotten: handle hanging node
                                        // constraints
       constraints.distribute (projection);
 
-                                       // then compute the interpolation error
-      VectorTools::integrate_difference (dof_handler,
-                                         projection,
-                                         F<dim> (q, fe.n_components()),
-                                         error,
-                                         QGauss<dim>(std::max(p,q)+1),
-                                         VectorTools::L2_norm);
-      std::cout << fe.get_name() << ", P_" << q
-              << ", rel. error=" << error.l2_norm() / projection.l2_norm()
-              << std::endl;
-
-      if (q<=p-order_difference)
-        if (error.l2_norm() > 1e-10*projection.l2_norm())
-          {
-        std::cout << "Projection failed with relative error "
-                << error.l2_norm() / projection.l2_norm()
-                << std::endl;
-        Assert (false, ExcInternalError());
-          }
-    }
+      double sum=0;
+      for (unsigned int i=0; i<projection.size(); ++i)
+        sum += std::fabs(projection[i]);
+      printf ("Check: %5.13f\n", sum);
 }
 
 
@@ -154,15 +117,14 @@ void do_project (const Triangulation<dim> &triangulation,
 // of polynomial degree p has normal components of degree p-1 and therefore
 // can only represent polynomials of degree p-1 exactly. the gap is then 1.
 template <int dim>
-void test_no_hanging_nodes (const FiniteElement<dim> &fe,
-                            const unsigned int        p,
-                            const unsigned int        order_difference = 0)
+void test_no_hanging_nodes (const FiniteElement<dim> &fe)
 {
   Triangulation<dim>     triangulation;
   GridGenerator::hyper_cube (triangulation);
   triangulation.refine_global (3);
 
-  do_project (triangulation, fe, p, order_difference);
+  for (unsigned int i=0; i<12; ++i)
+    do_project (triangulation, fe);
 }
 
 
@@ -170,7 +132,7 @@ void test_no_hanging_nodes (const FiniteElement<dim> &fe,
 template <int dim>
 void test ()
 {
-  test_no_hanging_nodes (FE_Q<dim>(1), 1);
+  test_no_hanging_nodes (FE_Q<dim>(1));
 }
 
 
