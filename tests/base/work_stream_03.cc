@@ -20,7 +20,6 @@
 // verifying that it indeed works
 
 #include "../tests.h"
-#include <deal.II/base/work_stream.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
@@ -44,53 +43,50 @@
 #include <deal.II/fe/fe_dgq.h>
 #include <deal.II/fe/fe_nedelec.h>
 #include <deal.II/fe/fe_q.h>
-
-#include <deal.II/base/function.h>
-#include <deal.II/base/quadrature.h>
-#include <deal.II/lac/vector.h>
-#include <deal.II/lac/sparse_matrix.h>
-#include <deal.II/lac/compressed_sparsity_pattern.h>
-#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
-#include <deal.II/lac/precondition.h>
-#include <deal.II/lac/solver_cg.h>
-#include <deal.II/lac/vector_memory.h>
-#include <deal.II/dofs/dof_accessor.h>
-#include <deal.II/dofs/dof_handler.h>
-#include <deal.II/dofs/dof_tools.h>
-#include <deal.II/fe/mapping_q1.h>
-#include <deal.II/hp/fe_values.h>
-#include <deal.II/numerics/vector_tools.h>
-#include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/fe/fe_q_hierarchical.h>
+#include <deal.II/fe/fe_raviart_thomas.h>
+#include <deal.II/fe/fe_system.h>
 
 #include <fstream>
 #include <vector>
-#include <iomanip>
-
-using namespace dealii;
-
 
 char logname[] = "work_stream_03/output";
-
 
 
 template <int dim>
 class F :  public Function<dim>
 {
   public:
-    F ()
-		    :
-		    q(1)
+    F (const unsigned int q,
+       const unsigned int n_components)
+                    :
+                    Function<dim>(n_components),
+                    q(q)
       {}
 
     virtual double value (const Point<dim> &p,
-			  const unsigned int component) const
+                          const unsigned int component) const
       {
-	Assert (component == 0, ExcInternalError());
-	double val = 0;
-	for (unsigned int d=0; d<dim; ++d)
-	  for (unsigned int i=0; i<=q; ++i)
-	    val += (d+1)*(i+1)*std::pow (p[d], 1.*i);
-	return val;
+        Assert ((component == 0) && (this->n_components == 1),
+                ExcInternalError());
+        double val = 0;
+        for (unsigned int d=0; d<dim; ++d)
+          for (unsigned int i=0; i<=q; ++i)
+            val += (d+1)*(i+1)*std::pow (p[d], 1.*i);
+        return val;
+      }
+
+
+    virtual void vector_value (const Point<dim> &p,
+                               Vector<double>   &v) const
+      {
+        for (unsigned int c=0; c<v.size(); ++c)
+          {
+            v(c) = 0;
+            for (unsigned int d=0; d<dim; ++d)
+              for (unsigned int i=0; i<=q; ++i)
+                v(c) += (d+1)*(i+1)*std::pow (p[d], 1.*i)+c;
+          }
       }
 
   private:
@@ -98,193 +94,83 @@ class F :  public Function<dim>
 };
 
 
-Triangulation<2>     triangulation;
-FE_Q<2> fe(3);
-DoFHandler<2>        dof_handler(triangulation);
-ConstraintMatrix constraints;
-
-namespace
-{
-  template <int dim,
-           int spacedim>
-  struct Scratch
-  {
-    Scratch (const ::dealii::hp::FECollection<dim,spacedim> &fe,
-             const UpdateFlags         update_flags,
-             const ::dealii::hp::QCollection<dim> &quadrature)
-      :
-      fe_collection (fe),
-      quadrature_collection (quadrature),
-      x_fe_values (fe_collection,
-                   quadrature_collection,
-                   update_flags),
-      rhs_values(quadrature_collection.max_n_quadrature_points()),
-      update_flags (update_flags)
-    {}
-
-    Scratch (const Scratch &data)
-      :
-      fe_collection (data.fe_collection),
-      quadrature_collection (data.quadrature_collection),
-      x_fe_values (fe_collection,
-                   quadrature_collection,
-                   data.update_flags),
-      rhs_values (data.rhs_values),
-      update_flags (data.update_flags)
-    {}
-
-    const ::dealii::hp::FECollection<dim,spacedim>      &fe_collection;
-    const ::dealii::hp::QCollection<dim>                &quadrature_collection;
-
-    ::dealii::hp::FEValues<dim,spacedim> x_fe_values;
-
-    std::vector<double>                  rhs_values;
-
-    const UpdateFlags update_flags;
-  };
-
-
-  struct CopyData
-  {
-    std::vector<types::global_dof_index> dof_indices;
-    FullMatrix<double>        cell_matrix;
-    dealii::Vector<double>    cell_rhs;
-    const ConstraintMatrix   *constraints;
-  };
-}
-
-template<int dim, int spacedim, typename CellIterator>
-  void
-  mass_assembler(const CellIterator &cell, Scratch<dim, spacedim> &data,
-      CopyData &copy_data)
-  {
-    data.x_fe_values.reinit(cell);
-    const FEValues<dim, spacedim> &fe_values =
-        data.x_fe_values.get_present_fe_values();
-
-    const unsigned int dofs_per_cell = fe_values.dofs_per_cell, n_q_points =
-        fe_values.n_quadrature_points;
-    const FiniteElement<dim, spacedim> &fe = fe_values.get_fe();
-    const unsigned int n_components = fe.n_components();
-
-      {
-        copy_data.cell_matrix.reinit(dofs_per_cell, dofs_per_cell);
-        copy_data.cell_rhs.reinit(dofs_per_cell);
-
-        copy_data.dof_indices.resize(dofs_per_cell);
-      }
-
-      Assert (copy_data.cell_matrix.frobenius_norm() == 0, ExcInternalError());
-    cell->get_dof_indices(copy_data.dof_indices);
-
-    data.rhs_values.resize(n_q_points);
-    F<dim>().value_list(fe_values.get_quadrature_points(),
-        data.rhs_values);
-
-    for (unsigned int i = 0; i < dofs_per_cell; ++i)
-      {
-        const unsigned int component_i = fe.system_to_component_index(i).first;
-        const double *phi_i = &fe_values.shape_value(i, 0);
-
-        double add_data = 0;
-        for (unsigned int point = 0; point < n_q_points; ++point)
-          add_data += phi_i[point] * fe_values.JxW(point)
-              * data.rhs_values[point];
-        copy_data.cell_rhs(i) = add_data;
-      }
-  }
-
-
-template <typename MatrixType,
-         typename VectorType>
-void copy_local_to_global (const CopyData &data,
-                           MatrixType *matrix,
-                           VectorType *right_hand_side)
-{
-  const unsigned int dofs_per_cell = data.dof_indices.size();
-    data.constraints->distribute_local_to_global(data.cell_matrix,
-                                                 data.cell_rhs,
-                                                 data.dof_indices,
-                                                 *matrix, *right_hand_side);
-}
-
-
-
-template <int dim, typename number, int spacedim>
-void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
-                         const Quadrature<dim>    &q,
-                         SparseMatrix<number>     &matrix,
-                         Vector<double>           &rhs_vector)
-{
-  Assert (matrix.m() == dof.n_dofs(),
-          ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
-  Assert (matrix.n() == dof.n_dofs(),
-          ExcDimensionMismatch (matrix.n(), dof.n_dofs()));
-
-  hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
-  hp::QCollection<dim>                q_collection (q);
-  Scratch<dim, spacedim>
-  assembler_data (fe_collection,
-                  update_values |
-                  update_JxW_values | update_quadrature_points,
-                  q_collection);
-  CopyData copy_data;
-  copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
-                                assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.dof_indices.resize (assembler_data.fe_collection.max_dofs_per_cell());
-  copy_data.constraints = &constraints;
-
-  dealii::WorkStream::run (dof.begin_active(),
-                   static_cast<typename DoFHandler<dim>::active_cell_iterator>(dof.end()),
-                   &mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
-                   std_cxx1x::bind(&
-                                   copy_local_to_global<SparseMatrix<number>, Vector<double> >,
-                                   std_cxx1x::_1, &matrix, &rhs_vector),
-                   assembler_data,
-                   copy_data,
-                   2*multithread_info.n_default_threads,
-                   1);
-}
-
-
 template <int dim>
-void do_project (const unsigned int        p)
+void do_project (const Triangulation<dim> &triangulation,
+                 const FiniteElement<dim> &fe,
+                 const unsigned int        p,
+                 const unsigned int        order_difference)
 {
-  SparsityPattern sparsity;
-  {
-    CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(), dof_handler.n_dofs());
-    DoFTools::make_sparsity_pattern (dof_handler, csp, constraints,
-                                     false);
+  DoFHandler<dim>        dof_handler(triangulation);
+  dof_handler.distribute_dofs (fe);
 
-    sparsity.copy_from (csp);
-  }
+  std::cout << "n_dofs=" << dof_handler.n_dofs() << std::endl;
 
-  SparseMatrix<double> mass_matrix (sparsity);
-  Vector<double> tmp (mass_matrix.n());
+  ConstraintMatrix constraints;
+  DoFTools::make_hanging_node_constraints (dof_handler,
+                                           constraints);
+  constraints.close ();
 
-  const Function<2>* dummy = 0;
-  create_mass_matrix(dof_handler, QGauss < dim > (5), mass_matrix, tmp);
+  Vector<double> projection (dof_handler.n_dofs());
+  Vector<float>  error (triangulation.n_active_cells());
+  for (unsigned int q=0; q<=p+2-order_difference; ++q)
+    {
+                                       // project the function
+      VectorTools::project (dof_handler,
+                            constraints,
+                            QGauss<dim>(p+2),
+                            F<dim> (q, fe.n_components()),
+                            projection);
+                                       // just to make sure it doesn't get
+                                       // forgotten: handle hanging node
+                                       // constraints
+      constraints.distribute (projection);
 
-  double l1 = 0;
-  for (unsigned int i=0; i<tmp.size(); ++i)
-    l1 += std::fabs(tmp[i]);
-  std::ostringstream x;
-  x.precision(18);
-  x << "Check: " << tmp.size() << ' ' << l1 << ' ' << tmp.l1_norm() << std::endl;
-  std::cout << x.str();
+                                       // then compute the interpolation error
+      VectorTools::integrate_difference (dof_handler,
+                                         projection,
+                                         F<dim> (q, fe.n_components()),
+                                         error,
+                                         QGauss<dim>(std::max(p,q)+1),
+                                         VectorTools::L2_norm);
+      std::cout << fe.get_name() << ", P_" << q
+              << ", rel. error=" << error.l2_norm() / projection.l2_norm()
+              << std::endl;
+
+      if (q<=p-order_difference)
+        if (error.l2_norm() > 1e-10*projection.l2_norm())
+          {
+        std::cout << "Projection failed with relative error "
+                << error.l2_norm() / projection.l2_norm()
+                << std::endl;
+        Assert (false, ExcInternalError());
+          }
+    }
 }
 
+
+
+// check the given element of polynomial order p. the last parameter, if
+// given, denotes a gap in convergence order; for example, the Nedelec element
+// of polynomial degree p has normal components of degree p-1 and therefore
+// can only represent polynomials of degree p-1 exactly. the gap is then 1.
+template <int dim>
+void test_no_hanging_nodes (const FiniteElement<dim> &fe,
+                            const unsigned int        p,
+                            const unsigned int        order_difference = 0)
+{
+  Triangulation<dim>     triangulation;
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (3);
+
+  do_project (triangulation, fe, p, order_difference);
+}
 
 
 
 template <int dim>
 void test ()
 {
-  Threads::TaskGroup<> g;
-  for (unsigned int p=1; p<48*3; ++p)
-    g += Threads::new_task (&do_project<dim>, 3);
-  g.join_all ();
+  test_no_hanging_nodes (FE_Q<dim>(1), 1);
 }
 
 
@@ -297,13 +183,5 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  GridGenerator::hyper_cube (triangulation, 0, 1);
-  triangulation.refine_global (1);
-  dof_handler.distribute_dofs (fe);
-  constraints.close ();
-
-  test<2>();
-
-  deallog << "OK" << std::endl;
+  test<3>();
 }
-
