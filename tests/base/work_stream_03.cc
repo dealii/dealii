@@ -23,6 +23,7 @@
 #include <deal.II/base/function.h>
 #include <deal.II/base/logstream.h>
 #include <deal.II/base/quadrature_lib.h>
+#include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
 
 #include <deal.II/grid/tria.h>
@@ -49,11 +50,13 @@
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
 #include <deal.II/numerics/matrix_tools.h>
+#include <deal.II/hp/fe_values.h>
 
 #include <fstream>
 #include <vector>
 
 char logname[] = "work_stream_03/output";
+
 
 
 template <int dim>
@@ -73,44 +76,150 @@ class F :  public Function<dim>
       }
 };
 
+namespace
+{
+  template <int dim,
+           int spacedim>
+  struct Scratch
+  {
+    Scratch (const ::dealii::hp::FECollection<dim,spacedim> &fe,
+             const UpdateFlags         update_flags,
+             const ::dealii::hp::QCollection<dim> &quadrature)
+      :
+      fe_collection (fe),
+      quadrature_collection (quadrature),
+      x_fe_values (fe_collection,
+                   quadrature_collection,
+                   update_flags),
+      rhs_values(quadrature_collection.max_n_quadrature_points()),
+      update_flags (update_flags)
+    {}
+
+    Scratch (const Scratch &data)
+      :
+      fe_collection (data.fe_collection),
+      quadrature_collection (data.quadrature_collection),
+      x_fe_values (fe_collection,
+                   quadrature_collection,
+                   data.update_flags),
+      rhs_values (data.rhs_values),
+      update_flags (data.update_flags)
+    {}
+
+    const ::dealii::hp::FECollection<dim,spacedim>      &fe_collection;
+    const ::dealii::hp::QCollection<dim>                &quadrature_collection;
+
+    ::dealii::hp::FEValues<dim,spacedim> x_fe_values;
+
+    std::vector<double>                  rhs_values;
+
+    const UpdateFlags update_flags;
+  };
+
+
+  struct CopyData
+  {
+    Vector<double>    cell_rhs;
+  };
+}
+
+template<int dim, int spacedim, typename CellIterator>
+  void
+  mass_assembler(const CellIterator &cell, Scratch<dim, spacedim> &data,
+      CopyData &copy_data)
+  {
+    data.x_fe_values.reinit(cell);
+    const FEValues<dim, spacedim> &fe_values =
+        data.x_fe_values.get_present_fe_values();
+
+    const unsigned int dofs_per_cell = fe_values.dofs_per_cell, n_q_points =
+        fe_values.n_quadrature_points;
+    const FiniteElement<dim, spacedim> &fe = fe_values.get_fe();
+    const unsigned int n_components = fe.n_components();
+
+      {
+        copy_data.cell_rhs.reinit(dofs_per_cell);
+      }
+
+    data.rhs_values.resize(n_q_points);
+    F<dim>().value_list(fe_values.get_quadrature_points(),
+        data.rhs_values);
+
+    for (unsigned int i = 0; i < dofs_per_cell; ++i)
+      {
+        const unsigned int component_i = fe.system_to_component_index(i).first;
+        const double *phi_i = &fe_values.shape_value(i, 0);
+
+        double add_data = 0;
+        for (unsigned int point = 0; point < n_q_points; ++point)
+          add_data += phi_i[point] * fe_values.JxW(point)
+              * data.rhs_values[point];
+        copy_data.cell_rhs(i) = add_data;
+      }
+  }
+
+
+template <typename VectorType>
+void copy_local_to_global (const CopyData &data,
+                           VectorType *right_hand_side)
+{
+//  std::cout << data.cell_rhs.l2_norm() << ' ';
+  right_hand_side->push_back (data.cell_rhs.l2_norm());
+}
+
+
+
+template <int dim, int spacedim>
+void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
+                         const Quadrature<dim>    &q,
+                         std::vector<double>           &rhs_vector)
+{
+  hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
+  hp::QCollection<dim>                q_collection (q);
+  Scratch<dim, spacedim>
+  assembler_data (fe_collection,
+                  update_values |
+                  update_JxW_values | update_quadrature_points,
+                  q_collection);
+  CopyData copy_data;
+  copy_data.cell_rhs.reinit (assembler_data.fe_collection.max_dofs_per_cell());
+
+  dealii::WorkStream::run (dof.begin_active(),
+                   static_cast<typename DoFHandler<dim>::active_cell_iterator>(dof.end()),
+                   &mass_assembler<dim, spacedim, typename DoFHandler<dim,spacedim>::active_cell_iterator>,
+                   std_cxx1x::bind(&
+                                   copy_local_to_global<std::vector<double> >,
+                                   std_cxx1x::_1, &rhs_vector),
+                   assembler_data,
+                   copy_data,
+                   2*multithread_info.n_default_threads,
+                   1);
+}
+
 
 template <int dim>
 void do_project (const FiniteElement<dim> &fe)
 {
   Triangulation<dim>     triangulation;
   GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (3);
+  triangulation.refine_global (2);
 
   DoFHandler<dim>        dof_handler(triangulation);
   dof_handler.distribute_dofs (fe);
 
-  ConstraintMatrix constraints;
-  constraints.close ();
+  std::vector<double> tmp;
 
-  SparsityPattern sparsity (dof_handler.n_dofs(), dof_handler.n_dofs(), 30);
-  DoFTools::make_sparsity_pattern (dof_handler, sparsity);
-  sparsity.compress();
-
-  SparseMatrix<double> mass_matrix (sparsity);
-  Vector<double> tmp (mass_matrix.n());
-
-  const Function<dim>* dummy = 0;
-  MatrixCreator::create_mass_matrix (dof_handler, QGauss<dim>(3),
-      mass_matrix, F<dim>(), tmp,
-      dummy, constraints);
+  create_mass_matrix (dof_handler, QGauss<dim>(3),
+      tmp);
 
   double sum=0;
-  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+  for (unsigned int i=0; i<tmp.size(); ++i)
     sum += std::fabs(tmp[i]);
-  printf ("Check: %5.13f\n", sum);
+  printf ("\nCheck: %5.13f\n", sum);
 }
 
 
 
-// check the given element of polynomial order p. the last parameter, if
-// given, denotes a gap in convergence order; for example, the Nedelec element
-// of polynomial degree p has normal components of degree p-1 and therefore
-// can only represent polynomials of degree p-1 exactly. the gap is then 1.
 template <int dim>
 void test_no_hanging_nodes (const FiniteElement<dim> &fe)
 {
