@@ -28,6 +28,8 @@
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
 #include <deal.II/lac/constraint_matrix.h>
+#include <deal.II/lac/sparse_matrix.h>
+#include <deal.II/lac/compressed_simple_sparsity_pattern.h>
 #include <deal.II/grid/grid_generator.h>
 #include <deal.II/grid/grid_refinement.h>
 #include <deal.II/grid/tria_accessor.h>
@@ -46,6 +48,7 @@
 #include <deal.II/fe/fe_q_hierarchical.h>
 #include <deal.II/fe/fe_raviart_thomas.h>
 #include <deal.II/fe/fe_system.h>
+#include <deal.II/numerics/matrix_tools.h>
 
 #include <fstream>
 #include <vector>
@@ -57,11 +60,6 @@ template <int dim>
 class F :  public Function<dim>
 {
   public:
-    F ()
-                    :
-                    q(1)
-      {}
-
     virtual double value (const Point<dim> &p,
                           const unsigned int component) const
       {
@@ -69,45 +67,42 @@ class F :  public Function<dim>
                 ExcInternalError());
         double val = 0;
         for (unsigned int d=0; d<dim; ++d)
-          for (unsigned int i=0; i<=q; ++i)
+          for (unsigned int i=0; i<=1; ++i)
             val += (d+1)*(i+1)*std::pow (p[d], 1.*i);
         return val;
       }
-
-  private:
-    const unsigned int q;
 };
 
 
 template <int dim>
-void do_project (const Triangulation<dim> &triangulation,
-                 const FiniteElement<dim> &fe)
+void do_project (const FiniteElement<dim> &fe)
 {
+  Triangulation<dim>     triangulation;
+  GridGenerator::hyper_cube (triangulation);
+  triangulation.refine_global (3);
+
   DoFHandler<dim>        dof_handler(triangulation);
   dof_handler.distribute_dofs (fe);
 
   ConstraintMatrix constraints;
-  DoFTools::make_hanging_node_constraints (dof_handler,
-                                           constraints);
   constraints.close ();
 
-  Vector<double> projection (dof_handler.n_dofs());
+  SparsityPattern sparsity (dof_handler.n_dofs(), dof_handler.n_dofs(), 30);
+  DoFTools::make_sparsity_pattern (dof_handler, sparsity);
+  sparsity.compress();
 
-  // project the function
-      VectorTools::project (dof_handler,
-                            constraints,
-                            QGauss<dim>(3),
-                            F<dim> (),
-                            projection);
-                                       // just to make sure it doesn't get
-                                       // forgotten: handle hanging node
-                                       // constraints
-      constraints.distribute (projection);
+  SparseMatrix<double> mass_matrix (sparsity);
+  Vector<double> tmp (mass_matrix.n());
 
-      double sum=0;
-      for (unsigned int i=0; i<projection.size(); ++i)
-        sum += std::fabs(projection[i]);
-      printf ("Check: %5.13f\n", sum);
+  const Function<dim>* dummy = 0;
+  MatrixCreator::create_mass_matrix (dof_handler, QGauss<dim>(3),
+      mass_matrix, F<dim>(), tmp,
+      dummy, constraints);
+
+  double sum=0;
+  for (unsigned int i=0; i<dof_handler.n_dofs(); ++i)
+    sum += std::fabs(tmp[i]);
+  printf ("Check: %5.13f\n", sum);
 }
 
 
@@ -119,20 +114,8 @@ void do_project (const Triangulation<dim> &triangulation,
 template <int dim>
 void test_no_hanging_nodes (const FiniteElement<dim> &fe)
 {
-  Triangulation<dim>     triangulation;
-  GridGenerator::hyper_cube (triangulation);
-  triangulation.refine_global (3);
-
   for (unsigned int i=0; i<12; ++i)
-    do_project (triangulation, fe);
-}
-
-
-
-template <int dim>
-void test ()
-{
-  test_no_hanging_nodes (FE_Q<dim>(1));
+    do_project (fe);
 }
 
 
@@ -145,5 +128,5 @@ int main ()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-  test<3>();
+  test_no_hanging_nodes (FE_Q<3>(1));
 }
