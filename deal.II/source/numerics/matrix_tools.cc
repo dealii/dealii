@@ -195,8 +195,6 @@ namespace MatrixCreator
         std::vector<double>                  rhs_values;
         std::vector<dealii::Vector<double> > rhs_vector_values;
 
-        std::vector<double> old_JxW;
-
         const Function<spacedim>   *coefficient;
         const Function<spacedim>   *rhs_function;
 
