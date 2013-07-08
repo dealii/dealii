@@ -43,7 +43,7 @@ namespace internal
      * independent of the hierarchical structure of cells, which are organized in levels. In 2D
      * we store information on degrees of freedom located on lines whereas in 3D we store
      * information on drefrees of freedom located on quads and lines. In 1D we do nothing, as
-     * the faces of lines are vertices which are treated seperately.
+     * the faces of lines are vertices which are treated separately.
      *
      * Apart from the internal::hp::DoFObjects object containing the data to store
      * (degree of freedom indices) and all the access-functionality to this data, we do not
@@ -81,7 +81,7 @@ namespace internal
 
     /**
      * Store the indices of degrees of freedom on faces in 1D. As these would be vertices, which
-     * are treted seperately, don't do anything.
+     * are treted separately, don't do anything.
      *
      * @ingroup hp
      * @author Tobias Leicht, 2006

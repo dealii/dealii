@@ -1455,7 +1455,7 @@ public:
    *  RefinementListener.
    *
    * @note The use of this class has been
-   * superceded by the signals mechanism.
+   * superseded by the signals mechanism.
    * See the general documentation of the
    * Triangulation class for more information.
    *
@@ -1470,7 +1470,7 @@ public:
      * class also has virtual functions.
      *
      * @note The use of this class has been
-     * superceded by the signals mechanism.
+     * superseded by the signals mechanism.
      * See the general documentation of the
      * Triangulation class for more information.
      *
@@ -1486,7 +1486,7 @@ public:
      * registered with the triangulation.
      *
      * @note The use of this class has been
-     * superceded by the signals mechanism.
+     * superseded by the signals mechanism.
      * See the general documentation of the
      * Triangulation class for more information.
      *
@@ -1504,7 +1504,7 @@ public:
      * registered with the triangulation.
      *
      * @note The use of this class has been
-     * superceded by the signals mechanism.
+     * superseded by the signals mechanism.
      * See the general documentation of the
      * Triangulation class for more information.
      *
@@ -1529,7 +1529,7 @@ public:
      * derived classes.
      *
      * @note The use of this class has been
-     * superceded by the signals mechanism.
+     * superseded by the signals mechanism.
      * See the general documentation of the
      * Triangulation class for more information.
      *
@@ -1552,7 +1552,7 @@ public:
      * implemented in derived classes.
      *
      * @note The use of this class has been
-     * superceded by the signals mechanism.
+     * superseded by the signals mechanism.
      * See the general documentation of the
      * Triangulation class for more information.
      *
@@ -2203,7 +2203,7 @@ public:
    *  the Triangulation is refined.
    *
    * @note The use of this function has been
-   * superceded by the signals mechanism.
+   * superseded by the signals mechanism.
    * See the general documentation of the
    * Triangulation class for more information.
    *
@@ -2221,7 +2221,7 @@ public:
    *  Triangulation.
    *
    * @note The use of this function has been
-   * superceded by the signals mechanism.
+   * superseded by the signals mechanism.
    * See the general documentation of the
    * Triangulation class for more information.
    *
@@ -3201,7 +3201,7 @@ public:
    */
   DeclException0 (ExcTriangulationNotEmpty);
   /**
-   * Trying to re-read a grid, an error occured.
+   * Trying to re-read a grid, an error occurred.
    *
    * @ingroup Exceptions
    */
@@ -3521,7 +3521,7 @@ private:
    *  this contains nothing, in 2D it contains data
    *  concerning lines and in 3D quads and lines.  All of
    *  these have no level and are therefore treated
-   *  seperately.
+   *  separately.
    */
   dealii::internal::Triangulation::TriaFaces<dim> *faces;
 

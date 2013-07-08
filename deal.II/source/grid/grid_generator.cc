@@ -2589,7 +2589,7 @@ GridGenerator::cylinder (Triangulation<3> &tria,
   // respectively. note that we also
   // have to deal with those lines
   // that are purely in the interior
-  // of the ends. we determine wether
+  // of the ends. we determine whether
   // an edge is purely in the
   // interior if one of its vertices
   // is at coordinates '+-a' as set

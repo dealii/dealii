@@ -448,7 +448,7 @@ namespace SLEPcWrappers
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 #else
-    // Supress compiler warnings about unused paameters.
+    // Suppress compiler warnings about unused parameters.
     (void) eps;
 
     // PETSc/SLEPc version must be > 3.1.0.
@@ -481,7 +481,7 @@ namespace SLEPcWrappers
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 #else
-    // Supress compiler warnings about unused paameters.
+    // Suppress compiler warnings about unused parameters.
     (void) eps;
 
     // PETSc/SLEPc version must be > 3.1.0.
@@ -517,7 +517,7 @@ namespace SLEPcWrappers
                              this->solver_control.max_steps());
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 #else
-    // Supress compiler warnings about unused paameters.
+    // Suppress compiler warnings about unused parameters.
     (void) eps;
 
     Assert ((false),
