@@ -111,26 +111,14 @@ namespace
   {
     Scratch (const ::dealii::hp::FECollection<dim,spacedim> &fe,
              const UpdateFlags         update_flags,
-             const Function<spacedim> *coefficient,
-             const Function<spacedim> *rhs_function,
-             const ::dealii::hp::QCollection<dim> &quadrature,
-             const ::dealii::hp::MappingCollection<dim,spacedim> &mapping)
+             const ::dealii::hp::QCollection<dim> &quadrature)
       :
       fe_collection (fe),
       quadrature_collection (quadrature),
-      mapping_collection (mapping),
-      x_fe_values (mapping_collection,
-                   fe_collection,
+      x_fe_values (fe_collection,
                    quadrature_collection,
                    update_flags),
-      coefficient_values(quadrature_collection.max_n_quadrature_points()),
-      coefficient_vector_values (quadrature_collection.max_n_quadrature_points(),
-                                 dealii::Vector<double> (fe_collection.n_components())),
       rhs_values(quadrature_collection.max_n_quadrature_points()),
-      rhs_vector_values(quadrature_collection.max_n_quadrature_points(),
-                        dealii::Vector<double> (fe_collection.n_components())),
-      coefficient (coefficient),
-      rhs_function (rhs_function),
       update_flags (update_flags)
     {}
 
@@ -138,35 +126,19 @@ namespace
       :
       fe_collection (data.fe_collection),
       quadrature_collection (data.quadrature_collection),
-      mapping_collection (data.mapping_collection),
-      x_fe_values (mapping_collection,
-                   fe_collection,
+      x_fe_values (fe_collection,
                    quadrature_collection,
                    data.update_flags),
-      coefficient_values (data.coefficient_values),
-      coefficient_vector_values (data.coefficient_vector_values),
       rhs_values (data.rhs_values),
-      rhs_vector_values (data.rhs_vector_values),
-      coefficient (data.coefficient),
-      rhs_function (data.rhs_function),
       update_flags (data.update_flags)
     {}
 
     const ::dealii::hp::FECollection<dim,spacedim>      &fe_collection;
     const ::dealii::hp::QCollection<dim>                &quadrature_collection;
-    const ::dealii::hp::MappingCollection<dim,spacedim> &mapping_collection;
 
     ::dealii::hp::FEValues<dim,spacedim> x_fe_values;
 
-    std::vector<double>                  coefficient_values;
-    std::vector<dealii::Vector<double> > coefficient_vector_values;
     std::vector<double>                  rhs_values;
-    std::vector<dealii::Vector<double> > rhs_vector_values;
-
-    std::vector<double> old_JxW;
-
-    const Function<spacedim>   *coefficient;
-    const Function<spacedim>   *rhs_function;
 
     const UpdateFlags update_flags;
   };
@@ -206,7 +178,7 @@ template<int dim, int spacedim, typename CellIterator>
     cell->get_dof_indices(copy_data.dof_indices);
 
     data.rhs_values.resize(n_q_points);
-    data.rhs_function->value_list(fe_values.get_quadrature_points(),
+    F<dim>().value_list(fe_values.get_quadrature_points(),
         data.rhs_values);
 
     for (unsigned int i = 0; i < dofs_per_cell; ++i)
@@ -230,28 +202,19 @@ void copy_local_to_global (const CopyData &data,
                            VectorType *right_hand_side)
 {
   const unsigned int dofs_per_cell = data.dof_indices.size();
-  Assert (data.cell_matrix.frobenius_norm() == 0, ExcInternalError());
-
-  Assert (matrix->frobenius_norm() == 0, ExcInternalError());
     data.constraints->distribute_local_to_global(data.cell_matrix,
                                                  data.cell_rhs,
                                                  data.dof_indices,
                                                  *matrix, *right_hand_side);
-    Assert (matrix->frobenius_norm() == 0, ExcInternalError());
-//Q: why does this write anything into the matrix???
 }
 
 
 
 template <int dim, typename number, int spacedim>
-void create_mass_matrix (const Mapping<dim,spacedim>       &mapping,
-                         const DoFHandler<dim,spacedim>    &dof,
+void create_mass_matrix (const DoFHandler<dim,spacedim>    &dof,
                          const Quadrature<dim>    &q,
                          SparseMatrix<number>     &matrix,
-                         const Function<spacedim>      &rhs,
-                         Vector<double>           &rhs_vector,
-                         const Function<spacedim> *const coefficient,
-                         const ConstraintMatrix   &constraints)
+                         Vector<double>           &rhs_vector)
 {
   Assert (matrix.m() == dof.n_dofs(),
           ExcDimensionMismatch (matrix.m(), dof.n_dofs()));
@@ -260,13 +223,11 @@ void create_mass_matrix (const Mapping<dim,spacedim>       &mapping,
 
   hp::FECollection<dim,spacedim>      fe_collection (dof.get_fe());
   hp::QCollection<dim>                q_collection (q);
-  hp::MappingCollection<dim,spacedim> mapping_collection (mapping);
   Scratch<dim, spacedim>
   assembler_data (fe_collection,
                   update_values |
                   update_JxW_values | update_quadrature_points,
-                  coefficient, &rhs,
-                  q_collection, mapping_collection);
+                  q_collection);
   CopyData copy_data;
   copy_data.cell_matrix.reinit (assembler_data.fe_collection.max_dofs_per_cell(),
                                 assembler_data.fe_collection.max_dofs_per_cell());
@@ -303,12 +264,14 @@ void do_project (const unsigned int        p)
   Vector<double> tmp (mass_matrix.n());
 
   const Function<2>* dummy = 0;
-  create_mass_matrix(StaticMappingQ1 < dim > ::mapping,
-      dof_handler, QGauss < dim > (5), mass_matrix, F<dim>(), tmp, dummy,
-      constraints);
+  create_mass_matrix(dof_handler, QGauss < dim > (5), mass_matrix, tmp);
+
+  double l1 = 0;
+  for (unsigned int i=0; i<tmp.size(); ++i)
+    l1 += std::fabs(tmp[i]);
   std::ostringstream x;
   x.precision(18);
-  x << "Check1: " << mass_matrix.frobenius_norm() << " " << tmp.l1_norm() << std::endl;
+  x << "Check: " << tmp.size() << ' ' << l1 << ' ' << tmp.l1_norm() << std::endl;
   std::cout << x.str();
 }
 
