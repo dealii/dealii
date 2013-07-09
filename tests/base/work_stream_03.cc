@@ -24,6 +24,7 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/work_stream.h>
 #include <deal.II/lac/vector.h>
+#include <deal.II/base/parallel.h>
 
 #include <deal.II/grid/tria.h>
 #include <deal.II/dofs/dof_handler.h>
@@ -88,9 +89,18 @@ namespace
 
   struct CopyData
   {
-    Vector<double>    cell_rhs;
+    std::vector<double>    cell_rhs;
   };
 }
+
+void zero_subrange (const unsigned int begin,
+                   const unsigned int end,
+                   std::vector<double> &dst)
+{
+  for (unsigned int i=begin; i<end; ++i)
+    dst[i] = 0;
+}
+
 
 template<int dim, typename CellIterator>
   void
@@ -99,14 +109,18 @@ template<int dim, typename CellIterator>
   {
     data.x_fe_values.reinit(cell);
 
+    const Point<dim> q=data.x_fe_values.quadrature_point(0);
+
     // this appears to be the key: the following line overwrites some of the memory
     // in which we store the quadrature point location. if the line is moved down,
     // the comparison in the if() always succeeds...
-    copy_data.cell_rhs = 0;
-    if (cell->center().distance (data.x_fe_values.quadrature_point(0)) >= 1e-6 *cell->diameter())
-      std::cout << '.' << std::flush;
-    else
-      std::cout << '*' << std::flush;
+    parallel::apply_to_subranges
+    (0U, copy_data.cell_rhs.size(),
+        std_cxx1x::bind(&zero_subrange,
+            std_cxx1x::_1, std_cxx1x::_2, std_cxx1x::ref(copy_data.cell_rhs)),
+            1);
+
+    std::cout << (q != data.x_fe_values.quadrature_point(0) ? '.' : '*') << std::flush;
 
     copy_data.cell_rhs[0] = value(data.x_fe_values.quadrature_point(0));
   }
@@ -140,7 +154,7 @@ void do_project ()
       double sum = 0;
       Scratch<dim> assembler_data (dof_handler.get_fe(), q);
       CopyData copy_data;
-      copy_data.cell_rhs.reinit (8);
+      copy_data.cell_rhs.resize (8);
       dealii::WorkStream::run (dof_handler.begin_active(),
                        dof_handler.end(),
                        &mass_assembler<dim, typename DoFHandler<dim>::active_cell_iterator>,
@@ -152,6 +166,7 @@ void do_project ()
                        8,
                        1);
       printf ("\nCheck: %5.3f\n", sum);
+      deallog << sum << std::endl;
     }
 }
 
