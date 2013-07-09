@@ -420,11 +420,13 @@ inline
 Number 
 Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> & indices) const
 {
-    const unsigned int outer_ind = indices[rank_-1];
+    const unsigned int inner_ind = indices[0];
+    Assert (inner_ind<dim, ExcIndexRange(inner_ind, 0, dim));
+    
 	TableIndices<rank_-1> indices1;
 	for (unsigned int i = 0; i < rank_-1;i++)
-       indices1[i] = indices[i];
-	return (subtensor[outer_ind])[indices1];	
+       indices1[i] = indices[i+1];
+	return (subtensor[inner_ind])[indices1];	
 }
 
 template <int rank_, int dim, typename Number>
@@ -432,11 +434,13 @@ inline
 Number & 
 Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> & indices)
 {
-    const unsigned int outer_ind = indices[rank_-1];
+    const unsigned int inner_ind = indices[0];
+    Assert (inner_ind<dim, ExcIndexRange(inner_ind, 0, dim));
+    
 	TableIndices<rank_-1> indices1;
 	for (unsigned int i = 0; i < rank_-1;i++)
-       indices1[i] = indices[i];
-	return (subtensor[outer_ind])[indices1];	
+       indices1[i] = indices[i+1];
+	return (subtensor[inner_ind])[indices1];		
 }
 
 template <int rank_, int dim, typename Number>
