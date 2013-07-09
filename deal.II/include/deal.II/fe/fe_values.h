@@ -4651,7 +4651,7 @@ namespace FEValuesViews
         const unsigned int comp =
           shape_function_data[shape_function].single_nonzero_component_index;
         const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
-        return_value[indices] = fe_values.shape_values(snc,q_point);//last index first [jj][ii]
+        return_value[indices] = fe_values.shape_values(snc,q_point);
         return return_value;
       }
     else
@@ -4661,7 +4661,7 @@ namespace FEValuesViews
           if (shape_function_data[shape_function].is_nonzero_shape_function_component[d]) {
             const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(d);
             return_value[indices]
-              = fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point);//last index first [jj][ii]
+              = fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point);
           }
         return return_value;
       }

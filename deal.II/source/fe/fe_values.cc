@@ -1173,7 +1173,7 @@ namespace FEValuesViews
 
                   const double *shape_value_ptr = &shape_values(snc,0);
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    values[q_point][indices] += value * *shape_value_ptr++;//last index first [j][i]
+                    values[q_point][indices] += value * *shape_value_ptr++;
                 }
               else
                 for (unsigned int d=0;
@@ -1185,7 +1185,7 @@ namespace FEValuesViews
                       const double *shape_value_ptr =
                         &shape_values(shape_function_data[shape_function].row_index[d],0);
                       for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                        values[q_point][indices] += value * *shape_value_ptr++;//last index first [j][i]
+                        values[q_point][indices] += value * *shape_value_ptr++;
                     }
             }
         }

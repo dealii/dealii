@@ -1,0 +1,51 @@
+
+DEAL::FE=FESystem<2>[FE_Q<2>(1)^4]
+DEAL::q_point=0
+DEAL::   method 1: 329. 370.
+DEAL::   method 2: 329. 370.
+DEAL::
+DEAL::q_point=1
+DEAL::   method 1: 472. 521.
+DEAL::   method 2: 472. 521.
+DEAL::
+DEAL::q_point=2
+DEAL::   method 1: 354. 397.
+DEAL::   method 2: 354. 397.
+DEAL::
+DEAL::q_point=3
+DEAL::   method 1: 586. 642.
+DEAL::   method 2: 586. 642.
+DEAL::
+DEAL::FE=FESystem<3>[FE_Q<3>(1)^9]
+DEAL::q_point=0
+DEAL::   method 1: 8.02e+03 8.32e+03 8.61e+03
+DEAL::   method 2: 8.02e+03 8.32e+03 8.61e+03
+DEAL::
+DEAL::q_point=1
+DEAL::   method 1: 9.35e+03 9.64e+03 9.94e+03
+DEAL::   method 2: 9.35e+03 9.64e+03 9.94e+03
+DEAL::
+DEAL::q_point=2
+DEAL::   method 1: 1.02e+04 1.05e+04 1.08e+04
+DEAL::   method 2: 1.02e+04 1.05e+04 1.08e+04
+DEAL::
+DEAL::q_point=3
+DEAL::   method 1: 1.16e+04 1.19e+04 1.22e+04
+DEAL::   method 2: 1.16e+04 1.19e+04 1.22e+04
+DEAL::
+DEAL::q_point=4
+DEAL::   method 1: 1.07e+04 1.10e+04 1.13e+04
+DEAL::   method 2: 1.07e+04 1.10e+04 1.13e+04
+DEAL::
+DEAL::q_point=5
+DEAL::   method 1: 1.20e+04 1.23e+04 1.26e+04
+DEAL::   method 2: 1.20e+04 1.23e+04 1.26e+04
+DEAL::
+DEAL::q_point=6
+DEAL::   method 1: 1.29e+04 1.32e+04 1.35e+04
+DEAL::   method 2: 1.29e+04 1.32e+04 1.35e+04
+DEAL::
+DEAL::q_point=7
+DEAL::   method 1: 1.42e+04 1.45e+04 1.48e+04
+DEAL::   method 2: 1.42e+04 1.45e+04 1.48e+04
+DEAL::

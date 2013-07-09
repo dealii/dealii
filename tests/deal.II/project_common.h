@@ -136,9 +136,12 @@ void do_project (const Triangulation<dim> &triangulation,
 	  
       if (q<=p-order_difference)
 	if (error.l2_norm() > 1e-10*projection.l2_norm())
+	  {
 	deallog << "Projection failed with relative error "
 		<< error.l2_norm() / projection.l2_norm()
 		<< std::endl;
+	Assert (false, ExcInternalError());
+	  }
     }
 }
 
