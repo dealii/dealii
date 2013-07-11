@@ -19,6 +19,20 @@
 MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
   FIND_PACKAGE(LAPACK)
 
+  #
+  # Well, in case of static archives we have to manually pick up the
+  # complete link interface. *sigh*
+  #
+  # Do this unconditionally for the most common case:
+  # TODO: Non-GNU setups...
+  #
+  IF(NOT m_lib MATCHES "-NOTFOUND")
+    LIST(APPEND LAPACK_LIBRARIES ${m_lib})
+  ENDIF()
+
+  ENABLE_IF_LINKS(LAPACK_LINKER_FLAGS "-lgfortran")
+  ENABLE_IF_LINKS(LAPACK_LINKER_FLAGS "-lquadmath")
+
   IF(LAPACK_FOUND)
     MARK_AS_ADVANCED(
       atlas_LIBRARY
@@ -52,15 +66,6 @@ SET(DEAL_II_LAPACK_FUNCTIONS
 
 MACRO(CHECK_FOR_LAPACK_FUNCTIONS)
   SET(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES})
-  #
-  # For some static lapack versions it is necessary to link with -lm.
-  # So link with it as well if -lm is already present in our link
-  # interface:
-  #
-  IF(NOT m_lib MATCHES "-NOTFOUND")
-    LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${m_lib})
-  ENDIF()
-
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${LAPACK_LINKER_FLAGS}")
 
   FOREACH(_func ${DEAL_II_LAPACK_FUNCTIONS})
