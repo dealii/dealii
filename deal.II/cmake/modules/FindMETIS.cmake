@@ -26,8 +26,10 @@ INCLUDE(FindPackageHandleStandardArgs)
 SET_IF_EMPTY(METIS_DIR "$ENV{METIS_DIR}")
 
 #
-# TODO: Metis is usually pretty self contained. So no external dependencies
+# Metis is usually pretty self contained. So no external dependencies
 # so far... But there could be dependencies on pcre and mpi...
+#
+# Link in MPI unconditionally (if found)
 #
 
 FIND_PATH(METIS_INCLUDE_DIR metis.h
@@ -55,7 +57,7 @@ FIND_PACKAGE_HANDLE_STANDARD_ARGS(METIS DEFAULT_MSG
 IF(METIS_FOUND)
   SET(METIS_LIBRARIES
     ${METIS_LIBRARY}
-    ${MPI_CXX_LIBRARIES} # for good measure
+    ${MPI_C_LIBRARIES} # for good measure
     )
   SET(METIS_INCLUDE_DIRS ${METIS_INCLUDE_DIR})
 

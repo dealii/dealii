@@ -18,6 +18,13 @@
 
 MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   #
+  # Enable Fortran support so that MPI_Fortran_LIBRARIES is set up.
+  #
+  IF(NOT CMAKE_Fortran_COMPILER_WORKS)
+    ENABLE_LANGUAGE(Fortran OPTIONAL)
+  ENDIF()
+
+  #
   # Obey a manual user override: If MPI_CXX_FOUND is set to true in the
   # cache, we skip the FIND_PACKAGE calls:
   #

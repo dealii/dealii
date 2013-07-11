@@ -35,6 +35,7 @@ ENDFOREACH()
 # now.
 #
 FIND_PACKAGE(LAPACK)
+FIND_PACKAGE(METIS)
 
 #
 # Two macros to make life easier:
@@ -128,9 +129,16 @@ IF(UMFPACK_FOUND)
     ${CAMD_LIBRARY}
     ${AMD_LIBRARY}
     ${SuiteSparse_config_LIBRARY}
-    ${METIS_LIBRARIES} # for good measure
-    ${LAPACK_LIBRARIES}
     )
+
+  #
+  # For good measure:
+  #
+  IF(METIS_FOUND)
+    LIST(APPEND UMFPACK_LIBRARIES ${METIS_LIBRARIES})
+  ENDIF()
+
+  LIST(APPEND UMFPACK_LIBRARIES ${LAPACK_LIBRARIES})
 
   #
   # Add rt to the link interface as well (for whatever reason,

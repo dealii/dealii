@@ -91,7 +91,7 @@ IF(MUMPS_FOUND)
     ${MUMPS_COMMON_LIBRARY}
     ${PORD_LIBRARY}
     ${SCALAPACK_LIBRARIES}
-    ${MPI_CXX_LIBRARIES} # For good measure
+    ${MPI_Fortran_LIBRARIES} # For good measure
     )
   SET(MUMPS_LINKER_FLAGS
     ${SCALAPACK_LINKER_FLAGS}
