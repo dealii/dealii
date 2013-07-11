@@ -44,7 +44,7 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
   # Do this unconditionally for the most common case:
   # TODO: Non-GNU setups...
   #
-  FOREACH(_lib m gfortran quadmath)
+  FOREACH(_lib gfortran m quadmath)
     FIND_LIBRARY(${_lib}_lib
       NAMES ${_lib}
       HINTS ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
