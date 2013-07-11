@@ -35,13 +35,30 @@ SET(DEAL_II_WITH_BOOST ON # Always true. We need it :-]
 
 
 MACRO(FEATURE_BOOST_FIND_EXTERNAL var)
-  #
-  # We require at least version 1.44
-  #
+
   IF(DEAL_II_WITH_THREADS)
-    FIND_PACKAGE(Boost 1.44 COMPONENTS serialization system thread)
+    SET(_boost_components serialization system thread)
   ELSE()
-    FIND_PACKAGE(Boost 1.44 COMPONENTS serialization system)
+    SET(_boost_components serialization system)
+  ENDIF()
+
+  #
+  # Prefer static libs if BUILD_SHARED_LIBS=OFF:
+  #
+  IF(NOT BUILD_SHARED_LIBS)
+    SET(Boost_USE_STATIC_LIBS TRUE)
+  ENDIF()
+
+  FIND_PACKAGE(Boost 1.44 COMPONENTS ${_boost_components})
+
+  #
+  # Fall back to dynamic libraries if no static libraries could be found:
+  #
+  IF( Boost_USE_STATIC_LIBS AND
+      (NOT Boost_SERIALIZATION_FOUND OR NOT Boost_SYSTEM_FOUND)
+    )
+    SET(Boost_USE_STATIC_LIBS FALSE)
+    FIND_PACKAGE(Boost 1.44 COMPONENTS ${_boost_components})
   ENDIF()
 
   IF( Boost_SERIALIZATION_FOUND AND
