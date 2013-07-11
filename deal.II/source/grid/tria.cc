@@ -2049,7 +2049,7 @@ namespace internal
         // first, we only collect the data
         // now
 
-        // the bool array stores, wether the lines
+        // the bool array stores, whether the lines
         // are in the standard orientation or not
 
         // note that QuadComparator is a
@@ -2565,7 +2565,7 @@ namespace internal
 
             else
               {
-                // look wether it exists in
+                // look whether it exists in
                 // reverse direction
                 std::swap (line_vertices.first, line_vertices.second);
                 if (needed_lines.find(line_vertices) != needed_lines.end())
@@ -2623,7 +2623,7 @@ namespace internal
                 if (needed_lines.find(line_vertices) != needed_lines.end())
                   line[i] = needed_lines[line_vertices];
                 else
-                  // look wether it exists
+                  // look whether it exists
                   // in reverse direction
                   {
                     std::swap (line_vertices.first, line_vertices.second);
@@ -9329,7 +9329,7 @@ namespace internal
 
       /**
        * Helper function for
-       * @p fix_coarsen_flags. Return wether
+       * @p fix_coarsen_flags. Return whether
        * coarsening of this cell is allowed.
        * Coarsening can be forbidden if the
        * neighboring cells are or will be
@@ -9386,7 +9386,7 @@ namespace internal
                   // to the common neighbor cell,
                   // not to its children. what we
                   // really want to know in the
-                  // following is, wether the
+                  // following is, whether the
                   // neighbor cell is refined twice
                   // with reference to our cell.
                   // that only has to be asked, if
@@ -9744,7 +9744,7 @@ create_triangulation (const std::vector<Point<spacedim> >    &v,
       Its entries are indexes by the local indeces of the common face.
       For example if two elements share a face, and this face is
       face 0 for element 0 and face 1 for element 1, then
-      table(0,1) will tell wether the orientation are the same (true) or
+      table(0,1) will tell whether the orientation are the same (true) or
       opposite (false).
 
       Even though there may be a combinatorial/graph theory argument to get
@@ -13617,7 +13617,7 @@ bool Triangulation<dim,spacedim>::prepare_coarsening_and_refinement ()
       //    next global loop. when this
       //    function terminates, the
       //    requirement will be
-      //    fullfilled. However, it might be
+      //    fulfilled. However, it might be
       //    faster to insert an inner loop
       //    here.
       bool changed = true;

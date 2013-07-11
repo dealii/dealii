@@ -26,7 +26,9 @@
 #include <mpi.h>
 #else
 typedef int MPI_Comm;
-#define MPI_COMM_WORLD 0
+#  ifndef MPI_COMM_WORLD
+#    define MPI_COMM_WORLD 0
+#  endif
 #endif
 
 DEAL_II_NAMESPACE_OPEN

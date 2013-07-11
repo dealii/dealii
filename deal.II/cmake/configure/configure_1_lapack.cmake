@@ -52,15 +52,6 @@ SET(DEAL_II_LAPACK_FUNCTIONS
 
 MACRO(CHECK_FOR_LAPACK_FUNCTIONS)
   SET(CMAKE_REQUIRED_LIBRARIES ${LAPACK_LIBRARIES})
-  #
-  # For some static lapack versions it is necessary to link with -lm.
-  # So link with it as well if -lm is already present in our link
-  # interface:
-  #
-  IF(NOT m_lib MATCHES "-NOTFOUND")
-    LIST(APPEND CMAKE_REQUIRED_LIBRARIES ${m_lib})
-  ENDIF()
-
   ADD_FLAGS(CMAKE_REQUIRED_FLAGS "${LAPACK_LINKER_FLAGS}")
 
   FOREACH(_func ${DEAL_II_LAPACK_FUNCTIONS})
@@ -79,6 +70,14 @@ MACRO(RESET_LAPACK_FUNCTIONS_CACHE)
     UNSET(HAVE_${_func_uppercase} CACHE)
   ENDFOREACH()
 ENDMACRO()
+
+#
+# Resolve a cache invalidation problem by searching for this flag
+# unconditionally. It is used in FEATURE_LAPACK_CONFIGURE_EXTERNAL
+# depending on cached variables.
+#
+ENABLE_IF_LINKS(_dummy "-lgfortran")
+ENABLE_IF_LINKS(_dummy "-lquadmath")
 
 
 MACRO(FEATURE_LAPACK_CONFIGURE_EXTERNAL)
@@ -100,9 +99,24 @@ MACRO(FEATURE_LAPACK_CONFIGURE_EXTERNAL)
     LIST(APPEND LAPACK_LIBRARIES ${BLAS_LIBRARIES})
   ENDIF()
 
+
+  #
+  # Well, in case of static archives we have to manually pick up the
+  # complete link interface. *sigh*
+  #
+  # Do this unconditionally for the most common case:
+  # TODO: Non-GNU setups...
+  #
+  IF(NOT m_lib MATCHES "-NOTFOUND")
+    LIST(APPEND LAPACK_LIBRARIES ${m_lib})
+  ENDIF()
+
+  ENABLE_IF_LINKS(LAPACK_LINKER_FLAGS "-lgfortran")
+  ENABLE_IF_LINKS(LAPACK_LINKER_FLAGS "-lquadmath")
+
+
   ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${LAPACK_LINKER_FLAGS}")
   LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${LAPACK_LIBRARIES})
-
 
   CHECK_FOR_LAPACK_FUNCTIONS()
 ENDMACRO()

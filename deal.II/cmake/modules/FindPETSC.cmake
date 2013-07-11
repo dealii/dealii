@@ -52,8 +52,8 @@ FIND_LIBRARY(PETSC_LIBRARY
 FIND_FILE(PETSC_PETSCVARIABLES
   NAMES petscvariables
   HINTS
-    ${PETSC_DIR}
     ${PETSC_DIR}/${PETSC_ARCH}
+    ${PETSC_DIR}
   PATH_SUFFIXES conf
   )
 
@@ -75,7 +75,7 @@ IF(NOT PETSC_PETSCVARIABLES MATCHES "-NOTFOUND")
       IF(NOT _token MATCHES "(petsc|stdc\\+\\+|gcc_s)")
         FIND_LIBRARY(PETSC_LIBRARY_${_token}
           NAMES ${_token}
-          HINTS ${_hintes}
+          HINTS ${_hints}
           )
         IF(NOT PETSC_LIBRARY_${_token} MATCHES "-NOTFOUND")
           LIST(APPEND _petsc_libraries ${PETSC_LIBRARY_${_token}})

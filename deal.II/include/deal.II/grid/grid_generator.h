@@ -607,7 +607,7 @@ public:
    * @arg @p L: extension in @p z-direction (only used in 3d)
    * @arg @p repetitions: number of subdivisions
    *      along the @p z-direction
-   * @arg @p colorize: wether to assign different
+   * @arg @p colorize: whether to assign different
    *     boundary indicators to different faces.
    *    The colors are given in lexicographic
    *    ordering for the flat faces (0 to 3 in 2d,

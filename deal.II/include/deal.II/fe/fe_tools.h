@@ -259,7 +259,7 @@ namespace FETools
    * For all possible (isotropic and anisotropic) refinement cases compute the
    * embedding matrices from a coarse cell to the child cells. Each column of
    * the resulting matrices contains the representation of a coarse grid basis
-   * functon by the fine grid basis; the matrices are split such that there is
+   * function by the fine grid basis; the matrices are split such that there is
    * one matrix for every child.
    *
    * This function computes the coarse grid function in a sufficiently large

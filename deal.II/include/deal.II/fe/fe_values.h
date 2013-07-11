@@ -4619,6 +4619,114 @@ namespace FEValuesViews
       }
   }
 
+  template <int dim, int spacedim>
+  inline
+  typename Tensor<2, dim, spacedim>::value_type
+  Tensor<2, dim, spacedim>::value (const unsigned int shape_function,
+                                   const unsigned int q_point) const
+  {
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_values,
+            typename FVB::ExcAccessToUninitializedField());
+
+    // similar to the vector case where we
+    // have more then one index and we need
+    // to convert between unrolled and
+    // component indexing for tensors
+    const int snc
+      = shape_function_data[shape_function].single_nonzero_component;
+
+    if (snc == -2)
+      {
+        // shape function is zero for the
+        // selected components
+        return value_type();
+
+      }
+    else if (snc != -1)
+      {
+        value_type return_value;
+        const unsigned int comp =
+          shape_function_data[shape_function].single_nonzero_component_index;
+        const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
+        return_value[indices] = fe_values.shape_values(snc,q_point);
+        return return_value;
+      }
+    else
+      {
+        value_type return_value;
+        for (unsigned int d = 0; d < dim*dim; ++d)
+          if (shape_function_data[shape_function].is_nonzero_shape_function_component[d]) {
+            const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(d);
+            return_value[indices]
+              = fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point);
+          }
+        return return_value;
+      }
+  }
+
+
+  template <int dim, int spacedim>
+  inline
+  typename Tensor<2, dim, spacedim>::divergence_type
+  Tensor<2, dim, spacedim>::divergence(const unsigned int shape_function,
+                                       const unsigned int q_point) const
+  {
+    typedef FEValuesBase<dim,spacedim> FVB;
+    Assert (shape_function < fe_values.fe->dofs_per_cell,
+            ExcIndexRange (shape_function, 0, fe_values.fe->dofs_per_cell));
+    Assert (fe_values.update_flags & update_gradients,
+            typename FVB::ExcAccessToUninitializedField());
+
+    const int snc = shape_function_data[shape_function].single_nonzero_component;
+
+    if (snc == -2)
+      {
+        // shape function is zero for the
+        // selected components
+        return divergence_type();
+      }
+    else if (snc != -1)
+      {
+        // we have a single non-zero component
+        // when the tensor is
+        // represented in unrolled form.
+        //
+        // the divergence of a second-order tensor
+        // is a first order tensor.
+        //
+        // assume the second-order tensor is
+        // A with components A_{ij}.  
+        // divergence as:
+        // b_j := \dfrac{\partial phi_{ij}}{\partial x_i}.
+        //
+        // Now, we know the nonzero component
+        // in unrolled form: it is indicated
+        // by 'snc'. we can figure out which
+        // tensor components belong to this:
+        const unsigned int comp =
+          shape_function_data[shape_function].single_nonzero_component_index;
+        const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
+        const unsigned int ii = indices[0];
+        const unsigned int jj = indices[1];
+
+        const dealii::Tensor<1, spacedim> phi_grad = fe_values.shape_gradients[snc][q_point];
+
+        divergence_type return_value;
+        return_value[jj] = phi_grad[ii];
+
+        return return_value;
+
+      }
+    else
+      {
+        Assert (false, ExcNotImplemented());
+        divergence_type return_value;
+        return return_value;
+      }
+  }
 }
 
 

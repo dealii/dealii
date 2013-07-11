@@ -217,7 +217,7 @@ public:
    * view_of_long_vector(i), with i>0 might
    * cause an attempt to access invalid
    * areas of memory, or might function
-   * properly, depending on wether or not
+   * properly, depending on whether or not
    * the system was able to allocate some
    * memory consecutively after the
    * original allocation.

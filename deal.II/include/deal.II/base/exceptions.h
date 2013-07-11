@@ -79,7 +79,7 @@ public:
 
   /**
    * Print more specific information about the exception which
-   * occured. Overload this function in your own exception classes.
+   * occurred. Overload this function in your own exception classes.
    */
   virtual void print_info (std::ostream &out) const;
 
@@ -148,7 +148,7 @@ namespace deal_II_exceptions
    * processes is redirected to the same console window. In this case,
    * it is convenient to set as additional name the name of the host on
    * which the program runs, so that one can see in which instance of the
-   * program the exception occured.
+   * program the exception occurred.
    *
    * The string pointed to by the argument is copied, so doesn't need to be
    * stored after the call to this function.

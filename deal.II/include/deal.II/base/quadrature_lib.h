@@ -295,7 +295,7 @@ public:
    * $[x_0,1]$, the actual location of the
    * singularity, the scale factor inside
    * the logarithmic function and a flag
-   * that decides wether the singularity is
+   * that decides whether the singularity is
    * left inside the quadrature formula or
    * it is factored out, to be included in
    * the integrand.
@@ -334,7 +334,7 @@ protected:
  * original quadrature, and this process is repeated for the next half
  * element.
  *
- * Upon construction it is possible to specify wether we want the
+ * Upon construction it is possible to specify whether we want the
  * singularity removed, or not. In other words, this quadrature can be
  * used to integrate $g(x) = 1/R\ f(x)$, or simply $f(x)$, with the $1/R$
  * factor already included in the quadrature weights.

@@ -1,0 +1,27 @@
+
+DEAL::0 0 -> 0
+DEAL::0 -> 0 0
+DEAL::0 1 -> 1
+DEAL::1 -> 0 1
+DEAL::0 2 -> 2
+DEAL::2 -> 0 2
+DEAL::1 0 -> 3
+DEAL::3 -> 1 0
+DEAL::1 1 -> 4
+DEAL::4 -> 1 1
+DEAL::1 2 -> 5
+DEAL::5 -> 1 2
+DEAL::2 0 -> 6
+DEAL::6 -> 2 0
+DEAL::2 1 -> 7
+DEAL::7 -> 2 1
+DEAL::2 2 -> 8
+DEAL::8 -> 2 2
+DEAL::Number of stress components: 9	Number of gamma components: 1
+DEAL::Number of active cells: 1
+DEAL::Total number of cells: 1
+DEAL::Number of degrees of freedom: 80 = (72 + 8)
+DEAL::dofs_per_cell: 80
+DEAL::fe.dofs_per_cell: 80	quadrature_formula.size(): 1
+DEAL::1 here
+DEAL::Analysis complete

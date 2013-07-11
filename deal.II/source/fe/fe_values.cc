@@ -1170,12 +1170,10 @@ namespace FEValuesViews
                     shape_function_data[shape_function].single_nonzero_component_index;
 
                   const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
-                  const unsigned int i = indices[0],
-                                     j = indices[1];
 
                   const double *shape_value_ptr = &shape_values(snc,0);
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    values[q_point][i][j] += value * *shape_value_ptr++;
+                    values[q_point][indices] += value * *shape_value_ptr++;
                 }
               else
                 for (unsigned int d=0;
@@ -1183,13 +1181,11 @@ namespace FEValuesViews
                   if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
                     {
                       const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(d);
-                      const unsigned int i = indices[0],
-                                         j = indices[1];
 
                       const double *shape_value_ptr =
                         &shape_values(shape_function_data[shape_function].row_index[d],0);
                       for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                        values[q_point][i][j] += value * *shape_value_ptr++;
+                        values[q_point][indices] += value * *shape_value_ptr++;
                     }
             }
         }
@@ -1239,10 +1235,7 @@ namespace FEValuesViews
                   for (unsigned int q_point = 0; q_point < n_quadrature_points;
                        ++q_point, ++shape_gradient_ptr)
                     {
-                      divergences[q_point][ii] += value * (*shape_gradient_ptr)[jj];
-
-                      if (ii != jj)
-                        divergences[q_point][jj] += value * (*shape_gradient_ptr)[ii];
+                      divergences[q_point][jj] += value * (*shape_gradient_ptr)[ii];
                     }
                 }
               else

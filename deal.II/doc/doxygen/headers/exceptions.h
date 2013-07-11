@@ -245,7 +245,7 @@
  *      do_something ();
  *    }
  *    catch (exception &e) {
- *      std::cerr << "Exception occured:" << std::endl
+ *      std::cerr << "Exception occurred:" << std::endl
  *           << e.what ()
  *           << std::endl;
  *      do_something_to_reciver ();

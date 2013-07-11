@@ -1384,7 +1384,7 @@ namespace DoFTools
 
   /**
    * Do the same thing as the corresponding
-   * extract_dofs() functino for one level
+   * extract_dofs() function for one level
    * of a multi-grid DoF numbering.
    */
   template <class DH>
@@ -1396,7 +1396,7 @@ namespace DoFTools
 
   /**
    * Do the same thing as the corresponding
-   * extract_dofs() functino for one level
+   * extract_dofs() function for one level
    * of a multi-grid DoF numbering.
    */
   template <class DH>

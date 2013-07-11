@@ -188,7 +188,7 @@ public:
    * omitted (see previous function) and execpt of the columns that are
    * previously evaluated rate columns.  This function allows to evaluate the
    * convergence rate for almost all columns of a table without calling
-   * evaluate_convergence_rates() for each column seperately.
+   * evaluate_convergence_rates() for each column separately.
    *
    * Example:
    * Columns like <tt>n cells</tt> or <tt>n dofs</tt> columns may be wanted to

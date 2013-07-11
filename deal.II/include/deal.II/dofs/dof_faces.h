@@ -42,7 +42,7 @@ namespace internal
      * the hierarchical structure of cells, which are organized in levels. In 2D we store
      * information on degrees of freedom located on lines whereas in 3D we store information on
      * degrees of freedom located on quads and lines. In 1D we do nothing, as the faces of
-     * lines are vertices which are treated seperately.
+     * lines are vertices which are treated separately.
      *
      * Apart from the DoFObjects object containing the data to store (degree of freedom
      * indices) we do not store any data or provide any functionality. However, we do implement
@@ -72,7 +72,7 @@ namespace internal
 
     /**
      * Store the indices of degrees of freedom on faces in 1D. As these would be vertices, which
-     * are treted seperately, don't do anything.
+     * are treted separately, don't do anything.
      *
      * @author Tobias Leicht, 2006
      */

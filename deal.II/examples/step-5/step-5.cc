@@ -533,7 +533,7 @@ void Step5<dim>::output_results (const unsigned int cycle) const
 
 // The second to last thing in this program is the definition of the
 // <code>run()</code> function. In contrast to the previous programs, we will
-// compute on a sequence of meshes that after each iteration is globall
+// compute on a sequence of meshes that after each iteration is globally
 // refined. The function therefore consists of a loop over 6 cycles. In each
 // cycle, we first print the cycle number, and then have to decide what to do
 // with the mesh. If this is not the first cycle, we simply refine the

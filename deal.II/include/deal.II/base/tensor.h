@@ -144,6 +144,16 @@ public:
   const Tensor<rank_-1,dim,Number> &operator [] (const unsigned int i) const;
 
   /**
+   * Read access using TableIndices <tt>indices</tt>
+   */
+  Number operator [](const TableIndices<rank_> & indices) const; 
+  
+  /**
+   * Read and write access using TableIndices <tt>indices</tt>
+   */
+  Number &operator [](const TableIndices<rank_> & indices); 
+  
+  /**
    *  Assignment operator.
    */
   Tensor &operator = (const Tensor<rank_,dim,Number> &);
@@ -405,7 +415,33 @@ Tensor<rank_,dim,Number>::operator[] (const unsigned int i) const
   return subtensor[i];
 }
 
+template <int rank_, int dim, typename Number>
+inline
+Number 
+Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> & indices) const
+{
+    const unsigned int inner_ind = indices[0];
+    Assert (inner_ind<dim, ExcIndexRange(inner_ind, 0, dim));
+    
+	TableIndices<rank_-1> indices1;
+	for (unsigned int i = 0; i < rank_-1;i++)
+       indices1[i] = indices[i+1];
+	return (subtensor[inner_ind])[indices1];	
+}
 
+template <int rank_, int dim, typename Number>
+inline
+Number & 
+Tensor<rank_,dim,Number>::operator[] (const TableIndices<rank_> & indices)
+{
+    const unsigned int inner_ind = indices[0];
+    Assert (inner_ind<dim, ExcIndexRange(inner_ind, 0, dim));
+    
+	TableIndices<rank_-1> indices1;
+	for (unsigned int i = 0; i < rank_-1;i++)
+       indices1[i] = indices[i+1];
+	return (subtensor[inner_ind])[indices1];		
+}
 
 template <int rank_, int dim, typename Number>
 inline

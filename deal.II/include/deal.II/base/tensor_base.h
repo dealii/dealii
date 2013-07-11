@@ -434,6 +434,16 @@ public:
    * backcompatibility.
    */
   Number &operator [] (const unsigned int index);
+  
+  /**
+   * Read access using TableIndices <tt>indices</tt>
+   */
+  Number operator [](const TableIndices<1> & indices) const; 
+  
+  /**
+   * Read and write access using TableIndices <tt>indices</tt>
+   */
+  Number &operator [](const TableIndices<1> & indices); 
 
   /**
    * Assignment operator.
@@ -980,6 +990,22 @@ Number &Tensor<1,dim,Number>::operator [] (const unsigned int index)
 {
   Assert (index<dim, ExcIndexRange (index, 0, dim));
   return values[index];
+}
+
+template <int dim, typename Number>
+inline
+Number Tensor<1,dim,Number>::operator [] (const TableIndices<1> & indices) const
+{
+  Assert (indices[0]<dim, ExcIndexRange (indices[0], 0, dim));
+  return values[indices[0]];
+}
+
+template <int dim, typename Number>
+inline
+Number &Tensor<1,dim,Number>::operator [] (const TableIndices<1> & indices) 
+{
+  Assert (indices[0]<dim, ExcIndexRange (indices[0], 0, dim));
+  return values[indices[0]];
 }
 
 
