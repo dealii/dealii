@@ -233,7 +233,7 @@ namespace Step7
   // share the same connotation that points have and are only objects in a
   // more abstract space than the one spanned by the coordinate
   // directions. (In fact, gradients live in `reciprocal' space, since the
-  // dimension of their components is not that of a length, but one over
+  // dimension of their components is not that of a length, but of one over
   // length).
   template <int dim>
   Tensor<1,dim> Solution<dim>::gradient (const Point<dim>   &p,

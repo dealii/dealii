@@ -142,7 +142,7 @@ namespace Step9
   // @sect3{Equation data declaration}
 
   // Next we declare a class that describes the advection field. This, of
-  // course, is a vector field with as many compents as there are space
+  // course, is a vector field with as many components as there are space
   // dimensions. One could now use a class derived from the
   // <code>Function</code> base class, as we have done for boundary values and
   // coefficients in previous examples, but there is another possibility in
@@ -391,7 +391,7 @@ namespace Step9
   // rather than the common vectors of doubles, as the additional accuracy is
   // not necessary for estimated values.
   //
-  // In addition to these two functions, the class declares to exceptions
+  // In addition to these two functions, the class declares two exceptions
   // which are raised when a cell has no neighbors in each of the space
   // directions (in which case the matrix described in the introduction would
   // be singular and can't be inverted), while the other one is used in the
@@ -510,11 +510,11 @@ namespace Step9
     // configured for multi-threading, then the number of CPUs is set to one.)
     // However, sometimes there might be reasons to use another value. For
     // example, you might want to use less processors than there are in your
-    // system in order not to use too many computational ressources. On the
+    // system in order not to use too many computational resources. On the
     // other hand, if there are several jobs running on a computer and you
     // want to get a higher percentage of CPU time, it might be worth to start
     // more threads than there are CPUs, as most operating systems assign
-    // roughly the same CPU ressources to all threads presently running. For
+    // roughly the same CPU resources to all threads presently running. For
     // this reason, the <code>MultithreadInfo</code> class contains a
     // read-write variable <code>n_default_threads</code> which is set to
     // <code>n_cpus</code> by default, but can be set to another value. This
@@ -576,7 +576,7 @@ namespace Step9
     // differ (<code>begin_active</code> returns an
     // <code>active_iterator</code>, while <code>end</code> returns a
     // <code>raw_iterator</code>), and in this case the C++ language requires
-    // us to specify the template type explicitely. For brevity, we first
+    // us to specify the template type explicitly. For brevity, we first
     // typedef this data type to an alias.
     typedef typename DoFHandler<dim>::active_cell_iterator active_cell_iterator;
     std::vector<std::pair<active_cell_iterator,active_cell_iterator> >
@@ -611,8 +611,8 @@ namespace Step9
     // When all the threads are running, the only thing we have to do is wait
     // for them to finish. This is necessary of course, as we can't proceed
     // with our tasks before the matrix and right hand side are
-    // assemblesd. Waiting for all the threads to finish can be done using the
-    // <code>joint_all</code> function in the <code>ThreadGroup</code>
+    // assembled. Waiting for all the threads to finish can be done using the
+    // <code>join_all</code> function in the <code>ThreadGroup</code>
     // container, which just calls <code>join</code> on each of the thread
     // objects it stores.
     //
@@ -621,7 +621,7 @@ namespace Step9
     threads.join_all ();
 
 
-    // After the matrix has been assembled in parallel, we stil have to
+    // After the matrix has been assembled in parallel, we still have to
     // eliminate hanging node constraints. This is something that can't be
     // done on each of the threads separately, so we have to do it now.
     hanging_node_constraints.condense (system_matrix);
@@ -816,7 +816,7 @@ namespace Step9
         //
         // On the other hand, we would now like to write the local
         // contributions to the global system of equations into the global
-        // objects. This needs some kind of synchronisation, as if we would
+        // objects. This needs some kind of synchronization, as if we would
         // not take care of the fact that multiple threads write into the
         // matrix at the same time, we might be surprised that one threads
         // reads data from the matrix that another thread is presently
