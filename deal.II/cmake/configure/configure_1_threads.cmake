@@ -50,7 +50,7 @@ MACRO(SETUP_THREADING)
     ENDIF()
   ENDIF()
 
-  ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
+  ADD_FLAGS(DEAL_II_LINKER_FLAGS "${CMAKE_THREAD_LIBS_INIT}")
 
   #
   # Set up some posix thread specific configuration toggles:

@@ -110,7 +110,7 @@
       PROPERTIES
       VERSION ${VERSION}
       SOVERSION ${VERSION}
-      LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_${build}}"
+      LINK_FLAGS "${DEAL_II_LINKER_FLAGS_${build}}"
       COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${build}}"
       COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${build}}"
       )
@@ -177,15 +177,15 @@
     #   CMAKE_CXX_FLAGS
     #   DEAL_II_CXX_FLAGS_DEBUG
     #   DEAL_II_CXX_FLAGS_RELEASE
-    #   CMAKE_SHARED_LINKER_FLAGS
-    #   DEAL_II_SHARED_LINKER_FLAGS_DEBUG
-    #   DEAL_II_SHARED_LINKER_FLAGS_RELEASE
+    #   DEAL_II_LINKER_FLAGS
+    #   DEAL_II_LINKER_FLAGS_DEBUG
+    #   DEAL_II_LINKER_FLAGS_RELEASE
     #
     # All modifications shall be guarded with the ENABLE_IF_SUPPORTED
     # or ENABLE_IF_LINKS macro, e.g.
     #
     #   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
-    #   ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
+    #   ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
     #
     # Compiler flags for platform dependent optimization (such as
     # -march=native) must always be guarded with
@@ -513,9 +513,9 @@
 	<li>
 	  For internal use, for setting necessary linker flags for the deal.II library:
 	  <ul>
-            <li> <code>CMAKE_SHARED_LINKER_FLAGS</code>
-            <li> <code>DEAL_II_SHARED_LINKER_FLAGS_DEBUG</code>
-            <li> <code>DEAL_II_SHARED_LINKER_FLAGS_RELEASE</code>
+            <li> <code>DEAL_II_LINKER_FLAGS</code>
+            <li> <code>DEAL_II_LINKER_FLAGS_DEBUG</code>
+            <li> <code>DEAL_II_LINKER_FLAGS_RELEASE</code>
 	  </ul>
 
 	<li>

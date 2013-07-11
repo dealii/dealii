@@ -99,8 +99,14 @@ _both(
   )
 IF(CMAKE_CROSSCOMPILING)
   _both(
-    "#        CROSSCOMPILING!\n"
+    "#\n#        CROSSCOMPILING!\n"
     "#        DEAL_II_NATIVE:         ${DEAL_II_NATIVE}\n"
+    )
+ENDIF()
+
+IF(DEAL_II_STATIC_EXECUTABLE)
+  _both(
+    "#\n#        STATIC LINKAGE!\n"
     )
 ENDIF()
 
@@ -108,21 +114,21 @@ _both("#\n")
 
 _detailed(
 "#  Compiler flags used for this build:
-#        CMAKE_CXX_FLAGS:                     ${CMAKE_CXX_FLAGS}
+#        CMAKE_CXX_FLAGS:              ${CMAKE_CXX_FLAGS}
 "
   )
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  _detailed("#        DEAL_II_CXX_FLAGS_RELEASE:           ${DEAL_II_CXX_FLAGS_RELEASE}\n")
+  _detailed("#        DEAL_II_CXX_FLAGS_RELEASE:    ${DEAL_II_CXX_FLAGS_RELEASE}\n")
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  _detailed("#        DEAL_II_CXX_FLAGS_DEBUG:             ${DEAL_II_CXX_FLAGS_DEBUG}\n")
+  _detailed("#        DEAL_II_CXX_FLAGS_DEBUG:      ${DEAL_II_CXX_FLAGS_DEBUG}\n")
 ENDIF()
-_detailed("#        CMAKE_SHARED_LINKER_FLAGS:           ${CMAKE_SHARED_LINKER_FLAGS}\n")
+_detailed("#        DEAL_II_LINKER_FLAGS:         ${DEAL_II_LINKER_FLAGS}\n")
 IF(CMAKE_BUILD_TYPE MATCHES "Release")
-  _detailed("#        DEAL_II_SHARED_LINKER_FLAGS_RELEASE: ${DEAL_II_SHARED_LINKER_FLAGS_RELEASE}\n")
+  _detailed("#        DEAL_II_LINKER_FLAGS_RELEASE: ${DEAL_II_LINKER_FLAGS_RELEASE}\n")
 ENDIF()
 IF(CMAKE_BUILD_TYPE MATCHES "Debug")
-  _detailed("#        DEAL_II_SHARED_LINKER_FLAGS_DEBUG:   ${DEAL_II_SHARED_LINKER_FLAGS_DEBUG}\n")
+  _detailed("#        DEAL_II_LINKER_FLAGS_DEBUG:   ${DEAL_II_LINKER_FLAGS_DEBUG}\n")
 ENDIF()
 _detailed("#\n")
 

@@ -28,15 +28,15 @@
 #   CMAKE_CXX_FLAGS
 #   DEAL_II_CXX_FLAGS_DEBUG
 #   DEAL_II_CXX_FLAGS_RELEASE
-#   CMAKE_SHARED_LINKER_FLAGS
-#   DEAL_II_SHARED_LINKER_FLAGS_DEBUG
-#   DEAL_II_SHARED_LINKER_FLAGS_RELEASE
+#   DEAL_II_LINKER_FLAGS
+#   DEAL_II_LINKER_FLAGS_DEBUG
+#   DEAL_II_LINKER_FLAGS_RELEASE
 #
 # All modifications shall be guarded with the ENABLE_IF_SUPPORTED
 # or ENABLE_IF_LINKS macro, e.g.
 #
 #   ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
-#   ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
+#   ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 #
 # Checks for compiler features (such as C++11 support) and compiler
 # specific bugs that

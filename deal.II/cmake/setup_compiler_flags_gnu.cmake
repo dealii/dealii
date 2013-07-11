@@ -51,7 +51,7 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-fpic")
 # Check whether the -as-needed flag is available. If so set it to link
 # the deal.II library with it.
 #
-ENABLE_IF_LINKS(CMAKE_SHARED_LINKER_FLAGS "-Wl,--as-needed")
+ENABLE_IF_LINKS(DEAL_II_LINKER_FLAGS "-Wl,--as-needed")
 
 #
 # Setup various warnings:
@@ -100,10 +100,10 @@ IF(DEAL_II_STATIC_EXECUTABLE)
   # To produce a static executable, we have to statically link libstdc++
   # and gcc's support libraries and glibc:
   #
-  # (Well... the name "CMAKE_SHARED_LINKER_FLAGS" is a bit misleading :-])
+  # (Well... the name "DEAL_II_LINKER_FLAGS" is a bit misleading :-])
   #
-  ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-static")
-  ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-pthread")
+  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-static")
+  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-pthread")
 ENDIF()
 
 
@@ -147,13 +147,13 @@ IF (CMAKE_BUILD_TYPE MATCHES "Debug")
   ENDIF()
 
   ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-ggdb")
-  ENABLE_IF_SUPPORTED(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-ggdb")
+  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS_DEBUG "-ggdb")
   #
   # If -ggdb is not available, fall back to -g:
   #
   IF(NOT DEAL_II_HAVE_FLAG_ggdb)
     ENABLE_IF_SUPPORTED(DEAL_II_CXX_FLAGS_DEBUG "-g")
-    ENABLE_IF_SUPPORTED(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "-g")
+    ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS_DEBUG "-g")
   ENDIF()
 ENDIF()
 
