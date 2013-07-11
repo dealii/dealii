@@ -19,6 +19,43 @@
 MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
   FIND_PACKAGE(LAPACK)
 
+  #
+  # So, well... LAPACK_LINKER_FLAGS and LAPACK_LIBRARIES should contain the
+  # complete link interface. But for invalid user overrides we include
+  # BLAS_LIBRARIES and BLAS_LINKER_FLAGS as well..
+  #
+  IF(NOT LAPACK_LINKER_FLAGS MATCHES "${BLAS_LINKER_FLAGS}")
+    MESSAGE(STATUS
+      "Manually adding BLAS_LINKER_FLAGS to LAPACK_LINKER_FLAGS"
+      )
+    ADD_FLAGS(LAPACK_LINKER_FLAGS "${BLAS_LINKER_FLAGS}")
+  ENDIF()
+  IF(NOT "${LAPACK_LIBRARIES}" MATCHES "${BLAS_LIBRARIES}")
+    MESSAGE(STATUS
+      "Manually adding BLAS_LIBRARIES to LAPACK_LIBRARIES"
+      )
+    LIST(APPEND LAPACK_LIBRARIES ${BLAS_LIBRARIES})
+  ENDIF()
+
+  #
+  # Well, in case of static archives we have to manually pick up the
+  # complete link interface. *sigh*
+  #
+  # Do this unconditionally for the most common case:
+  # TODO: Non-GNU setups...
+  #
+  FOREACH(_lib m gfortran quadmath)
+    FIND_LIBRARY(${_lib}_lib
+      NAMES ${_lib}
+      HINTS ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
+    MARK_AS_ADVANCED(${_lib}_lib)
+
+    IF(NOT ${_lib}_lib MATCHES "-NOTFOUND")
+      LIST(APPEND LAPACK_LIBRARIES ${${_lib}_lib})
+    ENDIF()
+  ENDFOREACH()
+
+
   IF(LAPACK_FOUND)
     MARK_AS_ADVANCED(
       atlas_LIBRARY
@@ -71,49 +108,9 @@ MACRO(RESET_LAPACK_FUNCTIONS_CACHE)
   ENDFOREACH()
 ENDMACRO()
 
-#
-# Resolve a cache invalidation problem by searching for this flag
-# unconditionally. It is used in FEATURE_LAPACK_CONFIGURE_EXTERNAL
-# depending on cached variables.
-#
-ENABLE_IF_LINKS(_dummy "-lgfortran")
-ENABLE_IF_LINKS(_dummy "-lquadmath")
 
 
 MACRO(FEATURE_LAPACK_CONFIGURE_EXTERNAL)
-  #
-  # So, well... LAPACK_LINKER_FLAGS and LAPACK_LIBRARIES should contain the
-  # complete link interface. But for invalid user overrides we include
-  # BLAS_LIBRARIES and BLAS_LINKER_FLAGS as well..
-  #
-  IF(NOT LAPACK_LINKER_FLAGS MATCHES "${BLAS_LINKER_FLAGS}")
-    MESSAGE(STATUS
-      "Manually adding BLAS_LINKER_FLAGS to LAPACK_LINKER_FLAGS"
-      )
-    ADD_FLAGS(LAPACK_LINKER_FLAGS "${BLAS_LINKER_FLAGS}")
-  ENDIF()
-  IF(NOT "${LAPACK_LIBRARIES}" MATCHES "${BLAS_LIBRARIES}")
-    MESSAGE(STATUS
-      "Manually adding BLAS_LIBRARIES to LAPACK_LIBRARIES"
-      )
-    LIST(APPEND LAPACK_LIBRARIES ${BLAS_LIBRARIES})
-  ENDIF()
-
-
-  #
-  # Well, in case of static archives we have to manually pick up the
-  # complete link interface. *sigh*
-  #
-  # Do this unconditionally for the most common case:
-  # TODO: Non-GNU setups...
-  #
-  IF(NOT m_lib MATCHES "-NOTFOUND")
-    LIST(APPEND LAPACK_LIBRARIES ${m_lib})
-  ENDIF()
-
-  ENABLE_IF_LINKS(LAPACK_LINKER_FLAGS "-lgfortran")
-  ENABLE_IF_LINKS(LAPACK_LINKER_FLAGS "-lquadmath")
-
 
   ADD_FLAGS(CMAKE_SHARED_LINKER_FLAGS "${LAPACK_LINKER_FLAGS}")
   LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${LAPACK_LIBRARIES})
