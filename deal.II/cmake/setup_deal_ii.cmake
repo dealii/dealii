@@ -147,7 +147,7 @@ ENDIF()
 
 ###########################################################################
 #                                                                         #
-#  Cleanup and Includes that have to happen after the call to PROJECT():  #
+#    Cleanup and setup that has to happen after the call to PROJECT():    #
 #                                                                         #
 ###########################################################################
 
@@ -164,6 +164,14 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     )
 ENDFOREACH()
 
+#
+# Invert the search order for libraries when BUILD_SHARED_LIBS=OFF to
+# prefer static archives instead of shared libraries:
+#
+IF(NOT BUILD_SHARED_LIBS)
+  # TODO: Does this work on a Windows or CYGWIN target?
+  LIST(REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
+ENDIF()
 
 #
 # Cross compilation stuff:
