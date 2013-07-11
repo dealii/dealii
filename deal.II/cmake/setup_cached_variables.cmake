@@ -30,12 +30,13 @@
 #
 # Options regarding compilation and linking:
 #
+#     CMAKE_BUILD_TYPE
 #     DEAL_II_ALLOW_PLATFORM_INTROSPECTION
 #     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
-#     CMAKE_BUILD_TYPE
+#     DEAL_II_STATIC_EXECUTABLE
 #     BUILD_SHARED_LIBS
 #     CMAKE_INSTALL_RPATH_USE_LINK_PATH
-#     CMAKE_C_FLAGS
+#     CMAKE_C_FLAGS                     *)
 #     CMAKE_CXX_FLAGS                   *)
 #     CMAKE_SHARED_LINKER_FLAGS         *)
 #     DEAL_II_CXX_FLAGS_DEBUG
@@ -45,8 +46,8 @@
 #     DEAL_II_WITH_64BIT_INDICES
 #
 # *)  May also be set via environment variable (CFLAGS, CXXFLAGS, LDFLAGS)
-#     (nonempty cached variable has precedence will not be overwritten by
-#     environment)
+#     (a nonempty cached variable has precedence and will not be
+#     overwritten by environment)
 #
 
 
@@ -115,18 +116,6 @@ ENDIF()
 #                                                                         #
 ###########################################################################
 
-OPTION(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
-  "Allow platform introspection for CPU command set, SSE and AVX"
-  ON
-  )
-MARK_AS_ADVANCED(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
-
-OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
-  "Configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
-  ON
-  )
-MARK_AS_ADVANCED(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
-
 #
 # Setup CMAKE_BUILD_TYPE:
 #
@@ -148,10 +137,36 @@ IF( NOT "${CMAKE_BUILD_TYPE}" STREQUAL "Release" AND
     )
 ENDIF()
 
-SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
-  "Build a shared library"
+
+OPTION(DEAL_II_ALLOW_PLATFORM_INTROSPECTION
+  "Allow platform introspection for CPU command set, SSE and AVX"
+  ON
   )
+MARK_AS_ADVANCED(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)
+
+OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
+  "Configure sensible default CFLAGS and CXXFLAGS depending on platform, compiler and build target."
+  ON
+  )
+MARK_AS_ADVANCED(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
+
+OPTION(DEAL_II_STATIC_EXECUTABLE
+  "Provide a link interface that is suitable for static linkage of executables. Enabling this option forces BUILD_SHARED_LIBS=OFF"
+  OFF
+  )
+MARK_AS_ADVANCED(DEAL_II_STATIC_EXECUTABLE)
+
+IF(DEAL_II_STATIC_EXECUTABLE)
+  SET(BUILD_SHARED_LIBS "OFF" CACHE BOOL
+    "Build a shared library" FORCE
+    )
+ELSE()
+  SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
+    "Build a shared library"
+    )
+ENDIF()
 MARK_AS_ADVANCED(BUILD_SHARED_LIBS)
+
 
 #
 # Set CMAKE_INSTALL_RPATH_USE_LINK_PATH to default to ON and promote to
@@ -161,6 +176,7 @@ SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
   "Set the rpath of the library to the external link pathes on installation"
   )
 MARK_AS_ADVANCED(CMAKE_INSTALL_RPATH_USE_LINK_PATH)
+
 
 #
 # Define the variable that defines whether we should use 32- or 64-bit

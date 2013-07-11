@@ -95,6 +95,18 @@ IF(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 ENDIF()
 
 
+IF(DEAL_II_STATIC_EXECUTABLE)
+  #
+  # To produce a static executable, we have to statically link libstdc++
+  # and gcc's support libraries and glibc:
+  #
+  # (Well... the name "CMAKE_SHARED_LINKER_FLAGS" is a bit misleading :-])
+  #
+  ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-static")
+  ENABLE_IF_SUPPORTED(CMAKE_SHARED_LINKER_FLAGS "-pthread")
+ENDIF()
+
+
 #############################
 #                           #
 #    For Release target:    #

@@ -116,4 +116,14 @@ MACRO(DEAL_II_SETUP_TARGET _target)
   #
   TARGET_LINK_LIBRARIES(${_target} ${DEAL_II_TARGET})
 
+  #
+  # If DEAL_II_STATIC_EXECUTABLE is set, switch to final link type to
+  # static:
+  #
+  IF(DEAL_II_STATIC_EXECUTABLE)
+    SET_PROPERTY(TARGET ${_target} PROPERTY
+      LINK_SEARCH_END_STATIC TRUE
+      )
+  ENDIF()
+
 ENDMACRO()

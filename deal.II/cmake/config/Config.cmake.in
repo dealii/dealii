@@ -127,6 +127,13 @@ SET(DEAL_II_USER_DEFINITIONS_RELEASE "@DEAL_II_USER_DEFINITIONS_RELEASE@")
 
 
 #
+# Build a static executable:
+#
+
+SET(DEAL_II_STATIC_EXECUTABLE "@DEAL_II_STATIC_EXECUTABLE@")
+
+
+#
 # Information about include directories and libraries
 #
 
