@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2009-2012 by Timo Heister and the deal.II authors */
+/*    Copyright (C) 2009-2013 by Timo Heister and the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -133,23 +133,23 @@ namespace Step40
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
-    MPI_Comm mpi_communicator;
+    MPI_Comm                                  mpi_communicator;
 
-    parallel::distributed::Triangulation<dim>   triangulation;
+    parallel::distributed::Triangulation<dim> triangulation;
 
-    DoFHandler<dim>      dof_handler;
-    FE_Q<dim>            fe;
+    DoFHandler<dim>                           dof_handler;
+    FE_Q<dim>                                 fe;
 
-    IndexSet             locally_owned_dofs;
-    IndexSet             locally_relevant_dofs;
+    IndexSet                                  locally_owned_dofs;
+    IndexSet                                  locally_relevant_dofs;
 
-    ConstraintMatrix     constraints;
+    ConstraintMatrix                          constraints;
 
-    PETScWrappers::MPI::SparseMatrix system_matrix;
-    PETScWrappers::MPI::Vector locally_relevant_solution;
-    PETScWrappers::MPI::Vector system_rhs;
+    PETScWrappers::MPI::SparseMatrix          system_matrix;
+    PETScWrappers::MPI::Vector                locally_relevant_solution;
+    PETScWrappers::MPI::Vector                system_rhs;
 
-    ConditionalOStream                pcout;
+    ConditionalOStream                        pcout;
   };
 
 
