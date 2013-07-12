@@ -18,6 +18,7 @@
 // already be familiar friends:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/timer.h>
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/solver_cg.h>
@@ -150,6 +151,7 @@ namespace Step40
     PETScWrappers::MPI::Vector                system_rhs;
 
     ConditionalOStream                        pcout;
+    TimerOutput                               computing_timer;
   };
 
 
@@ -175,8 +177,11 @@ namespace Step40
     fe (2),
     pcout (std::cout,
            (Utilities::MPI::this_mpi_process(mpi_communicator)
-            == 0))
-  {}
+            == 0)),
+    computing_timer (pcout,
+                     TimerOutput::summary,
+                     TimerOutput::wall_times)
+ {}
 
 
 
@@ -206,6 +211,8 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::setup_system ()
   {
+    TimerOutput::Scope t(computing_timer, "setup");
+
     dof_handler.distribute_dofs (fe);
 
     // The next two lines extract some informatino we will need later on,
@@ -334,6 +341,8 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::assemble_system ()
   {
+    TimerOutput::Scope t(computing_timer, "assembly");
+
     const QGauss<dim>  quadrature_formula(3);
 
     FEValues<dim> fe_values (fe, quadrature_formula,
@@ -428,6 +437,7 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
+    TimerOutput::Scope t(computing_timer, "solve");
     PETScWrappers::MPI::Vector
     completely_distributed_solution (mpi_communicator,
                                      dof_handler.n_dofs(),
@@ -473,6 +483,8 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::refine_grid ()
   {
+    TimerOutput::Scope t(computing_timer, "refine");
+
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate (dof_handler,
                                         QGauss<dim-1>(3),
@@ -620,10 +632,16 @@ namespace Step40
         solve ();
 
         if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 32)
-          output_results (cycle);
-
+          {
+            TimerOutput::Scope t(computing_timer, "output");
+            output_results (cycle);
+          }
+	
         pcout << std::endl;
+        computing_timer.print_summary ();
+        computing_timer.reset ();
       }
+    
   }
 }
 
