@@ -39,6 +39,7 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   #
   SET_IF_EMPTY(MPI_CXX_COMPILER ${CMAKE_CXX_COMPILER})
   SET_IF_EMPTY(MPI_C_COMPILER ${CMAKE_C_COMPILER}) # for good measure
+  SET_IF_EMPTY(MPI_Fortran_COMPILER ${CMAKE_Fortran_COMPILER}) # for good measure
   FIND_PACKAGE(MPI)
 
   IF(NOT MPI_CXX_FOUND)
@@ -55,9 +56,19 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
       SET(MPI_FOUND) # clear this value so that FIND_PACKAGE runs again.
       UNSET(MPI_CXX_COMPILER CACHE)
       UNSET(MPI_C_COMPILER CACHE)
+      UNSET(MPI_Fortran_COMPILER CACHE)
       FIND_PACKAGE(MPI)
     ENDIF()
   ENDIF()
+
+  #
+  # Manually clean up variables:
+  #
+  FOREACH(_lang C CXX Fortran)
+    IF(MPI_${_lang}_LIBRARIES MATCHES "-NOTFOUND")
+      SET(MPI_${_lang}_LIBRARIES)
+    ENDIF()
+  ENDFOREACH()
 
   IF(MPI_CXX_FOUND)
     # Hide some variables:
