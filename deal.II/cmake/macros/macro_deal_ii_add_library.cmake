@@ -17,12 +17,12 @@
 # build type specified in DEAL_II_BUILD_TYPES
 #
 # It is assumed that the desired compilation configuration is set via
-#   DEAL_II_SHARED_LINKER_FLAGS_${build}
+#   DEAL_II_LINKER_FLAGS_${build}
 #   DEAL_II_CXX_FLAGS_${build}
 #   DEAL_II_DEFINITIONS_${build}
 #
 # as well as the global (for all build types)
-#   CMAKE_SHARED_LINKER_FLAGS
+#   DEAL_II_LINKER_FLAGS
 #   CMAKE_CXX_FLAGS
 #   DEAL_II_DEFINITIONS
 #
@@ -37,7 +37,7 @@ MACRO(DEAL_II_ADD_LIBRARY _library)
       )
 
     SET_TARGET_PROPERTIES(${_library}.${_build_lowercase} PROPERTIES
-      LINK_FLAGS "${DEAL_II_SHARED_LINKER_FLAGS_${_build}}"
+      LINK_FLAGS "${DEAL_II_LINKER_FLAGS};${DEAL_II_LINKER_FLAGS_${_build}}"
       COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS};${DEAL_II_DEFINITIONS_${_build}}"
       COMPILE_FLAGS "${DEAL_II_CXX_FLAGS_${_build}}"
       LINKER_LANGUAGE "CXX"

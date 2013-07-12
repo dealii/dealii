@@ -3,7 +3,7 @@
 
 /*    $Id$       */
 /*                                                                */
-/*    Copyright (C) 2009-2012 by Timo Heister and the deal.II authors */
+/*    Copyright (C) 2009-2013 by Timo Heister and the deal.II authors */
 /*                                                                */
 /*    This file is subject to QPL and may not be  distributed     */
 /*    without copyright and license information. Please refer     */
@@ -18,6 +18,7 @@
 // already be familiar friends:
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
+#include <deal.II/base/timer.h>
 
 #include <deal.II/lac/generic_linear_algebra.h>
 
@@ -31,7 +32,6 @@ namespace LA
   using namespace dealii::LinearAlgebraTrilinos;
 #endif
 }
-
 
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
@@ -148,23 +148,24 @@ namespace Step40
     void refine_grid ();
     void output_results (const unsigned int cycle) const;
 
-    MPI_Comm mpi_communicator;
+    MPI_Comm                                  mpi_communicator;
 
-    parallel::distributed::Triangulation<dim>   triangulation;
+    parallel::distributed::Triangulation<dim> triangulation;
 
-    DoFHandler<dim>      dof_handler;
-    FE_Q<dim>            fe;
+    DoFHandler<dim>                           dof_handler;
+    FE_Q<dim>                                 fe;
 
-    IndexSet             locally_owned_dofs;
-    IndexSet             locally_relevant_dofs;
+    IndexSet                                  locally_owned_dofs;
+    IndexSet                                  locally_relevant_dofs;
 
-    ConstraintMatrix     constraints;
+    ConstraintMatrix                          constraints;
 
     LA::MPI::SparseMatrix system_matrix;
     LA::MPI::Vector locally_relevant_solution;
     LA::MPI::Vector system_rhs;
 
-    ConditionalOStream                pcout;
+    ConditionalOStream                        pcout;
+    TimerOutput                               computing_timer;
   };
 
 
@@ -190,8 +191,11 @@ namespace Step40
     fe (2),
     pcout (std::cout,
            (Utilities::MPI::this_mpi_process(mpi_communicator)
-            == 0))
-  {}
+            == 0)),
+    computing_timer (pcout,
+                     TimerOutput::summary,
+                     TimerOutput::wall_times)
+ {}
 
 
 
@@ -221,6 +225,8 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::setup_system ()
   {
+    TimerOutput::Scope t(computing_timer, "setup");
+
     dof_handler.distribute_dofs (fe);
 
     // The next two lines extract some informatino we will need later on,
@@ -345,6 +351,8 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::assemble_system ()
   {
+    TimerOutput::Scope t(computing_timer, "assembly");
+
     const QGauss<dim>  quadrature_formula(3);
 
     FEValues<dim> fe_values (fe, quadrature_formula,
@@ -439,6 +447,7 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::solve ()
   {
+    TimerOutput::Scope t(computing_timer, "solve");
     LA::MPI::Vector
     completely_distributed_solution (locally_owned_dofs, mpi_communicator);
 
@@ -486,6 +495,8 @@ namespace Step40
   template <int dim>
   void LaplaceProblem<dim>::refine_grid ()
   {
+    TimerOutput::Scope t(computing_timer, "refine");
+
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate (dof_handler,
                                         QGauss<dim-1>(3),
@@ -633,10 +644,16 @@ namespace Step40
         solve ();
 
         if (Utilities::MPI::n_mpi_processes(mpi_communicator) <= 32)
-          output_results (cycle);
-
+          {
+            TimerOutput::Scope t(computing_timer, "output");
+            output_results (cycle);
+          }
+	
         pcout << std::endl;
+        computing_timer.print_summary ();
+        computing_timer.reset ();
       }
+    
   }
 }
 

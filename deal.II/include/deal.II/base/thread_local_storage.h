@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2011, 2012 by the deal.II authors
+//    Copyright (C) 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -29,7 +29,6 @@ DEAL_II_NAMESPACE_OPEN
 
 namespace Threads
 {
-  template <typename T>
   /**
    * @brief A class that provides a separate storage location on each thread that accesses the object.
    *
@@ -60,7 +59,8 @@ namespace Threads
    * provides a reference to a unique object when accessed from different threads.
    * Objects of type T are created lazily, i.e. they are only created whenever a
    * thread actually calls get().
-   **/
+   */
+  template <typename T>
   class ThreadLocalStorage
   {
   public:

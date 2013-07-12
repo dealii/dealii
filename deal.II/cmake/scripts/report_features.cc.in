@@ -61,7 +61,7 @@ int main()
   if(${_shared_libs})
     std::cout << "dealii-feature: shared_libs=yes" << std::endl;
   else
-    std::cout << "dealii-feature: shared_libs=yes" << std::endl;
+    std::cout << "dealii-feature: shared_libs=no" << std::endl;
 
 #ifdef DEAL_II_WITH_ARPACK
   std::cout << "dealii-feature: ARPACK=yes" << std::endl;

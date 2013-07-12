@@ -95,17 +95,22 @@
 #   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_CXX_FLAGS_RELEASE variable"
 #   )
 #
-# SET(CMAKE_SHARED_LINKER_FLAGS "" CACHE STRING
-#   "The user supplied cache variable will be appended _at the end_ of the auto generated CMAKE_SHARED_LINKER_FLAGS variable"
+# SET(DEAL_II_LINKER_FLAGS "" CACHE STRING
+#   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_LINKER_FLAGS variable"
 #   )
 #
-# SET(DEAL_II_SHARED_LINKER_FLAGS_DEBUG "" CACHE STRING
-#   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_SHARED_LINKER_FLAGS_DEBUG variable"
+# SET(DEAL_II_LINKER_FLAGS_DEBUG "" CACHE STRING
+#   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_LINKER_FLAGS_DEBUG variable"
 #   )
 #
-# SET(DEAL_II_SHARED_LINKER_FLAGS_RELEASE "" CACHE STRING
-#   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_SHARED_LINKER_FLAGS_RELEASE variable"
+# SET(DEAL_II_LINKER_FLAGS_RELEASE "" CACHE STRING
+#   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_LINKER_FLAGS_RELEASE variable"
 #   )
+#
+# OPTION(DEAL_II_STATIC_EXECUTABLE "ON" CACHE BOOL
+#   "Provide a link interface that is suitable for static linkage of executables. Enabling this option forces BUILD_SHARED_LIBS=OFF"
+#   )
+#
 #
 # SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
 #   "Build a shared library"

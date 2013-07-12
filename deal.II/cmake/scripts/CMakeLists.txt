@@ -49,12 +49,21 @@ IF(DEAL_II_COMPONENT_COMPAT_FILES)
   ADD_EXECUTABLE(report_features
     ${CMAKE_CURRENT_BINARY_DIR}/report_features.cc
     )
+
+  #
+  # Link report_features in the same way as the library/final executable:
+  #
   TARGET_LINK_LIBRARIES(report_features ${DEAL_II_EXTERNAL_LIBRARIES})
   SET_TARGET_PROPERTIES(report_features
     PROPERTIES
-    LINK_FLAGS "${CMAKE_SHARED_LINKER_FLAGS}"
+    LINK_FLAGS "${DEAL_II_LINKER_FLAGS}"
     COMPILE_DEFINITIONS "${DEAL_II_DEFINITIONS}"
     )
+  IF(DEAL_II_STATIC_EXECUTABLE)
+    SET_PROPERTY(TARGET report_features PROPERTY
+      LINK_SEARCH_END_STATIC TRUE
+      )
+  ENDIF()
 
   IF(NOT CMAKE_CROSSCOMPILING)
     ADD_CUSTOM_TARGET(run_report_features COMMAND report_features)

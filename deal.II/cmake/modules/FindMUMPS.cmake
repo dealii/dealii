@@ -31,11 +31,8 @@ INCLUDE(FindPackageHandleStandardArgs)
 # (We'll rely on the user of FindMUMPS, setting up mpi *cough*)
 #
 FIND_PACKAGE(SCALAPACK) # which will also include lapack and blas
+FIND_PACKAGE(METIS)
 
-#
-# TODO: mumps might link to scotch and or metis as well. Ignore this for
-#       now. :-]
-#
 
 FIND_PATH(MUMPS_INCLUDE_DIR dmumps_c.h
   HINTS
@@ -91,7 +88,8 @@ IF(MUMPS_FOUND)
     ${MUMPS_COMMON_LIBRARY}
     ${PORD_LIBRARY}
     ${SCALAPACK_LIBRARIES}
-    ${MPI_CXX_LIBRARIES} # For good measure
+    ${METIS_LIBRARIES}       # for good measure
+    ${MPI_Fortran_LIBRARIES} # for good measure
     )
   SET(MUMPS_LINKER_FLAGS
     ${SCALAPACK_LINKER_FLAGS}
