@@ -93,6 +93,7 @@ IF(P4EST_FOUND)
   SET(P4EST_LIBRARIES
     ${P4EST_LIBRARY}
     ${SC_LIBRARY}
+    ${LAPACK_LIBRARIES} # for good measure
     ${MPI_C_LIBRARIES} # for good measure
     )
   SET(P4EST_INCLUDE_DIRS

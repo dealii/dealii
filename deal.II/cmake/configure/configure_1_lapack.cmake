@@ -37,26 +37,25 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     LIST(APPEND LAPACK_LIBRARIES ${BLAS_LIBRARIES})
   ENDIF()
 
-  #
-  # Well, in case of static archives we have to manually pick up the
-  # complete link interface. *sigh*
-  #
-  # Do this unconditionally for the most common case:
-  # TODO: Non-GNU setups...
-  #
-  FOREACH(_lib gfortran m quadmath)
-    FIND_LIBRARY(${_lib}_lib
-      NAMES ${_lib}
-      HINTS ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
-    MARK_AS_ADVANCED(${_lib}_lib)
-
-    IF(NOT ${_lib}_lib MATCHES "-NOTFOUND")
-      LIST(APPEND LAPACK_LIBRARIES ${${_lib}_lib})
-    ENDIF()
-  ENDFOREACH()
-
-
   IF(LAPACK_FOUND)
+    #
+    # Well, in case of static archives we have to manually pick up the
+    # complete link interface. *sigh*
+    #
+    # Do this unconditionally for the most common case:
+    # TODO: Non-GNU setups...
+    #
+    FOREACH(_lib gfortran m quadmath)
+      FIND_LIBRARY(${_lib}_lib
+        NAMES ${_lib}
+        HINTS ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
+      MARK_AS_ADVANCED(${_lib}_lib)
+
+      IF(NOT ${_lib}_lib MATCHES "-NOTFOUND")
+        LIST(APPEND LAPACK_LIBRARIES ${${_lib}_lib})
+      ENDIF()
+    ENDFOREACH()
+
     MARK_AS_ADVANCED(
       atlas_LIBRARY
       blas_LIBRARY
