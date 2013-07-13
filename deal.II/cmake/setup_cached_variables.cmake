@@ -33,8 +33,9 @@
 #     CMAKE_BUILD_TYPE
 #     DEAL_II_ALLOW_PLATFORM_INTROSPECTION
 #     DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
-#     DEAL_II_STATIC_EXECUTABLE
 #     BUILD_SHARED_LIBS
+#     DEAL_II_PREFER_STATIC_LIBS
+#     DEAL_II_STATIC_EXECUTABLE
 #     CMAKE_INSTALL_RPATH_USE_LINK_PATH
 #     CMAKE_C_FLAGS                     *)
 #     CMAKE_CXX_FLAGS                   *)
@@ -150,22 +151,32 @@ OPTION(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS
   )
 MARK_AS_ADVANCED(DEAL_II_SETUP_DEFAULT_COMPILER_FLAGS)
 
+SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
+  "Build a shared library"
+  )
+
+OPTION(DEAL_II_PREFER_STATIC_LIBS
+  "Prefer static libraries over dynamic libraries when searching for features and corresponding link interface"
+  OFF
+  )
+MARK_AS_ADVANCED(DEAL_II_PREFER_STATIC_LIBS)
+
 OPTION(DEAL_II_STATIC_EXECUTABLE
-  "Provide a link interface that is suitable for static linkage of executables. Enabling this option forces BUILD_SHARED_LIBS=OFF"
+  "Provide a link interface that is suitable for static linkage of executables. Enabling this option forces BUILD_SHARED_LIBS=OFF and DEAL_II_PREFER_STATIC_LIBS=ON"
   OFF
   )
 MARK_AS_ADVANCED(DEAL_II_STATIC_EXECUTABLE)
 
 IF(DEAL_II_STATIC_EXECUTABLE)
   SET(BUILD_SHARED_LIBS "OFF" CACHE BOOL
-    "Build a shared library" FORCE
-    )
-ELSE()
-  SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
     "Build a shared library"
+    FORCE
+    )
+  SET(DEAL_II_PREFER_STATIC_LIBS "ON" CACHE BOOL
+    "Prefer static libraries over dynamic libraries when searching for features and corresponding link interface"
+    FORCE
     )
 ENDIF()
-MARK_AS_ADVANCED(BUILD_SHARED_LIBS)
 
 
 #

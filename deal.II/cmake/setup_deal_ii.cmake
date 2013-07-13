@@ -164,11 +164,11 @@ FOREACH(_build ${DEAL_II_BUILD_TYPES})
     )
 ENDFOREACH()
 
-#
-# Invert the search order for libraries when BUILD_SHARED_LIBS=OFF to
-# prefer static archives instead of shared libraries:
-#
-IF(NOT BUILD_SHARED_LIBS)
+IF(DEAL_II_PREFER_STATIC_LIBS)
+  #
+  # Invert the search order for libraries when DEAL_II_PREFER_STATIC_LIBS
+  # is set. This will prefer static archives instead of shared libraries:
+  #
   # TODO: Does this work on a Windows or CYGWIN target?
   LIST(REVERSE CMAKE_FIND_LIBRARY_SUFFIXES)
 ENDIF()
