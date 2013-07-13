@@ -107,13 +107,16 @@
 #   "The user supplied cache variable will be appended _at the end_ of the auto generated DEAL_II_LINKER_FLAGS_RELEASE variable"
 #   )
 #
-# OPTION(DEAL_II_STATIC_EXECUTABLE "ON" CACHE BOOL
-#   "Provide a link interface that is suitable for static linkage of executables. Enabling this option forces BUILD_SHARED_LIBS=OFF"
-#   )
-#
-#
 # SET(BUILD_SHARED_LIBS "ON" CACHE BOOL
 #   "Build a shared library"
+#   )
+#
+# SET(DEAL_II_PREFER_STATIC_LIBS "OFF" CACHE BOOL
+#   "Prefer static libraries over dynamic libraries when searching for features and corresponding link interface"
+#   )
+#
+# OPTION(DEAL_II_STATIC_EXECUTABLE "OFF" CACHE BOOL
+#   "Provide a link interface that is suitable for static linkage of executables. Enabling this option forces BUILD_SHARED_LIBS=OFF and DEAL_II_PREFER_STATIC_LIBS=ON"
 #   )
 #
 # SET(CMAKE_INSTALL_RPATH_USE_LINK_PATH "ON" CACHE BOOL
