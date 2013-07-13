@@ -43,7 +43,6 @@
 	    <li><a href="#config.h.in"><code>./include/deal.II/base/config.h.in</code></a>
             <li><a href="#source"><code>./source/CMakeLists.txt</code></a>
             <li><a href="#projectconfig"><code>./cmake/config/CMakeLists.txt</code></a>
-            <li>TODO
           </ul>
 	</td>
       </tr>
@@ -602,9 +601,20 @@
       <pre>
 
     #
+    # Glob for all header files associated with the object target:
+    # As this list is only for cosmetic reasons, so that associated header
+    # files show up in IDEs, we don't manage an explicit list (with the
+    # tradeoff to have to run "make rebuild_cache" when a new header file
+    # emerges...)
+    #
+    FILE(GLOB _header
+      ${CMAKE_SOURCE_DIR}/include/deal.II/dofs/*.h
+      )
+
+    #
     # A list of source files forming the object target:
     #
-    SET(src
+    SET(_src
       ...
       dof_tools.cc
       )
@@ -612,7 +622,7 @@
     #
     # A list of instantiations that must be expanded:
     #
-    SET(inst_in_files
+    SET(_inst
       ...
       dof_tools.inst.in
       )
@@ -625,7 +635,10 @@
     #   ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/deal_ii_objects_(debug/release)
     # so that it is available in global scope.
     #
-    DEAL_II_ADD_LIBRARY(obj_dofs OBJECT ${src})
+    # Header files and instatiation files (${_header}, ${_inst}) are added
+    # for cosmetic reasons, so that they show up in IDEs.
+    #
+    DEAL_II_ADD_LIBRARY(obj_dofs OBJECT ${_src} ${_header} ${_inst})
 
     #
     # This macro will set up an obj_dofs.inst target for expanding all
