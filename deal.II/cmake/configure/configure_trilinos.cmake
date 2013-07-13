@@ -238,13 +238,7 @@ MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   # The user has to know the location of the trilinos headers as well:
   LIST(APPEND DEAL_II_USER_INCLUDE_DIRS ${TRILINOS_INCLUDE_DIRS})
 
-  LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES
-    # The Trilinos libraries:
-    ${TRILINOS_LIBRARIES}
-    # All external libraries necessary for the Trilinos libraries. Nice and
-    # easy :-)
-    ${Trilinos_TPL_LIBRARIES}
-    )
+  LIST(APPEND DEAL_II_EXTERNAL_LIBRARIES ${TRILINOS_LIBRARIES})
 
   SET(DEAL_II_EXPAND_TRILINOS_VECTOR "TrilinosWrappers::Vector")
   SET(DEAL_II_EXPAND_TRILINOS_BLOCKVECTOR "TrilinosWrappers::BlockVector")
