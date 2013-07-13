@@ -24,7 +24,14 @@
 # The macro will be included in CONFIGURE_FEATURE_THREADS_EXTERNAL/BUNDLED.
 #
 MACRO(SETUP_THREADING)
+  #
+  # Switch the library preference back to prefer dynamic libraries if
+  # DEAL_II_PREFER_STATIC_LIBS=TRUE but DEAL_II_STATIC_EXECUTABLE=FALSE. In
+  # this case system libraries should be linked dynamically.
+  #
+  SWITCH_LIBRARY_PREFERENCE()
   FIND_PACKAGE(Threads)
+  SWITCH_LIBRARY_PREFERENCE()
 
   IF(NOT Threads_FOUND)
     # TODO:

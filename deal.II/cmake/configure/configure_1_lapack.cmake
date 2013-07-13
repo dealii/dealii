@@ -45,16 +45,23 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     # Do this unconditionally for the most common case:
     # TODO: Non-GNU setups...
     #
+    #
+    # Switch the library preference back to prefer dynamic libraries if
+    # DEAL_II_PREFER_STATIC_LIBS=TRUE but DEAL_II_STATIC_EXECUTABLE=FALSE. In
+    # this case system libraries should be linked dynamically.
+    #
+    SWITCH_LIBRARY_PREFERENCE()
     FOREACH(_lib gfortran m quadmath)
-      FIND_LIBRARY(${_lib}_lib
+      FIND_LIBRARY(${_lib}_LIBRARY
         NAMES ${_lib}
         HINTS ${CMAKE_CXX_IMPLICIT_LINK_DIRECTORIES})
-      MARK_AS_ADVANCED(${_lib}_lib)
+      MARK_AS_ADVANCED(${_lib}_LIBRARY)
 
-      IF(NOT ${_lib}_lib MATCHES "-NOTFOUND")
-        LIST(APPEND LAPACK_LIBRARIES ${${_lib}_lib})
+      IF(NOT ${_lib}_LIBRARY MATCHES "-NOTFOUND")
+        LIST(APPEND LAPACK_LIBRARIES ${${_lib}_LIBRARY})
       ENDIF()
     ENDFOREACH()
+    SWITCH_LIBRARY_PREFERENCE()
 
     MARK_AS_ADVANCED(
       atlas_LIBRARY
