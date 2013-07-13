@@ -188,5 +188,5 @@ IF(CMAKE_CROSSCOMPILING)
   SET(DEAL_II_NATIVE "DEAL_II_NATIVE-NOTFOUND" CACHE FILEPATH
     "A pointer to a native deal.Ii build directory"
     )
-  INCLUDE(${DEAL_II_NATIVE}/cmake/scripts//importExecutables.cmake)
+  INCLUDE(${DEAL_II_NATIVE}/cmake/scripts/importExecutables.cmake)
 ENDIF()

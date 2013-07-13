@@ -80,6 +80,18 @@ ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1478")
 ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-wd1572")
 
 
+IF(DEAL_II_STATIC_EXECUTABLE)
+  #
+  # To produce a static executable, we have to statically link intel's
+  # support libraries:
+  #
+  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-static")
+  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-static-intel")
+  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-static-gcc")
+  ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-pthread")
+ENDIF()
+
+
 #############################
 #                           #
 #    For Release target:    #

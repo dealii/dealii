@@ -100,8 +100,6 @@ IF(DEAL_II_STATIC_EXECUTABLE)
   # To produce a static executable, we have to statically link libstdc++
   # and gcc's support libraries and glibc:
   #
-  # (Well... the name "DEAL_II_LINKER_FLAGS" is a bit misleading :-])
-  #
   ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-static")
   ENABLE_IF_SUPPORTED(DEAL_II_LINKER_FLAGS "-pthread")
 ENDIF()
