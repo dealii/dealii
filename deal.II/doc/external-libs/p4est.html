@@ -2,8 +2,8 @@
    "http://www.w3.org/TR/REC-html40/frameset.dtd">
 <html>
   <head>
-    <link href="../screen.css" rel="StyleSheet" media="screen">
-    <title>The deal.II Readme</title>
+    <title>The deal.II Readme on interfacing to p4est</title>
+    <link href="../screen.css" rel="StyleSheet">
     <meta name="author" content="the deal.II authors <authors@dealii.org>">
     <meta name="keywords" content="deal.II">
   </head>
@@ -23,34 +23,38 @@
 
     <p>
       You need to install p4est before deal.II. To do so, you can
-      download it
-      from <a href="http://www.p4est.org/" target="_top">here</a>, copy it to
-      a fresh directory into which you should also copy
-      the <a href="p4est-setup.sh">p4est-setup.sh script</a> (the one
-      from this link, not one you may have gotten from the p4est webpage). Then
-      call the script as follows:
-      <code>
-	<pre>
-	  ./p4est-setup.sh p4est-x-y-z.tar.gz /path/to/installation
-	</pre>
-      </code>
+      download it from <a href="http://www.p4est.org/" target="_top">here</a>.
+      You can either choose to manually compile and install p4est (as
+      explained in documentation of p4est), or alternatively use
+      <a href="p4est-setup.sh">a script</a> that will automatically compile
+      and install a debug and optimized version of p4est.
+
+    </p>
+
+    <p>
+      If you want to use the script, copy the tarball to a fresh directory
+      together with the <a href="p4est-setup.sh">p4est-setup.sh script</a>
+      (the one from this link, not one you may have gotten from the p4est
+      webpage). Then call the script as follows:
+      <pre>
+
+    ./p4est-setup.sh p4est-x-y-z.tar.gz /path/to/installation
+      </pre>
       where <code>p4est-x-y-z.tar.gz</code> is the name of the p4est
       distribution file, and <code>/path/to/installation</code> is a
       directory into which you want to install p4est.
     </p>
 
     <p>
-      After this, you need to configure <acronym>deal.II</acronym>
-      using a line like
-      <code>
-	<pre>
+      In both cases, you can configure <acronym>deal.II</acronym> using a
+      line like
+      <pre>
 
     cmake -DP4EST_DIR=/path/to/installation -DDEAL_II_WITH_P4EST=ON -DDEAL_II_WITH_MPI=ON <...>
-	</pre>
-      </code>
-      Obviously, you can also add additional flags to
-      <code>cmake</code> as described in the general <a
-      href="../readme.html">ReadMe file</a>.
+      </pre>
+      if the p4est library isn't picked up automatically. Obviously, you
+      can also add additional flags to <code>cmake</code> as described in
+      the general <a href="../readme.html">ReadMe file</a>.
     </p>
 
     <hr>
