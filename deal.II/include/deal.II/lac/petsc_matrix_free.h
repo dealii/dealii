@@ -41,7 +41,7 @@ namespace PETScWrappers
    * See also the documentation of dealii::MatrixFree class and step-37 and step-48.
    *
    * Similar to other matrix classes in namespaces PETScWrappers and PETScWrappers::MPI,
-   * the MatrxiFree class provides the usual matrix-vector multiplication
+   * the MatrixFree class provides the usual matrix-vector multiplication
    *   <tt>vmult(VectorBase &dst, const VectorBase &src)</tt>
    * which is pure virtual and must be reimplemented in derived classes.
    * Besides the usual interface, this class has a matrix-vector multiplication

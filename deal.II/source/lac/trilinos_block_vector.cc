@@ -136,6 +136,28 @@ namespace TrilinosWrappers
       collect_sizes();
     }
 
+    void
+    BlockVector::reinit (const std::vector<IndexSet> &parallel_partitioning,
+                         const std::vector<IndexSet> &ghost_values,
+                         const MPI_Comm              &communicator)
+    {
+      const size_type no_blocks = parallel_partitioning.size();
+      std::vector<size_type> block_sizes (no_blocks);
+
+      for (size_type i=0; i<no_blocks; ++i)
+        {
+          block_sizes[i] = parallel_partitioning[i].size();
+        }
+
+      this->block_indices.reinit (block_sizes);
+      if (components.size() != n_blocks())
+        components.resize(n_blocks());
+
+      for (size_type i=0; i<n_blocks(); ++i)
+        components[i].reinit(parallel_partitioning[i], ghost_values[i], communicator);
+
+      collect_sizes();
+    }
 
 
     void

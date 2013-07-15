@@ -19,6 +19,20 @@
 #include <deal.II/base/quadrature_lib.h>
 #include <deal.II/base/function.h>
 #include <deal.II/base/timer.h>
+
+#include <deal.II/lac/generic_linear_algebra.h>
+
+#define USE_PETSC_LA
+
+namespace LA
+{
+#ifdef USE_PETSC_LA
+  using namespace dealii::LinearAlgebraPETSc;
+#else
+  using namespace dealii::LinearAlgebraTrilinos;
+#endif
+}
+
 #include <deal.II/lac/vector.h>
 #include <deal.II/lac/full_matrix.h>
 #include <deal.II/lac/solver_cg.h>
@@ -146,9 +160,9 @@ namespace Step40
 
     ConstraintMatrix                          constraints;
 
-    PETScWrappers::MPI::SparseMatrix          system_matrix;
-    PETScWrappers::MPI::Vector                locally_relevant_solution;
-    PETScWrappers::MPI::Vector                system_rhs;
+    LA::MPI::SparseMatrix system_matrix;
+    LA::MPI::Vector locally_relevant_solution;
+    LA::MPI::Vector system_rhs;
 
     ConditionalOStream                        pcout;
     TimerOutput                               computing_timer;
@@ -237,12 +251,10 @@ namespace Step40
     // locally owned cells (of course the linear solvers will read from it,
     // but they do not care about the geometric location of degrees of
     // freedom).
-    locally_relevant_solution.reinit (mpi_communicator,
-                                      locally_owned_dofs,
-                                      locally_relevant_dofs);
-    system_rhs.reinit (mpi_communicator,
-                       dof_handler.n_dofs(),
-                       dof_handler.n_locally_owned_dofs());
+    locally_relevant_solution.reinit (locally_owned_dofs,
+                                      locally_relevant_dofs, mpi_communicator);
+    system_rhs.reinit (locally_owned_dofs, mpi_communicator);
+
     system_rhs = 0;
 
     // The next step is to compute hanging node and boundary value
@@ -294,21 +306,19 @@ namespace Step40
     // entries that will exist in that part of the finite element matrix that
     // it will own. The final step is to initialize the matrix with the
     // sparsity pattern.
-    CompressedSimpleSparsityPattern csp (dof_handler.n_dofs(),
-                                         dof_handler.n_dofs(),
-                                         locally_relevant_dofs);
-    DoFTools::make_sparsity_pattern (dof_handler,
-                                     csp,
+    CompressedSimpleSparsityPattern csp (locally_relevant_dofs);
+
+    DoFTools::make_sparsity_pattern (dof_handler, csp,
                                      constraints, false);
     SparsityTools::distribute_sparsity_pattern (csp,
                                                 dof_handler.n_locally_owned_dofs_per_processor(),
                                                 mpi_communicator,
                                                 locally_relevant_dofs);
-    system_matrix.reinit (mpi_communicator,
+
+    system_matrix.reinit (locally_owned_dofs,
+                          locally_owned_dofs,
                           csp,
-                          dof_handler.n_locally_owned_dofs_per_processor(),
-                          dof_handler.n_locally_owned_dofs_per_processor(),
-                          Utilities::MPI::this_mpi_process(mpi_communicator));
+                          mpi_communicator);
   }
 
 
@@ -438,20 +448,22 @@ namespace Step40
   void LaplaceProblem<dim>::solve ()
   {
     TimerOutput::Scope t(computing_timer, "solve");
-    PETScWrappers::MPI::Vector
-    completely_distributed_solution (mpi_communicator,
-                                     dof_handler.n_dofs(),
-                                     dof_handler.n_locally_owned_dofs());
+    LA::MPI::Vector
+    completely_distributed_solution (locally_owned_dofs, mpi_communicator);
 
     SolverControl solver_control (dof_handler.n_dofs(), 1e-12);
 
-    PETScWrappers::SolverCG solver(solver_control, mpi_communicator);
+    LA::SolverCG solver(solver_control, mpi_communicator);
+    LA::MPI::PreconditionAMG preconditioner;
 
-    // Ask for a symmetric preconditioner by setting the first parameter in
-    // AdditionalData to true.
-    PETScWrappers::PreconditionBoomerAMG
-    preconditioner(system_matrix,
-                   PETScWrappers::PreconditionBoomerAMG::AdditionalData(true));
+    LA::MPI::PreconditionAMG::AdditionalData data;
+
+#ifdef USE_PETSC_LA
+    data.symmetric_operator = true;
+#else
+    //trilinos defaults are good
+#endif
+    preconditioner.initialize(system_matrix, data);
 
     solver.solve (system_matrix, completely_distributed_solution, system_rhs,
                   preconditioner);

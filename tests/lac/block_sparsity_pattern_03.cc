@@ -1,0 +1,60 @@
+//----------------------------------------------------------------------
+//    $Id$
+//    Version: $Name$
+//
+//    Copyright (C) 2006, 2008, 2010 by the deal.II authors
+//
+//    This file is subject to QPL and may not be  distributed
+//    without copyright and license information. Please refer
+//    to the file deal.II/doc/license.html for the  text  and
+//    further information on this license.
+//
+//----------------------------------------------------------------------
+
+
+// BlockSparsityPattern::column_number is broken
+
+#include "../tests.h"
+#include <deal.II/base/logstream.h>
+#include <deal.II/lac/block_sparsity_pattern.h>
+
+#include <iomanip>
+#include <fstream>
+
+int main()
+{
+  initlog(__FILE__);
+
+  std::vector<types::global_dof_index> row_blocks(2);
+  row_blocks[0] = 10;
+  row_blocks[1] = 5;
+
+  BlockCompressedSimpleSparsityPattern csp (row_blocks, row_blocks);
+
+      csp.reinit(2,2);
+    csp.block(0,0).reinit(10,10);
+    csp.block(0,1).reinit(10,5);
+    csp.block(1,0).reinit(5,10);
+    csp.block(1,1).reinit(5,5);
+    csp.collect_sizes();
+    csp.add(5,5);
+    csp.add(12,12);
+    csp.add(5,11);
+    csp.add(11,3);
+
+    csp.print(deallog.get_file_stream());
+
+
+    for (types::global_dof_index row=0; row<csp.n_rows(); ++row)
+      {
+        types::global_dof_index rlen = csp.row_length(row);
+
+        for (types::global_dof_index c=0; c<rlen; ++c)
+          {
+            types::global_dof_index column = csp.column_number(row, c);
+            deallog << row << "," << column << std::endl;
+          }
+      }
+  
+  deallog << "OK" << std::endl;
+}

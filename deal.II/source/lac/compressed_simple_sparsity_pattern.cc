@@ -249,6 +249,15 @@ CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const size_typ
 }
 
 
+CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const IndexSet &rowset_)
+  :
+  rows(0),
+  cols(0),
+  rowset(0)
+{
+  reinit (rowset_.size(), rowset_.size(), rowset_);
+}
+
 
 CompressedSimpleSparsityPattern::CompressedSimpleSparsityPattern (const size_type n)
   :

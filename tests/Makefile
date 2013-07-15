@@ -22,6 +22,7 @@ nofail-dirs = a-framework       \
               serialization     \
 	      mesh_converter    \
 	      $(if $(DEAL_II_USE_MPI:no=),      $(if $(USE_CONTRIB_P4EST:no=),mpi,),) \
+	      $(if $(DEAL_II_USE_MPI:no=),      $(if $(USE_CONTRIB_P4EST:no=),gla,),) \
 	      $(if $(USE_CONTRIB_P4EST:no=),    distributed_grids,) \
 	      $(if $(USE_CONTRIB_PETSC:no=),    petsc,) \
 	      $(if $(USE_CONTRIB_SLEPC:no=),    slepc,) \

@@ -1,0 +1,47 @@
+
+DEAL:0:PETSc::numproc=4
+DEAL:0:PETSc::l2norm: 0.400000
+DEAL:0:PETSc::size: 16
+DEAL:0:PETSc::block(0).size: 10
+DEAL:0:PETSc::block(1).size: 6
+DEAL:0:PETSc::my first entry: 0.00000
+DEAL:0:PETSc::OK
+DEAL:0:Trilinos::numproc=4
+DEAL:0:Trilinos::l2norm: 0.400000
+DEAL:0:Trilinos::size: 16
+DEAL:0:Trilinos::block(0).size: 10
+DEAL:0:Trilinos::block(1).size: 6
+DEAL:0:Trilinos::my first entry: 0.00000
+DEAL:0:Trilinos::OK
+
+DEAL:1:PETSc::l2norm: 0.400000
+DEAL:1:PETSc::size: 16
+DEAL:1:PETSc::block(0).size: 10
+DEAL:1:PETSc::block(1).size: 6
+DEAL:1:PETSc::my first entry: 0.100000
+DEAL:1:Trilinos::l2norm: 0.400000
+DEAL:1:Trilinos::size: 16
+DEAL:1:Trilinos::block(0).size: 10
+DEAL:1:Trilinos::block(1).size: 6
+DEAL:1:Trilinos::my first entry: 0.100000
+
+
+DEAL:2:PETSc::l2norm: 0.400000
+DEAL:2:PETSc::size: 16
+DEAL:2:PETSc::block(0).size: 10
+DEAL:2:PETSc::block(1).size: 6
+DEAL:2:Trilinos::l2norm: 0.400000
+DEAL:2:Trilinos::size: 16
+DEAL:2:Trilinos::block(0).size: 10
+DEAL:2:Trilinos::block(1).size: 6
+
+
+DEAL:3:PETSc::l2norm: 0.400000
+DEAL:3:PETSc::size: 16
+DEAL:3:PETSc::block(0).size: 10
+DEAL:3:PETSc::block(1).size: 6
+DEAL:3:Trilinos::l2norm: 0.400000
+DEAL:3:Trilinos::size: 16
+DEAL:3:Trilinos::block(0).size: 10
+DEAL:3:Trilinos::block(1).size: 6
+

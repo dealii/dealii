@@ -168,7 +168,7 @@ namespace PETScWrappers
      * the start.
      */
     template <typename SparsityType>
-    SparseMatrix (const SparsityType &sparsity_pattern,
+    explicit SparseMatrix (const SparsityType &sparsity_pattern,
                   const bool          preset_nonzero_locations = true);
 
     /**
@@ -320,6 +320,15 @@ namespace PETScWrappers
                                        const VectorBase &v) const;
 
   private:
+
+    /**
+     * Purposefully not implemented
+     */
+    SparseMatrix(const SparseMatrix &);
+    /**
+     * Purposefully not implemented
+     */
+    SparseMatrix& operator= (const SparseMatrix &);
 
     /**
      * Do the actual work for the

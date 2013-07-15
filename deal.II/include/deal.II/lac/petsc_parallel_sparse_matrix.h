@@ -298,6 +298,13 @@ namespace PETScWrappers
        */
       SparseMatrix &operator = (const value_type d);
 
+
+      /**
+       * Make a copy of the PETSc matrix @p other. It is assumed that both matrices have
+       * the same SparsityPattern.
+       */
+      void copy_from(const SparseMatrix & other);
+
       /**
        * Throw away the present matrix and
        * generate one that has the same
@@ -371,6 +378,18 @@ namespace PETScWrappers
                    const std::vector<size_type> &local_columns_per_process,
                    const unsigned int            this_process,
                    const bool                    preset_nonzero_locations = true);
+
+      /**
+       * Create a matrix where the size() of the IndexSets determine the global
+       * number of rows and columns and the entries of the IndexSet give
+       * the rows and columns for the calling processor.
+       * Note that only contiguous IndexSets are supported.
+       */
+      template <typename SparsityType>
+      void reinit (const IndexSet & local_rows,
+                  const IndexSet & local_columns,
+                   const SparsityType         &sparsity_pattern,
+                   const MPI_Comm                  &communicator);
 
       /**
        * Return a reference to the MPI
@@ -475,6 +494,14 @@ namespace PETScWrappers
                       const std::vector<size_type> &local_columns_per_process,
                       const unsigned int            this_process,
                       const bool                    preset_nonzero_locations);
+
+      /**
+       * Same as previous functions.
+       */
+      template <typename SparsityType>
+      void do_reinit (const IndexSet & local_rows,
+                      const IndexSet & local_columns,
+                       const SparsityType         &sparsity_pattern);
 
       /**
        *  To allow calling protected

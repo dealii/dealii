@@ -19,6 +19,7 @@
 
 #  include <deal.II/base/table.h>
 #  include <deal.II/lac/block_matrix_base.h>
+#  include <deal.II/lac/block_sparsity_pattern.h>
 #  include <deal.II/lac/petsc_parallel_sparse_matrix.h>
 #  include <deal.II/lac/petsc_parallel_block_vector.h>
 #  include <deal.II/lac/exceptions.h>
@@ -171,6 +172,31 @@ namespace PETScWrappers
        */
       void reinit (const size_type n_block_rows,
                    const size_type n_block_columns);
+
+
+      /**
+       * Efficiently reinit the block matrix for a parallel computation.
+       * Only the BlockSparsityPattern of the Simple type can efficiently
+       * store large sparsity patterns in parallel, so this is the only
+       * supported argument.
+       * The IndexSets describe the locally owned range of DoFs for each block.
+       * Note that each IndexSet needs to be contiguous. For a symmetric structure
+       * hand in the same vector for the first two arguments.
+       */
+      void reinit(const std::vector<IndexSet> &rows,
+          const std::vector<IndexSet> &cols,
+          const BlockCompressedSimpleSparsityPattern &bcsp,
+          const MPI_Comm &com);
+
+
+      /**
+       * Same as above but for a symmetric structure only.
+       */
+      void reinit(const std::vector<IndexSet> &sizes,
+          const BlockCompressedSimpleSparsityPattern &bcsp,
+          const MPI_Comm &com);
+
+
 
       /**
        * Matrix-vector multiplication:

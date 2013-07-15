@@ -1,0 +1,29 @@
+
+DEAL:0:PETSc::numproc=10
+DEAL:0:PETSc::0: 0.00000
+DEAL:0:PETSc::1: 1.00000
+DEAL:0:PETSc::0,1 : 10.0000
+DEAL:0:PETSc::OK
+DEAL:0:Trilinos::numproc=10
+DEAL:0:Trilinos::0: 0.00000
+DEAL:0:Trilinos::1: 1.00000
+DEAL:0:Trilinos::0,1 : 10.0000
+DEAL:0:Trilinos::OK
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

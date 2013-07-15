@@ -72,7 +72,7 @@ namespace TrilinosWrappers
  * You will in general not want to use this class, but one of the
  * derived classes.
  *
- * @todo Handle opitmization of diagonal elements of the underlying
+ * @todo Handle optimization of diagonal elements of the underlying
  * SparsityPattern correctly.
  *
  * @see @ref GlossBlockLA "Block (linear algebra)"

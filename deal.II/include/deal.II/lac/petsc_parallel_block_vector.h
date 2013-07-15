@@ -134,6 +134,15 @@ namespace PETScWrappers
                             const MPI_Comm &communicator = MPI_COMM_WORLD);
 
       /**
+       * Same as above, but include ghost elements
+       */
+      BlockVector (const std::vector<IndexSet> &parallel_partitioning,
+          const std::vector<IndexSet> &ghost_indices,
+          const MPI_Comm &communicator);
+
+
+
+      /**
        * Destructor. Clears memory
        */
       ~BlockVector ();
@@ -280,6 +289,13 @@ namespace PETScWrappers
                    const MPI_Comm              &communicator);
 
       /**
+       * Same as above but include ghost entries.
+       */
+      void reinit (const std::vector<IndexSet> &parallel_partitioning,
+                   const std::vector<IndexSet> &ghost_entries,
+                   const MPI_Comm              &communicator);
+	
+      /**
        * Change the number of blocks to
        * <tt>num_blocks</tt>. The individual
        * blocks will get initialized with
@@ -399,6 +415,13 @@ namespace PETScWrappers
       reinit(parallel_partitioning, communicator);
     }
 
+    inline
+    BlockVector::BlockVector (const std::vector<IndexSet> &parallel_partitioning,
+        const std::vector<IndexSet> &ghost_indices,
+        const MPI_Comm &communicator)
+    {
+      reinit(parallel_partitioning, ghost_indices, communicator);
+    }
 
     inline
     BlockVector &
@@ -485,8 +508,27 @@ namespace PETScWrappers
         this->components.resize(this->n_blocks());
 
       for (unsigned int i=0; i<this->n_blocks(); ++i)
-        block(i).reinit(communicator, parallel_partitioning[i]);
+        block(i).reinit(parallel_partitioning[i], communicator);
     }
+
+    inline
+     void
+     BlockVector::reinit (const std::vector<IndexSet> &parallel_partitioning,
+                 const std::vector<IndexSet> &ghost_entries,
+                 const MPI_Comm              &communicator)
+    {
+      std::vector<types::global_dof_index> sizes(parallel_partitioning.size());
+      for (unsigned int i=0; i<parallel_partitioning.size(); ++i)
+        sizes[i] = parallel_partitioning[i].size();
+
+      this->block_indices.reinit(sizes);
+      if (this->components.size() != this->n_blocks())
+        this->components.resize(this->n_blocks());
+
+      for (unsigned int i=0; i<this->n_blocks(); ++i)
+        block(i).reinit(parallel_partitioning[i], ghost_entries[i], communicator);
+    }
+
 
 
     inline

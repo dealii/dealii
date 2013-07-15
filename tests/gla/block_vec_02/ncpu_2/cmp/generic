@@ -1,0 +1,27 @@
+
+DEAL:0:PETSc::numproc=2
+DEAL:0:PETSc::size: 16
+DEAL:0:PETSc::block(0).size: 10
+DEAL:0:PETSc::block(1).size: 6
+DEAL:0:PETSc::my first entry: 0.00000
+DEAL:0:PETSc::before: 0.00000
+DEAL:0:PETSc::after: 3.00000
+DEAL:0:PETSc::OK
+DEAL:0:Trilinos::numproc=2
+DEAL:0:Trilinos::size: 16
+DEAL:0:Trilinos::block(0).size: 10
+DEAL:0:Trilinos::block(1).size: 6
+DEAL:0:Trilinos::my first entry: 0.00000
+DEAL:0:Trilinos::before: 0.00000
+DEAL:0:Trilinos::after: 3.00000
+DEAL:0:Trilinos::OK
+
+DEAL:1:PETSc::size: 16
+DEAL:1:PETSc::block(0).size: 10
+DEAL:1:PETSc::block(1).size: 6
+DEAL:1:PETSc::my first entry: 0.100000
+DEAL:1:Trilinos::size: 16
+DEAL:1:Trilinos::block(0).size: 10
+DEAL:1:Trilinos::block(1).size: 6
+DEAL:1:Trilinos::my first entry: 0.100000
+

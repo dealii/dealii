@@ -1173,6 +1173,13 @@ namespace PETScWrappers
     void write_ascii (const PetscViewerFormat format = PETSC_VIEWER_DEFAULT);
 
     /**
+     * print command, similar to write_ascii, but the same format as
+     * produced by Trilinos
+     */
+    void print (std::ostream &out,
+                const bool    alternative_output = false) const;
+
+    /**
      *  Returns the number bytes consumed
      *  by this matrix on this CPU.
      */
@@ -1292,6 +1299,16 @@ namespace PETScWrappers
 
 
   private:
+
+    /**
+     * purposefully not implemented
+     */
+    MatrixBase(const MatrixBase &);
+    /**
+     * purposefully not implemented
+     */
+    MatrixBase& operator=(const MatrixBase &);
+
     /**
      * An internal array of integer
      * values that is used to store the
