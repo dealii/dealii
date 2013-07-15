@@ -71,6 +71,14 @@ this function.
 
 
 <ol>
+  <li> New: various functions for parallel computations got introduced to
+  make Trilinos and PETSc interfaces similar. Now step-40 can be used with
+  PETSc or Trilinos with just a few changes. This patch also introduces
+  better support for block systems in the PETSc interfaces.
+  <br>
+  (Timo Heister, 2013/07/15)
+  </li>
+
   <li> New: deal.II can now be compiled to 64-bit global dof indices. To turn
   this feature on, use the cmake option -DDEAL_II_WITH_64BIT_INDICES=ON. If
   PETSc and/or Trilinos are used, they must be compiled to support 64-bit
