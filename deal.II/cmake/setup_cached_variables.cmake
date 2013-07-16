@@ -299,20 +299,18 @@ UNSET(ENV{LDFLAGS})
 GET_CMAKE_PROPERTY(_res VARIABLES)
 FOREACH(_var ${_res})
   #
-  # Rename WITH_* by DEAL_II_WITH_*
+  # Rename (ALLOW|WITH|FORCE|COMPONENT)_* by DEAL_II_(ALLOW|WITH|FORCE|COMPONENT)_*
   #
-  IF(_var MATCHES "^WITH_")
-    SET(DEAL_II_${_var} ${${_var}} CACHE BOOL "" FORCE)
-    UNSET(${_var} CACHE)
-  ENDIF()
+  FOREACH(_match ALLOW_ WITH_ FORCE_ COMPONENT_)
+    IF(_var MATCHES "^${_match}")
+      SET(DEAL_II_${_var} ${${_var}} CACHE BOOL "" FORCE)
+      UNSET(${_var} CACHE)
+    ENDIF()
+  ENDFOREACH()
 
   #
   # Same for components:
   #
-  IF(_var MATCHES "^COMPONENT_")
-    SET(DEAL_II_${_var} ${${_var}} CACHE BOOL "" FORCE)
-    UNSET(${_var} CACHE)
-  ENDIF()
   IF(_var MATCHES "^(COMPAT_FILES|DOCUMENTATION|EXAMPLES|MESH_CONVERTER|PARAMETER_GUI)")
     SET(DEAL_II_COMPONENT_${_var} ${${_var}} CACHE BOOL "" FORCE)
     UNSET(${_var} CACHE)
