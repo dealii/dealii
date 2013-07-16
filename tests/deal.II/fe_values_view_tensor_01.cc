@@ -175,10 +175,10 @@ void MixedElastoPlasticity<dim>::assemble_system()
 						 endc = dof_handler.end();
                                                    
 
-  std::vector<Tensor<1,dim>> div_values(n_q_points);
-  std::vector<Tensor<2,dim>> stress_values(n_q_points);
+  std::vector<Tensor<1,dim> > div_values(n_q_points);
+  std::vector<Tensor<2,dim> > stress_values(n_q_points);
                                                                      
-  unsigned int cc = 0;                                                                     
+  unsigned int cc = 0;
   for (; cell!=endc; ++cell) //loop over all cells
     {
       deallog<<++cc<<" ";
@@ -189,8 +189,7 @@ void MixedElastoPlasticity<dim>::assemble_system()
         
       fe_values[stress_extr].get_function_values(solution,stress_values);
       fe_values[stress_extr].get_function_divergences(solution,div_values);
-        
-    }          
+    }
 }
 
 template <int dim>
