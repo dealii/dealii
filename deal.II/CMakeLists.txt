@@ -67,7 +67,7 @@ INCLUDE(setup_cached_variables)
 # Now, set the project and set up the rest:
 #
 PROJECT(deal.II CXX)
-ENABLE_LANGUAGE(C OPTIONAL)
+ENABLE_LANGUAGE(C) # OPTIONAL) wrt to bug http://public.kitware.com/Bug/view.php?id=9220
 INCLUDE(setup_deal_ii)
 INCLUDE(setup_compiler_flags)
 
