@@ -2451,7 +2451,7 @@ namespace internal
             // to blocks. If yes, we can add the block
             // ranges to the IndexSet, otherwise we need
             // to go through the indices once again and
-            // add each element individually (slow!)
+            // add each element individually
             unsigned int sum = 0;
             for (unsigned int i=0; i<n_filled_blocks; ++i)
               sum += block_indices[i].second;
@@ -2461,8 +2461,7 @@ namespace internal
                                                            block_indices[i].first+
                                                            block_indices[i].second);
             else
-              for (it=new_numbers.begin() ; it != new_numbers.end(); ++it)
-                number_cache.locally_owned_dofs.add_index (*it);
+              number_cache.locally_owned_dofs.add_indices(new_numbers.begin(), new_numbers.end());
           }
 
 
