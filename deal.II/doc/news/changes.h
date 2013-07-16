@@ -155,6 +155,12 @@ this function.
 
 <ol>
 
+<li>Improved: the "pure" functions in MeshWorker::LocalIntegrator are now implemented and throw
+an exception if not overloaded.
+<br>
+(Guido Kanschat, 2013/07/16)
+</li>
+
 <li> New: The function SparseDirectUMFPACK::Tvmult is now implemented.
 <br>
 (Matthias Maier, 2013/07/03)

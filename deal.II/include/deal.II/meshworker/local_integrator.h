@@ -1,7 +1,7 @@
 //---------------------------------------------------------------------------
 //    $Id$
 //
-//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012 by the deal.II authors
+//    Copyright (C) 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -35,6 +35,10 @@ namespace MeshWorker
    * integrate on boundary and interior faces. Thes flags are true by
    * default, but can be modified by applications to speed up the loop.
    *
+   * If a function is not overloaded in a derived class, but its usage
+   * flag is true, the function will cause an exception
+   * ExcPureFunction.
+   *
    * @ingroup MeshWorker
    * @author Guido Kanschat
    * @date 2012
@@ -44,10 +48,14 @@ namespace MeshWorker
   {
   public:
     /**
-    * The constructor setting
-    * default values.
+    * The constructor setting default values, namely all integration flags to true.
     */
     LocalIntegrator();
+
+    /**
+    * The constructor setting integration flags to specified values.
+    */
+    LocalIntegrator(bool use_cell, bool use_boundary, bool use_face);
 
     /**
     * The empty virtual destructor.
@@ -55,53 +63,53 @@ namespace MeshWorker
     ~LocalIntegrator();
 
     /**
-    * Virtual function for
-    * integrating on cells.
+    * Virtual function for integrating on cells. Throws exception
+    * PureFunctionCalled if not overloaded by a derived class.
     */
     virtual void cell(DoFInfo<dim, spacedim, number> &dinfo,
-                      IntegrationInfo<dim, spacedim> &info) const = 0;
+                      IntegrationInfo<dim, spacedim> &info) const;
     /**
-    * Virtual function for
-    * integrating on boundary faces.
+    * Virtual function for integrating on boundary faces. Throws exception
+    * PureFunctionCalled if not overloaded by a derived class.
     */
     virtual void boundary(DoFInfo<dim, spacedim, number> &dinfo,
-                          IntegrationInfo<dim, spacedim> &info) const = 0;
+                          IntegrationInfo<dim, spacedim> &info) const;
     /**
-    * Virtual function for
-    * integrating on interior faces.
+    * Virtual function for integrating on interior faces. Throws exception
+    * PureFunctionCalled if not overloaded by a derived class.
     */
     virtual void face(DoFInfo<dim, spacedim, number> &dinfo1,
                       DoFInfo<dim, spacedim, number> &dinfo2,
                       IntegrationInfo<dim, spacedim> &info1,
-                      IntegrationInfo<dim, spacedim> &info2) const = 0;
+                      IntegrationInfo<dim, spacedim> &info2) const;
 
     /**
-    * The flag indicating whether
-    * the cell integrator cell()
-    * is to be used in the
-    * loop. Defaults to
-    * <tt>true</tt>.
+    * The flag indicating whether the cell integrator cell() is to be
+    * used in the loop. Defaults to <tt>true</tt>.
     */
     bool use_cell;
 
     /**
-    * The flag indicating whether
-    * the boundary integrator
-    * boundary() is to be
-    * used in the loop. Defaults
-    * to <tt>true</tt>.
+    * The flag indicating whether the boundary integrator boundary()
+    * is to be used in the loop. Defaults to <tt>true</tt>.
     */
     bool use_boundary;
 
     /**
-    * The flag indicating whether
-    * the interior face integrator
-    * face() is to be used in the
-    * loop. Defaults to
-    * <tt>true</tt>.
+    * The flag indicating whether the interior face integrator face()
+    * is to be used in the loop. Defaults to <tt>true</tt>.
     */
     bool use_face;
-
+    
+    /**
+     * This error is thrown if one of the virtual functions cell(),
+     * boundary(), or face() is called without being overloaded in a
+     * derived class. Consider setting #use_cell, #use_boundary, and
+     * #use_face to false, respectively.
+     *
+     * @ingroup Exceptions
+     */
+    DeclException0(ExcPureFunction);
   };
 }
 

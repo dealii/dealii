@@ -62,8 +62,44 @@ namespace MeshWorker
 
 
   template <int dim, int spacedim, typename number>
+  LocalIntegrator<dim, spacedim, number>::LocalIntegrator (bool c, bool b, bool f)
+    :
+    use_cell(c), use_boundary(b), use_face(f)
+  {}
+
+
+  template <int dim, int spacedim, typename number>
   LocalIntegrator<dim, spacedim, number>::~LocalIntegrator ()
   {}
+
+  template <int dim, int spacedim, typename number>
+  void
+  LocalIntegrator<dim, spacedim, number>::cell (DoFInfo<dim, spacedim, number> &,
+						IntegrationInfo<dim, spacedim> &) const
+  {
+    Assert(false, ExcPureFunction());
+  }
+
+
+  template <int dim, int spacedim, typename number>
+  void
+  LocalIntegrator<dim, spacedim, number>::boundary (DoFInfo<dim, spacedim, number> &,
+						    IntegrationInfo<dim, spacedim> &) const
+  {
+    Assert(false, ExcPureFunction());
+  }
+
+
+  template <int dim, int spacedim, typename number>
+  void
+  LocalIntegrator<dim, spacedim, number>::face (DoFInfo<dim, spacedim, number> &,
+						DoFInfo<dim, spacedim, number> &,
+						IntegrationInfo<dim, spacedim> &,
+						IntegrationInfo<dim, spacedim> &) const
+  {
+    Assert(false, ExcPureFunction());
+  }
+
 
   template class LocalIntegrator<1,1,float>;
   template class LocalIntegrator<1,1,double>;
