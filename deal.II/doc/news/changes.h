@@ -164,7 +164,14 @@ this function.
 
 <ol>
 
-<li>Improved: the "pure" functions in MeshWorker::LocalIntegrator are now implemented and throw
+<li>Improved: The WorkStream class used throughout deal.II is now using
+thread local variables and initializes temporary variables on the thread
+that uses them, leading to better cache locality.
+<br>
+(Wolfgang Bangerth, 2013/07/16)
+</li>
+
+<li>Improved: The "pure" functions in MeshWorker::LocalIntegrator are now implemented and throw
 an exception if not overloaded.
 <br>
 (Guido Kanschat, 2013/07/16)
