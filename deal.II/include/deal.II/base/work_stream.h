@@ -483,7 +483,7 @@ namespace WorkStream
               scratch_data = new ScratchData(*current_item->sample_scratch_data);
 
               typename ItemType::ScratchDataList::value_type
-              new_scratch_object = { std::shared_ptr<ScratchData>(scratch_data), true };
+              new_scratch_object = { std_cxx1x::shared_ptr<ScratchData>(scratch_data), true };
               scratch_data_list.push_back (new_scratch_object);
             }
         }
