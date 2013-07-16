@@ -71,6 +71,15 @@ this function.
 
 
 <ol>
+  <li> Improvements on the CMake build system: A Working C (or Fortran) compiler
+  is now fully optional; Improved support for static linkage with a toggle
+  "DEAL_II_PREFER_STATIC_LIBS" that will prefer static archives for non system
+  libraries and "DEAL_II_STATIC_EXECUTABLE" that will switch the complete link
+  interface to static linkage.
+  <br>
+  (Matthias Maier, 2013/07/16)
+  </li>
+
   <li> New: various functions for parallel computations got introduced to
   make Trilinos and PETSc interfaces similar. Now step-40 can be used with
   PETSc or Trilinos with just a few changes. This patch also introduces
