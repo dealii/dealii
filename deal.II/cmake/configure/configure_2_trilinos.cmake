@@ -215,15 +215,6 @@ MACRO(FEATURE_TRILINOS_FIND_EXTERNAL var)
 ENDMACRO()
 
 
-#
-# Resolve a cache invalidation problem by searching for these flags
-# unconditionally. They're used in FEATURE_TRILINOS_CONFIGURE_EXTERNAL
-# depending on cached variables.
-#
-ENABLE_IF_SUPPORTED(_dummy "-Wno-unused")
-ENABLE_IF_SUPPORTED(_dummy "-Wno-extra")
-ENABLE_IF_SUPPORTED(_dummy "-Wno-overloaded-virtual")
-
 MACRO(FEATURE_TRILINOS_CONFIGURE_EXTERNAL)
   #
   # *Boy* Sanitize the include paths given by TrilinosConfig.cmake...
