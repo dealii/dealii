@@ -37,6 +37,18 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     LIST(APPEND LAPACK_LIBRARIES ${BLAS_LIBRARIES})
   ENDIF()
 
+  MARK_AS_ADVANCED(
+    atlas_LIBRARY
+    blas_LIBRARY
+    gslcblas_LIBRARY
+    lapack_LIBRARY
+    m_LIBRARY
+    ptf77blas_LIBRARY
+    ptlapack_LIBRARY
+    refblas_LIBRARY
+    reflapack_LIBRARY
+    )
+
   IF(LAPACK_FOUND)
     #
     # Well, in case of static archives we have to manually pick up the
@@ -63,17 +75,6 @@ MACRO(FEATURE_LAPACK_FIND_EXTERNAL var)
     ENDFOREACH()
     SWITCH_LIBRARY_PREFERENCE()
 
-    MARK_AS_ADVANCED(
-      atlas_LIBRARY
-      blas_LIBRARY
-      gslcblas_LIBRARY
-      lapack_LIBRARY
-      m_LIBRARY
-      ptf77blas_LIBRARY
-      ptlapack_LIBRARY
-      refblas_LIBRARY
-      reflapack_LIBRARY
-      )
     SET(${var} TRUE)
   ENDIF()
 ENDMACRO()
