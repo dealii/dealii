@@ -36,17 +36,20 @@ class LA_Dummy
 	class Vector
 	{
 	  public:
-	    
-	    Vector(const IndexSet local, const MPI_Comm &comm=MPI_COMM_WORLD)
+
+	    Vector()
 	      {}
 	    
-	    Vector(const IndexSet &local, const IndexSet &ghost, const MPI_Comm &comm=MPI_COMM_WORLD) 
+	    Vector(const IndexSet local, const MPI_Comm &comm)
+	      {}
+	    
+	    Vector(const IndexSet &local, const IndexSet &ghost, const MPI_Comm &comm) 
 	      {}
 
-	    void reinit(const IndexSet local, const MPI_Comm &comm=MPI_COMM_WORLD)
+	    void reinit(const IndexSet local, const MPI_Comm &comm)
 	      {}
 
-	    void reinit(const IndexSet local, const IndexSet &ghost, const MPI_Comm &comm=MPI_COMM_WORLD)
+	    void reinit(const IndexSet local, const IndexSet &ghost, const MPI_Comm &comm)
 	      {}
 	    
 	    void compress(VectorOperation::values op)

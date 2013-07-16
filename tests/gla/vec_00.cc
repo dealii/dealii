@@ -49,24 +49,13 @@ void test ()
 
   
   {
-				     //implicit communicator:
-    typename LA::MPI::Vector v1(local_active);
-    Assert(!v1.has_ghost_elements(), ExcInternalError());
-    Assert(v1.size()==numproc*2, ExcInternalError());
-
-    v1.reinit(something);
-    Assert(!v1.has_ghost_elements(), ExcInternalError());
-    Assert(v1.size()==100, ExcInternalError());
-    
-    v1.reinit(local_active, local_relevant);
-    Assert(v1.has_ghost_elements(), ExcInternalError());
-    Assert(v1.size()==numproc*2, ExcInternalError());
+    typename LA::MPI::Vector v1;
     
     v1.reinit(something, MPI_COMM_WORLD);
     Assert(!v1.has_ghost_elements(), ExcInternalError());
     Assert(v1.size()==100, ExcInternalError());
 
-    typename LA::MPI::Vector v2(local_active, local_relevant);
+    typename LA::MPI::Vector v2(local_active, local_relevant, MPI_COMM_WORLD);
     Assert(v2.has_ghost_elements(), ExcInternalError());
     Assert(v2.size()==numproc*2, ExcInternalError());
 

@@ -40,14 +40,6 @@ void test ()
   local_active.add_range(myid*2,myid*2+2);
   IndexSet local_relevant(numproc*2);
   local_relevant.add_range(1,2);
-
-  {
-				     //implicit communicator:
-    typename LA::MPI::Vector v1(local_active);
-    typename LA::MPI::Vector v2(local_active, local_relevant);
-    Assert(!v1.has_ghost_elements(), ExcInternalError());
-    Assert(v2.has_ghost_elements(), ExcInternalError());
-  }
   
   typename LA::MPI::Vector vb(local_active, MPI_COMM_WORLD);
   typename LA::MPI::Vector v(local_active, local_relevant, MPI_COMM_WORLD);

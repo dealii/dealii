@@ -42,8 +42,8 @@ void test ()
   IndexSet local_relevant(numproc*2);
   local_relevant.add_range(1,2);
 
-  typename LA::MPI::Vector vb(local_active);
-  typename LA::MPI::Vector v(local_active, local_relevant);
+  typename LA::MPI::Vector vb(local_active, MPI_COMM_WORLD);
+  typename LA::MPI::Vector v(local_active, local_relevant, MPI_COMM_WORLD);
 
   vb = 1.0;
 

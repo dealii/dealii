@@ -70,7 +70,7 @@ void test ()
 
   matrix.add(1,1,1.3);
 
-  matrix.compress();
+  matrix.compress(VectorOperation::add);
 
   if (myid==0)
     {
