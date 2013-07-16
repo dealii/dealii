@@ -2,7 +2,7 @@
 //    $Id$
 //    Version: $Name$ 
 //
-//    Copyright (C) 2006 by the deal.II authors
+//    Copyright (C) 2006, 2013 by the deal.II authors
 //
 //    This file is subject to QPL and may not be  distributed
 //    without copyright and license information. Please refer
@@ -98,8 +98,7 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-// 1d is presently not implemented  
-//  test<1>();
+  test<1>();
   test<2>();
   test<3>();
 }

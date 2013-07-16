@@ -95,8 +95,7 @@ int main()
   deallog.depth_console(0);
   deallog.threshold_double(1.e-10);
 
-// 1d is presently not implemented  
-//  test<1>();
+  test<1>();
   test<2>();
   test<3>();
 }
