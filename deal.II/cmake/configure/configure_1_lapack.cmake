@@ -101,10 +101,19 @@ MACRO(CHECK_FOR_LAPACK_FUNCTIONS)
   #
   ENABLE_IF_SUPPORTED(CMAKE_REQUIRED_FLAGS "-pthread")
 
-  FOREACH(_func ${DEAL_II_LAPACK_FUNCTIONS})
-    STRING(TOUPPER ${_func} _func_uppercase)
-    CHECK_FUNCTION_EXISTS(${_func} HAVE_${_func_uppercase})
-  ENDFOREACH()
+  IF(CMAKE_C_COMPILER_WORKS)
+    FOREACH(_func ${DEAL_II_LAPACK_FUNCTIONS})
+      STRING(TOUPPER ${_func} _func_uppercase)
+      CHECK_FUNCTION_EXISTS(${_func} HAVE_${_func_uppercase})
+    ENDFOREACH()
+  ELSE()
+    MESSAGE(STATUS
+      "No suitable C compiler was found! Skipping LAPACK symbol check."
+      )
+    FOREACH(_func ${DEAL_II_LAPACK_FUNCTIONS})
+      SET_IF_EMPTY(HAVE_${_func_uppercase} TRUE)
+    ENDFOREACH()
+  ENDIF()
 
   SET(CMAKE_REQUIRED_LIBRARIES)
   STRIP_FLAG(CMAKE_REQUIRED_FLAGS "${LAPACK_LINKER_FLAGS}")

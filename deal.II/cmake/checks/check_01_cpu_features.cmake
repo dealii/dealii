@@ -37,8 +37,14 @@
 #
 # Determine the Endianess of the platform:
 #
-INCLUDE(TestBigEndian)
-TEST_BIG_ENDIAN(DEAL_II_WORDS_BIGENDIAN)
+IF(CMAKE_C_COMPILER_WORKS)
+  INCLUDE(TestBigEndian)
+  TEST_BIG_ENDIAN(DEAL_II_WORDS_BIGENDIAN)
+ELSE()
+  MESSAGE(STATUS
+    "No suitable C compiler was found! Assuming little endian platform."
+    )
+ENDIF()
 
 
 IF(DEAL_II_ALLOW_PLATFORM_INTROSPECTION)

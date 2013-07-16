@@ -18,7 +18,7 @@
 
 MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   #
-  # Enable Fortran support so that MPI_Fortran_LIBRARIES is set up.
+  # Enable C and Fortran support so that MPI_Fortran_LIBRARIES is set up.
   #
   IF(NOT CMAKE_Fortran_COMPILER_WORKS)
     ENABLE_LANGUAGE(Fortran OPTIONAL)
@@ -38,8 +38,22 @@ MACRO(FEATURE_MPI_FIND_EXTERNAL var)
   # directly.
   #
   SET_IF_EMPTY(MPI_CXX_COMPILER ${CMAKE_CXX_COMPILER})
-  SET_IF_EMPTY(MPI_C_COMPILER ${CMAKE_C_COMPILER}) # for good measure
-  SET_IF_EMPTY(MPI_Fortran_COMPILER ${CMAKE_Fortran_COMPILER}) # for good measure
+  IF(CMAKE_C_COMPILER_WORKS)
+    SET_IF_EMPTY(MPI_C_COMPILER ${CMAKE_C_COMPILER}) # for good measure
+  ELSE()
+    MESSAGE(STATUS
+      "No suitable C compiler was found! MPI C interface can not be "
+      "autodetected"
+      )
+  ENDIF()
+  IF(CMAKE_Fortran_COMPILER_WORKS)
+    SET_IF_EMPTY(MPI_Fortran_COMPILER ${CMAKE_Fortran_COMPILER}) # for good measure
+  ELSE()
+    MESSAGE(STATUS
+      "No suitable Fortran compiler was found! MPI Fortran interface can "
+      "not be autodetected"
+      )
+  ENDIF()
   FIND_PACKAGE(MPI)
 
   IF(NOT MPI_CXX_FOUND)

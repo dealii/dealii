@@ -18,7 +18,6 @@
 
 INCLUDE(CheckCXXCompilerFlag)
 INCLUDE(CheckCXXSourceCompiles)
-INCLUDE(CheckCSourceCompiles)
 INCLUDE(CheckCXXSourceRuns)
 INCLUDE(CheckCXXSymbolExists)
 INCLUDE(CheckIncludeFileCXX)

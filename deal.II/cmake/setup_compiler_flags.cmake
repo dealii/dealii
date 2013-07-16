@@ -61,29 +61,11 @@
 ###########################################################################
 
 #
-# Check the user provided C and CXX flags:
+# Check the user provided CXX flags:
 #
-
-IF(NOT "${CMAKE_C_FLAGS_SAVED}" STREQUAL "${DEAL_II_C_FLAGS_SAVED}")
-  UNSET(DEAL_II_HAVE_USABLE_C_FLAGS CACHE)
-ENDIF()
-SET(DEAL_II_C_FLAGS_SAVED "${CMAKE_C_FLAGS_SAVED}" CACHE INTERNAL "" FORCE)
-
-SET(CMAKE_REQUIRED_FLAGS "${CMAKE_C_FLAGS_SAVED}")
-CHECK_C_SOURCE_COMPILES(
-  "int main(){ return 0; }"
-  DEAL_II_HAVE_USABLE_C_FLAGS)
-SET(CMAKE_REQUIRED_FLAGS "")
-
-IF(NOT DEAL_II_HAVE_USABLE_C_FLAGS)
-  UNSET(DEAL_II_HAVE_USABLE_C_FLAGS CACHE)
-  MESSAGE(FATAL_ERROR "\n"
-    "Configuration error: Cannot compile with the specified C flags: "
-    "${CMAKE_C_FLAGS_SAVED}\n"
-    )
-ENDIF()
-
-
+#
+# Omit to test for a sane C and Fortran toolchain for now..
+#
 IF(NOT "${CMAKE_CXX_FLAGS_SAVED}" STREQUAL "${DEAL_II_CXX_FLAGS_SAVED}")
   UNSET(DEAL_II_HAVE_USABLE_CXX_FLAGS CACHE)
 ENDIF()
@@ -101,20 +83,6 @@ IF(NOT DEAL_II_HAVE_USABLE_CXX_FLAGS)
     "Configuration error: Cannot compile with the specified CXX flags: "
     "${CMAKE_CXX_FLAGS_SAVED}\n"
     )
-ENDIF()
-
-
-#
-# CMAKE_C_COMPILER and CMAKE_CXX_COMPILER have to be of the same brand.
-#
-IF(NOT ( "${CMAKE_C_COMPILER_ID}" STREQUAL "${CMAKE_CXX_COMPILER_ID}" AND
-         "${CMAKE_C_COMPILER_VERSION}" STREQUAL "${CMAKE_CXX_COMPILER_VERSION}" ) )
-    MESSAGE(FATAL_ERROR "\n"
-      "Configuration error: The specified C and CXX compiler have to be of the "
-      "same family, but cmake found:\n"
-      "CMAKE_C_COMPILER: ${CMAKE_C_COMPILER_ID} ${CMAKE_C_COMPILER_VERSION}\n"
-      "CMAKE_CXX_COMPILER: ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}\n"
-      )
 ENDIF()
 
 

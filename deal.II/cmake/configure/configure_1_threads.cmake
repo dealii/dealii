@@ -25,16 +25,37 @@
 #
 MACRO(SETUP_THREADING)
   #
-  # Switch the library preference back to prefer dynamic libraries if
-  # DEAL_II_PREFER_STATIC_LIBS=TRUE but DEAL_II_STATIC_EXECUTABLE=FALSE. In
-  # this case system libraries should be linked dynamically.
+  # Unfortunately the FindThreads macro needs a working C compiler
   #
-  SWITCH_LIBRARY_PREFERENCE()
-  FIND_PACKAGE(Threads)
-  SWITCH_LIBRARY_PREFERENCE()
+  IF(CMAKE_C_COMPILER_WORKS)
+    #
+    # Switch the library preference back to prefer dynamic libraries if
+    # DEAL_II_PREFER_STATIC_LIBS=TRUE but DEAL_II_STATIC_EXECUTABLE=FALSE. In
+    # this case system libraries should be linked dynamically.
+    #
+    SWITCH_LIBRARY_PREFERENCE()
+    FIND_PACKAGE(Threads)
+    SWITCH_LIBRARY_PREFERENCE()
+
+  ELSE()
+
+    #
+    # We have no way to query for thread support. Just assume that it is
+    # provided by Pthreads...
+    #
+    MESSAGE(STATUS
+      "No suitable C compiler was found! Assuming threading is provided by Pthreads."
+      )
+    SET_IF_EMPTY(Threads_FOUND TRUE)
+    SET_IF_EMPTY(CMAKE_THREAD_LIBS_INIT "-lpthread")
+    SET_IF_EMPTY(CMAKE_USE_PTHREADS_INIT TRUE)
+  ENDIF()
 
   IF(NOT Threads_FOUND)
-    # TODO:
+    #
+    # TODO: This is a dead end. Threading might be setup with internal TBB
+    # so we have no way of returning unsuccessfully...
+    #
     MESSAGE(FATAL_ERROR
       "\nInternal configuration error: No Threading support found\n\n"
       )

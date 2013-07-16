@@ -66,7 +66,8 @@ INCLUDE(setup_cached_variables)
 #
 # Now, set the project and set up the rest:
 #
-PROJECT(deal.II CXX C)
+PROJECT(deal.II CXX)
+ENABLE_LANGUAGE(C OPTIONAL)
 INCLUDE(setup_deal_ii)
 INCLUDE(setup_compiler_flags)
 
