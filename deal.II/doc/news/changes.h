@@ -164,6 +164,13 @@ this function.
 
 <ol>
 
+<li>Fixed: VectorTools::project has an option to first project onto the
+boundary. However, the implementation of this option ignored the mapping
+that is provided to the function. This is now fixed.
+<br>
+(Wolfgang Bangerth, 2013/07/16)
+</li>
+
 <li>Improved: The WorkStream class used throughout deal.II is now using
 thread local variables and initializes temporary variables on the thread
 that uses them, leading to better cache locality.

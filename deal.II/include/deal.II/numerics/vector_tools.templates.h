@@ -575,7 +575,7 @@ namespace VectorTools
           typename FunctionMap<spacedim>::type boundary_functions;
           for (types::boundary_id c=0; c<numbers::internal_face_boundary_id; ++c)
             boundary_functions[c] = &function;
-          project_boundary_values (dof, boundary_functions, q_boundary,
+          project_boundary_values (mapping, dof, boundary_functions, q_boundary,
                                    boundary_values);
         }
 
