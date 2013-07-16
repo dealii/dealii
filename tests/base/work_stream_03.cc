@@ -89,8 +89,17 @@ zero_subrange(const unsigned int begin, const unsigned int end,
     dst[i] = 0;
 }
 
+
+void
+zero_element(std::vector<double> &dst,
+	     const unsigned int i)
+{
+  dst[i] = 0;
+}
+
+
 template<int dim>
-  void
+void
   mass_assembler(const typename Triangulation<dim>::active_cell_iterator &cell,
       Scratch<dim> &data, CopyData &copy_data)
   {
@@ -98,24 +107,25 @@ template<int dim>
 
     const Point<dim> q = data.x_fe_values.quadrature_point(0);
 
-    // this appears to be the key: the following line overwrites some of the memory
-    // in which we store the quadrature point location. if the line is moved down,
-    // the comparison in the if() always succeeds...
+    // this appears to be the key: the following two ways both overwrite some
+    // of the memory in which we store the quadrature point location.
     parallel::apply_to_subranges(0U, copy_data.cell_rhs.size(),
         std_cxx1x::bind(&zero_subrange, std_cxx1x::_1, std_cxx1x::_2,
             std_cxx1x::ref(copy_data.cell_rhs)), 1);
 
-    std::cout << (q != data.x_fe_values.quadrature_point(0) ? '.' : '*')
-        << std::flush;
+    Assert(q == data.x_fe_values.quadrature_point(0),
+        ExcInternalError());
 
     copy_data.cell_rhs[0] = value(data.x_fe_values.quadrature_point(0));
   }
+
 
 void
 copy_local_to_global(const CopyData &data, double *sum)
 {
   *sum += data.cell_rhs[0];
 }
+
 
 void
 do_project()
@@ -141,7 +151,8 @@ do_project()
           &mass_assembler<dim>,
           std_cxx1x::bind(&copy_local_to_global, std_cxx1x::_1, &sum),
           assembler_data, copy_data, 8, 1);
-      printf("\nCheck: %5.3f\n", sum);
+
+      Assert (std::fabs(sum-288.) < 1e-12, ExcInternalError());
       deallog << sum << std::endl;
     }
 }
