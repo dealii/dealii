@@ -300,9 +300,13 @@ namespace
   };
 #endif
 
-  static unsigned int vtk_cell_type[4] =
+  // NOTE: (UK) The dimension of the array is choosen to 5 to allow the choice
+  // DataOutBase<deal_II_dimension,deal_II_dimension+1> in general
+  // Wolfgang supposed that we don't need it in general, but however this
+  // choice avoids a -Warray-bounds check warning
+  static unsigned int vtk_cell_type[5] =
   {
-    0, 3, 9, 12
+    0, 3, 9, 12, static_cast<unsigned int>(-1)
   };
 
 //----------------------------------------------------------------------//
