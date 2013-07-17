@@ -1552,14 +1552,18 @@ namespace DoFRenumbering
   {
     if (dof_wise_renumbering == false)
       {
-        std::vector<typename DH::active_cell_iterator>
-        ordered_cells(dof.get_tria().n_active_cells());
+        std::vector<typename DH::active_cell_iterator> ordered_cells;
+        ordered_cells.reserve(dof.get_tria().n_active_cells());
         const CompareDownstream<typename DH::active_cell_iterator, DH::space_dimension> comparator(direction);
 
-        typename DH::active_cell_iterator begin = dof.begin_active();
+        typename DH::active_cell_iterator p = dof.begin_active();
         typename DH::active_cell_iterator end = dof.end();
 
-        std::copy (begin, end, ordered_cells.begin());
+        while (p!=end)
+          {
+            ordered_cells.push_back(p);
+            ++p;
+          }
         std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
         compute_cell_wise(new_indices, reverse, dof, ordered_cells);
@@ -1655,14 +1659,18 @@ namespace DoFRenumbering
   {
     if (dof_wise_renumbering == false)
       {
-        std::vector<typename DH::level_cell_iterator>
-        ordered_cells(dof.get_tria().n_cells(level));
+        std::vector<typename DH::level_cell_iterator> ordered_cells;
+        ordered_cells.reserve (dof.get_tria().n_cells(level));
         const CompareDownstream<typename DH::level_cell_iterator, DH::space_dimension> comparator(direction);
 
-        typename DH::level_cell_iterator begin = dof.begin(level);
+        typename DH::level_cell_iterator p = dof.begin(level);
         typename DH::level_cell_iterator end = dof.end(level);
 
-        std::copy (begin, end, ordered_cells.begin());
+        while (p!=end)
+          {
+            ordered_cells.push_back(p);
+            ++p;
+          }
         std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
         compute_cell_wise(new_indices, reverse, dof, level, ordered_cells);
@@ -1808,14 +1816,18 @@ namespace DoFRenumbering
     const Point<DH::space_dimension> &center,
     const bool counter)
   {
-    std::vector<typename DH::active_cell_iterator>
-    ordered_cells(dof.get_tria().n_active_cells());
+    std::vector<typename DH::active_cell_iterator> ordered_cells;
+    ordered_cells.reserve (dof.get_tria().n_active_cells());
     internal::ClockCells<DH::space_dimension> comparator(center, counter);
 
-    typename DH::active_cell_iterator begin = dof.begin_active();
+    typename DH::active_cell_iterator p = dof.begin_active();
     typename DH::active_cell_iterator end = dof.end();
 
-    std::copy (begin, end, ordered_cells.begin());
+    while (p!=end)
+      {
+        ordered_cells.push_back(p);
+        ++p;
+      }
     std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
     std::vector<types::global_dof_index> reverse(new_indices.size());
@@ -1830,14 +1842,18 @@ namespace DoFRenumbering
                      const Point<DH::space_dimension> &center,
                      const bool counter)
   {
-    std::vector<typename DH::level_cell_iterator>
-    ordered_cells(dof.get_tria().n_cells(level));
+    std::vector<typename DH::level_cell_iterator> ordered_cells;
+    ordered_cells.reserve(dof.get_tria().n_active_cells());
     internal::ClockCells<DH::space_dimension> comparator(center, counter);
 
-    typename DH::level_cell_iterator begin = dof.begin(level);
+    typename DH::level_cell_iterator p = dof.begin(level);
     typename DH::level_cell_iterator end = dof.end(level);
 
-    std::copy (begin, end, ordered_cells.begin());
+    while (p!=end)
+      {
+        ordered_cells.push_back(p);
+        ++p;
+      }
     std::sort (ordered_cells.begin(), ordered_cells.end(), comparator);
 
     cell_wise(dof, level, ordered_cells);

@@ -264,7 +264,7 @@ public:
    *   = accessor;
    * @endcode
    */
-  TriaRawIterator (const Accessor &a);
+  explicit TriaRawIterator (const Accessor &a);
 
   /**
    * Constructor. Assumes that the
@@ -273,7 +273,7 @@ public:
    * one.
    */
   template <typename OtherAccessor>
-  TriaRawIterator (const OtherAccessor &a);
+  explicit TriaRawIterator (const OtherAccessor &a);
 
   /**
    *  Proper constructor, initialized
@@ -684,6 +684,13 @@ public:
                 const int                 level,
                 const int                 index,
                 const typename Accessor::AccessorData *local_data = 0);
+
+  /**
+   * Construct from an accessor of type OtherAccessor that is convertible
+   * to the type Accessor.
+   */
+  template <typename OtherAccessor>
+  explicit TriaIterator (const OtherAccessor &a);
 
   /**
    * This is a conversion operator
@@ -1278,7 +1285,24 @@ TriaIterator<Accessor>::TriaIterator (const TriaRawIterator<OtherAccessor> &i)
 #endif
 }
 
-
+template <typename Accessor>
+template <typename OtherAccessor>
+TriaIterator<Accessor>::TriaIterator (const OtherAccessor &a)
+:
+TriaRawIterator<Accessor> (a)
+{
+#ifdef DEBUG
+  // do this like this, because:
+  // if we write
+  // "Assert (IteratorState::past_the_end || used)"
+  // used() is called anyway, even if
+  // state==IteratorState::past_the_end, and will then
+  // throw the exception!
+  if (this->state() != IteratorState::past_the_end)
+    Assert (this->accessor.used(),
+            ExcAssignmentOfUnusedObject());
+#endif
+}
 
 template <typename Accessor>
 template <typename OtherAccessor>
