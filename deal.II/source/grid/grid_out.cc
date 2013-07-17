@@ -1657,7 +1657,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   x_dimension_perspective = x_max_perspective - x_min_perspective;
   y_dimension_perspective = y_max_perspective - y_min_perspective;
 
-  cell_label_font_size = static_cast<unsigned int>(.5 + (height/100.) * 2.75) * 9. * (min_level_min_vertex_distance / std::min(x_dimension, y_dimension));
+  cell_label_font_size = static_cast<unsigned int>((.5 + (height/100.) * 2.75) * 9. * (min_level_min_vertex_distance / std::min(x_dimension, y_dimension)));
 
 
 // create the svg file with an internal style sheet
