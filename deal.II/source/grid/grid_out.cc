@@ -1363,7 +1363,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   unsigned int n_levels = 0;
   unsigned int n_subdomains = 0;
   unsigned int n_level_subdomains = 0;
-  
+
   unsigned int n = 0;
 
   unsigned int min_level, max_level;
@@ -1458,7 +1458,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
       if ((unsigned int)cell->level() < min_level) min_level = cell->level();
       if ((unsigned int)cell->level() > max_level) max_level = cell->level();
 
-      materials[(unsigned int)cell->material_id()] = 1;      
+      materials[(unsigned int)cell->material_id()] = 1;
       levels[(unsigned int)cell->level()] = 1;
       if (cell->active())
 	subdomains[cell->subdomain_id()+2] = 1;
@@ -1657,7 +1657,7 @@ void GridOut::write_svg(const Triangulation<2,2> &tria, std::ostream &out) const
   x_dimension_perspective = x_max_perspective - x_min_perspective;
   y_dimension_perspective = y_max_perspective - y_min_perspective;
 
-  cell_label_font_size = static_cast<unsigned int>((.5 + (height/100.) * 2.75) * 9. * (min_level_min_vertex_distance / std::min(x_dimension, y_dimension)));
+  cell_label_font_size = static_cast<unsigned int>((int)(.5 + (height/100.) * 2.75) * 9. * (min_level_min_vertex_distance / std::min(x_dimension, y_dimension)));
 
 
 // create the svg file with an internal style sheet
