@@ -13,7 +13,7 @@
 #####
 
 #
-# Configuration for the netcdf library:
+# Configuration for the metis library:
 #
 
 MACRO(FEATURE_METIS_FIND_EXTERNAL var)
