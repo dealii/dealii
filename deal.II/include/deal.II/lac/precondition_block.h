@@ -1127,7 +1127,7 @@ Accessor (const PreconditionBlockJacobi<MATRIX, inverse_type> *matrix,
 
 template<class MATRIX, typename inverse_type>
 inline
-typename PreconditionBlockJacobi<MATRIX, inverse_type>::size_type 
+typename PreconditionBlockJacobi<MATRIX, inverse_type>::size_type
 PreconditionBlockJacobi<MATRIX, inverse_type>::const_iterator::Accessor::row() const
 {
   Assert (a_block < matrix->size(),

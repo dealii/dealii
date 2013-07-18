@@ -303,7 +303,7 @@ namespace Utilities
                       ExcIndexRange(expanded_import_indices[i], local_range_data.first,
                                     local_range_data.second));
               types::global_dof_index new_index = (expanded_import_indices[i] -
-                                        local_range_data.first);
+                                                   local_range_data.first);
               if (new_index == last_index+1)
                 compressed_import_indices.back().second++;
               else

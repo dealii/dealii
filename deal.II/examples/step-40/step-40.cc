@@ -195,7 +195,7 @@ namespace Step40
     computing_timer (pcout,
                      TimerOutput::summary,
                      TimerOutput::wall_times)
- {}
+  {}
 
 
 
@@ -648,12 +648,12 @@ namespace Step40
             TimerOutput::Scope t(computing_timer, "output");
             output_results (cycle);
           }
-	
+
         pcout << std::endl;
         computing_timer.print_summary ();
         computing_timer.reset ();
       }
-    
+
   }
 }
 

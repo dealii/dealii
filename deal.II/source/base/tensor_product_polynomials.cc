@@ -35,7 +35,7 @@ namespace internal
     void compute_tensor_index(const unsigned int,
                               const unsigned int,
                               const unsigned int,
-                              unsigned int      (&)[dim])
+                              unsigned int      ( &)[dim])
     {
       Assert(false, ExcNotImplemented());
     }

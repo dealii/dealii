@@ -206,7 +206,7 @@ IdentityMatrix::reinit (const size_type n)
 
 
 inline
-IdentityMatrix::size_type 
+IdentityMatrix::size_type
 IdentityMatrix::m () const
 {
   return size;
@@ -215,7 +215,7 @@ IdentityMatrix::m () const
 
 
 inline
-IdentityMatrix::size_type 
+IdentityMatrix::size_type
 IdentityMatrix::n () const
 {
   return size;

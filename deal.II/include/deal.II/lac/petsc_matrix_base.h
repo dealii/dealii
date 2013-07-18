@@ -69,11 +69,11 @@ namespace PETScWrappers
       class Accessor
       {
       public:
-      /**
-       * Declare type for container size.
-       */
-      typedef types::global_dof_index size_type;
-	  
+        /**
+         * Declare type for container size.
+         */
+        typedef types::global_dof_index size_type;
+
         /**
          * Constructor. Since we use
          * accessors only for read
@@ -193,7 +193,7 @@ namespace PETScWrappers
        * Declare type for container size.
        */
       typedef types::global_dof_index size_type;
-	
+
       /**
        * Constructor. Create an iterator
        * into the matrix @p matrix for the
@@ -306,11 +306,11 @@ namespace PETScWrappers
      * class.
      */
     typedef MatrixIterators::const_iterator const_iterator;
-      
-      /**
-       * Declare type for container size.
-       */
-      typedef types::global_dof_index size_type;
+
+    /**
+     * Declare type for container size.
+     */
+    typedef types::global_dof_index size_type;
 
     /**
      * Declare a typedef in analogy to all
@@ -954,8 +954,8 @@ namespace PETScWrappers
      * Add the matrix @p other scaled by the factor @p factor to the current
      * matrix.
      */
-    MatrixBase & add (const MatrixBase &other,
-		      const PetscScalar factor);
+    MatrixBase &add (const MatrixBase &other,
+                     const PetscScalar factor);
 
     /**
      * Matrix-vector multiplication:
@@ -1312,7 +1312,7 @@ namespace PETScWrappers
     /**
      * purposefully not implemented
      */
-    MatrixBase& operator=(const MatrixBase &);
+    MatrixBase &operator=(const MatrixBase &);
 
     /**
      * An internal array of integer
@@ -1365,7 +1365,7 @@ namespace PETScWrappers
 
 
     inline
-    const_iterator::Accessor::size_type 
+    const_iterator::Accessor::size_type
     const_iterator::Accessor::row() const
     {
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
@@ -1374,7 +1374,7 @@ namespace PETScWrappers
 
 
     inline
-    const_iterator::Accessor::size_type 
+    const_iterator::Accessor::size_type
     const_iterator::Accessor::column() const
     {
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());
@@ -1383,7 +1383,7 @@ namespace PETScWrappers
 
 
     inline
-    const_iterator::Accessor::size_type 
+    const_iterator::Accessor::size_type
     const_iterator::Accessor::index() const
     {
       Assert (a_row < matrix->m(), ExcBeyondEndOfMatrix());

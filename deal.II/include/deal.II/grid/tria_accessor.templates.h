@@ -147,10 +147,10 @@ bool
 TriaAccessorBase<structdim,dim,spacedim>::operator < (const TriaAccessorBase<structdim,dim,spacedim> &other) const
 {
   Assert (tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
-  
+
   if (present_level != other.present_level)
     return (present_level < other.present_level);
-  
+
   return (present_index < other.present_index);
 
 }
@@ -3010,14 +3010,14 @@ bool
 CellAccessor<dim,spacedim>::operator < (const CellAccessor<dim,spacedim> &other) const
 {
   Assert (this->tria == other.tria, TriaAccessorExceptions::ExcCantCompareIterators());
-  
+
   if (level_subdomain_id() != other.level_subdomain_id())
     return (level_subdomain_id() < other.level_subdomain_id());
-  
+
   if (active() && other.active() &&
       (subdomain_id() != other.subdomain_id()))
     return (subdomain_id() < other.subdomain_id());
-  
+
   return TriaAccessorBase<dim,dim,spacedim>::operator < (other);
 }
 

@@ -975,7 +975,7 @@ namespace Step37
 
     typedef PreconditionChebyshev<LevelMatrixType,Vector<double> > SMOOTHER;
     MGSmootherPrecondition<LevelMatrixType, SMOOTHER, Vector<double> >
-      mg_smoother;
+    mg_smoother;
 
     // Then, we initialize the smoother with our level matrices and the
     // mandatory additional data for the Chebyshev smoother. We use quite a

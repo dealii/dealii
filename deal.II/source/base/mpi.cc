@@ -312,10 +312,10 @@ namespace Utilities
 
 
     MPI_InitFinalize::MPI_InitFinalize (int    &argc,
-                       char ** &argv,
-                       unsigned int max_num_threads)
-    :
-        owns_mpi (true)
+                                        char ** &argv,
+                                        unsigned int max_num_threads)
+      :
+      owns_mpi (true)
     {
       do_init(argc, argv, max_num_threads);
     }
@@ -334,8 +334,8 @@ namespace Utilities
 
     void
     MPI_InitFinalize::do_init(int    &argc,
-              char ** &argv,
-              unsigned int max_num_threads)
+                              char ** &argv,
+                              unsigned int max_num_threads)
     {
       static bool constructor_has_already_run = false;
       Assert (constructor_has_already_run == false,
@@ -422,8 +422,8 @@ namespace Utilities
           // or just end PETSc.
           PetscFinalize();
 #  endif
-	}
-#endif	  
+        }
+#endif
 
 
       // only MPI_Finalize if we are running with MPI and we are not using PETSc

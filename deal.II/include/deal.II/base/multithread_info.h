@@ -42,7 +42,7 @@ DEAL_II_NAMESPACE_OPEN
  * To set n_default_threads add the following at the start of your main():
  * <code>
  * multithread_info.n_default_threads=1;
- * </code> 
+ * </code>
  *
  * @ingroup threads
  * @author Thomas Richter, Wolfgang Bangerth, 2000

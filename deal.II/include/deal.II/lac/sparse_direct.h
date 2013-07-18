@@ -170,40 +170,40 @@ public:
    * inverse of the matrix, $A^{-1}$.
    */
   void vmult (Vector<double> &dst,
-	      const Vector<double> &src) const;
+              const Vector<double> &src) const;
 
   /**
    * Same as before, but for block vectors.
    */
   void vmult (BlockVector<double> &dst,
-	      const BlockVector<double> &src) const;
+              const BlockVector<double> &src) const;
 
   /**
    * Same as before, but uses the transpose of the matrix, i.e. this
    * function multiplies with $A^{-T}$.
    */
   void Tvmult (Vector<double> &dst,
-	       const Vector<double> &src) const;
+               const Vector<double> &src) const;
 
   /**
    * Same as before, but for block vectors
    */
   void Tvmult (BlockVector<double> &dst,
-	       const BlockVector<double> &src) const;
+               const BlockVector<double> &src) const;
 
   /**
    * Same as vmult(), but adding to the previous solution. Not implemented
    * yet but necessary for compiling certain other classes.
    */
   void vmult_add (Vector<double> &dst,
-		  const Vector<double> &src) const;
+                  const Vector<double> &src) const;
 
   /**
    * Same as before, but uses the transpose of the matrix, i.e. this
    * function multiplies with $A^{-T}$.
    */
   void Tvmult_add (Vector<double> &dst,
-		   const Vector<double> &src) const;
+                   const Vector<double> &src) const;
 
   /**
    * @}
@@ -262,7 +262,7 @@ public:
   /**
    * @}
    */
-  
+
   /**
    * One of the UMFPack routines threw an error. The error code is included
    * in the output and can be looked up in the UMFPack user manual. The

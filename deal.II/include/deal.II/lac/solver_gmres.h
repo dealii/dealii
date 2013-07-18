@@ -710,7 +710,7 @@ SolverGMRES<VECTOR>::solve (const MATRIX         &A,
               precondition.vmult(vv,p);
             }
           else
-            { 
+            {
               precondition.vmult(p, tmp_vectors[inner_iteration]);
               A.vmult(vv,p);
             };

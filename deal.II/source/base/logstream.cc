@@ -149,10 +149,10 @@ LogStream::operator<< (std::ostream& (*p) (std::ostream &))
       if (at_newline)
         print_line_head();
 
-      if(p == p_flush)
+      if (p == p_flush)
         at_newline = false;
 
-      if(p == p_endl)
+      if (p == p_endl)
         at_newline = true;
 
       if (get_prefixes().size() <= std_depth)
@@ -352,7 +352,7 @@ LogStream::get_prefixes() const
 
   // If this is a new locally stored stack, copy the "blessed" prefixes
   // from the initial thread that created logstream.
-  if(! exists)
+  if (! exists)
     {
       const tbb::enumerable_thread_specific<std::stack<std::string> > &impl
         = prefixes.get_implementation();

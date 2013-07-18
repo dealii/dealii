@@ -102,7 +102,7 @@ unsigned int MultithreadInfo::get_n_cpus()
 void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
 {
   unsigned int max_threads_env = numbers::invalid_unsigned_int;
-  char* penv;
+  char *penv;
   penv = getenv ("DEAL_II_NUM_THREADS");
 
   if (penv!=NULL)
@@ -112,9 +112,9 @@ void MultithreadInfo::set_thread_limit(const unsigned int max_threads)
   if (n_max_threads == numbers::invalid_unsigned_int)
     n_max_threads = tbb::task_scheduler_init::default_num_threads();
   else
-  {
-    static tbb::task_scheduler_init dummy (n_max_threads);
-  }
+    {
+      static tbb::task_scheduler_init dummy (n_max_threads);
+    }
 }
 
 bool MultithreadInfo::is_running_single_threaded()

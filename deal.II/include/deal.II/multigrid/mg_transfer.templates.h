@@ -203,24 +203,24 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg(
 
       // First copy all indices local to this process
       if (constraints==0)
-	for (IT i= copy_indices[level].begin();
-	     i != copy_indices[level].end(); ++i)
-	  dst(i->first) = src[level](i->second);
+        for (IT i= copy_indices[level].begin();
+             i != copy_indices[level].end(); ++i)
+          dst(i->first) = src[level](i->second);
       else
-	for (IT i= copy_indices[level].begin();
-	     i != copy_indices[level].end(); ++i)
-	  constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
-	
+        for (IT i= copy_indices[level].begin();
+             i != copy_indices[level].end(); ++i)
+          constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
+
       // Do the same for the indices where the level index is local,
       // but the global index is not
       if (constraints==0)
-	for (IT i= copy_indices_from_me[level].begin();
-	     i != copy_indices_from_me[level].end(); ++i)
-	  dst(i->first) = src[level](i->second);
+        for (IT i= copy_indices_from_me[level].begin();
+             i != copy_indices_from_me[level].end(); ++i)
+          dst(i->first) = src[level](i->second);
       else
-	for (IT i= copy_indices_from_me[level].begin();
-	     i != copy_indices_from_me[level].end(); ++i)
-	  constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
+        for (IT i= copy_indices_from_me[level].begin();
+             i != copy_indices_from_me[level].end(); ++i)
+          constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
     }
 }
 
@@ -245,24 +245,24 @@ MGTransferPrebuilt<VECTOR>::copy_from_mg_add (
     {
       typedef std::vector<std::pair<types::global_dof_index, unsigned int> >::const_iterator IT;
       if (constraints==0)
-	for (IT i= copy_indices[level].begin();
-	     i != copy_indices[level].end(); ++i)
-	  dst(i->first) += src[level](i->second);
+        for (IT i= copy_indices[level].begin();
+             i != copy_indices[level].end(); ++i)
+          dst(i->first) += src[level](i->second);
       else
-	for (IT i= copy_indices[level].begin();
-	     i != copy_indices[level].end(); ++i)
-	  constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
-      
+        for (IT i= copy_indices[level].begin();
+             i != copy_indices[level].end(); ++i)
+          constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
+
       // Do the same for the indices where the level index is local,
       // but the global index is not
       if (constraints==0)
-	for (IT i= copy_indices_from_me[level].begin();
-	     i != copy_indices_from_me[level].end(); ++i)
-	  dst(i->first) += src[level](i->second);
+        for (IT i= copy_indices_from_me[level].begin();
+             i != copy_indices_from_me[level].end(); ++i)
+          dst(i->first) += src[level](i->second);
       else
-	for (IT i= copy_indices_from_me[level].begin();
-	     i != copy_indices_from_me[level].end(); ++i)
-	  constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
+        for (IT i= copy_indices_from_me[level].begin();
+             i != copy_indices_from_me[level].end(); ++i)
+          constraints->distribute_local_to_global(i->first, src[level](i->second), dst);
     }
 }
 

@@ -723,7 +723,7 @@ LAPACKFullMatrix<number>::copy_from (const MATRIX &M)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
-          entry != end_row; ++entry)
+           entry != end_row; ++entry)
         this->el(row, entry->column()) = entry->value();
     }
 
@@ -750,7 +750,7 @@ LAPACKFullMatrix<number>::fill (
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
-          entry != end_row; ++entry)
+           entry != end_row; ++entry)
         {
           const size_type i = transpose ? entry->column() : row;
           const size_type j = transpose ? row : entry->column();

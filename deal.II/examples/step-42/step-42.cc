@@ -100,32 +100,34 @@ namespace Step42
   template <int dim>
   class Input
   {
-   public:
-    Input (const char* _name) :
+  public:
+    Input (const char *_name) :
       name (_name),
       mpi_communicator (MPI_COMM_WORLD),
       pcout (std::cout,
-               (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
+             (Utilities::MPI::this_mpi_process(mpi_communicator) == 0)),
       obstacle_data (0),
       hx (0),
       hy (0),
       nx (0),
       ny (0)
-      {read_obstacle (name);}
+    {
+      read_obstacle (name);
+    }
 
-      double hv (int i, int j);
+    double hv (int i, int j);
 
-      double obstacle_function (double x,double y);
+    double obstacle_function (double x,double y);
 
-      void read_obstacle (const char* name);
+    void read_obstacle (const char *name);
 
-   private:
-      const char*          name;
-      MPI_Comm             mpi_communicator;
-      ConditionalOStream   pcout;
-      std::vector<double>  obstacle_data;
-      double               hx, hy;
-      int                  nx, ny;
+  private:
+    const char          *name;
+    MPI_Comm             mpi_communicator;
+    ConditionalOStream   pcout;
+    std::vector<double>  obstacle_data;
+    double               hx, hy;
+    int                  nx, ny;
   };
 
   // This function is used in obstacle_function ()
@@ -212,7 +214,7 @@ namespace Step42
   // obstacle datas and stores them in the std::vector
   // obstacle_data. It will be used only in run ().
   template <int dim>
-  void Input<dim>::read_obstacle (const char* name)
+  void Input<dim>::read_obstacle (const char *name)
   {
     std::ifstream f(name);
 
@@ -222,9 +224,9 @@ namespace Step42
 
     for (int k=0; k<nx*ny; k++)
       {
-	double val;
-	f >> val;
-	obstacle_data.push_back(val);
+        double val;
+        f >> val;
+        obstacle_data.push_back(val);
       }
 
     hx = 1.0/(nx - 1);
@@ -253,18 +255,21 @@ namespace Step42
                      MPI_Comm _mpi_communicator,
                      ConditionalOStream _pcout);
 
-    void plast_linear_hardening (SymmetricTensor<4,dim> 	  &stress_strain_tensor,
+    void plast_linear_hardening (SymmetricTensor<4,dim>     &stress_strain_tensor,
                                  const SymmetricTensor<2,dim> &strain_tensor,
-                                 unsigned int            	  &elast_points,
-                                 unsigned int            	  &plast_points,
-                                 double                  	  &yield);
-    void linearized_plast_linear_hardening (SymmetricTensor<4,dim> 		 &stress_strain_tensor_linearized,
-                                            SymmetricTensor<4,dim> 		 &stress_strain_tensor,
+                                 unsigned int               &elast_points,
+                                 unsigned int               &plast_points,
+                                 double                     &yield);
+    void linearized_plast_linear_hardening (SymmetricTensor<4,dim>     &stress_strain_tensor_linearized,
+                                            SymmetricTensor<4,dim>     &stress_strain_tensor,
                                             const SymmetricTensor<2,dim> &strain_tensor);
     inline SymmetricTensor<2,dim> get_strain (const FEValues<dim> &fe_values,
                                               const unsigned int  shape_func,
                                               const unsigned int  q_point) const;
-    void set_sigma_0 (double sigma_hlp) {sigma_0 = sigma_hlp;}
+    void set_sigma_0 (double sigma_hlp)
+    {
+      sigma_0 = sigma_hlp;
+    }
 
   private:
     SymmetricTensor<4,dim>  stress_strain_tensor_mu;
@@ -324,11 +329,11 @@ namespace Step42
   // Also we sum up the elastic and the plastic quadrature
   // points.
   template <int dim>
-  void ConstitutiveLaw<dim>::plast_linear_hardening (SymmetricTensor<4,dim> 	  &stress_strain_tensor,
+  void ConstitutiveLaw<dim>::plast_linear_hardening (SymmetricTensor<4,dim>     &stress_strain_tensor,
                                                      const SymmetricTensor<2,dim> &strain_tensor,
-                                                     unsigned int             	  &elast_points,
-                                                     unsigned int            	  &plast_points,
-                                                     double                 	  &yield)
+                                                     unsigned int                 &elast_points,
+                                                     unsigned int               &plast_points,
+                                                     double                     &yield)
   {
     if (dim == 3)
       {
@@ -359,9 +364,9 @@ namespace Step42
   // This function returns the linearized stress strain tensor.
   // It contains the derivative of the nonlinear constitutive law.
   template <int dim>
-  void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,dim> 		 &stress_strain_tensor_linearized,
-		  	  	  	  	  	  	  	  	  	  	  	  	  	  	SymmetricTensor<4,dim> 	 	 &stress_strain_tensor,
-		  	  	  	  	  	  	  	  	  	  	  	  	  	  	const SymmetricTensor<2,dim> &strain_tensor)
+  void ConstitutiveLaw<dim>::linearized_plast_linear_hardening (SymmetricTensor<4,dim>     &stress_strain_tensor_linearized,
+      SymmetricTensor<4,dim>     &stress_strain_tensor,
+      const SymmetricTensor<2,dim> &strain_tensor)
   {
     if (dim == 3)
       {
@@ -485,7 +490,7 @@ namespace Step42
         Function<dim>(dim),
         input_obstacle_copy(_input),
         use_read_obstacle(_use_read_obstacle)
-	  {}
+      {}
 
       virtual double value (const Point<dim>   &p,
                             const unsigned int  component = 0) const;
@@ -495,7 +500,7 @@ namespace Step42
 
     private:
       std_cxx1x::shared_ptr<Input<dim> >  const &input_obstacle_copy;
-      bool										use_read_obstacle;
+      bool                    use_read_obstacle;
     };
 
     template <int dim>
@@ -510,10 +515,10 @@ namespace Step42
         return_value = p(1);
       if (component == 2)
         {
-    	  if (use_read_obstacle)
-    		  return_value = 1.999 - input_obstacle_copy->obstacle_function (p(0), p(1));
-    	  else
-    		  return_value = -std::sqrt (0.36 - (p(0)-0.5)*(p(0)-0.5) - (p(1)-0.5)*(p(1)-0.5)) + 1.59;
+          if (use_read_obstacle)
+            return_value = 1.999 - input_obstacle_copy->obstacle_function (p(0), p(1));
+          else
+            return_value = -std::sqrt (0.36 - (p(0)-0.5)*(p(0)-0.5) - (p(1)-0.5)*(p(1)-0.5)) + 1.59;
         }
       return return_value;
     }
@@ -703,7 +708,7 @@ namespace Step42
       computing_timer.exit_section("Setup: distribute DoFs");
     }
 
-    					// Setup of the hanging nodes and the Dirichlet constraints.
+    // Setup of the hanging nodes and the Dirichlet constraints.
     {
       constraints_hanging_nodes.clear ();
       constraints_hanging_nodes.reinit (locally_relevant_dofs);
@@ -721,7 +726,7 @@ namespace Step42
       dirichlet_constraints ();
     }
 
-    					// Initialization for matrices and vectors.
+    // Initialization for matrices and vectors.
     {
       solution.reinit (locally_relevant_dofs, mpi_communicator);
       system_rhs_newton.reinit (locally_owned_dofs, mpi_communicator);
@@ -732,7 +737,7 @@ namespace Step42
       active_set.set_size (locally_relevant_dofs.size ());
     }
 
-    					// Here we setup sparsity pattern.
+    // Here we setup sparsity pattern.
     {
       computing_timer.enter_section("Setup: matrix");
       TrilinosWrappers::SparsityPattern sp (locally_owned_dofs,
@@ -745,12 +750,12 @@ namespace Step42
 
       system_matrix_newton.reinit (sp);
 
-				       // we are going to reuse the system
-				       // matrix for assembling the diagonal
-				       // of the mass matrix so that we do not
-				       // need to allocate two sparse matrices
-				       // at the same time:
-      TrilinosWrappers::SparseMatrix & mass_matrix = system_matrix_newton;
+      // we are going to reuse the system
+      // matrix for assembling the diagonal
+      // of the mass matrix so that we do not
+      // need to allocate two sparse matrices
+      // at the same time:
+      TrilinosWrappers::SparseMatrix &mass_matrix = system_matrix_newton;
       assemble_mass_matrix_diagonal (mass_matrix);
       const unsigned int
       start = (system_rhs_newton.local_range().first),
@@ -758,10 +763,10 @@ namespace Step42
       for (unsigned int j=start; j<end; j++)
         diag_mass_matrix_vector (j) = mass_matrix.diag_element (j);
       number_iterations = 0;
-      
+
       diag_mass_matrix_vector.compress (VectorOperation::insert);
 
-				       // remove the mass matrix entries from the matrix:
+      // remove the mass matrix entries from the matrix:
       mass_matrix = 0;
 
       computing_timer.exit_section("Setup: matrix");
@@ -1018,7 +1023,7 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::assemble_mass_matrix_diagonal (TrilinosWrappers::SparseMatrix &mass_matrix)
   {
-	QTrapez<dim-1>  face_quadrature_formula;
+    QTrapez<dim-1>  face_quadrature_formula;
 
     FEFaceValues<dim> fe_values_face (fe, face_quadrature_formula,
                                       update_values   |
@@ -1031,7 +1036,7 @@ namespace Step42
     FullMatrix<double>   cell_matrix (dofs_per_cell, dofs_per_cell);
     Tensor<1,dim,double> ones (dim);
     for (unsigned i=0; i<dim; i++)
-    	ones[i] = 1.0;
+      ones[i] = 1.0;
 
     std::vector<types::global_dof_index> local_dof_indices (dofs_per_cell);
 
@@ -1053,7 +1058,7 @@ namespace Step42
               for (unsigned int q_point=0; q_point<n_face_q_points; ++q_point)
                 for (unsigned int i=0; i<dofs_per_cell; ++i)
                   cell_matrix(i,i) += (fe_values_face[displacement].value (i, q_point) *
-                		  	  	  	   ones *
+                                       ones *
                                        fe_values_face.JxW (q_point));
 
               cell->get_dof_indices (local_dof_indices);
@@ -1271,8 +1276,8 @@ namespace Step42
     SolverControl solver_control (system_matrix_newton.m(), solver_tolerance);
     SolverBicgstab<TrilinosWrappers::MPI::Vector>
     solver(solver_control, mem,
-    		SolverBicgstab<TrilinosWrappers::MPI::Vector>::
-    		AdditionalData(false, 1.e-10));
+           SolverBicgstab<TrilinosWrappers::MPI::Vector>::
+           AdditionalData(false, 1.e-10));
 
     solver.solve(system_matrix_newton, distributed_solution, system_rhs_newton, preconditioner_u);
 
@@ -1397,9 +1402,9 @@ namespace Step42
             computing_timer.exit_section("Residual and lambda");
 
             pcout << "      Residual of the non-contact part of the system: " << resid
-                              << std::endl
-                              << "         with a damping parameter alpha = " << a
-                              << std::endl;
+                  << std::endl
+                  << "         with a damping parameter alpha = " << a
+                  << std::endl;
 
             // The previous iteration of step 0 is the solution of an elastic problem.
             // So a linear combination of a plastic and an elastic solution makes no sense
@@ -1416,7 +1421,7 @@ namespace Step42
         int is_my_set_changed = (active_set == active_set_old)?0:1;
         int num_changed = Utilities::MPI::sum(is_my_set_changed, MPI_COMM_WORLD);
         if (num_changed==0 && resid < 1e-8)
-                   break;
+          break;
         active_set_old = active_set;
       }
 
@@ -1431,7 +1436,7 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::refine_grid ()
   {
-	Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
+    Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
     KellyErrorEstimator<dim>::estimate (dof_handler,
                                         QGauss<dim-1>(3),
                                         typename FunctionMap<dim>::type(),
@@ -1546,13 +1551,13 @@ namespace Step42
   template <int dim>
   void PlasticityContactProblem<dim>::run ()
   {
-	use_read_obstacle = false;
-	if (use_read_obstacle)
-	{
-		pcout << "Read the obstacle from a file." << std::endl;
-		input_obstacle.reset (new Input<dim>("obstacle_file.pbm"));
-		pcout << "Obstacle is available now." << std::endl;
-	}
+    use_read_obstacle = false;
+    if (use_read_obstacle)
+      {
+        pcout << "Read the obstacle from a file." << std::endl;
+        input_obstacle.reset (new Input<dim>("obstacle_file.pbm"));
+        pcout << "Obstacle is available now." << std::endl;
+      }
 
     const unsigned int n_cycles = 6;
     for (cycle=0; cycle<n_cycles; ++cycle)
@@ -1568,10 +1573,10 @@ namespace Step42
           }
         else
           {
-                computing_timer.enter_section("Setup: refine mesh");
-        	soltrans.reset (new parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::Vector>(dof_handler));
-        	refine_grid ();
-        	computing_timer.exit_section("Setup: refine mesh");
+            computing_timer.enter_section("Setup: refine mesh");
+            soltrans.reset (new parallel::distributed::SolutionTransfer<dim,TrilinosWrappers::MPI::Vector>(dof_handler));
+            refine_grid ();
+            computing_timer.exit_section("Setup: refine mesh");
           }
 
         setup_system ();
@@ -1580,8 +1585,8 @@ namespace Step42
           {
             TrilinosWrappers::MPI::Vector    distributed_solution (system_rhs_newton);
             distributed_solution = solution;
-        	soltrans->interpolate(distributed_solution);
-        	solution = distributed_solution;
+            soltrans->interpolate(distributed_solution);
+            solution = distributed_solution;
           }
 
         computing_timer.exit_section("Setup");
@@ -1618,7 +1623,7 @@ int main (int argc, char *argv[])
     int _n_refinements_global = 3;
 
     if (argc == 2)
-        _n_refinements_global = atoi(argv[1]);
+      _n_refinements_global = atoi(argv[1]);
 
     PlasticityContactProblem<3> laplace_problem_3d (_n_refinements_global);
     laplace_problem_3d.run ();

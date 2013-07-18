@@ -166,7 +166,7 @@ vector_gradient (const Point<dim>            &p,
       Point<dim> q1, q2, q3, q4;
       Vector<double>
       v1(this->n_components), v2(this->n_components),
-         v3(this->n_components), v4(this->n_components);
+      v3(this->n_components), v4(this->n_components);
       const double h_inv_12=1./(12*h);
       for (unsigned int i=0; i<dim; ++i)
         {

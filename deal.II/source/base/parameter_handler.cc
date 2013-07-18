@@ -1085,20 +1085,20 @@ ParameterHandler::mangle (const std::string &s)
   for (unsigned int i=0; i<s.size(); ++i)
     {
       static const std::string allowed_characters
-	("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+      ("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 
       if ((! mangle_whole_string)
-	  &&
-	  (allowed_characters.find (s[i]) != std::string::npos))
-	u.push_back (s[i]);
+          &&
+          (allowed_characters.find (s[i]) != std::string::npos))
+        u.push_back (s[i]);
       else
-	{
-	  u.push_back ('_');
-	  static const char hex[16]
-	    = { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
-	  u.push_back (hex[static_cast<unsigned char>(s[i])/16]);
-	  u.push_back (hex[static_cast<unsigned char>(s[i])%16]);
-	}
+        {
+          u.push_back ('_');
+          static const char hex[16]
+            = { '0','1','2','3','4','5','6','7','8','9','a','b','c','d','e','f'};
+          u.push_back (hex[static_cast<unsigned char>(s[i])/16]);
+          u.push_back (hex[static_cast<unsigned char>(s[i])%16]);
+        }
     }
 
   return u;

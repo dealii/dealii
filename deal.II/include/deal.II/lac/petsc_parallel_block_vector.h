@@ -142,8 +142,8 @@ namespace PETScWrappers
        * Same as above, but include ghost elements
        */
       BlockVector (const std::vector<IndexSet> &parallel_partitioning,
-          const std::vector<IndexSet> &ghost_indices,
-          const MPI_Comm &communicator);
+                   const std::vector<IndexSet> &ghost_indices,
+                   const MPI_Comm &communicator);
 
 
 
@@ -299,7 +299,7 @@ namespace PETScWrappers
       void reinit (const std::vector<IndexSet> &parallel_partitioning,
                    const std::vector<IndexSet> &ghost_entries,
                    const MPI_Comm              &communicator);
-	
+
       /**
        * Change the number of blocks to
        * <tt>num_blocks</tt>. The individual
@@ -415,15 +415,15 @@ namespace PETScWrappers
 
     inline
     BlockVector::BlockVector (const std::vector<IndexSet> &parallel_partitioning,
-                 const MPI_Comm              &communicator)
+                              const MPI_Comm              &communicator)
     {
       reinit(parallel_partitioning, communicator);
     }
 
     inline
     BlockVector::BlockVector (const std::vector<IndexSet> &parallel_partitioning,
-        const std::vector<IndexSet> &ghost_indices,
-        const MPI_Comm &communicator)
+                              const std::vector<IndexSet> &ghost_indices,
+                              const MPI_Comm &communicator)
     {
       reinit(parallel_partitioning, ghost_indices, communicator);
     }
@@ -502,7 +502,7 @@ namespace PETScWrappers
     inline
     void
     BlockVector::reinit (const std::vector<IndexSet> &parallel_partitioning,
-                 const MPI_Comm              &communicator)
+                         const MPI_Comm              &communicator)
     {
       std::vector<size_type> sizes(parallel_partitioning.size());
       for (unsigned int i=0; i<parallel_partitioning.size(); ++i)
@@ -517,10 +517,10 @@ namespace PETScWrappers
     }
 
     inline
-     void
-     BlockVector::reinit (const std::vector<IndexSet> &parallel_partitioning,
-                 const std::vector<IndexSet> &ghost_entries,
-                 const MPI_Comm              &communicator)
+    void
+    BlockVector::reinit (const std::vector<IndexSet> &parallel_partitioning,
+                         const std::vector<IndexSet> &ghost_entries,
+                         const MPI_Comm              &communicator)
     {
       std::vector<types::global_dof_index> sizes(parallel_partitioning.size());
       for (unsigned int i=0; i<parallel_partitioning.size(); ++i)

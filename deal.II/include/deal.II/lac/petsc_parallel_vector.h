@@ -176,10 +176,10 @@ namespace PETScWrappers
        */
       static const bool supports_distributed_data = true;
 
-         /**
-       * Default constructor. Initialize the
-       * vector as empty.
-       */
+      /**
+      * Default constructor. Initialize the
+      * vector as empty.
+      */
       Vector ();
 
       /**
@@ -298,8 +298,8 @@ namespace PETScWrappers
        * vector.
        */
       Vector (const IndexSet &local,
-                       const IndexSet &ghost,
-                       const MPI_Comm &communicator);
+              const IndexSet &ghost,
+              const MPI_Comm &communicator);
 
       /**
        * Constructs a new parallel PETSc

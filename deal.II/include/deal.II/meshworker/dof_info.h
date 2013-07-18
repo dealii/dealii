@@ -122,7 +122,7 @@ namespace MeshWorker
      * pointer empty, but setting
      * the #aux_local_indices.
      */
-    DoFInfo (const DoFHandler<dim, spacedim>& dof_handler);
+    DoFInfo (const DoFHandler<dim, spacedim> &dof_handler);
 
     /**
      * Set the current cell and
@@ -156,7 +156,7 @@ namespace MeshWorker
     template <class DHFaceIterator>
     void set_face (const DHFaceIterator &f,
                    const unsigned int face_no);
-    
+
     /**
      * Switch to a new subface of the same cell. Does not change @p
      * indices and does not reset data in LocalResults.

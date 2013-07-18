@@ -830,7 +830,7 @@ namespace StandardExceptions
                                              ExcIndexRange((index),0,(range)))
 
 #define AssertGlobalIndexRange(index,range) Assert((index) < (range), \
-						   ExcIndexRange<types::global_dof_index>((index),0,(range)))
+                                                   ExcIndexRange<types::global_dof_index>((index),0,(range)))
 
 using namespace StandardExceptions;
 

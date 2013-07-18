@@ -299,7 +299,7 @@ namespace ChunkSparseMatrixIterators
      * of the current kind.
      */
     typedef
-    const Accessor<number,Constness> & value_type;
+    const Accessor<number,Constness> &value_type;
 
     /**
      * Constructor. Create an iterator into the matrix @p matrix for the given
@@ -1351,7 +1351,7 @@ ChunkSparseMatrix<number>::m () const
 
 template <typename number>
 inline
-typename ChunkSparseMatrix<number>::size_type 
+typename ChunkSparseMatrix<number>::size_type
 ChunkSparseMatrix<number>::n () const
 {
   Assert (cols != 0, ExcNotInitialized());
@@ -1373,13 +1373,13 @@ ChunkSparseMatrix<number>::get_sparsity_pattern () const
 
 template <typename number>
 inline
-typename ChunkSparseMatrix<number>::size_type 
+typename ChunkSparseMatrix<number>::size_type
 ChunkSparseMatrix<number>::compute_location (const size_type i,
                                              const size_type j) const
 {
   const size_type chunk_size = cols->get_chunk_size();
   const size_type chunk_index
-  = cols->sparsity_pattern(i/chunk_size, j/chunk_size);
+    = cols->sparsity_pattern(i/chunk_size, j/chunk_size);
 
   if (chunk_index == ChunkSparsityPattern::invalid_entry)
     return ChunkSparsityPattern::invalid_entry;

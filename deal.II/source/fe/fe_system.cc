@@ -593,7 +593,7 @@ FESystem<dim,spacedim>::get_interpolation_matrix (
 
 
 template <int dim, int spacedim>
-const FullMatrix<double>&
+const FullMatrix<double> &
 FESystem<dim,spacedim>
 ::get_restriction_matrix (const unsigned int child,
                           const RefinementCase<dim> &refinement_case) const
@@ -620,7 +620,7 @@ FESystem<dim,spacedim>
 
       // shortcut for accessing local restrictions further down
       std::vector<const FullMatrix<double> *>
-        base_matrices(this->n_base_elements());
+      base_matrices(this->n_base_elements());
 
       for (unsigned int i=0; i<this->n_base_elements(); ++i)
         {
@@ -660,11 +660,11 @@ FESystem<dim,spacedim>
 
                 // so get the common base element and the indices therein:
                 const unsigned int
-                  base = this->system_to_base_table[i].first.first;
+                base = this->system_to_base_table[i].first.first;
 
                 const unsigned int
-                  base_index_i = this->system_to_base_table[i].second,
-                  base_index_j = this->system_to_base_table[j].second;
+                base_index_i = this->system_to_base_table[i].second,
+                base_index_j = this->system_to_base_table[j].second;
 
                 // if we are sure that DoFs i and j may couple, then copy
                 // entries of the matrices:
@@ -682,7 +682,7 @@ FESystem<dim,spacedim>
 
 
 template <int dim, int spacedim>
-const FullMatrix<double>&
+const FullMatrix<double> &
 FESystem<dim,spacedim>
 ::get_prolongation_matrix (const unsigned int child,
                            const RefinementCase<dim> &refinement_case) const
@@ -706,7 +706,7 @@ FESystem<dim,spacedim>
 
       bool do_prolongation = true;
       std::vector<const FullMatrix<double> *>
-        base_matrices(this->n_base_elements());
+      base_matrices(this->n_base_elements());
       for (unsigned int i=0; i<this->n_base_elements(); ++i)
         {
           base_matrices[i] =
@@ -729,11 +729,11 @@ FESystem<dim,spacedim>
                     this->system_to_base_table[j].first)
                   continue;
                 const unsigned int
-                  base = this->system_to_base_table[i].first.first;
+                base = this->system_to_base_table[i].first.first;
 
                 const unsigned int
-                  base_index_i = this->system_to_base_table[i].second,
-                  base_index_j = this->system_to_base_table[j].second;
+                base_index_i = this->system_to_base_table[i].second,
+                base_index_j = this->system_to_base_table[j].second;
                 prolongate(i,j) = (*base_matrices[base])(base_index_i,base_index_j);
               }
           prolongate.swap(const_cast<FullMatrix<double> &>
@@ -2462,17 +2462,17 @@ FESystem<dim,spacedim>::multiply_dof_numbers (
     unsigned int index = 0;
     for (unsigned int index=0; index<fes.size(); ++index)
       if (multiplicities[index]>0)
-	{
-	  total_conformity = fes[index]->conforming_space;
-	  break;
-	}
+        {
+          total_conformity = fes[index]->conforming_space;
+          break;
+        }
 
     for (; index<fes.size(); ++index)
       if (multiplicities[index]>0)
-	total_conformity =
-	  typename FiniteElementData<dim>::Conformity(total_conformity
-						      &
-						      fes[index]->conforming_space);
+        total_conformity =
+          typename FiniteElementData<dim>::Conformity(total_conformity
+                                                      &
+                                                      fes[index]->conforming_space);
   }
 
   std::vector<unsigned int> dpo;
@@ -2482,10 +2482,10 @@ FESystem<dim,spacedim>::multiply_dof_numbers (
   if (dim>2) dpo.push_back(multiplied_dofs_per_hex);
 
   return FiniteElementData<dim> (dpo,
-				 multiplied_n_components,
-				 degree,
-				 total_conformity,
-				 summed_multiplicities);
+                                 multiplied_n_components,
+                                 degree,
+                                 total_conformity,
+                                 summed_multiplicities);
 }
 
 

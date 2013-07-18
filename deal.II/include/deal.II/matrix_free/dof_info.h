@@ -55,17 +55,17 @@ namespace internal
      */
     struct DoFInfo
     {
-            
+
       /**
        * size_type of the dof_indicies object.
        */
-      
+
       typedef std::vector<types::global_dof_index>::size_type size_dof;
-      
+
       /**
        * size_type of the constraint_indicators object.
        */
-      
+
       typedef std::vector<std::pair<unsigned short, unsigned short> >::size_type size_constraint;
 
       /**
@@ -82,7 +82,7 @@ namespace internal
        * Clears all data fields in this class.
        */
       void clear ();
-      
+
 
       /**
        * Returns a pointer to the first index in the DoF row @p row.
@@ -191,7 +191,7 @@ namespace internal
        * DoFHandlers.
        */
       void compute_renumber_hp_serial (SizeInfo                  &size_info,
-                                     std::vector<types::global_dof_index> &renumbering,
+                                       std::vector<types::global_dof_index> &renumbering,
                                        std::vector<unsigned int> &irregular_cells);
 
       /**
@@ -432,7 +432,7 @@ namespace internal
 #ifndef DOXYGEN
 
     inline
-      const types::global_dof_index *
+    const types::global_dof_index *
     DoFInfo::begin_indices (const unsigned int row) const
     {
       AssertIndexRange (row, row_starts.size()-1);
@@ -444,7 +444,7 @@ namespace internal
 
 
     inline
-      const types::global_dof_index *
+    const types::global_dof_index *
     DoFInfo::end_indices (const unsigned int row) const
     {
       AssertIndexRange (row, row_starts.size()-1);

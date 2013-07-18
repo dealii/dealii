@@ -171,20 +171,20 @@ namespace WorkStream
           std_cxx1x::shared_ptr<ScratchData> scratch_data;
           bool                               currently_in_use;
 
-	  /**
-	   * Default constructor.
-	   */
-	  ScratchDataObject ()
-	  :
-	  currently_in_use (false)
-	    {}
+          /**
+           * Default constructor.
+           */
+          ScratchDataObject ()
+            :
+            currently_in_use (false)
+          {}
 
-	  ScratchDataObject (ScratchData *p,
-			     const bool in_use)
-	  :
-	  scratch_data (p),
-	  currently_in_use (in_use)
-	    {}
+          ScratchDataObject (ScratchData *p,
+                             const bool in_use)
+            :
+            scratch_data (p),
+            currently_in_use (in_use)
+          {}
         };
 
 
@@ -254,17 +254,17 @@ namespace WorkStream
         const ScratchData *sample_scratch_data;
 
 
-	/**
-	 * Default constructor.
-	 * Initialize everything that doesn't
-	 * have a default constructor itself.
-	 */
-	ItemType ()
-	:
-	n_items (0),
-	scratch_data (0),
-	sample_scratch_data (0)
-	  {}
+        /**
+         * Default constructor.
+         * Initialize everything that doesn't
+         * have a default constructor itself.
+         */
+        ItemType ()
+          :
+          n_items (0),
+          scratch_data (0),
+          sample_scratch_data (0)
+        {}
       };
 
 
@@ -286,7 +286,7 @@ namespace WorkStream
         tbb::filter (/*is_serial=*/true),
         remaining_iterator_range (begin, end),
         ring_buffer (buffer_size),
-	sample_scratch_data (sample_scratch_data),
+        sample_scratch_data (sample_scratch_data),
         n_emitted_items (0),
         chunk_size (chunk_size)
       {
@@ -431,9 +431,9 @@ namespace WorkStream
         ring_buffer[element].work_items
         .resize (chunk_size, remaining_iterator_range.second);
         ring_buffer[element].scratch_data
-	        = &thread_local_scratch;
+          = &thread_local_scratch;
         ring_buffer[element].sample_scratch_data
-                = &sample_scratch_data;
+          = &sample_scratch_data;
         ring_buffer[element].copy_datas
         .resize (chunk_size, sample_copy_data);
       }
@@ -502,8 +502,8 @@ namespace WorkStream
           // see if there is an unused object. if so, grab it and mark
           // it as used
           for (typename ItemType::ScratchDataList::iterator
-              p = scratch_data_list.begin();
-              p != scratch_data_list.end(); ++p)
+               p = scratch_data_list.begin();
+               p != scratch_data_list.end(); ++p)
             if (p->currently_in_use == false)
               {
                 scratch_data = p->scratch_data.get();
@@ -517,7 +517,7 @@ namespace WorkStream
               scratch_data = new ScratchData(*current_item->sample_scratch_data);
 
               typename ItemType::ScratchDataList::value_type
-		new_scratch_object (scratch_data, true);
+              new_scratch_object (scratch_data, true);
               scratch_data_list.push_back (new_scratch_object);
             }
         }
@@ -527,22 +527,22 @@ namespace WorkStream
         // nothing good can happen if they throw an exception and we are best
         // off catching it and showing an error message
         for (unsigned int i=0; i<current_item->n_items; ++i)
-	  {
-	    try
-	      {
-		worker (current_item->work_items[i],
-		        *scratch_data,
-			current_item->copy_datas[i]);
-	      }
-	    catch (const std::exception &exc)
-	      {
-		Threads::internal::handle_std_exception (exc);
-	      }
-	    catch (...)
-	      {
-		Threads::internal::handle_unknown_exception ();
-	      }
-	  }
+          {
+            try
+              {
+                worker (current_item->work_items[i],
+                        *scratch_data,
+                        current_item->copy_datas[i]);
+              }
+            catch (const std::exception &exc)
+              {
+                Threads::internal::handle_std_exception (exc);
+              }
+            catch (...)
+              {
+                Threads::internal::handle_unknown_exception ();
+              }
+          }
 
         // finally mark the scratch object as unused again. as above, there
         // is no need to lock anything here since the object we work on
@@ -552,8 +552,8 @@ namespace WorkStream
           scratch_data_list = current_item->scratch_data->get();
 
           for (typename ItemType::ScratchDataList::iterator p =
-              scratch_data_list.begin(); p != scratch_data_list.end();
-              ++p)
+                 scratch_data_list.begin(); p != scratch_data_list.end();
+               ++p)
             if (p->scratch_data.get() == scratch_data)
               {
                 Assert(p->currently_in_use == true, ExcInternalError());
@@ -630,20 +630,20 @@ namespace WorkStream
         // above, catch exceptions rather than letting it propagate into
         // unknown territories
         for (unsigned int i=0; i<current_item->n_items; ++i)
-	  {
-	    try
-	      {
-		copier (current_item->copy_datas[i]);
-	      }
-	    catch (const std::exception &exc)
-	      {
-		Threads::internal::handle_std_exception (exc);
-	      }
-	    catch (...)
-	      {
-		Threads::internal::handle_unknown_exception ();
-	      }
-	  }
+          {
+            try
+              {
+                copier (current_item->copy_datas[i]);
+              }
+            catch (const std::exception &exc)
+              {
+                Threads::internal::handle_std_exception (exc);
+              }
+            catch (...)
+              {
+                Threads::internal::handle_unknown_exception ();
+              }
+          }
 
 
         // return an invalid

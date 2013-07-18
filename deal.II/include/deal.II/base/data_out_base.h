@@ -1279,66 +1279,66 @@ public:
    */
   struct SvgFlags
   {
-    public:
-      /**
-       * This denotes the number of the
-       * data vector which shall be used
-       * for generating the height
-       * information. By default, the
-       * first data vector is taken,
-       * i.e. <tt>height_vector==0</tt>, if
-       * there is any data vector. If there
-       * is no data vector, no height
-       * information is generated.
-       */
-      unsigned int height_vector;      
-
-      /*
-       * Angles for the perspective view
-       */
-      int azimuth_angle, polar_angle;
-      
-      unsigned int line_thickness;
-
-      /*
-       * Draw a margin of 5% around the plotted area
-       */
-      bool margin;
-
-      /*
-       * Draw a colorbar encoding the cell coloring 
-       */
-      bool draw_colorbar;
-
-      /*
-       * Constructor.
-       */
-      SvgFlags(const unsigned int height_vector = 0,
-               const int azimuth_angle = 37,
-               const int polar_angle = 45,
-               const unsigned int line_thickness = 1,
-               const bool margin = true,
-               const bool draw_colorbar = true);
-
-      /**
-       * Determine an estimate for
-       * the memory consumption (in
-       * bytes) of this
-       * object. Since sometimes
-       * the size of objects can
-       * not be determined exactly
-       * (for example: what is the
-       * memory consumption of an
-       * STL <tt>std::map</tt> type with a
-       * certain number of
-       * elements?), this is only
-       * an estimate. however often
-       * quite close to the true
-       * value.
+  public:
+    /**
+     * This denotes the number of the
+     * data vector which shall be used
+     * for generating the height
+     * information. By default, the
+     * first data vector is taken,
+     * i.e. <tt>height_vector==0</tt>, if
+     * there is any data vector. If there
+     * is no data vector, no height
+     * information is generated.
      */
-      std::size_t memory_consumption () const;
+    unsigned int height_vector;
 
-    private:
+    /*
+     * Angles for the perspective view
+     */
+    int azimuth_angle, polar_angle;
+
+    unsigned int line_thickness;
+
+    /*
+     * Draw a margin of 5% around the plotted area
+     */
+    bool margin;
+
+    /*
+     * Draw a colorbar encoding the cell coloring
+     */
+    bool draw_colorbar;
+
+    /*
+     * Constructor.
+     */
+    SvgFlags(const unsigned int height_vector = 0,
+             const int azimuth_angle = 37,
+             const int polar_angle = 45,
+             const unsigned int line_thickness = 1,
+             const bool margin = true,
+             const bool draw_colorbar = true);
+
+    /**
+     * Determine an estimate for
+     * the memory consumption (in
+     * bytes) of this
+     * object. Since sometimes
+     * the size of objects can
+     * not be determined exactly
+     * (for example: what is the
+     * memory consumption of an
+     * STL <tt>std::map</tt> type with a
+     * certain number of
+     * elements?), this is only
+     * an estimate. however often
+     * quite close to the true
+     * value.
+    */
+    std::size_t memory_consumption () const;
+
+  private:
 
   };
 
@@ -1496,7 +1496,7 @@ public:
     vtu,
 
     /**
-     * Output in 
+     * Output in
      * SVG format.
      */
     svg,
@@ -1870,23 +1870,23 @@ public:
                               const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                               const VtkFlags                          &flags,
                               std::ostream                            &out);
-  
+
   /**
    * Write the given list of patches to the output stream in SVG format.
    *
-   * SVG (Scalable Vector Graphics) is an XML-based vector image format 
-   * developed and maintained by the World Wide Web Consortium (W3C). 
-   * This function conforms to the latest specification SVG 1.1, 
+   * SVG (Scalable Vector Graphics) is an XML-based vector image format
+   * developed and maintained by the World Wide Web Consortium (W3C).
+   * This function conforms to the latest specification SVG 1.1,
    * released on August 16, 2011. Controlling the graphic output is
-   * possible by setting or clearing the respective flags (see the 
-   * SvgFlags struct). At present, this format only supports output 
+   * possible by setting or clearing the respective flags (see the
+   * SvgFlags struct). At present, this format only supports output
    * for two-dimensional data, with values in the third direction
    * taken from a data vector.
-   * 
-   * For the output, each patch is subdivided into four triangles 
-   * which are then written as polygons and filled with a linear 
-   * color gradient. The arising coloring of the patches visualizes 
-   * the data values at the vertices taken from the specified data 
+   *
+   * For the output, each patch is subdivided into four triangles
+   * which are then written as polygons and filled with a linear
+   * color gradient. The arising coloring of the patches visualizes
+   * the data values at the vertices taken from the specified data
    * vector. A colorbar can be drawn to encode the coloring.
    *
    * @note Yet only implemented for two dimensions with an additional
@@ -1898,7 +1898,7 @@ public:
                          const std::vector<std_cxx1x::tuple<unsigned int, unsigned int, std::string> > &vector_data_ranges,
                          const SvgFlags                          &flags,
                          std::ostream                            &out);
-  
+
   /**
    * Write the given list of patches to the output stream in deal.II
    * intermediate format. This is not a format understood by any other
@@ -2129,19 +2129,19 @@ private:
 
 
   /**
-   * This function projects a three-dimensional point (Point<3> point) 
-   * onto a two-dimensional image plane, specified by the position of 
-   * the camera viewing system (Point<3> camera_position), camera 
-   * direction (Point<3> camera_position), camera horizontal (Point<3> 
-   * camera_horizontal, necessary for the correct alignment of the 
+   * This function projects a three-dimensional point (Point<3> point)
+   * onto a two-dimensional image plane, specified by the position of
+   * the camera viewing system (Point<3> camera_position), camera
+   * direction (Point<3> camera_position), camera horizontal (Point<3>
+   * camera_horizontal, necessary for the correct alignment of the
    * later images), and the focus of the camera (float camera_focus).
    *
    * For SVG output.
    */
-  static Point<2> svg_project_point(Point<3> point, 
-                                    Point<3> camera_position, 
-                                    Point<3> camera_direction, 
-                                    Point<3> camera_horizontal, 
+  static Point<2> svg_project_point(Point<3> point,
+                                    Point<3> camera_position,
+                                    Point<3> camera_direction,
+                                    Point<3> camera_horizontal,
                                     float camera_focus);
   /**
    * Function to compute the gradient parameters for
@@ -2681,7 +2681,7 @@ public:
    * in SVG format. See
    * DataOutBase::write_svg.
    */
-  void write_svg(std::ostream &out) const; 
+  void write_svg(std::ostream &out) const;
 
   /**
    * Obtain data through get_patches()

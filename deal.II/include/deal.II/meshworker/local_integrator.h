@@ -105,7 +105,7 @@ namespace MeshWorker
     * is to be used in the loop. Defaults to <tt>true</tt>.
     */
     bool use_face;
-    
+
     /**
      * This error is thrown if one of the virtual functions cell(),
      * boundary(), or face() is called without being overloaded in a

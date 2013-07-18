@@ -154,8 +154,8 @@ namespace PETScWrappers
     attained_ownership(true)
   {
     Assert( multithread_info.is_running_single_threaded(),
-        ExcMessage("PETSc does not support multi-threaded access, set "
-            "the thread limit to 1 in MPI_InitFinalize()."));
+            ExcMessage("PETSc does not support multi-threaded access, set "
+                       "the thread limit to 1 in MPI_InitFinalize()."));
   }
 
 
@@ -169,8 +169,8 @@ namespace PETScWrappers
     attained_ownership(true)
   {
     Assert( multithread_info.is_running_single_threaded(),
-        ExcMessage("PETSc does not support multi-threaded access, set "
-            "the thread limit to 1 in MPI_InitFinalize()."));
+            ExcMessage("PETSc does not support multi-threaded access, set "
+                       "the thread limit to 1 in MPI_InitFinalize()."));
 
     int ierr = VecDuplicate (v.vector, &vector);
     AssertThrow (ierr == 0, ExcPETScError(ierr));
@@ -190,8 +190,8 @@ namespace PETScWrappers
     attained_ownership(false)
   {
     Assert( multithread_info.is_running_single_threaded(),
-        ExcMessage("PETSc does not support multi-threaded access, set "
-            "the thread limit to 1 in MPI_InitFinalize()."));
+            ExcMessage("PETSc does not support multi-threaded access, set "
+                       "the thread limit to 1 in MPI_InitFinalize()."));
   }
 
 
@@ -269,7 +269,7 @@ namespace PETScWrappers
 
 
 
-  VectorBase::size_type 
+  VectorBase::size_type
   VectorBase::size () const
   {
     PetscInt sz;
@@ -281,7 +281,7 @@ namespace PETScWrappers
 
 
 
-  VectorBase::size_type 
+  VectorBase::size_type
   VectorBase::local_size () const
   {
     PetscInt sz;
@@ -469,13 +469,13 @@ namespace PETScWrappers
     return mean;
 
 #else // PETSC_USE_COMPLEX
-  Assert ((false),
-	  ExcMessage ("Your PETSc/SLEPc installation was configured with scalar-type complex "
-		      "but this function is not defined for complex types."));
+    Assert ((false),
+            ExcMessage ("Your PETSc/SLEPc installation was configured with scalar-type complex "
+                        "but this function is not defined for complex types."));
 
-  // Prevent compiler warning about no return value
-  PetscScalar dummy;
-  return dummy;
+    // Prevent compiler warning about no return value
+    PetscScalar dummy;
+    return dummy;
 #endif
   }
 

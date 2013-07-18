@@ -277,7 +277,7 @@ namespace Utilities
        * Returns the MPI communicator underlying the
        * partitioner object.
        */
-      const MPI_Comm& get_communicator() const;
+      const MPI_Comm &get_communicator() const;
 
       /**
        * Computes the memory consumption of this
@@ -290,7 +290,7 @@ namespace Utilities
        */
       DeclException2 (ExcIndexNotPresent,
                       types::global_dof_index,
-		      unsigned int,
+                      unsigned int,
                       << "Global index " << arg1
                       << " neither owned nor ghost on proc " << arg2);
 
@@ -413,7 +413,7 @@ namespace Utilities
     {
       types::global_dof_index size= local_range_data.second - local_range_data.first;
       Assert(size<=std::numeric_limits<unsigned int>::max(),
-	     ExcNotImplemented());
+             ExcNotImplemented());
       return static_cast<unsigned int>(size);
     }
 
@@ -574,7 +574,7 @@ namespace Utilities
 
 
     inline
-    const MPI_Comm&
+    const MPI_Comm &
     Partitioner::get_communicator() const
     {
       return communicator;

@@ -540,9 +540,9 @@ Tvmult_add (BlockVector<somenumber>       &dst,
           ExcDimensionMismatch(src.n_blocks(), n_block_rows()));
 
   for (unsigned int row=0; row<n_block_rows(); ++row)
-      for (unsigned int col=0; col<n_block_cols(); ++col)
-        block(row,col).Tvmult_add (dst.block(col),
-                                   src.block(row));
+    for (unsigned int col=0; col<n_block_cols(); ++col)
+      block(row,col).Tvmult_add (dst.block(col),
+                                 src.block(row));
 }
 
 

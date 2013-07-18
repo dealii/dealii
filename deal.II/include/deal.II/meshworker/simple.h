@@ -120,8 +120,8 @@ namespace MeshWorker
        */
       SmartPointer<const ConstraintMatrix,ResidualSimple<VECTOR> > constraints;
     };
-    
-    
+
+
     /**
      * Assemble local matrices into a single global matrix. If this global
      * matrix has a block structure, this structure is not used, but
@@ -515,8 +515,8 @@ namespace MeshWorker
     inline void
     ResidualSimple<MATRIX>::initialize_local_blocks(const BlockIndices &)
     {}
-    
-    
+
+
     template <class VECTOR>
     template <class DOFINFO>
     inline void
@@ -540,13 +540,13 @@ namespace MeshWorker
             }
           else
             {
-	      if (info.indices_by_block.size() == 0)
-		constraints->distribute_local_to_global(info.vector(k).block(0), info.indices, (*residuals(k)));
-	      else
-		for (unsigned int i=0;i != info.vector(k).n_blocks();++i)
-		  constraints->distribute_local_to_global(info.vector(k).block(i), info.indices_by_block[i], (*residuals(k)));
-	    }
-	}
+              if (info.indices_by_block.size() == 0)
+                constraints->distribute_local_to_global(info.vector(k).block(0), info.indices, (*residuals(k)));
+              else
+                for (unsigned int i=0; i != info.vector(k).n_blocks(); ++i)
+                  constraints->distribute_local_to_global(info.vector(k).block(i), info.indices_by_block[i], (*residuals(k)));
+            }
+        }
     }
 
     template <class VECTOR>
@@ -566,27 +566,27 @@ namespace MeshWorker
             }
           else
             {
-	      if (info1.indices_by_block.size() == 0 && info2.indices_by_block.size() == 0)
-		{
-		  constraints->distribute_local_to_global
-		    (info1.vector(k).block(0), info1.indices, (*residuals(k)));
-		  constraints->distribute_local_to_global
-		    (info2.vector(k).block(0), info2.indices, (*residuals(k)));
-		}
-	      else if (info1.indices_by_block.size() != 0 && info2.indices_by_block.size() != 0)
-		{
-		  for (unsigned int i=0;i<info1.vector(k).n_blocks();++i)
-		    {
-		      constraints->distribute_local_to_global
-			(info1.vector(k).block(i), info1.indices_by_block[i], (*residuals(k)));
-		      constraints->distribute_local_to_global
-			(info2.vector(k).block(i), info2.indices_by_block[i], (*residuals(k)));
-		    }
-		}
-	      else
-		{
-		  Assert(false, ExcNotImplemented());
-		}
+              if (info1.indices_by_block.size() == 0 && info2.indices_by_block.size() == 0)
+                {
+                  constraints->distribute_local_to_global
+                  (info1.vector(k).block(0), info1.indices, (*residuals(k)));
+                  constraints->distribute_local_to_global
+                  (info2.vector(k).block(0), info2.indices, (*residuals(k)));
+                }
+              else if (info1.indices_by_block.size() != 0 && info2.indices_by_block.size() != 0)
+                {
+                  for (unsigned int i=0; i<info1.vector(k).n_blocks(); ++i)
+                    {
+                      constraints->distribute_local_to_global
+                      (info1.vector(k).block(i), info1.indices_by_block[i], (*residuals(k)));
+                      constraints->distribute_local_to_global
+                      (info2.vector(k).block(i), info2.indices_by_block[i], (*residuals(k)));
+                    }
+                }
+              else
+                {
+                  Assert(false, ExcNotImplemented());
+                }
             }
         }
     }
@@ -726,9 +726,9 @@ namespace MeshWorker
                      info2.indices_by_block[row], info1.indices_by_block[column]);
           }
       else
-	{
-	  Assert(false, ExcNotImplemented());
-	}
+        {
+          Assert(false, ExcNotImplemented());
+        }
     }
 
 
@@ -971,17 +971,17 @@ namespace MeshWorker
           for (unsigned int j=0; j<i1.size(); ++j)
             for (unsigned int k=0; k<i2.size(); ++k)
               if (std::fabs(M(j,k)) >= threshold)
-		// Enter values into matrix only if j corresponds to a
-		// degree of freedom on the refinemenent edge, k does
-		// not, and both are not on the boundary. This is part
-		// the difference between the complete matrix with no
-		// boundary condition at the refinement edge and and
-		// the matrix assembled above by assemble().
-		
-		// Thus the logic is: enter the row if it is
-		// constrained by hanging node constraints (actually,
-		// the whole refinement edge), but not if it is
-		// constrained by a boundary constraint.
+                // Enter values into matrix only if j corresponds to a
+                // degree of freedom on the refinemenent edge, k does
+                // not, and both are not on the boundary. This is part
+                // the difference between the complete matrix with no
+                // boundary condition at the refinement edge and and
+                // the matrix assembled above by assemble().
+
+                // Thus the logic is: enter the row if it is
+                // constrained by hanging node constraints (actually,
+                // the whole refinement edge), but not if it is
+                // constrained by a boundary constraint.
                 if (mg_constrained_dofs->at_refinement_edge(level, i1[j]) &&
                     !mg_constrained_dofs->at_refinement_edge(level, i2[k]))
                   {

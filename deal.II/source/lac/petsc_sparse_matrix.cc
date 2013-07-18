@@ -197,7 +197,7 @@ namespace PETScWrappers
     // convert, unless we want to play dirty
     // tricks with conversions of pointers
     const std::vector<PetscInt>
-      int_row_lengths (row_lengths.begin(), row_lengths.end());
+    int_row_lengths (row_lengths.begin(), row_lengths.end());
 
     const int ierr
       = MatCreateSeqAIJ(PETSC_COMM_SELF, m, n, 0,

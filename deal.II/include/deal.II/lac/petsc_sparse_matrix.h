@@ -174,7 +174,7 @@ namespace PETScWrappers
      */
     template <typename SparsityType>
     explicit SparseMatrix (const SparsityType &sparsity_pattern,
-                  const bool          preset_nonzero_locations = true);
+                           const bool          preset_nonzero_locations = true);
 
     /**
      * This operator assigns a scalar to
@@ -214,7 +214,7 @@ namespace PETScWrappers
      * the constructor of this class with
      * the same argument list as the
      * present function.
-     */                           
+     */
     void reinit (const size_type               m,
                  const size_type               n,
                  const std::vector<size_type> &row_lengths,
@@ -333,7 +333,7 @@ namespace PETScWrappers
     /**
      * Purposefully not implemented
      */
-    SparseMatrix& operator= (const SparseMatrix &);
+    SparseMatrix &operator= (const SparseMatrix &);
 
     /**
      * Do the actual work for the

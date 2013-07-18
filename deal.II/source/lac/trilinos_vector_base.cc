@@ -31,7 +31,7 @@ namespace TrilinosWrappers
   {
 #ifndef DEAL_II_USE_LARGE_INDEX_TYPE
     // define a helper function that queries the global vector length of an
-    // Epetra_FEVector object  by calling either the 32- or 64-bit 
+    // Epetra_FEVector object  by calling either the 32- or 64-bit
     // function necessary.
     int global_length(const Epetra_FEVector &vector)
     {
@@ -39,7 +39,7 @@ namespace TrilinosWrappers
     }
 #else
     // define a helper function that queries the global vector length of an
-    // Epetra_FEVector object  by calling either the 32- or 64-bit 
+    // Epetra_FEVector object  by calling either the 32- or 64-bit
     // function necessary.
     long long int global_length(const Epetra_FEVector &vector)
     {
@@ -63,7 +63,7 @@ namespace TrilinosWrappers
       // we can use []. Note that we
       // can only get local values.
 
-      const TrilinosWrappers::types::int_type local_index = 
+      const TrilinosWrappers::types::int_type local_index =
         vector.vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
       Assert (local_index >= 0,
               ExcAccessToNonLocalElement (index,
@@ -191,7 +191,7 @@ namespace TrilinosWrappers
   {
     // Extract local indices in
     // the vector.
-    TrilinosWrappers::types::int_type trilinos_i = 
+    TrilinosWrappers::types::int_type trilinos_i =
       vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
     TrilinosScalar value = 0.;
 
@@ -220,7 +220,7 @@ namespace TrilinosWrappers
   {
     // Extract local indices in
     // the vector.
-    TrilinosWrappers::types::int_type trilinos_i = 
+    TrilinosWrappers::types::int_type trilinos_i =
       vector->Map().LID(static_cast<TrilinosWrappers::types::int_type>(index));
     TrilinosScalar value = 0.;
 
@@ -449,7 +449,7 @@ namespace TrilinosWrappers
     //entry.
     return sizeof(*this)
            + this->local_size()*( sizeof(double)+
-               sizeof(TrilinosWrappers::types::int_type) );
+                                  sizeof(TrilinosWrappers::types::int_type) );
   }
 
 } /* end of namespace TrilinosWrappers */

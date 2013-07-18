@@ -612,7 +612,7 @@ BlockList::initialize_vertex_patches_mg(
 
 
 inline
-BlockList::size_type 
+BlockList::size_type
 BlockList::size() const
 {
   return index_sets.size();
@@ -620,7 +620,7 @@ BlockList::size() const
 
 
 inline
-BlockList::size_type 
+BlockList::size_type
 BlockList::block_size(size_type block) const
 {
   return index_sets[block].size();
@@ -646,7 +646,7 @@ BlockList::end(size_type block) const
 
 
 inline
-BlockList::size_type 
+BlockList::size_type
 BlockList::local_index(size_type block, size_type index) const
 {
   AssertIndexRange(block, index_sets.size());

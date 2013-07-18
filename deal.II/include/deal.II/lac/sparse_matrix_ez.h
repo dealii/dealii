@@ -1138,7 +1138,7 @@ Accessor (const SparseMatrixEZ<number> *matrix,
 
 template <typename number>
 inline
-typename SparseMatrixEZ<number>::size_type 
+typename SparseMatrixEZ<number>::size_type
 SparseMatrixEZ<number>::const_iterator::Accessor::row() const
 {
   return a_row;
@@ -1147,7 +1147,7 @@ SparseMatrixEZ<number>::const_iterator::Accessor::row() const
 
 template <typename number>
 inline
-typename SparseMatrixEZ<number>::size_type 
+typename SparseMatrixEZ<number>::size_type
 SparseMatrixEZ<number>::const_iterator::Accessor::column() const
 {
   return matrix->data[matrix->row_info[a_row].start+a_index].column;
@@ -1628,7 +1628,7 @@ SparseMatrixEZ<number>::copy_from (const MATRIX &M)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
-          entry != end_row; ++entry)
+           entry != end_row; ++entry)
         if (entry->value() != 0)
           set(row, entry->column(), entry->value());
     }
@@ -1656,7 +1656,7 @@ SparseMatrixEZ<number>::add (const number factor,
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
-          entry != end_row; ++entry)
+           entry != end_row; ++entry)
         if (entry->value() != 0)
           add(row, entry->column(), factor * entry->value());
     }

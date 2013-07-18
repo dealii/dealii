@@ -2972,26 +2972,26 @@ namespace TrilinosWrappers
 
     Epetra_CombineMode mode = last_action;
     if (last_action == Zero)
-    {
-      if ((operation==::dealii::VectorOperation::add) ||
-          (operation==::dealii::VectorOperation::unknown))
-        mode = Add;
-      else if (operation==::dealii::VectorOperation::insert)
-        mode = Insert;
-    }
+      {
+        if ((operation==::dealii::VectorOperation::add) ||
+            (operation==::dealii::VectorOperation::unknown))
+          mode = Add;
+        else if (operation==::dealii::VectorOperation::insert)
+          mode = Insert;
+      }
     else
-    {
-      Assert(
+      {
+        Assert(
           ((last_action == Add) && (operation!=::dealii::VectorOperation::insert))
           ||
           ((last_action == Insert) && (operation!=::dealii::VectorOperation::add)),
           ExcMessage("operation and argument to compress() do not match"));
-    }
+      }
 
     // flush buffers
     int ierr;
     ierr = matrix->GlobalAssemble (*column_space_map, matrix->RowMap(),
-        true, mode);
+                                   true, mode);
 
     AssertThrow (ierr == 0, ExcTrilinosError(ierr));
 
@@ -3137,7 +3137,7 @@ namespace TrilinosWrappers
     if (elide_zero_values == false)
       {
         col_index_ptr = (TrilinosWrappers::types::int_type *)col_indices;
-        col_value_ptr = const_cast<TrilinosScalar*>(values);
+        col_value_ptr = const_cast<TrilinosScalar *>(values);
         n_columns = n_cols;
       }
     else
@@ -3187,9 +3187,9 @@ namespace TrilinosWrappers
         if (matrix->Filled() == false)
           {
             ierr = matrix->Epetra_CrsMatrix::InsertGlobalValues(
-                static_cast<TrilinosWrappers::types::int_type>(row), 
-                static_cast<int>(n_columns),const_cast<double *>(col_value_ptr), 
-                col_index_ptr);
+                     static_cast<TrilinosWrappers::types::int_type>(row),
+                     static_cast<int>(n_columns),const_cast<double *>(col_value_ptr),
+                     col_index_ptr);
 
             // When inserting elements, we do not want to create exceptions in
             // the case when inserting non-local data (since that's what we
@@ -3362,7 +3362,7 @@ namespace TrilinosWrappers
     if (elide_zero_values == false)
       {
         col_index_ptr = (TrilinosWrappers::types::int_type *)col_indices;
-        col_value_ptr = const_cast<TrilinosScalar*>(values);
+        col_value_ptr = const_cast<TrilinosScalar *>(values);
         n_columns = n_cols;
 #ifdef DEBUG
         for (size_type j=0; j<n_cols; ++j)
@@ -3674,9 +3674,9 @@ namespace TrilinosWrappers
                 ExcMessage ("Column map of matrix does not fit with vector map!"));
         Assert (out.vector_partitioner().SameAs(m.RangeMap()) == true,
                 ExcMessage ("Row map of matrix does not fit with vector map!"));
-		(void)m;
-		(void)in;
-		(void)out;
+        (void)m;
+        (void)in;
+        (void)out;
       }
     }
   }
@@ -3690,16 +3690,16 @@ namespace TrilinosWrappers
   {
     Assert (&src != &dst, ExcSourceEqualsDestination());
     Assert (matrix->Filled(), ExcMatrixNotCompressed());
-	(void)src;
-	(void)dst;
+    (void)src;
+    (void)dst;
 
     internal::SparseMatrix::check_vector_map_equality(*matrix, src, dst);
     const size_type dst_local_size = dst.end() - dst.begin();
     AssertDimension (dst_local_size, static_cast<size_type>(matrix->RangeMap().NumMyElements()));
-	(void)dst_local_size;
+    (void)dst_local_size;
     const size_type src_local_size = src.end() - src.begin();
     AssertDimension (src_local_size, static_cast<size_type>(matrix->DomainMap().NumMyElements()));
-	(void)src_local_size;
+    (void)src_local_size;
 
     Epetra_MultiVector tril_dst (View, matrix->RangeMap(), dst.begin(),
                                  matrix->DomainMap().NumMyPoints(), 1);
@@ -3713,7 +3713,7 @@ namespace TrilinosWrappers
   }
 
 
- 
+
   template <typename VectorType>
   inline
   void

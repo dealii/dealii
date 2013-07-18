@@ -71,9 +71,9 @@ namespace PETScWrappers
     void
     BlockSparseMatrix::
     reinit(const std::vector<IndexSet> &rows,
-        const std::vector<IndexSet> &cols,
-        const BlockCompressedSimpleSparsityPattern &bcsp,
-        const MPI_Comm &com)
+           const std::vector<IndexSet> &cols,
+           const BlockCompressedSimpleSparsityPattern &bcsp,
+           const MPI_Comm &com)
     {
       Assert(rows.size() == bcsp.n_block_rows(), ExcMessage("invalid size"));
       Assert(cols.size() == bcsp.n_block_cols(), ExcMessage("invalid size"));
@@ -81,31 +81,31 @@ namespace PETScWrappers
 
       clear();
       this->sub_objects.reinit (bcsp.n_block_rows(),
-          bcsp.n_block_cols());
+                                bcsp.n_block_cols());
 
       std::vector<types::global_dof_index> row_sizes;
       for (unsigned int r=0; r<bcsp.n_block_rows(); ++r)
-              row_sizes.push_back( bcsp.block(r,0).n_rows() );
+        row_sizes.push_back( bcsp.block(r,0).n_rows() );
       this->row_block_indices.reinit (row_sizes);
 
       std::vector<types::global_dof_index> col_sizes;
       for (unsigned int c=0; c<bcsp.n_block_cols(); ++c)
-              col_sizes.push_back( bcsp.block(0,c).n_cols() );
+        col_sizes.push_back( bcsp.block(0,c).n_cols() );
       this->column_block_indices.reinit (col_sizes);
 
       for (unsigned int r=0; r<this->n_block_rows(); ++r)
-         for (unsigned int c=0; c<this->n_block_cols(); ++c)
-           {
-             Assert(rows[r].size() == bcsp.block(r,c).n_rows(), ExcMessage("invalid size"));
-             Assert(cols[c].size() == bcsp.block(r,c).n_cols(), ExcMessage("invalid size"));
+        for (unsigned int c=0; c<this->n_block_cols(); ++c)
+          {
+            Assert(rows[r].size() == bcsp.block(r,c).n_rows(), ExcMessage("invalid size"));
+            Assert(cols[c].size() == bcsp.block(r,c).n_cols(), ExcMessage("invalid size"));
 
-             BlockType *p = new BlockType();
-             p->reinit(rows[r],
-                       cols[c],
-                       bcsp.block(r,c),
-                       com);
-             this->sub_objects[r][c] = p;
-           }
+            BlockType *p = new BlockType();
+            p->reinit(rows[r],
+                      cols[c],
+                      bcsp.block(r,c),
+                      com);
+            this->sub_objects[r][c] = p;
+          }
 
       collect_sizes();
     }
@@ -113,8 +113,8 @@ namespace PETScWrappers
     void
     BlockSparseMatrix::
     reinit(const std::vector<IndexSet> &sizes,
-        const BlockCompressedSimpleSparsityPattern &bcsp,
-        const MPI_Comm &com)
+           const BlockCompressedSimpleSparsityPattern &bcsp,
+           const MPI_Comm &com)
     {
       reinit(sizes, sizes, bcsp, com);
     }

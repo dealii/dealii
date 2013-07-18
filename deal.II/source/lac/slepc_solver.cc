@@ -110,8 +110,8 @@ namespace SLEPcWrappers
   }
 
   void
-  SolverBase::solve (const size_type  n_eigenpairs, 
-		     size_type *n_converged)
+  SolverBase::solve (const size_type  n_eigenpairs,
+                     size_type *n_converged)
   {
     int ierr;
 
@@ -158,7 +158,7 @@ namespace SLEPcWrappers
     // set target eigenvalues to solve for
     ierr = EPSSetTarget (solver_data->eps, target_eigenvalue);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
-    
+
     // set which portion of the eigenspectrum to solve for
     ierr = EPSSetWhichEigenpairs (solver_data->eps, set_which);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
@@ -227,8 +227,8 @@ namespace SLEPcWrappers
 
     // get converged eigenpair
     int ierr = EPSGetEigenpair (solver_data->eps, index,
-                                &eigenvalues, PETSC_NULL, 
-				eigenvectors, PETSC_NULL);
+                                &eigenvalues, PETSC_NULL,
+                                eigenvectors, PETSC_NULL);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
   }
 
@@ -242,11 +242,11 @@ namespace SLEPcWrappers
   {
 #ifndef PETSC_USE_COMPLEX
     AssertThrow (solver_data.get() != 0, ExcSLEPcWrappersUsageError());
-    
+
     // get converged eigenpair
     int ierr = EPSGetEigenpair (solver_data->eps, index,
-				&real_eigenvalues, &imag_eigenvalues, 
-				real_eigenvectors, imag_eigenvectors);
+                                &real_eigenvalues, &imag_eigenvalues,
+                                real_eigenvectors, imag_eigenvectors);
     AssertThrow (ierr == 0, ExcSLEPcError(ierr));
 #else
     Assert ((false),
@@ -495,8 +495,8 @@ namespace SLEPcWrappers
 
   /* ---------------------- LAPACK ------------------------- */
   SolverLAPACK::SolverLAPACK (SolverControl        &cn,
-			      const MPI_Comm       &mpi_communicator,
-			      const AdditionalData &data)
+                              const MPI_Comm       &mpi_communicator,
+                              const AdditionalData &data)
     :
     SolverBase (cn, mpi_communicator),
     additional_data (data)

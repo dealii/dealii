@@ -622,7 +622,7 @@ namespace parallel
       if (this->block(0).partitioner->n_mpi_processes() > 1)
         return Utilities::MPI::sum (local_result,
                                     this->block(0).partitioner->get_communicator())/
-          (real_type)this->size();
+               (real_type)this->size();
       else
         return local_result/(real_type)this->size();
     }

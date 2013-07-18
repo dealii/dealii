@@ -308,7 +308,7 @@ namespace PETScWrappers
        * Make a copy of the PETSc matrix @p other. It is assumed that both matrices have
        * the same SparsityPattern.
        */
-      void copy_from(const SparseMatrix & other);
+      void copy_from(const SparseMatrix &other);
 
       /**
        * Throw away the present matrix and
@@ -391,8 +391,8 @@ namespace PETScWrappers
        * Note that only contiguous IndexSets are supported.
        */
       template <typename SparsityType>
-      void reinit (const IndexSet & local_rows,
-                  const IndexSet & local_columns,
+      void reinit (const IndexSet &local_rows,
+                   const IndexSet &local_columns,
                    const SparsityType         &sparsity_pattern,
                    const MPI_Comm                  &communicator);
 
@@ -504,9 +504,9 @@ namespace PETScWrappers
        * Same as previous functions.
        */
       template <typename SparsityType>
-      void do_reinit (const IndexSet & local_rows,
-                      const IndexSet & local_columns,
-                       const SparsityType         &sparsity_pattern);
+      void do_reinit (const IndexSet &local_rows,
+                      const IndexSet &local_columns,
+                      const SparsityType         &sparsity_pattern);
 
       /**
        *  To allow calling protected

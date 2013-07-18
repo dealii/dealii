@@ -40,7 +40,7 @@ template <int dim> struct FunctionMap;
 class MGConstrainedDoFs : public Subscriptor
 {
 public:
-	
+
   typedef std::vector<std::set<types::global_dof_index> >::size_type size_dof;
   /**
    * Fill the internal data

@@ -589,9 +589,9 @@ namespace internal
                           const bool check_validity)
         {
           for (typename std::vector<typename DoFHandler<1,spacedim>::MGVertexDoFs>::iterator
-		 i=dof_handler.mg_vertex_dofs.begin();
+               i=dof_handler.mg_vertex_dofs.begin();
                i!=dof_handler.mg_vertex_dofs.end();
-	       ++i)
+               ++i)
             // if the present vertex lives on
             // the current level
             if ((i->get_coarsest_level() <= level) &&
@@ -611,9 +611,9 @@ namespace internal
 
 
           for (std::vector<types::global_dof_index>::iterator
-		 i=dof_handler.mg_levels[level]->dof_object.dofs.begin();
+               i=dof_handler.mg_levels[level]->dof_object.dofs.begin();
                i!=dof_handler.mg_levels[level]->dof_object.dofs.end();
-	       ++i)
+               ++i)
             {
               if (*i != DoFHandler<1>::invalid_dof_index)
                 {
@@ -846,8 +846,8 @@ namespace internal
         static
         void
         renumber_mg_dofs (const std::vector<dealii::types::global_dof_index> &,
-                          const IndexSet                  &,
-                          DoFHandler<3,spacedim>          &,
+                          const IndexSet &,
+                          DoFHandler<3,spacedim> &,
                           const unsigned int               ,
                           const bool                       )
         {
@@ -1327,7 +1327,7 @@ namespace internal
           const typename dealii::internal::p4est::types<dim>::quadrant &p4est_cell,
           const typename DoFHandler<dim,spacedim>::level_cell_iterator &dealii_cell,
           const typename dealii::internal::p4est::types<dim>::quadrant &quadrant,
-          dealii::types::global_dof_index* dofs,
+          dealii::types::global_dof_index *dofs,
           unsigned int level)
         {
           if (internal::p4est::quadrant_is_equal<dim>(p4est_cell, quadrant))
@@ -1582,10 +1582,10 @@ namespace internal
                 =reinterpret_cast<typename dealii::internal::p4est::types<dim>::quadrant *>(ptr);
               ptr+=cells*sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
               dealii::types::global_dof_index *dofs
-		= reinterpret_cast<dealii::types::global_dof_index*>(ptr);
+                = reinterpret_cast<dealii::types::global_dof_index *>(ptr);
 
-	      // the dofs pointer contains for each cell the number of dofs
-	      // on that cell (dofs[0]) followed by the dof indices itself.
+              // the dofs pointer contains for each cell the number of dofs
+              // on that cell (dofs[0]) followed by the dof indices itself.
               for (unsigned int c=0; c<cells; ++c, dofs+=1+dofs[0])
                 {
                   typename DoFHandler<dim,spacedim>::level_cell_iterator
@@ -1821,10 +1821,10 @@ namespace internal
                 =reinterpret_cast<typename dealii::internal::p4est::types<dim>::quadrant *>(ptr);
               ptr+=cells*sizeof(typename dealii::internal::p4est::types<dim>::quadrant);
               dealii::types::global_dof_index *dofs
-		= reinterpret_cast<dealii::types::global_dof_index*>(ptr);
+                = reinterpret_cast<dealii::types::global_dof_index *>(ptr);
 
-	      // the dofs pointer contains for each cell the number of dofs
-	      // on that cell (dofs[0]) followed by the dof indices itself.
+              // the dofs pointer contains for each cell the number of dofs
+              // on that cell (dofs[0]) followed by the dof indices itself.
               for (unsigned int c=0; c<cells; ++c, dofs+=1+dofs[0])
                 {
                   typename DoFHandler<dim,spacedim>::level_cell_iterator

@@ -535,7 +535,7 @@ namespace DoFRenumbering
   {
 //TODO: Merge with previous function
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(),
-                                           hp::DoFHandler<dim>::invalid_dof_index);
+                                                      hp::DoFHandler<dim>::invalid_dof_index);
 
     typename hp::DoFHandler<dim>::active_cell_iterator
     start = dof_handler.begin_active();
@@ -568,7 +568,7 @@ namespace DoFRenumbering
            ExcNotInitialized());
 
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(level),
-                                           DH::invalid_dof_index);
+                                                      DH::invalid_dof_index);
 
     typename DH::level_cell_iterator start =dof_handler.begin(level);
     typename DH::level_cell_iterator end = dof_handler.end(level);
@@ -761,10 +761,10 @@ namespace DoFRenumbering
                        Utilities::MPI::n_mpi_processes (tria->get_communicator()));
 
         MPI_Allgather ( &local_dof_count[0],
-			n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
-			&all_dof_counts[0],
                         n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
-			tria->get_communicator());
+                        &all_dof_counts[0],
+                        n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
+                        tria->get_communicator());
 
         for (unsigned int i=0; i<n_buckets; ++i)
           Assert (all_dof_counts[n_buckets*tria->locally_owned_subdomain()+i]
@@ -834,7 +834,7 @@ namespace DoFRenumbering
   block_wise (DoFHandler<dim,spacedim> &dof_handler)
   {
     std::vector<types::global_dof_index> renumbering (dof_handler.n_locally_owned_dofs(),
-                                           DoFHandler<dim>::invalid_dof_index);
+                                                      DoFHandler<dim>::invalid_dof_index);
 
     typename DoFHandler<dim,spacedim>::active_cell_iterator
     start = dof_handler.begin_active();
@@ -903,7 +903,7 @@ namespace DoFRenumbering
            ExcNotInitialized());
 
     std::vector<types::global_dof_index> renumbering (dof_handler.n_dofs(level),
-                                           DoFHandler<dim>::invalid_dof_index);
+                                                      DoFHandler<dim>::invalid_dof_index);
 
     typename DoFHandler<dim>::level_cell_iterator
     start =dof_handler.begin(level);
@@ -1058,13 +1058,13 @@ namespace DoFRenumbering
         all_dof_counts(fe_collection.n_components() *
                        Utilities::MPI::n_mpi_processes (tria->get_communicator()));
 
-	Assert (sizeof(types::global_dof_index) == sizeof(unsigned int),
-		ExcNotImplemented());
+        Assert (sizeof(types::global_dof_index) == sizeof(unsigned int),
+                ExcNotImplemented());
         MPI_Allgather ( &local_dof_count[0],
-			n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
-			&all_dof_counts[0],
                         n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
-			tria->get_communicator());
+                        &all_dof_counts[0],
+                        n_buckets, DEAL_II_DOF_INDEX_MPI_TYPE,
+                        tria->get_communicator());
 
         for (unsigned int i=0; i<n_buckets; ++i)
           Assert (all_dof_counts[n_buckets*tria->locally_owned_subdomain()+i]
@@ -1186,7 +1186,7 @@ namespace DoFRenumbering
   hierarchical (DoFHandler<dim> &dof_handler)
   {
     std::vector<types::global_dof_index> renumbering (dof_handler.n_locally_owned_dofs(),
-                                           DoFHandler<dim>::invalid_dof_index);
+                                                      DoFHandler<dim>::invalid_dof_index);
 
     typename DoFHandler<dim>::level_cell_iterator cell;
 
@@ -1279,7 +1279,7 @@ namespace DoFRenumbering
            ExcNotInitialized());
 
     std::vector<types::global_dof_index> renumbering(dof_handler.n_dofs(level),
-                                          DH::invalid_dof_index);
+                                                     DH::invalid_dof_index);
     compute_sort_selected_dofs_back(renumbering, dof_handler, selected_dofs, level);
 
     dof_handler.renumber_dofs(level, renumbering);

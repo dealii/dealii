@@ -177,7 +177,7 @@ public:
   /**
    * Enable output to a second stream <tt>o</tt>.
    *
-   * The optional argument @p print_job_id specifies whether 
+   * The optional argument @p print_job_id specifies whether
    */
   void attach (std::ostream &o,
                const bool    print_job_id = true);

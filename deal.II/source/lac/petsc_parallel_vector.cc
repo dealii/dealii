@@ -97,9 +97,9 @@ namespace PETScWrappers
 
 
     Vector::Vector (const IndexSet   &local,
-          const MPI_Comm     &communicator)
-    :
-          communicator (communicator)
+                    const MPI_Comm     &communicator)
+      :
+      communicator (communicator)
     {
       Assert(local.is_contiguous(), ExcNotImplemented());
       Vector::create_vector(local.size(), local.n_elements());
@@ -107,9 +107,9 @@ namespace PETScWrappers
 
 
     Vector::Vector (const MPI_Comm     &communicator,
-                     const IndexSet   &local)
-    :
-          communicator (communicator)
+                    const IndexSet   &local)
+      :
+      communicator (communicator)
     {
       Assert(local.is_contiguous(), ExcNotImplemented());
       Vector::create_vector(local.size(), local.n_elements());
@@ -218,7 +218,7 @@ namespace PETScWrappers
     Vector::operator = (const PETScWrappers::Vector &v)
     {
       Assert(last_action==VectorOperation::unknown,
-          ExcMessage("Call to compress() required before calling operator=."));
+             ExcMessage("Call to compress() required before calling operator=."));
       //TODO [TH]: can not access v.last_action here. Implement is_compressed()?
       //Assert(v.last_action==VectorOperation::unknown,
       //    ExcMessage("Call to compress() required before calling operator=."));

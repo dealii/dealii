@@ -614,7 +614,7 @@ namespace DoFTools
                       if (!cell->neighbor(face)->active()
                           ||
                           (cell->neighbor(face)->subdomain_id() !=
-                          cell->subdomain_id()))
+                           cell->subdomain_id()))
                         constraints.add_entries_local_to_global
                         (dofs_on_other_cell, dofs_on_this_cell,
                          sparsity, keep_constrained_dofs);
@@ -2893,9 +2893,9 @@ namespace DoFTools
           for (unsigned int i=0; i<dofs_per_face; ++i)
             if (!constraint_matrix.is_constrained(dofs_2[i]))
               if ((component_mask.n_selected_components(fe.n_components())
-		   == fe.n_components())
-		  ||
-		  component_mask[fe.face_system_to_component_index(i).first])
+                   == fe.n_components())
+                  ||
+                  component_mask[fe.face_system_to_component_index(i).first])
                 {
                   constraint_matrix.add_line(dofs_2[i]);
                   for (unsigned int jj=0; jj<dofs_per_face; ++jj)
@@ -4509,7 +4509,7 @@ namespace DoFTools
     const unsigned int n_components = dof_handler.get_fe().n_components();
 
     std::fill (dofs_per_component.begin(), dofs_per_component.end(),
-	       types::global_dof_index(0));
+               types::global_dof_index(0));
 
     // If the empty vector was given as default argument, set up this
     // vector as identity.
@@ -4560,7 +4560,7 @@ namespace DoFTools
             ||
             (std::accumulate (dofs_per_component.begin(),
                               dofs_per_component.end(),
-			      types::global_dof_index(0))
+                              types::global_dof_index(0))
              == dof_handler.n_locally_owned_dofs()),
             ExcInternalError());
 
@@ -4577,7 +4577,7 @@ namespace DoFTools
 
         MPI_Allreduce ( &local_dof_count[0], &dofs_per_component[0], n_target_components,
                         DEAL_II_DOF_INDEX_MPI_TYPE,
-			MPI_SUM, tria->get_communicator());
+                        MPI_SUM, tria->get_communicator());
       }
 #endif
   }
@@ -4600,7 +4600,7 @@ namespace DoFTools
       {
         const FiniteElement<DH::dimension,DH::space_dimension> &fe = fe_collection[this_fe];
         std::fill (dofs_per_block.begin(), dofs_per_block.end(),
-		   types::global_dof_index(0));
+                   types::global_dof_index(0));
 
         // If the empty vector was given as default argument, set up this
         // vector as identity.
@@ -4652,9 +4652,9 @@ namespace DoFTools
           {
             std::vector<types::global_dof_index> local_dof_count = dofs_per_block;
             MPI_Allreduce ( &local_dof_count[0], &dofs_per_block[0],
-			    n_target_blocks,
+                            n_target_blocks,
                             DEAL_II_DOF_INDEX_MPI_TYPE,
-			    MPI_SUM, tria->get_communicator());
+                            MPI_SUM, tria->get_communicator());
           }
 #endif
 #endif
@@ -4813,7 +4813,7 @@ namespace DoFTools
                         if (global_parameter_representation(i) != 0)
                           {
                             const types::global_dof_index wi = parameter_dof_indices[local_dof],
-			      wj = weight_mapping[i];
+                                                          wj = weight_mapping[i];
                             weights[wi][wj] = global_parameter_representation(i);
                           };
                       }
@@ -4895,7 +4895,7 @@ namespace DoFTools
 
         // global numbers of dofs
         const types::global_dof_index n_coarse_dofs = coarse_grid.n_dofs(),
-	  n_fine_dofs   = fine_grid.n_dofs();
+                                      n_fine_dofs   = fine_grid.n_dofs();
 
         // local numbers of dofs
         const unsigned int fine_dofs_per_cell   = fine_fe.dofs_per_cell;
@@ -5134,7 +5134,7 @@ namespace DoFTools
 
     // global numbers of dofs
     const types::global_dof_index n_coarse_dofs = coarse_grid.n_dofs(),
-                       n_fine_dofs   = fine_grid.n_dofs();
+                                  n_fine_dofs   = fine_grid.n_dofs();
 
 
     // get an array in which we store which dof on the coarse grid is a
@@ -5249,7 +5249,7 @@ namespace DoFTools
               j = weights[row].find(col);
               if ((j != weights[row].end()) && (j->second != 0))
                 constraint_line.push_back (std::pair<types::global_dof_index,double>(representants[row],
-                                                                                     j->second));
+                                           j->second));
             };
 
           constraints.add_entries (global_dof, constraint_line);
@@ -5309,7 +5309,7 @@ namespace DoFTools
 
     // first construct the inverse mapping of weight_mapping
     std::vector<types::global_dof_index> inverse_weight_mapping (n_global_parm_dofs,
-                                                      DoFHandler<dim,spacedim>::invalid_dof_index);
+        DoFHandler<dim,spacedim>::invalid_dof_index);
     for (types::global_dof_index i=0; i<weight_mapping.size(); ++i)
       {
         const types::global_dof_index parameter_dof = weight_mapping[i];

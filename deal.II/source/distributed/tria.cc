@@ -1462,7 +1462,7 @@ namespace
         void *ptr = static_cast<char *>(q->p.user_data) + offset;
         typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus
         status = * static_cast<
-                 typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus*
+                 typename parallel::distributed::Triangulation<dim,spacedim>::CellStatus *
                  >(q->p.user_data);
         switch (status)
           {
@@ -2863,12 +2863,12 @@ namespace parallel
       // do not allow anisotropic refinement
 #ifdef DEBUG
       for (typename Triangulation<dim,spacedim>::active_cell_iterator
-                 cell = this->begin_active();
-                 cell != this->end(); ++cell)
-              if (cell->is_locally_owned() && cell->refine_flag_set())
-                  Assert (cell->refine_flag_set() ==
-                          RefinementPossibilities<dim>::isotropic_refinement,
-                          ExcMessage ("This class does not support anisotropic refinement"));
+           cell = this->begin_active();
+           cell != this->end(); ++cell)
+        if (cell->is_locally_owned() && cell->refine_flag_set())
+          Assert (cell->refine_flag_set() ==
+                  RefinementPossibilities<dim>::isotropic_refinement,
+                  ExcMessage ("This class does not support anisotropic refinement"));
 #endif
 
 
@@ -2876,11 +2876,11 @@ namespace parallel
       if (this->n_levels()==dealii::internal::p4est::functions<dim>::max_level)
         {
           for (typename Triangulation<dim,spacedim>::active_cell_iterator
-                     cell = this->begin_active(dealii::internal::p4est::functions<dim>::max_level-1);
-                     cell != this->end(dealii::internal::p4est::functions<dim>::max_level-1); ++cell)
+               cell = this->begin_active(dealii::internal::p4est::functions<dim>::max_level-1);
+               cell != this->end(dealii::internal::p4est::functions<dim>::max_level-1); ++cell)
             {
               AssertThrow(!(cell->refine_flag_set()),
-                  ExcMessage("Fatal Error: maximum refinement level of p4est reached."));
+                          ExcMessage("Fatal Error: maximum refinement level of p4est reached."));
             }
         }
 
@@ -3247,8 +3247,8 @@ namespace parallel
       try
         {
           dealii::Triangulation<dim,spacedim>::
-            copy_triangulation (old_tria);
-	}
+          copy_triangulation (old_tria);
+        }
       catch (const typename dealii::Triangulation<dim,spacedim>::DistortedCellList &)
         {
           // the underlying
@@ -3270,7 +3270,7 @@ namespace parallel
                           "if they are not refined!"));
 
       if (const dealii::parallel::distributed::Triangulation<dim,spacedim> *
-	  old_tria_x = dynamic_cast<const dealii::parallel::distributed::Triangulation<dim,spacedim> *>(&old_tria))
+          old_tria_x = dynamic_cast<const dealii::parallel::distributed::Triangulation<dim,spacedim> *>(&old_tria))
         {
           Assert (!old_tria_x->refinement_in_progress,
                   ExcMessage ("Parallel distributed triangulations can only "

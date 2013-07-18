@@ -66,7 +66,7 @@ namespace internals
      * the copy_from() function, if the inner iterator type points to plain
      * unsigned integers.
      */
-    size_type 
+    size_type
     get_column_index_from_iterator (const size_type i);
 
     /**
@@ -75,7 +75,7 @@ namespace internals
      * unsigned integers and some other value.
      */
     template <typename value>
-    size_type 
+    size_type
     get_column_index_from_iterator (const std::pair<size_type, value> &i);
 
     /**
@@ -84,7 +84,7 @@ namespace internals
      * <tt>std::map</tt>).
      */
     template <typename value>
-    size_type 
+    size_type
     get_column_index_from_iterator (const std::pair<const size_type, value> &i);
 
   }
@@ -1493,12 +1493,12 @@ namespace SparsityPatternIterators
 
 
   inline
-  size_type 
+  size_type
   Accessor::row() const
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
 
-    const std::size_t * insert_point =
+    const std::size_t *insert_point =
       std::upper_bound(sparsity_pattern->rowstart,
                        sparsity_pattern->rowstart + sparsity_pattern->rows + 1,
                        index_within_sparsity);
@@ -1507,7 +1507,7 @@ namespace SparsityPatternIterators
 
 
   inline
-  size_type 
+  size_type
   Accessor::column() const
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
@@ -1517,7 +1517,7 @@ namespace SparsityPatternIterators
 
 
   inline
-  size_type 
+  size_type
   Accessor::index() const
   {
     Assert (is_valid_entry() == true, ExcInvalidIterator());
@@ -1715,7 +1715,7 @@ SparsityPattern::row_end (const size_type r) const
 
 
 inline
-SparsityPattern::size_type 
+SparsityPattern::size_type
 SparsityPattern::n_rows () const
 {
   return rows;
@@ -1723,7 +1723,7 @@ SparsityPattern::n_rows () const
 
 
 inline
-SparsityPattern::size_type 
+SparsityPattern::size_type
 SparsityPattern::n_cols () const
 {
   return cols;
@@ -1782,7 +1782,7 @@ SparsityPattern::row_length (const size_type row) const
 
 
 inline
-SparsityPattern::size_type 
+SparsityPattern::size_type
 SparsityPattern::column_number (const size_type row,
                                 const unsigned int index) const
 {
@@ -1869,14 +1869,14 @@ SparsityPattern::operator == (const SparsityPattern &sp2)  const
 namespace internal
 {
   namespace SparsityPatternTools
-  { 
+  {
     /**
      * Declare type for container size.
      */
-    typedef types::global_dof_index size_type;       
-   
+    typedef types::global_dof_index size_type;
+
     inline
-    size_type 
+    size_type
     get_column_index_from_iterator (const size_type i)
     {
       return i;
@@ -1886,7 +1886,7 @@ namespace internal
 
     template <typename value>
     inline
-    size_type 
+    size_type
     get_column_index_from_iterator (const std::pair<size_type, value> &i)
     {
       return i.first;
@@ -1896,7 +1896,7 @@ namespace internal
 
     template <typename value>
     inline
-    size_type 
+    size_type
     get_column_index_from_iterator (const std::pair<const size_type, value> &i)
     {
       return i.first;

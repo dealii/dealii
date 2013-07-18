@@ -1011,7 +1011,7 @@ FE_Q_Base<POLY,dim,spacedim>::initialize_constraints (const std::vector<Point<1>
 
 
 template <class POLY, int dim, int spacedim>
-const FullMatrix<double>&
+const FullMatrix<double> &
 FE_Q_Base<POLY,dim,spacedim>
 ::get_prolongation_matrix (const unsigned int child,
                            const RefinementCase<dim> &refinement_case) const
@@ -1066,7 +1066,7 @@ FE_Q_Base<POLY,dim,spacedim>
       // almost negligible also for high order elements
       const unsigned int dofs1d = this->degree+1;
       std::vector<Table<2,double> >
-        subcell_evaluations (dim, Table<2,double>(dofs1d, dofs1d));
+      subcell_evaluations (dim, Table<2,double>(dofs1d, dofs1d));
       const std::vector<unsigned int> &index_map_inverse =
         this->poly_space.get_numbering_inverse();
 
@@ -1188,7 +1188,7 @@ FE_Q_Base<POLY,dim,spacedim>
 
 
 template <class POLY, int dim, int spacedim>
-const FullMatrix<double>&
+const FullMatrix<double> &
 FE_Q_Base<POLY,dim,spacedim>
 ::get_restriction_matrix (const unsigned int child,
                           const RefinementCase<dim> &refinement_case) const

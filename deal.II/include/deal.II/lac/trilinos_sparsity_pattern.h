@@ -1661,8 +1661,8 @@ namespace TrilinosWrappers
     // from it which we can by evaluating an expression such as when
     // multiplying the value produced by 2
     Assert (sizeof(TrilinosWrappers::types::int_type) ==
-	    sizeof((*begin)*2),
-	    ExcNotImplemented());
+            sizeof((*begin)*2),
+            ExcNotImplemented());
 
     TrilinosWrappers::types::int_type *col_index_ptr =
       (TrilinosWrappers::types::int_type *)(&*begin);

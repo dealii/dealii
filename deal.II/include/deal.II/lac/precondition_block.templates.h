@@ -863,8 +863,8 @@ void PreconditionBlockSOR<MATRIX,inverse_type>::backward (
             {
               const size_type column = entry->column();
               const size_type inverse_permuted_column = permuted
-                                                           ? this->inverse_permutation[column]
-                                                           : column;
+                                                        ? this->inverse_permutation[column]
+                                                        : column;
               if (inverse_permuted_column >= block_end)
                 b_cell_row -= entry->value() * dst(column);
               else if (!this->inverses_ready() && column >= block_start)

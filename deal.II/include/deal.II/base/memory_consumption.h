@@ -472,7 +472,7 @@ namespace MemoryConsumption
   {
     return sizeof(int);
   }
-  
+
 
 
   inline
@@ -481,7 +481,7 @@ namespace MemoryConsumption
     return sizeof(unsigned int);
   }
 
-  
+
 
   inline
   std::size_t memory_consumption (const unsigned long long int)

@@ -136,10 +136,10 @@ public:
                  int, char *, std::string &,
                  << "Object of class " << arg2
                  << " is still used by " << arg1 << " other objects.\n"
-		 << "(Additional information: " << arg3 << ")\n"
-		 << "Note the entry in the Frequently Asked Questions of "
-		 << "deal.II (linked to from http://www.dealii.org/) for "
-		 << "more information on what this error means.");
+                 << "(Additional information: " << arg3 << ")\n"
+                 << "Note the entry in the Frequently Asked Questions of "
+                 << "deal.II (linked to from http://www.dealii.org/) for "
+                 << "more information on what this error means.");
 
   /**
    * A subscriber with the

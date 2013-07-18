@@ -320,7 +320,7 @@ namespace Step50
     deallog  << std::endl;
 
     DoFTools::extract_locally_relevant_dofs (mg_dof_handler,
-        locally_relevant_set);
+                                             locally_relevant_set);
 
 
     //solution.reinit (mg_dof_handler.n_dofs());
@@ -431,14 +431,14 @@ namespace Step50
         MGTools::make_sparsity_pattern(mg_dof_handler, csp, level);
 
         mg_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
-            mg_dof_handler.locally_owned_mg_dofs(level),
-            csp,
-            MPI_COMM_WORLD, true);
+                                  mg_dof_handler.locally_owned_mg_dofs(level),
+                                  csp,
+                                  MPI_COMM_WORLD, true);
 
         mg_interface_matrices[level].reinit(mg_dof_handler.locally_owned_mg_dofs(level),
-            mg_dof_handler.locally_owned_mg_dofs(level),
-            csp,
-            MPI_COMM_WORLD, true);
+                                            mg_dof_handler.locally_owned_mg_dofs(level),
+                                            csp,
+                                            MPI_COMM_WORLD, true);
       }
   }
 
@@ -703,7 +703,7 @@ namespace Step50
                                        mg_interface_matrices[cell->level()]);
         }
 
-    for (unsigned int i=0;i<triangulation.n_global_levels();++i)
+    for (unsigned int i=0; i<triangulation.n_global_levels(); ++i)
       {
         mg_matrices[i].compress(VectorOperation::add);
         mg_interface_matrices[i].compress(VectorOperation::add);
@@ -750,7 +750,7 @@ namespace Step50
     // argument.
     mg_transfer.build_matrices(mg_dof_handler);
 
-    matrix_t & coarse_matrix = mg_matrices[0];
+    matrix_t &coarse_matrix = mg_matrices[0];
     //coarse_matrix.copy_from (mg_matrices[0]);
     //MGCoarseGridHouseholder<double,vector_t> coarse_grid_solver;
     //coarse_grid_solver.initialize (coarse_matrix);
@@ -841,28 +841,28 @@ namespace Step50
 
     if (false)
       {
-	// code to optionally compare to Trilinos ML
-	TrilinosWrappers::PreconditionAMG prec;
-	
-    TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
-    //    Amg_data.constant_modes = constant_modes;
-    Amg_data.elliptic = true;
-    Amg_data.higher_order_elements = true;
-    Amg_data.smoother_sweeps = 2;
-    Amg_data.aggregation_threshold = 0.02;
-    // Amg_data.symmetric = true;
+        // code to optionally compare to Trilinos ML
+        TrilinosWrappers::PreconditionAMG prec;
 
-    prec.initialize (system_matrix,
-                                    Amg_data);
-    cg.solve (system_matrix, solution, system_rhs,
-              prec);
+        TrilinosWrappers::PreconditionAMG::AdditionalData Amg_data;
+        //    Amg_data.constant_modes = constant_modes;
+        Amg_data.elliptic = true;
+        Amg_data.higher_order_elements = true;
+        Amg_data.smoother_sweeps = 2;
+        Amg_data.aggregation_threshold = 0.02;
+        // Amg_data.symmetric = true;
+
+        prec.initialize (system_matrix,
+                         Amg_data);
+        cg.solve (system_matrix, solution, system_rhs,
+                  prec);
       }
     else
       {
-    cg.solve (system_matrix, solution, system_rhs,
-              preconditioner);
+        cg.solve (system_matrix, solution, system_rhs,
+                  preconditioner);
       }
-    
+
     constraints.distribute (solution);
   }
 
@@ -894,16 +894,16 @@ namespace Step50
     TrilinosWrappers::MPI::Vector temp_solution;
     temp_solution.reinit(locally_relevant_set, MPI_COMM_WORLD);
     temp_solution = solution;
-    
+
     KellyErrorEstimator<dim>::estimate (static_cast<DoFHandler<dim>&>(mg_dof_handler),
                                         QGauss<dim-1>(3),
                                         typename FunctionMap<dim>::type(),
                                         temp_solution,
                                         estimated_error_per_cell);
     parallel::distributed::GridRefinement::
-      refine_and_coarsen_fixed_fraction (triangulation,
-					 estimated_error_per_cell,
-					 0.3, 0.03);
+    refine_and_coarsen_fixed_fraction (triangulation,
+                                       estimated_error_per_cell,
+                                       0.3, 0.03);
     triangulation.execute_coarsening_and_refinement ();
   }
 
@@ -993,7 +993,7 @@ namespace Step50
             triangulation.refine_global (3);
           }
         else
-	   refine_grid ();
+          refine_grid ();
 
         deallog << "   Number of active cells:       "
                 << triangulation.n_global_active_cells()

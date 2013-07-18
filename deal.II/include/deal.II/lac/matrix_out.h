@@ -391,7 +391,7 @@ MatrixOut::build_patches (const Matrix      &matrix,
                           const std::string &name,
                           const Options      options)
 {
-  size_type 
+  size_type
   gridpoints_x = (matrix.n() / options.block_size
                   +
                   (matrix.n() % options.block_size != 0 ? 1 : 0)),

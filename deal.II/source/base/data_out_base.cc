@@ -2222,17 +2222,17 @@ DataOutBase::VtkFlags::memory_consumption () const
 
 
 DataOutBase::SvgFlags::SvgFlags (const unsigned int height_vector,
-                                 const int azimuth_angle, 
+                                 const int azimuth_angle,
                                  const int polar_angle,
                                  const unsigned int line_thickness,
                                  const bool margin,
                                  const bool draw_colorbar) :
-height_vector(height_vector),
-azimuth_angle(azimuth_angle),
-polar_angle(polar_angle),
-line_thickness(line_thickness),
-margin(margin),
-draw_colorbar(draw_colorbar)
+  height_vector(height_vector),
+  azimuth_angle(azimuth_angle),
+  polar_angle(polar_angle),
+  line_thickness(line_thickness),
+  margin(margin),
+  draw_colorbar(draw_colorbar)
 {}
 
 
@@ -2545,17 +2545,17 @@ Point<6> DataOutBase::svg_get_gradient_parameters(Point<3> points[])
   int i, j;
 
   for (i = 0; i < 2; ++i)
-  {
-    for (j = 0; j < 2-i; ++j)
     {
-      if (points[j][2] > points[j + 1][2])
-      {
-        Point<3> temp = points[j];
-        points[j] = points[j+1];
-        points[j+1] = temp;
-      }
+      for (j = 0; j < 2-i; ++j)
+        {
+          if (points[j][2] > points[j + 1][2])
+            {
+              Point<3> temp = points[j];
+              points[j] = points[j+1];
+              points[j+1] = temp;
+            }
+        }
     }
-  }
 
   // save the related three-dimensional vectors v_min, v_inter, and v_max
   v_min = points[0];
@@ -2578,47 +2578,47 @@ Point<6> DataOutBase::svg_get_gradient_parameters(Point<3> points[])
   bool col_change = false;
 
   if (A[0][0] == 0)
-  {
-    col_change = true;
-
-    A[0][0] = A[0][1];
-    A[0][1] = 0;
-
-    double temp = A[1][0];
-    A[1][0] = A[1][1];
-    A[1][1] = temp;
-  }
-
-  for (unsigned int k = 0; k < 1; k++) 
-  {
-    for (unsigned int i = k+1; i < 2; i++) 
     {
-      x = A[i][k] / A[k][k];
+      col_change = true;
 
-      for (unsigned int j = k+1; j < 2; j++) A[i][j] = A[i][j] - A[k][j] * x;
+      A[0][0] = A[0][1];
+      A[0][1] = 0;
 
-      b[i] = b[i] - b[k]*x;
-
+      double temp = A[1][0];
+      A[1][0] = A[1][1];
+      A[1][1] = temp;
     }
-  }
+
+  for (unsigned int k = 0; k < 1; k++)
+    {
+      for (unsigned int i = k+1; i < 2; i++)
+        {
+          x = A[i][k] / A[k][k];
+
+          for (unsigned int j = k+1; j < 2; j++) A[i][j] = A[i][j] - A[k][j] * x;
+
+          b[i] = b[i] - b[k]*x;
+
+        }
+    }
 
   b[1] = b[1] / A[1][1];
 
-  for (int i = 0; i >= 0; i--) 
-  {
-    sum = b[i];
+  for (int i = 0; i >= 0; i--)
+    {
+      sum = b[i];
 
-    for (unsigned int j = i+1; j < 2; j++) sum = sum - A[i][j] * b[j];
+      for (unsigned int j = i+1; j < 2; j++) sum = sum - A[i][j] * b[j];
 
-    b[i] = sum / A[i][i];
-  }
+      b[i] = sum / A[i][i];
+    }
 
   if (col_change)
-  {
-    double temp = b[0];
-    b[0] = b[1];
-    b[1] = temp;
-  }
+    {
+      double temp = b[0];
+      b[0] = b[1];
+      b[1] = temp;
+    }
 
   double c = b[0] * (v_max[2] - v_min[2]) + b[1] * (v_inter[2] - v_min[2]) + v_min[2];
 
@@ -2634,47 +2634,47 @@ Point<6> DataOutBase::svg_get_gradient_parameters(Point<3> points[])
   col_change = false;
 
   if (A[0][0] == 0)
-  {
-    col_change = true;
-
-    A[0][0] = A[0][1];
-    A[0][1] = 0;
-
-    double temp = A[1][0];
-    A[1][0] = A[1][1];
-    A[1][1] = temp;
-  }
-
-  for (unsigned int k = 0; k < 1; k++) 
-  {
-    for (unsigned int i = k+1; i < 2; i++) 
     {
-      x = A[i][k] / A[k][k];
+      col_change = true;
 
-      for (unsigned int j = k+1; j < 2; j++) A[i][j] = A[i][j] - A[k][j] * x;
+      A[0][0] = A[0][1];
+      A[0][1] = 0;
 
-      b[i] = b[i] - b[k] * x;
-
+      double temp = A[1][0];
+      A[1][0] = A[1][1];
+      A[1][1] = temp;
     }
-  }
+
+  for (unsigned int k = 0; k < 1; k++)
+    {
+      for (unsigned int i = k+1; i < 2; i++)
+        {
+          x = A[i][k] / A[k][k];
+
+          for (unsigned int j = k+1; j < 2; j++) A[i][j] = A[i][j] - A[k][j] * x;
+
+          b[i] = b[i] - b[k] * x;
+
+        }
+    }
 
   b[1]=b[1] / A[1][1];
 
-  for (int i = 0; i >= 0; i--) 
-  {
-    sum = b[i];
+  for (int i = 0; i >= 0; i--)
+    {
+      sum = b[i];
 
-    for (unsigned int j = i+1; j < 2; j++) sum = sum - A[i][j]*b[j];
+      for (unsigned int j = i+1; j < 2; j++) sum = sum - A[i][j]*b[j];
 
-    b[i] = sum / A[i][i];
-  }
+      b[i] = sum / A[i][i];
+    }
 
   if (col_change)
-  {
-    double temp = b[0];
-    b[0] = b[1];
-    b[1] = temp;
-  }
+    {
+      double temp = b[0];
+      b[0] = b[1];
+      b[1] = temp;
+    }
 
   gradient[0] = b[0] * (v_max[2] - v_min[2]) + b[1] * (v_inter[2] - v_min[2]) - c + v_min[2];
 
@@ -2690,46 +2690,46 @@ Point<6> DataOutBase::svg_get_gradient_parameters(Point<3> points[])
   col_change = false;
 
   if (A[0][0] == 0)
-  {
-    col_change = true;
-
-    A[0][0] = A[0][1];
-    A[0][1] = 0;
-
-    double temp = A[1][0];
-    A[1][0] = A[1][1];
-    A[1][1] = temp;
-  }
-
-  for (unsigned int k = 0; k < 1; k++) 
-  {
-    for (unsigned int i = k+1; i < 2; i++) 
     {
-      x = A[i][k] / A[k][k];
+      col_change = true;
 
-      for (unsigned int j = k+1; j < 2; j++) A[i][j] = A[i][j] - A[k][j] * x;
+      A[0][0] = A[0][1];
+      A[0][1] = 0;
 
-      b[i] = b[i] - b[k] * x;
+      double temp = A[1][0];
+      A[1][0] = A[1][1];
+      A[1][1] = temp;
     }
-  }
+
+  for (unsigned int k = 0; k < 1; k++)
+    {
+      for (unsigned int i = k+1; i < 2; i++)
+        {
+          x = A[i][k] / A[k][k];
+
+          for (unsigned int j = k+1; j < 2; j++) A[i][j] = A[i][j] - A[k][j] * x;
+
+          b[i] = b[i] - b[k] * x;
+        }
+    }
 
   b[1] = b[1] / A[1][1];
 
-  for (int i = 0; i >= 0; i--) 
-  {
-    sum = b[i];
+  for (int i = 0; i >= 0; i--)
+    {
+      sum = b[i];
 
-    for (unsigned int j = i+1; j < 2; j++) sum = sum - A[i][j] * b[j];
+      for (unsigned int j = i+1; j < 2; j++) sum = sum - A[i][j] * b[j];
 
-    b[i] = sum / A[i][i];
-  }
+      b[i] = sum / A[i][i];
+    }
 
   if (col_change)
-  {
-    double temp = b[0];
-    b[0] = b[1];
-    b[1] = temp;
-  }
+    {
+      double temp = b[0];
+      b[0] = b[1];
+      b[1] = temp;
+    }
 
   gradient[1] = b[0] * (v_max[2] - v_min[2]) + b[1] * (v_inter[2] - v_min[2]) - c + v_min[2];
 
@@ -2744,7 +2744,7 @@ Point<6> DataOutBase::svg_get_gradient_parameters(Point<3> points[])
 
   gradient_parameters[0] = v_min[0];
   gradient_parameters[1] = v_min[1];
-  
+
   gradient_parameters[2] = v_min[0] + lambda * gradient[0];
   gradient_parameters[3] = v_min[1] + lambda * gradient[1];
 
@@ -5333,7 +5333,7 @@ void DataOutBase::write_vtu_main (const std::vector<Patch<dim,spacedim> > &patch
 
     if (n_metadata > 0)
       out << "</FieldData>\n";
-}
+  }
 
 
   VtuStream vtu_out(out, flags);
@@ -5606,7 +5606,7 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
 
   // margin around the plotted area
   unsigned int margin_in_percent = 0;
-  if(flags.margin) margin_in_percent = 5;
+  if (flags.margin) margin_in_percent = 5;
 
 
 // determine the bounding box in the model space
@@ -5627,8 +5627,8 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
   Point<2> projection_decomposition;
   Point<2> projection_decompositions[4];
 
-  compute_node(projected_point, &*patch, 0, 0, 0, n_subdivisions); 
- 
+  compute_node(projected_point, &*patch, 0, 0, 0, n_subdivisions);
+
   Assert ((flags.height_vector < patch->data.n_rows()) ||
           patch->data.n_rows() == 0,
           ExcIndexRange (flags.height_vector, 0, patch->data.n_rows()));
@@ -5642,55 +5642,55 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
 
   // iterate over the patches
   for (; patch != patches.end(); ++patch)
-  {
-    n_subdivisions = patch->n_subdivisions;
-    n = n_subdivisions + 1;
+    {
+      n_subdivisions = patch->n_subdivisions;
+      n = n_subdivisions + 1;
 
-    for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
-    {  
-      for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
-      {
-        compute_node(projected_points[0], &*patch, i1, i2, 0, n_subdivisions);
-        compute_node(projected_points[1], &*patch, i1+1, i2, 0, n_subdivisions);
-        compute_node(projected_points[2], &*patch, i1, i2+1, 0, n_subdivisions);
-        compute_node(projected_points[3], &*patch, i1+1, i2+1, 0, n_subdivisions);
+      for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
+        {
+          for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
+            {
+              compute_node(projected_points[0], &*patch, i1, i2, 0, n_subdivisions);
+              compute_node(projected_points[1], &*patch, i1+1, i2, 0, n_subdivisions);
+              compute_node(projected_points[2], &*patch, i1, i2+1, 0, n_subdivisions);
+              compute_node(projected_points[3], &*patch, i1+1, i2+1, 0, n_subdivisions);
 
-        x_min = std::min(x_min, (double)projected_points[0][0]);
-        x_min = std::min(x_min, (double)projected_points[1][0]);
-        x_min = std::min(x_min, (double)projected_points[2][0]);
-        x_min = std::min(x_min, (double)projected_points[3][0]);
+              x_min = std::min(x_min, (double)projected_points[0][0]);
+              x_min = std::min(x_min, (double)projected_points[1][0]);
+              x_min = std::min(x_min, (double)projected_points[2][0]);
+              x_min = std::min(x_min, (double)projected_points[3][0]);
 
-        x_max = std::max(x_max, (double)projected_points[0][0]);
-        x_max = std::max(x_max, (double)projected_points[1][0]);
-        x_max = std::max(x_max, (double)projected_points[2][0]);
-        x_max = std::max(x_max, (double)projected_points[3][0]);   
+              x_max = std::max(x_max, (double)projected_points[0][0]);
+              x_max = std::max(x_max, (double)projected_points[1][0]);
+              x_max = std::max(x_max, (double)projected_points[2][0]);
+              x_max = std::max(x_max, (double)projected_points[3][0]);
 
-        y_min = std::min(y_min, (double)projected_points[0][1]);
-        y_min = std::min(y_min, (double)projected_points[1][1]);
-        y_min = std::min(y_min, (double)projected_points[2][1]);
-        y_min = std::min(y_min, (double)projected_points[3][1]);
+              y_min = std::min(y_min, (double)projected_points[0][1]);
+              y_min = std::min(y_min, (double)projected_points[1][1]);
+              y_min = std::min(y_min, (double)projected_points[2][1]);
+              y_min = std::min(y_min, (double)projected_points[3][1]);
 
-        y_max = std::max(y_max, (double)projected_points[0][1]);
-        y_max = std::max(y_max, (double)projected_points[1][1]);
-        y_max = std::max(y_max, (double)projected_points[2][1]);
-        y_max = std::max(y_max, (double)projected_points[3][1]);
- 
-        Assert ((flags.height_vector < patch->data.n_rows()) ||
-                patch->data.n_rows() == 0,
-                ExcIndexRange (flags.height_vector, 0, patch->data.n_rows()));
+              y_max = std::max(y_max, (double)projected_points[0][1]);
+              y_max = std::max(y_max, (double)projected_points[1][1]);
+              y_max = std::max(y_max, (double)projected_points[2][1]);
+              y_max = std::max(y_max, (double)projected_points[3][1]);
 
-        z_min = std::min(z_min, (double)patch->data(flags.height_vector, i1*d1 + i2*d2));
-        z_min = std::min(z_min, (double)patch->data(flags.height_vector, (i1+1)*d1 + i2*d2));
-        z_min = std::min(z_min, (double)patch->data(flags.height_vector, i1*d1 + (i2+1)*d2));
-        z_min = std::min(z_min, (double)patch->data(flags.height_vector, (i1+1)*d1 + (i2+1)*d2));
+              Assert ((flags.height_vector < patch->data.n_rows()) ||
+                      patch->data.n_rows() == 0,
+                      ExcIndexRange (flags.height_vector, 0, patch->data.n_rows()));
 
-        z_max = std::max(z_max, (double)patch->data(flags.height_vector, i1*d1 + i2*d2));
-        z_max = std::max(z_max, (double)patch->data(flags.height_vector, (i1+1)*d1 + i2*d2));
-        z_max = std::max(z_max, (double)patch->data(flags.height_vector, i1*d1 + (i2+1)*d2));
-        z_max = std::max(z_max, (double)patch->data(flags.height_vector, (i1+1)*d1 + (i2+1)*d2));
-      }
+              z_min = std::min(z_min, (double)patch->data(flags.height_vector, i1*d1 + i2*d2));
+              z_min = std::min(z_min, (double)patch->data(flags.height_vector, (i1+1)*d1 + i2*d2));
+              z_min = std::min(z_min, (double)patch->data(flags.height_vector, i1*d1 + (i2+1)*d2));
+              z_min = std::min(z_min, (double)patch->data(flags.height_vector, (i1+1)*d1 + (i2+1)*d2));
+
+              z_max = std::max(z_max, (double)patch->data(flags.height_vector, i1*d1 + i2*d2));
+              z_max = std::max(z_max, (double)patch->data(flags.height_vector, (i1+1)*d1 + i2*d2));
+              z_max = std::max(z_max, (double)patch->data(flags.height_vector, i1*d1 + (i2+1)*d2));
+              z_max = std::max(z_max, (double)patch->data(flags.height_vector, (i1+1)*d1 + (i2+1)*d2));
+            }
+        }
     }
-  }
 
   x_dimension = x_max - x_min;
   y_dimension = y_max - y_min;
@@ -5770,7 +5770,7 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
   camera_position[1] -= (z_min + 2. * z_dimension) * sin(angle_factor * flags.polar_angle) * cos(angle_factor * flags.azimuth_angle);
 
 
-// determine the bounding box on the projection plane 
+// determine the bounding box on the projection plane
   double x_min_perspective, y_min_perspective;
   double x_max_perspective, y_max_perspective;
   double x_dimension_perspective, y_dimension_perspective;
@@ -5782,8 +5782,8 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
 
   Point<3> point(true);
 
-  compute_node(projected_point, &*patch, 0, 0, 0, n_subdivisions);  
-  
+  compute_node(projected_point, &*patch, 0, 0, 0, n_subdivisions);
+
   Assert ((flags.height_vector < patch->data.n_rows()) ||
           patch->data.n_rows() == 0,
           ExcIndexRange (flags.height_vector, 0, patch->data.n_rows()));
@@ -5801,69 +5801,69 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
 
   // iterate over the patches
   for (; patch != patches.end(); ++patch)
-  {
-    n_subdivisions = patch->n_subdivisions;
-    n = n_subdivisions + 1;
+    {
+      n_subdivisions = patch->n_subdivisions;
+      n = n_subdivisions + 1;
 
-    for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
-    {  
-      for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
-      {
-        Point<spacedim> projected_vertices[4];
-        Point<3> vertices[4];
+      for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
+        {
+          for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
+            {
+              Point<spacedim> projected_vertices[4];
+              Point<3> vertices[4];
 
-        compute_node(projected_vertices[0], &*patch, i1, i2, 0, n_subdivisions);
-        compute_node(projected_vertices[1], &*patch, i1+1, i2, 0, n_subdivisions);
-        compute_node(projected_vertices[2], &*patch, i1, i2+1, 0, n_subdivisions);
-        compute_node(projected_vertices[3], &*patch, i1+1, i2+1, 0, n_subdivisions);
+              compute_node(projected_vertices[0], &*patch, i1, i2, 0, n_subdivisions);
+              compute_node(projected_vertices[1], &*patch, i1+1, i2, 0, n_subdivisions);
+              compute_node(projected_vertices[2], &*patch, i1, i2+1, 0, n_subdivisions);
+              compute_node(projected_vertices[3], &*patch, i1+1, i2+1, 0, n_subdivisions);
 
-        Assert ((flags.height_vector < patch->data.n_rows()) ||
-                patch->data.n_rows() == 0,
-                ExcIndexRange (flags.height_vector, 0, patch->data.n_rows()));
+              Assert ((flags.height_vector < patch->data.n_rows()) ||
+                      patch->data.n_rows() == 0,
+                      ExcIndexRange (flags.height_vector, 0, patch->data.n_rows()));
 
-        vertices[0][0] = projected_vertices[0][0];
-        vertices[0][1] = projected_vertices[0][1]; 
-        vertices[0][2] = patch->data.n_rows() != 0 ? patch->data(0,i1*d1 + i2*d2) : 0;
-               
-        vertices[1][0] = projected_vertices[1][0];
-        vertices[1][1] = projected_vertices[1][1]; 
-        vertices[1][2] = patch->data.n_rows() != 0 ? patch->data(0,(i1+1)*d1 + i2*d2) : 0;
-        
-        vertices[2][0] = projected_vertices[2][0];
-        vertices[2][1] = projected_vertices[2][1]; 
-        vertices[2][2] = patch->data.n_rows() != 0 ? patch->data(0,i1*d1 + (i2+1)*d2) : 0;
+              vertices[0][0] = projected_vertices[0][0];
+              vertices[0][1] = projected_vertices[0][1];
+              vertices[0][2] = patch->data.n_rows() != 0 ? patch->data(0,i1*d1 + i2*d2) : 0;
 
-        vertices[3][0] = projected_vertices[3][0];
-        vertices[3][1] = projected_vertices[3][1];         
-        vertices[3][2] = patch->data.n_rows() != 0 ? patch->data(0,(i1+1)*d1 + (i2+1)*d2) : 0;
+              vertices[1][0] = projected_vertices[1][0];
+              vertices[1][1] = projected_vertices[1][1];
+              vertices[1][2] = patch->data.n_rows() != 0 ? patch->data(0,(i1+1)*d1 + i2*d2) : 0;
 
-        projection_decompositions[0] = svg_project_point(vertices[0], camera_position, camera_direction, camera_horizontal, camera_focus);
-        projection_decompositions[1] = svg_project_point(vertices[1], camera_position, camera_direction, camera_horizontal, camera_focus);
-        projection_decompositions[2] = svg_project_point(vertices[2], camera_position, camera_direction, camera_horizontal, camera_focus);
-        projection_decompositions[3] = svg_project_point(vertices[3], camera_position, camera_direction, camera_horizontal, camera_focus);
+              vertices[2][0] = projected_vertices[2][0];
+              vertices[2][1] = projected_vertices[2][1];
+              vertices[2][2] = patch->data.n_rows() != 0 ? patch->data(0,i1*d1 + (i2+1)*d2) : 0;
 
-        x_min_perspective = std::min(x_min_perspective, (double)projection_decompositions[0][0]);
-        x_min_perspective = std::min(x_min_perspective, (double)projection_decompositions[1][0]);
-        x_min_perspective = std::min(x_min_perspective, (double)projection_decompositions[2][0]);
-        x_min_perspective = std::min(x_min_perspective, (double)projection_decompositions[3][0]);
+              vertices[3][0] = projected_vertices[3][0];
+              vertices[3][1] = projected_vertices[3][1];
+              vertices[3][2] = patch->data.n_rows() != 0 ? patch->data(0,(i1+1)*d1 + (i2+1)*d2) : 0;
 
-        x_max_perspective = std::max(x_max_perspective, (double)projection_decompositions[0][0]);
-        x_max_perspective = std::max(x_max_perspective, (double)projection_decompositions[1][0]);
-        x_max_perspective = std::max(x_max_perspective, (double)projection_decompositions[2][0]);
-        x_max_perspective = std::max(x_max_perspective, (double)projection_decompositions[3][0]);
+              projection_decompositions[0] = svg_project_point(vertices[0], camera_position, camera_direction, camera_horizontal, camera_focus);
+              projection_decompositions[1] = svg_project_point(vertices[1], camera_position, camera_direction, camera_horizontal, camera_focus);
+              projection_decompositions[2] = svg_project_point(vertices[2], camera_position, camera_direction, camera_horizontal, camera_focus);
+              projection_decompositions[3] = svg_project_point(vertices[3], camera_position, camera_direction, camera_horizontal, camera_focus);
 
-        y_min_perspective = std::min(y_min_perspective, (double)projection_decompositions[0][1]);
-        y_min_perspective = std::min(y_min_perspective, (double)projection_decompositions[1][1]);
-        y_min_perspective = std::min(y_min_perspective, (double)projection_decompositions[2][1]);
-        y_min_perspective = std::min(y_min_perspective, (double)projection_decompositions[3][1]);
+              x_min_perspective = std::min(x_min_perspective, (double)projection_decompositions[0][0]);
+              x_min_perspective = std::min(x_min_perspective, (double)projection_decompositions[1][0]);
+              x_min_perspective = std::min(x_min_perspective, (double)projection_decompositions[2][0]);
+              x_min_perspective = std::min(x_min_perspective, (double)projection_decompositions[3][0]);
 
-        y_max_perspective = std::max(y_max_perspective, (double)projection_decompositions[0][1]);
-        y_max_perspective = std::max(y_max_perspective, (double)projection_decompositions[1][1]);
-        y_max_perspective = std::max(y_max_perspective, (double)projection_decompositions[2][1]);
-        y_max_perspective = std::max(y_max_perspective, (double)projection_decompositions[3][1]);
-      }
+              x_max_perspective = std::max(x_max_perspective, (double)projection_decompositions[0][0]);
+              x_max_perspective = std::max(x_max_perspective, (double)projection_decompositions[1][0]);
+              x_max_perspective = std::max(x_max_perspective, (double)projection_decompositions[2][0]);
+              x_max_perspective = std::max(x_max_perspective, (double)projection_decompositions[3][0]);
+
+              y_min_perspective = std::min(y_min_perspective, (double)projection_decompositions[0][1]);
+              y_min_perspective = std::min(y_min_perspective, (double)projection_decompositions[1][1]);
+              y_min_perspective = std::min(y_min_perspective, (double)projection_decompositions[2][1]);
+              y_min_perspective = std::min(y_min_perspective, (double)projection_decompositions[3][1]);
+
+              y_max_perspective = std::max(y_max_perspective, (double)projection_decompositions[0][1]);
+              y_max_perspective = std::max(y_max_perspective, (double)projection_decompositions[1][1]);
+              y_max_perspective = std::max(y_max_perspective, (double)projection_decompositions[2][1]);
+              y_max_perspective = std::max(y_max_perspective, (double)projection_decompositions[3][1]);
+            }
+        }
     }
-  }
 
   x_dimension_perspective = x_max_perspective - x_min_perspective;
   y_dimension_perspective = y_max_perspective - y_min_perspective;
@@ -5872,290 +5872,360 @@ void DataOutBase::write_svg (const std::vector<Patch<dim,spacedim> > &patches,
 
   // iterate over the patches
   for (patch = patches.begin(); patch != patches.end(); ++patch)
-  {
-    n_subdivisions = patch->n_subdivisions;
-    n = n_subdivisions + 1;
+    {
+      n_subdivisions = patch->n_subdivisions;
+      n = n_subdivisions + 1;
 
-    for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
-    {  
-      for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
-      {
-        Point<spacedim> projected_vertices[4];
-        SvgCell cell;
+      for (unsigned int i2 = 0; i2 < n_subdivisions; ++i2)
+        {
+          for (unsigned int i1 = 0; i1 < n_subdivisions; ++i1)
+            {
+              Point<spacedim> projected_vertices[4];
+              SvgCell cell;
 
-        compute_node(projected_vertices[0], &*patch, i1, i2, 0, n_subdivisions);
-        compute_node(projected_vertices[1], &*patch, i1+1, i2, 0, n_subdivisions);
-        compute_node(projected_vertices[2], &*patch, i1, i2+1, 0, n_subdivisions);
-        compute_node(projected_vertices[3], &*patch, i1+1, i2+1, 0, n_subdivisions);
+              compute_node(projected_vertices[0], &*patch, i1, i2, 0, n_subdivisions);
+              compute_node(projected_vertices[1], &*patch, i1+1, i2, 0, n_subdivisions);
+              compute_node(projected_vertices[2], &*patch, i1, i2+1, 0, n_subdivisions);
+              compute_node(projected_vertices[3], &*patch, i1+1, i2+1, 0, n_subdivisions);
 
-        Assert ((flags.height_vector < patch->data.n_rows()) ||
-                patch->data.n_rows() == 0,
-                ExcIndexRange (flags.height_vector, 0, patch->data.n_rows()));
+              Assert ((flags.height_vector < patch->data.n_rows()) ||
+                      patch->data.n_rows() == 0,
+                      ExcIndexRange (flags.height_vector, 0, patch->data.n_rows()));
 
-        cell.vertices[0][0] = projected_vertices[0][0];
-        cell.vertices[0][1] = projected_vertices[0][1]; 
-        cell.vertices[0][2] = patch->data.n_rows() != 0 ? patch->data(0,i1*d1 + i2*d2) : 0;
-               
-        cell.vertices[1][0] = projected_vertices[1][0];
-        cell.vertices[1][1] = projected_vertices[1][1]; 
-        cell.vertices[1][2] = patch->data.n_rows() != 0 ? patch->data(0,(i1+1)*d1 + i2*d2) : 0;
-        
-        cell.vertices[2][0] = projected_vertices[2][0];
-        cell.vertices[2][1] = projected_vertices[2][1]; 
-        cell.vertices[2][2] = patch->data.n_rows() != 0 ? patch->data(0,i1*d1 + (i2+1)*d2) : 0;
+              cell.vertices[0][0] = projected_vertices[0][0];
+              cell.vertices[0][1] = projected_vertices[0][1];
+              cell.vertices[0][2] = patch->data.n_rows() != 0 ? patch->data(0,i1*d1 + i2*d2) : 0;
 
-        cell.vertices[3][0] = projected_vertices[3][0];
-        cell.vertices[3][1] = projected_vertices[3][1];         
-        cell.vertices[3][2] = patch->data.n_rows() != 0 ? patch->data(0,(i1+1)*d1 + (i2+1)*d2) : 0;
+              cell.vertices[1][0] = projected_vertices[1][0];
+              cell.vertices[1][1] = projected_vertices[1][1];
+              cell.vertices[1][2] = patch->data.n_rows() != 0 ? patch->data(0,(i1+1)*d1 + i2*d2) : 0;
 
-        cell.projected_vertices[0] = svg_project_point(cell.vertices[0], camera_position, camera_direction, camera_horizontal, camera_focus);
-        cell.projected_vertices[1] = svg_project_point(cell.vertices[1], camera_position, camera_direction, camera_horizontal, camera_focus);
-        cell.projected_vertices[2] = svg_project_point(cell.vertices[2], camera_position, camera_direction, camera_horizontal, camera_focus);
-        cell.projected_vertices[3] = svg_project_point(cell.vertices[3], camera_position, camera_direction, camera_horizontal, camera_focus);
+              cell.vertices[2][0] = projected_vertices[2][0];
+              cell.vertices[2][1] = projected_vertices[2][1];
+              cell.vertices[2][2] = patch->data.n_rows() != 0 ? patch->data(0,i1*d1 + (i2+1)*d2) : 0;
 
-        cell.center = .25 * (cell.vertices[0] + cell.vertices[1] + cell.vertices[2] + cell.vertices[3]);
-        cell.projected_center = svg_project_point(cell.center, camera_position, camera_direction, camera_horizontal, camera_focus);
+              cell.vertices[3][0] = projected_vertices[3][0];
+              cell.vertices[3][1] = projected_vertices[3][1];
+              cell.vertices[3][2] = patch->data.n_rows() != 0 ? patch->data(0,(i1+1)*d1 + (i2+1)*d2) : 0;
 
-        cell.depth = cell.center.distance(camera_position);
- 
-        cells.insert(cell);
-      }
+              cell.projected_vertices[0] = svg_project_point(cell.vertices[0], camera_position, camera_direction, camera_horizontal, camera_focus);
+              cell.projected_vertices[1] = svg_project_point(cell.vertices[1], camera_position, camera_direction, camera_horizontal, camera_focus);
+              cell.projected_vertices[2] = svg_project_point(cell.vertices[2], camera_position, camera_direction, camera_horizontal, camera_focus);
+              cell.projected_vertices[3] = svg_project_point(cell.vertices[3], camera_position, camera_direction, camera_horizontal, camera_focus);
+
+              cell.center = .25 * (cell.vertices[0] + cell.vertices[1] + cell.vertices[2] + cell.vertices[3]);
+              cell.projected_center = svg_project_point(cell.center, camera_position, camera_direction, camera_horizontal, camera_focus);
+
+              cell.depth = cell.center.distance(camera_position);
+
+              cells.insert(cell);
+            }
+        }
     }
-  }
 
 
 // write the svg file
   width = static_cast<unsigned int>(.5 + height * (x_dimension_perspective / y_dimension_perspective));
   unsigned int additional_width = 0;
 
-  if(flags.draw_colorbar) additional_width = static_cast<unsigned int>(.5 + height * .3); // additional width for colorbar
-  
+  if (flags.draw_colorbar) additional_width = static_cast<unsigned int>(.5 + height * .3); // additional width for colorbar
+
   // basic svg header and background rectangle
-  out << "<svg width=\"" << width + additional_width << "\" height=\"" << height << "\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">" << '\n' 
+  out << "<svg width=\"" << width + additional_width << "\" height=\"" << height << "\" xmlns=\"http://www.w3.org/2000/svg\" version=\"1.1\">" << '\n'
       << " <rect width=\"" << width + additional_width << "\" height=\"" << height << "\" style=\"fill:white\"/>" << '\n' << '\n';
 
   unsigned int triangle_counter = 0;
- 
+
   // write the cells in the correct order
   for (typename std::multiset<SvgCell>::const_iterator cell = cells.begin(); cell != cells.end(); ++cell)
-  {
-    Point<3> points3d_triangle[3];
-
-    for (unsigned int triangle_index = 0; triangle_index < 4; triangle_index++)
     {
-      switch (triangle_index)
-      {
-        case 0: points3d_triangle[0] = cell->vertices[0], points3d_triangle[1] = cell->vertices[1], points3d_triangle[2] = cell->center; break;
-        case 1: points3d_triangle[0] = cell->vertices[1], points3d_triangle[1] = cell->vertices[3], points3d_triangle[2] = cell->center; break;
-        case 2: points3d_triangle[0] = cell->vertices[3], points3d_triangle[1] = cell->vertices[2], points3d_triangle[2] = cell->center; break;
-        case 3: points3d_triangle[0] = cell->vertices[2], points3d_triangle[1] = cell->vertices[0], points3d_triangle[2] = cell->center; break;
-        default: break;
-      }
+      Point<3> points3d_triangle[3];
 
-      Point<6> gradient_param = svg_get_gradient_parameters(points3d_triangle);
+      for (unsigned int triangle_index = 0; triangle_index < 4; triangle_index++)
+        {
+          switch (triangle_index)
+            {
+            case 0:
+              points3d_triangle[0] = cell->vertices[0], points3d_triangle[1] = cell->vertices[1], points3d_triangle[2] = cell->center;
+              break;
+            case 1:
+              points3d_triangle[0] = cell->vertices[1], points3d_triangle[1] = cell->vertices[3], points3d_triangle[2] = cell->center;
+              break;
+            case 2:
+              points3d_triangle[0] = cell->vertices[3], points3d_triangle[1] = cell->vertices[2], points3d_triangle[2] = cell->center;
+              break;
+            case 3:
+              points3d_triangle[0] = cell->vertices[2], points3d_triangle[1] = cell->vertices[0], points3d_triangle[2] = cell->center;
+              break;
+            default:
+              break;
+            }
 
-      double start_h = .667 - ((gradient_param[4] - z_min) / z_dimension) * .667;
-      double stop_h = .667 - ((gradient_param[5] - z_min) / z_dimension) * .667;  
+          Point<6> gradient_param = svg_get_gradient_parameters(points3d_triangle);
 
-      unsigned int start_r = 0;
-      unsigned int start_g = 0;
-      unsigned int start_b = 0;
+          double start_h = .667 - ((gradient_param[4] - z_min) / z_dimension) * .667;
+          double stop_h = .667 - ((gradient_param[5] - z_min) / z_dimension) * .667;
 
-      unsigned int stop_r = 0;
-      unsigned int stop_g = 0;
-      unsigned int stop_b = 0;
+          unsigned int start_r = 0;
+          unsigned int start_g = 0;
+          unsigned int start_b = 0;
 
-      unsigned int start_i = static_cast<unsigned int>(start_h * 6.);
-      unsigned int stop_i = static_cast<unsigned int>(stop_h * 6.);
+          unsigned int stop_r = 0;
+          unsigned int stop_g = 0;
+          unsigned int stop_b = 0;
 
-      double start_f = start_h * 6. - start_i;
-      double start_q = 1. - start_f;
+          unsigned int start_i = static_cast<unsigned int>(start_h * 6.);
+          unsigned int stop_i = static_cast<unsigned int>(stop_h * 6.);
 
-      double stop_f = stop_h * 6. - stop_i;
-      double stop_q = 1. - stop_f;
+          double start_f = start_h * 6. - start_i;
+          double start_q = 1. - start_f;
 
-      switch (start_i % 6)
-      {
-        case 0: start_r = 255, start_g = static_cast<unsigned int>(.5 + 255. * start_f); break;
-        case 1: start_r = static_cast<unsigned int>(.5 + 255. * start_q), start_g = 255; break;
-        case 2: start_g = 255, start_b = static_cast<unsigned int>(.5 + 255. * start_f); break;
-        case 3: start_g = static_cast<unsigned int>(.5 + 255. * start_q), start_b = 255; break; 
-        case 4: start_r = static_cast<unsigned int>(.5 + 255. * start_f), start_b = 255; break;
-        case 5: start_r = 255, start_b = static_cast<unsigned int>(.5 + 255. * start_q); break;
-        default: break;
-      }
+          double stop_f = stop_h * 6. - stop_i;
+          double stop_q = 1. - stop_f;
 
-      switch (stop_i % 6)
-      {
-        case 0: stop_r = 255, stop_g = static_cast<unsigned int>(.5 + 255. * stop_f); break;
-        case 1: stop_r = static_cast<unsigned int>(.5 + 255. * stop_q), stop_g = 255; break;
-        case 2: stop_g = 255, stop_b = static_cast<unsigned int>(.5 + 255. * stop_f); break;
-        case 3: stop_g = static_cast<unsigned int>(.5 + 255. * stop_q), stop_b = 255; break; 
-        case 4: stop_r = static_cast<unsigned int>(.5 + 255. * stop_f), stop_b = 255; break;
-        case 5: stop_r = 255, stop_b = static_cast<unsigned int>(.5 + 255. * stop_q); break;
-        default: break;
-      }
+          switch (start_i % 6)
+            {
+            case 0:
+              start_r = 255, start_g = static_cast<unsigned int>(.5 + 255. * start_f);
+              break;
+            case 1:
+              start_r = static_cast<unsigned int>(.5 + 255. * start_q), start_g = 255;
+              break;
+            case 2:
+              start_g = 255, start_b = static_cast<unsigned int>(.5 + 255. * start_f);
+              break;
+            case 3:
+              start_g = static_cast<unsigned int>(.5 + 255. * start_q), start_b = 255;
+              break;
+            case 4:
+              start_r = static_cast<unsigned int>(.5 + 255. * start_f), start_b = 255;
+              break;
+            case 5:
+              start_r = 255, start_b = static_cast<unsigned int>(.5 + 255. * start_q);
+              break;
+            default:
+              break;
+            }
 
-      Point<3> gradient_start_point_3d, gradient_stop_point_3d;
+          switch (stop_i % 6)
+            {
+            case 0:
+              stop_r = 255, stop_g = static_cast<unsigned int>(.5 + 255. * stop_f);
+              break;
+            case 1:
+              stop_r = static_cast<unsigned int>(.5 + 255. * stop_q), stop_g = 255;
+              break;
+            case 2:
+              stop_g = 255, stop_b = static_cast<unsigned int>(.5 + 255. * stop_f);
+              break;
+            case 3:
+              stop_g = static_cast<unsigned int>(.5 + 255. * stop_q), stop_b = 255;
+              break;
+            case 4:
+              stop_r = static_cast<unsigned int>(.5 + 255. * stop_f), stop_b = 255;
+              break;
+            case 5:
+              stop_r = 255, stop_b = static_cast<unsigned int>(.5 + 255. * stop_q);
+              break;
+            default:
+              break;
+            }
 
-      gradient_start_point_3d[0] = gradient_param[0];     
-      gradient_start_point_3d[1] = gradient_param[1];    
-      gradient_start_point_3d[2] = gradient_param[4];    
+          Point<3> gradient_start_point_3d, gradient_stop_point_3d;
 
-      gradient_stop_point_3d[0] = gradient_param[2];     
-      gradient_stop_point_3d[1] = gradient_param[3];    
-      gradient_stop_point_3d[2] = gradient_param[5];  
+          gradient_start_point_3d[0] = gradient_param[0];
+          gradient_start_point_3d[1] = gradient_param[1];
+          gradient_start_point_3d[2] = gradient_param[4];
 
-      Point<2> gradient_start_point = svg_project_point(gradient_start_point_3d, camera_position, camera_direction, camera_horizontal, camera_focus);
-      Point<2> gradient_stop_point = svg_project_point(gradient_stop_point_3d, camera_position, camera_direction, camera_horizontal, camera_focus);
+          gradient_stop_point_3d[0] = gradient_param[2];
+          gradient_stop_point_3d[1] = gradient_param[3];
+          gradient_stop_point_3d[2] = gradient_param[5];
 
-      // define linear gradient
-      out << "  <linearGradient id=\"" << triangle_counter << "\" gradientUnits=\"userSpaceOnUse\" "
-          << "x1=\"" 
-          << static_cast<unsigned int>(.5 + ((gradient_start_point[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent)) 
-          << "\" " 
-          << "y1=\"" 
-          << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((gradient_start_point[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent)) 
-          << "\" "
-          << "x2=\"" 
-          << static_cast<unsigned int>(.5 + ((gradient_stop_point[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent)) 
-          << "\" "
-          << "y2=\"" 
-          << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((gradient_stop_point[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent)) 
-          << "\""
-          << ">" << '\n'
-          << "   <stop offset=\"0\" style=\"stop-color:rgb(" << start_r << "," << start_g << "," << start_b << ")\"/>" << '\n'
-          << "   <stop offset=\"1\" style=\"stop-color:rgb(" << stop_r << "," << stop_g << "," << stop_b << ")\"/>" << '\n'
-          << "  </linearGradient>" << '\n';
+          Point<2> gradient_start_point = svg_project_point(gradient_start_point_3d, camera_position, camera_direction, camera_horizontal, camera_focus);
+          Point<2> gradient_stop_point = svg_project_point(gradient_stop_point_3d, camera_position, camera_direction, camera_horizontal, camera_focus);
 
-      // draw current triangle
-      double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
-      double x3 = cell->projected_center[0];
-      double y3 = cell->projected_center[1];
-   
-      switch (triangle_index)
-      {
-        case 0: x1 = cell->projected_vertices[0][0], y1 = cell->projected_vertices[0][1], x2 = cell->projected_vertices[1][0], y2 = cell->projected_vertices[1][1]; break;
-        case 1: x1 = cell->projected_vertices[1][0], y1 = cell->projected_vertices[1][1], x2 = cell->projected_vertices[3][0], y2 = cell->projected_vertices[3][1]; break;
-        case 2: x1 = cell->projected_vertices[3][0], y1 = cell->projected_vertices[3][1], x2 = cell->projected_vertices[2][0], y2 = cell->projected_vertices[2][1]; break;
-        case 3: x1 = cell->projected_vertices[2][0], y1 = cell->projected_vertices[2][1], x2 = cell->projected_vertices[0][0], y2 = cell->projected_vertices[0][1]; break;
-        default: break;
-      }
+          // define linear gradient
+          out << "  <linearGradient id=\"" << triangle_counter << "\" gradientUnits=\"userSpaceOnUse\" "
+              << "x1=\""
+              << static_cast<unsigned int>(.5 + ((gradient_start_point[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent))
+              << "\" "
+              << "y1=\""
+              << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((gradient_start_point[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent))
+              << "\" "
+              << "x2=\""
+              << static_cast<unsigned int>(.5 + ((gradient_stop_point[0] - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent))
+              << "\" "
+              << "y2=\""
+              << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((gradient_stop_point[1] - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent))
+              << "\""
+              << ">" << '\n'
+              << "   <stop offset=\"0\" style=\"stop-color:rgb(" << start_r << "," << start_g << "," << start_b << ")\"/>" << '\n'
+              << "   <stop offset=\"1\" style=\"stop-color:rgb(" << stop_r << "," << stop_g << "," << stop_b << ")\"/>" << '\n'
+              << "  </linearGradient>" << '\n';
 
-      out << "  <path d=\"M " 
-          << static_cast<unsigned int>(.5 + ((x1 - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent)) 
-          << ' ' 
-          << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((y1 - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent)) 
-          << " L " 
-          << static_cast<unsigned int>(.5 + ((x2 - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent)) 
-          << ' ' 
-          << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((y2 - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent))
-          << " L " 
-          << static_cast<unsigned int>(.5 + ((x3 - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent)) 
-          << ' ' 
-          << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((y3 - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent)) 
-          << " L " 
-          << static_cast<unsigned int>(.5 + ((x1 - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent))
-          << ' ' 
-          << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((y1 - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent)) 
-          << "\" style=\"stroke:black; fill:url(#" << triangle_counter << "); stroke-width:" << flags.line_thickness << "\"/>" << '\n';
+          // draw current triangle
+          double x1 = 0, y1 = 0, x2 = 0, y2 = 0;
+          double x3 = cell->projected_center[0];
+          double y3 = cell->projected_center[1];
 
-      triangle_counter++;
+          switch (triangle_index)
+            {
+            case 0:
+              x1 = cell->projected_vertices[0][0], y1 = cell->projected_vertices[0][1], x2 = cell->projected_vertices[1][0], y2 = cell->projected_vertices[1][1];
+              break;
+            case 1:
+              x1 = cell->projected_vertices[1][0], y1 = cell->projected_vertices[1][1], x2 = cell->projected_vertices[3][0], y2 = cell->projected_vertices[3][1];
+              break;
+            case 2:
+              x1 = cell->projected_vertices[3][0], y1 = cell->projected_vertices[3][1], x2 = cell->projected_vertices[2][0], y2 = cell->projected_vertices[2][1];
+              break;
+            case 3:
+              x1 = cell->projected_vertices[2][0], y1 = cell->projected_vertices[2][1], x2 = cell->projected_vertices[0][0], y2 = cell->projected_vertices[0][1];
+              break;
+            default:
+              break;
+            }
+
+          out << "  <path d=\"M "
+              << static_cast<unsigned int>(.5 + ((x1 - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent))
+              << ' '
+              << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((y1 - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent))
+              << " L "
+              << static_cast<unsigned int>(.5 + ((x2 - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent))
+              << ' '
+              << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((y2 - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent))
+              << " L "
+              << static_cast<unsigned int>(.5 + ((x3 - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent))
+              << ' '
+              << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((y3 - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent))
+              << " L "
+              << static_cast<unsigned int>(.5 + ((x1 - x_min_perspective) / x_dimension_perspective) * (width - (width/100.) * 2. * margin_in_percent) + ((width/100.) * margin_in_percent))
+              << ' '
+              << static_cast<unsigned int>(.5 + height - (height/100.) * margin_in_percent - ((y1 - y_min_perspective) / y_dimension_perspective) * (height - (height/100.) * 2. * margin_in_percent))
+              << "\" style=\"stroke:black; fill:url(#" << triangle_counter << "); stroke-width:" << flags.line_thickness << "\"/>" << '\n';
+
+          triangle_counter++;
+        }
     }
-  }
 
 
 // draw the colorbar
   if (flags.draw_colorbar)
-  {
-    out << '\n' << " <!-- colorbar -->" << '\n';
-
-    unsigned int element_height = static_cast<unsigned int>(((height/100.) * (71. - 2.*margin_in_percent)) / 4);
-    unsigned int element_width = static_cast<unsigned int>(.5 + (height/100.) * 2.5);
-
-    additional_width = 0;
-    if (!flags.margin) additional_width = static_cast<unsigned int>(.5 + (height/100.) * 2.5);
-
-    for (unsigned int index = 0; index < 4; index++)
     {
-      double start_h = .667 - ((index+1) / 4.) * .667;
-      double stop_h = .667 - (index / 4.) * .667;  
+      out << '\n' << " <!-- colorbar -->" << '\n';
 
-      unsigned int start_r = 0;
-      unsigned int start_g = 0;
-      unsigned int start_b = 0;
+      unsigned int element_height = static_cast<unsigned int>(((height/100.) * (71. - 2.*margin_in_percent)) / 4);
+      unsigned int element_width = static_cast<unsigned int>(.5 + (height/100.) * 2.5);
 
-      unsigned int stop_r = 0;
-      unsigned int stop_g = 0;
-      unsigned int stop_b = 0;
+      additional_width = 0;
+      if (!flags.margin) additional_width = static_cast<unsigned int>(.5 + (height/100.) * 2.5);
 
-      unsigned int start_i = static_cast<unsigned int>(start_h * 6.);
-      unsigned int stop_i = static_cast<unsigned int>(stop_h * 6.);
+      for (unsigned int index = 0; index < 4; index++)
+        {
+          double start_h = .667 - ((index+1) / 4.) * .667;
+          double stop_h = .667 - (index / 4.) * .667;
 
-      double start_f = start_h * 6. - start_i;
-      double start_q = 1. - start_f;
+          unsigned int start_r = 0;
+          unsigned int start_g = 0;
+          unsigned int start_b = 0;
 
-      double stop_f = stop_h * 6. - stop_i;
-      double stop_q = 1. - stop_f;
+          unsigned int stop_r = 0;
+          unsigned int stop_g = 0;
+          unsigned int stop_b = 0;
 
-      switch (start_i % 6)
-      {
-        case 0: start_r = 255, start_g = static_cast<unsigned int>(.5 + 255. * start_f); break;
-        case 1: start_r = static_cast<unsigned int>(.5 + 255. * start_q), start_g = 255; break;
-        case 2: start_g = 255, start_b = static_cast<unsigned int>(.5 + 255. * start_f); break;
-        case 3: start_g = static_cast<unsigned int>(.5 + 255. * start_q), start_b = 255; break; 
-        case 4: start_r = static_cast<unsigned int>(.5 + 255. * start_f), start_b = 255; break;
-        case 5: start_r = 255, start_b = static_cast<unsigned int>(.5 + 255. * start_q); break;
-        default: break;
-      }
+          unsigned int start_i = static_cast<unsigned int>(start_h * 6.);
+          unsigned int stop_i = static_cast<unsigned int>(stop_h * 6.);
 
-      switch (stop_i % 6)
-      {
-        case 0: stop_r = 255, stop_g = static_cast<unsigned int>(.5 + 255. * stop_f); break;
-        case 1: stop_r = static_cast<unsigned int>(.5 + 255. * stop_q), stop_g = 255; break;
-        case 2: stop_g = 255, stop_b = static_cast<unsigned int>(.5 + 255. * stop_f); break;
-        case 3: stop_g = static_cast<unsigned int>(.5 + 255. * stop_q), stop_b = 255; break; 
-        case 4: stop_r = static_cast<unsigned int>(.5 + 255. * stop_f), stop_b = 255; break;
-        case 5: stop_r = 255, stop_b = static_cast<unsigned int>(.5 + 255. * stop_q); break;
-        default: break;
-      }
+          double start_f = start_h * 6. - start_i;
+          double start_q = 1. - start_f;
 
-      // define gradient
-      out << "  <linearGradient id=\"colorbar_" << index << "\" gradientUnits=\"userSpaceOnUse\" "
-          << "x1=\"" << width + additional_width << "\" " 
-          << "y1=\"" << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29)) + (3-index) * element_height << "\" "
-          << "x2=\"" << width + additional_width << "\" "
-          << "y2=\"" << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29)) + (4-index) * element_height << "\""
-          << ">" << '\n'
-          << "   <stop offset=\"0\" style=\"stop-color:rgb(" << start_r << "," << start_g << "," << start_b << ")\"/>" << '\n'
-          << "   <stop offset=\"1\" style=\"stop-color:rgb(" << stop_r << "," << stop_g << "," << stop_b << ")\"/>" << '\n'
-          << "  </linearGradient>" << '\n';          
+          double stop_f = stop_h * 6. - stop_i;
+          double stop_q = 1. - stop_f;
 
-      // draw box corresponding to the gradient above
-      out << "  <rect" 
-          << " x=\"" << width + additional_width
-          << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29)) + (3-index) * element_height
-          << "\" width=\"" << element_width
-          << "\" height=\"" << element_height
-          << "\" style=\"stroke:black; stroke-width:2; fill:url(#colorbar_" << index << ")\"/>" << '\n';
+          switch (start_i % 6)
+            {
+            case 0:
+              start_r = 255, start_g = static_cast<unsigned int>(.5 + 255. * start_f);
+              break;
+            case 1:
+              start_r = static_cast<unsigned int>(.5 + 255. * start_q), start_g = 255;
+              break;
+            case 2:
+              start_g = 255, start_b = static_cast<unsigned int>(.5 + 255. * start_f);
+              break;
+            case 3:
+              start_g = static_cast<unsigned int>(.5 + 255. * start_q), start_b = 255;
+              break;
+            case 4:
+              start_r = static_cast<unsigned int>(.5 + 255. * start_f), start_b = 255;
+              break;
+            case 5:
+              start_r = 255, start_b = static_cast<unsigned int>(.5 + 255. * start_q);
+              break;
+            default:
+              break;
+            }
+
+          switch (stop_i % 6)
+            {
+            case 0:
+              stop_r = 255, stop_g = static_cast<unsigned int>(.5 + 255. * stop_f);
+              break;
+            case 1:
+              stop_r = static_cast<unsigned int>(.5 + 255. * stop_q), stop_g = 255;
+              break;
+            case 2:
+              stop_g = 255, stop_b = static_cast<unsigned int>(.5 + 255. * stop_f);
+              break;
+            case 3:
+              stop_g = static_cast<unsigned int>(.5 + 255. * stop_q), stop_b = 255;
+              break;
+            case 4:
+              stop_r = static_cast<unsigned int>(.5 + 255. * stop_f), stop_b = 255;
+              break;
+            case 5:
+              stop_r = 255, stop_b = static_cast<unsigned int>(.5 + 255. * stop_q);
+              break;
+            default:
+              break;
+            }
+
+          // define gradient
+          out << "  <linearGradient id=\"colorbar_" << index << "\" gradientUnits=\"userSpaceOnUse\" "
+              << "x1=\"" << width + additional_width << "\" "
+              << "y1=\"" << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29)) + (3-index) * element_height << "\" "
+              << "x2=\"" << width + additional_width << "\" "
+              << "y2=\"" << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29)) + (4-index) * element_height << "\""
+              << ">" << '\n'
+              << "   <stop offset=\"0\" style=\"stop-color:rgb(" << start_r << "," << start_g << "," << start_b << ")\"/>" << '\n'
+              << "   <stop offset=\"1\" style=\"stop-color:rgb(" << stop_r << "," << stop_g << "," << stop_b << ")\"/>" << '\n'
+              << "  </linearGradient>" << '\n';
+
+          // draw box corresponding to the gradient above
+          out << "  <rect"
+              << " x=\"" << width + additional_width
+              << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29)) + (3-index) * element_height
+              << "\" width=\"" << element_width
+              << "\" height=\"" << element_height
+              << "\" style=\"stroke:black; stroke-width:2; fill:url(#colorbar_" << index << ")\"/>" << '\n';
+        }
+
+      for (unsigned int index = 0; index < 5; index++)
+        {
+          out << "  <text x=\"" << width + additional_width + static_cast<unsigned int>(1.5 * element_width)
+              << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29) + (4.-index) * element_height + 30.) << "\""
+              << " style=\"text-anchor:start; font-size:80; font-family:Helvetica";
+
+          if (index == 0 || index == 4) out << "; font-weight:bold";
+
+          out << "\">" << (float)(((int)((z_min + index * (z_dimension / 4.))*10000))/10000.);
+
+          if (index == 4) out << " max";
+          if (index == 0) out << " min";
+
+          out << "</text>" << '\n';
+        }
     }
-    
-    for (unsigned int index = 0; index < 5; index++)
-    {
-      out << "  <text x=\"" << width + additional_width + static_cast<unsigned int>(1.5 * element_width)
-          << "\" y=\"" << static_cast<unsigned int>(.5 + (height/100.) * (margin_in_percent + 29) + (4.-index) * element_height + 30.) << "\""
-          << " style=\"text-anchor:start; font-size:80; font-family:Helvetica";
-
-      if (index == 0 || index == 4) out << "; font-weight:bold";
-
-      out << "\">" << (float)(((int)((z_min + index * (z_dimension / 4.))*10000))/10000.);
-
-      if (index == 4) out << " max";
-      if (index == 0) out << " min";
-
-      out << "</text>" << '\n';
-    }
-  }
 
   // finalize the svg file
   out << '\n' << "</svg>";

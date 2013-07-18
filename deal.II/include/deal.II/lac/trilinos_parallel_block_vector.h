@@ -125,7 +125,7 @@ namespace TrilinosWrappers
        * processes.
        */
       explicit BlockVector (const std::vector<IndexSet> &parallel_partitioning,
-                   const MPI_Comm              &communicator = MPI_COMM_WORLD);
+                            const MPI_Comm              &communicator = MPI_COMM_WORLD);
 
       /**
        * Copy-Constructor. Set all the

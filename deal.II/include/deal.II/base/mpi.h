@@ -381,8 +381,8 @@ namespace Utilities
        * Called by the constructors.
        */
       void do_init(int    &argc,
-          char ** &argv,
-          unsigned int max_num_threads);
+                   char ** &argv,
+                   unsigned int max_num_threads);
     };
 
     namespace internal
@@ -414,7 +414,7 @@ namespace Utilities
       {
         return MPI_UNSIGNED_LONG;
       }
-      
+
 
       inline MPI_Datatype mpi_type_id (const unsigned long long int *)
       {

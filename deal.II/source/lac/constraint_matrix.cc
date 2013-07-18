@@ -197,7 +197,7 @@ void ConstraintMatrix::close ()
   // won't modify the size any more after this point.
   {
     std::vector<size_type> new_lines (lines_cache.size(),
-                                         numbers::invalid_size_type);
+                                      numbers::invalid_size_type);
     size_type counter = 0;
     for (std::vector<ConstraintLine>::const_iterator line=lines.begin();
          line!=lines.end(); ++line, ++counter)
@@ -529,7 +529,7 @@ ConstraintMatrix::merge (const ConstraintMatrix &other_constraints,
               for (ConstraintLine::Entries::const_iterator j=other_line->begin();
                    j!=other_line->end(); ++j)
                 tmp.push_back (std::pair<size_type,double>(j->first,
-                                                              j->second*weight));
+                                                           j->second*weight));
 
               line->inhomogeneity += other_constraints.get_inhomogeneity(line->entries[i].first) *
                                      weight;
@@ -871,7 +871,7 @@ void ConstraintMatrix::condense (CompressedSparsityPattern &sparsity) const
                      q!=lines[distribute[column]].entries.size();
                      ++q)
                   {
-                    const size_type 
+                    const size_type
                     new_col = lines[distribute[column]].entries[q].first;
 
                     sparsity.add (row, new_col);
@@ -948,7 +948,7 @@ void ConstraintMatrix::condense (CompressedSetSparsityPattern &sparsity) const
                        q!=lines[distribute[column]].entries.size();
                        ++q)
                     {
-                      const size_type 
+                      const size_type
                       new_col = lines[distribute[column]].entries[q].first;
 
                       sparsity.add (row, new_col);
@@ -1000,7 +1000,7 @@ void ConstraintMatrix::condense (CompressedSimpleSparsityPattern &sparsity) cons
   // otherwise, the number states which line in the constraint matrix
   // handles this index
   std::vector<size_type> distribute(sparsity.n_rows(),
-                                       numbers::invalid_size_type);
+                                    numbers::invalid_size_type);
 
   for (size_type c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = c;
@@ -1038,7 +1038,7 @@ void ConstraintMatrix::condense (CompressedSimpleSparsityPattern &sparsity) cons
                      q!=lines[distribute[column]].entries.size();
                      ++q)
                   {
-                    const size_type 
+                    const size_type
                     new_col = lines[distribute[column]].entries[q].first;
 
                     sparsity.add (row, new_col);
@@ -1100,7 +1100,7 @@ void ConstraintMatrix::condense (BlockSparsityPattern &sparsity) const
   // otherwise, the number states which line in the constraint matrix
   // handles this index
   std::vector<size_type> distribute (sparsity.n_rows(),
-                                        numbers::invalid_size_type);
+                                     numbers::invalid_size_type);
 
   for (size_type c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = c;
@@ -1210,7 +1210,7 @@ void ConstraintMatrix::condense (BlockCompressedSparsityPattern &sparsity) const
   // otherwise, the number states which line in the constraint matrix
   // handles this index
   std::vector<size_type> distribute (sparsity.n_rows(),
-                                        numbers::invalid_size_type);
+                                     numbers::invalid_size_type);
 
   for (size_type c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
@@ -1321,7 +1321,7 @@ void ConstraintMatrix::condense (BlockCompressedSetSparsityPattern &sparsity) co
   // otherwise, the number states which line in the constraint matrix
   // handles this index
   std::vector<size_type> distribute (sparsity.n_rows(),
-                                        numbers::invalid_size_type);
+                                     numbers::invalid_size_type);
 
   for (size_type c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
@@ -1434,7 +1434,7 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
   // otherwise, the number states which line in the constraint matrix
   // handles this index
   std::vector<size_type> distribute (sparsity.n_rows(),
-                                        numbers::invalid_size_type);
+                                     numbers::invalid_size_type);
 
   for (size_type c=0; c<lines.size(); ++c)
     distribute[lines[c].line] = static_cast<signed int>(c);
@@ -1503,7 +1503,8 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
                   if (distribute[global_col] == numbers::invalid_size_type)
                     // distribute entry at irregular row @p{row} and
                     // regular column global_col.
-                    { for (size_type q=0;
+                    {
+                      for (size_type q=0;
                            q!=lines[distribute[row]].entries.size(); ++q)
                         sparsity.add (lines[distribute[row]].entries[q].first,
                                       global_col);
@@ -1511,7 +1512,8 @@ void ConstraintMatrix::condense (BlockCompressedSimpleSparsityPattern &sparsity)
                   else
                     // distribute entry at irregular row @p{row} and
                     // irregular column @p{global_col}
-                    { for (size_type p=0;
+                    {
+                      for (size_type p=0;
                            p!=lines[distribute[row]].entries.size(); ++p)
                         for (size_type q=0; q!=lines[distribute[global_col]].entries.size(); ++q)
                           sparsity.add (lines[distribute[row]].entries[p].first,
@@ -1541,7 +1543,7 @@ bool ConstraintMatrix::is_identity_constrained (const size_type index) const
 
 
 
-ConstraintMatrix::size_type 
+ConstraintMatrix::size_type
 ConstraintMatrix::max_constraint_indirections () const
 {
   size_type return_value = 0;

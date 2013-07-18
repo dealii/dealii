@@ -74,7 +74,7 @@ namespace internal
     template <typename Number>
     unsigned short
     ConstraintValues<Number>::
-      insert_entries (const std::vector<std::pair<types::global_dof_index,double> > &entries)
+    insert_entries (const std::vector<std::pair<types::global_dof_index,double> > &entries)
     {
       next_constraint.first.resize(entries.size());
       if (entries.size() > 0)
@@ -173,7 +173,7 @@ namespace internal
 
 
     void
-      DoFInfo::read_dof_indices (const std::vector<types::global_dof_index> &local_indices,
+    DoFInfo::read_dof_indices (const std::vector<types::global_dof_index> &local_indices,
                                const std::vector<unsigned int> &lexicographic_inv,
                                const ConstraintMatrix          &constraints,
                                const unsigned int               cell_number,
@@ -191,7 +191,7 @@ namespace internal
                                     dofs_per_cell[0] : dofs_per_cell[cell_active_fe_index[cell_number]];
       for (unsigned int i=0; i<dofs_this_cell; i++)
         {
-	        types::global_dof_index current_dof =
+          types::global_dof_index current_dof =
             local_indices[lexicographic_inv[i]];
           const std::vector<std::pair<types::global_dof_index,double> >
           *entries_ptr =
@@ -287,8 +287,8 @@ no_constraint:
             }
         }
       row_starts[cell_number+1] = std_cxx1x::tuple<size_dof,
-						   size_constraint,
-						   unsigned int>
+                                  size_constraint,
+                                  unsigned int>
                                   (dof_indices.size(), constraint_indicator.size(), 0);
 
       // now to the plain indices: in case we have constraints on this cell,
@@ -305,7 +305,7 @@ no_constraint:
             {
               for (unsigned int i=0; i<dofs_this_cell; ++i)
                 {
-		              types::global_dof_index current_dof =
+                  types::global_dof_index current_dof =
                     local_indices[lexicographic_inv[i]];
                   if (n_mpi_procs > 1 &&
                       (current_dof < first_owned ||
@@ -332,7 +332,7 @@ no_constraint:
 
       // sort ghost dofs and compress out duplicates
       const types::global_dof_index n_owned  = (vector_partitioner->local_range().second-
-                                     vector_partitioner->local_range().first);
+                                                vector_partitioner->local_range().first);
       const size_dof n_ghosts = ghost_dofs.size();
       unsigned int       n_unique_ghosts= 0;
 #ifdef DEBUG
@@ -356,7 +356,7 @@ no_constraint:
             }
           std::sort (ghost_origin.begin(), ghost_origin.end());
 
-	  types::global_dof_index last_contiguous_start = ghost_origin[0].first;
+          types::global_dof_index last_contiguous_start = ghost_origin[0].first;
           ghost_numbering[ghost_origin[0].second] = 0;
           for (size_dof i=1; i<n_ghosts; i++)
             {
@@ -392,8 +392,8 @@ no_constraint:
           const unsigned int n_boundary_cells = boundary_cells.size();
           for (unsigned int i=0; i<n_boundary_cells; ++i)
             {
-	      types::global_dof_index *data_ptr = const_cast<types::global_dof_index *>
-                                       (begin_indices(boundary_cells[i]));
+              types::global_dof_index *data_ptr = const_cast<types::global_dof_index *>
+                                                  (begin_indices(boundary_cells[i]));
 
               const types::global_dof_index   *row_end = end_indices(boundary_cells[i]);
               for ( ; data_ptr != row_end; ++data_ptr)
@@ -410,7 +410,7 @@ no_constraint:
                   if (row_length_indicators(boundary_cells[i]) > 0)
                     {
                       types::global_dof_index *data_ptr = const_cast<types::global_dof_index *>
-                                               (begin_indices_plain(boundary_cells[i]));
+                                                          (begin_indices_plain(boundary_cells[i]));
                       const types::global_dof_index *row_end =
                         (end_indices_plain(boundary_cells[i]));
                       for ( ; data_ptr != row_end; ++data_ptr)
@@ -444,7 +444,7 @@ no_constraint:
                                       std::vector<types::global_dof_index> &renumbering)
     {
       std::vector<types::global_dof_index> reverse_numbering (size_info.n_active_cells,
-                                                   numbers::invalid_unsigned_int);
+                                                              numbers::invalid_unsigned_int);
       const unsigned int n_boundary_cells = boundary_cells.size();
       for (unsigned int j=0; j<n_boundary_cells; ++j)
         reverse_numbering[boundary_cells[j]] =
@@ -560,7 +560,7 @@ no_constraint:
                                         std::vector<types::global_dof_index> &renumbering)
     {
       std::vector<types::global_dof_index> reverse_numbering (size_info.n_active_cells,
-                                                   numbers::invalid_unsigned_int);
+                                                              numbers::invalid_unsigned_int);
       const unsigned int n_boundary_cells = boundary_cells.size();
       for (unsigned int j=0; j<n_boundary_cells; ++j)
         reverse_numbering[boundary_cells[j]] = j;
@@ -744,8 +744,8 @@ no_constraint:
       // sanity check 1: all indices should be smaller than the number of dofs
       // locally owned plus the number of ghosts
       const types::global_dof_index index_range = (vector_partitioner->local_range().second-
-                                        vector_partitioner->local_range().first)
-                                       + vector_partitioner->ghost_indices().n_elements();
+                                                   vector_partitioner->local_range().first)
+                                                  + vector_partitioner->ghost_indices().n_elements();
       for (size_dof i=0; i<dof_indices.size(); ++i)
         AssertIndexRange (dof_indices[i], index_range);
 
@@ -769,7 +769,7 @@ no_constraint:
       // sanity check 3: all non-boundary cells should have indices that only
       // refer to the locally owned range
       const types::global_dof_index local_size = (vector_partitioner->local_range().second-
-                                       vector_partitioner->local_range().first);
+                                                  vector_partitioner->local_range().first);
       for (unsigned int row=0; row<size_info.boundary_cells_start; ++row)
         {
           const types::global_dof_index *ptr     = begin_indices(row);
@@ -1701,11 +1701,11 @@ not_connect:
     {
       AssertDimension (row_starts.size()-1, size_info.n_active_cells);
       const types::global_dof_index n_rows =
-                                  (vector_partitioner->local_range().second-
-                                   vector_partitioner->local_range().first)
-                                  + vector_partitioner->ghost_indices().n_elements();
+        (vector_partitioner->local_range().second-
+         vector_partitioner->local_range().first)
+        + vector_partitioner->ghost_indices().n_elements();
       const types::global_dof_index n_blocks = (do_blocking == true) ?
-                                    task_info.n_blocks : size_info.n_active_cells;
+                                               task_info.n_blocks : size_info.n_active_cells;
 
       // first determine row lengths
       std::vector<unsigned int> row_lengths(n_rows);
@@ -1849,7 +1849,7 @@ not_connect:
           else
             {
               const types::global_dof_index *it = begin_indices (block),
-                                  * end_cell = end_indices (block);
+                                             * end_cell = end_indices (block);
               for ( ; it != end_cell; ++it)
                 if (row_lengths[*it] > 0)
                   {
@@ -1884,7 +1884,7 @@ not_connect:
 
       types::global_dof_index counter = 0;
       std::vector<types::global_dof_index>::iterator dof_ind = dof_indices.begin(),
-                                          end_ind = dof_indices.end();
+                                                     end_ind = dof_indices.end();
       for ( ; dof_ind != end_ind; ++dof_ind)
         {
           if (*dof_ind < local_size)
@@ -1941,7 +1941,7 @@ not_connect:
     {
       out << "       Memory row starts indices:    ";
       size_info.print_memory_statistics
-	(out, (row_starts.capacity()*sizeof(std_cxx1x::tuple<size_dof, size_constraint, unsigned int>)));
+      (out, (row_starts.capacity()*sizeof(std_cxx1x::tuple<size_dof, size_constraint, unsigned int>)));
       out << "       Memory dof indices:           ";
       size_info.print_memory_statistics
       (out, MemoryConsumption::memory_consumption (dof_indices));

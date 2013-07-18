@@ -623,7 +623,7 @@ namespace VectorTools
     // interpolate the boundary values and then condense the matrix and vector
     if (constraints_are_compatible)
       {
-        const Function<spacedim>* dummy = 0;
+        const Function<spacedim> *dummy = 0;
         MatrixCreator::create_mass_matrix (mapping, dof, quadrature,
                                            mass_matrix, function, tmp,
                                            dummy, constraints);
@@ -5429,7 +5429,7 @@ namespace VectorTools
   subtract_mean_value(VECTOR                  &v,
                       const std::vector<bool> &p_select)
   {
-    if(p_select.size() == 0)
+    if (p_select.size() == 0)
       {
         // In case of an empty boolean mask operate on the whole vector:
         v.add( - v.mean_value() );
@@ -5439,12 +5439,12 @@ namespace VectorTools
         // This function is not implemented for distributed vectors, so
         // if v is not a boring Vector or BlockVector:
         Assert(   dynamic_cast<Vector<double> *>(& v)
-               || dynamic_cast<Vector<float> *>(& v)
-               || dynamic_cast<Vector<long double> *>(& v)
-               || dynamic_cast<BlockVector<double> *>(& v)
-               || dynamic_cast<BlockVector<float> *>(& v)
-               || dynamic_cast<BlockVector<long double> *>(& v),
-               ExcNotImplemented());
+                  || dynamic_cast<Vector<float> *>(& v)
+                  || dynamic_cast<Vector<long double> *>(& v)
+                  || dynamic_cast<BlockVector<double> *>(& v)
+                  || dynamic_cast<BlockVector<float> *>(& v)
+                  || dynamic_cast<BlockVector<long double> *>(& v),
+                  ExcNotImplemented());
 
         const unsigned int n = v.size();
 

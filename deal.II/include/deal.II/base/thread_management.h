@@ -2717,7 +2717,7 @@ namespace Threads
   inline
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3, Arg4, Arg5, Arg6>,6>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const) DEAL_II_DEPRECATED;
+           spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6) const) DEAL_II_DEPRECATED;
 
 
   template <typename RT, typename C,
@@ -2750,13 +2750,13 @@ namespace Threads
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6, Arg7>,7>
-  spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) DEAL_II_DEPRECATED;
+           spawn (RT (*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) DEAL_II_DEPRECATED;
 
 
   template <typename RT,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7>
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5, typename Arg6,
+           typename Arg7>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6, Arg7>,7>
@@ -2781,13 +2781,13 @@ namespace Threads
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6, Arg7>,7>
-  spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) DEAL_II_DEPRECATED;
+           spawn (C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7)) DEAL_II_DEPRECATED;
 
 
   template <typename RT, typename C,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7>
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5, typename Arg6,
+           typename Arg7>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6, Arg7>,7>
@@ -2813,13 +2813,13 @@ namespace Threads
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6, Arg7>,7>
-  spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const) DEAL_II_DEPRECATED;
+           spawn (const C &c, RT (C::*fun_ptr)(Arg1,Arg2,Arg3,Arg4,Arg5,Arg6,Arg7) const) DEAL_II_DEPRECATED;
 
 
   template <typename RT, typename C,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7>
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5, typename Arg6,
+           typename Arg7>
   inline
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3,
@@ -2854,9 +2854,9 @@ namespace Threads
 
 
   template <typename RT,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7, typename Arg8>
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5, typename Arg6,
+           typename Arg7, typename Arg8>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6,
@@ -2889,9 +2889,9 @@ namespace Threads
 
 
   template <typename RT, typename C,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7, typename Arg8>
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5, typename Arg6,
+           typename Arg7, typename Arg8>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6,
@@ -2925,9 +2925,9 @@ namespace Threads
 
 
   template <typename RT, typename C,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7, typename Arg8>
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5, typename Arg6,
+           typename Arg7, typename Arg8>
   inline
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3,
@@ -2964,9 +2964,9 @@ namespace Threads
 
 
   template <typename RT,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7, typename Arg8, typename Arg9>
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5, typename Arg6,
+           typename Arg7, typename Arg8, typename Arg9>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6,
@@ -2999,9 +2999,9 @@ namespace Threads
 
 
   template <typename RT, typename C,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7, typename Arg8, typename Arg9>
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5, typename Arg6,
+           typename Arg7, typename Arg8, typename Arg9>
   inline
   internal::fun_encapsulator<RT,std_cxx1x::tuple<Arg1, Arg2, Arg3,
            Arg4, Arg5, Arg6,
@@ -3035,9 +3035,9 @@ namespace Threads
 
 
   template <typename RT, typename C,
-  typename Arg1, typename Arg2, typename Arg3,
-  typename Arg4, typename Arg5, typename Arg6,
-  typename Arg7, typename Arg8, typename Arg9>
+           typename Arg1, typename Arg2, typename Arg3,
+           typename Arg4, typename Arg5, typename Arg6,
+           typename Arg7, typename Arg8, typename Arg9>
   inline
   internal::fun_encapsulator<RT,
            std_cxx1x::tuple<Arg1, Arg2, Arg3,

@@ -59,7 +59,7 @@ namespace Step26
     void solve_time_step();
     void output_results() const;
     void refine_mesh (const unsigned int min_grid_level,
-		      const unsigned int max_grid_level);
+                      const unsigned int max_grid_level);
 
     Triangulation<dim>   triangulation;
     FE_Q<dim>            fe;
@@ -176,13 +176,13 @@ namespace Step26
     dof_handler.distribute_dofs(fe);
 
     std::cout << std::endl
-	      << "==========================================="
-	      << std::endl
-	      << "Number of active cells: " << triangulation.n_active_cells()
+              << "==========================================="
               << std::endl
-	      << "Number of degrees of freedom: " << dof_handler.n_dofs()
+              << "Number of active cells: " << triangulation.n_active_cells()
               << std::endl
-	      << std::endl;
+              << "Number of degrees of freedom: " << dof_handler.n_dofs()
+              << std::endl
+              << std::endl;
 
     constraints.clear ();
     DoFTools::make_hanging_node_constraints (dof_handler,
@@ -203,12 +203,12 @@ namespace Step26
     MatrixCreator::create_mass_matrix(dof_handler,
                                       QGauss<dim>(fe.degree+1),
                                       mass_matrix,
-                                      (const Function<dim>*)0,
+                                      (const Function<dim> *)0,
                                       constraints);
     MatrixCreator::create_laplace_matrix(dof_handler,
                                          QGauss<dim>(fe.degree+1),
                                          laplace_matrix,
-                                         (const Function<dim>*)0,
+                                         (const Function<dim> *)0,
                                          constraints);
 
     solution.reinit(dof_handler.n_dofs());
@@ -291,7 +291,7 @@ namespace Step26
   // too high a mesh level.
   template <int dim>
   void HeatEquation<dim>::refine_mesh (const unsigned int min_grid_level,
-				       const unsigned int max_grid_level)
+                                       const unsigned int max_grid_level)
   {
     Vector<float> estimated_error_per_cell (triangulation.n_active_cells());
 
@@ -310,8 +310,8 @@ namespace Step26
            cell != triangulation.end(); ++cell)
         cell->clear_refine_flag ();
     for (typename Triangulation<dim>::active_cell_iterator
-           cell = triangulation.begin_active(min_grid_level);
-	 cell != triangulation.end_active(min_grid_level); ++cell)
+         cell = triangulation.begin_active(min_grid_level);
+         cell != triangulation.end_active(min_grid_level); ++cell)
       cell->clear_coarsen_flag ();
 
 
@@ -403,8 +403,8 @@ start_time_iteration:
         std::cout << "Time step " << timestep_number << " at t=" << time
                   << std::endl;
 
-	tmp.reinit (solution.size());
-	forcing_terms.reinit (solution.size());
+        tmp.reinit (solution.size());
+        forcing_terms.reinit (solution.size());
 
         mass_matrix.vmult(system_rhs, old_solution);
 
@@ -458,16 +458,16 @@ start_time_iteration:
             (pre_refinement_step < n_adaptive_pre_refinement_steps))
           {
             refine_mesh (initial_global_refinement,
-			 initial_global_refinement + n_adaptive_pre_refinement_steps);
+                         initial_global_refinement + n_adaptive_pre_refinement_steps);
             ++pre_refinement_step;
 
-	    std::cout << std::endl;
+            std::cout << std::endl;
 
             goto start_time_iteration;
           }
         else if ((timestep_number > 0) && (timestep_number % 5 == 0))
           refine_mesh (initial_global_refinement,
-		       initial_global_refinement + n_adaptive_pre_refinement_steps);
+                       initial_global_refinement + n_adaptive_pre_refinement_steps);
 
         old_solution = solution;
       }

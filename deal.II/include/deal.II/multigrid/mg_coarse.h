@@ -313,9 +313,9 @@ MGCoarseGridHouseholder<number, VECTOR>::initialize(
 template<typename number, class VECTOR>
 void
 MGCoarseGridHouseholder<number, VECTOR>::operator() (
-						     const unsigned int /*level*/,
-						     VECTOR       &dst,
-						     const VECTOR &src) const
+  const unsigned int /*level*/,
+  VECTOR       &dst,
+  const VECTOR &src) const
 {
   householder.least_squares(dst, src);
 }
@@ -344,9 +344,9 @@ MGCoarseGridSVD<number, VECTOR>::initialize(
 template<typename number, class VECTOR>
 void
 MGCoarseGridSVD<number, VECTOR>::operator() (
-					     const unsigned int /*level*/,
-					     VECTOR       &dst,
-					     const VECTOR &src) const
+  const unsigned int /*level*/,
+  VECTOR       &dst,
+  const VECTOR &src) const
 {
   matrix.vmult(dst, src);
 }

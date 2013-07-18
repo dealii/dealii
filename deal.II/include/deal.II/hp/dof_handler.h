@@ -383,7 +383,7 @@ namespace hp
      * DoFs which are constrained by
      * hanging nodes, see @ref constraints.
      */
-   types::global_dof_index n_dofs () const;
+    types::global_dof_index n_dofs () const;
 
     /**
     * The number of multilevel

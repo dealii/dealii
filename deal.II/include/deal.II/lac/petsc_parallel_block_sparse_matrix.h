@@ -189,17 +189,17 @@ namespace PETScWrappers
        * hand in the same vector for the first two arguments.
        */
       void reinit(const std::vector<IndexSet> &rows,
-          const std::vector<IndexSet> &cols,
-          const BlockCompressedSimpleSparsityPattern &bcsp,
-          const MPI_Comm &com);
+                  const std::vector<IndexSet> &cols,
+                  const BlockCompressedSimpleSparsityPattern &bcsp,
+                  const MPI_Comm &com);
 
 
       /**
        * Same as above but for a symmetric structure only.
        */
       void reinit(const std::vector<IndexSet> &sizes,
-          const BlockCompressedSimpleSparsityPattern &bcsp,
-          const MPI_Comm &com);
+                  const BlockCompressedSimpleSparsityPattern &bcsp,
+                  const MPI_Comm &com);
 
 
 

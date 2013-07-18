@@ -1253,14 +1253,14 @@ namespace FEValuesViews
      */
     typedef dealii::Tensor<1, spacedim> divergence_type;
 
-      /**
-       * A structure where for each shape
-       * function we pre-compute a bunch of
-       * data that will make later accesses
-       * much cheaper.
-       */
-      struct ShapeFunctionData
-      {
+    /**
+     * A structure where for each shape
+     * function we pre-compute a bunch of
+     * data that will make later accesses
+     * much cheaper.
+     */
+    struct ShapeFunctionData
+    {
       /**
        * For each pair (shape
        * function,component within
@@ -1276,7 +1276,7 @@ namespace FEValuesViews
        * (e.g. for RT elements it depends
        * on the shape of a cell).
        */
-        bool is_nonzero_shape_function_component[value_type::n_independent_components];
+      bool is_nonzero_shape_function_component[value_type::n_independent_components];
 
       /**
        * For each pair (shape function,
@@ -1294,7 +1294,7 @@ namespace FEValuesViews
        * harder to compute this
        * information.
        */
-        unsigned int row_index[value_type::n_independent_components];
+      unsigned int row_index[value_type::n_independent_components];
 
       /**
        * For each shape function say the
@@ -1313,15 +1313,15 @@ namespace FEValuesViews
        * no components are nonzero then
        * store -2.
        */
-        int single_nonzero_component;
-        unsigned int single_nonzero_component_index;
-      };
+      int single_nonzero_component;
+      unsigned int single_nonzero_component_index;
+    };
 
     /**
      * Default constructor. Creates an
      * invalid object.
      */
-      Tensor();
+    Tensor();
 
 
     /**
@@ -1338,8 +1338,8 @@ namespace FEValuesViews
      * index of the first component of the
      * selected symmetric second order tensor.
      */
-      Tensor(const FEValuesBase<dim, spacedim> &fe_values_base,
-	     const unsigned int first_tensor_component);
+    Tensor(const FEValuesBase<dim, spacedim> &fe_values_base,
+           const unsigned int first_tensor_component);
 
 
     /**
@@ -1348,7 +1348,7 @@ namespace FEValuesViews
      * copying and generate an exception if
      * this function is called.
      */
-      Tensor &operator=(const Tensor<2, dim, spacedim> &);
+    Tensor &operator=(const Tensor<2, dim, spacedim> &);
 
     /**
      * Return the value of the vector
@@ -1374,9 +1374,9 @@ namespace FEValuesViews
      * the quadrature point at which
      * function is to be evaluated
      */
-      value_type
-      value (const unsigned int shape_function,
-             const unsigned int q_point) const;
+    value_type
+    value (const unsigned int shape_function,
+           const unsigned int q_point) const;
 
     /**
      * Return the vector divergence of
@@ -1394,9 +1394,9 @@ namespace FEValuesViews
      * is as documented for the value()
      * function.
      */
-      divergence_type
-      divergence (const unsigned int shape_function,
-                  const unsigned int q_point) const;
+    divergence_type
+    divergence (const unsigned int shape_function,
+                const unsigned int q_point) const;
 
     /**
      * Return the values of the selected
@@ -1414,9 +1414,9 @@ namespace FEValuesViews
      * function but it only works on the
      * selected vector components.
      */
-      template <class InputVector>
-      void get_function_values (const InputVector &fe_function,
-                                std::vector<value_type> &values) const;
+    template <class InputVector>
+    void get_function_values (const InputVector &fe_function,
+                              std::vector<value_type> &values) const;
 
 
     /**
@@ -1442,30 +1442,30 @@ namespace FEValuesViews
      * definition of the
      * divergence.
      */
-      template <class InputVector>
-      void get_function_divergences (const InputVector &fe_function,
-                                     std::vector<divergence_type> &divergences) const;
+    template <class InputVector>
+    void get_function_divergences (const InputVector &fe_function,
+                                   std::vector<divergence_type> &divergences) const;
 
-    private:
-      /**
-       * A reference to the FEValuesBase object
-       * we operate on.
-       */
-      const FEValuesBase<dim, spacedim> &fe_values;
+  private:
+    /**
+     * A reference to the FEValuesBase object
+     * we operate on.
+     */
+    const FEValuesBase<dim, spacedim> &fe_values;
 
-      /**
-       * The first component of the vector
-       * this view represents of the
-       * FEValuesBase object.
-       */
-      const unsigned int first_tensor_component;
+    /**
+     * The first component of the vector
+     * this view represents of the
+     * FEValuesBase object.
+     */
+    const unsigned int first_tensor_component;
 
-      /**
-       * Store the data about shape
-       * functions.
-       */
-      std::vector<ShapeFunctionData> shape_function_data;
-    };
+    /**
+     * Store the data about shape
+     * functions.
+     */
+    std::vector<ShapeFunctionData> shape_function_data;
+  };
 
 }
 
@@ -4663,11 +4663,12 @@ namespace FEValuesViews
       {
         value_type return_value;
         for (unsigned int d = 0; d < dim*dim; ++d)
-          if (shape_function_data[shape_function].is_nonzero_shape_function_component[d]) {
-            const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(d);
-            return_value[indices]
-              = fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point);
-          }
+          if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+            {
+              const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(d);
+              return_value[indices]
+                = fe_values.shape_values(shape_function_data[shape_function].row_index[d],q_point);
+            }
         return return_value;
       }
   }
@@ -4703,7 +4704,7 @@ namespace FEValuesViews
         // is a first order tensor.
         //
         // assume the second-order tensor is
-        // A with components A_{ij}.  
+        // A with components A_{ij}.
         // divergence as:
         // b_j := \dfrac{\partial phi_{ij}}{\partial x_i}.
         //

@@ -997,8 +997,8 @@ private:
      * given (inclusive) range of levels.
      */
     void init (const unsigned int coarsest_level,
-	       const unsigned int finest_level,
-	       const unsigned int dofs_per_vertex);
+               const unsigned int finest_level,
+               const unsigned int dofs_per_vertex);
 
     /**
      * Return the coarsest level for which this structure
@@ -1018,7 +1018,7 @@ private:
      */
     types::global_dof_index
     get_index (const unsigned int level,
-	       const unsigned int dof_number) const;
+               const unsigned int dof_number) const;
 
     /**
      * Set the index of the <code>dof_number</code>th degree of
@@ -1026,8 +1026,8 @@ private:
      * to <code>index</code>.
      */
     void set_index (const unsigned int level,
-		    const unsigned int dof_number,
-		    const types::global_dof_index index);
+                    const unsigned int dof_number,
+                    const types::global_dof_index index);
 
     /**
      * Exception.

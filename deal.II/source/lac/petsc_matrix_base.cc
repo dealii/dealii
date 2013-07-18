@@ -281,7 +281,7 @@ namespace PETScWrappers
 
 
 
-  MatrixBase::size_type 
+  MatrixBase::size_type
   MatrixBase::n () const
   {
     PetscInt n_rows, n_cols;
@@ -294,7 +294,7 @@ namespace PETScWrappers
 
 
 
-  MatrixBase::size_type 
+  MatrixBase::size_type
   MatrixBase::local_size () const
   {
     PetscInt n_rows, n_cols;
@@ -321,7 +321,7 @@ namespace PETScWrappers
 
 
 
-  MatrixBase::size_type 
+  MatrixBase::size_type
   MatrixBase::n_nonzero_elements () const
   {
     MatInfo mat_info;
@@ -334,7 +334,7 @@ namespace PETScWrappers
 
 
 
-  MatrixBase::size_type 
+  MatrixBase::size_type
   MatrixBase::
   row_length (const size_type row) const
   {
@@ -469,16 +469,16 @@ namespace PETScWrappers
 
   MatrixBase &
   MatrixBase::add (const MatrixBase &other,
-		   const PetscScalar factor)
+                   const PetscScalar factor)
   {
     const int ierr = MatAXPY (matrix, factor,
-			      other, DIFFERENT_NONZERO_PATTERN);
+                              other, DIFFERENT_NONZERO_PATTERN);
 
     Assert (ierr == 0, ExcPETScError(ierr));
 
     return *this;
   }
-  
+
 
   void
   MatrixBase::vmult (VectorBase       &dst,
@@ -612,7 +612,7 @@ namespace PETScWrappers
 
   void
   MatrixBase::print (std::ostream &out,
-              const bool    alternative_output) const
+                     const bool    alternative_output) const
   {
     std::pair<MatrixBase::size_type, MatrixBase::size_type>
     loc_range = local_range();

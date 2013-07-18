@@ -268,13 +268,13 @@ void Timer::reset ()
 TimerOutput::TimerOutput (std::ostream &stream,
                           const enum OutputFrequency output_frequency,
                           const enum OutputType output_type)
-  :
-  output_frequency (output_frequency),
-  output_type (output_type),
-  out_stream (stream, true),
-  output_is_enabled (true)
+:
+output_frequency (output_frequency),
+                 output_type (output_type),
+                 out_stream (stream, true),
+                 output_is_enabled (true)
 #ifdef DEAL_II_WITH_MPI
-  , mpi_communicator (MPI_COMM_SELF)
+                 , mpi_communicator (MPI_COMM_SELF)
 #endif
 {}
 
@@ -283,13 +283,13 @@ TimerOutput::TimerOutput (std::ostream &stream,
 TimerOutput::TimerOutput (ConditionalOStream &stream,
                           const enum OutputFrequency output_frequency,
                           const enum OutputType output_type)
-  :
-  output_frequency (output_frequency),
-  output_type (output_type),
-  out_stream (stream),
-  output_is_enabled (true)
+:
+output_frequency (output_frequency),
+output_type (output_type),
+out_stream (stream),
+output_is_enabled (true)
 #ifdef DEAL_II_WITH_MPI
-  , mpi_communicator (MPI_COMM_SELF)
+, mpi_communicator (MPI_COMM_SELF)
 #endif
 {}
 
@@ -300,12 +300,12 @@ TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
                           std::ostream &stream,
                           const enum OutputFrequency output_frequency,
                           const enum OutputType output_type)
-  :
-  output_frequency (output_frequency),
-  output_type (output_type),
-  out_stream (stream, true),
-  output_is_enabled (true),
-  mpi_communicator (mpi_communicator)
+:
+output_frequency (output_frequency),
+output_type (output_type),
+out_stream (stream, true),
+output_is_enabled (true),
+mpi_communicator (mpi_communicator)
 {}
 
 
@@ -314,12 +314,12 @@ TimerOutput::TimerOutput (MPI_Comm      mpi_communicator,
                           ConditionalOStream &stream,
                           const enum OutputFrequency output_frequency,
                           const enum OutputType output_type)
-  :
-  output_frequency (output_frequency),
-  output_type (output_type),
-  out_stream (stream),
-  output_is_enabled (true),
-  mpi_communicator (mpi_communicator)
+:
+output_frequency (output_frequency),
+output_type (output_type),
+out_stream (stream),
+output_is_enabled (true),
+mpi_communicator (mpi_communicator)
 {}
 
 #endif
@@ -331,7 +331,7 @@ TimerOutput::~TimerOutput()
     leave_subsection();
 
   if ( (output_frequency == summary || output_frequency == every_call_and_summary)
-      && output_is_enabled == true)
+       && output_is_enabled == true)
     print_summary();
 }
 

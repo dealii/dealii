@@ -44,29 +44,29 @@ public:
    * construct CellId with a given coarse_cell_index and list of child indices
    */
   explicit CellId(unsigned int coarse_cell_id_, std::vector<unsigned char> id_)
-  : coarse_cell_id(coarse_cell_id_), id(id_)
+    : coarse_cell_id(coarse_cell_id_), id(id_)
   {}
 
   /**
    * construct an empty CellId.
    */
   CellId()
-  : coarse_cell_id(-1)
+    : coarse_cell_id(-1)
   {}
 
   /**
    * compare two CellIds
    */
-  bool operator== (const CellId & other) const;
+  bool operator== (const CellId &other) const;
 
   /**
    * compare two CellIds
    */
-  bool operator!= (const CellId & other) const;
+  bool operator!= (const CellId &other) const;
 
 
-  friend std::istream& operator>> (std::istream& is, CellId& cid);
-  friend std::ostream& operator<< (std::ostream& os, const CellId& cid);
+  friend std::istream &operator>> (std::istream &is, CellId &cid);
+  friend std::ostream &operator<< (std::ostream &os, const CellId &cid);
 private:
   unsigned int coarse_cell_id;
   std::vector<unsigned char> id;
@@ -75,10 +75,10 @@ private:
 /**
  * output CellId into a stream
  */
-inline std::ostream& operator<< (std::ostream& os, const CellId& cid)
+inline std::ostream &operator<< (std::ostream &os, const CellId &cid)
 {
   os << cid.coarse_cell_id << '_' << cid.id.size() << ':';
-  for (unsigned int i=0;i<cid.id.size();++i)
+  for (unsigned int i=0; i<cid.id.size(); ++i)
     os << static_cast<int>(cid.id[i]);
   return os;
 }
@@ -86,7 +86,7 @@ inline std::ostream& operator<< (std::ostream& os, const CellId& cid)
 /**
  * read CellId from a stream
  */
-inline std::istream& operator>> (std::istream& is, CellId& cid)
+inline std::istream &operator>> (std::istream &is, CellId &cid)
 {
   unsigned int cellid;
   is >> cellid;
@@ -104,7 +104,7 @@ inline std::istream& operator>> (std::istream& is, CellId& cid)
 
   char value;
   cid.id.clear();
-  for (unsigned int i=0;i<idsize;++i)
+  for (unsigned int i=0; i<idsize; ++i)
     {
       is >> value;
       cid.id.push_back(value-'0');
@@ -113,7 +113,7 @@ inline std::istream& operator>> (std::istream& is, CellId& cid)
 }
 
 inline bool
-CellId::operator== (const CellId & other) const
+CellId::operator== (const CellId &other) const
 {
   if (this->coarse_cell_id != other.coarse_cell_id)
     return false;
@@ -124,7 +124,7 @@ CellId::operator== (const CellId & other) const
  *
  */
 inline bool
-CellId::operator!= (const CellId & other) const
+CellId::operator!= (const CellId &other) const
 {
   return !(*this == other);
 }

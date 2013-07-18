@@ -88,7 +88,7 @@ namespace PETScWrappers
        */
       typedef types::global_dof_index size_type;
 
-      private:
+    private:
       /**
        * Constructor. It is made private so
        * as to only allow the actual vector
@@ -98,8 +98,8 @@ namespace PETScWrappers
                        const size_type   index);
 
 
-      public:
-	
+    public:
+
       /**
        * This looks like a copy operator,
        * but does something different than

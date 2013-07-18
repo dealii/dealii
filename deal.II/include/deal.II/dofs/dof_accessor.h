@@ -419,15 +419,15 @@ public:
    * level this line lives on.
    */
   void get_mg_dof_indices (const int level,
-			   std::vector<types::global_dof_index> &dof_indices,
-			   const unsigned int fe_index = DH::default_fe_index) const;
+                           std::vector<types::global_dof_index> &dof_indices,
+                           const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
    * Sets the level DoF indices that are returned by get_mg_dof_indices.
    */
   void set_mg_dof_indices (const int level,
-			   const std::vector<types::global_dof_index> &dof_indices,
-			   const unsigned int fe_index = DH::default_fe_index);
+                           const std::vector<types::global_dof_index> &dof_indices,
+                           const unsigned int fe_index = DH::default_fe_index);
 
   /**
    * Global DoF index of the <i>i</i>
@@ -475,9 +475,9 @@ public:
    * level @p level. Also see vertex_dof_index().
    */
   types::global_dof_index mg_vertex_dof_index (const int level,
-					       const unsigned int vertex,
-					       const unsigned int i,
-					       const unsigned int fe_index = DH::default_fe_index) const;
+                                               const unsigned int vertex,
+                                               const unsigned int i,
+                                               const unsigned int fe_index = DH::default_fe_index) const;
 
   /**
    * Index of the <i>i</i>th degree

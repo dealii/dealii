@@ -503,8 +503,8 @@ namespace Step17
           cell->get_dof_indices (local_dof_indices);
           hanging_node_constraints
           .distribute_local_to_global(cell_matrix, cell_rhs,
-                                       local_dof_indices,
-                                       system_matrix, system_rhs);
+                                      local_dof_indices,
+                                      system_matrix, system_rhs);
         }
 
     // Now compress the vector and the system matrix:

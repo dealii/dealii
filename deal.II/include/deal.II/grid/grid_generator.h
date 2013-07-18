@@ -692,7 +692,7 @@ public:
    */
   static
   void
-  extrude_triangulation(const Triangulation<2, 2> & input,
+  extrude_triangulation(const Triangulation<2, 2> &input,
                         const size_type n_slices,
                         const double height,
                         Triangulation<3,3> &result);

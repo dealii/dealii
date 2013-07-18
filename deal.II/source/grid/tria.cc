@@ -11035,15 +11035,15 @@ Triangulation<dim,spacedim>::last_active () const
 {
   // get the last used cell
   cell_iterator cell = last();
-  
+
   if (cell != end())
     {
       // then move to the last active one
       if (cell->active()==true)
-	return cell;
+        return cell;
       while ((--cell).state() == IteratorState::valid)
-	if (cell->active()==true)
-	  return cell;
+        if (cell->active()==true)
+          return cell;
     }
   return cell;
 }
@@ -11057,15 +11057,15 @@ Triangulation<dim,spacedim>::last_active (const unsigned int level) const
   // get the last used cell on this level
   cell_iterator cell = last(level);
 
- if (cell != end(level))
-   {
-     // then move to the last active one
-     if (cell->active()==true)
-       return cell;
-     while ((--cell).state() == IteratorState::valid)
-       if (cell->active()==true)
-	 return cell;
-   }
+  if (cell != end(level))
+    {
+      // then move to the last active one
+      if (cell->active()==true)
+        return cell;
+      while ((--cell).state() == IteratorState::valid)
+        if (cell->active()==true)
+          return cell;
+    }
   return cell;
 }
 
@@ -11194,7 +11194,7 @@ Triangulation<dim, spacedim>::begin_raw_line (const unsigned int level) const
     {
     case 1:
       Assert (level<n_global_levels() || level<levels.size(), ExcInvalidLevel(level));
-      
+
       if (level >= levels.size() || levels[level]->cells.cells.size() == 0)
         return end_line();
 
@@ -11354,10 +11354,10 @@ Triangulation<dim,spacedim>::begin_raw_hex (const unsigned int level) const
     case 3:
     {
       Assert (level<n_global_levels() || level<levels.size(), ExcInvalidLevel(level));
-      
+
       if (level >= levels.size() || levels[level]->cells.cells.size() == 0)
         return end_hex();
-      
+
       return raw_hex_iterator (const_cast<Triangulation<dim,spacedim>*>(this),
                                level,
                                0);

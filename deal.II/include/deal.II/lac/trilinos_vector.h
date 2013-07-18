@@ -50,16 +50,16 @@ namespace TrilinosWrappers
   namespace
   {
 #ifndef DEAL_II_USE_LARGE_INDEX_TYPE
-    // define a helper function that queries the global ID of local ID of 
-    // an Epetra_BlockMap object  by calling either the 32- or 64-bit 
+    // define a helper function that queries the global ID of local ID of
+    // an Epetra_BlockMap object  by calling either the 32- or 64-bit
     // function necessary.
     int gid(const Epetra_BlockMap &map, int i)
     {
       return map.GID(i);
     }
 #else
-    // define a helper function that queries the global ID of local ID of 
-    // an Epetra_BlockMap object  by calling either the 32- or 64-bit 
+    // define a helper function that queries the global ID of local ID of
+    // an Epetra_BlockMap object  by calling either the 32- or 64-bit
     // function necessary.
     long long int gid(const Epetra_BlockMap &map, int i)
     {
@@ -287,8 +287,8 @@ namespace TrilinosWrappers
        * values ghost.
        */
       void reinit (const IndexSet &local,
-          const IndexSet &ghost,
-          const MPI_Comm &communicator = MPI_COMM_WORLD);
+                   const IndexSet &ghost,
+                   const MPI_Comm &communicator = MPI_COMM_WORLD);
 
       /**
        * Set all components of the
@@ -423,7 +423,7 @@ namespace TrilinosWrappers
        * details.
        */
       Vector (const Epetra_Map &parallel_partitioning,
-                       const VectorBase &v);
+              const VectorBase &v);
 
       /**
        * Reinitialize from a deal.II
@@ -452,7 +452,7 @@ namespace TrilinosWrappers
        */
       template <typename Number>
       Vector (const Epetra_Map             &parallel_partitioning,
-                       const dealii::Vector<Number> &v);
+              const dealii::Vector<Number> &v);
 //@}
       /**
        * @name Initialization with an IndexSet
@@ -469,7 +469,7 @@ namespace TrilinosWrappers
        * vector.
        */
       explicit Vector (const IndexSet &parallel_partitioning,
-              const MPI_Comm &communicator = MPI_COMM_WORLD);
+                       const MPI_Comm &communicator = MPI_COMM_WORLD);
 
       /**
        * Creates a ghosted parallel vector.
@@ -490,8 +490,8 @@ namespace TrilinosWrappers
        * partitioning details.
        */
       Vector (const IndexSet   &parallel_partitioning,
-                       const VectorBase &v,
-                       const MPI_Comm   &communicator = MPI_COMM_WORLD);
+              const VectorBase &v,
+              const MPI_Comm   &communicator = MPI_COMM_WORLD);
 
       /**
        * Copy-constructor from deal.II
@@ -501,8 +501,8 @@ namespace TrilinosWrappers
        */
       template <typename Number>
       Vector (const IndexSet               &parallel_partitioning,
-                       const dealii::Vector<Number> &v,
-                       const MPI_Comm               &communicator = MPI_COMM_WORLD);
+              const dealii::Vector<Number> &v,
+              const MPI_Comm               &communicator = MPI_COMM_WORLD);
 
       /**
        * Reinit functionality. This function
@@ -696,7 +696,7 @@ namespace TrilinosWrappers
      * be generated internally.
      */
     explicit Vector (const IndexSet &partitioning,
-            const MPI_Comm &communicator = MPI_COMM_WORLD);
+                     const MPI_Comm &communicator = MPI_COMM_WORLD);
 
     /**
      * This constructor takes a

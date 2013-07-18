@@ -72,10 +72,10 @@ SparseVanka<number>::compute_inverses ()
 #else
   const size_type n_inverses = std::count (selected.begin(),
                                            selected.end(),
-                                            true);
+                                           true);
 
-  const size_type n_inverses_per_thread = std::max(n_inverses / n_threads, 
-          static_cast<size_type> (1U));
+  const size_type n_inverses_per_thread = std::max(n_inverses / n_threads,
+                                                   static_cast<size_type> (1U));
 
   // set up start and end index
   // for each of the
@@ -293,7 +293,7 @@ SparseVanka<number>::apply_preconditioner (Vector<number2>         &dst,
             // number of DoFs coupling to
             // irow (including irow itself)
             for (typename SparseMatrix<number>::const_iterator p=matrix->begin(row);
-                p != matrix->end(row); ++p)
+                 p != matrix->end(row); ++p)
               {
                 // find out whether this DoF
                 // (that couples with @p irow,
@@ -396,8 +396,8 @@ SparseBlockVanka<number>::compute_dof_masks (const SparseMatrix<number> &M,
                                            selected.end(),
                                            true);
 
-  const size_type n_inverses_per_block = std::max(n_inverses / n_blocks, 
-      static_cast<size_type> (1U));
+  const size_type n_inverses_per_block = std::max(n_inverses / n_blocks,
+                                                  static_cast<size_type> (1U));
 
   // precompute the splitting points
   std::vector<std::pair<size_type, size_type> > intervals (n_blocks);

@@ -347,7 +347,7 @@ namespace FEValuesViews
   template <int dim, int spacedim>
   Tensor<2, dim, spacedim>::
   Tensor(const FEValuesBase<dim, spacedim> &fe_values,
-                  const unsigned int first_tensor_component)
+         const unsigned int first_tensor_component)
     :
     fe_values(fe_values),
     first_tensor_component(first_tensor_component),
@@ -480,7 +480,7 @@ namespace FEValuesViews
             const double *shape_value_ptr =
               &shape_values(shape_function_data[shape_function].row_index, 0);
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-              values[q_point] += value * *shape_value_ptr++;
+              values[q_point] += value **shape_value_ptr++;
           }
     }
 
@@ -514,7 +514,7 @@ namespace FEValuesViews
             const dealii::Tensor<order,spacedim> *shape_derivative_ptr =
               &shape_derivatives[shape_function_data[shape_function].row_index][0];
             for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-              derivatives[q_point] += value * *shape_derivative_ptr++;
+              derivatives[q_point] += value **shape_derivative_ptr++;
           }
     }
 
@@ -585,7 +585,7 @@ namespace FEValuesViews
                 shape_function_data[shape_function].single_nonzero_component_index;
               const double *shape_value_ptr = &shape_values(snc,0);
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                values[q_point][comp] += value * *shape_value_ptr++;
+                values[q_point][comp] += value **shape_value_ptr++;
             }
           else
             for (unsigned int d=0; d<spacedim; ++d)
@@ -594,7 +594,7 @@ namespace FEValuesViews
                   const double *shape_value_ptr =
                     &shape_values(shape_function_data[shape_function].row_index[d],0);
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    values[q_point][d] += value * *shape_value_ptr++;
+                    values[q_point][d] += value **shape_value_ptr++;
                 }
         }
     }
@@ -636,7 +636,7 @@ namespace FEValuesViews
               const dealii::Tensor<order,spacedim> *shape_derivative_ptr =
                 &shape_derivatives[snc][0];
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                derivatives[q_point][comp] += value * *shape_derivative_ptr++;
+                derivatives[q_point][comp] += value **shape_derivative_ptr++;
             }
           else
             for (unsigned int d=0; d<spacedim; ++d)
@@ -646,7 +646,7 @@ namespace FEValuesViews
                     &shape_derivatives[shape_function_data[shape_function].
                                        row_index[d]][0];
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    derivatives[q_point][d] += value * *shape_derivative_ptr++;
+                    derivatives[q_point][d] += value **shape_derivative_ptr++;
                 }
         }
     }
@@ -954,7 +954,7 @@ namespace FEValuesViews
       AssertDimension (laplacians.size(), n_quadrature_points);
 
       std::fill (laplacians.begin(), laplacians.end(),
-		 dealii::Tensor<1,spacedim>());
+                 dealii::Tensor<1,spacedim>());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1031,7 +1031,7 @@ namespace FEValuesViews
                 (shape_function_data[shape_function].single_nonzero_component_index);
               const double *shape_value_ptr = &shape_values(snc,0);
               for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                values[q_point][comp] += value * *shape_value_ptr++;
+                values[q_point][comp] += value **shape_value_ptr++;
             }
           else
             for (unsigned int d=0;
@@ -1043,7 +1043,7 @@ namespace FEValuesViews
                   const double *shape_value_ptr =
                     &shape_values(shape_function_data[shape_function].row_index[d],0);
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    values[q_point][comp] += value * *shape_value_ptr++;
+                    values[q_point][comp] += value **shape_value_ptr++;
                 }
         }
     }
@@ -1063,7 +1063,7 @@ namespace FEValuesViews
       AssertDimension (divergences.size(), n_quadrature_points);
 
       std::fill (divergences.begin(), divergences.end(),
-		 dealii::Tensor<1,spacedim>());
+                 dealii::Tensor<1,spacedim>());
 
       for (unsigned int shape_function=0;
            shape_function<dofs_per_cell; ++shape_function)
@@ -1138,119 +1138,119 @@ namespace FEValuesViews
 
     // ---------------------- non-symmetric tensor part ------------------------
 
-        template <int dim, int spacedim>
-        void
-        do_function_values (const ::dealii::Vector<double> &dof_values,
-                            const Table<2,double>          &shape_values,
-                            const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                            std::vector<dealii::Tensor<2,spacedim> > &values)
+    template <int dim, int spacedim>
+    void
+    do_function_values (const ::dealii::Vector<double> &dof_values,
+                        const Table<2,double>          &shape_values,
+                        const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
+                        std::vector<dealii::Tensor<2,spacedim> > &values)
+    {
+      const unsigned int dofs_per_cell = dof_values.size();
+      const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
+                                               shape_values.n_cols() : values.size();
+      AssertDimension (values.size(), n_quadrature_points);
+
+      std::fill (values.begin(), values.end(),
+                 dealii::Tensor<2,spacedim>());
+
+      for (unsigned int shape_function=0;
+           shape_function<dofs_per_cell; ++shape_function)
         {
-          const unsigned int dofs_per_cell = dof_values.size();
-          const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
-                                                   shape_values.n_cols() : values.size();
-          AssertDimension (values.size(), n_quadrature_points);
+          const int snc = shape_function_data[shape_function].single_nonzero_component;
 
-          std::fill (values.begin(), values.end(),
-                     dealii::Tensor<2,spacedim>());
+          if (snc == -2)
+            // shape function is zero for the selected components
+            continue;
 
-          for (unsigned int shape_function=0;
-               shape_function<dofs_per_cell; ++shape_function)
+          const double value = dof_values(shape_function);
+          if (value == 0.)
+            continue;
+
+          if (snc != -1)
             {
-              const int snc = shape_function_data[shape_function].single_nonzero_component;
+              const unsigned int comp =
+                shape_function_data[shape_function].single_nonzero_component_index;
 
-              if (snc == -2)
-                // shape function is zero for the selected components
-                continue;
+              const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
 
-              const double value = dof_values(shape_function);
-              if (value == 0.)
-                continue;
-
-              if (snc != -1)
+              const double *shape_value_ptr = &shape_values(snc,0);
+              for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
+                values[q_point][indices] += value **shape_value_ptr++;
+            }
+          else
+            for (unsigned int d=0;
+                 d<dim*dim; ++d)
+              if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
                 {
-                  const unsigned int comp =
-                    shape_function_data[shape_function].single_nonzero_component_index;
+                  const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(d);
 
-                  const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
-
-                  const double *shape_value_ptr = &shape_values(snc,0);
+                  const double *shape_value_ptr =
+                    &shape_values(shape_function_data[shape_function].row_index[d],0);
                   for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                    values[q_point][indices] += value * *shape_value_ptr++;
+                    values[q_point][indices] += value **shape_value_ptr++;
                 }
-              else
-                for (unsigned int d=0;
-                     d<dim*dim; ++d)
-                  if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
-                    {
-                      const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(d);
-
-                      const double *shape_value_ptr =
-                        &shape_values(shape_function_data[shape_function].row_index[d],0);
-                      for (unsigned int q_point=0; q_point<n_quadrature_points; ++q_point)
-                        values[q_point][indices] += value * *shape_value_ptr++;
-                    }
-            }
         }
+    }
 
 
 
-        template <int dim, int spacedim>
-        void
-        do_function_divergences (const ::dealii::Vector<double> &dof_values,
-                                 const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
-                                 const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
-                                 std::vector<dealii::Tensor<1,spacedim> > &divergences)
+    template <int dim, int spacedim>
+    void
+    do_function_divergences (const ::dealii::Vector<double> &dof_values,
+                             const std::vector<std::vector<dealii::Tensor<1,spacedim> > > &shape_gradients,
+                             const std::vector<typename Tensor<2,dim,spacedim>::ShapeFunctionData> &shape_function_data,
+                             std::vector<dealii::Tensor<1,spacedim> > &divergences)
+    {
+      const unsigned int dofs_per_cell = dof_values.size();
+      const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
+                                               shape_gradients[0].size() : divergences.size();
+      AssertDimension (divergences.size(), n_quadrature_points);
+
+      std::fill (divergences.begin(), divergences.end(),
+                 dealii::Tensor<1,spacedim>());
+
+      for (unsigned int shape_function=0;
+           shape_function<dofs_per_cell; ++shape_function)
         {
-          const unsigned int dofs_per_cell = dof_values.size();
-          const unsigned int n_quadrature_points = dofs_per_cell > 0 ?
-                                                   shape_gradients[0].size() : divergences.size();
-          AssertDimension (divergences.size(), n_quadrature_points);
+          const int snc = shape_function_data[shape_function].single_nonzero_component;
 
-          std::fill (divergences.begin(), divergences.end(),
-		     dealii::Tensor<1,spacedim>());
+          if (snc == -2)
+            // shape function is zero for the selected components
+            continue;
 
-          for (unsigned int shape_function=0;
-               shape_function<dofs_per_cell; ++shape_function)
+          const double value = dof_values(shape_function);
+          if (value == 0.)
+            continue;
+
+          if (snc != -1)
             {
-              const int snc = shape_function_data[shape_function].single_nonzero_component;
+              const unsigned int comp =
+                shape_function_data[shape_function].single_nonzero_component_index;
 
-              if (snc == -2)
-                // shape function is zero for the selected components
-                continue;
+              const dealii::Tensor < 1, spacedim> *shape_gradient_ptr =
+                &shape_gradients[snc][0];
 
-              const double value = dof_values(shape_function);
-              if (value == 0.)
-                continue;
+              const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
+              const unsigned int ii = indices[0];
+              const unsigned int jj = indices[1];
 
-              if (snc != -1)
+              for (unsigned int q_point = 0; q_point < n_quadrature_points;
+                   ++q_point, ++shape_gradient_ptr)
                 {
-                  const unsigned int comp =
-                    shape_function_data[shape_function].single_nonzero_component_index;
-
-                  const dealii::Tensor < 1, spacedim> *shape_gradient_ptr =
-                    &shape_gradients[snc][0];
-
-                  const TableIndices<2> indices = dealii::Tensor<2,spacedim>::unrolled_to_component_indices(comp);
-                  const unsigned int ii = indices[0];
-                  const unsigned int jj = indices[1];
-
-                  for (unsigned int q_point = 0; q_point < n_quadrature_points;
-                       ++q_point, ++shape_gradient_ptr)
-                    {
-                      divergences[q_point][jj] += value * (*shape_gradient_ptr)[ii];
-                    }
-                }
-              else
-                {
-                  for (unsigned int d = 0;
-                       d < dim*dim; ++d)
-                    if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
-                      {
-                        Assert (false, ExcNotImplemented());
-                      }
+                  divergences[q_point][jj] += value * (*shape_gradient_ptr)[ii];
                 }
             }
+          else
+            {
+              for (unsigned int d = 0;
+                   d < dim*dim; ++d)
+                if (shape_function_data[shape_function].is_nonzero_shape_function_component[d])
+                  {
+                    Assert (false, ExcNotImplemented());
+                  }
+            }
         }
+    }
 
   } // end of namespace internal
 
@@ -1716,7 +1716,7 @@ namespace internal
 #endif
           new (&second_order_tensors[component])
           dealii::FEValuesViews::Tensor<2, dim, spacedim > (fe_values,
-							    component);
+                                                            component);
         }
     }
   }
@@ -2237,7 +2237,7 @@ namespace internal
 
         const double *shape_value_ptr = &shape_values(shape_func, 0);
         for (unsigned int point=0; point<n_quadrature_points; ++point)
-          values[point] += value * *shape_value_ptr++;
+          values[point] += value **shape_value_ptr++;
       }
   }
 
@@ -2300,11 +2300,11 @@ namespace internal
                 {
                   VectorType &values_comp = values[comp];
                   for (unsigned int point=0; point<n_quadrature_points; ++point)
-                    values_comp[point] += value * *shape_value_ptr++;
+                    values_comp[point] += value **shape_value_ptr++;
                 }
               else
                 for (unsigned int point=0; point<n_quadrature_points; ++point)
-                  values[point][comp] += value * *shape_value_ptr++;
+                  values[point][comp] += value **shape_value_ptr++;
             }
           else
             for (unsigned int c=0; c<n_components; ++c)
@@ -2323,11 +2323,11 @@ namespace internal
                     VectorType &values_comp = values[comp];
                     for (unsigned int point=0; point<n_quadrature_points;
                          ++point)
-                      values_comp[point] += value * *shape_value_ptr++;
+                      values_comp[point] += value **shape_value_ptr++;
                   }
                 else
                   for (unsigned int point=0; point<n_quadrature_points; ++point)
-                    values[point][comp] += value * *shape_value_ptr++;
+                    values[point][comp] += value **shape_value_ptr++;
               }
         }
   }
@@ -2364,7 +2364,7 @@ namespace internal
         const Tensor<order,spacedim> *shape_derivative_ptr
           = &shape_derivatives[shape_func][0];
         for (unsigned int point=0; point<n_quadrature_points; ++point)
-          derivatives[point] += value * *shape_derivative_ptr++;
+          derivatives[point] += value **shape_derivative_ptr++;
       }
   }
 
@@ -2426,10 +2426,10 @@ namespace internal
 
               if (quadrature_points_fastest)
                 for (unsigned int point=0; point<n_quadrature_points; ++point)
-                  derivatives[comp][point] += value * *shape_derivative_ptr++;
+                  derivatives[comp][point] += value **shape_derivative_ptr++;
               else
                 for (unsigned int point=0; point<n_quadrature_points; ++point)
-                  derivatives[point][comp] += value * *shape_derivative_ptr++;
+                  derivatives[point][comp] += value **shape_derivative_ptr++;
             }
           else
             for (unsigned int c=0; c<n_components; ++c)
@@ -2446,10 +2446,10 @@ namespace internal
 
                 if (quadrature_points_fastest)
                   for (unsigned int point=0; point<n_quadrature_points; ++point)
-                    derivatives[comp][point] += value * *shape_derivative_ptr++;
+                    derivatives[comp][point] += value **shape_derivative_ptr++;
                 else
                   for (unsigned int point=0; point<n_quadrature_points; ++point)
-                    derivatives[point][comp] += value * *shape_derivative_ptr++;
+                    derivatives[point][comp] += value **shape_derivative_ptr++;
               }
         }
   }

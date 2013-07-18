@@ -324,7 +324,7 @@ protected:
   TriaAccessorBase (const Triangulation<dim,spacedim> *parent =  0,
                     const int                 level  = -1,
                     const int                 index  = -1,
-                    const AccessorData       *       =  0);
+                    const AccessorData             * =  0);
 
   /**
    *  Copy constructor. Creates an
@@ -350,14 +350,14 @@ protected:
    *  object with exactly the same data.
    */
   TriaAccessorBase &operator = (const TriaAccessorBase &);
-  
+
   /**
    * Ordering of accessors. If #structure_dimension is less than
    * #dimension, we simply compare the index of such an object. If
    * #structure_dimension equals #dimension, we compare the level()
    * first, and the index() only if levels are equal.
    */
-  bool operator < (const TriaAccessorBase& other) const;
+  bool operator < (const TriaAccessorBase &other) const;
 
 protected:
   /**
@@ -2861,7 +2861,7 @@ public:
    * for more information.
    */
   bool active () const;
-  
+
   /**
    * Ordering of accessors. This function implements a total ordering
    * of cells even on a parallel::distributed::Triangulation. This
@@ -2869,7 +2869,7 @@ public:
    * and both cells are active, it compares subdomain_id(). If this is
    * inconclusive, TriaAccessorBase::operator < () is called.
    */
-  bool operator < (const CellAccessor<dim, spacedim>& other) const;
+  bool operator < (const CellAccessor<dim, spacedim> &other) const;
 
 
   /**
@@ -3222,7 +3222,7 @@ CellAccessor<dim,spacedim>::id() const
     {
       // find the 'v'st child of our parent we are
       unsigned char v=-1;
-      for (unsigned int c=0;c<ptr.parent()->n_children();++c)
+      for (unsigned int c=0; c<ptr.parent()->n_children(); ++c)
         {
           if (ptr.parent()->child_index(c)==ptr.index())
             {

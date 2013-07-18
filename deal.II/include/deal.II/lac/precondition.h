@@ -1321,7 +1321,7 @@ PreconditionSSOR<MATRIX>::initialize (const MATRIX &rA,
           // only. note: the first entry in each line denotes the diagonal
           // element, which we need not check.
           typename SparseMatrix<typename MATRIX::value_type>::const_iterator
-            it = mat->begin(row)+1;
+          it = mat->begin(row)+1;
           for ( ; it < mat->end(row); ++it)
             if (it->column() > row)
               break;
@@ -1776,7 +1776,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
 
       // attach stream to SolverCG, run it with log report for eigenvalues
       std::ostream *old_stream = deallog.has_file() ? &deallog.get_file_stream() :
-        static_cast<std::ostream *>(0);
+                                 static_cast<std::ostream *>(0);
       if (old_stream)
         deallog.detach();
 
@@ -1796,7 +1796,7 @@ PreconditionChebyshev<MATRIX,VECTOR>::initialize (const MATRIX &matrix,
       cg_data.compute_eigenvalues = true;
       SolverCG<VECTOR> solver (control, memory, cg_data);
       internal::PreconditionChebyshev::DiagonalPreconditioner<VECTOR>
-        preconditioner(data.matrix_diagonal_inverse);
+      preconditioner(data.matrix_diagonal_inverse);
       try
         {
           solver.solve(matrix, *dummy, *rhs, preconditioner);

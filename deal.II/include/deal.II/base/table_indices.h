@@ -46,12 +46,12 @@ public:
    * <tt>i</tt>th index.
    */
   unsigned int operator[] (const unsigned int i) const;
-  
+
   /**
    * Write access the value of the
    * <tt>i</tt>th index.
    */
-  unsigned int & operator[] (const unsigned int i);
+  unsigned int &operator[] (const unsigned int i);
 
   /**
    * Compare two index fields for
@@ -438,7 +438,7 @@ TableIndicesBase<N>::operator [] (const unsigned int i) const
 template <int N>
 inline
 unsigned int &
-TableIndicesBase<N>::operator [] (const unsigned int i) 
+TableIndicesBase<N>::operator [] (const unsigned int i)
 {
   Assert (i < N, ExcIndexRange (i, 0, N));
   return indices[i];

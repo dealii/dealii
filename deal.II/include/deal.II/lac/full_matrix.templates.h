@@ -343,9 +343,9 @@ void FullMatrix<number>::fill (const FullMatrix<number2> &src,
 
   // Compute maximal size of copied block
   const size_type rows = std::min (m() - dst_offset_i,
-                                      src.m() - src_offset_i);
+                                   src.m() - src_offset_i);
   const size_type cols = std::min (n() - dst_offset_j,
-                                      src.n() - src_offset_j);
+                                   src.n() - src_offset_j);
 
   for (size_type i=0; i<rows ; ++i)
     for (size_type j=0; j<cols ; ++j)
@@ -1151,7 +1151,7 @@ void FullMatrix<number>::Tadd (const FullMatrix<number2> &src,
   // Compute maximal size of copied block
   const size_type rows = std::min (m() - dst_offset_i, src.n() - src_offset_j);
   const size_type cols = std::min (n() - dst_offset_j,
-                                      src.m() - src_offset_i);
+                                   src.m() - src_offset_i);
 
 
   for (size_type i=0; i<rows ; ++i)
@@ -1646,7 +1646,7 @@ FullMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
   const somenumber *src_ptr = src.begin();
 
   for (size_type i=0; i<n; ++i, ++dst_ptr, ++src_ptr)
-    *dst_ptr = somenumber(om) * *src_ptr / somenumber((*this)(i,i));
+    *dst_ptr = somenumber(om) **src_ptr / somenumber((*this)(i,i));
 }
 
 

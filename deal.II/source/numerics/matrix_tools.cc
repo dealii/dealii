@@ -2010,7 +2010,7 @@ namespace MatrixTools
 
 
     std::map<types::global_dof_index,double>::const_iterator dof  = boundary_values.begin(),
-							     endd = boundary_values.end();
+                                                             endd = boundary_values.end();
     for (; dof != endd; ++dof)
       {
         Assert (dof->first < n_dofs, ExcInternalError());

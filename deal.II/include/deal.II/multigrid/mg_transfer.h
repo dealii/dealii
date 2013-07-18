@@ -48,9 +48,9 @@ namespace internal
   {
     typedef ::dealii::SparsityPattern Sparsity;
     typedef ::dealii::SparseMatrix<typename VECTOR::value_type> Matrix;
-    
+
     template <class CSP, class DH>
-    static void reinit(Matrix& matrix, Sparsity& sparsity, int level, const CSP& csp, const DH&)
+    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const CSP &csp, const DH &)
     {
       sparsity.copy_from (csp);
       matrix.reinit (sparsity);
@@ -63,15 +63,15 @@ namespace internal
   {
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
-    
+
     template <class CSP, class DH>
-    static void reinit(Matrix& matrix, Sparsity& sparsity, int level, const CSP& csp, DH& dh)
+    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const CSP &csp, DH &dh)
     {
       matrix.reinit(dh.locally_owned_mg_dofs(level+1),
-		    dh.locally_owned_mg_dofs(level),
-		    csp, MPI_COMM_WORLD, true);
+                    dh.locally_owned_mg_dofs(level),
+                    csp, MPI_COMM_WORLD, true);
     }
-    
+
   };
 
   template <>
@@ -79,9 +79,9 @@ namespace internal
   {
     typedef ::dealii::TrilinosWrappers::SparsityPattern Sparsity;
     typedef ::dealii::TrilinosWrappers::SparseMatrix Matrix;
-    
+
     template <class CSP, class DH>
-    static void reinit(Matrix& matrix, Sparsity& sparsity, int level, const CSP& csp, DH& dh)
+    static void reinit(Matrix &matrix, Sparsity &sparsity, int level, const CSP &csp, DH &dh)
     {
     }
   };
@@ -235,17 +235,17 @@ public:
    * Memory used by this object.
    */
   std::size_t memory_consumption () const;
-  
+
   /**
    * Print all the matrices for debugging purposes.
    */
-  void print_matrices(std::ostream& os) const;
+  void print_matrices(std::ostream &os) const;
 
   /**
    * Print the copy index fields for debugging purposes.
    */
-  void print_indices(std::ostream& os) const;
-  
+  void print_indices(std::ostream &os) const;
+
 private:
 
   /**
@@ -268,7 +268,7 @@ private:
   /**
    * Mapping for the copy_to_mg() and copy_from_mg() functions. Here only
    * index pairs locally owned
-   * 
+   *
    * The data is organized as follows: one vector per level. Each
    * element of these vectors contains first the global index, then
    * the level index.
@@ -295,7 +295,7 @@ private:
    */
   std::vector<std::vector<std::pair<types::global_dof_index, unsigned int> > >
   copy_indices_from_me;
-  
+
 
   /**
    * The vector that stores what

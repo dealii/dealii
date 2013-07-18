@@ -360,7 +360,7 @@ DerivativeForm<order,dim,spacedim>::covariant_form() const
 
       Tensor<2,dim> DF_t (dealii::transpose(invert(  (Tensor<2,dim>)(*this)   )));
       DerivativeForm<1,dim, spacedim> result = DF_t;
-      return(result);
+      return (result);
     }
   else
     {

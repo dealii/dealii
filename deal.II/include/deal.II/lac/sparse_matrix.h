@@ -713,7 +713,7 @@ public:
    * object. See MemoryConsumption.
    */
   std::size_t memory_consumption () const;
-  
+
   /**
    * Dummy function for compatibility with distributed, parallel matrices.
    */
@@ -949,7 +949,7 @@ public:
   SparseMatrix<number> &
   copy_from (const TrilinosWrappers::SparseMatrix &matrix);
 #endif
-  
+
   /**
    * Add <tt>matrix</tt> scaled by <tt>factor</tt> to this matrix, i.e. the
    * matrix <tt>factor*matrix</tt> is added to <tt>this</tt>. This function
@@ -2478,43 +2478,43 @@ void SparseMatrix<number>::print (STREAM &out, bool across, bool diagonal_first)
 {
   Assert (cols != 0, ExcNotInitialized());
   Assert (val != 0, ExcNotInitialized());
-  
+
   bool hanging_diagonal = false;
   number diagonal;
-  
+
   for (size_type i=0; i<cols->rows; ++i)
     {
       for (size_type j=cols->rowstart[i]; j<cols->rowstart[i+1]; ++j)
-	{
-	  if (!diagonal_first && i == cols->colnums[j])
-	    {
-	      diagonal = val[j];
-	      hanging_diagonal = true;
-	    }
-	  else
-	    {
-	      if (hanging_diagonal && cols->colnums[j]>i)
-		{
-		  if (across)
-		    out << ' ' << i << ',' << i << ':' << diagonal;
-		  else
-		    out << '(' << i << ',' << i << ") " << diagonal << std::endl;
-		  hanging_diagonal = false;
-		}
-	      if (across)
-		out << ' ' << i << ',' << cols->colnums[j] << ':' << val[j];
-	      else
-		out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << std::endl;
-	    }
-	}
+        {
+          if (!diagonal_first && i == cols->colnums[j])
+            {
+              diagonal = val[j];
+              hanging_diagonal = true;
+            }
+          else
+            {
+              if (hanging_diagonal && cols->colnums[j]>i)
+                {
+                  if (across)
+                    out << ' ' << i << ',' << i << ':' << diagonal;
+                  else
+                    out << '(' << i << ',' << i << ") " << diagonal << std::endl;
+                  hanging_diagonal = false;
+                }
+              if (across)
+                out << ' ' << i << ',' << cols->colnums[j] << ':' << val[j];
+              else
+                out << "(" << i << "," << cols->colnums[j] << ") " << val[j] << std::endl;
+            }
+        }
       if (hanging_diagonal)
-	{
-	  if (across)
-	    out << ' ' << i << ',' << i << ':' << diagonal;
-	  else
-	    out << '(' << i << ',' << i << ") " << diagonal << std::endl;
-	  hanging_diagonal = false;
-	}
+        {
+          if (across)
+            out << ' ' << i << ',' << i << ':' << diagonal;
+          else
+            out << '(' << i << ',' << i << ") " << diagonal << std::endl;
+          hanging_diagonal = false;
+        }
     }
   if (across)
     out << std::endl;

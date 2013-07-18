@@ -419,7 +419,7 @@ BlockIndices::global_to_local (const size_type i) const
     --block;
 
   return std::pair<size_type,size_type>(block,
-                                              i-start_indices[block]);
+                                        i-start_indices[block]);
 }
 
 

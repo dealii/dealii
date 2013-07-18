@@ -251,7 +251,7 @@ factorize (const Matrix &matrix)
     for (size_type row = 0; row < matrix.m(); ++row)
       {
         for (typename Matrix::const_iterator p=matrix.begin(row);
-            p!=matrix.end(row); ++p)
+             p!=matrix.end(row); ++p)
           {
             // write entry into the first free one for this row
             Ai[row_pointers[row]] = p->column();
@@ -552,7 +552,7 @@ void SparseDirectMUMPS::initialize_matrix (const Matrix &matrix)
       for (size_type row = 0; row < matrix.m(); ++row)
         {
           for (typename Matrix::const_iterator ptr = matrix.begin (row);
-              ptr != matrix.end (row); ++ptr)
+               ptr != matrix.end (row); ++ptr)
             if (std::abs (ptr->value ()) > 0.0)
               {
                 a[index]   = ptr->value ();

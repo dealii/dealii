@@ -325,14 +325,14 @@ namespace MeshWorker
      * @note This function is usually only called by the assembler.
      */
     void initialize_numbers(const unsigned int n);
-    
+
     /**
      * Initialize the vector with vector values.
      *
      * @note This function is usually only called by the assembler.
      */
     void initialize_vectors(const unsigned int n);
-    
+
     /**
      * Allocate @p n local matrices. Additionally, set their block row
      * and column coordinates to zero. The matrices themselves are

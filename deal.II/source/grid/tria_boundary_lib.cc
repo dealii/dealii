@@ -843,10 +843,10 @@ get_new_point_on_line (const typename Triangulation<dim>::line_iterator &line) c
   if ((line_center(0) == this->center(0))
       &&
       ((std::fabs(vertices[0].distance(this->center)-this->radius) >
-	1e-5*this->radius)
+        1e-5*this->radius)
        ||
        (std::fabs(vertices[1].distance(this->center)-this->radius) >
-	1e-5*this->radius)))
+        1e-5*this->radius)))
     return line_center;
   else
     return HyperBallBoundary<dim>::get_new_point_on_line (line);

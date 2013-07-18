@@ -1135,16 +1135,16 @@ namespace Step18
           cell->get_dof_indices (local_dof_indices);
 
           hanging_node_constraints
-	    .distribute_local_to_global (cell_matrix, cell_rhs,
+          .distribute_local_to_global (cell_matrix, cell_rhs,
                                        local_dof_indices,
-					 system_matrix, system_rhs);
+                                       system_matrix, system_rhs);
         }
 
     // Now compress the vector and the system matrix:
     system_matrix.compress(VectorOperation::add);
     system_rhs.compress(VectorOperation::add);
 
-    
+
     // The last step is to again fix up boundary values, just as we already
     // did in previous programs. A slight complication is that the
     // <code>apply_boundary_values</code> function wants to have a solution

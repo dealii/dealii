@@ -389,8 +389,8 @@ SparsityPattern::reinit (const size_type m,
   std::size_t vec_len = 0;
   for (size_type i=0; i<m; ++i)
     vec_len += std::min(static_cast<size_type>(store_diagonal_first_in_row ?
-					       std::max(row_lengths[i], 1U) :
-					       row_lengths[i]),
+                                               std::max(row_lengths[i], 1U) :
+                                               row_lengths[i]),
                         n);
 
   // sometimes, no entries are
@@ -416,7 +416,7 @@ SparsityPattern::reinit (const size_type m,
   max_row_length = (row_lengths.size() == 0 ?
                     0 :
                     std::min (static_cast<size_type>(*std::max_element(row_lengths.begin(),
-								       row_lengths.end())),
+                                                     row_lengths.end())),
                               n));
 
   if (store_diagonal_first_in_row && (max_row_length==0) && (m!=0))
@@ -468,7 +468,7 @@ SparsityPattern::reinit (const size_type m,
     rowstart[i] = rowstart[i-1] +
                   (store_diagonal_first_in_row ?
                    std::max(std::min(static_cast<size_type>(row_lengths[i-1]),n),
-			    static_cast<size_type> (1U)) :
+                            static_cast<size_type> (1U)) :
                    std::min(static_cast<size_type>(row_lengths[i-1]),n));
   Assert ((rowstart[rows]==vec_len)
           ||
@@ -775,7 +775,7 @@ SparsityPattern::empty () const
 
 
 
-SparsityPattern::size_type 
+SparsityPattern::size_type
 SparsityPattern::max_entries_per_row () const
 {
   // if compress() has not yet been
@@ -797,7 +797,7 @@ SparsityPattern::max_entries_per_row () const
 
 
 
-SparsityPattern::size_type 
+SparsityPattern::size_type
 SparsityPattern::operator () (const size_type i,
                               const size_type j) const
 {
@@ -835,8 +835,8 @@ SparsityPattern::operator () (const size_type i,
                                           &colnums[rowstart[i]]);
   const size_type *const p
     = Utilities::lower_bound<const size_type *> (sorted_region_start,
-                                                    &colnums[rowstart[i+1]],
-                                                    j);
+                                                 &colnums[rowstart[i+1]],
+                                                 j);
   if ((p != &colnums[rowstart[i+1]])  &&  (*p == j))
     return (p - &colnums[0]);
   else
@@ -935,7 +935,7 @@ SparsityPattern::exists (const size_type i, const size_type j) const
 
 
 
-SparsityPattern::size_type 
+SparsityPattern::size_type
 SparsityPattern::row_position (const size_type i, const size_type j) const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());
@@ -1071,7 +1071,7 @@ SparsityPattern::print_gnuplot (std::ostream &out) const
 
 
 
-SparsityPattern::size_type 
+SparsityPattern::size_type
 SparsityPattern::bandwidth () const
 {
   Assert ((rowstart!=0) && (colnums!=0), ExcEmptyObject());

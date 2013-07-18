@@ -530,7 +530,7 @@ void MatrixFree<dim,Number>::initialize_indices
             dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>
             (&fe.base_element(0));
           const FE_Poly<TensorProductPolynomials<dim,Polynomials::
-            PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
+          PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
             dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
             Polynomials::PiecewisePolynomial<double> >,dim,dim>*>
             (&fe.base_element(0));

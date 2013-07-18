@@ -507,8 +507,8 @@ void ArpackSolver::solve (
       AssertDimension (eigenvalues.size(), eigenvalues_im.size());
 
       for (size_type i=0; i<eigenvalues.size(); ++i)
-	eigenvalues[i] = std::complex<double> (eigenvalues_real[i],
-					       eigenvalues_im[i]);
+        eigenvalues[i] = std::complex<double> (eigenvalues_real[i],
+                                               eigenvalues_im[i]);
     }
 }
 

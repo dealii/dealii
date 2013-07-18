@@ -69,7 +69,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
       // Calculate all missing rate values:
       for (unsigned int i = no_rate_entries; i<n; ++i)
         {
-          if(i == 0)
+          if (i == 0)
             {
               // no value available for the first row
               add_value(rate_key, std::string("-"));
@@ -87,7 +87,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
       // Calculate all missing rate values:
       for (unsigned int i = no_rate_entries; i<n; ++i)
         {
-          if(i == 0)
+          if (i == 0)
             {
               // no value available for the first row
               add_value(rate_key, std::string("-"));
@@ -115,7 +115,7 @@ void ConvergenceTable::evaluate_convergence_rates(const std::string &data_column
     }
 
   // only add rate_key to the supercolumn once
-  if(no_rate_entries == 0)
+  if (no_rate_entries == 0)
     {
       add_column_to_supercolumn(rate_key, superkey);
     }
@@ -156,7 +156,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
       // Calculate all missing rate values:
       for (unsigned int i = no_rate_entries; i<n; ++i)
         {
-          if(i == 0)
+          if (i == 0)
             {
               // no value available for the first row
               add_value(rate_key, std::string("-"));
@@ -174,7 +174,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
       // Calculate all missing rate values:
       for (unsigned int i = no_rate_entries; i<n; ++i)
         {
-          if(i == 0)
+          if (i == 0)
             {
               // no value available for the first row
               add_value(rate_key, std::string("-"));
@@ -205,7 +205,7 @@ ConvergenceTable::evaluate_convergence_rates(const std::string &data_column_key,
     }
 
   // only add rate_key to the supercolumn once
-  if(no_rate_entries == 0)
+  if (no_rate_entries == 0)
     {
       add_column_to_supercolumn(rate_key, superkey);
     }

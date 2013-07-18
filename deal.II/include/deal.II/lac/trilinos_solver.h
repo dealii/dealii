@@ -162,9 +162,9 @@ namespace TrilinosWrappers
 
     /**
      * Solve the linear system
-     * <tt>Ax=b</tt> where <tt>A</tt> 
-     * is an operator. This function 
-     * can be used for matrix free 
+     * <tt>Ax=b</tt> where <tt>A</tt>
+     * is an operator. This function
+     * can be used for matrix free
      * computation. Depending on
      * the information provided by
      * derived classes and the
@@ -207,7 +207,7 @@ namespace TrilinosWrappers
     /**
      * Solve the linear system
      * <tt>Ax=b</tt> where <tt>A</tt>
-     * is an operator. This function can 
+     * is an operator. This function can
      * be used for matric free. Depending on the
      * information provided by derived
      * classes and the object passed as a

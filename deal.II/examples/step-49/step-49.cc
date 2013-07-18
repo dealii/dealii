@@ -49,7 +49,7 @@ using namespace dealii;
 // format that can easily be visualized in the same way as was done in step-1.
 template<int dim>
 void mesh_info(const Triangulation<dim> &tria,
-	       const std::string        &filename)
+               const std::string        &filename)
 {
   std::cout << "Mesh info:" << std::endl
             << " dimension: " << dim << std::endl
@@ -87,8 +87,8 @@ void mesh_info(const Triangulation<dim> &tria,
   GridOut grid_out;
   grid_out.write_eps (tria, out);
   std::cout << " written to " << filename
-	    << std::endl
-	    << std::endl;
+            << std::endl
+            << std::endl;
 }
 
 // @sect3{Main routines}
@@ -129,7 +129,7 @@ void grid_2 ()
   repetitions[1]=2;
   GridGenerator::subdivided_hyper_rectangle (tria2, repetitions,
                                              Point<2>(1.0,-1.0),
-					     Point<2>(4.0,1.0));
+                                             Point<2>(4.0,1.0));
 
   Triangulation<2> triangulation;
   GridGenerator::merge_triangulations (tria1, tria2, triangulation);
@@ -244,7 +244,7 @@ void grid_4()
 Point<2> grid_5_transform (const Point<2> &in)
 {
   return Point<2>(in(0),
-		  in(1) + std::sin(in(0)/5.0*3.14159));
+                  in(1) + std::sin(in(0)/5.0*3.14159));
 }
 
 
@@ -256,7 +256,7 @@ void grid_5()
   repetitions[1] = 2;
   GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
                                              Point<2>(0.0,0.0),
-					     Point<2>(10.0,1.0));
+                                             Point<2>(10.0,1.0));
 
   GridTools::transform(&grid_5_transform, tria);
   mesh_info(tria, "grid-5.eps");
@@ -276,16 +276,16 @@ void grid_5()
 // vertices.
 struct Grid6Func
 {
-    double trans(const double y) const
-      {
-	return std::tanh(2*y)/tanh(2);
-      }
+  double trans(const double y) const
+  {
+    return std::tanh(2*y)/tanh(2);
+  }
 
-    Point<2> operator() (const Point<2> & in) const
-      {
-	return Point<2> (in(0),
-			 trans(in(1)));
-      }
+  Point<2> operator() (const Point<2> &in) const
+  {
+    return Point<2> (in(0),
+                     trans(in(1)));
+  }
 };
 
 
@@ -296,7 +296,7 @@ void grid_6()
   repetitions[0] = repetitions[1] = 40;
   GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
                                              Point<2>(0.0,0.0),
-					     Point<2>(1.0,1.0));
+                                             Point<2>(1.0,1.0));
 
   GridTools::transform(Grid6Func(), tria);
   mesh_info(tria, "grid-6.eps");
@@ -318,7 +318,7 @@ void grid_7()
   repetitions[0] = repetitions[1] = 16;
   GridGenerator::subdivided_hyper_rectangle (tria, repetitions,
                                              Point<2>(0.0,0.0),
-					     Point<2>(1.0,1.0));
+                                             Point<2>(1.0,1.0));
 
   GridTools::distort_random (0.3, tria, true);
   mesh_info(tria, "grid-7.eps");

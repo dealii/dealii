@@ -488,7 +488,7 @@ namespace parallel
        * not owned by the current processor but can be written into or read
        * from locally (ghost elements).
        */
-      const IndexSet& ghost_elements() const;
+      const IndexSet &ghost_elements() const;
 
       /**
        * Returns whether the given global index is a ghost index on the
@@ -774,7 +774,7 @@ namespace parallel
        * vector.
        */
       const MPI_Comm &get_mpi_communicator () const;
-      
+
       /**
        * Checks whether the given partitioner is compatible with the
        * partitioner used for this vector. Two partitioners are compatible if
@@ -1042,7 +1042,7 @@ namespace parallel
       else if (partitioner.get() != c.partitioner.get())
         {
           size_type local_ranges_different_loc = (local_range() !=
-                                                     c.local_range());
+                                                  c.local_range());
           if ((partitioner->n_mpi_processes() > 1 &&
                Utilities::MPI::max(local_ranges_different_loc,
                                    partitioner->get_communicator()) != 0)
@@ -1074,7 +1074,7 @@ namespace parallel
       else if (partitioner.get() != c.partitioner.get())
         {
           size_type local_ranges_different_loc = (local_range() !=
-                                                     c.local_range());
+                                                  c.local_range());
           if ((partitioner->n_mpi_processes() > 1 &&
                Utilities::MPI::max(local_ranges_different_loc,
                                    partitioner->get_communicator()) != 0)
@@ -1209,8 +1209,8 @@ namespace parallel
     Vector<Number>::vectors_equal_local (const Vector<Number2> &v) const
     {
       return partitioner->local_size()>0 ?
-        vector_view.template operator == <Number2>(v.vector_view)
-        : true;
+             vector_view.template operator == <Number2>(v.vector_view)
+             : true;
     }
 
 
@@ -1325,7 +1325,7 @@ namespace parallel
         return Utilities::MPI::sum (local_result *
                                     (real_type)partitioner->local_size(),
                                     partitioner->get_communicator())
-          /(real_type)partitioner->size();
+               /(real_type)partitioner->size();
       else
         return local_result;
     }
@@ -1441,8 +1441,8 @@ namespace parallel
     template <typename Number>
     inline
     std::pair<typename Vector<Number>::size_type,
-      typename Vector<Number>::size_type>
-    Vector<Number>::local_range () const
+        typename Vector<Number>::size_type>
+        Vector<Number>::local_range () const
     {
       return partitioner->local_range();
     }
@@ -1477,7 +1477,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    typename Vector<Number>::size_type 
+    typename Vector<Number>::size_type
     Vector<Number>::n_ghost_entries () const
     {
       return partitioner->n_ghost_indices();
@@ -1487,7 +1487,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    const IndexSet&
+    const IndexSet &
     Vector<Number>::ghost_elements() const
     {
       return partitioner->ghost_indices();
@@ -2008,7 +2008,7 @@ namespace parallel
 
     template <typename Number>
     inline
-    const MPI_Comm&
+    const MPI_Comm &
     Vector<Number>::get_mpi_communicator() const
     {
       return partitioner->get_communicator();

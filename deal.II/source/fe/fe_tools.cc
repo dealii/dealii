@@ -1694,10 +1694,10 @@ namespace FETools
         DoFTools::extract_locally_relevant_dofs (dof2,
                                                  dof2_locally_relevant_dofs);
 
-        parallel::distributed::Vector<Number> 
-          u2 (dof2_locally_owned_dofs,
-              dof2_locally_relevant_dofs,
-              u1.get_mpi_communicator());
+        parallel::distributed::Vector<Number>
+        u2 (dof2_locally_owned_dofs,
+            dof2_locally_relevant_dofs,
+            u1.get_mpi_communicator());
 
         interpolate(dof1, u1, dof2, constraints2, u2);
         u2.update_ghost_values ();

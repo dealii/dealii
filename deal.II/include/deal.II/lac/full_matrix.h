@@ -1543,7 +1543,7 @@ FullMatrix<number>::copy_from (const MATRIX &M)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
-          entry != end_row; ++entry)
+           entry != end_row; ++entry)
         this->el(row, entry->column()) = entry->value();
     }
 }
@@ -1564,7 +1564,7 @@ FullMatrix<number>::copy_transposed (const MATRIX &M)
     {
       const typename MATRIX::const_iterator end_row = M.end(row);
       for (typename MATRIX::const_iterator entry = M.begin(row);
-          entry != end_row; ++entry)
+           entry != end_row; ++entry)
         this->el(entry->column(), row) = entry->value();
     }
 }
@@ -1869,11 +1869,11 @@ FullMatrix<number>::print (STREAM             &s,
   for (size_type i=0; i<this->m(); ++i)
     {
       for (size_type j=0; j<this->n(); ++j)
-	{
-	  s.width(w);
-	  s.precision(p);
-	  s << this->el(i,j);
-	}
+        {
+          s.width(w);
+          s.precision(p);
+          s << this->el(i,j);
+        }
       s << std::endl;
     }
 

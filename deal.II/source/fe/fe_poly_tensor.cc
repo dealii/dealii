@@ -87,14 +87,14 @@ namespace
 
 
   void
-  get_face_sign_change_rt (const Triangulation<3>::cell_iterator & cell,
+  get_face_sign_change_rt (const Triangulation<3>::cell_iterator &cell,
                            const unsigned int                      dofs_per_face,
                            std::vector<double>                   &face_sign)
   {
     std::fill (face_sign.begin (), face_sign.end (), 1.0);
 //TODO: think about what it would take here
   }
-  
+
   void
   get_face_sign_change_nedelec (const Triangulation<1>::cell_iterator &,
                                 const unsigned int                     ,
@@ -117,7 +117,7 @@ namespace
 
 
   void
-  get_face_sign_change_nedelec (const Triangulation<3>::cell_iterator & cell,
+  get_face_sign_change_nedelec (const Triangulation<3>::cell_iterator &cell,
                                 const unsigned int                      dofs_per_face,
                                 std::vector<double>                   &face_sign)
   {
@@ -421,19 +421,18 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_values (
   // Compute eventual sign changes depending on the neighborhood
   // between two faces.
   std::vector<double> sign_change (this->dofs_per_cell, 1.0);
-  
+
   if (mapping_type == mapping_raviart_thomas)
     get_face_sign_change_rt (cell, this->dofs_per_face, sign_change);
-  
-  else
-    if (mapping_type == mapping_nedelec)
-      get_face_sign_change_nedelec (cell, this->dofs_per_face, sign_change);
+
+  else if (mapping_type == mapping_nedelec)
+    get_face_sign_change_nedelec (cell, this->dofs_per_face, sign_change);
   // for Piola mapping, the similarity
   // concept cannot be used because of
   // possible sign changes from one cell to
   // the next.
   if ( (mapping_type == mapping_piola) || (mapping_type == mapping_raviart_thomas)
-                                       || (mapping_type == mapping_nedelec))
+       || (mapping_type == mapping_nedelec))
     if (cell_similarity == CellSimilarity::translation)
       cell_similarity = CellSimilarity::none;
 
@@ -634,13 +633,12 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
   // Compute eventual sign changes depending
   // on the neighborhood between two faces.
   std::vector<double> sign_change (this->dofs_per_cell, 1.0);
-  
+
   if (mapping_type == mapping_raviart_thomas)
     get_face_sign_change_rt (cell, this->dofs_per_face, sign_change);
-  
-  else
-    if (mapping_type == mapping_nedelec)
-      get_face_sign_change_nedelec (cell, this->dofs_per_face, sign_change);
+
+  else if (mapping_type == mapping_nedelec)
+    get_face_sign_change_nedelec (cell, this->dofs_per_face, sign_change);
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {
@@ -782,7 +780,7 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_face_values (
               for (unsigned int k = 0; k < n_q_points; ++k)
                 for (unsigned int d = 0; d < dim; ++d)
                   data.shape_gradients[first + d][k] = sign_change[i] * shape_grads1[k][d];
-              
+
               break;
             }
 
@@ -844,13 +842,12 @@ FE_PolyTensor<POLY,dim,spacedim>::fill_fe_subface_values (
   // Compute eventual sign changes depending
   // on the neighborhood between two faces.
   std::vector<double> sign_change (this->dofs_per_cell, 1.0);
-  
+
   if (mapping_type == mapping_raviart_thomas)
     get_face_sign_change_rt (cell, this->dofs_per_face, sign_change);
-  
-  else
-    if (mapping_type == mapping_nedelec)
-      get_face_sign_change_nedelec (cell, this->dofs_per_face, sign_change);
+
+  else if (mapping_type == mapping_nedelec)
+    get_face_sign_change_nedelec (cell, this->dofs_per_face, sign_change);
 
   for (unsigned int i=0; i<this->dofs_per_cell; ++i)
     {

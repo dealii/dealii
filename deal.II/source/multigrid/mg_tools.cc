@@ -591,8 +591,8 @@ namespace MGTools
                                                      endc = dof.end(level);
     for (; cell!=endc; ++cell)
       {
-	if (!cell->is_locally_owned_on_level()) continue;
-	
+        if (!cell->is_locally_owned_on_level()) continue;
+
         cell->get_mg_dof_indices (dofs_on_this_cell);
         // make sparsity pattern for this cell
         for (unsigned int i=0; i<dofs_per_cell; ++i)
@@ -656,8 +656,8 @@ namespace MGTools
                                                      endc = dof.end(level);
     for (; cell!=endc; ++cell)
       {
-	if (!cell->is_locally_owned_on_level()) continue;
-	
+        if (!cell->is_locally_owned_on_level()) continue;
+
         cell->get_mg_dof_indices (dofs_on_this_cell);
         // Loop over all interior neighbors
         for (unsigned int face = 0;
@@ -746,9 +746,9 @@ namespace MGTools
 
     for (; cell!=endc; ++cell)
       {
-	if (!cell->is_locally_owned_on_level()) continue;
-	
-	cell->get_mg_dof_indices (dofs_on_this_cell);
+        if (!cell->is_locally_owned_on_level()) continue;
+
+        cell->get_mg_dof_indices (dofs_on_this_cell);
         // make sparsity pattern for this cell
         for (unsigned int i=0; i<total_dofs; ++i)
           for (unsigned int j=0; j<total_dofs; ++j)
@@ -914,8 +914,8 @@ namespace MGTools
 
     for (; cell!=endc; ++cell)
       {
-	if (!cell->is_locally_owned_on_level()) continue;
-	
+        if (!cell->is_locally_owned_on_level()) continue;
+
         cell->get_mg_dof_indices (dofs_on_this_cell);
         // Loop over all interior neighbors
         for (unsigned int face = 0;
@@ -1248,120 +1248,120 @@ namespace MGTools
         for (; cell!=endc; ++cell)
           if (dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
               || cell->level_subdomain_id()==dof.get_tria().locally_owned_subdomain())
-          for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
-               ++face_no)
-            {
-              if (cell->at_boundary(face_no) == false)
-                continue;
+            for (unsigned int face_no = 0; face_no < GeometryInfo<dim>::faces_per_cell;
+                 ++face_no)
+              {
+                if (cell->at_boundary(face_no) == false)
+                  continue;
 
-              const FiniteElement<dim> &fe = cell->get_fe();
-              const unsigned int level = cell->level();
+                const FiniteElement<dim> &fe = cell->get_fe();
+                const unsigned int level = cell->level();
 
-              // we can presently deal only with
-              // primitive elements for boundary
-              // values. this does not preclude
-              // us using non-primitive elements
-              // in components that we aren't
-              // interested in, however. make
-              // sure that all shape functions
-              // that are non-zero for the
-              // components we are interested in,
-              // are in fact primitive
-              for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
-                {
-                  const ComponentMask &nonzero_component_array
-                    = cell->get_fe().get_nonzero_components (i);
-                  for (unsigned int c=0; c<n_components; ++c)
-                    if ((nonzero_component_array[c] == true)
-                        &&
-                        (component_mask[c] == true))
-                      Assert (cell->get_fe().is_primitive (i),
-                              ExcMessage ("This function can only deal with requested boundary "
-                                          "values that correspond to primitive (scalar) base "
-                                          "elements"));
-                }
+                // we can presently deal only with
+                // primitive elements for boundary
+                // values. this does not preclude
+                // us using non-primitive elements
+                // in components that we aren't
+                // interested in, however. make
+                // sure that all shape functions
+                // that are non-zero for the
+                // components we are interested in,
+                // are in fact primitive
+                for (unsigned int i=0; i<cell->get_fe().dofs_per_cell; ++i)
+                  {
+                    const ComponentMask &nonzero_component_array
+                      = cell->get_fe().get_nonzero_components (i);
+                    for (unsigned int c=0; c<n_components; ++c)
+                      if ((nonzero_component_array[c] == true)
+                          &&
+                          (component_mask[c] == true))
+                        Assert (cell->get_fe().is_primitive (i),
+                                ExcMessage ("This function can only deal with requested boundary "
+                                            "values that correspond to primitive (scalar) base "
+                                            "elements"));
+                  }
 
-              typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(face_no);
-              const types::boundary_id boundary_component = face->boundary_indicator();
-              if (function_map.find(boundary_component) != function_map.end())
-                // face is of the right component
-                {
-                  // get indices, physical location and
-                  // boundary values of dofs on this
-                  // face
-                  local_dofs.resize (fe.dofs_per_face);
-                  face->get_mg_dof_indices (level, local_dofs);
-                  if (fe_is_system)
-                    {
-                      // enter those dofs
-                      // into the list that
-                      // match the
-                      // component
-                      // signature. avoid
-                      // the usual
-                      // complication that
-                      // we can't just use
-                      // *_system_to_component_index
-                      // for non-primitive
-                      // FEs
-                      for (unsigned int i=0; i<local_dofs.size(); ++i)
-                        {
-                          unsigned int component;
-                          if (fe.is_primitive())
-                            component = fe.face_system_to_component_index(i).first;
-                          else
-                            {
-                              // non-primitive
-                              // case. make
-                              // sure that
-                              // this
-                              // particular
-                              // shape
-                              // function
-                              // _is_
-                              // primitive,
-                              // and get at
-                              // it's
-                              // component. use
-                              // usual
-                              // trick to
-                              // transfer
-                              // face dof
-                              // index to
-                              // cell dof
-                              // index
-                              const unsigned int cell_i
-                                = (dim == 1 ?
-                                   i
-                                   :
-                                   (dim == 2 ?
-                                    (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
-                                      :
-                                      (dim == 3 ?
-                                       (i<4*fe.dofs_per_vertex ?
-                                        i
+                typename DoFHandler<dim,spacedim>::face_iterator face = cell->face(face_no);
+                const types::boundary_id boundary_component = face->boundary_indicator();
+                if (function_map.find(boundary_component) != function_map.end())
+                  // face is of the right component
+                  {
+                    // get indices, physical location and
+                    // boundary values of dofs on this
+                    // face
+                    local_dofs.resize (fe.dofs_per_face);
+                    face->get_mg_dof_indices (level, local_dofs);
+                    if (fe_is_system)
+                      {
+                        // enter those dofs
+                        // into the list that
+                        // match the
+                        // component
+                        // signature. avoid
+                        // the usual
+                        // complication that
+                        // we can't just use
+                        // *_system_to_component_index
+                        // for non-primitive
+                        // FEs
+                        for (unsigned int i=0; i<local_dofs.size(); ++i)
+                          {
+                            unsigned int component;
+                            if (fe.is_primitive())
+                              component = fe.face_system_to_component_index(i).first;
+                            else
+                              {
+                                // non-primitive
+                                // case. make
+                                // sure that
+                                // this
+                                // particular
+                                // shape
+                                // function
+                                // _is_
+                                // primitive,
+                                // and get at
+                                // it's
+                                // component. use
+                                // usual
+                                // trick to
+                                // transfer
+                                // face dof
+                                // index to
+                                // cell dof
+                                // index
+                                const unsigned int cell_i
+                                  = (dim == 1 ?
+                                     i
+                                     :
+                                     (dim == 2 ?
+                                      (i<2*fe.dofs_per_vertex ? i : i+2*fe.dofs_per_vertex)
                                         :
-                                        (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
-                                         i+4*fe.dofs_per_vertex
+                                        (dim == 3 ?
+                                         (i<4*fe.dofs_per_vertex ?
+                                          i
+                                          :
+                                          (i<4*fe.dofs_per_vertex+4*fe.dofs_per_line ?
+                                           i+4*fe.dofs_per_vertex
+                                           :
+                                           i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
                                          :
-                                         i+4*fe.dofs_per_vertex+8*fe.dofs_per_line))
-                                       :
-                                       numbers::invalid_unsigned_int)));
-                              Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
+                                         numbers::invalid_unsigned_int)));
+                                Assert (cell_i < fe.dofs_per_cell, ExcInternalError());
 
-                              // make sure
-                              // that if
-                              // this is
-                              // not a
-                              // primitive
-                              // shape function,
-                              // then all
-                              // the
-                              // corresponding
-                              // components
-                              // in the
-                              // mask are
-                              // not set
+                                // make sure
+                                // that if
+                                // this is
+                                // not a
+                                // primitive
+                                // shape function,
+                                // then all
+                                // the
+                                // corresponding
+                                // components
+                                // in the
+                                // mask are
+                                // not set
 //                         if (!fe.is_primitive(cell_i))
 //                           for (unsigned int c=0; c<n_components; ++c)
 //                             if (fe.get_nonzero_components(cell_i)[c])
@@ -1372,18 +1372,18 @@ namespace MGTools
 // components. if shape function is non-primitive, then we will ignore
 // the result in the following anyway, otherwise there's only one
 // non-zero component which we will use
-                              component = fe.get_nonzero_components(cell_i).first_selected_component();
-                            }
+                                component = fe.get_nonzero_components(cell_i).first_selected_component();
+                              }
 
-                          if (component_mask[component] == true)
-                            boundary_indices[level].insert(local_dofs[i]);
-                        }
-                    }
-                  else
-                    for (unsigned int i=0; i<local_dofs.size(); ++i)
-                      boundary_indices[level].insert(local_dofs[i]);
-                }
-            }
+                            if (component_mask[component] == true)
+                              boundary_indices[level].insert(local_dofs[i]);
+                          }
+                      }
+                    else
+                      for (unsigned int i=0; i<local_dofs.size(); ++i)
+                        boundary_indices[level].insert(local_dofs[i]);
+                  }
+              }
       }
   }
 

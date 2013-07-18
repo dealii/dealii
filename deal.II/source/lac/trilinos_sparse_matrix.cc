@@ -440,8 +440,8 @@ namespace TrilinosWrappers
   {
     namespace
     {
-    // distinguish between compressed sparsity types that define row_begin()
-    // and SparsityPattern that uses begin() as iterator type
+      // distinguish between compressed sparsity types that define row_begin()
+      // and SparsityPattern that uses begin() as iterator type
       template <typename Sparsity>
       void copy_row (const Sparsity        &csp,
                      const size_type        row,
@@ -501,7 +501,7 @@ namespace TrilinosWrappers
     column_space_map.reset (new Epetra_Map (input_col_map));
 
     const size_type first_row = min_my_gid(input_row_map),
-      last_row = max_my_gid(input_row_map)+1;
+                    last_row = max_my_gid(input_row_map)+1;
     std::vector<int> n_entries_per_row(last_row-first_row);
 
     for (size_type row=first_row; row<last_row; ++row)
@@ -556,7 +556,7 @@ namespace TrilinosWrappers
 
     // check whether we got the number of columns right.
     AssertDimension (sparsity_pattern.n_cols(),static_cast<size_type>(
-          n_global_cols(*graph)));
+                       n_global_cols(*graph)));
 
     // And now finally generate the matrix.
     matrix.reset (new Epetra_FECrsMatrix(Copy, *graph, false));
@@ -848,7 +848,7 @@ namespace TrilinosWrappers
     // Extract local indices in
     // the matrix.
     int trilinos_i = matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
-      trilinos_j = matrix->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
+        trilinos_j = matrix->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
     TrilinosScalar value = 0.;
 
     // If the data is not on the
@@ -923,7 +923,7 @@ namespace TrilinosWrappers
     // Extract local indices in
     // the matrix.
     int trilinos_i = matrix->LRID(static_cast<TrilinosWrappers::types::int_type>(i)),
-      trilinos_j = matrix->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
+        trilinos_j = matrix->LCID(static_cast<TrilinosWrappers::types::int_type>(j));
     TrilinosScalar value = 0.;
 
     // If the data is not on the
@@ -1482,9 +1482,9 @@ namespace TrilinosWrappers
   SparseMatrix::memory_consumption () const
   {
     size_type static_memory = sizeof(this) + sizeof (*matrix)
-                                 + sizeof(*matrix->Graph().DataPtr());
+                              + sizeof(*matrix->Graph().DataPtr());
     return ((sizeof(TrilinosScalar)+sizeof(TrilinosWrappers::types::int_type))*
-        matrix->NumMyNonzeros() + sizeof(int)*local_size() + static_memory);
+            matrix->NumMyNonzeros() + sizeof(int)*local_size() + static_memory);
   }
 }
 

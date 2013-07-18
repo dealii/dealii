@@ -544,10 +544,10 @@ public:
                   const ForwardIterator end,
                   const size_type chunk_size);
 
-   /**
-    * @deprecated This function is deprecated. Use the function
-    * without the last argument
-    */
+  /**
+   * @deprecated This function is deprecated. Use the function
+   * without the last argument
+   */
   template <typename ForwardIterator>
   void copy_from (const size_type       n_rows,
                   const size_type       n_cols,
@@ -923,7 +923,7 @@ namespace ChunkSparsityPatternIterators
             const unsigned int          row)
     :
     sparsity_pattern(sparsity_pattern),
-    reduced_accessor(row==sparsity_pattern->n_rows() ? 
+    reduced_accessor(row==sparsity_pattern->n_rows() ?
                      *sparsity_pattern->sparsity_pattern.end() :
                      *sparsity_pattern->sparsity_pattern.
                      begin(row/sparsity_pattern->get_chunk_size())),
@@ -951,12 +951,12 @@ namespace ChunkSparsityPatternIterators
   Accessor::is_valid_entry () const
   {
     return reduced_accessor.is_valid_entry()
-      &&
-      sparsity_pattern->get_chunk_size()*reduced_accessor.row()+chunk_row <
-      sparsity_pattern->n_rows()
-      &&
-      sparsity_pattern->get_chunk_size()*reduced_accessor.column()+chunk_col <
-      sparsity_pattern->n_cols();
+           &&
+           sparsity_pattern->get_chunk_size()*reduced_accessor.row()+chunk_row <
+           sparsity_pattern->n_rows()
+           &&
+           sparsity_pattern->get_chunk_size()*reduced_accessor.column()+chunk_col <
+           sparsity_pattern->n_cols();
   }
 
 
@@ -968,7 +968,7 @@ namespace ChunkSparsityPatternIterators
     Assert (is_valid_entry() == true, ExcInvalidIterator());
 
     return sparsity_pattern->get_chunk_size()*reduced_accessor.row() +
-      chunk_row;
+           chunk_row;
   }
 
 
@@ -980,7 +980,7 @@ namespace ChunkSparsityPatternIterators
     Assert (is_valid_entry() == true, ExcInvalidIterator());
 
     return sparsity_pattern->get_chunk_size()*reduced_accessor.column() +
-      chunk_col;
+           chunk_col;
   }
 
 
@@ -1028,10 +1028,10 @@ namespace ChunkSparsityPatternIterators
           return true;
 
         const unsigned int
-          global_row = sparsity_pattern->get_chunk_size()*reduced_accessor.row()
-          +chunk_row,
-          other_global_row = sparsity_pattern->get_chunk_size()*
-          other.reduced_accessor.row()+other.chunk_row;
+        global_row = sparsity_pattern->get_chunk_size()*reduced_accessor.row()
+                     +chunk_row,
+                     other_global_row = sparsity_pattern->get_chunk_size()*
+                                        other.reduced_accessor.row()+other.chunk_row;
         if (global_row < other_global_row)
           return true;
         else if (global_row > other_global_row)
@@ -1214,7 +1214,7 @@ ChunkSparsityPattern::iterator
 ChunkSparsityPattern::end (const unsigned int r) const
 {
   Assert (r<n_rows(), ExcIndexRange(r,0,n_rows()))
-    return iterator(this, r+1);
+  return iterator(this, r+1);
 }
 
 
@@ -1311,7 +1311,7 @@ ChunkSparsityPattern::copy_from (const size_type       n_rows,
       for (inner_iterator j=i->begin(); j!=end_of_row; ++j)
         {
           const size_type col
-          = internal::SparsityPatternTools::get_column_index_from_iterator(*j);
+            = internal::SparsityPatternTools::get_column_index_from_iterator(*j);
           Assert (col < n_cols, ExcInvalidIndex(col,n_cols));
 
           add (row, col);

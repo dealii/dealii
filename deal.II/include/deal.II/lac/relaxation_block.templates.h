@@ -221,10 +221,10 @@ RelaxationBlock<MATRIX,inverse_type>::do_step (
           // Apply inverse diagonal
           this->inverse_vmult(block, x_cell, b_cell);
 #ifdef DEBUG
-	  for (unsigned int i=0;i<x_cell.size();++i)
-	    {
-	      Assert(numbers::is_finite(x_cell(i)), ExcNumberNotFinite());
-	    }
+          for (unsigned int i=0; i<x_cell.size(); ++i)
+            {
+              Assert(numbers::is_finite(x_cell(i)), ExcNumberNotFinite());
+            }
 #endif
           // Store in result vector
           row=additional_data->block_list.begin(block);

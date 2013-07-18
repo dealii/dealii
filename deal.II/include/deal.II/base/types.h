@@ -94,12 +94,12 @@ namespace types
    * The data type always indicates an
    * unsigned integer type.
    */
-   typedef unsigned int global_dof_index;
+  typedef unsigned int global_dof_index;
 
-   /**
-    * An identifier that denotes the MPI type
-    * associated with types::global_dof_index.
-    */
+  /**
+   * An identifier that denotes the MPI type
+   * associated with types::global_dof_index.
+   */
 #  define DEAL_II_DOF_INDEX_MPI_TYPE MPI_UNSIGNED
 #endif
 

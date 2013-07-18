@@ -2304,11 +2304,11 @@ void GridGenerator::truncated_cone (Triangulation<3> &triangulation,
                                     const double half_length)
 {
   // Determine number of cells and vertices
-  const size_type 
+  const size_type
   n_cells = static_cast<size_type>(std::floor (half_length /
-                                                  std::max (radius_0,
-                                                            radius_1) +
-                                                  0.5));
+                                               std::max (radius_0,
+                                                         radius_1) +
+                                               0.5));
   const size_type n_vertices = 4 * (n_cells + 1);
   std::vector<Point<3> > vertices_tmp(n_vertices);
 
@@ -2714,17 +2714,18 @@ GridGenerator::half_hyper_ball (Triangulation<3> &tria,
             {
               cell->face(i)->set_boundary_indicator(1);
               for (unsigned int j=0; j<GeometryInfo<3>::lines_per_face; ++j)
-		{
-		  const Point<3> vertices[2]
-		    = { cell->face(i)->line(j)->vertex(0),
-			cell->face(i)->line(j)->vertex(1) };
-		  if ((std::fabs(vertices[0].distance(center)-radius) >
-		       1e-5*radius)
-		      ||
-		      (std::fabs(vertices[1].distance(center)-radius) >
-		       1e-5*radius))
-		    cell->face(i)->line(j)->set_boundary_indicator(1);
-		}
+                {
+                  const Point<3> vertices[2]
+                    = { cell->face(i)->line(j)->vertex(0),
+                        cell->face(i)->line(j)->vertex(1)
+                      };
+                  if ((std::fabs(vertices[0].distance(center)-radius) >
+                       1e-5*radius)
+                      ||
+                      (std::fabs(vertices[1].distance(center)-radius) >
+                       1e-5*radius))
+                    cell->face(i)->line(j)->set_boundary_indicator(1);
+                }
             }
         }
       ++cell;
@@ -3440,14 +3441,14 @@ extrude_triangulation(const Triangulation<2, 2> &input,
           {
             quad.boundary_id = cell->face(f)->boundary_indicator();
             bid = std::max(bid, quad.boundary_id);
-          for (size_type slice=0; slice<n_slices-1; ++slice)
-            {
-              quad.vertices[0] = cell->face(f)->vertex_index(0)+slice*input.n_vertices();
-              quad.vertices[1] = cell->face(f)->vertex_index(1)+slice*input.n_vertices();
-              quad.vertices[2] = cell->face(f)->vertex_index(0)+(slice+1)*input.n_vertices();
-              quad.vertices[3] = cell->face(f)->vertex_index(1)+(slice+1)*input.n_vertices();
-              s.boundary_quads.push_back(quad);
-            }
+            for (size_type slice=0; slice<n_slices-1; ++slice)
+              {
+                quad.vertices[0] = cell->face(f)->vertex_index(0)+slice*input.n_vertices();
+                quad.vertices[1] = cell->face(f)->vertex_index(1)+slice*input.n_vertices();
+                quad.vertices[2] = cell->face(f)->vertex_index(0)+(slice+1)*input.n_vertices();
+                quad.vertices[3] = cell->face(f)->vertex_index(1)+(slice+1)*input.n_vertices();
+                s.boundary_quads.push_back(quad);
+              }
           }
     }
 

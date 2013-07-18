@@ -473,8 +473,8 @@ namespace Step48
       "solution-" + Utilities::int_to_string (timestep_number, 3);
 
     std::ofstream output ((filename +
-      "." + Utilities::int_to_string (Utilities::MPI::
-                                      this_mpi_process(MPI_COMM_WORLD),4) + ".vtu").c_str());
+                           "." + Utilities::int_to_string (Utilities::MPI::
+                                                           this_mpi_process(MPI_COMM_WORLD),4) + ".vtu").c_str());
     data_out.write_vtu (output);
 
     if (Utilities::MPI::this_mpi_process(MPI_COMM_WORLD) == 0)

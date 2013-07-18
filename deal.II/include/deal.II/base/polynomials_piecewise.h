@@ -192,7 +192,7 @@ namespace Polynomials
               y = offset+step+step-x;
           }
         else
-          { 
+          {
             const number offset = step * interval;
             if (x<offset || x>offset+step)
               return 0;

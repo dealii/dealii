@@ -94,17 +94,17 @@ Subscriptor::~Subscriptor ()
     {
       if (std::uncaught_exception() == false)
         {
-	  std::string infostring;
-	  for (map_iterator it = counter_map.begin(); it != counter_map.end(); ++it)
-	    {
-	      if (it->second > 0)
-		infostring += std::string("\n  from Subscriber ")
-			      + std::string(it->first);
-	    }
+          std::string infostring;
+          for (map_iterator it = counter_map.begin(); it != counter_map.end(); ++it)
+            {
+              if (it->second > 0)
+                infostring += std::string("\n  from Subscriber ")
+                              + std::string(it->first);
+            }
 
-	  if (infostring == "")
-	    infostring = "<none>";
-	  
+          if (infostring == "")
+            infostring = "<none>";
+
           Assert (counter == 0,
                   ExcInUse (counter, object_info->name(), infostring));
         }

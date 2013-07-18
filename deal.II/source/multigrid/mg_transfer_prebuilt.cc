@@ -151,8 +151,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children() &&
             ( mg_dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
-                || cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain()
-                ))
+              || cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain()
+            ))
           {
             cell->get_mg_dof_indices (dof_indices_parent);
 
@@ -185,23 +185,23 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                   }
               }
           }
-      
+
       internal::MatrixSelector<VECTOR>::reinit(*prolongation_matrices[level],
-					       *prolongation_sparsities[level],
-					       level,
-					       csp,
-					       mg_dof);
+                                               *prolongation_sparsities[level],
+                                               level,
+                                               csp,
+                                               mg_dof);
       csp.reinit(0,0);
-      
+
       FullMatrix<double> prolongation;
-      
+
       // now actually build the matrices
       for (typename DoFHandler<dim,spacedim>::cell_iterator cell=mg_dof.begin(level);
            cell != mg_dof.end(level); ++cell)
         if (cell->has_children() &&
             (mg_dof.get_tria().locally_owned_subdomain()==numbers::invalid_subdomain_id
              || cell->level_subdomain_id()==mg_dof.get_tria().locally_owned_subdomain())
-             )
+           )
           {
             cell->get_mg_dof_indices (dof_indices_parent);
 
@@ -215,12 +215,12 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
                 prolongation
                   = mg_dof.get_fe().get_prolongation_matrix (child,
                                                              cell->refinement_case());
-		
-		if (mg_constrained_dofs != 0 && mg_constrained_dofs->set_boundary_values())
-		  for (unsigned int j=0;j<dofs_per_cell; ++j)
-		    if (mg_constrained_dofs->is_boundary_index(level, dof_indices_parent[j]))
-		      for (unsigned int i=0; i<dofs_per_cell; ++i)
-			prolongation(i,j) = 0.;
+
+                if (mg_constrained_dofs != 0 && mg_constrained_dofs->set_boundary_values())
+                  for (unsigned int j=0; j<dofs_per_cell; ++j)
+                    if (mg_constrained_dofs->is_boundary_index(level, dof_indices_parent[j]))
+                      for (unsigned int i=0; i<dofs_per_cell; ++i)
+                        prolongation(i,j) = 0.;
 
                 cell->child(child)->get_mg_dof_indices (dof_indices_child);
 
@@ -243,9 +243,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // of the global and mgdof, so that we later not access non-local elements
   // in copy_to/from_mg.
   // We keep track in the bitfield dof_touched which global dof has
-  // been processed already (on the current level). This is the same as 
+  // been processed already (on the current level). This is the same as
   // the multigrid running in serial.
-  // Only entering on the finest level gives wrong results (why?) 
+  // Only entering on the finest level gives wrong results (why?)
 
   copy_indices.resize(n_levels);
   copy_indices_from_me.resize(n_levels);
@@ -272,8 +272,8 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
         {
           if (mg_dof.get_tria().locally_owned_subdomain()!=numbers::invalid_subdomain_id
               &&  (level_cell->level_subdomain_id()==numbers::artificial_subdomain_id
-              ||  level_cell->subdomain_id()==numbers::artificial_subdomain_id)
-              )
+                   ||  level_cell->subdomain_id()==numbers::artificial_subdomain_id)
+             )
             continue;
 
           // get the dof numbers of this cell for the global and the level-wise
@@ -296,13 +296,13 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
               if (global_mine && level_mine)
                 copy_indices[level].push_back(
-                    std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+                  std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
               else if (level_mine)
                 copy_indices_from_me[level].push_back(
-                    std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+                  std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
               else if (global_mine)
                 copy_indices_to_me[level].push_back(
-                    std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
+                  std::pair<unsigned int, unsigned int> (global_dof_indices[i], level_dof_indices[i]));
               else
                 continue;
 
@@ -315,11 +315,11 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
   // more reliable output for regression texts
 #ifdef DEBUG
   std::less<std::pair<types::global_dof_index, unsigned int> > compare;
-  for (unsigned int level=0;level<copy_indices.size();++level)
+  for (unsigned int level=0; level<copy_indices.size(); ++level)
     std::sort(copy_indices[level].begin(), copy_indices[level].end(), compare);
-  for (unsigned int level=0;level<copy_indices_from_me.size();++level)
+  for (unsigned int level=0; level<copy_indices_from_me.size(); ++level)
     std::sort(copy_indices_from_me[level].begin(), copy_indices_from_me[level].end(), compare);
-  for (unsigned int level=0;level<copy_indices_to_me.size();++level)
+  for (unsigned int level=0; level<copy_indices_to_me.size(); ++level)
     std::sort(copy_indices_to_me[level].begin(), copy_indices_to_me[level].end(), compare);
 #endif
 }
@@ -327,9 +327,9 @@ void MGTransferPrebuilt<VECTOR>::build_matrices (
 
 template <class VECTOR>
 void
-MGTransferPrebuilt<VECTOR>::print_matrices (std::ostream& os) const
+MGTransferPrebuilt<VECTOR>::print_matrices (std::ostream &os) const
 {
-  for (unsigned int level = 0;level<prolongation_matrices.size();++level)
+  for (unsigned int level = 0; level<prolongation_matrices.size(); ++level)
     {
       os << "Level " << level << std::endl;
       prolongation_matrices[level]->print(os);
@@ -339,26 +339,26 @@ MGTransferPrebuilt<VECTOR>::print_matrices (std::ostream& os) const
 
 template <class VECTOR>
 void
-MGTransferPrebuilt<VECTOR>::print_indices (std::ostream& os) const
+MGTransferPrebuilt<VECTOR>::print_indices (std::ostream &os) const
 {
-  for (unsigned int level = 0;level<copy_indices.size();++level)
+  for (unsigned int level = 0; level<copy_indices.size(); ++level)
     {
-      for (unsigned int i=0;i<copy_indices[level].size();++i)
-  	os << "copy_indices[" << level
-	   << "]\t" << copy_indices[level][i].first << '\t' << copy_indices[level][i].second << std::endl;
+      for (unsigned int i=0; i<copy_indices[level].size(); ++i)
+        os << "copy_indices[" << level
+           << "]\t" << copy_indices[level][i].first << '\t' << copy_indices[level][i].second << std::endl;
     }
-  
-  for (unsigned int level = 0;level<copy_indices_from_me.size();++level)
+
+  for (unsigned int level = 0; level<copy_indices_from_me.size(); ++level)
     {
-      for (unsigned int i=0;i<copy_indices_from_me[level].size();++i)
-  	os << "copy_ifrom  [" << level
-	   << "]\t" << copy_indices_from_me[level][i].first << '\t' << copy_indices_from_me[level][i].second << std::endl;
+      for (unsigned int i=0; i<copy_indices_from_me[level].size(); ++i)
+        os << "copy_ifrom  [" << level
+           << "]\t" << copy_indices_from_me[level][i].first << '\t' << copy_indices_from_me[level][i].second << std::endl;
     }
-  for (unsigned int level = 0;level<copy_indices_to_me.size();++level)
+  for (unsigned int level = 0; level<copy_indices_to_me.size(); ++level)
     {
-      for (unsigned int i=0;i<copy_indices_to_me[level].size();++i)
-  	os << "copy_ito    [" << level
-	   << "]\t" << copy_indices_to_me[level][i].first << '\t' << copy_indices_to_me[level][i].second << std::endl;
+      for (unsigned int i=0; i<copy_indices_to_me[level].size(); ++i)
+        os << "copy_ito    [" << level
+           << "]\t" << copy_indices_to_me[level][i].first << '\t' << copy_indices_to_me[level][i].second << std::endl;
     }
 }
 

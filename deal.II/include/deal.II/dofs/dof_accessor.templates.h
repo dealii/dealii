@@ -1181,7 +1181,7 @@ namespace internal
               }
             else
               pointer += static_cast<types::global_dof_index>(
-		(*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
+                           (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
           }
       }
 
@@ -1270,7 +1270,7 @@ namespace internal
               return *(pointer + 1 + local_index);
             else
               pointer += static_cast<types::global_dof_index>(
-		(*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
+                           (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
           }
       }
 
@@ -1316,7 +1316,7 @@ namespace internal
             else
               {
                 pointer += static_cast<types::global_dof_index>(
-		  (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
+                             (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
                 ++counter;
               }
           }
@@ -1375,7 +1375,7 @@ namespace internal
                     ExcInternalError());
 
             pointer += static_cast<types::global_dof_index>(
-	      (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
+                         (*dof_handler.finite_elements)[this_fe_index].dofs_per_vertex + 1);
             ++counter;
           }
       }
@@ -1512,7 +1512,7 @@ template<int structdim, class DH, bool lda>
 inline
 types::global_dof_index
 DoFAccessor<structdim, DH,lda>::mg_dof_index (const int level,
-					      const unsigned int i) const
+                                              const unsigned int i) const
 {
   return this->dof_handler->template get_dof_index<structdim> (level, this->present_index, 0, i);
 }
@@ -1607,9 +1607,9 @@ template<int structdim, class DH, bool lda>
 inline
 types::global_dof_index
 DoFAccessor<structdim, DH,lda>::mg_vertex_dof_index (const int level,
-						     const unsigned int vertex,
-						     const unsigned int i,
-						     const unsigned int fe_index) const
+                                                     const unsigned int vertex,
+                                                     const unsigned int i,
+                                                     const unsigned int fe_index) const
 {
   Assert (this->dof_handler != 0, ExcInvalidObject ());
   Assert (&this->dof_handler->get_fe () != 0, ExcInvalidObject ());
@@ -1624,7 +1624,7 @@ inline
 void
 DoFAccessor<structdim, DH,lda>::set_vertex_dof_index (const unsigned int vertex,
                                                       const unsigned int i,
-						      const types::global_dof_index index,
+                                                      const types::global_dof_index index,
                                                       const unsigned int fe_index) const
 {
   dealii::internal::DoFAccessor::Implementation::set_vertex_dof_index
@@ -1640,10 +1640,10 @@ template<int structdim, class DH, bool lda>
 inline
 void
 DoFAccessor<structdim, DH,lda>::set_mg_vertex_dof_index (const int level,
-							 const unsigned int vertex,
-							 const unsigned int i,
-							 const types::global_dof_index index,
-							 const unsigned int fe_index) const
+                                                         const unsigned int vertex,
+                                                         const unsigned int i,
+                                                         const types::global_dof_index index,
+                                                         const unsigned int fe_index) const
 {
   Assert (this->dof_handler != 0, ExcInvalidObject ());
   Assert (&this->dof_handler->get_fe () != 0, ExcInvalidObject ());
@@ -1657,8 +1657,8 @@ template<int structdim, class DH, bool lda>
 inline
 void
 DoFAccessor<structdim, DH,lda>::set_mg_dof_index (const int level,
-						  const unsigned int i,
-						  const types::global_dof_index index) const
+                                                  const unsigned int i,
+                                                  const types::global_dof_index index) const
 {
   this->dof_handler->template set_dof_index<structdim> (level, this->present_index, 0, i, index);
 }
@@ -2161,10 +2161,10 @@ DoFAccessor<structdim,DH,lda>::line (const unsigned int i) const
 
   // checking of 'i' happens in line_index(i)
   return typename dealii::internal::DoFHandler::Iterators<DH,lda>::line_iterator
-    (this->tria,
-     0,  // only sub-objects are allowed, which have no level
-     this->line_index(i),
-     this->dof_handler);
+         (this->tria,
+          0,  // only sub-objects are allowed, which have no level
+          this->line_index(i),
+          this->dof_handler);
 }
 
 
@@ -2196,10 +2196,10 @@ DoFAccessor<structdim,DH,lda>::quad (const unsigned int i) const
 
   // checking of 'i' happens in quad_index(i)
   return typename dealii::internal::DoFHandler::Iterators<DH,lda>::quad_iterator
-    (this->tria,
-     0,  // only sub-objects are allowed, which have no level
-     this->quad_index(i),
-     this->dof_handler);
+         (this->tria,
+          0,  // only sub-objects are allowed, which have no level
+          this->quad_index(i),
+          this->dof_handler);
 }
 
 

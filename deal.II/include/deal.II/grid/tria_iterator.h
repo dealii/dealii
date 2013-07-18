@@ -1189,13 +1189,13 @@ TriaRawIterator<Accessor>::operator < (const TriaRawIterator<Accessor> &other) c
 
   Assert (&accessor.get_triangulation() == &other.accessor.get_triangulation(),
           ExcInvalidComparison());
-  
+
   // Deal with iterators past end
   if (state()==IteratorState::past_the_end)
     return false;
   if (other.state()==IteratorState::past_the_end)
     return true;
-  
+
   return ((**this) < (*other));
 }
 
@@ -1293,8 +1293,8 @@ TriaIterator<Accessor>::TriaIterator (const TriaRawIterator<OtherAccessor> &i)
 template <typename Accessor>
 template <typename OtherAccessor>
 TriaIterator<Accessor>::TriaIterator (const OtherAccessor &a)
-:
-TriaRawIterator<Accessor> (a)
+  :
+  TriaRawIterator<Accessor> (a)
 {
 #ifdef DEBUG
   // do this like this, because:

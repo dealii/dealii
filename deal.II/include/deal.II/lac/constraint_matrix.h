@@ -1523,7 +1523,7 @@ public:
    * @ingroup Exceptions
    */
   DeclException2 (ExcIncorrectConstraint,
-		  int, int,
+                  int, int,
                   << "While distributing the constraint for DoF "
                   << arg1 << ", it turns out that one of the processors "
                   << "who own the " << arg2
@@ -1534,7 +1534,7 @@ public:
                   << "with the appropriate locally_relevant set so "
                   << "that every processor who owns a DoF that constrains "
                   << "another DoF also knows about this constraint?");
-  
+
 private:
 
   /**

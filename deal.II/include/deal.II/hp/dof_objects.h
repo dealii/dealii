@@ -319,8 +319,8 @@ namespace internal
                 return *(pointer + 1 + local_index);
               else
                 pointer += static_cast<types::global_dof_index>(
-                    dof_handler.get_fe()[*pointer]
-                    .template n_dofs_per_object<dim>() + 1);
+                             dof_handler.get_fe()[*pointer]
+                             .template n_dofs_per_object<dim>() + 1);
             }
         }
     }
@@ -623,8 +623,8 @@ namespace internal
                 return true;
               else
                 pointer += static_cast<types::global_dof_index>(
-                    dof_handler.get_fe()[*pointer]
-                    .template n_dofs_per_object<dim>()+1);
+                             dof_handler.get_fe()[*pointer]
+                             .template n_dofs_per_object<dim>()+1);
             }
         }
     }

@@ -179,19 +179,19 @@ void
 SparseLUDecomposition<number>::prebuild_lower_bound()
 {
   const size_type *const
-    column_numbers = this->get_sparsity_pattern().colnums;
+  column_numbers = this->get_sparsity_pattern().colnums;
   const std::size_t *const
-    rowstart_indices = this->get_sparsity_pattern().rowstart;
+  rowstart_indices = this->get_sparsity_pattern().rowstart;
   const size_type N = this->m();
- 
-   prebuilt_lower_bound.resize (N);
- 
-   for (size_type row=0; row<N; row++)
-     {
-       prebuilt_lower_bound[row]
-         = Utilities::lower_bound (&column_numbers[rowstart_indices[row]+1],
-                                   &column_numbers[rowstart_indices[row+1]],
-                                   row);
+
+  prebuilt_lower_bound.resize (N);
+
+  for (size_type row=0; row<N; row++)
+    {
+      prebuilt_lower_bound[row]
+        = Utilities::lower_bound (&column_numbers[rowstart_indices[row]+1],
+                                  &column_numbers[rowstart_indices[row+1]],
+                                  row);
     }
 }
 
@@ -224,7 +224,7 @@ SparseLUDecomposition<number>::copy_from (const SparseMatrix<somenumber> &matrix
     {
       typename SparseMatrix<number>::iterator index = this->begin(row);
       typename SparseMatrix<somenumber>::const_iterator
-        in_index = matrix.begin(row);
+      in_index = matrix.begin(row);
       index->value() = in_index->value();
       ++index, ++in_index;
       while (index < this->end(row) && in_index < matrix.end(row))

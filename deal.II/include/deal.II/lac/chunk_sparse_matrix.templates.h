@@ -211,9 +211,9 @@ namespace internal
       const size_type n_filled_last_cols = n % chunk_size;
 
       const size_type last_regular_row = n_filled_last_rows > 0 ?
-                                            std::min(m/chunk_size, 
-                                                static_cast<size_type>(end_row)) : 
-                                            end_row;
+                                         std::min(m/chunk_size,
+                                                  static_cast<size_type>(end_row)) :
+                                         end_row;
       const size_type irregular_col = n/chunk_size;
 
       typename OutVector::iterator dst_ptr = dst.begin()+chunk_size*begin_row;
@@ -455,7 +455,7 @@ ChunkSparseMatrix<number>::reinit (const ChunkSparsityPattern &sparsity)
   // chunks. this entails some padding elements
   const size_type chunk_size = cols->get_chunk_size();
   const size_type N = cols->sparsity_pattern.n_nonzero_elements() *
-                         chunk_size * chunk_size;
+                      chunk_size * chunk_size;
   if (N > max_len || max_len == 0)
     {
       if (val != 0)
@@ -497,7 +497,7 @@ ChunkSparseMatrix<number>::empty () const
 
 
 template <typename number>
-typename ChunkSparseMatrix<number>::size_type 
+typename ChunkSparseMatrix<number>::size_type
 ChunkSparseMatrix<number>::n_nonzero_elements () const
 {
   Assert (cols != 0, ExcNotInitialized());
@@ -507,7 +507,7 @@ ChunkSparseMatrix<number>::n_nonzero_elements () const
 
 
 template <typename number>
-typename ChunkSparseMatrix<number>::size_type 
+typename ChunkSparseMatrix<number>::size_type
 ChunkSparseMatrix<number>::n_actually_nonzero_elements () const
 {
   Assert (cols != 0, ExcNotInitialized());
@@ -592,7 +592,7 @@ ChunkSparseMatrix<number>::add (const number factor,
                                         * chunk_size * chunk_size];
 
   while (val_ptr != end_ptr)
-    *val_ptr++ += factor * *matrix_ptr++;
+    *val_ptr++ += factor **matrix_ptr++;
 }
 
 

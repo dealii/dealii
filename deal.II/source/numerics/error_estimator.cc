@@ -473,7 +473,7 @@ namespace internal
             {
               fe_face_values_neighbor.get_present_fe_values()
               .get_function_gradients (*solutions[n],
-				       parallel_data.neighbor_psi[n]);
+                                       parallel_data.neighbor_psi[n]);
 
               // compute the jump in the gradients
               for (unsigned int component=0; component<n_components; ++component)
@@ -1327,7 +1327,7 @@ estimate (const Mapping<1,spacedim>                    &mapping,
                 for (unsigned int s=0; s<n_solution_vectors; ++s)
                   fe_values.get_present_fe_values()
                   .get_function_gradients (*solutions[s],
-					   gradients_neighbor[s]);
+                                           gradients_neighbor[s]);
 
                 // extract the
                 // gradients of all the

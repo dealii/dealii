@@ -264,7 +264,7 @@ get_interpolation_matrix (const FiniteElement<dim,spacedim> &x_source_fe,
                                 x_source_fe.dofs_per_cell));
 
   this->FE_Q_Base<TensorProductPolynomialsConst<dim>,dim,spacedim>::
-    get_interpolation_matrix(x_source_fe, interpolation_matrix);
+  get_interpolation_matrix(x_source_fe, interpolation_matrix);
 }
 
 

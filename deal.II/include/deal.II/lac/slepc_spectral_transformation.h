@@ -47,7 +47,7 @@ namespace SLEPcWrappers
    * <code>eigensolver</code>:
    * @code
    *  // Set a transformation, this one shifts the eigenspectrum by 3.142..
-   *  SLEPcWrappers::TransformationShift::AdditionalData additional_data (3.142); 
+   *  SLEPcWrappers::TransformationShift::AdditionalData additional_data (3.142);
    *  SLEPcWrappers::TransformationShift shift (additional_data);
    *  eigensolver.set_transformation (shift);
    * @endcode
@@ -57,7 +57,7 @@ namespace SLEPcWrappers
    *  SolverArnoldi system (solver_control, mpi_communicator);
    *  eigensolver.solve (A, B, lambda, x, size_of_spectrum);
    * @endcode
-   * 
+   *
    * @note These options can also be set at the commandline.
    *
    * @ingroup SLEPcWrappers

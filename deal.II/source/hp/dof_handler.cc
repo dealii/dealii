@@ -847,7 +847,7 @@ namespace internal
             // non-invalid value later on
             dof_handler.faces->lines.dof_offsets
               = std::vector<types::global_dof_index> (dof_handler.tria->n_raw_lines(),
-                                           DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                      DoFHandler<dim,spacedim>::invalid_dof_index);
             dof_handler.faces->lines.dofs
               = std::vector<types::global_dof_index> (n_line_slots,
                                                       DoFHandler<dim,spacedim>::invalid_dof_index);
@@ -1060,7 +1060,7 @@ namespace internal
             {
               dof_handler.levels[level]->dof_object.dof_offsets
                 = std::vector<types::global_dof_index> (dof_handler.tria->n_raw_hexs(level),
-                                             DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                        DoFHandler<dim,spacedim>::invalid_dof_index);
 
               types::global_dof_index next_free_dof = 0;
               for (typename DoFHandler<dim,spacedim>::active_cell_iterator
@@ -1215,7 +1215,7 @@ namespace internal
               {
                 dof_handler.faces->quads.dof_offsets
                   = std::vector<types::global_dof_index> (dof_handler.tria->n_raw_quads(),
-                                               DoFHandler<dim,spacedim>::invalid_dof_index);
+                                                          DoFHandler<dim,spacedim>::invalid_dof_index);
                 dof_handler.faces->quads.dofs
                   = std::vector<types::global_dof_index> (n_quad_slots,
                                                           DoFHandler<dim,spacedim>::invalid_dof_index);
@@ -1482,9 +1482,9 @@ namespace internal
         max_couplings_between_dofs (const DoFHandler<1,spacedim> &dof_handler)
         {
           return std::min(static_cast<types::global_dof_index> (3*
-                dof_handler.finite_elements->max_dofs_per_vertex() +
-                2*dof_handler.finite_elements->max_dofs_per_line()),
-              dof_handler.n_dofs());
+                                                                dof_handler.finite_elements->max_dofs_per_vertex() +
+                                                                2*dof_handler.finite_elements->max_dofs_per_line()),
+                          dof_handler.n_dofs());
         }
 
 
@@ -2680,7 +2680,7 @@ namespace hp
             ExcMessage ("Global number of degrees of freedom is too large."));
     number_cache.n_locally_owned_dofs_per_processor
       = std::vector<types::global_dof_index> (1,
-          (types::global_dof_index) number_cache.n_global_dofs);
+                                              (types::global_dof_index) number_cache.n_global_dofs);
 
     number_cache.locally_owned_dofs_per_processor
       = std::vector<IndexSet> (1,

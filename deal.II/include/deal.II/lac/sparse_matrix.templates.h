@@ -250,7 +250,7 @@ SparseMatrix<number>::empty () const
 
 
 template <typename number>
-typename SparseMatrix<number>::size_type 
+typename SparseMatrix<number>::size_type
 SparseMatrix<number>::get_row_length (const size_type row) const
 {
   Assert (cols != 0, ExcNotInitialized());
@@ -260,7 +260,7 @@ SparseMatrix<number>::get_row_length (const size_type row) const
 
 
 template <typename number>
-typename SparseMatrix<number>::size_type 
+typename SparseMatrix<number>::size_type
 SparseMatrix<number>::n_nonzero_elements () const
 {
   Assert (cols != 0, ExcNotInitialized());
@@ -270,7 +270,7 @@ SparseMatrix<number>::n_nonzero_elements () const
 
 
 template <typename number>
-typename SparseMatrix<number>::size_type 
+typename SparseMatrix<number>::size_type
 SparseMatrix<number>::n_actually_nonzero_elements (const double threshold) const
 {
   Assert (cols != 0, ExcNotInitialized());
@@ -366,7 +366,7 @@ SparseMatrix<number>::copy_from (const TrilinosWrappers::SparseMatrix &matrix)
 {
   Assert (m() == matrix.m(), ExcDimensionMismatch(m(), matrix.m()));
   Assert (n() == matrix.n(), ExcDimensionMismatch(n(), matrix.n()));
-  
+
   // first delete previous content
   *this = 0;
 
@@ -382,10 +382,10 @@ SparseMatrix<number>::copy_from (const TrilinosWrappers::SparseMatrix &matrix)
       // length of the row
       int ncols;
       int ierr
-	= matrix.trilinos_matrix().ExtractGlobalRowCopy
-	(row, matrix.row_length(row), ncols,
-	 &(value_cache[0]),
-	 reinterpret_cast<TrilinosWrappers::types::int_type*>(&(colnum_cache[0])));
+        = matrix.trilinos_matrix().ExtractGlobalRowCopy
+          (row, matrix.row_length(row), ncols,
+           &(value_cache[0]),
+           reinterpret_cast<TrilinosWrappers::types::int_type *>(&(colnum_cache[0])));
       Assert (ierr==0, ExcTrilinosError(ierr));
 
       // resize arrays to the size actually used
@@ -394,8 +394,8 @@ SparseMatrix<number>::copy_from (const TrilinosWrappers::SparseMatrix &matrix)
 
       // then copy everything in one swoop
       this->set(row,
-		colnum_cache,
-		value_cache);
+                colnum_cache,
+                value_cache);
     }
 
   return *this;
@@ -419,7 +419,7 @@ SparseMatrix<number>::add (const number factor,
   const number *const end_ptr    = &val[cols->n_nonzero_elements()];
 
   while (val_ptr != end_ptr)
-    *val_ptr++ += factor * *matrix_ptr++;
+    *val_ptr++ += factor **matrix_ptr++;
 }
 
 
@@ -987,9 +987,9 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
               {
                 const size_type col = *rows;
                 size_type *new_cols = const_cast<size_type *>
-                                         (&sp_B.colnums[sp_B.rowstart[col]]);
+                                      (&sp_B.colnums[sp_B.rowstart[col]]);
                 size_type *end_new_cols = const_cast<size_type *>
-                                             (&sp_B.colnums[sp_B.rowstart[col+1]]);
+                                          (&sp_B.colnums[sp_B.rowstart[col+1]]);
 
                 // if B has a diagonal, need to add that manually. this way,
                 // we maintain sortedness.
@@ -1052,7 +1052,7 @@ SparseMatrix<number>::mmult (SparseMatrix<numberC>       &C,
             &B.val[new_cols-&sp_B.colnums[sp_B.rowstart[0]]];
           const numberB *const end_cols = &B.val[sp_B.rowstart[col+1]];
           for (; B_val_ptr != end_cols; ++B_val_ptr)
-            *new_ptr++ = A_val * *B_val_ptr * (use_vector ? V(col) : 1);
+            *new_ptr++ = A_val **B_val_ptr * (use_vector ? V(col) : 1);
 
           C.add (i, new_ptr-&new_entries[0], new_cols, &new_entries[0],
                  false, true);
@@ -1112,10 +1112,10 @@ SparseMatrix<number>::Tmmult (SparseMatrix<numberC>       &C,
             const size_type *const end_rows =
               &sp_A.colnums[sp_A.rowstart[i+1]];
             // cast away constness to conform with csp.add_entries interface
-            size_type *new_cols = const_cast<size_type*>
-                                     (&sp_B.colnums[sp_B.rowstart[i]]);
-            size_type *end_new_cols = const_cast<size_type*>
-                                         (&sp_B.colnums[sp_B.rowstart[i+1]]);
+            size_type *new_cols = const_cast<size_type *>
+                                  (&sp_B.colnums[sp_B.rowstart[i]]);
+            size_type *end_new_cols = const_cast<size_type *>
+                                      (&sp_B.colnums[sp_B.rowstart[i+1]]);
 
             if (sp_B.n_rows() == sp_B.n_cols())
               ++new_cols;
@@ -1182,7 +1182,7 @@ SparseMatrix<number>::Tmmult (SparseMatrix<numberC>       &C,
           const numberB *B_val_ptr =
             &B.val[new_cols-&sp_B.colnums[sp_B.rowstart[0]]];
           for (; B_val_ptr != end_cols; ++B_val_ptr)
-            *new_ptr++ = A_val * *B_val_ptr * (use_vector ? V(i) : 1);
+            *new_ptr++ = A_val **B_val_ptr * (use_vector ? V(i) : 1);
 
           C.add (row, new_ptr-&new_entries[0], new_cols, &new_entries[0],
                  false, true);
@@ -1357,7 +1357,7 @@ SparseMatrix<number>::precondition_Jacobi (Vector<somenumber>       &dst,
   // square matrix by above assertion
   if (om != 1.)
     for (size_type i=0; i<n; ++i, ++dst_ptr, ++src_ptr, ++rowstart_ptr)
-      *dst_ptr = om * *src_ptr / val[*rowstart_ptr];
+      *dst_ptr = om **src_ptr / val[*rowstart_ptr];
   else
     for (size_type i=0; i<n; ++i, ++dst_ptr, ++src_ptr, ++rowstart_ptr)
       *dst_ptr = *src_ptr / val[*rowstart_ptr];

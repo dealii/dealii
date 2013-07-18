@@ -46,12 +46,12 @@ namespace TrilinosWrappers
     // by calling either the 32- or 64-bit function necessary, and returns the
     // result in the correct data type so that we can use it in calling other
     // Epetra member functions that are overloaded by index type
-    int* my_global_elements(const Epetra_BlockMap &map)
+    int *my_global_elements(const Epetra_BlockMap &map)
     {
-       return map.MyGlobalElements();
+      return map.MyGlobalElements();
     }
     // define a helper function that queries the global vector length of an
-    // Epetra_FEVector object  by calling either the 32- or 64-bit 
+    // Epetra_FEVector object  by calling either the 32- or 64-bit
     // function necessary.
     int global_length(const Epetra_FEVector &vector)
     {
@@ -71,12 +71,12 @@ namespace TrilinosWrappers
     // by calling either the 32- or 64-bit function necessary, and returns the
     // result in the correct data type so that we can use it in calling other
     // Epetra member functions that are overloaded by index type
-    long long int* my_global_elements(const Epetra_BlockMap &map)
+    long long int *my_global_elements(const Epetra_BlockMap &map)
     {
-       return map.MyGlobalElements64();
+      return map.MyGlobalElements64();
     }
     // define a helper function that queries the global vector length of an
-    // Epetra_FEVector object  by calling either the 32- or 64-bit 
+    // Epetra_FEVector object  by calling either the 32- or 64-bit
     // function necessary.
     long long int global_length(const Epetra_FEVector &vector)
     {
@@ -129,8 +129,8 @@ namespace TrilinosWrappers
       VectorBase()
     {
       AssertThrow (n_global_elements(input_map) == n_global_elements(v.vector->Map()),
-		   ExcDimensionMismatch (n_global_elements(input_map),
-					 n_global_elements(v.vector->Map())));
+                   ExcDimensionMismatch (n_global_elements(input_map),
+                                         n_global_elements(v.vector->Map())));
 
       last_action = Zero;
 
@@ -151,7 +151,7 @@ namespace TrilinosWrappers
       :
       VectorBase()
     {
-      AssertThrow (parallel_partitioner.size() == 
+      AssertThrow (parallel_partitioner.size() ==
                    static_cast<size_type>(n_global_elements(v.vector->Map())),
                    ExcDimensionMismatch (parallel_partitioner.size(),
                                          n_global_elements(v.vector->Map())));

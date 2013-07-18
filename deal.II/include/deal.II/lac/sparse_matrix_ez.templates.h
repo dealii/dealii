@@ -259,7 +259,7 @@ SparseMatrixEZ<number>::precondition_Jacobi (Vector<somenumber>       &dst,
   for (; ri != end; ++dst_ptr, ++src_ptr, ++ri)
     {
       Assert (ri->diagonal != RowInfo::invalid_diagonal, ExcNoDiagonal());
-      *dst_ptr = om * *src_ptr / data[ri->start + ri->diagonal].value;
+      *dst_ptr = om **src_ptr / data[ri->start + ri->diagonal].value;
     }
 }
 
@@ -393,7 +393,7 @@ SparseMatrixEZ<number>::memory_consumption() const
 
 
 template <typename number>
-typename SparseMatrixEZ<number>::size_type 
+typename SparseMatrixEZ<number>::size_type
 SparseMatrixEZ<number>::get_row_length (const size_type row) const
 {
   return row_info[row].length;
@@ -402,7 +402,7 @@ SparseMatrixEZ<number>::get_row_length (const size_type row) const
 
 
 template <typename number>
-typename SparseMatrixEZ<number>::size_type 
+typename SparseMatrixEZ<number>::size_type
 SparseMatrixEZ<number>::n_nonzero_elements() const
 {
   typename std::vector<RowInfo>::const_iterator row = row_info.begin();

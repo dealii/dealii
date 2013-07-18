@@ -74,7 +74,7 @@ namespace Polynomials
               }
           }
         else
-          { 
+          {
             const double offset = step * interval;
             if (x<offset || x>offset+step)
               {

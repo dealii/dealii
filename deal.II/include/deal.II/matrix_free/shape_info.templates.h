@@ -65,13 +65,13 @@ namespace internal
         const FE_Poly<TensorProductPolynomials<dim>,dim,dim> *fe_poly =
           dynamic_cast<const FE_Poly<TensorProductPolynomials<dim>,dim,dim>*>(&fe);
         const FE_Poly<TensorProductPolynomials<dim,Polynomials::
-          PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
+        PiecewisePolynomial<double> >,dim,dim> *fe_poly_piece =
           dynamic_cast<const FE_Poly<TensorProductPolynomials<dim,
           Polynomials::PiecewisePolynomial<double> >,dim,dim>*> (&fe);
         Assert (fe_poly != 0 || fe_poly_piece, ExcNotImplemented());
         lexicographic = fe_poly != 0 ?
-          fe_poly->get_poly_space_numbering_inverse() :
-          fe_poly_piece->get_poly_space_numbering_inverse();
+                        fe_poly->get_poly_space_numbering_inverse() :
+                        fe_poly_piece->get_poly_space_numbering_inverse();
 
         // to evaluate 1D polynomials, evaluate along the line where y=z=0,
         // assuming that shape_value(0,Point<dim>()) == 1. otherwise, need

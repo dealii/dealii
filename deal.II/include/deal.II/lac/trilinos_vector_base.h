@@ -690,7 +690,7 @@ namespace TrilinosWrappers
     /**
      * Make the Vector class a bit like the <tt>vector<></tt> class of
      * the C++ standard library by returning iterators to the start and end
-     * of the locally owned elements of this vector. The ordering of local elements corresponds to the one given 
+     * of the locally owned elements of this vector. The ordering of local elements corresponds to the one given
      *
      * It holds that end() - begin() == local_size().
      */
@@ -1268,9 +1268,9 @@ namespace TrilinosWrappers
       {
         const size_type n_indices = vector->Map().NumMyElements();
 #ifndef DEAL_II_USE_LARGE_INDEX_TYPE
-        unsigned int * vector_indices = (unsigned int*)vector->Map().MyGlobalElements();
+        unsigned int *vector_indices = (unsigned int *)vector->Map().MyGlobalElements();
 #else
-        size_type * vector_indices = (size_type*)vector->Map().MyGlobalElements64();
+        size_type *vector_indices = (size_type *)vector->Map().MyGlobalElements64();
 #endif
         is.add_indices(vector_indices, vector_indices+n_indices);
         is.compress();
