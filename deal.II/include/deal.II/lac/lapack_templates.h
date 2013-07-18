@@ -1,16 +1,19 @@
-//---------------------------------------------------------------------------
+// ---------------------------------------------------------------------
+// $Id$
 //
-//    This file was automatically generated from lapack_templates.h.in
-//    See blastemplates in the deal.II contrib directory
+// Copyright (C) 2005 - 2013 by the deal.II authors
 //
-//    Copyright (C) 2005, 2006, 2007, 2008, 2009, 2010 by the deal authors
+// This file is part of the deal.II library.
 //
-//    This file is subject to QPL and may not be distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
 //
-//---------------------------------------------------------------------------
+// ---------------------------------------------------------------------
+
 
 #ifndef __LAPACK_TEMPLATES_H
 #define __LAPACK_TEMPLATES_H
