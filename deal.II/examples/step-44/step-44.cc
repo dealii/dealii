@@ -1,13 +1,25 @@
-/* Authors: Jean-Paul Pelteret, University of Cape Town,            */
-/*          Andrew McBride, University of Erlangen-Nuremberg, 2010  */
-/*                                                                  */
-/*    Copyright (C) 2010-2012 by the deal.II authors         */
-/*                        & Jean-Paul Pelteret and Andrew McBride   */
-/*                                                                  */
-/*    This file is subject to QPL and may not be  distributed       */
-/*    without copyright and license information. Please refer       */
-/*    to the file deal.II/doc/license.html for the  text  and       */
-/*    further information on this license.                          */
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 2010 - 2013 by the deal.II authors and
+//                              & Jean-Paul Pelteret and Andrew McBride
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
+/*
+ * Authors: Jean-Paul Pelteret, University of Cape Town,
+ *          Andrew McBride, University of Erlangen-Nuremberg, 2010
+ */
+
 
 // We start by including all the necessary deal.II header files and some C++
 // related ones. They have been discussed in detail in previous tutorial
