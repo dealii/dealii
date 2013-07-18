@@ -24,11 +24,11 @@ CONFIGURE_FILE(
   )
 
 
-###########################################################################
-#                                                                         #
-#               Setup and install the convenience macros:                 #
-#                                                                         #
-###########################################################################
+########################################################################
+#                                                                      #
+#              Setup and install the convenience macros:               #
+#                                                                      #
+########################################################################
 
 INSTALL(FILES
   ${CMAKE_SOURCE_DIR}/cmake/macros/macro_deal_ii_initialize_cached_variables.cmake
@@ -39,11 +39,11 @@ INSTALL(FILES
   )
 
 
-###########################################################################
-#                                                                         #
-#         Configure and install the cmake project configuration:          #
-#                                                                         #
-###########################################################################
+########################################################################
+#                                                                      #
+#        Configure and install the cmake project configuration:        #
+#                                                                      #
+########################################################################
 
 #
 # Strip -Wno-deprecated from CMAKE_CXX_FLAGS so that deprecation warnings
@@ -138,11 +138,11 @@ INSTALL(FILES
   )
 
 
-###########################################################################
-#                                                                         #
-#          Configure and install the old Makefile configuration:          #
-#                                                                         #
-###########################################################################
+########################################################################
+#                                                                      #
+#         Configure and install the old Makefile configuration:        #
+#                                                                      #
+########################################################################
 
 
 IF(DEAL_II_COMPONENT_COMPAT_FILES)

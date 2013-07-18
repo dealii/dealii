@@ -57,11 +57,11 @@
 # *)  Can be overwritten by the command line via -D<...>
 #
 
-###########################################################################
-#                                                                         #
-#                   General information about deal.II:                    #
-#                                                                         #
-###########################################################################
+########################################################################
+#                                                                      #
+#                  General information about deal.II:                  #
+#                                                                      #
+########################################################################
 
 SET_IF_EMPTY(DEAL_II_PACKAGE_NAME "deal.II")
 
@@ -85,11 +85,11 @@ STRING(REGEX REPLACE
 SET(DEAL_II_VERSION ${DEAL_II_VERSION_MAJOR}.${DEAL_II_VERSION_MINOR})
 
 
-###########################################################################
-#                                                                         #
-#          Information about paths, install locations and names:          #
-#                                                                         #
-###########################################################################
+########################################################################
+#                                                                      #
+#         Information about paths, install locations and names:        #
+#                                                                      #
+########################################################################
 
 SET(DEAL_II_PROJECT_CONFIG_NAME "${DEAL_II_PACKAGE_NAME}")
 
@@ -147,11 +147,11 @@ IF(CMAKE_BUILD_TYPE MATCHES "Release")
 ENDIF()
 
 
-###########################################################################
-#                                                                         #
-#    Cleanup and setup that has to happen after the call to PROJECT():    #
-#                                                                         #
-###########################################################################
+########################################################################
+#                                                                      #
+#   Cleanup and setup that has to happen after the call to PROJECT():  #
+#                                                                      #
+########################################################################
 
 #
 # Cleanup some files used for storing the names of all object targets that

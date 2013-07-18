@@ -14,11 +14,11 @@
 ##
 ## ---------------------------------------------------------------------
 
-###########################################################################
-#                                                                         #
-#                    Check for various compiler bugs:                     #
-#                                                                         #
-###########################################################################
+########################################################################
+#                                                                      #
+#                   Check for various compiler bugs:                   #
+#                                                                      #
+########################################################################
 
 
 #
@@ -97,38 +97,6 @@ ENDIF()
 IF(CMAKE_CXX_COMPILER_ID MATCHES "GNU" AND
    CMAKE_CXX_COMPILER_VERSION MATCHES "4.4.")
   STRIP_FLAG(CMAKE_CXX_FLAGS "-pedantic")
-ENDIF()
-
-
-#
-# Some gcc compiler versions have a problem when using an unsigned count
-# in the std::advance function. Unfortunately, this also happens
-# occasionally from within the standard library, so we can't prevent the
-# warning messages. Since this is annoying, switch of the flag -W which
-# causes this.
-#
-# - Matthias Maier, rewritten 2012
-#
-
-# TODO: We use the mpi.h header file for this check. We should test this
-# bug directly...
-CHECK_INCLUDE_FILE_CXX("mpi.h" HAVE_MPI_H)
-
-IF(HAVE_MPI_H)
-  PUSH_TEST_FLAG("-Wunused-parameter")
-  PUSH_TEST_FLAG("-Werror")
-  CHECK_CXX_COMPILER_BUG(
-    "
-    #include <mpi.h>
-    int main() { return 0; }
-    "
-    DEAL_II_ADVANCE_WARNING_BUG)
-  POP_TEST_FLAG()
-  POP_TEST_FLAG()
-
-  IF(DEAL_II_ADVANCE_WARNING_BUG)
-    ENABLE_IF_SUPPORTED(CMAKE_CXX_FLAGS "-Wno-unused-parameter")
-  ENDIF()
 ENDIF()
 
 

@@ -19,11 +19,11 @@
 #
 
 
-###########################################################################
-#                                                                         #
-#  Custom targets for library, documentation and compat_files components: #
-#                                                                         #
-###########################################################################
+########################################################################
+#                                                                      #
+#   Custom targets for library, documentation and compat_files comp.:  #
+#                                                                      #
+########################################################################
 
 ADD_CUSTOM_TARGET(library)
 FOREACH(_build ${DEAL_II_BUILD_TYPES})

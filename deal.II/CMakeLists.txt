@@ -15,18 +15,18 @@
 ## ---------------------------------------------------------------------
 
 
-##                                                                       ##
-#             The cmake build system for the deal.II project              #
-#                                                                         #
-#     See doc/readme.html and doc/development/cmake.html for further      #
-#     details on how to use the cmake build system of deal.II.            #
-##                                                                       ##
+##                                                                    ##
+#            The cmake build system for the deal.II project            #
+#                                                                      #
+#    See doc/readme.html and doc/development/cmake.html for further    #
+#    details on how to use the cmake build system of deal.II.          #
+##                                                                    ##
 
-###########################################################################
-#                                                                         #
-#                             Configuration:                              #
-#                                                                         #
-###########################################################################
+########################################################################
+#                                                                      #
+#                            Configuration:                            #
+#                                                                      #
+########################################################################
 
 #
 # General configuration for cmake:
@@ -108,11 +108,11 @@ ENDFOREACH()
 INCLUDE(setup_finalize)
 
 
-###########################################################################
-#                                                                         #
-#                      Compilation and installation:                      #
-#                                                                         #
-###########################################################################
+########################################################################
+#                                                                      #
+#                     Compilation and installation:                    #
+#                                                                      #
+########################################################################
 
 MESSAGE(STATUS "")
 MESSAGE(STATUS "Configuring done. Proceed to target definitions now.")
