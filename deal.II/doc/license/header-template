@@ -1,7 +1,7 @@
-//----------------------------------------------------------------------
+// ---------------------------------------------------------------------
 // $Id$
 //
-// Copyright (C) 1998 - 2013 by the deal.II authors
+// Copyright (C) @YEAR@ by the deal.II authors
 //
 // This file is part of the deal.II library.
 //
@@ -12,4 +12,4 @@
 // The full text of the license can be found in the file LICENSE at
 // the top level of the deal.II distribution.
 //
-//----------------------------------------------------------------------
+// ---------------------------------------------------------------------
