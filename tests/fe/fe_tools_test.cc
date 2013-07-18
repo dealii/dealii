@@ -1,15 +1,22 @@
-/* fe_tools_test.cc,v 1.6 2003/04/09 15:49:54 wolf Exp */
-/* Author: Ralf Hartmann, University of Heidelberg, 1999 */
+// ---------------------------------------------------------------------
+// $Id$
+//
+// Copyright (C) 1999 - 2013 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
 
-/*    fe_tools_test.cc,v 1.6 2003/04/09 15:49:54 wolf Exp       */
-/*    Version:                                           */
-/*                                                                */
-/*    Copyright (C) 1999, 2000, 2001, 2002, 2003, 2005, 2007, 2010 by the deal.II authors */
-/*                                                                */
-/*    This file is subject to QPL and may not be  distributed     */
-/*    without copyright and license information. Please refer     */
-/*    to the file deal.II/doc/license.html for the  text  and     */
-/*    further information on this license.                        */
+/*
+ * Author: Ralf Hartmann, University of Heidelberg, 1999
+ */
 
 
 #include "../tests.h"

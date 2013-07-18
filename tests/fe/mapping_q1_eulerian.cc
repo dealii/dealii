@@ -1,6 +1,19 @@
-// mapping_q1_eulerian.cc,v 1.3 2002/06/26 12:28:54 guido Exp
-// Copyright (C) 2001, 2002, 2005, 2010 Michael Stadler, Wolfgang Bangerth
+// ---------------------------------------------------------------------
+// $Id$
 //
+// Copyright (C) 2001 - 2013 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>

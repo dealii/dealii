@@ -1,25 +1,19 @@
-//----------------------------------------------------------------------
+// ---------------------------------------------------------------------
 // $Id$
-// Version: $Name$ 
 //
-// (c) 2001 the deal.II authors
+// Copyright (C) 2013 by the deal.II authors
 //
-// purpose of this test:
+// This file is part of the deal.II library.
 //
-// check 1st and 2nd order derivatives of continuous elements.
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
 //
-//
-// Method:
-//
-// solve  (u,v) = (f,v)
-//
-// Compute L2, H1 and H2 norm of the errors. Does not use VectorTools.
-//
-// The logfile checked in for comparison does not contain the errors.
-// There, we compute the L^2-norm of the derivatives. Change the variable
-// errors below to true to compute errors.
-//
-//----------------------------------------------------------------------
+// ---------------------------------------------------------------------
+
 
 const bool errors = false;
 

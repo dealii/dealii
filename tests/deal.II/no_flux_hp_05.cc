@@ -1,12 +1,19 @@
-// check the creation of no-flux boundary conditions for a finite
-// element that consists of more than dim components and where
-// therefore we have to pick the vector components from somewhere in
-// the middle
+// ---------------------------------------------------------------------
+// $Id$
 //
-// similar to no_flux_hp_02, but for a Q^dim \times DGP element as
-// used for Stokes at times. The problem here is that the DGP element
-// does not have support points, which caused problems when this test
-// was written
+// Copyright (C) 2013 by the deal.II authors
+//
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
 
 
 #include "../tests.h"

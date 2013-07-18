@@ -1,14 +1,19 @@
-// up_and_down.cc,v 1.4 2003/04/09 15:49:55 wolf Exp
-// (c) Wolfgang Bangerth
+// ---------------------------------------------------------------------
+// $Id$
 //
-// Try something remarkably simple: take some arbitrary (discrete)
-// function and transfer it to a coarser grid. transfer it back to the
-// fine grid. store it and call it X. transfer down to the coarse grid
-// and back up again. Should still be X, no?
+// Copyright (C) 2013 by the deal.II authors
 //
-// do this for a couple of possible finite elements, in particular to
-// composed and vector valued ones, to stress test their embedding and
-// restriction matrices.
+// This file is part of the deal.II library.
+//
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
 
 #include "../tests.h"
 #include <deal.II/base/quadrature_lib.h>

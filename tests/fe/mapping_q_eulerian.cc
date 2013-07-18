@@ -1,15 +1,19 @@
-//----------------------------  mapping_q_eulerian.cc  ---------------------------
-//    mapping_q_eulerian.cc,v 1.3 2003/06/09 16:00:38 wolf Exp
-//    Version: 
+// ---------------------------------------------------------------------
+// $Id$
 //
-//    Copyright (C) 2008, 2010 by the deal.II authors and Joshua White
+// Copyright (C) 2008 - 2013 by the deal.II authors
 //
-//    This file is subject to QPL and may not be  distributed
-//    without copyright and license information. Please refer
-//    to the file deal.II/doc/license.html for the  text  and
-//    further information on this license.
+// This file is part of the deal.II library.
 //
-//----------------------------  mapping_q_eulerian.cc  ---------------------------
+// The deal.II library is free software; you can use it, redistribute
+// it, and/or modify it under the terms of the GNU Lesser General
+// Public License as published by the Free Software Foundation; either
+// version 2.1 of the License, or (at your option) any later version.
+// The full text of the license can be found in the file LICENSE at
+// the top level of the deal.II distribution.
+//
+// ---------------------------------------------------------------------
+
 
 // compute some convergence results from computing pi on a mesh that
 // is deformed to represent a quarter of a ring
