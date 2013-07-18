@@ -536,6 +536,68 @@ namespace VectorTools
   }
 
 
+  namespace
+  {
+    /**
+     * Compute the boundary values to be used in the project() functions.
+     */
+    template <int dim, int spacedim>
+    void project_compute_b_v (const Mapping<dim, spacedim>   &mapping,
+                  const DoFHandler<dim,spacedim> &dof,
+                  const Function<spacedim> &function,
+                  const bool                enforce_zero_boundary,
+                  const Quadrature<dim-1>  &q_boundary,
+                  const bool                project_to_boundary_first,
+                  std::map<types::global_dof_index,double> &boundary_values)
+    {
+      if (enforce_zero_boundary == true)
+        // no need to project boundary
+        // values, but enforce
+        // homogeneous boundary values
+        // anyway
+        internal::
+        interpolate_zero_boundary_values (dof, boundary_values);
+
+      else
+        // no homogeneous boundary values
+        if (project_to_boundary_first == true)
+          // boundary projection required
+          {
+            // set up a list of boundary
+            // functions for the
+            // different boundary
+            // parts. We want the
+            // function to hold on
+            // all parts of the boundary
+            typename FunctionMap<spacedim>::type boundary_functions;
+            for (types::boundary_id c=0; c<numbers::internal_face_boundary_id; ++c)
+              boundary_functions[c] = &function;
+            project_boundary_values (mapping, dof, boundary_functions, q_boundary,
+                                     boundary_values);
+          }
+    }
+
+
+    /**
+     * Return whether the boundary values try to constrain a degree of
+     * freedom that is already constrained to something else
+     */
+    bool constraints_and_b_v_are_compatible (const ConstraintMatrix   &constraints,
+        std::map<types::global_dof_index,double> &boundary_values)
+    {
+      for (std::map<types::global_dof_index,double>::iterator it=boundary_values.begin();
+           it != boundary_values.end(); ++it)
+        if (constraints.is_constrained(it->first))
+//TODO: This looks wrong -- shouldn't it be ==0 in the first condition and && ?
+          if (!(constraints.get_constraint_entries(it->first)->size() > 0
+                ||
+                (constraints.get_inhomogeneity(it->first) == it->second)))
+            return false;
+
+      return true;
+    }
+  }
+
 
   template <int dim, class VECTOR, int spacedim>
   void project (const Mapping<dim, spacedim>   &mapping,
@@ -557,54 +619,16 @@ namespace VectorTools
 
     // make up boundary values
     std::map<types::global_dof_index,double> boundary_values;
+    project_compute_b_v(mapping, dof, function, enforce_zero_boundary,
+                        q_boundary, project_to_boundary_first, boundary_values);
 
-    if (enforce_zero_boundary == true)
-      // no need to project boundary
-      // values, but enforce
-      // homogeneous boundary values
-      // anyway
-      internal::
-      interpolate_zero_boundary_values (dof, boundary_values);
-
-    else
-      // no homogeneous boundary values
-      if (project_to_boundary_first == true)
-        // boundary projection required
-        {
-          // set up a list of boundary
-          // functions for the
-          // different boundary
-          // parts. We want the
-          // function to hold on
-          // all parts of the boundary
-          typename FunctionMap<spacedim>::type boundary_functions;
-          for (types::boundary_id c=0; c<numbers::internal_face_boundary_id; ++c)
-            boundary_functions[c] = &function;
-          project_boundary_values (mapping, dof, boundary_functions, q_boundary,
-                                   boundary_values);
-        }
+    // check if constraints are compatible (see below)
+    const bool constraints_are_compatible =
+        constraints_and_b_v_are_compatible(constraints, boundary_values);
 
     // set up mass matrix and right hand side
     Vector<double> vec (dof.n_dofs());
     SparsityPattern sparsity;
-
-    // check if constraints are compatible (see below)
-    bool constraints_are_compatible = true;
-    {
-      for (std::map<types::global_dof_index,double>::iterator it=boundary_values.begin();
-           it != boundary_values.end(); ++it)
-        if (constraints.is_constrained(it->first))
-          if (!(constraints.get_constraint_entries(it->first)->size() > 0
-                ||
-                (constraints.get_inhomogeneity(it->first) == it->second)))
-            {
-              constraints_are_compatible = false;
-              break;
-            }
-    }
-
-    // use csp to consume less memory and to
-    // still be fast
     {
       CompressedSimpleSparsityPattern csp (dof.n_dofs(), dof.n_dofs());
       DoFTools::make_sparsity_pattern (dof, csp, constraints,
@@ -612,7 +636,6 @@ namespace VectorTools
 
       sparsity.copy_from (csp);
     }
-
     SparseMatrix<double> mass_matrix (sparsity);
     Vector<double> tmp (mass_matrix.n());
 
