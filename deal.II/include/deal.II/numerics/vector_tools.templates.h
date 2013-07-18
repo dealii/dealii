@@ -543,12 +543,12 @@ namespace VectorTools
      */
     template <int dim, int spacedim>
     void project_compute_b_v (const Mapping<dim, spacedim>   &mapping,
-                  const DoFHandler<dim,spacedim> &dof,
-                  const Function<spacedim> &function,
-                  const bool                enforce_zero_boundary,
-                  const Quadrature<dim-1>  &q_boundary,
-                  const bool                project_to_boundary_first,
-                  std::map<types::global_dof_index,double> &boundary_values)
+                              const DoFHandler<dim,spacedim> &dof,
+                              const Function<spacedim> &function,
+                              const bool                enforce_zero_boundary,
+                              const Quadrature<dim-1>  &q_boundary,
+                              const bool                project_to_boundary_first,
+                              std::map<types::global_dof_index,double> &boundary_values)
     {
       if (enforce_zero_boundary == true)
         // no need to project boundary
@@ -583,7 +583,7 @@ namespace VectorTools
      * freedom that is already constrained to something else
      */
     bool constraints_and_b_v_are_compatible (const ConstraintMatrix   &constraints,
-        std::map<types::global_dof_index,double> &boundary_values)
+                                             std::map<types::global_dof_index,double> &boundary_values)
     {
       for (std::map<types::global_dof_index,double>::iterator it=boundary_values.begin();
            it != boundary_values.end(); ++it)
@@ -624,7 +624,7 @@ namespace VectorTools
 
     // check if constraints are compatible (see below)
     const bool constraints_are_compatible =
-        constraints_and_b_v_are_compatible(constraints, boundary_values);
+      constraints_and_b_v_are_compatible(constraints, boundary_values);
 
     // set up mass matrix and right hand side
     Vector<double> vec (dof.n_dofs());
