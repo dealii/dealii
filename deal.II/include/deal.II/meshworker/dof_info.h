@@ -313,7 +313,7 @@ namespace MeshWorker
     get_indices(c);
     level_cell = c->is_level_cell();
 
-    cell = static_cast<typename Triangulation<dim,spacedim>::cell_iterator> (c);
+    cell = typename Triangulation<dim,spacedim>::cell_iterator(*c);
     face_number = deal_II_numbers::invalid_unsigned_int;
     sub_number = deal_II_numbers::invalid_unsigned_int;
     if (block_info)
@@ -345,11 +345,11 @@ namespace MeshWorker
     const unsigned int face_no)
   {
     if ((cell.state() != IteratorState::valid)
-        ||  cell != static_cast<typename Triangulation<dim>::cell_iterator> (c))
+        ||  cell != typename Triangulation<dim>::cell_iterator(*c))
       get_indices(c);
     level_cell = c->is_level_cell();
 
-    cell = static_cast<typename Triangulation<dim>::cell_iterator> (c);
+    cell = typename Triangulation<dim>::cell_iterator(*c);
     set_face(f,face_no);
 
     if (block_info)
