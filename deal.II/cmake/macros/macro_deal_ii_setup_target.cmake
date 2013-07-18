@@ -68,7 +68,7 @@ MACRO(DEAL_II_SETUP_TARGET _target)
   #
   # If the global property DEBUG_CONFIGURATIONS is set all build
   # types that (case insensitive) match one of the listed build types is
-  # considered a "debug" build. Ther rest is "optimized".
+  # considered a "debug" build. The rest is "optimized".
   #
   # Otherwise every build type that (case insensitively) matches "debug" is
   # considered a debug build.
@@ -117,7 +117,7 @@ MACRO(DEAL_II_SETUP_TARGET _target)
   TARGET_LINK_LIBRARIES(${_target} ${DEAL_II_TARGET})
 
   #
-  # If DEAL_II_STATIC_EXECUTABLE is set, switch to final link type to
+  # If DEAL_II_STATIC_EXECUTABLE is set, switch the final link type to
   # static:
   #
   IF(DEAL_II_STATIC_EXECUTABLE)

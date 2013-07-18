@@ -91,7 +91,7 @@ MACRO(DEAL_II_INVOKE_AUTOPILOT)
       COMMENT "Switch CMAKE_BUILD_TYPE to Release"
       )
 
-    # Only mention release and debug targets if its actuallay possible to
+    # Only mention release and debug targets if it is actuallay possible to
     # switch between them:
     IF(${DEAL_II_BUILD_TYPE} MATCHES "DebugRelease")
       SET(_switch_targets
